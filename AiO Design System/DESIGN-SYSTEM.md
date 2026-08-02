@@ -150,6 +150,12 @@ Thanh trên: `--h-topbar: 44px`.
 > *phần tử này đóng vai gì trong màn hình?* Một trong hai quyết định chính của màn
 > hình thì không được để `--h-ctrl-sm`.
 
+**Vùng bấm (touch/click target) — ngoại lệ có chủ đích:**
+- **Panel (desktop, dùng chuột):** 24–28px là **ĐÚNG** — Premiere gốc cũng ~24px,
+  editor cần mật độ cao. Chuẩn 44px của mobile KHÔNG áp cho panel. Nếu nút nhỏ hơn
+  vùng bấm mong muốn thì nới **vùng bấm** bằng padding (giữ dáng nhỏ), đừng phình nút.
+- **Website (có người dùng mobile):** giữ **44×44px** cho mọi thứ bấm được, cách nhau ≥8px.
+
 ---
 
 ## 5. Component — đặc tả dùng lại
@@ -208,6 +214,40 @@ viền `--accent-line` + ring `--accent`. Placeholder màu `--text-3`.
 - **Chỉ báo khi THẤT BẠI.** Việc thành công mà người dùng đã thấy thì im lặng.
 - Nút xoá nói **hậu quả bằng số** ("Xoá 3 phụ đề") và **ẩn khi số = 0**.
 - Bước chạy > ~30 giây phải có **con số nhúc nhích** (không để nhãn đứng im).
+
+### Loading / tiến trình — ☠️ chỗ THẮNG đối thủ (AutoCut/AutoPod báo tiến trình rất tệ)
+Đây là component quan trọng nhất mà bản đầu còn thiếu. Ba trạng thái rõ ràng:
+- **Nút chính LÀ đèn báo:** đang chạy → nền chuyển trạng thái + khoá + đổi nhãn
+  thành tiến trình ("Đang cắt… 42%"); xong → **đổi màu rõ** (dùng `--ok`) rồi mới
+  về thường. Người dùng nhìn MÀU là biết, khỏi đọc số.
+- **Bước > ~30 giây bắt buộc có số nhúc nhích** (%, "câu 42/2033", giai đoạn) — kiểm
+  xem công cụ nền đã in tiến trình chưa trước khi tự viết bộ đếm.
+- **Vùng dữ liệu đang xử lý:** làm mờ tại chỗ, **không chèn banner** đẩy layout.
+  Khung xương phải cao đúng bằng hàng thật để lúc thay dữ liệu không nhảy.
+- Mốc "xong" lấy **tín hiệu xong thật của tác vụ** (nút hiện lại), không đặt giờ chờ.
+
+### Dropdown / select (4+ lựa chọn — segmented chỉ cho 2–3)
+- Nút mở nền `--bg-4` viền `--line-2`, cao `--h-ctrl`; menu nổi `--bg-3` + `--shadow-md`,
+  bo `--r-md`. Mục đang chọn có dấu tick + chữ `--accent`.
+- ☠️ **Xổ chứa đúng MỘT mục là phản tác dụng** — làm mục phẳng bấm thẳng.
+
+### Modal / dialog
+- Lớp phủ `rgb(0 0 0 / 55%)`; thân `--bg-6` + `--shadow-pop`, bo `--r-lg`, `max-width` ~420px.
+- **Bẫy phím Tab trong modal** (không tab ra ngoài); Esc đóng; focus vào nút an toàn.
+- Nút xác nhận **phá huỷ** đặt xa nút Huỷ, dùng họ danger, nói hậu quả bằng số.
+
+### Toast / thông báo
+- Chỉ hiện khi **THẤT BẠI** (hoặc việc người dùng KHÔNG nhìn thấy kết quả). Góc dưới,
+  `--bg-3` + viền ngữ nghĩa (`--danger`/`--ok`), tự tắt sau ~4s, có nút đóng.
+- `aria-live="polite"` để máy đọc màn hình đọc.
+
+### Tooltip
+- Cho nút chỉ có icon (bắt buộc kèm `aria-label` + `title`). Nền `--bg-0` viền `--line-2`,
+  `--fs-xs`, hiện sau ~400ms. **Không nhét thông tin bắt buộc chỉ vào tooltip.**
+
+### Thanh cuộn (panel hay cuộn)
+- Tuỳ biến tối: `width:10px`, tay cuộn `rgb(255 255 255 / 14%)` bo tròn, rãnh trong
+  suốt. Đừng để thanh cuộn trắng mặc định của Windows phá nền tối.
 
 ---
 
@@ -273,7 +313,61 @@ nhưng phần tử phải hiện đủ ở trạng thái cuối.
 
 ---
 
-## 11. tokens.css — nguồn chân lý (copy nguyên nếu cần dựng thật)
+## 11. Trạng thái tương tác — MỌI control phải đủ 5 trạng thái
+
+Mỗi phần tử bấm được phải khai đủ: **thường · hover · nhấn (active) · focus · vô hiệu**
+(và **đang chạy** nếu có tác vụ dài). Thiếu một cái là cảm giác "chưa xong".
+
+| Trạng thái | Quy định |
+|---|---|
+| Hover | đổi nền một bậc (`--bg-4`→`--bg-5`), chuyển `--dur` 150ms; con trỏ `pointer` |
+| Nhấn | lún nhẹ `scale(.97)` hoặc tối thêm một chút, **0ms** (phản hồi tức thì) |
+| **Focus** | ☠️ **`:focus-visible` viền `--accent-line` + ring `0 0 0 3px var(--accent-soft)`** trên MỌI control (không chỉ ô nhập). **Không bao giờ `outline:none` mà không thay thế.** |
+| Vô hiệu | `opacity:.45` + `cursor:not-allowed`; **ẩn hẳn** nếu thao tác không áp dụng được (hơn là bày rồi báo lỗi) |
+| Đang chạy | xem §5 Loading — khoá + đổi nhãn + màu |
+
+**Bàn phím:** mọi thứ có click phải Tab tới được + Enter/Space kích hoạt; thứ tự Tab
+khớp thứ tự nhìn; nút lồng trong nút phải `stopPropagation`. Modal bẫy Tab, Esc đóng.
+
+---
+
+## 12. Icon — SVG, KHÔNG bao giờ emoji/ký tự
+
+- ☠️ **Icon là SVG** (bộ **Lucide** hoặc Heroicons — nét mảnh, hợp dark tool), **không
+  dùng emoji hay ký tự unicode** làm icon. *(style-guide.html đang để vài ký tự như
+  placeholder — bản thật phải thay bằng SVG.)*
+- Cỡ trong panel: **16px** (khớp `--fs`), nét (stroke) ~1.5px. Icon phi văn bản cần
+  tương phản ≥ 3:1 với nền.
+- ☠️ **Kiểm icon Ở ĐÚNG CỠ SẼ DÙNG** — bánh răng 8 nan vẽ 13–14px đọc ra thành mặt
+  trời; cỡ nhỏ chọn hình ít chi tiết (sliders thay bánh răng).
+- ☠️ **Không dùng cờ emoji** (Windows không có glyph quốc kỳ → hiện hai chữ cái). Cần
+  cờ thì vẽ SVG, mọi cờ rộng bằng nhau.
+
+---
+
+## 13. Z-index — thang lớp, không đặt số bừa
+
+Đặt tầng theo thang cố định để không loạn khi thêm modal/toast:
+`--z-base:0` · `--z-dropdown:100` · `--z-sticky:200` · `--z-modal:300` ·
+`--z-toast:400` · `--z-tooltip:500`. ☠️ **Đừng chồng quá hai tầng `sticky`.**
+
+---
+
+## 14. Website bán hàng — khác panel
+
+Website (Next.js, có người dùng mobile) theo cùng bảng màu/chữ nhưng **thêm**:
+- **Responsive breakpoints:** 375 · 768 · 1024 · 1440px. Không tràn ngang, không tắt zoom.
+- **Touch target 44px** (mobile), cách nhau ≥8px.
+- **Một ngôn ngữ chủ đạo** — không trộn Việt/Anh giữa trang (lỗi hiện tại). Nếu song
+  ngữ thì theo khuôn nhất quán.
+- Được phép có **hero/điểm nhấn** (khác panel) — nhưng vẫn là chỗ tiêu boldness DUY
+  NHẤT; phần còn lại giữ kỷ luật.
+- **Con số phải khớp thực tế sản phẩm** (đang ghi "8 tool" nhưng mới có 7 + mục
+  feature chỉ kể 4 — phải thống nhất).
+
+---
+
+## 15. tokens.css — nguồn chân lý (copy nguyên nếu cần dựng thật)
 
 Khi Claude design xuất HTML/CSS, biến phải map về đúng đây. Đừng chế biến mới màu
 đã có tên.
@@ -308,5 +402,9 @@ Khi Claude design xuất HTML/CSS, biến phải map về đúng đây. Đừng 
   --h-ctrl-sm:24px; --h-ctrl:28px; --h-ctrl-lg:34px; --h-topbar:44px;
   /* Chuyển động */
   --dur:150ms; --ease:cubic-bezier(.32,.72,0,1);
+  /* Vòng focus (dùng cho MỌI control) */
+  --focus-ring:0 0 0 3px var(--accent-soft);
+  /* Z-index — thang lớp */
+  --z-base:0; --z-dropdown:100; --z-sticky:200; --z-modal:300; --z-toast:400; --z-tooltip:500;
 }
 ```
