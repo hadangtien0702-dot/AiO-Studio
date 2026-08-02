@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Remote debug cho CEP panel.
+  Khi PlayerDebugMode bật + file này tồn tại, mở trình duyệt tới:
+      http://localhost:8088
+  để xem/DevTools panel đang chạy trong Premiere.
+-->
+<ExtensionList>
+  <Extension Id="com.aiostudio.powerbin.panel">
+    <HostList>
+      <Host Name="PPRO" Port="8090" />
+    </HostList>
+  </Extension>
+</ExtensionList>

@@ -1,0 +1,1143 @@
+/**
+ * App.tsx — AiO Transcripts.
+ *
+ * Panel này CHỈ làm một việc: khoanh I/O → chép lời thành phụ đề gắn lên
+ * sequence đang mở, kèm marker ở chỗ máy nghe không chắc.
+ *
+ * ══════════════════════════════════════════════════════════════════════════
+ * [2.1.0] DỌN SẠCH MÃ CẮT — 2026-07-29
+ * ══════════════════════════════════════════════════════════════════════════
+ *
+ * Bản tách 2.0.0 giữ nguyên bộ máy cắt của Autocut và chỉ thêm một nhánh
+ * `if (chiPhuDe) … return`. Đo lại thì `autoCut(true)` là **lời gọi duy nhất**
+ * trong cả file — nên toàn bộ phần sau lệnh `return` đó là **mã chết**:
+ * tính điểm cắt, dựng sequence, đối chiếu số đo, nút hoàn tác, ba mức cắt,
+ * component `KetQua`. Panel gánh theo mà không bao giờ chạy.
+ *
+ * Nặng hơn: nhánh phụ đề vẫn **lọc dải giọng nói và đo mức âm cả file** rồi
+ * vứt kết quả đi — hai việc đó chỉ phục vụ quyết định CẮT. Trên video dài,
+ * `locDaiGiongNoi` phải cho FFmpeg đọc lại toàn bộ WAV.
+ *
+ * Bản này bỏ hết. Việc còn lại đúng bốn bước: đọc vùng → tách tiếng → nghe
+ * hiểu → gắn lên timeline.
+ */
+import { useEffect, useRef, useState } from 'react'
+import {
+  isInHost,
+  evalScript,
+  napLaiHost,
+  getRangeClips,
+  datMarker,
+  ganPhuDe,
+  demDoPanelTao,
+  tenSequenceDangMo,
+  danhSachSequence,
+  moSequenceTheoId,
+  xoaMarker,
+  xoaPhuDe,
+} from './lib/cep'
+import { getFs, getPath, nodeAvailable } from './lib/node'
+import { getFFmpegPath } from './services/ffmpeg'
+import { mmss, type CauNoi, type Segment } from './services/plan'
+import {
+  MO_HINH,
+  docDem,
+  donWav,
+  luuDem,
+  nghe,
+  thieuGi,
+  timBoMay,
+  trichTieng,
+  type MaMoHinh,
+} from './services/whisper'
+import {
+  THAY_TU_MAC_DINH,
+  chonChoSoat,
+  dungBangTuClip,
+  gioiHanTheoKhung,
+  nhomNgonNgu,
+  sinhSrt,
+  type Cau,
+  type KieuKhung,
+  type Moc,
+  type ThayTu,
+} from './services/srt'
+import MinhHoa from './MinhHoa'
+import DaiCo, { SO_NGON_NGU } from './Co'
+
+/**
+ * Các bước của một lần chạy — để vẽ ra cho người dùng thấy đang ở đâu.
+ *
+ * Nhãn nói VIỆC nó làm, không nói tên kỹ thuật. Số giây là ĐO THẬT trên video
+ * 58 phút ngày 29/07, dùng để người dựng ước được còn phải chờ bao lâu.
+ *
+ * [2.1.0] Bỏ bước "Đo mức âm": nó chỉ phục vụ việc CẮT (chọn ngưỡng dB), mà
+ * panel này không cắt. Bày một bước không dẫn tới đâu là bắt người ta chờ và
+ * tưởng máy đang làm gì đó cho mình.
+ */
+/**
+ * Hai khung hình, hai luật cắt câu khác nhau.
+ *
+ * Anh Tiến 30/07: *"phần transcripts hành cho video dạng 9:16 dạng dọc thì sẽ
+ * ít từ hơn đó em… vì nó sẽ bị đè mép biên safe zone hoặc là tràn mép mất
+ * chữ"*. Khung dọc chỉ rộng 9/16 = **56%** so với ngang.
+ *
+ * Đo thật trên 1.028 khối của video 60 phút — cả hai bộ đều **0 vượt chuẩn,
+ * 0 mất chữ**. Chi tiết ở `GIOI_HAN_NGANG` / `GIOI_HAN_DOC` trong `srt.ts`.
+ */
+const KHUNG = [
+  {
+    ma: 'ngang' as KieuKhung,
+    ten: 'Ngang 16:9',
+    mo: 'Chuẩn phụ đề quốc tế cho video ngang',
+  },
+  {
+    ma: 'doc' as KieuKhung,
+    ten: 'Dọc 9:16',
+    mo: 'Câu ngắn hơn — khỏi tràn mép, khỏi đè safe zone',
+  },
+] as const
+
+const CAC_BUOC = [
+  { ten: 'Đọc vùng đã khoanh', uoc: 2 },
+  { ten: 'Tách tiếng khỏi video', uoc: 45 },
+  { ten: 'Nghe hiểu lời nói', uoc: 177 },
+  { ten: 'Gắn phụ đề lên timeline', uoc: 10 },
+] as const
+
+/** Kết quả một lần chép lời. */
+interface KetPhuDe {
+  soCau: number
+  soTu: number
+  /** Ma ngon ngu Whisper nhan ra (`-l auto`). Rong = khong doc duoc. */
+  ngonNgu?: string
+  duongDan: string
+  ganDuoc: boolean
+  /**
+   * Marker chỗ Whisper nghe không chắc.
+   *
+   * ☠️ `soCho` bị TRẦN 60 chặt xuống (lấy 60 chỗ TỆ NHẤT — rải kín timeline
+   * thì marker mất tác dụng). `tongCho` là số chỗ dưới ngưỡng THẬT, trước
+   * trần. Vấp 30/07/2026: cả 3 video đều hiện "60", anh Tiến hỏi *"có thực
+   * tế không hay bị ghi đè?"* — số thật là 107/220/433, panel giấu mà không
+   * nói. Trần là cố ý; GIẤU trần mới là lỗi.
+   */
+  soat?: { soCho: number; temNhat: number; tongCho: number }
+  buoc?: { ten: string; ket: string; giay: number }[]
+  giayTong: number
+}
+
+/** Bảng sửa từ lưu lại giữa các phiên — càng dùng càng chuẩn. */
+const KHOA_THAY_TU = 'aio-autocut-thay-tu'
+
+function docBangSua(): ThayTu[] {
+  try {
+    const s = localStorage.getItem(KHOA_THAY_TU)
+    if (s) return JSON.parse(s) as ThayTu[]
+  } catch {
+    /* hỏng thì dùng mặc định */
+  }
+  return THAY_TU_MAC_DINH
+}
+
+export default function App() {
+  const [host, setHost] = useState('(đang kiểm tra…)')
+  const [dangChay, setDangChay] = useState('')
+  /**
+   * Đồng hồ chạy suốt lúc làm việc.
+   *
+   * Anh Tiến 2026-07-28: *"em có chạy hay không em phải thay đổi trạng thái cho
+   * anh biết chứ"*. Nhãn đứng im hơn một phút (tách tiếng 45s + nạp mô hình lên
+   * GPU 30-60s) thì không phân biệt được ĐANG CHẠY với ĐÃ TREO — anh ấy đã mở
+   * Task Manager để tự kiểm hai lần.
+   */
+  const [giayTroi, setGiayTroi] = useState(0)
+  const [canLam, setCanLam] = useState('')
+  const [loi, setLoi] = useState('')
+  const [ket, setKet] = useState<KetPhuDe | null>(null)
+
+  /** `buocIdx` = đang ở bước thứ mấy · `phanTram` < 0 = chưa đo được. */
+  const [buocIdx, setBuocIdx] = useState(-1)
+  const [phanTram, setPhanTram] = useState(-1)
+
+  const [maMoHinh, setMaMoHinh] = useState<MaMoHinh>("turbo")
+  /** Khung hình quyết định luật cắt câu — xem hằng `KHUNG` ở trên. */
+  const [khung, setKhung] = useState<KieuKhung>('ngang')
+  /**
+   * Bảng sửa từ KHÔNG còn giao diện (anh Tiến chốt 29/07: *"editor sẽ sửa
+   * trong phần Properties của Pr luôn"*). Giữ biến để `sinhSrt` vẫn nhận đúng
+   * tham số. Đọc từ localStorage phòng khi người dùng đã nhập trước đó; không
+   * có thì là bảng RỖNG.
+   */
+  const [bangSua] = useState<ThayTu[]>(docBangSua)
+  /** Đổi số này là hình minh hoạ chạy lại từ đầu (xem `MinhHoa`). */
+  const [lanMinhHoa, setLanMinhHoa] = useState(0)
+  /**
+   * Thứ panel đã tạo trên sequence đang mở — để nút xoá nói HẬU QUẢ BẰNG SỐ
+   * THẬT. Bày nút "Xoá" trơ mà không nói xoá bao nhiêu là bắt người ta bấm
+   * trong bóng tối.
+   */
+  const [daTao, setDaTao] = useState<{ marker: number; itemSrt: number } | null>(null)
+  const [dangDon, setDangDon] = useState('')
+  /**
+   * ☠️ Sequence đổi thì SỐ PHẢI ĐỔI THEO — vấp 30/07/2026.
+   *
+   * Anh Tiến mở 3 sequence, cả 3 đều thấy chung một khối "1.101 câu · 1:50.2"
+   * và hỏi *"sao cả 3 sequence này thông số lại giống nhau thế em?"*. Vì khối
+   * kết quả là TRÍ NHỚ CỦA PANEL về lần chạy cuối, còn nút "Xoá N marker" đếm
+   * từ lúc chạy xong — Premiere không báo cho panel biết người dùng đổi
+   * sequence, nên mọi con số đứng im và thành nói dối.
+   *
+   * `tenSeq` = sequence đang mở (soi theo nhịp) · `tenSeqKet` = sequence của
+   * lần chạy cuối. Lệch nhau thì khối kết quả phải NÓI RÕ nó là của ai.
+   */
+  const [tenSeq, setTenSeq] = useState('')
+  const [tenSeqKet, setTenSeqKet] = useState('')
+  const tenSeqRef = useRef('')
+  /**
+   * Ô CHỌN SEQUENCE — anh Tiến 31/07: shorts đẻ nhiều sequence, panel làm
+   * việc ngầm trên "cái đang mở" nên *"bị lưu đè và hiển thị không đúng"*.
+   * Danh sách theo ID (tên có thể trùng); chọn = kích hoạt trên timeline.
+   * `idSeqChay` = sequence bị GHIM suốt một lượt chạy — trước khi gắn phụ
+   * đề/marker sẽ kích hoạt lại đúng nó, người dùng có bấm lung tung giữa
+   * chừng thì kết quả vẫn về đúng nơi.
+   */
+  const [dsSeq, setDsSeq] = useState<{ id: string; ten: string; dangMo: boolean }[]>([])
+  const idSeqChay = useRef('')
+  /**
+   * Biên lai của TỪNG sequence trong phiên panel này. Anh Tiến 30/07, lần hai:
+   * *"anh đổi sequence thì thông tin ở panel cũng phải đổi cho giống chứ em"* —
+   * cảnh báo "số liệu này của sequence khác" chỉ là nửa đường; đúng nghĩa là
+   * ĐỔI TAB THÌ TRÁO BIÊN LAI. Sequence chưa chạy lần nào trong phiên thì ẩn
+   * biên lai (không có gì để khoe thì im lặng, đừng trưng số của người khác).
+   */
+  const ketTheoSeq = useRef(new Map<string, KetPhuDe>())
+
+  /** Đếm lại sau mỗi thao tác — đừng tin con số cũ trong state. */
+  async function demLai() {
+    if (!isInHost()) return
+    try {
+      if (!(await napLaiHost())) return
+      setDaTao(await demDoPanelTao())
+    } catch {
+      /* đếm không được thì ẩn khối dọn dẹp, không phá gì */
+    }
+  }
+
+
+  // Đồng hồ: chạy khi có việc, dừng và trả về 0 khi xong.
+  useEffect(() => {
+    if (!dangChay) {
+      setGiayTroi(0)
+      return
+    }
+    const batDau = Date.now()
+    const id = window.setInterval(() => setGiayTroi(Math.floor((Date.now() - batDau) / 1000)), 1000)
+    return () => window.clearInterval(id)
+  }, [dangChay])
+
+  useEffect(() => {
+    if (!isInHost()) {
+      setHost('KHÔNG chạy trong Premiere (đang mở bằng trình duyệt)')
+      return
+    }
+    // Nạp lại host TRƯỚC khi hỏi bất cứ điều gì — nếu không, panel mới sẽ nói
+    // chuyện với host cũ và mọi hàm mới trả về "EvalScript error.".
+    void napLaiHost().then(() =>
+      evalScript('getHostInfo()').then((raw) => {
+        const phan = raw.split('|')
+        const project = phan[phan.length - 1] || '?'
+        setHost(`Premiere ${phan[0] || '?'} · ${project}`)
+        void demLai()
+      }),
+    )
+  }, [])
+
+  // Soi sequence đang mở theo nhịp — Premiere KHÔNG báo sự kiện đổi sequence.
+  // Mỗi nhịp chỉ hỏi TÊN (một evalScript đọc thuộc tính, không nạp host, không
+  // duyệt project); chỉ khi tên ĐỔI mới đếm lại thứ panel đã tạo. Dừng soi khi
+  // đang chạy để không chen vào giữa lúc nghe hiểu.
+  //
+  // ☠️ NHỊP PHẢI THEO MẮT NGƯỜI, KHÔNG THEO KỊCH BẢN ĐO — vấp 30/07/2026.
+  // Bản đầu đặt 4 giây; phép thử tự động (đổi sequence rồi CHỜ 6s) đạt 5/5,
+  // nhưng anh Tiến bấm tab thật thì *"nó không thay đổi thông số"* — người
+  // dựng liếc panel trong ~1 giây, 4 giây với UI là "đứng im". Kịch bản đo
+  // kiên nhẫn hơn người thật là kịch bản đo sai. Rút còn 1 giây (đọc một
+  // thuộc tính, không đáng kể), kèm chốt chặn gọi chồng: lúc Premiere bận
+  // (render/xuất), một cú evalScript có thể treo vài giây — không chặn thì
+  // các nhịp sau xếp hàng đè lên nhau.
+  useEffect(() => {
+    if (!isInHost() || dangChay) return
+    let dung = false
+    let dangSoi = false
+    const soi = async () => {
+      if (dangSoi) return
+      dangSoi = true
+      try {
+        // Một cú đọc: danh sách + cái đang mở (nuôi cả ô chọn lẫn đèn).
+        const ds = await danhSachSequence()
+        if (dung) return
+        setDsSeq(ds)
+        const ten = ds.find((d) => d.dangMo)?.ten ?? ''
+        if (!ten) return
+        if (tenSeqRef.current && ten !== tenSeqRef.current) {
+          void demLai()
+          // TRÁO BIÊN LAI theo sequence vừa mở — có thì hiện của nó, chưa chạy
+          // lần nào trong phiên thì ẩn. Không trưng số của sequence khác.
+          const luu = ketTheoSeq.current.get(ten)
+          setKet(luu ?? null)
+          setTenSeqKet(luu ? ten : '')
+        }
+        tenSeqRef.current = ten
+        setTenSeq(ten)
+      } finally {
+        dangSoi = false
+      }
+    }
+    void soi()
+    const id = window.setInterval(() => void soi(), 1000)
+    return () => {
+      dung = true
+      window.clearInterval(id)
+    }
+  }, [dangChay])
+
+  /** Đặt nhãn + bước + phần trăm trong một nhịp, khỏi quên cập nhật thanh. */
+  function baoBuoc(nhan: string, buoc: number, pt = -1) {
+    setDangChay(nhan)
+    setBuocIdx(buoc)
+    setPhanTram(pt)
+  }
+
+  async function lamPhuDe() {
+    baoBuoc('Đang đọc vùng đã khoanh…', 0)
+    setLoi('')
+    setCanLam('')
+    setKet(null)
+    const batDau = Date.now()
+
+    try {
+      if (!nodeAvailable()) throw new Error('Panel không dùng được Node.js — không gọi được bộ xử lý media.')
+      if (!getFFmpegPath()) throw new Error('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất.')
+
+      // Nạp lại host mỗi lần bấm: rẻ, và chắc chắn panel nói chuyện với đúng bản
+      // code vừa cài chứ không phải bản Premiere giữ từ lúc khởi động.
+      if (!(await napLaiHost())) {
+        throw new Error('Không nạp được host/index.jsx từ thư mục extension.')
+      }
+
+      // ── 1. Vùng anh khoanh bằng phím I / O ──
+      const { vung, loi: loiVung } = await getRangeClips()
+      if (!vung) {
+        if (loiVung?.canLam) setCanLam(loiVung.message)
+        else setLoi(loiVung?.message ?? 'Không đọc được vùng đã khoanh')
+        return
+      }
+
+      // Biên lai kết quả PHẢI ghi tên sequence nó thuộc về — chộp ngay lúc đọc
+      // vùng, vì đây chính là sequence mà toàn bộ số liệu sắp sinh ra nói tới.
+      // Và GHIM cả ID: mấy phút nghe hiểu là đủ để người dùng bấm sang
+      // sequence khác — trước khi gắn phụ đề/marker sẽ kích hoạt lại đúng nó.
+      const tenSeqLanNay = await tenSequenceDangMo()
+      idSeqChay.current = (await danhSachSequence()).find((d) => d.dangMo)?.id ?? ''
+      if (tenSeqLanNay) {
+        setTenSeqKet(tenSeqLanNay)
+        tenSeqRef.current = tenSeqLanNay
+        setTenSeq(tenSeqLanNay)
+      }
+
+      const doiToc = vung.clips.filter((c) => Math.abs(c.speed - 1) > 0.01)
+      if (doiToc.length) {
+        setCanLam(
+          `Trong vùng có ${doiToc.length} clip đã đổi tốc độ (${(doiToc[0].speed * 100).toFixed(0)}%). ` +
+            'Panel chưa quy đổi được thời gian cho clip đổi tốc độ — trả về 100% rồi chạy lại.',
+        )
+        return
+      }
+
+      // ☠️ Nghe hiểu BẮT BUỘC. Không có công tắc tắt — tắt nghe hiểu thì panel
+      // này không còn gì để làm.
+      const boMay = timBoMay(maMoHinh)
+      if (!boMay) {
+        setCanLam('Chưa cài bộ nghe hiểu nên chưa chép lời được.\n' + thieuGi())
+        return
+      }
+
+      const buoc: NonNullable<KetPhuDe['buoc']> = []
+
+      // ── 2+3. Tách tiếng rồi cho Whisper nghe, cho TỪNG file gốc trong vùng ──
+      const soFile = new Set(vung.clips.map((x) => x.path)).size
+      const daNghe = new Map<
+        string,
+        {
+          cau: CauNoi[]
+          tu: { chu: string; giay: number; p: number }[]
+          /** Mã ngôn ngữ Whisper nhận ra — quyết định luật cắt dòng. */
+          ngonNgu?: string
+        }
+      >()
+      let daXong = 0
+
+      for (const c of vung.clips) {
+        if (daNghe.has(c.path)) continue
+        daXong++
+        const nhan = soFile > 1 ? ` (file ${daXong}/${soFile})` : ''
+
+        // BỘ ĐỆM: chạy Autocut trên đúng file này rồi thì dùng lại, khỏi tốn
+        // 3-8 phút. Khoá theo kích thước + giờ sửa của video VÀ theo mô hình,
+        // nên file đổi là tự hết hiệu lực.
+        //
+        // ☠️ Đọc đệm TRƯỚC khi tách tiếng: có đệm thì khỏi phải trích WAV, mà
+        // đó mới là bước tốn đĩa nhất (45 giây trên file 9,3 GB). Bản 2.0.0
+        // trích xong mới hỏi đệm — làm thừa đúng bước đắt nhất.
+        const demCu = docDem(c.path, maMoHinh)
+        if (demCu) {
+          buoc.push({
+            ten: 'Dùng lại kết quả nghe đã có',
+            ket: `${demCu.cau.length} câu · ${demCu.tu.length} từ · không phải nghe lại`,
+            giay: 0,
+          })
+          daNghe.set(c.path, demCu)
+          continue
+        }
+
+        baoBuoc('Đang tách tiếng khỏi video' + nhan, 1)
+        let t0 = Date.now()
+        const { wav, duration } = await trichTieng(c.path, (giayXong) =>
+          setDangChay(`Đang tách tiếng khỏi video${nhan}… ${dongHo(giayXong)}`),
+        )
+        const giayTrich = (Date.now() - t0) / 1000
+        // Bước này bị ĐĨA quyết định, không phải CPU. In ra tốc độ đọc thật để
+        // nhìn phát biết file đang nằm trên HDD hay SSD.
+        const co = doDaiFile(c.path)
+        const tocDo = co > 0 && giayTrich > 0 ? co / 1048576 / giayTrich : 0
+        buoc.push({
+          ten: 'Tách tiếng khỏi video',
+          ket:
+            (duration > 0 ? `${duration.toFixed(0)}s tiếng` : 'xong') +
+            (co > 0 ? ` · đọc ${(co / 1073741824).toFixed(2)} GB` : '') +
+            (tocDo > 0 ? ` · ${tocDo.toFixed(0)} MB/s` : ''),
+          giay: giayTrich,
+        })
+
+        baoBuoc(`Đang nghe hiểu lời nói${nhan}`, 2)
+        t0 = Date.now()
+        const ketNghe = await nghe(wav, boMay, (p) =>
+          // Bước dài nhất của cả luồng (3-8 phút). p = -1 nghĩa là còn đang nạp
+          // mô hình lên GPU, chưa nghe — lúc đó thanh chạy qua lại chứ không
+          // đứng ở 0%, vì đứng ở 0% thì nhìn y như treo.
+          baoBuoc(
+            p < 0 ? `Đang nạp mô hình lên GPU${nhan}` : `Đang nghe hiểu lời nói${nhan}`,
+            2,
+            p,
+          ),
+        )
+        donWav(wav)
+        buoc.push({
+          ten: 'Nghe hiểu lời nói (GPU)',
+          ket:
+            `${ketNghe.cau.length} câu · ${ketNghe.tu.length} từ` +
+            (ketNghe.ngonNgu ? ` · nghe ra tiếng ${tenNgonNgu(ketNghe.ngonNgu)}` : ''),
+          giay: (Date.now() - t0) / 1000,
+        })
+
+        // Ghi lại làm bước đệm cho lần sau (và cho panel Autocut).
+        luuDem(c.path, maMoHinh, ketNghe)
+        daNghe.set(c.path, ketNghe)
+      }
+
+      // ── 4. Quy đổi mốc rồi gắn lên sequence ──
+      //
+      // ☠️ [2.0.0] TRƯỚC ĐÂY CHỈ LẤY `vung.clips[0]` — và đó là lỗi CÂM.
+      // Đo thật 29/07 trên sequence 17 clip do Auto Cut sinh ra: bảng quy đổi
+      // chỉ có đoạn [0 → 3,36] của clip đầu, nên 15/16 câu rơi ra ngoài và bị
+      // bỏ. File .srt ra đúng 1 câu / 136 byte, KHÔNG báo lỗi gì.
+      //
+      // Nên bảng quy đổi phải dựng từ MỌI clip trong vùng, dùng vị trí THẬT
+      // của từng clip (`seqTu`) chứ không cộng dồn — clip có thể hở nhau.
+      baoBuoc('Đang gắn phụ đề lên timeline', 3)
+
+      // ☠️ GHIM SEQUENCE — vấp thật anh Tiến báo 31/07: trong mấy phút panel
+      // nghe hiểu, luồng shorts (hoặc chính người dùng) đổi sequence đang mở
+      // → phụ đề gắn lên SAI sequence, "bị lưu đè và hiển thị không đúng".
+      // Kích hoạt lại đúng sequence đã ghim theo ID trước khi ghi bất cứ gì.
+      if (idSeqChay.current) await moSequenceTheoId(idSeqChay.current)
+
+      // Ưu tiên track hình; sequence chỉ có tiếng thì lấy track tiếng.
+      const clipHinh = vung.clips.filter((c) => c.kind === 'V')
+      const nguon = clipHinh.length ? clipHinh : vung.clips.filter((c) => c.kind === 'A')
+
+      // Mỗi file gốc có một bản nghe riêng, mà một mốc giây chỉ quy đổi được
+      // trong phạm vi MỘT file. Vùng trộn nhiều file thì chọn file chiếm nhiều
+      // thời lượng nhất, và NÓI RA phần bị bỏ qua — đừng im lặng.
+      const theoFile = new Map<string, typeof nguon>()
+      for (const c of nguon) {
+        const ds = theoFile.get(c.path) ?? []
+        ds.push(c)
+        theoFile.set(c.path, ds)
+      }
+      const xepTheoDoDai = [...theoFile.entries()].sort(
+        (a, b) =>
+          b[1].reduce((t, c) => t + (c.seqDen - c.seqTu), 0) -
+          a[1].reduce((t, c) => t + (c.seqDen - c.seqTu), 0),
+      )
+      const [pathChinh, clipsChinh] = xepTheoDoDai[0] ?? ['', []]
+      const nghedDuoc = pathChinh ? daNghe.get(pathChinh) : undefined
+      if (!clipsChinh.length || !nghedDuoc?.cau.length) {
+        setCanLam('Không nghe ra câu nào trong vùng này. Kiểm lại xem clip có tiếng không.')
+        return
+      }
+      if (xepTheoDoDai.length > 1) {
+        const boQua = xepTheoDoDai.slice(1).reduce((t, [, ds]) => t + ds.length, 0)
+        setCanLam(
+          `Vùng này có ${xepTheoDoDai.length} file khác nhau. Mới làm phụ đề cho ` +
+            `"${pathChinh.split(/[\\/]/).pop()}" (${clipsChinh.length} clip); ` +
+            `${boQua} clip của file khác chưa được chép.`,
+        )
+      }
+
+      const xepTheoSeq = clipsChinh.slice().sort((a, b) => a.seqTu - b.seqTu)
+      const keepsNguyen: Segment[] = xepTheoSeq.map((c) => ({ start: c.srcTu, end: c.srcDen }))
+
+      // ☠️ MỐC PHẢI LÀ GIỜ TUYỆT ĐỐI TRÊN SEQUENCE — `gocSeq = 0`.
+      //
+      // Host gọi `seq.createCaptionTrack(pi, 0, …)`: caption track LUÔN đặt tại
+      // giây 0 của sequence. Nên mốc trong .srt phải tự mang vị trí thật của
+      // clip, không được chuẩn hoá về 0.
+      //
+      // Lỗi đã thấy tận mắt 29/07: sequence có clip bắt đầu ở giây 38,53 thì
+      // phụ đề nằm ở 0:00–1:12 còn clip nằm ở 0:45–2:00 — lệch đúng 38,53 giây.
+      const bangMoc = dungBangTuClip(xepTheoSeq, 0)
+
+      const pd = await ganPhuDeVao(
+        pathChinh,
+        nghedDuoc.cau,
+        keepsNguyen,
+        bangSua,
+        setDangChay,
+        bangMoc,
+        // ☠️ Luật cắt dòng phụ thuộc NGÔN NGỮ, không chỉ khung hình. Chữ CJK
+        // rộng gấp 2,16 lần Latin (đo 30/07) nên trần phải là 32 đơn vị thay vì
+        // 42. Ngôn ngữ do chính Whisper trả về sau khi nghe (`-l auto`).
+        gioiHanTheoKhung(khung, nghedDuoc.ngonNgu),
+        nghedDuoc.tu,
+      )
+      let kpd: KetPhuDe = {
+        soCau: pd.soCau,
+        soTu: nghedDuoc.tu.length,
+        ngonNgu: nghedDuoc.ngonNgu,
+        duongDan: pd.duongDan,
+        ganDuoc: pd.ganDuoc,
+        buoc,
+        giayTong: (Date.now() - batDau) / 1000,
+      }
+      setKet(kpd)
+      if (tenSeqLanNay) ketTheoSeq.current.set(tenSeqLanNay, kpd)
+
+      // Marker chỗ Whisper nghe không chắc — thứ người dựng cần soát nhất.
+      if (nghedDuoc.tu.length) {
+        // Đếm TỔNG THẬT trước, rồi mới chặt trần 60 — trần là cố ý (marker rải
+        // kín timeline thì mất tác dụng), nhưng GIẤU trần thì con số thành nói
+        // dối một nửa. Đo 30/07: 3 video ra 107/220/433 chỗ, cả 3 cùng hiện
+        // "60" và anh Tiến hỏi ngay "có thực tế không hay bị ghi đè?".
+        const tongCho = chonChoSoat(nghedDuoc.tu, keepsNguyen, 0.6, Number.MAX_SAFE_INTEGER, bangMoc).length
+        const cho = chonChoSoat(nghedDuoc.tu, keepsNguyen, 0.6, 60, bangMoc)
+        const dong = cho.map((c) => `${c.giay.toFixed(3)}|${c.chu}|${c.p.toFixed(3)}|tu`)
+        if (dong.length) {
+          setDangChay(`Đang đánh dấu ${dong.length} chỗ cần soát…`)
+          // Ghim lại lần nữa — bước gắn phụ đề có thể mất vài giây.
+          if (idSeqChay.current) await moSequenceTheoId(idSeqChay.current)
+          const { daDat } = await datMarker(dong.join(';'))
+          kpd = { ...kpd, soat: { soCho: daDat, temNhat: cho[0]?.p ?? 1, tongCho } }
+          setKet(kpd)
+          if (tenSeqLanNay) ketTheoSeq.current.set(tenSeqLanNay, kpd)
+        }
+      }
+    } catch (e: any) {
+      setLoi(String(e?.message ?? e))
+    } finally {
+      setDangChay('')
+      setBuocIdx(-1)
+      setPhanTram(-1)
+      void demLai()
+    }
+  }
+
+  const trongHost = isInHost()
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <svg
+          className={trongHost ? 'topbar__icon' : 'topbar__icon topbar__icon--tat'}
+          viewBox="0 0 24 24"
+          width="13"
+          height="13"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="M7 11h3M14 11h3M7 15h6M16 15h1" />
+        </svg>
+        <h1 className="topbar__ten">Transcript</h1>
+        {/* Version LAY TU package.json luc build (`__VERSION__`), khong go tay.
+            Anh Tien 30/07: *"em nho them cac ki hieu version cua 4 tool"*. Da hai
+            lan panel chay ban cu ma khong ai biet, phai do qua cong debug moi thay.
+            Kiem 3 cho khop nhau: `node design-system/version.mjs`. */}
+        <span className="topbar__ver">v{__VERSION__}</span>
+        <p className="topbar__host" title={host}>
+          {host}
+        </p>
+      </header>
+
+      <div className="than">
+        {/* ══════════════════════════════════════════════════════════════════
+            KHỐI 1 — PANEL NÀY LÀM GÌ
+            ══════════════════════════════════════════════════════════════════
+            Anh Tiến 29/07 chỉ vào panel Asset Manager mở cạnh bên: *"em thấy
+            phần Asset Manager nó có 2 phần không em, anh cũng muốn tách ra như
+            vậy"*. Khối này trả lời "nó làm gì cho tôi", khối dưới là "chạy đi".
+
+            Lúc đang chạy thì GIẤU: người dùng không cần xem lời giải thích khi
+            máy đã bắt đầu làm. */}
+        {!dangChay && !ket && (
+          <section className="khoi">
+            {/* ☠️ MỘT KHUÔN CHUNG cho cả bốn panel — anh Tiến 30/07: *"2 dòng
+                text này là hướng dẫn, em làm sao cho nó gọn hàng và giống nhau"*.
+
+                Khuôn: [Khoanh đoạn cần VIỆC bằng I và O.] [Chọn A và B rồi bấm.]
+                Hai vế, hai câu, cùng độ dài — đọc lướt là so được ngay.
+
+                Và KHÔNG nói kết quả đi đâu ở đây: mỗi thanh chọn đã có dòng
+                `.chon__mo` nói hệ quả của chính nó. Nói ở hai nơi là bắt mắt
+                đọc hai lần, mà còn dễ nói dối khi logic đổi. */}
+            <p className="chidan">
+              Khoanh đoạn cần <b>chép lời</b> bằng <kbd>I</kbd> và <kbd>O</kbd>. Chọn khung
+              và cách chép rồi bấm.
+            </p>
+
+            <div className="mh">
+              <button
+                type="button"
+                className="mh__nut"
+                title="Bấm để xem lại"
+                onClick={() => setLanMinhHoa((n) => n + 1)}
+              >
+                <MinhHoa lan={lanMinhHoa} />
+              </button>
+              <p className="mh__chu">
+                Máy nghe hết đoạn → chép thành <b>phụ đề</b> đặt đúng chỗ người ta nói →
+                cắm <b>cờ đỏ</b> ở chỗ nó nghe không chắc.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            KHỐI 2 — CHỌN CÁCH CHÉP RỒI CHẠY
+            ══════════════════════════════════════════════════════════════════ */}
+        <section className="khoi">
+          {!dangChay && (
+            <>
+              {/* ══════════════════════════════════════════════════════════════
+                  1. KHUNG HÌNH — chọn TRƯỚC, vì nó quyết định luật cắt câu
+                  ══════════════════════════════════════════════════════════════
+                  Anh Tiến 30/07: *"sẽ được chọn được phần khung thì rồi mới
+                  chứ đúng không em"* — đúng, khung là quyết định gốc: video dọc
+                  thì mỗi khối chỉ được 4-6 từ, khác hẳn ngang. */}
+              {/* ══════════════════════════════════════════════════════════════
+                  0. SEQUENCE — chọn TƯỜNG MINH, hết cảnh làm ngầm trên "cái
+                  đang mở". Anh Tiến 31/07: shorts đẻ nhiều sequence, kết quả
+                  "bị lưu đè và hiển thị không đúng". Chọn = mở nó trên
+                  timeline (cái nhìn thấy = cái sẽ chạy), và lượt chạy GHIM
+                  theo ID nên đổi tab giữa chừng cũng không lạc chỗ. */}
+              {dsSeq.length > 0 && (
+                <div className="chon">
+                  <span className="chon__nhan">Sequence</span>
+                  <select
+                    className="seqpick"
+                    value={dsSeq.find((d) => d.dangMo)?.id ?? ''}
+                    onChange={(e) => {
+                      void moSequenceTheoId(e.target.value).then((ok) => {
+                        if (ok) void demLai()
+                      })
+                    }}
+                  >
+                    {dsSeq.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.ten}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="chon">
+                <span className="chon__nhan">Khung hình</span>
+                <div className="seg">
+                  {KHUNG.map((k) => (
+                    <button
+                      key={k.ma}
+                      className={k.ma === khung ? 'seg__nut seg__nut--chon' : 'seg__nut'}
+                      title={k.mo}
+                      onClick={() => setKhung(k.ma)}
+                    >
+                      {k.ten}
+                    </button>
+                  ))}
+                </div>
+                <p className="chon__mo">{KHUNG.find((k) => k.ma === khung)?.mo}</p>
+              </div>
+
+              {/* ══════════════════════════════════════════════════════════════
+                  2. CÁCH CHÉP
+                  ══════════════════════════════════════════════════════════════
+                  ☠️ Hai nhãn phải nằm trên CÙNG MỘT TRỤC so sánh. Bản trước là
+                  "Nhanh" / "Phụ đề câu dài" — một cái nói TỐC ĐỘ, một cái nói
+                  ĐỘ DÀI CÂU, đặt cạnh nhau đọc không so được. Anh Tiến 30/07:
+                  *"nhìn nó kì, em đổi lại 2 từ của button đó cho nó hiệu quả
+                  hơn"*. Nay cả hai đều nói độ dài câu; tốc độ xuống dòng mô tả.
+
+                  Hình minh hoạ ở giữa hai nút cũng gỡ theo — anh Tiến thấy nó
+                  chen vào giữa nhìn kì, mà nhãn đúng thì đã tự nói được rồi. */}
+              <div className="chon">
+                <span className="chon__nhan">Cách chép</span>
+                <div className="seg">
+                  {MO_HINH.map((m) => (
+                    <button
+                      key={m.ma}
+                      className={m.ma === maMoHinh ? 'seg__nut seg__nut--chon' : 'seg__nut'}
+                      title={m.mo}
+                      onClick={() => setMaMoHinh(m.ma)}
+                    >
+                      {m.ma === 'turbo' ? 'Câu ngắn' : 'Câu dài'}
+                    </button>
+                  ))}
+                </div>
+                <p className="chon__mo">
+                  {maMoHinh === 'turbo'
+                    ? 'Câu ngắn, nhiều khối · chạy nhanh hơn'
+                    : 'Câu dài, ít khối · nghe kỹ hơn'}
+                </p>
+              </div>
+            </>
+          )}
+
+          {dangChay ? (
+            <DangChay
+              nhan={dangChay}
+              phanTram={phanTram}
+              giay={giayTroi}
+              buocIdx={buocIdx}
+              cacBuoc={CAC_BUOC}
+            />
+          ) : (
+            <button className="btn btn--primary" onClick={() => void lamPhuDe()}>
+              {ket ? 'Chép lại' : 'Làm phụ đề'}
+            </button>
+          )}
+
+          {canLam && <p className="canlam">{canLam}</p>}
+          {loi && <pre className="loi">{loi}</pre>}
+
+          {ket && <KetQuaPhuDe ket={ket} tenSeqKet={tenSeqKet} tenSeqDangMo={tenSeq} />}
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            ĐƯỜNG RA — xoá thứ panel đã tạo
+            ══════════════════════════════════════════════════════════════════
+            Anh Tiến 30/07: *"thêm nút xoá scripts và xoá marker trong
+            transcripts nữa"*. Luật đã chốt từ lâu: có đường VÀO thì phải có
+            đường RA.
+
+            ☠️ Nút xoá nói HẬU QUẢ BẰNG SỐ THẬT, và chỉ hiện khi thật sự có gì
+            để xoá — nút bấm rồi báo "không có gì" là nút nói dối.
+
+            ☠️ NHƯNG ẨN CẢ KHỐI thì người dùng tưởng MẤT TÍNH NĂNG — vấp thật
+            01/08: anh Tiến hỏi *"ủa cái nút xoá marker và caption đâu mất rồi
+            em?"* trong khi panel chạy đúng (sequence đang mở có 0 marker,
+            0 file .srt). Nay: KHỐI luôn hiện, chỉ NÚT là ẩn; không có gì để
+            dọn thì nói thẳng bằng một dòng chữ. Tính năng nhìn thấy được,
+            mà vẫn không có nút nói dối. */}
+        {!dangChay && daTao && (
+          <div className="don">
+            <span className="don__nhan">Dọn thứ panel đã tạo</span>
+            {daTao.marker === 0 && daTao.itemSrt === 0 && (
+              <p className="don__mo">
+                Sequence này chưa có gì do panel tạo — chạy "Làm phụ đề" xong thì
+                nút xoá phụ đề và marker sẽ hiện ở đây.
+              </p>
+            )}
+            <div className="don__nut">
+              {daTao.itemSrt > 0 && (
+                <button
+                  className="btn btn--phu"
+                  disabled={!!dangDon}
+                  onClick={() => {
+                    void (async () => {
+                      setDangDon('phude')
+                      setLoi('')
+                      setCanLam('')
+                      try {
+                        if (!(await napLaiHost())) throw new Error('Không nạp được host.')
+                        const r = await xoaPhuDe()
+                        if (r.loi) setCanLam(r.loi.message)
+                        else
+                          setCanLam(
+                            `Đã gỡ ${r.daXoa} phụ đề khỏi project. File trên đĩa vẫn còn — ` +
+                              'panel không tự xoá file của anh.',
+                          )
+                      } catch (e: any) {
+                        setLoi(String(e?.message ?? e))
+                      } finally {
+                        setDangDon('')
+                        void demLai()
+                      }
+                    })()
+                  }}
+                >
+                  {dangDon === 'phude' ? 'Đang gỡ…' : `Gỡ ${daTao.itemSrt} file phụ đề khỏi project`}
+                </button>
+              )}
+              {daTao.marker > 0 && (
+                <button
+                  className="btn btn--phu"
+                  disabled={!!dangDon}
+                  onClick={() => {
+                    void (async () => {
+                      setDangDon('marker')
+                      setLoi('')
+                      setCanLam('')
+                      try {
+                        if (!(await napLaiHost())) throw new Error('Không nạp được host.')
+                        const r = await xoaMarker()
+                        if (r.loi) setCanLam(r.loi.message)
+                        else setCanLam(`Đã xoá ${r.daXoa} marker. Còn lại ${r.conLai} marker trên sequence.`)
+                      } catch (e: any) {
+                        setLoi(String(e?.message ?? e))
+                      } finally {
+                        setDangDon('')
+                        void demLai()
+                      }
+                    })()
+                  }}
+                >
+                  {dangDon === 'marker' ? 'Đang xoá…' : `Xoá ${daTao.marker} marker`}
+                </button>
+              )}
+            </div>
+            <p className="don__mo">
+              Chỉ xoá thứ panel tạo ra. Phụ đề và marker anh tự làm không bị chạm.
+              {/* ☠️ NÓI THẬT GIỚI HẠN — anh Tiến 31/07: "bấm vào xoá thì nó
+                  không có tác dụng". Nút gỡ được FILE trong project; còn TRACK
+                  caption trên timeline thì Premiere KHÔNG mở API cho tool nào
+                  đụng (đo: seq.captionTracks = undefined). Không nói ra thì
+                  nút thành nút nói dối. */}
+              {daTao.itemSrt > 0 && (
+                <>
+                  {' '}Track caption trên timeline Premiere không cho tool xoá —
+                  chuột phải vào đầu track → <b>Delete Track</b>.
+                </>
+              )}
+            </p>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            DẢI CỜ NGÔN NGỮ — anh Tiến 30/07 yêu cầu carousel dạng cờ
+            ══════════════════════════════════════════════════════════════════
+            ☠️ Cờ vẽ SVG, KHÔNG emoji: Windows không có glyph quốc kỳ nên emoji
+            cờ hiện thành hai chữ cái. Đã đo — xem `Co.tsx`. */}
+        {!dangChay && (
+          <div className="mh mh--nho">
+            <DaiCo />
+            <p className="mh__chu">
+              Tự nhận ngôn ngữ — <b>{SO_NGON_NGU}+ thứ tiếng</b>, không phải chọn tay.
+            </p>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            ☠️ BẢNG "SỬA TỪ NGHE NHẦM" ĐÃ GỠ — anh Tiến chốt 29/07
+            ══════════════════════════════════════════════════════════════════
+            Nguyên văn: *"editor sẽ sửa trong phần Properties của Pr luôn,
+            không cần phải thêm chỗ này"*.
+
+            Đúng: Premiere có sẵn panel Text/Captions, sửa thẳng trên timeline
+            thì thấy ngay chữ nằm ở đâu — tiện hơn gõ vào một bảng rời rồi
+            chạy lại cả lượt.
+
+            Cái MẤT ĐI, ghi ra để sau này ai cần thì biết: bảng đó sửa TỰ ĐỘNG
+            cho mọi lần chạy sau, còn Properties là sửa TAY từng lần. Với người
+            làm nhiều video cùng một ngành (thuật ngữ lặp lại), cơ chế tự động
+            tiết kiệm hơn. Nếu sau này cần bật lại thì `sinhSrt` vẫn nhận tham
+            số `bangSua` — chỉ thiếu phần giao diện.
+            ══════════════════════════════════════════════════════════════════ */}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Khối ĐANG CHẠY — thay cho cái nút xám ngoét mà anh Tiến gọi là "phèn".
+ *
+ * Ba thứ nó phải trả lời, không bắt ai đoán:
+ *   1. Máy còn sống không  -> thanh chạy, không bao giờ đứng im
+ *   2. Đang làm gì         -> nhãn nói VIỆC, kèm % khi đo được
+ *   3. Còn bao lâu nữa     -> danh sách bước, bước nào xong thì tích
+ */
+function DangChay({
+  nhan,
+  phanTram,
+  giay,
+  buocIdx,
+  cacBuoc,
+}: {
+  nhan: string
+  phanTram: number
+  giay: number
+  buocIdx: number
+  cacBuoc: readonly { readonly ten: string; readonly uoc: number }[]
+}) {
+  const doDuoc = phanTram >= 0
+  return (
+    <div className="chay" aria-live="polite">
+      <div className={doDuoc ? 'chay__thanh' : 'chay__thanh chay__thanh--troi'}>
+        {doDuoc && <div className="chay__day" style={{ width: `${phanTram}%` }} />}
+        <span className="chay__chu">
+          {nhan}
+          {doDuoc && <b>{phanTram}%</b>}
+        </span>
+        <span className="chay__gio">{dongHo(giay)}</span>
+      </div>
+
+      <ol className="chay__buoc">
+        {cacBuoc.map((b, i) => {
+          const tt = i < buocIdx ? 'xong' : i === buocIdx ? 'dang' : 'cho'
+          return (
+            <li key={b.ten} className={`chay__buoc--${tt}`}>
+              <span className="chay__cham">{tt === 'xong' ? '✓' : tt === 'dang' ? '●' : '○'}</span>
+              {b.ten}
+            </li>
+          )
+        })}
+      </ol>
+    </div>
+  )
+}
+
+/**
+ * Kết quả — người dựng chỉ cần biết ba điều: chép được bao nhiêu câu, phụ đề
+ * nằm đâu, chỗ nào phải soát lại. Số kỹ thuật gấp vào trong.
+ *
+ * ☠️ Khối này là BIÊN LAI CỦA MỘT LẦN CHẠY, không phải trạng thái của sequence
+ * đang mở — nên nó PHẢI ghi tên sequence nó thuộc về. Vấp 30/07/2026: anh Tiến
+ * đổi qua 3 sequence, cả 3 đều thấy "1.101 câu" của lần chạy cuối và hỏi
+ * *"sao cả 3 sequence này thông số lại giống nhau thế em?"*.
+ */
+function KetQuaPhuDe({
+  ket,
+  tenSeqKet,
+  tenSeqDangMo,
+}: {
+  ket: KetPhuDe
+  tenSeqKet: string
+  tenSeqDangMo: string
+}) {
+  const khacSeq = !!tenSeqKet && !!tenSeqDangMo && tenSeqKet !== tenSeqDangMo
+  return (
+    <div className="ketqua">
+      {/* Chỉ cảnh khi ĐANG MỞ sequence khác — mở đúng thì im lặng. */}
+      {khacSeq && (
+        <p className="ketqua__dong">
+          <b className="canh">Số liệu dưới đây là của «{tenSeqKet}»</b> — anh đang mở «
+          {tenSeqDangMo}». Muốn chép cho sequence này thì khoanh vùng rồi bấm lại.
+        </p>
+      )}
+      <div className="ketqua__so">
+        <div>
+          <b>{ket.soCau.toLocaleString('vi-VN')}</b>
+          <span>câu đã chép</span>
+        </div>
+        <div>
+          <b>{mmss(ket.giayTong)}</b>
+          <span>chạy mất</span>
+        </div>
+        <div>
+          <b className={ket.soat?.soCho ? 'canh' : undefined}>{ket.soat?.soCho ?? 0}</b>
+          <span>chỗ cần soát</span>
+        </div>
+      </div>
+
+      <p className="ketqua__dong">
+        {ket.ganDuoc
+          ? // Ghi TÊN THẬT, không ghi "sequence đang mở" — câu đó đúng lúc chạy
+            // xong nhưng thành nói dối ngay khi người dùng đổi sequence.
+            <>Phụ đề đã gắn lên sequence {tenSeqKet ? <b>«{tenSeqKet}»</b> : 'đã chạy'}.</>
+          : 'Đã tạo file phụ đề nhưng chưa gắn được lên timeline — mở tay từ đường dẫn dưới.'}
+        {/* ☠️ PHẢI NÓI RA ngôn ngữ nó nhận được. Panel dùng `-l auto` nên nếu nó
+            nghe sai thứ tiếng thì cả bản chép là rác — mà không nói ra thì người
+            dùng chỉ biết sau khi đọc hết phụ đề. Đây cũng là chỗ duy nhất báo
+            được rằng luật cắt dòng đang theo nhóm nào. */}
+        {ket.ngonNgu && (
+          <>
+            {' '}
+            Nghe ra <b>tiếng {tenNgonNgu(ket.ngonNgu)}</b>
+            {nhomNgonNgu(ket.ngonNgu) === 'cjk' && ' — cắt dòng theo chuẩn chữ vuông'}.
+          </>
+        )}
+      </p>
+      {/* ☠️ Chi hien TEN FILE. Anh Tien 30/07: *"ban thuong mai khong de
+          nguoi dung biet minh dung gi va lam gi"* — duong dan day du vua dai
+          vua bay ra cau truc thu muc. Day du nam trong tooltip, ai can thi re
+          chuot. */}
+      <p className="ketqua__duong" title={ket.duongDan}>
+        {ket.duongDan.split(/[\/]/).pop()}
+      </p>
+
+      {!!ket.soat?.soCho && (
+        <p className="ketqua__dong">
+          {/* Bị trần chặt thì NÓI RA — "60" khi số thật là 433 là nói dối một
+              nửa. Không bị trần thì giữ câu gọn, đừng bắt người ta đọc thêm. */}
+          {ket.soat.tongCho > ket.soat.soCho ? (
+            <>
+              Máy không chắc ở <b>{ket.soat.tongCho.toLocaleString('vi-VN')} chỗ</b> — đã cắm
+              marker <b>{ket.soat.soCho} chỗ tệ nhất</b>. Bấm <kbd>M</kbd> để đi tới từng chỗ.
+            </>
+          ) : (
+            <>
+              <b>{ket.soat.soCho} marker</b> trên timeline — bấm <kbd>M</kbd> để đi tới từng chỗ
+              máy nghe không chắc.
+            </>
+          )}
+        </p>
+      )}
+
+      {/* ☠️ KHỐI "MÁY ĐÃ LÀM NHỮNG GÌ" ĐÃ GỠ KHỎI MÀN HÌNH — 29/07.
+          Anh Tiến chỉ vào nó trên panel Autocut: *"ở phần autocut anh bảo em
+          đã bỏ phần này đi mà em"*. Trước đó anh đã nói một lần: *"ở phần chi
+          tiết em có thể ẩn hoặc remove đi vì anh thấy dư thừa, cái đó chủ yếu
+          là thuật toán của mình thôi"*. Phiên trước chọn "gấp lại" thay vì bỏ
+          — nói hai lần thì đó là quyết định, không phải góp ý.
+
+          `buoc[]` VẪN ĐƯỢC THU THẬP (rẻ, và là thứ duy nhất chứng minh máy
+          không bỏ qua bước nào khi cần gỡ lỗi) — chỉ không vẽ ra màn hình.
+          Đọc nó qua cổng debug 8091:
+              document.querySelector('#root')._reactRootContainer  hoặc
+              xem `buoc` trong `PROGRESS.md` của lần chạy tương ứng. */}
+    </div>
+  )
+}
+
+/**
+ * Mã ngôn ngữ Whisper -> tên tiếng Việt, để in cho người dựng đọc.
+ *
+ * Chỉ liệt kê thứ tiếng hay gặp trong nghề dựng phim. Mã lạ thì **trả về chính
+ * mã đó** chứ không đoán — người dùng thấy "sw" còn hiểu được là mã ISO, thấy
+ * một cái tên bịa thì tưởng panel nhận sai.
+ */
+const TEN_NGON_NGU: Record<string, string> = {
+  vi: 'Việt',
+  en: 'Anh',
+  zh: 'Trung',
+  yue: 'Quảng Đông',
+  ja: 'Nhật',
+  ko: 'Hàn',
+  es: 'Tây Ban Nha',
+  pt: 'Bồ Đào Nha',
+  fr: 'Pháp',
+  de: 'Đức',
+  ru: 'Nga',
+  it: 'Ý',
+  th: 'Thái',
+  id: 'Indonesia',
+  ms: 'Mã Lai',
+  hi: 'Hindi',
+  ar: 'Ả Rập',
+  tr: 'Thổ Nhĩ Kỳ',
+  nl: 'Hà Lan',
+  pl: 'Ba Lan',
+  uk: 'Ukraina',
+  km: 'Khmer',
+  lo: 'Lào',
+  tl: 'Tagalog',
+}
+
+function tenNgonNgu(ma: string): string {
+  const m = (ma || '').toLowerCase()
+  return TEN_NGON_NGU[m] ?? m
+}
+
+/** Giây -> "m:ss" cho đồng hồ trên nút. */
+function dongHo(giay: number): string {
+  const m = Math.floor(giay / 60)
+  const s = giay % 60
+  return `${m}:${s < 10 ? '0' : ''}${s}`
+}
+
+/** Kích thước file trên đĩa (byte), 0 nếu không đọc được. */
+function doDaiFile(p: string): number {
+  try {
+    const fs = getFs()
+    return fs ? fs.statSync(p).size : 0
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * Sinh file .srt rồi gắn lên sequence đang mở.
+ *
+ * File .srt ghi **cạnh video gốc**, KHÔNG ghi vào `%APPDATA%`: Premiere Beta
+ * chạy với AppData bị ảo hoá nên cả Node lẫn ExtendScript đều không thấy file
+ * mới tạo ở đó (đo thật 2026-07-28 — xem PROGRESS.md).
+ */
+async function ganPhuDeVao(
+  mediaPath: string,
+  cau: CauNoi[],
+  keeps: Segment[],
+  bangSua: ThayTu[],
+  bao: (s: string) => void,
+  bangSan?: Moc[],
+  gioiHan?: ReturnType<typeof gioiHanTheoKhung>,
+  /** [2.4.0] Moc tung TU tren FILE GOC — de dat moc cac mau cat ra dung cho
+   *  nguoi ta noi that, thay vi chia deu theo so chu. */
+  tuTinCay?: { chu: string; giay: number; p: number }[],
+): Promise<{ soCau: number; soBo: number; duongDan: string; ganDuoc: boolean }> {
+  const fs = getFs()
+  const path = getPath()
+  if (!fs || !path) throw new Error('Panel không dùng được Node.js')
+
+  bao('Đang quy đổi mốc thời gian…')
+  const { noiDung, soCau, soBo } = sinhSrt(
+    cau as Cau[],
+    keeps,
+    bangSua,
+    bangSan,
+    gioiHan,
+    tuTinCay,
+  )
+  if (!soCau) throw new Error('Không câu nào rơi vào phần đã giữ lại.')
+
+  // Tên có GIỜ PHÚT GIÂY, không ghi đè file cũ. Hai lý do:
+  //   1. Premiere đọc nội dung .srt vào bộ nhớ lúc import; ghi đè file trên đĩa
+  //      thì caption đã nằm trên timeline KHÔNG đổi theo — chạy lại lần hai mà
+  //      vẫn ra phụ đề cũ, rất khó hiểu cho người dùng.
+  //   2. Anh Tiến có thể đã sửa tay file trước; ghi đè là xoá công của người ta.
+  const gio = new Date()
+  const p2 = (n: number) => String(n).padStart(2, '0')
+  const dau = `${p2(gio.getHours())}${p2(gio.getMinutes())}${p2(gio.getSeconds())}`
+  const thuMuc = path.dirname(mediaPath)
+  const ten = path.basename(mediaPath).replace(/\.[^.]+$/, '')
+  const srtPath = path.join(thuMuc, `${ten}-autocut-${dau}.srt`)
+  fs.writeFileSync(srtPath, noiDung, 'utf8')
+
+  bao('Đang gắn phụ đề lên timeline…')
+  const { ok } = await ganPhuDe(srtPath)
+
+  return { soCau, soBo, duongDan: srtPath, ganDuoc: ok }
+}

@@ -1,0 +1,77 @@
+// =========================================================================
+//  MIXINS — các khuôn dùng lại. Đặt ở ĐÂY thay vì chép tay ở nhiều file,
+//  để một bug chỉ phải sửa một lần.
+// =========================================================================
+@use 'sass:list';
+
+/// Chữ tràn thì cắt bằng dấu ba chấm. Bắt buộc kèm min-width:0 khi ở flex.
+@mixin ellipsis {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/// Nền control cơ bản (nút / ô nhập).
+@mixin surface($bg: var(--bg-4), $line: var(--line-2)) {
+  background: $bg;
+  border: 1px solid $line;
+}
+
+/// Khung control ngang: cao chuẩn, icon + chữ cùng dòng.
+@mixin control-row($h: var(--h-ctrl)) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: $h;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/// Vòng viền trạng thái ĐANG CHỌN — vẽ bằng inset shadow nên KHÔNG
+/// tràn ra ngoài hộp (tránh đè lên phần tử kế bên — bài học quy tắc 49).
+@mixin ring($color: var(--accent), $w: 1.5px) {
+  box-shadow: inset 0 0 0 $w $color;
+}
+
+/// Chuyển động chuẩn cho các thuộc tính truyền vào.
+@mixin motion($props...) {
+  $out: ();
+  @each $p in $props {
+    $out: list.append($out, #{$p} var(--dur) var(--ease), comma);
+  }
+  transition: $out;
+}
+
+/// Thanh cuộn mảnh, chỉ hiện khi cần.
+@mixin scroll-thin {
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--line-2);
+    background-clip: content-box;
+    border: 3px solid transparent;
+    border-radius: var(--r-pill);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-5);
+    background-clip: content-box;
+  }
+}
+
+/// Nhãn nhóm cỡ micro (tiêu đề mục trong menu trái).
+///
+/// KHÔNG dùng `text-transform: uppercase`: quy ước nhãn của dự án là chỉ viết hoa
+/// chữ cái đầu, và CSS in hoa toàn bộ sẽ phá quy ước đó ngay trên màn hình dù
+/// trong code viết đúng. Phân tầng thị giác lấy bằng CỠ CHỮ + MÀU + giãn chữ.
+@mixin caps-label {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+}

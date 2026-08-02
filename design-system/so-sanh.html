@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<title>AiO Studio — soi 4 panel cạnh nhau</title>
+<style>
+  /* Bàn so sánh: bốn panel THẬT chạy cạnh nhau, cùng bề rộng, cùng lúc.
+     Lệch một bậc thang chữ hay một cỡ nút là nhìn phát thấy — thứ mà đọc
+     4 file CSS riêng lẻ thì không đời nào thấy. */
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #08080a;
+    color: #f5f5f7;
+    font: 13px/1.45 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 10px 16px;
+    background: #0f0f11;
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+  }
+  h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.014em; }
+  .ghichu { color: #8d8d95; font-size: 11px; }
+  label { display: inline-flex; align-items: center; gap: 6px; color: #c3c3c8; font-size: 12px; }
+  input[type=range] { width: 150px; }
+  .hang {
+    display: flex; gap: 12px; padding: 12px; align-items: flex-start;
+    overflow-x: auto;
+  }
+  .o { flex: 0 0 auto; }
+  .nhan {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    padding: 6px 8px; margin-bottom: 6px;
+    background: #1c1c1f; border: 1px solid rgb(255 255 255 / 6%); border-radius: 6px;
+  }
+  .nhan b { font-size: 12px; font-weight: 600; }
+  .nhan span { color: #8d8d95; font-size: 10px; font-variant-numeric: tabular-nums; }
+  iframe {
+    display: block; border: 1px solid rgb(255 255 255 / 10%); border-radius: 8px;
+    background: #151517;
+  }
+  /* Vạch kẻ ngang để so chiều cao thanh trên và nút giữa 4 panel. */
+  .khung { position: relative; }
+  .vach {
+    position: absolute; left: 0; right: 0; height: 1px;
+    background: rgb(255 87 20 / 55%); pointer-events: none;
+  }
+  .vach::after {
+    content: attr(data-y); position: absolute; right: 2px; top: -13px;
+    color: #ff5714; font-size: 9px; font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>AiO Studio — 4 panel cạnh nhau</h1>
+  <label>Bề rộng <input id="rong" type="range" min="280" max="700" value="380" /> <span id="rongSo">380px</span></label>
+  <label>Cao <input id="cao" type="range" min="400" max="1000" value="700" /> <span id="caoSo">700px</span></label>
+  <label><input id="vach" type="checkbox" checked /> vạch chuẩn 44 / 78px</label>
+  <span class="ghichu">Vạch cam: đáy thanh trên (44) và đáy khối đầu (78). Bốn panel phải cắt vạch ở cùng một chỗ.</span>
+</header>
+
+<div class="hang" id="hang"></div>
+
+<script>
+const PANEL = [
+  { ten: 'Asset Manager', cong: 5180 },
+  { ten: 'Power Bins',    cong: 5181 },
+  { ten: 'Autocut',       cong: 5182 },
+  { ten: 'Transcript',    cong: 5183 },
+];
+
+const hang = document.getElementById('hang');
+for (const p of PANEL) {
+  const o = document.createElement('div');
+  o.className = 'o';
+  o.innerHTML =
+    '<div class="nhan"><b>' + p.ten + '</b><span>:' + p.cong + '</span></div>' +
+    '<div class="khung">' +
+      '<iframe src="http://localhost:' + p.cong + '/" loading="eager"></iframe>' +
+      '<div class="vach" data-y="44" style="top:44px"></div>' +
+      '<div class="vach" data-y="78" style="top:78px"></div>' +
+    '</div>';
+  hang.appendChild(o);
+}
+
+const rong = document.getElementById('rong');
+const cao = document.getElementById('cao');
+const vach = document.getElementById('vach');
+function ve() {
+  document.getElementById('rongSo').textContent = rong.value + 'px';
+  document.getElementById('caoSo').textContent = cao.value + 'px';
+  for (const f of document.querySelectorAll('iframe')) {
+    f.style.width = rong.value + 'px';
+    f.style.height = cao.value + 'px';
+  }
+  for (const v of document.querySelectorAll('.vach')) {
+    v.style.display = vach.checked ? 'block' : 'none';
+  }
+}
+rong.addEventListener('input', ve);
+cao.addEventListener('input', ve);
+vach.addEventListener('change', ve);
+ve();
+</script>
+</body>
+</html>

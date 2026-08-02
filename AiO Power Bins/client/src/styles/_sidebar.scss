@@ -1,0 +1,549 @@
+// =========================================================================
+//  SIDEBAR — menu trái. Nhiệm vụ duy nhất: ĐIỀU HƯỚNG.
+//  Accent chỉ xuất hiện ở đúng một dòng đang chọn.
+// =========================================================================
+@use 'mixins' as m;
+
+.sidebar {
+  position: relative; // mốc cho mép kéo
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: var(--sidebar-w);
+  min-height: 0;
+  border-right: 1px solid var(--line-1);
+  background: var(--bg-1);
+}
+
+// ── Mép kéo đổi bề rộng ──────────────────────────────────────────────────
+//  Vùng bắt chuột rộng 6px (mép 1px thì không ai trúng), nhưng chỉ SÁNG LÊN
+//  khi rê vào — bình thường phải vô hình để không thành một đường kẻ thừa.
+.sidebar__resizer {
+  @include m.motion(background);
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 6px;
+  background: transparent;
+  cursor: col-resize;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent-line);
+  }
+}
+
+// Khi đang kéo: khoá con trỏ và cấm bôi đen, nếu không chữ trong menu sẽ bị
+// quét xanh theo chuột trông như lỗi.
+body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.sidebar__nav {
+  @include m.scroll-thin;
+
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--sp-2) var(--sp-2) var(--sp-3);
+}
+
+// ── Nhãn nhóm ────────────────────────────────────────────────────────────
+.nav-section {
+  @include m.caps-label;
+
+  padding: var(--sp-4) var(--sp-3) var(--sp-1);
+
+  &:first-child {
+    padding-top: var(--sp-2);
+  }
+}
+
+.nav-empty {
+  padding: var(--sp-2) var(--sp-3);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+// ── Dòng điều hướng (là <button> để Tab / Enter đều dùng được) ───────────
+.nav-item {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  height: 28px;
+  padding: 0 var(--sp-3);
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+
+  > svg {
+    color: var(--text-3);
+    @include m.motion(color);
+  }
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+
+    > svg {
+      color: var(--text-2);
+    }
+  }
+}
+
+.nav-item--active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: var(--fw-semibold);
+
+  > svg,
+  .nav-count {
+    color: var(--accent-text);
+  }
+
+  &:hover > svg {
+    color: var(--accent-text);
+  }
+}
+
+.nav-label {
+  @include m.ellipsis;
+
+  flex: 1;
+}
+
+.nav-count {
+  flex-shrink: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+
+// ── Thư mục con cấp 1 dưới mục loại đang chọn ("list như trong folder") ──
+//  Cùng ngôn ngữ thụt lề + vạch dọc với khay trong Brand Kit.
+.nav-sub {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: calc(100% - var(--sp-5));
+  height: 26px;
+  margin-left: var(--sp-5);
+  padding: 0 var(--sp-3);
+  border: none;
+  border-left: 1px solid var(--line-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: transparent;
+  color: var(--text-3);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+
+  > svg {
+    color: var(--text-3);
+  }
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+  }
+}
+
+.nav-sub--active {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+  color: var(--accent-text);
+
+  > svg,
+  .nav-count {
+    color: var(--accent-text);
+  }
+}
+
+/// Quét lại RIÊNG thư mục này — chỉ hiện khi rê vào dòng (không bày sẵn).
+.nav-sub__refresh {
+  @include m.motion(opacity, color);
+
+  display: flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  opacity: 0;
+  appearance: none;
+
+  &:hover:not(:disabled) {
+    color: var(--text-1);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.3 !important;
+  }
+
+  .nav-sub:hover &,
+  &:focus-visible {
+    opacity: 1;
+  }
+}
+
+.nav-heart {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--heart);
+}
+
+.nav-caret {
+  @include m.motion(transform);
+}
+
+.nav-caret--open {
+  transform: rotate(90deg);
+}
+
+// ── Chân menu: nguồn đã thêm + cài đặt ───────────────────────────────────
+.sidebar__foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+  padding: var(--sp-2);
+  border-top: 1px solid var(--line-1);
+  background: var(--bg-1); // nền đục để phủ đuôi dòng menu bị cắt
+}
+
+.sidebar__foot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.foot-toggle {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1;
+  min-width: 0;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-2);
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+  }
+
+  > span:first-of-type {
+    flex: 1;
+    text-align: left;
+  }
+}
+
+.foot-list {
+  @include m.scroll-thin;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 96px;
+  overflow-y: auto;
+}
+
+.foot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 3px var(--sp-2);
+  border-radius: var(--r-sm);
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.foot-row__path {
+  @include m.ellipsis;
+
+  flex: 1;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  direction: rtl; // giữ phần đuôi đường dẫn (tên thư mục) cho dễ nhận
+  text-align: left;
+}
+
+.foot-row__del {
+  display: flex;
+  padding: 2px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--danger);
+  }
+}
+
+// ── Khu Power Bins / Packs trong menu trái ───────────────────────────────
+.hub {
+  padding: var(--sp-2) 0;
+}
+
+.hub__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3) var(--sp-1);
+}
+
+.hub__title {
+  @include m.caps-label;
+  @include m.ellipsis;
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+// Tạo brand là việc CHÍNH của màn hình này khi chưa có brand nào —
+// cho nó một khối riêng, rộng hết cột, cao bằng control chuẩn. Nút nhỏ nhét
+// cạnh tiêu đề vừa khó bấm vừa trông như một chi tiết phụ.
+.hub__add-main {
+  @include m.motion(background, border-color, color);
+
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - var(--sp-4));
+  height: var(--h-ctrl);
+  margin: var(--sp-1) var(--sp-2) var(--sp-2);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--bg-hover);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+}
+
+.hub__form {
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2) var(--sp-2);
+}
+
+.hub__input {
+  @include m.surface(var(--bg-0), var(--line-2));
+  @include m.motion(border-color);
+
+  flex: 1;
+  min-width: 0;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  outline: none;
+
+  &:focus {
+    border-color: var(--accent-line);
+  }
+
+  &::placeholder {
+    color: var(--text-3);
+  }
+}
+
+.hub__submit {
+  @include m.motion(background);
+
+  flex-shrink: 0;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--bg-5);
+  }
+}
+
+.hub__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 var(--sp-2);
+}
+
+.hub__item {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+
+  > svg {
+    color: var(--text-3);
+  }
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+  }
+}
+
+.hub__item--active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+
+  > svg,
+  .hub__count {
+    color: var(--accent-text);
+  }
+}
+
+.hub__name {
+  @include m.ellipsis;
+
+  flex: 1;
+}
+
+// ── Brand Kit: brand là tầng trên, khay thụt vào một bậc ─────────────────
+.hub__brand + .hub__brand {
+  margin-top: 1px;
+}
+
+.hub__item--brand {
+  color: var(--text-1);
+  font-weight: var(--fw-semibold);
+}
+
+/// Khay của brand: thụt vào + vạch dọc mảnh để thấy rõ nó thuộc brand trên nó.
+.hub__item--bin {
+  margin-left: var(--sp-4);
+  padding-left: var(--sp-3);
+  border-left: 1px solid var(--line-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+
+/// Dòng "Thêm khay" — nằm trong nhóm khay nên thụt cùng bậc.
+.hub__add-row {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: calc(100% - var(--sp-4));
+  height: var(--h-ctrl-sm);
+  margin-left: var(--sp-4);
+  padding: 0 var(--sp-3);
+  border: none;
+  border-left: 1px solid var(--line-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: transparent;
+  color: var(--text-3);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+  }
+}
+
+.hub__form--nested {
+  margin-left: var(--sp-4);
+  padding-right: 0;
+}
+
+.hub__count {
+  flex-shrink: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+/// Nút xoá chỉ hiện khi rê vào dòng — việc phá huỷ không được bày sẵn.
+.hub__del {
+  @include m.motion(opacity, color);
+
+  display: flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  opacity: 0;
+
+  &:hover {
+    color: var(--danger);
+  }
+
+  .hub__item:hover &,
+  &:focus-visible {
+    opacity: 1;
+  }
+}
+
+.hub__empty {
+  padding: var(--sp-3) var(--sp-3);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+}

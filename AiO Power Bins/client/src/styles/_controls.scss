@@ -1,0 +1,260 @@
+// =========================================================================
+//  CONTROLS — nút, ô nhập, âm lượng.
+//  Chỉ có ĐÚNG 2 họ nút: việc thường (.btn) và việc phá huỷ (.btn--danger).
+//  (`.btn--state-*` không phải họ thứ ba — đó là màu trạng thái cho đúng một
+//   nút vừa bấm được vừa làm đèn báo; xem ghi chú tại chỗ.)
+//  Tối đa 1 nút primary trên màn hình (bài học: "nhìn rối" = nhiều KIỂU nút).
+// =========================================================================
+@use 'mixins' as m;
+
+// ── Nút chữ ──────────────────────────────────────────────────────────────
+.btn {
+  @include m.control-row;
+  @include m.surface;
+  @include m.motion(background, border-color, color);
+
+  appearance: none;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+
+  &:hover:not(:disabled) {
+    background: var(--bg-5);
+    border-color: var(--line-strong);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.btn--sm {
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-xs);
+}
+
+/// Nút chính — DUY NHẤT một cái mỗi màn hình.
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-on);
+  font-weight: var(--fw-semibold);
+
+  &:hover:not(:disabled) {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+}
+
+.btn--secondary {
+  background: var(--bg-4);
+  border-color: var(--line-2);
+  color: var(--text-1);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-2);
+
+  &:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: transparent;
+    color: var(--text-1);
+  }
+}
+
+// ── Màu TRẠNG THÁI cho nút Render preview ────────────────────────────────
+//  KHÔNG phải họ nút thứ ba. Đây là đúng MỘT nút vừa là nút bấm vừa là đèn
+//  báo tình trạng thư viện — chủ dự án yêu cầu 28/07: "chưa render hết thì
+//  màu đỏ, render xong là xanh". Nhìn lướt qua thanh công cụ là biết ngay
+//  còn thiếu preview hay không, khỏi phải đọc con số.
+//
+//  Dùng cùng công thức với .btn--danger: nền trong suốt + viền mờ + chữ màu,
+//  nên nó vẫn là nút phụ, không giành chỗ với nút chính "Thêm thư mục".
+.btn--state-pending {
+  background: transparent;
+  border-color: rgb(255 95 109 / 45%);
+  color: var(--danger);
+
+  &:hover:not(:disabled) {
+    background: rgb(255 95 109 / 12%);
+    border-color: var(--danger);
+  }
+}
+
+.btn--state-done {
+  background: transparent;
+  border-color: rgb(78 201 138 / 45%);
+  color: var(--ok);
+
+  &:hover:not(:disabled) {
+    background: rgb(78 201 138 / 12%);
+    border-color: var(--ok);
+  }
+}
+
+/// Việc phá huỷ: viền màu, KHÔNG bao giờ là primary.
+.btn--danger {
+  background: transparent;
+  border-color: rgb(240 115 111 / 45%);
+  color: var(--danger);
+
+  &:hover:not(:disabled) {
+    background: rgb(240 115 111 / 12%);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+}
+
+// ── Nút chỉ có icon ──────────────────────────────────────────────────────
+.icon-btn {
+  @include m.motion(background, border-color, color);
+
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--h-ctrl);
+  height: var(--h-ctrl);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: var(--text-1);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.icon-btn--on {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+// ── Ô tìm kiếm ───────────────────────────────────────────────────────────
+.searchbox {
+  @include m.surface(var(--bg-0), var(--line-2));
+  @include m.motion(border-color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1 1 140px;
+  min-width: 0;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-md);
+
+  &:focus-within {
+    border-color: var(--accent-line);
+  }
+}
+
+.searchbox__icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.searchbox__input {
+  @include m.ellipsis;
+
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  outline: none;
+
+  &::placeholder {
+    color: var(--text-3);
+  }
+}
+
+.searchbox__clear {
+  display: flex;
+  padding: 2px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-1);
+  }
+}
+
+// ── Cụm điều khiển nghe thử (âm lượng · cao độ) ───────────────────────────
+//  CHỈ hiện ở mục Âm thanh & Nhạc của Asset Manager.
+.audio-ctrl {
+  @include m.surface(var(--bg-0), var(--line-2));
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-3) 0 2px;
+  border-radius: var(--r-md);
+}
+
+.audio-ctrl__slider {
+  appearance: none;
+  width: 58px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line-2);
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--text-1);
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  &:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+}
+
+.audio-ctrl__value {
+  min-width: 28px;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  text-align: right;
+}
+
+// ── Đèn báo xử lý nền ────────────────────────────────────────────────────
+.queue-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  padding: 0 var(--sp-3);
+  height: var(--h-ctrl-sm);
+  border-radius: var(--r-pill);
+  background: var(--bg-hover);
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
+}

@@ -1,0 +1,749 @@
+/* =========================================================================
+   AiO Studio — Transcript · dang rieng cua panel nay
+
+   Token (mau, thang chu, khoang cach, chieu cao control) KHONG nam o day —
+   xem `@import` ngay ben duoi. Bon panel dung CHUNG mot bo token.
+   ========================================================================= */
+
+/* ☠️ TOKEN KHONG CON NAM O DAY.
+   Nguon chan ly duy nhat: `AiO Studio/design-system/tokens.css`.
+   File `tokens.css` canh ben la BAN COPY do `dong-bo-tokens.ps1` sinh ra —
+   sua no thi lan dong bo sau bi ghi de. Sua ban goc roi chay script. */
+@import './tokens.css';
+
+
+/* ── Nền tảng ────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Trình duyệt cho form control font riêng (~13.33px) → lệch khỏi thang --fs-*. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg-2);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; /* panel CEP không bao giờ cuộn ở tầng body */
+}
+
+/* Ai dùng bàn phím cũng phải thấy mình đang ở đâu — KHÔNG được gỡ. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Khung tổng ──────────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Thanh trên: tên công cụ + host. Mỏng, chìm, không giành chỗ với nội dung. */
+.topbar {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--sp-3);
+  align-items: center;
+  height: var(--h-topbar);
+  padding: 0 var(--sp-4);
+  border-bottom: 1px solid var(--line-1);
+  background: var(--bg-1);
+}
+
+/* Icon nhận diện panel — 13px, cùng ngôn ngữ hình với Asset Manager và
+   Power Bins (`.topbar__title-icon`). Anh Tiến 29/07 soi bốn panel cạnh nhau:
+   *"auto cut và transcripts không có icon"*.
+
+   Icon VỪA là nhận diện VỪA là đèn báo: cam = đang chạy trong Premiere,
+   xám = mở bằng trình duyệt. Một phần tử làm được hai việc thì đừng bày hai. */
+.topbar__icon {
+  display: block;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.topbar__icon--tat { color: var(--text-3); }
+
+.topbar__ten {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.topbar__host {
+  margin: 0 0 0 auto;
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.than {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-height: 0;
+  padding: var(--sp-4);
+  overflow-y: auto;
+  /* ☠️ GIỚI HẠN BỀ NGANG. Panel CEP kéo được từ ~300px tới hết màn hình; anh
+     Tiến kéo rộng ra thì mọi thứ giãn hết cỡ, nút AUTO CUT dài cả 1500px, đọc
+     rất mệt. Quy tắc Container Width: đừng để nội dung trải hết viewport.
+     Căn giữa để khi panel hẹp thì vẫn dùng trọn bề ngang. */
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── Hướng dẫn một dòng ──────────────────────────────────────────────── */
+
+.chidan {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+.chidan kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+}
+
+/* ── Nút ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: center;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.btn:hover:not(:disabled) {
+  background: var(--bg-5);
+  border-color: var(--line-strong);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Nút chính — DUY NHẤT một cái mỗi màn hình. */
+/* ☠️ NÚT CHÍNH TỪNG LÀ MỘT MẢNG CAM 610x46px CHIẾM 96% BỀ NGANG.
+   Đo 29/07 trên panel thật: cao 46px cứng, chữ 17px, in đậm, IN HOA, giãn
+   chữ 0,06em. Panel Asset Manager mở ngay cạnh thì nút cam lớn nhất chỉ
+   **117x24px, chữ 11px, không in hoa, không giãn chữ**.
+
+   Ba thứ cộng lại (to + IN HOA + giãn chữ) làm nó đọc ra như biển hiệu chứ
+   không phải nút bấm. Bỏ hai thứ sau, giữ lại độ nổi bằng MÀU và bề ngang —
+   nó vẫn là CTA duy nhất của màn hình, không cần hét lên mới thấy. */
+.btn--primary {
+  height: 34px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+/* Đang chạy: giữ nguyên chiều cao để bố cục không xê dịch (quy tắc 19). */
+.btn--primary:disabled {
+  opacity: 1;
+  border-color: var(--line-2);
+  background: var(--bg-4);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0;
+}
+
+/* ── Chọn mức: một hàng ba ô, kiểu segmented ─────────────────────────── */
+
+/* ☠️ ĐỪNG KHAI `repeat(N, 1fr)` — số lượng nút KHÔNG được chôn vào CSS.
+   Anh Tiến 29/07 soi bốn panel cạnh nhau: *"tỉ lệ button khác nhau, cái thì 2
+   cái thì 3"*. Bản cũ khai cứng 3 cột cho ba mức cắt, nên thanh hai nút chiếm
+   2/3 rồi chừa trống 1/3 — phải đẻ thêm lớp `.seg--nho` để vá.
+   `grid-auto-flow: column` chia đều theo số con THẬT: 2 nút mỗi nút 1/2,
+   3 nút mỗi nút 1/3. Bảo đảm theo CẤU TẠO, khỏi kiểm lại bằng mắt. */
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-1);
+}
+/* ☠️ KHÔNG dùng `--h-ctrl-sm` cho thanh này. Anh Tiến 29/07: *"nút này hơi
+   nhỏ làm lại"*. `--h-ctrl-sm` (24px) là cỡ của nút PHỤ trên thanh công cụ;
+   thanh này là **một trong hai quyết định chính** của cả màn hình (chọn cách
+   chép, rồi bấm chạy) nên phải bấm được thoải mái.
+   Đặt 32px — thấp hơn nút chính 34px một chút để thứ bậc vẫn rõ. */
+.seg__nut {
+  height: 32px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.seg__nut:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+.seg__nut--chon {
+  background: var(--bg-4);
+  color: var(--accent-text);
+  font-weight: var(--fw-semibold);
+}
+.seg__nut:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Khối chọn mức — một quyết định, một khung ─────────────────────────────
+   Anh Tiến 29/07: *"phần này em hãy tạo thành một section riêng với phần dưới"*.
+   Trên: cắt sâu cỡ nào. Dưới: cắt vào đâu, rồi chạy. Hai việc khác nhau thì
+   đừng để dính liền một mạch. */
+
+.khoi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
+  background: var(--bg-2);
+}
+.khoi .chidan { margin: 0; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HÌNH ĐỘNG DIỄN GIẢI — panel này làm gì
+   ══════════════════════════════════════════════════════════════════════════
+
+   ☠️ Anh Tiến chốt 29/07: *"điều quan trọng là em phải có animation diễn giải
+   cho từng phần"*. Mỗi chuyển động phải trả lời được **nó đang kể điều gì**.
+
+   BA Ý -> BA PHA, giữa các pha có NHỊP NGHỈ (xem MinhHoa.tsx):
+     1. vệt quét chạy dọc clip   -> máy đang NGHE cả đoạn
+     2. khối phụ đề hiện dần     -> lời thành CHỮ, đúng chỗ người ta nói
+     3. cờ đỏ bật lên            -> chỗ máy nghe KHÔNG CHẮC, bấm M đi soát
+
+   Nhịp nghỉ là thứ đắt nhất — làm liền mạch thì mắt không tách được ba ý.
+   Và chạy MỘT lần rồi dừng: lặp mãi thành đèn nhấp nháy kéo mắt người dựng. */
+
+.mh {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+/* ══════════════════════════════════════════════════════════════════════════
+   DẢI CỜ NGÔN NGỮ — anh Tiến 30/07: *"làm một carousel dạng flag cái ngôn ngữ
+   đang hỗ trợ vào đây"*
+   ══════════════════════════════════════════════════════════════════════════
+
+   ☠️ Cờ vẽ bằng SVG, KHÔNG dùng emoji. Đo thật: Windows không có glyph quốc kỳ
+   nên emoji cờ hiện ra thành HAI CHỮ CÁI ("VN", "US"). Bằng chứng: 🇻🇳 rộng
+   đúng bằng tổng 🇻 + 🇳. Xem chú thích đầy đủ trong `Co.tsx`.
+
+   Đây là dải chạy liên tục nên `infinite` là ĐÚNG bản chất — khác animation
+   diễn giải (thứ đó kể xong phải dừng). Nhưng phải chạy CHẬM và **dừng khi rê
+   chuột**, vì nó nằm cạnh vùng làm việc: một dải nhích mãi trong tầm mắt người
+   đang dựng phim là nhiễu, không phải trang trí. */
+
+.daico {
+  overflow: hidden;
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--line-1);
+}
+.daico__chay {
+  display: flex;
+  width: max-content;
+  gap: var(--sp-4);
+  /* 40s cho một vòng — đủ chậm để đọc được tên khi mắt bắt vào. */
+  animation: daico-chay 40s linear infinite;
+}
+/* Rê chuột thì dừng để đọc. Có chuyển động thì phải có cách bắt nó đứng lại. */
+.daico:hover .daico__chay { animation-play-state: paused; }
+@keyframes daico-chay {
+  /* Danh sách được nhân đôi trong `Co.tsx`, nên -50% là đúng MỘT vòng —
+     không thấy chỗ nối, không cần tính bề rộng bằng JS. */
+  to { transform: translateX(-50%); }
+}
+.daico__mot {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.daico__co {
+  display: block;
+  flex-shrink: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+}
+.daico__ten {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Tắt chuyển động nhưng GIỮ dải — nó là nội dung (danh sách ngôn ngữ),
+     không phải hiệu ứng. Người dùng cuộn ngang được. */
+  .daico__chay { animation: none; }
+  .daico { overflow-x: auto; }
+}
+
+/* ── Một lựa chọn: nhãn · thanh · hệ quả ──────────────────────────────────
+   Ba tầng theo thứ tự đọc: "chọn cái gì" → các lựa chọn → "chọn cái này thì
+   sao". Tầng thứ ba là thứ hay bị bỏ, và nó chính là thứ người dùng cần:
+   không có nó thì phải chạy thử mấy phút mới biết khác gì. */
+/* Ô chọn sequence — cùng ngôn ngữ với ô nhập của bộ (bg-4, viền line-2). */
+.seqpick {
+  height: var(--h-ctrl);
+  width: 100%;
+  background: var(--bg-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  padding: 0 var(--sp-3);
+}
+.seqpick:focus { outline: none; border-color: var(--accent-line); }
+
+.chon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.chon__nhan {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+/* Hệ quả của lựa chọn đang chọn. Cỡ chữ nhỏ hơn nhãn nút nhưng KHÔNG mờ đi —
+   `opacity` kéo tương phản xuống dưới AA (đã trả giá 29/07). Phân cấp bằng
+   CỠ CHỮ và MÀU có đo, không bằng độ mờ. */
+.chon__mo {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+
+/* ── Minh hoạ hai mô hình — bấm cái nào THẤY NGAY nó khác chỗ nào ──────────
+   Anh Tiến 29/07: *"2 phần này cần có animation để hiểu, thêm vào"*. Trước đó
+   thanh chọn chỉ tô sáng nút — người dùng không có cách nào biết "Nhanh" khác
+   "Phụ đề câu dài" ở đâu, ngoài chạy thử cả hai, mỗi lần mấy phút.
+
+   Hình kể đúng khác biệt THẬT: số khối và độ dài khối. */
+.mh__mohinh {
+  display: block;
+  width: 100%;
+  height: 14px; /* cố định — xem chú thích `--h` ở `.mh__hinh` */
+}
+.mh__mhkhoi {
+  animation: mh-hienchu 300ms var(--ease) both;
+  animation-delay: var(--tre, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mh__mhkhoi { animation: none; opacity: 1; transform: none; }
+}
+
+/* Cả hình là một nút — bấm để xem lại. Có đường VÀO thì phải có đường RA:
+   animation chạy một lần rồi dừng, không có cách xem lại là cụt. */
+.mh__nut {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  cursor: pointer;
+}
+.mh__nut:hover { border-color: var(--line-1); }
+.mh__nut:focus-visible {
+  outline: none;
+  border-color: var(--accent-line);
+}
+
+.mh__hinh {
+  display: block;
+  width: 100%;
+  /* ☠️ Cao CỐ ĐỊNH. `height:auto` làm hình phình khổng lồ khi panel kéo rộng —
+     đo thật ở panel Autocut 29/07: viewBox 320 trong panel 1600px cho ra hình
+     cao 310px, để lại một khoảng trống mênh mông. */
+  height: 54px;
+}
+
+.mh__chu {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.mh__chu b { color: var(--text-2); font-weight: var(--fw-semibold); }
+
+/* ── Màu: lấy gần timeline Premiere để người dựng nhận ra ngay ──────────── */
+.mh__v { fill: #2f5d86; stroke: #4a86c5; stroke-width: 0.6; }
+.mh__a { fill: #2c6236; stroke: #4d9e5c; stroke-width: 0.6; }
+.mh__song { stroke: #8fe0a4; stroke-width: 1.1; stroke-linecap: round; opacity: 0.9; }
+
+/* ☠️ CAPTION TRACK MÀU VÀNG, KHÔNG PHẢI TÍM — anh Tiến sửa 29/07:
+   *"phần caption là phần màu vàng chứ không phải màu tím nha em"*.
+   Vàng là màu Premiere thật dùng cho caption track; tím là màu tôi tự nghĩ ra
+   cho "dễ phân biệt". Hình minh hoạ mà tô màu khác phần mềm thật thì người
+   dựng phải dịch trong đầu — đúng thứ nó sinh ra để tránh.
+   → Lấy màu từ CHÍNH phần mềm, đừng chọn cho đẹp. */
+.mh__ccnen { fill: #6b5518; stroke: #e8c05a; stroke-width: 0.6; }
+.mh__ccchu { stroke: #f7e6b4; stroke-width: 1.6; stroke-linecap: round; }
+
+/* Cờ — CÙNG màu với marker thật mà panel cắm lên timeline. */
+.mh__cocan { stroke: var(--danger); stroke-width: 1.2; }
+.mh__cola { fill: var(--danger); }
+
+/* ── PHA 1: vệt quét = "máy đang nghe" ─────────────────────────────────── */
+.mh__quet {
+  fill: url(#mh-quet-mau);
+  animation: mh-quet var(--quet-dai, 900ms) cubic-bezier(0.4, 0, 0.5, 1) both;
+}
+@keyframes mh-quet {
+  /* Đi từ x=-40 (ngoài mép trái) tới hết bề ngang viewBox 320 => 360 đơn vị.
+     Trong SVG, `px` của CSS transform là ĐƠN VỊ VIEWBOX, không phải pixel màn
+     hình — nên `preserveAspectRatio="none"` kéo giãn cũng không sai. */
+  from { transform: translateX(0); }
+  to { transform: translateX(360px); }
+}
+
+/* ── PHA 2: lời thành chữ, trái sang phải ──────────────────────────────── */
+.mh__cc {
+  animation: mh-hienchu var(--dai, 380ms) var(--ease) both;
+  animation-delay: var(--tre, 0ms);
+}
+@keyframes mh-hienchu {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PHA 3: cắm cờ ────────────────────────────────────────────────────────
+   `scaleY` từ CHÂN cờ (transform-origin đặt trong JSX) — cờ MỌC LÊN từ
+   timeline. Đây là một trong số ít chỗ `scaleY` đúng: nó kể được ý "cắm",
+   trong khi `scale` đều lại thành "phình ra từ giữa". */
+.mh__co {
+  animation: mh-camco 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--tre, 0ms);
+}
+@keyframes mh-camco {
+  from { opacity: 0; transform: scaleY(0); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+/* ☠️ TÔN TRỌNG `prefers-reduced-motion` — Windows tắt hiệu ứng là cờ này bật.
+   Tắt chuyển động nhưng KHÔNG được để phần tử kẹt ở trạng thái đầu: phải hiện
+   đủ cả ba tầng, vì chúng là NỘI DUNG chứ không phải trang trí. */
+@media (prefers-reduced-motion: reduce) {
+  .mh__cc,
+  .mh__co {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  /* Vệt quét không mang nội dung gì ngoài "đang nghe" — tắt hẳn. */
+  .mh__quet { animation: none; opacity: 0; }
+}
+/* ── ĐANG CHẠY ────────────────────────────────────────────────────────────
+   Thay cho cái nút xám mà anh Tiến gọi là "phèn" (29/07). Thanh KHÔNG BAO GIỜ
+   đứng im: đo được thì đầy dần, chưa đo được thì vệt sáng trôi qua lại. */
+
+.chay {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.chay__thanh {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  overflow: hidden;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+}
+
+.chay__day {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent-soft);
+  transition: width 0.3s ease;
+}
+
+/* Chưa đo được % thì cho một vệt sáng trôi — đứng ở 0% nhìn y như treo. */
+.chay__thanh--troi::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+  animation: chay-troi 1.5s ease-in-out infinite;
+}
+@keyframes chay-troi {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+.chay__chu {
+  position: relative;
+  flex: 1;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.chay__chu b {
+  margin-left: var(--sp-2);
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.chay__gio {
+  position: relative;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.chay__buoc {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chay__buoc li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+}
+.chay__cham {
+  width: 13px;
+  text-align: center;
+  font-size: var(--fs-2xs);
+}
+.chay__buoc--xong { color: var(--text-3); }
+.chay__buoc--xong .chay__cham { color: var(--ok); }
+.chay__buoc--dang { color: var(--text-1); font-weight: var(--fw-semibold); }
+.chay__buoc--dang .chay__cham { color: var(--accent); }
+.chay__buoc--cho { color: var(--text-3); opacity: 0.5; }
+
+/* ── Thông báo ───────────────────────────────────────────────────────── */
+
+/* Việc người dùng CẦN LÀM — không phải hỏng hóc, nên không tô đỏ. */
+.canlam {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh);
+  white-space: pre-wrap;
+}
+
+.loi {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid rgb(255 95 109 / 40%);
+  border-radius: var(--r-md);
+  background: rgb(255 95 109 / 10%);
+  color: #ffb3ba;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Kết quả ──────────────────────────────────────────────────────────────
+   Người dựng cần đúng ba con số, rồi phụ đề nằm đâu, rồi chỗ nào phải soát.
+   Số kỹ thuật gấp vào trong `.fold`.
+
+   ☠️ TRƯỚC 2.1.0 KHỐI NÀY KHÔNG HỀ CÓ CSS. `.ketqua`, `.ketqua__so`,
+   `.ketqua__dong`, `.ketqua__duong`, `.canh` chưa từng được khai trong
+   styles.css — component vẫn vẽ ra, nhưng bằng style MẶC ĐỊNH của trình
+   duyệt: ba ô số xếp dọc, chữ serif, không viền không nền. Đây chính là thứ
+   người dùng nhìn thấy sau MỖI lần chạy.
+
+   Phát hiện bằng cách đối chiếu máy móc: gom mọi class TSX dùng, gom mọi
+   class CSS khai, lấy hiệu hai tập. Nhìn bằng mắt qua 800 dòng CSS thì không
+   đời nào thấy. */
+
+.ketqua {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.ketqua__so {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+}
+.ketqua__so > div {
+  display: flex;
+  min-width: 0; /* số dài (12.345) đẩy phình cột nếu thiếu dòng này */
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+}
+.ketqua__so b {
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-display);
+  line-height: var(--lh-tight);
+}
+/* Còn chỗ phải soát thì đổi MÀU — anh Tiến 28/07: *"chưa render hết thì màu
+   đỏ, render xong là xanh"*. Nhìn màu là biết còn việc, khỏi đọc số. Dùng
+   `--warn` chứ không `--danger`: đây là việc-phải-làm, không phải hỏng hóc. */
+.ketqua__so b.canh { color: var(--warn); }
+.ketqua__so span {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+.ketqua__dong {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh);
+}
+.ketqua__dong b { color: var(--text-1); font-weight: var(--fw-semibold); }
+
+.ketqua__duong {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-sm);
+  background: var(--bg-0);
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  /* Đường dẫn dài phải xuống dòng, không được đẩy panel rộng ra. */
+  word-break: break-all;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ĐƯỜNG RA — khối dọn thứ panel đã tạo
+   ══════════════════════════════════════════════════════════════════════════
+   Anh Tiến 30/07: *"thêm nút xoá scripts và xoá marker"*. Luật: có đường VÀO
+   thì phải có đường RA.
+
+   ☠️ Nút phụ (`.btn--phu`), KHÔNG phải primary — mỗi màn hình chỉ một nút chính,
+   và việc phá huỷ thì không bao giờ được làm nút chính. */
+.don {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-2);
+}
+.don__nhan {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.don__nut {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+.don__mo {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+
+/* Nút phụ: cùng dáng `.btn` nhưng viền, không tô đặc — việc phá huỷ đứng xa
+   nút hay bấm và không tranh chú ý với nút chính. */
+.btn--phu {
+  border-color: var(--line-2);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.btn--phu:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--bg-4);
+  color: var(--text-1);
+}

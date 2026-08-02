@@ -1,0 +1,28 @@
+{
+  "name": "aio-studio-autocut",
+  "private": true,
+  "version": "1.5.0",
+  "type": "module",
+  "description": "AiO Studio - Autocut: tu cat khoang lang tren timeline Premiere",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:release": "tsc -b && vite build --mode release",
+    "kiem": "tsc src/services/silencelog.ts src/services/plan.ts src/services/srt.ts src/services/amluong.ts --target es2020 --module es2020 --skipLibCheck --outDir ../tests/js && node ../tests/kiem-tinh-toan.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-singlefile": "^2.3.3",
+    "zxp-sign-cmd": "^2.0.0"
+  }
+}

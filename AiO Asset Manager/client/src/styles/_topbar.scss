@@ -1,0 +1,63 @@
+// =========================================================================
+//  TOPBAR — chỉ còn 2 dải mỏng (trước đây 4 dải, ăn ~250px chiều cao).
+//  Dải 1: điều hướng + hành động chính. Dải 2: tìm kiếm (+ âm lượng).
+// =========================================================================
+@use 'mixins' as m;
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  // Chieu cao thanh tren lay tu token dung chung — xem design-system/tokens.css
+  height: var(--h-topbar);
+  padding: 0 var(--sp-3);
+  border-bottom: 1px solid var(--line-1);
+  // Thanh tren dung --bg-1 (toi hon nen app) de tach bach — xem design-system/MASTER.md
+  background: var(--bg-1);
+}
+
+.topbar__spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+/// Tên không gian làm việc đang mở — thay cho 3 nút tab tô xanh chói.
+.topbar__title {
+  @include m.ellipsis;
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.topbar__title-icon {
+  display: flex;
+  color: var(--text-3);
+}
+
+/// Đang quét — số chạy, không đổi bố cục.
+.topbar__scanning {
+  flex-shrink: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+// ── Dải 2: tìm kiếm ──────────────────────────────────────────────────────
+.contextbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-height: 38px;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--line-1);
+  background: var(--bg-2);
+}

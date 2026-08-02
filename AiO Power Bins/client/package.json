@@ -1,0 +1,31 @@
+{
+  "name": "aio-studio-asset-manager",
+  "private": true,
+  "version": "2.0.0-dev.6",
+  "type": "module",
+  "description": "AiO Studio — Asset Manager panel (CEP) cho Premiere Pro",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:release": "tsc -b && vite build --mode release"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "sass": "^1.102.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-singlefile": "^2.3.3",
+    "zxp-sign-cmd": "^2.0.0"
+  }
+}

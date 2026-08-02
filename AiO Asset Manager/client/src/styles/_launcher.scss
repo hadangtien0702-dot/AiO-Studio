@@ -1,0 +1,131 @@
+// =========================================================================
+//  LAUNCHER — màn hình chào khi mở panel: chọn 1 trong 2 phần chính.
+//  Đây là nơi DUY NHẤT trong app được phép "to và thoáng" — nó không phải
+//  vùng làm việc, nó là cánh cửa.
+// =========================================================================
+@use 'mixins' as m;
+
+.launcher {
+  @include m.scroll-thin;
+
+  position: relative; // neo nút Cài đặt ở góc trên phải
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-6) var(--sp-5);
+  // Vệt sáng rất nhẹ phía trên cho có chiều sâu, không dùng gradient chói.
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgb(255 87 20 / 8%), transparent 60%),
+    var(--bg-2);
+}
+
+// ── Thương hiệu ──────────────────────────────────────────────────────────
+.launcher__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.launcher__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--bg-3);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.launcher__name {
+  margin: 0;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+// ── Hai lựa chọn chính ───────────────────────────────────────────────────
+.launcher__choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 520px;
+}
+
+.launcher-card {
+  @include m.surface(var(--bg-3), var(--line-1));
+  @include m.motion(border-color, background, transform);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border-radius: var(--r-lg);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+
+  &:hover {
+    background: var(--bg-4);
+    border-color: var(--line-strong);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.launcher-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
+  background: var(--bg-0);
+  color: var(--text-2);
+}
+
+.launcher-card__title {
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.launcher-card__desc {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+}
+
+.launcher-card__count {
+  margin-top: auto;
+  color: var(--text-2);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+}
+
+// ── Lối vào phụ (Gói Packs) — nhỏ, không cạnh tranh với 2 phần chính ─────
+
+// Cài đặt thuộc về cả tool — trên màn hình chọn nó nằm góc trên phải,
+// tách khỏi hai lối vào chính để không cạnh tranh sự chú ý.
+.launcher__settings {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+}

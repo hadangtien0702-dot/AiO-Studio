@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build, Binaries, and Output directories
+dist/
+build/
+bin/
+.next/
+.wrangler/
+out/
+*.zxp
+*.exe
+
+# Adobe Premiere / AE preview & binary media files
+*.cfa
+*.pek
+*.aegraphic
+*.prproj
+*.mp4
+*.wav
+*.mp3
+*.prin
+file pr for test/Adobe Premiere Pro (Beta) Audio Previews/
+file pr for test/**/Audio Previews/
+file pr for test/**/Peak Files/
+
+# Python / Virtual Environment
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# Environment and Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Generated
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.log

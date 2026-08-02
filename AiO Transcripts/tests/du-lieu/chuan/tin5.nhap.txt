@@ -1,0 +1,37 @@
+# BAN NHAP CHO SOAT - tin5
+#
+# CACH SOAT:
+#   1. Mo file WAV cung ten, nghe theo moc thoi gian.
+#   2. Sua THANG vao phan chu sau dau "|". Dung doi moc thoi gian.
+#   3. Dong bat dau bang [?] la cho may TU KHAI khong chac - nghe ky.
+#   4. Dong bat dau bang [!] la cho HAI MO HINH chep khac nhau - nghe ky hon.
+#   5. Nghe ra gi thi ghi nay - ke ca noi lap, noi vap. Day la ban CHUAN.
+#   6. Doan im lang hoac khong ro tieng nguoi noi: xoa han dong do.
+#
+# Luu lai thanh: tin5.chuan.txt
+
+    00:00.0 | Bây giờ Leon sẽ chia sẻ để anh chị biết
+[!] 00:04.4 | Vì sao Elix Sale Agent tại Think Small & Strong
+[?] 00:07.0 | Lại hoàn toàn khác biệt so với những công ty khác
+[!] 00:09.7 | Khi tham gia khóa đào tạo Elix Sale Agent
+[!] 00:12.1 | Anh chị sẽ được đào tạo kỹ năng chốt sale
+    00:14.4 | Sắc bén hoàn toàn miễn phí trong vòng 15 ngày
+[!] 00:17.0 | Điều đặc biệt ở đây là anh chị sẽ có cơ hội
+    00:19.4 | Được đào tạo trực tiếp từ Leon
+[!] 00:21.3 | Là CEO của Think Small & Strong
+[!] 00:23.3 | Leon là một trong top 1%
+    00:25.9 | Của những người bán hàng xuất sắc nhất
+    00:27.6 | Trên thế giới trong ngành bảo hiểm
+[!] 00:28.8 | và đã được danh hiệu là người bán hàng đứng đầu trong danh sách 15.000 agents tại Mỹ trong suốt 4 năm vừa qua.
+[!] 00:36.0 | Đặc biệt hơn nữa, Team Small Insurance đã nhận được giải thưởng từ ClickFunnels
+[!] 00:39.6 | với doanh số lên đến gần 2 triệu đô một năm cho việc tìm kiếm khách hàng bằng công nghệ Digital Marketing Online.
+[!] 00:46.3 | Là một CEO, là một mentor đầy kinh nghiệm,
+[!] 00:49.1 | Leon tin chắc rằng Leon sẽ giúp các anh chị trở thành một agent giỏi.
+[!] 00:54.5 | Là một CEO, một mentor, là một CEO, một mentor, là một CEO, một mentor đầy kinh nghiệm,
+[!] 01:00.6 | Leon tin chắc rằng Leon sẽ giúp anh chị trở thành một người Asian giỏi.
+[!] 01:04.9 | Đây sẽ là cơ hội mà anh chị không nên bỏ lỡ.
+    01:07.5 | Hiện tại Leon chỉ còn 4 chỗ chống cho vị trí này.
+[!] 01:15.3 | Đây sẽ là cơ hội mà anh chị không nên bỏ lỡ.
+    01:18.0 | Hiện tại Leon chỉ còn 4 chỗ chống cho vị trí này.
+    01:20.7 | Truy cập ngay vào website bên dưới để ứng tuyển.
+    01:23.3 | Hy vọng sẽ được gặp và trò chuyện với anh chị.

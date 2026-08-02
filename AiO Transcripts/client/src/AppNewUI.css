@@ -1,0 +1,349 @@
+/* AppNewUI.css - CSS Độc Lập Cho Giao Diện Mới Transcripts */
+
+.app-newui {
+  background-color: var(--bg-1, #0a0a0c);
+  color: var(--text-1, #f5f5f7);
+  font-family: var(--font-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif);
+}
+
+.topbar-newui {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(21, 21, 25, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent, #ff5714);
+  box-shadow: 0 0 10px rgba(255, 87, 20, 0.8);
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+.version-pill {
+  font-size: 10px;
+  background: rgba(255, 87, 20, 0.15);
+  color: var(--accent-text, #ffb599);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 87, 20, 0.3);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-3, #8d8d95);
+}
+
+.status-light.online {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok, #4ec98a);
+  box-shadow: 0 0 6px rgba(78, 201, 138, 0.8);
+}
+
+.than-newui {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Card Styling */
+.ui-card {
+  background: var(--bg-3, #1c1c1f);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.ui-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.hero-card {
+  background: linear-gradient(145deg, rgba(255, 87, 20, 0.1) 0%, rgba(28, 28, 31, 0.8) 100%);
+  border: 1px solid rgba(255, 87, 20, 0.25);
+}
+
+.hero-header-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.badge-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff5714;
+  background: rgba(255, 87, 20, 0.15);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.engine-tag {
+  font-size: 10px;
+  color: #a0a0aa;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.hero-card h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+}
+
+.hero-desc {
+  font-size: 12px;
+  color: #b0b0b8;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.hero-desc kbd {
+  background: #2a2a30;
+  border: 1px solid #40404a;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+/* Control Groups */
+.card-title-row {
+  margin-bottom: 14px;
+}
+
+.card-title-row h3 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+}
+
+.sub-note {
+  font-size: 11px;
+  color: #888890;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #d0d0d8;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.select-custom {
+  background: #141417;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-custom:focus {
+  border-color: #ff5714;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #121215;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.segment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #8d8d95;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.segment-btn.active {
+  background: #282830;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-hint {
+  font-size: 11px;
+  color: #4ec98a;
+  margin: 2px 0 0 0;
+}
+
+/* Action Buttons */
+.btn-action-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ff5714 0%, #ff7038 100%);
+  color: #0d0400;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 87, 20, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-action-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 87, 20, 0.5);
+}
+
+.processing-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 87, 20, 0.1);
+  border: 1px solid rgba(255, 87, 20, 0.3);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #ffb599;
+  font-weight: 600;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 181, 153, 0.3);
+  border-top-color: #ffb599;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Result Card */
+.result-card {
+  border-color: rgba(78, 201, 138, 0.3);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-success-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4ec98a;
+}
+
+.time-tag {
+  font-size: 11px;
+  color: #888890;
+}
+
+.result-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stat-box {
+  background: #141417;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.stat-num.highlight {
+  color: #ff5f6d;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: #888890;
+  margin-top: 2px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-sec {
+  flex: 1;
+  background: #24242a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d0d0d8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-sec:hover {
+  background: #2e2e36;
+  color: #ffffff;
+}

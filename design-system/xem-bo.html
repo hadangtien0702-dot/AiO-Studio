@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Studio — xem cả bộ</title>
+<link rel="stylesheet" href="/design-system/tokens.css" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg-2); color: var(--text-1);
+    font-family: var(--font-ui); font-size: var(--fs-md); line-height: var(--lh);
+    padding: var(--sp-6) var(--sp-5);
+  }
+  .dau { max-width: 1400px; margin: 0 auto var(--sp-6); }
+  .dau h1 { font-family: var(--font-display); font-size: var(--fs-xl); letter-spacing: var(--ls-display); }
+  .dau p { color: var(--text-3); font-size: var(--fs-sm); margin-top: var(--sp-2); }
+  .luoi {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: var(--sp-5);
+  }
+  .the {
+    background: var(--bg-3); border: 1px solid var(--line-1);
+    border-radius: var(--r-lg); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .the__dau {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--bg-1); border-bottom: 1px solid var(--line-1);
+  }
+  .the__ten { font-weight: var(--fw-semibold); font-size: var(--fs-sm); }
+  .the__mo { color: var(--text-3); font-size: var(--fs-xs); margin-left: auto; }
+  .the iframe {
+    width: 100%; height: 720px; border: 0; background: var(--bg-2);
+  }
+  .ghichu {
+    max-width: 1400px; margin: var(--sp-6) auto 0;
+    color: var(--text-3); font-size: var(--fs-sm);
+  }
+</style>
+</head>
+<body>
+  <div class="dau">
+    <h1>AiO Studio — cả bộ 5 panel</h1>
+    <p>Bản xem UI ngoài Premiere — nút gọi vào host sẽ báo "không ở trong Premiere", đó là đúng thiết kế. Mở từ điện thoại: cùng địa chỉ, thay localhost bằng IP máy.</p>
+  </div>
+  <div class="luoi">
+    <div class="the">
+      <div class="the__dau"><span class="the__ten">Re-Frames</span><span class="the__mo">shorts theo nội dung · bám chủ thể · song ngữ</span></div>
+      <iframe src="/AiO Auto Re-Frames/dist/index.html"></iframe>
+    </div>
+    <div class="the">
+      <div class="the__dau"><span class="the__ten">Transcripts</span><span class="the__mo">phụ đề + marker chỗ nghe không chắc</span></div>
+      <iframe src="/AiO Transcripts/dist/index.html"></iframe>
+    </div>
+    <div class="the">
+      <div class="the__dau"><span class="the__ten">Autocut</span><span class="the__mo">cắt khoảng lặng</span></div>
+      <iframe src="/AiO Autocut/dist/index.html"></iframe>
+    </div>
+    <div class="the">
+      <div class="the__dau"><span class="the__ten">Asset Manager</span><span class="the__mo">kho asset</span></div>
+      <iframe src="/AiO Asset Manager/dist/index.html"></iframe>
+    </div>
+    <div class="the">
+      <div class="the__dau"><span class="the__ten">Power Bins</span><span class="the__mo">brand kit mọi project</span></div>
+      <iframe src="/AiO Power Bins/dist/index.html"></iframe>
+    </div>
+  </div>
+  <p class="ghichu">Nguồn: file dist thật của từng panel — đúng từng pixel bản đang cài trong Premiere.</p>
+</body>
+</html>

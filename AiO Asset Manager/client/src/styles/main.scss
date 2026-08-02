@@ -1,0 +1,18 @@
+// =========================================================================
+//  AiO Studio — DESIGN SYSTEM (điểm vào duy nhất)
+//  Hướng: "Studio Console" — tối, gọn, NỘI DUNG LÀ CHÍNH.
+//  Panel công cụ nhúng trong Adobe Premiere Pro. Chữ: SF Pro.
+//
+//  Thứ tự nạp có ý nghĩa: token → base → control → khối giao diện.
+//  Tài liệu đầy đủ: design-system/aio-studio/MASTER.md
+// =========================================================================
+
+@use 'tokens';
+@use 'base';
+@use 'controls';
+@use 'topbar';
+@use 'launcher';
+@use 'sidebar';
+@use 'grid';
+@use 'card';
+@use 'overlays';

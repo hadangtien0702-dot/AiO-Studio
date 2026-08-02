@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Guide Frame — bàn xem trước safe zone</title>
+<link rel="stylesheet" href="./dist/tokens.css" />
+<style>
+  /* Bàn duyệt bằng MẮT cho anh Tiến — vẽ toàn bộ định dạng từ cùng một bộ vẽ
+     (dist/ve-guide.js) và cùng một dữ liệu (dist/safe-zones.js) mà panel dùng.
+     Trang này đúng thì panel vẽ đúng — một nguồn duy nhất. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg-2); color: var(--text-1);
+    font-family: var(--font-ui); font-size: var(--fs-md); line-height: var(--lh);
+    padding: 24px;
+  }
+  h1 { font-size: var(--fs-xl); font-weight: var(--fw-semibold); }
+  .meta { color: var(--text-3); font-size: var(--fs-sm); margin-top: 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--fs-xs); color: var(--text-3); margin-top: 10px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .luoi {
+    margin-top: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;
+  }
+  .the {
+    background: var(--bg-3); border: 1px solid var(--line-1); border-radius: var(--r-lg);
+    padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .the__ten { font-weight: var(--fw-semibold); display: flex; align-items: center; gap: 8px; }
+  .the__cham { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .cham--chinh_thuc { background: var(--ok); }
+  .cham--ben_thu_3 { background: var(--warn); }
+  .cham--uoc_luong { background: var(--text-3); }
+  .the__khung { background: #1a1a1e; border-radius: 6px; display: flex; justify-content: center; padding: 8px; }
+  .the__khung canvas { max-width: 100%; }
+  .the__meta { color: var(--text-3); font-size: var(--fs-xs); }
+  .the__vung { font-size: var(--fs-xs); color: var(--text-2); }
+  .the__vung div { padding: 1px 0; }
+  .the__nguon { font-size: var(--fs-2xs); color: var(--text-3); border-top: 1px solid var(--line-1); padding-top: 6px; }
+  .the__ghichu { font-size: var(--fs-xs); color: var(--text-2); }
+  .lang {
+    position: fixed; top: 16px; right: 16px;
+    height: 28px; padding: 0 12px;
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    background: var(--bg-4); color: var(--text-1); font-size: var(--fs-sm);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <h1>AiO Guide Frame — bàn xem trước safe zone</h1>
+  <div class="meta" id="meta"></div>
+  <div class="legend" id="legend"></div>
+  <div class="luoi" id="luoi"></div>
+  <button class="lang" id="lang" onclick="doiNgonNgu()">EN</button>
+
+<script src="./dist/safe-zones.js"></script>
+<script src="./dist/ve-guide.js"></script>
+<script>
+  'use strict';
+  var DU = window.SAFE_ZONES;
+  var L = 'vi';
+  var TT = {
+    vi: { chinh_thuc: 'chính thức', ben_thu_3: 'bên thứ ba đo', uoc_luong: 'ước lượng',
+          lgUi: 'Bị UI che', lgCrop: 'Bị cắt (ngữ cảnh khác)', lgKn: 'Đệm khuyến nghị', lgSafe: 'Vùng an toàn',
+          meta: 'Số liệu {v} · {n} nền tảng · {f} khung hình · nguồn gốc từng con số: nghien-cuu-safe-zone.md',
+          canh: { top: 'Trên', bottom: 'Dưới', left: 'Trái', right: 'Phải' } },
+    en: { chinh_thuc: 'official', ben_thu_3: 'third-party', uoc_luong: 'estimate',
+          lgUi: 'Covered by UI', lgCrop: 'Cropped (other surfaces)', lgKn: 'Recommended padding', lgSafe: 'Safe area',
+          meta: 'Data {v} · {n} platforms · {f} frames · every number traces to nghien-cuu-safe-zone.md',
+          canh: { top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right' } }
+  };
+  function t(k) { return TT[L][k]; }
+
+  function dung() {
+    var soFmt = 0;
+    DU.nenTang.forEach(function (nt) { soFmt += nt.dinhDang.length; });
+    document.getElementById('meta').textContent =
+      t('meta').replace('{v}', DU.phienBanDuLieu).replace('{n}', DU.nenTang.length).replace('{f}', soFmt);
+    document.getElementById('legend').innerHTML =
+      '<span><i style="background:rgba(255,95,109,0.55)"></i>' + t('lgUi') + '</span>' +
+      '<span><i style="background:repeating-linear-gradient(45deg,rgba(232,192,90,0.8) 0 2px,transparent 2px 5px)"></i>' + t('lgCrop') + '</span>' +
+      '<span><i style="border:1px dashed rgba(255,255,255,0.55);background:none"></i>' + t('lgKn') + '</span>' +
+      '<span><i style="border:1.5px solid rgba(64,220,255,0.95);background:none"></i>' + t('lgSafe') + '</span>' +
+      '<span><i style="background:var(--ok);border-radius:50%"></i>' + t('chinh_thuc') + '</span>' +
+      '<span><i style="background:var(--warn);border-radius:50%"></i>' + t('ben_thu_3') + '</span>' +
+      '<span><i style="background:var(--text-3);border-radius:50%"></i>' + t('uoc_luong') + '</span>';
+
+    var luoi = document.getElementById('luoi');
+    luoi.innerHTML = '';
+    DU.nenTang.forEach(function (nt) {
+      nt.dinhDang.forEach(function (f) {
+        var the = document.createElement('div');
+        the.className = 'the';
+        var vungHtml = f.vung.map(function (v) {
+          return '<div>' + TT[L].canh[v.canh] + ' <b>' + v.pt + '%</b> · ' + v.px1080 + 'px — ' + v.ui[L] + '</div>';
+        }).join('');
+        the.innerHTML =
+          '<div class="the__ten"><span class="the__cham cham--' + f.trangThai + '"></span>' + nt.ten + ' — ' + f.ten[L] + '</div>' +
+          '<div class="the__khung"><canvas></canvas></div>' +
+          '<div class="the__meta">' + f.canvas.w + '×' + f.canvas.h + ' · ' + t(f.trangThai) + '</div>' +
+          '<div class="the__vung">' + vungHtml + '</div>' +
+          ((f.ghiChu && f.ghiChu[L]) ? '<div class="the__ghichu">' + f.ghiChu[L] + '</div>' : '') +
+          '<div class="the__nguon">' + f.nguon + '</div>';
+        luoi.appendChild(the);
+
+        var cv = the.querySelector('canvas');
+        var w = 216, h = w * f.canvas.h / f.canvas.w;
+        if (h > 300) { h = 300; w = h * f.canvas.w / f.canvas.h; }
+        var dpr = window.devicePixelRatio || 1;
+        cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+        cv.style.width = Math.round(w) + 'px'; cv.style.height = Math.round(h) + 'px';
+        var ctx = cv.getContext('2d');
+        ctx.scale(dpr, dpr);
+        ctx.fillStyle = '#101013';
+        ctx.fillRect(0, 0, w, h);
+        // Ban duyet noi bo GIU nhan %·px de doi chieu — panel nguoi dung thi KHONG
+        VeGuide.ve(ctx, w, h, f, L, { tag: false, nhan: true });
+      });
+    });
+    document.getElementById('lang').textContent = (L === 'vi') ? 'EN' : 'VI';
+  }
+  function doiNgonNgu() { L = (L === 'vi') ? 'en' : 'vi'; dung(); }
+  dung();
+</script>
+</body>
+</html>

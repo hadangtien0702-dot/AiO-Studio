@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Studio — Style Guide (Studio Console)</title>
+<style>
+:root{
+  --bg-0:#0a0a0b;--bg-1:#0f0f11;--bg-2:#151517;--bg-3:#1c1c1f;--bg-4:#232327;--bg-5:#2c2c31;--bg-6:#161618;
+  --bg-hover:rgb(255 255 255 /5%);--bg-active:rgb(255 255 255 /9%);
+  --line-1:rgb(255 255 255 /6%);--line-2:rgb(255 255 255 /10%);--line-strong:rgb(255 255 255 /16%);
+  --text-1:#f5f5f7;--text-2:#c3c3c8;--text-3:#8d8d95;--text-meta:#9b9ba3;--icon-dim:#8f8f97;
+  --accent:#ff5714;--accent-hover:#ff7038;--accent-soft:rgb(255 87 20 /16%);--accent-line:rgb(255 87 20 /40%);
+  --accent-text:#ffb599;--accent-on:#150700;
+  --ok:#4ec98a;--warn:#e8c05a;--danger:#ff5f6d;--danger-strong:#ff4757;--heart:#ff6b81;
+  --font-ui:'SF Pro Text','SF Pro Display',-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
+  --font-display:'SF Pro Display','SF Pro Text',-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+  --fs-2xs:10px;--fs-xs:11px;--fs-sm:12px;--fs-md:13px;--fs-lg:15px;--fs-xl:19px;
+  --fw-normal:400;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-tight:1.25;--lh:1.45;--ls-display:-0.014em;
+  --sp-1:4px;--sp-2:6px;--sp-3:8px;--sp-4:12px;--sp-5:16px;--sp-6:24px;
+  --r-sm:6px;--r-md:8px;--r-lg:12px;--r-pill:999px;
+  --shadow-sm:0 1px 2px rgb(0 0 0 /30%);--shadow-md:0 8px 24px rgb(0 0 0 /45%);--shadow-pop:0 18px 52px rgb(0 0 0 /62%);
+  --h-ctrl-sm:24px;--h-ctrl:28px;--h-ctrl-lg:34px;--h-topbar:44px;
+  --dur:150ms;--ease:cubic-bezier(.32,.72,0,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-2);color:var(--text-1);font-family:var(--font-ui);font-size:var(--fs-md);line-height:var(--lh);
+  padding:var(--sp-6);}
+.wrap{max-width:960px;margin:0 auto;}
+h1{font-family:var(--font-display);font-size:28px;letter-spacing:var(--ls-display);font-weight:var(--fw-bold);}
+.sub{color:var(--text-3);font-size:var(--fs-sm);margin-top:var(--sp-2);}
+section{margin-top:var(--sp-6);background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-lg);
+  padding:var(--sp-5);}
+h2{font-size:var(--fs-lg);font-weight:var(--fw-semibold);margin-bottom:var(--sp-4);
+  display:flex;align-items:center;gap:var(--sp-3);}
+h2 .tag{font-size:var(--fs-2xs);color:var(--text-3);font-weight:var(--fw-normal);letter-spacing:.04em;}
+h3{font-size:var(--fs-sm);color:var(--text-3);font-weight:var(--fw-semibold);text-transform:uppercase;
+  letter-spacing:.05em;margin:var(--sp-5) 0 var(--sp-3);}
+h3:first-of-type{margin-top:0;}
+.row{display:flex;flex-wrap:wrap;gap:var(--sp-4);align-items:flex-end;}
+/* swatches */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--sp-3);}
+.sw{border:1px solid var(--line-1);border-radius:var(--r-md);overflow:hidden;}
+.sw .chip{height:56px;}
+.sw .meta{padding:var(--sp-2) var(--sp-3);background:var(--bg-4);}
+.sw .name{font-size:var(--fs-xs);font-weight:var(--fw-semibold);}
+.sw .val{font-size:var(--fs-2xs);color:var(--text-3);font-family:ui-monospace,monospace;}
+.sw .use{font-size:var(--fs-2xs);color:var(--text-meta);margin-top:2px;}
+/* type */
+.type-row{display:flex;align-items:baseline;gap:var(--sp-4);padding:var(--sp-2) 0;border-bottom:1px solid var(--line-1);}
+.type-row .tk{font-family:ui-monospace,monospace;font-size:var(--fs-2xs);color:var(--text-3);width:120px;flex:none;}
+/* buttons */
+.btn{height:var(--h-ctrl);padding:0 var(--sp-4);border-radius:var(--r-sm);border:1px solid var(--line-2);
+  background:var(--bg-4);color:var(--text-1);font-family:inherit;font-size:var(--fs-md);font-weight:var(--fw-medium);
+  cursor:pointer;text-transform:none;letter-spacing:0;transition:background var(--dur) var(--ease);
+  display:inline-flex;align-items:center;gap:var(--sp-2);}
+.btn:hover{background:var(--bg-5);}
+.btn--primary{background:var(--accent);color:var(--accent-on);border-color:transparent;font-weight:var(--fw-semibold);}
+.btn--primary:hover{background:var(--accent-hover);}
+.btn--lg{height:var(--h-ctrl-lg);padding:0 var(--sp-5);}
+.btn--sm{height:var(--h-ctrl-sm);padding:0 var(--sp-3);font-size:var(--fs-sm);}
+.btn--danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+.btn--danger:hover{background:rgb(255 95 109 /12%);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+/* input */
+.field{display:flex;flex-direction:column;gap:var(--sp-2);}
+.field label{font-size:var(--fs-xs);color:var(--text-3);}
+.input{height:var(--h-ctrl);background:var(--bg-0);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  color:var(--text-1);font-family:inherit;font-size:var(--fs-md);padding:0 var(--sp-3);min-width:200px;}
+.input:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft);}
+.input::placeholder{color:var(--text-3);}
+/* segmented */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg-2);border:1px solid var(--line-2);
+  border-radius:var(--r-sm);padding:3px;gap:3px;max-width:360px;}
+.seg button{height:var(--h-ctrl);border:0;background:transparent;color:var(--text-2);font-family:inherit;
+  font-size:var(--fs-md);font-weight:var(--fw-medium);border-radius:4px;cursor:pointer;}
+.seg button[aria-selected="true"]{background:var(--bg-4);color:var(--accent);font-weight:var(--fw-semibold);}
+/* chips */
+.chip-pill{display:inline-flex;align-items:center;gap:var(--sp-2);height:var(--h-ctrl-sm);padding:0 var(--sp-3);
+  border-radius:var(--r-pill);font-size:var(--fs-xs);font-weight:var(--fw-medium);border:1px solid var(--line-2);
+  background:var(--bg-4);color:var(--text-2);}
+.chip-pill.accent{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-text);}
+.chip-pill.ok{border-color:rgb(78 201 138 /45%);color:var(--ok);}
+.chip-pill.warn{border-color:rgb(232 192 90 /45%);color:var(--warn);}
+.chip-pill.danger{border-color:rgb(255 95 109 /45%);color:var(--danger);}
+.dot{width:8px;height:8px;border-radius:50%;}
+/* topbar sample */
+.topbar{height:var(--h-topbar);background:var(--bg-1);border:1px solid var(--line-1);border-radius:var(--r-md);
+  display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-4);}
+.topbar .id{display:flex;align-items:center;gap:var(--sp-2);font-weight:var(--fw-semibold);font-size:var(--fs-md);}
+.topbar .id .ic{width:16px;height:16px;border-radius:4px;background:var(--accent);}
+.topbar .ver{color:var(--text-3);font-size:var(--fs-xs);}
+.topbar .status{color:var(--text-3);font-size:var(--fs-xs);margin-left:var(--sp-3);}
+.topbar .push{margin-left:auto;display:flex;gap:var(--sp-2);}
+/* empty state */
+.empty{background:var(--bg-2);border:1px dashed var(--line-2);border-radius:var(--r-md);
+  padding:var(--sp-6);text-align:center;}
+.empty .eic{width:40px;height:40px;margin:0 auto var(--sp-3);border-radius:var(--r-md);background:var(--bg-4);
+  display:flex;align-items:center;justify-content:center;color:var(--icon-dim);font-size:20px;}
+.empty h4{font-size:var(--fs-md);font-weight:var(--fw-semibold);}
+.empty p{color:var(--text-3);font-size:var(--fs-sm);margin:var(--sp-2) auto var(--sp-4);max-width:320px;}
+/* premiere legend */
+.pr{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--sp-3);}
+.pr .item{display:flex;align-items:center;gap:var(--sp-3);background:var(--bg-2);border:1px solid var(--line-1);
+  border-radius:var(--r-sm);padding:var(--sp-3);font-size:var(--fs-sm);}
+.pr .bar{width:28px;height:16px;border-radius:3px;flex:none;}
+.note{font-size:var(--fs-xs);color:var(--text-meta);margin-top:var(--sp-3);}
+.don-dont{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);}
+.dd{border-radius:var(--r-md);padding:var(--sp-4);font-size:var(--fs-sm);}
+.dd.no{background:rgb(255 95 109 /8%);border:1px solid rgb(255 95 109 /30%);}
+.dd.yes{background:rgb(78 201 138 /8%);border:1px solid rgb(78 201 138 /30%);}
+.dd h4{font-size:var(--fs-sm);margin-bottom:var(--sp-2);}
+.dd.no h4{color:var(--danger);}
+.dd.yes h4{color:var(--ok);}
+.dd ul{list-style:none;display:flex;flex-direction:column;gap:var(--sp-2);}
+.dd li{color:var(--text-2);padding-left:var(--sp-4);position:relative;}
+.dd.no li::before{content:"✕";position:absolute;left:0;color:var(--danger);}
+.dd.yes li::before{content:"✓";position:absolute;left:0;color:var(--ok);}
+@media(max-width:640px){.don-dont{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AiO Studio — Style Guide</h1>
+  <p class="sub">Hướng thiết kế "Studio Console" · tối, gọn, nội dung là chính · sống cạnh timeline Premiere · chạy được ở 300px. Trang này render đúng bằng token thật — dùng để đối chiếu bằng MẮT (token khớp ≠ nhìn giống nhau).</p>
+
+  <section>
+    <h2>Thanh trên <span class="tag">44px · chung cho cả 7 panel</span></h2>
+    <div class="topbar">
+      <span class="id"><span class="ic"></span> Autocut</span>
+      <span class="ver">v1.5.0</span>
+      <span class="status">Đang chờ Premiere…</span>
+      <span class="push"><button class="btn btn--sm">Thêm thư mục</button></span>
+    </div>
+    <p class="note">Icon trái đổi màu theo trạng thái kết nối (gộp luôn vai trò đèn báo) · tên panel + version · tối đa 1–2 nút phải · trạng thái host nói ở MỘT nơi.</p>
+  </section>
+
+  <section>
+    <h2>Màu <span class="tag">nền đen trung tính · viền hairline · accent cam tiết chế</span></h2>
+    <h3>Bề mặt</h3>
+    <div class="swatches" id="sw-bg"></div>
+    <h3>Chữ (đã đo tương phản trộn alpha)</h3>
+    <div class="swatches" id="sw-text"></div>
+    <h3>Accent cam &amp; ngữ nghĩa</h3>
+    <div class="swatches" id="sw-acc"></div>
+  </section>
+
+  <section>
+    <h2>Chữ <span class="tag">SF Pro · một thang, sáu bậc</span></h2>
+    <div id="type"></div>
+    <p class="note">Đừng nâng cả thang. Muốn to hơn ở một chỗ thì dùng bậc cao hơn ở đúng chỗ đó.</p>
+  </section>
+
+  <section>
+    <h2>Nút <span class="tag">hai họ · không viết hoa · không giãn chữ</span></h2>
+    <h3>Chính (mỗi màn hình chỉ MỘT)</h3>
+    <div class="row">
+      <button class="btn btn--primary btn--lg">Cắt khoảng lặng</button>
+      <button class="btn btn--primary">Làm phụ đề</button>
+    </div>
+    <h3>Thường · phụ · phá huỷ · vô hiệu</h3>
+    <div class="row">
+      <button class="btn">Cắt tại chỗ</button>
+      <button class="btn btn--sm">Thêm thư mục</button>
+      <button class="btn btn--danger">Xoá 3 phụ đề</button>
+      <button class="btn" disabled>Chưa có gì để xoá</button>
+    </div>
+    <p class="note">Chữ trên nút cam là <code>--accent-on</code> (nâu gần đen), không phải trắng. Việc phá huỷ dùng nút viền danger, đặt xa nút hay bấm, và nói hậu quả bằng số.</p>
+  </section>
+
+  <section>
+    <h2>Ô nhập &amp; Segmented</h2>
+    <div class="row">
+      <div class="field"><label>Ô tìm</label><input class="input" placeholder="Tìm asset theo tên…" /></div>
+      <div class="field"><label>Ô nhập số</label><input class="input" style="min-width:120px" value="-39 dB" /></div>
+    </div>
+    <h3>Segmented — 2–3 lựa chọn loại trừ</h3>
+    <div class="seg">
+      <button aria-selected="false">Giữ nhịp</button>
+      <button aria-selected="true">Vừa</button>
+      <button aria-selected="false">Cắt sạch</button>
+    </div>
+    <p class="note">Dùng <code>grid-auto-flow:column</code> — không chôn số con vào CSS. Mục chọn nổi bằng nền lift + chữ accent.</p>
+  </section>
+
+  <section>
+    <h2>Chip / Badge / Trạng thái</h2>
+    <div class="row" style="align-items:center">
+      <span class="chip-pill">Video</span>
+      <span class="chip-pill accent"><span class="dot" style="background:var(--accent)"></span> Đang chọn</span>
+      <span class="chip-pill ok"><span class="dot" style="background:var(--ok)"></span> Xong</span>
+      <span class="chip-pill warn"><span class="dot" style="background:var(--warn)"></span> Còn việc</span>
+      <span class="chip-pill danger"><span class="dot" style="background:var(--danger)"></span> Cần soát</span>
+    </div>
+    <p class="note">Chip có viền để tách khối (nền nhạt cùng tông rất dễ chìm). Vàng = còn việc phải làm, KHÔNG phải hỏng.</p>
+  </section>
+
+  <section>
+    <h2>Empty state</h2>
+    <div class="empty">
+      <div class="eic">▦</div>
+      <h4>Chưa có asset nào</h4>
+      <p>Bấm <b>Thêm thư mục</b> ở thanh trên để quét asset trên máy.</p>
+      <button class="btn btn--primary">Thêm thư mục</button>
+    </div>
+    <p class="note">Icon mờ + một câu nói phải làm gì tiếp + đúng MỘT nút. Câu chỉ dẫn phải trỏ đúng nút CÓ THẬT trên màn hình.</p>
+  </section>
+
+  <section>
+    <h2>Màu vật thể Premiere <span class="tag">vẽ mini-timeline thì lấy đúng màu này</span></h2>
+    <div class="pr">
+      <div class="item"><span class="bar" style="background:#5a8fc7"></span> Clip video</div>
+      <div class="item"><span class="bar" style="background:#4a9d6e"></span> Clip audio</div>
+      <div class="item"><span class="bar" style="background:#e8c05a"></span> Caption / phụ đề</div>
+      <div class="item"><span class="bar" style="background:#8fd0ff"></span> Playhead</div>
+    </div>
+    <p class="note">Caption của Premiere màu VÀNG và nằm TRÊN timeline. Vẽ sai màu/sai tầng thì người dựng phải dịch trong đầu. (Giá trị chính xác đang được kiểm lại từ Adobe Spectrum.)</p>
+  </section>
+
+  <section>
+    <h2>Nên / Không nên</h2>
+    <div class="don-dont">
+      <div class="dd yes"><h4>Nên</h4><ul>
+        <li>Một CTA chính mỗi màn hình</li>
+        <li>Tách nhóm bằng BỀ MẶT (nền lift + viền), không bằng nhiều nhãn</li>
+        <li>Phân cấp bằng cỡ chữ + độ đậm</li>
+        <li>Chỉ báo khi THẤT BẠI</li>
+        <li>Nhãn nút = việc nó làm</li>
+      </ul></div>
+      <div class="dd no"><h4>Không</h4><ul>
+        <li>Nút IN HOA / giãn chữ</li>
+        <li>Chữ trắng trên nút cam</li>
+        <li>Nâng cả thang chữ cho "to"</li>
+        <li>Dùng opacity làm nhạt chữ</li>
+        <li>Nhiều dải nhãn xám chồng nhau</li>
+        <li>Hero / gradient lớn</li>
+      </ul></div>
+    </div>
+  </section>
+</div>
+<script>
+const BG=[['--bg-0','#0a0a0b','khung xem media'],['--bg-1','#0f0f11','thanh trên / rail'],['--bg-2','#151517','nền app'],['--bg-3','#1c1c1f','thẻ'],['--bg-4','#232327','nút / ô nhập'],['--bg-5','#2c2c31','nút hover'],['--line-2','rgb(255 255 255 /10%)','viền hairline']];
+const TX=[['--text-1','#f5f5f7','14.4:1 · chính'],['--text-2','#c3c3c8','8.9:1 · phụ'],['--text-3','#8d8d95','4.8:1 · nhãn'],['--text-meta','#9b9ba3','5.7:1 · meta'],['--icon-dim','#8f8f97','4.9:1 · icon']];
+const AC=[['--accent','#ff5714','active · CTA · focus'],['--accent-on','#150700','chữ trên nút cam'],['--accent-soft','rgb(255 87 20 /16%)','nền chip accent'],['--ok','#4ec98a','xong'],['--warn','#e8c05a','còn việc'],['--danger','#ff5f6d','hỏng / phá huỷ'],['--heart','#ff6b81','yêu thích']];
+function fill(id,arr){document.getElementById(id).innerHTML=arr.map(([n,v,u])=>
+ `<div class="sw"><div class="chip" style="background:var(${n})"></div><div class="meta"><div class="name">${n}</div><div class="val">${v}</div><div class="use">${u}</div></div></div>`).join('');}
+fill('sw-bg',BG);fill('sw-text',TX);fill('sw-acc',AC);
+const TY=[['--fs-xl','19px','số lớn / empty-state'],['--fs-lg','15px','tiêu đề mục'],['--fs-md','13px','mặc định · body · nút'],['--fs-sm','12px','nhãn · chip'],['--fs-xs','11px','meta · chỉ dẫn'],['--fs-2xs','10px','số đếm · nhãn nhóm']];
+document.getElementById('type').innerHTML=TY.map(([t,s,u])=>
+ `<div class="type-row"><span class="tk">${t} · ${s}</span><span style="font-size:var(${t})">Dựng phim nhanh hơn</span><span style="color:var(--text-3);font-size:var(--fs-xs);margin-left:auto">${u}</span></div>`).join('');
+</script>
+</body>
+</html>

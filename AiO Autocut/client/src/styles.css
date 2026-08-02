@@ -1,0 +1,1140 @@
+/* =========================================================================
+   AiO Studio — Autocut · dang rieng cua panel nay
+
+   Token (mau, thang chu, khoang cach, chieu cao control) KHONG nam o day —
+   xem `@import` ngay ben duoi. Bon panel dung CHUNG mot bo token.
+   ========================================================================= */
+
+/* ☠️ TOKEN KHONG CON NAM O DAY.
+   Nguon chan ly duy nhat: `AiO Studio/design-system/tokens.css`.
+   File `tokens.css` canh ben la BAN COPY do `dong-bo-tokens.ps1` sinh ra —
+   sua no thi lan dong bo sau bi ghi de. Sua ban goc roi chay script. */
+@import './tokens.css';
+
+
+/* ── Nền tảng ────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Trình duyệt cho form control font riêng (~13.33px) → lệch khỏi thang --fs-*. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg-2);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; /* panel CEP không bao giờ cuộn ở tầng body */
+}
+
+/* Ai dùng bàn phím cũng phải thấy mình đang ở đâu — KHÔNG được gỡ. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Khung tổng ──────────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Thanh trên: tên công cụ + host. Mỏng, chìm, không giành chỗ với nội dung. */
+.topbar {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--sp-3);
+  align-items: center;
+  height: var(--h-topbar);
+  padding: 0 var(--sp-4);
+  border-bottom: 1px solid var(--line-1);
+  background: var(--bg-1);
+}
+
+/* Icon nhận diện panel — 13px, cùng ngôn ngữ hình với Asset Manager và
+   Power Bins (`.topbar__title-icon`). Anh Tiến 29/07 soi bốn panel cạnh nhau:
+   *"auto cut và transcripts không có icon"*.
+
+   Icon VỪA là nhận diện VỪA là đèn báo: cam = đang chạy trong Premiere,
+   xám = mở bằng trình duyệt. Một phần tử làm được hai việc thì đừng bày hai. */
+.topbar__icon {
+  display: block;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.topbar__icon--tat { color: var(--text-3); }
+
+.topbar__ten {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.topbar__host {
+  margin: 0 0 0 auto;
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.than {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-height: 0;
+  padding: var(--sp-4);
+  overflow-y: auto;
+  /* ☠️ GIỚI HẠN BỀ NGANG. Panel CEP kéo được từ ~300px tới hết màn hình; anh
+     Tiến kéo rộng ra thì mọi thứ giãn hết cỡ, nút AUTO CUT dài cả 1500px, đọc
+     rất mệt. Quy tắc Container Width: đừng để nội dung trải hết viewport.
+     Căn giữa để khi panel hẹp thì vẫn dùng trọn bề ngang. */
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── Hướng dẫn một dòng ──────────────────────────────────────────────── */
+
+.chidan {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+.chidan kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+}
+
+/* ── Nút ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: center;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.btn:hover:not(:disabled) {
+  background: var(--bg-5);
+  border-color: var(--line-strong);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Nút chính — DUY NHẤT một cái mỗi màn hình. */
+/* Nut chinh: bo IN HOA + gian chu. Do 29/07: nut cam lon nhat cua Asset Manager
+   chi 117x24px chu 11px khong in hoa; ban cu o day la mang cam 610x46px chu 17px
+   IN HOA gian 0,06em -> doc ra nhu bien hieu chu khong phai nut. */
+.btn--primary {
+  height: 34px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+/* Đang chạy: giữ nguyên chiều cao để bố cục không xê dịch (quy tắc 19). */
+.btn--primary:disabled {
+  opacity: 1;
+  border-color: var(--line-2);
+  background: var(--bg-4);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0;
+}
+
+/* ── Chọn mức: một hàng ba ô, kiểu segmented ─────────────────────────── */
+
+/* ☠️ ĐỪNG KHAI `repeat(N, 1fr)` — số lượng nút KHÔNG được chôn vào CSS.
+   Anh Tiến 29/07 soi bốn panel cạnh nhau: *"tỉ lệ button khác nhau, cái thì 2
+   cái thì 3"*. Bản cũ khai cứng 3 cột cho ba mức cắt, nên thanh hai nút chiếm
+   2/3 rồi chừa trống 1/3 — phải đẻ thêm lớp `.seg--nho` để vá.
+   `grid-auto-flow: column` chia đều theo số con THẬT: 2 nút mỗi nút 1/2,
+   3 nút mỗi nút 1/3. Bảo đảm theo CẤU TẠO, khỏi kiểm lại bằng mắt. */
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-1);
+}
+/* KHONG dung --h-ctrl-sm (24px, co nut PHU tren thanh cong cu). Thanh nay la
+   mot trong hai quyet dinh chinh cua man hinh nen phai bam duoc thoai mai.
+   Anh Tien 29/07: *"nut nay hoi nho lam lai"*. 32px - thap hon nut chinh 34px
+   mot chut de thu bac van ro. */
+.seg__nut {
+  height: 32px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.seg__nut:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+.seg__nut--chon {
+  background: var(--bg-4);
+  color: var(--accent-text);
+  font-weight: var(--fw-semibold);
+}
+.seg__nut:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Thanh có nhãn DÀI: xếp dọc khi panel hẹp ─────────────────────────────
+   Anh Tiến 30/07 chụp bàn so sánh ở bề rộng 380px: nhãn "Cắt và Import vào
+   Sequence mới" **vỡ 2 dòng** trong khi "Cắt tại chỗ" chỉ 1 dòng — nhìn lệch.
+
+   Đo thật bề rộng chuỗi (span `white-space: nowrap`, cùng font):
+       "Cắt và Import vào Sequence mới"  199px
+       "Cắt tại chỗ"                      67px
+
+   Nút cần 199 + padding 12 = **211px**. Hai nút cạnh nhau:
+       211×2 + gap 2 + seg padding 4 + than padding 24 = **452px**
+
+   → Dưới 452px thì không có cách nào để hai nhãn cùng một hàng mà không vỡ.
+   Ngưỡng đặt **480px** cho dư một chút (font hệ thống có thể rộng hơn SF Pro).
+
+   ☠️ KHÔNG rút ngắn nhãn để nó vừa: anh Tiến chốt *"chỗ này phải là Cắt và
+   Import vào Sequence mới"* — nhãn phải nói đủ ba việc (cắt · import · vào
+   sequence mới). Bố cục phải nhường nhãn, không phải ngược lại.
+
+   ☠️ Và KHÔNG áp cho mọi `.seg`: thanh ba mức ("Giữ nhịp" 51px · "Vừa" 24px ·
+   "Cắt sạch" 54px) vừa thoải mái ở 380px. Xếp dọc nó là tốn ba hàng vô ích. */
+@media (max-width: 480px) {
+  .seg--dai {
+    grid-auto-flow: row;
+  }
+}
+
+/* ── Một lựa chọn: thanh · hình · hệ quả ──────────────────────────────────
+   Ba tầng theo thứ tự đọc. Tầng thứ ba ("chọn cái này thì sao") là thứ hay bị
+   bỏ, mà nó chính là thứ người dùng cần — không có nó thì phải chạy thử mới biết. */
+.chon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+/* Hệ quả của lựa chọn. Phân cấp bằng CỠ CHỮ và MÀU có đo, KHÔNG bằng `opacity`
+   — opacity kéo tương phản xuống dưới AA (đã trả giá 29/07: 5,54 → 3,66). */
+.chon__mo {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+.chon__mo b { color: var(--text-2); font-weight: var(--fw-semibold); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HÌNH ĐỘNG "ĐẶT KẾT QUẢ Ở ĐÂU" — xem MinhHoaNoiDat.tsx
+   ══════════════════════════════════════════════════════════════════════════
+
+   Anh Tiến 30/07: *"chỗ này hôm qua anh có bảo là tạo một animation timeline để
+   giải thích mà sao em không làm?"*.
+
+   Khác biệt cần kể là KHÔNG GIAN: một dải (cắt tại chỗ) hay hai dải (tạo mới).
+   Nên hai lựa chọn có HAI chuyển động khác nhau, không phải cùng hiệu ứng:
+     tạo mới  -> đoạn RƠI xuống dải dưới, dải trên còn nguyên cả chỗ đỏ
+     tại chỗ  -> chỗ đỏ TAN, đoạn TRƯỢT NGANG dồn lại trên chính dải đó */
+
+.mhn {
+  display: block;
+  width: 100%;
+  /* ☠️ Cao CỐ ĐỊNH — `height:auto` làm hình phình khổng lồ khi panel kéo rộng
+     (đo thật 29/07: viewBox 320 trong panel 1600px cho ra hình cao 310px). */
+  height: 42px;
+}
+
+/* Đoạn giữ đi về chỗ của nó. HAI PHA TÁCH BẠCH, có nhịp nghỉ 48–58%.
+   Làm liền một mạch thì đoạn đi chéo và mắt không tách được "rơi khỏi bản gốc"
+   với "dồn sát vào nhau" — mà đó là hai ý (bài học 29/07, panel này).
+   Với "cắt tại chỗ" thì `--dy: 0`, nên pha 1 thành nhịp chờ cho chỗ đỏ tan. */
+.mhn__di {
+  animation: mhn-di 620ms cubic-bezier(0.33, 0.9, 0.35, 1) both;
+  animation-delay: var(--tre, 0ms);
+}
+@keyframes mhn-di {
+  0% {
+    transform: translate(var(--dx, 0), var(--dy, 0));
+    opacity: 0.5;
+  }
+  30% { opacity: 1; }
+  48% { transform: translate(var(--dx, 0), 0); }
+  58% { transform: translate(var(--dx, 0), 0); }
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+/* Chỗ đỏ TAN ĐI — chỉ ở "cắt tại chỗ", vì ở đó nó sắp bị xoá thật. */
+.mhn__tan {
+  animation: mhn-tan 380ms var(--ease) both;
+  animation-delay: var(--tre, 0ms);
+}
+@keyframes mhn-tan {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ☠️ TÔN TRỌNG `prefers-reduced-motion`. Tắt chuyển động nhưng phần tử phải về
+   ĐÚNG trạng thái cuối — kẹt ở trạng thái đầu là hình nói sai. */
+@media (prefers-reduced-motion: reduce) {
+  .mhn__di {
+    animation: none;
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  .mhn__tan { animation: none; opacity: 0; }
+}
+
+/* ── Khối chọn mức — một quyết định, một khung ─────────────────────────────
+   Anh Tiến 29/07: *"phần này em hãy tạo thành một section riêng với phần dưới"*.
+   Trên: cắt sâu cỡ nào. Dưới: cắt vào đâu, rồi chạy. Hai việc khác nhau thì
+   đừng để dính liền một mạch. */
+
+.khoi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
+  background: var(--bg-2);
+}
+.khoi .chidan { margin: 0; }
+
+/* ── Hình minh hoạ ba mức — TĨNH, hiện ngay khi bấm mức ────────────────────
+   Không phải số đo: nó chỉ để người dựng mường tượng mức này cắt thưa hay dày.
+   Dải sóng THẬT nằm ở khối xem trước, sau khi tách tiếng xong. */
+
+.mh {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: calc(var(--sp-4) * -1 + var(--sp-2));
+}
+.mh {
+  gap: 4px;
+}
+.mh__hinh {
+  display: block;
+  width: 100%;
+  /* Cao CỐ ĐỊNH — xem chú thích `preserveAspectRatio` trong MinhHoa.tsx.
+     `height:auto` làm hình phình lên 310px khi panel rộng 1600px.
+     35.5 đơn vị viewBox = 1 timeline (track hình 15 + khe 1,5 + track tiếng 19). */
+  height: 36px;
+  /* ☠️ BẮT BUỘC cho animation "rơi từ dải trên xuống": lúc bắt đầu, đoạn nằm
+     NGOÀI khung SVG (ở trên). Mặc định SVG cắt phần tràn ra → đoạn biến mất
+     rồi mới hiện, nhìn như chớp giật chứ không phải rơi xuống. */
+  overflow: visible;
+}
+
+/* Nhãn hai dải — để ngoài SVG vì `preserveAspectRatio="none"` kéo méo chữ. */
+.mh__nhan {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mh__nhan--sau { margin-top: var(--sp-2); }
+.mh__nhan i {
+  color: var(--ok);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Màu lấy gần với timeline Premiere để người dựng nhận ra ngay:
+   track hình xanh biển, track tiếng xanh lá có sóng âm sáng hơn. */
+.mh__v { fill: #2f5d86; stroke: #4a86c5; stroke-width: 0.6; }
+.mh__a { fill: #2c6236; stroke: #4d9e5c; stroke-width: 0.6; }
+.mh__song { stroke: #8fe0a4; stroke-width: 1.1; stroke-linecap: round; opacity: 0.9; }
+.mh__bo { fill: rgb(255 95 109 / 42%); stroke: rgb(255 95 109 / 85%); stroke-width: 0.8; }
+
+/* ── Chuyển động: đoạn giữ TRƯỢT từ chỗ cũ về chỗ dồn sát ───────────────────
+   Anh Tiến 29/07: *"anh cần làm một animation cơ bản để nó mượt giữa 2
+   timeline"*. Đây là spatial continuity — mắt bám được đoạn nào đi đâu, thay
+   vì thấy hai hình rời nhau.
+
+   Quãng trượt của mỗi đoạn khác nhau nên truyền qua biến `--delta` từ JSX.
+   Stagger 22ms mỗi đoạn cho thành một đợt sóng, không phải bật cái rụp. */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ANIMATION KỂ MỘT CÂU CHUYỆN, THEO ĐÚNG THỨ TỰ
+   ══════════════════════════════════════════════════════════════════════════
+
+   Anh Tiến 29/07 nói rõ điều muốn người xem hiểu: *"ồ nếu mà mình sử dụng tool
+   này sẽ cut bỏ được những điểm màu đỏ, và các điểm màu xanh sẽ còn lại"*.
+
+   Nên thứ tự phải là:
+     1. (0–560ms)   Dải Raw hiện ra, chỗ ĐỎ nhấp nháy — mắt bắt được "đây là
+                    phần sẽ bị bỏ"
+     2. (từ 420ms)  Các đoạn XANH rơi từ dải Raw xuống, dồn sát lại
+   Chạy cùng lúc thì không ai hiểu cái nào dẫn tới cái nào. */
+
+.mh__truot {
+  /* HAI PHA TÁCH BẠCH. Anh Tiến 29/07: *"animation này anh cần nó hạ xuống rồi
+     mới ghép lại á em"*. Làm cùng lúc thì đoạn đi chéo, mắt không tách được
+     "rơi khỏi bản gốc" với "dồn sát vào nhau" — mà đó là hai ý khác nhau.
+
+     Chậm hơn nữa (820ms → 1250ms) theo yêu cầu *"animation em làm chậm lại"*.
+     Đây là hình minh hoạ để ngắm và hiểu, không phải phản hồi bấm nút. */
+  animation: mh-truot 1250ms cubic-bezier(0.33, 0.9, 0.35, 1) both;
+  animation-delay: var(--tre, 0ms);
+}
+@keyframes mh-truot {
+  /* Pha 1 (0–48%): RƠI XUỐNG, giữ nguyên vị trí ngang của nó trên dải Raw */
+  0% {
+    transform: translate(var(--dx, 0), var(--dy, 0));
+    opacity: 0.45;
+  }
+  30% { opacity: 1; }
+  48% {
+    transform: translate(var(--dx, 0), 0);
+  }
+  /* Nghỉ một nhịp cho mắt kịp thấy "đã xuống, chưa ghép" */
+  58% {
+    transform: translate(var(--dx, 0), 0);
+  }
+  /* Pha 2 (58–100%): DỒN SÁT vào nhau */
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+/* Chỗ ĐỎ hiện sẵn, KHÔNG nhấp nháy — anh Tiến: *"bỏ nhấp nháy luôn nha em"*.
+   Nhấp nháy làm mắt bị kéo đi trong khi phần chính là chuyển động rơi-rồi-ghép. */
+
+/* ── Vệt sáng quét khi ghép xong ───────────────────────────────────────────
+   Anh Tiến: *"khi ghép xong em cho anh một lightwipe cho nó đẹp đẹp"*. Đây là
+   dấu chấm hết của câu chuyện — "xong, ngắn đi từng này".
+
+   Chạy MỘT lần (`both`, không `infinite`): lặp là thành đèn nhấp nháy, mắt bị
+   kéo mãi không thôi. Thời điểm chạy do `--loe-tre` quyết định, tính từ lúc
+   đoạn cuối ghép xong. */
+
+.mh__vo { position: relative; }
+
+/* Khung cắt riêng cho vệt sáng: SVG phải để `overflow: visible` cho animation
+   rơi, nhưng vệt sáng thì KHÔNG được tràn ra ngoài dải. */
+.mh__khungloe {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.mh__loe {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgb(255 255 255 / 42%) 50%,
+    transparent 62%
+  );
+  transform: translateX(-115%);
+  animation: mh-loe 780ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+  animation-delay: var(--loe-tre, 1500ms);
+}
+@keyframes mh-loe {
+  to { transform: translateX(115%); }
+}
+
+/* ☠️ TÔN TRỌNG `prefers-reduced-motion`. Windows tắt hiệu ứng chuyển động là
+   cờ này bật — đã mất cả buổi ở Thinksmart vì quên nó (LESSONS quy tắc 16).
+   Tắt animation nhưng KHÔNG được để đoạn kẹt ở vị trí cũ: phải về đúng chỗ. */
+@media (prefers-reduced-motion: reduce) {
+  .mh__truot {
+    animation: none;
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  /* Vệt sáng thuần trang trí — tắt hẳn, không cần thay thế bằng gì. */
+  .mh__loe { animation: none; opacity: 0; }
+}
+.mh__chu {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.mh__chu b { color: var(--text-1); font-variant-numeric: tabular-nums; }
+
+/* ── Đường lùi sau khi cắt tại chỗ ────────────────────────────────────────
+   Nút phụ, không tranh chú ý với kết quả. Nhưng phải thấy được ngay — đây là
+   thứ cứu người dùng khi cắt xong thấy không ưng. */
+
+.lui {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.lui span {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.btn--phu {
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+.btn--phu:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--bg-4);
+}
+.btn--phu:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn--phu:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Chỗ cần soát — việc người dựng phải làm tiếp, KHÔNG giấu trong mục gấp. */
+.soat {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.soat b { color: var(--text-1); }
+
+/* Thanh chọn phụ (nơi đặt kết quả) — chữ nhỏ hơn ba mức cắt để không cạnh
+   tranh với quyết định chính. Số cột do `.seg` tự chia theo số con. */
+.seg--nho .seg__nut {
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-xs);
+}
+
+.seg__mo {
+  margin: calc(var(--sp-4) * -1 + var(--sp-1)) 0 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LAUNCHER — màn hình chào, chọn công cụ.
+
+   Chép ĐÚNG bố cục + tên lớp của `_launcher.scss` bên AiO Editing (đã đổi từ
+   SCSS sang CSS thuần vì Autocut không dùng SCSS). Anh Tiến 29/07 chỉ vào
+   panel Asset Manager mở cạnh bên và bảo tách y như vậy — hai panel đứng cùng
+   một cửa sổ Premiere, khác kiểu là lộ ra ngay là đồ chắp vá.
+
+   Đây là chỗ DUY NHẤT được phép "to và thoáng": nó là cánh cửa, không phải
+   vùng làm việc.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.launcher {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-6) var(--sp-5);
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgb(255 87 20 / 8%), transparent 60%),
+    var(--bg-2);
+}
+
+.launcher__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.launcher__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--bg-3);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.launcher__name {
+  margin: 0;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.launcher__choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 520px;
+}
+
+.launcher-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
+  background: var(--bg-3);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.14s ease, background 0.14s ease, transform 0.14s ease;
+}
+.launcher-card:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-4);
+}
+.launcher-card:active { transform: scale(0.99); }
+.launcher-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.launcher-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
+  background: var(--bg-0);
+  color: var(--text-2);
+}
+
+.launcher-card__title {
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.launcher-card__desc {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+}
+
+.launcher-card__count {
+  margin-top: auto;
+  color: var(--text-2);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+}
+
+/* Đường RA — có vào thì phải có ra. Nhỏ, không cạnh tranh với nút chính. */
+.quay-lai {
+  align-self: flex-start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+.quay-lai:hover:not(:disabled) { color: var(--text-1); }
+.quay-lai:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Xem trước: dải sóng + ba con số ──────────────────────────────────────
+   Thay cho dòng chữ mô tả mức mà anh Tiến nói người dùng không đọc (29/07).
+   Hình nói thay thông số. */
+
+.xem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--bg-2);
+}
+
+.song {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+  background: var(--bg-0);
+}
+
+/* ── ĐANG CHẠY ────────────────────────────────────────────────────────────
+   Thay cho cái nút xám mà anh Tiến gọi là "phèn" (29/07). Thanh KHÔNG BAO GIỜ
+   đứng im: đo được thì đầy dần, chưa đo được thì vệt sáng trôi qua lại. */
+
+.chay {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.chay__thanh {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  overflow: hidden;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+}
+
+.chay__day {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent-soft);
+  transition: width 0.3s ease;
+}
+
+/* Chưa đo được % thì cho một vệt sáng trôi — đứng ở 0% nhìn y như treo. */
+.chay__thanh--troi::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+  animation: chay-troi 1.5s ease-in-out infinite;
+}
+@keyframes chay-troi {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+.chay__chu {
+  position: relative;
+  flex: 1;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.chay__chu b {
+  margin-left: var(--sp-2);
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.chay__gio {
+  position: relative;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.chay__buoc {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chay__buoc li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+}
+.chay__cham {
+  width: 13px;
+  text-align: center;
+  font-size: var(--fs-2xs);
+}
+.chay__buoc--xong { color: var(--text-3); }
+.chay__buoc--xong .chay__cham { color: var(--ok); }
+.chay__buoc--dang { color: var(--text-1); font-weight: var(--fw-semibold); }
+.chay__buoc--dang .chay__cham { color: var(--accent); }
+.chay__buoc--cho { color: var(--text-3); opacity: 0.5; }
+
+/* Hai dải xếp chồng, CÙNG tỉ lệ pixel/giây — dải dưới ngắn hơn đúng bằng
+   phần bị cắt. Người dựng nhìn là hình dung ngay, khỏi đọc số. */
+.xem__dai {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.xem__nhan {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+}
+.xem__nhan b {
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+.xem__nhan i {
+  margin-left: auto;
+  color: var(--accent-text);
+  font-size: var(--fs-sm);
+  font-style: normal;
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.xem__luu {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+.xem__luu b { color: var(--text-2); font-weight: var(--fw-semibold); }
+.xem__luu em {
+  display: block;
+  margin-top: var(--sp-2);
+  color: var(--warn);
+  font-style: normal;
+}
+
+/* ── Ô tích ──────────────────────────────────────────────────────────── */
+
+.tich {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-1);
+  cursor: pointer;
+}
+.tich:hover { border-color: var(--line-2); }
+.tich input {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+.tich__chu { color: var(--text-2); font-size: var(--fs-sm); }
+.tich__chu b { color: var(--text-1); font-weight: var(--fw-semibold); }
+.tich__chu em {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-style: normal;
+  line-height: var(--lh);
+}
+
+/* ── Thông báo ───────────────────────────────────────────────────────── */
+
+/* Việc người dùng CẦN LÀM — không phải hỏng hóc, nên không tô đỏ. */
+.canlam {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh);
+  white-space: pre-wrap;
+}
+
+.loi {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid rgb(255 95 109 / 40%);
+  border-radius: var(--r-md);
+  background: rgb(255 95 109 / 10%);
+  color: #ffb3ba;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Kết quả ─────────────────────────────────────────────────────────── */
+
+.ket { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+.oso { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); }
+.o {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+}
+.o__nhan {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-tight);
+}
+.o__so {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-display);
+}
+
+.ketluan {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line-1);
+  border-left: 2px solid var(--ok);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  background: var(--bg-3);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  line-height: var(--lh);
+}
+.ketluan--nghi { border-left-color: var(--danger); color: var(--danger); }
+
+.doi { margin: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.doi > div { display: grid; grid-template-columns: 96px 1fr; gap: var(--sp-3); }
+.doi dt { color: var(--text-3); font-size: var(--fs-xs); }
+.doi dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+.doi b { color: var(--accent-text); font-weight: var(--fw-semibold); }
+.duongdan {
+  display: block;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  word-break: break-all;
+}
+
+/* ── Biên bản: máy đã làm những gì ───────────────────────────────────── */
+/* Đây là thứ chứng minh nó không "chạy nhanh vì bỏ qua bước nào". */
+.bien { margin: 0; padding: 0 0 0 var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-1); }
+.bien li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 38px;
+  gap: var(--sp-2);
+  align-items: baseline;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.bien__ten { color: var(--text-2); }
+.bien__ket { color: var(--accent-text); }
+.bien__giay { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── Mục gấp lại ─────────────────────────────────────────────────────── */
+
+.fold {
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-1);
+}
+.fold > summary {
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-4);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  line-height: var(--h-ctrl);
+  cursor: pointer;
+  list-style: none;
+}
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before { content: '▸'; margin-right: var(--sp-2); }
+.fold[open] > summary::before { content: '▾'; }
+.fold[open] > summary { color: var(--text-2); }
+.fold > *:not(summary) { padding: 0 var(--sp-4) var(--sp-4); }
+
+/* ── Tham số ─────────────────────────────────────────────────────────── */
+
+.params { display: flex; flex-direction: column; gap: var(--sp-4); }
+.params label { display: flex; flex-direction: column; gap: var(--sp-1); }
+.params span { color: var(--text-1); font-size: var(--fs-sm); }
+.params em {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-style: normal;
+  line-height: var(--lh);
+}
+.params b { color: var(--accent-text); font-weight: var(--fw-semibold); }
+
+/* MỌI ô nhập trong panel. Gộp một chỗ, không để sót ô nào.
+   ☠️ Đã trả giá: `.sua__hang input` từng bị bỏ quên khỏi nhóm này -> rơi về nền
+   TRẮNG mặc định của trình duyệt, mà `color: inherit` lại kéo màu chữ sáng
+   xuống => chữ trắng trên nền trắng, gõ vào không thấy gì. */
+.o-nhap,
+.params input,
+.sua__hang input {
+  width: 100%;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-0);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+}
+.o-nhap:focus,
+.params input:focus,
+.sua__hang input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+/* Chữ gợi ý cũng phải đọc được — mặc định của Chromium quá mờ trên nền tối. */
+.o-nhap::placeholder,
+.params input::placeholder,
+.sua__hang input::placeholder {
+  color: var(--text-3);
+  opacity: 1;
+}
+
+/* ── Bảng dạy máy chữ nó nghe nhầm ───────────────────────────────────── */
+
+.sua { display: flex; flex-direction: column; gap: var(--sp-2); }
+.sua__mo {
+  margin: 0 0 var(--sp-1);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+}
+.sua__hang {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12px minmax(0, 1fr) var(--h-ctrl-sm);
+  gap: var(--sp-2);
+  align-items: center;
+}
+/* BẮT BUỘC: ô lưới mặc định `min-width: auto`, nên `<input>` (vốn có bề rộng
+   mặc định ~170px) đẩy phình cột và tràn khỏi panel. Đo được: tràn 154px ở
+   panel rộng 280px. `minmax(0,1fr)` ở trên + dòng này là hai nửa của một khoá.
+   (Màu nền/chữ của ô này nằm ở nhóm ô nhập chung phía dưới.) */
+.sua__hang input { min-width: 0; }
+.sua__hang > span {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+.sua__xoa {
+  width: var(--h-ctrl-sm);
+  height: var(--h-ctrl-sm);
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.sua__xoa:hover { background: var(--bg-4); color: var(--danger); }
+.sua__them {
+  align-self: flex-start;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+.sua__them:hover { border-color: var(--accent-line); color: var(--accent-text); }
+
+/* Chấm màu chú giải cho marker — nhìn màu là biết loại, khỏi đọc chữ.
+   Khớp với màu Premiere đặt trong ac_datMarker: index 1 = đỏ, index 2 = vàng. */
+.cham {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+.cham--do { background: #e5484d; }
+.cham--vang { background: #ffb224; }

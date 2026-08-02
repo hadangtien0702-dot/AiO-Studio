@@ -1,0 +1,232 @@
+// =========================================================================
+//  OVERLAYS — modal, toast, thanh thao tác hàng loạt.
+// =========================================================================
+@use 'mixins' as m;
+
+// ── Modal ────────────────────────────────────────────────────────────────
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  background: rgb(0 0 0 / 62%);
+  backdrop-filter: blur(3px);
+}
+
+.modal-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--bg-6);
+  box-shadow: var(--shadow-pop);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line-1);
+}
+
+.modal-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.modal-body {
+  @include m.scroll-thin;
+
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: var(--sp-4);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--line-1);
+}
+
+// ── Hàng thiết lập trong modal ───────────────────────────────────────────
+.setting-section {
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--line-1);
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.setting-section__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+}
+
+.setting-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.setting-row__label {
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+
+.setting-row__desc {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  line-height: 1.5;
+}
+
+// Đường dẫn: cho xuống dòng giữa chừng thay vì cắt cụt — người dùng cần đọc
+// được nó đang nằm ở ổ nào.
+.setting-row__desc--path {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.setting-row__value {
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.setting-select {
+  @include m.surface(var(--bg-4), var(--line-2));
+
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-md);
+  color: var(--text-1);
+  font-size: var(--fs-xs);
+  outline: none;
+}
+
+/// Câu giải thích hậu quả, đặt NGAY TRÊN nút phá huỷ — người dùng đọc được
+/// trước khi bấm, không phải sau khi đã lỡ tay.
+.setting-note {
+  margin: var(--sp-2) 0 var(--sp-3);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh);
+
+  b {
+    color: var(--text-2);
+    font-weight: var(--fw-semibold);
+  }
+}
+
+// ── Thanh tiến độ (chuyển mã / xuất file) ────────────────────────────────
+.transcode-progress-bar {
+  width: 100%;
+  height: 6px;
+  margin-top: var(--sp-3);
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--bg-0);
+}
+
+.transcode-progress-fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  transition: width 0.2s ease-out;
+}
+
+.transcode-status {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--sp-1);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+// ── Toast — nằm TRÊN thanh thao tác để không che nhau ────────────────────
+.toast-container {
+  position: fixed;
+  bottom: 48px;
+  left: 50%;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast-box {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 92vw;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--bg-5);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  animation: toast-in var(--dur) var(--ease);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--text-2);
+}
+
+.toast-message {
+  min-width: 0;
+}

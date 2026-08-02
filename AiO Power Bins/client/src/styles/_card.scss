@@ -1,0 +1,289 @@
+// =========================================================================
+//  CARD ASSET — ngôi sao của panel. Nguyên tắc: ẢNH LÀ CHÍNH.
+//  Không badge chữ hoa tô màu, không chấm màu bày sẵn — mọi thứ phụ chỉ
+//  xuất hiện khi rê chuột. Thẻ hover KHÔNG nhấc lên (tránh giật lưới).
+// =========================================================================
+@use 'mixins' as m;
+
+.card-asset {
+  @include m.motion(background, box-shadow);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--bg-3);
+  cursor: pointer;
+
+  @include m.ring(var(--line-1), 1px);
+
+  &:hover {
+    background: var(--bg-4);
+
+    @include m.ring(var(--line-strong), 1px);
+  }
+}
+
+// Thẻ ĐANG PHÁT (do người dùng bấm vào). Viền cam để giữa lưới 60 ô vẫn biết
+// ngay tiếng/hình đang phát ra từ đâu — nhất là với âm thanh, thứ không có gì
+// chuyển động để nhận ra.
+.card-asset--playing {
+  &,
+  &:hover {
+    @include m.ring(var(--accent), 2px);
+  }
+}
+
+// [1.0.3] Ảnh/video BÊN TRONG thẻ không được tự kéo.
+//  Chromium cho kéo <img> theo mặc định, và khi người dùng bấm giữ ngay trên
+//  ảnh thì nguồn kéo là cái ẢNH chứ không phải cái thẻ — gói kéo thành URL ảnh
+//  (http://127.0.0.1/media?...) thay vì đường dẫn file, Premiere từ chối và hiện
+//  con trỏ dấu cấm. Chặn ở đây để mọi cú kéo đều xuất phát từ THẺ.
+.card-asset img,
+.card-asset video {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+// ── Khung hình ───────────────────────────────────────────────────────────
+.card-asset__thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-0);
+}
+
+.card-asset__media {
+  @include m.motion(transform);
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  .card-asset:hover & {
+    transform: scale(1.03);
+  }
+}
+
+/// Video hover đè LÊN ảnh tĩnh trong cùng ô — ảnh vẫn hiện cho tới khi frame
+/// đầu của video sẵn sàng, nên không có khoảnh khắc đen.
+.card-asset__media--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.card-asset__icon {
+  display: flex;
+  color: var(--icon-dim);
+  opacity: 0.45;
+}
+
+/// Khung sóng âm — với asset audio thì SÓNG ÂM chính là nội dung, nên nó chiếm
+/// gần hết ô thay vì thu nhỏ ở giữa.
+.card-asset__waveform-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: var(--sp-3) var(--sp-2);
+  background: var(--bg-0);
+}
+
+/// Bấm được để tua: con trỏ chữ I-beam kiểu thanh thời gian, và vạch playhead
+/// đậm hơn khi rê chuột lên để biết mình sắp nhảy tới đâu.
+.card-asset__waveform-box--seek {
+  cursor: col-resize;
+}
+
+.card-asset__media--waveform {
+  @include m.motion(opacity);
+
+  width: 100%;
+  height: 100%;
+  // `fill` (không phải contain): giãn theo chiều cao ô để sóng đủ lớn mà đọc
+  // được đường bao. Chiều ngang vẫn là trọn thời lượng nên không mất đầu/cuối.
+  object-fit: fill;
+  opacity: 0.85;
+
+  .card-asset:hover & {
+    opacity: 1;
+    transform: none; // sóng âm KHÔNG zoom — sẽ lệch khỏi vạch playhead
+  }
+}
+
+/// Chưa sinh xong sóng âm: nói rõ đang chờ, đừng để ô trống vô nghĩa.
+.card-asset__waveform-wait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--icon-dim);
+  font-size: var(--fs-2xs);
+  text-align: center;
+
+  > svg {
+    opacity: 0.5;
+  }
+}
+
+// [1.3.2] Đã thử và HỎNG — khác hẳn "đang chờ".
+//  Cố ý KHÔNG dùng --danger đỏ chói: file hỏng trong thư viện 28.900 asset là
+//  chuyện thường, không phải sự cố cần báo động. Chỉ cần đủ khác để mắt phân
+//  biệt được với thẻ đang chờ khi lướt qua.
+.card-asset__waveform-wait--failed {
+  color: var(--text-3);
+
+  > svg {
+    opacity: 0.3;
+  }
+}
+
+.waveform-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 1.5px;
+  background: var(--accent);
+  pointer-events: none;
+  transition: left 0.1s linear;
+}
+
+.thumb-loading {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, var(--bg-0) 30%, var(--bg-3) 50%, var(--bg-0) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+// ── Thời lượng: đặt TRÊN ảnh (quy ước quen thuộc của mọi thư viện video) ──
+.duration-badge {
+  position: absolute;
+  right: var(--sp-2);
+  bottom: var(--sp-2);
+  z-index: 2;
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  background: rgb(0 0 0 / 68%);
+  color: #fff;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}
+
+// ── Lớp hành động ─────────────────────────────────────────────────────────
+//  Là con của THẺ (không phải của ô ảnh) nên dạng danh sách xếp được nó ra
+//  cuối hàng. Ở dạng lưới nó phủ lên đúng vùng ảnh, không lấn xuống phần chữ.
+.card-asset__actions {
+  position: absolute;
+  inset: 0 0 var(--card-info-h) 0;
+  z-index: 3;
+  pointer-events: none; // chỉ các nút bên trong mới nhận chuột
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+// ── Yêu thích: chỉ hiện khi rê chuột, hoặc khi đã được thích ──────────────
+.fav-btn {
+  @include m.motion(opacity, color, background);
+
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 45%);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  backdrop-filter: blur(2px);
+
+  .card-asset:hover &,
+  &:focus-visible {
+    opacity: 1;
+  }
+
+  &:hover {
+    background: rgb(0 0 0 / 70%);
+    color: var(--heart);
+  }
+}
+
+.fav-btn--on {
+  color: var(--heart);
+  opacity: 1;
+}
+
+// [0.17.0] Đã bỏ `.import-btn` (nút Chèn trên từng thẻ). Cả lưới giờ chỉ có
+// MỘT nút Chèn ở thanh dưới — xem `.view-switch__insert` trong `_grid.scss`.
+
+// ── Chân thẻ: tên + loại ─────────────────────────────────────────────────
+.card-asset__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+}
+
+.card-asset__name {
+  @include m.ellipsis;
+
+  color: var(--text-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+
+/// Loại file: icon + đuôi file. Icon mang nghĩa, chữ hoa tô màu thì không —
+/// một nhãn đúng lặp 60 lần trên màn hình sẽ thành nhiễu (quy tắc 33).
+.card-asset__meta {
+  @include m.ellipsis;
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--text-meta);
+  font-size: var(--fs-2xs);
+
+  > svg {
+    opacity: 0.8;
+  }
+}
+
+.card-asset__meta-sep {
+  opacity: 0.45;
+}
+

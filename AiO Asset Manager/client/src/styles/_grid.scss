@@ -1,0 +1,277 @@
+// =========================================================================
+//  GRID — vùng nội dung chính + trạng thái rỗng + cụm "dạng hiển thị" nổi.
+// =========================================================================
+@use 'mixins' as m;
+
+/// Chiều cao cụm "dạng hiển thị" nổi ở góc phải dưới. Vùng cuộn phải TRẢ LẠI
+/// chỗ này bằng padding, nếu không hàng cuối sẽ nằm sau lưng nó (quy tắc 56).
+$view-switch-h: 30px;
+$view-switch-w: 92px;
+
+.grid-scroll {
+  @include m.scroll-thin;
+
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--sp-3) var(--sp-3) calc(#{$view-switch-h} + var(--sp-5));
+}
+
+.scan-banner {
+  margin-bottom: var(--sp-3);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+// ── "Đang xem 1.000 trong 91.256" ────────────────────────────────────────
+//  Dòng chân lưới khi thư viện còn asset chưa đổ ra. Cố ý KHÔNG phải nút bấm:
+//  cuộn tới gần đáy là lưới tự đổ tiếp (xem PAGE trong Grid.tsx). Dòng này chỉ
+//  để người dùng kéo thanh cuộn xuống hết khỏi tưởng thư viện chỉ có bấy nhiêu.
+.grid-more {
+  padding: var(--sp-3) 0 var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+
+// ── Vùng nhận file kéo thả (Power Bins / Brand Kit) ──────────────────────
+//  Viền sáng lên khi đang kéo file qua. Vẽ bằng inset shadow nên KHÔNG làm
+//  xê dịch bố cục lưới (border thật sẽ đẩy nội dung 2px).
+.grid-scroll--dragover {
+  @include m.ring(var(--accent), 2px);
+
+  background: var(--accent-soft);
+}
+
+.dropzone-hint {
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+}
+
+// ── Cụm nghe thử của phần Âm thanh ───────────────────────────────────────
+//  Nằm TRONG phần âm thanh (không phải ở thanh tìm kiếm chung, vì tìm kiếm
+//  dùng cho mọi mục). Dính ở đầu vùng cuộn để chỉnh được trong lúc đang nghe.
+//  Lề âm để nền phủ hết bề ngang vùng cuộn, bù lại padding của .grid-scroll.
+//  Không có nhãn chữ "Nghe thử": ở panel hẹp (vùng nội dung ~330px) nhãn đẩy hai
+//  cụm xuống dòng thứ hai trông lệch. Nghĩa được giữ bằng icon loa / icon cao độ
+//  ngay cạnh thanh trượt, kèm title + aria-label.
+.audio-bar {
+  position: sticky;
+  top: calc(var(--sp-3) * -1);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin: calc(var(--sp-3) * -1) calc(var(--sp-3) * -1) var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--line-1);
+  background: var(--bg-2);
+}
+
+// ── Cụm chọn dạng hiển thị — góc phải phía dưới ──────────────────────────
+.view-switch {
+  position: absolute;
+  right: var(--sp-3);
+  bottom: var(--sp-3);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  background: rgb(29 32 40 / 88%);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+}
+
+.view-switch__btn {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+
+  &:hover:not(.view-switch__btn--active) {
+    background: var(--bg-hover);
+    color: var(--text-1);
+  }
+}
+
+.view-switch__btn--active {
+  background: var(--bg-5);
+  color: var(--text-1);
+}
+
+// ── Nút Chèn duy nhất của lưới ───────────────────────────────────────────
+//  Nằm cùng hàng với nút đổi cỡ hiển thị. Mang tên asset đang trỏ tới nên
+//  phải co giãn được, và phải cắt bớt tên dài thay vì đẩy giãn cả thanh.
+.view-switch__insert {
+  @include m.motion(background, color, opacity);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 240px;
+  height: 26px;
+  padding: 0 var(--sp-3);
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--accent-on); // nâu gần đen: chữ trắng trên cam chỉ đạt 3.2:1
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  &:disabled {
+    background: var(--bg-5);
+    color: var(--text-3);
+    cursor: default;
+  }
+}
+
+// Bỏ khỏi khay — việc gỡ bỏ, nên dùng hệ nút phá huỷ, không dùng cam như Import.
+.view-switch__remove {
+  @include m.motion(background, color);
+
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 26px;
+  padding: 0 var(--sp-3);
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--bg-5);
+  color: var(--danger);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--danger);
+    color: var(--bg-0);
+  }
+}
+
+.view-switch__sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 2px;
+  background: var(--line-2);
+}
+
+// ── Trạng thái (rỗng / lỗi / đang quét) ──────────────────────────────────
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 56px var(--sp-6);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+.state--error {
+  color: var(--danger);
+}
+
+.state__icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--sp-2);
+  color: var(--icon-dim);
+  opacity: 0.6;
+}
+
+.state__title {
+  margin: 0;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.state__hint {
+  max-width: 320px;
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+}
+
+// ── Dải tiêu đề gói Pack ─────────────────────────────────────────────────
+.pack-banner {
+  @include m.surface(var(--bg-3), var(--line-1));
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+}
+
+.pack-banner__info {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.pack-banner__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-md);
+  background: var(--bg-0);
+  color: var(--text-2);
+}
+
+.pack-banner__title {
+  @include m.ellipsis;
+
+  margin: 0;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+}
+
+.pack-banner__sub {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+.pack-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}

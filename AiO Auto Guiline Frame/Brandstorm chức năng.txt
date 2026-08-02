@@ -1,0 +1,10 @@
+Anh cần một tool có thể đo lường được các tỉ lệ khung hình của  các nền tang 
+ví dụ như faceboook có bao nhiêu khung video được cập nhật real time theo facebook
+và tool của mình tự động đưa ra các guiline safe zone dành cho editor
+
+Cụ thể một frame hình:
+Facebook gần đây đang có frame 4:5 ((tỉ lệ khung hình là 4:5) thì khi editor dung làm sao họ biết được  chỗ nào nên tránh vì trong khung facebook có thể các phần của họ đó em như avatar , tiêu đề , ..
+
+
+Mục tiêu của tool này, khi eidotr cần biết uược một khung hình an toàn để dung thì chỉ cần chọn và sqeuncce sẽ hiện các guiline cụ thể của mỗi khùng hình 
+Yêu cầu: Research chi tiết các khung hình đang có hiện tại và đưa chính xác vào Tool Panel

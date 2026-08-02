@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0"
+    ExtensionBundleId="com.aiostudio.powerbin"
+    ExtensionBundleVersion="2.0.0"
+    ExtensionBundleName="AiO Studio - Power Bins"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <ExtensionList>
+    <Extension Id="com.aiostudio.powerbin.panel" Version="2.0.0" />
+  </ExtensionList>
+
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="PPRO" Version="[15.0,99.9]" />
+    </HostList>
+    <LocaleList>
+      <Locale Code="All" />
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="9.0" />
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+
+  <DispatchInfoList>
+    <Extension Id="com.aiostudio.powerbin.panel">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./dist/index.html</MainPath>
+          <ScriptPath>./host/index.jsx</ScriptPath>
+          <CEFCommandLine>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--mixed-context</Parameter>
+            <Parameter>--allow-file-access</Parameter>
+            <Parameter>--allow-file-access-from-files</Parameter>
+            <!-- Tang toc phan cung: GPU giai ma video + rasterize, cho preview muot -->
+            <Parameter>--ignore-gpu-blacklist</Parameter>
+            <Parameter>--ignore-gpu-blocklist</Parameter>
+            <Parameter>--enable-gpu-rasterization</Parameter>
+            <Parameter>--enable-oop-rasterization</Parameter>
+            <Parameter>--enable-accelerated-video-decode</Parameter>
+            <Parameter>--enable-accelerated-2d-canvas</Parameter>
+            <Parameter>--enable-zero-copy</Parameter>
+            <Parameter>--disable-gpu-driver-bug-workarounds</Parameter>
+            <Parameter>--autoplay-policy=no-user-gesture-required</Parameter>
+            <!-- Dung nhieu tai nguyen hon cho preview muot (may cau hinh cao) -->
+            <Parameter>--js-flags=--max-old-space-size=4096</Parameter>
+            <Parameter>--num-raster-threads=4</Parameter>
+            <Parameter>--disable-frame-rate-limit</Parameter>
+            <Parameter>--disable-gpu-vsync</Parameter>
+            <Parameter>--disable-renderer-backgrounding</Parameter>
+            <Parameter>--disable-background-timer-throttling</Parameter>
+            <Parameter>--disable-backgrounding-occluded-windows</Parameter>
+            <Parameter>--video-threads=8</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>AiO Studio - Power Bins</Menu>
+          <Geometry>
+            <Size>
+              <Height>640</Height>
+              <Width>380</Width>
+            </Size>
+            <MinSize>
+              <Height>360</Height>
+              <Width>280</Width>
+            </MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>
