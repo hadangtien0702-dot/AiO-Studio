@@ -88,7 +88,7 @@ h3:first-of-type{margin-top:0;}
 .topbar{height:var(--h-topbar);background:var(--bg-1);border:1px solid var(--line-1);border-radius:var(--r-md);
   display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-4);}
 .topbar .id{display:flex;align-items:center;gap:var(--sp-2);font-weight:var(--fw-semibold);font-size:var(--fs-md);}
-.topbar .id .ic{width:16px;height:16px;border-radius:4px;background:var(--accent);}
+.topbar .id .ic{width:18px;height:18px;border-radius:4px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;}
 .topbar .ver{color:var(--text-3);font-size:var(--fs-xs);}
 .topbar .status{color:var(--text-3);font-size:var(--fs-xs);margin-left:var(--sp-3);}
 .topbar .push{margin-left:auto;display:flex;gap:var(--sp-2);}
@@ -117,6 +117,14 @@ h3:first-of-type{margin-top:0;}
 .dd.no li::before{content:"✕";position:absolute;left:0;color:var(--danger);}
 .dd.yes li::before{content:"✓";position:absolute;left:0;color:var(--ok);}
 @media(max-width:640px){.don-dont{grid-template-columns:1fr}}
+/* states + loading */
+.states{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;}
+.btn--focus{outline:none;border-color:var(--accent-line);box-shadow:var(--focus-ring);}
+.btn--run{background:var(--bg-4);color:var(--text-2);border-color:var(--line-2);cursor:progress;pointer-events:none;}
+.btn--done{background:transparent;border-color:var(--ok);color:var(--ok);}
+.prog{height:6px;background:var(--bg-0);border-radius:var(--r-pill);overflow:hidden;max-width:360px;margin-top:var(--sp-3);border:1px solid var(--line-1);}
+.prog i{display:block;height:100%;width:42%;background:var(--accent);border-radius:var(--r-pill);}
+.state-lbl{font-size:var(--fs-2xs);color:var(--text-3);width:100%;margin-top:var(--sp-2);}
 </style>
 </head>
 <body>
@@ -127,7 +135,7 @@ h3:first-of-type{margin-top:0;}
   <section>
     <h2>Thanh trên <span class="tag">44px · chung cho cả 7 panel</span></h2>
     <div class="topbar">
-      <span class="id"><span class="ic"></span> Autocut</span>
+      <span class="id"><span class="ic"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#150700" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span> Autocut</span>
       <span class="ver">v1.5.0</span>
       <span class="status">Đang chờ Premiere…</span>
       <span class="push"><button class="btn btn--sm">Thêm thư mục</button></span>
@@ -198,7 +206,7 @@ h3:first-of-type{margin-top:0;}
   <section>
     <h2>Empty state</h2>
     <div class="empty">
-      <div class="eic">▦</div>
+      <div class="eic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
       <h4>Chưa có asset nào</h4>
       <p>Bấm <b>Thêm thư mục</b> ở thanh trên để quét asset trên máy.</p>
       <button class="btn btn--primary">Thêm thư mục</button>
@@ -215,6 +223,29 @@ h3:first-of-type{margin-top:0;}
       <div class="item"><span class="bar" style="background:#8fd0ff"></span> Playhead</div>
     </div>
     <p class="note">Caption của Premiere màu VÀNG và nằm TRÊN timeline. Vẽ sai màu/sai tầng thì người dựng phải dịch trong đầu. (Giá trị chính xác đang được kiểm lại từ Adobe Spectrum.)</p>
+  </section>
+
+  <section>
+    <h2>Trạng thái &amp; Loading <span class="tag">mỗi control đủ 5 trạng thái · tiến trình là chỗ thắng đối thủ</span></h2>
+    <h3>Năm trạng thái của một nút</h3>
+    <div class="states">
+      <button class="btn">Thường</button>
+      <button class="btn" style="background:var(--bg-5)">Hover</button>
+      <button class="btn" style="transform:scale(.97)">Nhấn</button>
+      <button class="btn btn--focus">Focus</button>
+      <button class="btn" disabled>Vô hiệu</button>
+      <span class="state-lbl">Focus: ring <code>--accent-soft</code> trên MỌI control — không bao giờ <code>outline:none</code> trần.</span>
+    </div>
+    <h3>Nút chính LÀ đèn báo tiến trình</h3>
+    <div class="states">
+      <button class="btn btn--primary btn--lg">Cắt khoảng lặng</button>
+      <span style="color:var(--text-3)">→</span>
+      <button class="btn btn--run btn--lg">Đang cắt… 42%</button>
+      <span style="color:var(--text-3)">→</span>
+      <button class="btn btn--done btn--lg">✓ Đã cắt 478 đoạn</button>
+    </div>
+    <div class="prog"><i></i></div>
+    <p class="note">Đang chạy → khoá + đổi nhãn thành % (con số nhúc nhích cho bước &gt;30s). Xong → đổi MÀU rõ (nhìn màu là biết, khỏi đọc số). AutoCut/AutoPod báo tiến trình rất tệ — đây là chỗ mình hơn.</p>
   </section>
 
   <section>
