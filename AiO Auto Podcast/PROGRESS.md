@@ -1,5 +1,112 @@
 # AiO Auto Podcast - Nhat ky
 
+## [tu-sync] - 2026-08-03 15:51 - CUU dist/ (3 PANEL) + TU DO OFFSET, DUNG SEQUENCE THU
+
+Anh Tien chot 2 viec: (1) chep dist ve repo va commit luon; (2) em tu tao
+project rieng, tu do offset — KHONG dung project that cua anh.
+
+### 1. CUU dist/ — nguyen nhan goc la .gitignore, khong phai tai nan
+`.gitignore` dong 9 co `dist/` — dung cho panel CO BUILD, nhung 3 panel
+KHONG build thi `dist/` chinh LA MA NGUON viet tay. Quy tac chung nuot mat
+chung trong im lang.
+
+Do that truoc khi sua:
+
+| Panel | dist tren o | git theo doi | ban da cai |
+|---|---|---|---|
+| Auto Podcast | MAT SACH | 0 file | con |
+| Guide Frame | MAT SACH | 0 file | con |
+| Re-Frames | con 3 file | 0 file | con |
+| Auto Cut Short | chua co code | 0 | chua cai |
+
+-> Khong va rieng Podcast (bai hoc 5n): sua ca 3. Them ngoai le
+`!/​<panel>/dist/` — phai un-ignore CHINH THU MUC vi git khong descend vao
+thu muc bi ignore, un-ignore file ben trong khong co tac dung. Da kiem
+`git check-ignore`: ca 3 duong dan khong con bi chan.
+
+Chep dist tu ban da cai ve repo cho Podcast + Guide Frame. Re-Frames doi
+chieu MD5: 3/3 file giong het ban cai.
+
+Kiem chung (chay tu REPO sau khi chep, khong phai ban sao scratchpad):
+- `tests/kiem-nao.mjs`: **16/16 DAT**, ranh lech 0 ms
+- `tests/stress.mjs` : **12/12 ca bat buoc DAT**, dung 100% moi ca
+- Ca "cuoi-chung 2s" ra 10/10 -> dung ban v0.3.1, khong mat chuc nang.
+- Commit `f6c7e70`, 15 file, 5181 dong. 12 file dist nay da nam trong git.
+
+### 2. TU SYNC — do offset bang tuong quan cheo, co THUOC NGOAI cham
+Tach tieng 6 file cam 4K (~17 GB/file) -> wav 8kHz mono: **25-28 giay/file**
+(ffmpeg seek theo index, khong doc het file). Envelope dB chuan hoa (bo
+trung binh, chia do lech chuan) roi tuong quan cheo: quet tho 0,2s +-12
+phut, tinh chinh 20ms.
+
+Ket qua (BUOI 2 = C4026/C4234/C4089 + Trong2/Dilys2): r = 0,71-0,75,
+offset +1,74 / +1,56 / +1,18 giay.
+
+**THUOC NGOAI:** `PR\Audio.xml` cua anh Tien co "Synced Sequence" do
+**PluralEyes** sync — cong cu doc lap hoan toan. Doi chieu:
+
+| Cap | Em do | PluralEyes | Lech |
+|---|---|---|---|
+| C4026 - C4234 | +0,180s | +0,167s | 0,32 frame |
+| C4026 - C4089 | +0,560s | +0,584s | 0,57 frame |
+| C4234 - C4089 | +0,380s | +0,417s | 0,89 frame |
+| **C4026 <-> mic (tuyet doi)** | **+1,740s** | **+1,752s** | **0,30 frame** |
+
+Lech trung binh **0,59 frame**. Day la lan dau tien cac con so cua du an
+duoc cham bang thuoc DUNG NGOAI thuat toan (bai hoc 5d).
+
+**PluralEyes KHONG sync duoc mic Trong(2)** — no vut file do vao dong cuoi
+timeline (frame 130753, cung cho voi C4023/C4088 la cac clip vun). Em sync
+duoc, va vi tri em tinh ra (66828) TRUNG KHIT voi Dilys(2) ma PluralEyes
+dat — dung nhu ky vong (cung may ghi, chia file cung luc).
+
+### ☠️ EM DA KET LUAN SAI MOT LAN — nguong tin cay qua chat
+Truoc khi doi chieu, em bao "buoi 1 khong co mic" vi dat nguong r >= 0,25
+va cap buoi 1 chi ra r = 0,13-0,17. **Sai.** Doi chieu PluralEyes:
+
+| Cap | Em do (lag) | PluralEyes | |
+|---|---|---|---|
+| C4025 <-> Thien(1) | -10,4s | -10,34s | khop |
+| C4233 <-> Thien(1) | -3,2s | -3,13s | khop |
+| C4087 <-> Thien(1) | -3,8s | -3,71s | khop |
+
+**Lag em do dung ca 3, chi co r thap.** Nguong tin cay tu dat da loai nham
+cap DUNG. Bai hoc: voi tuong quan cheo, **dinh o dung mot cho qua nhieu cap
+doc lap** la bang chung manh hon gia tri r tuyet doi. Neu sau nay lam tinh
+nang tu sync, ĐUNG chan bang nguong r cung — hay xet tinh nhat quan giua
+cac cap.
+
+### 3. SEQUENCE THU da dung
+`file pr for test\podcast-buoi2\PODCAST-BUOI2-da-sync.xml` (7,7 KB) —
+FCP7 xmeml theo dung khuon Premiere tu xuat (doc mau tu `PR\Audio.xml`).
+- 3 track video (Cam1/2/3) + 2 track audio (mic Trong, mic Dilys)
+- **Moi track dung 1 clip lien** -> thoa rang buoc MVP cua tool
+- Vi tri frame: 42 / 38 / 28 (lay tu PluralEyes), mic o 0
+- Dai 63.926 frame = 44,44 phut @ 23,976 fps
+- Mic dung ban copy TEN ASCII (`Mic-Trong.mp3`/`Mic-Dilys.mp3`, MD5 giong
+  ban goc) de ne ky tu U+F022 lam Premiere mat link.
+
+Kiem chung: `XmlDocument.Load` -> hop le (well-formed); giai ma pathurl ra
+dung 3 duong dan that; dem duoc 3 track video + 2 track audio, moi track 1
+clip.
+
+**CHUA KIEM:** chua import thu vao Premiere. Khong tu lam vi Premiere dang
+mo project that cua anh Tien, import se tao sequence trong project do.
+Buoc nay can anh Tien.
+
+### File anh huong
+- `.gitignore` (goc AiO Studio) — them 3 ngoai le
+- `AiO Auto Podcast/dist/` · `AiO Auto Guiline Frame/dist/` ·
+  `AiO Auto Re-Frames/dist/` — dua vao git
+- `file pr for test\podcast-buoi2\` — 2 mp3 ten ASCII + 1 XML sequence
+- Ban do trong scratchpad: `tach-tieng-cam.mjs` · `do-offset.mjs` ·
+  `soi-buoi1.mjs` · `doi-chieu-offset.mjs` · `sinh-sequence.mjs`
+
+### Con no
+1. Anh Tien import XML -> mo panel Auto Podcast -> chay that (chua lam).
+2. Anh cham 12 clip nghe kiem (`podcast-nghe-kiem\_BANG-CHAM.csv`).
+3. Nguong 6 dB / san -50 dB van chua sua — doi dap an.
+
 ## [do-lieu-that] - 2026-08-03 15:34 - DO NAO TREN LIEU PODCAST THAT + PHAT HIEN MAT dist/
 
 Anh Tien dua lieu that: `G:\Quay PV tuyen dung_DRT_0902\Video` (+ folder

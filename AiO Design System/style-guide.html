@@ -5,22 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AiO Studio — Style Guide (Studio Console)</title>
 <style>
+@font-face{
+  font-family:'Inter var';
+  font-style:normal;
+  font-weight:100 900;              /* MỘT file variable cho MỌI weight — hết cảnh thiếu bold/regular */
+  font-display:swap;
+  src:url('fonts/Inter.woff2') format('woff2');
+}
+@font-face{
+  font-family:'Inter var';
+  font-style:italic;               /* bản nghiêng — mọi weight */
+  font-weight:100 900;
+  font-display:swap;
+  src:url('fonts/Inter-Italic.woff2') format('woff2');
+}
 :root{
-  --bg-0:#0a0a0b;--bg-1:#0f0f11;--bg-2:#151517;--bg-3:#1c1c1f;--bg-4:#232327;--bg-5:#2c2c31;--bg-6:#161618;
+  --bg-0:#0e0e0e;--bg-1:#141414;--bg-2:#181818;--bg-3:#1f1f1f;--bg-4:#282828;--bg-5:#333333;--bg-6:#161616;
   --bg-hover:rgb(255 255 255 /5%);--bg-active:rgb(255 255 255 /9%);
   --line-1:rgb(255 255 255 /6%);--line-2:rgb(255 255 255 /10%);--line-strong:rgb(255 255 255 /16%);
   --text-1:#f5f5f7;--text-2:#c3c3c8;--text-3:#8d8d95;--text-meta:#9b9ba3;--icon-dim:#8f8f97;
-  --accent:#ff5714;--accent-hover:#ff7038;--accent-soft:rgb(255 87 20 /16%);--accent-line:rgb(255 87 20 /40%);
-  --accent-text:#ffb599;--accent-on:#150700;
+  --accent:#f86820;--accent-hover:#ff7d3c;--accent-pressed:#e0590e;--accent-soft:rgb(248 104 32 /16%);--accent-line:rgb(248 104 32 /40%);
+  --accent-text:#ffb891;--accent-on:#ffffff;
   --ok:#4ec98a;--warn:#e8c05a;--danger:#ff5f6d;--danger-strong:#ff4757;--heart:#ff6b81;
-  --font-ui:'SF Pro Text','SF Pro Display',-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
-  --font-display:'SF Pro Display','SF Pro Text',-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+  --font-ui:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-display:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fs-2xs:10px;--fs-xs:11px;--fs-sm:12px;--fs-md:13px;--fs-lg:15px;--fs-xl:19px;
   --fw-normal:400;--fw-medium:500;--fw-semibold:600;--fw-bold:700;--lh-tight:1.25;--lh:1.45;--ls-display:-0.014em;
   --sp-1:4px;--sp-2:6px;--sp-3:8px;--sp-4:12px;--sp-5:16px;--sp-6:24px;
   --r-sm:6px;--r-md:8px;--r-lg:12px;--r-pill:999px;
   --shadow-sm:0 1px 2px rgb(0 0 0 /30%);--shadow-md:0 8px 24px rgb(0 0 0 /45%);--shadow-pop:0 18px 52px rgb(0 0 0 /62%);
   --h-ctrl-sm:24px;--h-ctrl:28px;--h-ctrl-lg:34px;--h-topbar:44px;
+  --pr-video:#729ACC; --pr-video-head:#5b7ea8; --pr-audio:#1D7021; --pr-playhead:#2D8CEB;
   --dur:150ms;--ease:cubic-bezier(.32,.72,0,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -55,8 +70,9 @@ h3:first-of-type{margin-top:0;}
   cursor:pointer;text-transform:none;letter-spacing:0;transition:background var(--dur) var(--ease);
   display:inline-flex;align-items:center;gap:var(--sp-2);}
 .btn:hover{background:var(--bg-5);}
-.btn--primary{background:var(--accent);color:var(--accent-on);border-color:transparent;font-weight:var(--fw-semibold);}
+.btn--primary{background:var(--accent);color:#fff;border-color:transparent;font-weight:var(--fw-bold);font-size:var(--fs-lg);}
 .btn--primary:hover{background:var(--accent-hover);}
+.btn--primary:active{background:var(--accent-pressed);}
 .btn--lg{height:var(--h-ctrl-lg);padding:0 var(--sp-5);}
 .btn--sm{height:var(--h-ctrl-sm);padding:0 var(--sp-3);font-size:var(--fs-sm);}
 .btn--danger{background:transparent;border-color:var(--danger);color:var(--danger);}
@@ -115,7 +131,8 @@ h3:first-of-type{margin-top:0;}
 .dd ul{list-style:none;display:flex;flex-direction:column;gap:var(--sp-2);}
 .dd li{color:var(--text-2);padding-left:var(--sp-4);position:relative;}
 .dd.no li::before{content:"✕";position:absolute;left:0;color:var(--danger);}
-.dd.yes li::before{content:"✓";position:absolute;left:0;color:var(--ok);}
+.dd.yes li::before{content:"";position:absolute;left:0;top:6px;width:9px;height:5px;
+  border-left:2px solid var(--ok);border-bottom:2px solid var(--ok);transform:rotate(-45deg);}
 @media(max-width:640px){.don-dont{grid-template-columns:1fr}}
 /* states + loading */
 .states{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;}
@@ -125,17 +142,96 @@ h3:first-of-type{margin-top:0;}
 .prog{height:6px;background:var(--bg-0);border-radius:var(--r-pill);overflow:hidden;max-width:360px;margin-top:var(--sp-3);border:1px solid var(--line-1);}
 .prog i{display:block;height:100%;width:42%;background:var(--accent);border-radius:var(--r-pill);}
 .state-lbl{font-size:var(--fs-2xs);color:var(--text-3);width:100%;margin-top:var(--sp-2);}
+/* loading variants */
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-strong);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;flex:none}
+.spin--lg{width:28px;height:28px;border-width:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.prog--indet{position:relative}
+.prog--indet i{width:38%;position:absolute;left:0;animation:indet 1.2s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes indet{0%{left:-38%}100%{left:100%}}
+.skel{background:linear-gradient(90deg,var(--bg-3) 25%,var(--bg-5) 37%,var(--bg-3) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:var(--r-sm)}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.skel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-3);max-width:420px}
+.skel-card{height:78px}
+.skel-line{height:10px;margin-top:var(--sp-2)}
+.dimwrap{position:relative;border:1px solid var(--line-1);border-radius:var(--r-md);background:var(--bg-2);padding:var(--sp-4);overflow:hidden;max-width:420px;color:var(--text-3);font-size:var(--fs-sm)}
+.dimover{position:absolute;inset:0;background:rgb(14 14 14 /55%);display:flex;align-items:center;justify-content:center;gap:var(--sp-3);color:var(--text-2);font-size:var(--fs-sm)}
+@media (prefers-reduced-motion:reduce){.spin,.prog--indet i,.skel{animation-duration:.01ms;animation-iteration-count:1}}
+
+/* ===== BỔ SUNG 2026-08-03 — rút từ panel Autocut đã chốt ===== */
+.two{display:grid;grid-template-columns:64fr 36fr;gap:var(--sp-4);max-width:560px}
+.two .cel{border:1px dashed var(--line-2);border-radius:var(--r-md);padding:var(--sp-4);
+  min-height:104px;display:flex;flex-direction:column;gap:var(--sp-2);font-size:var(--fs-xs);color:var(--text-3)}
+.two .cel b{color:var(--text-1);font-size:var(--fs-sm);font-weight:600}
+.two .cel .pin{margin-top:auto;height:22px;border-radius:var(--r-sm);background:var(--accent);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:var(--fs-2xs);font-weight:700}
+/* dải timeline hai tầng */
+.tl{position:relative;height:82px;background:var(--bg-0);border-radius:var(--r-sm);padding:8px 6px;max-width:520px}
+.tl .marks{position:relative;height:6px}
+.tl .marks i{position:absolute;top:0;height:6px;background:var(--danger);border-radius:1px}
+.tl .lanes{display:flex;gap:2px;height:60px;margin-top:4px}
+.tl .clip{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tl .v{height:20px;background:var(--pr-video);border-radius:2px;
+  background-image:linear-gradient(var(--pr-video-head) 0 5px,transparent 5px)}
+.tl .a{flex:1;background:var(--pr-audio);border-radius:2px;display:flex;align-items:center;gap:2px;padding:0 3px;overflow:hidden}
+.tl .a i{flex:1 0 2px;background:rgb(255 255 255 /45%);border-radius:1px}
+.tl .cuts{position:absolute;inset:14px 6px 8px}
+.tl .cuts i{position:absolute;top:0;bottom:0;background:rgb(255 95 109 /18%);border-radius:2px}
+/* khối "đã mất đi" */
+.gonewrap{display:flex;height:82px;background:var(--bg-0);border-radius:var(--r-sm);padding:8px 6px;max-width:520px}
+.gonewrap .keep{flex:0 0 57%;background:var(--pr-audio);border-radius:2px;opacity:.85}
+.gone{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:var(--sp-1);text-align:center;border-left:1px dashed rgb(255 95 109 /45%);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  background:repeating-linear-gradient(135deg,rgb(255 95 109 /10%) 0 5px,transparent 5px 13px)}
+.gone .n{font-size:var(--fs-xl);font-weight:600;color:var(--text-1);letter-spacing:-.014em;line-height:1.15}
+.gone .l{font-size:var(--fs-xs);color:var(--text-3)}
+/* ô số kết quả */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);max-width:520px}
+.tile{background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4)}
+.tile .k{font-size:var(--fs-2xs);font-weight:500;color:var(--text-3)}
+.tile .v{font-size:var(--fs-xl);font-weight:600;letter-spacing:-.014em;margin-top:2px;color:var(--text-1)}
+.tile .v--ok{color:var(--ok)}
+.tile .ar{color:var(--text-3);font-weight:400}
+/* bảng dữ liệu */
+.tbl{width:100%;border-collapse:collapse;max-width:560px}
+.tbl th{text-align:left;font-size:var(--fs-2xs);font-weight:500;color:var(--text-3);
+  padding:0 var(--sp-6) var(--sp-3) 0;border-bottom:1px solid var(--line-1)}
+.tbl th:last-child,.tbl td:last-child{text-align:right;padding-right:0}
+.tbl td{padding:var(--sp-1) var(--sp-6) var(--sp-1) 0;border-top:1px solid rgb(255 255 255 /4%);
+  font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap}
+.tbl tr:hover td{background:rgb(255 255 255 /5%)}
+.tbl td.dur{font-weight:600;color:var(--text-1)}
+.tbl tr[data-kept] td{background:rgb(248 104 32 /7%);color:var(--text-3)}
+.tbl tr[data-kept] td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+.keepb[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-text);font-weight:600}
+/* thẻ lựa chọn có hình */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);max-width:400px}
+.opt{position:relative;text-align:left;padding:var(--sp-4);background:var(--bg-2);border:1px solid var(--line-2);
+  border-radius:var(--r-md);cursor:pointer;color:inherit;font-family:inherit}
+.opt[aria-checked="true"]{background:var(--bg-4);border-color:var(--accent-line);box-shadow:inset 0 0 0 1px var(--accent-line)}
+.opt .nm{display:block;font-size:var(--fs-sm);font-weight:600;color:var(--text-1);margin-top:var(--sp-4)}
+.opt .sub{display:block;font-size:var(--fs-2xs);color:var(--text-3);margin-top:3px}
+.opt .tick{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:999px;background:var(--accent);
+  color:#fff;display:none;align-items:center;justify-content:center}
+.opt[aria-checked="true"] .tick{display:flex}
+.dia{display:flex;flex-direction:column;gap:var(--sp-3);height:56px;justify-content:center}
+.bar2{height:14px;background:var(--bg-0);border:1px solid var(--line-2);border-radius:3px;display:flex;gap:2px;padding:2px}
+.bar2.hi{border-color:var(--accent-line)}
+.bar2 i{flex:1;background:var(--pr-video);border-radius:2px}
+.bar2 i.mute{background:rgb(114 154 204 /30%)}
+.bar2 i.gone{background:rgb(255 95 109 /30%);box-shadow:inset 0 0 0 1px rgb(255 95 109 /55%)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>AiO Studio — Style Guide</h1>
-  <p class="sub">Hướng thiết kế "Studio Console" · tối, gọn, nội dung là chính · sống cạnh timeline Premiere · chạy được ở 300px. Trang này render đúng bằng token thật — dùng để đối chiếu bằng MẮT (token khớp ≠ nhìn giống nhau).</p>
+  <p class="sub">Hướng thiết kế "Studio Console" · tối, gọn, nội dung là chính · sống cạnh timeline Premiere · dock hẹp 200–260px, thả nổi thì hai cột. Trang này render đúng bằng token thật — dùng để đối chiếu bằng MẮT (token khớp ≠ nhìn giống nhau).</p>
 
   <section>
     <h2>Thanh trên <span class="tag">44px · chung cho cả 7 panel</span></h2>
     <div class="topbar">
-      <span class="id"><span class="ic"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#150700" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span> Autocut</span>
+      <span class="id"><span class="ic"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span> Autocut</span>
       <span class="ver">v1.5.0</span>
       <span class="status">Đang chờ Premiere…</span>
       <span class="push"><button class="btn btn--sm">Thêm thư mục</button></span>
@@ -154,9 +250,19 @@ h3:first-of-type{margin-top:0;}
   </section>
 
   <section>
-    <h2>Chữ <span class="tag">SF Pro · một thang, sáu bậc</span></h2>
+    <h2>Chữ <span class="tag">Inter (bundled woff2) · một thang, sáu bậc</span></h2>
     <div id="type"></div>
-    <p class="note">Đừng nâng cả thang. Muốn to hơn ở một chỗ thì dùng bậc cao hơn ở đúng chỗ đó.</p>
+    <h3>Độ đậm &amp; nghiêng (Inter variable — đủ hết)</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:var(--sp-4);align-items:baseline;font-size:var(--fs-lg)">
+      <span style="font-weight:400">Regular 400</span>
+      <span style="font-weight:500">Medium 500</span>
+      <span style="font-weight:600">SemiBold 600</span>
+      <span style="font-weight:700">Bold 700</span>
+      <span style="font-weight:800">ExtraBold 800</span>
+      <span style="font-style:italic;color:var(--text-2)">Italic nghiêng</span>
+      <span style="font-weight:700;font-style:italic;color:var(--text-2)">Bold Italic</span>
+    </div>
+    <p class="note">Một file <code>Inter.woff2</code> (variable) cho mọi weight 100–900 + một file nghiêng — hết cảnh "thiếu bold/regular". Có dấu tiếng Việt đầy đủ (ệ ữ ắ đ ₫). Trong UI mặc định dùng 400/500/600/700; <b>nghiêng dùng rất hạn chế</b> (dễ khó đọc ở cỡ nhỏ trên nền tối).</p>
   </section>
 
   <section>
@@ -173,7 +279,7 @@ h3:first-of-type{margin-top:0;}
       <button class="btn btn--danger">Xoá 3 phụ đề</button>
       <button class="btn" disabled>Chưa có gì để xoá</button>
     </div>
-    <p class="note">Chữ trên nút cam là <code>--accent-on</code> (nâu gần đen), không phải trắng. Việc phá huỷ dùng nút viền danger, đặt xa nút hay bấm, và nói hậu quả bằng số.</p>
+    <p class="note">Chữ trên nút cam là <b>trắng, ĐẬM, cỡ ≥14px</b> (giống reference). Chữ trắng trên cam <code>#F86820</code> đạt 3:1 — hợp lệ cho chữ TO/đậm; nên nút chính luôn bold + cỡ lớn. Việc phá huỷ dùng nút viền danger, đặt xa nút hay bấm, nói hậu quả bằng số.</p>
   </section>
 
   <section>
@@ -217,12 +323,13 @@ h3:first-of-type{margin-top:0;}
   <section>
     <h2>Màu vật thể Premiere <span class="tag">vẽ mini-timeline thì lấy đúng màu này</span></h2>
     <div class="pr">
-      <div class="item"><span class="bar" style="background:#5a8fc7"></span> Clip video</div>
-      <div class="item"><span class="bar" style="background:#4a9d6e"></span> Clip audio</div>
+      <div class="item"><span class="bar" style="background:var(--pr-video)"></span> Clip video <code>#729ACC</code></div>
+      <div class="item"><span class="bar" style="background:var(--pr-video-head)"></span> Đầu clip video <code>#5b7ea8</code></div>
+      <div class="item"><span class="bar" style="background:var(--pr-audio)"></span> Clip audio <code>#1D7021</code></div>
       <div class="item"><span class="bar" style="background:#e8c05a"></span> Caption / phụ đề</div>
-      <div class="item"><span class="bar" style="background:#8fd0ff"></span> Playhead</div>
+      <div class="item"><span class="bar" style="background:var(--pr-playhead)"></span> Playhead <code>#2D8CEB</code></div>
     </div>
-    <p class="note">Caption của Premiere màu VÀNG và nằm TRÊN timeline. Vẽ sai màu/sai tầng thì người dựng phải dịch trong đầu. (Giá trị chính xác đang được kiểm lại từ Adobe Spectrum.)</p>
+    <p class="note">Caption của Premiere màu VÀNG và nằm TRÊN timeline. Vẽ sai màu/sai tầng thì người dựng phải dịch trong đầu. Giá trị lấy từ bảng <b>Classic</b> của Premiere — đã đồng bộ với DESIGN-SYSTEM §1.</p>
   </section>
 
   <section>
@@ -242,10 +349,133 @@ h3:first-of-type{margin-top:0;}
       <span style="color:var(--text-3)">→</span>
       <button class="btn btn--run btn--lg">Đang cắt… 42%</button>
       <span style="color:var(--text-3)">→</span>
-      <button class="btn btn--done btn--lg">✓ Đã cắt 478 đoạn</button>
+      <button class="btn btn--done btn--lg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M20 6 9 17l-5-5"/></svg>Đã cắt 478 đoạn</button>
     </div>
     <div class="prog"><i></i></div>
     <p class="note">Đang chạy → khoá + đổi nhãn thành % (con số nhúc nhích cho bước &gt;30s). Xong → đổi MÀU rõ (nhìn màu là biết, khỏi đọc số). AutoCut/AutoPod báo tiến trình rất tệ — đây là chỗ mình hơn.</p>
+  </section>
+
+  <section>
+    <h2>Loading — các kiểu <span class="tag">chọn theo: biết % không · ngắn/dài · một item hay cả lưới</span></h2>
+    <h3>Spinner — thao tác ngắn, không rõ thời lượng</h3>
+    <div class="states">
+      <span class="spin"></span>
+      <span class="spin spin--lg"></span>
+      <button class="btn"><span class="spin" style="width:13px;height:13px;border-width:2px"></span> Đang xử lý…</button>
+      <span class="state-lbl">Chỉ dùng khi &lt; vài giây. Việc dài mà để spinner quay hoài → người ta tưởng treo.</span>
+    </div>
+    <h3>Thanh tiến trình — xác định (%) vs không xác định</h3>
+    <div style="max-width:360px">
+      <div class="state-lbl" style="margin-top:0">Biết %:</div>
+      <div class="prog"><i style="width:64%"></i></div>
+      <div class="state-lbl">Không biết % (vẫn đang chạy):</div>
+      <div class="prog prog--indet"><i></i></div>
+    </div>
+    <h3>Tiến trình có ĐƠN VỊ ĐẾM — việc rất dài (bắt buộc số nhúc nhích)</h3>
+    <div class="states">
+      <span style="color:var(--text-2);display:inline-flex;align-items:center;gap:8px"><span class="spin" style="width:13px;height:13px"></span> Đang chép… câu 42 / 2.033</span>
+      <span class="state-lbl">Chép lời cả video / quét 28k asset: hiện số đếm được để thấy nó tiến, đừng để nhãn đứng im.</span>
+    </div>
+    <h3>Skeleton — đang tải lưới / danh sách</h3>
+    <div class="skel-grid">
+      <div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div>
+    </div>
+    <p class="note">Tải lưới asset: khung xương cao ĐÚNG bằng thẻ thật để lúc có dữ liệu không nhảy layout.</p>
+    <h3>Làm mờ tại chỗ — xử lý lại nội dung đã có</h3>
+    <div class="dimwrap">
+      Nội dung hiện có trên timeline…<br>… đang được xử lý lại.
+      <div class="dimover"><span class="spin"></span> Đang cập nhật…</div>
+    </div>
+    <p class="note">Không chèn banner đẩy layout — làm mờ vùng dữ liệu tại chỗ. Tôn trọng <code>prefers-reduced-motion</code> (tắt chuyển động thì vẫn hiện đủ).</p>
+  </section>
+
+
+  <section>
+    <h2>Bố cục — hai dạng <span class="tag">§8 · dock hẹp một cột · thả nổi hai cột</span></h2>
+    <div class="two">
+      <div class="cel"><b>Cột trái ~64%</b>chuyện xảy ra với media<br>xem trước trước/sau · danh sách chi tiết</div>
+      <div class="cel"><b>Cột phải ~36%</b>quyết định rồi chạy<br>lựa chọn · ô số kết quả<div class="pin">NÚT CHÍNH NEO ĐÁY</div></div>
+    </div>
+    <p class="note">Chia theo <b>vai trò</b>, không theo thứ tự code. Dưới 900px thì xếp dọc lại. Trần 1440×920 —
+      rộng/cao hơn thì để trống, đừng kéo thẻ ra cho đầy. Hai cột phải kết thúc <b>bằng nhau</b> ở đáy.</p>
+  </section>
+
+  <section>
+    <h2>Dải timeline hai tầng <span class="tag">làn đánh dấu · video 22px · audio 38px</span></h2>
+    <div class="tl" id="tl1">
+      <div class="marks"></div>
+      <div class="lanes"><div class="clip"><div class="v"></div><div class="a"></div></div><div class="clip"><div class="v"></div><div class="a"></div></div></div>
+      <div class="cuts"></div>
+    </div>
+    <p class="note">☠️ Chỗ sẽ cắt đánh dấu ở <b>làn riêng phía trên</b>, chỉ phủ mờ 18% lên clip — tô đậm thẳng lên clip
+      thì 40 vệt là dải thành cháo. ☠️ Dạng sóng phải <b>nói thật</b>: chỗ lặng biên độ tụt sát 0, người dựng nhìn sóng
+      chứ không nhìn khoanh.</p>
+  </section>
+
+  <section>
+    <h2>Khối "đã mất đi" <span class="tag">chỗ thắng đối thủ · bề ngang tự nó là con số</span></h2>
+    <div class="gonewrap">
+      <div class="keep"></div>
+      <div class="gone">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+        <span class="n">1 phút 55 giây</span><span class="l">đã cắt bỏ</span>
+      </div>
+    </div>
+    <p class="note">Gạch chéo <code>--danger</code> 10% (chu kỳ 13px · vạch 5px · 45°) đọc ra "bị lấy đi" mà không cần chú thích.
+      Rộng đúng tỉ lệ bị mất. Con số cỡ <code>--fs-xl</code> là thứ to nhất trong dải.</p>
+  </section>
+
+  <section>
+    <h2>Ô số kết quả <span class="tag">màu nói VAI TRÒ của số, không phải cho đẹp</span></h2>
+    <div class="tiles">
+      <div class="tile"><div class="k">Thời lượng</div><div class="v">4:27 <span class="ar">→</span> <span class="v--ok">2:32</span></div></div>
+      <div class="tile"><div class="k">Số nhát cắt</div><div class="v v--ok">43 đoạn</div></div>
+      <div class="tile"><div class="k">Còn lại</div><div class="v v--ok">57%</div></div>
+    </div>
+    <p class="note">Số <b>đầu vào</b> để <code>--text-1</code> · số <b>kết quả</b> ăn <code>--ok</code> · mũi tên <code>--text-3</code>.
+      Nên "4:27 → 2:32" chỉ vế sau xanh — cho xanh cả cụm là màu hết ý nghĩa.</p>
+  </section>
+
+  <section>
+    <h2>Bảng dữ liệu <span class="tag">hàng 33px · cột chữ co vừa · một cột nuốt phần thừa</span></h2>
+    <table class="tbl">
+      <thead><tr><th>Bắt đầu</th><th>Kết thúc</th><th>Dài</th><th>Thao tác</th></tr></thead>
+      <tbody>
+        <tr><td>00:00:16:15</td><td>00:00:18:06</td><td class="dur">1,6 s</td><td><button class="btn btn--sm keepb" aria-pressed="false">Giữ lại</button></td></tr>
+        <tr><td>00:00:20:15</td><td>00:00:24:22</td><td class="dur">4,3 s</td><td><button class="btn btn--sm keepb" aria-pressed="false">Giữ lại</button></td></tr>
+        <tr data-kept><td>00:00:26:13</td><td>00:00:29:15</td><td class="dur">3,1 s</td><td><button class="btn btn--sm keepb" aria-pressed="true">Đang giữ</button></td></tr>
+      </tbody>
+    </table>
+    <p class="note">Hàng có trạng thái riêng báo bằng <b>3 dấu hiệu cùng lúc</b>: nền nhạt accent · vạch accent bên trái · chip đổi nhãn.
+      ☠️ Cột chữ <code>width:1px; white-space:nowrap</code>, để MỘT cột nuốt phần thừa — không thì màn rộng cột đầu dính mép trái,
+      cột thao tác dính mép phải, giữa trống hoác. Chặn chiều cao vùng cuộn ở ~10 hàng.</p>
+  </section>
+
+  <section>
+    <h2>Thẻ lựa chọn có hình <span class="tag">khi hai lựa chọn khác nhau ở HÌNH DẠNG kết quả</span></h2>
+    <div class="opts" role="radiogroup" aria-label="Nơi đặt kết quả">
+      <button class="opt" role="radio" aria-checked="true">
+        <span class="tick"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="dia"><span class="bar2"><i class="mute"></i></span><span class="bar2 hi"><i></i><i></i><i></i><i></i><i></i></span></span>
+        <span class="nm">Sequence mới</span><span class="sub">Giữ nguyên sequence đang mở</span>
+      </button>
+      <button class="opt" role="radio" aria-checked="false">
+        <span class="tick"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="dia"><span class="bar2"><i></i><i></i><i class="gone"></i><i></i><i></i><i class="gone"></i><i></i></span></span>
+        <span class="nm">Cắt tại chỗ</span><span class="sub">Sửa thẳng trên sequence này</span>
+      </button>
+    </div>
+    <p class="note">Segmented chữ không kể được sự khác nhau về kết quả — vẽ ra bằng chính vật thể Premiere.
+      "Sequence mới" = hai thanh (gốc mờ + bản mới đậm); "Cắt tại chỗ" = một thanh bị khoét đỏ.</p>
+  </section>
+
+  <section>
+    <h2>☠️ Điều khiển phải TÍNH LẠI THẬT <span class="tag">§8b · bài học đắt nhất</span></h2>
+    <p class="note" style="max-width:640px">Panel Autocut bản đầu: bấm "Mức cắt" chỉ đổi màu nút chọn, cả panel đứng im.
+      Anh Tiến nói ngay <i>"chỗ này anh chưa tương tác được"</i> — dù nút <b>có</b> phản hồi.<br><br>
+      <b>Luật:</b> control đổi quyết định thì MỌI con số phụ thuộc phải đổi theo, cùng lúc. Ở Autocut đổi mức cắt kéo theo
+      vạch đánh dấu · chiều dài dải kết quả · ba ô số · danh sách · nhãn nút chính.<br>
+      <b>Nhưng cái KHÔNG phụ thuộc thì đừng vẽ lại</b> — dạng sóng bản gốc không đổi theo mức cắt, vẽ lại nó là nói dối.</p>
   </section>
 
   <section>
@@ -260,7 +490,7 @@ h3:first-of-type{margin-top:0;}
       </ul></div>
       <div class="dd no"><h4>Không</h4><ul>
         <li>Nút IN HOA / giãn chữ</li>
-        <li>Chữ trắng trên nút cam</li>
+        <li>Chữ trắng trên cam NHỎ/mảnh (phải bold + cỡ lớn)</li>
         <li>Nâng cả thang chữ cho "to"</li>
         <li>Dùng opacity làm nhạt chữ</li>
         <li>Nhiều dải nhãn xám chồng nhau</li>
@@ -270,15 +500,36 @@ h3:first-of-type{margin-top:0;}
   </section>
 </div>
 <script>
-const BG=[['--bg-0','#0a0a0b','khung xem media'],['--bg-1','#0f0f11','thanh trên / rail'],['--bg-2','#151517','nền app'],['--bg-3','#1c1c1f','thẻ'],['--bg-4','#232327','nút / ô nhập'],['--bg-5','#2c2c31','nút hover'],['--line-2','rgb(255 255 255 /10%)','viền hairline']];
+const BG=[['--bg-0','#0e0e0e','khung xem media'],['--bg-1','#141414','thanh trên / rail'],['--bg-2','#181818','nền app'],['--bg-3','#1f1f1f','thẻ'],['--bg-4','#282828','nút / ô nhập'],['--bg-5','#333333','nút hover'],['--line-2','rgb(255 255 255 /10%)','viền hairline']];
 const TX=[['--text-1','#f5f5f7','14.4:1 · chính'],['--text-2','#c3c3c8','8.9:1 · phụ'],['--text-3','#8d8d95','4.8:1 · nhãn'],['--text-meta','#9b9ba3','5.7:1 · meta'],['--icon-dim','#8f8f97','4.9:1 · icon']];
-const AC=[['--accent','#ff5714','active · CTA · focus'],['--accent-on','#150700','chữ trên nút cam'],['--accent-soft','rgb(255 87 20 /16%)','nền chip accent'],['--ok','#4ec98a','xong'],['--warn','#e8c05a','còn việc'],['--danger','#ff5f6d','hỏng / phá huỷ'],['--heart','#ff6b81','yêu thích']];
+const AC=[['--accent','#f86820','active · CTA · focus'],['--accent-hover','#ff7d3c','hover'],['--accent-pressed','#e0590e','nhấn'],['--accent-soft','rgb(248 104 32 /16%)','nền chip accent'],['--accent-text','#ffb891','chữ trên chip accent'],['--ok','#4ec98a','xong'],['--warn','#e8c05a','còn việc'],['--danger','#ff5f6d','hỏng / phá huỷ']];
 function fill(id,arr){document.getElementById(id).innerHTML=arr.map(([n,v,u])=>
  `<div class="sw"><div class="chip" style="background:var(${n})"></div><div class="meta"><div class="name">${n}</div><div class="val">${v}</div><div class="use">${u}</div></div></div>`).join('');}
 fill('sw-bg',BG);fill('sw-text',TX);fill('sw-acc',AC);
 const TY=[['--fs-xl','19px','số lớn / empty-state'],['--fs-lg','15px','tiêu đề mục'],['--fs-md','13px','mặc định · body · nút'],['--fs-sm','12px','nhãn · chip'],['--fs-xs','11px','meta · chỉ dẫn'],['--fs-2xs','10px','số đếm · nhãn nhóm']];
 document.getElementById('type').innerHTML=TY.map(([t,s,u])=>
  `<div class="type-row"><span class="tk">${t} · ${s}</span><span style="font-size:var(${t})">Dựng phim nhanh hơn</span><span style="color:var(--text-3);font-size:var(--fs-xs);margin-left:auto">${u}</span></div>`).join('');
+</script>
+
+<script>
+/* điền dạng sóng + vạch đánh dấu cho phần minh hoạ (chỉ để xem, không phải dữ liệu thật) */
+(function(){
+  const r=(s=>()=>((s=(s*1664525+1013904223)>>>0)/4294967296))(11);
+  const sil=[[4,3],[14,4],[26,3],[38,5],[52,3],[63,4],[74,3],[85,4]];
+  document.querySelectorAll('#tl1 .a').forEach((a,ci)=>{
+    for(let i=0;i<44;i++){
+      const f=(ci*44+i)/88*100, q=sil.some(([s,w])=>f>=s&&f<=s+w);
+      const b=document.createElement('i');
+      b.style.height=(q?4+r()*5:14+Math.pow(r(),1.6)*84)+'%'; a.appendChild(b);
+    }
+  });
+  const mk=document.querySelector('#tl1 .marks'), cu=document.querySelector('#tl1 .cuts');
+  sil.forEach(([s,w])=>{ for(const host of [mk,cu]){ const i=document.createElement('i');
+    i.style.left=s+'%'; i.style.width=w+'%'; host.appendChild(i);} });
+  document.querySelectorAll('.opts').forEach(g=>g.addEventListener('click',e=>{
+    const b=e.target.closest('[role=radio]'); if(b)[...g.children].forEach(x=>x.setAttribute('aria-checked',x===b));
+  }));
+})();
 </script>
 </body>
 </html>

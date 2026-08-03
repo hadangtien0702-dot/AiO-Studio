@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AiO Studio — Asset Manager · thiết kế mới</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  Asset Manager — thiết kế mới theo design system "Studio Console".
+  Đặt trong AiO Design System/AiO Asset Manager/ — font lấy từ ../fonts/.
+  Mọi màu/cỡ/khoảng cách lấy từ tokens.css — không chế thêm giá trị mới.
+-->
+<style>
+/* ============ FONT ============ */
+@font-face{font-family:'Inter var';font-style:normal;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter.woff2') format('woff2');}
+@font-face{font-family:'Inter var';font-style:italic;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter-Italic.woff2') format('woff2');}
+
+/* ============ TOKENS — chép từ DESIGN-SYSTEM.md §15 ============ */
+:root{
+  --bg-0:#0e0e0e; --bg-1:#141414; --bg-2:#181818; --bg-3:#1f1f1f;
+  --bg-4:#282828; --bg-5:#333333; --bg-6:#161616;
+  --bg-hover:rgb(255 255 255 /5%); --bg-active:rgb(255 255 255 /9%);
+  --line-1:rgb(255 255 255 /6%); --line-2:rgb(255 255 255 /10%); --line-strong:rgb(255 255 255 /16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95; --text-meta:#9b9ba3; --icon-dim:#8f8f97;
+  --accent:#f86820; --accent-hover:#ff7d3c; --accent-pressed:#e0590e;
+  --accent-soft:rgb(248 104 32 /16%); --accent-line:rgb(248 104 32 /40%);
+  --accent-text:#ffb891; --accent-on:#ffffff;
+  --ok:#4ec98a; --warn:#e8c05a; --danger:#ff5f6d; --danger-strong:#ff4757; --heart:#ff6b81;
+  --font-ui:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --fs-2xs:10px; --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:19px;
+  --fw-normal:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-tight:1.25; --lh:1.45; --ls-display:-0.014em;
+  --sp-1:4px; --sp-2:6px; --sp-3:8px; --sp-4:12px; --sp-5:16px; --sp-6:24px;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --shadow-sm:0 1px 2px rgb(0 0 0 /30%); --shadow-md:0 8px 24px rgb(0 0 0 /45%);
+  --h-ctrl-sm:24px; --h-ctrl:28px; --h-ctrl-lg:34px; --h-topbar:44px;
+  --dur:150ms; --ease:cubic-bezier(.32,.72,0,1);
+  --focus-ring:0 0 0 3px var(--accent-soft);
+  --z-dropdown:100; --z-sticky:200; --z-modal:300; --z-toast:400; --z-tooltip:500;
+  /* vật thể Premiere — bảng Classic */
+  --pr-video:#729ACC; --pr-video-head:#5b7ea8; --pr-audio:#1D7021;
+  /* màu thumbnail media — KHÔNG phải vật thể timeline, nên được có màu riêng.
+     Lưới 28.846 asset mà xám hết thì không quét mắt được. */
+  --m-audio:#4f8ff7; --m-video:#7c6cf0; --m-mogrt:#3fb6a8; --m-anh:#c9a227; --m-preset:#e07a4a;
+}
+
+/* ============ NỀN ============ */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+/* reset margin mặc định — không reset thì mỗi <h2> đội thêm ~21px không ai chủ ý */
+h1,h2,h3,h4,p,ul,ol,figure{margin:0}
+ul{list-style:none;padding:0}
+body{background:var(--bg-2);color:var(--text-1);font:var(--fw-normal) var(--fs-md)/var(--lh) var(--font-ui);
+  -webkit-font-smoothing:antialiased;font-feature-settings:'tnum' 1;}
+svg{display:block}
+.ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round}
+.ico-sm{width:14px;height:14px}
+.spacer{flex:1}
+
+:where(button,[tabindex],input,select):focus-visible{
+  outline:none;border-color:var(--accent-line);box-shadow:var(--focus-ring)}
+
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgb(255 255 255 /14%);border-radius:var(--r-pill);
+  border:2px solid transparent;background-clip:content-box}
+*::-webkit-scrollbar-thumb:hover{background:rgb(255 255 255 /22%);background-clip:content-box}
+
+/* ============ THANH TRÊN — khuôn CHUNG cho cả 7 panel ============ */
+.topbar{height:var(--h-topbar);background:var(--bg-1);border-bottom:1px solid var(--line-1);
+  display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-5)}
+.brand-ico{color:var(--accent)}
+.brand{font-size:var(--fs-lg);font-weight:var(--fw-semibold)}
+.ver{font-size:var(--fs-xs);color:var(--text-3)}
+.host{font-size:var(--fs-sm);color:var(--text-3)}
+.host b{color:var(--text-2);font-weight:var(--fw-medium)}
+.host i{color:var(--text-3);font-style:normal;margin:0 var(--sp-2)}
+
+/* ============ NÚT — HAI họ, không hơn ============ */
+.btn{height:var(--h-ctrl);padding:0 var(--sp-4);display:inline-flex;align-items:center;gap:var(--sp-2);
+  background:var(--bg-4);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  color:var(--text-1);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);
+  text-transform:none;letter-spacing:normal;cursor:pointer;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.btn:hover{background:var(--bg-5)}
+.btn:active{transform:scale(.97);transition:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn--sm{height:var(--h-ctrl-sm);padding:0 var(--sp-3);font-size:var(--fs-xs)}
+.btn--icon{width:var(--h-ctrl-sm);height:var(--h-ctrl-sm);padding:0;justify-content:center;color:var(--text-2)}
+/* chữ TRẮNG BOLD ≥14px trên cam — 3:1 chỉ hợp lệ cho chữ to/đậm */
+.btn--primary{height:var(--h-ctrl-lg);justify-content:center;gap:var(--sp-3);
+  background:var(--accent);border:none;border-radius:var(--r-md);
+  color:var(--accent-on);font-size:var(--fs-lg);font-weight:var(--fw-bold);padding:0 var(--sp-6)}
+.btn--primary:hover{background:var(--accent-hover)}
+.btn--primary:active{background:var(--accent-pressed)}
+.btn--primary:disabled{background:var(--bg-4);color:var(--text-3);opacity:1}
+.btn--primary[data-state="run"]{background:var(--bg-4);color:var(--text-1);cursor:progress}
+.btn--primary[data-state="done"]{background:var(--ok);color:#0e2a1c}
+
+/* ============ KHUNG ============ */
+.wrap{padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-4);
+  height:min(calc(100vh - var(--h-topbar)),920px);overflow:auto;
+  max-width:1440px;width:100%;margin-inline:auto}
+.card{background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-lg);padding:var(--sp-5)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-bottom:var(--sp-4)}
+.card-t{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+
+/* thanh công cụ: ô tìm + sắp xếp + cỡ lưới */
+.tools{display:flex;align-items:center;gap:var(--sp-3)}
+.search{flex:1;min-width:0;position:relative}
+.search .ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3)}
+.search input{width:100%;height:var(--h-ctrl);padding:0 var(--sp-4) 0 32px;background:var(--bg-0);
+  border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--text-1);
+  font:var(--fw-normal) var(--fs-md)/1 var(--font-ui)}
+.search input::placeholder{color:var(--text-3)}
+.zoom{display:flex;align-items:center;gap:var(--sp-2)}
+.zoom input[type=range]{-webkit-appearance:none;appearance:none;width:118px;height:4px;
+  border-radius:2px;background:var(--bg-4);border:1px solid var(--line-2);cursor:pointer}
+.zoom input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:var(--r-pill);background:var(--accent);border:2px solid var(--bg-3);cursor:grab}
+.zoom input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;background:var(--accent-pressed)}
+.zoom input[type=range]:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.seg{display:flex;padding:3px;height:var(--h-ctrl-sm);background:var(--bg-0);
+  border:1px solid var(--line-2);border-radius:var(--r-sm)}
+.seg button{display:flex;align-items:center;justify-content:center;width:26px;
+  border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text-3);cursor:pointer;padding:0}
+.seg button:hover{background:var(--bg-hover);color:var(--text-2)}
+.seg button[aria-checked="true"]{background:var(--bg-4);border-color:var(--line-2);color:var(--accent)}
+/* chân khung lưới — nút đổi cỡ ở đây, KHÔNG thả nổi đè lên asset */
+.main-ft{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4) var(--sp-1);
+  border-top:1px solid var(--line-1)}
+.main-ft .sub{font-size:var(--fs-xs);color:var(--text-3)}
+
+/* ============ LƯỚI CHÍNH: sidebar + nội dung ============ */
+.grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:var(--sp-4);flex:1;min-height:0}
+/* ============ HỘP THOẠI ============ */
+.ov{position:fixed;inset:0;z-index:var(--z-modal);background:rgb(0 0 0 /55%);
+  display:flex;align-items:center;justify-content:center;padding:var(--sp-5)}
+.modal{width:100%;max-width:460px;background:var(--bg-6);border:1px solid var(--line-2);
+  border-radius:var(--r-lg);box-shadow:0 18px 52px rgb(0 0 0 /62%);padding:var(--sp-5);
+  display:flex;flex-direction:column;gap:var(--sp-3);max-height:min(86vh,660px)}
+.modal-body{flex:1;min-height:0;overflow-y:auto;margin-right:calc(var(--sp-2) * -1);padding-right:var(--sp-2)}
+.mrow{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-4) 0;border-bottom:1px solid var(--line-1)}
+.mrow .lbl{margin-right:var(--sp-3)}
+.mrow--top{padding-top:var(--sp-2)}
+.mrow .lbl{flex:1;min-width:0}
+.mrow .lbl b{display:block;font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1)}
+.mrow .lbl span{display:block;font-size:var(--fs-xs);color:var(--text-3);margin-top:2px}
+.mrow .lbl .path{font-size:var(--fs-2xs);word-break:break-all}
+.mrow .val{font-size:var(--fs-lg);font-weight:var(--fw-semibold);color:var(--text-1)}
+.danger-box{margin-top:var(--sp-5);padding:var(--sp-4);border-radius:var(--r-md);
+  border:1px solid rgb(255 95 109 /28%);background:rgb(255 95 109 /6%)}
+.danger-box > b{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--danger)}
+.danger-box p{margin:var(--sp-2) 0 var(--sp-4);font-size:var(--fs-xs);color:var(--text-2);line-height:1.5}
+.danger-box p b{color:var(--text-1);font-weight:var(--fw-semibold)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.modal-ft{display:flex;align-items:center;gap:var(--sp-3);padding-top:var(--sp-4);
+  border-top:1px solid var(--line-1)}
+.btn--go{color:var(--danger);border-color:rgb(255 95 109 /35%);background:transparent}
+.btn--go:hover{background:rgb(255 95 109 /12%)}
+
+/* ---- dock hẹp: sidebar thành hàng chip lọc ngang, lưới co về 1–2 cột ---- */
+.side{display:flex;flex-direction:column;gap:var(--sp-5);padding:var(--sp-4);overflow-y:auto}
+.side-lbl{font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-3);
+  padding:0 var(--sp-3);margin-bottom:var(--sp-2)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{position:relative;display:flex;align-items:center;gap:var(--sp-3);width:100%;
+  height:var(--h-ctrl);padding:0 var(--sp-3);background:none;border:none;border-radius:var(--r-sm);
+  color:var(--text-2);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer;text-align:left}
+.nav button:hover{background:var(--bg-hover)}
+.nav button .n{margin-left:auto;font-size:var(--fs-xs);color:var(--text-3);font-weight:var(--fw-normal)}
+.nav button[aria-current="true"]{background:var(--bg-4);color:var(--accent)}
+.nav button[aria-current="true"] .n{color:var(--accent-text)}
+.nav button[aria-current="true"]::before{content:"";position:absolute;left:0;top:6px;bottom:6px;
+  width:2px;border-radius:1px;background:var(--accent)}
+.side-ft{margin-top:auto;padding-top:var(--sp-4);border-top:1px solid var(--line-1);
+  display:flex;flex-direction:column;gap:var(--sp-2)}
+.qline{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-xs);color:var(--text-3)}
+.qline .ok{color:var(--ok)}
+.src-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.src{display:flex;flex-direction:column;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.src{margin:0}
+.src li{display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-sm);
+  color:var(--text-2);padding:var(--sp-2) 0}
+.src .p{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
+.src .n{color:var(--text-3);font-size:var(--fs-2xs)}
+
+/* ---- vùng lưới asset ---- */
+.main{display:flex;flex-direction:column;min-height:0;padding:var(--sp-4) var(--sp-4) 0}
+.main-hd{display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-1) var(--sp-3);
+  border-bottom:1px solid var(--line-1);margin-bottom:var(--sp-4)}
+.main-hd .t{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.main-hd .sub{font-size:var(--fs-xs);color:var(--text-3)}
+.scroller{flex:1;min-height:0;overflow-y:auto;padding:0 var(--sp-1) var(--sp-4)}
+.assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:var(--sp-4)}
+
+/* ---- thẻ asset ---- */
+.a{position:relative;background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--r-md);
+  overflow:hidden;cursor:grab;text-align:left;padding:0;color:inherit;font-family:inherit;
+  transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.a:hover{border-color:var(--line-strong)}
+.a[aria-selected="true"]{border-color:var(--accent-line);background:rgb(248 104 32 /7%);
+  box-shadow:inset 0 0 0 1px var(--accent-line)}
+.a .thumb{position:relative;aspect-ratio:16/9;background:var(--bg-0);display:flex;
+  align-items:center;justify-content:center;overflow:hidden}
+.a .wave{position:absolute;inset:0;display:flex;align-items:center;gap:1px;padding:0 12px;
+  background:linear-gradient(180deg,#121316,#0d0e10)}
+.a .wave i{flex:1 0 2px;border-radius:1px;align-self:center;
+  background:linear-gradient(180deg,var(--m-audio),color-mix(in srgb,var(--m-audio) 62%,#0b1a33))}
+.a .wave::after{content:"";position:absolute;left:12px;right:12px;top:50%;height:1px;
+  background:rgb(255 255 255 /8%)}
+.a .ph{position:absolute;inset:0}
+/* khung hình giả — mỗi lớp là MỘT phần tử thật, không dùng ::before/::after,
+   để còn xuất được ra SVG và để code ánh xạ 1-1 */
+.a .ph > i{position:absolute;inset:0;display:block}
+.a .ph .l1{background:linear-gradient(200deg, hsl(var(--h) 18% 13%), hsl(calc(var(--h) + 20) 14% 7%))}
+.a .ph .l2{background:radial-gradient(90% 80% at calc(100% - var(--x)) calc(100% - var(--y)), hsl(calc(var(--h) + 45) 24% 22%) 0%, transparent 58%)}
+.a .ph .l3{background:radial-gradient(80% 70% at var(--x) var(--y), hsl(var(--h) 30% 38%) 0%, transparent 60%)}
+.a .ph .l4{background:radial-gradient(115% 95% at 50% 45%,transparent 38%,rgb(0 0 0 /66%) 100%)}
+/* hạt phim — giữ rất nhẹ, đủ để bề mặt không phẳng lì */
+.a .grain{position:absolute;inset:0;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E")}
+.a .badge{position:absolute;left:var(--sp-2);bottom:var(--sp-2);display:flex;align-items:center;gap:4px;
+  padding:2px 6px;border-radius:4px;background:rgb(14 14 14 /72%);
+  font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-2)}
+.a .dur{position:absolute;right:var(--sp-2);bottom:var(--sp-2);padding:1px 5px;border-radius:4px;
+  background:rgb(14 14 14 /78%);font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-1)}
+.a .meta{padding:var(--sp-3) var(--sp-3) var(--sp-3)}
+.a .nm{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-1);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.a .ty{display:flex;align-items:center;gap:var(--sp-2);margin-top:3px;
+  font-size:var(--fs-2xs);color:var(--text-3)}
+/* ô chọn — hiện khi rê chuột hoặc khi đã chọn */
+.a .pick{position:absolute;left:var(--sp-2);top:var(--sp-2);width:18px;height:18px;border-radius:4px;
+  background:rgb(14 14 14 /70%);border:1px solid var(--line-strong);display:flex;
+  align-items:center;justify-content:center;color:transparent;opacity:0;transition:opacity var(--dur)}
+.a:hover .pick,.a[aria-selected="true"] .pick{opacity:1}
+.a[aria-selected="true"] .pick{background:var(--accent);border-color:var(--accent);color:#fff}
+/* tim — dùng token --heart, chỉ hiện khi rê chuột hoặc đã thích */
+.a .fav{position:absolute;right:var(--sp-2);top:var(--sp-2);width:22px;height:22px;padding:0;
+  background:rgb(14 14 14 /70%);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;color:var(--text-3);cursor:pointer;
+  opacity:0;transition:opacity var(--dur)}
+.a:hover .fav,.a .fav[aria-pressed="true"]{opacity:1}
+.a .fav[aria-pressed="true"]{color:var(--heart)}
+.a .fav[aria-pressed="true"] svg{fill:var(--heart)}
+
+/* ============ HỘP THOẠI ============ */
+.ov{position:fixed;inset:0;z-index:var(--z-modal);background:rgb(0 0 0 /55%);
+  display:flex;align-items:center;justify-content:center;padding:var(--sp-5)}
+.modal{width:100%;max-width:460px;background:var(--bg-6);border:1px solid var(--line-2);
+  border-radius:var(--r-lg);box-shadow:0 18px 52px rgb(0 0 0 /62%);padding:var(--sp-5);
+  display:flex;flex-direction:column;gap:var(--sp-3);max-height:min(86vh,660px)}
+.modal-body{flex:1;min-height:0;overflow-y:auto;margin-right:calc(var(--sp-2) * -1);padding-right:var(--sp-2)}
+.mrow{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-4) 0;border-bottom:1px solid var(--line-1)}
+.mrow .lbl{margin-right:var(--sp-3)}
+.mrow--top{padding-top:var(--sp-2)}
+.mrow .lbl{flex:1;min-width:0}
+.mrow .lbl b{display:block;font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1)}
+.mrow .lbl span{display:block;font-size:var(--fs-xs);color:var(--text-3);margin-top:2px}
+.mrow .lbl .path{font-size:var(--fs-2xs);word-break:break-all}
+.mrow .val{font-size:var(--fs-lg);font-weight:var(--fw-semibold);color:var(--text-1)}
+.danger-box{margin-top:var(--sp-5);padding:var(--sp-4);border-radius:var(--r-md);
+  border:1px solid rgb(255 95 109 /28%);background:rgb(255 95 109 /6%)}
+.danger-box > b{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--danger)}
+.danger-box p{margin:var(--sp-2) 0 var(--sp-4);font-size:var(--fs-xs);color:var(--text-2);line-height:1.5}
+.danger-box p b{color:var(--text-1);font-weight:var(--fw-semibold)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.modal-ft{display:flex;align-items:center;gap:var(--sp-3);padding-top:var(--sp-4);
+  border-top:1px solid var(--line-1)}
+.btn--go{color:var(--danger);border-color:rgb(255 95 109 /35%);background:transparent}
+.btn--go:hover{background:rgb(255 95 109 /12%)}
+
+/* ---- dock hẹp: sidebar thành hàng chip lọc ngang, lưới co về 1–2 cột ---- */
+.side{display:flex;flex-direction:column;gap:var(--sp-5);padding:var(--sp-4);overflow-y:auto}
+.side-lbl{font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-3);
+  padding:0 var(--sp-3);margin-bottom:var(--sp-2)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{position:relative;display:flex;align-items:center;gap:var(--sp-3);width:100%;
+  height:var(--h-ctrl);padding:0 var(--sp-3);background:none;border:none;border-radius:var(--r-sm);
+  color:var(--text-2);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer;text-align:left}
+.nav button:hover{background:var(--bg-hover)}
+.nav button .n{margin-left:auto;font-size:var(--fs-xs);color:var(--text-3);font-weight:var(--fw-normal)}
+.nav button[aria-current="true"]{background:var(--bg-4);color:var(--accent)}
+.nav button[aria-current="true"] .n{color:var(--accent-text)}
+.nav button[aria-current="true"]::before{content:"";position:absolute;left:0;top:6px;bottom:6px;
+  width:2px;border-radius:1px;background:var(--accent)}
+.side-ft{margin-top:auto;padding-top:var(--sp-4);border-top:1px solid var(--line-1);
+  display:flex;flex-direction:column;gap:var(--sp-2)}
+.qline{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-xs);color:var(--text-3)}
+.qline .ok{color:var(--ok)}
+.src-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.src{display:flex;flex-direction:column;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.src{margin:0}
+.src li{display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-sm);
+  color:var(--text-2);padding:var(--sp-2) 0}
+.src .p{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
+.src .n{color:var(--text-3);font-size:var(--fs-2xs)}
+
+/* ---- vùng lưới asset ---- */
+.main{display:flex;flex-direction:column;min-height:0;padding:var(--sp-4) var(--sp-4) 0}
+.main-hd{display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-1) var(--sp-3);
+  border-bottom:1px solid var(--line-1);margin-bottom:var(--sp-4)}
+.main-hd .t{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.main-hd .sub{font-size:var(--fs-xs);color:var(--text-3)}
+.scroller{flex:1;min-height:0;overflow-y:auto;padding:0 var(--sp-1) var(--sp-4)}
+.assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:var(--sp-4)}
+
+/* ---- thẻ asset ---- */
+.a{position:relative;background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--r-md);
+  overflow:hidden;cursor:grab;text-align:left;padding:0;color:inherit;font-family:inherit;
+  transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.a:hover{border-color:var(--line-strong)}
+.a[aria-selected="true"]{border-color:var(--accent-line);background:rgb(248 104 32 /7%);
+  box-shadow:inset 0 0 0 1px var(--accent-line)}
+.a .thumb{position:relative;aspect-ratio:16/9;background:var(--bg-0);display:flex;
+  align-items:center;justify-content:center;overflow:hidden}
+.a .wave{position:absolute;inset:0;display:flex;align-items:center;gap:1px;padding:0 12px;
+  background:linear-gradient(180deg,#121316,#0d0e10)}
+.a .wave i{flex:1 0 2px;border-radius:1px;align-self:center;
+  background:linear-gradient(180deg,var(--m-audio),color-mix(in srgb,var(--m-audio) 62%,#0b1a33))}
+.a .wave::after{content:"";position:absolute;left:12px;right:12px;top:50%;height:1px;
+  background:rgb(255 255 255 /8%)}
+.a .ph{position:absolute;inset:0}
+/* khung hình giả — mỗi lớp là MỘT phần tử thật, không dùng ::before/::after,
+   để còn xuất được ra SVG và để code ánh xạ 1-1 */
+.a .ph > i{position:absolute;inset:0;display:block}
+.a .ph .l1{background:linear-gradient(200deg, hsl(var(--h) 18% 13%), hsl(calc(var(--h) + 20) 14% 7%))}
+.a .ph .l2{background:radial-gradient(90% 80% at calc(100% - var(--x)) calc(100% - var(--y)), hsl(calc(var(--h) + 45) 24% 22%) 0%, transparent 58%)}
+.a .ph .l3{background:radial-gradient(80% 70% at var(--x) var(--y), hsl(var(--h) 30% 38%) 0%, transparent 60%)}
+.a .ph .l4{background:radial-gradient(115% 95% at 50% 45%,transparent 38%,rgb(0 0 0 /66%) 100%)}
+/* hạt phim — giữ rất nhẹ, đủ để bề mặt không phẳng lì */
+.a .grain{position:absolute;inset:0;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E")}
+.a .badge{position:absolute;left:var(--sp-2);bottom:var(--sp-2);display:flex;align-items:center;gap:4px;
+  padding:2px 6px;border-radius:4px;background:rgb(14 14 14 /72%);
+  font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-2)}
+.a .dur{position:absolute;right:var(--sp-2);bottom:var(--sp-2);padding:1px 5px;border-radius:4px;
+  background:rgb(14 14 14 /78%);font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-1)}
+.a .meta{padding:var(--sp-3) var(--sp-3) var(--sp-3)}
+.a .nm{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-1);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.a .ty{display:flex;align-items:center;gap:var(--sp-2);margin-top:3px;
+  font-size:var(--fs-2xs);color:var(--text-3)}
+/* ô chọn — hiện khi rê chuột hoặc khi đã chọn */
+.a .pick{position:absolute;left:var(--sp-2);top:var(--sp-2);width:18px;height:18px;border-radius:4px;
+  background:rgb(14 14 14 /70%);border:1px solid var(--line-strong);display:flex;
+  align-items:center;justify-content:center;color:transparent;opacity:0;transition:opacity var(--dur)}
+.a:hover .pick,.a[aria-selected="true"] .pick{opacity:1}
+.a[aria-selected="true"] .pick{background:var(--accent);border-color:var(--accent);color:#fff}
+/* tim — dùng token --heart, chỉ hiện khi rê chuột hoặc đã thích */
+.a .fav{position:absolute;right:var(--sp-2);top:var(--sp-2);width:22px;height:22px;padding:0;
+  background:rgb(14 14 14 /70%);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;color:var(--text-3);cursor:pointer;
+  opacity:0;transition:opacity var(--dur)}
+.a:hover .fav,.a .fav[aria-pressed="true"]{opacity:1}
+.a .fav[aria-pressed="true"]{color:var(--heart)}
+.a .fav[aria-pressed="true"] svg{fill:var(--heart)}
+
+/* ============ THANH HÀNH ĐỘNG DƯỚI ============ */
+.act{display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-5);
+  background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-lg)}
+.act .sum{font-size:var(--fs-md);color:var(--text-2)}
+.act .sum b{color:var(--text-1);font-weight:var(--fw-semibold)}
+.act .hint{font-size:var(--fs-xs);color:var(--text-3)}
+
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+  .side{flex-direction:row;gap:var(--sp-2);overflow-x:auto;overflow-y:hidden;padding:var(--sp-2)}
+  .side > div{display:contents}
+  .side-lbl,.side-ft{display:none}
+  .nav{flex-direction:row;gap:var(--sp-2)}
+  .nav button{width:auto;height:var(--h-ctrl-sm);white-space:nowrap;background:var(--bg-2);
+    border:1px solid var(--line-2);padding:0 var(--sp-3)}
+  .nav button[aria-current="true"]::before{display:none}
+  .nav button .n{margin-left:var(--sp-2)}
+  .assets{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:var(--sp-3)}
+  .main-ft{flex-wrap:wrap;gap:var(--sp-2)}
+  .main-ft .btn--primary{flex:1 0 100%}
+  /* thanh trên: bỏ trạng thái host và chữ trên nút, chỉ giữ icon — không thì tràn ngang */
+  .topbar{padding:0 var(--sp-3);gap:var(--sp-2)}
+  .host{display:none}
+  .topbar .btn span,.topbar .btn{font-size:0}
+  .topbar .btn{padding:0;width:var(--h-ctrl);justify-content:center}
+  .topbar .btn .ico{width:15px;height:15px}
+}
+@media (max-width:420px){
+  .assets{grid-template-columns:1fr}
+  .side{padding:var(--sp-2) var(--sp-1)}
+}
+
+/* ---- sidebar ---- */
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ THANH TRÊN ============ -->
+<header class="topbar">
+  <svg class="ico brand-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+  <span class="brand">Asset Manager</span>
+  <span class="ver">v1.2.0</span>
+  <span class="spacer"></span>
+  <span class="host">Premiere 26.5.0<i>|</i><b>Test3.prproj</b></span>
+  <button class="btn">
+    <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 11v6M9 14h6"/></svg>
+    <span>Thêm thư mục</span>
+  </button>
+  <button class="btn btn--icon" id="moCaiDat" title="Nguồn kho & cài đặt" aria-label="Nguồn kho & cài đặt">
+    <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg>
+  </button>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ THANH CÔNG CỤ ============ -->
+  <div class="tools">
+    <label class="search">
+      <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Tìm asset theo tên…" autocomplete="off">
+    </label>
+</div>
+
+  <div class="grid">
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="card side">
+      <div>
+        <div class="side-lbl">Tổng quan</div>
+        <nav class="nav" id="navTong">
+          <button aria-current="true" data-k="all">
+            <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Tất cả asset <span class="n" id="nAll">28.846</span>
+          </button>
+          <button data-k="fav">
+            <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.5-1.5 3-3.4 3-5.5A5.5 5.5 0 0 0 12 5.5 5.5 5.5 0 0 0 2 8.5c0 2.1 1.5 4 3 5.5l7 7Z"/></svg>
+            Yêu thích <span class="n" id="nFav">1</span>
+          </button>
+        </nav>
+      </div>
+
+      <div>
+        <div class="side-lbl">Loại asset</div>
+        <nav class="nav" id="navLoai"></nav>
+      </div>
+
+    </aside>
+
+    <!-- ==================== LƯỚI ASSET ==================== -->
+    <section class="card main" style="padding:var(--sp-4) var(--sp-4) 0">
+      <div class="main-hd">
+        <span class="t" id="hdT">Tất cả asset</span>
+        <span class="sub" id="hdN">28.846 mục</span>
+        <span class="spacer"></span>
+        <span class="sub" id="hdSel"></span>
+      </div>
+      <div class="scroller"><div class="assets" id="assets"></div></div>
+      <div class="main-ft">
+        <span class="spacer"></span>
+        <button class="btn btn--sm" id="clearSel" hidden>Bỏ chọn</button>
+        <div class="zoom">
+          <svg class="ico" style="width:13px;height:13px;color:var(--text-3)" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="9.5" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="16" y="9.5" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><rect x="9.5" y="16" width="5" height="5" rx="1"/><rect x="16" y="16" width="5" height="5" rx="1"/></svg>
+          <input type="range" id="co" min="150" max="420" step="10" value="248" aria-label="Cỡ ô asset">
+          <svg class="ico" style="width:16px;height:16px;color:var(--text-3)" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/></svg>
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Cỡ lưới">
+          <button role="radio" aria-checked="true" data-co="248" title="Ô nhỏ, nhiều cột" aria-label="Ô nhỏ, nhiều cột">
+            <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="9.5" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="16" y="9.5" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><rect x="9.5" y="16" width="5" height="5" rx="1"/><rect x="16" y="16" width="5" height="5" rx="1"/></svg>
+          </button>
+          <button role="radio" aria-checked="false" data-co="340" title="Ô lớn, ít cột" aria-label="Ô lớn, ít cột">
+            <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/></svg>
+          </button>
+        </div>
+        <button class="btn btn--primary" id="go" disabled>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
+          <span id="goLabel">Import</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ============ HỘP THOẠI: CÀI ĐẶT ============ -->
+<div class="ov" id="ov" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mdT">
+    <div class="modal-hd">
+      <h2 class="card-t" id="mdT">
+        <svg class="ico ico-sm" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-3px;margin-right:6px" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg>
+        Cài đặt
+      </h2>
+      <button class="btn btn--icon" id="dong" title="Đóng" aria-label="Đóng">
+        <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- nguồn kho -->
+      <div class="mrow mrow--top">
+        <span class="lbl"><b>Nguồn kho · 2</b><span>Preview đủ · quét lúc 14:02</span></span>
+        <button class="btn btn--sm" id="themAsset">
+          <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 11v6M9 14h6"/></svg>
+          Thêm asset
+        </button>
+        <button class="btn btn--sm" title="Quét lại kho" aria-label="Quét lại kho">
+          <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Quét lại
+        </button>
+      </div>
+      <ul class="src">
+        <li><span class="p">E:\Asset\SFX Library</span><span class="n">18.204</span>
+          <button class="btn btn--sm btn--go" title="Gỡ nguồn này">Gỡ</button></li>
+        <li><span class="p">D:\Mogrt Pack 2026</span><span class="n">10.642</span>
+          <button class="btn btn--sm btn--go" title="Gỡ nguồn này">Gỡ</button></li>
+      </ul>
+
+      <!-- nơi lưu -->
+      <div class="mrow">
+        <span class="lbl"><b>Nơi lưu</b><span class="path">C:\Users\DRT-G21\AppData\Roaming\AiOStudio</span></span>
+        <button class="btn btn--sm">
+          <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          Đổi chỗ…
+        </button>
+      </div>
+
+      <!-- bộ nhớ đệm -->
+      <div class="mrow">
+        <span class="lbl"><b>Bộ nhớ đệm</b><span>Đang dùng cho 14.637 asset</span></span>
+        <span class="val">203,6 MB</span>
+      </div>
+
+      <!-- dọn rác -->
+      <div class="mrow">
+        <span class="lbl"><b>Dọn rác</b><span>Không có file thừa</span></span>
+        <button class="btn btn--sm" disabled title="Không có file thừa để dọn">
+          <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Dọn rác
+        </button>
+      </div>
+
+      <!-- việc phá huỷ: nói hậu quả bằng SỐ, đặt xa nút an toàn -->
+      <div class="danger-box">
+        <b>Xoá tất cả bộ nhớ đệm</b>
+        <p>Panel sẽ phải tạo lại <b>1.661 ảnh xem trước</b>, <b>12.936 sóng âm</b> và
+           <b>40 bản xem nhanh</b>. Trong lúc đó các thẻ chỉ hiện icon.
+           Thư viện, brand, khay và yêu thích <b>giữ nguyên</b>.</p>
+        <button class="btn btn--go">
+          <svg class="ico" style="width:13px;height:13px" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Xoá tất cả · 203,6 MB
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-ft">
+      <span class="spacer"></span>
+      <button class="btn" id="dong2">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= DỮ LIỆU MẪU ================= */
+const rand=(s=>()=>((s=(s*1664525+1013904223)>>>0)/4294967296))(29);
+const LOAI=[
+  {k:'video', ten:'Video',    n:1562,  ico:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/>'},
+  {k:'mogrt', ten:'Mogrt',    n:4156,  ico:'<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>'},
+  {k:'audio', ten:'Âm thanh', n:12948, ico:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'},
+  {k:'anh',   ten:'Hình ảnh', n:9871,  ico:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>'},
+  {k:'preset',ten:'Preset',   n:309,   ico:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>'},
+];
+const TONG=LOAI.reduce((a,b)=>a+b.n,0);
+const vn=n=>n.toLocaleString('vi-VN');
+const mm=s=>`${s/60|0}:${String(Math.round(s%60)).padStart(2,'0')}`;
+
+/* danh sách mẫu để nhìn — mỗi loại một dáng thumbnail khác nhau */
+const TEN={audio:['_ Alarm','_ Ambience','_ Whoosh','_ Impact','_ Riser'],
+  video:['Mobile_Scroll','Drone_City','Slow_Zoom','Bokeh_Loop'],
+  mogrt:['Lower_Third','Title_Pack','Callout','Subscribe_Anim'],
+  anh:['Texture_Paper','Sky_Gradient','Grain_Overlay','Light_Leak'],
+  preset:['Teal_Orange','Film_Halation','Clean_Contrast']};
+const EXT={audio:'WAV',video:'MP4',mogrt:'MOGRT',anh:'PNG',preset:'LOOK'};
+let ASSET=[];
+(function seed(){
+  let id=0;
+  for(const L of LOAI){
+    const nhan=TEN[L.k];
+    for(let i=0;i<(L.k==='audio'?14:5);i++){
+      const ng = L.k==='mogrt' ? 'Mogrt Pack 2026' : 'SFX Library';
+      const goc = L.k==='mogrt' ? 'D:\\Mogrt Pack 2026' : 'E:\\Asset\\SFX Library';
+      const t = `${nhan[i%nhan.length]} ${i+1}`;
+      ASSET.push({id:id++, loai:L.k, ten:t, nguon:ng, duong:`${goc}\\${t}.${EXT[L.k].toLowerCase()}`,
+        ext:EXT[L.k], dur:L.k==='anh'||L.k==='preset'?0:3+rand()*24,
+        mb:0.4+rand()*38, fav:false});
+    }
+  }
+})();
+
+/* ================= TRẠNG THÁI ================= */
+let loc='all', tim='', chon=new Set();
+const $=i=>document.getElementById(i);
+const el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e};
+
+/* ================= VẼ ================= */
+function sidebar(){
+  $('navLoai').innerHTML=LOAI.map(L=>
+    `<button data-k="${L.k}" ${loc===L.k?'aria-current="true"':''}>
+       <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true">${L.ico}</svg>
+       ${L.ten} <span class="n">${vn(L.n)}</span></button>`).join('');
+  $('nAll').textContent=vn(TONG);
+  $('nFav').textContent=vn(ASSET.filter(a=>a.fav).length);
+  for(const b of document.querySelectorAll('#navTong button'))
+    b.setAttribute('aria-current', b.dataset.k===loc);
+}
+
+function loc_ra(){
+  let r=ASSET;
+  if(loc==='fav') r=r.filter(a=>a.fav);
+  else if(loc!=='all') r=r.filter(a=>a.loai===loc);
+  if(tim) r=r.filter(a=>a.ten.toLowerCase().includes(tim));
+  return r;
+}
+
+const gieo=a=>(s=>()=>((s=(s*1103515245+12345)>>>0)/4294967296))(a.id*7+3);
+function song(a){
+  /* sóng đối xứng qua trục giữa như trình duyệt audio thật — vẽ từ id nên lần nào cũng y hệt */
+  const r=gieo(a); let h='';
+  for(let i=0;i<64;i++){
+    const bao=Math.sin(i/64*Math.PI)**0.45;               // bao hình: mỏng dần hai đầu
+    h+=`<i style="height:${Math.max(4,(6+Math.pow(r(),1.6)*92)*bao)|0}%"></i>`;
+  }
+  return `<span class="wave">${h}</span>`;
+}
+function khung(a){
+  /* khung hình giả: sắc độ lấy từ id, mỗi asset một tông riêng */
+  const r=gieo(a);
+  const h=(r()*360)|0, x=(18+r()*60)|0, y=(14+r()*52)|0;
+  return `<span class="ph" style="--h:${h};--x:${x}%;--y:${y}%">` +
+         `<i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>` +
+         `<span class="grain"></span></span>`;
+}
+const HINH={
+  video:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z"/>',
+  mogrt:'<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/>',
+  anh:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  preset:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>'};
+
+function luoi(){
+  const ds=loc_ra(), box=$('assets');
+  box.innerHTML=ds.map(a=>{
+    const on=chon.has(a.id);
+    const thumb = a.loai==='audio' ? song(a) : khung(a);
+    const L = LOAI.find(l=>l.k===a.loai);
+    return `<div class="a" role="button" tabindex="0" data-t="${a.loai}" data-id="${a.id}" aria-selected="${on}" draggable="true">
+      <div class="thumb">${thumb}
+        <span class="pick"><svg class="ico" style="width:11px;height:11px;stroke-width:3" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <button class="fav" aria-pressed="${a.fav}" aria-label="Yêu thích">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.4 3-5.5A5.5 5.5 0 0 0 12 5.5 5.5 5.5 0 0 0 2 8.5c0 2.1 1.5 4 3 5.5l7 7Z"/></svg>
+        </button>
+        <span class="badge"><svg class="ico" style="width:11px;height:11px" viewBox="0 0 24 24">${L.ico}</svg>${a.ext}</span>
+        ${a.dur?`<span class="dur">${mm(a.dur)}</span>`:''}
+      </div>
+      <div class="meta"><div class="nm" title="${a.duong}">${a.ten}</div>
+        <div class="ty">${a.nguon}</div>
+      </div></div>`}).join('');
+
+  const L=LOAI.find(l=>l.k===loc);
+  $('hdT').textContent = loc==='all'?'Tất cả asset' : loc==='fav'?'Yêu thích' : L.ten;
+  const tong = loc==='all'?TONG : loc==='fav'?ASSET.filter(a=>a.fav).length : L.n;
+  $('hdN').textContent = tim ? `${vn(ds.length)} mục khớp “${tim}”` : `${vn(tong)} mục`;
+}
+
+function thanh(){
+  const n=chon.size;
+  $('go').disabled = !n;
+  $('hdSel').textContent = n ? `đã chọn ${n}` : '';
+  $('clearSel').hidden = !n;
+}
+const ve=()=>{sidebar();luoi();thanh()};
+
+/* ================= TƯƠNG TÁC ================= */
+/* đổi bộ lọc thì MỌI con số phụ thuộc đổi theo — §8b */
+document.querySelector('.grid').addEventListener('click',e=>{
+  const b=e.target.closest('.nav button'); if(!b)return;
+  loc=b.dataset.k; ve();
+});
+$('assets').addEventListener('click',e=>{
+  const f=e.target.closest('.fav');
+  if(f){ const a=ASSET.find(x=>x.id===+f.closest('.a').dataset.id);
+         a.fav=!a.fav; ve(); e.stopPropagation(); return; }
+  const c=e.target.closest('.a'); if(!c)return;
+  const id=+c.dataset.id;
+  chon.has(id)?chon.delete(id):chon.add(id);
+  ve();
+});
+$('clearSel').addEventListener('click',()=>{chon.clear();ve()});
+/* đổi cỡ lưới thì lưới PHẢI đổi thật — §8b.
+   Thanh trượt là nguồn chân lý; hai nút chỉ là mốc sẵn có, bấm thì nhảy tới mốc đó. */
+function datCo(px){
+  $('co').value = px;
+  $('assets').style.gridTemplateColumns = `repeat(auto-fill,minmax(${px}px,1fr))`;
+  for(const b of document.querySelectorAll('.main-ft .seg [role=radio]'))
+    b.setAttribute('aria-checked', Math.abs(px - +b.dataset.co) <= 20);
+}
+$('co').addEventListener('input', e=>datCo(+e.target.value));
+document.querySelector('.main-ft .seg').addEventListener('click',e=>{
+  const b=e.target.closest('[role=radio]'); if(b) datCo(+b.dataset.co);
+});
+$('q').addEventListener('input',e=>{tim=e.target.value.trim().toLowerCase();luoi();});
+/* nút chính LÀ đèn báo tiến trình */
+$('go').addEventListener('click',()=>{
+  if($('go').dataset.state)return;
+  const n=chon.size; $('go').dataset.state='run'; let p=0;
+  const t=setInterval(()=>{
+    p+=6+Math.random()*9;
+    if(p>=100){clearInterval(t);
+      $('go').dataset.state='done'; $('goLabel').textContent=`Đã import ${n}`;
+      setTimeout(()=>{delete $('go').dataset.state; $('goLabel').textContent='Import'; chon.clear(); ve()},2200);
+    } else $('goLabel').textContent=`Đang import… ${Math.min(99,p|0)}%`;
+  },240);
+});
+
+/* hộp thoại: Esc đóng, bấm nền đóng, mở là focus vào nút an toàn — §5 Modal */
+const ov=$('ov');
+const mo=()=>{ov.hidden=false;$('dong2').focus()};
+const dong=()=>{ov.hidden=true;$('moCaiDat').focus()};
+$('moCaiDat').addEventListener('click',mo);
+$('dong').addEventListener('click',dong);
+$('dong2').addEventListener('click',dong);
+ov.addEventListener('mousedown',e=>{if(e.target===ov)dong()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ov.hidden)dong()});
+ov.addEventListener('keydown',e=>{           /* bẫy Tab trong hộp thoại */
+  if(e.key!=='Tab')return;
+  const f=[...ov.querySelectorAll('button')];
+  const i=f.indexOf(document.activeElement);
+  const t=e.shiftKey?(i<=0?f.length-1:i-1):(i>=f.length-1?0:i+1);
+  f[t].focus(); e.preventDefault();
+});
+
+ve();
+</script>
+</body>
+</html>

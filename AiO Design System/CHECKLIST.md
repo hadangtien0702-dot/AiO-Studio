@@ -13,6 +13,9 @@
 - [ ] **Sống ở ~200px** (panel) — không tràn ngang; website không tràn ở 375px.
 - [ ] **Một CTA chính** mỗi màn hình; việc phá huỷ đặt xa, họ danger, nói hậu quả bằng số.
 - [ ] **Dùng đúng token** — không màu/cỡ chế mới ngoài `tokens.css`.
+- [ ] **Control TÍNH LẠI THẬT** — đổi một lựa chọn thì MỌI con số phụ thuộc đổi theo (§8b).
+      Chỉ đổi màu nút = trả lại.
+- [ ] **Khung ngoài KHÔNG `overflow:hidden`** — cửa sổ thấp là mất nút chính.
 
 ## 🟡 Phải có
 
@@ -26,6 +29,10 @@
 - [ ] `prefers-reduced-motion` được tôn trọng (vẫn hiện đủ ở trạng thái cuối).
 - [ ] **Nhãn = việc nó làm**; một thông điệp một nơi; không chú thích dài.
 - [ ] **Empty state:** icon + câu nói phải làm gì + 1 CTA trỏ đúng nút CÓ THẬT.
+- [ ] **Không lỗ trống** — chỗ dôi ra được dời/cho to ra/gom thành MỘT khoảng nghỉ (§8).
+- [ ] **Hai cột kết thúc bằng nhau ở đáy** — đo, đừng ước lượng bằng mắt.
+- [ ] **Một con số một nơi** — quét cả màn xem có số nào hiện hai chỗ không.
+- [ ] **Bỏ câu mô tả nói lại thứ nút bên cạnh đã nói.**
 
 ## 🟢 Nên soi
 
@@ -35,6 +42,8 @@
 - [ ] Z-index theo thang (`--z-*`), không đặt số bừa.
 - [ ] **Bản thương mại không lộ công cụ nền** (tên OSS, thông số, đường dẫn, tên file).
 - [ ] Website: một ngôn ngữ chủ đạo; con số khớp thực tế sản phẩm.
+- [ ] Số **kết quả** ăn màu `--ok`, số **đầu vào** để `--text-1` — không cho xanh cả cụm.
+- [ ] Xuất SVG cho Illustrator: không `rgba()`, `id` không dấu cách, chữ thành đường vẽ (§16).
 
 ## Phép kiểm bằng SỐ (không tin bằng mắt suông)
 
@@ -42,3 +51,5 @@
 - [ ] Đo trên **panel/bề rộng THẬT**, cả 200px lẫn rộng — không đo mẫu nhỏ tự dựng.
 - [ ] **Xếp cạnh bản panel anh em** (`so-sanh.html`) — token khớp KHÔNG có nghĩa nhìn giống.
 - [ ] Số đo vô lý → **nghi công cụ đo trước**, đừng vội sửa code.
+- [ ] Kiểm ở **nhiều chiều cao cửa sổ** (760 · 900 · 1400px), không chỉ một cỡ.
+- [ ] File xuất cho AI: dựng thử bằng bộ đọc SVG 1.1 nghiêm ngặt, **đừng tin trình duyệt**.

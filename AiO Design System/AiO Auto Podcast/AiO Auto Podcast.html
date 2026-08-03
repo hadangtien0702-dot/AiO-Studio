@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AiO Studio — Auto Podcast · thiết kế mới</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  Auto Podcast — thiết kế mới theo design system "Studio Console".
+  Đặt trong AiO Design System/AiO Auto Podcast/ — font lấy từ ../fonts/.
+  Dữ liệu track dựng đúng khuôn host pc_thongTinSeq() trả về:
+  loại | chỉ số | tên track | số clip | tên clip đầu | đường media | bắt đầu | in | kết thúc
+-->
+<style>
+/* ============ FONT ============ */
+@font-face{font-family:'Inter var';font-style:normal;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter.woff2') format('woff2');}
+@font-face{font-family:'Inter var';font-style:italic;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter-Italic.woff2') format('woff2');}
+
+/* ============ TOKENS — chép từ DESIGN-SYSTEM.md §15 ============ */
+:root{
+  --bg-0:#0e0e0e; --bg-1:#141414; --bg-2:#181818; --bg-3:#1f1f1f;
+  --bg-4:#282828; --bg-5:#333333; --bg-6:#161616;
+  --bg-hover:rgb(255 255 255 /5%); --bg-active:rgb(255 255 255 /9%);
+  --line-1:rgb(255 255 255 /6%); --line-2:rgb(255 255 255 /10%); --line-strong:rgb(255 255 255 /16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95; --text-meta:#9b9ba3; --icon-dim:#8f8f97;
+  --accent:#f86820; --accent-hover:#ff7d3c; --accent-pressed:#e0590e;
+  --accent-soft:rgb(248 104 32 /16%); --accent-line:rgb(248 104 32 /40%);
+  --accent-text:#ffb891; --accent-on:#ffffff;
+  --ok:#4ec98a; --warn:#e8c05a; --danger:#ff5f6d; --danger-strong:#ff4757; --heart:#ff6b81;
+  --font-ui:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --fs-2xs:10px; --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:19px;
+  --fw-normal:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-tight:1.25; --lh:1.45; --ls-display:-0.014em;
+  --sp-1:4px; --sp-2:6px; --sp-3:8px; --sp-4:12px; --sp-5:16px; --sp-6:24px;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --shadow-sm:0 1px 2px rgb(0 0 0 /30%); --shadow-md:0 8px 24px rgb(0 0 0 /45%);
+  --h-ctrl-sm:24px; --h-ctrl:28px; --h-ctrl-lg:34px; --h-topbar:44px;
+  --dur:150ms; --ease:cubic-bezier(.32,.72,0,1);
+  --focus-ring:0 0 0 3px var(--accent-soft);
+  --z-dropdown:100; --z-sticky:200; --z-modal:300; --z-toast:400; --z-tooltip:500;
+  /* vật thể Premiere — bảng Classic */
+  --pr-video:#729ACC; --pr-video-head:#5b7ea8; --pr-audio:#1D7021;
+  /* màu NGƯỜI NÓI — mỗi người một màu xuyên suốt chip → track → monitor → dải cắt.
+     Tránh cam (màu hành động) và tránh xanh lá (màu "xong"). */
+  --p1:#4f8ff7; --p2:#a78bfa; --p3:#e8c05a; --p4:#3fb6a8;
+  /* cam thấy NHIỀU người (cam chung / wide) — trung tính, vì nó không của riêng ai */
+  --chung:#94a0b4;
+}
+
+/* ============ NỀN ============ */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+h1,h2,h3,h4,p,ul,ol,figure{margin:0}
+ul{list-style:none;padding:0}
+body{background:var(--bg-2);color:var(--text-1);font:var(--fw-normal) var(--fs-md)/var(--lh) var(--font-ui);
+  -webkit-font-smoothing:antialiased;font-feature-settings:'tnum' 1;}
+svg{display:block}
+.ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round}
+.ico-sm{width:14px;height:14px}
+.spacer{flex:1}
+
+:where(button,[tabindex],input,select):focus-visible{
+  outline:none;border-color:var(--accent-line);box-shadow:var(--focus-ring)}
+
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgb(255 255 255 /14%);border-radius:var(--r-pill);
+  border:2px solid transparent;background-clip:content-box}
+*::-webkit-scrollbar-thumb:hover{background:rgb(255 255 255 /22%);background-clip:content-box}
+
+/* ============ THANH TRÊN — khuôn CHUNG cho cả 7 panel ============ */
+.topbar{height:var(--h-topbar);background:var(--bg-1);border-bottom:1px solid var(--line-1);
+  display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-5)}
+.brand-ico{color:var(--accent)}
+.brand{font-size:var(--fs-lg);font-weight:var(--fw-semibold)}
+.ver{font-size:var(--fs-xs);color:var(--text-3)}
+.host{font-size:var(--fs-sm);color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.host b{color:var(--text-2);font-weight:var(--fw-medium)}
+.host i{color:var(--text-3);font-style:normal;margin:0 var(--sp-2)}
+
+/* ============ NÚT — HAI họ, không hơn ============ */
+.btn{height:var(--h-ctrl);padding:0 var(--sp-4);display:inline-flex;align-items:center;gap:var(--sp-2);
+  background:var(--bg-4);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  color:var(--text-1);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);
+  text-transform:none;letter-spacing:normal;cursor:pointer;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.btn:hover{background:var(--bg-5)}
+.btn:active{transform:scale(.97);transition:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn--sm{height:var(--h-ctrl-sm);padding:0 var(--sp-3);font-size:var(--fs-xs)}
+.btn--icon{width:var(--h-ctrl-sm);height:var(--h-ctrl-sm);padding:0;justify-content:center;color:var(--text-2)}
+.btn--primary{position:relative;overflow:hidden;height:var(--h-ctrl-lg);justify-content:center;gap:var(--sp-3);
+  background:var(--accent);border:none;border-radius:var(--r-md);
+  color:var(--accent-on);font-size:var(--fs-lg);font-weight:var(--fw-bold);padding:0 var(--sp-6)}
+.btn--primary:hover{background:var(--accent-hover)}
+.btn--primary:active{background:var(--accent-pressed)}
+.btn--primary:disabled{background:var(--bg-4);color:var(--text-3);opacity:1;cursor:not-allowed}
+.btn--primary[data-state="run"]{background:var(--bg-4);color:var(--text-1);cursor:progress}
+.btn--primary[data-state="done"]{background:var(--ok);color:#0e2a1c}
+.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);
+  border-radius:0 2px 2px 0;transition:width var(--dur) linear}
+
+/* ============ KHUNG ============ */
+.wrap{padding:var(--sp-5);max-width:1180px;width:100%;margin-inline:auto;
+  height:calc(100vh - var(--h-topbar));overflow:auto}
+.card{background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-lg);padding:var(--sp-5)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-bottom:var(--sp-4)}
+.card-t{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+.sub{font-size:var(--fs-xs);color:var(--text-3)}
+/* khung ÔM nội dung — kéo giãn hết chiều cao chỉ đẻ ra lỗ trống (§8) */
+.main{display:flex;flex-direction:column;max-height:100%;padding-bottom:0}
+
+/* ============ NGƯỜI NÓI — hàng chip ngang ============ */
+.whorow{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+  padding-bottom:var(--sp-4);border-bottom:1px solid var(--line-1)}
+.who{display:contents}
+.who li{display:flex;align-items:center;gap:var(--sp-2);height:var(--h-ctrl);padding:0 var(--sp-2) 0 var(--sp-3);
+  background:var(--bg-4);border:1px solid var(--line-2);border-radius:var(--r-pill)}
+.dot{width:9px;height:9px;border-radius:var(--r-pill);flex:none;background:var(--c)}
+.who .nm{font-size:var(--fs-sm);font-weight:var(--fw-medium);white-space:nowrap}
+.who .cnt{font-size:var(--fs-2xs);color:var(--text-2);font-variant-numeric:tabular-nums}
+.who .x{width:18px;height:18px;padding:0;justify-content:center;background:transparent;
+  border-color:transparent;color:var(--text-3);border-radius:var(--r-pill)}
+.who .x:hover{background:rgb(255 95 109 /16%);color:var(--danger)}
+
+/* ============ BẢN ĐỒ TRACK ============ */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:var(--sp-5);min-height:0}
+.scroller{min-height:0;overflow-y:auto;margin:0 calc(var(--sp-2) * -1);padding:var(--sp-2)}
+.tracks{display:flex;flex-direction:column}
+.tr{display:grid;grid-template-columns:34px minmax(140px,1fr) minmax(90px,330px) 156px;
+  align-items:center;gap:var(--sp-3);padding:var(--sp-3);
+  border-radius:var(--r-sm);border:1px solid transparent}
+.tr:hover{background:var(--bg-hover)}
+.tr[data-xem]{background:var(--bg-hover);border-color:var(--line-2)}
+.tr .lbl{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-xs);
+  font-weight:var(--fw-semibold);color:var(--text-2);font-variant-numeric:tabular-nums}
+.tr .bar{width:3px;height:16px;border-radius:2px;background:var(--line-2);flex:none}
+.tr[data-ai] .bar{background:var(--c)}
+.tr .file{min-width:0;font-size:var(--fs-sm);color:var(--text-1);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr .file small{display:block;font-size:var(--fs-2xs);color:var(--text-3);font-weight:var(--fw-normal)}
+.tr .empty-note{font-size:var(--fs-xs);color:var(--text-3)}
+.tr.trong{opacity:.55}
+.tr.trong .mini{cursor:default;
+  background:repeating-linear-gradient(135deg,transparent 0 5px,rgb(255 255 255 /4%) 5px 10px)}
+.tr.trong .mini .kim2{display:none}
+
+/* ô mini = một track thu nhỏ. Trước khi dựng: clip nằm đâu. Sau khi dựng: các
+   lát mà track đó CÒN clip — đúng hình dạng timeline sẽ ra trong Premiere. */
+.mini{position:relative;height:18px;border-radius:3px;background:var(--bg-0);
+  border:1px solid var(--line-1);overflow:hidden;cursor:ew-resize}
+.mini i{position:absolute;top:2px;bottom:2px;border-radius:2px;background:var(--pr-video);opacity:.75}
+.tr[data-loai=A] .mini i{background:var(--pr-audio)}
+.tr[data-ai] .mini i{background:var(--c);opacity:.9}
+.mini[data-giu] i{background:var(--pr-audio)!important;opacity:.55}
+.mini .kim2{position:absolute;top:-1px;bottom:-1px;width:1px;background:var(--text-1);
+  opacity:.85;pointer-events:none}
+
+/* thước thời gian — không có nó thì dải màu chỉ là một vệt vô nghĩa */
+.tr.thuoc{padding-top:0;padding-bottom:var(--sp-1)}
+.tr.thuoc:hover{background:transparent}
+.ruler{position:relative;height:14px;font-size:var(--fs-2xs);color:var(--text-3);
+  font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line-1)}
+.ruler span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.ruler span:first-child{transform:none}
+.ruler span:last-child{transform:translateX(-100%)}
+
+/* dải phân nhóm HÌNH / TIẾNG — tách bằng BỀ MẶT, không phải nhãn xám chồng nhau */
+.tsep{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4) var(--sp-3) var(--sp-2);
+  font-size:var(--fs-2xs);font-weight:var(--fw-semibold);color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.06em}
+.tsep::after{content:"";flex:1;height:1px;background:var(--line-1)}
+
+/* ============ CHỌN NGƯỜI CHO TRACK ============
+   Cam KHÔNG một-một với người: một cam có thể thấy hai người (cam chung).
+   Nên hàng hình dùng chip bật/tắt nhiều lựa chọn, không dùng ô xổ một lựa chọn. */
+.pick{display:flex;align-items:center;gap:var(--sp-1);flex-wrap:wrap}
+.pick button{height:var(--h-ctrl-sm);min-width:var(--h-ctrl-sm);padding:0 var(--sp-2);
+  display:inline-flex;align-items:center;gap:var(--sp-1);
+  background:var(--bg-0);border:1px solid var(--line-2);border-radius:var(--r-pill);
+  color:var(--text-3);font:var(--fw-semibold) var(--fs-2xs)/1 var(--font-ui);cursor:pointer;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.pick button:hover{background:var(--bg-hover);color:var(--text-2)}
+.pick button[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 24%,var(--bg-0));
+  border-color:var(--c);color:var(--text-1)}
+.pick .dot{width:7px;height:7px}
+.pick button[aria-pressed="false"] .dot{background:var(--line-strong)}
+.pick .tat{font-weight:var(--fw-medium)}
+.pick .tat[aria-pressed="true"]{background:var(--bg-4);border-color:var(--line-strong);color:var(--text-2)}
+
+/* ============ MONITOR ============ */
+.mon{display:flex;flex-direction:column;gap:var(--sp-3);padding-top:var(--sp-2)}
+/* khung theo ĐÚNG tỉ lệ sequence, không ép 16:9 cứng */
+.mon-box{position:relative;width:100%;aspect-ratio:var(--ar,16/9);border-radius:var(--r-md);
+  overflow:hidden;background:var(--bg-0);border:1px solid var(--line-2)}
+.frame{position:absolute;inset:0}
+.frame i{position:absolute;inset:0;display:block}
+.frame .l1{background:linear-gradient(200deg,hsl(var(--h) 18% 15%),hsl(calc(var(--h) + 20) 14% 8%))}
+.frame .l2{background:radial-gradient(85% 75% at 74% 68%,hsl(calc(var(--h) + 45) 24% 24%) 0%,transparent 58%)}
+.frame .l3{background:radial-gradient(60% 58% at 44% 42%,hsl(var(--h) 30% 42%) 0%,transparent 62%)}
+.frame .l4{background:radial-gradient(115% 95% at 50% 45%,transparent 38%,rgb(0 0 0 /62%) 100%)}
+/* cam chung: HAI vùng sáng — nhìn là biết khung này có hai người */
+.frame[data-chung] .l3{background:
+  radial-gradient(34% 44% at 30% 48%,hsl(var(--h) 30% 42%) 0%,transparent 66%),
+  radial-gradient(34% 44% at 70% 48%,hsl(calc(var(--h) + 70) 26% 38%) 0%,transparent 66%)}
+.mon-badge{position:absolute;left:var(--sp-3);top:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2);
+  height:22px;padding:0 var(--sp-3) 0 var(--sp-2);border-radius:var(--r-pill);
+  background:rgb(14 14 14 /78%);border:1px solid var(--line-2);
+  font-size:var(--fs-2xs);font-weight:var(--fw-semibold);color:var(--text-1);white-space:nowrap}
+.mon-tc{position:absolute;right:var(--sp-3);bottom:var(--sp-3);padding:2px 6px;border-radius:4px;
+  background:rgb(14 14 14 /78%);font-size:var(--fs-2xs);color:var(--text-2);font-variant-numeric:tabular-nums}
+.mon-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:var(--sp-2);color:var(--text-3);font-size:var(--fs-xs);text-align:center;padding:var(--sp-4);
+  background:var(--bg-0)}
+
+/* dải nhát cắt — cả tập trên một dải, ai lên hình lúc nào */
+.cut{position:relative;height:26px;border-radius:var(--r-sm);background:var(--bg-0);
+  border:1px solid var(--line-2);cursor:ew-resize;overflow:hidden;touch-action:none}
+.cut:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.cut-seg{position:absolute;inset:0}
+.cut-seg i{position:absolute;top:0;bottom:0;background:var(--c)}
+.cut.chua .cut-seg{background:repeating-linear-gradient(135deg,transparent 0 5px,rgb(255 255 255 /5%) 5px 10px)}
+.kim{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--text-1);
+  box-shadow:0 0 0 1px rgb(0 0 0 /55%);pointer-events:none}
+.mon-rule{line-height:1.5}
+.mon-key{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-4);font-size:var(--fs-2xs);color:var(--text-3)}
+.mon-key span{display:flex;align-items:center;gap:var(--sp-1)}
+
+/* ============ CHÂN — trạng thái + nút chính ============ */
+.main-ft{display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-4) var(--sp-1);
+  border-top:1px solid var(--line-1);min-width:0}
+.stat{display:flex;align-items:flex-start;gap:var(--sp-2);font-size:var(--fs-sm);
+  color:var(--text-2);min-width:0}
+.stat > span{min-width:0}
+.stat svg{flex:none;margin-top:2px}
+.stat[data-m=warn]{color:var(--warn)}
+
+/* ============ HỘP THOẠI ============ */
+.ov{position:fixed;inset:0;z-index:var(--z-modal);background:rgb(0 0 0 /55%);
+  display:flex;align-items:center;justify-content:center;padding:var(--sp-5)}
+.modal{width:100%;max-width:460px;background:var(--bg-6);border:1px solid var(--line-2);
+  border-radius:var(--r-lg);box-shadow:0 18px 52px rgb(0 0 0 /62%);padding:var(--sp-5);
+  display:flex;flex-direction:column;gap:var(--sp-3);max-height:min(86vh,660px)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.modal-body{flex:1;min-height:0;overflow-y:auto;margin-right:calc(var(--sp-2) * -1);padding-right:var(--sp-2)}
+.mrow{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-4) 0;border-bottom:1px solid var(--line-1)}
+.mrow .lbl{flex:1;min-width:0;margin-right:var(--sp-3)}
+.mrow .lbl b{display:block;font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1)}
+.mrow .lbl span{display:block;font-size:var(--fs-xs);color:var(--text-3);margin-top:2px}
+.modal-ft{display:flex;align-items:center;gap:var(--sp-3);padding-top:var(--sp-4);border-top:1px solid var(--line-1)}
+.num{width:74px;height:var(--h-ctrl);padding:0 var(--sp-2);background:var(--bg-0);border:1px solid var(--line-2);
+  border-radius:var(--r-sm);color:var(--text-1);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);
+  text-align:right;font-variant-numeric:tabular-nums}
+select{height:var(--h-ctrl);padding:0 var(--sp-2);background:var(--bg-0);
+  border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--text-1);
+  font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer}
+select:hover{border-color:var(--line-strong)}
+
+/* ---- dock hẹp: kẹp cạnh timeline Premiere ----
+   ĐẶT CUỐI BẢNG: media query trước phần định nghĩa sẽ bị luật sau ghi đè. */
+@media (max-width:1000px){
+  /* monitor lên TRÊN bản đồ track và bị kẹp chiều cao — bài học Re-Frames:
+     preview chiếm 40% màn thì màn hình đầu đọc như chưa làm xong */
+  .work{grid-template-columns:1fr;gap:var(--sp-4)}
+  .mon{order:-1;padding-top:0}
+  .mon-box{max-height:min(34vh,240px);margin-inline:auto}
+}
+@media (max-width:820px){
+  .tr{grid-template-columns:34px minmax(110px,1fr) minmax(70px,110px) 150px}
+}
+@media (max-width:560px){
+  .wrap{padding:var(--sp-3)}
+  .card{padding:var(--sp-4)}
+  .topbar{padding:0 var(--sp-3)}
+  .host{display:none}
+  /* ô mini là thứ ĐẦU TIÊN bỏ khi chật — nó phụ trợ, không phải điều khiển */
+  .tr{grid-template-columns:32px minmax(0,1fr) 150px}
+  .mini,.tr.thuoc{display:none}
+  .main-ft{flex-wrap:wrap;gap:var(--sp-2)}
+  .main-ft .btn--primary{flex:1 0 100%}
+}
+@media (max-width:360px){
+  .tr{grid-template-columns:28px minmax(0,1fr);row-gap:var(--sp-2)}
+  .tr .pick{grid-column:1/-1}
+  .brand{font-size:var(--fs-md)}
+  .ver{display:none}
+  /* nút chính: cho cao lên thay vì cắt cụt chữ — overflow:hidden của thanh
+     tiến độ sẽ xén mất chữ nếu bắt xuống dòng trong chiều cao cố định */
+  .btn--primary{height:auto;min-height:var(--h-ctrl-lg);padding:var(--sp-3) var(--sp-4);
+    font-size:var(--fs-md);line-height:1.3;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ THANH TRÊN ============ -->
+<header class="topbar">
+  <svg class="ico brand-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4M8 22h8"/></svg>
+  <h1 class="brand">Auto Podcast</h1>
+  <span class="ver">v0.3.0</span>
+  <span class="spacer"></span>
+  <span class="host"><b>Premiere 26.5.0</b><i>·</i>Test3.prproj</span>
+  <button class="btn btn--sm" id="lang" title="Chuyển sang tiếng Anh" aria-label="Chuyển sang tiếng Anh">EN</button>
+  <button class="btn btn--icon" id="moCaiDat" title="Cài đặt cắt" aria-label="Cài đặt cắt">
+    <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg>
+  </button>
+</header>
+
+<div class="wrap">
+  <section class="card main">
+    <div class="card-hd">
+      <h2 class="card-t">Bản đồ track</h2>
+    </div>
+
+    <!-- người nói: hàng chip ngang, không phải một cột riêng -->
+    <div class="whorow">
+      <ul class="who" id="who"></ul>
+      <button class="btn btn--sm" id="them">
+        <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm người
+      </button>
+    </div>
+
+    <div class="work">
+      <div class="scroller">
+        <div class="tracks" id="tracks"></div>
+      </div>
+
+      <!-- MONITOR — xem đúng khung hình panel sẽ lấy tại mốc đang trỏ -->
+      <aside class="mon">
+        <div class="mon-box">
+          <div class="frame" id="frame"><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i></div>
+          <span class="mon-badge" id="monBadge"></span>
+          <span class="mon-tc" id="monTc">0:00</span>
+          <div class="mon-empty" id="monEmpty">
+            <svg class="ico" style="width:22px;height:22px" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 13 5.2 3.1a1 1 0 0 0 1.5-.9V8.8a1 1 0 0 0-1.5-.9L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+            <span>Chọn người cho một track cam để xem hình</span>
+          </div>
+        </div>
+
+        <div class="cut" id="cut" role="slider" tabindex="0" aria-label="Kéo để xem khung hình tại mốc khác"
+             aria-valuemin="0" aria-valuemax="3734" aria-valuenow="0">
+          <div class="cut-seg" id="cutSeg"></div>
+          <span class="kim" id="kim"></span>
+        </div>
+        <div class="mon-key" id="monKey"></div>
+        <p class="sub mon-rule" id="monRule"></p>
+      </aside>
+    </div>
+
+    <div class="main-ft">
+      <span class="stat" id="stat"></span>
+      <span class="spacer"></span>
+      <button class="btn btn--primary" id="go" disabled>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+        <span id="goLabel">Cắt timeline theo người nói</span>
+        <span class="prog" id="prog" style="width:0"></span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ HỘP THOẠI: CÀI ĐẶT CẮT ============ -->
+<div class="ov" id="ov" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mdT">
+    <div class="modal-hd">
+      <h2 class="card-t" id="mdT">Cài đặt cắt</h2>
+      <button class="btn btn--icon" id="dong" title="Đóng" aria-label="Đóng">
+        <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="mrow" style="padding-top:var(--sp-2)">
+        <span class="lbl"><b>Cắt sớm trước khi nói</b><span>Vào hình trước tiếng một chút, đúng nhịp editor</span></span>
+        <input class="num" type="text" inputmode="decimal" id="lead" value="0,40" aria-label="Cắt sớm, giây">
+        <span class="sub">giây</span>
+      </div>
+      <div class="mrow">
+        <span class="lbl"><b>Ở một cam ngắn nhất</b><span>Dưới mức này thì giữ nguyên cam, không nhấp nháy</span></span>
+        <input class="num" type="text" inputmode="decimal" id="shot" value="1,0" aria-label="Ở một cam ngắn nhất, giây">
+        <span class="sub">giây</span>
+      </div>
+      <div class="mrow">
+        <span class="lbl"><b>Ở một cam lâu nhất</b><span>Quá mức này thì đảo sang cam chung cho đỡ tù</span></span>
+        <input class="num" type="text" inputmode="decimal" id="maxShot" value="18" aria-label="Ở một cam lâu nhất, giây">
+        <span class="sub">giây</span>
+      </div>
+      <div class="mrow">
+        <span class="lbl"><b>Ngưỡng chênh giữa hai mic</b><span>Tự đo từ chính file — hoặc chốt một số cố định</span></span>
+        <select id="nguong" style="width:112px">
+          <option value="auto">Tự đo</option>
+          <option value="6">6 dB</option>
+          <option value="9">9 dB</option>
+        </select>
+      </div>
+      <div class="mrow">
+        <span class="lbl"><b>Tiếng sau khi cắt</b><span>Giữ mọi mic thì còn tiếng cười, tiếng ừ-hử của người kia</span></span>
+        <select id="cheDoTieng" style="width:150px">
+          <option value="theo">Theo người nói</option>
+          <option value="giu">Giữ nguyên mọi mic</option>
+        </select>
+      </div>
+      <div class="mrow" style="border-bottom:0">
+        <span class="lbl"><b>Bản gốc</b><span>Panel luôn cắt một bản sao, tự lưu project trước khi ghi</span></span>
+        <span class="stat" style="color:var(--ok)">
+          <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/></svg>
+          <span>Không bị đụng</span>
+        </span>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <span class="sub" id="tomTat" style="flex:1;min-width:0"></span>
+      <button class="btn" id="dong2">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ============ DỮ LIỆU — đúng khuôn pc_thongTinSeq() của host ============ */
+const SEQ = { ten:'Test3 Insane - Doc 9-16', dai:3734, w:1920, h:1080 };   /* 62:14 */
+const GOC = 'YTDown.com_YouTube_Insane-Conspiracy-Theories-That-Turned-Out-True';
+const TRACK = [
+  { loai:'V', idx:2, ten:'V3', soClip:1, clip:GOC+'_CAM-C-WIDE.mp4',      tu:0, den:3734 },
+  { loai:'V', idx:1, ten:'V2', soClip:1, clip:GOC+'_CAM-B-GUEST.mp4',     tu:0, den:3734 },
+  { loai:'V', idx:0, ten:'V1', soClip:1, clip:GOC+'_CAM-A-HOST.mp4',      tu:0, den:3734 },
+  { loai:'A', idx:0, ten:'A1', soClip:1, clip:GOC+'_MIC-HOST-LAV.wav',    tu:0, den:3734 },
+  { loai:'A', idx:1, ten:'A2', soClip:1, clip:GOC+'_MIC-GUEST-LAV.wav',   tu:0, den:3734 },
+  { loai:'A', idx:2, ten:'A3', soClip:1, clip:'Nhac_nen_intro_outro.wav', tu:0, den:214 },
+];
+
+let NGUOI = [ {id:1, ten:'Người 1', mau:'var(--p1)'}, {id:2, ten:'Người 2', mau:'var(--p2)'} ];
+const BANG_MAU = ['var(--p1)','var(--p2)','var(--p3)','var(--p4)'];
+
+/* gán: khoá track -> Set(id người) cho HÌNH · id người hoặc 'x' cho TIẾNG.
+   Hình dùng Set vì MỘT CAM CÓ THỂ THẤY NHIỀU NGƯỜI — đó chính là cam chung. */
+const gan = new Map();
+const khoa = t => t.loai + t.idx;
+const aiCua = k => { const v = gan.get(k); return v instanceof Set ? [...v] : (typeof v === 'number' ? [v] : []); };
+
+/* ============ TIỆN ============ */
+const mmss = s => Math.floor(s/60) + ':' + String(Math.round(s%60)).padStart(2,'0');
+/* Các file một buổi podcast gần như luôn cùng phần đầu dài và CHỈ khác ở đuôi.
+   Cắt đuôi hay cắt giữa đều cho ra mấy dòng giống hệt nhau — nên bỏ phần đầu CHUNG.
+   Đừng đòi MỌI file cùng phần đầu: chỉ một file nhạc nền là hỏng cả phép tính. */
+const DAU_CHUNG = (() => {
+  const ds = TRACK.filter(t => t.soClip > 0).map(t => t.clip);
+  let tot = '', totN = 0;
+  for (const goc of ds) for (let i = goc.length; i > 10; i--) {
+    if (!'_-. '.includes(goc[i-1])) continue;
+    const dau = goc.slice(0, i), n = ds.filter(x => x.startsWith(dau)).length;
+    if (n < 2) continue;
+    /* NHIỀU file dùng chung ăn trước, dài hơn chỉ để phân định khi hoà —
+       lấy "dài nhất" trước thì 3 file cam thắng, 2 file mic bị bỏ lại nguyên tên. */
+    if (n > totN || (n === totN && dau.length > tot.length)) { tot = dau; totN = n; }
+  }
+  return totN >= 2 ? tot : '';
+})();
+const tenNgan = s => (DAU_CHUNG && s.startsWith(DAU_CHUNG)) ? '…' + s.slice(DAU_CHUNG.length) : s;
+
+/* ============ CÀI ĐẶT ============ */
+const so = v => parseFloat(String(v).replace(',', '.'));
+const viet = v => String(v).replace('.', ',');
+function docCaiDat(){
+  return { lead: so($('lead').value) || 0, shot: so($('shot').value) || 1,
+           max: so($('maxShot').value) || 18, nguong: $('nguong').value, tieng: $('cheDoTieng').value };
+}
+
+/* ============ MONITOR + DẢI NHÁT CẮT ============
+   Monitor trả lời đúng một câu: "panel lấy hình của ai, lúc này?".
+   Trước khi phân tích nó vẫn có ích — nhìn hình là biết gán nhầm track chưa. */
+let moc = 0, camXem = null, KE_HOACH = null;
+const hueCua = k => (k.charCodeAt(1) * 97 + 41) % 360;
+const camDaGan = () => TRACK.filter(t => t.loai === 'V' && t.soClip > 0 && aiCua(khoa(t)).length);
+
+function camTaiMoc(){
+  const ds = camDaGan();
+  if (!ds.length) return null;
+  if (KE_HOACH){
+    const d = KE_HOACH.find(x => moc >= x.tu && moc < x.den);
+    if (d){ const t = ds.find(x => khoa(x) === d.cam); if (t) return t; }
+  }
+  if (camXem){ const t = ds.find(x => khoa(x) === camXem); if (t) return t; }
+  return ds[ds.length - 1];
+}
+
+function veMonitor(){
+  document.querySelector('.mon-box').style.setProperty('--ar', SEQ.w + '/' + SEQ.h);
+  const t = camTaiMoc();
+  $('monEmpty').hidden = !!t;
+  $('frame').hidden = $('monBadge').hidden = $('monTc').hidden = !t;
+  for (const k of document.querySelectorAll('.mini .kim2')) k.style.left = (moc / SEQ.dai * 100) + '%';
+  for (const r of document.querySelectorAll('.tr[data-loai=V]'))
+    r.toggleAttribute('data-xem', !!t && r.dataset.k === khoa(t));
+
+  if (t){
+    const ai = aiCua(khoa(t)).map(id => NGUOI.find(n => n.id === id)).filter(Boolean);
+    $('frame').style.setProperty('--h', hueCua(khoa(t)));
+    $('frame').toggleAttribute('data-chung', ai.length > 1);
+    $('monBadge').innerHTML = ai.map(n =>
+      `<span class="dot" style="--c:${n.mau};width:7px;height:7px"></span>`).join('')
+      + `${t.ten} · ${ai.length > 1 ? 'cam chung' : (ai[0] ? ai[0].ten : '')}`;
+    $('monTc').textContent = mmss(moc) + ' / ' + mmss(SEQ.dai);
+  }
+
+  const cut = $('cut');
+  cut.classList.toggle('chua', !KE_HOACH);
+  cut.setAttribute('aria-valuenow', Math.round(moc));
+  cut.setAttribute('aria-valuetext', mmss(moc) + (t ? ' — ' + t.ten : ''));
+  $('cutSeg').innerHTML = KE_HOACH ? KE_HOACH.map(d =>
+    `<i style="--c:${d.mau};left:${d.tu / SEQ.dai * 100}%;width:${(d.den - d.tu) / SEQ.dai * 100}%"></i>`).join('') : '';
+  $('kim').style.left = (moc / SEQ.dai * 100) + '%';
+
+  /* chú giải màu — dải chỉ có nghĩa khi nói rõ màu nào là ai */
+  const ds = camDaGan();
+  const coChung = ds.some(x => aiCua(khoa(x)).length > 1);
+  $('monKey').innerHTML = NGUOI.filter(n => ds.some(x => aiCua(khoa(x)).includes(n.id)))
+    .map(n => `<span><span class="dot" style="--c:${n.mau}"></span>${n.ten}</span>`).join('')
+    + (coChung ? `<span><span class="dot" style="--c:var(--chung)"></span>Cam chung</span>` : '');
+  $('monRule').textContent = KE_HOACH
+    ? `${KE_HOACH.length} nhát cắt trên ${mmss(SEQ.dai)} — kéo dải để xem từng nhát lấy hình của ai.`
+    : (coChung
+        ? 'Ai nói thì cắt sang cam người đó · hai người nói cùng lúc hoặc ở một cam quá lâu thì đảo sang cam chung.'
+        : 'Mic ai to hơn thì cắt sang cam người đó.');
+}
+
+/* kế hoạch nhát cắt — sinh từ hạt cố định nên lần nào cũng ra y hệt */
+function sinhKeHoach(){
+  const ds = camDaGan(); if (!ds.length) return null;
+  const rieng = id => ds.find(t => { const a = aiCua(khoa(t)); return a.length === 1 && a[0] === id; });
+  const camChung = ds.find(t => aiCua(khoa(t)).length > 1);
+  const coCam = NGUOI.filter(n => ds.some(t => aiCua(khoa(t)).includes(n.id)));
+  if (coCam.length < 2) return null;
+
+  const c = docCaiDat();
+  let r = 20260803; const ran = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
+  const out = []; let t = 0, i = 0, lienTuc = 0, camTruoc = null;
+
+  const kChung = camChung ? khoa(camChung) : null;
+  while (t < SEQ.dai && out.length < 4000){
+    const nguoi = coCam[i % coCam.length];
+    let d = Math.max(c.shot, Math.min(SEQ.dai - t, 3 + Math.pow(ran(), 1.8) * 26));
+    const camNguoi = rieng(nguoi.id) || ds.find(x => aiCua(khoa(x)).includes(nguoi.id));
+    if (!camNguoi) break;
+
+    /* Đảo sang cam chung khi: hai người nói chồng nhau, HOẶC ở đúng một cam quá lâu.
+       ĐANG ở cam chung thì không đảo tiếp — không thì lienTuc cộng dồn trên chính
+       cam chung, quaLau luôn đúng, và cả tập kẹt ở một cam. */
+    const dangChung = camTruoc === kChung;
+    const chongNhau = kChung && !dangChung && ran() < 0.07;
+    const quaLau = kChung && !dangChung && khoa(camNguoi) === camTruoc && lienTuc + d > c.max;
+    let cam = camNguoi;
+    if (chongNhau || quaLau){ cam = camChung; d = Math.min(d, 4 + ran() * 4); }
+
+    const k = khoa(cam), ai = aiCua(k);
+    const mau = ai.length > 1 ? 'var(--chung)' : ((NGUOI.find(n => n.id === ai[0]) || {}).mau || 'var(--chung)');
+    out.push({ tu:t, den:Math.min(SEQ.dai, t + d), cam:k, ai, mau, nguoi:nguoi.id });
+    lienTuc = (k === camTruoc) ? lienTuc + d : d;
+    camTruoc = k; t += d;
+    if (!chongNhau && !quaLau) i += ran() < 0.82 ? 1 : 0;
+  }
+  return out;
+}
+
+function datMoc(el, x){
+  const r = el.getBoundingClientRect();
+  moc = Math.max(0, Math.min(SEQ.dai, (x - r.left) / r.width * SEQ.dai));
+  veMonitor();
+}
+$('cut').addEventListener('pointerdown', e => { $('cut').setPointerCapture(e.pointerId); datMoc($('cut'), e.clientX); });
+$('cut').addEventListener('pointermove', e => { if (e.buttons) datMoc($('cut'), e.clientX); });
+$('cut').addEventListener('keydown', e => {
+  const b = { ArrowLeft:-15, ArrowRight:15, Home:-1e9, End:1e9 }[e.key];
+  if (b === undefined) return;
+  moc = Math.max(0, Math.min(SEQ.dai, moc + b)); veMonitor(); e.preventDefault();
+});
+
+/* ============ VẼ ============ */
+function veNguoi(){
+  $('who').innerHTML = NGUOI.map(n => {
+    const so2 = TRACK.filter(t => aiCua(khoa(t)).includes(n.id)).length;
+    return `<li style="--c:${n.mau}">
+      <span class="dot"></span><span class="nm">${n.ten}</span>
+      <span class="cnt">${so2 ? so2 + ' track' : '—'}</span>
+      ${NGUOI.length > 2 ? `<button class="btn btn--sm x" data-bo="${n.id}" title="Bỏ ${n.ten}" aria-label="Bỏ ${n.ten}">
+        <svg class="ico" style="width:11px;height:11px" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>` : ''}
+    </li>`;
+  }).join('');
+}
+
+function veTrack(){
+  const giuMic = docCaiDat().tieng === 'giu';
+  /* Sau khi dựng, ô mini vẽ ĐÚNG hình dạng track sẽ ra trong Premiere:
+     cam nào lên hình lúc nào thì track đó còn clip lúc đó, chỗ khác để trống. */
+  const latCua = t => {
+    if (!KE_HOACH) return '';
+    const k = khoa(t);
+    if (t.loai === 'V')
+      return KE_HOACH.filter(d => d.cam === k).map(d =>
+        `<i style="--c:${d.mau};left:${d.tu/SEQ.dai*100}%;width:${Math.max(.12,(d.den-d.tu)/SEQ.dai*100)}%"></i>`).join('');
+    if (giuMic) return '';
+    const id = gan.get(k); if (typeof id !== 'number') return '';
+    const ng = NGUOI.find(n => n.id === id); if (!ng) return '';
+    return KE_HOACH.filter(d => d.nguoi === id).map(d =>
+      `<i style="--c:${ng.mau};left:${d.tu/SEQ.dai*100}%;width:${Math.max(.12,(d.den-d.tu)/SEQ.dai*100)}%"></i>`).join('');
+  };
+
+  const hang = t => {
+    const k = khoa(t), ai = aiCua(k), trong = t.soClip === 0;
+    const tu = t.tu / SEQ.dai * 100, rong = Math.max(1.5, (t.den - t.tu) / SEQ.dai * 100);
+    const mau = ai.length > 1 ? 'var(--chung)'
+              : ai.length ? ((NGUOI.find(n => n.id === ai[0]) || {}).mau || '') : '';
+    const chon = t.loai === 'V'
+      ? `<div class="pick" data-k="${k}">${NGUOI.map(n =>
+          `<button aria-pressed="${ai.includes(n.id)}" data-id="${n.id}" style="--c:${n.mau}"
+            title="${t.ten} có thấy ${n.ten} không"><span class="dot"></span>${n.id}</button>`).join('')
+        }<button class="tat" aria-pressed="${gan.get(k) === 'x'}" data-id="x" title="Không dùng track này">tắt</button></div>`
+      : `<select data-k="${k}" aria-label="Track ${t.ten} là mic của ai">
+          <option value="">— chọn người —</option>
+          ${NGUOI.map(n => `<option value="${n.id}"${gan.get(k) === n.id ? ' selected' : ''}>${n.ten}</option>`).join('')}
+          <option value="x"${gan.get(k) === 'x' ? ' selected' : ''}>Không dùng</option>
+        </select>`;
+    return `<div class="tr${trong ? ' trong' : ''}" data-loai="${t.loai}" data-k="${k}"
+       ${ai.length ? `data-ai="1" style="--c:${mau}"` : ''}>
+      <span class="lbl"><span class="bar"></span>${t.ten}</span>
+      ${trong
+        ? `<span class="empty-note">track trống</span><span class="mini"></span><span class="empty-note">—</span>`
+        : `<span class="file" title="${t.clip}">${tenNgan(t.clip)}
+             <small>${mmss(t.den - t.tu)}${t.soClip > 1 ? ' · ' + t.soClip + ' clip' : ''}</small></span>
+           <span class="mini"${giuMic && t.loai === 'A' ? ' data-giu="1"' : ''}>${
+             latCua(t) || `<i style="left:${tu}%;width:${rong}%"></i>`}<b class="kim2"></b></span>
+           ${chon}`}
+    </div>`;
+  };
+
+  const thuoc = [0,.25,.5,.75,1].map(f => `<span style="left:${f*100}%">${mmss(SEQ.dai*f)}</span>`).join('');
+  $('tracks').innerHTML =
+    `<div class="tr thuoc"><span></span><span></span><span class="ruler">${thuoc}</span><span></span></div>` +
+    `<div class="tsep">Hình — cam nào thấy ai</div>` +
+    TRACK.filter(t => t.loai === 'V').map(hang).join('') +
+    `<div class="tsep">Tiếng — mic riêng của ai${giuMic ? ' · giữ nguyên, chỉ dùng để nghe' : ''}</div>` +
+    TRACK.filter(t => t.loai === 'A').map(hang).join('');
+}
+
+/* ============ KIỂM: ĐỦ ĐIỀU KIỆN DỰNG CHƯA ============ */
+function kiem(){
+  const dung = TRACK.filter(t => t.soClip > 0);
+  const coCam = id => dung.some(t => t.loai === 'V' && aiCua(khoa(t)).includes(id));
+  const coMic = id => dung.some(t => t.loai === 'A' && gan.get(khoa(t)) === id);
+  /* mic dùng chung là SAI — não so năng lượng cần mỗi người đúng một mic riêng.
+     Cam dùng chung thì ĐƯỢC, đó chính là cam chung. */
+  const micTrung = NGUOI.some(n => dung.filter(t => t.loai === 'A' && gan.get(khoa(t)) === n.id).length > 1);
+  const thieu = NGUOI.filter(n => !coCam(n.id) || !coMic(n.id));
+
+  if (micTrung) return {ok:false, m:'warn', t:'Một người đang nhận <b>2 mic</b> — não so tiếng cần mỗi người đúng một mic riêng.'};
+  if (thieu.length){
+    const n = thieu[0], c = !coCam(n.id) ? 'cam' : 'mic';
+    return {ok:false, m:'warn',
+      t:`Chưa gán <b>${c}</b> cho <b>${n.ten}</b>${thieu.length > 1 ? ` và ${thieu.length - 1} người nữa` : ''}.`};
+  }
+  return {ok:true, m:'', t:''};      /* xong xuôi thì IM — việc thành công không cần báo */
+}
+
+function veChan(){
+  const k = kiem();
+  $('stat').dataset.m = k.m;
+  $('stat').innerHTML = k.t
+    ? (k.m === 'warn' ? `<svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>` : '')
+      + `<span>${k.t}</span>`
+    : '';
+  $('go').disabled = !k.ok;
+}
+
+const ve = () => { veNguoi(); veTrack(); veChan(); veMonitor(); };
+
+/* ============ TƯƠNG TÁC ============ */
+$('tracks').addEventListener('click', e => {
+  const b = e.target.closest('.pick button');
+  if (b){
+    const k = b.closest('.pick').dataset.k;
+    if (b.dataset.id === 'x') gan.set(k, gan.get(k) === 'x' ? new Set() : 'x');
+    else {
+      const cur = gan.get(k) instanceof Set ? gan.get(k) : new Set();
+      const id = +b.dataset.id;
+      cur.has(id) ? cur.delete(id) : cur.add(id);
+      gan.set(k, cur);
+    }
+    camXem = k; KE_HOACH = null; ve(); return;
+  }
+  const tr = e.target.closest('.tr[data-loai=V][data-ai]');
+  if (tr && !e.target.closest('.mini')){ camXem = tr.dataset.k; ve(); }
+});
+$('tracks').addEventListener('change', e => {
+  const s = e.target.closest('select'); if (!s) return;
+  const v = s.value;
+  if (!v) gan.delete(s.dataset.k); else gan.set(s.dataset.k, v === 'x' ? 'x' : +v);
+  ve();
+});
+/* ô mini cũng là mặt tua — kéo ở đâu cũng ra cùng một mốc */
+$('tracks').addEventListener('pointerdown', e => {
+  const m = e.target.closest('.mini'); if (!m || m.closest('.tr.trong')) return;
+  m.setPointerCapture(e.pointerId); datMoc(m, e.clientX);
+});
+$('tracks').addEventListener('pointermove', e => {
+  const m = e.target.closest('.mini');
+  if (m && e.buttons && !m.closest('.tr.trong')) datMoc(m, e.clientX);
+});
+$('who').addEventListener('click', e => {
+  const b = e.target.closest('[data-bo]'); if (!b) return;
+  const id = +b.dataset.bo;
+  NGUOI = NGUOI.filter(n => n.id !== id);
+  for (const [k, v] of gan){
+    if (v instanceof Set) v.delete(id);
+    else if (v === id) gan.delete(k);
+  }
+  KE_HOACH = null; ve();
+});
+$('them').addEventListener('click', () => {
+  if (NGUOI.length >= 4) return;
+  const id = Math.max(0, ...NGUOI.map(n => n.id)) + 1;
+  NGUOI.push({ id, ten:'Người ' + id, mau:BANG_MAU[(id - 1) % 4] });
+  KE_HOACH = null; ve();
+  $('them').disabled = NGUOI.length >= 4;
+});
+
+/* ============ DỰNG — chạy theo LÔ, tiến độ phải nhúc nhích ============ */
+$('go').addEventListener('click', () => {
+  const b = $('go'); if (b.disabled) return;
+  b.disabled = true; b.dataset.state = 'run';
+  const buoc = ['Nhân bản sequence','Đặt hình','Dọn tiếng','Đặt tiếng','Đo lại kết quả'];
+  let p = 0;
+  const t = setInterval(() => {
+    p += 3.2;
+    $('prog').style.width = Math.min(100, p) + '%';
+    $('goLabel').textContent = `${buoc[Math.min(4, Math.floor(p / 20))]}… ${Math.min(99, p | 0)}%`;
+    if (p >= 100){
+      clearInterval(t);
+      KE_HOACH = sinhKeHoach(); ve();
+      b.dataset.state = 'done';
+      $('goLabel').textContent = docCaiDat().tieng === 'giu'
+        ? `Đã cắt ${KE_HOACH.length} nhát hình · tiếng giữ nguyên`
+        : `Đã cắt ${KE_HOACH.length} nhát · lệch 0 frame`;
+      $('prog').style.width = '0';
+      setTimeout(() => { delete b.dataset.state; $('goLabel').textContent = 'Cắt lại'; b.disabled = false; }, 2600);
+    }
+  }, 60);
+});
+
+/* ============ CÀI ĐẶT ĐỔI LÀ PHẢI TÍNH LẠI THẬT (§8b) ============ */
+function apCaiDat(){
+  const c = docCaiDat();
+  const tom = `Cắt sớm ${viet(c.lead.toFixed(2))}s · cam ${viet(c.shot.toFixed(1))}–${c.max}s · `
+    + `ngưỡng ${c.nguong === 'auto' ? 'tự đo' : c.nguong + ' dB'} · `
+    + (c.tieng === 'giu' ? 'giữ mọi mic' : 'tiếng theo người nói');
+  $('tomTat').textContent = tom;
+  $('moCaiDat').title = 'Cài đặt cắt — ' + tom;
+  if (KE_HOACH) KE_HOACH = sinhKeHoach();   /* đổi cài đặt thì kế hoạch phải tính LẠI */
+  ve();
+}
+for (const id of ['lead','shot','maxShot','nguong','cheDoTieng'])
+  $(id).addEventListener('input', apCaiDat);
+
+/* ============ HỘP THOẠI ============ */
+const ov = $('ov');
+const dongHop = () => { ov.hidden = true; $('moCaiDat').focus(); };
+$('moCaiDat').addEventListener('click', () => { ov.hidden = false; $('dong2').focus(); });
+$('dong').addEventListener('click', dongHop);
+$('dong2').addEventListener('click', dongHop);
+ov.addEventListener('mousedown', e => { if (e.target === ov) dongHop(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) dongHop(); });
+ov.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const f = [...ov.querySelectorAll('button,input,select')];
+  const i = f.indexOf(document.activeElement);
+  const t = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i >= f.length - 1 ? 0 : i + 1);
+  f[t].focus(); e.preventDefault();
+});
+
+apCaiDat();
+</script>
+</body>
+</html>

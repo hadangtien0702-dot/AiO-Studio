@@ -288,15 +288,60 @@ không cứu. Phải dựng lại tay, kết quả **lệch 0,03 giây**.
 - **Đừng bao giờ gọi undo trong vòng lặp**
 - **Ghi lại trạng thái gốc TRƯỚC khi bấm** (số clip, mốc đầu/cuối)
 
-## Giao diện: đang ở góc nhìn CHỦ DỰ ÁN, chưa phải NGƯỜI DÙNG
+## ☠️ GIAO DIỆN ĐÃ CHỐT 2026-08-03 — ĐỪNG THIẾT KẾ LẠI
+
+Anh Tiến: *"anh chốt UI cho auto cut rồi đó em, chốt phiên bản này nhé em"*.
+
+**Nguồn chân lý của HÌNH: `AiO Design System/Design/Auto Cut.html`** — anh Tiến
+tự dựng bằng Claude design. ☠️ **File đó là của anh ấy, KHÔNG được sửa.** Nguyên
+văn: *"file HTML là file anh chốt thiết kế, em không được sửa thiết kế anh chốt"*.
+Muốn đổi hình thì đổi ở đó trước, rồi mới ghép vào panel.
+
+Cách ghép (đã làm, giữ nguyên lối này cho các panel sau):
+- `client/src/giao-dien.css` — **file riêng**, nạp SAU `styles.css` để thắng ở
+  tên class trùng. Không viết đè `styles.css` vì file đó còn giữ dạng của
+  `.chay` · `.ket` · `.lui` · `.loi` đang chạy — dựng lại giao diện và có nguy cơ
+  phá mấy khối đó CÙNG LÚC thì không biết cái nào gây lỗi.
+- `Timeline.tsx` (hai dải xem trước) · `BangDoan.tsx` (bảng + bảng mẫu) — mới.
+- `DaiSong.tsx` và `MinhHoaNoiDat.tsx` **giữ lại, thôi dùng**. `DaiSong` có
+  **đường ngưỡng cam nhấp nhô theo nền ồn** — thứ chứng minh tool không cắt nhầm
+  lời người ngồi xa mic. Thiết kế mới không có chỗ cho nó. Cần trưng lại thì có sẵn.
+
+**Panel nay là CỬA SỔ RIÊNG**, không dock được nữa: `<Type>Modeless</Type>`,
+kho mở 1280x800. Anh Tiến: *"khi bấm vào thì mặc định mình sẽ bung một cửa sổ
+riêng biệt nằm ngoài luôn với UI gốc đẹp nhất"*. Dock bên phải chỉ được 360px
+thì lưới hai cột luôn rơi về một cột. ☠️ Đổi `Type` **bắt buộc tắt hẳn Premiere**
+rồi mở lại, reload panel không ăn.
+
+☠️ **Khổ cửa sổ THẬT khác số trong manifest.** Máy anh Tiến `devicePixelRatio
+= 1.5` nên `Size 1280x800` mở ra chỉ **1005x682 CSS px**. Mọi ngưỡng media query
+phải nghĩ theo số THẬT đó, và phải đo trên panel đang chạy chứ không đo trên
+Chrome máy.
+
+### Thứ đã GỠ khỏi màn hình — ghi để phiên sau đừng "sửa lại cho đúng"
+
+| Gỡ cái gì | Vì sao | Mất gì |
+|---|---|---|
+| Dòng *"Đây là ước tính hơi thấp — thực tế ngắn hơn 3–8%"* | Anh Tiến: *"remove cho anh chỗ này của em luôn"* | Thứ DUY NHẤT nói con số kia là ước lượng. Đo thật: máy luôn cắt NHIỀU HƠN hình vẽ (Cắt sạch 488,6 → 501,0s) |
+| Khối tiến trình ở bước xem trước | Lúc đó luồng đang **đợi người dùng**, mà nút ngay dưới đã nói đủ | Không mất gì — nó lặp |
+| Card "Kết quả" trong lúc đang chạy | Nhường 138px cho ô tiến trình | Không mất — lúc đó ba số kia mới là ước lượng |
+
+### Ô "Ước còn lại" đang NÓI DỐI — chưa chốt cách xử lý
+
+Ba số 87/74/57% đo trên **video 58 phút**, không phải clip đang mở. Đo trên
+Test3 (26 phút, mức "Cắt sạch"): thực tế **cắt được 30 giây, còn 98%** — lệch
+**41 điểm phần trăm**. Đã báo anh Tiến hai lần, chưa chốt bỏ hay giữ.
+→ Cùng loại lỗi anh Tiến từng bắt: *"đừng lấy số đo ra bao biện cho thứ hiển thị
+sai"*. Đừng để nó nằm im mãi.
+
+## Góc nhìn NGƯỜI DÙNG (bối cảnh cũ, vẫn đúng)
 
 Anh Tiến chốt 28/07: *"anh em mình đang build và kiểm tra dưới góc nhìn của một
 production owner. Khi build xong em sửa UI thành góc nhìn của một editor sử dụng
 tool này."*
 
-**Việc phải làm khi tính năng chốt xong:** người dựng cần biết *cắt xong chưa ·
-ngắn đi bao nhiêu · có chỗ nào cần soát lại*. KHÔNG cần số khoảng lặng thô, số
-từ, thời gian từng bước, tên mô hình. Chuyển phần kỹ thuật vào mục gấp lại.
+Người dựng cần biết *cắt xong chưa · ngắn đi bao nhiêu · có chỗ nào cần soát lại*.
+KHÔNG cần số khoảng lặng thô, số từ, thời gian từng bước, tên mô hình.
 **Đừng xoá code đo — chỉ giấu.** Lần sau sửa thuật toán lại cần.
 
 ## Nguyên tắc riêng của dự án này

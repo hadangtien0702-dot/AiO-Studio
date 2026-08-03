@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AiO Studio — Autocut · thiết kế mới</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  Autocut — thiết kế mới, dựng theo design system "Studio Console".
+  Đặt trong AiO Design System/Autocut/ — font lấy từ ../fonts/ (double-click là chạy, không cần server).
+  Mọi màu/cỡ/khoảng cách đều lấy từ tokens.css — không chế thêm giá trị mới.
+-->
+<style>
+/* ============ FONT: một file variable cho mọi weight ============ */
+@font-face{font-family:'Inter var';font-style:normal;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter.woff2') format('woff2');}
+@font-face{font-family:'Inter var';font-style:italic;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter-Italic.woff2') format('woff2');}
+
+/* ============ TOKENS — chép nguyên từ DESIGN-SYSTEM.md §15 ============ */
+:root{
+  --bg-0:#0e0e0e; --bg-1:#141414; --bg-2:#181818; --bg-3:#1f1f1f;
+  --bg-4:#282828; --bg-5:#333333; --bg-6:#161616;
+  --bg-hover:rgb(255 255 255 /5%); --bg-active:rgb(255 255 255 /9%);
+  --line-1:rgb(255 255 255 /6%); --line-2:rgb(255 255 255 /10%); --line-strong:rgb(255 255 255 /16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95; --text-meta:#9b9ba3; --icon-dim:#8f8f97;
+  --accent:#f86820; --accent-hover:#ff7d3c; --accent-pressed:#e0590e;
+  --accent-soft:rgb(248 104 32 /16%); --accent-line:rgb(248 104 32 /40%);
+  --accent-text:#ffb891; --accent-on:#ffffff;
+  --ok:#4ec98a; --warn:#e8c05a; --danger:#ff5f6d; --danger-strong:#ff4757; --heart:#ff6b81;
+  --font-ui:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --fs-2xs:10px; --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:19px;
+  --fw-normal:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-tight:1.25; --lh:1.45; --ls-display:-0.014em;
+  --sp-1:4px; --sp-2:6px; --sp-3:8px; --sp-4:12px; --sp-5:16px; --sp-6:24px;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --shadow-sm:0 1px 2px rgb(0 0 0 /30%); --shadow-md:0 8px 24px rgb(0 0 0 /45%);
+  --h-ctrl-sm:24px; --h-ctrl:28px; --h-ctrl-lg:34px; --h-topbar:44px;
+  --dur:150ms; --ease:cubic-bezier(.32,.72,0,1);
+  --focus-ring:0 0 0 3px var(--accent-soft);
+  --z-dropdown:100; --z-sticky:200; --z-modal:300; --z-toast:400; --z-tooltip:500;
+  /* vật thể Premiere — bảng Classic, đừng tự chọn cho "hài hoà" */
+  --pr-video:#729ACC; --pr-video-head:#5b7ea8; --pr-audio:#1D7021;
+}
+
+/* ============ NỀN ============ */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+/* reset margin mặc định của trình duyệt — không reset thì mỗi <h2> đội thêm ~21px
+   mà không ai chủ ý, và code ghép lại sẽ không bao giờ khớp */
+h1,h2,h3,h4,p,ul,ol,figure{margin:0}
+body{background:var(--bg-2);color:var(--text-1);font:var(--fw-normal) var(--fs-md)/var(--lh) var(--font-ui);
+  -webkit-font-smoothing:antialiased;font-feature-settings:'tnum' 1;}
+svg{display:block}
+.ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round}
+.ico-sm{width:14px;height:14px}
+
+/* focus thấy được trên MỌI control — không bao giờ outline:none trần */
+:where(button,[tabindex],input,select):focus-visible{
+  outline:none;border-color:var(--accent-line);box-shadow:var(--focus-ring)}
+
+/* thanh cuộn tối tuỳ biến — không để trắng mặc định Windows */
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgb(255 255 255 /14%);border-radius:var(--r-pill);
+  border:2px solid transparent;background-clip:content-box}
+*::-webkit-scrollbar-thumb:hover{background:rgb(255 255 255 /22%);background-clip:content-box}
+
+/* ============ THANH TRÊN — khuôn CHUNG cho cả 7 panel ============ */
+.topbar{height:var(--h-topbar);background:var(--bg-1);border-bottom:1px solid var(--line-1);
+  display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-5)}
+/* icon nhận diện kiêm đèn báo kết nối — không thêm chấm tròn riêng */
+.brand-ico{color:var(--accent)}
+.brand-ico[data-host="off"]{color:var(--text-3)}
+.brand{font-size:var(--fs-lg);font-weight:var(--fw-semibold)}
+.ver{font-size:var(--fs-xs);color:var(--text-3)}
+.spacer{flex:1}
+.host{font-size:var(--fs-sm);color:var(--text-3)}
+.host b{color:var(--text-2);font-weight:var(--fw-medium)}
+.host i{color:var(--line-2);font-style:normal;margin:0 var(--sp-2)}
+
+/* ============ NÚT — HAI họ, không hơn ============ */
+.btn{height:var(--h-ctrl);padding:0 var(--sp-4);display:inline-flex;align-items:center;gap:var(--sp-2);
+  background:var(--bg-4);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  color:var(--text-1);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);
+  text-transform:none;letter-spacing:normal;cursor:pointer;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.btn:hover{background:var(--bg-5)}
+.btn:active{transform:scale(.97);transition:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn--sm{height:var(--h-ctrl-sm);padding:0 var(--sp-3);font-size:var(--fs-xs)}
+.btn--icon{width:var(--h-ctrl-sm);height:var(--h-ctrl-sm);padding:0;justify-content:center;color:var(--text-2)}
+/* chữ TRẮNG BOLD ≥14px trên cam — 3:1 chỉ hợp lệ cho chữ to/đậm */
+.btn--primary{height:var(--h-ctrl-lg);width:100%;justify-content:center;gap:var(--sp-3);
+  background:var(--accent);border:none;border-radius:var(--r-md);
+  color:var(--accent-on);font-size:var(--fs-lg);font-weight:var(--fw-bold)}
+.btn--primary:hover{background:var(--accent-hover)}
+.btn--primary:active{background:var(--accent-pressed)}
+.btn--primary[data-state="run"]{background:var(--bg-4);color:var(--text-1);cursor:progress}
+.btn--primary[data-state="done"]{background:var(--ok);color:#0e2a1c}
+
+/* ============ THẺ / SECTION ============ */
+.wrap{padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-4);
+  height:min(calc(100vh - var(--h-topbar)),920px);overflow:auto;
+  max-width:1440px;width:100%;margin-inline:auto}
+.card{background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-lg);padding:var(--sp-5)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-bottom:var(--sp-4)}
+.card-t{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
+
+/* dải vùng chọn */
+.selbar{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-4);
+  background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-md);min-height:36px}
+.selbar .lbl{font-size:var(--fs-xs);color:var(--text-3)}
+.selbar .val{font-size:var(--fs-md);font-weight:var(--fw-medium)}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 var(--sp-1);
+  background:var(--bg-4);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  font-size:var(--fs-2xs);font-weight:var(--fw-semibold);color:var(--text-2)}
+
+/* lưới 2 cột — xếp dọc khi hẹp, không cắt chữ */
+.grid{display:grid;grid-template-columns:minmax(0,720fr) minmax(0,406fr);gap:var(--sp-4);flex:1;min-height:0}
+.col{display:flex;flex-direction:column;gap:var(--sp-4);min-width:0;min-height:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+/* ============ XEM TRƯỚC ============ */
+.legend{display:flex;gap:var(--sp-5);font-size:var(--fs-xs);color:var(--text-2)}
+.legend span{display:inline-block;white-space:nowrap}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;
+  vertical-align:-1px;margin-right:var(--sp-2)}
+.sw--cut{background:rgb(255 95 109 /30%);border:1px solid rgb(255 95 109 /65%)}
+.sw--keep{background:var(--pr-video)}
+.trk-hd{display:flex;align-items:baseline;justify-content:space-between;
+  font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-2);margin-bottom:var(--sp-3)}
+.trk-hd .meta{font-size:var(--fs-xs);font-weight:var(--fw-normal);color:var(--text-3)}
+
+.tl{position:relative;height:92px;background:var(--bg-0);border-radius:var(--r-sm);padding:8px 6px}
+.tl .marks{position:relative;height:6px}
+.tl .marks i{position:absolute;top:0;height:6px;background:var(--danger);border-radius:1px}
+.tl .lanes{display:flex;gap:2px;height:66px;margin-top:4px}
+.tl .clip{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tl .v{height:22px;background:var(--pr-video);border-radius:2px;
+  background-image:linear-gradient(var(--pr-video-head) 0 5px,transparent 5px)}
+.tl .a{flex:1;background:var(--pr-audio);border-radius:2px;display:flex;align-items:center;
+  gap:2px;padding:0 3px;overflow:hidden}
+.tl .a i{flex:1 0 2px;background:rgb(255 255 255 /45%);border-radius:1px}
+.tl .cuts{position:absolute;inset:14px 6px 8px}
+.tl .cuts i{position:absolute;top:0;bottom:0;background:rgb(255 95 109 /18%);border-radius:2px}
+.tl .seams{position:absolute;inset:4px 0 0;display:flex}
+.tl .seams i{flex:1;border-right:1px solid rgb(255 255 255 /20%)}
+/* nửa phải của dải "sau khi cắt": chỗ trống nói ra điều gì đó, không để hở suông */
+.tl--after{display:flex;gap:0}
+.tl .kept{flex:0 0 57%;min-width:0;position:relative}
+.tl .kept .lanes{margin-top:10px}
+.tl .gone{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:var(--sp-1);text-align:center;
+  border-left:1px dashed rgb(255 95 109 /45%);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  /* gạch chéo = phần bị lấy đi, đọc ra ngay không cần chú thích */
+  background:repeating-linear-gradient(135deg,rgb(255 95 109 /10%) 0 5px,transparent 5px 13px)}
+.tl .gone .ico{color:var(--danger)}
+.tl .gone .n{font-size:var(--fs-xl);font-weight:var(--fw-semibold);color:var(--text-1);
+  letter-spacing:var(--ls-display);line-height:1.15}
+.tl .gone .l{font-size:var(--fs-xs);color:var(--text-3)}
+
+.card--res{flex:1;display:flex;flex-direction:column}
+.tiles{flex:1;display:grid;grid-template-columns:1fr;gap:var(--sp-3)}
+.tile{background:var(--bg-2);border:1px solid var(--line-1);border-radius:var(--r-md);
+  padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;justify-content:center}
+.tile .k{font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-3)}
+.tile .v{font-size:var(--fs-xl);font-weight:var(--fw-semibold);letter-spacing:var(--ls-display);margin-top:2px}
+.tile .v--ok{color:var(--ok)}
+.tile .ar{color:var(--text-3);font-weight:var(--fw-normal)}
+
+/* ============ DANH SÁCH 43 ĐOẠN ============ */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:var(--fs-2xs);font-weight:var(--fw-medium);color:var(--text-3);
+  padding:0 0 var(--sp-3);border-bottom:1px solid var(--line-1);position:sticky;top:0;background:var(--bg-3)}
+.tbl th:last-child,.tbl td:last-child{text-align:right}
+.tbl td{padding:var(--sp-1) 0;border-top:1px solid rgb(255 255 255 /4%);
+  font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap}
+/* cot chu co dung be rong minh can; cot dang song nuot phan thua */
+.tbl th,.tbl td{width:1px;padding-right:var(--sp-6)}
+.tbl th:nth-child(4),.tbl td:nth-child(4){width:auto}
+.tbl th:last-child,.tbl td:last-child{padding-right:0}
+.tbl tr:hover td{background:var(--bg-hover)}
+.tbl td.dur{font-weight:var(--fw-semibold);color:var(--text-1)}
+.scroller{flex:1;min-height:0;overflow-y:auto;margin-right:calc(var(--sp-2) * -1);padding-right:var(--sp-2)}
+.spark{width:100%;min-width:140px;height:20px;background:var(--bg-0);border-radius:3px;display:flex;align-items:center;
+  gap:2px;padding:0 4px}
+.spark i{flex:1 0 2px;background:var(--danger);opacity:.75;border-radius:1px}
+tr[data-kept] td{color:var(--text-3)}
+tr[data-kept] td.dur{color:var(--text-3)}
+tr[data-kept] td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+tr[data-kept] .spark i{background:var(--ok);opacity:.9}
+tr[data-kept] td{background:rgb(248 104 32 /7%)}
+.keep-btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-line);
+  color:var(--accent-text);font-weight:var(--fw-semibold)}
+
+/* ============ SEGMENTED — 2–3 lựa chọn, KHÔNG chôn số con vào CSS ============ */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;padding:3px;height:32px;
+  background:var(--bg-0);border:1px solid var(--line-2);border-radius:var(--r-md)}
+.seg button{border:1px solid transparent;border-radius:var(--r-sm);background:transparent;
+  color:var(--text-2);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer;
+  transition:background var(--dur) var(--ease)}
+.seg button:hover{background:var(--bg-hover)}
+.seg button[aria-checked="true"]{background:var(--bg-4);border-color:var(--line-2);
+  color:var(--accent);font-weight:var(--fw-semibold)}
+
+/* ============ NƠI ĐẶT KẾT QUẢ — hai lựa chọn khác nhau về HÌNH ============ */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4)}
+.opt{position:relative;text-align:left;padding:var(--sp-4);background:var(--bg-2);
+  border:1px solid var(--line-2);border-radius:var(--r-md);cursor:pointer;color:inherit;
+  font-family:var(--font-ui);transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.opt:hover{background:var(--bg-4)}
+.opt[aria-checked="true"]{background:var(--bg-4);border-color:var(--accent-line);box-shadow:inset 0 0 0 1px var(--accent-line)}
+.opt .nm{display:block;font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1);margin-top:var(--sp-4)}
+.opt .sub{display:block;font-size:var(--fs-2xs);color:var(--text-3);margin-top:3px}
+.opt .tick{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:var(--r-pill);
+  background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center}
+.opt[aria-checked="true"] .tick{display:flex}
+.dia{display:flex;flex-direction:column;gap:var(--sp-3);height:44px;justify-content:center}
+.bar{height:14px;background:var(--bg-0);border:1px solid var(--line-2);border-radius:3px;
+  display:flex;gap:2px;padding:2px}
+.bar.hi{border-color:var(--accent-line)}
+.bar i{flex:1;background:var(--pr-video);border-radius:2px}
+.bar i.mute{background:rgb(114 154 204 /30%)}
+.bar i.gone{background:rgb(255 95 109 /30%);box-shadow:inset 0 0 0 1px rgb(255 95 109 /55%)}
+
+/* the 'Noi dat ket qua' cung gian ra -> hai hinh minh hoa to hon, de doc hon */
+.card--fill{display:flex;flex-direction:column}
+.card--fill .dia{height:64px}
+.card--list{flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* ============ CTA ============ */
+.cta{padding-top:var(--sp-1)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ THANH TRÊN ============ -->
+<header class="topbar">
+  <svg class="ico brand-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+  <span class="brand">Autocut</span>
+  <span class="ver">v1.5.0</span>
+  <span class="spacer"></span>
+  <span class="host">Premiere 26.5.0<i>|</i><b>Test3.prproj</b></span>
+  <button class="btn btn--icon" title="Cài đặt Autocut" aria-label="Cài đặt Autocut">
+    <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg>
+  </button>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ VÙNG CHỌN ============ -->
+  <div class="selbar">
+    <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)" aria-hidden="true"><path d="M9 4H5v16h4M15 4h4v16h-4"/></svg>
+    <span class="lbl">Đoạn đang chọn</span>
+    <span class="val">4 phút 27 giây</span>
+    <span class="spacer"></span>
+    <span class="lbl">Đổi vùng bằng phím</span>
+    <kbd class="kbd">I</kbd><kbd class="kbd">O</kbd>
+  </div>
+
+  <div class="grid">
+    <!-- ==================== CỘT TRÁI ==================== -->
+    <div class="col">
+
+      <section class="card">
+        <div class="card-hd">
+          <h2 class="card-t">Xem trước kết quả</h2>
+          <div class="legend">
+            <span><i class="sw sw--cut"></i>Sẽ cắt · <b id="cutCount">43</b>&nbsp;đoạn</span>
+            <span><i class="sw sw--keep"></i>Giữ lại</span>
+          </div>
+        </div>
+
+        <div class="trk-hd"><span>Bản gốc</span><span class="meta">4 phút 27 giây</span></div>
+        <div class="tl" id="tlOrig">
+          <div class="marks"></div>
+          <div class="lanes"></div>
+          <div class="cuts"></div>
+        </div>
+
+        <div class="trk-hd" style="margin-top:var(--sp-6)">
+          <span>Sau khi cắt</span>
+          <span class="meta" id="afterMeta"></span>
+        </div>
+        <div class="tl tl--after" id="tlAfter">
+          <div class="kept" id="keptBox"><div class="lanes"></div><div class="seams"></div></div>
+          <div class="gone">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+            <span class="n" id="goneNum"></span>
+            <span class="l">đã cắt bỏ</span>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="card card--list">
+        <div class="card-hd"><h2 class="card-t"><span id="listCount">43</span> đoạn sẽ cắt</h2></div>
+        <div class="scroller">
+          <table class="tbl">
+            <thead><tr>
+              <th>Bắt đầu</th><th>Kết thúc</th><th>Dài</th><th>Dạng sóng</th><th>Thao tác</th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== CỘT PHẢI ==================== -->
+    <div class="col col--right">
+
+      <section class="card">
+        <div class="card-hd">
+          <h2 class="card-t">Mức cắt</h2>
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Mức cắt">
+          <button role="radio" aria-checked="false">Giữ nhịp</button>
+          <button role="radio" aria-checked="false">Vừa</button>
+          <button role="radio" aria-checked="true">Cắt sạch</button>
+        </div>
+      </section>
+
+      <section class="card card--fill">
+        <div class="card-hd"><h2 class="card-t">Nơi đặt kết quả</h2></div>
+        <div class="opts" role="radiogroup" aria-label="Nơi đặt kết quả">
+          <button class="opt" role="radio" aria-checked="true">
+            <span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:10px;height:10px;stroke-width:3" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="dia">
+              <span class="bar"><i class="mute"></i></span>
+              <span class="bar hi"><i></i><i></i><i></i><i></i><i></i></span>
+            </span>
+            <span class="nm">Sequence mới</span>
+            <span class="sub">Giữ nguyên sequence đang mở</span>
+          </button>
+          <button class="opt" role="radio" aria-checked="false">
+            <span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:10px;height:10px;stroke-width:3" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="dia">
+              <span class="bar"><i></i><i></i><i class="gone"></i><i></i><i></i><i class="gone"></i><i></i></span>
+            </span>
+            <span class="nm">Cắt tại chỗ</span>
+            <span class="sub">Sửa thẳng trên sequence này</span>
+          </button>
+        </div>
+      </section>
+
+
+      <section class="card card--res">
+        <div class="card-hd"><h2 class="card-t">Kết quả</h2></div>
+        <div class="tiles">
+          <div class="tile"><div class="k">Thời lượng</div><div class="v" id="tileDur"></div></div>
+          <div class="tile"><div class="k">Số nhát cắt</div><div class="v v--ok"><span id="tileCount">43</span>&nbsp;đoạn</div></div>
+          <div class="tile"><div class="k">Còn lại</div><div class="v v--ok" id="tilePct"></div></div>
+        </div>
+      </section>
+
+      <div class="cta">
+        <!-- nhãn nút = việc nó làm + hậu quả bằng SỐ; nút chính LÀ đèn báo tiến trình -->
+        <button class="btn btn--primary" id="go">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+          <span id="goLabel">Cắt 43 khoảng lặng</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= DỮ LIỆU: khoảng lặng CÓ THẬT trong 4 phút 27 giây =================
+   Chỗ lặng là chuyện của audio, không đổi. Cái ĐỔI theo "Mức cắt" là mình quyết định
+   cắt những chỗ nào và chừa lại bao nhiêu đệm hai đầu. */
+const TOTAL=267, OFFSET=12+4/24;
+const rand=(s=>()=>((s=(s*1664525+1013904223)>>>0)/4294967296))(7);
+const norm=(a,t)=>{const k=t/a.reduce((x,y)=>x+y,0);return a.map(v=>v*k)};
+const sil =norm(Array.from({length:43},()=>0.6+rand()*3.6),115);
+const talk=norm(Array.from({length:44},()=>0.8+rand()*5.2),TOTAL-115);
+let _t=0; const SIL=sil.map((d,i)=>{_t+=talk[i];const o={start:_t,dur:d,db:-(38+rand()*8)};_t+=d;return o});
+/* nhiễu cố định -> vẽ lại bao nhiêu lần dạng sóng vẫn y hệt, không nhảy lung tung */
+const NOISE=Array.from({length:997},()=>rand());
+const nz=i=>NOISE[((i*7919)%997+997)%997];
+
+/* ba mức: giữ nhịp cắt ít và chừa đệm rộng; cắt sạch bỏ hết, không chừa */
+const LEVELS={
+  'Giữ nhịp':{min:2.5, pad:0.60},
+  'Vừa'     :{min:1.3, pad:0.28},
+  'Cắt sạch':{min:0.0, pad:0.00},
+};
+let level='Cắt sạch', kept=new Set();
+const cutsOf=lv=>SIL.filter(s=>s.dur>=LEVELS[lv].min)
+  .map(s=>({start:s.start+LEVELS[lv].pad/2, dur:s.dur-LEVELS[lv].pad, db:s.db}))
+  .filter(s=>s.dur>=0.2);
+
+/* ---------- định dạng ---------- */
+const pad2=n=>String(n).padStart(2,'0');
+const tc=s=>{const f=Math.round((s+OFFSET)*24);
+  return `${pad2(f/86400|0)}:${pad2(f/1440%60|0)}:${pad2(f/24%60|0)}:${pad2(f%24)}`};
+const mins =s=>`${Math.floor(s/60)} phút ${Math.round(s%60)} giây`;
+const clock=s=>`${Math.floor(s/60)}:${pad2(Math.round(s%60))}`;
+const vn=(n,d=1)=>n.toFixed(d).replace('.',',');
+const $=id=>document.getElementById(id);
+const el=(tag,cls)=>{const e=document.createElement(tag);if(cls)e.className=cls;return e};
+
+/* ---------- dải timeline ---------- */
+const quiet=f=>SIL.some(s=>f*TOTAL>=s.start&&f*TOTAL<=s.start+s.dur);
+function lanes(host,nclip,quietFn,total=170){
+  const box=host.querySelector('.lanes'); box.textContent='';
+  const per=Math.max(1,Math.round(total/nclip));
+  for(let c=0;c<nclip;c++){
+    const clip=el('div','clip'); clip.append(el('div','v'));
+    const a=el('div','a');
+    for(let b=0;b<per;b++){
+      const f=(c+(b+.5)/per)/nclip, k=c*per+b;
+      const h=(quietFn&&quietFn(f)) ? 4+nz(k)*5 : 12+Math.pow(nz(k),1.6)*88;
+      const bar=el('i'); bar.style.height=h+'%'; a.append(bar);
+    }
+    clip.append(a); box.append(clip);
+  }
+}
+lanes($('tlOrig'),3,quiet);   /* bản gốc vẽ MỘT lần — audio có đổi đâu mà vẽ lại */
+
+/* ---------- vẽ lại mọi thứ phụ thuộc vào Mức cắt ---------- */
+function render(){
+  const all=cutsOf(level);
+  const cuts=all.filter((_,i)=>!kept.has(i));
+  const cutSec=cuts.reduce((a,s)=>a+s.dur,0);
+  const keepSec=TOTAL-cutSec, pct=Math.round(keepSec/TOTAL*100);
+
+  /* vạch đánh dấu + vệt đỏ trên bản gốc */
+  const marks=document.querySelector('#tlOrig .marks'), ov=document.querySelector('#tlOrig .cuts');
+  marks.textContent=''; ov.textContent='';
+  cuts.forEach(s=>{
+    const L=s.start/TOTAL*100+'%', W=`max(2px,${s.dur/TOTAL*100}%)`;
+    const m=el('i'); m.style.left=L; m.style.width=W; marks.append(m);
+    const c=el('i'); c.style.left=L; c.style.width=W; ov.append(c);
+  });
+
+  /* dải sau khi cắt: ngắn lại đúng tỉ lệ, số mối nối đúng số nhát cắt */
+  const box=$('keptBox'); box.style.flexBasis=pct+'%';
+  lanes(box,1,null,Math.max(12,Math.round(170*keepSec/TOTAL)));
+  const seams=box.querySelector('.seams'); seams.textContent='';
+  for(let i=0;i<cuts.length;i++) seams.append(el('i'));
+
+  /* mọi con số nói về cùng một việc phải khớp nhau */
+  $('afterMeta').textContent=mins(keepSec);
+  $('goneNum').textContent=mins(cutSec);
+  $('tileDur').innerHTML=`${clock(TOTAL)} <span class="ar">→</span> <span class="v--ok">${clock(keepSec)}</span>`;
+  $('tilePct').textContent=pct+'%';
+  ['cutCount','tileCount','listCount'].forEach(i=>$(i).textContent=cuts.length);
+  $('goLabel').textContent=cuts.length?`Cắt ${cuts.length} khoảng lặng`:'Chưa có đoạn nào để cắt';
+  $('go').disabled=!cuts.length;   /* ẩn/khoá khi số = 0, đừng bày rồi báo lỗi */
+
+  /* danh sách */
+  const rows=$('rows'); rows.textContent='';
+  all.forEach((s,i)=>{
+    const on=kept.has(i), tr=el('tr');
+    if(on) tr.setAttribute('data-kept','');
+    const spark=Array.from({length:45},(_,b)=>`<i style="height:${(4+nz(i*45+b)*38)|0}%"></i>`).join('');
+    tr.innerHTML=`<td>${tc(s.start)}</td><td>${tc(s.start+s.dur)}</td>
+      <td class="dur">${vn(s.dur)} s</td>
+      <td><span class="spark">${spark}</span></td>
+      <td><button class="btn btn--sm keep-btn" data-i="${i}" aria-pressed="${on}">${on?'Đang giữ':'Giữ lại'}</button></td>`;
+    rows.append(tr);
+  });
+}
+
+/* ---------- tương tác ---------- */
+function radio(group,btn){[...group.children].forEach(b=>b.setAttribute('aria-checked',b===btn))}
+
+/* Mức cắt: đổi mức thì TÍNH LẠI cả panel, không chỉ đổi màu nút */
+const seg=document.querySelector('.seg');
+seg.addEventListener('click',e=>{
+  const b=e.target.closest('[role=radio]'); if(!b)return;
+  radio(seg,b); level=b.textContent.trim(); kept.clear(); render();
+});
+
+/* Nơi đặt kết quả: đổi lựa chọn thì câu "sẽ thực hiện" phải nói đúng việc sắp làm */
+const opts=document.querySelector('.opts');
+opts.addEventListener('click',e=>{
+  const b=e.target.closest('[role=radio]'); if(!b)return;
+  radio(opts,b);
+});
+
+/* Giữ lại một đoạn: mọi con số nói về nó đổi theo ngay */
+$('rows').addEventListener('click',e=>{
+  const b=e.target.closest('.keep-btn'); if(!b)return;
+  const i=+b.dataset.i; kept.has(i)?kept.delete(i):kept.add(i); render();
+});
+
+/* Nút chính LÀ đèn báo: đang chạy → % nhúc nhích; xong → đổi MÀU rồi mới về thường */
+const go=$('go');
+go.addEventListener('click',()=>{
+  if(go.dataset.state)return;
+  const n=$('goLabel').textContent.match(/\d+/)?.[0]||0;
+  go.dataset.state='run'; let p=0;
+  const tick=setInterval(()=>{
+    p+=4+Math.random()*7;
+    if(p>=100){clearInterval(tick);
+      go.dataset.state='done'; $('goLabel').textContent=`Đã cắt ${n} khoảng lặng`;
+      setTimeout(()=>{delete go.dataset.state; $('goLabel').textContent=`Cắt ${n} khoảng lặng`},2200);
+    } else $('goLabel').textContent=`Đang cắt… ${Math.min(99,p|0)}%`;
+  },260);
+});
+
+render();
+</script>
+</body>
+</html>

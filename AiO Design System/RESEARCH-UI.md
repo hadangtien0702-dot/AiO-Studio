@@ -6,9 +6,18 @@
 
 ---
 
-## ☠️ QUYẾT ĐỊNH CẦN CHỐT TRƯỚC KHI THIẾT KẾ: CAM hay XANH?
+## ✅ ĐÃ CHỐT (02/08): CAM — theo reference "Dominic" anh Tiến gửi
 
-Nghiên cứu Adobe lộ ra một mâu thuẫn nền tảng, anh cần chốt vì nó đổi cả hệ màu:
+Anh Tiến chọn hướng **CAM**, gửi reference (Pinterest — portfolio "Dominic", dark + cam).
+Bộ màu đã lấy từ reference và áp vào `DESIGN-SYSTEM.md` + `style-guide.html`:
+- Nền ấm/sáng hơn bản cũ, gần Premiere: `#181818` (chính) · `#282828` (thẻ).
+- Cam vàng thuần: **`#F86820`** (thay `#ff5714`), hover `#ff7d3c`, nhấn `#e0590e`.
+- **Chữ TRẮNG bold trên nút cam** (như reference) — không phải chữ đen.
+Phần dưới giữ lại để tra cứu lý do.
+
+---
+
+## (Đã chốt) Bối cảnh quyết định CAM vs XANH:
 
 - **Hệ hiện tại (đang dùng):** nền đen sâu `#0a0a0b`, **accent CAM `#ff5714`** — một
   bản sắc riêng, giống cách AutoCut/AutoPod tự làm thương hiệu, khác Premiere.

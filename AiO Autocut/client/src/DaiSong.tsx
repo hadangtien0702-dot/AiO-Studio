@@ -21,11 +21,12 @@
  * Nhìn cái là hiểu vì sao tool này không cắt mất lời người ngồi xa.
  */
 import { useEffect, useRef } from 'react'
-import { uocVungCat, vungConLai, type MucAm, type Quang } from './services/amluong'
+import { vungConLai, type MucAm, type Quang } from './services/amluong'
 
 // `uocVungCat` để trong `services/amluong.ts` chứ không để ở file này: nó là
 // tính toán thuần, mà `npm run kiem` chỉ biên dịch thư mục services. Để ở đây
 // là mất khả năng tự kiểm bằng số — thứ đắt nhất của dự án này.
+// Từ 03/08 chính App gọi nó rồi truyền `cat` xuống đây.
 
 const NEN_DAY = -75 // đáy khung vẽ; dưới mức này coi như im hẳn
 const NEN_DINH = -5 // đỉnh khung vẽ
@@ -199,16 +200,30 @@ function mmss(giay: number): string {
   return `${p}:${String(s).padStart(2, '0')}`
 }
 
+/** "1 phút 55 giây" — cỡ chữ to thì nói bằng tiếng người, đừng bắt đọc 115. */
+function dai(giay: number): string {
+  const g = Math.max(0, Math.round(giay))
+  const p = Math.floor(g / 60)
+  return p > 0 ? `${p} phút ${g % 60} giây` : `${g} giây`
+}
+
 interface PropsXem {
   mucAm: MucAm
   bien: number
-  minSilence: number
-  pad: number
-  onTiep: () => void
+  /** Danh sách khoảng sẽ cắt — App tính sẵn bằng `uocVungCat` rồi truyền xuống,
+      vì nó còn dùng cho bảng danh sách và ba ô Kết quả. Tính hai lần là hai
+      nguồn số cho CÙNG một việc, kiểu gì cũng có lúc lệch nhau. */
+  cat: Quang[]
 }
 
-export function XemTruoc({ mucAm, bien, minSilence, pad, onTiep }: PropsXem) {
-  const cat = uocVungCat(mucAm, bien, minSilence, pad)
+/**
+ * Hai dải sóng THẬT, đặt trong khung "Xem trước kết quả" của thiết kế mới.
+ *
+ * ☠️ Nút "CẮT ĐI" đã chuyển RA NGOÀI, xuống chỗ nút chính. Thiết kế 03/08 chỉ
+ * có MỘT nút chính cho cả màn hình — để nút thứ hai nằm lẫn giữa nội dung là
+ * người dùng phải tìm xem bấm cái nào.
+ */
+export function XemTruoc({ mucAm, bien, cat }: PropsXem) {
   const tong = mucAm.cua.length * mucAm.buocGiay
   let boDi = 0
   for (const c of cat) boDi += c.den - c.tu
@@ -216,28 +231,51 @@ export function XemTruoc({ mucAm, bien, minSilence, pad, onTiep }: PropsXem) {
   const tyLe = tong > 0 ? conLai / tong : 1
 
   return (
-    <div className="xem">
-      <div className="xem__dai">
-        <span className="xem__nhan">
-          Trước <b>{mmss(tong)}</b>
-        </span>
-        <DaiGoc mucAm={mucAm} bien={bien} cat={cat} cao={96} />
+    <>
+      <div className="trk-hd">
+        <span>Bản gốc</span>
+        <span className="meta">{mmss(tong)}</span>
       </div>
+      <DaiGoc mucAm={mucAm} bien={bien} cat={cat} cao={96} />
 
-      <div className="xem__dai">
-        <span className="xem__nhan">
-          Sau <b>{mmss(conLai)}</b>
+      <div className="trk-hd" style={{ marginTop: 'var(--sp-5)' }}>
+        <span>Sau khi cắt</span>
+        <span className="meta">
+          {mmss(conLai)}
           <i>−{mmss(boDi)}</i>
         </span>
-        {/* Co bề rộng đúng tỉ lệ để hai dải so được với nhau bằng MẮT. */}
-        <div style={{ width: `${(tyLe * 100).toFixed(2)}%` }}>
+      </div>
+      {/* Co bề rộng đúng tỉ lệ để hai dải so được với nhau bằng MẮT, và chỗ
+          trống bên phải KHÔNG để hở suông — gạch chéo đỏ + con số, đọc ra ngay
+          "mất đi bấy nhiêu" mà không cần chú thích. */}
+      <div className="sau">
+        <div className="sau__giu" style={{ flexBasis: `${(tyLe * 100).toFixed(2)}%` }}>
           <DaiSauCat mucAm={mucAm} bien={bien} cat={cat} cao={96} />
         </div>
+        {boDi > 0 && (
+          <div className="sau__bo">
+            {/* Bỏ được ÍT thì khối này hẹp, nhét chữ vào là chữ tràn đè lên
+                gạch chéo. Đo thật 03/08 trên video 26 phút của anh Tiến: bỏ
+                0:30 = 1,9% — khối rộng chưa tới 20px. Dưới 15% thì để trống,
+                con số đã có sẵn ở nhãn "Sau khi cắt" ngay trên đầu. */}
+            {1 - tyLe >= 0.15 && (
+              <>
+                <svg className="ico" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="6" cy="6" r="3" />
+                  <circle cx="6" cy="18" r="3" />
+                  <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
+                </svg>
+                <span className="n">{dai(boDi)}</span>
+                <span className="l">đã cắt bỏ</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <p className="xem__luu">
         Đỏ là chỗ sẽ bỏ · đường cam là ngưỡng, nó <b>nhấp nhô theo nền ồn từng đoạn</b>{' '}
-        chứ không phải một mức cứng cho cả file. Bấm ba mức ở trên để xem khác nhau chỗ nào.
+        chứ không phải một mức cứng cho cả file. Bấm ba mức để xem khác nhau chỗ nào.
         {/* ☠️ Câu dưới SUÝT VIẾT NGƯỢC (29/07). Tôi định ghi "bước nghe hiểu sẽ
             giữ lại bớt nên thực tế bỏ ít hơn" — nghe hợp lý mà sai. Đo trên dữ
             liệu thật (mục 17 của `npm run kiem`), video 58 phút:
@@ -250,10 +288,6 @@ export function XemTruoc({ mucAm, bien, minSilence, pad, onTiep }: PropsXem) {
           tiếng động nhưng không phải lời nói, nên thực tế thường ngắn hơn chừng 3–8% nữa.
         </em>
       </p>
-
-      <button className="btn btn--primary" onClick={onTiep}>
-        CẮT ĐI
-      </button>
-    </div>
+    </>
   )
 }

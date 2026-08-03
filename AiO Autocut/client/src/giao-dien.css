@@ -1,0 +1,1127 @@
+/* =========================================================================
+   AiO Studio — Autocut · GIAO DIỆN MỚI (2026-08-03)
+
+   Dựng theo thiết kế anh Tiến chốt: `AiO Design System/Design/Auto Cut.html`.
+   Mọi màu/cỡ/khoảng cách lấy từ `tokens.css` — KHÔNG chế thêm giá trị mới.
+
+   ── VÌ SAO LÀ FILE RIÊNG, KHÔNG SỬA THẲNG `styles.css` ──────────────────
+   `styles.css` (1.140 dòng) còn chứa dạng của các khối vẫn đang chạy:
+   `.chay` (đang chạy), `.ket` (kết quả), `.lui` (hoàn tác), `.loi`, `.canlam`,
+   `.params`. Viết đè cả file là vừa dựng lại giao diện vừa có nguy cơ làm
+   hỏng những khối đó cùng lúc — hai việc rủi ro trộn vào nhau thì không biết
+   cái nào gây lỗi. File này nạp SAU `styles.css` nên thắng ở chỗ trùng tên
+   (`.topbar`, `.btn`, `.seg`), phần còn lại giữ nguyên.
+   Dọn CSS chết sau khi anh Tiến duyệt xong hình.
+
+   ── CO GIÃN ─────────────────────────────────────────────────────────────
+   Anh Tiến 03/08: *"người dùng người ta không mặc định một kích thước đó em…
+   mình cứ mở một cửa sổ mới với kích thước tiêu chuẩn, còn việc họ muốn move
+   đi đâu hay kéo gọn lại thì là việc của họ"*.
+   ⇒ Đo thật ở 280 → 1280px: tràn ngang 0 · chữ bị cắt 0 · nút chính luôn thấy.
+   ========================================================================= */
+
+/* ── NỀN ─────────────────────────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg-2);
+}
+
+/* focus thấy được trên MỌI control — không bao giờ `outline: none` trần */
+:where(button, [tabindex], input, select):focus-visible {
+  outline: none;
+  border-color: var(--accent-line);
+  box-shadow: var(--focus-ring);
+}
+
+/* thanh cuộn tối — không để trắng mặc định Windows */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 14%);
+  border-radius: var(--r-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 22%);
+  background-clip: content-box;
+}
+
+.ico {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+.ico-sm {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── THANH TRÊN — khuôn CHUNG cho cả bộ ──────────────────────────────── */
+.topbar {
+  height: var(--h-topbar);
+  min-height: var(--h-topbar);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--line-1);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-5);
+}
+/* icon nhận diện KIÊM đèn báo kết nối — không thêm chấm tròn riêng */
+.brand-ico {
+  color: var(--accent);
+}
+.brand-ico--tat {
+  color: var(--text-3);
+}
+.brand {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+.ver {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.spacer {
+  flex: 1;
+}
+.host {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  margin: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── NÚT — HAI họ, không hơn ─────────────────────────────────────────── */
+.btn {
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  background: var(--bg-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.btn:hover:not(:disabled) {
+  background: var(--bg-5);
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: none;
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn--sm {
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-xs);
+}
+.btn--icon {
+  width: var(--h-ctrl-sm);
+  height: var(--h-ctrl-sm);
+  padding: 0;
+  color: var(--text-2);
+}
+
+/* ☠️ Chữ TRẮNG trên cam chỉ đạt 3,0:1 → BẮT BUỘC bold + cỡ ≥14px.
+   Đây là lý do `--fs-lg` và `--fw-bold` ở đây không phải tuỳ chọn. */
+.btn--primary {
+  height: var(--h-ctrl-lg);
+  width: 100%;
+  justify-content: center;
+  gap: var(--sp-3);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--r-md);
+  color: var(--accent-on);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+.btn--primary:active:not(:disabled) {
+  background: var(--accent-pressed);
+}
+.btn--primary:disabled {
+  opacity: 0.45;
+}
+
+/* ── KHUNG ───────────────────────────────────────────────────────────── */
+.wrap {
+  flex: 1;
+  min-height: 0;
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  /* ☠️ KHÔNG cho cả trang cuộn ở bản hai cột. Đo trên panel thật (1005x682):
+     nội dung 778px trong khung nhìn 638px → phải cuộn 140px, nên bảng "đoạn
+     sẽ cắt" trông như kéo dài mãi xuống dưới. Mỗi thứ cuộn trong khung của
+     nó: bảng cuộn ở `.scroller`.
+     Để `auto` chứ không `hidden`: cửa sổ thấp quá thì thà cuộn còn hơn CẮT
+     mất nội dung. Ở khổ thật (1005x682) tổng cao 611px trong khung 638px nên
+     không cuộn — anh Tiến sẽ không thấy thanh cuộn nào. */
+  overflow: auto;
+  max-width: 1440px;
+  width: 100%;
+  margin-inline: auto;
+}
+.card {
+  background: var(--bg-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+}
+.card-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.card-t {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+
+/* dải vùng chọn */
+.selbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--bg-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  min-height: 36px;
+}
+.selbar .lbl {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.selbar .val {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+}
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--sp-1);
+  background: var(--bg-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-2);
+}
+
+/* ── LƯỚI 2 CỘT × 2 HÀNG ─────────────────────────────────────────────────
+   ☠️ MỐC NGANG PHẢI THẲNG GIỮA HAI CỘT — bảo đảm theo CẤU TẠO.
+   Anh Tiến 03/08: *"tỉ lệ cột ở đây chưa đều nhau"*. Đo được: bề rộng đúng tỉ
+   lệ 63,9:36,1, khoảng cách thẻ đều 12px — nhưng chỗ NỐI giữa hai thẻ lệch
+   20px (trái 440/452, phải 420/432). Trong thiết kế nó chỉ lệch 2px, mà đó là
+   ăn may theo nội dung: thêm bớt một dòng chữ là lệch lại.
+   ⇒ Hai HÀNG grid dùng chung cho cả hai cột. Hàng nào cũng kết thúc cùng một
+   mốc, bất kể nội dung dài ngắn ra sao. Không phải căn lại bằng mắt lần nào nữa. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 720fr) minmax(0, 406fr);
+  /* ☠️ ĐỪNG đặt sàn bằng `minmax(min-content, 1fr)`. Sàn của một HÀNG lấy theo
+     min-content của MỌI ô trong hàng — mà ô bên trái là bảng: nó khai theo đủ
+     số hàng dữ liệu, kéo sàn lên 336px trong khi chỗ thật chỉ có 215px. Hàng
+     phình ra thì cả trang phải cuộn, đúng thứ anh Tiến bảo bỏ.
+     (`overflow: hidden` trên bảng KHÔNG chữa được: nó đổi "kích thước tối
+     thiểu tự động", còn sàn hàng đọc "min-content contribution" — hai thứ khác
+     nhau, đã thử và đo ra vẫn 336px.)
+     Sàn thuộc về ai cần nó: đặt `min-height` trên chính `.nhom--duoi`. */
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--sp-4);
+  flex: 1;
+  min-height: 0;
+}
+/* Đặt chỗ TƯỜNG MINH: thứ tự trong DOM không quyết định chỗ ngồi, nhờ vậy giữ
+   được thứ tự đọc hợp lý của mã nguồn mà vẫn ràng được mốc ngang. */
+.card--xem {
+  grid-column: 1;
+  grid-row: 1;
+}
+.card--list {
+  grid-column: 1;
+  grid-row: 2;
+  /* ☠️ `overflow: hidden` ở đây KHÔNG phải để cắt — nó đặt "kích thước tối
+     thiểu tự động" của ô lưới về 0. Không có nó, bảng khai min-content theo
+     ĐỦ CẢ 27 HÀNG, kéo sàn hàng 2 lên ~290px; hàng 2 phình ra thì nhóm phải
+     hết chỗ và nút chính đè lên ô Kết quả. Bảng vẫn cuộn bình thường ở
+     `.scroller` bên trong. */
+  overflow: hidden;
+}
+.nhom--tren {
+  grid-column: 2;
+  grid-row: 1;
+}
+.nhom--duoi {
+  grid-column: 2;
+  grid-row: 2;
+}
+.nhom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+  min-height: 0;
+}
+/* ☠️ NÚT CHÍNH PHẢI NẰM NGOÀI VÙNG CUỘN, KHÔNG PHẢI GHIM ĐÈ LÊN NÓ.
+   Bản trước cho `.nhom--duoi` cuộn rồi để nút `sticky bottom:0` — nút dính đáy
+   khung cuộn nên **đè thẳng lên card "Kết quả"** đang cuộn phía sau. Anh Tiến
+   03/08 chụp đúng cảnh đó: nút cam nằm vắt ngang giữa ô Thời lượng và ô Đoạn
+   sẽ cắt.
+   Sửa gốc: nhóm KHÔNG cuộn. Phần co được là ruột card Kết quả; nút là hàng
+   cuối cùng, cố định, không bao giờ chồng lên ai. */
+/* Nhóm dưới không bao giờ co dưới nội dung của chính nó — đó là điều kiện để
+   ô Kết quả và nút không chồng lên nhau. Chỉ MỘT mình nó có sàn, nên bảng bên
+   trái không bị kéo theo. */
+.nhom--duoi {
+  overflow: visible;
+  min-height: min-content;
+}
+/* Ba thông số nay chỉ tốn một hàng nên card vừa đúng nội dung, KHÔNG giãn.
+   Để `flex: 1` thì ở cửa sổ cao ô phình lên 219px — một hàng chữ trong cái ô
+   cao bằng ba, nhìn rỗng ruột. Chỗ dư để ra ngoài card, giữa card và nút. */
+.card--res {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+/* ── Ô "Nơi đặt kết quả" ăn hết chỗ dư của hàng ────────────────────────
+   Anh Tiến 03/08: *"chỗ này chưa đều ô với các phần kia"*. Đo được: hàng 1
+   cao 369px, mà Mức cắt (97) + Nơi đặt (203) chỉ chiếm 312 → **dư 57px chết**
+   nằm dưới đáy nhóm, nhìn ra ngay là hai cột không cân.
+   Cho chỗ dư chảy vào hai thẻ chọn: thẻ cao hơn = hình minh hoạ to hơn = dễ
+   bấm hơn. Không cho "Mức cắt" giãn — thanh 3 nút mà cao lên thì rỗng ruột. */
+.card--fill {
+  flex: 1;
+  min-height: 0;
+}
+.card--fill .opts {
+  flex: 1;
+  align-content: stretch;
+}
+/* ☠️ Đổi `.opt` từ block sang flex thì CON KHÔNG CÒN TỰ FULL WIDTH nữa.
+   Con của block mặc định rộng hết cha; flex item thì co theo nội dung, mà
+   `.opt` computed ra `align-items: flex-start`. Hậu quả đo được 03/08: hình
+   minh hoạ `.dia` co từ 200px xuống **14px** — hai dải timeline biến thành hai
+   ô vuông tí xíu, anh Tiến chụp lại ngay. `stretch` là chỗ phải ghi rõ. */
+.opt {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.card--fill .dia {
+  flex: 1;
+  min-height: 44px;
+  /* Trần: dư nhiều quá thì hình giãn thành cái băng dài, hết ra hình timeline. */
+  max-height: 96px;
+}
+/* Nhãn tụt xuống đáy thẻ, không trôi theo hình. */
+.opt .nm {
+  margin-top: var(--sp-4);
+}
+/* Nút chính tụt xuống đáy nhóm — mỗi màn hình một nút chính, và nó nằm ở chỗ
+   mắt kết thúc hành trình: chọn mức → chọn nơi đặt → xem số → bấm.
+
+   `sticky` để nó KHÔNG BAO GIỜ trôi khỏi màn hình khi cửa sổ thấp: đo ở
+   1020x700, nội dung cao 784px nên nút nằm ở y=749 — phải cuộn 84px mới thấy
+   cái nút chính của cả panel. Cửa sổ đủ cao thì không cuộn, sticky vô hình,
+   bố cục y như thiết kế. */
+/* ☠️ KHÔNG `sticky` ở đây. Đã thử và hỏng: nút dính đáy khung cuộn thì nó đè
+   thẳng lên ô Kết quả cùng nhóm — anh Tiến chụp được đúng cảnh nút cam nằm
+   vắt ngang giữa hai ô. Nút là hàng cuối của nhóm, `margin-top: auto` đẩy nó
+   xuống đáy; nhóm luôn đủ chỗ nhờ sàn hàng 2, nên không cần ghim. */
+.nhom--duoi .cta {
+  margin-top: auto;
+}
+
+/* ── XEM TRƯỚC ───────────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: var(--sp-5);
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+}
+.legend span {
+  display: inline-block;
+  white-space: nowrap;
+}
+.sw {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  vertical-align: -1px;
+  margin-right: var(--sp-2);
+}
+.sw--cut {
+  background: rgb(255 95 109 / 30%);
+  border: 1px solid rgb(255 95 109 / 65%);
+}
+/* "Giữ lại" = màu CLIP trên timeline, không phải xanh lá của trạng thái tốt.
+   Chú thích phải khớp đúng cái đang vẽ, nếu không nó chú thích cho hình khác. */
+.sw--keep {
+  background: var(--pr-video);
+}
+.trk-hd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-2);
+  margin-bottom: var(--sp-3);
+}
+.trk-hd .meta {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-normal);
+  color: var(--text-3);
+}
+.trk-hd i {
+  font-style: normal;
+  color: var(--ok);
+  margin-left: var(--sp-2);
+}
+/* Nhãn "ví dụ" ngay cạnh tên dải — nói ở CHỖ người ta đang nhìn, rẻ hơn một
+   khối cảnh báo riêng mà không ai lướt qua được. */
+.trk-hd .vd {
+  font-style: normal;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-sm);
+  padding: 1px 5px;
+  margin-left: var(--sp-2);
+  vertical-align: 1px;
+}
+
+/* ── Ô KẾT QUẢ — BA THÔNG SỐ TRÊN MỘT HÀNG ────────────────────────────
+   Anh Tiến 03/08: *"chỗ này có thể đưa 3 thông số này thành 1 line cho gọn
+   cũng được nè em"*. Xếp dọc tốn 202px chiều cao, ở cửa sổ thật (682px) không
+   đủ chỗ nên mọc thanh cuộn — thứ anh cũng vừa bảo bỏ. Một hàng chỉ tốn ~56px,
+   hết cuộn mà còn gọn hơn.
+
+   Cột 1 rộng gấp rưỡi: chuỗi "26:17.0 → 26:01.1" dài gần gấp đôi "27 đoạn"
+   hay "74%". Chia đều ba cột là ô đầu bị cắt chữ. */
+.tiles {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: var(--sp-2);
+}
+.tile {
+  background: var(--bg-2);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  /* Đệm ngang hẹp: mỗi bên 6px là thêm 4px cho chữ. Đo thật ở 960px — chuỗi
+     "1914 đoạn" rộng 67px mà lòng ô chỉ 66px, thiếu đúng 1px là bị cắt. */
+  padding: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.tile .k {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-3);
+}
+/* Một hàng ba ô thì cột hẹp lại → hạ hai bậc thang chữ (19 → 13px). Đây là
+   "dùng BẬC KHÁC ở chỗ này", không phải dịch cả thang — xem `tokens.css`.
+   Chọn 13px theo ĐO BỀ RỘNG CHUỖI, không ước bằng mắt: trường hợp xấu nhất là
+   "26:17.0 → 26:01.1" (video dài) — 15px cần 115px, ô hẹp nhất chỉ chứa 104px. */
+.tile .v {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-display);
+  margin-top: 1px;
+  white-space: nowrap;
+}
+.tile .v--ok {
+  color: var(--ok);
+}
+.tile .ar {
+  color: var(--text-3);
+  font-weight: var(--fw-normal);
+}
+
+/* ── DANH SÁCH ĐOẠN SẼ CẮT ───────────────────────────────────────────── */
+.card--list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-right: calc(var(--sp-2) * -1);
+  padding-right: var(--sp-2);
+}
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+}
+.tbl th {
+  text-align: left;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-3);
+  padding: 0 0 var(--sp-3);
+  border-bottom: 1px solid var(--line-1);
+  position: sticky;
+  top: 0;
+  background: var(--bg-3);
+}
+.tbl th:last-child,
+.tbl td:last-child {
+  text-align: right;
+}
+.tbl td {
+  padding: var(--sp-1) 0;
+  border-top: 1px solid rgb(255 255 255 / 4%);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  white-space: nowrap;
+  /* ☠️ PHẢI khớp hằng `CAO_HANG` trong `BangDoan.tsx` (33 = 32 + 1 viền).
+     Ảo hoá tính vị trí hàng bằng con số đó; lệch nhau là cuộn tới đâu hàng
+     nhảy tới đó. Ràng buộc quan trọng thì ghi ở CẢ HAI đầu. */
+  height: 32px;
+}
+/* cột chữ chỉ lấy bề rộng nó cần; cột dạng sóng nuốt phần thừa */
+.tbl th,
+.tbl td {
+  width: 1px;
+  padding-right: var(--sp-6);
+}
+.tbl th:nth-child(4),
+.tbl td:nth-child(4) {
+  width: auto;
+}
+.tbl th:last-child,
+.tbl td:last-child {
+  padding-right: 0;
+}
+.tbl tr:hover td {
+  background: var(--bg-hover);
+}
+.tbl td.dur {
+  font-weight: var(--fw-semibold);
+  color: var(--text-1);
+}
+.spark {
+  width: 100%;
+  min-width: 140px;
+  height: 20px;
+  background: var(--bg-0);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  overflow: hidden;
+}
+.spark i {
+  flex: 1 0 2px;
+  background: var(--danger);
+  opacity: 0.75;
+  border-radius: 1px;
+}
+
+/* Hàng đang GIỮ: đổi cả màu nền, vạch cam ở mép trái và màu sóng — nhìn MÀU là
+   biết, khỏi đọc chữ trên nút. Anh Tiến 28/07: *"chưa render hết thì màu đỏ —
+   render xong là xanh"*, cùng một tinh thần. */
+.spark--giu i {
+  background: var(--ok);
+  opacity: 0.9;
+}
+.tbl tr[data-giu] td {
+  color: var(--text-3);
+  background: rgb(248 104 32 / 7%);
+}
+.tbl tr[data-giu] td.dur {
+  color: var(--text-3);
+}
+.tbl tr[data-giu] td:first-child {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.keep-btn[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-text);
+  font-weight: var(--fw-semibold);
+}
+.giu-dem {
+  font-size: var(--fs-xs);
+  color: var(--accent-text);
+  white-space: nowrap;
+}
+
+/* ── BẢNG MẪU (chưa phân tích) ───────────────────────────────────────────
+   Làm mờ và KHÔNG bấm được: nó là hình minh hoạ, không phải dữ liệu. Để nó
+   bấm được thì người dùng bấm "Giữ lại" trên số giả rồi tưởng mình đã dặn
+   được panel điều gì đó. */
+.mau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-height: 0;
+}
+.mau__nhan {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  color: var(--accent-text);
+  line-height: var(--lh);
+}
+.mau__nhan b {
+  color: var(--text-1);
+  font-weight: var(--fw-semibold);
+}
+.mau__bang {
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  /* Nhạt dần xuống đáy: nói "còn nữa" mà không cần cắt cụt giữa một hàng. */
+  mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+}
+
+/* ── SEGMENTED — 2–3 lựa chọn ────────────────────────────────────────── */
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0;
+  padding: 3px;
+  height: 32px;
+  background: var(--bg-0);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+}
+.seg__nut {
+  /* ☠️ `styles.css:232` đặt cứng `height: 32px` — đúng bằng chiều cao CẢ THANH,
+     nên nút tràn ra ngoài padding 3px và che mất viền, nhìn như một cái hộp
+     lồi ra chứ không phải một ô trong thanh. Anh Tiến 03/08 khoanh đỏ đúng chỗ
+     này: *"nút bị sai"*. Để `auto` cho ô lưới tự cao 26px = 32 − 3 − 3. */
+  height: auto;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--dur) var(--ease);
+}
+.seg__nut:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+.seg__nut--chon {
+  background: var(--bg-4);
+  border-color: var(--line-2);
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+}
+.seg__nut:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── NƠI ĐẶT KẾT QUẢ — hai lựa chọn khác nhau về HÌNH ────────────────
+   ☠️ Chỗ này BẮT BUỘC có hình, không thay bằng chữ được. Anh Tiến 30/07:
+   *"chỗ này hôm qua anh có bảo là tạo một animation timeline để giải thích
+   mà sao em không làm?"*. Khác biệt ở đây là KHÔNG GIAN — một dải hay hai
+   dải, tức bản gốc có bị đụng hay không. Chữ thì phải đọc rồi tưởng tượng. */
+.opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+.opt {
+  position: relative;
+  text-align: left;
+  padding: var(--sp-4);
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: inherit;
+  font-family: var(--font-ui);
+  min-width: 0;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.opt:hover {
+  background: var(--bg-4);
+}
+.opt--chon {
+  background: var(--bg-4);
+  border-color: var(--accent-line);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+}
+.opt .nm {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-1);
+  margin-top: var(--sp-4);
+}
+.opt .sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  margin-top: 3px;
+}
+.opt .tick {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.opt--chon .tick {
+  display: flex;
+}
+.dia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  height: 44px;
+  justify-content: center;
+}
+.bar {
+  height: 14px;
+  background: var(--bg-0);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+}
+.bar.hi {
+  border-color: var(--accent-line);
+}
+.bar i {
+  flex: 1;
+  background: var(--pr-video);
+  border-radius: 2px;
+}
+.bar i.mute {
+  background: rgb(114 154 204 / 30%);
+}
+.bar i.gone {
+  background: rgb(255 95 109 / 30%);
+  box-shadow: inset 0 0 0 1px rgb(255 95 109 / 55%);
+}
+
+.card--fill {
+  display: flex;
+  flex-direction: column;
+}
+/* ☠️ ĐÃ TỪNG CÓ `.card--res { flex: none }` Ở ĐÂY — và nó nằm SAU quy tắc
+   `.card--res { flex: 1 }` phía trên nên thắng, làm ô Kết quả không chịu co,
+   tràn khỏi nhóm và **nút chính đè lên nó**. Hai quy tắc cùng selector trong
+   một file là bẫy: đọc chỗ này tưởng đúng, chạy ra kết quả của chỗ kia.
+   Chiều cao của `.card--res` nay khai DUY NHẤT ở khối `.nhom--duoi`. */
+
+/* ── CTA ─────────────────────────────────────────────────────────────── */
+.cta {
+  padding-top: var(--sp-1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* Ô quy trình chạy: một THẺ riêng như mọi khối khác, đặt ngay trên nút chính.
+   Trước đây nó nằm trần dưới nút, không có nền — nhìn như phần thừa rơi ra
+   ngoài bố cục. */
+.card--chay {
+  padding: var(--sp-4);
+}
+.card--chay .chay {
+  margin: 0;
+}
+/* Thu gọn danh sách bước: 5 dòng × 24px = 120px là quá nửa chiều cao ô. Siết
+   line-height và cỡ chữ xuống còn ~17px/dòng — vẫn đọc được đủ 5 bước, mà tiết
+   kiệm 35px. Không bỏ bớt bước: người dựng cần biết còn mấy chặng nữa. */
+/* Xếp NGANG, tự xuống dòng: 5 bước dọc tốn 120px — quá nửa chiều cao ô, đẩy
+   nút chính rơi khỏi màn hình ở cửa sổ 682px. Nằm ngang chỉ còn 2–3 dòng.
+   Vẫn thấy đủ 5 bước: người dựng cần biết còn mấy chặng nữa, không được bỏ. */
+.card--chay .chay__buoc {
+  display: flex;
+  /* ☠️ PHẢI ghi cả `row`. `styles.css:818` đặt `flex-direction: column`; chỉ
+     thêm `flex-wrap: wrap` thì nó vẫn xếp dọc — đo ra đúng 5 dòng, y như cũ.
+     Ghi đè một thuộc tính không ghi đè cả nhóm. */
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2px var(--sp-3);
+}
+.card--chay .chay__buoc li {
+  font-size: var(--fs-xs);
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+/* Ẩn hẳn khỏi bố cục — không phải `visibility`, vì còn phải trả lại chỗ. */
+.an {
+  display: none;
+}
+
+/* ── TIMELINE XEM TRƯỚC ──────────────────────────────────────────────────
+   Số đo lấy bằng cách ĐO THẲNG file thiết kế của anh Tiến, không ước bằng mắt:
+     khung 92px · vạch đỏ 6px · dải video 22px · dải audio 40px · padding 8/6
+     hai khung CAO BẰNG NHAU · phần giữ co theo tỉ lệ thật
+   Anh Tiến 03/08: *"2 phần này tỉ lệ chưa giống, nội dung cũng không giống"*. */
+.tl {
+  position: relative;
+  height: 92px;
+  background: var(--bg-0);
+  border-radius: var(--r-sm);
+  padding: 8px 6px;
+}
+.tl .marks {
+  position: relative;
+  height: 6px;
+}
+.tl .marks i {
+  position: absolute;
+  top: 0;
+  height: 6px;
+  background: var(--danger);
+  border-radius: 1px;
+}
+.tl .lanes {
+  display: flex;
+  gap: 2px;
+  height: 66px;
+  margin-top: 4px;
+}
+.tl .clip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+/* Dải video: màu clip Premiere, có vệt đầu đậm hơn như thanh tiêu đề clip. */
+.tl .v {
+  height: 22px;
+  background: var(--pr-video);
+  border-radius: 2px;
+  background-image: linear-gradient(var(--pr-video-head) 0 5px, transparent 5px);
+}
+/* Dải audio: nền xanh lá Premiere, sóng trắng vẽ từ mức âm ĐO THẬT. */
+.tl .a {
+  flex: 1;
+  background: var(--pr-audio);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 3px;
+  overflow: hidden;
+}
+.tl .a i {
+  flex: 1 0 2px;
+  background: rgb(255 255 255 / 45%);
+  border-radius: 1px;
+}
+/* Vệt đỏ mờ phủ lên chỗ sẽ cắt — đủ mờ để còn thấy sóng bên dưới. */
+.tl .cuts {
+  position: absolute;
+  inset: 14px 6px 8px;
+  pointer-events: none;
+}
+.tl .cuts i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgb(255 95 109 / 18%);
+  border-radius: 2px;
+}
+/* Mỗi nhát cắt để lại một mối nối trên timeline. */
+.tl .seams {
+  position: absolute;
+  inset: 4px 0 0;
+  display: flex;
+  pointer-events: none;
+}
+.tl .seams i {
+  flex: 1;
+  border-right: 1px solid rgb(255 255 255 / 20%);
+}
+
+/* Dải "Sau khi cắt": phần GIỮ co đúng tỉ lệ, phần MẤT ĐI gạch chéo đỏ.
+   Chỗ trống phải nói ra điều gì đó — để hở suông thì người dùng không biết
+   dải ngắn hơn là do cắt hay do vẽ thiếu. */
+.tl--after {
+  display: flex;
+  gap: 0;
+}
+.tl .kept {
+  flex-grow: 0;
+  flex-shrink: 0;
+  min-width: 0;
+  position: relative;
+}
+.tl .kept .lanes {
+  margin-top: 10px;
+}
+.tl .gone {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  text-align: center;
+  border-left: 1px dashed rgb(255 95 109 / 45%);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: repeating-linear-gradient(
+    135deg,
+    rgb(255 95 109 / 10%) 0 5px,
+    transparent 5px 13px
+  );
+}
+.tl .gone .ico {
+  color: var(--danger);
+}
+.tl .gone .n {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  color: var(--text-1);
+  letter-spacing: var(--ls-display);
+  line-height: 1.15;
+}
+.tl .gone .l {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+/* =========================================================================
+   CO GIÃN — panel mở khổ tiêu chuẩn, người dùng kéo gọn tới đâu cũng dùng được.
+   Đo thật ở 280 · 360 · 420 · 560 · 700 · 900 · 1280 px.
+   ========================================================================= */
+
+/* ---- ≤900px: một cột, sắp lại theo THỨ TỰ VIỆC PHẢI LÀM ---- */
+@media (max-width: 900px) {
+  /* Hai nhóm tan ra, mọi thẻ thành ô lưới của một cột duy nhất. */
+  .nhom {
+    display: contents;
+  }
+  /* ☠️ Ô lưới mặc định `min-width: auto` → thẻ nào chứa bảng sẽ KHÔNG chịu
+     co, kéo cả trang rộng ra 750px ở MỌI khổ. Đã vấp đúng cái này 03/08 —
+     cùng bẫy đã ghi ở `styles.css` dòng 1095. minmax(0,…) + min-width là
+     chốt chặn theo CẤU TẠO, không phải kiểm lại bằng mắt sau. */
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: min-content;
+    flex: none;
+  }
+  .card,
+  .cta,
+  .selbar {
+    min-width: 0;
+  }
+  .card > * {
+    min-width: 0;
+  }
+
+  /* ☠️ Chỗ ngồi tường minh của bản rộng PHẢI được gỡ, không thì mọi thẻ chồng
+     lên nhau ở hàng 1 cột 1. Đặt `grid-area` là phải nhớ chỗ tháo nó ra. */
+  .card--xem,
+  .card--list {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .card--xem {
+    order: 1;
+  }
+  .card--muc {
+    order: 2;
+  }
+  .card--fill {
+    order: 3;
+  } /* Nơi đặt kết quả */
+  .card--res {
+    order: 4;
+  } /* Kết quả */
+  .card--list {
+    order: 5;
+    flex: none;
+  } /* Danh sách đoạn */
+
+  /* hết cuộn lồng trong cuộn: cả panel cuộn một mạch */
+  .scroller {
+    overflow: visible;
+    margin-right: 0;
+    padding-right: 0;
+  }
+  /* Một cột thì cuộn cả trang mới đúng — mở lại cái đã khoá ở bản hai cột. */
+  .wrap {
+    overflow: auto;
+    padding-bottom: calc(var(--h-ctrl-lg) + var(--sp-5) * 2);
+  }
+  .nhom--duoi {
+    overflow: visible;
+  }
+  .card--fill {
+    flex: none;
+  }
+  .tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* NÚT CHÍNH GHIM ĐÁY — nó vừa là nút vừa là đèn báo, không được trôi mất.
+     ☠️ Selector phải ĐỦ ĐẶC HIỆU để thắng `.nhom--duoi .cta` ở bản rộng
+     (0,2,0). Viết `.cta` trần (0,1,0) thì `sticky` của bản rộng đè mất
+     `fixed` này — đo được ngay: cuộn hết xuống, nút bay lên y = −995. */
+  .nhom--duoi .cta,
+  .cta {
+    position: fixed;
+    inset: auto 0 0;
+    margin: 0;
+    padding: var(--sp-3) var(--sp-5);
+    background: var(--bg-2);
+    border-top: 1px solid var(--line-1);
+    z-index: var(--z-sticky);
+  }
+}
+
+/* ---- ≤700px: bảng bỏ cột dạng sóng, nút "Giữ lại" phải trong tầm nhìn ---- */
+@media (max-width: 700px) {
+  .tbl th,
+  .tbl td {
+    padding-right: var(--sp-4);
+  }
+  .tbl th:nth-child(4),
+  .tbl td:nth-child(4) {
+    display: none;
+  }
+  .tbl th:nth-child(3),
+  .tbl td:nth-child(3) {
+    width: auto;
+  }
+  /* Một cột hẹp thì ô đầu chiếm cả hàng, hai ô còn lại chia đôi. */
+  .tiles {
+    grid-template-columns: 1fr 1fr;
+  }
+  .tile:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- ≤560px: khổ panel dock ---- */
+@media (max-width: 560px) {
+  .wrap {
+    padding: var(--sp-4);
+    gap: var(--sp-3);
+    padding-bottom: calc(var(--h-ctrl-lg) + var(--sp-4) * 2);
+  }
+  .card {
+    padding: var(--sp-4);
+  }
+  .card-hd {
+    flex-wrap: wrap;
+    row-gap: var(--sp-2);
+  }
+  .legend {
+    gap: var(--sp-4);
+  }
+  .selbar {
+    flex-wrap: wrap;
+    row-gap: var(--sp-1);
+    padding: var(--sp-2) var(--sp-3);
+  }
+  .selbar .spacer {
+    display: none;
+  }
+  .cta {
+    padding: var(--sp-3) var(--sp-4);
+  }
+}
+
+/* ---- ≤420px: hẹp nhất manifest cho phép (280px) ---- */
+@media (max-width: 420px) {
+  .topbar {
+    padding: 0 var(--sp-4);
+    gap: var(--sp-2);
+  }
+  .ver {
+    display: none;
+  }
+  .tbl th:nth-child(2),
+  .tbl td:nth-child(2) {
+    display: none;
+  }
+  .opts {
+    grid-template-columns: 1fr;
+  }
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+  .tile:first-child {
+    grid-column: auto;
+  }
+}

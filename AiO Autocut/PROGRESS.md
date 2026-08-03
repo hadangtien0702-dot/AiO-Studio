@@ -1,5 +1,243 @@
 # AiO Autocut - Nhat ky
 
+## TRANG THAI HIEN TAI (2026-08-03 14:47 +0700)
+
+- **UI moi DA CHOT.** Chu du an: *"anh chot UI cho auto cut roi do em, chot phien
+  ban nay nhe em"*. Thiet ke goc: `AiO Design System/Design/Auto Cut.html`.
+- Panel chay dang **cua so RIENG** (`<Type>Modeless</Type>`), kho mo 1280x800.
+- Da do tren panel that (Chromium 99 trong Premiere, chu du an keo cua so
+  1280x800): tran ngang **0** · chu bi cat **0** · le moc ngang giua hai cot
+  **0** · ca trang cuon **0** · 27 doan that hien du · nut chinh trong man hinh.
+- **Thuat toan cat KHONG dong** trong ca phien nay. Chi thay lop trinh bay.
+- Viec ke tiep: xem muc "CON NO" o duoi.
+
+## [1.5.0] - 2026-08-03 14:47 (UTC+7)
+
+### Vong sua thu ba - CHOT UI
+
+Chu du an mo panel that, chi ra 8 cho nua. Moi cho deu DO truoc khi sua:
+
+| Cho | Nguyen nhan DO duoc | Da sua |
+|---|---|---|
+| Nut mac cat nhin nhu hop loi ra | `styles.css:232` dat cung `height: 32px` = cao bang CA THANH, tran khoi padding 3px | `height: auto` -> nut 25px, vua long thanh |
+| Khoi xem truoc sai ti le | Do ra `coTimelineMoi: false` - dang la `MinhHoa` cu cao **36px**, thiet ke la **92px** | `TimelineMau` dung CHUNG khuon `.tl` |
+| Ti le cot chua deu | Be rong dung 63,9:36,1 va gap deu 12px, nhung **moc noi lech 20px** (trai 440/452, phai 420/432) | Luoi 2 cot x 2 HANG, cot phai gom 2 nhom -> lech **0** |
+| Bang keo dai xuong duoi | Noi dung 778px trong khung 638px -> ca trang cuon 140px | Bang cuon trong khung rieng |
+| O "Noi dat ket qua" du trong | Hang 1 cao 369, cot phai chi 312 -> **du 57px chet** | Cho du chay vao hai the chon, hinh minh hoa 64 -> 85px |
+| Nut de len card Ket qua | `.cta` `sticky bottom:0` trong vung cuon -> dinh day va de len card sau no | Nut la hang cuoi cua nhom, khong ghim |
+| Hinh minh hoa vo thanh o vuong | Doi `.opt` block -> flex, con khong con tu full ngang (`align-items: flex-start`) -> `.dia` co tu 200px xuong **14px** | Them `align-items: stretch` |
+| Thanh cuon o o Ket qua | 3 o xep doc ton 202px, cua so that khong du cho | Chu du an chot: *"dua 3 thong so nay thanh 1 line"* -> 1 hang, ~48px |
+
+### Da sua them theo yeu cau
+
+- **Go khoi "Cho anh chon muc" o buoc xem truoc.** Chu du an: *"dung roi, bo cai
+  do di em"*. Luc do luong dang dung doi nguoi dung, ma nut ngay duoi da noi du.
+- **O quy trinh chay thanh THE RIENG, dat TREN nut.** Chu du an khoanh dung vung
+  giua card Ket qua va nut. De nhet vua: danh sach 5 buoc xep **3 dong ngang**
+  (truoc la 5 dong doc), o **247 -> 204px**, va **an card Ket qua khi dang chay**
+  (luc do ba con so moi la uoc luong, chua phai ket qua that).
+- **Go dong "Day la uoc tinh hoi thap - thuc te ngan hon 3-8%"** theo yeu cau.
+  ☠️ Danh doi da ghi ngay trong `Timeline.tsx`: do la thu DUY NHAT tren man hinh
+  noi rang con so kia moi la UOC LUONG. Do that: may luon cat NHIEU HON hinh ve
+  (Giu nhip 141,4 -> 152,3s · Vua 303,9 -> 315,4s · Cat sach 488,6 -> 501,0s).
+- Cat chu thua cho vua mot hang: "1914 doan" -> **1914** (nhan da noi "doan"),
+  "26:17.0 -> 26:01.1" -> **26:17 -> 26:01**. Chon co chu 13px bang cach **do be
+  rong CHUOI that**: 15px can 115px ma long o hep nhat chi chua 104px.
+
+### File anh huong
+`client/src/giao-dien.css` · `client/src/App.tsx` · `client/src/Timeline.tsx` ·
+`client/src/BangDoan.tsx` · `client/src/tokens.css` · `CSXS/manifest.xml`
+
+### ☠️ BON CAI BAY CSS DA VAP TRONG PHIEN NAY
+
+1. **Dat san chieu cao NHAM CHO.** `minmax(min-content, 1fr)` tren HANG luoi lay
+   min-content cua MOI o trong hang - ma o trai la bang, no khai theo du 27 hang
+   du lieu, keo san len **336px** trong khi cho that chi 215px. Sua 3 lan sai
+   huong moi ra. `overflow: hidden` tren bang KHONG chua duoc (no doi "kich thuoc
+   toi thieu tu dong", con san hang doc "min-content contribution" - hai thu khac
+   nhau, da thu va do ra van 336px). **San thuoc ve ai can no**: dat `min-height`
+   tren chinh `.nhom--duoi`.
+2. **Doi block -> flex thi con KHONG con tu full ngang.** Hinh minh hoa co tu
+   200px xuong 14px. Con cua block mac dinh rong het cha; flex item thi co theo
+   noi dung.
+3. **Hai quy tac cung selector trong MOT file.** `.card--res { flex: none }` nam
+   SAU `.card--res { flex: 1 }` nen thang - doc cho tren tuong dung, chay ra ket
+   qua cua cho duoi.
+4. **Ghi de MOT thuoc tinh khong ghi de CA NHOM.** Them `flex-wrap: wrap` ma quen
+   `flex-direction: row` -> danh sach buoc van xep doc y nhu cu (`styles.css:818`
+   dat `column`). Do ra dung 5 dong, khong doi mot chut nao.
+
+### ☠️ HAI LAN THUOC DO BAO SAI, SUYT SUA NHAM CODE DANG DUNG
+
+- **Doc DOM ngay sau `click()` la lay gia tri CU.** Ban do dau bao "bam 3 muc
+  khong doi gi" -> suyt di sua mot doan dang chay dung. React gom cap nhat lai;
+  phai `await` mot nhip. Do lai: 87/74/57% doi dung.
+- **`requestAnimationFrame` KHONG chay khi pane an** -> ban do treo 30 giay. Ep
+  layout dong bo bang `void el.offsetHeight` thay vi doi rAF.
+- Va mot lan **do sai NGU CANH**: mo phong trang thai dang chay CO nut, trong khi
+  code luc do lai AN nut khi chay - nghia la "o nam tren nut" khong bao gio quan
+  sat duoc. Phep do dung nhung dung tren mot the gioi khong ton tai.
+
+### Do hieu nang tren panel that (Chromium 99, khong phai Chrome may)
+
+| Dung 1.914 doan | Chrome 148 | **CEP Chromium 99** |
+|---|---|---|
+| Timeline | 23,3 ms | **56,2 ms** |
+| Bang KHONG ao hoa | 539 ms | **1.963,6 ms** |
+| Bang co ao hoa (~40 hang) | 7,2 ms | **33,4 ms** |
+
+Ao hoa cuu **1.964 -> 33 ms (gap 59 lan)** trong moi truong that. Do tren Chrome
+may thi con so nhe di **3,6 lan** - suyt nua ket luan "chap nhan duoc".
+
+### CON NO
+
+- **Nut muc bi KHOA o buoc xem truoc** (`disabled={!!dangChay}`) - do lai 03/08:
+  ca ba nut `disabled: true`. Nguoi dung nhin dai song roi muon doi muc thi khong
+  duoc, phai chay lai tu dau. Chu du an noi *"cac tinh nang cu hoat dong binh
+  thuong la duoc"* nen GIU NGUYEN, nhung day la cho dang sua.
+- **[CHO] Chua do duoc o quy trinh chay luc CHAY THAT.** No chi hien khi may dang
+  chay, ma bat dung thoi diem do qua cong debug thi khong kip. Da do bang cach mo
+  phong dung markup that: o cao 204px, 5 buoc 3 dong ngang, khong tran, khong de
+  len nut. O kho 1005x682 nut khoa tho ra ngoai day **19px** (khong chan thao tac
+  vi nut dang khoa).
+- **O "Uoc con lai" van la so cua VIDEO KHAC** (87/74/57% do tren video 58 phut).
+  Do that tren Test3: muc "Cat sach" 26 phut chi cat duoc **30 giay, con 98%**.
+  Da bao chu du an hai lan, chua chot bo hay giu.
+- **Chua biet Test3 co nhac nen khong** - neu co thi tool khong tim duoc khoang
+  lang, va do la GIOI HAN THAT chu khong phai bug. Panel dang im lang tra ve 98%.
+- 6 panel con lai chua doi token cam; `design-system/tokens.css` da cap nhat
+  nhung **chua chay `dong-bo-tokens.ps1`**, va cac panel do **chua co**
+  `client/src/fonts/Inter.woff2` (da ghi canh bao ngay trong file nguon).
+
+## [1.5.0] - 2026-08-03 11:24 (UTC+7)
+
+### Vong sua thu hai (cung ngay, sau khi chu du an mo panel that)
+
+Chu du an mo panel len va bat duoc 5 cho. Moi cho deu DO duoc truoc khi sua:
+
+1. **☠️ NUT CAT BIEN MAT o buoc xem truoc** - do: `.cta` co **0 nut**. Chu du an
+   khong phai dang cho may chay, ma **bi ket**. Nguyen nhan: o buoc xem truoc
+   `dangChay` VAN co gia tri ("Cho anh chon muc") vi luong dang dung doi nguoi
+   dung; ban dau viet `dangChay ? tien-trinh : xemTruoc ? nut` nen nhanh tien
+   trinh an truoc. Ban cu khong dinh vi nut CAT DI nam BEN TRONG khoi xem truoc.
+2. **Icon "[ ]" o thanh vung chon hien ra chu "Γ"** - thieu `viewBox`, SVG ve o
+   toa do goc 1:1 nen bi cat con moi net tren.
+3. **Thieu khoi gach cheo "1 phut 55 giay / da cat bo"** o dai "Sau khi cat".
+4. **Bang thieu 2 cot** "Dang song" + "Giu lai" (ban dau bo di vi nang).
+5. **Hai dai xem truoc sai ca ti le lan noi dung** - chu du an khoanh do:
+   *"2 phan nay ti le chua giong, noi dung cung khong giong luon em"*.
+
+### Da sua
+
+- **`Timeline.tsx`** (MOI): dung lai hai dai theo dung thiet ke - timeline kieu
+  Premiere thay cho canvas dai song dB. Do THANG file thiet ke de lay so, khong
+  uoc bang mat: khung **92px** · vach do **6px** · dai video **22px** · dai
+  audio **40px** · mau `#729ACC`/`#1D7021`/`#0e0e0e` · vet do `rgba(255,95,109,.18)`.
+  Do lai tren CSS da build: **khop tat ca**, hai khung cao bang nhau.
+  Song trang VAN ve tu `mucAm.cua` (muc am do that 20ms), vet do la cho cat that,
+  so khe clip lay tu vung that. **Hinh doi, du lieu khong doi.**
+- **`TimelineMau`**: luc chua phan tich dung CHUNG khuon `.tl` 92px voi so mau
+  tat dinh. Truoc do cho nay la `MinhHoa` cao **36px** -> bam chay xong bo cuc
+  nhay mot nhip. Do 3 muc: con **87/74/57%**, vach do **9/17/29**, o Ket qua va
+  mo ta doi theo. Nhan **"vi du"** ngay canh ten dai.
+- **`BangDoan.tsx`** (MOI): bang du 5 cot. Dang song ve tu muc am that cua chinh
+  doan do. Nut **"Giu lai" AN THAT** vao ket qua cat - loc theo KHOANG THOI GIAN
+  o buoc cat cuoi, khong theo chi so hang (bang xem truoc dung `uocVungCat`, cat
+  that dung giao Whisper voi nang luong -> hai danh sach khac nhau ca so luong
+  lan thu tu). Bien ban them dong "Chua cho anh bam Giu lai".
+  **Ao hoa** tren 120 doan: 1.914 doan truoc day = 101.442 phan tu DOM / 688ms,
+  nay luon chi ~40 hang.
+- **`BangMau`**: bang vi du luc chua chay - chu du an dong y *"tao 1 bang mockup
+  gia de khach hang hinh dung"*. Nhung phai TU NOI no la vi du: nhan cam, mo 0.4,
+  **khong bam duoc** (bam duoc thi khach bam "Giu lai" tren so gia roi tuong da
+  dan duoc panel dieu gi).
+- **Nut mac cat cao 32px = cao bang CA THANH**, tran ra ngoai padding 3px va che
+  vien - nhin nhu cai hop loi ra. Nguyen nhan: `styles.css:232` dat cung
+  `height: 32px` ma lop giao dien moi khong ghi de. Sua `height: auto` -> nut
+  cao **25px**, vua khit long thanh (content box 24,67px).
+- **`manifest.xml`**: `<Type>Panel</Type>` -> **`Modeless`**, kho **1280x800**.
+  Chu du an: *"khi bam vao thi mac dinh minh se bung mot cua so rieng biet nam
+  ngoai luon voi UI goc dep nhat"*. 1280x800 la dung kho da do khop 23/23 phan
+  tu voi ban thiet ke. Danh doi: KHONG dock vao workspace duoc nua.
+  ☠️ Doi Type BAT BUOC tat han Premiere roi mo lai.
+
+### ☠️ Bai hoc do luong trong vong nay
+- **Doc ngay sau `click()` la lay gia tri CU.** Do lan dau bao "bam 3 muc khong
+  doi gi" -> suyt di sua mot doan code dang dung. React gom cap nhat lai; phai
+  `await` mot nhip roi moi doc. Do lai: 87/74/57% doi dung.
+- **`requestAnimationFrame` KHONG chay khi pane an** -> ban do treo 30 giay.
+  Ep layout dong bo bang `void el.offsetHeight` thay vi doi rAF.
+
+### Changed - GHEP THIET KE MOI CUA CHU DU AN VAO PANEL
+
+Boi canh: chu du an tu thiet ke lai UI Autocut bang Claude design, chot o
+`AiO Design System/Design/Auto Cut.html`, roi giao: *"em update vao PR roi chay
+kiem tra nha em"*. Kem hai rang buoc:
+- *"file HTML la file anh chot thiet ke, em khong duoc sua thiet ke anh chot"*
+- *"responsive duoc khong em... minh cu mo mot cua so moi voi kich thuoc tieu
+  chuan, con viec ho muon move di dau hay keo gon lai thi la viec cua ho"*
+
+### Da lam
+- **`tokens.css`**: bo mau CAM moi (`--accent` #ff5714 -> **#f86820**), nen am
+  hon (#151517 -> **#181818**), va **font Inter DONG GOI** thay cho SF Pro muon
+  cua he thong. `--accent-on` doi tu nau-den -> **TRANG**, kem canh bao trong
+  file: trang tren cam chi 3,0:1 nen nut dung no BAT BUOC bold + >=14px.
+- **`giao-dien.css`** (file MOI): toan bo dang cua thiet ke moi + lop co gian.
+  De rieng chu khong sua de `styles.css` vi file do con chua dang cua `.chay`,
+  `.ket`, `.lui`, `.loi` van dang chay - dung lai giao dien va co nguy co pha
+  may khoi do CUNG LUC thi khong biet cai nao gay loi.
+- **`App.tsx`**: dung lai JSX theo luoi 2 cot cua thiet ke. Giu NGUYEN toan bo
+  state va luong chay. Them:
+  - thanh **"Doan dang chon"** doc that tu vung I-O (`getRangeClips`), lam moi
+    moi lan panel duoc focus - nguoi dung khoanh ben Premiere roi moi click
+    sang panel. KHONG hen gio hoi lien tuc (cam tranh CPU voi host).
+  - **bang danh sach doan se cat** voi timecode THAT tren sequence (cong moc
+    dau vung, dem theo fps) thay vi so giay tuong doi.
+  - **ba o Ket qua**: chua phan tich thi la UOC LUONG theo muc (87/74/57%,
+    do that tren video 58:37), phan tich xong thi la so THAT. Nhan doi theo
+    ("Uoc con lai" vs "Con lai") de khong noi doi.
+- **`DaiSong.tsx`**: `XemTruoc` bo nut "CAT DI" ben trong, dua ra nut chinh
+  duy nhat o duoi. `cat` (danh sach khoang cat) nay do App tinh MOT LAN roi
+  truyen xuong - dai song, bang va ba o Ket qua deu noi ve cung mot viec.
+- **`CSXS/manifest.xml`**: kho mo mac dinh **360x520 -> 1020x700**. Kho cu lam
+  panel LUON roi ve mot cot, khong bao gio thay duoc bo cuc hai cot da thiet ke.
+  MinSize giu 280x320.
+
+### ☠️ Bay da vap khi lam co gian
+Cho `.col` tan ra bang `display:contents` de sap lai thu tu o kho hep, cac the
+thanh **o luoi** - ma o luoi mac dinh `min-width:auto` nen the nao chua bang se
+KHONG chiu co, keo ca trang rong **750px o MOI kho** tu 560px tro xuong.
+Dung cai bay da ghi san o `styles.css` dong 1095. Chot chan: `minmax(0,1fr)` +
+`min-width:0`, tuc bao dam theo CAU TAO chu khong kiem lai bang mat sau.
+**So do vo ly (moi kho deu ra 750) la thu bat duoc no** - khong co phep do thi
+di thang vao ban cai.
+
+### Da kiem chung bang so
+- **Thiet ke chot khong bi dung**: o 1280x800, so tung phan tu giua ban chot va
+  ban co gian - **23/23 trung khit, 0 cho lech**.
+- **Ban build that** (`dist/index.html`), do o 7 kho tu **280 -> 1280px**:
+  tran ngang **0** · chu bi cat **0** · phan tu thoi ra ngoai **0** ·
+  nut chinh **luon thay**, ke ca khi cuon het xuong.
+- Font Inter nhung **nap duoc** (`document.fonts.check` = true).
+- Nut chinh: 34px, 15px, **bold 700**, chu trang tren #f86820 - dung luat
+  "chu trang tren cam phai to/dam".
+- `dist/index.html` **206,9 -> 491,6 kB** (+284,7 kB), do nhung font Inter
+  base64. Vite gop tat ca vao MOT file (`viteSingleFile`) nen font khong tach
+  ra duoc. Da bo ban italic de do nang.
+
+### CHUA kiem duoc - can chu du an mo lai panel
+Script cai go thu muc extension trong luc panel dang mo -> panel dong, cong
+8089 tat. Va vua sua `manifest.xml` nen phai **TAT HAN Premiere roi mo lai**.
+Chua do duoc tren panel that: mau/font trong moi truong CEP, thanh "Doan dang
+chon" co doc dung vung I-O khong, bang danh sach voi du lieu that.
+
+### Con no
+- **Hieu nang o quy mo that**: do tren ban thiet ke, 1.914 khoang lang (video
+  58 phut) = **101.442 phan tu DOM**, dung bang **688ms**. Ban ghep vao panel
+  da bo cot dang song (nang nhat) nhung VAN chua ao hoa danh sach.
+- 6 panel con lai chua doi token - `design-system/tokens.css` moi chua chay
+  dong bo, vi chung chua duoc thiet ke lai, doi mau bay gio la nua cu nua moi.
+
 ## [1.5.0] - 2026-07-30 09:46 (UTC+7)
 
 ### Added - ANIMATION GIAI THICH "DAT KET QUA O DAU" (MinhHoaNoiDat.tsx)

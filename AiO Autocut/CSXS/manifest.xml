@@ -40,12 +40,33 @@
           <AutoVisible>true</AutoVisible>
         </Lifecycle>
         <UI>
-          <Type>Panel</Type>
+          <!-- ☠️ MODELESS = CUA SO RIENG, NOI BEN NGOAI PREMIERE.
+               Anh Tien 2026-08-03: *"khi bam vao thi mac dinh minh se bung mot
+               cua so rieng biet nam ngoai luon voi UI goc dep nhat"*.
+
+               Danh doi phai biet truoc:
+                 - KHONG dock vao workspace duoc nua. Doi lai la luon du cho
+                   cho luoi HAI COT, khong bi bop thanh mot cot nhu khi dock
+                   ben phai (360px).
+                 - Cua so nay nam TREN Premiere, khong an sau lung.
+                 - Doi Type BAT BUOC tat han Premiere roi mo lai; reload panel
+                   khong an.
+               Muon quay ve dock thi doi lai <Type>Panel</Type>. -->
+          <Type>Modeless</Type>
           <Menu>AiO Studio - Autocut</Menu>
+          <!-- KHO MO MAC DINH, doi 2026-08-03.
+               Anh Tien: *"khi minh bam vao extension minh cu mo mot cua so moi
+               cua minh voi kich thuoc tieu chuan, con viec ho muon move di dau
+               hay keo gon lai thi la viec cua ho"*.
+               1280x800 = DUNG kho da do khop 23/23 phan tu voi ban thiet ke anh
+               Tien chot. Mo ra la thay dung bo cuc do, khong phai ban bi bop.
+               Truoc day 360x520 -> panel luon roi ve mot cot.
+               MinSize giu 280x320: da DO THAT o kho do, tran ngang 0, chu khong
+               bi cat, nut chinh van ghim day. -->
           <Geometry>
             <Size>
-              <Height>520</Height>
-              <Width>360</Width>
+              <Height>800</Height>
+              <Width>1280</Width>
             </Size>
             <MinSize>
               <Height>320</Height>
