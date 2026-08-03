@@ -16,6 +16,7 @@ dist/
 !/AiO Auto Podcast/dist/
 !/AiO Auto Re-Frames/dist/
 !/AiO Auto Guiline Frame/dist/
+!/AiO WELCOME/dist/
 build/
 bin/
 .next/

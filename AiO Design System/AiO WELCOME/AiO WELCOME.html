@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AiO Studio — Welcome & Tool Hub</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-0);
+      color: var(--text-1);
+      font-size: var(--fs-md);
+      line-height: 1.45;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-4);
+      border-radius: var(--r-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-3);
+    }
+
+    /* Layout Container */
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header Bar */
+    header.top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--bg-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 12px 20px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent) 0%, #ff9d66 100%);
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--fw-bold);
+      color: #fff;
+      font-size: 18px;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: var(--fw-bold);
+      letter-spacing: -0.01em;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-weight: var(--fw-semibold);
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      border: 1px solid var(--accent-line);
+      padding: 2px 6px;
+      border-radius: var(--r-full);
+      text-transform: uppercase;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* Search & Status */
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 420px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-1);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-md);
+      padding: 8px 12px 8px 36px;
+      color: var(--text-1);
+      font-family: inherit;
+      font-size: var(--fs-sm);
+      outline: none;
+      transition: all var(--dur) var(--ease);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: var(--focus-ring);
+      background: var(--bg-0);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      background: var(--bg-1);
+      border: 1px solid var(--line-1);
+      padding: 6px 12px;
+      border-radius: var(--r-full);
+      color: var(--text-2);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 8px var(--ok);
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(248, 104, 32, 0.12) 0%, rgba(24, 24, 24, 0.9) 60%), var(--bg-2);
+      border: 1px solid var(--accent-line);
+      border-radius: var(--r-xl);
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .hero-content {
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: var(--fw-semibold);
+      color: var(--accent-text);
+      background: var(--accent-soft);
+      padding: 4px 10px;
+      border-radius: var(--r-full);
+      width: fit-content;
+      border: 1px solid var(--accent-line);
+    }
+
+    .hero-title {
+      font-size: var(--fs-2xl);
+      font-weight: var(--fw-bold);
+      color: var(--text-1);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .hero-desc {
+      font-size: var(--fs-md);
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 6px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: var(--fw-bold);
+      color: var(--text-1);
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .hero-illustration {
+      font-size: 80px;
+      opacity: 0.15;
+      position: absolute;
+      right: 20px;
+      bottom: -10px;
+      pointer-events: none;
+    }
+
+    /* Filter Tabs */
+    .filter-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line-2);
+      padding-bottom: 12px;
+    }
+
+    .tabs-group {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: var(--bg-2);
+      border: 1px solid var(--line-1);
+      color: var(--text-2);
+      padding: 6px 14px;
+      border-radius: var(--r-md);
+      font-size: var(--fs-sm);
+      font-weight: var(--fw-medium);
+      cursor: pointer;
+      transition: all var(--dur) var(--ease);
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: var(--bg-3);
+      color: var(--text-1);
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: var(--accent-on);
+      border-color: var(--accent);
+      font-weight: var(--fw-bold);
+    }
+
+    .tool-count-badge {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* Tool Grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .tool-card {
+      background: var(--bg-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all var(--dur) var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card:hover {
+      border-color: var(--accent-line);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+      background: var(--bg-3);
+    }
+
+    .card-top {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tool-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      background: var(--bg-1);
+      border: 1px solid var(--line-1);
+      flex-shrink: 0;
+    }
+
+    .badge-wrap {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: var(--fw-semibold);
+      padding: 2px 8px;
+      border-radius: var(--r-full);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-hot {
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      border: 1px solid var(--accent-line);
+    }
+
+    .badge-pro {
+      background: var(--purple-soft);
+      color: var(--purple);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .badge-ai {
+      background: var(--info-soft);
+      color: var(--info);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-ready {
+      background: var(--ok-soft);
+      color: var(--ok);
+      border: 1px solid rgba(78, 201, 138, 0.3);
+    }
+
+    .tool-title {
+      font-size: var(--fs-lg);
+      font-weight: var(--fw-bold);
+      color: var(--text-1);
+    }
+
+    .tool-desc {
+      font-size: var(--fs-sm);
+      color: var(--text-2);
+      line-height: 1.45;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .feature-tag {
+      font-size: 11px;
+      background: var(--bg-1);
+      color: var(--text-3);
+      padding: 3px 8px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--line-1);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--line-1);
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+
+    .shortcut-text {
+      font-size: 11px;
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kbd {
+      background: var(--bg-1);
+      border: 1px solid var(--line-2);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: monospace;
+      font-size: 10px;
+      color: var(--text-2);
+    }
+
+    .btn-launch {
+      background: var(--accent);
+      color: var(--accent-on);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--r-md);
+      font-size: var(--fs-sm);
+      font-weight: var(--fw-bold);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--dur) var(--ease);
+    }
+
+    .btn-launch:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 12px var(--accent-soft);
+    }
+
+    .btn-launch:active {
+      background: var(--accent-pressed);
+    }
+
+    /* Modal Detail View */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: var(--z-modal);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-2);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-xl);
+      max-width: 560px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform: scale(0.95);
+      transition: transform var(--dur) var(--ease);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-3);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--r-sm);
+    }
+
+    .modal-close:hover {
+      color: var(--text-1);
+      background: var(--bg-3);
+    }
+
+    /* Quick Tips & Footer */
+    footer.bottom-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid var(--line-1);
+      padding-top: 16px;
+      font-size: 11px;
+      color: var(--text-3);
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-link {
+      color: var(--text-2);
+      text-decoration: none;
+    }
+
+    .footer-link:hover {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-logo">A</div>
+        <div class="brand-text">
+          <div class="brand-title">
+            AiO Studio
+            <span class="brand-badge">v1.5.0</span>
+          </div>
+          <div class="brand-sub">Adobe Premiere Pro Automation Suite</div>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm công cụ (Autocut, Podcast, Re-Frames...)...">
+      </div>
+
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>Premiere Pro CEP Ready</span>
+      </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-content">
+        <div class="hero-tag">✨ Sức mạnh tự động hóa cho Editor</div>
+        <h1 class="hero-title">Trung tâm Công cụ AiO Studio</h1>
+        <p class="hero-desc">
+          Tối ưu hóa workflow chỉnh sửa video và audio của bạn. Tự động hóa các tác vụ lặp đi lặp lại với bộ 7 công cụ tích hợp sẵn cho Premiere Pro.
+        </p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-val">7</span>
+            <span class="stat-lbl">Panel công cụ</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">100%</span>
+            <span class="stat-lbl">Tự động hóa</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">v1.5.0</span>
+            <span class="stat-lbl">Phiên bản chốt</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-illustration">🎬</div>
+    </section>
+
+    <!-- Filter & Category Section -->
+    <section class="filter-section">
+      <div class="tabs-group" id="tabGroup">
+        <button class="tab-btn active" data-cat="all">Tất cả công cụ (7)</button>
+        <button class="tab-btn" data-cat="editing">Cắt dựng & Audio (3)</button>
+        <button class="tab-btn" data-cat="graphics">Đồ họa & Asset (2)</button>
+
+        <button class="tab-btn" data-cat="layout">Bố cục & Frame (2)</button>
+      </div>
+      <div class="tool-count-badge" id="toolCount">Hiển thị 7/7 công cụ</div>
+    </section>
+
+    <!-- Tools Grid -->
+    <main class="tools-grid" id="toolsGrid">
+      <!-- 1. AiO Autocut -->
+      <article class="tool-card" data-cat="editing" data-name="aio autocut cat tu dong silence filter">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">✂️</div>
+            <div class="badge-wrap">
+              <span class="badge badge-hot">HOT</span>
+              <span class="badge badge-ai">AI POWERED</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Autocut</h2>
+          <p class="tool-desc">Tự động phát hiện khoảng lặng (silence), lọc câu trùng và cắt thô nhanh cho Podcast, Vlog & bài giảng.</p>
+          <div class="feature-list">
+            <span class="feature-tag">Lọc nhiễu âm</span>
+            <span class="feature-tag">3 mức cắt linh hoạt</span>
+            <span class="feature-tag">Timecode thật</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+1</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Autocut', 'com.aio.autocut')">Mở Panel ➔</button>
+        </div>
+      </article>
+
+      <!-- 2. AiO Auto Podcast -->
+      <article class="tool-card" data-cat="editing" data-name="aio auto podcast hau ky multi mic bleed filter">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">🎙️</div>
+            <div class="badge-wrap">
+              <span class="badge badge-pro">PRO AUDIO</span>
+              <span class="badge badge-ready">READY</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Auto Podcast</h2>
+          <p class="tool-desc">Hậu kỳ podcast đa mic chuyên nghiệp. Khử tràn tiếng (bleed 2-way) và phân biệt chính xác người nói.</p>
+          <div class="feature-list">
+            <span class="feature-tag">Khử tràn 2 mic</span>
+            <span class="feature-tag">Tự động chuyển người</span>
+            <span class="feature-tag">Test kiêm não</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+2</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Auto Podcast', 'com.aio.podcast')">Mở Panel ➔</button>
+        </div>
+      </article>
+
+      <!-- 3. AiO Auto Re-Frames -->
+      <article class="tool-card" data-cat="layout" data-name="aio auto re-frames vertical video tiktok shorts 9:16">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">📱</div>
+            <div class="badge-wrap">
+              <span class="badge badge-ai">AI TRACKING</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Auto Re-Frames</h2>
+          <p class="tool-desc">Chuyển đổi video ngang 16:9 sang video dọc 9:16 (TikTok, Reels, Shorts) tự động theo dõi chủ thể.</p>
+          <div class="feature-list">
+            <span class="feature-tag">Smart Tracking</span>
+            <span class="feature-tag">Khổ 9:16 / 1:1</span>
+            <span class="feature-tag">Smooth Motion</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+3</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Auto Re-Frames', 'com.aio.reframes')">Mở Panel ➔</button>
+        </div>
+      </article>
+
+      <!-- 4. AiO Auto Safe Zone / Guide Frame -->
+      <article class="tool-card" data-cat="layout" data-name="aio safe zone guide frame social overlay tiktok shorts">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">📐</div>
+            <div class="badge-wrap">
+              <span class="badge badge-ready">PREVIEW</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Guide Frame</h2>
+          <p class="tool-desc">Hiển thị các khung an toàn chuẩn mạng xã hội (UI TikTok, Shorts, Facebook Overlay) ngay trên Program Monitor.</p>
+          <div class="feature-list">
+            <span class="feature-tag">12 mẫu khung UI</span>
+            <span class="feature-tag">Bật/tắt 1-click</span>
+            <span class="feature-tag">Độ nét cao</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+4</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Guide Frame', 'com.aio.guideframe')">Mở Panel ➔</button>
+        </div>
+      </article>
+
+      <!-- 5. AiO Asset Manager -->
+      <article class="tool-card" data-cat="graphics" data-name="aio asset manager sfx sfx motion graphics preset store">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">📦</div>
+            <div class="badge-wrap">
+              <span class="badge badge-pro">ASSETS</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Asset Manager</h2>
+          <p class="tool-desc">Kho tài nguyên đồ họa, hiệu ứng âm thanh (SFX), Motion Graphics và Preset dự án tích hợp sẵn.</p>
+          <div class="feature-list">
+            <span class="feature-tag">Kéo thả Premiere</span>
+            <span class="feature-tag">Xem trước âm thanh</span>
+            <span class="feature-tag">Bộ sưu tập VIP</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+5</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Asset Manager', 'com.aio.assetmanager')">Mở Panel ➔</button>
+        </div>
+      </article>
+
+      <!-- 6. AiO Power Bins -->
+      <article class="tool-card" data-cat="graphics" data-name="aio power bins auto organize bin color label project">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">🗂️</div>
+            <div class="badge-wrap">
+              <span class="badge badge-ready">ORGANIZER</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Power Bins</h2>
+          <p class="tool-desc">Tự động phân loại file media nhập vào, tạo cấu trúc Bin chuẩn và gán nhãn màu Footage theo tiêu chuẩn Pro.</p>
+          <div class="feature-list">
+            <span class="feature-tag">Tự phân loại Bin</span>
+            <span class="feature-tag">Gán nhãn màu</span>
+            <span class="feature-tag">Tối ưu Project</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+6</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Power Bins', 'com.aio.powerbins')">Mở Panel ➔</button>
+        </div>
+      </article>
+
+      <!-- 7. AiO Transcripts -->
+      <article class="tool-card" data-cat="editing" data-name="aio transcripts boc bang phu de speech to text srt">
+        <div class="card-top">
+          <div class="card-header">
+            <div class="tool-icon-wrap">📝</div>
+            <div class="badge-wrap">
+              <span class="badge badge-ai">SUBTITLE</span>
+            </div>
+          </div>
+          <h2 class="tool-title">AiO Transcripts</h2>
+          <p class="tool-desc">Trích xuất văn bản từ giọng nói (Speech-to-Text), chỉnh sửa phụ đề và tự động tạo Caption trên Timeline.</p>
+          <div class="feature-list">
+            <span class="feature-tag">Tiếng Việt chuẩn</span>
+            <span class="feature-tag">Đồng bộ Timecode</span>
+            <span class="feature-tag">Xuất SRT/VTT</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="shortcut-text">Mở nhanh <span class="kbd">Alt+7</span></span>
+          <button class="btn-launch" onclick="launchTool('AiO Transcripts', 'com.aio.transcripts')">Mở Panel ➔</button>
+        </div>
+      </article>
+    </main>
+
+    <!-- Bottom Footer -->
+    <footer class="bottom-info">
+      <div>© 2026 AiO Studio — Bản quyền thuộc về Ha Dang Tien</div>
+      <div class="footer-links">
+        <a href="#" class="footer-link" onclick="alert('Đã đồng bộ Design System v1.5.0 mới nhất!')">Design System Guide</a>
+        <a href="#" class="footer-link" onclick="alert('Hotkeys: Alt+1..7 mở nhanh từng công cụ trong Premiere Pro')">Phím tắt</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal Preview / Info -->
+  <div class="modal-overlay" id="toolModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="font-size: 18px; font-weight: bold; color: var(--text-1);">Thông tin Công cụ</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modalBody" style="font-size: 13px; color: var(--text-2); line-height: 1.5;">
+        Nội dung thông tin panel...
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
+        <button class="tab-btn" onclick="closeModal()">Đóng</button>
+        <button class="btn-launch" id="modalConfirmBtn">Mở ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Search Functionality
+    const searchInput = document.getElementById('searchInput');
+    const toolsGrid = document.getElementById('toolsGrid');
+    const cards = toolsGrid.querySelectorAll('.tool-card');
+    const toolCount = document.getElementById('toolCount');
+
+    function filterTools() {
+      const query = searchInput.value.toLowerCase().trim();
+      const activeTab = document.querySelector('.tab-btn.active').dataset.cat;
+      let visible = 0;
+
+      cards.forEach(card => {
+        const cat = card.dataset.cat;
+        const name = card.dataset.name;
+        const matchQuery = !query || name.includes(query);
+        const matchTab = activeTab === 'all' || cat === activeTab;
+
+        if (matchQuery && matchTab) {
+          card.style.display = 'flex';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      toolCount.textContent = `Hiển thị ${visible}/7 công cụ`;
+    }
+
+    searchInput.addEventListener('input', filterTools);
+
+    // Tab Filtering
+    const tabGroup = document.getElementById('tabGroup');
+    tabGroup.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tab-btn')) {
+        tabGroup.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        filterTools();
+      }
+    });
+
+    // Launch Tool Handler (CEP Extension Integration)
+    function launchTool(toolName, extensionId) {
+      if (window.__Adobe_CEP__) {
+        try {
+          const csInterface = new CSInterface();
+          csInterface.requestOpenExtension(extensionId, "");
+        } catch (err) {
+          console.warn("Không thể mở trực tiếp CEP ID:", extensionId, err);
+          showModal(toolName, extensionId);
+        }
+      } else {
+        showModal(toolName, extensionId);
+      }
+    }
+
+    // Modal Handler
+    function showModal(toolName, extensionId) {
+      const modal = document.getElementById('toolModal');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      title.textContent = `Khởi chạy ${toolName}`;
+      body.innerHTML = `
+        <p style="margin-bottom: 8px;"><strong>Trạng thái:</strong> Sẵn sàng hoạt động trên Premiere Pro.</p>
+        <p style="margin-bottom: 8px;"><strong>Extension ID:</strong> <code style="background: var(--bg-1); padding: 2px 6px; border-radius: 4px;">${extensionId}</code></p>
+        <p>Bạn đang ở chế độ xem trước (Browser Preview). Trong môi trường Premiere Pro CEP, nút này sẽ mở trực tiếp Panel tương ứng.</p>
+      `;
+
+      confirmBtn.onclick = () => {
+        alert(`Đã gửi lệnh kích hoạt ${toolName} (${extensionId})!`);
+        closeModal();
+      };
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('toolModal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

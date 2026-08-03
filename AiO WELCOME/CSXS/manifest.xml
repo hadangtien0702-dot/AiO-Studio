@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.aio.welcome" ExtensionBundleVersion="1.5.0" ExtensionBundleName="AiO Welcome" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<ExtensionList>
+		<Extension Id="com.aio.welcome" Version="1.5.0" />
+	</ExtensionList>
+	<DispatchInfoList>
+		<Extension Id="com.aio.welcome">
+			<DispatchInfo >
+				<Resources>
+					<MainPath>./dist/index.html</MainPath>
+					<ScriptPath>./host/index.jsx</ScriptPath>
+				</Resources>
+				<Lifecycle>
+					<AutoVisible>true</AutoVisible>
+				</Lifecycle>
+				<UI>
+					<Type>Modeless</Type>
+					<Menu>AiO Welcome Hub</Menu>
+					<Geometry>
+						<Size>
+							<Width>1020</Width>
+							<Height>720</Height>
+						</Size>
+						<MinSize>
+							<Width>340</Width>
+							<Height>500</Height>
+						</MinSize>
+					</Geometry>
+					<Icons>
+					</Icons>
+				</UI>
+			</DispatchInfo>
+		</Extension>
+	</DispatchInfoList>
+</ExtensionManifest>
