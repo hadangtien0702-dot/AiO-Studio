@@ -1,5 +1,30 @@
 # AiO Auto Podcast - Nhat ky
 
+## [level-3] - 2026-08-03 17:43 - ANH TIEN MO TA LEVEL 3 "TRO VAO FOLDER LA XONG" - GHI VAO TINH-NANG.md
+
+Anh Tien nhan tin mo ta 2 level cua san pham:
+- Level basic: nguoi dung tu import + tu sync bang Premiere (chon nhieu
+  file sync mot lan), qua tab tool gan video/audio cua ai, tool tu cat.
+  -> Chinh la LEVEL 0-1 dang chay (v0.3.1).
+- Level xin nhat: "tool tro vao folder chua hinh anh va am thanh, tu dong
+  lam cac thao tac tren".
+
+Da lam (chi sua TAI LIEU, khong dung ma nguon):
+- Them muc **LEVEL 3** vao TINH-NANG.md: 5 dau viec (quet folder + xu ly
+  2 bay U+F022/file trung MD5 · tu sync · tu dung sequence · goi y ghep
+  cap mic-cam + tach buoi · chuoi mot nut co duong dung tung chang).
+- Go dong "KHONG LAM: tu sync" — chinh anh mo lai khi mo ta Level 3.
+  Spike tu-sync 15:51 hom nay da do: lech 0,59 frame vs PluralEyes.
+
+Kiem chung them trong phien: nghi ngo dist/ repo lech ban cai (md5sum bao
+LECH ca 4 file) -> so lai bang cmp tung byte: GIONG HET ca 4. Thuoc do sai:
+md5sum voi duong dan chua `\` in them ky tu thoat `\` truoc ma bam, chuoi
+so sanh lech (bai hoc 5: nghi cong cu do truoc). dist/ da an toan trong git
+(commit f6c7e70), khop ban cai tung byte.
+
+Con no (khong doi): 3 viec cho anh Tien — import XML buoi 2, cham 12 clip
+nghe kiem, roi moi sua nguong 6dB/san -50dB theo dap an.
+
 ## [tu-sync] - 2026-08-03 15:51 - CUU dist/ (3 PANEL) + TU DO OFFSET, DUNG SEQUENCE THU
 
 Anh Tien chot 2 viec: (1) chep dist ve repo va commit luon; (2) em tu tao

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AiO WELCOME — Studio Console Hub</title>
+  <title>AiO WELCOME — Interactive Studio Console Hub</title>
   <link rel="stylesheet" href="tokens.css">
   <style>
     * {
@@ -25,7 +25,6 @@
       overflow-y: auto;
     }
 
-    /* Custom Scrollbar (§5) */
     ::-webkit-scrollbar {
       width: 10px;
     }
@@ -40,7 +39,6 @@
       background: rgba(255, 255, 255, 0.25);
     }
 
-    /* Outer Wrapper (§8: Max 1440px width, max 920px height, scrollable) */
     .app-viewport {
       max-width: 1440px;
       margin: 0 auto;
@@ -49,7 +47,7 @@
       flex-direction: column;
     }
 
-    /* Topbar (§5: 44px height, --bg-1, border --line-1) */
+    /* Topbar */
     header.topbar {
       height: var(--h-topbar);
       background: var(--bg-1);
@@ -115,7 +113,7 @@
       background: var(--ok);
     }
 
-    /* Main Content Area */
+    /* Content Area */
     main.content-area {
       padding: var(--sp-5);
       display: flex;
@@ -124,7 +122,7 @@
       flex: 1;
     }
 
-    /* Control Toolbar (Search & Filter) */
+    /* Toolbar Section */
     .toolbar-section {
       display: flex;
       align-items: center;
@@ -174,7 +172,6 @@
       pointer-events: none;
     }
 
-    /* Segmented Control (§5: grid auto-flow column, no fixed count in CSS) */
     .segmented-control {
       display: grid;
       grid-auto-flow: column;
@@ -212,58 +209,93 @@
       font-weight: var(--fw-semibold);
     }
 
-    .segment-btn:focus-visible {
-      box-shadow: var(--focus-ring);
-      outline: none;
-    }
-
-    /* Stats Overview Section (§5: Stat Tile) */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--sp-4);
-    }
-
-    .stat-tile {
+    /* ROI Simulator Banner (Interactive Value Demo) */
+    .roi-section {
       background: var(--bg-3);
-      border: 1px solid var(--line-1);
-      border-radius: var(--r-md);
-      padding: var(--sp-4);
+      border: 1px solid var(--accent-line);
+      border-radius: var(--r-lg);
+      padding: var(--sp-4) var(--sp-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-5);
+      flex-wrap: wrap;
+    }
+
+    .roi-info {
       display: flex;
       flex-direction: column;
       gap: var(--sp-1);
+      max-width: 460px;
     }
 
-    .stat-label {
-      font-size: var(--fs-2xs);
-      color: var(--text-3);
-    }
-
-    .stat-value-group {
+    .roi-title {
+      font-size: var(--fs-lg);
+      font-weight: var(--fw-semibold);
+      color: var(--text-1);
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: var(--sp-2);
     }
 
-    .stat-value {
-      font-size: var(--fs-xl);
-      font-weight: var(--fw-semibold);
-      color: var(--ok);
-    }
-
-    .stat-sub {
+    .roi-desc {
       font-size: var(--fs-xs);
       color: var(--text-2);
     }
 
-    /* Tool Grid (§8: Dock 1-col vs Float 2-col responsive grid) */
+    .roi-calculator {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      background: var(--bg-0);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+    }
+
+    .roi-slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .roi-slider-label {
+      font-size: var(--fs-2xs);
+      color: var(--text-3);
+    }
+
+    .roi-slider {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .roi-result {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      border-left: 1px solid var(--line-1);
+      padding-left: var(--sp-4);
+    }
+
+    .roi-time-saved {
+      font-size: var(--fs-xl);
+      font-weight: var(--fw-bold);
+      color: var(--ok);
+    }
+
+    .roi-sub {
+      font-size: var(--fs-2xs);
+      color: var(--text-3);
+    }
+
+    /* Tools Grid */
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: var(--sp-4);
     }
 
-    /* Section Card (§5: Section block) */
+    /* Interactive Section Card */
     .tool-card {
       background: var(--bg-3);
       border: 1px solid var(--line-1);
@@ -321,7 +353,6 @@
       border: 1px solid var(--line-2);
       color: var(--text-2);
       background: var(--bg-0);
-      text-transform: none; /* (§10 Rule 1: No uppercase) */
     }
 
     .badge-accent {
@@ -339,7 +370,7 @@
     .card-body {
       display: flex;
       flex-direction: column;
-      gap: var(--sp-2);
+      gap: var(--sp-3);
     }
 
     .card-title {
@@ -354,20 +385,148 @@
       line-height: var(--lh);
     }
 
-    .feature-tags {
+    /* LIVE INTERACTIVE PREVIEW BOX Inside Card */
+    .interactive-demo-box {
+      background: var(--bg-0);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-md);
+      padding: var(--sp-3);
       display: flex;
-      flex-wrap: wrap;
-      gap: var(--sp-1);
-      margin-top: var(--sp-1);
+      flex-direction: column;
+      gap: var(--sp-2);
     }
 
-    .tag-chip {
+    .demo-label {
       font-size: var(--fs-2xs);
       color: var(--text-3);
-      background: var(--bg-0);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 4px;
+    }
+
+    .demo-btn {
+      background: var(--bg-3);
       border: 1px solid var(--line-1);
-      padding: 2px 6px;
+      color: var(--text-2);
+      font-size: 11px;
+      padding: 2px 8px;
       border-radius: var(--r-sm);
+      cursor: pointer;
+      transition: all var(--dur) var(--ease);
+    }
+
+    .demo-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      border-color: var(--accent-line);
+      font-weight: var(--fw-semibold);
+    }
+
+    /* Visual Timeline Preview Component */
+    .timeline-bar-preview {
+      height: 24px;
+      background: var(--bg-1);
+      border-radius: var(--r-sm);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      gap: 2px;
+    }
+
+    .clip-block {
+      height: 16px;
+      background: var(--pr-video);
+      border-top: 2px solid var(--pr-video-head);
+      border-radius: 2px;
+      flex: 1;
+      transition: all var(--dur) var(--ease);
+    }
+
+    .clip-block.silence-removed {
+      background: rgba(255, 95, 109, 0.2);
+      border-top-color: var(--danger);
+      flex: 0.1;
+      opacity: 0.3;
+    }
+
+    .wave-line-preview {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 20px;
+      width: 100%;
+    }
+
+    .wave-bar {
+      flex: 1;
+      background: var(--ok);
+      height: 40%;
+      border-radius: 1px;
+      transition: height var(--dur) var(--ease), background var(--dur) var(--ease);
+    }
+
+    .wave-bar.bleed {
+      background: var(--danger);
+      height: 90%;
+    }
+
+    /* Reframe Preview Box */
+    .reframe-box-preview {
+      height: 50px;
+      background: var(--bg-1);
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .aspect-frame {
+      border: 1px dashed var(--accent);
+      background: var(--accent-soft);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--accent-text);
+      transition: width var(--dur) var(--ease);
+    }
+
+    .aspect-frame.ratio-9-16 { width: 30px; }
+    .aspect-frame.ratio-1-1 { width: 50px; }
+    .aspect-frame.ratio-16-9 { width: 90px; }
+
+    /* Asset Item Preview */
+    .asset-list-mini {
+      display: flex;
+      gap: 6px;
+    }
+
+    .asset-chip {
+      background: var(--bg-2);
+      border: 1px solid var(--line-1);
+      border-radius: var(--r-sm);
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .asset-chip:hover {
+      border-color: var(--accent-line);
+      color: var(--text-1);
     }
 
     .card-foot {
@@ -384,7 +543,7 @@
       color: var(--text-3);
     }
 
-    /* Buttons (§5 & §10: Primary Button Cam - bold font, size >= 14px) */
+    /* Primary Cam Button */
     .btn {
       height: var(--h-ctrl);
       background: var(--bg-4);
@@ -399,29 +558,22 @@
       display: inline-flex;
       align-items: center;
       gap: var(--sp-2);
-      text-transform: none; /* (§10 Rule 1: NO UPPERCASE) */
-      letter-spacing: normal; /* (§10 Rule 1: NO LETTER SPACING) */
-      transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+      text-transform: none;
+      letter-spacing: normal;
+      transition: background var(--dur) var(--ease);
     }
 
     .btn:hover {
       background: var(--bg-5);
-      border-color: var(--line-strong);
     }
 
-    .btn:focus-visible {
-      box-shadow: var(--focus-ring);
-      outline: none;
-    }
-
-    /* Nút chính (.btn--primary): cam đặc, chữ trắng BOLD, cỡ >= 14px (§5 & §10 Rule 2) */
     .btn--primary {
-      height: var(--h-ctrl-lg); /* 34px */
+      height: var(--h-ctrl-lg);
       background: var(--accent);
-      color: var(--accent-on); /* #ffffff */
+      color: var(--accent-on);
       border: none;
-      font-weight: var(--fw-bold); /* 700 */
-      font-size: 14px; /* >= 14px (Contrast ratio requirement) */
+      font-weight: var(--fw-bold);
+      font-size: 14px;
       padding: 0 var(--sp-5);
     }
 
@@ -429,11 +581,7 @@
       background: var(--accent-hover);
     }
 
-    .btn--primary:active {
-      background: var(--accent-pressed);
-    }
-
-    /* Modal (§5) */
+    /* Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -493,11 +641,10 @@
 </head>
 <body>
   <div class="app-viewport">
-    <!-- Topbar (§5: 44px, --bg-1, border --line-1) -->
+    <!-- Topbar -->
     <header class="topbar">
       <div class="topbar-brand">
-        <!-- SVG Lucide Layout Icon (NO EMOJI) -->
-        <svg class="brand-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="brand-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
           <line x1="3" y1="9" x2="21" y2="9"/>
           <line x1="9" y1="21" x2="9" y2="9"/>
@@ -510,24 +657,22 @@
 
       <div class="topbar-status">
         <span class="status-dot"></span>
-        <span>Premiere Pro CEP</span>
+        <span>Premiere Pro CEP Ready</span>
       </div>
     </header>
 
     <!-- Main Content Area -->
     <main class="content-area">
-      <!-- Toolbar Section: Search & Segmented Control -->
+      <!-- Toolbar Section -->
       <section class="toolbar-section">
         <div class="search-container">
-          <!-- SVG Search Icon -->
           <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Tìm công cụ (Autocut, Podcast, Re-Frames...)...">
+          <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm tính năng (Autocut, Podcast, Re-Frames, SFX...)...">
         </div>
 
-        <!-- Segmented Control (§5: grid auto-flow column) -->
         <nav class="segmented-control" id="categorySegments">
           <button class="segment-btn active" data-cat="all">Tất cả (7)</button>
           <button class="segment-btn" data-cat="editing">Cắt dựng & Audio (3)</button>
@@ -536,33 +681,34 @@
         </nav>
       </section>
 
-      <!-- Stat Tiles Section (§5: Stat Tile) -->
-      <section class="stats-row">
-        <div class="stat-tile">
-          <span class="stat-label">Hệ thống công cụ</span>
-          <div class="stat-value-group">
-            <span class="stat-value">7</span>
-            <span class="stat-sub">panel tích hợp</span>
+      <!-- ROI Calculator Banner (Interactive Value Simulator) -->
+      <section class="roi-section">
+        <div class="roi-info">
+          <div class="roi-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px; height:18px; color:var(--accent);">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+            Tăng tốc Workflow Editor
           </div>
+          <p class="roi-desc">Mô phỏng thời gian tiết kiệm thực tế khi tự động hóa hậu kỳ bằng bộ 7 panel AiO Studio.</p>
         </div>
-        <div class="stat-tile">
-          <span class="stat-label">Tự động hóa Premiere Pro</span>
-          <div class="stat-value-group">
-            <span class="stat-value">100%</span>
-            <span class="stat-sub">CEP Native</span>
+
+        <div class="roi-calculator">
+          <div class="roi-slider-group">
+            <span class="roi-slider-label">Số video dựng/tuần: <strong id="videoCountText" style="color:var(--text-1);">5 video</strong></span>
+            <input type="range" id="videoSlider" class="roi-slider" min="1" max="20" value="5">
           </div>
-        </div>
-        <div class="stat-tile">
-          <span class="stat-label">Tiêu chuẩn Studio Console</span>
-          <div class="stat-value-group">
-            <span class="stat-value">v1.5.0</span>
-            <span class="stat-sub">Dominic Palette</span>
+          <div class="roi-result">
+            <span class="roi-time-saved" id="savedHoursText">22.5 giờ</span>
+            <span class="roi-sub">tiết kiệm mỗi tuần</span>
           </div>
         </div>
       </section>
 
-      <!-- Tools Grid (7 Tools with SVG icons, no emoji) -->
+      <!-- Tools Grid with LIVE INTERACTIVE PREVIEWS -->
       <section class="tools-grid" id="toolsGrid">
+        
         <!-- 1. AiO Autocut -->
         <article class="tool-card" data-cat="editing" data-name="aio autocut cat tu dong silence filter">
           <div class="card-head">
@@ -581,11 +727,27 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Autocut</h2>
-            <p class="card-desc">Tự động phát hiện khoảng lặng (silence), lọc câu trùng lặp và cắt nháp nhanh cho Podcast, Vlog.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">Lọc nhiễu âm</span>
-              <span class="tag-chip">3 mức cắt</span>
-              <span class="tag-chip">Timecode real</span>
+            <p class="card-desc">Tự động phát hiện khoảng lặng (silence) và cắt thô video tức thì.</p>
+            
+            <!-- Live Interactive Demo Box -->
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Thử nghiệm mức cắt:</span>
+                <strong id="autocutResultText" style="color:var(--ok);">58m37s → 24m12s</strong>
+              </div>
+              <div class="demo-controls" id="autocutDemoBtns">
+                <button class="demo-btn" data-level="light">Nhẹ (-40dB)</button>
+                <button class="demo-btn active" data-level="medium">Vừa (-32dB)</button>
+                <button class="demo-btn" data-level="deep">Sâu (-25dB)</button>
+              </div>
+              <!-- Timeline Bar Preview -->
+              <div class="timeline-bar-preview" id="autocutTimelineBar">
+                <div class="clip-block"></div>
+                <div class="clip-block silence-removed"></div>
+                <div class="clip-block"></div>
+                <div class="clip-block silence-removed"></div>
+                <div class="clip-block"></div>
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -611,11 +773,26 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Auto Podcast</h2>
-            <p class="card-desc">Hậu kỳ podcast đa microphone. Khử tràn tiếng (bleed 2-way) và tự động nhận diện người nói.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">Khử rò rỉ 2-way</span>
-              <span class="tag-chip">Tách kênh mic</span>
-              <span class="tag-chip">Test kiểm não</span>
+            <p class="card-desc">Khử tràn tiếng (bleed 2-way) giữa 2 micro và tách kênh người nói.</p>
+
+            <!-- Live Interactive Demo Box -->
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Khử rò rỉ Audio Bleed:</span>
+                <strong id="podcastStatusText" style="color:var(--ok);">Giảm 94% rò rỉ</strong>
+              </div>
+              <div class="demo-controls" id="podcastDemoBtns">
+                <button class="demo-btn active" data-bleed="on">Bật lọc Bleed (-16dB)</button>
+                <button class="demo-btn" data-bleed="off">Gốc (Chưa lọc)</button>
+              </div>
+              <!-- Waveform Preview -->
+              <div class="wave-line-preview" id="waveformPreview">
+                <div class="wave-bar" style="height:80%;"></div>
+                <div class="wave-bar" style="height:30%;"></div>
+                <div class="wave-bar" style="height:10%;"></div>
+                <div class="wave-bar" style="height:90%;"></div>
+                <div class="wave-bar" style="height:20%;"></div>
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -640,11 +817,22 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Auto Re-Frames</h2>
-            <p class="card-desc">Chuyển đổi video ngang 16:9 sang video dọc 9:16 (TikTok, Reels, Shorts) tự động theo dõi chủ thể.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">Smart Tracking</span>
-              <span class="tag-chip">Khổ 9:16 / 1:1</span>
-              <span class="tag-chip">Smooth Motion</span>
+            <p class="card-desc">Chuyển video ngang 16:9 sang video dọc 9:16 tự động bám chủ thể.</p>
+
+            <!-- Live Interactive Demo Box -->
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Tỉ lệ khung hình:</span>
+                <strong id="reframeText" style="color:var(--accent-text);">Shorts 9:16</strong>
+              </div>
+              <div class="demo-controls" id="reframeDemoBtns">
+                <button class="demo-btn active" data-ratio="9-16">9:16 Dọc</button>
+                <button class="demo-btn" data-ratio="1-1">1:1 Vuông</button>
+                <button class="demo-btn" data-ratio="16-9">16:9 Ngang</button>
+              </div>
+              <div class="reframe-box-preview">
+                <div class="aspect-frame ratio-9-16" id="aspectFrame">AI Lock</div>
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -672,11 +860,22 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Guide Frame</h2>
-            <p class="card-desc">Hiển thị các khung an toàn chuẩn mạng xã hội (UI TikTok, Shorts, Facebook Overlay) trên Program Monitor.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">12 mẫu UI MXH</span>
-              <span class="tag-chip">Bật/tắt 1-click</span>
-              <span class="tag-chip">Chính xác px</span>
+            <p class="card-desc">Khung an toàn UI TikTok, Shorts, Reels overlay trên Program Monitor.</p>
+
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Khung Overlay MXH:</span>
+                <strong id="guideText" style="color:var(--text-1);">TikTok UI Overlay</strong>
+              </div>
+              <div class="demo-controls" id="guideDemoBtns">
+                <button class="demo-btn active" data-guide="tiktok">TikTok</button>
+                <button class="demo-btn" data-guide="shorts">Shorts</button>
+                <button class="demo-btn" data-guide="reels">Reels</button>
+              </div>
+              <div style="font-size:11px; color:var(--text-3); display:flex; justify-content:space-between; align-items:center;">
+                <span>Vùng an toàn nút Like/Cmt:</span>
+                <span style="color:var(--ok);">Hiển thị chuẩn px</span>
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -700,11 +899,18 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Asset Manager</h2>
-            <p class="card-desc">Kho tài nguyên đồ họa, hiệu ứng âm thanh (SFX), Motion Graphics và Preset dự án tích hợp sẵn.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">Kéo thả Premiere</span>
-              <span class="tag-chip">Xem trước SFX</span>
-              <span class="tag-chip">Preset mẫu</span>
+            <p class="card-desc">Kho hiệu ứng âm thanh (SFX), Motion Graphics kéo thả vào Timeline.</p>
+
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Nghe thử & Kéo thả SFX:</span>
+                <strong id="assetPreviewText" style="color:var(--accent-text);">Swoosh_Fast.wav</strong>
+              </div>
+              <div class="asset-list-mini">
+                <div class="asset-chip" onclick="previewAsset('Swoosh_Fast.wav')">🔊 Swoosh</div>
+                <div class="asset-chip" onclick="previewAsset('Pop_Impact.wav')">🔊 Pop</div>
+                <div class="asset-chip" onclick="previewAsset('Whoosh_Transition.wav')">🔊 Whoosh</div>
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -730,11 +936,18 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Power Bins</h2>
-            <p class="card-desc">Tự động phân loại file media nhập vào, tạo cấu trúc Bin chuẩn và gán nhãn màu Footage theo tiêu chuẩn Pro.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">Cấu trúc Bin chuẩn</span>
-              <span class="tag-chip">Nhãn màu Footage</span>
-              <span class="tag-chip">Tối ưu Project</span>
+            <p class="card-desc">Tự động tạo cấu trúc Bin chuẩn và gán nhãn màu Footage theo tiêu chuẩn Pro.</p>
+
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Phân loại 48 File Footage:</span>
+                <strong style="color:var(--ok);">Đã gắn nhãn Premiere</strong>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <span class="tag-chip" style="border-color:var(--pr-video); color:var(--text-1);">01_CAM_A (Xanh)</span>
+                <span class="tag-chip" style="border-color:var(--pr-audio); color:var(--text-1);">02_AUDIO (Lá)</span>
+                <span class="tag-chip" style="border-color:var(--warn); color:var(--text-1);">03_SFX (Vàng)</span>
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -752,7 +965,6 @@
                 <polyline points="14 2 14 8 20 8"/>
                 <line x1="16" y1="13" x2="8" y2="13"/>
                 <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10 9 9 9 8 9"/>
               </svg>
             </div>
             <div class="badge-group">
@@ -762,11 +974,16 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Transcripts</h2>
-            <p class="card-desc">Trích xuất văn bản từ giọng nói (Speech-to-Text), chỉnh sửa phụ đề và tự động tạo Caption trên Timeline.</p>
-            <div class="feature-tags">
-              <span class="tag-chip">Tiếng Việt chuẩn</span>
-              <span class="tag-chip">Đồng bộ Timecode</span>
-              <span class="tag-chip">Xuất SRT/VTT</span>
+            <p class="card-desc">Bóc băng thoại Speech-to-Text Tiếng Việt và xuất Caption tự động.</p>
+
+            <div class="interactive-demo-box">
+              <div class="demo-label">
+                <span>Demo Phụ đề Đồng bộ:</span>
+                <strong style="color:var(--accent-text);">00:04.12 → 00:08.50</strong>
+              </div>
+              <div style="font-size:11px; color:var(--text-1); background:var(--bg-1); padding:4px 8px; border-radius:4px; border-left:2px solid var(--accent);">
+                "Chào mừng bạn đến với bộ panel tự động hóa AiO Studio..."
+              </div>
             </div>
           </div>
           <div class="card-foot">
@@ -778,15 +995,15 @@
     </main>
   </div>
 
-  <!-- Modal Dialog (§5) -->
+  <!-- Modal Dialog -->
   <div class="modal-backdrop" id="toolModal">
     <div class="modal-panel">
       <div class="modal-head">
-        <h3 class="modal-title" id="modalTitle">Thông tin công cụ</h3>
+        <h3 class="modal-title" id="modalTitle">Khởi chạy công cụ</h3>
         <button class="btn" style="height:24px; padding:0 8px;" onclick="closeModal()">✕</button>
       </div>
       <div class="modal-body" id="modalBody">
-        Nội dung chi tiết...
+        Nội dung...
       </div>
       <div class="modal-foot">
         <button class="btn" onclick="closeModal()">Đóng</button>
@@ -796,6 +1013,18 @@
   </div>
 
   <script>
+    // ROI Calculator Interactive Logic
+    const videoSlider = document.getElementById('videoSlider');
+    const videoCountText = document.getElementById('videoCountText');
+    const savedHoursText = document.getElementById('savedHoursText');
+
+    videoSlider.addEventListener('input', (e) => {
+      const count = parseInt(e.target.value, 10);
+      videoCountText.textContent = `${count} video`;
+      const hoursSaved = (count * 4.5).toFixed(1);
+      savedHoursText.textContent = `${hoursSaved} giờ`;
+    });
+
     // Search Filter
     const searchInput = document.getElementById('searchInput');
     const toolsGrid = document.getElementById('toolsGrid');
@@ -821,7 +1050,6 @@
 
     searchInput.addEventListener('input', filterTools);
 
-    // Segmented Control Filter
     const categorySegments = document.getElementById('categorySegments');
     categorySegments.addEventListener('click', (e) => {
       if (e.target.classList.contains('segment-btn')) {
@@ -831,7 +1059,90 @@
       }
     });
 
-    // CEP Tool Launcher
+    // 1. Autocut Interactive Level Demo
+    const autocutBtns = document.getElementById('autocutDemoBtns');
+    const autocutResultText = document.getElementById('autocutResultText');
+    const autocutTimelineBar = document.getElementById('autocutTimelineBar');
+
+    autocutBtns.addEventListener('click', (e) => {
+      if (e.target.classList.contains('demo-btn')) {
+        autocutBtns.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+
+        const level = e.target.dataset.level;
+        if (level === 'light') {
+          autocutResultText.textContent = '58m37s → 38m15s';
+          autocutTimelineBar.children[1].style.flex = '0.4';
+          autocutTimelineBar.children[3].style.flex = '0.4';
+        } else if (level === 'medium') {
+          autocutResultText.textContent = '58m37s → 24m12s';
+          autocutTimelineBar.children[1].style.flex = '0.1';
+          autocutTimelineBar.children[3].style.flex = '0.1';
+        } else if (level === 'deep') {
+          autocutResultText.textContent = '58m37s → 16m40s';
+          autocutTimelineBar.children[1].style.flex = '0.02';
+          autocutTimelineBar.children[3].style.flex = '0.02';
+        }
+      }
+    });
+
+    // 2. Podcast Bleed Demo
+    const podcastBtns = document.getElementById('podcastDemoBtns');
+    const podcastStatusText = document.getElementById('podcastStatusText');
+    const waveformPreview = document.getElementById('waveformPreview');
+
+    podcastBtns.addEventListener('click', (e) => {
+      if (e.target.classList.contains('demo-btn')) {
+        podcastBtns.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+
+        const bleed = e.target.dataset.bleed;
+        if (bleed === 'on') {
+          podcastStatusText.textContent = 'Giảm 94% rò rỉ';
+          podcastStatusText.style.color = 'var(--ok)';
+          Array.from(waveformPreview.children).forEach((bar, idx) => {
+            if (idx % 2 === 1) {
+              bar.style.height = '15%';
+              bar.style.background = 'var(--ok)';
+            }
+          });
+        } else {
+          podcastStatusText.textContent = 'Tràn tiếng -7.1dB';
+          podcastStatusText.style.color = 'var(--danger)';
+          Array.from(waveformPreview.children).forEach((bar, idx) => {
+            if (idx % 2 === 1) {
+              bar.style.height = '85%';
+              bar.style.background = 'var(--danger)';
+            }
+          });
+        }
+      }
+    });
+
+    // 3. Re-Frames Ratio Demo
+    const reframeBtns = document.getElementById('reframeDemoBtns');
+    const reframeText = document.getElementById('reframeText');
+    const aspectFrame = document.getElementById('aspectFrame');
+
+    reframeBtns.addEventListener('click', (e) => {
+      if (e.target.classList.contains('demo-btn')) {
+        reframeBtns.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+
+        const ratio = e.target.dataset.ratio;
+        aspectFrame.className = `aspect-frame ratio-${ratio}`;
+        if (ratio === '9-16') reframeText.textContent = 'Shorts 9:16';
+        else if (ratio === '1-1') reframeText.textContent = 'Square 1:1';
+        else if (ratio === '16-9') reframeText.textContent = 'Wide 16:9';
+      }
+    });
+
+    // Asset Preview Mini Action
+    function previewAsset(filename) {
+      document.getElementById('assetPreviewText').textContent = filename;
+    }
+
+    // Modal Tool Launcher
     function launchTool(toolName, extensionId) {
       if (window.__Adobe_CEP__) {
         try {
@@ -853,12 +1164,12 @@
 
       title.textContent = `Mở ${toolName}`;
       body.innerHTML = `
-        <p style="margin-bottom: 6px;"><strong>Trạng thái:</strong> Sẵn sàng trong Premiere Pro.</p>
+        <p style="margin-bottom: 6px;"><strong>Trạng thái:</strong> CEP Native Extension.</p>
         <p><strong>Extension ID:</strong> <code style="background: var(--bg-0); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line-1);">${extensionId}</code></p>
       `;
 
       confirmBtn.onclick = () => {
-        alert(`Kích hoạt ${toolName} (${extensionId})`);
+        alert(`Kích hoạt ${toolName} (${extensionId})!`);
         closeModal();
       };
 

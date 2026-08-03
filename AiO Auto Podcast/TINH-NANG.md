@@ -115,14 +115,46 @@ offline, mua một lần. Đừng ôm thêm việc của hai mảnh kia vào đ�
       bẩn, máy yếu) — không đối thủ nào dám in số của chính họ; mình lấy
       minh bạch làm vũ khí bán.
 
+## LEVEL 3 — "TRỎ VÀO FOLDER LÀ XONG" (anh Tiến mô tả 03/08/2026)
+
+> Anh Tiến 03/08/2026: level basic là người dùng tự import + tự sync bằng
+> Premiere rồi qua tab tool gán ai-là-ai; *"level xịn nhất: tool trỏ vào
+> folder chứa hình ảnh và âm thanh, tự động làm các thao tác trên"*.
+> Level basic = LEVEL 0–1 phía trên, ĐÃ CHẠY. Phần dưới là đường lên đỉnh.
+
+- [ ] 1. Chọn folder → tool tự quét, phân loại video/audio. Phải xử lý ngay
+      hai bẫy đã gặp trên liệu thật 03/08: tên file Mac chứa U+F022 làm CLI
+      gãy, và file audio TRÙNG từng byte (cùng MD5) phải gộp làm một.
+- [ ] 2. **TỰ SYNC bằng tương quan chéo** — spike ĐÃ ĐO 03/08 trên liệu
+      thật (3 cam 4K + 2 mic, 44 phút): lệch trung bình **0,59 frame** so
+      với PluralEyes, và sync được cả cặp mà PluralEyes bỏ cuộc. Còn thiếu:
+      đóng thành module trong panel; KHÔNG chặn bằng ngưỡng r cứng — xét
+      tính nhất quán giữa các cặp (bài học 03/08: r thấp mà lag vẫn đúng).
+- [ ] 3. Tự dựng sequence đã sync trong Premiere. Spike 03/08 đã sinh FCP7
+      XML hợp lệ (`podcast-buoi2\PODCAST-BUOI2-da-sync.xml`) nhưng CHƯA
+      import thử; đường thứ hai là host JSX tự đặt clip theo offset — chưa
+      làm. Đo: ranh sync trên timeline lệch < 1 frame so với PluralEyes.
+- [ ] 4. Tự GỢI Ý ghép cặp mic ↔ cam (tương quan bleed), kèm gom file theo
+      buổi quay (liệu thật 03/08: 1 folder = 2 buổi phỏng vấn khác nhau,
+      tương quan chéo giữa 2 buổi r ~ 0,02 → tách được bằng máy). Người
+      dùng chỉ XÁC NHẬN + đặt tên người. Cam wide / cam 2 người KHÔNG đoán
+      được bằng âm thanh — chỗ đó vẫn phải hỏi người dùng.
+- [ ] 5. Chuỗi liền một nút: folder → sync → sequence → xác nhận gán → cắt.
+      Có đường dừng và sửa tay ở TỪNG chặng — tự động là mặc định, không
+      phải bắt buộc.
+
 ## KHÔNG LÀM (đã chốt, đừng mở lại khi chưa hỏi anh)
 
 - ML nhận diện giọng nói — bài toán này giải bằng SO SÁNH NĂNG LƯỢNG là đủ
 - Track audio TRỘN sẵn (một track cho cả phòng) — yêu cầu mỗi người một mic
-- Tự sync các cam/mic — Premiere Synchronize làm tốt rồi, đừng làm lại
+- ~~Tự sync các cam/mic — Premiere Synchronize làm tốt rồi, đừng làm lại~~
+  **MỞ LẠI 03/08/2026 — chính anh Tiến mở**, khi mô tả Level 3 "trỏ vào
+  folder". Với Level 0–2 người dùng vẫn sync bằng Premiere như cũ; tự sync
+  chỉ nằm trong đường Level 3. Spike đã đo: 0,59 frame vs PluralEyes.
 - Nhịp dựng "nghệ thuật" (đổi cam theo cảm xúc, theo nhạc…) — v1 cắt ĐÚNG
   trước đã, đẹp tính sau khi có người dùng thật chê
 
 ---
 
-*Cập nhật lần cuối: 01/08/2026 — v0.1.0 vừa cài dev, chờ liệu thật.*
+*Cập nhật lần cuối: 03/08/2026 — thêm LEVEL 3 theo mô tả của anh Tiến;
+mở lại mục tự-sync (spike đã đo 0,59 frame so với PluralEyes).*
