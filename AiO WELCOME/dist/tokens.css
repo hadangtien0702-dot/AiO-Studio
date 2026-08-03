@@ -1,4 +1,4 @@
-/* AiO Studio - Standard Unified Design System Tokens */
+/* AiO Studio — Design System Tokens ("Studio Console" Section 15) */
 @font-face {
   font-family: 'Inter var';
   font-style: normal;
@@ -7,8 +7,16 @@
   src: url('fonts/Inter.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Inter var';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/Inter-Italic.woff2') format('woff2');
+}
+
 :root {
-  /* Bề mặt (Surface Colors - Dominic palette) */
+  /* Bề mặt — reference "Dominic" (ấm/sáng hơn, gần Premiere #1D1D1D) */
   --bg-0: #0e0e0e;
   --bg-1: #141414;
   --bg-2: #181818;
@@ -16,68 +24,92 @@
   --bg-4: #282828;
   --bg-5: #333333;
   --bg-6: #161616;
-  --bg-glass: rgba(24, 24, 24, 0.75);
-  --bg-hover: rgba(255, 255, 255, 0.05);
-  --bg-active: rgba(255, 255, 255, 0.09);
+  --bg-hover: rgb(255 255 255 / 5%);
+  --bg-active: rgb(255 255 255 / 9%);
 
-  /* Viền (Borders & Hairlines) */
-  --line-1: rgba(255, 255, 255, 0.06);
-  --line-2: rgba(255, 255, 255, 0.10);
-  --line-strong: rgba(255, 255, 255, 0.16);
+  /* Viền — hairline, KHÔNG xám đặc */
+  --line-1: rgb(255 255 255 / 6%);
+  --line-2: rgb(255 255 255 / 10%);
+  --line-strong: rgb(255 255 255 / 16%);
 
-  /* Chữ (Typography & Icons) */
+  /* Chữ (đã đo tương phản thật, trộn alpha) */
   --text-1: #f5f5f7;
   --text-2: #c3c3c8;
   --text-3: #8d8d95;
   --text-meta: #9b9ba3;
   --icon-dim: #8f8f97;
 
-  /* Accent Cam (Brand Orange) */
+  /* Accent CAM vàng (reference #F86820) */
   --accent: #f86820;
   --accent-hover: #ff7d3c;
   --accent-pressed: #e0590e;
-  --accent-soft: rgba(248, 104, 32, 0.16);
-  --accent-line: rgba(248, 104, 32, 0.40);
+  --accent-soft: rgb(248 104 32 / 16%);
+  --accent-line: rgb(248 104 32 / 40%);
   --accent-text: #ffb891;
   --accent-on: #ffffff;
 
-  /* Ngữ nghĩa (Status Semantic Colors) */
+  /* Ngữ nghĩa — sắc phải PHÂN BIỆT được với cam */
   --ok: #4ec98a;
-  --ok-soft: rgba(78, 201, 138, 0.15);
   --warn: #e8c05a;
-  --warn-soft: rgba(232, 192, 90, 0.15);
   --danger: #ff5f6d;
-  --danger-soft: rgba(255, 95, 109, 0.15);
-  --info: #3b82f6;
-  --info-soft: rgba(59, 130, 246, 0.15);
-  --purple: #a855f7;
-  --purple-soft: rgba(168, 85, 247, 0.15);
+  --danger-strong: #ff4757;
+  --heart: #ff6b81;
 
-  /* Font + Thang chữ */
+  /* Font + thang chữ */
   --font-ui: 'Inter var', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Inter var', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --fs-2xs: 10px;
   --fs-xs: 11px;
   --fs-sm: 12px;
   --fs-md: 13px;
   --fs-lg: 15px;
   --fs-xl: 19px;
-  --fs-2xl: 24px;
   --fw-normal: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
   --fw-bold: 700;
+  --lh-tight: 1.25;
+  --lh: 1.45;
+  --ls-display: -0.014em;
 
-  /* Bo góc & Đệm */
-  --r-sm: 4px;
+  /* Khoảng cách / bo / bóng */
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 12px;
+  --sp-5: 16px;
+  --sp-6: 24px;
+  --r-sm: 6px;
   --r-md: 8px;
   --r-lg: 12px;
-  --r-xl: 16px;
-  --r-full: 9999px;
+  --r-pill: 999px;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 45%);
+  --shadow-pop: 0 18px 52px rgb(0 0 0 / 62%);
 
-  /* Hiệu ứng */
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 25px rgba(248, 104, 32, 0.25);
-  --dur: 200ms;
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Chiều cao control */
+  --h-ctrl-sm: 24px;
+  --h-ctrl: 28px;
+  --h-ctrl-lg: 34px;
+  --h-topbar: 44px;
+
+  /* Chuyển động */
+  --dur: 150ms;
+  --ease: cubic-bezier(.32,.72,0,1);
+
+  /* Vòng focus (dùng cho MỌI control) */
   --focus-ring: 0 0 0 3px var(--accent-soft);
+
+  /* Vật thể Premiere */
+  --pr-video: #729ACC;
+  --pr-video-head: #5b7ea8;
+  --pr-audio: #1D7021;
+
+  /* Z-index — thang lớp */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-tooltip: 500;
 }
