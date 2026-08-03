@@ -16,7 +16,7 @@
 
     body {
       font-family: var(--font-ui);
-      background-color: var(--bg-2);
+      background-color: var(--bg-0);
       color: var(--text-1);
       font-size: var(--fs-md);
       line-height: var(--lh);
@@ -29,14 +29,14 @@
       width: 10px;
     }
     ::-webkit-scrollbar-track {
-      background: transparent;
+      background: var(--bg-0);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.16);
       border-radius: var(--r-pill);
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.28);
     }
 
     .app-viewport {
@@ -60,6 +60,7 @@
       position: sticky;
       top: 0;
       z-index: var(--z-sticky);
+      backdrop-filter: blur(12px);
     }
 
     .topbar-brand {
@@ -69,29 +70,30 @@
     }
 
     .brand-icon-svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       color: var(--accent);
       flex-shrink: 0;
     }
 
     .brand-name {
       font-size: var(--fs-lg);
-      font-weight: var(--fw-semibold);
+      font-weight: var(--fw-bold);
       color: var(--text-1);
       display: flex;
       align-items: center;
       gap: var(--sp-2);
+      letter-spacing: -0.01em;
     }
 
     .brand-version {
       font-size: var(--fs-2xs);
-      color: var(--text-3);
-      background: var(--bg-4);
-      border: 1px solid var(--line-1);
-      padding: 1px 6px;
+      color: var(--accent-text);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+      padding: 1px 7px;
       border-radius: var(--r-pill);
-      font-weight: var(--fw-medium);
+      font-weight: var(--fw-semibold);
     }
 
     .topbar-status {
@@ -100,17 +102,18 @@
       gap: var(--sp-2);
       font-size: var(--fs-xs);
       color: var(--text-2);
-      background: var(--bg-0);
-      border: 1px solid var(--line-1);
-      padding: 3px 10px;
+      background: var(--bg-2);
+      border: 1px solid var(--line-2);
+      padding: 4px 12px;
       border-radius: var(--r-pill);
     }
 
     .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--ok);
+      box-shadow: 0 0 8px var(--ok);
     }
 
     /* Content Area */
@@ -134,17 +137,17 @@
     .search-container {
       position: relative;
       flex: 1;
-      min-width: 240px;
+      min-width: 260px;
       max-width: 480px;
     }
 
     .search-input {
       width: 100%;
       height: var(--h-ctrl);
-      background: var(--bg-0);
+      background: var(--bg-1);
       border: 1px solid var(--line-2);
       border-radius: var(--r-sm);
-      padding: 0 var(--sp-3) 0 32px;
+      padding: 0 var(--sp-3) 0 34px;
       color: var(--text-1);
       font-family: inherit;
       font-size: var(--fs-md);
@@ -155,6 +158,7 @@
     .search-input:focus-visible {
       border-color: var(--accent-line);
       box-shadow: var(--focus-ring);
+      background: var(--bg-2);
     }
 
     .search-input::placeholder {
@@ -163,11 +167,11 @@
 
     .search-icon-svg {
       position: absolute;
-      left: 10px;
+      left: 11px;
       top: 50%;
       transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
       color: var(--icon-dim);
       pointer-events: none;
     }
@@ -176,7 +180,7 @@
       display: grid;
       grid-auto-flow: column;
       grid-auto-columns: minmax(max-content, 1fr);
-      background: var(--bg-0);
+      background: var(--bg-1);
       border: 1px solid var(--line-1);
       border-radius: var(--r-sm);
       padding: 2px;
@@ -187,7 +191,7 @@
       background: transparent;
       border: none;
       color: var(--text-2);
-      height: 24px;
+      height: 26px;
       padding: 0 var(--sp-3);
       border-radius: var(--r-sm);
       font-family: inherit;
@@ -209,9 +213,9 @@
       font-weight: var(--fw-semibold);
     }
 
-    /* ROI Simulator Banner (Interactive Value Demo) */
+    /* ROI Calculator Section */
     .roi-section {
-      background: var(--bg-3);
+      background: linear-gradient(135deg, rgba(248, 104, 32, 0.08) 0%, rgba(31, 31, 31, 0.95) 100%), var(--bg-2);
       border: 1px solid var(--accent-line);
       border-radius: var(--r-lg);
       padding: var(--sp-4) var(--sp-5);
@@ -220,18 +224,19 @@
       justify-content: space-between;
       gap: var(--sp-5);
       flex-wrap: wrap;
+      box-shadow: var(--shadow-md);
     }
 
     .roi-info {
       display: flex;
       flex-direction: column;
       gap: var(--sp-1);
-      max-width: 460px;
+      max-width: 480px;
     }
 
     .roi-title {
       font-size: var(--fs-lg);
-      font-weight: var(--fw-semibold);
+      font-weight: var(--fw-bold);
       color: var(--text-1);
       display: flex;
       align-items: center;
@@ -246,41 +251,43 @@
     .roi-calculator {
       display: flex;
       align-items: center;
-      gap: var(--sp-4);
-      background: var(--bg-0);
+      gap: var(--sp-5);
+      background: var(--bg-1);
       border: 1px solid var(--line-2);
       border-radius: var(--r-md);
-      padding: var(--sp-3) var(--sp-4);
+      padding: var(--sp-3) var(--sp-5);
     }
 
     .roi-slider-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .roi-slider-label {
-      font-size: var(--fs-2xs);
-      color: var(--text-3);
+      font-size: var(--fs-xs);
+      color: var(--text-2);
     }
 
     .roi-slider {
       accent-color: var(--accent);
       cursor: pointer;
+      width: 160px;
     }
 
     .roi-result {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      border-left: 1px solid var(--line-1);
+      border-left: 1px solid var(--line-2);
       padding-left: var(--sp-4);
     }
 
     .roi-time-saved {
-      font-size: var(--fs-xl);
+      font-size: 22px;
       font-weight: var(--fw-bold);
       color: var(--ok);
+      line-height: 1.1;
     }
 
     .roi-sub {
@@ -291,26 +298,29 @@
     /* Tools Grid */
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: var(--sp-4);
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: var(--sp-5);
     }
 
-    /* Interactive Section Card */
+    /* Section Card */
     .tool-card {
-      background: var(--bg-3);
+      background: var(--bg-2);
       border: 1px solid var(--line-1);
       border-radius: var(--r-lg);
-      padding: var(--sp-4);
+      padding: var(--sp-5);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       gap: var(--sp-4);
-      transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+      transition: all var(--dur) var(--ease);
+      position: relative;
     }
 
     .tool-card:hover {
-      border-color: var(--line-strong);
-      background: var(--bg-4);
+      border-color: var(--accent-line);
+      background: var(--bg-3);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
     }
 
     .card-head {
@@ -321,11 +331,11 @@
     }
 
     .card-icon-wrap {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: var(--r-md);
-      background: var(--bg-0);
-      border: 1px solid var(--line-1);
+      background: var(--bg-1);
+      border: 1px solid var(--line-2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -334,8 +344,8 @@
     }
 
     .card-icon-svg {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       stroke-width: 1.5;
     }
 
@@ -347,12 +357,12 @@
 
     .badge {
       font-size: var(--fs-2xs);
-      font-weight: var(--fw-medium);
-      padding: 1px 6px;
+      font-weight: var(--fw-semibold);
+      padding: 2px 7px;
       border-radius: var(--r-pill);
       border: 1px solid var(--line-2);
       color: var(--text-2);
-      background: var(--bg-0);
+      background: var(--bg-1);
     }
 
     .badge-accent {
@@ -374,159 +384,239 @@
     }
 
     .card-title {
-      font-size: var(--fs-lg);
-      font-weight: var(--fw-semibold);
+      font-size: 16px;
+      font-weight: var(--fw-bold);
       color: var(--text-1);
+      letter-spacing: -0.01em;
     }
 
     .card-desc {
       font-size: var(--fs-xs);
       color: var(--text-2);
-      line-height: var(--lh);
+      line-height: 1.45;
     }
 
-    /* LIVE INTERACTIVE PREVIEW BOX Inside Card */
-    .interactive-demo-box {
+    /* REAL PREMIERE PRO SIMULATOR CANVAS BOX Inside Card */
+    .simulator-canvas {
       background: var(--bg-0);
-      border: 1px solid var(--line-2);
+      border: 1px solid var(--line-strong);
       border-radius: var(--r-md);
       padding: var(--sp-3);
       display: flex;
       flex-direction: column;
       gap: var(--sp-2);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
     }
 
-    .demo-label {
-      font-size: var(--fs-2xs);
-      color: var(--text-3);
+    .sim-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      font-size: var(--fs-2xs);
+      color: var(--text-3);
+      border-bottom: 1px solid var(--line-1);
+      padding-bottom: 4px;
     }
 
-    .demo-controls {
+    .sim-controls {
       display: flex;
       gap: 4px;
     }
 
-    .demo-btn {
-      background: var(--bg-3);
-      border: 1px solid var(--line-1);
+    .sim-btn {
+      background: var(--bg-2);
+      border: 1px solid var(--line-2);
       color: var(--text-2);
-      font-size: 11px;
-      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: var(--fw-medium);
+      padding: 3px 8px;
       border-radius: var(--r-sm);
       cursor: pointer;
       transition: all var(--dur) var(--ease);
     }
 
-    .demo-btn.active {
+    .sim-btn:hover {
+      background: var(--bg-4);
+      color: var(--text-1);
+    }
+
+    .sim-btn.active {
       background: var(--accent-soft);
       color: var(--accent-text);
       border-color: var(--accent-line);
-      font-weight: var(--fw-semibold);
+      font-weight: var(--fw-bold);
     }
 
-    /* Visual Timeline Preview Component */
-    .timeline-bar-preview {
-      height: 24px;
-      background: var(--bg-1);
+    /* Premiere Timeline Simulation Display */
+    .pr-timeline-display {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: #111112;
       border-radius: var(--r-sm);
+      padding: 6px;
       position: relative;
-      overflow: hidden;
+    }
+
+    .pr-track {
       display: flex;
       align-items: center;
-      padding: 0 4px;
-      gap: 2px;
+      gap: 3px;
+      height: 18px;
+      position: relative;
     }
 
-    .clip-block {
-      height: 16px;
+    .pr-track-label {
+      width: 20px;
+      font-size: 9px;
+      font-family: monospace;
+      color: var(--text-3);
+      flex-shrink: 0;
+    }
+
+    .pr-clip {
+      height: 100%;
       background: var(--pr-video);
       border-top: 2px solid var(--pr-video-head);
       border-radius: 2px;
       flex: 1;
+      position: relative;
       transition: all var(--dur) var(--ease);
     }
 
-    .clip-block.silence-removed {
-      background: rgba(255, 95, 109, 0.2);
-      border-top-color: var(--danger);
-      flex: 0.1;
-      opacity: 0.3;
+    .pr-clip.audio {
+      background: var(--pr-audio);
+      border-top: 2px solid #2d9432;
     }
 
-    .wave-line-preview {
+    .pr-clip.cut-zone {
+      background: rgba(255, 95, 109, 0.25);
+      border: 1px dashed var(--danger);
+      flex: 0.12;
+    }
+
+    .pr-playhead {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 35%;
+      width: 1px;
+      background: #00e5ff;
+      box-shadow: 0 0 6px #00e5ff;
+      z-index: 5;
+    }
+
+    .pr-playhead::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      width: 7px;
+      height: 5px;
+      background: #00e5ff;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    /* Waveform Simulator */
+    .waveform-display {
       display: flex;
       align-items: center;
       gap: 2px;
-      height: 20px;
+      height: 24px;
       width: 100%;
+      background: #111112;
+      padding: 4px;
+      border-radius: var(--r-sm);
     }
 
     .wave-bar {
       flex: 1;
       background: var(--ok);
-      height: 40%;
+      height: 50%;
       border-radius: 1px;
       transition: height var(--dur) var(--ease), background var(--dur) var(--ease);
     }
 
-    .wave-bar.bleed {
+    .wave-bar.bleed-high {
       background: var(--danger);
       height: 90%;
     }
 
-    /* Reframe Preview Box */
-    .reframe-box-preview {
-      height: 50px;
-      background: var(--bg-1);
+    /* Reframe Canvas Simulator */
+    .reframe-canvas {
+      height: 64px;
+      background: #0a0a0b;
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
+      border: 1px solid var(--line-1);
     }
 
-    .aspect-frame {
-      border: 1px dashed var(--accent);
-      background: var(--accent-soft);
-      height: 100%;
+    .sim-video-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, #2a2a30 0%, #101014 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
-      color: var(--accent-text);
-      transition: width var(--dur) var(--ease);
     }
 
-    .aspect-frame.ratio-9-16 { width: 30px; }
-    .aspect-frame.ratio-1-1 { width: 50px; }
-    .aspect-frame.ratio-16-9 { width: 90px; }
-
-    /* Asset Item Preview */
-    .asset-list-mini {
-      display: flex;
-      gap: 6px;
-    }
-
-    .asset-chip {
-      background: var(--bg-2);
-      border: 1px solid var(--line-1);
-      border-radius: var(--r-sm);
-      padding: 4px 8px;
-      font-size: 11px;
-      color: var(--text-2);
+    .subject-box {
+      border: 1.5px solid var(--accent);
+      background: rgba(248, 104, 32, 0.15);
+      border-radius: 2px;
       display: flex;
       align-items: center;
-      gap: 4px;
-      cursor: pointer;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--accent-text);
+      font-weight: bold;
+      transition: all var(--dur) var(--ease);
+      box-shadow: 0 0 10px rgba(248, 104, 32, 0.3);
     }
 
-    .asset-chip:hover {
-      border-color: var(--accent-line);
-      color: var(--text-1);
+    .subject-box.ratio-9-16 { width: 34px; height: 58px; }
+    .subject-box.ratio-1-1 { width: 48px; height: 48px; }
+    .subject-box.ratio-16-9 { width: 90px; height: 50px; }
+
+    /* Phone Safe Zone Overlay Simulator */
+    .phone-overlay-sim {
+      height: 64px;
+      background: #000;
+      border-radius: var(--r-sm);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line-2);
+    }
+
+    .ui-overlay-lines {
+      position: absolute;
+      inset: 0;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px;
+      font-size: 8px;
+      color: var(--text-3);
+    }
+
+    .overlay-right-icons {
+      position: absolute;
+      right: 6px;
+      bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 8px;
+      color: #fff;
     }
 
     .card-foot {
@@ -543,7 +633,7 @@
       color: var(--text-3);
     }
 
-    /* Primary Cam Button */
+    /* Buttons (§5 & §10) */
     .btn {
       height: var(--h-ctrl);
       background: var(--bg-4);
@@ -585,7 +675,8 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -657,7 +748,7 @@
 
       <div class="topbar-status">
         <span class="status-dot"></span>
-        <span>Premiere Pro CEP Ready</span>
+        <span>Premiere Pro CEP Connected</span>
       </div>
     </header>
 
@@ -670,7 +761,7 @@
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm tính năng (Autocut, Podcast, Re-Frames, SFX...)...">
+          <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm công cụ (Autocut, Podcast, Re-Frames, SFX...)...">
         </div>
 
         <nav class="segmented-control" id="categorySegments">
@@ -681,17 +772,17 @@
         </nav>
       </section>
 
-      <!-- ROI Calculator Banner (Interactive Value Simulator) -->
+      <!-- ROI Calculator Section -->
       <section class="roi-section">
         <div class="roi-info">
           <div class="roi-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px; height:18px; color:var(--accent);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:20px; height:20px; color:var(--accent);">
               <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
               <polyline points="17 6 23 6 23 12"/>
             </svg>
-            Tăng tốc Workflow Editor
+            Tăng Tốc Workflow Editor
           </div>
-          <p class="roi-desc">Mô phỏng thời gian tiết kiệm thực tế khi tự động hóa hậu kỳ bằng bộ 7 panel AiO Studio.</p>
+          <p class="roi-desc">Mô phỏng số giờ tiết kiệm thực tế khi tự động hóa hậu kỳ Premiere Pro với bộ 7 panel AiO Studio.</p>
         </div>
 
         <div class="roi-calculator">
@@ -706,7 +797,7 @@
         </div>
       </section>
 
-      <!-- Tools Grid with LIVE INTERACTIVE PREVIEWS -->
+      <!-- Tools Grid with REAL VISUAL SIMULATOR CANVASES -->
       <section class="tools-grid" id="toolsGrid">
         
         <!-- 1. AiO Autocut -->
@@ -727,26 +818,45 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Autocut</h2>
-            <p class="card-desc">Tự động phát hiện khoảng lặng (silence) và cắt thô video tức thì.</p>
+            <p class="card-desc">Phát hiện khoảng lặng (silence), lọc câu trùng và tự động cắt nháp video trên Timeline Premiere Pro.</p>
             
-            <!-- Live Interactive Demo Box -->
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Thử nghiệm mức cắt:</span>
+            <!-- Real Premiere Timeline Simulator Canvas -->
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>Timeline Premiere (V1 + A1):</span>
                 <strong id="autocutResultText" style="color:var(--ok);">58m37s → 24m12s</strong>
               </div>
-              <div class="demo-controls" id="autocutDemoBtns">
-                <button class="demo-btn" data-level="light">Nhẹ (-40dB)</button>
-                <button class="demo-btn active" data-level="medium">Vừa (-32dB)</button>
-                <button class="demo-btn" data-level="deep">Sâu (-25dB)</button>
+
+              <!-- Premiere Timeline Visual Display -->
+              <div class="pr-timeline-display" id="prTimelineVisual">
+                <div class="pr-playhead"></div>
+                <!-- Video Track V1 -->
+                <div class="pr-track">
+                  <span class="pr-track-label">V1</span>
+                  <div class="pr-clip"></div>
+                  <div class="pr-clip cut-zone" id="cutZone1"></div>
+                  <div class="pr-clip"></div>
+                  <div class="pr-clip cut-zone" id="cutZone2"></div>
+                  <div class="pr-clip"></div>
+                </div>
+                <!-- Audio Track A1 -->
+                <div class="pr-track">
+                  <span class="pr-track-label">A1</span>
+                  <div class="pr-clip audio"></div>
+                  <div class="pr-clip cut-zone"></div>
+                  <div class="pr-clip audio"></div>
+                  <div class="pr-clip cut-zone"></div>
+                  <div class="pr-clip audio"></div>
+                </div>
               </div>
-              <!-- Timeline Bar Preview -->
-              <div class="timeline-bar-preview" id="autocutTimelineBar">
-                <div class="clip-block"></div>
-                <div class="clip-block silence-removed"></div>
-                <div class="clip-block"></div>
-                <div class="clip-block silence-removed"></div>
-                <div class="clip-block"></div>
+
+              <div class="sim-controls" id="autocutDemoBtns" style="justify-content:space-between; margin-top:4px;">
+                <span style="font-size:10px; color:var(--text-3); align-self:center;">Mức cắt:</span>
+                <div style="display:flex; gap:3px;">
+                  <button class="sim-btn" data-level="light">Nhẹ (-40dB)</button>
+                  <button class="sim-btn active" data-level="medium">Vừa (-32dB)</button>
+                  <button class="sim-btn" data-level="deep">Sâu (-25dB)</button>
+                </div>
               </div>
             </div>
           </div>
@@ -773,25 +883,32 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Auto Podcast</h2>
-            <p class="card-desc">Khử tràn tiếng (bleed 2-way) giữa 2 micro và tách kênh người nói.</p>
+            <p class="card-desc">Khử tràn tiếng (bleed 2-way) giữa các microphone, tự động nhận diện người nói và phân kênh audio.</p>
 
-            <!-- Live Interactive Demo Box -->
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Khử rò rỉ Audio Bleed:</span>
-                <strong id="podcastStatusText" style="color:var(--ok);">Giảm 94% rò rỉ</strong>
+            <!-- Dual-Mic Waveform Visual Simulator Canvas -->
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>Tách Kênh Mic Host & Guest:</span>
+                <strong id="podcastStatusText" style="color:var(--ok);">Giảm 94% Bleed (-16dB)</strong>
               </div>
-              <div class="demo-controls" id="podcastDemoBtns">
-                <button class="demo-btn active" data-bleed="on">Bật lọc Bleed (-16dB)</button>
-                <button class="demo-btn" data-bleed="off">Gốc (Chưa lọc)</button>
-              </div>
-              <!-- Waveform Preview -->
-              <div class="wave-line-preview" id="waveformPreview">
-                <div class="wave-bar" style="height:80%;"></div>
-                <div class="wave-bar" style="height:30%;"></div>
-                <div class="wave-bar" style="height:10%;"></div>
-                <div class="wave-bar" style="height:90%;"></div>
+
+              <div class="waveform-display" id="waveformPreview">
+                <div class="wave-bar" style="height:85%;"></div>
                 <div class="wave-bar" style="height:20%;"></div>
+                <div class="wave-bar" style="height:15%;"></div>
+                <div class="wave-bar" style="height:90%;"></div>
+                <div class="wave-bar" style="height:25%;"></div>
+                <div class="wave-bar" style="height:75%;"></div>
+                <div class="wave-bar" style="height:15%;"></div>
+                <div class="wave-bar" style="height:80%;"></div>
+              </div>
+
+              <div class="sim-controls" id="podcastDemoBtns" style="justify-content:space-between; margin-top:4px;">
+                <span style="font-size:10px; color:var(--text-3); align-self:center;">Chế độ lọc:</span>
+                <div style="display:flex; gap:3px;">
+                  <button class="sim-btn active" data-bleed="on">Bật lọc Bleed (-16dB)</button>
+                  <button class="sim-btn" data-bleed="off">Chưa lọc (Gốc)</button>
+                </div>
               </div>
             </div>
           </div>
@@ -817,21 +934,28 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Auto Re-Frames</h2>
-            <p class="card-desc">Chuyển video ngang 16:9 sang video dọc 9:16 tự động bám chủ thể.</p>
+            <p class="card-desc">Tự động chuyển đổi video ngang 16:9 sang video dọc 9:16 (TikTok/Reels/Shorts) theo dõi chủ thể AI.</p>
 
-            <!-- Live Interactive Demo Box -->
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Tỉ lệ khung hình:</span>
+            <!-- Video Aspect Canvas Simulator -->
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>AI Subject Tracking Viewfinder:</span>
                 <strong id="reframeText" style="color:var(--accent-text);">Shorts 9:16</strong>
               </div>
-              <div class="demo-controls" id="reframeDemoBtns">
-                <button class="demo-btn active" data-ratio="9-16">9:16 Dọc</button>
-                <button class="demo-btn" data-ratio="1-1">1:1 Vuông</button>
-                <button class="demo-btn" data-ratio="16-9">16:9 Ngang</button>
+
+              <div class="reframe-canvas">
+                <div class="sim-video-bg">
+                  <div class="subject-box ratio-9-16" id="aspectFrame">Subject Locked</div>
+                </div>
               </div>
-              <div class="reframe-box-preview">
-                <div class="aspect-frame ratio-9-16" id="aspectFrame">AI Lock</div>
+
+              <div class="sim-controls" id="reframeDemoBtns" style="justify-content:space-between; margin-top:4px;">
+                <span style="font-size:10px; color:var(--text-3); align-self:center;">Tỉ lệ xuất:</span>
+                <div style="display:flex; gap:3px;">
+                  <button class="sim-btn active" data-ratio="9-16">9:16 Dọc</button>
+                  <button class="sim-btn" data-ratio="1-1">1:1 Vuông</button>
+                  <button class="sim-btn" data-ratio="16-9">16:9 Ngang</button>
+                </div>
               </div>
             </div>
           </div>
@@ -860,21 +984,35 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Guide Frame</h2>
-            <p class="card-desc">Khung an toàn UI TikTok, Shorts, Reels overlay trên Program Monitor.</p>
+            <p class="card-desc">Hiển thị khung an toàn chuẩn mạng xã hội (UI TikTok, Shorts, Facebook Overlay) ngay trên Program Monitor.</p>
 
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Khung Overlay MXH:</span>
-                <strong id="guideText" style="color:var(--text-1);">TikTok UI Overlay</strong>
+            <!-- Social Media Phone Simulator -->
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>Safe Zone Grid Overlay:</span>
+                <strong id="guideText" style="color:var(--text-1);">TikTok UI Safe Zone</strong>
               </div>
-              <div class="demo-controls" id="guideDemoBtns">
-                <button class="demo-btn active" data-guide="tiktok">TikTok</button>
-                <button class="demo-btn" data-guide="shorts">Shorts</button>
-                <button class="demo-btn" data-guide="reels">Reels</button>
+
+              <div class="phone-overlay-sim">
+                <div class="ui-overlay-lines">
+                  <span>TOP UI SAFE AREA</span>
+                  <span style="align-self:center;">SAFE CONTENT ZONE</span>
+                  <span>BOTTOM CAPTION ZONE</span>
+                </div>
+                <div class="overlay-right-icons">
+                  <span>♥ 1.2M</span>
+                  <span>💬 4.5K</span>
+                  <span>↗ Share</span>
+                </div>
               </div>
-              <div style="font-size:11px; color:var(--text-3); display:flex; justify-content:space-between; align-items:center;">
-                <span>Vùng an toàn nút Like/Cmt:</span>
-                <span style="color:var(--ok);">Hiển thị chuẩn px</span>
+
+              <div class="sim-controls" id="guideDemoBtns" style="justify-content:space-between; margin-top:4px;">
+                <span style="font-size:10px; color:var(--text-3); align-self:center;">Mẫu UI:</span>
+                <div style="display:flex; gap:3px;">
+                  <button class="sim-btn active" data-guide="tiktok">TikTok</button>
+                  <button class="sim-btn" data-guide="shorts">Shorts</button>
+                  <button class="sim-btn" data-guide="reels">Reels</button>
+                </div>
               </div>
             </div>
           </div>
@@ -899,17 +1037,23 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Asset Manager</h2>
-            <p class="card-desc">Kho hiệu ứng âm thanh (SFX), Motion Graphics kéo thả vào Timeline.</p>
+            <p class="card-desc">Kho tài nguyên hiệu ứng âm thanh (SFX), Motion Graphics và Preset dự án kéo thả trực tiếp.</p>
 
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Nghe thử & Kéo thả SFX:</span>
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>Nghe thử Audio & Kéo thả SFX:</span>
                 <strong id="assetPreviewText" style="color:var(--accent-text);">Swoosh_Fast.wav</strong>
               </div>
-              <div class="asset-list-mini">
-                <div class="asset-chip" onclick="previewAsset('Swoosh_Fast.wav')">🔊 Swoosh</div>
-                <div class="asset-chip" onclick="previewAsset('Pop_Impact.wav')">🔊 Pop</div>
-                <div class="asset-chip" onclick="previewAsset('Whoosh_Transition.wav')">🔊 Whoosh</div>
+
+              <div style="display:flex; flex-direction:column; gap:4px; background:#111112; padding:6px; border-radius:4px;">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-2);">
+                  <span onclick="previewAsset('Swoosh_Fast.wav')" style="cursor:pointer;">🔊 Swoosh_Fast.wav</span>
+                  <span style="color:var(--accent-text);">Kéo vào A2 ➔</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-2);">
+                  <span onclick="previewAsset('Pop_Impact.wav')" style="cursor:pointer;">🔊 Pop_Impact.wav</span>
+                  <span style="color:var(--ok);">Đã lưu yêu thích</span>
+                </div>
               </div>
             </div>
           </div>
@@ -936,17 +1080,27 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Power Bins</h2>
-            <p class="card-desc">Tự động tạo cấu trúc Bin chuẩn và gán nhãn màu Footage theo tiêu chuẩn Pro.</p>
+            <p class="card-desc">Tự động phân loại media nhập vào, tạo cấu trúc Bin chuẩn và gán nhãn màu Footage theo tiêu chuẩn Pro.</p>
 
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Phân loại 48 File Footage:</span>
-                <strong style="color:var(--ok);">Đã gắn nhãn Premiere</strong>
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>Auto Bin Structuring Engine:</span>
+                <strong style="color:var(--ok);">48 Files Organized</strong>
               </div>
-              <div style="display:flex; gap:6px;">
-                <span class="tag-chip" style="border-color:var(--pr-video); color:var(--text-1);">01_CAM_A (Xanh)</span>
-                <span class="tag-chip" style="border-color:var(--pr-audio); color:var(--text-1);">02_AUDIO (Lá)</span>
-                <span class="tag-chip" style="border-color:var(--warn); color:var(--text-1);">03_SFX (Vàng)</span>
+
+              <div style="display:flex; flex-direction:column; gap:3px; background:#111112; padding:6px; border-radius:4px; font-size:10px;">
+                <div style="display:flex; align-items:center; gap:6px; color:var(--pr-video);">
+                  <span>📁 01_FOOTAGE_CAM_A</span>
+                  <span style="background:var(--pr-video); color:#000; padding:0 4px; border-radius:2px; font-weight:bold;">Cerulean</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; color:var(--pr-audio);">
+                  <span>📁 02_AUDIO_HQ_MICS</span>
+                  <span style="background:var(--pr-audio); color:#fff; padding:0 4px; border-radius:2px; font-weight:bold;">Forest</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; color:var(--warn);">
+                  <span>📁 03_SFX_GRAPHICS</span>
+                  <span style="background:var(--warn); color:#000; padding:0 4px; border-radius:2px; font-weight:bold;">Mango</span>
+                </div>
               </div>
             </div>
           </div>
@@ -974,15 +1128,16 @@
           </div>
           <div class="card-body">
             <h2 class="card-title">AiO Transcripts</h2>
-            <p class="card-desc">Bóc băng thoại Speech-to-Text Tiếng Việt và xuất Caption tự động.</p>
+            <p class="card-desc">Trích xuất văn bản từ giọng nói (Speech-to-Text Tiếng Việt), chỉnh sửa phụ đề và tạo Caption trên Timeline.</p>
 
-            <div class="interactive-demo-box">
-              <div class="demo-label">
-                <span>Demo Phụ đề Đồng bộ:</span>
+            <div class="simulator-canvas">
+              <div class="sim-header">
+                <span>Speech-to-Text Synchronizer:</span>
                 <strong style="color:var(--accent-text);">00:04.12 → 00:08.50</strong>
               </div>
-              <div style="font-size:11px; color:var(--text-1); background:var(--bg-1); padding:4px 8px; border-radius:4px; border-left:2px solid var(--accent);">
-                "Chào mừng bạn đến với bộ panel tự động hóa AiO Studio..."
+
+              <div style="font-size:11px; color:var(--text-1); background:#111112; padding:6px 8px; border-radius:4px; border-left:3px solid var(--accent);">
+                "Chào mừng bạn đến với bộ panel tự động hóa hậu kỳ AiO Studio..."
               </div>
             </div>
           </div>
@@ -1013,7 +1168,7 @@
   </div>
 
   <script>
-    // ROI Calculator Interactive Logic
+    // ROI Calculator
     const videoSlider = document.getElementById('videoSlider');
     const videoCountText = document.getElementById('videoCountText');
     const savedHoursText = document.getElementById('savedHoursText');
@@ -1059,46 +1214,47 @@
       }
     });
 
-    // 1. Autocut Interactive Level Demo
+    // 1. Autocut Simulator Logic
     const autocutBtns = document.getElementById('autocutDemoBtns');
     const autocutResultText = document.getElementById('autocutResultText');
-    const autocutTimelineBar = document.getElementById('autocutTimelineBar');
+    const cutZone1 = document.getElementById('cutZone1');
+    const cutZone2 = document.getElementById('cutZone2');
 
     autocutBtns.addEventListener('click', (e) => {
-      if (e.target.classList.contains('demo-btn')) {
-        autocutBtns.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+      if (e.target.classList.contains('sim-btn')) {
+        autocutBtns.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
 
         const level = e.target.dataset.level;
         if (level === 'light') {
           autocutResultText.textContent = '58m37s → 38m15s';
-          autocutTimelineBar.children[1].style.flex = '0.4';
-          autocutTimelineBar.children[3].style.flex = '0.4';
+          cutZone1.style.flex = '0.3';
+          cutZone2.style.flex = '0.3';
         } else if (level === 'medium') {
           autocutResultText.textContent = '58m37s → 24m12s';
-          autocutTimelineBar.children[1].style.flex = '0.1';
-          autocutTimelineBar.children[3].style.flex = '0.1';
+          cutZone1.style.flex = '0.12';
+          cutZone2.style.flex = '0.12';
         } else if (level === 'deep') {
           autocutResultText.textContent = '58m37s → 16m40s';
-          autocutTimelineBar.children[1].style.flex = '0.02';
-          autocutTimelineBar.children[3].style.flex = '0.02';
+          cutZone1.style.flex = '0.02';
+          cutZone2.style.flex = '0.02';
         }
       }
     });
 
-    // 2. Podcast Bleed Demo
+    // 2. Podcast Waveform Simulator Logic
     const podcastBtns = document.getElementById('podcastDemoBtns');
     const podcastStatusText = document.getElementById('podcastStatusText');
     const waveformPreview = document.getElementById('waveformPreview');
 
     podcastBtns.addEventListener('click', (e) => {
-      if (e.target.classList.contains('demo-btn')) {
-        podcastBtns.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+      if (e.target.classList.contains('sim-btn')) {
+        podcastBtns.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
 
         const bleed = e.target.dataset.bleed;
         if (bleed === 'on') {
-          podcastStatusText.textContent = 'Giảm 94% rò rỉ';
+          podcastStatusText.textContent = 'Giảm 94% Bleed (-16dB)';
           podcastStatusText.style.color = 'var(--ok)';
           Array.from(waveformPreview.children).forEach((bar, idx) => {
             if (idx % 2 === 1) {
@@ -1107,7 +1263,7 @@
             }
           });
         } else {
-          podcastStatusText.textContent = 'Tràn tiếng -7.1dB';
+          podcastStatusText.textContent = 'Tràn tiếng Bleed (-7.1dB)';
           podcastStatusText.style.color = 'var(--danger)';
           Array.from(waveformPreview.children).forEach((bar, idx) => {
             if (idx % 2 === 1) {
@@ -1119,30 +1275,30 @@
       }
     });
 
-    // 3. Re-Frames Ratio Demo
+    // 3. Re-Frames Simulator Logic
     const reframeBtns = document.getElementById('reframeDemoBtns');
     const reframeText = document.getElementById('reframeText');
     const aspectFrame = document.getElementById('aspectFrame');
 
     reframeBtns.addEventListener('click', (e) => {
-      if (e.target.classList.contains('demo-btn')) {
-        reframeBtns.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+      if (e.target.classList.contains('sim-btn')) {
+        reframeBtns.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
 
         const ratio = e.target.dataset.ratio;
-        aspectFrame.className = `aspect-frame ratio-${ratio}`;
+        aspectFrame.className = `subject-box ratio-${ratio}`;
         if (ratio === '9-16') reframeText.textContent = 'Shorts 9:16';
         else if (ratio === '1-1') reframeText.textContent = 'Square 1:1';
         else if (ratio === '16-9') reframeText.textContent = 'Wide 16:9';
       }
     });
 
-    // Asset Preview Mini Action
+    // Asset Preview Action
     function previewAsset(filename) {
       document.getElementById('assetPreviewText').textContent = filename;
     }
 
-    // Modal Tool Launcher
+    // Modal CEP Launcher
     function launchTool(toolName, extensionId) {
       if (window.__Adobe_CEP__) {
         try {

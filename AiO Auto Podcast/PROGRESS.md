@@ -1,5 +1,72 @@
 # AiO Auto Podcast - Nhat ky
 
+## [project-rieng] - 2026-08-03 19:43 - TAO PROJECT RIENG CHO BAI PODCAST THEO YEU CAU ANH TIEN
+
+Anh Tien: "tao cho anh mot project moi di". Lam bang `app.newProject` tu
+panel (khong dung tay):
+- Tao `file pr for test\podcast-buoi2\AiO-Podcast-Test.prproj` -> ok=true,
+  active chuyen sang project moi, **Test3 van mo** (projects 1 -> 2).
+- Import lai XML vao bin `AiO-PODCAST-TEST-XML` trong project moi:
+  root 0->1, sequence 0->1, bin 6 muc. Do ruot sequence: y het lan do
+  trong Test3 (3V+2A, 5/5 clip dung vi tri 42/38/28/0/0, online,
+  endFrame 63.926).
+- `project.save()` co chot ten project truoc khi luu (khong luu nham
+  project khac). File tren dia: 14.377 byte, 19:43.
+- Luc do thay activeSequence = "Test podcasst" — anh Tien dang tu tao
+  sequence tay trong project moi, tuc anh da bat dau nghich. Tot.
+- Bin `AiO-PODCAST-TEST-XML` trong Test3 gio thanh thua — CHUA xoa, cho
+  anh Tien quyet (xoa bin la sach, khong dung media goc).
+
+## [import-xml] - 2026-08-03 19:39 - IMPORT SEQUENCE TU SYNC VAO PREMIERE THAT: KHOP DAP AN 100%
+
+Anh Tien chot "em import thu roi bao anh" va tu mo panel (cong 8094 song
+19:36). Import qua evalScript tu panel that, KHONG dung tay keo tha.
+Xoa mon no so 1 cua muc [tu-sync]: XML sinh bang code DA VAO DUOC Premiere.
+
+### Cach lam (3 buoc, bieu thuc JS ghi ra file theo luat windows-scripting)
+1. TRUOC: Test3.prproj, 24 muc goc, 16 sequence, active "Test3 Insane -
+   Doc 9-16", chua co sequence trung ten.
+2. IMPORT `PODCAST-BUOI2-da-sync.xml` vao bin rieng `AiO-PODCAST-TEST-XML`
+   bang `app.project.importFiles(..., true, bin, false)` -> ok=true,
+   root 24->25 (dung 1 bin), sequence 16->17 (dung 1), bin chua 6 muc
+   (1 sequence + 5 media).
+3. SAU - do tung track (tick = 10.594.584.000/frame @ 23,976):
+
+| Track | Ky vong | Do duoc |
+|---|---|---|
+| V1 | C4026 @ frame 42 | C4026.MP4 @ 42f, online |
+| V2 | C4234 @ 38 | C4234.MP4 @ 38f, online |
+| V3 | C4089 @ 28 | C4089.MP4 @ 28f, online |
+| A1 | Mic-Trong @ 0 | Mic-Trong.mp3 @ 0f, online |
+| A2 | Mic-Dilys @ 0 | Mic-Dilys.mp3 @ 0f, online |
+| Moi track 1 clip lien | 5/5 | 5/5 (thoa rang buoc MVP) |
+| endFrame | 63.926 | 63.926 - khop tung frame |
+| Media offline | 0 | 0 (ca duong G: co dau tieng Viet) |
+| Active sequence | khong doi | van "Test3 Insane - Doc 9-16" |
+
+=> Duong "tu sync -> sinh XML -> import -> sequence san sang cho panel"
+THONG SUOT. Level 3 muc 3 (tu dung sequence) co bang chung dau tien;
+con lai la goi qua host JSX thay vi bat nguoi dung import tay.
+
+### Ba thuoc do HONG bi bat trong phien (deu truoc khi cham san pham)
+1. `curl -s && echo SONG` — exit 0 ke ca HTTP 404 -> bao cong 8090 la CDP
+   trong khi do la node server khac. Phai doc BODY tim webSocketDebuggerUrl.
+2. Python giai ma pathurl chet vi in tieng Viet ra console Windows -> bao
+   "MAT 3 file video" trong khi file nam day du tren G:.
+3. `p.sequences.numItems` = undefined — SequenceCollection dem bang
+   `numSequences`. Neu khong sua truoc thi buoc SAU bao "khong thay
+   sequence" OAN sau khi import thanh cong.
+
+### Don dep
+Bin `AiO-PODCAST-TEST-XML` nam trong Test3.prproj cua anh Tien — xoa bin
+la sach (khong dung media goc). De lai cho anh mo xem.
+
+### Con no (thu tu moi)
+1. Anh Tien mo sequence "PODCAST BUOI2 da sync", nghe thu vai cho xem
+   sync tai co khop khong (thuoc ngoai cuoi cung cho tu-sync).
+2. Anh cham 12 clip nghe kiem (`podcast-nghe-kiem\_BANG-CHAM.csv`).
+3. Nguong 6 dB / san -50 dB — doi dap an tu (2) roi moi sua.
+
 ## [level-3] - 2026-08-03 17:43 - ANH TIEN MO TA LEVEL 3 "TRO VAO FOLDER LA XONG" - GHI VAO TINH-NANG.md
 
 Anh Tien nhan tin mo ta 2 level cua san pham:

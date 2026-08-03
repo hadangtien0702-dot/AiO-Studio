@@ -131,9 +131,11 @@ offline, mua một lần. Đừng ôm thêm việc của hai mảnh kia vào đ�
       đóng thành module trong panel; KHÔNG chặn bằng ngưỡng r cứng — xét
       tính nhất quán giữa các cặp (bài học 03/08: r thấp mà lag vẫn đúng).
 - [ ] 3. Tự dựng sequence đã sync trong Premiere. Spike 03/08 đã sinh FCP7
-      XML hợp lệ (`podcast-buoi2\PODCAST-BUOI2-da-sync.xml`) nhưng CHƯA
-      import thử; đường thứ hai là host JSX tự đặt clip theo offset — chưa
-      làm. Đo: ranh sync trên timeline lệch < 1 frame so với PluralEyes.
+      XML hợp lệ VÀ import thật vào Premiere qua evalScript (19:39): 3V+2A,
+      5/5 clip đúng vị trí 42/38/28/0/0 frame, endFrame 63.926 khớp từng
+      frame, 0 media offline, active sequence không bị đổi. Còn thiếu: gói
+      thành nút trong panel (thay vì script ngoài) — và thước cuối là TAI
+      anh Tiến nghe thử sequence đó xem sync có khớp không.
 - [ ] 4. Tự GỢI Ý ghép cặp mic ↔ cam (tương quan bleed), kèm gom file theo
       buổi quay (liệu thật 03/08: 1 folder = 2 buổi phỏng vấn khác nhau,
       tương quan chéo giữa 2 buổi r ~ 0,02 → tách được bằng máy). Người
