@@ -7,6 +7,15 @@ yarn-error.log*
 
 # Build, Binaries, and Output directories
 dist/
+# ☠️ NGOAI LE 2026-08-03: ba panel nay KHONG CO BUOC BUILD — dist/ cua chung
+# LA MA NGUON viet tay (index.html + nao.js...), khong phai san pham build.
+# Quy tac "dist/" o tren da nuot mat chung trong im lang: Auto Podcast va
+# Guide Frame MAT SACH dist tren o (chi con trong ban da cai o %APPDATA%),
+# Re-Frames con file nhung nam ngoai git. Doi thu muc thi phai un-ignore
+# CHINH THU MUC, khong un-ignore duoc file ben trong mot thu muc bi ignore.
+!/AiO Auto Podcast/dist/
+!/AiO Auto Re-Frames/dist/
+!/AiO Auto Guiline Frame/dist/
 build/
 bin/
 .next/

@@ -1,0 +1,169 @@
+/* =========================================================================
+   AiO STUDIO — TOKENS: NGUỒN CHÂN LÝ DUY NHẤT
+   =========================================================================
+
+   ☠️ ĐỪNG SỬA BẢN COPY TRONG TỪNG DỰ ÁN. Sửa file này, rồi chạy:
+
+       scripts\dong-bo-tokens.ps1
+
+   Nó chép file này sang cả 4 panel. Sửa bản copy thì lần đồng bộ sau bị ghi
+   đè, và bạn sẽ mất một buổi để hiểu vì sao thay đổi của mình biến mất.
+
+   ── VÌ SAO CÓ FILE NÀY ────────────────────────────────────────────────────
+   Anh Tiến 2026-07-29: *"anh thấy cả 4 phần UI chưa đồng bộ đó em. Em nên đưa
+   ra một UI Design System cho thống nhất về font chữ, kích thước button…
+   Anh thấy mỗi lần em thiết kế lại lặp lại các lỗi từ hồi xưa đến giờ."*
+
+   Anh ấy đúng, và đây là nguyên nhân đo được: **bốn file CSS chép tay lẫn
+   nhau**. Sổ bài học thiết kế đã ghi từ lâu (quy tắc 21) — *"không bao giờ
+   để hai file CSS chép tay lẫn nhau, cùng một bug sẽ phải sửa nhiều lần và
+   chắc chắn có lần quên"* — mà vẫn vấp, vì lời dặn nằm trong tài liệu chứ
+   không nằm trong **cơ chế**.
+
+   Đo thật 29/07 trên ba panel đang mở cùng lúc trong Premiere (634x678):
+
+       |                | Asset Manager | Autocut | Transcript |
+       | thang chữ      |      khớp     |  khớp   |   khớp     |
+       | thanh trên     |  44px, bg-2   | 38, bg-1|  38, bg-1  |
+       | --h-topbar     |  KHÔNG CÓ     |  38px   |   38px     |
+       | nút chính      |     28px      |  34px   |   34px     |
+
+   → Ràng buộc quan trọng thì phải bảo đảm **theo cấu tạo**, không kiểm lại
+   bằng mắt sau. Bộ kiểm `kiem-dong-bo.mjs` đo thẳng 4 panel đang chạy.
+
+   ── HƯỚNG THIẾT KẾ ────────────────────────────────────────────────────────
+   "Studio Console" — tối, gọn, NỘI DUNG LÀ CHÍNH. Panel sống cạnh timeline
+   Premiere nên không được tranh sáng với nó: nền đen trung tính, viền hairline,
+   accent cam dùng rất tiết chế.
+
+   Mọi giá trị chữ đã đo tương phản thật (luminance có trộn alpha) ≥ 4.5:1.
+   ========================================================================= */
+
+:root {
+  /* ── Bề mặt — ĐEN trung tính, 7 bậc ─────────────────────────────────── */
+  --bg-0: #0a0a0b; /* sâu nhất — khung xem media, ô nhập */
+  --bg-1: #0f0f11; /* rail / menu trái / THANH TRÊN */
+  --bg-2: #151517; /* nền chính của app */
+  --bg-3: #1c1c1f; /* thẻ, mặt nổi */
+  --bg-4: #232327; /* nút, ô nhập */
+  --bg-5: #2c2c31; /* nút khi rê chuột */
+  --bg-6: #161618; /* mặt chìm (modal body) */
+  --bg-hover: rgb(255 255 255 / 5%);
+  --bg-active: rgb(255 255 255 / 9%);
+
+  /* ── Viền hairline — chữ ký của phong cách (KHÔNG xám đặc) ──────────── */
+  --line-1: rgb(255 255 255 / 6%);
+  --line-2: rgb(255 255 255 / 10%);
+  --line-strong: rgb(255 255 255 / 16%);
+
+  /* ── Chữ — trung tính, đo trên mọi bậc nền ──────────────────────────── */
+  --text-1: #f5f5f7; /* 14.4:1 — chính */
+  --text-2: #c3c3c8; /* 8.9:1  — phụ */
+  --text-3: #8d8d95; /* 4.8:1  — nhãn, số đếm */
+  --text-meta: #9b9ba3; /* 5.7:1 — meta trong thẻ asset */
+  --icon-dim: #8f8f97; /* 4.9:1 — icon placeholder */
+
+  /* ── Accent CAM — dùng RẤT tiết chế: active + primary + focus ────────
+     ☠️ Chữ trên nút cam đặc dùng `--accent-on` (nâu gần đen): chữ TRẮNG chỉ
+     đạt 3.3:1 trên nền cam nên KHÔNG dùng được cho chữ nhỏ. */
+  --accent: #ff5714; /* 4.9:1 khi làm chữ/icon trên nền tối */
+  --accent-hover: #ff7038;
+  --accent-soft: rgb(255 87 20 / 16%);
+  --accent-line: rgb(255 87 20 / 40%);
+  --accent-text: #ffb599; /* 9.2:1 — chữ trên nền accent-soft */
+  --accent-on: #150700; /* 6.2:1 — chữ trên nền accent đặc */
+
+  /* ── Ngữ nghĩa — chọn sắc PHÂN BIỆT được với cam ─────────────────────
+     ☠️ `--danger` là HỒNG-ĐỎ, cố ý tách khỏi cam của accent. Dùng đỏ cam
+     thì hai thứ khác nghĩa hoàn toàn lại nhìn giống nhau. */
+  --ok: #4ec98a;
+  --warn: #e8c05a;
+  --danger: #ff5f6d;
+  --danger-strong: #ff4757;
+  --heart: #ff6b81;
+
+  /* ── Chữ: SF Pro (Text cho UI, Display cho cỡ lớn) ───────────────────
+     Máy không có SF Pro tự lùi về Inter → Segoe UI, không vỡ layout. */
+  --font-ui: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont,
+    'Inter', 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'SF Pro Display', 'SF Pro Text', -apple-system,
+    BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+
+  /* ── Thang cỡ chữ — MỘT thang duy nhất cho cả 4 panel ─────────────────
+     ☠️ ĐỪNG NÂNG CẢ THANG. Vấp thật 29/07: anh Tiến bảo *"tăng font lên
+     GIỐNG NHƯ Asset Manager"*, bản sửa nâng cả thang +2px nên VƯỢT Asset
+     Manager một bậc — hai panel cạnh nhau trong cùng cửa sổ lộ ra ngay,
+     anh nói *"phần ui này cũng thấy gớm luôn"*.
+     Muốn chữ to hơn ở một chỗ thì dùng BẬC CAO HƠN ở chỗ đó, đừng dịch
+     cả thang. */
+  --fs-2xs: 10px; /* micro: số đếm, nhãn nhóm */
+  --fs-xs: 11px; /* meta, nhãn phụ, chỉ dẫn */
+  --fs-sm: 12px; /* nhãn, chip, control phụ */
+  --fs-md: 13px; /* mặc định / body / nút */
+  --fs-lg: 15px; /* tiêu đề mục */
+  --fs-xl: 19px; /* số lớn trong ô kết quả, empty-state */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --lh-tight: 1.25;
+  --lh: 1.45;
+  --ls-display: -0.014em; /* SF Pro cần siết nhẹ ở cỡ lớn */
+
+  /* ── Khoảng cách — lưới 4px ─────────────────────────────────────────── */
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 12px;
+  --sp-5: 16px;
+  --sp-6: 24px;
+
+  /* ── Bo góc ──────────────────────────────────────────────────────────── */
+  --r-sm: 6px; /* nút phụ, chip, ô nhập */
+  --r-md: 8px; /* nút, thẻ nhỏ */
+  --r-lg: 12px; /* khối section, modal */
+  --r-pill: 999px;
+
+  /* ── Đổ bóng — chỉ cho lớp NỔI ──────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 45%);
+  --shadow-pop: 0 18px 52px rgb(0 0 0 / 62%);
+
+  /* ── Chiều cao ô điều khiển — BA BẬC, không hơn ───────────────────────
+     ☠️ Cỡ chữ và chiều cao là MỘT CẶP. Đổi thang chữ mà quên mấy biến này
+     thì hoặc chật cứng, hoặc rỗng hoác (vấp 29/07 hai lần).
+     Phép kiểm: `chiều cao − line-height` phải ≥ 6px.
+
+     Chọn bậc theo VAI TRÒ, không theo cảm giác:
+       --h-ctrl-sm  nút phụ trên thanh công cụ, chip
+       --h-ctrl     nút thường, ô nhập, mục menu   ← mặc định
+       --h-ctrl-lg  CTA CHÍNH của màn hình (mỗi màn hình chỉ MỘT)
+
+     Vấp 29/07: đem `--h-ctrl-sm` (24px) áp cho thanh chọn vốn là một trong
+     hai quyết định chính → anh Tiến: *"nút này hơi nhỏ làm lại"*. Dùng đúng
+     token nhưng SAI VAI TRÒ vẫn ra kết quả sai. */
+  --h-ctrl-sm: 24px;
+  --h-ctrl: 28px;
+  --h-ctrl-lg: 34px;
+
+  /* ── Thanh trên — CHUNG cho cả 4 panel ────────────────────────────────
+     44px, nền `--bg-1` (tối hơn nền app để tách bạch).
+     Trước 29/07: Asset Manager 44px nền bg-2 và KHÔNG token hoá, ba panel
+     kia 38px nền bg-1. Lấy 44px vì đó cũng là ngưỡng touch target chuẩn,
+     và thanh trên của Asset Manager có nút bấm bên trong. */
+  --h-topbar: 44px;
+
+  /* ── Chuyển động ─────────────────────────────────────────────────────
+     150ms cho phản hồi bấm. Hình minh hoạ để GIẢI THÍCH thì được phép chậm
+     hơn nhiều (~1000–2500ms) — người ta đang ngắm để hiểu, không đợi máy
+     trả lời. Đừng lấy `--dur` cho loại đó. */
+  --dur: 150ms;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* ── Riêng Asset Manager / Power Bins (panel có lưới asset) ──────────── */
+  --sidebar-w: 204px;
+  /** Chiều cao phần tên + loại file dưới mỗi thẻ.
+      PHẢI khớp hằng INFO_H trong components/Grid.tsx — Grid tính chiều cao
+      thẻ bằng JS; lệch nhau là ảnh bị hở hoặc nút Chèn đè lên chữ. */
+  --card-info-h: 44px;
+}

@@ -1,5 +1,119 @@
 # AiO Auto Podcast - Nhat ky
 
+## [do-lieu-that] - 2026-08-03 15:34 - DO NAO TREN LIEU PODCAST THAT + PHAT HIEN MAT dist/
+
+Anh Tien dua lieu that: `G:\Quay PV tuyen dung_DRT_0902\Video` (+ folder
+`Audio` canh no). Day la mon no ghi trong CLAUDE.md: "CHUA do bleed tren
+lieu THAT". KHONG sua mot dong ma nguon nao trong phien nay — chi DO.
+
+### Boi canh: lieu that khong giong gia dinh
+Do ra KHONG phai 1 podcast 3 nguoi, ma la **2 buoi phong van rieng, moi
+buoi 2 nguoi**, anh Trong dan ca hai buoi:
+
+| | Buoi 1 (video ~40,4 phut) | Buoi 2 (video ~44,3 phut) |
+|---|---|---|
+| Mic | Trong (1) + Thien (1) | Trong (2) + Dilys (2) |
+| Tuong quan envelope trong buoi | r = 0,52 | r = 0,54 |
+| Tuong quan CHEO giua 2 buoi | r ~ 0,02 (khac thoi diem) | |
+
+Video: 3 cam x 4K x 24000/1001 fps, moi cam quay ca 2 buoi.
+Ca 5 file mp3 deu dung 44,25 phut / 106.199.040 byte — do may ghi tu chia
+theo dung luong (320kbps x 2655s), KHONG phai chia theo nguoi.
+L va R trong moi file r = 1,0000 -> mono nhan doi, moi file = 1 mic. Dat.
+
+### HAI BAY TRONG CHINH DU LIEU (bat duoc truoc khi no cam vao san pham)
+1. **Ky tu U+F022 trong ten file.** `Quay Phim 9<U+F022>2 ...mp3` — do dau `"`
+   hop le tren Mac, Windows map sang vung Private Use Area. Truyen ten nay
+   qua PowerShell 5.1 sang ffmpeg.exe -> "No such file or directory" o CA 4
+   FILE, du Get-ChildItem doc duoc binh thuong. Ne bang cach copy sang ten
+   ASCII. 8.3 shortpath KHONG cuu duoc (o G: tat 8dot3name).
+   -> Ban ban PHAI xu ly: nguoi dung Mac-sang-Windows se dinh 100%.
+2. **File trung y het.** `Dylis (2).mp3` trung TUNG BYTE voi
+   `Quay Phim 9"2 Dilys (2).mp3` (cung MD5) — thua 101 MB. Neu gan ca hai
+   lam 2 nguoi khac nhau thi chenh luon = 0dB, nao se tra KHONG_PHAN_BIET.
+
+### PHAT HIEN CHAN: thu muc dist/ MAT khoi repo
+`dist/nao.js` + `dist/index.html` KHONG con trong repo va **chua bao gio
+duoc git theo doi** (`git ls-files` khong co dong nao ve dist) -> khong co
+ban lui. Toan bo file repo cung mot moc 2026-08-02 21:22:41 = mot lan chep
+de hang loat; dist bi bo lai vi untracked.
+
+Ban duy nhat con lai tren may: panel DA CAI o
+`%APPDATA%\Adobe\CEP\extensions\com.aiostudio.podcast\dist\`.
+
+**Do that tren ban sot do (chay trong scratchpad, khong dung ban dang chay):**
+- `kiem-nao.mjs`: **16/16 DAT**, ranh lech 0 ms.
+- `stress.mjs`: **12/12 ca bat buoc DAT**, dung 100% moi ca.
+- Ca 2 "cuoi-chung 2s" ra **10/10** (dung dap an) -> ban sot CO chot chuyen
+  nguoi, tuc dung la v0.3.1. Doc code xac nhan: K_ONSET=25, NG_X=15, NG_CUR=5.
+- `index.html` co `banDo` 12 lan -> co UI ban do track (v0.3.0).
+=> **Khong mat chuc nang nao**, chi can chep nguoc ve repo (CHO ANH TIEN DUYET).
+
+### KET QUA NAO TREN LIEU THAT — bleed nang hon du doan nhieu
+Chay nao that (`AiONao.doDb` + `aiDangNoi`) tren 2 cap mic, 44,25 phut/cap:
+
+| Phep do | Buoi 1 | Buoi 2 |
+|---|---|---|
+| trangThai | OK | OK |
+| tyLeRo (nguong gay an toan 20%) | 30,6% | **23,0%** — sat mep |
+| So luot / mat do | 120 luot · 2,7 nhat/phut | 79 luot · 1,8 nhat/phut |
+| Chia hinh | Trong 21,3% / Thien 78,7% | Trong 32,7% / Dilys 67,3% |
+| **Chenh mic to nhat vs mic nhi (p50)** | **7,1 dB** | **6,2 dB** |
+| % cua so co tieng chenh DUOI 6 dB | **35,0%** | **46,5%** |
+| Thoi gian chay nao | 8 ms | 10 ms |
+
+Lieu tong hop tu truoc gio dung bleed -16 dB (chenh rat ro). Lieu that chi
+chenh 6-7 dB -> **nguong 6 dB dang nam dung giua dai du lieu that**, khong
+con khoang an toan.
+
+Chot an toan "mic deu" cho qua ca 4 mic (dai p90-p10 = 15,4 den 26,2 dB) —
+dung, khong bat oan.
+
+### KET QUA KHONG ON DINH — bang chung
+Quet nguong tren buoi 2 (san x chenh):
+
+| san | chenh | tyLeRo | luot | nhat/phut | chia hinh |
+|---|---|---|---|---|---|
+| -50 | 6 dB | 23,0% | 79 | 1,8 | 33/67 |
+| -55 | 6 dB | 29,3% | 105 | 2,4 | 38/62 |
+| -60 | 6 dB | 36,0% | **171** | 3,9 | **50/50** |
+| -65 | 6 dB | 37,6% | 215 | 4,9 | 57/43 |
+
+Chi ha san 10 dB ma chia hinh nhay 33/67 -> 50/50 va so nhat cat gap doi.
+Nhay den muc do thi CHUA duoc tin bat ky gia tri nao. Buoi 1 on dinh hon
+(21/79 -> 25/75) nhung cung khong chung minh duoc gi.
+
+**Nghi van huong sua (CHUA sua):** san -50 dB la HANG SO CUNG, ma mic buoi
+nay thu nho (p90 chi -44 dB, p50 -54 dB) nen no loai 60-78% so cua so.
+San nen tinh theo MUC NEN CUA CHINH FILE, khong phai so co dinh. Nhung
+chua co dap an thi sua la sua mu — doi anh Tien cham tai truoc.
+
+### GIOI HAN PHAI NOI RO (bai hoc 5d)
+Moi con so tren deu do em dung **chinh nang luong dB** de cham diem mot
+thuat toan **cung chay bang dB** — thuoc lam bang cung vat lieu voi cai no
+do thi luon tu khen minh. Chi duoc noi "chay ra ket qua trong hop ly",
+KHONG duoc noi "cat dung".
+
+Da dung bo NGHE KIEM lam thuoc ngoai:
+`file pr for test\podcast-nghe-kiem\` — 12 clip 6 giay (6 moi buoi, chon
+bang PRNG co seed 2026/803), moi clip la mot moc tool bao CHUYEN NGUOI,
+moc nam o giay thu 3, tron 2 mic + loudnorm de nghe nhu trong phong.
+Kem `_BANG-CHAM.csv` de anh Tien danh Dung/Sai.
+
+### File anh huong
+- KHONG sua ma nguon nao. Chi them thu muc lieu thu:
+  `file pr for test\podcast-nghe-kiem\` (12 mp3 + 1 csv, ~850 KB).
+- Ban do trong scratchpad phien nay: `phan-tich.mjs` · `chay-nao-that.mjs` ·
+  `quet-nguong.mjs` · `sinh-nghe-kiem.mjs`.
+
+### Con no sau phien nay
+1. Chep `dist/` tu ban da cai ve repo — CHO ANH TIEN DUYET (ghi vao repo).
+   Va lan nay phai **commit dist vao git**, dung de untracked nua.
+2. Anh Tien cham 12 clip nghe kiem -> co dap an moi dong vao nguong.
+3. Chua dung thu tren Premiere voi project that (`Quay PV tuyen
+   dung_DRT_0902.prproj`) — viec nay CHO ANH DUYET, va neu lam thi chi chay
+   tren BAN SAO (bai hoc undo 29/07).
+
 ## [0.3.1] - 2026-08-02 20:56 - STRESS TEST 12 CA KHO + SUA NAO "CUOI CHUNG"
 
 (Ghi chu ngay thang: cac muc 0.1.0 -> 0.3.1 deu la viec lam trong PHIEN

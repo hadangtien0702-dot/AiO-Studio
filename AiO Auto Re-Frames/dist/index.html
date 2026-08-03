@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>AiO Auto Re-Frames</title>
+<link rel="stylesheet" href="./tokens.css" />
+<style>
+  /* v0.4 — SONG NGỮ Việt–Anh (chặn bán lộ ra từ bài nhập vai 31/07: bán thị
+     trường Tây mà UI tiếng Việt là khách đóng panel ngay). Mọi chữ đi qua
+     từ điển NGON_NGU + t(); nút gạt VI/EN trên thanh trên, nhớ localStorage.
+     Bố cục giữ nguyên v0.3: minh hoạ + đèn + tỉ lệ + hai luồng. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg-2);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: var(--fs-md);
+    line-height: var(--lh);
+    user-select: none;
+  }
+  .topbar {
+    height: var(--h-topbar);
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line-1);
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: 0 var(--sp-5);
+  }
+  .topbar__ten { font-weight: var(--fw-semibold); }
+  .topbar__ver { color: var(--text-3); font-size: var(--fs-xs); }
+  .topbar__host { margin-left: auto; color: var(--text-3); font-size: var(--fs-xs); }
+  .lang {
+    height: var(--h-ctrl-sm);
+    padding: 0 var(--sp-3);
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    background: none; color: var(--text-2);
+    font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+    letter-spacing: 0.06em;
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .lang:hover { background: var(--bg-hover); color: var(--text-1); }
+
+  .than {
+    max-width: 640px; margin: 0 auto;
+    padding: var(--sp-5);
+    display: flex; flex-direction: column; gap: var(--sp-5);
+  }
+
+  /* ── Minh hoạ: khung nguồn 16:9 ĐỨNG YÊN, khung phụ tỉ lệ bay vào ─────── */
+  /* ── Hướng dẫn lần đầu ───────────────────────────────────────────────── */
+  .hd {
+    background: var(--bg-3); border: 1px solid var(--accent-line);
+    border-radius: var(--r-lg); padding: var(--sp-4);
+    display: flex; flex-direction: column; gap: var(--sp-3);
+  }
+  .hd__buoc { display: flex; align-items: baseline; gap: var(--sp-3); font-size: var(--fs-sm); color: var(--text-2); }
+  .hd__so {
+    flex: none; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-text);
+    font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+    display: inline-flex; align-items: center; justify-content: center;
+    transform: translateY(2px);
+  }
+  .hd__ok { align-self: flex-end; }
+
+  .mh { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .mh__khung {
+    position: relative;
+    width: 100%; max-width: 520px; margin: 0 auto;
+    background: var(--bg-0);
+    border: 1px solid var(--line-1); border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .mh__nguoi { position: absolute; }
+  .mh__dau { border-radius: 50%; background: var(--text-3); margin: 0 auto; }
+  .mh__minh { border-radius: 10px 10px 4px 4px; background: var(--text-3); opacity: 0.75; }
+  .mh__cua {
+    position: absolute;
+    border: 2px solid var(--accent); border-radius: var(--r-md);
+    box-shadow: 0 0 0 9999px rgb(0 0 0 / 45%);
+  }
+  .mh__chu { color: var(--text-2); font-size: var(--fs-sm); }
+  .mh__chu b { color: var(--text-1); }
+
+  .den {
+    display: flex; align-items: center; gap: var(--sp-3);
+    font-size: var(--fs-sm); color: var(--text-2);
+  }
+  .den__cham {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-3); flex: none;
+    transition: background var(--dur) var(--ease);
+  }
+  .den--ok .den__cham { background: var(--ok); }
+  .den--cho .den__cham { background: var(--warn); }
+
+  .chon { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .chon__nhan {
+    font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+  }
+  .seg {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    gap: var(--sp-2);
+    background: var(--bg-3); border: 1px solid var(--line-1);
+    border-radius: var(--r-md); padding: var(--sp-1);
+  }
+  .seg__nut {
+    height: 44px;
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-3);
+    background: none; border: 1px solid transparent; border-radius: var(--r-sm);
+    color: var(--text-2); font-family: var(--font-ui); font-size: var(--fs-md);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .seg__nut:hover { background: var(--bg-hover); }
+  .seg__nut--chon {
+    background: var(--accent-soft); border-color: var(--accent-line);
+    color: var(--text-1); font-weight: var(--fw-medium);
+  }
+  .seg__hinh {
+    border: 1.5px solid currentColor; border-radius: 2px; flex: none;
+    opacity: 0.85;
+  }
+  .chon__mo { color: var(--text-3); font-size: var(--fs-sm); min-height: 18px; }
+
+  .btn-chinh {
+    height: var(--h-ctrl-lg);
+    border: none; border-radius: var(--r-md);
+    background: var(--accent); color: var(--accent-on);
+    font-family: var(--font-ui); font-size: var(--fs-md); font-weight: var(--fw-semibold);
+    cursor: pointer; transition: background var(--dur) var(--ease);
+    width: 100%;
+  }
+  .btn-chinh:hover:not(:disabled) { background: var(--accent-hover); }
+  .btn-chinh:disabled { opacity: 0.55; cursor: default; }
+
+  .canlam { color: var(--text-2); font-size: var(--fs-sm); }
+  .loi { color: var(--danger); font-size: var(--fs-sm); white-space: pre-wrap; user-select: text; }
+
+  .btn-phu {
+    height: var(--h-ctrl);
+    border: 1px solid var(--line-strong); border-radius: var(--r-md);
+    background: none; color: var(--text-2);
+    font-family: var(--font-ui); font-size: var(--fs-md);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .btn-phu:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-1); }
+  .btn-phu:disabled { opacity: 0.5; cursor: default; }
+
+  .ds { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .ds__muc {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--bg-3); border: 1px solid var(--line-1);
+    border-radius: var(--r-sm); cursor: pointer;
+  }
+  .ds__muc:hover { background: var(--bg-hover); }
+  .ds__muc input { accent-color: var(--accent); flex: none; }
+  .ds__giay {
+    flex: none; min-width: 44px; text-align: right;
+    font-size: var(--fs-sm); color: var(--accent-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .ds__chu {
+    flex: 1; font-size: var(--fs-sm); color: var(--text-2);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .ketqua {
+    background: var(--bg-3); border: 1px solid var(--line-1);
+    border-radius: var(--r-lg); padding: var(--sp-4);
+    display: none; flex-direction: column; gap: var(--sp-3);
+  }
+  .ketqua--hien { display: flex; }
+  .ketqua__so { display: flex; gap: var(--sp-3); }
+  .ketqua__so > div {
+    flex: 1; background: var(--bg-4); border-radius: var(--r-md);
+    padding: var(--sp-3); text-align: center;
+  }
+  .ketqua__so b {
+    display: block; font-size: var(--fs-xl);
+    font-family: var(--font-display); letter-spacing: var(--ls-display);
+  }
+  .ketqua__so span { color: var(--text-3); font-size: var(--fs-2xs); }
+  .ketqua__dong { color: var(--text-2); font-size: var(--fs-sm); user-select: text; }
+  .ketqua__dong b { color: var(--text-1); }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="topbar__ten">Re-Frames</span>
+    <span class="topbar__ver">v0.5.0</span>
+    <span class="topbar__host" id="host"></span>
+    <button class="lang" id="lang" onclick="doiNgonNgu()"></button>
+  </div>
+
+  <div class="than">
+    <!-- HƯỚNG DẪN LẦN ĐẦU — 3 bước, bấm "Đã hiểu" là biến mất vĩnh viễn.
+         Người phổ thông không đọc docs; 60 giây đầu quyết định giữ hay bỏ. -->
+    <div class="hd" id="hd" style="display:none">
+      <div class="hd__buoc"><span class="hd__so">1</span><span id="hd1"></span></div>
+      <div class="hd__buoc"><span class="hd__so">2</span><span id="hd2"></span></div>
+      <div class="hd__buoc"><span class="hd__so">3</span><span id="hd3"></span></div>
+      <button class="btn-phu hd__ok" id="hdOk" onclick="dongHuongDan()"></button>
+    </div>
+
+    <div class="mh">
+      <div class="mh__khung">
+        <div class="mh__cua"></div>
+        <div class="mh__nguoi"><div class="mh__dau"></div><div class="mh__minh"></div></div>
+      </div>
+      <p class="mh__chu" id="mhChu"></p>
+    </div>
+
+    <div class="den" id="den"><span class="den__cham"></span><span id="denChu"></span></div>
+
+    <div class="chon">
+      <span class="chon__nhan" id="nhanKhung"></span>
+      <div class="seg" id="seg"></div>
+      <p class="chon__mo" id="segMo"></p>
+    </div>
+
+    <!-- LUỒNG CHÍNH: shorts theo nội dung. Nút chính duy nhất sống ở đây. -->
+    <div class="chon">
+      <span class="chon__nhan" id="nhanShort"></span>
+      <button class="btn-chinh" id="nutTim" onclick="timDoan()"></button>
+      <p class="chon__mo" id="timMo"></p>
+      <div class="ds" id="dsDoan" style="display:none"></div>
+      <button class="btn-chinh" id="nutTao" onclick="taoShorts()" style="display:none"></button>
+      <p class="canlam" id="taoKq" style="display:none"></p>
+    </div>
+
+    <!-- LUỒNG PHỤ: đổi khung cả sequence -->
+    <div class="chon">
+      <span class="chon__nhan" id="nhanCaSeq"></span>
+      <button class="btn-phu" id="nut" onclick="lamDoc()"></button>
+    </div>
+
+    <!-- XUẤT CHECK: FFmpeg đọc FILE GỐC theo mốc — KHÔNG đụng API xuất của
+         Premiere (hai lần sập app 31/07 + 01/08, xem host/reframe.jsx). -->
+    <div class="chon">
+      <span class="chon__nhan" id="nhanXuat"></span>
+      <button class="btn-phu" id="nutXuat" onclick="xuatCheck()"></button>
+      <p class="chon__mo" id="xuatMo"></p>
+    </div>
+
+    <p class="canlam" id="canlam" style="display:none"></p>
+    <pre class="loi" id="loi" style="display:none"></pre>
+
+    <div class="ketqua" id="ketqua">
+      <div class="ketqua__so">
+        <div><b id="soClip">0</b><span id="nhanSoClip"></span></div>
+        <div><b id="khung">—</b><span id="nhanKhungKq"></span></div>
+      </div>
+      <p class="ketqua__dong" id="kqDong"></p>
+    </div>
+  </div>
+
+<script src="./CSInterface.js"></script>
+<script>
+  var cs = new CSInterface()
+
+  // ═══ SONG NGỮ ═══════════════════════════════════════════════════════════
+  var NGON_NGU = {
+    vi: {
+      dang_kiem_tra: '(đang kiểm tra…)',
+      mh_chu: 'Nhân bản sequence đang mở sang khung mới — <b>Premiere tự bám theo chủ thể</b> trong từng clip, người nói không rơi ra ngoài hình. Bản ngang gốc giữ nguyên.',
+      den_dang_nhin: 'Đang nhìn sequence…',
+      nhan_khung: 'Khung đích',
+      nhan_short: 'Short theo nội dung',
+      nhan_ca_seq: 'Cả sequence',
+      ti_916: 'Dọc 9:16', ti_11: 'Vuông 1:1', ti_45: 'Dọc 4:5',
+      mo_916: 'TikTok · Reels · Shorts — khung dọc toàn màn điện thoại.',
+      mo_11: 'Bài đăng vuông — feed Facebook, LinkedIn.',
+      mo_45: 'Feed Instagram — dọc vừa, chiếm nhiều màn hình nhất được phép.',
+      tim_doan: 'Tìm đoạn theo nội dung video',
+      tim_lai: 'Tìm lại',
+      tim_mo: 'Tool đọc bản chép lời rồi tách từng câu hỏi được trả lời trọn ý — dài ngắn theo ý nói, không ép 60 giây.',
+      dang_doc: 'Đang đọc bản chép lời…',
+      khong_nap_host: 'Không nạp được host.',
+      mo_seq_video: 'Mở sequence chứa video chính rồi bấm lại.',
+      thieu_node: 'Panel không đọc được file (thiếu Node).',
+      chua_ban_chep: 'Video này chưa có bản chép lời — chạy Transcripts (hoặc Autocut) trên nó trước, rồi bấm lại.',
+      khong_cau_hoi: 'Đọc {n} câu nhưng không thấy câu hỏi nào được trả lời trọn trong 20–180 giây.',
+      thay_doan: 'Thấy {n} đoạn hỏi–đáp trọn ý (tick đoạn muốn tạo):',
+      tao_short: 'Tạo {n} short {ten}',
+      dang_tao_short: 'Đang tạo short {i}/{n}…',
+      da_tao: 'Đã tạo {x}/{n} short — nằm trên timeline, Premiere đang tự phân tích chủ thể từng cái.',
+      short_loi: 'Short {i} lỗi: ',
+      video_khac: 'Video khác rồi — bấm quét lại để lấy câu hỏi của đúng video này.',
+      tao_ca_seq: 'Tạo bản {ten} cho cả sequence',
+      dang_tao: 'Đang tạo…',
+      cho_premiere: '(đang chờ Premiere…)',
+      premiere_chua: 'Premiere chưa sẵn sàng.',
+      chua_mo_seq: 'Chưa mở sequence nào.',
+      dang_mo: 'Đang mở «{ten}» · {kich} — sẵn sàng.',
+      khong_ngang: '«{ten}» không phải bản ngang — mở bản ngang gốc để tạo.',
+      nhan_so_clip: 'clip đã bám chủ thể',
+      nhan_khung_kq: 'khung hình',
+      kq_dong: 'Đã tạo <b>{ten}</b> và mở nó trên timeline. Premiere đang tự phân tích chủ thể — clip dài thì chờ nó chạy nền xong.',
+      khong_nap_host_file: 'Không nạp được host/index.jsx từ thư mục extension.',
+      clip_khong_gan: '{n} clip không gắn được. Lỗi đầu: ',
+      da_co_san: '{n} clip đã được bám chủ thể từ lần chạy trước — giữ nguyên, không gắn lại.',
+      host_la: 'Host trả lời lạ:',
+      loi_khong_ro: 'Lỗi không nhận ra',
+      cl_CHUA_MO_PROJECT: 'Mở một project trước đã.',
+      cl_CHUA_MO_SEQUENCE: 'Mở sequence ngang cần đổi khung rồi bấm lại.',
+      cl_DA_LA_BAN_DOC: 'Sequence này không phải bản ngang — mở bản ngang gốc rồi bấm lại.',
+      l_THIEU_AUTO_REFRAME: 'Bản Premiere này không có hiệu ứng Auto Reframe.',
+      l_CLONE_LOI: 'Không nhân bản được sequence.',
+      l_CLONE_KHONG_RA_SEQ: 'Nhân bản xong nhưng không thấy sequence mới.',
+      l_DOI_KHUNG_LOI: 'Không đổi được khung hình.',
+      l_KHUNG_KHONG_DOI: 'Khung hình không chịu đổi.',
+      nhan_xuat: 'Xuất check',
+      nut_xuat: 'Xuất MP4 check 720p',
+      xuat_mo: 'Cắt thẳng từ file gốc bằng bộ xử lý media — không đụng Premiere. Bản check nội dung khung ngang; khung dọc xem trên timeline.',
+      dang_xuat: 'Đang xuất…',
+      xuat_xong: 'Đã xuất {ten} ({giay}s · {mb} MB) — nằm cạnh video gốc.',
+      xuat_nhieu_clip: 'Sequence này có {n} clip — bản check hiện chỉ xuất sequence 1 clip (các short).',
+      xuat_thieu_ffmpeg: 'Không tìm thấy bộ xử lý media — cần cài kèm AiO Transcripts hoặc Autocut.',
+      xuat_loi: 'Xuất lỗi: ',
+      hd_1: 'Mở sequence NGANG chứa video dài (podcast, phỏng vấn…).',
+      hd_2: 'Bấm "Tìm đoạn theo nội dung video" — tool đọc lời thoại, tách từng câu hỏi được trả lời trọn ý.',
+      hd_3: 'Tick đoạn ưng → "Tạo short" — mỗi đoạn thành một bản dọc tự bám người nói, nằm ngay trên timeline.',
+      hd_ok: 'Đã hiểu',
+    },
+    en: {
+      dang_kiem_tra: '(checking…)',
+      mh_chu: 'Duplicates the open sequence into a new frame — <b>Premiere auto-tracks the subject</b> in every clip, so the speaker never falls out of shot. Your original stays untouched.',
+      den_dang_nhin: 'Watching sequence…',
+      nhan_khung: 'Target frame',
+      nhan_short: 'Shorts from content',
+      nhan_ca_seq: 'Whole sequence',
+      ti_916: 'Vertical 9:16', ti_11: 'Square 1:1', ti_45: 'Portrait 4:5',
+      mo_916: 'TikTok · Reels · Shorts — full-screen vertical.',
+      mo_11: 'Square post — Facebook & LinkedIn feeds.',
+      mo_45: 'Instagram feed — the tallest ratio allowed.',
+      tim_doan: 'Find segments from video content',
+      tim_lai: 'Rescan',
+      tim_mo: 'Reads the transcript and pulls out every question answered in full — length follows the idea, not a fixed 60s.',
+      dang_doc: 'Reading transcript…',
+      khong_nap_host: 'Could not load the host script.',
+      mo_seq_video: 'Open the sequence with your main video, then try again.',
+      thieu_node: 'Panel cannot read files (Node missing).',
+      chua_ban_chep: 'No transcript for this video yet — run Transcripts (or Autocut) on it first, then try again.',
+      khong_cau_hoi: 'Read {n} sentences but found no question answered fully within 20–180 seconds.',
+      thay_doan: 'Found {n} complete Q&A segments (tick the ones to create):',
+      tao_short: 'Create {n} {ten} shorts',
+      dang_tao_short: 'Creating short {i}/{n}…',
+      da_tao: 'Created {x}/{n} shorts — on your timeline; Premiere is analyzing subjects in the background.',
+      short_loi: 'Short {i} failed: ',
+      video_khac: 'Different video — rescan to get questions for this one.',
+      tao_ca_seq: 'Convert whole sequence to {ten}',
+      dang_tao: 'Working…',
+      cho_premiere: '(waiting for Premiere…)',
+      premiere_chua: 'Premiere is not ready yet.',
+      chua_mo_seq: 'No sequence open.',
+      dang_mo: 'Open: «{ten}» · {kich} — ready.',
+      khong_ngang: '«{ten}» is not horizontal — open the original horizontal sequence.',
+      nhan_so_clip: 'clips subject-tracked',
+      nhan_khung_kq: 'frame size',
+      kq_dong: 'Created <b>{ten}</b> and opened it on the timeline. Premiere is analyzing subjects — long clips keep working in the background.',
+      khong_nap_host_file: 'Could not load host/index.jsx from the extension folder.',
+      clip_khong_gan: '{n} clips did not get the effect. First error: ',
+      da_co_san: '{n} clips already had tracking from a previous run — left untouched.',
+      host_la: 'Unexpected host reply:',
+      loi_khong_ro: 'Unrecognized error',
+      cl_CHUA_MO_PROJECT: 'Open a project first.',
+      cl_CHUA_MO_SEQUENCE: 'Open the horizontal sequence you want to convert, then try again.',
+      cl_DA_LA_BAN_DOC: 'This sequence is not horizontal — open the original horizontal one, then try again.',
+      l_THIEU_AUTO_REFRAME: 'This Premiere build has no Auto Reframe effect.',
+      l_CLONE_LOI: 'Could not duplicate the sequence.',
+      l_CLONE_KHONG_RA_SEQ: 'Duplicated, but the new sequence was not found.',
+      l_DOI_KHUNG_LOI: 'Could not change the frame size.',
+      l_KHUNG_KHONG_DOI: 'Frame size refused to change.',
+      nhan_xuat: 'Draft export',
+      nut_xuat: 'Export 720p draft MP4',
+      xuat_mo: 'Cut straight from the source file by our media engine — never touches Premiere. Content-check draft in landscape; view the vertical on the timeline.',
+      dang_xuat: 'Exporting…',
+      xuat_xong: 'Exported {ten} ({giay}s · {mb} MB) — next to the source video.',
+      xuat_nhieu_clip: 'This sequence has {n} clips — draft export currently handles 1-clip sequences (the shorts).',
+      xuat_thieu_ffmpeg: 'Media engine not found — install AiO Transcripts or Autocut alongside this panel.',
+      xuat_loi: 'Export failed: ',
+      hd_1: 'Open the HORIZONTAL sequence with your long video (podcast, interview…).',
+      hd_2: 'Hit "Find segments from video content" — the tool reads the transcript and pulls out every fully-answered question.',
+      hd_3: 'Tick the ones you like → "Create shorts" — each becomes a vertical cut that auto-tracks the speaker, right on your timeline.',
+      hd_ok: 'Got it',
+    },
+  }
+  var L = 'vi'
+  try { L = localStorage.getItem('aio-lang') || 'vi' } catch (e) {}
+  if (!NGON_NGU[L]) L = 'vi'
+
+  function t(k) {
+    var b = NGON_NGU[L][k]
+    if (b === undefined) b = NGON_NGU.vi[k]
+    return b === undefined ? k : b
+  }
+  function tp(k, thay) {
+    var s = t(k)
+    Object.keys(thay || {}).forEach(function (kk) { s = s.split('{' + kk + '}').join(String(thay[kk])) })
+    return s
+  }
+
+  /** Áp chữ tĩnh + vẽ lại phần động theo ngôn ngữ hiện tại. */
+  function apNgonNgu() {
+    document.documentElement.lang = L
+    document.getElementById('lang').textContent = L === 'vi' ? 'EN' : 'VI'
+    document.getElementById('mhChu').innerHTML = t('mh_chu')
+    document.getElementById('nhanKhung').textContent = t('nhan_khung')
+    document.getElementById('nhanShort').textContent = t('nhan_short')
+    document.getElementById('nhanCaSeq').textContent = t('nhan_ca_seq')
+    document.getElementById('nhanSoClip').textContent = t('nhan_so_clip')
+    document.getElementById('nhanKhungKq').textContent = t('nhan_khung_kq')
+    document.getElementById('nhanXuat').textContent = t('nhan_xuat')
+    document.getElementById('xuatMo').textContent = t('xuat_mo')
+    if (!dangXuat) document.getElementById('nutXuat').textContent = t('nut_xuat')
+    document.getElementById('hd1').textContent = t('hd_1')
+    document.getElementById('hd2').textContent = t('hd_2')
+    document.getElementById('hd3').textContent = t('hd_3')
+    document.getElementById('hdOk').textContent = t('hd_ok')
+    if (!document.getElementById('host').textContent) {
+      document.getElementById('host').textContent = t('dang_kiem_tra')
+    }
+    if (!document.getElementById('denChu').textContent) {
+      document.getElementById('denChu').textContent = t('den_dang_nhin')
+    }
+    // Mô tả khu short: chỉ đè khi đang là câu mặc định (không phá thông báo).
+    if (!dsDoan.length && !dangTim) document.getElementById('timMo').textContent = t('tim_mo')
+    veSeg()
+  }
+
+  function doiNgonNgu() {
+    L = L === 'vi' ? 'en' : 'vi'
+    try { localStorage.setItem('aio-lang', L) } catch (e) {}
+    apNgonNgu()
+  }
+
+  // ═══ Ba khung đích — tên/mô tả tra từ điển, thông số là hình học thật ═══
+  var KHUNG = [
+    { w: 1080, h: 1920, nhan: 'Doc 9-16',  tenKey: 'ti_916', moKey: 'mo_916', hinhW: 12, hinhH: 21 },
+    { w: 1080, h: 1080, nhan: 'Vuong 1-1', tenKey: 'ti_11',  moKey: 'mo_11',  hinhW: 17, hinhH: 17 },
+    { w: 1080, h: 1350, nhan: 'Doc 4-5',   tenKey: 'ti_45',  moKey: 'mo_45',  hinhW: 16, hinhH: 20 },
+  ]
+  var dangChon = 0
+  var dangChay = false
+
+  function tenTiLe() { return t(KHUNG[dangChon].tenKey) }
+
+  function veSeg() {
+    var seg = document.getElementById('seg')
+    seg.innerHTML = ''
+    KHUNG.forEach(function (k, i) {
+      var b = document.createElement('button')
+      b.className = 'seg__nut' + (i === dangChon ? ' seg__nut--chon' : '')
+      var hinh = document.createElement('span')
+      hinh.className = 'seg__hinh'
+      hinh.style.width = k.hinhW + 'px'
+      hinh.style.height = k.hinhH + 'px'
+      b.appendChild(hinh)
+      b.appendChild(document.createTextNode(t(k.tenKey)))
+      b.onclick = function () {
+        dangChon = i
+        veSeg()
+        veMinhHoa(true)
+      }
+      seg.appendChild(b)
+    })
+    document.getElementById('segMo').textContent = t(KHUNG[dangChon].moKey)
+    document.getElementById('nut').textContent = dangChay
+      ? t('dang_tao')
+      : tp('tao_ca_seq', { ten: tenTiLe().toLowerCase() })
+    if (typeof capNhatNutTao === 'function' && document.getElementById('nutTao')) capNhatNutTao()
+  }
+
+  // ── Minh hoạ — khung 16:9 ĐỨNG YÊN, khung phụ tỉ lệ bay vào ôm người ────
+  function veMinhHoa(chayLai) {
+    var khung = document.querySelector('.mh__khung')
+    var cua = document.querySelector('.mh__cua')
+    var nguoi = document.querySelector('.mh__nguoi')
+    var dau = document.querySelector('.mh__dau')
+    var minh = document.querySelector('.mh__minh')
+    var k = KHUNG[dangChon]
+
+    var W = khung.clientWidth
+    if (!W) return
+    var H = Math.round(W * 9 / 16)
+    khung.style.height = H + 'px'
+
+    var caoNguoi = Math.round(H * 0.5)
+    var rongNguoi = Math.round(caoNguoi * 0.42)
+    var dDau = Math.round(rongNguoi * 0.62)
+    nguoi.style.width = rongNguoi + 'px'
+    nguoi.style.height = caoNguoi + 'px'
+    nguoi.style.bottom = Math.round(H * 0.12) + 'px'
+    dau.style.width = dDau + 'px'
+    dau.style.height = dDau + 'px'
+    minh.style.width = rongNguoi + 'px'
+    minh.style.height = (caoNguoi - dDau - 4) + 'px'
+    minh.style.marginTop = '4px'
+
+    var vien = 6
+    var caoCua = H - vien * 2
+    var rongCua = Math.round(caoCua * k.w / k.h)
+    cua.style.top = vien + 'px'
+    cua.style.height = caoCua + 'px'
+    cua.style.width = rongCua + 'px'
+
+    var tamNguoi1 = Math.round(W * 0.42)
+    var tamNguoi2 = Math.round(W * 0.56)
+    var kepCua = function (tam) {
+      var trai = tam - Math.round(rongCua / 2)
+      if (trai < vien) trai = vien
+      if (trai > W - rongCua - vien) trai = W - rongCua - vien
+      return trai
+    }
+    nguoi.style.left = (tamNguoi1 - Math.round(rongNguoi / 2)) + 'px'
+    cua.style.left = kepCua(tamNguoi1) + 'px'
+
+    if (!chayLai && !khung.__daChay) chayLai = true
+    if (!chayLai) return
+    khung.__daChay = true
+
+    ;[cua, nguoi].forEach(function (el) {
+      if (el.getAnimations) el.getAnimations().forEach(function (a) { a.cancel() })
+    })
+    cua.animate(
+      [{ opacity: 0, transform: 'scale(1.1)' }, { opacity: 1, transform: 'scale(1)' }],
+      { duration: 450, easing: 'cubic-bezier(0.32,0.72,0,1)', fill: 'both' },
+    )
+    nguoi.animate(
+      [
+        { left: (tamNguoi1 - rongNguoi / 2) + 'px' },
+        { left: (tamNguoi2 - rongNguoi / 2) + 'px' },
+      ],
+      { duration: 1500, delay: 900, easing: 'cubic-bezier(0.32,0.72,0,1)', fill: 'both' },
+    )
+    cua.animate(
+      [{ left: kepCua(tamNguoi1) + 'px' }, { left: kepCua(tamNguoi2) + 'px' }],
+      { duration: 1500, delay: 1080, easing: 'cubic-bezier(0.32,0.72,0,1)', fill: 'both' },
+    )
+  }
+  window.addEventListener('resize', function () { veMinhHoa(false) })
+
+  function napLaiHost(xong) {
+    var ext = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/')
+    var lenh = 'var __n="OK"; try { $.evalFile("' + ext + '/host/index.jsx") } catch(e) { __n="ERR:"+e } __n'
+    cs.evalScript(lenh, function (kq) { xong(String(kq).indexOf('OK') === 0) })
+  }
+
+  function hien(id, text) {
+    var el = document.getElementById(id)
+    el.style.display = text ? '' : 'none'
+    el.textContent = text || ''
+  }
+
+  function lamDoc() {
+    var k = KHUNG[dangChon]
+    var nut = document.getElementById('nut')
+    dangChay = true
+    nut.disabled = true
+    veSeg()
+    hien('canlam', ''); hien('loi', '')
+    document.getElementById('ketqua').className = 'ketqua'
+
+    napLaiHost(function (ok) {
+      if (!ok) { xong(); hien('loi', t('khong_nap_host_file')); return }
+      cs.evalScript('rf_lamDoc(' + k.w + ',' + k.h + ',"' + k.nhan + '")', function (raw) {
+        xong()
+        raw = String(raw)
+        if (raw.indexOf('OK:') === 0) {
+          var kv = {}
+          raw.slice(3).split('\n').forEach(function (d) {
+            var i = d.indexOf('=')
+            if (i > 0) kv[d.slice(0, i)] = d.slice(i + 1)
+          })
+          document.getElementById('soClip').textContent = kv.daGan || '0'
+          document.getElementById('khung').textContent = (kv.khung || '').replace('x', '×')
+          document.getElementById('kqDong').innerHTML = tp('kq_dong', { ten: kv.seqMoi || '' })
+          document.getElementById('ketqua').className = 'ketqua ketqua--hien'
+          if (parseInt(kv.soLoi || '0', 10) > 0) {
+            hien('loi', tp('clip_khong_gan', { n: kv.soLoi }) + (kv.loiDau || '?'))
+          }
+          if (parseInt(kv.daCoSan || '0', 10) > 0) {
+            hien('canlam', tp('da_co_san', { n: kv.daCoSan }))
+          }
+        } else if (raw.indexOf('ERR:') === 0) {
+          var ma = raw.slice(4).split('|')[0]
+          if (NGON_NGU.vi['cl_' + ma] !== undefined) hien('canlam', t('cl_' + ma))
+          else if (NGON_NGU.vi['l_' + ma] !== undefined) hien('loi', t('l_' + ma) + '\n' + raw)
+          else hien('loi', t('loi_khong_ro') + '\n' + raw)
+        } else {
+          hien('loi', t('host_la') + '\n' + raw)
+        }
+      })
+    })
+
+    function xong() {
+      dangChay = false
+      document.getElementById('nut').disabled = false
+      veSeg()
+    }
+  }
+
+  // ═══ SHORTS THEO NỘI DUNG ═══════════════════════════════════════════════
+  function layFs() {
+    try { if (window.cep_node && window.cep_node.require) return window.cep_node.require('fs') } catch (e) {}
+    try { if (typeof require === 'function') return require('fs') } catch (e) {}
+    return null
+  }
+
+  function chiaDoan(cau) {
+    var viTriHoi = []
+    cau.forEach(function (c, i) { if (/\?\s*$/.test(String(c.chu).trim())) viTriHoi.push(i) })
+    var ds = []
+    for (var k = 0; k < viTriHoi.length; k++) {
+      var dau = viTriHoi[k]
+      var cuoi = (k + 1 < viTriHoi.length ? viTriHoi[k + 1] : cau.length) - 1
+      if (cuoi <= dau) continue
+      var dai = cau[cuoi].den - cau[dau].tu
+      if (dai < 20 || dai > 180) continue
+      ds.push({ tu: cau[dau].tu, den: cau[cuoi].den, dai: dai, hoi: String(cau[dau].chu).trim() })
+    }
+    return ds.slice(0, 12)
+  }
+
+  var dsDoan = []
+  var duongMedia = ''
+  var dangTim = false
+  var dangXuat = false
+
+  // ═══ XUẤT CHECK 720p — FFmpeg đọc FILE GỐC, không đụng API xuất Premiere
+  //     (hai lần sập app: exportAsMediaDirect 31/07, app.encoder 01/08). ═══
+  function timFfmpeg(fs) {
+    var goc = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/')
+    var ung = ['com.aiostudio.transcript', 'com.aiostudio.autocut']
+    for (var i = 0; i < ung.length; i++) {
+      var p = goc.replace(/com\.aiostudio\.[a-z]+$/, ung[i]) + '/bin/win64/ffmpeg.exe'
+      try { if (fs.existsSync(p)) return p } catch (e) {}
+    }
+    return null
+  }
+
+  function xuatCheck() {
+    var nutX = document.getElementById('nutXuat')
+    dangXuat = true
+    nutX.disabled = true
+    nutX.textContent = t('dang_xuat')
+    hien('canlam', ''); hien('loi', '')
+
+    function xongXuat(canLamText, loiText) {
+      dangXuat = false
+      nutX.disabled = false
+      nutX.textContent = t('nut_xuat')
+      if (canLamText) hien('canlam', canLamText)
+      if (loiText) hien('loi', loiText)
+    }
+
+    napLaiHost(function (ok) {
+      if (!ok) { xongXuat(null, t('khong_nap_host_file')); return }
+      cs.evalScript('rf_thongTinXuat()', function (raw) {
+        raw = String(raw)
+        if (raw.indexOf('OK:') !== 0) {
+          var ma = raw.indexOf('ERR:') === 0 ? raw.slice(4).split('|')[0] : ''
+          if (ma === 'NHIEU_CLIP') xongXuat(tp('xuat_nhieu_clip', { n: raw.split('|')[1] || '?' }), null)
+          else if (ma === 'CHUA_MO_SEQUENCE') xongXuat(t('cl_CHUA_MO_SEQUENCE'), null)
+          else xongXuat(null, t('xuat_loi') + raw)
+          return
+        }
+        var kv = {}
+        raw.slice(3).split('\n').forEach(function (d) {
+          var i = d.indexOf('=')
+          if (i > 0) kv[d.slice(0, i)] = d.slice(i + 1)
+        })
+        var fs = layFs()
+        if (!fs) { xongXuat(null, t('thieu_node')); return }
+        var ffmpeg = timFfmpeg(fs)
+        if (!ffmpeg) { xongXuat(t('xuat_thieu_ffmpeg'), null); return }
+
+        var goc = String(kv.duong).replace(/\\/g, '/')
+        var tu = parseFloat(kv.tuGiay)
+        var dai = parseFloat(kv.denGiay) - tu
+        var thuMuc = goc.slice(0, goc.lastIndexOf('/'))
+        var tenSach = String(kv.ten).replace(/[^\w\- ]/g, '').replace(/\s+/g, ' ').trim() || 'short'
+        var ra = thuMuc + '/' + tenSach + '-check-720.mp4'
+
+        var cp = null
+        try { cp = window.cep_node ? window.cep_node.require('child_process') : require('child_process') } catch (e) {}
+        if (!cp) { xongXuat(null, t('thieu_node')); return }
+
+        // -ss TRƯỚC -i: nhảy thẳng tới mốc (bài học skill CEP). -t = thời lượng.
+        // libopenh264: encoder BSD trong bundle LGPL — sạch để bán.
+        var thamSo = [
+          '-y', '-ss', tu.toFixed(3), '-i', goc, '-t', dai.toFixed(3),
+          '-vf', 'scale=-2:720',
+          '-c:v', 'libopenh264', '-b:v', '2500k',
+          '-c:a', 'aac', '-b:a', '128k',
+          ra,
+        ]
+        var duoiLoi = ''
+        var con = cp.execFile(ffmpeg, thamSo, { windowsHide: true, maxBuffer: 8 * 1024 * 1024 }, function (err) {
+          if (err) { xongXuat(null, t('xuat_loi') + (duoiLoi.slice(-300) || String(err))); return }
+          var mb = '?'
+          try { mb = (fs.statSync(ra.replace(/\//g, '\\')).size / 1048576).toFixed(1) } catch (e2) {
+            try { mb = (fs.statSync(ra).size / 1048576).toFixed(1) } catch (e3) {}
+          }
+          xongXuat(tp('xuat_xong', { ten: tenSach + '-check-720.mp4', giay: dai.toFixed(0), mb: mb }), null)
+        })
+        if (con && con.stderr) con.stderr.on('data', function (d) { duoiLoi += String(d) })
+      })
+    })
+  }
+
+  function timDoan() {
+    var nutTim = document.getElementById('nutTim')
+    var mo = document.getElementById('timMo')
+    dangTim = true
+    nutTim.disabled = true
+    mo.textContent = t('dang_doc')
+    hien('taoKq', '')
+    napLaiHost(function (ok) {
+      if (!ok) { dangTim = false; nutTim.disabled = false; mo.textContent = t('khong_nap_host'); return }
+      cs.evalScript('rf_duongDanMedia()', function (raw) {
+        raw = String(raw)
+        if (raw.indexOf('OK:') !== 0) {
+          dangTim = false; nutTim.disabled = false
+          mo.textContent = t('mo_seq_video')
+          return
+        }
+        duongMedia = raw.slice(3)
+        var fs = layFs()
+        if (!fs) { dangTim = false; nutTim.disabled = false; mo.textContent = t('thieu_node'); return }
+        var demPath = duongMedia.replace(/\\/g, '/').replace(/\.[^.\/]+$/, '') + '.autocut-nghe.json'
+        var j = null
+        try { j = JSON.parse(fs.readFileSync(demPath, 'utf8')) } catch (e) {}
+        if (!j || !j.cau || !j.cau.length) {
+          dangTim = false; nutTim.disabled = false
+          mo.textContent = t('chua_ban_chep')
+          return
+        }
+        dsDoan = chiaDoan(j.cau)
+        dangTim = false; nutTim.disabled = false
+        if (!dsDoan.length) {
+          mo.textContent = tp('khong_cau_hoi', { n: j.cau.length })
+          return
+        }
+        mo.textContent = tp('thay_doan', { n: dsDoan.length })
+        veDsDoan()
+      })
+    })
+  }
+
+  function veDsDoan() {
+    var khungDs = document.getElementById('dsDoan')
+    khungDs.innerHTML = ''
+    khungDs.style.display = ''
+    dsDoan.forEach(function (d) {
+      var hang = document.createElement('label')
+      hang.className = 'ds__muc'
+      var tick = document.createElement('input')
+      tick.type = 'checkbox'
+      tick.checked = true
+      tick.onchange = capNhatNutTao
+      hang.appendChild(tick)
+      var giay = document.createElement('span')
+      giay.className = 'ds__giay'
+      giay.textContent = Math.round(d.dai) + 's'
+      hang.appendChild(giay)
+      var chu = document.createElement('span')
+      chu.className = 'ds__chu'
+      chu.textContent = d.hoi
+      chu.title = d.hoi
+      hang.appendChild(chu)
+      khungDs.appendChild(hang)
+    })
+    capNhatNutTao()
+  }
+
+  function demTick() {
+    return [].filter.call(document.querySelectorAll('#dsDoan input'), function (t) { return t.checked }).length
+  }
+
+  function capNhatNutTao() {
+    var n = demTick()
+    var nutTao = document.getElementById('nutTao')
+    var nutTim = document.getElementById('nutTim')
+    var coDs = document.querySelectorAll('#dsDoan .ds__muc').length > 0
+    nutTao.style.display = n ? '' : 'none'
+    nutTao.textContent = tp('tao_short', { n: n, ten: tenTiLe().toLowerCase() })
+    nutTim.className = coDs ? 'btn-phu' : 'btn-chinh'
+    nutTim.textContent = coDs ? t('tim_lai') : t('tim_doan')
+  }
+
+  function taoShorts() {
+    var k = KHUNG[dangChon]
+    var chon = []
+    var ticks = document.querySelectorAll('#dsDoan input')
+    dsDoan.forEach(function (d, i) { if (ticks[i] && ticks[i].checked) chon.push(d) })
+    if (!chon.length) return
+    var nutTao = document.getElementById('nutTao')
+    var nutTim = document.getElementById('nutTim')
+    dangChay = true
+    nutTao.disabled = true
+    nutTim.disabled = true
+    var xongDs = []
+    var i = 0
+    ;(function tiep() {
+      if (i >= chon.length) {
+        dangChay = false
+        nutTao.disabled = false
+        dangTim = false; nutTim.disabled = false
+        capNhatNutTao()
+        hien('taoKq', tp('da_tao', { x: xongDs.length, n: chon.length }))
+        return
+      }
+      var d = chon[i]
+      nutTao.textContent = tp('dang_tao_short', { i: i + 1, n: chon.length })
+      var ten = 'Short ' + (i + 1) + ' - ' + k.nhan
+      var duong = duongMedia.replace(/\\/g, '/')
+      cs.evalScript(
+        'rf_catShort("' + duong + '",' + d.tu.toFixed(3) + ',' + d.den.toFixed(3) + ',' + k.w + ',' + k.h + ',"' + ten + '")',
+        function (raw) {
+          raw = String(raw)
+          if (raw.indexOf('OK:') === 0) xongDs.push(ten)
+          else hien('loi', tp('short_loi', { i: i + 1 }) + raw)
+          i++
+          tiep()
+        },
+      )
+    })()
+  }
+
+  // ═══ Đèn trạng thái + thanh trên: một cú đọc mỗi giây, tự lành ══════════
+  var dangSoi = false
+  function soi() {
+    if (dangChay || dangSoi) return
+    dangSoi = true
+    cs.evalScript(
+      '(function(){try{var v=String(app.version);var p=(app.project&&app.project.name)?String(app.project.name):"";var s=app.project?app.project.activeSequence:null;var t=s?s.getSettings():null;var md="";try{for(var i=0;i<s.videoTracks.numTracks;i++){if(s.videoTracks[i].clips.numItems>0){md=String(s.videoTracks[i].clips[0].projectItem.getMediaPath());break}}}catch(e2){}return v+"|~|"+p+"|~|"+(s?String(s.name):"")+"|~|"+(t?t.videoFrameWidth+"x"+t.videoFrameHeight:"")+"|~|"+md}catch(e){return ""}})()',
+      function (raw) {
+        dangSoi = false
+        raw = String(raw)
+        var den = document.getElementById('den')
+        var chu = document.getElementById('denChu')
+        var nut = document.getElementById('nut')
+        var nutTim = document.getElementById('nutTim')
+        var host = document.getElementById('host')
+        var phan = raw.split('|~|')
+        // batDuoc = hai luồng chính (cần bản NGANG) · coSeq = nút xuất check
+        // (bản dọc cũng xuất được, chỉ cần CÓ sequence).
+        var khoa = function (batDuoc, coSeq) {
+          if (dangChay || dangTim || dangXuat) return
+          nut.disabled = !batDuoc
+          nutTim.disabled = !batDuoc
+          document.getElementById('nutXuat').disabled = !coSeq
+        }
+        if (phan.length < 4) {
+          host.textContent = t('cho_premiere')
+          den.className = 'den den--cho'
+          chu.textContent = t('premiere_chua')
+          khoa(false, false)
+          return
+        }
+        host.textContent = 'Premiere ' + phan[0] + (phan[1] ? ' · ' + phan[1] : '')
+        var ten = phan[2]
+        var kich = phan[3].split('x')
+        if (!ten) {
+          den.className = 'den den--cho'
+          chu.textContent = t('chua_mo_seq')
+          khoa(false, false)
+          return
+        }
+        var ngang = parseInt(kich[0], 10) > parseInt(kich[1], 10)
+        if (ngang) {
+          den.className = 'den den--ok'
+          chu.textContent = tp('dang_mo', { ten: ten, kich: kich[0] + '×' + kich[1] })
+          khoa(true, true)
+        } else {
+          den.className = 'den den--cho'
+          chu.textContent = tp('khong_ngang', { ten: ten })
+          khoa(false, true)
+        }
+
+        // Danh sách đoạn là CỦA MỘT VIDEO — đổi video là tự dọn, bắt quét lại.
+        var media = (phan[4] || '').replace(/\\/g, '/')
+        if (dsDoan.length && duongMedia && media && media !== duongMedia.replace(/\\/g, '/')) {
+          xoaDanhSachDoan()
+        }
+      },
+    )
+  }
+
+  function xoaDanhSachDoan() {
+    dsDoan = []
+    duongMedia = ''
+    var khungDs = document.getElementById('dsDoan')
+    khungDs.innerHTML = ''
+    khungDs.style.display = 'none'
+    document.getElementById('nutTao').style.display = 'none'
+    document.getElementById('timMo').textContent = t('video_khac')
+    capNhatNutTao()
+  }
+  window.setInterval(soi, 1000)
+
+  // Hướng dẫn lần đầu: chỉ hiện khi CHƯA từng bấm "Đã hiểu".
+  function dongHuongDan() {
+    document.getElementById('hd').style.display = 'none'
+    try { localStorage.setItem('aio-rf-daXemHuongDan', '1') } catch (e) {}
+  }
+  try {
+    if (!localStorage.getItem('aio-rf-daXemHuongDan')) {
+      document.getElementById('hd').style.display = ''
+    }
+  } catch (e) {}
+
+  apNgonNgu()
+  veMinhHoa(false)
+  soi()
+</script>
+</body>
+</html>

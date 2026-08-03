@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>AiO Guide Frame</title>
+<link rel="stylesheet" href="./tokens.css" />
+<style>
+  /* v0.1 — panel guideline safe zone. SONG NGỮ từ dòng đầu (luật bán hàng
+     31/07). Dữ liệu vẽ lấy từ safe-zones.js (SINH từ safe-zones.json — nguồn
+     chân lý, đừng sửa tay). Bộ vẽ nằm ở ve-guide.js dùng chung với bàn xem
+     trước. Bố cục theo design-system "Studio Console". */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg-2);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: var(--fs-md);
+    line-height: var(--lh);
+    user-select: none;
+  }
+  .topbar {
+    height: var(--h-topbar);
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line-1);
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: 0 var(--sp-5);
+  }
+  .topbar__ten { font-weight: var(--fw-semibold); display: inline-flex; align-items: center; gap: var(--sp-3); }
+  .topbar__ten::before {
+    content: ''; width: 8px; height: 8px; border-radius: 2px;
+    background: var(--accent); box-shadow: 0 0 8px rgb(255 87 20 / 45%);
+  }
+  .topbar__ver {
+    color: var(--text-3); font-size: var(--fs-2xs); font-weight: var(--fw-medium);
+    background: var(--bg-4); border: 1px solid var(--line-1); border-radius: var(--r-pill);
+    padding: 2px 8px;
+  }
+  .topbar__host { margin-left: auto; color: var(--text-3); font-size: var(--fs-xs); }
+  .lang {
+    height: var(--h-ctrl-sm);
+    padding: 0 var(--sp-3);
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    background: none; color: var(--text-2);
+    font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+    letter-spacing: 0.06em;
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .lang:hover { background: var(--bg-hover); color: var(--text-1); }
+
+  .than {
+    max-width: 680px; margin: 0 auto;
+    padding: var(--sp-5);
+    display: flex; flex-direction: column; gap: var(--sp-5);
+  }
+
+  /* ── Bố cục 2 cột khi panel RỘNG: điều khiển trái, xem trước là NHÂN VẬT CHÍNH phải.
+     Panel hẹp (dock dọc) giữ một cột: chọn → xem → hành động. ── */
+  .noiDung { display: flex; flex-direction: column; gap: var(--sp-5); }
+  .cot { display: contents; }
+  #dkSafe, #dkLuoi { order: 1; }
+  #xemSafe, #xemLuoi { order: 2; }
+  .khuHanhDong { order: 3; }
+  @media (min-width: 560px) {
+    .than { max-width: 1040px; }
+    .noiDung {
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) 1fr;
+      gap: var(--sp-6);
+      align-items: start;
+    }
+    .cot { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
+    .cot--phai { position: sticky; top: var(--sp-5); }
+  }
+
+  .nhan {
+    font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+  }
+
+  /* ── Hai tab: viên thuốc gọn giữa panel ── */
+  .tabs {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    gap: var(--sp-1);
+    background: var(--bg-1); border: 1px solid var(--line-1);
+    border-radius: var(--r-pill); padding: 3px;
+    width: 100%; max-width: 420px; margin: 0 auto;
+    box-shadow: inset 0 1px 3px rgb(0 0 0 / 35%);
+  }
+  .tabs__nut {
+    height: 30px;
+    background: none; border: 1px solid transparent; border-radius: var(--r-pill);
+    color: var(--text-2); font-family: var(--font-ui); font-size: var(--fs-md);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .tabs__nut:hover { background: var(--bg-hover); }
+  .tabs__nut--chon {
+    background: linear-gradient(180deg, var(--bg-5), var(--bg-4));
+    border-color: var(--line-strong);
+    color: var(--text-1); font-weight: var(--fw-medium);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
+  }
+
+  /* ── Khối trái: card có lớp lang thay vì form trần ── */
+  .khoi {
+    background: linear-gradient(180deg, var(--bg-3), var(--bg-2));
+    border: 1px solid var(--line-1); border-radius: var(--r-lg);
+    padding: var(--sp-4);
+  }
+
+  /* ── Ô nhập lề % trong tab lưới ── */
+  .le { display: inline-flex; align-items: center; gap: var(--sp-2); }
+  .le input {
+    width: 52px; height: var(--h-ctrl);
+    background: var(--bg-0); border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    color: var(--text-1); font-family: var(--font-ui); font-size: var(--fs-md);
+    text-align: center;
+  }
+  .le input:focus { outline: none; border-color: var(--accent-line); }
+  .le span { color: var(--text-3); font-size: var(--fs-sm); }
+
+  /* ── Màu lưới: ô màu tròn ── */
+  .swatches { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+  .swatch {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--line-2); background: none;
+    cursor: pointer; padding: 0;
+    transition: all var(--dur) var(--ease);
+  }
+  .swatch--chon { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .swatch--auto { background: conic-gradient(#fff 0 25%, #e8c05a 0 50%, #40dcff 0 75%, #8d8d95 0); }
+
+  /* ── Đường tự thêm ── */
+  .duongs { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .duong { display: flex; align-items: center; gap: var(--sp-2); }
+  .duong .seg2 {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    background: var(--bg-3); border: 1px solid var(--line-1); border-radius: var(--r-sm);
+    padding: 2px; gap: 2px;
+  }
+  .duong .seg2 button {
+    height: 22px; padding: 0 var(--sp-3);
+    background: none; border: none; border-radius: 4px;
+    color: var(--text-3); font-family: var(--font-ui); font-size: var(--fs-xs);
+    cursor: pointer;
+  }
+  .duong .seg2 button.chon { background: var(--bg-5); color: var(--text-1); }
+  .duong input {
+    width: 58px; height: var(--h-ctrl);
+    background: var(--bg-0); border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    color: var(--text-1); font-family: var(--font-ui); font-size: var(--fs-md);
+    text-align: center;
+  }
+  .duong input:focus { outline: none; border-color: var(--accent-line); }
+  .duong__xoa {
+    width: 22px; height: 22px;
+    background: none; border: none; border-radius: var(--r-sm);
+    color: var(--text-3); font-size: var(--fs-md); line-height: 1;
+    cursor: pointer;
+  }
+  .duong__xoa:hover { color: var(--danger); background: var(--bg-hover); }
+
+  /* ── Preset của tôi ── */
+  .presetrow { display: flex; gap: var(--sp-2); }
+  .presetrow input {
+    flex: 1; min-width: 0; height: var(--h-ctrl);
+    padding: 0 var(--sp-3);
+    background: var(--bg-0); border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    color: var(--text-1); font-family: var(--font-ui); font-size: var(--fs-md);
+  }
+  .presetrow input:focus { outline: none; border-color: var(--accent-line); }
+  .preset__xoa { margin-left: 5px; color: var(--text-3); }
+  .preset__xoa:hover { color: var(--danger); }
+
+  /* ── Chọn nền tảng: MỘT hàng chip, cuộn ngang khi hẹp — giấu thanh cuộn cho sạch ── */
+  .chips {
+    display: flex; flex-wrap: nowrap; gap: var(--sp-2);
+    overflow-x: auto; padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none;
+    height: var(--h-ctrl);
+    padding: 0 var(--sp-4);
+    background: none; border: 1px solid var(--line-2); border-radius: var(--r-pill);
+    color: var(--text-2); font-family: var(--font-ui); font-size: var(--fs-sm);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .chip:hover { background: var(--bg-hover); border-color: var(--line-strong); color: var(--text-1); }
+  .chip--chon {
+    background: var(--accent-soft); border-color: var(--accent-line);
+    color: var(--text-1); font-weight: var(--fw-medium);
+  }
+  .chip--chon .chip__dot { box-shadow: 0 0 6px currentColor; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; }
+  .chip__dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+  /* ── Khung hình: THẺ hình thu nhỏ đúng tỉ lệ — nhìn dáng là hiểu ── */
+  .fmts { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .fmt {
+    width: 96px;
+    display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-2);
+    background: var(--bg-3); border: 1px solid var(--line-1); border-radius: var(--r-md);
+    color: var(--text-2); font-family: var(--font-ui);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .fmt:hover { background: var(--bg-4); border-color: var(--line-strong); transform: translateY(-1px); }
+  .fmt--chon { border-color: var(--accent-line); background: var(--bg-4); color: var(--text-1); }
+  .fmt--chon .fmt__khung { box-shadow: 0 0 0 1px var(--accent-line); }
+  .fmt__khung {
+    height: 56px; display: flex; align-items: center;
+    border-radius: 4px; transition: box-shadow var(--dur) var(--ease);
+  }
+  .fmt__khung canvas { border-radius: 3px; display: block; }
+  .fmt__ten {
+    font-size: var(--fs-xs); text-align: center; line-height: var(--lh-tight);
+    min-height: calc(var(--fs-xs) * var(--lh-tight) * 2);
+    display: flex; align-items: center;
+  }
+
+  /* ── Dòng trấn an — MỘT dòng duy nhất thay cho mọi chữ phân tích ── */
+  .capnhat {
+    display: flex; align-items: center; gap: var(--sp-2);
+    font-size: var(--fs-sm); color: var(--ok);
+  }
+  .capnhat::before { content: '✓'; font-weight: var(--fw-bold); }
+
+  /* ── Xem trước — sân khấu chấm mờ, khung bọc VIỀN THIẾT BỊ thật ── */
+  .xem { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
+  .xem__khung {
+    background:
+      radial-gradient(rgb(255 255 255 / 3.5%) 1px, transparent 1.5px) 0 0 / 18px 18px,
+      radial-gradient(130% 130% at 50% 0%, #141418 0%, var(--bg-0) 75%);
+    border: 1px solid var(--line-1); border-radius: var(--r-lg);
+    padding: var(--sp-6);
+    display: flex; justify-content: center; align-items: center;
+  }
+  .thietBi {
+    padding: 9px;
+    background: linear-gradient(180deg, #202024, #0d0d10);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgb(255 255 255 / 7%);
+    transition: border-radius var(--dur) var(--ease);
+  }
+  .thietBi--doc { border-radius: 26px; }
+  .thietBi--doc canvas { border-radius: 17px; }
+  .thietBi--ngang { border-radius: 12px; padding: 8px; }
+  .thietBi--ngang canvas { border-radius: 5px; }
+  .thietBi--vuong { border-radius: 18px; }
+  .thietBi--vuong canvas { border-radius: 10px; }
+  .thietBi canvas {
+    max-width: 100%; display: block;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 70%);
+  }
+  .xem__trangthai { font-size: var(--fs-xs); color: var(--text-3); }
+  .xem__ghichu { font-size: var(--fs-sm); color: var(--text-2); }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2); font-size: var(--fs-xs); color: var(--text-3); }
+  .legend span {
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--line-1); border-radius: var(--r-pill);
+    background: var(--bg-3); padding: 3px 10px;
+  }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+
+  /* ── Hành động ── */
+  .den {
+    display: flex; align-items: center; gap: var(--sp-3);
+    font-size: var(--fs-sm); color: var(--text-2);
+  }
+  .den__cham {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-3); flex: none;
+    transition: background var(--dur) var(--ease);
+  }
+  .den--ok .den__cham { background: var(--ok); }
+  .den--cho .den__cham { background: var(--warn); }
+  .den--loi .den__cham { background: var(--danger); }
+
+  /* Nut chinh MOT MINH mot hang cho chu khong bao gio gay dong; nut Tat xep duoi */
+  .hanhdong { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .hanhdong .btn { white-space: nowrap; }
+  .btn {
+    height: var(--h-ctrl);
+    padding: 0 var(--sp-5);
+    background: linear-gradient(180deg, var(--bg-5), var(--bg-4));
+    border: 1px solid var(--line-2); border-radius: var(--r-md);
+    color: var(--text-1); font-family: var(--font-ui); font-size: var(--fs-md);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .btn:hover:not(:disabled) { border-color: var(--line-strong); filter: brightness(1.12); }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .btn--primary {
+    height: var(--h-ctrl-lg);
+    background: linear-gradient(180deg, var(--accent-hover), var(--accent));
+    border-color: transparent;
+    color: var(--accent-on); font-weight: var(--fw-semibold);
+    box-shadow: 0 4px 14px rgb(255 87 20 / 28%), inset 0 1px 0 rgb(255 255 255 / 28%);
+  }
+  .btn--primary:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
+  .btn--primary:active:not(:disabled) { transform: translateY(0); }
+  .btn--xong {
+    background: linear-gradient(180deg, #5fd69a, var(--ok));
+    color: #06180e;
+    box-shadow: 0 4px 14px rgb(78 201 138 / 25%);
+  }
+
+  .canhbao {
+    display: none;
+    padding: var(--sp-3) var(--sp-4);
+    background: rgb(232 192 90 / 12%); border: 1px solid rgb(232 192 90 / 35%);
+    border-radius: var(--r-md);
+    font-size: var(--fs-sm); color: var(--warn);
+  }
+  .canhbao--hien { display: block; }
+
+  .trangthai { font-size: var(--fs-sm); color: var(--text-2); min-height: 18px; white-space: pre-line; }
+  .trangthai--loi { color: var(--danger); }
+
+  .phu { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .phu__hint { font-size: var(--fs-xs); color: var(--text-3); }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="topbar__ten">AiO Guide Frame</span>
+    <span class="topbar__ver">v0.1.0</span>
+    <span class="topbar__host" id="host">…</span>
+    <button class="lang" id="lang" onclick="doiNgonNgu()"></button>
+  </div>
+
+  <div class="than">
+    <div class="tabs">
+      <button class="tabs__nut tabs__nut--chon" id="tabSafe" onclick="chuyenTab('safe')"></button>
+      <button class="tabs__nut" id="tabLuoi" onclick="chuyenTab('luoi')"></button>
+    </div>
+
+    <div class="noiDung">
+      <div class="cot cot--trai">
+        <div id="dkSafe" class="khoi">
+          <div>
+            <div class="nhan" id="nhanNenTang"></div>
+            <div class="chips" id="chips" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:16px">
+            <div class="nhan" id="nhanDinhDang"></div>
+            <div class="fmts" id="fmts" style="margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div id="dkLuoi" class="khoi" style="display:none">
+          <div>
+            <div class="nhan" id="nhanTiLe"></div>
+            <div class="chips" id="chipsTiLe" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:16px">
+            <div class="nhan" id="nhanLuoi"></div>
+            <div class="chips" id="chipsLuoi" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:16px">
+            <div class="nhan" id="nhanDuong"></div>
+            <div class="duongs" id="duongs" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:16px">
+            <div class="nhan" id="nhanMau"></div>
+            <div class="swatches" id="swatches" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:16px">
+            <div class="nhan" id="nhanPreset"></div>
+            <div class="presetrow" style="margin-top:6px">
+              <input id="tenPreset" type="text" maxlength="24" />
+              <button class="btn" id="nutLuuPreset" onclick="luuPreset()"></button>
+            </div>
+            <div class="chips" id="presets" style="margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div class="khuHanhDong khoi">
+          <div class="den" id="den"><span class="den__cham"></span><span id="denChu"></span></div>
+          <div class="hanhdong" style="margin-top:8px">
+            <button class="btn btn--primary" id="nutHien" onclick="hienGuide()"></button>
+            <button class="btn" id="nutTat" onclick="tatGuide()"></button>
+          </div>
+          <div class="canhbao" id="canhbao" style="margin-top:8px"></div>
+          <div class="trangthai" id="trangthai" style="margin-top:8px"></div>
+          <div class="phu" style="margin-top:8px">
+            <button class="btn" id="nutGuides" onclick="luuGuides()"></button>
+            <span class="phu__hint" id="hintGuides"></span>
+          </div>
+          <div class="capnhat" id="capnhat" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="cot cot--phai">
+        <div class="xem" id="xemSafe">
+          <div class="xem__khung"><div class="thietBi thietBi--doc" id="tbSafe"><canvas id="cv"></canvas></div></div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="xem" id="xemLuoi" style="display:none">
+          <div class="xem__khung"><div class="thietBi thietBi--ngang" id="tbLuoi"><canvas id="cvLuoi"></canvas></div></div>
+          <div class="xem__trangthai" id="metaLuoi" style="text-align:center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="./CSInterface.js"></script>
+<script src="./safe-zones.js"></script>
+<script src="./ve-guide.js"></script>
+<script>
+  'use strict';
+  var PHIEN_BAN = '0.1.0';
+  var DU = window.SAFE_ZONES;
+
+  /* ── Song ngữ ─────────────────────────────────────────────────────────── */
+  var NGON_NGU = {
+    vi: {
+      tabSafe: 'Safe zone',
+      tabLuoi: 'Lưới bố cục',
+      nhanLuoi: 'Lưới',
+      nhanTiLe: 'Tỉ lệ khung',
+      tuTheoSeq: 'Theo sequence',
+      nhanMau: 'Màu',
+      tuDong: 'Tự động',
+      nhanDuong: 'Đường tự thêm',
+      themDuong: '+ Thêm đường',
+      ngang: 'Ngang',
+      doc: 'Dọc',
+      nhanPreset: 'Preset của tôi',
+      luuPreset: 'Lưu',
+      tenPresetGoiY: 'Tên preset…',
+      chia3: 'Chia 3',
+      tam: 'Tâm khung',
+      vang: 'Tỉ lệ vàng',
+      le: 'Lề',
+      luoiTrong: 'Chọn ít nhất một lưới hoặc thêm một đường đã anh ơi.',
+      nenTang: 'Nền tảng',
+      dinhDang: 'Khung hình',
+      hien: 'Hiện guideline trên sequence',
+      dangHien: 'Đang đặt…',
+      daHien: 'Đã đặt guideline ✓',
+      tat: 'Tắt guideline',
+      dangTat: 'Đang gỡ…',
+      luuGuides: 'Lưu file .guides',
+      hintGuides: 'Guide gốc Premiere — không dính vào video xuất',
+      denChuaNoi: 'Chưa nối được với Premiere',
+      denSanSang: 'Sẵn sàng — sequence: ',
+      denChuaSeq: 'Chưa mở sequence nào trong Premiere',
+      canhbao: 'Sequence còn {n} lớp guideline — tắt trước khi xuất video.',
+      capNhat: 'Thông số kỹ thuật đã cập nhật phiên bản mới nhất',
+      lgUi: 'Bị UI che',
+      lgCrop: 'Bị cắt (ngữ cảnh khác)',
+      lgKn: 'Đệm khuyến nghị',
+      lgSafe: 'Vùng an toàn',
+      daDat: 'Đã đặt lên track V{track} · phủ {dai}s / sequence {seq}s',
+      phuThieu: '\nLớp guide là ảnh tĩnh nên chỉ phủ {dai}s — kéo dài đuôi clip AIO_GUIDE nếu cần phủ hết.',
+      daTat: 'Đã gỡ {n} lớp guideline. Sequence sạch.',
+      tatThieu: 'Đã gỡ {n} lớp, CÒN {m} lớp chưa gỡ được — kiểm tra track bị khoá.',
+      daLuuGuides: 'Đã lưu: {path}\nNhập vào Premiere: Program Monitor → View → Guide Templates → Manage Guides → Import.',
+      khopLech: '\nLưu ý: sequence {sw}×{sh} khác tỉ lệ khung {fw}×{fh} — guideline vẽ vào vùng {fw2}×{fh2} giữa khung.',
+      l_CHUA_MO_SEQ: 'Chưa mở sequence nào trong Premiere.',
+      l_SEQ_TRONG: 'Sequence chưa có clip nào — thêm clip rồi bấm lại.',
+      l_HET_TRACK: 'Không có track video trống trên cùng. Thêm 1 track: chuột phải vào đầu track → Add Track, rồi bấm lại.',
+      l_KHONG_THAY_FILE: 'Không ghi được file guide ra đĩa.',
+      l_IMPORT_HONG: 'Premiere không import được ảnh guide.',
+      l_IMPORT_KHONG_VAO: 'Import xong nhưng không thấy ảnh trong project.',
+      l_DAT_HONG: 'Không đặt được clip lên track.',
+      l_DAT_KHONG_VAO: 'Đặt clip xong nhưng track không thêm clip nào.',
+      l_KHONG_DOC_DUOC_KHUNG: 'Không đọc được kích thước sequence.',
+      l_HOST_CU: 'Premiere đang chạy host cũ — tắt hẳn Premiere rồi mở lại.',
+      l_KHONG_NODE: 'Panel không bật được Node — cài lại panel.',
+      l_TREO: 'Premiere không trả lời — nhìn màn hình Premiere xem có hộp thoại nào đang chờ bấm không.'
+    },
+    en: {
+      tabSafe: 'Safe zone',
+      tabLuoi: 'Composition grid',
+      nhanLuoi: 'Grids',
+      nhanTiLe: 'Frame ratio',
+      tuTheoSeq: 'Match sequence',
+      nhanMau: 'Color',
+      tuDong: 'Auto',
+      nhanDuong: 'Custom lines',
+      themDuong: '+ Add line',
+      ngang: 'Horizontal',
+      doc: 'Vertical',
+      nhanPreset: 'My presets',
+      luuPreset: 'Save',
+      tenPresetGoiY: 'Preset name…',
+      chia3: 'Thirds',
+      tam: 'Center',
+      vang: 'Golden ratio',
+      le: 'Margin',
+      luoiTrong: 'Pick at least one grid or add a line first.',
+      nenTang: 'Platform',
+      dinhDang: 'Frame',
+      hien: 'Show guides on sequence',
+      dangHien: 'Placing…',
+      daHien: 'Guides placed ✓',
+      tat: 'Remove guides',
+      dangTat: 'Removing…',
+      luuGuides: 'Save .guides file',
+      hintGuides: 'Native Premiere guides — never in your export',
+      denChuaNoi: 'Not connected to Premiere',
+      denSanSang: 'Ready — sequence: ',
+      denChuaSeq: 'No sequence open in Premiere',
+      canhbao: '{n} guide layer(s) still on the sequence — remove before exporting.',
+      capNhat: 'Specs up to date with the latest platform versions',
+      lgUi: 'Covered by UI',
+      lgCrop: 'Cropped (other surfaces)',
+      lgKn: 'Recommended padding',
+      lgSafe: 'Safe area',
+      daDat: 'Placed on track V{track} · covers {dai}s / sequence {seq}s',
+      phuThieu: '\nGuide layer is a still image covering {dai}s — extend the AIO_GUIDE clip tail if you need full coverage.',
+      daTat: 'Removed {n} guide layer(s). Sequence clean.',
+      tatThieu: 'Removed {n}, {m} layer(s) could NOT be removed — check locked tracks.',
+      daLuuGuides: 'Saved: {path}\nImport in Premiere: Program Monitor → View → Guide Templates → Manage Guides → Import.',
+      khopLech: '\nNote: sequence {sw}×{sh} differs from the {fw}×{fh} frame — guides drawn into the centered {fw2}×{fh2} region.',
+      l_CHUA_MO_SEQ: 'No sequence is open in Premiere.',
+      l_SEQ_TRONG: 'Sequence has no clips yet — add a clip and try again.',
+      l_HET_TRACK: 'No empty top video track. Add one: right-click a track header → Add Track, then retry.',
+      l_KHONG_THAY_FILE: 'Could not write the guide file to disk.',
+      l_IMPORT_HONG: 'Premiere failed to import the guide image.',
+      l_IMPORT_KHONG_VAO: 'Import ran but the image did not appear in the project.',
+      l_DAT_HONG: 'Could not place the clip on the track.',
+      l_DAT_KHONG_VAO: 'Placement ran but the track gained no clip.',
+      l_KHONG_DOC_DUOC_KHUNG: 'Could not read the sequence frame size.',
+      l_HOST_CU: 'Premiere is running an old host script — fully restart Premiere.',
+      l_KHONG_NODE: 'Panel could not access Node — reinstall the panel.',
+      l_TREO: 'Premiere is not responding — check its window for a blocking dialog.'
+    }
+  };
+  var L = 'vi';
+  try { L = localStorage.getItem('aio-lang') || 'vi'; } catch (e) {}
+  if (!NGON_NGU[L]) L = 'vi';
+  function t(k) {
+    var b = NGON_NGU[L][k];
+    if (b === undefined) b = NGON_NGU.vi[k];
+    return (b === undefined) ? k : b;
+  }
+  function tm(k, thay) {
+    var s = t(k);
+    for (var kk in thay) s = s.split('{' + kk + '}').join(thay[kk]);
+    return s;
+  }
+
+  /* ── Trạng thái chọn ──────────────────────────────────────────────────── */
+  var ntChon = DU.nenTang[0].id;
+  var fmtChon = DU.nenTang[0].dinhDang[0].id;
+  var tabChon = 'safe';
+  var seqKichThuoc = null; // {w,h} sequence dang mo — cap nhat moi lan hoi host
+
+  /* Cau hinh luoi bo cuc — nho lai lan sau.
+     tiLe: 'auto' = theo sequence · mau: null = moi nhom mot mau mac dinh */
+  var luoiCfg = { chia3: true, tam: false, vang: false, le: 0, tiLe: 'auto', mau: null, tuyChinh: [] };
+  try {
+    var luuLuoi = JSON.parse(localStorage.getItem('aio-gf-luoi') || 'null');
+    if (luuLuoi && typeof luuLuoi === 'object') {
+      for (var kL in luoiCfg) if (luuLuoi[kL] !== undefined) luoiCfg[kL] = luuLuoi[kL];
+    }
+  } catch (e) {}
+  function luuLuoiCfg() { try { localStorage.setItem('aio-gf-luoi', JSON.stringify(luoiCfg)); } catch (e) {} }
+
+  var TI_LE = [
+    { id: 'auto', ten: null }, // nhan dien qua t('tuTheoSeq')
+    { id: '9:16', w: 1080, h: 1920 },
+    { id: '1:1', w: 1080, h: 1080 },
+    { id: '4:5', w: 1080, h: 1350 },
+    { id: '16:9', w: 1920, h: 1080 }
+  ];
+  var MAU_CHON = ['#ffffff', '#40dcff', '#ff5714', '#ff5f6d', '#4ec98a', '#e8c05a'];
+
+  /* Preset nguoi dung tu luu (Guideify co "Save & Reuse Custom Presets" — minh phai co) */
+  var luoiPresets = [];
+  try { luoiPresets = JSON.parse(localStorage.getItem('aio-gf-luoi-presets') || '[]') || []; } catch (e) {}
+  function luuPresets() { try { localStorage.setItem('aio-gf-luoi-presets', JSON.stringify(luoiPresets)); } catch (e) {} }
+
+  function layNt(id) {
+    for (var i = 0; i < DU.nenTang.length; i++) if (DU.nenTang[i].id === id) return DU.nenTang[i];
+    return DU.nenTang[0];
+  }
+  function layFmt() {
+    var nt = layNt(ntChon);
+    for (var i = 0; i < nt.dinhDang.length; i++) if (nt.dinhDang[i].id === fmtChon) return nt.dinhDang[i];
+    return nt.dinhDang[0];
+  }
+
+  /* ── Dựng UI ──────────────────────────────────────────────────────────── */
+  /* Chấm màu thương hiệu — nhìn màu là nhận ra app, khỏi đọc hết chữ */
+  var MAU_NEN_TANG = {
+    tiktok: '#25f4ee', instagram: '#e1306c', facebook: '#1877f2',
+    youtube: '#ff0000', snapchat: '#fffc00', pinterest: '#e60023',
+    linkedin: '#0a66c2', x: '#e7e9ea', zalo: '#0068ff', broadcast: '#8d8d95'
+  };
+  function dungChips() {
+    var h = '';
+    for (var i = 0; i < DU.nenTang.length; i++) {
+      var nt = DU.nenTang[i];
+      h += '<button class="chip' + (nt.id === ntChon ? ' chip--chon' : '') + '" onclick="chonNt(\'' + nt.id + '\')">' +
+        '<span class="chip__dot" style="background:' + (MAU_NEN_TANG[nt.id] || '#8d8d95') + '"></span>' +
+        nt.ten + '</button>';
+    }
+    document.getElementById('chips').innerHTML = h;
+  }
+  function dungFmts() {
+    var nt = layNt(ntChon), h = '';
+    for (var i = 0; i < nt.dinhDang.length; i++) {
+      var f = nt.dinhDang[i];
+      h += '<button class="fmt' + (f.id === fmtChon ? ' fmt--chon' : '') + '" onclick="chonFmt(\'' + f.id + '\')">' +
+        '<span class="fmt__khung"><canvas data-fmt="' + f.id + '"></canvas></span>' +
+        '<span class="fmt__ten">' + f.ten[L] + '</span></button>';
+    }
+    document.getElementById('fmts').innerHTML = h;
+    // Ve hinh thu nho dung ti le — nhin dang khung la hieu no la gi
+    var minis = document.querySelectorAll('#fmts canvas');
+    for (var j = 0; j < minis.length; j++) {
+      var cv = minis[j];
+      var f2 = null;
+      for (var k = 0; k < nt.dinhDang.length; k++) if (nt.dinhDang[k].id === cv.getAttribute('data-fmt')) f2 = nt.dinhDang[k];
+      if (!f2) continue;
+      var r = f2.canvas.w / f2.canvas.h;
+      var mh = 52, mw = Math.round(mh * r);
+      if (mw > 78) { mw = 78; mh = Math.round(mw / r); }
+      if (mw < 20) mw = 20;
+      var dpr = window.devicePixelRatio || 1;
+      cv.width = mw * dpr; cv.height = mh * dpr;
+      cv.style.width = mw + 'px'; cv.style.height = mh + 'px';
+      var ctx = cv.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = '#101013';
+      ctx.fillRect(0, 0, mw, mh);
+      VeGuide.ve(ctx, mw, mh, f2, L, { tag: false, uiThat: false });
+    }
+  }
+  function lopThietBi(tiLe) {
+    return 'thietBi ' + (tiLe < 0.9 ? 'thietBi--doc' : (tiLe > 1.15 ? 'thietBi--ngang' : 'thietBi--vuong'));
+  }
+  function vePreview() {
+    var f = layFmt();
+    var cv = document.getElementById('cv');
+    document.getElementById('tbSafe').className = lopThietBi(f.canvas.w / f.canvas.h);
+    var kich = coXemTruoc(document.querySelector('#xemSafe .xem__khung'), f.canvas.w / f.canvas.h);
+    var w = kich.w, h = kich.h;
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    cv.style.width = Math.round(w) + 'px'; cv.style.height = Math.round(h) + 'px';
+    var ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#1a1a1e';
+    ctx.fillRect(0, 0, w, h);
+    VeGuide.ve(ctx, w, h, f, L, { tag: false });
+    dungLegend(f);
+  }
+  /* Legend chi hien LOAI VUNG co mat trong khung dang chon — bot nhieu. */
+  function dungLegend(f) {
+    var co = { ui: false, crop: false, khuyen_nghi: false };
+    for (var i = 0; i < f.vung.length; i++) co[f.vung[i].loai] = true;
+    var h = '';
+    if (co.ui) h += '<span><i style="background:rgba(255,95,109,0.55)"></i>' + t('lgUi') + '</span>';
+    if (co.crop) h += '<span><i style="background:repeating-linear-gradient(45deg,rgba(232,192,90,0.8) 0 2px,transparent 2px 5px)"></i>' + t('lgCrop') + '</span>';
+    if (co.khuyen_nghi) h += '<span><i style="border:1px dashed rgba(255,255,255,0.55);background:none"></i>' + t('lgKn') + '</span>';
+    if (co.ui || co.crop) h += '<span><i style="border:1.5px solid rgba(64,220,255,0.95);background:none"></i>' + t('lgSafe') + '</span>';
+    document.getElementById('legend').innerHTML = h;
+  }
+  function apNhan() {
+    document.getElementById('lang').textContent = (L === 'vi') ? 'EN' : 'VI';
+    document.getElementById('tabSafe').textContent = t('tabSafe');
+    document.getElementById('tabLuoi').textContent = t('tabLuoi');
+    document.getElementById('nhanLuoi').textContent = t('nhanLuoi');
+    document.getElementById('nhanTiLe').textContent = t('nhanTiLe');
+    document.getElementById('nhanMau').textContent = t('nhanMau');
+    document.getElementById('nhanDuong').textContent = t('nhanDuong');
+    document.getElementById('nhanPreset').textContent = t('nhanPreset');
+    document.getElementById('nutLuuPreset').textContent = t('luuPreset');
+    document.getElementById('tenPreset').placeholder = t('tenPresetGoiY');
+    document.getElementById('nhanNenTang').textContent = t('nenTang');
+    document.getElementById('nhanDinhDang').textContent = t('dinhDang');
+    document.getElementById('nutHien').textContent = t('hien');
+    document.getElementById('nutTat').textContent = t('tat');
+    document.getElementById('nutGuides').textContent = t('luuGuides');
+    document.getElementById('hintGuides').textContent = t('hintGuides');
+    document.getElementById('capnhat').textContent = t('capNhat');
+    dungFmts();
+    vePreview();
+    if (tabChon === 'luoi') dungTabLuoi();
+  }
+  function doiNgonNgu() {
+    L = (L === 'vi') ? 'en' : 'vi';
+    try { localStorage.setItem('aio-lang', L); } catch (e) {}
+    apNhan();
+  }
+  function chonNt(id) {
+    ntChon = id;
+    fmtChon = layNt(id).dinhDang[0].id;
+    dungChips(); dungFmts(); vePreview();
+  }
+  function chonFmt(id) { fmtChon = id; dungFmts(); vePreview(); }
+
+  /* ── Tab Lưới bố cục ──────────────────────────────────────────────────── */
+  function dungTabLuoi() {
+    dungChipsTiLe(); dungChipsLuoi(); dungDuongs(); dungSwatches(); dungPresets(); veLuoiPreview();
+  }
+  function chuyenTab(tab) {
+    tabChon = tab;
+    document.getElementById('tabSafe').className = 'tabs__nut' + (tab === 'safe' ? ' tabs__nut--chon' : '');
+    document.getElementById('tabLuoi').className = 'tabs__nut' + (tab === 'luoi' ? ' tabs__nut--chon' : '');
+    document.getElementById('dkSafe').style.display = (tab === 'safe') ? 'block' : 'none';
+    document.getElementById('xemSafe').style.display = (tab === 'safe') ? 'flex' : 'none';
+    document.getElementById('dkLuoi').style.display = (tab === 'luoi') ? 'block' : 'none';
+    document.getElementById('xemLuoi').style.display = (tab === 'luoi') ? 'flex' : 'none';
+    if (tab === 'luoi') dungTabLuoi(); else vePreview();
+  }
+
+  /* Kich thuoc xem truoc theo be rong that cua san khau — panel rong thi hinh LON */
+  function coXemTruoc(khung, tiLe) {
+    var rong = (khung.clientWidth || 320) - 34;
+    var rongPanel = window.innerWidth || 340;
+    var caoMax = (rongPanel >= 560) ? 520 : 320;
+    var w = Math.min(rong, 480), h = w / tiLe;
+    if (h > caoMax) { h = caoMax; w = h * tiLe; }
+    return { w: w, h: h };
+  }
+  function batLuoi(khoa) {
+    if (khoa === 'le') { luoiCfg.le = (luoiCfg.le > 0) ? 0 : 5; }
+    else { luoiCfg[khoa] = !luoiCfg[khoa]; }
+    luuLuoiCfg(); dungChipsLuoi(); veLuoiPreview();
+  }
+  function doiLe(giaTri) {
+    var v = Math.max(0, Math.min(25, parseFloat(giaTri) || 0));
+    luoiCfg.le = v;
+    luuLuoiCfg(); veLuoiPreview();
+  }
+  function dungChipsLuoi() {
+    var h = '';
+    ['chia3', 'tam', 'vang'].forEach(function (k) {
+      h += '<button class="chip' + (luoiCfg[k] ? ' chip--chon' : '') + '" onclick="batLuoi(\'' + k + '\')">' + t(k) + '</button>';
+    });
+    h += '<button class="chip' + (luoiCfg.le > 0 ? ' chip--chon' : '') + '" onclick="batLuoi(\'le\')">' + t('le') + '</button>';
+    if (luoiCfg.le > 0) {
+      h += '<span class="le"><input type="number" min="0" max="25" step="0.5" value="' + luoiCfg.le +
+        '" onchange="doiLe(this.value)" aria-label="' + t('le') + ' %" /><span>%</span></span>';
+    }
+    document.getElementById('chipsLuoi').innerHTML = h;
+  }
+
+  /* Tỉ lệ khung xem trước — editor dựng dọc phải xem được lưới trên khung dọc */
+  function chonTiLe(id) { luoiCfg.tiLe = id; luuLuoiCfg(); dungChipsTiLe(); veLuoiPreview(); }
+  function dungChipsTiLe() {
+    var h = '';
+    TI_LE.forEach(function (tl) {
+      var ten = (tl.id === 'auto') ? t('tuTheoSeq') : tl.id;
+      h += '<button class="chip' + (luoiCfg.tiLe === tl.id ? ' chip--chon' : '') + '" onclick="chonTiLe(\'' + tl.id + '\')">' + ten + '</button>';
+    });
+    document.getElementById('chipsTiLe').innerHTML = h;
+  }
+
+  /* Màu lưới */
+  function chonMau(mau) { luoiCfg.mau = mau || null; luuLuoiCfg(); dungSwatches(); veLuoiPreview(); }
+  function dungSwatches() {
+    var h = '<button class="swatch swatch--auto' + (!luoiCfg.mau ? ' swatch--chon' : '') +
+      '" onclick="chonMau(null)" title="' + t('tuDong') + '" aria-label="' + t('tuDong') + '"></button>';
+    MAU_CHON.forEach(function (m) {
+      h += '<button class="swatch' + (luoiCfg.mau === m ? ' swatch--chon' : '') +
+        '" style="background:' + m + '" onclick="chonMau(\'' + m + '\')" aria-label="' + m + '"></button>';
+    });
+    document.getElementById('swatches').innerHTML = h;
+  }
+
+  /* Đường tự thêm */
+  function themDuong() {
+    if (luoiCfg.tuyChinh.length >= 12) return;
+    luoiCfg.tuyChinh.push({ huong: 'ngang', pt: 50 });
+    luuLuoiCfg(); dungDuongs(); veLuoiPreview();
+  }
+  function suaDuong(i, khoa, giaTri) {
+    var d = luoiCfg.tuyChinh[i];
+    if (!d) return;
+    if (khoa === 'pt') d.pt = Math.max(0.5, Math.min(99.5, parseFloat(giaTri) || 50));
+    else d.huong = giaTri;
+    luuLuoiCfg(); dungDuongs(); veLuoiPreview();
+  }
+  function xoaDuong(i) {
+    luoiCfg.tuyChinh.splice(i, 1);
+    luuLuoiCfg(); dungDuongs(); veLuoiPreview();
+  }
+  function dungDuongs() {
+    var h = '';
+    luoiCfg.tuyChinh.forEach(function (d, i) {
+      h += '<div class="duong">' +
+        '<span class="seg2">' +
+        '<button class="' + (d.huong === 'ngang' ? 'chon' : '') + '" onclick="suaDuong(' + i + ',\'huong\',\'ngang\')">' + t('ngang') + '</button>' +
+        '<button class="' + (d.huong === 'doc' ? 'chon' : '') + '" onclick="suaDuong(' + i + ',\'huong\',\'doc\')">' + t('doc') + '</button>' +
+        '</span>' +
+        '<input type="number" min="0.5" max="99.5" step="0.5" value="' + d.pt + '" onchange="suaDuong(' + i + ',\'pt\',this.value)" aria-label="%" />' +
+        '<span class="phu__hint">%</span>' +
+        '<button class="duong__xoa" onclick="xoaDuong(' + i + ')" aria-label="xoa">×</button>' +
+        '</div>';
+    });
+    h += '<div><button class="btn" onclick="themDuong()">' + t('themDuong') + '</button></div>';
+    document.getElementById('duongs').innerHTML = h;
+  }
+
+  /* Preset của tôi — lưu nguyên bộ cấu hình lưới, bấm là áp lại */
+  function luuPreset() {
+    var o = document.getElementById('tenPreset');
+    var ten = (o.value || '').trim();
+    if (!ten) { o.focus(); return; }
+    var cfg = JSON.parse(JSON.stringify(luoiCfg));
+    var cu = -1;
+    luoiPresets.forEach(function (p, i) { if (p.ten === ten) cu = i; });
+    if (cu >= 0) luoiPresets[cu] = { ten: ten, cfg: cfg }; else luoiPresets.push({ ten: ten, cfg: cfg });
+    luuPresets(); o.value = '';
+    dungPresets();
+  }
+  function apPreset(i) {
+    var p = luoiPresets[i];
+    if (!p) return;
+    luoiCfg = JSON.parse(JSON.stringify(p.cfg));
+    luuLuoiCfg(); dungTabLuoi();
+  }
+  function xoaPreset(ev, i) {
+    ev.stopPropagation();
+    luoiPresets.splice(i, 1);
+    luuPresets(); dungPresets();
+  }
+  function dungPresets() {
+    var h = '';
+    luoiPresets.forEach(function (p, i) {
+      h += '<button class="chip" onclick="apPreset(' + i + ')">' + p.ten +
+        '<span class="preset__xoa" onclick="xoaPreset(event,' + i + ')" role="button" aria-label="xoa">×</span></button>';
+    });
+    document.getElementById('presets').innerHTML = h;
+  }
+
+  function veLuoiPreview() {
+    var cv = document.getElementById('cvLuoi');
+    // Ti le: nguoi dung chon; 'auto' = theo sequence dang mo (chua noi thi 16:9)
+    var kt = null;
+    TI_LE.forEach(function (tl) { if (tl.id === luoiCfg.tiLe && tl.w) kt = { w: tl.w, h: tl.h }; });
+    var theoSeq = !kt;
+    if (!kt) kt = seqKichThuoc || { w: 1920, h: 1080 };
+    var tiLe = kt.w / kt.h;
+    document.getElementById('tbLuoi').className = lopThietBi(tiLe);
+    var kich = coXemTruoc(document.querySelector('#xemLuoi .xem__khung'), tiLe);
+    var w = kich.w, h = kich.h;
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    cv.style.width = Math.round(w) + 'px'; cv.style.height = Math.round(h) + 'px';
+    var ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#1a1a1e';
+    ctx.fillRect(0, 0, w, h);
+    VeGuide.veLuoi(ctx, w, h, luoiCfg, L, { tag: false });
+    document.getElementById('metaLuoi').textContent = kt.w + '×' + kt.h + (theoSeq && seqKichThuoc ? ' · ' + t('tuTheoSeq') : '');
+  }
+
+  /* ── Cầu nối host ─────────────────────────────────────────────────────── */
+  var cs = null, extPath = '';
+  try {
+    cs = new CSInterface();
+    extPath = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/');
+  } catch (e) {}
+
+  function evalP(script, timeoutMs) {
+    return new Promise(function (res, rej) {
+      if (!cs) { rej(new Error('NO_CS')); return; }
+      var xong = false;
+      var dh = setTimeout(function () { if (!xong) { xong = true; rej(new Error('TREO')); } }, timeoutMs || 8000);
+      cs.evalScript(script, function (r) {
+        if (xong) return;
+        xong = true; clearTimeout(dh); res(r);
+      });
+    });
+  }
+
+  /* Nạp lại host TRƯỚC MỖI lệnh (bệnh "panel mới host cũ") + kiểm hàm CUỐI FILE
+     trả đúng version (bệnh "evalFile nuốt file giữa chừng"). */
+  function napHost() {
+    var p = extPath + '/host/guideframe.jsx';
+    var sc = "var __nap='OK'; try { $.evalFile(\"" + p + "\") } catch(e) { __nap='ERR:'+e } __nap";
+    return evalP(sc).then(function (r) {
+      if (String(r).indexOf('OK') !== 0) throw new Error('HOST_CU');
+      return evalP('gf_phienBan()');
+    }).then(function (v) {
+      if (String(v) !== PHIEN_BAN) throw new Error('HOST_CU');
+    });
+  }
+
+  function nodeFs() {
+    try {
+      if (window.cep_node && window.cep_node.require) return window.cep_node.require('fs');
+      if (typeof require === 'function') return require('fs');
+    } catch (e) {}
+    return null;
+  }
+
+  var THU_MUC = 'C:/AiOStudio/GuideFrame'; // ☠️ KHÔNG dùng %APPDATA% — Premiere ảo hoá thư mục mới tạo trong đó (đo 28/07)
+
+  function ghiFile(duongDan, duLieu, encoding) {
+    var fs = nodeFs();
+    if (!fs) throw new Error('KHONG_NODE');
+    try { fs.mkdirSync(THU_MUC, { recursive: true }); } catch (e) {}
+    fs.writeFileSync(duongDan, duLieu, encoding ? { encoding: encoding } : 'utf8');
+    if (!fs.existsSync(duongDan)) throw new Error('KHONG_THAY_FILE');
+  }
+
+  /* ── Trạng thái + đèn ─────────────────────────────────────────────────── */
+  function den(lop, chu) {
+    var d = document.getElementById('den');
+    d.className = 'den den--' + lop;
+    document.getElementById('denChu').textContent = chu;
+  }
+  function baoTrangThai(chu, laLoi) {
+    var el = document.getElementById('trangthai');
+    el.textContent = chu || '';
+    el.className = 'trangthai' + (laLoi ? ' trangthai--loi' : '');
+  }
+  function baoLoi(raw) {
+    var ma = String(raw || '');
+    if (ma.indexOf('ERR:') === 0) ma = ma.slice(4).split('|')[0];
+    var key = 'l_' + ma;
+    baoTrangThai(NGON_NGU.vi[key] !== undefined ? t(key) : (t('l_TREO') + '\n' + raw), true);
+  }
+  function capNhatCanhBao(soLop) {
+    var el = document.getElementById('canhbao');
+    if (soLop > 0) {
+      el.textContent = tm('canhbao', { n: soLop });
+      el.className = 'canhbao canhbao--hien';
+    } else {
+      el.className = 'canhbao';
+    }
+  }
+
+  function demLop() {
+    return napHost()
+      .then(function () { return evalP('gf_demOverlay()'); })
+      .then(function (r) {
+        r = String(r);
+        if (r.indexOf('OK:') === 0) capNhatCanhBao(parseInt(r.slice(3), 10) || 0);
+      })
+      .catch(function () {});
+  }
+
+  /* ── Hành động chính ──────────────────────────────────────────────────── */
+  var dangChay = false;
+
+  function hienGuide() {
+    if (dangChay) return;
+    var lamLuoi = (tabChon === 'luoi');
+    if (lamLuoi && VeGuide.duongLuoi(luoiCfg).length === 0) {
+      baoTrangThai(t('luoiTrong'), true);
+      return;
+    }
+    dangChay = true;
+    var nut = document.getElementById('nutHien');
+    nut.disabled = true; nut.textContent = t('dangHien'); nut.classList.remove('btn--xong');
+    baoTrangThai('');
+    var f = layFmt();
+    var seqW = 0, seqH = 0, seqDai = 0;
+
+    napHost()
+      .then(function () { return evalP('gf_thongTinSeq()'); })
+      .then(function (r) {
+        r = String(r);
+        if (r.indexOf('OK:') !== 0) throw new Error(r);
+        var m = r.slice(3).split('|');
+        seqW = parseInt(m[0], 10); seqH = parseInt(m[1], 10); seqDai = parseFloat(m[2]);
+        seqKichThuoc = { w: seqW, h: seqH };
+        den('ok', t('denSanSang') + seqW + '×' + seqH);
+
+        // Vẽ PNG đúng kích thước sequence
+        var cv = document.createElement('canvas');
+        cv.width = seqW; cv.height = seqH;
+        var ctx = cv.getContext('2d');
+        var ghiChuLech = '';
+        if (lamLuoi) {
+          // Lưới bố cục: luôn vẽ đúng khung sequence, không có chuyện lệch tỉ lệ
+          VeGuide.veLuoi(ctx, seqW, seqH, luoiCfg, L, { tag: true });
+          var b64L = cv.toDataURL('image/png').split(',')[1];
+          var duongDanL = THU_MUC + '/AIO_GUIDE_luoi_' + seqW + 'x' + seqH + '_' + L + '.png';
+          ghiFile(duongDanL, b64L, 'base64');
+          return evalP('gf_datOverlay("' + duongDanL + '")', 20000).then(function (r2) {
+            return { r: String(r2), ghiChuLech: '' };
+          });
+        }
+        var tiLeSeq = seqW / seqH, tiLeFmt = f.canvas.w / f.canvas.h;
+        var lech = Math.abs(tiLeSeq - tiLeFmt) / tiLeFmt > 0.02;
+        var opts = { tag: true, tenNenTang: layNt(ntChon).ten + ' — ' + f.ten[L], phienBanDuLieu: DU.phienBanDuLieu };
+        if (!lech) {
+          VeGuide.ve(ctx, seqW, seqH, f, L, opts);
+        } else {
+          // Sequence khác tỉ lệ: mờ phần ngoài, vẽ guideline vào vùng giữa đúng tỉ lệ khung
+          var rw, rh;
+          if (tiLeSeq > tiLeFmt) { rh = seqH; rw = rh * tiLeFmt; } else { rw = seqW; rh = rw / tiLeFmt; }
+          var rx = (seqW - rw) / 2, ry = (seqH - rh) / 2;
+          ctx.fillStyle = 'rgba(0,0,0,0.45)';
+          ctx.fillRect(0, 0, seqW, seqH);
+          ctx.clearRect(rx, ry, rw, rh);
+          ctx.save();
+          ctx.translate(rx, ry);
+          VeGuide.ve(ctx, rw, rh, f, L, opts);
+          ctx.restore();
+          ctx.strokeStyle = 'rgba(64,220,255,0.9)';
+          ctx.lineWidth = Math.max(1.5, seqW / 1080 * 2);
+          ctx.strokeRect(rx, ry, rw, rh);
+          ghiChuLech = tm('khopLech', { sw: seqW, sh: seqH, fw: f.canvas.w, fh: f.canvas.h, fw2: Math.round(rw), fh2: Math.round(rh) });
+        }
+
+        var b64 = cv.toDataURL('image/png').split(',')[1];
+        var duongDan = THU_MUC + '/AIO_GUIDE_' + f.id + '_' + seqW + 'x' + seqH + '_' + L + '.png';
+        ghiFile(duongDan, b64, 'base64');
+        return evalP('gf_datOverlay("' + duongDan + '")', 20000).then(function (r2) {
+          return { r: String(r2), ghiChuLech: ghiChuLech };
+        });
+      })
+      .then(function (kq) {
+        if (kq.r.indexOf('OK:') !== 0) throw new Error(kq.r);
+        var phan = {};
+        kq.r.slice(3).split('|').forEach(function (c) { var x = c.split('='); phan[x[0]] = x[1]; });
+        var daiThuc = parseFloat(phan.daiThuc), daiSeq = parseFloat(phan.daiSeq);
+        var chu = tm('daDat', { track: phan.track, dai: phan.daiThuc, seq: phan.daiSeq });
+        if (daiThuc < daiSeq - 0.5) chu += tm('phuThieu', { dai: phan.daiThuc });
+        chu += kq.ghiChuLech;
+        baoTrangThai(chu);
+        nut.textContent = t('daHien'); nut.classList.add('btn--xong');
+        return demLop();
+      })
+      .catch(function (e) { baoLoi(e && e.message ? e.message : e); den('loi', t('denChuaNoi')); })
+      .then(function () {
+        dangChay = false;
+        nut.disabled = false;
+        if (!nut.classList.contains('btn--xong')) nut.textContent = t('hien');
+        setTimeout(function () { nut.textContent = t('hien'); nut.classList.remove('btn--xong'); }, 4000);
+      });
+  }
+
+  function tatGuide() {
+    if (dangChay) return;
+    dangChay = true;
+    var nut = document.getElementById('nutTat');
+    nut.disabled = true; nut.textContent = t('dangTat');
+    baoTrangThai('');
+    napHost()
+      .then(function () { return evalP('gf_tatOverlay()', 20000); })
+      .then(function (r) {
+        r = String(r);
+        if (r.indexOf('OK:') !== 0) throw new Error(r);
+        var phan = {};
+        r.slice(3).split('|').forEach(function (c) { var x = c.split('='); phan[x[0]] = x[1]; });
+        var conLai = parseInt(phan.conLai, 10) || 0;
+        baoTrangThai(conLai > 0 ? tm('tatThieu', { n: phan.xoa, m: phan.conLai }) : tm('daTat', { n: phan.xoa }), conLai > 0);
+        capNhatCanhBao(conLai);
+      })
+      .catch(function (e) { baoLoi(e && e.message ? e.message : e); })
+      .then(function () { dangChay = false; nut.disabled = false; nut.textContent = t('tat'); });
+  }
+
+  /* ── Xuất .guides (guide gốc Premiere — vị trí %, không dính export) ──── */
+  function motGuide(mau, ngang, viTri) {
+    // orientationType: 1 = đường DỌC, 0 = đường NGANG (giải mã từ file thật — CHƯA đo ngược, xem PROGRESS)
+    // Thứ tự khoá + số làm tròn 2 chữ số: BÁM SÁT file "Installed Guides.guides"
+    // thật của Premiere — parser Adobe có thể khó tính với số lẻ dài.
+    return {
+      'color:blue': Math.round(mau.b * 100) / 100,
+      'color:green': Math.round(mau.g * 100) / 100,
+      'color:red': Math.round(mau.r * 100) / 100,
+      orientationType: ngang ? 0 : 1,
+      pinToOpposite: false,
+      position: Math.round(viTri * 100) / 100,
+      positionType: 1
+    };
+  }
+  function luuGuides() {
+    try {
+      var guides = [], ten, tenFile;
+      if (tabChon === 'luoi') {
+        var ds = VeGuide.duongLuoi(luoiCfg);
+        if (ds.length === 0) {
+          baoTrangThai(t('luoiTrong'), true);
+          return;
+        }
+        // Nguoi dung chon mau thi ca bo guide theo mau do
+        var mauEp = null;
+        if (luoiCfg.mau) {
+          mauEp = {
+            r: parseInt(luoiCfg.mau.slice(1, 3), 16) / 255,
+            g: parseInt(luoiCfg.mau.slice(3, 5), 16) / 255,
+            b: parseInt(luoiCfg.mau.slice(5, 7), 16) / 255
+          };
+        }
+        for (var j = 0; j < ds.length; j++) {
+          var d = ds[j];
+          guides.push(motGuide(mauEp || VeGuide.MAU_LUOI_GUIDES[d.nhom], d.huong === 'ngang', Math.round(d.pt * 100) / 100));
+        }
+        ten = 'AiO ' + t('tabLuoi');
+        tenFile = 'AiO_luoi.guides';
+      } else {
+        var f = layFmt();
+        for (var i = 0; i < f.vung.length; i++) {
+          var v = f.vung[i];
+          if (v.loai === 'khuyen_nghi') continue;
+          var mau = (v.loai === 'crop') ? { r: 1, g: 0.75, b: 0.35 } : { r: 0, g: 1, b: 1 };
+          var ngang = (v.canh === 'top' || v.canh === 'bottom');
+          var viTri = (v.canh === 'top' || v.canh === 'left') ? v.pt : (100 - v.pt);
+          guides.push(motGuide(mau, ngang, viTri));
+        }
+        ten = 'AiO ' + layNt(ntChon).ten + ' - ' + f.ten.en;
+        tenFile = 'AiO_' + f.id + '.guides';
+      }
+      var goi = { guideTemplates: [{ guides: guides, name: ten }], version: 1 };
+      var duongDan = THU_MUC + '/' + tenFile;
+      ghiFile(duongDan, JSON.stringify(goi));
+      baoTrangThai(tm('daLuuGuides', { path: duongDan.replace(/\//g, '\\') }));
+    } catch (e) {
+      baoLoi(e && e.message ? e.message : e);
+    }
+  }
+
+  /* ── Khởi động ────────────────────────────────────────────────────────── */
+  function khoiDong() {
+    dungChips(); apNhan();
+    if (!cs) { den('loi', t('denChuaNoi')); document.getElementById('host').textContent = 'browser'; return; }
+    evalP('app.version').then(function (r) {
+      // app.version chac chan hon getHostInfo (ScriptPath co the chua nap khi panel reload)
+      var v = String(r || '');
+      document.getElementById('host').textContent = /^\d/.test(v) ? 'Premiere ' + v : 'Premiere';
+      return napHost();
+    }).then(function () {
+      return evalP('gf_thongTinSeq()');
+    }).then(function (r) {
+      r = String(r);
+      if (r.indexOf('OK:') === 0) {
+        var m = r.slice(3).split('|');
+        seqKichThuoc = { w: parseInt(m[0], 10), h: parseInt(m[1], 10) };
+        den('ok', t('denSanSang') + m[0] + '×' + m[1]);
+        if (tabChon === 'luoi') veLuoiPreview();
+      } else {
+        den('cho', t('denChuaSeq'));
+      }
+      return demLop();
+    }).catch(function () {
+      den('loi', t('denChuaNoi'));
+    });
+  }
+  khoiDong();
+
+  /* Panel Premiere bi keo gian lien tuc — ve lai xem truoc theo be rong moi */
+  var choVeLai = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(choVeLai);
+    choVeLai = setTimeout(function () {
+      if (tabChon === 'luoi') veLuoiPreview(); else vePreview();
+    }, 150);
+  });
+</script>
+</body>
+</html>

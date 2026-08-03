@@ -11,7 +11,15 @@
 > thành BẢN ĐỒ TRACK kiểu mini-timeline (gán theo track, V xếp ngược như
 > Premiere), mỗi người một màu xuyên suốt, kết quả có thanh "ai nói bao
 > nhiêu". v0.3.1: stress test 12 ca khó (não 16/16 + stress 12/12) —
-> sửa lỗi "cười chung" nhảy cam. Việc kế: **liệu podcast thật đo bleed**.
+> sửa lỗi "cười chung" nhảy cam.
+>
+> ☠️ **CẬP NHẬT 03/08/2026 — ĐÃ ĐO TRÊN LIỆU THẬT, có 2 việc chặn:**
+> (1) **`dist/` mất khỏi repo** (chưa từng được git theo dõi) — bản còn sót
+> nằm trong panel đã cài, đo lại vẫn 16/16 + 12/12, cần chép ngược về và
+> **commit vào git**; (2) **bleed thật chỉ 6,2–7,1 dB** chứ không phải
+> −16 dB như liệu tổng hợp → ngưỡng 6 dB hết khoảng an toàn, 35–46,5% cửa
+> sổ có tiếng thành "mù". Chưa sửa ngưỡng vì chưa có đáp án — đang chờ anh
+> Tiến chấm bộ nghe kiểm 12 clip. Xem `PROGRESS.md` mục 03/08.
 
 | | |
 |---|---|
@@ -83,9 +91,32 @@ chỉ cho đúng tính năng này — mình offline, nằm trong bộ, một gi�
   thật qua cổng debug — thao tác tay của anh vẫn là thước cuối).
 - Mỗi clip đặt ra có đuôi đệm ≤0,08s chống hụt khung (đo thật); giữa hai
   track khác nhau đuôi này thành overlap nhỏ — tiếng phòng, không nghe ra.
-- **Chưa đo bleed trên liệu THẬT** — liệu tổng hợp chưa có: nói chồng nhau,
-  cười, ừ-ờ đệm. Vẫn cần một sequence podcast thật của anh Tiến trước khi
-  hứa chất lượng với khách. Ngưỡng 6dB hiện là hằng; v2 tính tự đo theo bleed.
+- ☠️ **ĐÃ ĐO BLEED TRÊN LIỆU THẬT 03/08/2026 — và ngưỡng 6dB KHÔNG CÒN AN
+  TOÀN.** Liệu `G:\Quay PV tuyển dụng_DRT_0902` (2 buổi phỏng vấn, mỗi buổi
+  2 người): chênh mic to nhất vs mic nhì **p50 chỉ 6,2–7,1 dB**, trong khi
+  liệu tổng hợp trước giờ dùng bleed −16 dB. Hệ quả: **35,0% (buổi 1) và
+  46,5% (buổi 2) cửa sổ có tiếng bị coi là "mù"**; tyLeRo buổi 2 chỉ 23,0%
+  — sát ngưỡng từ chối 20%.
+  **Kết quả không ổn định:** hạ sàn −50 → −60 dB làm chia hình buổi 2 nhảy
+  từ 33/67 sang 50/50, nhát cắt 79 → 171. Nghi vấn gốc: sàn −50 dB là hằng
+  số cứng, mic thật thu nhỏ (p90 = −44 dB) nên loại 60–78% cửa sổ → sàn nên
+  tính theo **mức nền của chính file**. **CHƯA SỬA** — chưa có đáp án thì
+  sửa là sửa mù. Chi tiết + bảng quét: `PROGRESS.md` mục 03/08.
+- **Chưa có thước ĐỨNG NGOÀI.** Mọi số trên là dùng chính năng lượng dB
+  chấm điểm thuật toán cũng chạy bằng dB (bài học 5d) — chỉ nói được "kết
+  quả trông hợp lý", KHÔNG nói được "cắt đúng". Đã dựng bộ nghe kiểm
+  `file pr for test\podcast-nghe-kiem\` (12 clip 6 giây + `_BANG-CHAM.csv`),
+  chờ anh Tiến chấm bằng tai.
+- ☠️ **`dist/` KHÔNG ĐƯỢC GIT THEO DÕI — đã mất một lần (03/08).** `nao.js`
+  + `index.html` biến khỏi repo, không có bản lùi; bản duy nhất còn sót là
+  panel đã cài ở `%APPDATA%\Adobe\CEP\extensions\com.aiostudio.podcast\dist\`
+  (đo lại: kiem-nao 16/16, stress 12/12 — đúng v0.3.1, không mất chức năng).
+  **Panel này không có bước build, `dist/` LÀ mã nguồn viết tay — phải
+  commit vào git.**
+- **Hai bẫy nằm trong chính dữ liệu người dùng** (bắt được 03/08): tên file
+  từ Mac chứa ký tự **U+F022** (dấu `"`) làm mọi lệnh truyền tên qua CLI gãy
+  hết dù `Get-ChildItem` đọc bình thường — bản bán phải xử lý; và file mic
+  **trùng từng byte** (cùng MD5) nếu gán làm 2 người thì chênh luôn = 0 dB.
 - FFmpeg chưa bundle riêng (bản bán mới cần).
 
 ---
