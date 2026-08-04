@@ -1,5 +1,62 @@
 # AiO Auto Podcast - Nhat ky
 
+## [ui-studio-console] - 2026-08-04 23:44 - v0.5.0: GIAO DIEN MOI THEO THIET KE ANH TIEN + CAI DAT CAT
+
+Anh Tien chot thiet ke "Studio Console" (AiO Design System/AiO Auto
+Podcast/AiO Auto Podcast.html, ban 12:36 04/08) va dan "co mot so cho anh
+bi thieu em hay them neu can". Da doc LESSONS.md truoc khi lam (luat UI).
+
+### Thay doi (dist/index.html viet lai toan bo ~1400 dong; ENGINE giu nguyen)
+- Skin + layout theo thiet ke: topbar (brand/ver/host/EN/cai dat) · card
+  "Ban do track" · combobox sequence tu ve · hang track kieu moi · monitor
+  gia lap + DAI NHAT CAT + chu giai mau · nut chinh co thanh tien do %,
+  trang thai run/done (xanh la khi xong) · font Inter (dist/fonts).
+- MO HINH GAN MOI theo thiet ke: NGUOI MOC TU TEN GO vao track cam (khong
+  bay san "Nguoi 1/2"), cam chung = go 2 ten ngan cach phay, mic tu an
+  theo cap V/A cung so (tru khi da chot tay). Khong chan so nguoi (den 8+).
+  Luu gan khuon moi 'aio-pc-gan2' theo ten sequence.
+- HOP "CAI DAT CAT" — moi cai deu AN THAT vao engine:
+  cat som lead (lui ranh, chua toi thieu 0,3s cho doan truoc) · o mot cam
+  ngan nhat = luotToiThieu cua nao · o mot cam LAU NHAT = qua nguong thi
+  chen wide 4s (can cam chung) · nguong chenh auto/6/9 dB = nguongChenh ·
+  tieng theo nguoi / giu nguyen moi mic (di tru tu 'aio-pc-tienglien' cu).
+- TU LUU PROJECT truoc khi ghi (loi hua in trong hop cai dat — bai hoc
+  bay sach buoi chieu 04/08).
+- THEM ngoai thiet ke (anh dan thieu thi them): nut tu sync (v0.4.0) ·
+  khung bao loi to co tieu de · canh bao mic dinh dau cam · dong chia
+  thoi luong tung nguoi duoi monitor.
+- BO: nut them/bot track cua thiet ke (API Premiere khong cho panel them
+  track — cong tac vo nghia, bai hoc so tay #11) · man huong dan lan dau
+  + minh hoa cu (thiet ke thay bang empty state).
+
+### HAI BUG E2E BAT DUOC — deu sua bang phep do co lap
+1. ☠️ `app.project.save()` KEO activeSequence ve tab timeline dang mo
+   truoc mat nguoi dung -> pc_nhanBan gay SEQ_DOI. Hai lan lien tiep moi
+   nghi code minh (dau tien tuong anh doi tab that). Do co lap 1 lenh:
+   dat active roi save -> active nhay ve tab cu. Sua: sau save GHIM LAI
+   nguon bang pc_chonSeq roi moi dung.
+2. Ket qua hien dung 1 giay roi bien: dung xong active = ban cat -> soi
+   doi seqDangNhin -> docThongTinSeq xoa KE_HOACH/kqChia/done-state. Sua:
+   nho `tenVuaCat`, panel nhin sang chinh ban vua cat thi GIU ket qua.
+   Kem: tuDongGoiYGan chi goi y khi track dung 1 clip (khong bia ten vao
+   sequence ket qua).
+
+### Kiem chung
+- node --check 0 loi (3 lan cai) · gac cong kiem-nao 16/16 + kiem-sync
+  9/9 + stress 12/12 moi lan cai.
+- Browser pane: dock hep render dung (monitor len tren, empty states).
+- Panel that: ban do tu goi y ten tu file mic ("Mic_Trong_Buoi1"...), ne
+  tieng cam, ghep cap V1-A1; nut tu KHOA kem ly do that tren 2 sequence
+  PV_* cua anh (mic dang 2 clip/track — dung luat MVP).
+- E2E cat "PodTest Nguon" qua UI moi: 10 doan hinh, dai cat hien 10 seg
+  va DUNG LAI sau 10s, chia "micA 0:40 · micB 0:49" KHOP dap an chuan cu,
+  nut ve "Cat lai", 0 loi. Che do tieng 'giu' chay dung nho di tru.
+
+### Con cho
+- Anh bam tay tren UI moi (dialog chon file tu sync van chua qua tay that).
+- 2 sequence PV_Buoi1/Buoi2: mic 2 clip/track -> don ve 1 clip lien la nut
+  tu mo (panel da tu noi ly do ngay tren nut).
+
 ## [mau-theo-nguoi] - 2026-08-04 22:47 - v0.4.1: TO MAU NHAN THEO NGUOI SAU MOI LAN CAT
 
 Anh Tien (kem anh chup ban cat buoi 1 anh TU DUNG): "track audio va video

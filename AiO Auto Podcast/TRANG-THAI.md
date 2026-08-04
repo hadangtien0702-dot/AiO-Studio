@@ -8,7 +8,15 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 22:47 — panel v0.4.1, host v0.4.1.
+*Cập nhật lần cuối: 04/08/2026 23:44 — panel v0.5.0 (GIAO DIỆN MỚI theo
+thiết kế Studio Console anh Tiến chốt), host v0.4.1.
+Mới trong v0.5.0: gõ TÊN người thẳng vào track (cam chung = 2 tên, phẩy
+ngăn) · monitor + dải nhát cắt · hộp CÀI ĐẶT CẮT ăn thật (cắt sớm, cam
+ngắn/lâu nhất→đảo wide, ngưỡng dB, chế độ tiếng) · tự lưu project trước
+khi ghi · nút tiến độ %/xanh khi xong. E2E: cắt PodTest Nguon 10 đoạn,
+chia micA 0:40/micB 0:49 khớp đáp án. Đã bắt+sửa 2 bug bằng đo cô lập
+(save() kéo activeSequence về tab trước mặt; kết quả bị xoá sau 1s).
+CHỜ TAY ANH: bấm thử UI mới; 2 sequence PV_* cần dọn mic về 1 clip liền.*
 Mới nhất: **màu nhãn theo NGƯỜI** sau mỗi lần cắt — cam + mic cùng người
 cùng màu (khớp màu chip panel), cam chung màu nâu; đo ngược trên bản cắt
 buổi 1: V1+A1=nhãn 4, V2+A2=nhãn 8, wide=14, từng cặp cùng màu.*
