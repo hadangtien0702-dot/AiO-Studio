@@ -21,6 +21,10 @@
 > sổ có tiếng thành "mù". Chưa sửa ngưỡng vì chưa có đáp án — đang chờ anh
 > Tiến chấm bộ nghe kiểm 12 clip. Xem `PROGRESS.md` mục 03/08.
 
+> 📋 **BẢNG "CÁI GÌ XONG, CÁI GÌ CHƯA": `TRANG-THAI.md`** — anh Tiến yêu cầu
+> 04/08 khi test gặp nhiều trở ngại. Mỗi phiên sửa mã nguồn PHẢI cập nhật nó
+> (chỉ ghi ✅ khi có số đo trong PROGRESS.md).
+
 | | |
 |---|---|
 | Extension ID | `com.aiostudio.podcast` |

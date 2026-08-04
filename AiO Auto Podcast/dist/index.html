@@ -255,7 +255,7 @@
 <body>
   <div class="topbar">
     <span class="topbar__ten">Auto Podcast</span>
-    <span class="topbar__ver">v0.3.2</span>
+    <span class="topbar__ver">v0.3.3</span>
     <span class="topbar__host" id="host"></span>
     <button class="lang" id="lang" onclick="doiNgonNgu()"></button>
   </div>
@@ -336,6 +336,8 @@
       dang_mo: '{v} track hình · {a} track tiếng.',
       chon_seq: 'Sequence đang làm việc',
       cam_chung: 'Cam chung',
+      tieng_cua_cam: 'tiếng của cam V{n}',
+      tieng_cua_wide: 'tiếng của cam chung',
       nhan_gan: 'Track nào của ai',
       nhom_hinh: 'Hình — cam của ai', nhom_tieng: 'Tiếng — mic riêng của ai',
       khong_ai: '—',
@@ -388,6 +390,8 @@
       dang_mo: '{v} video · {a} audio tracks.',
       chon_seq: 'Working sequence',
       cam_chung: 'Wide (both)',
+      tieng_cua_cam: 'audio of cam V{n}',
+      tieng_cua_wide: 'wide cam audio',
       nhan_gan: 'Whose track is which',
       nhom_hinh: 'Video — whose camera', nhom_tieng: 'Audio — whose personal mic',
       khong_ai: '—',
@@ -618,6 +622,23 @@
     for (var k = 0; k < ds.length; k++) if (ds[k].i === i) return ds[k]
     return null
   }
+  /**
+   * Track HÌNH nào dùng CÙNG FILE với track tiếng này? (tiếng dính liền cam)
+   * Anh Tiến 04/08: V3 = cam chung mà A3 (tiếng của chính cây cam đó) lại
+   * bắt gán cho một "người" — hai hàng nói hai chuyện. Panel biết đường dẫn
+   * media nên phải tự nhận ra quan hệ này và nói ra.
+   */
+  function videoCungMedia(duongA) {
+    if (!duongA) return -1
+    var chuan = String(duongA).replace(/\\/g, '/').toLowerCase()
+    for (var k = 0; k < trackV.length; k++) {
+      if (trackV[k].soClip > 0 && trackV[k].duong &&
+          String(trackV[k].duong).replace(/\\/g, '/').toLowerCase() === chuan) {
+        return trackV[k].i
+      }
+    }
+    return -1
+  }
   /** Người nào đang giữ track này? (loai: 'cam'|'mic') */
   function nguoiCuaTrack(loai, i) {
     for (var n = 0; n < nguoiDs.length; n++) if (nguoiDs[n][loai] === i) return n
@@ -634,6 +655,19 @@
         if (nguoiDs[n0].cam === trackIdx) nguoiDs[n0].cam = -1
       }
       trackWide = trackIdx
+      // Tiếng DÍNH LIỀN của cam chung (cùng file) không phải mic của ai —
+      // đang gán cho người nào thì gỡ ra, cho V và A kể cùng một chuyện.
+      var trV = timTrack(trackV, trackIdx)
+      if (trV && trV.duong) {
+        var chuanW = String(trV.duong).replace(/\\/g, '/').toLowerCase()
+        for (var n1 = 0; n1 < nguoiDs.length; n1++) {
+          var tA = timTrack(trackA, nguoiDs[n1].mic)
+          if (tA && tA.duong &&
+              String(tA.duong).replace(/\\/g, '/').toLowerCase() === chuanW) {
+            nguoiDs[n1].mic = -1
+          }
+        }
+      }
       luuGan()
       veGan()
       return
@@ -719,6 +753,20 @@
           var canh = document.createElement('i')
           canh.textContent = '(' + tp('nhieu_clip', { n: tr.soClip }) + ')'
           clip.appendChild(canh)
+        }
+        if (loai === 'mic') {
+          // Tiếng dính liền một cây cam (cùng file với track hình) — nói ra
+          // để hàng V và hàng A kể cùng một chuyện, người dùng khỏi đoán.
+          var vIdx = videoCungMedia(tr.duong)
+          if (vIdx >= 0) {
+            clip.appendChild(document.createTextNode(' '))
+            var goc = document.createElement('span')
+            goc.style.color = 'var(--text-3)'
+            goc.textContent = '· ' + (vIdx === trackWide
+              ? t('tieng_cua_wide')
+              : tp('tieng_cua_cam', { n: vIdx + 1 }))
+            clip.appendChild(goc)
+          }
         }
         hang.appendChild(clip)
         var sel = document.createElement('select')

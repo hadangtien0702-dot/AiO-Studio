@@ -1,5 +1,30 @@
 # AiO Auto Podcast - Nhat ky
 
+## [v3-a3-khop] - 2026-08-04 12:28 - V/A KE CUNG MOT CHUYEN + BANG TRANG-THAI.md (v0.3.3)
+
+### 1. Anh Tien: "V3 va A3 no dang khong khop voi nhau"
+V3 = C4026 gan "Cam chung", nhung A3 (tieng DINH LIEN cua chinh cay cam
+do) van bat gan cho mot "nguoi" — hai hang noi hai chuyen. Panel biet
+duong dan media cua tung track nen phai TU NHAN RA quan he nay.
+
+Da lam:
+- `videoCungMedia(duongA)`: track tieng nao dung CUNG FILE voi track hinh
+  -> hang tieng tu ghi chu xam "· tieng cua cam V1" / "· tieng cua cam
+  chung". KHONG chan gan (co setup cam lav vao thang camera — tieng cam
+  chinh la mic that), chi noi ro nguon goc.
+- Gan mot track hinh lam CAM CHUNG -> tieng dinh lien cua no dang gan cho
+  ai thi TU GO (ve "—"), vi cam chung khong thuoc ve ai.
+
+Do that tren "test thuc te" cua anh: 3/3 hang tieng hien dung ghi chu
+(A1 "tieng cua cam V1", A2 "cam V2", A3 "cam chung"); gan lai V3 lam wide
+-> mic Nguoi 3 tu ve -1, A3 hien "—". Panel v0.3.3.
+
+### 2. Anh Tien: "tao cho anh mot track list cai gi da xong va cai nao"
+Tao **`TRANG-THAI.md`** — bang theo doi 3 muc: ✅ XONG (chi khi co so do
+trong PROGRESS) · 🔧 CHUA XONG (kem vi sao + can gi) · 🙋 DANG CHO TAI
+ANH. Ghi luat cap nhat vao CLAUDE.md cua du an: moi phien sua ma nguon
+phai cap nhat bang nay.
+
 ## [cam-chung] - 2026-08-04 11:57 - CAM CHUNG DUNG DUOC (v0.3.2)
 
 Anh Tien: quay that co "1 cam chung giua 2 nguoi nhung khi anh chon thi
