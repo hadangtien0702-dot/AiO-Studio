@@ -411,6 +411,7 @@
       sync_dang_mono: 'Tự sync: tách mono {i}/{n}…',
       sync_dang_dung: 'Tự sync: đang dựng sequence…',
       mic_dinh_cam: '⚠ Mic của {ten} đang đặt DÍNH ĐẦU clip cam — đầu file cam và đầu file mic hiếm khi là cùng một khoảnh khắc. Nếu chưa sync bằng đo, nhát cắt sẽ lệch; cân nhắc bấm "Thêm mic từ file — tự sync".',
+      mau_khong_ho_tro: 'Không tô được màu nhãn theo người (Premiere/host chưa hỗ trợ) — bản cắt không ảnh hưởng.',
       thieu_gan: 'Mỗi người cần đúng một track hình và một track tiếng — gán đủ rồi bấm.',
       thieu_gan_ai: '{ten} chưa có {thieu} — gán cho đủ, hoặc bấm × trên chip {ten} để bớt người.',
       thieu_hinh: 'track hình',
@@ -487,6 +488,7 @@
       sync_dang_mono: 'Auto sync: extracting mono {i}/{n}…',
       sync_dang_dung: 'Auto sync: building sequence…',
       mic_dinh_cam: '⚠ {ten}’s mic starts EXACTLY at the cam clip’s head — file heads are rarely the same real moment. If this was not measured-synced, cuts will drift; consider "Add mics from files — auto sync".',
+      mau_khong_ho_tro: 'Could not set per-person label colors (Premiere/host unsupported) — the cut itself is unaffected.',
       thieu_gan: 'Each person needs exactly one video and one audio track — finish assigning, then hit cut.',
       thieu_gan_ai: '{ten} has no {thieu} yet — assign it, or click × on the {ten} chip to remove them.',
       thieu_hinh: 'video track',
@@ -1136,7 +1138,7 @@
       napLaiHost(function (ok) {
         if (!ok) { thoatSync(t('khong_nap_host')); return }
         goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-        if (pb !== 'v0.3.1') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
+        if (pb !== 'v0.4.1') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
         goiHost('pc_nhapMono("' + micKq.map(function (m) { return chuoiJsx(m.mono) }).join(';') + '")').then(function (rN) {
         if (rN.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + rN); return }
         var kvN = tachKv(rN)
@@ -1424,7 +1426,7 @@
           // Chốt phiên bản: evalFile có thể nuốt file GIỮA CHỪNG không báo
           // lỗi (đo 01/08) — hàm cuối file trả lời đúng = cả file đã nạp.
           goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-          if (pb !== 'v0.3.1') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+          if (pb !== 'v0.4.1') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
           // Nhập bản mono vào project — host tìm projectItem theo đường dẫn,
           // chưa nhập thì `pc_datTieng` không thấy gì để đặt.
           goiHost('pc_nhapMono("' + duongMic.join(';') + '")').then(function (rN) {
@@ -1533,6 +1535,28 @@
                 nutChu(t('nut_dung'))
                 if (lech.length) { hien('loi', tp('lech_do', { chiTiet: lech.join(' · ') })) }
                 veKetQua(kv.seq, doan, daiGiay)
+                toMauNguoi()
+              })
+            }
+
+            // ── 5. TÔ MÀU NHÃN THEO NGƯỜI — cam + mic cùng người cùng màu
+            //    (anh Tiến 04/08: "track đều màu nhau, nhìn không biết ai").
+            //    Tô ở mức projectItem nên mọi clip từ file đó mang màu người,
+            //    khớp bảng MAU_NGUOI của panel: xanh→tím→teal→vàng→hồng→xám. ──
+            var NHAN_MAU = [4, 8, 10, 15, 6, 12] // Cerulean·Purple·Teal·Yellow·Rose·Tan
+            function toMauNguoi() {
+              var ds = []
+              nguoiDs.forEach(function (ng, p) {
+                var mau = NHAN_MAU[p % NHAN_MAU.length]
+                ds.push(duongCam[p] + ',' + mau)
+                ds.push(duongMic[p] + ',' + mau)
+              })
+              if (duongWide) ds.push(duongWide + ',14') // cam chung: nâu trung tính
+              goiHost('(typeof pc_toMau==="function")?pc_toMau("' + ds.join(';') + '"):"ERR:THIEU"').then(function (r) {
+                if (r.indexOf('OK:') !== 0 || r.indexOf('hoTro=1') < 0) {
+                  // Người dùng đang MONG màu — im lặng họ sẽ tưởng hỏng.
+                  hien('loi', t('mau_khong_ho_tro'))
+                }
               })
             }
 

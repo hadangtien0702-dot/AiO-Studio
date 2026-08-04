@@ -8,7 +8,10 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 22:29 — panel v0.4.0, host v0.3.1.
+*Cập nhật lần cuối: 04/08/2026 22:47 — panel v0.4.1, host v0.4.1.
+Mới nhất: **màu nhãn theo NGƯỜI** sau mỗi lần cắt — cam + mic cùng người
+cùng màu (khớp màu chip panel), cam chung màu nâu; đo ngược trên bản cắt
+buổi 1: V1+A1=nhãn 4, V2+A2=nhãn 8, wide=14, từng cặp cùng màu.*
 Mới trong v0.4.0 — **"Thêm mic từ file — TỰ SYNC"** (giải triệt để bài toán
 đầu vào, anh Tiến duyệt tối 04/08): chọn 2–6 file mic → tool tự đo mốc bằng
 tương quan chéo (lệch PluralEyes 0,19–0,29 frame trên liệu thật) → tự dựng

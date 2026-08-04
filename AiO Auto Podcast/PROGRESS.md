@@ -1,5 +1,39 @@
 # AiO Auto Podcast - Nhat ky
 
+## [mau-theo-nguoi] - 2026-08-04 22:47 - v0.4.1: TO MAU NHAN THEO NGUOI SAU MOI LAN CAT
+
+Anh Tien (kem anh chup ban cat buoi 1 anh TU DUNG): "track audio va video
+bi deu mau nhau anh nhin vao khong biet duoc ai het — em co the doi mau
+theo track giua video va audio duoc khong". Dung nguyen tac anh chot tu
+28/07: "nhin MAU la biet, khoi doc so".
+
+### Thay doi
+- **Host v0.4.1**: them `pc_toMau(dsStr)` — to NHAN MAU (label 0-15) cho
+  projectItem theo duong dan. To o muc PROJECT ITEM nen moi clip cat ra tu
+  file do, o MOI sequence, deu mang mau nguoi do — 194 nhat cat chi ton
+  3 cu goi. Do truoc khi viet: `setColorLabel/getColorLabel` CO THAT tren
+  Premiere Beta 26.5 (typeof = function), skill khong ghi cam (luat 5q).
+- **Panel**: sau khi do lai ket qua cat, goi to mau: cam + mic cua CUNG
+  NGUOI cung mau, khop bang MAU_NGUOI cua panel — nhan [4,8,10,15,6,12]
+  (Cerulean/Purple/Teal/Yellow/Rose/Tan), cam chung = 14 (nau). Khong to
+  duoc thi noi mot dong (nguoi dung dang mong mau, im lang tuong hong).
+- Nang kiem phien ban host o panel: 2 cho 'v0.3.1' -> 'v0.4.1'.
+
+### Kiem chung
+- node --check: panel + host (copy .jsx -> .js) = 0 loi. Gac cong cai
+  kiem-nao 16/16 + kiem-sync 9/9 + stress 12/12.
+- E2E tren PANEL THAT: cat "PV_Buoi1_Thien_va_Trong" (buoi 1 anh TU sync,
+  3 cam + 2 mic + CAM CHUNG) 16 giay -> 194 luot (Nguoi1 70 / Nguoi2 84 /
+  wide 40 · 4:12), khong loi. Doc nguoc getColorLabel tren ban cat:
+  V1 C4087=4 + A1 mic Trong=4 · V2 C4233=8 + A2 mic Thien=8 · V3 C4025=14
+  — TUNG CAP CUNG MAU dung thiet ke.
+- Ghi chu that: cu bam E2E roi vao sequence buoi 1 dang active cua anh
+  (sequence "AiO Sync" da bi xoa tay truoc do) -> sinh them ban
+  "...Podcast Cut (2)". Vo hai (ban goc nguyen) nhung la nhac nho: script
+  dieu khien phai KIEM sequence active truoc khi bam ho.
+- Quan sat dang gia: anh Tien da TU CHU tron quy trinh — tu sync buoi 1
+  (Thien+Trong), tu gan ca cam chung, ban cat 194 luot chay ngon.
+
 ## [tu-sync] - 2026-08-04 22:29 - v0.4.0 "THEM MIC TU FILE — TU SYNC": GIAI TRIET DE BAI TOAN DAU VAO
 
 Anh Tien duyet phuong an toi uu ("em lam truoc di em roi minh test sau").

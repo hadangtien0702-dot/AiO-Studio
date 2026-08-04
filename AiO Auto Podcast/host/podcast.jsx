@@ -463,11 +463,41 @@ function pc_nhapMono(dsStr) {
 }
 
 /**
+ * To NHAN MAU cho projectItem theo duong dan — cam + mic cua CUNG MOT NGUOI
+ * cung mot mau, timeline tu ke chuyen "doan nay cua ai". Anh Tien 04/08:
+ * "track audio va video deu mau nhau, anh nhin vao khong biet duoc ai het".
+ * To o muc PROJECT ITEM: moi clip cat ra tu file do (o moi sequence) deu
+ * mang mau nguoi do — 103 nhat cat chi ton vai cu goi.
+ * @param dsStr "duong,label;duong,label;..."  (label 0-15 cua Premiere)
+ * Tra "OK:daTo=n|khongThay=k|hoTro=0/1" — hoTro=0 la Premiere khong co API.
+ */
+function pc_toMau(dsStr) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var manh = String(dsStr).split(';');
+    var daTo = 0, khongThay = 0, hoTro = -1;
+    for (var i = 0; i < manh.length; i++) {
+      if (!manh[i]) continue;
+      var ph = manh[i].split(',');
+      if (ph.length !== 2) continue;
+      var pi = pc__item(ph[0]);
+      if (!pi) { khongThay++; continue; }
+      if (hoTro === -1) hoTro = (typeof pi.setColorLabel === 'function') ? 1 : 0;
+      if (hoTro !== 1) continue;
+      try { pi.setColorLabel(parseInt(ph[1], 10)); daTo++; } catch (e1) {}
+    }
+    return 'OK:daTo=' + daTo + '|khongThay=' + khongThay + '|hoTro=' + (hoTro === 1 ? 1 : 0);
+  } catch (e) {
+    return pc_err('pc_toMau', e);
+  }
+}
+
+/**
  * Phien ban host — panel KIEM sau moi lan nap, khop moi duoc chay.
  * ☠️ Phai la ham CUOI FILE: evalFile co the nuot file GIUA CHUNG ma khong
  * bao loi (do that 01/08: nap xong pc_datTieng nhung pc_doKetQua van ban
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.3.1';
+  return 'v0.4.1';
 }
