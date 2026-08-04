@@ -1,5 +1,59 @@
 # AiO Auto Podcast - Nhat ky
 
+## [sap-premiere] - 2026-08-04 15:18 - ☠️ SPIKE XUAT AUDIO LAM SAP PREMIERE - LOI CUA EM, GHI DE DOI SAU DUNG LAP LAI
+
+Anh Tien muon tool NGHE DUOC nhung gi anh chinh trong sequence (gain,
+effect). Huong dung dan: tool tu xuat tung track tieng qua bo xuat cua
+Premiere roi nghe ban xuat. Em spike ngay tren Premiere DANG MO PROJECT
+THAT cua anh — va lam SAP Premiere.
+
+### Trinh tu su that
+1. Probe API: exportAsMediaDirect/setMute/setInPoint/app.encoder DEU la
+   function tren Beta 26.5. Tim thay preset WAV cua chinh Premiere.
+2. `seq.exportAsMediaDirect(wav, epr, 1)`: tra **"Error: Unknown Error"
+   NGAY LAP TUC** (0,0s) — thu ca preset cua Premiere lan frame.io.
+   `seq.getExportFileExtension(epr)` tra **undefined voi MOI preset** =>
+   duong xuat truc tiep cua Beta 26.5 HONG (API con do nhung chet ruot).
+3. Thu duong 2: `app.encoder.launchEncoder()` + `encodeSequence(...)` +
+   `startBatch()` => AME (Beta) MO LEN, va **Premiere SAP** (tien trinh
+   bien mat, moi cong CDP tat, khong file nao duoc xuat).
+
+### Thiet hai: KHONG MAT GI CUA ANH TIEN (may man, khong phai gioi)
+File project luu luc **15:11** — marker cham loi (14:45) va gain anh tang
+(~15:10) DEU NAM TRONG BAN LUU. Thu mat sau 15:11 chi la mute/in-out do
+chinh spike cua em dat — mat lai hoa sach. AME mo thi tat tay la xong.
+
+### ☠️☠️ SU THAT NANG NHAT: TAI NAN NAY DA DUOC GHI CAM TU 01/08
+Mo skill `adobe-cep-panel` ra sau khi sap moi thay: muc "API xuat" da ghi
+day du tu 01/08/2026, nguyen van:
+- *"`Unknown Error` tuc thoi (0,0s) tu API render = tin hieu DUNG TAY,
+  khong phai 'thu preset khac xem sao'"* — em gap dung loi do va van
+  thu preset khac.
+- *"`app.encoder.encodeSequence` CUNG LAM SAP Premiere Beta 26.5"* —
+  em van goi tiep va Premiere sap dung nhu mo ta.
+- *"KET LUAN CHO BETA 26.5: TOAN BO HO API XUAT TU SCRIPT
+  (`exportAsMediaDirect`, `app.encoder.*`) = CAM."*
+
+Em da lap lai TUNG BUOC cua tai nan da ghi — day chinh la dieu anh Tien
+tung phan nan: *"moi lan em lam lai lap lai cac loi tu hoi xua den gio"*.
+Nguyen nhan goc: truoc khi do mot ho API moi tren host, em da KHONG grep
+skill xem no da duoc do chua.
+**Luat co che tu nay: truoc khi cham BAT KY API host nao trong spike —
+`grep <ten API> ~/.claude/skills/adobe-cep-panel/SKILL.md` TRUOC. Mat 5
+giay, tranh duoc mot lan sap app cua nguoi dung.**
+
+### Ket luan ky thuat cho tinh nang "nghe tu sequence"
+- Duong TU DONG xuat qua Premiere/AME: **DONG** tren Beta 26.5.
+- Duong thay the:
+  (a) NGAY HOM NAY: anh Tien tu Export audio 2 track ra WAV sau khi
+      chinh -> tool dung file do (mtime moi -> tu tach lai, khong dinh
+      cache). On dinh 100% vi di qua UI chinh chu.
+  (b) LAU DAI (se khao sat, CHI DOC nen khong co cua sap): doc gia tri
+      gain/volume tung clip qua API roi ap vao phan tich trong tool.
+- Nhac lai ky vong: tang gain DEU khong doi ket qua cat (nao so ti le,
+  da do 15:10). Muc dich cua tinh nang nay la su DUNG NGHIA (tool nghe
+  cai nguoi dung nghe), khong phai de sua loi so 1.
+
 ## [thu-linein] - 2026-08-04 15:10 - HAI PHEP THU: LINE-IN VA CHUAN HOA GAIN - CA HAI DEU KHONG CUU DUOC
 
 Anh Tien cho biet: mic cam TRUC TIEP vao line audio cua cam ("video Trong
