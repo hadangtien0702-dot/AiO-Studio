@@ -90,9 +90,13 @@ offline, mua một lần. Đừng ôm thêm việc của hai mảnh kia vào đ�
 
 ## LEVEL 2 — CHUYÊN NGHIỆP: ngang/vượt AutoPod, đủ tự tin thu tiền
 
-- [ ] 1. **Cam WIDE + luật về wide**: gán một cam là wide; nhiều người nói
-      cùng lúc → wide · im lâu → wide · cùng shot quá N giây → đảo wide.
-      (Anh đã chốt v1 chưa cần — đây là mục MỞ LẠI khi lên chuyên nghiệp.)
+- [ ] 1. **Cam WIDE + luật về wide** ⬅️ **ANH TIẾN HỎI 04/08 → ĐÃ CẦN, ưu
+      tiên lên đầu**: gán một cam là wide; nhiều người nói cùng lúc → wide ·
+      im lâu → wide · cùng shot quá N giây → đảo wide. Hiện tại cam chung
+      buộc phải để TRỐNG (không gán) nên phí một góc máy. Thêm giá trị
+      "Cam chung" vào ô chọn trong bản đồ track — nó KHÔNG thuộc về ai.
+      Số đo 04/08 ủng hộ mạnh: 4/6 khoảng gây tranh cãi rơi đúng vào lúc
+      KHÔNG AI NÓI — đó chính là chỗ wide nên xuất hiện thay vì đoán bừa.
 - [ ] 2. Nói chồng nhau xử lý tử tế — hai mic to ngang nhau trong >1s không
       được nhấp nháy cam (về wide nếu có, không thì giữ shot đang mở)
 - [ ] 3. 3+ người / 3+ cam đo thật trên Premiere (não đã qua bộ kiểm 3 mic,

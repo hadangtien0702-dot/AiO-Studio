@@ -83,20 +83,75 @@ var AiONao = (function () {
   }
 
   /**
+   * Sàn "coi là CÓ TIẾNG" — TỰ ĐO từ chính liệu, không dùng số cứng.
+   *
+   * ☠️ Vì sao bỏ hằng số −50 dB (đo thật 04/08/2026, liệu phỏng vấn 44 phút):
+   * mic thật thu nhỏ, mức GIỮA của cả hai mic là −54,6 / −54,8 dBFS — tức
+   * NẰM DƯỚI sàn. Sàn cứng gạt thẳng **57% số cửa sổ** trước khi kịp so
+   * sánh, nên não chỉ quyết định được 23% thời lượng, 77% còn lại là giữ
+   * người trước (đoán). Bàn đo có ĐÁP ÁN ở 4 mức âm lượng: sàn cứng đạt
+   * 12/12 khi tiếng to (−24/−40 dBFS) nhưng **0/6 khi tiếng nhỏ**
+   * (−54/−60 dBFS); mọi công thức tự đo đều 12/12.
+   *
+   * Cách đo: Otsu trên histogram dB 1 dB/bin — cùng đường Autocut đã đi khi
+   * bỏ ngưỡng im lặng −30 dB cứng. Otsu tách histogram thành hai cụm "nền
+   * phòng" và "có tiếng" rồi lấy ranh giữa, nên tự co giãn theo từng file.
+   * Kẹp trong [−75, −35] để một file dị dạng không kéo sàn đi quá xa.
+   */
+  function sanTuDo(mics) {
+    var B = 90 // bin 1 dB, từ −90 đến 0
+    var h = new Array(B)
+    for (var b = 0; b < B; b++) h[b] = 0
+    var N = 0
+    for (var m = 0; m < mics.length; m++) {
+      var d = mics[m].db
+      for (var i = 0; i < d.length; i++) {
+        var v = d[i]
+        if (v <= DAY + 1) continue // ngoài vùng thu / im tuyệt đối — không phải nền phòng
+        var k = Math.floor(v + 90)
+        if (k < 0) k = 0
+        if (k >= B) k = B - 1
+        h[k]++
+        N++
+      }
+    }
+    if (N < 100) return -50 // quá ít dữ liệu để đo — về số cũ
+    var best = -1, bestVar = -1
+    var w0 = 0, s0 = 0, tong = 0
+    for (var b2 = 0; b2 < B; b2++) tong += h[b2] * b2
+    for (var t = 1; t < B; t++) {
+      w0 += h[t - 1]
+      s0 += h[t - 1] * (t - 1)
+      var w1 = N - w0
+      if (!w0 || !w1) continue
+      var hieu = s0 / w0 - (tong - s0) / w1
+      var giaTri = w0 * w1 * hieu * hieu
+      if (giaTri > bestVar) { bestVar = giaTri; best = t }
+    }
+    if (best < 0) return -50
+    var san = best - 90
+    if (san < -75) san = -75
+    if (san > -35) san = -35
+    return san
+  }
+
+  /**
    * Quyết định AI ĐANG NÓI trên trục thời gian SEQUENCE.
    *
    * @param mics  [{ db: Float32Array, offset: giây }] — offset = mốc MEDIA trừ
    *              mốc SEQUENCE của mic đó (panel tính từ inPoint − start clip).
    * @param daiGiay  thời lượng cần phủ (giây, trục sequence)
-   * @param opts  { nguongChenh=6, nguongSan=-50, luotToiThieu=1, toiThieuRo=0.2 }
+   * @param opts  { nguongChenh=6, nguongSan=<TỰ ĐO>, luotToiThieu=1, toiThieuRo=0.2 }
+   *              nguongSan truyền số thì ÉP CỨNG (bộ kiểm dùng để quét ngưỡng).
    * @return { trangThai: 'OK'|'KHONG_PHAN_BIET'|'RONG',
    *           doan: [{tu, den, nguoi}],  // phủ kín [0, daiGiay], không hở
-   *           thongKe: { soCua, tyLeRo, cuaMoiNguoi: [] } }
+   *           thongKe: { soCua, tyLeRo, cuaMoiNguoi: [], san } }
    */
   function aiDangNoi(mics, daiGiay, opts) {
     opts = opts || {}
     var CHENH = opts.nguongChenh !== undefined ? opts.nguongChenh : 6
-    var SAN = opts.nguongSan !== undefined ? opts.nguongSan : -50
+    var SAN = opts.nguongSan !== undefined ? opts.nguongSan
+      : (mics && mics.length >= 2 ? sanTuDo(mics) : -50)
     var LUOT = opts.luotToiThieu !== undefined ? opts.luotToiThieu : 1
     var RO = opts.toiThieuRo !== undefined ? opts.toiThieuRo : 0.2
 
@@ -142,7 +197,7 @@ var AiONao = (function () {
       return {
         trangThai: 'KHONG_PHAN_BIET',
         doan: [],
-        thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi },
+        thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
       }
     }
 
@@ -184,7 +239,7 @@ var AiONao = (function () {
       return {
         trangThai: 'KHONG_PHAN_BIET',
         doan: [],
-        thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi },
+        thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
       }
     }
     for (var w1 = 0; w1 < dau; w1++) ket[w1] = ket[dau]
@@ -240,7 +295,7 @@ var AiONao = (function () {
     return {
       trangThai: 'OK',
       doan: doan,
-      thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi },
+      thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
     }
   }
 
@@ -257,7 +312,10 @@ var AiONao = (function () {
     return { p10: p(0.1), p50: p(0.5), p90: p(0.9) }
   }
 
-  return { taiWav: taiWav, doDb: doDb, aiDangNoi: aiDangNoi, phoMic: phoMic, CUA_GIAY: CUA_GIAY }
+  return {
+    taiWav: taiWav, doDb: doDb, aiDangNoi: aiDangNoi, phoMic: phoMic,
+    sanTuDo: sanTuDo, CUA_GIAY: CUA_GIAY,
+  }
 })()
 
 /* Cho Node chạy bộ kiểm; trong panel thì AiONao là biến toàn cục. */

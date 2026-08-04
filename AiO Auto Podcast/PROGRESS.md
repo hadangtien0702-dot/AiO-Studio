@@ -1,5 +1,199 @@
 # AiO Auto Podcast - Nhat ky
 
+## [san-tu-do] - 2026-08-04 09:47 - VIEC 2 XONG: BO SAN -50 dB CUNG, DUNG OTSU TU DO
+
+Anh Tien chot thu tu 1-2-3. Viec 2 lam xong truoc vi viec 1 phai cho
+Premiere ranh (anh dang chay Autocut chiem host ExtendScript).
+
+### VIET PHEP DO TRUOC KHI SUA (bai hoc 5h)
+Sinh lieu CO DAP AN o 4 MUC AM LUONG x 3 muc bleed. Muc am luong la chieu
+ma bo kiem cu KHONG he thu - va do dung la cho vo:
+
+| Cong thuc san | to (-24dBFS) | vua (-40) | **nho (-54 = LIEU THAT)** | rat nho (-60) |
+|---|---|---|---|---|
+| **cung -50 (dang dung)** | 3/3 100% | 3/3 100% | **0/3 0%** | **0/3 0%** |
+| p10gop +6 | 3/3 | 3/3 | 3/3 100% | 3/3 100% |
+| p10gop +9 | 3/3 | 3/3 | 3/3 100% | 3/3 99% |
+| **otsu** | 3/3 | 3/3 | **3/3 100%** | **3/3 100%** |
+
+=> San cung KHONG PHAI la "chua toi uu", no **hong han** o muc am luong
+cua lieu that. Bo kiem cu 16/16 khong bat duoc vi lieu tong hop o -24
+dBFS, cach lieu that **30 dB**. Dung bai hoc 2b, chieu bi bo sot lan nay
+la BIEN DO chu khong phai so luong.
+
+### CHON OTSU - va kiem ca chot GAY AN TOAN
+Chon Otsu vi (a) 100% moi muc, (b) khong co hang so "+6/+9" tu dat,
+(c) **cung duong Autocut da di** khi bo nguong im lang -30 dB cung.
+Histogram 1 dB/bin tu -90..0, kep san trong [-75, -35].
+
+Kiem rieng ca bleed -5 dB (2 mic gan giong nhau) - **ca 4 cong thuc deu
+GAY DUNG** (tra KHONG_PHAN_BIET, tyLeRo 0%), o ca muc to lan nho. San tu
+do KHONG lam mat chot an toan.
+
+### KIEM CHUNG SAU KHI SUA
+- `node tests/kiem-nao.mjs`: **16/16 DAT**, ranh lech 0 ms
+- `node tests/stress.mjs` : **12/12 ca bat buoc DAT**, dung 100% moi ca
+  (ty le ro tang ro: 89-98%; ca 60 phut/227 luot van 100%)
+- Tren LIEU THAT: san tu do = **-54,0 dB** (thay -50 cung)
+  | | luot | tyLeRo | Trong | Dilys |
+  |---|---|---|---|---|
+  | cu (-50 cung) | 79 | 23,0% | 33% | 67% |
+  | moi (tu do) | 103 | **28,1%** | 38% | 62% |
+
+**GIOI HAN (bai hoc 5d):** moi con so tren van do bang chinh dB. Chi duoc
+noi "tool NGHE RO hon 23% -> 28,1% thoi luong", KHONG duoc noi "cat dung
+hon". Thuoc cuoi cung van la tai anh Tien.
+
+### ☠️ EM DA DAN NHAN NGUOC TRONG BAO CAO 09:15 - da dinh chinh
+Bam lai duong dan (`bamTen` voi backslash Windows) moi ra dung:
+`m-1bnq3q9.wav` = **Mic-Trong** · `m-kbnyu4.wav` = **Mic-Dilys**.
+Ban do 09:15 dat nguoc => bang 6 moc bat dong bi doi ben:
+- moc t=417: dung ra la **nao CU dung**, bleed-cancel sai
+- moc t=1497: dung ra la **bleed-cancel dung**, nao cu sai
+Ket luan tong "1 thang - 1 thua - 4 hoa, chua chung minh duoc" **KHONG
+DOI**, nhung chi tiet tung moc thi da bao sai mot lan.
+=> Bai hoc: **thu tu file trong thu muc KHONG phai la nhan.** Nhan phai
+neo bang bang chung (o day la bam duong dan), giong bai hoc 5j.
+
+### File anh huong
+- `dist/nao.js`: them `sanTuDo()` (Otsu), `nguongSan` mac dinh = tu do,
+  `thongKe.san` de panel/bo kiem doc lai duoc. Da chep sang panel da cai.
+
+### CON DANG CHO
+- Viec 1 (stereo): host ExtendScript BAN (anh Tien chay Autocut) - 3 lenh
+  goi vao Premiere deu treo, ke ca lenh nhe nhat. Panel van song (18 tien
+  trinh CEP). Day la hanh vi DUNG, khong phai hong (bai hoc 5f).
+- Anh Tien bao them 09:44: cat xong bang Podcast roi chay Autocut thi
+  "am thanh ve dang cu, tu dong tru rat nhieu dB". Anh gui hinh: track
+  A2/A3 co cac clip dan nhan **L** va **R** rieng le -> dung la he qua
+  cua loi stereo tach kenh. Chua do duoc muc dB that vi Premiere ban.
+
+## [anh-tien-cham] - 2026-08-04 09:15 - ANH TIEN TEST VA BAO 4 DIEM - DO THAT CA 4, TIM RA THU PHAM CHINH
+
+Anh Tien tu bam thu roi liet ke 4 diem. Phien nay CHI DO, khong sua ma
+nguon (chua co dap an thi sua la sua mu).
+
+### 4. "Thu 2 lan ket qua rat giong nhau - bi de data cu?" -> KHONG DE
+Do that: project co 4 sequence, trong do HAI ban dung RIENG BIET:
+- "PODCAST BUOI2 da sync - Podcast Cut"     V=3:79  A=4:148
+- "PODCAST BUOI2 da sync - Podcast Cut (2)" V=3:79  A=3:158
+`pc__tenKhongTrung` tu them "(2)" - khong ghi de. Giong nhau vi thuat
+toan TAT DINH: cung file + cung nguong -> cung 79 luot. Ra khac moi dang
+lo. (Co cache WAV theo bam duong dan trong %TEMP%\aio-podcast - co chu
+dich, chi bo qua khi file nguon cu hon ban wav.)
+
+### DOC HET 158 CLIP (bai hoc 5k - dem khong phai la kiem)
+Lan truoc em chi doc clip DAU va CUOI roi SUY RA noi dung. Lan nay in het:
+- V1=40 C4234x40 (Trong) · V2=39 C4089x39 (Dilys) -> hinh SACH 100%
+- A1=40 Mic-Trongx40 · A2=79 = Mic-Trongx40 + Mic-Dilysx39 · A3=39 Mic-Dilysx39
+=> Dung chan doan stereo: moi mic stereo dat len track mono bi tach 2 kenh
+   sang 2 track. Suy doan lan truoc DUNG, nhung luc do em chua co quyen noi.
+
+### 3. "Chuyen cam va audio van bi sai" -> TIM RA THU PHAM, DO DUOC BANG SO
+Ban do offline tren dung 2 WAV panel da tach (44,2 phut):
+
+| Phep do | Ket qua |
+|---|---|
+| Cua so bi san -50 dB loai THANG | **75.574/132.650 = 57,0%** |
+| Muc mic Trong p10/p50/p90 | -65,5 / **-54,6** / -44,5 dBFS |
+| Muc mic Dilys p10/p50/p90 | -61,2 / **-54,8** / -45,8 dBFS |
+| Trong 43% con lai, chenh >=6 dB | 30.525/57.076 = 53,5% |
+| Chenh p10/p50/p90 | 3,0 / **6,2** / 11,1 dB |
+| => tyLeRo cuoi cung | **23,0%** |
+
+**THU PHAM: san -50 dB la HANG SO CUNG, ma MUC GIUA cua ca hai mic la
+-54,6 / -54,8 dBFS - tuc NAM DUOI SAN.** Hon nua thoi gian co tieng bi coi
+la im lang ngay tu buoc dau. Tool chi thuc su QUYET DINH duoc 23% thoi
+gian; 77% con lai la GIU NGUOI TRUOC (hysteresis) - tuc la doan.
+Day la thu chac chan sai, khong phu thuoc thuat toan nao.
+
+### DA THU BLEED-CANCEL - VA KHONG DUOC PHEP NOI LA TOT HON
+Y tuong: mic_A = giong_A + alpha*giong_B. Uoc luong alpha tu cac cua so
+mot nguoi ap dao (chenh >=12 dB), tru di roi so lai.
+- He so ro ri do duoc: **-13,3 dB** (vao Trong) va **-12,8 dB** (vao Dilys)
+- Chenh p50: 6,2 -> **11,3 dB** · ty le chenh >=6 dB: 53,5% -> **87,6%**
+- Nhung chia hinh DAO NGUOC: cu 33/67, moi (san -50) **76/24**
+
+=> Con so dep len that, nhung do bang chinh dB (bai hoc 5d - thuoc cung
+vat lieu). Nen em dung THUOC THI GIAC: 6 khoang bat dong dai nhat
+(14-32 giay), rut 6 khoanh khac moi khoang tu ca 2 cam can, NHIN MIENG:
+
+| Moc | Nao cu | Bleed-cancel | Nhin anh |
+|---|---|---|---|
+| t=2230 (32s) | Trong | Dilys | ca hai IM (Dilys ngua mat nghi) - hoa |
+| t=1963 (18s) | Trong | Dilys | ca hai IM (Dilys che mieng cuoi) - hoa |
+| t=417 (15s) | Dilys | Trong | Trong mieng he, dang noi -> **moi dung** |
+| t=2003 (15s) | Dilys | Trong | ca hai IM - hoa |
+| t=1155 (14s) | Trong | Dilys | ca hai IM - hoa |
+| t=1497 (14s) | Dilys | Trong | **Dilys mo mieng ro, thay rang** -> **CU DUNG** |
+
+**1 thang - 1 thua - 4 hoa. KHONG chung minh duoc bleed-cancel tot hon.**
+Neu chi doc bang so (87,6% vs 53,5%) thi em da bao cao sai. Moc t=1497
+cuu em - va no la moc THU 6, neu chi xem "vai cai dau" thi da trot lot.
+
+**Phat hien phu quan trong:** 4/6 khoang bat dong roi vao luc **KHONG AI
+NOI**. Tuc phan lon khac biet giua hai thuat toan nam o vung ca hai deu
+dang DOAN, khong phai vung "cat nham nguoi dang noi".
+
+### 1 & 2 - hai cau hoi SAN PHAM (chua co code, da ghi vao TINH-NANG.md)
+1. Sap xep folder bang 1 nut: thuoc LEVEL 3 muc 1. Lieu that cho thay
+   bin "Cam 3" chua ca C4086 (1:37) + C4087 (40:21, buoi 1) + C4088
+   (4:12) + C4089 (44:21, buoi 2) - lan ca file vun lan 2 buoi khac nhau.
+   Da co san 2 manh: tuong quan trong buoi r=0,52-0,54 vs cheo buoi
+   r~0,02 (tach buoi duoc bang may), va do dai file (loai file vun).
+2. Cam quay chung 2 nguoi: HIEN TAI de trong (khong gan) - dung nhu em
+   lam voi C4026. Muon dung phai co vai "CAM WIDE" = LEVEL 2 muc 1,
+   anh Tien tung chot "v1 chua can". Anh hoi tuc la nay da can.
+
+### KHONG SUA GI TRONG PHIEN NAY
+Ba viec cho anh Tien quyet, xem cuoi bao cao. Rieng loi stereo (158 clip)
+la bug ro rang, sua duoc ngay khi anh gat.
+
+## [chay-that-lieu-that] - 2026-08-03 19:54 - LAN DAU CHAY TOOL THAT TREN LIEU THAT - HINH DUNG, LO LOI MIC STEREO
+
+Anh Tien: "y anh la em control may anh de em thuc hien thuc te voi tool".
+Em dieu khien panel that qua cong 8094, di DUNG duong nguoi dung: kich hoat
+sequence -> panel tu nap ban do track -> gan qua o chon tren UI (dispatch
+event change) -> bam nut "Cat timeline theo nguoi noi" -> canh nut song lai
+(tin hieu xong, bai hoc 5f).
+
+### Buoc gan - biet cam nao cua ai bang MAT
+Rut 1 frame/cam (ffmpeg -ss 300): C4026 (V1) = WIDE 2 nguoi -> KHONG gan;
+C4234 (V2) = can anh Trong (nam, host); C4089 (V3) = can chi Dilys (nu, ao
+Dream Talent). Gan: Nguoi 1 = V2+A1 (Mic-Trong), Nguoi 2 = V3+A2
+(Mic-Dilys). soatGan = sach.
+
+### Ket qua chay (lieu 44,25 phut that, 2 nguoi)
+- Tach 2 WAV + nao + dung: het ~70 giay tong. Nao ra **79 luot** — TRUNG
+  KHIT voi quet offline 15:34 (san -50/chenh 6 -> 79 luot).
+- Panel: Nguoi 1 = 40 luot / 14:26 · Nguoi 2 = 39 luot / 29:48 (33/67,
+  khop quet offline). Phu 44:13.
+- **HINH DUNG 100%:** V1=0 · V2=40 clip C4234 (Trong) · V3=39 clip C4089
+  (Dilys) — tong 79/79, dung cam dung nguoi, wide de trong.
+- **TIENG LOI — tu do cua tool BAT DUOC va canh bao dung:** "tieng 158/79".
+  Do ngoai: a=4 track (goc 2): A1=40 Mic-Trong · A2=79 (40 Trong + 39
+  Dilys) · A3=39 Mic-Dilys · A4=0. 40+79+39 = 158.
+
+### Nguyen nhan (da khop so, chua sua)
+Mic mp3 la STEREO dual-mono (r=1,0). Sequence goc (tu XML em sinh) co
+track audio MONO. `pc_datTieng` dat item stereo len track mono -> Premiere
+TACH 2 KENH thanh 2 track item: kenh 1 vao track dich, kenh 2 tran sang
+track ke (va tu de ra track moi A3/A4). Trong->A1+A2, Dilys->A2+A3.
+- Lieu tong hop truoc gio la WAV MONO nen 10/10 sach — dung bai hoc 2b:
+  mau nho/khac chat giau loi.
+- Nghe thi VAN DUNG GIONG dung luot (dual-mono giong het nhau), chi bi
+  nhan doi lop va sai cau truc track so voi thiet ke "ve dung track goc".
+- Huong sua (chua lam, cho anh Tien nghe truoc): pc_nhanBan tao track
+  audio theo channel type cua mic item, hoac ep channel mapping mono
+  truoc khi dat. Phai kiem ca ca nguoc: sequence user sync tay co track
+  standard/stereo thi hanh vi ra sao.
+
+### Gioi han phai noi ro (5d)
+79 luot la dung NGUONG HIEN TAI (6dB/-50dB) — nguong nay da do la khong
+on dinh tren lieu that (tyLeRo 23% sat mep 20%). "Cat DUNG hay khong"
+van phai doi TAI anh Tien nghe sequence "PODCAST BUOI2 da sync - Podcast
+Cut" + cham 12 clip nghe kiem.
+
 ## [project-rieng] - 2026-08-03 19:43 - TAO PROJECT RIENG CHO BAI PODCAST THEO YEU CAU ANH TIEN
 
 Anh Tien: "tao cho anh mot project moi di". Lam bang `app.newProject` tu
