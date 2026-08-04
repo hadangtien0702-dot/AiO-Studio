@@ -112,6 +112,18 @@
   }
   .den--ok .den__cham { background: var(--ok); }
   .den--cho .den__cham { background: var(--warn); }
+  /* Ô chọn sequence làm việc — anh Tiến 04/08: mở nhiều sequence thì panel
+     tự bám activeSequence làm việc SAI CHỖ; người dùng phải được CHỌN. */
+  .den__chon {
+    flex: 1; min-width: 0; max-width: 320px;
+    height: var(--h-ctrl);
+    padding: 0 var(--sp-2);
+    background: var(--bg-4); color: var(--text-1);
+    border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    font-family: var(--font-ui); font-size: var(--fs-sm);
+    text-overflow: ellipsis;
+  }
+  .den__chon:disabled { opacity: 0.5; }
 
   /* ── Chip người ── */
   .nguoi-ds { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
@@ -243,7 +255,7 @@
 <body>
   <div class="topbar">
     <span class="topbar__ten">Auto Podcast</span>
-    <span class="topbar__ver">v0.3.0</span>
+    <span class="topbar__ver">v0.3.1</span>
     <span class="topbar__host" id="host"></span>
     <button class="lang" id="lang" onclick="doiNgonNgu()"></button>
   </div>
@@ -271,7 +283,7 @@
       <p class="mh__chu" id="mhChu"></p>
     </div>
 
-    <div class="den" id="den"><span class="den__cham"></span><span id="denChu"></span></div>
+    <div class="den" id="den"><span class="den__cham"></span><select class="den__chon" id="chonSeq" onchange="doiSeq()"></select><span id="denChu"></span></div>
 
     <div class="muc">
       <span class="muc__nhan" id="nhanGan"></span>
@@ -321,7 +333,8 @@
       cho_premiere: '(đang chờ Premiere…)',
       premiere_chua: 'Premiere chưa sẵn sàng.',
       chua_mo_seq: 'Chưa mở sequence nào.',
-      dang_mo: 'Đang mở «{ten}» · {v} track hình · {a} track tiếng.',
+      dang_mo: '{v} track hình · {a} track tiếng.',
+      chon_seq: 'Sequence đang làm việc',
       nhan_gan: 'Track nào của ai',
       nhom_hinh: 'Hình — cam của ai', nhom_tieng: 'Tiếng — mic riêng của ai',
       khong_ai: '—',
@@ -371,7 +384,8 @@
       cho_premiere: '(waiting for Premiere…)',
       premiere_chua: 'Premiere is not ready yet.',
       chua_mo_seq: 'No sequence open.',
-      dang_mo: 'Open: «{ten}» · {v} video · {a} audio tracks.',
+      dang_mo: '{v} video · {a} audio tracks.',
+      chon_seq: 'Working sequence',
       nhan_gan: 'Whose track is which',
       nhom_hinh: 'Video — whose camera', nhom_tieng: 'Audio — whose personal mic',
       khong_ai: '—',
@@ -920,7 +934,7 @@
           // Chốt phiên bản: evalFile có thể nuốt file GIỮA CHỪNG không báo
           // lỗi (đo 01/08) — hàm cuối file trả lời đúng = cả file đã nạp.
           goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-          if (pb !== 'v0.3.0') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+          if (pb !== 'v0.3.1') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
           // Nhập bản mono vào project — host tìm projectItem theo đường dẫn,
           // chưa nhập thì `pc_datTieng` không thấy gì để đặt.
           goiHost('pc_nhapMono("' + duongMic.join(';') + '")').then(function (rN) {
@@ -1076,6 +1090,7 @@
       var p = raw.slice(3).split('|')
       host.textContent = p[0] ? 'Premiere ' + p[0] + (p[1] ? ' · ' + p[1] : '') : t('cho_premiere')
       var tenSeq = p[2] || ''
+      capNhatChonSeq((p[6] || '').split(';;').filter(function (x) { return x }), tenSeq)
       if (!tenSeq) {
         den.className = 'den den--cho'
         chu.textContent = t('chua_mo_seq')
@@ -1093,6 +1108,50 @@
     })
   }
   window.setInterval(soi, 1000)
+
+  /**
+   * Ô CHỌN sequence làm việc — anh Tiến 04/08: *"anh không được chọn đúng
+   * sequence làm việc của mình"*. Trước đây panel tự bám activeSequence:
+   * mở nhiều sequence là nó nhảy theo tab đang mở, người dùng không có
+   * quyền chọn. Giờ danh sách lấy từ host mỗi nhịp soi, chọn là host đổi
+   * activeSequence — mọi chốt an toàn sẵn có (SEQ_DOI…) giữ nguyên.
+   */
+  function capNhatChonSeq(ds, tenDangMo) {
+    var sel = document.getElementById('chonSeq')
+    // Đang mở dropdown thì đừng vẽ lại — vẽ lại là nó sập xuống giữa tay người dùng.
+    if (document.activeElement === sel) return
+    var khoa = ds.join(';;') + '@' + tenDangMo
+    if (sel.getAttribute('data-khoa') === khoa) return
+    sel.setAttribute('data-khoa', khoa)
+    sel.innerHTML = ''
+    sel.setAttribute('aria-label', t('chon_seq'))
+    if (!ds.length) { sel.disabled = true; return }
+    sel.disabled = false
+    for (var i = 0; i < ds.length; i++) {
+      var o = document.createElement('option')
+      o.value = ds[i]
+      o.textContent = ds[i]
+      sel.appendChild(o)
+    }
+    sel.value = tenDangMo || ds[0]
+  }
+
+  function doiSeq() {
+    var sel = document.getElementById('chonSeq')
+    var ten = sel.value
+    if (!ten || dangChay) return
+    sel.blur() // nhả focus để nhịp soi sau được phép vẽ lại danh sách
+    goiHost('(typeof pc_chonSeq==="function")?pc_chonSeq("' + chuoiJsx(ten) + '"):"ERR:CHUA_NAP|"').then(function (r) {
+      if (String(r).indexOf('OK:') !== 0) {
+        // Host chưa nạp bản mới — nạp rồi thử lại một lần.
+        napLaiHost(function (ok) {
+          if (ok) goiHost('pc_chonSeq("' + chuoiJsx(ten) + '")').then(function () { soi() })
+        })
+        return
+      }
+      soi() // cập nhật ngay, khỏi đợi nhịp 1 giây
+    })
+  }
 
   function dongHuongDan() {
     document.getElementById('hd').style.display = 'none'

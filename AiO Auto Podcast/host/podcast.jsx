@@ -119,13 +119,46 @@ function pc_trangThai() {
     var v = String(app.version);
     var p = (app.project && app.project.name) ? String(app.project.name) : '';
     var s = app.project ? app.project.activeSequence : null;
-    if (!s) return 'OK:' + v + '|' + p + '||||';
+    // Truong thu 7: DANH SACH sequence trong project, cach nhau ';;'.
+    // ☠️ Vi sao co - anh Tien 04/08: mo ca chuc sequence thi panel tu bam
+    // activeSequence lam viec SAI CHO, "khong duoc chon dung sequence lam
+    // viec cua minh". Panel dung danh sach nay ve o CHON sequence.
+    var ds = [];
+    try {
+      var n = app.project.sequences ? (app.project.sequences.numSequences || 0) : 0;
+      for (var i = 0; i < n; i++) {
+        ds.push(pc__sach(String(app.project.sequences[i].name)));
+      }
+    } catch (e2) {}
+    if (!s) return 'OK:' + v + '|' + p + '|||||' + ds.join(';;');
     var st = s.getSettings();
     return 'OK:' + v + '|' + pc__sach(p) + '|' + pc__sach(s.name) + '|' +
       st.videoFrameWidth + 'x' + st.videoFrameHeight + '|' +
-      s.videoTracks.numTracks + '|' + s.audioTracks.numTracks;
+      s.videoTracks.numTracks + '|' + s.audioTracks.numTracks + '|' +
+      ds.join(';;');
   } catch (e) {
-    return 'OK:|||||';
+    return 'OK:||||||';
+  }
+}
+
+/**
+ * CHON sequence lam viec theo TEN — nguoi dung chon tren panel thay vi
+ * tool tu bam activeSequence. Doi activeSequence de moi duong san co
+ * (pc__seqDangDung, pc_thongTinSeq, chot SEQ_DOI) van dung nguyen.
+ */
+function pc_chonSeq(ten) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var n = app.project.sequences ? (app.project.sequences.numSequences || 0) : 0;
+    for (var i = 0; i < n; i++) {
+      if (pc__sach(String(app.project.sequences[i].name)) === String(ten)) {
+        app.project.activeSequence = app.project.sequences[i];
+        return 'OK:seq=' + pc__sach(String(app.project.activeSequence.name));
+      }
+    }
+    return 'ERR:KHONG_THAY_SEQ|' + pc__sach(String(ten));
+  } catch (e) {
+    return pc_err('pc_chonSeq', e);
   }
 }
 
@@ -436,5 +469,5 @@ function pc_nhapMono(dsStr) {
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.3.0';
+  return 'v0.3.1';
 }

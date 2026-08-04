@@ -1,5 +1,43 @@
 # AiO Auto Podcast - Nhat ky
 
+## [chon-sequence] - 2026-08-04 11:35 - O CHON SEQUENCE LAM VIEC (hinh 5 cua anh Tien)
+
+Anh Tien tu tao sequence "test thuc te" (import + sync bang Premiere —
+DUNG duong nguoi dung that), roi bao: *"anh khong duoc chon dung sequence
+lam viec cua minh"*. Truoc day panel TU BAM activeSequence — mo ca chuc
+sequence thi no nhay theo tab dang mo, nguoi dung khong co quyen chon.
+
+### DA LAM (v0.3.1)
+- Host: `pc_trangThai` tra them truong 7 = DANH SACH sequence (cach ';;');
+  `pc_chonSeq(ten)` doi activeSequence theo ten — moi chot an toan san co
+  (SEQ_DOI, pc__seqDangDung) giu nguyen vi van di qua activeSequence.
+- Panel: o chon `.den__chon` ngay dong den trang thai. Danh sach tu lam
+  moi moi nhip soi (1s); KHONG ve lai khi dropdown dang mo (ve lai la sap
+  giua tay nguoi dung); doi xong goi soi() ngay khoi doi 1 giay.
+- `pc_phienBan` v0.3.0 -> v0.3.1.
+
+### DO THAT tren panel (11 sequence trong project)
+- O chon hien du 11 muc, dang dung o "test thuc te".
+- Doi sang "Podcast Cut (4)": seqDangNhin doi theo, ban do ve lai 4 hang,
+  activeSequence trong Premiere doi that.
+- Doi nguoc ve "test thuc te" (chon theo CHI SO): khopNhau=true — o chon,
+  panel, activeSequence khop ca ba; ban do 6 hang.
+
+### ☠️ Thuoc do lai danh lua mot lan
+Lan dau thu "doi nguoc ve" bang `sel.value = 'test thực tế'` -> tra ve
+"" nhu the panel hong. Khong phai: chuoi TIENG VIET truyen qua PowerShell
+bi meo (bay da ghi trong skill windows-scripting) nen khong khop option.
+Chon theo selectedIndex thi chay ngay. Panel chua bao gio hong.
+
+### GHI NHAN THEM tu hinh anh Tien gui (CHUA sua trong phien nay)
+1. Hinh 1-3: chat luong cat tren lieu that — co doan nguoi nu noi ma
+   khong co hinh/tieng, co doan cat nham cam. Dung vung nguong dang cho
+   anh Tien cham tai (bang cham + 12 clip nghe kiem). KHONG sua mu.
+2. Hinh 4: sequence "test thuc te" cua anh sync bang Premiere chi co
+   TIENG CAM (C4089[A]...), chua co mic rieng — tool can mic rieng tung
+   nguoi. Can noi ro trong huong dan hoac panel canh bao khi track tieng
+   la tieng dinh lien clip hinh.
+
 ## [viec-1-stereo] - 2026-08-04 11:17 - XONG: TIENG MIC KHONG CON XE 2 TRACK
 
 Anh Tien chot lam tiep viec 1. Sua GOC: dat tieng bang FILE MONO thay vi
