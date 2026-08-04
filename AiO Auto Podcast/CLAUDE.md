@@ -3,9 +3,10 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 04/08/2026: panel v0.3.4 · host v0.3.1 — ĐÃ CÀI.**
+> **TRẠNG THÁI 04/08/2026: panel v0.3.6 · host v0.3.1 — ĐÃ CÀI.**
 > Trạng thái chi tiết từng tính năng (xong/chưa/lỗi mở): **`TRANG-THAI.md`**
 > — anh Tiến yêu cầu, mỗi phiên sửa code PHẢI cập nhật. Diễn biến: `PROGRESS.md`.
+> Giải thích chi tiết về Âm thanh & Quy trình Auto Cut: `GIAI-THICH-AUDIO-CHO-CLAUDE.md`.
 >
 > Chốt trong ngày 04/08:
 > - `dist/` ĐÃ vào git (commit f6c7e70, 03/08) — hết cảnh mất trắng.
