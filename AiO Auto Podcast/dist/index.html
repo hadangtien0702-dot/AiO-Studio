@@ -214,8 +214,28 @@
   .btn-chinh:hover:not(:disabled) { background: var(--accent-hover); }
   .btn-chinh:disabled { opacity: 0.55; cursor: default; }
 
-  .canlam { color: var(--text-2); font-size: var(--fs-sm); white-space: pre-wrap; }
-  .loi { color: var(--danger); font-size: var(--fs-sm); white-space: pre-wrap; user-select: text; }
+  /* ☠️ 04/08: anh Tiến bấm nút, tool chạy và DỪNG ĐÚNG ở chốt an toàn —
+     nhưng thông báo là một dòng chữ xám nhỏ nên anh tưởng "tool không chạy".
+     Thất bại phải TO và RÕ: khung nổi, viền màu, không lẫn vào nền. */
+  .canlam {
+    color: var(--text-1); font-size: var(--fs-sm); white-space: pre-wrap;
+    background: var(--bg-3); border: 1px solid var(--warn);
+    border-left: 3px solid var(--warn);
+    border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4);
+  }
+  .canlam::before {
+    content: attr(data-tieude);
+    display: block;
+    color: var(--warn); font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: var(--sp-2);
+  }
+  .loi {
+    color: var(--text-1); font-size: var(--fs-sm); white-space: pre-wrap; user-select: text;
+    background: var(--bg-3); border: 1px solid var(--danger);
+    border-left: 3px solid var(--danger);
+    border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4);
+  }
 
   /* ── Kết quả ── */
   .ketqua {
@@ -255,7 +275,7 @@
 <body>
   <div class="topbar">
     <span class="topbar__ten">Auto Podcast</span>
-    <span class="topbar__ver">v0.3.3</span>
+    <span class="topbar__ver">v0.3.4</span>
     <span class="topbar__host" id="host"></span>
     <button class="lang" id="lang" onclick="doiNgonNgu()"></button>
   </div>
@@ -363,7 +383,10 @@
       dang_thay_tieng: 'Đang thay tiếng cam bằng tiếng mic…',
       khong_phan_biet: 'Hai mic nghe giống nhau quá, không phân biệt được ai đang nói — kiểm tra lại: mỗi người một mic riêng, mic ai gần người nấy. (Cửa sổ nghe rõ: {ro}%)',
       mic_deu: 'Mic của {ten} (track {track}) có âm lượng đều suốt cả tập — nghe giống tiếng cam hoặc nhạc nền hơn là mic thu riêng một người. Kiểm tra lại bước gán rồi bấm lại.',
-      mot_luot: 'Nghe cả tập chỉ thấy MỘT người nói — thường do gán nhầm tiếng cam làm mic. Kiểm tra bước gán: mic của ai phải là track thu riêng người đó.',
+      mot_luot: 'Nghe cả tập chỉ thấy MỘT người nói nên không dựng — dựng ra sẽ chỉ có một cảnh duy nhất. Thường do một mic không thu được tiếng (dây, gain) hoặc gán nhầm track.',
+      canlam_tieude: 'Tool đã chạy — dừng lại vì',
+      nghe_thay: 'Đo được: {chiTiet}.',
+      nghe_mot_nguoi: '{ten} nghe rõ {pt}%',
       wav_hong: 'Không đọc được tiếng của {ten}.',
       tach_loi: 'Tách tiếng lỗi: ',
       dung_loi: 'Dựng lỗi: ',
@@ -417,7 +440,10 @@
       dang_thay_tieng: 'Swapping cam audio for mic audio…',
       khong_phan_biet: 'The mics sound too alike — cannot tell who is speaking. Check: one mic per person, each mic close to its person. (Clear windows: {ro}%)',
       mic_deu: 'The mic for {ten} (track {track}) has near-constant volume — it sounds like camera audio or a music bed, not a personal mic. Check the assignment and try again.',
-      mot_luot: 'The whole episode sounds like ONE person talking — usually camera audio was assigned as a mic. Check the assignment: each mic must be the personal recording of that person.',
+      mot_luot: 'The whole episode sounds like ONE person talking, so nothing was built — the result would be a single shot. Usually one mic recorded nothing (cable, gain) or a track is misassigned.',
+      canlam_tieude: 'The tool ran — stopped because',
+      nghe_thay: 'Measured: {chiTiet}.',
+      nghe_mot_nguoi: '{ten} clearly heard {pt}%',
       wav_hong: 'Could not read audio for {ten}.',
       tach_loi: 'Audio extraction failed: ',
       dung_loi: 'Build failed: ',
@@ -548,6 +574,21 @@
     var el = document.getElementById(id)
     el.style.display = text ? '' : 'none'
     el.textContent = text || ''
+    // Tiêu đề khung: nói rõ TOOL ĐÃ CHẠY — người dùng tưởng "bấm không chạy"
+    // trong khi nó chạy xong và dừng đúng chốt an toàn (vấp thật 04/08).
+    if (id === 'canlam') el.setAttribute('data-tieude', t('canlam_tieude'))
+  }
+  /** "Người 1 nghe rõ 2% · Người 2 nghe rõ 21%" — bằng chứng tool ĐÃ nghe. */
+  function taNgheThay(thongKe) {
+    if (!thongKe || !thongKe.cuaMoiNguoi || !thongKe.soCua) return ''
+    var phan = []
+    for (var i = 0; i < thongKe.cuaMoiNguoi.length; i++) {
+      phan.push(tp('nghe_mot_nguoi', {
+        ten: tenNguoi(i),
+        pt: (thongKe.cuaMoiNguoi[i] / thongKe.soCua * 100).toFixed(1),
+      }))
+    }
+    return '\n' + tp('nghe_thay', { chiTiet: phan.join(' · ') })
   }
   function goiHost(lenh) {
     return new Promise(function (res) { cs.evalScript(lenh, function (raw) { res(String(raw)) }) })
@@ -1007,11 +1048,11 @@
         var kq = AiONao.aiDangNoi(micDb, daiGiay, clipWide ? { coWide: true } : {})
         if (kq.trangThai !== 'OK') {
           var ro = kq.thongKe ? Math.round(kq.thongKe.tyLeRo * 100) : 0
-          thoat(null, tp('khong_phan_biet', { ro: ro }))
+          thoat(null, tp('khong_phan_biet', { ro: ro }) + taNgheThay(kq.thongKe))
           return
         }
         // ── Chốt an toàn 2: cả tập một lượt = gần như chắc gán sai. ──
-        if (kq.doan.length < 2) { thoat(null, t('mot_luot')); return }
+        if (kq.doan.length < 2) { thoat(null, t('mot_luot') + taNgheThay(kq.thongKe)); return }
 
         // ── 3. Cắt BẢN SAO theo lô — mỗi đoạn về ĐÚNG track gốc, ĐÚNG vị trí ──
         var doan = kq.doan

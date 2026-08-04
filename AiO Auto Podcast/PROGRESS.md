@@ -1,5 +1,32 @@
 # AiO Auto Podcast - Nhat ky
 
+## [that-bai-phai-to] - 2026-08-04 15:26 - "BAM MA KHONG THAY CHAY" = LOI HIEN THI (v0.3.4)
+
+Anh Tien bam "Cat timeline theo nguoi noi" tren "test thuc te" va noi
+"anh bam cat ma khong thay tool chay", so sanh voi tool khac "bam la
+chay veo veo". Su that: tool CHAY (~10 giay, cache WAV con), dung DUNG
+chot an toan "ca tap mot nguoi noi", va in mot dong chu xam nho — nguoi
+dung tuong panel do. Loi HIEN THI, khong phai loi logic.
+
+### DA SUA (v0.3.4)
+- Khung canh bao noi bat: vien + vach cam canh trai, tieu de tu dong
+  **"Tool da chay — dung lai vi"** (CSS ::before, hien qua ham hien()).
+- Thong bao chot an toan kem SO DO tung nguoi: goi taNgheThay(thongKe)
+  -> "Do duoc: Nguoi 1 nghe ro X% · Nguoi 2 nghe ro Y%".
+- Sua loi chu 'mot_luot': noi ro HAU QUA (dung ra chi co mot canh) va
+  nguyen nhan thuong gap (mot mic khong thu duoc tieng — day, gain).
+
+### DO THAT tren "test thuc te" cua anh
+Bam nut qua CDP: chay 10 giay, khung hien:
+  "Nghe ca tap chi thay MOT nguoi noi nen khong dung...
+   Do duoc: Nguoi 1 nghe ro 100.0% · Nguoi 2 nghe ro 0.0%."
+**"Nguoi 2 nghe ro 0%" = line-in cam Trong cam** — khop chan doan 15:10.
+Thong bao gio TU chi ra mic nao hong, khong can em ngoi do nua.
+
+### Tra loi cau "tool khac bam la chay veo veo"
+Chung cu dung bua — AutoPod bi che chinh vi the. Minh chon DUNG khi du
+lieu khong du de dung dung, nhung tu nay dung phai TO va co so do.
+
 ## [sap-premiere] - 2026-08-04 15:18 - ☠️ SPIKE XUAT AUDIO LAM SAP PREMIERE - LOI CUA EM, GHI DE DOI SAU DUNG LAP LAI
 
 Anh Tien muon tool NGHE DUOC nhung gi anh chinh trong sequence (gain,
