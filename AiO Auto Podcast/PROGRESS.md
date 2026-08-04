@@ -1,5 +1,46 @@
 # AiO Auto Podcast - Nhat ky
 
+## [cam-chung] - 2026-08-04 11:57 - CAM CHUNG DUNG DUOC (v0.3.2)
+
+Anh Tien: quay that co "1 cam chung giua 2 nguoi nhung khi anh chon thi
+lai khong su dung duoc". Truoc day anh phai che "Nguoi 3" de co cho gan
+-> doi mic rieng -> bi chot an toan chan. Cam chung khong co cho dung.
+
+### DA LAM
+- **nao.js**: opts `coWide` (TAT mac dinh) + `wideSauGiay` (mac dinh 2s).
+  Luat: im qua 2s -> ve wide (-1); 2s dau van nan nguoi vua noi (nhip
+  editor); doan dan chua ai noi -> wide; im ngan <~2s -> nan nuot tron,
+  khong nhay wide. So do ung ho: 4/6 khoang hai thuat toan cai nhau roi
+  dung luc KHONG AI NOI.
+- **Panel**: o chon track HINH them "Cam chung" (gia tri -2, vien xam,
+  doc quyen 1 track, khong thuoc ve ai); luu theo sequence dang moi
+  {ds, wide} (doc duoc ban cu dang mang); soatGan: wide khong can mic
+  nhung phai 1 clip lien; vung phu tinh ca clip wide; doan wide hinh tu
+  track wide, TIENG CA HAI MIC cung len (ai track nay — tieng phong tu
+  nhien); danh sach tieng tinh TRUOC -> buoc DO LAI so voi so mong doi
+  chinh xac; bang ket qua them ngan "Cam chung" xam.
+- pc_phienBan giu v0.3.1 (host khong doi cho wide); topbar v0.3.2.
+
+### KIEM CHUNG
+- `tests/kiem-wide.mjs` (MOI, 11 phep): tat coWide = hanh vi cu y het;
+  bat: doan dan wide, im 8s -> wide sau dung 2s nan (tu=13.00 mong 13),
+  ket thuc dung luc B noi (19.00), im 1s KHONG wide oan, ranh vao luot
+  noi 3.00/19.00/28.00 khong suy suyen, phu kin, wideSauGiay=4 -> 15.00.
+- kiem-nao 16/16 + stress 12/12: KHONG doi hanh vi cu.
+- **Chay THAT** (sequence AiO-WIDE-TEST = XML goc co C4026 wide):
+  V1=14 C4026 (wide) · V2=58 C4234 · V3=52 C4089 = 124 doan;
+  A1=72 mono (58 luot Trong + 14 wide) · A2=66 (52+14) — khop tung so;
+  panel: "Nguoi 1 58 luot 15:29 · Nguoi 2 52 luot 26:43 · Cam chung 14
+  luot 2:02", **0 canh bao lech**.
+
+### CON LAI
+- Noi chong nhau -> wide: CHUA lam (doi dap an tai). Cung shot qua N giay
+  -> dao wide: CHUA lam.
+- Sequence "test thuc te" cua anh Tien van chi co TIENG CAM (chua sync
+  mic rieng vao) — wide khong thay the duoc mic; van can anh sync mic.
+- Sequence thu AiO-WIDE-TEST + "AiO-WIDE-TEST - Podcast Cut" de lai cho
+  anh nghe; xoa tay khi xong (deleteSequence khong co trong Beta 26.5).
+
 ## [chon-sequence] - 2026-08-04 11:35 - O CHON SEQUENCE LAM VIEC (hinh 5 cua anh Tien)
 
 Anh Tien tu tao sequence "test thuc te" (import + sync bang Premiere —

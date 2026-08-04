@@ -154,6 +154,21 @@ var AiONao = (function () {
       : (mics && mics.length >= 2 ? sanTuDo(mics) : -50)
     var LUOT = opts.luotToiThieu !== undefined ? opts.luotToiThieu : 1
     var RO = opts.toiThieuRo !== undefined ? opts.toiThieuRo : 0.2
+    /**
+     * CAM CHUNG (wide) — anh Tiến 04/08: quay thật có "1 cam chung giữa 2
+     * người nhưng khi anh chọn thì lại không sử dụng được".
+     *
+     * Bật `coWide: true` thì đoạn nào KHÔNG AI NÓI RÕ kéo dài quá WIDE_GIAY
+     * sẽ trả `nguoi = -1` (về cam chung) thay vì đoán giữ người trước. Số đo
+     * ủng hộ: 4/6 khoảng hai thuật toán cãi nhau trên liệu thật rơi đúng lúc
+     * KHÔNG AI NÓI — đó là chỗ nên về wide thay vì đoán bừa.
+     *
+     * 2 giây đầu của khoảng im vẫn GIỮ người vừa nói (nhịp editor: máy nán
+     * lại một chút rồi mới về toàn cảnh). TẮT mặc định — không đổi hành vi
+     * 28 phép kiểm cũ.
+     */
+    var WIDE = opts.coWide === true
+    var WIDE_GIAY = opts.wideSauGiay !== undefined ? opts.wideSauGiay : 2.0
 
     if (!mics || mics.length < 2 || !(daiGiay > 0)) return { trangThai: 'RONG', doan: [], thongKe: null }
     var soCua = Math.floor(daiGiay / CUA_GIAY)
@@ -213,10 +228,14 @@ var AiONao = (function () {
     var K_ONSET = 25 // 0,5 giây
     var NG_X = 15    // X phải rõ ≥15/25
     var NG_CUR = 5   // người đang giữ hình phải im: ≤5/25 cửa sổ rõ
+    var NG_WIDE = Math.max(1, Math.round(WIDE_GIAY / CUA_GIAY))
     var ket = new Int16Array(soCua)
     var cur = -1
+    var muLienTiep = 0 // số cửa sổ mù liên tục — quá NG_WIDE thì về cam chung
     for (var w2 = 0; w2 < soCua; w2++) {
       var ung = tho[w2]
+      if (ung >= 0) muLienTiep = 0
+      else muLienTiep++
       if (ung >= 0 && ung !== cur) {
         var cuoiSpan = Math.min(w2 + K_ONSET, soCua)
         var span = cuoiSpan - w2
@@ -230,9 +249,14 @@ var AiONao = (function () {
           cur = ung
         }
       }
+      // Im quá WIDE_GIAY → về cam chung (-1). Chỉ khi coWide; hysteresis
+      // giữ-người-trước vẫn nguyên cho 2 giây đầu của khoảng im.
+      if (WIDE && muLienTiep > NG_WIDE) cur = -1
       ket[w2] = cur
     }
-    // Đoạn dẫn đầu trước người rõ đầu tiên: lấy người đó.
+    // Đoạn dẫn đầu trước người rõ đầu tiên: có wide thì về CAM CHUNG
+    // (chưa ai nói mà cắt cận một người là đoán bừa); không wide thì giữ
+    // hành vi cũ — lấy người rõ đầu tiên.
     var dau = 0
     while (dau < soCua && ket[dau] === -1) dau++
     if (dau >= soCua) {
@@ -242,7 +266,9 @@ var AiONao = (function () {
         thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
       }
     }
-    for (var w1 = 0; w1 < dau; w1++) ket[w1] = ket[dau]
+    if (!WIDE) {
+      for (var w1 = 0; w1 < dau; w1++) ket[w1] = ket[dau]
+    }
     tho = ket
 
     // ── 3. Gom thành lượt, rồi nuốt lượt ngắn hơn LUOT giây vào lượt trước

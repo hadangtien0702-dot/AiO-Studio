@@ -255,7 +255,7 @@
 <body>
   <div class="topbar">
     <span class="topbar__ten">Auto Podcast</span>
-    <span class="topbar__ver">v0.3.1</span>
+    <span class="topbar__ver">v0.3.2</span>
     <span class="topbar__host" id="host"></span>
     <button class="lang" id="lang" onclick="doiNgonNgu()"></button>
   </div>
@@ -335,6 +335,7 @@
       chua_mo_seq: 'Chưa mở sequence nào.',
       dang_mo: '{v} track hình · {a} track tiếng.',
       chon_seq: 'Sequence đang làm việc',
+      cam_chung: 'Cam chung',
       nhan_gan: 'Track nào của ai',
       nhom_hinh: 'Hình — cam của ai', nhom_tieng: 'Tiếng — mic riêng của ai',
       khong_ai: '—',
@@ -386,6 +387,7 @@
       chua_mo_seq: 'No sequence open.',
       dang_mo: '{v} video · {a} audio tracks.',
       chon_seq: 'Working sequence',
+      cam_chung: 'Wide (both)',
       nhan_gan: 'Whose track is which',
       nhom_hinh: 'Video — whose camera', nhom_tieng: 'Audio — whose personal mic',
       khong_ai: '—',
@@ -562,6 +564,9 @@
   var trackV = [] // {i, ten, soClip, tenClip, duong, batDau, inPoint, ketThuc}
   var trackA = []
   var nguoiDs = [ { cam: -1, mic: -1 }, { cam: -1, mic: -1 } ]
+  // CAM CHUNG — anh Tiến 04/08: quay thật có cam toàn cảnh 2 người, phải có
+  // chỗ gán. -1 = không có; ngược lại là chỉ số track V. Không thuộc về ai.
+  var trackWide = -1
   var seqDangNhin = ''
   var dangChay = false
 
@@ -571,7 +576,8 @@
   try { ganTheoSeq = JSON.parse(localStorage.getItem('aio-pc-gan') || '{}') } catch (e) {}
   function luuGan() {
     if (!seqDangNhin) return
-    ganTheoSeq[seqDangNhin] = JSON.parse(JSON.stringify(nguoiDs))
+    // Dạng mới {ds, wide}; bản cũ lưu thẳng mảng — đọc phải chịu được cả hai.
+    ganTheoSeq[seqDangNhin] = { ds: JSON.parse(JSON.stringify(nguoiDs)), wide: trackWide }
     try { localStorage.setItem('aio-pc-gan', JSON.stringify(ganTheoSeq)) } catch (e) {}
   }
 
@@ -592,7 +598,16 @@
           if (p[0] === 'V') trackV.push(tr); else trackA.push(tr)
         })
         var nho = ganTheoSeq[seqDangNhin]
-        if (nho && nho.length >= 2) nguoiDs = JSON.parse(JSON.stringify(nho))
+        trackWide = -1
+        if (nho) {
+          if (Array.isArray(nho)) {
+            // Bản lưu cũ (trước 04/08): mảng người, chưa có wide.
+            if (nho.length >= 2) nguoiDs = JSON.parse(JSON.stringify(nho))
+          } else {
+            if (nho.ds && nho.ds.length >= 2) nguoiDs = JSON.parse(JSON.stringify(nho.ds))
+            if (typeof nho.wide === 'number') trackWide = nho.wide
+          }
+        }
         veGan()
       })
     })
@@ -608,8 +623,22 @@
     for (var n = 0; n < nguoiDs.length; n++) if (nguoiDs[n][loai] === i) return n
     return -1
   }
-  /** Gán track cho người — độc quyền: track một chủ, người một track mỗi loại. */
+  /**
+   * Gán track cho người — độc quyền: track một chủ, người một track mỗi loại.
+   * Giá trị -2 (chỉ track HÌNH) = CAM CHUNG: không thuộc về ai, chỉ một track
+   * được làm cam chung.
+   */
   function ganTrack(loai, trackIdx, nguoiIdx) {
+    if (loai === 'cam' && nguoiIdx === -2) {
+      for (var n0 = 0; n0 < nguoiDs.length; n0++) {
+        if (nguoiDs[n0].cam === trackIdx) nguoiDs[n0].cam = -1
+      }
+      trackWide = trackIdx
+      luuGan()
+      veGan()
+      return
+    }
+    if (loai === 'cam' && trackWide === trackIdx) trackWide = -1
     for (var n = 0; n < nguoiDs.length; n++) {
       if (nguoiDs[n][loai] === trackIdx) nguoiDs[n][loai] = -1
     }
@@ -674,7 +703,9 @@
         var hang = document.createElement('div')
         hang.className = 'hang'
         var chu = nguoiCuaTrack(loai, tr.i)
-        hang.style.borderLeftColor = chu >= 0 ? MAU_NGUOI[chu % MAU_NGUOI.length] : 'transparent'
+        var laWide = (loai === 'cam' && tr.i === trackWide)
+        hang.style.borderLeftColor = laWide ? 'var(--text-3)'
+          : (chu >= 0 ? MAU_NGUOI[chu % MAU_NGUOI.length] : 'transparent')
         var nh = document.createElement('span')
         nh.className = 'hang__track'
         nh.textContent = tienTo + (tr.i + 1)
@@ -703,7 +734,14 @@
           o.textContent = tenNguoi(ni)
           sel.appendChild(o)
         })
-        sel.value = String(chu)
+        if (loai === 'cam') {
+          // CAM CHUNG — chỉ track hình mới có lựa chọn này.
+          var oW = document.createElement('option')
+          oW.value = '-2'
+          oW.textContent = t('cam_chung')
+          sel.appendChild(oW)
+        }
+        sel.value = laWide ? '-2' : String(chu)
         sel.onchange = function () { ganTrack(loai, tr.i, parseInt(sel.value, 10)) }
         hang.appendChild(sel)
         bando.appendChild(hang)
@@ -727,6 +765,14 @@
       if (!tV || !tA) return t('thieu_gan')
       if (tV.soClip !== 1) return tp('track_nhieu_clip', { track: 'V' + (ng.cam + 1), n: tV.soClip })
       if (tA.soClip !== 1) return tp('track_nhieu_clip', { track: 'A' + (ng.mic + 1), n: tA.soClip })
+    }
+    // Cam chung: không cần mic, nhưng track phải còn tồn tại và 1 clip liền.
+    if (trackWide >= 0) {
+      var tW = timTrack(trackV, trackWide)
+      if (!tW) { trackWide = -1 }
+      else if (tW.soClip !== 1) {
+        return tp('track_nhieu_clip', { track: 'V' + (trackWide + 1), n: tW.soClip })
+      }
     }
     return ''
   }
@@ -758,11 +804,14 @@
     var tenSeqGoc = seqDangNhin
 
     // Vùng phủ = giao của mọi clip được gán (trục sequence gốc).
+    // Cam chung (nếu có) cũng phải phủ đủ — đoạn wide lấy hình từ nó.
+    var clipWide = trackWide >= 0 ? timTrack(trackV, trackWide) : null
     var cacClip = []
     nguoiDs.forEach(function (ng) {
       cacClip.push(timTrack(trackV, ng.cam))
       cacClip.push(timTrack(trackA, ng.mic))
     })
+    if (clipWide) cacClip.push(clipWide)
     var tu0 = Math.max.apply(null, cacClip.map(function (c) { return c.batDau }))
     var den0 = Math.min.apply(null, cacClip.map(function (c) { return c.ketThuc }))
     var daiGiay = den0 - tu0
@@ -905,7 +954,9 @@
           }
         }
 
-        var kq = AiONao.aiDangNoi(micDb, daiGiay, {})
+        // CAM CHUNG: bật luật wide trong não khi có track được gán làm cam
+        // chung — im quá 2 giây thì về toàn cảnh thay vì đoán giữ người trước.
+        var kq = AiONao.aiDangNoi(micDb, daiGiay, clipWide ? { coWide: true } : {})
         if (kq.trangThai !== 'OK') {
           var ro = kq.thongKe ? Math.round(kq.thongKe.tyLeRo * 100) : 0
           thoat(null, tp('khong_phan_biet', { ro: ro }))
@@ -922,6 +973,8 @@
         })
         var offMic = viecMic.map(function (c) { return c.inPoint - c.batDau })
         var duongCam = nguoiDs.map(function (ng) { return chuoiJsx(timTrack(trackV, ng.cam).duong) })
+        var offWide = clipWide ? (clipWide.inPoint - clipWide.batDau) : 0
+        var duongWide = clipWide ? chuoiJsx(clipWide.duong) : ''
         // ☠️ Tiếng lấy từ bản MONO, KHÔNG lấy file gốc — file gốc stereo thì
         //    Premiere xé 2 kênh ra 2 track (xem khối chú thích ở `duongMono`).
         var duongMic = monoMic.map(function (d) { return chuoiJsx(d) })
@@ -958,8 +1011,12 @@
                 var d = doan[k]
                 var segTu = tu0 + d.tu
                 var segDen = tu0 + d.den
-                ds.push(nguoiDs[d.nguoi].cam + ',' + duongCam[d.nguoi] + ',' +
-                  (segTu + offCam[d.nguoi]).toFixed(4) + ',' + (segDen + offCam[d.nguoi]).toFixed(4) + ',' +
+                // nguoi = -1 là CAM CHUNG — hình lấy từ track wide.
+                var camIdx = d.nguoi >= 0 ? nguoiDs[d.nguoi].cam : trackWide
+                var camDuong = d.nguoi >= 0 ? duongCam[d.nguoi] : duongWide
+                var camOff = d.nguoi >= 0 ? offCam[d.nguoi] : offWide
+                ds.push(camIdx + ',' + camDuong + ',' +
+                  (segTu + camOff).toFixed(4) + ',' + (segDen + camOff).toFixed(4) + ',' +
                   segTu.toFixed(4))
               }
               i = cuoi
@@ -982,19 +1039,29 @@
               })
             }
 
+            // TIẾNG — danh sách phẳng tính TRƯỚC rồi mới chia lô:
+            //   đoạn của một người  → 1 mảnh (mic người đó, track của họ)
+            //   đoạn CAM CHUNG      → mỗi mic MỘT mảnh (cả phòng cùng lên,
+            //                         tiếng tự nhiên; ai track nấy như cũ)
+            // Nhờ tính trước nên bước ĐO LẠI biết chính xác phải có bao nhiêu
+            // clip tiếng — không lấy doan.length làm chuẩn nữa.
+            var viecTieng = []
+            doan.forEach(function (d) {
+              var segTu = tu0 + d.tu
+              var segDen = tu0 + d.den
+              var dsNguoi = d.nguoi >= 0 ? [d.nguoi] : nguoiDs.map(function (_, p) { return p })
+              dsNguoi.forEach(function (p) {
+                viecTieng.push(nguoiDs[p].mic + ',' + duongMic[p] + ',' +
+                  (segTu + offMic[p]).toFixed(4) + ',' + (segDen + offMic[p]).toFixed(4) + ',' +
+                  segTu.toFixed(4))
+              })
+            })
+
             var j = 0
             function loTieng() {
-              if (j >= doan.length) { doLai(); return }
-              var cuoi = Math.min(j + LO, doan.length)
-              var ds = []
-              for (var k = j; k < cuoi; k++) {
-                var d = doan[k]
-                var segTu = tu0 + d.tu
-                var segDen = tu0 + d.den
-                ds.push(nguoiDs[d.nguoi].mic + ',' + duongMic[d.nguoi] + ',' +
-                  (segTu + offMic[d.nguoi]).toFixed(4) + ',' + (segDen + offMic[d.nguoi]).toFixed(4) + ',' +
-                  segTu.toFixed(4))
-              }
+              if (j >= viecTieng.length) { doLai(); return }
+              var cuoi = Math.min(j + LO, viecTieng.length)
+              var ds = viecTieng.slice(j, cuoi)
               j = cuoi
               goiHost('pc_datTieng("' + chuoiJsx(tenThat) + '","' + ds.join(';') + '")').then(function (r4) {
                 if (r4.indexOf('OK:') !== 0 || r4.indexOf('soLoi=0') < 0) { thoat(t('dung_loi') + r4, null); return }
@@ -1009,7 +1076,7 @@
                 var kv = tachKv(r5)
                 var lech = []
                 if (parseInt(kv.tongHinh, 10) !== doan.length) lech.push('hinh ' + kv.tongHinh + '/' + doan.length)
-                if (parseInt(kv.tongTieng, 10) !== doan.length) lech.push('tieng ' + kv.tongTieng + '/' + doan.length)
+                if (parseInt(kv.tongTieng, 10) !== viecTieng.length) lech.push('tieng ' + kv.tongTieng + '/' + viecTieng.length)
                 if (Math.abs(parseFloat(kv.cuoiHinh) - den0) > 0.1) lech.push('cuoi ' + kv.cuoiHinh + '/' + den0.toFixed(3))
                 dangChay = false
                 document.getElementById('nutDung').disabled = false
@@ -1039,7 +1106,10 @@
     document.getElementById('kqDai').textContent = giayDep(daiGiay)
     var luotNguoi = nguoiDs.map(function () { return 0 })
     var giayNguoi = nguoiDs.map(function () { return 0 })
+    var luotWide = 0
+    var giayWide = 0
     doan.forEach(function (d) {
+      if (d.nguoi < 0) { luotWide++; giayWide += d.den - d.tu; return }
       luotNguoi[d.nguoi]++
       giayNguoi[d.nguoi] += d.den - d.tu
     })
@@ -1065,6 +1135,25 @@
         tp('chia_muc', { ten: tenNguoi(i), luot: luotNguoi[i], giay: giayDep(giayNguoi[i]) })))
       giai.appendChild(muc)
     })
+    // Ngăn CAM CHUNG — xám, đứng cuối. Không vẽ khi 0 giây (không bày thừa).
+    if (giayWide > 0.01) {
+      var mauW = 'var(--text-3)'
+      var phanW = document.createElement('div')
+      phanW.className = 'chia__phan'
+      phanW.style.width = (giayWide / daiGiay * 100).toFixed(1) + '%'
+      phanW.style.background = mauW
+      phanW.title = t('cam_chung')
+      thanh.appendChild(phanW)
+      var mucW = document.createElement('span')
+      mucW.className = 'chia__muc'
+      var chamW = document.createElement('span')
+      chamW.className = 'cham'
+      chamW.style.background = mauW
+      mucW.appendChild(chamW)
+      mucW.appendChild(document.createTextNode(
+        tp('chia_muc', { ten: t('cam_chung'), luot: luotWide, giay: giayDep(giayWide) })))
+      giai.appendChild(mucW)
+    }
     document.getElementById('kqDong').innerHTML = tp('kq_dong', { ten: tenSeq })
     document.getElementById('ketqua').className = 'ketqua ketqua--hien'
   }

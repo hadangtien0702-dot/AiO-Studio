@@ -90,13 +90,15 @@ offline, mua một lần. Đừng ôm thêm việc của hai mảnh kia vào đ�
 
 ## LEVEL 2 — CHUYÊN NGHIỆP: ngang/vượt AutoPod, đủ tự tin thu tiền
 
-- [ ] 1. **Cam WIDE + luật về wide** ⬅️ **ANH TIẾN HỎI 04/08 → ĐÃ CẦN, ưu
-      tiên lên đầu**: gán một cam là wide; nhiều người nói cùng lúc → wide ·
-      im lâu → wide · cùng shot quá N giây → đảo wide. Hiện tại cam chung
-      buộc phải để TRỐNG (không gán) nên phí một góc máy. Thêm giá trị
-      "Cam chung" vào ô chọn trong bản đồ track — nó KHÔNG thuộc về ai.
-      Số đo 04/08 ủng hộ mạnh: 4/6 khoảng gây tranh cãi rơi đúng vào lúc
-      KHÔNG AI NÓI — đó chính là chỗ wide nên xuất hiện thay vì đoán bừa.
+- [~] 1. **Cam WIDE + luật về wide** — **NỬA ĐẦU XONG 04/08 (v0.3.2)**:
+      ô chọn track hình có thêm "Cam chung" (không thuộc về ai, xám); não
+      thêm luật `coWide`: im quá 2 giây → về wide (2 giây đầu vẫn nán người
+      vừa nói), đoạn dẫn chưa ai nói → wide; đoạn wide tiếng CẢ HAI mic
+      cùng lên (ai track nấy). *(đo: kiem-wide 11/11 ranh 0ms; chạy thật
+      liệu buổi 2 + cam C4026: 124 đoạn = 58 Trọng + 52 Dilys + 14 wide
+      2:02, A1=72=58+14, A2=66=52+14, panel 0 lệch)*
+      **CÒN THIẾU:** nói chồng nhau → wide (hiện vẫn giữ người đang nói) ·
+      cùng shot quá N giây → đảo wide. Mở lại khi có đáp án tai anh Tiến.
 - [ ] 2. Nói chồng nhau xử lý tử tế — hai mic to ngang nhau trong >1s không
       được nhấp nháy cam (về wide nếu có, không thì giữ shot đang mở)
 - [ ] 3. 3+ người / 3+ cam đo thật trên Premiere (não đã qua bộ kiểm 3 mic,
