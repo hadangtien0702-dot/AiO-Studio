@@ -1,7 +1,9 @@
 # AiO Auto Podcast — BẢNG THEO DÕI: CÁI GÌ XONG, CÁI GÌ CHƯA
 
 > Anh Tiến yêu cầu 04/08/2026 khi test gặp nhiều trở ngại: *"em tạo cho anh
-> một track list cái gì đã xong và cái nào [chưa] em nhé"*.
+> một track list cái gì đã xong và cái nào [chưa] em nhé"*. Và ngay sau đó:
+> *"ủa anh thấy còn nhiều lỗi lắm mà em"* — anh đúng, bản đầu của bảng này
+> khoe phần xong nhiều quá. Đã sắp lại: **LỖI ĐỨNG TRÊN CÙNG**.
 >
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
@@ -10,7 +12,31 @@
 
 ---
 
-## ✅ XONG — đã đo, đã cài trên máy anh
+## ⛔ NÓI THẲNG: SẢN PHẨM CHƯA DÙNG ĐƯỢC ĐỂ GIAO KHÁCH
+
+**Lỗi số 1 — nhát cắt còn SAI trên liệu thật.** Anh Tiến nghe và chỉ ra
+nhiều mốc: người nữ nói mà không lên hình/tiếng, đang nói thì cắt nhầm
+sang người nam. Gốc đã đo được: mic thật chênh nhau chỉ 6–7 dB (liệu
+tổng hợp trước giờ chênh 16 dB), tool chỉ **nghe rõ 28% thời lượng** —
+72% còn lại là đoán. Mọi thứ ✅ bên dưới chỉ là MẢNH KỸ THUẬT; chừng nào
+lỗi này chưa hết thì sản phẩm chưa xong.
+
+## ⛔ LỖI ĐANG MỞ — anh đã báo / em đã thấy
+
+| # | Lỗi | Hiện trạng |
+|---|---|---|
+| 1 | **Cắt sai người trên liệu thật** (nhiều mốc: 00:38 · 02:58 · 03:13 · …) | Đã thử 1 hướng sửa (trừ tiếng rò rỉ) — đo bằng mắt 6 mốc: 1 thắng 1 thua 4 hoà, **chưa chứng minh được tốt hơn**. Cần bộ mốc sai từ tai anh để sửa có căn cứ |
+| 2 | **Hai người nói chồng nhau** — hình nhảy loạn hoặc kẹt một người | Chưa làm luật riêng; đợi cùng bộ đáp án với lỗi 1 |
+| 3 | **Sequence sync bằng Premiere chỉ có tiếng cam** → tool không chạy được, thông báo chưa dạy người dùng cách sửa | Mới có ghi chú xám "tiếng của cam V1"; chưa có hướng dẫn "sync kèm 2 file mic" ngay trên panel |
+| 4 | **Đầu bản dựng trống ~1,6 giây** (vùng phủ bắt đầu từ mốc mic, không phải 0) | Mới phát hiện 04/08 khi đo lỗ trống; nhìn như lỗi dù là chủ ý — cần quyết cách xử lý |
+| 5 | *(chỗ cho các lỗi anh thấy thêm — báo em từng dòng: mốc thời gian + hiện tượng)* | |
+
+Đã đo để loại trừ: bản dựng **không có lỗ trống** giữa chừng (0 lỗ trên
+cả 2 bản, hình phủ kín 1,6s → cuối) — vùng "trống" anh thấy là track của
+người bị cắt nhầm, không phải mất đoạn.
+
+## ✅ MẢNH KỸ THUẬT ĐÃ CHẠY ĐÚNG — có số đo, đã cài trên máy anh
+*(xong mảnh ≠ xong sản phẩm — sản phẩm chỉ xong khi hết mục ⛔ ở trên)*
 
 | Tính năng | Bằng chứng đo được | Ngày |
 |---|---|---|
@@ -26,15 +52,13 @@
 | Nhớ bước gán theo từng sequence | quay lại sequence cũ, bản đồ tự điền | 01/08 |
 | Tự sync bằng thuật toán (spike — chưa thành nút) | lệch 0,59 frame so với PluralEyes; import vào Premiere khớp 5/5 clip | 03/08 |
 
-## 🔧 CHƯA XONG — biết rồi, chưa làm / đang chờ đáp án
+## 🔧 CHƯA LÀM — tính năng còn thiếu (không phải lỗi)
 
 | Việc | Vì sao chưa | Cần gì để làm |
 |---|---|---|
-| **Độ CHÍNH XÁC cắt trên liệu thật** — anh chỉ ra 3 mốc sai (thiếu hình người nữ, cắt nhầm cam) | ngưỡng nghe đang mong manh (mic thật chênh chỉ 6–7dB); sửa mù là đổi kiểu sai | **mốc thời gian sai từ tai anh** — càng nhiều càng tốt |
-| Nói chồng nhau → về cam chung | cùng lý do trên | đáp án tai |
 | Track nhiều clip (cam bấm stop/start giữa buổi) | MVP đang đòi 1 clip liền/track | làm được ngay khi anh cần |
 | Tự sync thành NÚT trong panel (Level 3: trỏ folder là xong) | mới xong phần thuật toán + import | quyết định ưu tiên |
-| Panel chặn/cảnh báo khi sequence CHƯA có mic riêng (như "test thực tế") | mới có ghi chú xám, chưa chặn hẳn | quyết định cách hiển thị |
+| Cắt sớm 0,3–0,5s trước khi người nói bắt đầu (lead-in, nhịp editor) | chưa đụng tới | làm sau khi lỗi 1 hết |
 | File mono 244MB/mic hơi nặng | FLAC nhẹ hơn ~60% nhưng chưa thử với Premiere | anh gật thì em thử |
 
 ## 🙋 ĐANG CHỜ TAI ANH — máy không tự chấm được
