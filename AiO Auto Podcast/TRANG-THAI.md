@@ -8,7 +8,11 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 — panel v0.3.3, host v0.3.1.*
+*Cập nhật lần cuối: 04/08/2026 chiều — panel v0.3.4, host v0.3.1.
+Mới trong v0.3.4: thất bại hiện KHUNG TO "Tool đã chạy — dừng lại vì" kèm
+số đo từng người (tự chỉ mic nào hỏng). Việc kế tiếp chờ anh Tiến chốt:
+(1) nới luật onset cứu ~2-3/12 mốc lỗi; (2) buổi thu sau sửa khâu mic
+(line-in cam Trọng đang câm −75,5 dB, mic cài xa miệng).*
 
 ---
 

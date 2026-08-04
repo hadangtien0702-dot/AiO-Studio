@@ -3,23 +3,25 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 02/08/2026: v0.3.1 ĐÃ CÀI, ĐO END-TO-END TRÊN PANEL THẬT.**
-> (Phiên 01/08 = spike não. Toàn bộ panel + v0.2/v0.3/stress là phiên 02/08.)
-> v0.2: đổi dạng đầu ra — bản dựng là BẢN SAO timeline bị CẮT theo người
-> nói, giữ nguyên cấu trúc track (chuẩn AutoPod); 2 chốt an toàn chặn ca
-> gán nhầm tiếng cam làm mic. v0.3: làm lại UI theo anh Tiến — bước GÁN
-> thành BẢN ĐỒ TRACK kiểu mini-timeline (gán theo track, V xếp ngược như
-> Premiere), mỗi người một màu xuyên suốt, kết quả có thanh "ai nói bao
-> nhiêu". v0.3.1: stress test 12 ca khó (não 16/16 + stress 12/12) —
-> sửa lỗi "cười chung" nhảy cam.
+> **TRẠNG THÁI 04/08/2026: panel v0.3.4 · host v0.3.1 — ĐÃ CÀI.**
+> Trạng thái chi tiết từng tính năng (xong/chưa/lỗi mở): **`TRANG-THAI.md`**
+> — anh Tiến yêu cầu, mỗi phiên sửa code PHẢI cập nhật. Diễn biến: `PROGRESS.md`.
 >
-> ☠️ **CẬP NHẬT 03/08/2026 — ĐÃ ĐO TRÊN LIỆU THẬT, có 2 việc chặn:**
-> (1) **`dist/` mất khỏi repo** (chưa từng được git theo dõi) — bản còn sót
-> nằm trong panel đã cài, đo lại vẫn 16/16 + 12/12, cần chép ngược về và
-> **commit vào git**; (2) **bleed thật chỉ 6,2–7,1 dB** chứ không phải
-> −16 dB như liệu tổng hợp → ngưỡng 6 dB hết khoảng an toàn, 35–46,5% cửa
-> sổ có tiếng thành "mù". Chưa sửa ngưỡng vì chưa có đáp án — đang chờ anh
-> Tiến chấm bộ nghe kiểm 12 clip. Xem `PROGRESS.md` mục 03/08.
+> Chốt trong ngày 04/08:
+> - `dist/` ĐÃ vào git (commit f6c7e70, 03/08) — hết cảnh mất trắng.
+> - Sàn im lặng −50 dB cứng → **Otsu tự đo theo file** (bàn đo có đáp án:
+>   sàn cứng 0/6 ở tiếng nhỏ, tự đo 12/12). Ngưỡng chênh 6 dB giữ nguyên.
+> - Tiếng mic stereo hết xé 2 track (panel tách bản `.aio-mono.wav` cạnh
+>   file gốc rồi đặt bản đó). Ô CHỌN sequence làm việc. CAM CHUNG gán được
+>   (im >2s về wide). Thất bại hiện KHUNG TO kèm số đo từng người.
+> - **Lỗi số 1 (cắt sai người trên liệu thật) ĐÃ CÓ CHẨN ĐOÁN** từ 12
+>   marker anh Tiến chấm + soi khung hình: phần lớn do KHÂU THU (giọng
+>   Dilys vào mic Trọng to hơn chính mic cô ấy 10 dB; line-in cam Trọng
+>   gần như câm −75,5 dB). Code còn cứu được ~2-3/12 mốc (nới luật onset)
+>   — CHƯA làm, chờ anh Tiến chốt ưu tiên.
+> - ☠️ **CẤM HỌ API XUẤT TỪ SCRIPT** (`exportAsMediaDirect`, `app.encoder.*`)
+>   — 04/08 lặp lại tai nạn đã ghi trong skill từ 01/08, Premiere sập trên
+>   project thật. Trước khi dò API host lạ: grep skill `adobe-cep-panel` TRƯỚC.
 
 > 📋 **BẢNG "CÁI GÌ XONG, CÁI GÌ CHƯA": `TRANG-THAI.md`** — anh Tiến yêu cầu
 > 04/08 khi test gặp nhiều trở ngại. Mỗi phiên sửa mã nguồn PHẢI cập nhật nó
@@ -95,28 +97,21 @@ chỉ cho đúng tính năng này — mình offline, nằm trong bộ, một gi�
   thật qua cổng debug — thao tác tay của anh vẫn là thước cuối).
 - Mỗi clip đặt ra có đuôi đệm ≤0,08s chống hụt khung (đo thật); giữa hai
   track khác nhau đuôi này thành overlap nhỏ — tiếng phòng, không nghe ra.
-- ☠️ **ĐÃ ĐO BLEED TRÊN LIỆU THẬT 03/08/2026 — và ngưỡng 6dB KHÔNG CÒN AN
-  TOÀN.** Liệu `G:\Quay PV tuyển dụng_DRT_0902` (2 buổi phỏng vấn, mỗi buổi
-  2 người): chênh mic to nhất vs mic nhì **p50 chỉ 6,2–7,1 dB**, trong khi
-  liệu tổng hợp trước giờ dùng bleed −16 dB. Hệ quả: **35,0% (buổi 1) và
-  46,5% (buổi 2) cửa sổ có tiếng bị coi là "mù"**; tyLeRo buổi 2 chỉ 23,0%
-  — sát ngưỡng từ chối 20%.
-  **Kết quả không ổn định:** hạ sàn −50 → −60 dB làm chia hình buổi 2 nhảy
-  từ 33/67 sang 50/50, nhát cắt 79 → 171. Nghi vấn gốc: sàn −50 dB là hằng
-  số cứng, mic thật thu nhỏ (p90 = −44 dB) nên loại 60–78% cửa sổ → sàn nên
-  tính theo **mức nền của chính file**. **CHƯA SỬA** — chưa có đáp án thì
-  sửa là sửa mù. Chi tiết + bảng quét: `PROGRESS.md` mục 03/08.
+- ☠️ **BLEED LIỆU THẬT chỉ 6,2–7,1 dB** (đo 03/08) so với −16 dB của liệu
+  tổng hợp. **Sàn −50 dB cứng ĐÃ SỬA 04/08** thành Otsu tự đo theo file
+  (nghe rõ 23% → 28,1%). Ngưỡng chênh 6 dB giữ nguyên. Phần còn sai nằm ở
+  KHÂU THU (xem chẩn đoán 12 marker trong `PROGRESS.md` 04/08 14:57):
+  giọng người này lọt vào mic người kia to hơn chính mic họ — thuật toán
+  so năng lượng không vượt qua được, đã chứng minh bằng 2 phép thử
+  (line-in + chuẩn hoá gain, cùng ngày).
 - **Chưa có thước ĐỨNG NGOÀI.** Mọi số trên là dùng chính năng lượng dB
   chấm điểm thuật toán cũng chạy bằng dB (bài học 5d) — chỉ nói được "kết
   quả trông hợp lý", KHÔNG nói được "cắt đúng". Đã dựng bộ nghe kiểm
   `file pr for test\podcast-nghe-kiem\` (12 clip 6 giây + `_BANG-CHAM.csv`),
   chờ anh Tiến chấm bằng tai.
-- ☠️ **`dist/` KHÔNG ĐƯỢC GIT THEO DÕI — đã mất một lần (03/08).** `nao.js`
-  + `index.html` biến khỏi repo, không có bản lùi; bản duy nhất còn sót là
-  panel đã cài ở `%APPDATA%\Adobe\CEP\extensions\com.aiostudio.podcast\dist\`
-  (đo lại: kiem-nao 16/16, stress 12/12 — đúng v0.3.1, không mất chức năng).
-  **Panel này không có bước build, `dist/` LÀ mã nguồn viết tay — phải
-  commit vào git.**
+- ✅ **`dist/` ĐÃ vào git từ 03/08** (commit f6c7e70 — từng mất một lần vì
+  `.gitignore` chung nuốt). Panel này không có bước build, `dist/` LÀ mã
+  nguồn viết tay — đừng bao giờ cho nó vào ignore lại.
 - **Hai bẫy nằm trong chính dữ liệu người dùng** (bắt được 03/08): tên file
   từ Mac chứa ký tự **U+F022** (dấu `"`) làm mọi lệnh truyền tên qua CLI gãy
   hết dù `Get-ChildItem` đọc bình thường — bản bán phải xử lý; và file mic
