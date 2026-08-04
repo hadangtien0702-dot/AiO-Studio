@@ -1516,3 +1516,303 @@ function ac_catTaiCho(keepsStr, laLoDau) {
     return ac_err('ac_catTaiCho', e);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CAT DONG BO — cho sequence NHIEU TRACK (multicam podcast, phong van...)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ☠️ VI SAO PHAI CO DUONG RIENG — bat duoc 2026-08-04.
+
+   Anh Tien cat podcast bang AiO Auto Podcast (ra sequence 2 cam + 3 track mic),
+   roi chay Autocut de bo khoang lang. Do that ket qua:
+
+       truoc: A1 = Mic-Trong x37 | A2 = Mic-Trong + Mic-Dilys | A3 = Mic-Dilys
+       sau  : A1 = C4234 x300    | A2 = C4234 x300            | A3 = trong
+
+   **Mic bien mat sach, thay bang TIENG CAMERA.** Muc am luong chenh 15,6 dB
+   (mic cai ao -50,6 dB vs mic gan may quay -66,2 dB) — anh Tien nghe ra ngay
+   la "am thanh bi giam di nhieu".
+
+   Nguyen nhan: `ac_catTaiCho` XOA clip tren MOI track (buoc 4) roi DUNG LAI
+   chi tren V1 + A1 (buoc 5-6). Dung cho video THUONG (1 hinh + 1 tieng cua
+   chinh no) — sai hoan toan khi tieng nam o track RIENG khong dinh clip hinh.
+
+   Day KHONG phai loi thao tac: cat theo nguoi noi xong roi cat khoang lang la
+   duong di tu nhien nhat cua editor. Loi la cua san pham.
+
+   ─────────────────────────────────────────────────────────────────────────
+   THUAT TOAN — vi sao khong the chi "dat ve dung track"
+   ─────────────────────────────────────────────────────────────────────────
+   Dat moi doan ve dung track cua no roi don RIENG tung track thi hinh va
+   tieng LECH NHAU ngay: track nay bo 3 giay, track kia bo 5 giay.
+
+   Phai don theo MOT TRUC CHUNG:
+     1. Quy moi doan giu ve moc SEQUENCE (khong phai moc media cua tung clip)
+     2. HOP NHAT thanh danh sach khoang giu chung — cho nao BAT KY track nao
+        con tieng thi giu (hop, khong phai giao; lay giao la cat mat loi)
+     3. Ham anh xa: viTriMoi(t) = tong do dai cac khoang giu NAM TRUOC t
+     4. Moi track: cat phan giao voi khoang giu, dat tai viTriMoi
+   Nho vay moi track deu dich theo cung mot ham -> dong bo tuyet doi.
+
+   Chia lo: hop nhat can BIET HET truoc khi cat, nen khong chay tung lo duoc.
+   Panel goi `ac_dongBoThem` nhieu lan de tich luy, roi `ac_dongBoChay` mot lan.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Gom mot lo doan giu vao bo nho tam. Goi nhieu lan truoc khi chay. */
+function ac_dongBoThem(keepsStr, laLoDau) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    if (String(laLoDau) !== '0' || !$.global.__acDongBo) {
+      var s = app.project.activeSequence;
+      if (!s) return 'ERR:CHUA_MO_SEQUENCE|';
+      $.global.__acDongBo = { seq: s, muc: [] };
+    }
+    var kho = $.global.__acDongBo;
+    var phan = String(keepsStr).split(';');
+    for (var i = 0; i < phan.length; i++) {
+      if (!phan[i]) continue;
+      var f = phan[i].split(',');
+      if (f.length < 5) continue;
+      var a = parseFloat(f[3]), b = parseFloat(f[4]);
+      if (isNaN(a) || isNaN(b) || b <= a) continue;
+      kho.muc.push({
+        kind: f[0], ti: parseInt(f[1], 10), co: parseInt(f[2], 10), a: a, b: b,
+      });
+    }
+    return 'OK:daGom=' + kho.muc.length;
+  } catch (e) {
+    return ac_err('ac_dongBoThem', e);
+  }
+}
+
+/** Hop nhat cac khoang [tu,den] chong lan / sat nhau thanh danh sach roi rac. */
+function ac_hopNhat(ds, saiSo) {
+  if (!ds.length) return [];
+  ds.sort(function (x, y) { return x.tu - y.tu; });
+  var ra = [{ tu: ds[0].tu, den: ds[0].den }];
+  for (var i = 1; i < ds.length; i++) {
+    var cuoi = ra[ra.length - 1];
+    if (ds[i].tu <= cuoi.den + saiSo) {
+      if (ds[i].den > cuoi.den) cuoi.den = ds[i].den;
+    } else {
+      ra.push({ tu: ds[i].tu, den: ds[i].den });
+    }
+  }
+  return ra;
+}
+
+/**
+ * Cat dong bo THAT. Goi SAU khi da gom du bang `ac_dongBoThem`.
+ * Tra so lieu de panel doi chieu — khong tin "khong bao loi" la xong.
+ */
+function ac_dongBoChay() {
+  try {
+    var kho = $.global.__acDongBo;
+    if (!kho || !kho.seq) return 'ERR:CHUA_GOM_DOAN|';
+    var seq = kho.seq;
+    if (!kho.muc.length) return 'ERR:KHONG_CO_DOAN_GIU|';
+
+    var fps = 30;
+    try { fps = 1 / seq.getSettings().videoFrameRate.seconds; } catch (e) {}
+    var saiSo = 0.5 / fps;
+    var i, k, m;
+
+    // ── 1. Quy moi doan giu ve MOC SEQUENCE ──
+    // muc[i].a/b la moc trong MEDIA cua clip do; doi sang truc sequence bang
+    // start + (a - inPoint) cua chinh clip ay.
+    var giuSeq = [];
+    for (i = 0; i < kho.muc.length; i++) {
+      var mi = kho.muc[i];
+      var tr, c;
+      try {
+        tr = (mi.kind === 'V') ? seq.videoTracks[mi.ti] : seq.audioTracks[mi.ti];
+        c = tr.clips[mi.co];
+      } catch (e) { return 'ERR:CLIP_DA_DOI|khong tim thay clip so ' + mi.co; }
+      if (!c || !c.projectItem) return 'ERR:CLIP_DA_DOI|clip so ' + mi.co + ' khong con';
+      var cStart = c.start.seconds, cIn = c.inPoint.seconds;
+      giuSeq.push({ tu: cStart + (mi.a - cIn), den: cStart + (mi.b - cIn) });
+    }
+    var giu = ac_hopNhat(giuSeq, saiSo);
+    if (!giu.length) return 'ERR:KHONG_CO_DOAN_GIU|sau khi hop nhat';
+
+    // ── 2. Chup TOAN BO clip dang co, TRUOC khi xoa ──
+    // Sau khi xoa thi chi so khong con dung, phai giu het tham chieu tu bay gio.
+    function chup(ds, so, loai) {
+      var ra = [];
+      for (var t = 0; t < so; t++) {
+        var track, n = 0;
+        try { track = ds[t]; n = track.clips.numItems; } catch (e) { continue; }
+        for (var j = 0; j < n; j++) {
+          try {
+            var cl = track.clips[j];
+            if (!cl.projectItem) continue;
+            ra.push({
+              loai: loai, ti: t, pi: cl.projectItem,
+              start: cl.start.seconds, end: cl.end.seconds,
+              inP: cl.inPoint.seconds,
+            });
+          } catch (e) {}
+        }
+      }
+      return ra;
+    }
+    var moiClip = chup(seq.videoTracks, seq.videoTracks.numTracks, 'V')
+      .concat(chup(seq.audioTracks, seq.audioTracks.numTracks, 'A'));
+    if (!moiClip.length) return 'ERR:SEQUENCE_TRONG|';
+
+    // ── 3. Tinh viec can dat: phan GIAO giua tung clip va tung khoang giu ──
+    // viTriMoi = tong do dai cac khoang giu NAM TRUOC no -> moi track dich
+    // theo CUNG MOT ham, nen hinh va tieng khong the lech nhau.
+    var truocDo = [];
+    var congDon = 0;
+    for (k = 0; k < giu.length; k++) {
+      truocDo.push(congDon);
+      congDon += (giu[k].den - giu[k].tu);
+    }
+    var tongGiu = congDon;
+
+    var viec = [];
+    for (i = 0; i < moiClip.length; i++) {
+      var cp = moiClip[i];
+      for (k = 0; k < giu.length; k++) {
+        var tu = (cp.start > giu[k].tu) ? cp.start : giu[k].tu;
+        var den = (cp.end < giu[k].den) ? cp.end : giu[k].den;
+        if (den - tu <= saiSo) continue; // khong giao, hoac ngan hon 1 khung hinh
+        viec.push({
+          loai: cp.loai, ti: cp.ti, pi: cp.pi,
+          mIn: cp.inP + (tu - cp.start),   // moc trong MEDIA
+          mOut: cp.inP + (den - cp.start),
+          viTri: truocDo[k] + (tu - giu[k].tu), // moc tren SEQUENCE MOI
+        });
+      }
+    }
+    if (!viec.length) return 'ERR:KHONG_CO_DOAN_GIU|khong doan nao giao voi clip';
+
+    // ── 4. XOA sach (duyet NGUOC — xoa xuoi thi chi so tut, bo sot) ──
+    var soXoa = 0;
+    function xoaHet(ds, so) {
+      for (var t = 0; t < so; t++) {
+        var track, n = 0;
+        try { track = ds[t]; n = track.clips.numItems; } catch (e) { continue; }
+        for (var j = n - 1; j >= 0; j--) {
+          try { track.clips[j].remove(false, false); soXoa++; } catch (e) {}
+        }
+      }
+    }
+    xoaHet(seq.videoTracks, seq.videoTracks.numTracks);
+    xoaHet(seq.audioTracks, seq.audioTracks.numTracks);
+
+    // ── 5. Dat lai — moi doan ve DUNG TRACK CUA NO, dung vi tri da tinh ──
+    //
+    // ☠️ PHAI DAT HINH TRUOC, DON TIENG, ROI MOI DAT TIENG — do that
+    // 04/08 tren Premiere that (bo kiem Node KHONG bat duoc, xem duoi).
+    // `overwriteClip` len track HINH keo theo luon TIENG CUA CHINH CLIP DO
+    // xuong track tieng. Dat xen ke hinh/tieng thi ket qua ra:
+    //     A1 = Mic-Trong x52 + C4234 x23   <- tieng CAMERA lot vao
+    //     tiengGiay 7785s trong khi hinhGiay 2597s (gap 3)
+    // Dung cai bay ma AiO Auto Podcast da phai co `pc_donTieng` de xu ly.
+    //
+    // Sap theo vi tri tang dan tren tung track: dat lui ve truoc thi
+    // overwriteClip cat duoi clip da dat.
+    viec.sort(function (x, y) {
+      if (x.loai !== y.loai) return (x.loai === 'V') ? -1 : 1;
+      if (x.ti !== y.ti) return x.ti - y.ti;
+      return x.viTri - y.viTri;
+    });
+    var soLoi = 0, loiDau = '', daDat = 0;
+
+    function datMot(v) {
+      var track2;
+      try {
+        track2 = (v.loai === 'V') ? seq.videoTracks[v.ti] : seq.audioTracks[v.ti];
+      } catch (e) { soLoi++; if (!loiDau) loiDau = 'khong thay track ' + v.loai + v.ti; return; }
+      var e1 = ac_datInOut(v.pi, v.mIn, v.mOut);
+      if (e1) { soLoi++; if (!loiDau) loiDau = 'setInPoint: ' + e1; return; }
+      var e2 = ac_datClip(track2, v.pi, v.viTri);
+      if (e2) { soLoi++; if (!loiDau) loiDau = 'overwriteClip: ' + e2; return; }
+      daDat++;
+    }
+
+    // 5a. HINH truoc
+    for (i = 0; i < viec.length; i++) {
+      if (viec[i].loai === 'V') datMot(viec[i]);
+    }
+    // 5b. DON sach tieng cam bi keo theo — dem lai de bao cao, khong im lang
+    var tiengKeoTheo = 0;
+    for (m = 0; m < seq.audioTracks.numTracks; m++) {
+      var trA;
+      try { trA = seq.audioTracks[m]; } catch (e) { continue; }
+      for (var q = trA.clips.numItems - 1; q >= 0; q--) {
+        try { trA.clips[q].remove(false, false); tiengKeoTheo++; } catch (e) {}
+      }
+    }
+    // 5c. TIENG dat sau cung — gio khong con gi de bi de len
+    for (i = 0; i < viec.length; i++) {
+      if (viec[i].loai === 'A') datMot(viec[i]);
+    }
+
+    // ── 6. DO LAI — khong tin "khong bao loi" la da ghi (bai hoc 5l) ──
+    var tv = { tong: 0, cuoi: 0, so: 0 }, ta = { tong: 0, cuoi: 0, so: 0 };
+    var soTrackV = 0, soTrackA = 0;
+    for (m = 0; m < seq.videoTracks.numTracks; m++) {
+      var d1 = ac_tong(ac_docTrack(seq.videoTracks[m]));
+      if (d1.so > 0) soTrackV++;
+      tv.tong += d1.tong; tv.so += d1.so; if (d1.cuoi > tv.cuoi) tv.cuoi = d1.cuoi;
+    }
+    for (m = 0; m < seq.audioTracks.numTracks; m++) {
+      var d2 = ac_tong(ac_docTrack(seq.audioTracks[m]));
+      if (d2.so > 0) soTrackA++;
+      ta.tong += d2.tong; ta.so += d2.so; if (d2.cuoi > ta.cuoi) ta.cuoi = d2.cuoi;
+    }
+
+    $.global.__acDongBo = null;
+
+    var out = [];
+    out.push('seqMoi=' + String(seq.name));
+    out.push('seqGoc=' + String(seq.name));
+    out.push('thongSo=cat dong bo ' + fps.toFixed(2) + 'fps · ' +
+      soTrackV + ' track hinh · ' + soTrackA + ' track tieng');
+    out.push('daXoa=' + soXoa);
+    out.push('tiengKeoTheo=' + tiengKeoTheo);
+    out.push('yeuCauDoan=' + viec.length);
+    out.push('yeuCauGiay=' + tongGiu);
+    out.push('hinhClip=' + tv.so);
+    out.push('hinhGiay=' + tv.tong);
+    out.push('hinhCuoi=' + tv.cuoi);
+    out.push('tiengClip=' + ta.so);
+    out.push('tiengGiay=' + ta.tong);
+    out.push('tiengCuoi=' + ta.cuoi);
+    out.push('tiengTuTheo=0');
+    out.push('daDat=' + daDat);
+    out.push('soLoi=' + soLoi);
+    out.push('loiDau=' + loiDau);
+    return 'OK:' + out.join('\n');
+  } catch (e) {
+    $.global.__acDongBo = null;
+    return ac_err('ac_dongBoChay', e);
+  }
+}
+
+/**
+ * Sequence dang mo co phai loai NHIEU TRACK khong (multicam / mic rieng).
+ * Panel goi truoc khi cat de chon duong di — va de KHONG BAO GIO am tham
+ * xoa mat track cua nguoi dung.
+ * Tra "OK:trackV=n|trackA=n|daTrack=1/0".
+ */
+function ac_soTrackCoClip() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var v = 0, a = 0, i;
+    for (i = 0; i < seq.videoTracks.numTracks; i++) {
+      try { if (seq.videoTracks[i].clips.numItems > 0) v++; } catch (e) {}
+    }
+    for (i = 0; i < seq.audioTracks.numTracks; i++) {
+      try { if (seq.audioTracks[i].clips.numItems > 0) a++; } catch (e) {}
+    }
+    return 'OK:trackV=' + v + '|trackA=' + a + '|daTrack=' + ((v > 1 || a > 1) ? 1 : 0);
+  } catch (e) {
+    return ac_err('ac_soTrackCoClip', e);
+  }
+}

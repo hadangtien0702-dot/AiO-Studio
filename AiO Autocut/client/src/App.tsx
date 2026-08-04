@@ -18,6 +18,9 @@ import {
   buildKeep,
   catTaiCho,
   hoanTacTaiCho,
+  soTrackCoClip,
+  dongBoThem,
+  dongBoChay,
   type ClipVung,
   type KetQuaDung,
 } from './lib/cep'
@@ -849,6 +852,18 @@ export default function App() {
       const mm = String(gio.getMinutes()).padStart(2, '0')
       const tenSeqMoi = `${vung.seqName} - autocut ${hh}${mm}`
 
+      // ── Sequence NHIỀU TRACK đi đường riêng ──
+      //
+      // ☠️ Vấp thật 04/08: anh Tiến cắt podcast (ra 2 cam + 3 track mic) rồi
+      // chạy Autocut "cắt tại chỗ" → mic biến mất sạch, thay bằng tiếng camera
+      // (nhỏ hơn 15,6 dB). Vì đường cũ xoá mọi track rồi dựng lại chỉ trên
+      // V1 + A1 — đúng cho video thường, sai khi tiếng nằm ở track riêng.
+      //
+      // Đường mới dồn MỌI track theo cùng một trục thời gian nên hình/tiếng
+      // không lệch nhau và track nào ở đâu vẫn nguyên đó.
+      const daTrack = noiCat === 'taicho' ? await soTrackCoClip() : null
+      const catDongBo = daTrack?.daTrack === true
+
       let kq: KetQuaDung | null = null
       for (let i = 0; i < phan.length; i += CO_LO) {
         const lo = phan.slice(i, i + CO_LO)
@@ -856,10 +871,21 @@ export default function App() {
         // Đây là bước dài nhất (83% thời gian chạy) — phải có % thật, đứng im
         // là người dùng tưởng treo. `den/phan.length` là tiến độ ĐO ĐƯỢC.
         baoBuoc(
-          `Đang dựng ${den}/${phan.length} đoạn`,
+          catDongBo ? `Đang gom ${den}/${phan.length} đoạn` : `Đang dựng ${den}/${phan.length} đoạn`,
           4,
-          Math.round((den / phan.length) * 100),
+          Math.round((den / phan.length) * (catDongBo ? 70 : 100)),
         )
+        if (catDongBo) {
+          // Gom hết rồi mới cắt một lần — hợp nhất khoảng giữ cần biết hết
+          // trước, không cắt từng lô được.
+          const g = await dongBoThem(lo.join(';'), i === 0)
+          if (g.loi) {
+            if (g.loi.canLam) setCanLam(g.loi.message)
+            else setLoi(g.loi.message)
+            return
+          }
+          continue
+        }
         const r =
           noiCat === 'taicho'
             ? await catTaiCho(lo.join(';'), i === 0)
@@ -870,6 +896,21 @@ export default function App() {
           return
         }
         kq = r.kq // lô cuối mang số liệu đầy đủ nhất của cả sequence
+      }
+
+      if (catDongBo) {
+        baoBuoc(
+          `Đang cắt đồng bộ ${daTrack?.trackV ?? 0} track hình · ${daTrack?.trackA ?? 0} track tiếng`,
+          4,
+          85,
+        )
+        const r = await dongBoChay()
+        if (!r.kq) {
+          if (r.loi?.canLam) setCanLam(r.loi.message)
+          else setLoi(r.loi?.message ?? 'Cắt đồng bộ thất bại')
+          return
+        }
+        kq = r.kq
       }
       if (!kq) {
         setLoi('Dựng thất bại — không có lô nào chạy')

@@ -1,5 +1,87 @@
 # AiO Autocut - Nhat ky
 
+## [cat-dong-bo] - 2026-08-04 10:57 - SUA LOI AUTOCUT XOA MAT MIC CUA SEQUENCE MULTICAM
+
+Anh Tien cat podcast bang AiO Auto Podcast roi chay Autocut "Cat tai cho".
+Anh hoi: *"em co thay file am thanh cua anh no bi giam di nhieu khong"*.
+
+### KHONG PHAI GIAM dB — LA DOI NGUON TIENG
+Do that 3 sequence trong project cua anh:
+
+| Sequence | A1 | A2 | A3 |
+|---|---|---|---|
+| Podcast Cut (tool Podcast dung) | Mic-Trong x37 | Mic-Trong + Mic-Dilys | Mic-Dilys x37 |
+| **sau khi chay Autocut** | **C4234 x300** | **C4234 x300** | **trong** |
+
+Mic bien mat sach, thay bang TIENG CAMERA:
+
+| Nguon | mean_volume | max_volume |
+|---|---|---|
+| Mic lav | **-50,6 dB** | -23,4 dB |
+| Tieng cam C4234 | **-66,2 dB** | -41,8 dB |
+| Chenh | **15,6 dB** | 18,4 dB |
+
+Nguyen nhan: `ac_catTaiCho` XOA clip tren MOI track roi DUNG LAI chi tren
+V1 + A1. Dung cho video THUONG (1 hinh + 1 tieng cua chinh no) — sai hoan
+toan khi tieng nam o track RIENG. **Day khong phai loi thao tac cua anh
+Tien**: cat theo nguoi noi xong roi cat khoang lang la duong di tu nhien
+nhat cua editor.
+
+### DA LAM — duong RIENG, khong dung ham cu
+`ac_soTrackCoClip()` · `ac_dongBoThem()` · `ac_dongBoChay()` (host) +
+`soTrackCoClip/dongBoThem/dongBoChay` (cep.ts) + nhanh trong App.tsx.
+Ham cu giu nguyen cho video thuong — khong pha thu dang chay tot.
+
+Thuat toan (vi sao khong the chi "dat ve dung track"): dat dung track roi
+don RIENG tung track thi hinh va tieng LECH NHAU ngay. Phai:
+1. Quy moi doan giu ve moc SEQUENCE
+2. HOP NHAT thanh danh sach khoang giu chung (hop, khong phai giao)
+3. viTriMoi(t) = tong do dai cac khoang giu NAM TRUOC t
+4. Moi track cat phan giao va dat tai viTriMoi
+=> moi track dich theo CUNG MOT ham -> dong bo tuyet doi.
+
+### ☠️ BO KIEM MO PHONG BAO 20/20 DAT TRONG KHI BAN THAT HONG
+Viet `tests/kiem-dong-bo.mjs` nap CHINH file host that. Bao **20/20 DAT**.
+Chay tren Premiere that thi lo ra:
+
+    A1 = Mic-Trong x52 + **C4234 x23**   <- tieng camera lot vao
+    tiengGiay 7785s trong khi hinhGiay 2597s (gap 3)
+
+Vi moi truong gia HIEN HON may that: `overwriteClip` len track HINH keo
+theo luon TIENG CUA CHINH CLIP DO xuong track tieng — dung cai bay ma
+Podcast da phai co `pc_donTieng` de xu ly. Sua: dat HINH truoc -> DON
+sach tieng -> dat TIENG sau. Va **sua luon bo kiem** de no mo phong cai
+keo theo, lan sau bat duoc tai cho.
+
+→ Bai hoc: **bo kiem mo phong chi chung minh duoc dieu no biet mo phong.**
+Moi truong gia luon hien hon may that. Do tren may that van la bat buoc.
+
+### ☠️ VA CHINH BO KIEM CUNG SAI — nghi cong cu do truoc
+Sua xong thu tu, bo kiem van bao 4 phep TRUOT. Suyt di sua tiep host.
+Nguyen nhan o **ham `remove()` gia**: viet `this.__daXoa = true` — chi cam
+co, clip van nam nguyen trong mang. Host xoa DUNG ma bo kiem bao con sot.
+Sua `remove()` xoa that -> **20/20 DAT** lai.
+
+### DO TREN PREMIERE THAT (tren BAN SAO, bai hoc 3b)
+Clone "Podcast Cut (3)" -> bo 60 giay giua -> 309 doan:
+
+| | Truoc sua | Sau sua |
+|---|---|---|
+| A1 | Mic-Trong x52 + **C4234 x23** | **Mic-Trong x52** (sach) |
+| Toan bo track A | co C4234, C4089 lan vao | **0 clip camera** (don 206 clip) |
+| V1 / V2 | C4234 x52 / C4089 x51 | nguyen ven |
+| soLoi | 0 | 0 |
+
+### CON NO — noi ro, khong giau
+Cau truc track tieng van NO tu 3 len 4 track, `tiengGiay` 7783s so voi
+`hinhGiay` 2597s (gap 3). Do la **loi stereo cua Podcast (viec 1) chua
+sua**: moi mp3 stereo an 2 track lien tiep. Hai loi doc lap nhau — loi
+"Autocut xoa mic" da het, loi "mic stereo tran track" thi chua.
+
+Hai sequence THU con lai trong project cua anh Tien, `deleteSequence()`
+khong ton tai trong Premiere Beta 26.5 nen phai xoa tay:
+`AiO-THU-KENH` · `AiO-THU-DONGBO` · `AiO-THU-DONGBO-2`.
+
 ## TRANG THAI HIEN TAI (2026-08-03 14:47 +0700)
 
 - **UI moi DA CHOT.** Chu du an: *"anh chot UI cho auto cut roi do em, chot phien

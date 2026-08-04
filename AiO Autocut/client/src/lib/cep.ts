@@ -422,3 +422,84 @@ export async function catTaiCho(
     loi: null,
   }
 }
+
+/**
+ * Sequence đang mở có NHIỀU TRACK không (multicam / mic riêng từng người).
+ *
+ * ☠️ Phải hỏi trước khi cắt — vấp thật 2026-08-04. Anh Tiến cắt podcast bằng
+ * AiO Auto Podcast (ra 2 cam + 3 track mic) rồi chạy Autocut. Đo được:
+ *
+ *     trước: A1 = Mic-Trọng ×37 · A2 = Mic-Trọng + Mic-Dilys · A3 = Mic-Dilys
+ *     sau  : A1 = C4234 ×300   · A2 = C4234 ×300            · A3 = trống
+ *
+ * Mic biến mất sạch, thay bằng TIẾNG CAMERA — nhỏ hơn 15,6 dB (mic cài áo
+ * −50,6 dB vs mic gắn máy quay −66,2 dB). Vì `ac_catTaiCho` xoá mọi track rồi
+ * dựng lại chỉ trên V1 + A1: đúng cho video thường, sai hoàn toàn khi tiếng
+ * nằm ở track riêng. Đây không phải lỗi thao tác của người dùng — cắt theo
+ * người nói xong rồi cắt khoảng lặng là đường đi tự nhiên nhất của editor.
+ */
+export async function soTrackCoClip(): Promise<{
+  trackV: number
+  trackA: number
+  daTrack: boolean
+  loi: HostLoi | null
+}> {
+  const res = parseResult(await evalScript('ac_soTrackCoClip()'))
+  if (!res.ok) return { trackV: 0, trackA: 0, daTrack: false, loi: dichLoi(res.message) }
+  const kv = parseKV(res.message)
+  return {
+    trackV: parseInt(kv.trackV ?? '0', 10) || 0,
+    trackA: parseInt(kv.trackA ?? '0', 10) || 0,
+    daTrack: kv.daTrack === '1',
+    loi: null,
+  }
+}
+
+/**
+ * Gom một lô đoạn giữ cho đường CẮT ĐỒNG BỘ (nhiều track).
+ *
+ * Khác `catTaiCho`: hợp nhất các khoảng giữ cần BIẾT HẾT trước khi cắt, nên
+ * không cắt từng lô được. Panel gom hết bằng hàm này rồi gọi `dongBoChay` một
+ * lần duy nhất.
+ */
+export async function dongBoThem(
+  keeps: string,
+  loDau = true,
+): Promise<{ daGom: number; loi: HostLoi | null }> {
+  const res = parseResult(await evalScript(`ac_dongBoThem("${esc(keeps)}", "${loDau ? 1 : 0}")`))
+  if (!res.ok) return { daGom: 0, loi: dichLoi(res.message) }
+  const kv = parseKV(res.message)
+  return { daGom: parseInt(kv.daGom ?? '0', 10) || 0, loi: null }
+}
+
+/**
+ * Cắt đồng bộ THẬT — mọi track dồn theo CÙNG MỘT trục thời gian nên hình và
+ * tiếng không thể lệch nhau, và track nào ở đâu vẫn nguyên đó.
+ *
+ * Bộ tự kiểm chạy ngoài Premiere: `node tests/kiem-dong-bo.mjs` (20 phép).
+ */
+export async function dongBoChay(): Promise<{ kq: KetQuaDung | null; loi: HostLoi | null }> {
+  const res = parseResult(await evalScript('ac_dongBoChay()'))
+  if (!res.ok) return { kq: null, loi: dichLoi(res.message) }
+  const kv = parseKV(res.message)
+  const n = (k: string) => parseFloat(kv[k] ?? '0') || 0
+  return {
+    kq: {
+      seqMoi: kv.seqMoi ?? '',
+      seqGoc: kv.seqGoc ?? '',
+      thongSo: kv.thongSo ?? '',
+      yeuCauDoan: n('yeuCauDoan'),
+      yeuCauGiay: n('yeuCauGiay'),
+      hinhClip: n('hinhClip'),
+      hinhGiay: n('hinhGiay'),
+      hinhCuoi: n('hinhCuoi'),
+      tiengClip: n('tiengClip'),
+      tiengGiay: n('tiengGiay'),
+      tiengCuoi: n('tiengCuoi'),
+      tiengTuTheo: kv.tiengTuTheo === '1',
+      soLoi: n('soLoi'),
+      loiDau: kv.loiDau ?? '',
+    },
+    loi: null,
+  }
+}
