@@ -76,11 +76,12 @@ người bị cắt nhầm, không phải mất đoạn.
 
 ## 🙋 ĐANG CHỜ TAI ANH — máy không tự chấm được
 
-1. **Nghe dễ nhất: `test thực tế - Podcast Cut (2)`** — hình cắt theo
-   người, tiếng liền mạch nguyên vẹn (bản 15:51). Đối chiếu với
-   `test thực tế - Podcast Cut` (tiếng bám theo người) và
-   `PODCAST BUOI2 da sync - Podcast Cut (4)` — cắt có đúng nhịp không,
-   ghi giúp em mốc nào sai.
+1. **Nghe: `AiO-Sequence-TuDong - Podcast Cut (2)`** (bản 21:43 04/08 —
+   103 lượt, tiếng liền mạch, mic đã đặt đúng mốc) — cắt có đúng nhịp
+   không, ghi giúp em mốc nào sai. ⚠️ **XOÁ tay bản `AiO-Sequence-TuDong
+   - Podcast Cut` cũ (193 lượt)** — dựng từ mic đặt lệch mốc, tiếng trễ
+   môi 1,2–1,5s, đừng nghe nhầm bản đó. (Các bản Cut buổi chiều đã bay
+   cùng lần mở lại project không lưu.)
 2. **Chấm 12 clip** trong `file pr for test\podcast-nghe-kiem\_BANG-CHAM.csv`.
 3. ~~Sync lại "test thực tế" CÓ 2 file mic riêng~~ **EM ĐÃ LÀM 04/08
    15:44** — mic thật đã nằm đúng vị trí (theo PluralEyes, lệch ≤1 frame).

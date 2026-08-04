@@ -1,5 +1,43 @@
 # AiO Auto Podcast - Nhat ky
 
+## [mic-lech-moc] - 2026-08-04 21:43 - BAY MOI: MIC DAN VAO DAU CLIP CAM -> 193 LUOT AO; SUA XONG VE DUNG 103
+
+Toi nay co sequence moi "AiO-Sequence-TuDong" (2 cam + 2 mic mp3 DA nam
+trong sequence — dung huong em de nghi) va mot ban "- Podcast Cut" 193
+luot. Anh Tien gui giai thich cua Gemini (noi dung khop chan doan cua em,
+so 193 khop so that). Nhung do vi tri thi lo BAY MOI:
+
+### Bay: mic DAN VAO DAU CLIP CAM cua nguoi do
+- Mic-Dilys dat tai 0 (= dau clip C4089) · Mic-Trong dat tai 0,375s
+  (= dau clip C4234). Nhin rat hop ly — "mic cua ai dan vao cam nguoi do".
+- SAI vi: dau file cam va dau file mic KHONG phai cung mot khoanh khac
+  (do la viec cua sync). Hai file mic thu CUNG MAY, bam CUNG LUC — phai
+  nam CUNG MOT MOC. Do thuc te: mic phai bat dau 1,168s TRUOC C4089.
+- Hau qua do duoc: tieng tre so voi hinh 1,17-1,54s (lech moi nghe ro),
+  va HAI MIC LECH NHAU 0,375s lam nao so sai quanh moi luot chuyen ->
+  nhat cat doi tu 103 len 193. So 193 "dep" ma sai (bai hoc 5c).
+
+### Sua (chi dung AiO-Sequence-TuDong — "test thuc te" cua anh van nguyen)
+Dat lai 4 clip, GIU sync 9-frame va cach gan cua anh (gan cua anh DUNG:
+V1+A1 = Dilys, V2+A2 = Trong, khop frame da soi mat):
+- V1 C4089 @ frame 28 (1,1678s) · V2 C4234 @ frame 37 (1,5432s — dung
+  9 frame chenh nhu ban sync cua anh)
+- A1 Mic-Dilys @ 0 · A2 Mic-Trong @ 0 (cung moc)
+
+### Kiem chung: chay lai tren panel (toggle tieng lien ON)
+- 24 giay -> "AiO-Sequence-TuDong - Podcast Cut (2)": **103 luot** —
+  V1=51 clip 1655,0s · V2=52 clip 1003,8s · 0 ho · 0 cap canh cung track
+  · A1/A2 moi track 1 clip lien 1,543->2655,027s.
+- Khop TUNG SO voi ban chuan da kiem 15:44 (103 luot, 51/52, chia 62/38).
+- Ban "Podcast Cut" cu (193 luot, tu mic lech) la RAC — can anh xoa tay
+  (panel khong xoa duoc sequence).
+
+### Rut ra cho san pham
+Nguoi dung tu dat mic SE dan vao dau clip cam — tu nhien nhat ma sai.
+-> Cung co them ly do lam nut TU SYNC (Level 3). Truoc mat co the them
+canh bao re: 2 track mic duoc gan ma start LECH NHAU thi bao ngay (mic
+cung may thu thi phai cung moc) — ghi vao TINH-NANG lam sau.
+
 ## [bao-loi-ro] - 2026-08-04 16:11 - ANH TEST "CAN BAN NHAT" KET: BAO LOI PHAI CHI DICH DANH (v0.3.6)
 
 Anh Tien tu sync "test thuc te" bang Premiere Synchronize roi bam — khung
