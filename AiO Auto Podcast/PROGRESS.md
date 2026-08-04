@@ -1,5 +1,93 @@
 # AiO Auto Podcast - Nhat ky
 
+## [tieng-lien] - 2026-08-04 15:51 - TUY CHON "GIU TIENG LIEN MACH" (v0.3.5)
+
+Anh Tien thay step "Dang thay tieng cam bang tieng mic..." va hoi: "anh
+khong muon su dung step nay de anh nghe thu duoc khong em". Day la nhu cau
+that cua editor: nghe HOI THOAI LIEN MACH (ca tieng dem "u", cuoi... cua
+nguoi nghe) de cham nhat cat, thay vi tieng bi bam vun theo nguoi.
+
+### Thay doi (dist/index.html, panel v0.3.5 — host KHONG doi, khoi restart)
+- Checkbox "Giu tieng lien mach — chi cat hinh, tieng mic de nguyen" ngay
+  tren nut Dung. Song ngu VI/EN. Nho qua localStorage (aio-pc-tienglien).
+- Logic: bat thi `viecTieng` = MOT manh nguyen ven moi nguoi phu tron
+  [tu0..den0] thay vi manh-theo-doan. Duong dat tieng (pc_datTieng), don
+  tieng cam (pc_donTieng), chot DO LAI — tat ca giu nguyen vi viecTieng
+  van la danh sach manh nhu cu, chi it manh hon. KHONG dung toi host.
+
+### Kiem chung bang so
+- Gac cong cai: kiem-nao 16/16 + stress 12/12 (script sign-install tu chay).
+- Reload panel qua CDP (manifest khong doi nen khong can tat Premiere).
+- Chay THAT tren "test thuc te" voi toggle BAT: 32 giay, ra
+  "test thuc te - Podcast Cut (2)":
+  V1 = 51 clip C4089 · V2 = 52 clip C4234 (dung nhu ban cat thuong)
+  A1 = **1 clip** Mic-Dilys 1,585->2655,027s · A2 = **1 clip** Mic-Trong
+  1,585->2655,027s — tieng lien mach dung thiet ke, khong tieng cam sot.
+- Ban cat thuong truoc do ("test thuc te - Podcast Cut", 15:44) van nguyen
+  de doi chieu: cung 103 doan hinh, tieng bam theo nguoi.
+
+## [thay-mic-chay-lai] - 2026-08-04 15:44 - THAY MIC THAT VAO "test thuc te" -> TOOL DUNG 103 LUOT / 24 GIAY
+
+Anh Tien: "em thay mic that vao roi chay lai giup anh". Khong sua code —
+chi sua DU LIEU sequence roi chay tool qua dung duong nut bam.
+
+### Da lam (moi buoc co so do)
+1. Chup frame giua tap tu 2 cam de gan mic dung nguoi (thuoc ngoai bang
+   MAT): C4234 = nam vest = Trong · C4089 = nu ao Dream Talent = Dilys.
+   Khop voi cach gan cua ban Cut (4) truoc do.
+2. Ghi trang thai goc "test thuc te" TRUOC khi dung (bai hoc 3b):
+   V1 C4089@0 · V2 C4234@0,417s (offset tuong doi giua 2 cam DUNG san) ·
+   A1/A2 = tieng nhung cua cam, in=0 het.
+3. Go 4 clip cu, dat lai theo he moc PluralEyes da kiem chung: C4089 @
+   frame 28 · C4234 @ frame 38 · Mic-Dilys A1 @ 0 · Mic-Trong A2 @ 0
+   (overwriteClip + remove(false,false) — dung pattern host dang dung).
+   ☠️ overwriteClip file stereo TRAI clip thua sang track ke (A3 lo 1 clip
+   Mic-Trong) — phai don. Khong mat gi: L=R cua file mic (r=1,0000 da do).
+4. Lam moi panel bang cach doi activeSequence sang seq khac roi quay lai
+   (panel chi docThongTinSeq khi TEN seq doi — nhip soi 1s). Panel nho
+   nguyen buoc gan cu (ganTheoSeq/localStorage) va TU khop voi vi tri moi:
+   Nguoi 1 = V1+A1 (Dilys) · Nguoi 2 = V2+A2 (Trong).
+5. Bam nut qua CDP, cho theo moc NUT HIEN LAI (bai hoc 5f): xong sau
+   **24 giay** (WAV cache con tu lan truoc, cat 103 doan theo lo).
+
+### So do ban dung "test thuc te - Podcast Cut"
+- V1 = 51 clip C4089 (Dilys) 1655,0s · A1 = 51 clip Mic-Dilys 1655,2s
+- V2 = 52 clip C4234 (Trong) 1003,5s · A2 = 52 clip Mic-Trong 1003,4s
+  -> hinh-tieng KHOP TUNG CAP (lech 0,1-0,2s = duoi dem chong hut khung).
+- 103 doan xen ke hoan hao (0 cap canh nhau cung track), ho = 0, phu tu
+  1,585s den 2655,0s. 89 cho chong <=0,08s = duoi dem da ghi trong CLAUDE.
+- Chia 62/38 (Dilys/Trong) — khop ban Cut (4) va khop nao chay offline.
+- Panel bao: "103 luot · Nguoi 1 51 luot 27:32 · Nguoi 2 52 luot 16:41".
+
+### Con cho tai anh Tien
+Thuoc cuoi la TAI: mo "test thuc te - Podcast Cut" nghe 1 phut dau —
+cam co nhay dung nguoi dang noi khong, mic co dung nguoi khong (nhan
+Trong/Dilys tren file mic la gia dinh, chua ai kiem bang tai).
+
+## [do-tieng-cam] - 2026-08-04 15:33 - DINH LUONG vi sao "test thuc te" bi chan: tieng cam C4234 CAM THAT
+
+Anh Tien bao "tool khong chay" kem anh chup — chinh la khung canh bao
+v0.3.4 dang lam viec. Do them de dong ho so nguyen nhan (khong sua code):
+
+- Doc duong dan that tu sequence "test thuc te" (qua CDP, do theo CHI SO
+  sequence vi ten tieng Viet meo qua PowerShell): A1 -> Video\Cam 3\
+  C4089.MP4, A2 -> Video\Cam 2\C4234.MP4 — ca hai la TIENG NHUNG CUA CAM,
+  khong phai mic roi.
+- Do envelope 20ms hai duong tieng cam (da can offset PluralEyes 0,417s):
+  C4089 p50 = -39,7 dB (thu binh thuong) · C4234 p50 = **-75,6 dB, p90
+  -59,9** = gan nhu cam hoan toan (line-in chet, khop chan doan 15:10).
+- He qua: C4089 to hon >= 6 dB o **99,5%** cua so co tieng, C4234 thang
+  0,0% -> nao thay MOT nguoi noi suot -> chot an toan chan. Khop TUNG SO
+  voi dong panel in ra ("Nguoi 1 nghe ro 100.0% · Nguoi 2 nghe ro 0.0%").
+- Doi chung tool DUNG DUOC khi tieng la mic that: cung project co san
+  "PODCAST BUOI2 da sync - Podcast Cut (4)": V=52+51=103 nhat cat,
+  A=Mic-Trong 1003,4s / Mic-Dilys 1655,2s — hinh tieng khop tung track.
+
+Ket luan: khong co loi moi. "test thuc te" muon chay duoc thi tiec la
+tieng phai la 2 file mic that (Mic-Trong.mp3 / Mic-Dilys.mp3, da co trong
+project) — tieng cam khong cuu duoc voi lieu nay (C4234 cam, va 2 phep
+thu line-in 15:1x cung da that bai).
+
 ## [that-bai-phai-to] - 2026-08-04 15:26 - "BAM MA KHONG THAY CHAY" = LOI HIEN THI (v0.3.4)
 
 Anh Tien bam "Cat timeline theo nguoi noi" tren "test thuc te" va noi

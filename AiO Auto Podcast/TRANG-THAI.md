@@ -8,11 +8,13 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 chiều — panel v0.3.4, host v0.3.1.
-Mới trong v0.3.4: thất bại hiện KHUNG TO "Tool đã chạy — dừng lại vì" kèm
-số đo từng người (tự chỉ mic nào hỏng). Việc kế tiếp chờ anh Tiến chốt:
-(1) nới luật onset cứu ~2-3/12 mốc lỗi; (2) buổi thu sau sửa khâu mic
-(line-in cam Trọng đang câm −75,5 dB, mic cài xa miệng).*
+*Cập nhật lần cuối: 04/08/2026 15:51 — panel v0.3.5, host v0.3.1.
+Mới trong v0.3.5: tuỳ chọn "Giữ tiếng liền mạch" cạnh nút Dựng (anh xin
+đường nghe thử — chỉ cắt hình, tiếng mic nguyên vẹn). Trước đó v0.3.4:
+thất bại hiện KHUNG TO kèm số đo từng người. "test thực tế" đã được thay
+mic thật vào (15:44) — tool chạy được trên nó rồi. Việc kế tiếp chờ anh
+Tiến chốt: (1) nới luật onset cứu ~2-3/12 mốc lỗi; (2) buổi thu sau sửa
+khâu mic (line-in cam Trọng đang câm −75,5 dB, mic cài xa miệng).*
 
 ---
 
@@ -31,7 +33,7 @@ lỗi này chưa hết thì sản phẩm chưa xong.
 |---|---|---|
 | 1 | **Cắt sai người trên liệu thật** — anh chấm 12 marker, "nữ nói mà hình nam" | **ĐÃ CÓ CHẨN ĐOÁN (14:57 04/08)** từ 12 marker + soi mắt 5 mốc: (B) ~5 mốc **mic sai phía** — Dilys nói mà mic Trọng to hơn chính mic cô ấy 10 dB → thuật toán nào so âm lượng cũng thua, gốc ở khâu THU; (A) ~2 mốc não nghe đúng mà luật đổi người quá chặt → sửa được bằng code; (C) ~5 mốc vùng mù/đối đáp nhanh. Chờ anh xác nhận cách đặt mic buổi đó |
 | 2 | **Hai người nói chồng nhau** — hình nhảy loạn hoặc kẹt một người | Chưa làm luật riêng; đợi cùng bộ đáp án với lỗi 1 |
-| 3 | **Sequence sync bằng Premiere chỉ có tiếng cam** → tool không chạy được, thông báo chưa dạy người dùng cách sửa | Mới có ghi chú xám "tiếng của cam V1"; chưa có hướng dẫn "sync kèm 2 file mic" ngay trên panel |
+| 3 | **Sequence sync bằng Premiere chỉ có tiếng cam** → tool không chạy được, thông báo chưa dạy người dùng cách sửa | Mới có ghi chú xám "tiếng của cam V1"; chưa có hướng dẫn "sync kèm 2 file mic" ngay trên panel. Riêng "test thực tế" em đã thay mic thật vào (04/08 15:44, vị trí theo PluralEyes lệch ≤1 frame) — tool chạy được trên nó rồi |
 | 4 | **Đầu bản dựng trống ~1,6 giây** (vùng phủ bắt đầu từ mốc mic, không phải 0) | Mới phát hiện 04/08 khi đo lỗ trống; nhìn như lỗi dù là chủ ý — cần quyết cách xử lý |
 | 5 | *(chỗ cho các lỗi anh thấy thêm — báo em từng dòng: mốc thời gian + hiện tượng)* | |
 
@@ -45,6 +47,7 @@ người bị cắt nhầm, không phải mất đoạn.
 | Tính năng | Bằng chứng đo được | Ngày |
 |---|---|---|
 | **Cắt theo người nói** (2 người, mic riêng, bản sao timeline) | 124 đoạn trên liệu 44 phút thật, cấu trúc track khớp từng con số, 0 cảnh báo | 04/08 |
+| **Giữ tiếng liền mạch** (tuỳ chọn cạnh nút Dựng — chỉ cắt hình, tiếng mic nguyên vẹn để nghe thử) | "test thực tế - Podcast Cut (2)": hình 51+52 clip y bản thường, tiếng A1/A2 mỗi track đúng 1 clip liền 1,6s→2655s, dựng 32 giây | 04/08 |
 | **Chọn sequence làm việc** ngay trên panel | 11 sequence hiện đủ, đổi xuôi/ngược khớp cả ô chọn + panel + Premiere | 04/08 |
 | **Cam chung (wide)** — gán được, im >2s tự về toàn cảnh | 14 đoạn wide 2:02 đúng chỗ không ai nói; bộ kiểm 11/11 ranh 0ms | 04/08 |
 | **V và A kể cùng một chuyện** — tiếng dính liền cam tự ghi chú "tiếng của cam V1/cam chung", gán cam chung là tiếng của nó tự về "—" | đo trên "test thực tế": 3/3 hàng tiếng hiện đúng gốc | 04/08 |
@@ -67,11 +70,13 @@ người bị cắt nhầm, không phải mất đoạn.
 
 ## 🙋 ĐANG CHỜ TAI ANH — máy không tự chấm được
 
-1. **Nghe bản dựng** `AiO-WIDE-TEST - Podcast Cut` (có cam chung) và
-   `PODCAST BUOI2 da sync - Podcast Cut (4)` (bản mono sạch) — cắt có đúng
-   nhịp không, ghi giúp em mốc nào sai.
+1. **Nghe dễ nhất: `test thực tế - Podcast Cut (2)`** — hình cắt theo
+   người, tiếng liền mạch nguyên vẹn (bản 15:51). Đối chiếu với
+   `test thực tế - Podcast Cut` (tiếng bám theo người) và
+   `PODCAST BUOI2 da sync - Podcast Cut (4)` — cắt có đúng nhịp không,
+   ghi giúp em mốc nào sai.
 2. **Chấm 12 clip** trong `file pr for test\podcast-nghe-kiem\_BANG-CHAM.csv`.
-3. **Sync lại "test thực tế" CÓ 2 file mic riêng** — hiện nó chỉ có tiếng
-   camera nên tool không nghe được ai đang nói.
+3. ~~Sync lại "test thực tế" CÓ 2 file mic riêng~~ **EM ĐÃ LÀM 04/08
+   15:44** — mic thật đã nằm đúng vị trí (theo PluralEyes, lệch ≤1 frame).
 4. Xoá tay các sequence thử: `AiO-THU-KENH` · `AiO-THU-DONGBO` ·
    `AiO-THU-DONGBO-2` (Premiere không cho panel xoá sequence).

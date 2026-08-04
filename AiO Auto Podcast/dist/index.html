@@ -53,6 +53,14 @@
     letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
   }
 
+  /* Tuỳ chọn kèm nút chính (04/08 — anh Tiến xin đường "nghe thử") */
+  .tuychon {
+    display: flex; align-items: center; gap: var(--sp-2);
+    font-size: var(--fs-sm); color: var(--text-2); cursor: pointer;
+    user-select: none;
+  }
+  .tuychon input { accent-color: var(--accent); cursor: pointer; }
+
   /* ── Hướng dẫn lần đầu ── */
   .hd {
     background: var(--bg-3); border: 1px solid var(--accent-line);
@@ -313,6 +321,10 @@
 
     <div class="muc">
       <span class="muc__nhan" id="nhanDung"></span>
+      <label class="tuychon">
+        <input type="checkbox" id="tiengLien">
+        <span id="nhanTiengLien"></span>
+      </label>
       <button class="btn-chinh" id="nutDung" onclick="dungBan()"></button>
       <p class="canlam" id="canlam" style="display:none"></p>
       <pre class="loi" id="loi" style="display:none"></pre>
@@ -368,6 +380,7 @@
       nhieu_clip: '{n} clip',
       nhan_dung: 'Dựng',
       nut_dung: 'Cắt timeline theo người nói',
+      tieng_lien: 'Giữ tiếng liền mạch — chỉ cắt hình, tiếng mic để nguyên',
       thieu_gan: 'Mỗi người cần đúng một track hình và một track tiếng — gán đủ rồi bấm.',
       trung_track: '{a} và {b} đang dùng chung một track — mỗi người một track riêng.',
       track_nhieu_clip: '{track} có {n} clip — bản này cần track một clip liền (sync bằng Synchronize rồi để nguyên).',
@@ -425,6 +438,7 @@
       nhieu_clip: '{n} clips',
       nhan_dung: 'Build',
       nut_dung: 'Cut the timeline by speaker',
+      tieng_lien: 'Keep audio continuous — cut video only, leave mics uncut',
       thieu_gan: 'Each person needs exactly one video and one audio track — finish assigning, then hit cut.',
       trung_track: '{a} and {b} share the same track — one track per person.',
       track_nhieu_clip: '{track} has {n} clips — this version needs one continuous clip per track (Synchronize, then leave as is).',
@@ -485,6 +499,7 @@
     document.getElementById('nhanLuot').textContent = t('nhan_luot')
     document.getElementById('nhanDai').textContent = t('nhan_dai')
     document.getElementById('nhanChia').textContent = t('nhan_chia')
+    document.getElementById('nhanTiengLien').textContent = t('tieng_lien')
     if (!dangChay) document.getElementById('nutDung').textContent = t('nut_dung')
     document.getElementById('hd1').textContent = t('hd_1')
     document.getElementById('hd2').textContent = t('hd_2')
@@ -619,6 +634,14 @@
   // quay lại sequence nguồn thì lựa chọn cũ phải còn nguyên.
   var ganTheoSeq = {}
   try { ganTheoSeq = JSON.parse(localStorage.getItem('aio-pc-gan') || '{}') } catch (e) {}
+
+  // Tuỳ chọn "giữ tiếng liền mạch" — nhớ qua các phiên (04/08, anh Tiến:
+  // muốn nghe thử bản cắt với tiếng nguyên vẹn, không cắt tiếng theo người).
+  var oTiengLien = document.getElementById('tiengLien')
+  try { oTiengLien.checked = localStorage.getItem('aio-pc-tienglien') === '1' } catch (e) {}
+  oTiengLien.onchange = function () {
+    try { localStorage.setItem('aio-pc-tienglien', oTiengLien.checked ? '1' : '0') } catch (e) {}
+  }
   function luuGan() {
     if (!seqDangNhin) return
     // Dạng mới {ds, wide}; bản cũ lưu thẳng mảng — đọc phải chịu được cả hai.
@@ -1134,17 +1157,30 @@
             //                         tiếng tự nhiên; ai track nấy như cũ)
             // Nhờ tính trước nên bước ĐO LẠI biết chính xác phải có bao nhiêu
             // clip tiếng — không lấy doan.length làm chuẩn nữa.
+            //
+            // "GIỮ TIẾNG LIỀN MẠCH" (04/08): mỗi người MỘT mảnh nguyên vẹn
+            // phủ trọn [tu0..den0] — hình vẫn cắt theo người, tiếng không cắt.
+            // Đường đặt tiếng, chốt đo lại, mọi thứ phía sau giữ nguyên vì
+            // viecTieng vẫn là danh sách mảnh như cũ, chỉ ít mảnh hơn.
             var viecTieng = []
-            doan.forEach(function (d) {
-              var segTu = tu0 + d.tu
-              var segDen = tu0 + d.den
-              var dsNguoi = d.nguoi >= 0 ? [d.nguoi] : nguoiDs.map(function (_, p) { return p })
-              dsNguoi.forEach(function (p) {
-                viecTieng.push(nguoiDs[p].mic + ',' + duongMic[p] + ',' +
-                  (segTu + offMic[p]).toFixed(4) + ',' + (segDen + offMic[p]).toFixed(4) + ',' +
-                  segTu.toFixed(4))
+            if (oTiengLien.checked) {
+              nguoiDs.forEach(function (ng, p) {
+                viecTieng.push(ng.mic + ',' + duongMic[p] + ',' +
+                  (tu0 + offMic[p]).toFixed(4) + ',' + (den0 + offMic[p]).toFixed(4) + ',' +
+                  tu0.toFixed(4))
               })
-            })
+            } else {
+              doan.forEach(function (d) {
+                var segTu = tu0 + d.tu
+                var segDen = tu0 + d.den
+                var dsNguoi = d.nguoi >= 0 ? [d.nguoi] : nguoiDs.map(function (_, p) { return p })
+                dsNguoi.forEach(function (p) {
+                  viecTieng.push(nguoiDs[p].mic + ',' + duongMic[p] + ',' +
+                    (segTu + offMic[p]).toFixed(4) + ',' + (segDen + offMic[p]).toFixed(4) + ',' +
+                    segTu.toFixed(4))
+                })
+              })
+            }
 
             var j = 0
             function loTieng() {
