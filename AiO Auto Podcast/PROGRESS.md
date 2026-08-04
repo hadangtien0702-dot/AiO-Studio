@@ -1,5 +1,60 @@
 # AiO Auto Podcast - Nhat ky
 
+## [tu-sync] - 2026-08-04 22:29 - v0.4.0 "THEM MIC TU FILE — TU SYNC": GIAI TRIET DE BAI TOAN DAU VAO
+
+Anh Tien duyet phuong an toi uu ("em lam truoc di em roi minh test sau").
+Goc cua moi loi hom nay (sequence chi tieng cam · mic dan dau clip cam ·
+chip trong) la MOT: tool can dau vao chuan ma bat nguoi tu chuan bi.
+v0.4.0 dua phan chuan bi vao trong tool.
+
+### Thay doi
+1. **`dist/sync.js` MOI** — module THUAN nhu nao.js: tuong quan cheo duong
+   bao dB (quet tho 0,2s ±20 phut -> tinh chinh 20ms). Chot tin cay bang
+   HAI NUA DOC LAP cua file phai cung chi mot moc (lech <= 0,6s) — KHONG
+   dung nguong r tuyet doi (bai hoc: r=0,13-0,17 van la moc DUNG, nguong
+   r>=0,25 tung loai nham cap dung). `viTriDat` doi offset ra (vi tri,
+   cat dau). `p50` chon cam moc, loai cam cam.
+2. **`tests/kiem-sync.mjs` MOI** — 9 phep kiem co seed: tim lai offset
+   duong/am/0/1,168s (±1 cua so), tu choi 2 nguon khong lien quan, toan
+   dat/cat dau (kem ca that 04/08), p50 loai cam chet. Gan vao cong
+   sign-install (kiem-nao + kiem-sync + stress).
+3. **Panel** (`dist/index.html`):
+   - Nut phu "Them mic tu file — tu sync" duoi ban do track. Chon 2-6 file
+     -> tach WAV 16k (cache mtime) -> chon cam moc theo p50 (>-65) -> do
+     offset tung mic (tu choi neu 2 nua khong khop) -> tach mono chat luong
+     goc (.aio-mono.wav canh file goc, khong spill stereo) -> HOST dung
+     sequence "AiO Sync" bang TOAN HAM CO SAN (pc_nhanBan + pc_datHinh dat
+     lai hinh y vi tri nguoi dung + pc_donTieng + pc_datTieng voi setInPoint
+     cat dau + pc_doKetQua) — KHONG sua host, khong bay "panel moi host cu".
+   - TU GOI Y GAN theo thu tu track khi sequence CHUA TUNG GAP (het keo le
+     gan cu cua seq truoc — chi so track cu tren timeline moi la gan bay).
+     Cam giac "mot nut" nhu AutoPod cho ca chuan.
+   - CANH BAO (khong chan) "mic dan dinh dau clip cam" — bay 21:43.
+4. `scripts/sign-install.ps1`: them cong kiem-sync + doi sync.js phai co.
+
+### Kiem chung bang so
+- kiem-sync 9/9 DAT (seed).
+- **Lieu that + thuoc ngoai:** sync.js do offset mic vs C4089 ra 1,180s
+  (Trong) va 1,160s (Dilys) — PluralEyes noi 1,1678 -> lech **0,29 / 0,19
+  frame**, hai nua khop 0,000s, moi phep do 200ms.
+- Cu phap: tach script inline ra `node --check` = 0 loi TRUOC khi cai.
+- Gac cong cai: kiem-nao 16/16 + kiem-sync 9/9 + stress 12/12.
+- **E2E tren panel that** (dialog stub bang 2 duong dan that, moi buoc sau
+  do la duong that): nguon AiO-Sequence-TuDong -> tuSync 48 giay -> ra
+  sequence "AiO Sync": V1 C4089@1,1678 · V2 C4234@1,5432 (giu nguyen vi
+  tri nguon) · A1 Mic-Dilys@0 · A2 Mic-Trong@0 (lech tinh toan 8-12ms,
+  duoi 1 frame) -> ban do TU DIEN dung cap (V1=Nguoi1=Dilys) -> canh bao
+  an -> bam Cat 32 giay -> **"AiO Sync - Podcast Cut": 103 luot, 51/52,
+  27:32/16:41 — khop TUNG SO ban chuan**. Khong mot thao tac dat clip tay.
+
+### Gioi han noi ro
+- Cap nguoi<->mic la THEO THU TU CHON FILE (file 1 = Nguoi 1 = V1...).
+  May khong biet mat ai tren cam nao — nguoi dung liec lai truoc khi cat.
+- Dialog chon file chua qua tay nguoi dung (E2E stub) — anh Tien bam that
+  se la phep thu cuoi.
+- "test thuc te" cua anh hien co 2-3 clip/track (anh dang thu tay) — tu
+  sync doi track HINH dung 1 clip lien; seq do can don lai truoc khi dung.
+
 ## [mic-lech-moc] - 2026-08-04 21:43 - BAY MOI: MIC DAN VAO DAU CLIP CAM -> 193 LUOT AO; SUA XONG VE DUNG 103
 
 Toi nay co sequence moi "AiO-Sequence-TuDong" (2 cam + 2 mic mp3 DA nam

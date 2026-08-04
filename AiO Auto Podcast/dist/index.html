@@ -61,6 +61,20 @@
   }
   .tuychon input { accent-color: var(--accent); cursor: pointer; }
 
+  /* Nút phụ "tự sync" + cảnh báo nhỏ dưới bản đồ track (v0.4.0) */
+  .btn-phu {
+    width: 100%; margin-top: var(--sp-2);
+    background: transparent; border: 1px dashed var(--accent-line);
+    color: var(--text-2); border-radius: var(--r-md); padding: 6px 10px;
+    font-size: var(--fs-sm); cursor: pointer;
+  }
+  .btn-phu:hover:not(:disabled) { color: var(--text-1); border-color: var(--text-3); }
+  .btn-phu:disabled { opacity: 0.6; cursor: default; }
+  .canhbao-nho {
+    color: var(--warn, #d9a83c); font-size: var(--fs-xs);
+    margin: var(--sp-2) 0 0; line-height: 1.5;
+  }
+
   /* ── Hướng dẫn lần đầu ── */
   .hd {
     background: var(--bg-3); border: 1px solid var(--accent-line);
@@ -317,6 +331,8 @@
       <span class="muc__nhan" id="nhanGan"></span>
       <div class="nguoi-ds" id="dsChip"></div>
       <div class="bando" id="bando"></div>
+      <p class="canhbao-nho" id="canhbaoGan" style="display:none"></p>
+      <button class="btn-phu" id="nutSync" onclick="tuSync()"></button>
     </div>
 
     <div class="muc">
@@ -346,6 +362,7 @@
 
 <script src="./CSInterface.js"></script>
 <script src="./nao.js"></script>
+<script src="./sync.js"></script>
 <script src="./tai-nguyen.js"></script>
 <script>
   var cs = new CSInterface()
@@ -381,6 +398,19 @@
       nhan_dung: 'Dựng',
       nut_dung: 'Cắt timeline theo người nói',
       tieng_lien: 'Giữ tiếng liền mạch — chỉ cắt hình, tiếng mic để nguyên',
+      nut_sync: 'Thêm mic từ file — tự sync',
+      sync_tieude: 'TỰ SYNC — DỪNG LẠI VÌ',
+      sync_chon_tieude: 'Chọn file mic của từng người (2–6 file)',
+      sync_mot_mic: 'Mới chọn 1 file — cần mỗi người một file mic (ít nhất 2).',
+      sync_khong_cam: 'Sequence chưa có track hình nào đúng 1 clip liền để làm mốc sync.',
+      sync_thieu_track: 'Cần {can} track tiếng mà sequence chỉ có {co} — thêm track tiếng trong Premiere rồi chạy lại.',
+      sync_cam_cam: 'Tiếng của mọi cam đều quá nhỏ để làm mốc (câm/line-in hỏng). Tự sync cần ít nhất một cam thu được tiếng phòng.',
+      sync_khong_tin: 'Không dám chốt mốc cho {ten}: hai nửa file chỉ về hai mốc lệch nhau {lech}s. File có đúng của buổi quay này không?',
+      sync_dang_doc: 'Tự sync: đọc tiếng {i}/{n}…',
+      sync_dang_do: 'Tự sync: đo mốc {ten}…',
+      sync_dang_mono: 'Tự sync: tách mono {i}/{n}…',
+      sync_dang_dung: 'Tự sync: đang dựng sequence…',
+      mic_dinh_cam: '⚠ Mic của {ten} đang đặt DÍNH ĐẦU clip cam — đầu file cam và đầu file mic hiếm khi là cùng một khoảnh khắc. Nếu chưa sync bằng đo, nhát cắt sẽ lệch; cân nhắc bấm "Thêm mic từ file — tự sync".',
       thieu_gan: 'Mỗi người cần đúng một track hình và một track tiếng — gán đủ rồi bấm.',
       thieu_gan_ai: '{ten} chưa có {thieu} — gán cho đủ, hoặc bấm × trên chip {ten} để bớt người.',
       thieu_hinh: 'track hình',
@@ -444,6 +474,19 @@
       nhan_dung: 'Build',
       nut_dung: 'Cut the timeline by speaker',
       tieng_lien: 'Keep audio continuous — cut video only, leave mics uncut',
+      nut_sync: 'Add mics from files — auto sync',
+      sync_tieude: 'AUTO SYNC — STOPPED BECAUSE',
+      sync_chon_tieude: 'Pick each person’s mic file (2–6 files)',
+      sync_mot_mic: 'Only 1 file picked — each person needs their own mic file (at least 2).',
+      sync_khong_cam: 'No video track with exactly 1 continuous clip to anchor the sync.',
+      sync_thieu_track: 'Need {can} audio tracks but the sequence only has {co} — add audio tracks in Premiere and retry.',
+      sync_cam_cam: 'Every camera audio is too quiet to anchor on (dead/line-in broken). Auto sync needs at least one camera that recorded room sound.',
+      sync_khong_tin: 'Cannot lock an offset for {ten}: the two halves of the file point to marks {lech}s apart. Is this file really from this shoot?',
+      sync_dang_doc: 'Auto sync: reading audio {i}/{n}…',
+      sync_dang_do: 'Auto sync: measuring {ten}…',
+      sync_dang_mono: 'Auto sync: extracting mono {i}/{n}…',
+      sync_dang_dung: 'Auto sync: building sequence…',
+      mic_dinh_cam: '⚠ {ten}’s mic starts EXACTLY at the cam clip’s head — file heads are rarely the same real moment. If this was not measured-synced, cuts will drift; consider "Add mics from files — auto sync".',
       thieu_gan: 'Each person needs exactly one video and one audio track — finish assigning, then hit cut.',
       thieu_gan_ai: '{ten} has no {thieu} yet — assign it, or click × on the {ten} chip to remove them.',
       thieu_hinh: 'video track',
@@ -511,6 +554,7 @@
     document.getElementById('nhanChia').textContent = t('nhan_chia')
     document.getElementById('nhanTiengLien').textContent = t('tieng_lien')
     if (!dangChay) document.getElementById('nutDung').textContent = t('nut_dung')
+    if (!dangSync) document.getElementById('nutSync').textContent = t('nut_sync')
     document.getElementById('hd1').textContent = t('hd_1')
     document.getElementById('hd2').textContent = t('hd_2')
     document.getElementById('hd3').textContent = t('hd_3')
@@ -687,6 +731,13 @@
             if (nho.ds && nho.ds.length >= 2) nguoiDs = JSON.parse(JSON.stringify(nho.ds))
             if (typeof nho.wide === 'number') trackWide = nho.wide
           }
+        } else {
+          // Sequence CHƯA TỪNG GẶP: đừng kéo lê bước gán của sequence trước
+          // (chỉ số track cũ trên timeline mới = gán bậy) — làm mới rồi TỰ
+          // GỢI Ý theo thứ tự track (học cái hay của AutoPod: ca chuẩn thành
+          // một nút; ca lệch chuẩn người dùng vẫn sửa tay được).
+          nguoiDs = [ { cam: -1, mic: -1 }, { cam: -1, mic: -1 } ]
+          tuDongGoiYGan()
         }
         veGan()
       })
@@ -873,6 +924,263 @@
     }
     veNhom('nhom_hinh', coV, 'cam', 'V', true)
     veNhom('nhom_tieng', coA, 'mic', 'A', false)
+    capNhatCanhBaoGan()
+  }
+
+  /**
+   * Cảnh báo "mic dán vào đầu clip cam" — bẫy thật 04/08: nhìn rất hợp lý
+   * ("mic của ai dán vào cam người đó") mà sai, vì đầu file cam và đầu file
+   * mic không phải cùng khoảnh khắc. Hậu quả đo được: tiếng trễ môi
+   * 1,17–1,54s, nhát cắt đội ảo 103→193. Chỉ CẢNH BÁO, không chặn —
+   * rig ăn timecode chung thì trùng mốc thật là có thể.
+   */
+  function capNhatCanhBaoGan() {
+    var el = document.getElementById('canhbaoGan')
+    var ds = []
+    nguoiDs.forEach(function (ng, i) {
+      var tV = timTrack(trackV, ng.cam)
+      var tA = timTrack(trackA, ng.mic)
+      if (tV && tA && tV.soClip > 0 && tA.soClip > 0 &&
+          videoCungMedia(tA.duong) === -1 &&
+          Math.abs(tA.batDau - tV.batDau) < 0.021 && tA.inPoint < 0.021) {
+        ds.push(tenNguoi(i))
+      }
+    })
+    el.style.display = ds.length ? '' : 'none'
+    el.textContent = ds.length ? tp('mic_dinh_cam', { ten: ds.join(', ') }) : ''
+  }
+
+  /**
+   * TỰ GỢI Ý bước gán theo THỨ TỰ track — chỉ khi chưa ai được gán gì:
+   * track hình có clip (V tăng dần) ↔ người theo thứ tự; track tiếng là
+   * MIC RỜI (không dính file cam) xếp tăng dần. Cần đủ ≥2 cặp mới điền.
+   */
+  function tuDongGoiYGan() {
+    for (var i = 0; i < nguoiDs.length; i++) {
+      if (nguoiDs[i].cam !== -1 || nguoiDs[i].mic !== -1) return
+    }
+    if (trackWide !== -1) return
+    var coV = trackV.filter(function (tr) { return tr.soClip > 0 })
+      .sort(function (a, b) { return a.i - b.i })
+    var coA = trackA.filter(function (tr) { return tr.soClip > 0 && videoCungMedia(tr.duong) === -1 })
+      .sort(function (a, b) { return a.i - b.i })
+    var n = Math.min(coV.length, coA.length, 6)
+    if (n < 2) return
+    nguoiDs = []
+    for (var k = 0; k < n; k++) nguoiDs.push({ cam: coV[k].i, mic: coA[k].i })
+    luuGan()
+  }
+
+  // ═══ TỰ SYNC MIC (v0.4.0) — chọn file mic, tool đo mốc, dựng sequence ═══
+  // Toán nằm ở sync.js (thuần, kiểm bằng tests/kiem-sync.mjs). Đối chiếu
+  // thước ngoài PluralEyes trên liệu thật: lệch 0,19–0,29 frame. Host dùng
+  // NGUYÊN các hàm sẵn có (pc_nhanBan/datHinh/donTieng/datTieng/doKetQua) —
+  // không sửa host, không dính bẫy "panel mới host cũ".
+  var dangSync = false
+
+  function tenFileNgan(p) { return String(p).replace(/\\/g, '/').split('/').pop() }
+  function bamTenSync(s) {
+    var h = 5381
+    for (var x = 0; x < s.length; x++) h = ((h << 5) + h + s.charCodeAt(x)) | 0
+    return (h >>> 0).toString(36)
+  }
+  /** Cùng quy ước với bước dựng: bản mono chất lượng gốc nằm CẠNH file gốc. */
+  function duongMonoSync(nguon) {
+    var d = String(nguon).replace(/\\/g, '/')
+    return d.replace(/\.[^./]+$/, '') + '.aio-mono.wav'
+  }
+
+  function tuSync() {
+    if (dangChay || dangSync) return
+    hien('canlam', ''); hien('loi', '')
+    var fs = napNode('fs')
+    var os = napNode('os')
+    var cp = napNode('child_process')
+    if (!fs || !os || !cp) { hien('canlam', t('thieu_node'), 'sync_tieude'); return }
+    var ffmpeg = timFfmpeg(fs)
+    if (!ffmpeg) { hien('canlam', t('thieu_ffmpeg'), 'sync_tieude'); return }
+    if (!seqDangNhin) { hien('canlam', t('chua_mo_seq'), 'sync_tieude'); return }
+    var camDs = trackV.filter(function (tr) { return tr.soClip === 1 && tr.duong })
+    if (!camDs.length) { hien('canlam', t('sync_khong_cam'), 'sync_tieude'); return }
+
+    var chon = window.cep.fs.showOpenDialogEx(true, false, t('sync_chon_tieude'), '',
+      ['wav', 'mp3', 'm4a', 'aac', 'flac', 'aif', 'aiff'])
+    var files = (chon && chon.data) || []
+    if (!files.length) return // người dùng bấm Huỷ — im lặng
+    if (files.length === 1) { hien('canlam', t('sync_mot_mic'), 'sync_tieude'); return }
+    if (files.length > 6) files = files.slice(0, 6)
+    if (files.length > trackA.length) {
+      hien('canlam', tp('sync_thieu_track', { can: files.length, co: trackA.length }), 'sync_tieude')
+      return
+    }
+
+    dangSync = true
+    var nutS = document.getElementById('nutSync')
+    document.getElementById('nutDung').disabled = true
+    nutS.disabled = true
+    var tenSeqGoc = seqDangNhin
+    function thoatSync(loi) {
+      dangSync = false
+      nutS.disabled = false
+      document.getElementById('nutDung').disabled = false
+      nutS.textContent = t('nut_sync')
+      if (loi) hien('canlam', loi, 'sync_tieude')
+    }
+    var tmpDir = os.tmpdir().replace(/\\/g, '/') + '/aio-podcast'
+    try { if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir) } catch (e) {}
+
+    // ── 1. Tách WAV 16k phân tích cho CAM + MIC (tuần tự, có cache mtime) ──
+    var viec = []
+    camDs.forEach(function (tr) { viec.push({ loai: 'cam', nguon: tr.duong, tr: tr }) })
+    files.forEach(function (f) { viec.push({ loai: 'mic', nguon: f }) })
+    var idx = 0
+    function tachTiep() {
+      if (idx >= viec.length) { phanTich(); return }
+      var v = viec[idx]
+      nutS.textContent = tp('sync_dang_doc', { i: idx + 1, n: viec.length })
+      v.wav = tmpDir + '/s-' + bamTenSync(String(v.nguon).toLowerCase()) + '.wav'
+      var can = true
+      try {
+        if (fs.existsSync(v.wav) && fs.statSync(v.wav).mtimeMs > fs.statSync(v.nguon).mtimeMs) can = false
+      } catch (e) {}
+      idx++
+      if (!can) { tachTiep(); return }
+      var nsCpu = AiOTaiNguyen.chiaLuong(1)
+      cp.execFile(ffmpeg,
+        ['-y', '-threads', String(nsCpu.luongMoi), '-i', v.nguon,
+          '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', v.wav],
+        { windowsHide: true, maxBuffer: AiOTaiNguyen.tranDemLog() },
+        function (err, so, se) {
+          if (err) { thoatSync(t('tach_loi') + String(se || err).slice(-200)); return }
+          tachTiep()
+        })
+    }
+
+    // ── 2. Chọn cam MỐC (p50 cao nhất, phải > −65) rồi đo offset từng mic ──
+    function phanTich() {
+      setTimeout(function () { // nhả một nhịp cho nút kịp vẽ chữ
+        try {
+          function docDb(duongWav) {
+            var buf
+            try { buf = fs.readFileSync(duongWav) } catch (e) { return null }
+            var d = AiONao.taiWav(buf)
+            return d ? AiONao.doDb(d.pcm, d.sr) : null
+          }
+          var camTot = null, dbCam = null, p50Tot = -999
+          for (var i = 0; i < viec.length; i++) {
+            var v = viec[i]
+            if (v.loai !== 'cam') continue
+            var db = docDb(v.wav)
+            if (!db) continue
+            var p = AiOSync.p50(db)
+            if (p > p50Tot) { p50Tot = p; camTot = v; dbCam = db }
+          }
+          if (!camTot || p50Tot < -65) { thoatSync(t('sync_cam_cam')); return }
+
+          var micKq = []
+          for (var j = 0; j < viec.length; j++) {
+            var m = viec[j]
+            if (m.loai !== 'mic') continue
+            nutS.textContent = tp('sync_dang_do', { ten: tenFileNgan(m.nguon) })
+            var dbM = docDb(m.wav)
+            if (!dbM) { thoatSync(tp('wav_hong', { ten: tenFileNgan(m.nguon) })); return }
+            var off = AiOSync.timOffset(dbCam, dbM, { quetGiay: 1200 })
+            if (!off.tinCay) {
+              thoatSync(tp('sync_khong_tin', {
+                ten: tenFileNgan(m.nguon), lech: off.lech2NuaGiay.toFixed(1),
+              }))
+              return
+            }
+            var vt = AiOSync.viTriDat(camTot.tr.batDau, camTot.tr.inPoint, off.offsetGiay)
+            micKq.push({
+              nguon: m.nguon, daiGiay: dbM.length * 0.02,
+              viTri: vt.viTriGiay, catDau: vt.catDauGiay, r: off.r,
+            })
+          }
+          tachMonoSync(micKq)
+        } catch (e) { thoatSync('LOI: ' + e) }
+      }, 30)
+    }
+
+    // ── 3. Tách bản MONO chất lượng gốc để đặt lên timeline (mp3 stereo đặt
+    //       thẳng sẽ tràn 2 track — bẫy đã đo, xem chú thích ở bước dựng) ──
+    function tachMonoSync(micKq) {
+      var j = 0
+      function mot() {
+        if (j >= micKq.length) { dungSeqSync(micKq); return }
+        var m = micKq[j]
+        m.mono = duongMonoSync(m.nguon)
+        nutS.textContent = tp('sync_dang_mono', { i: j + 1, n: micKq.length })
+        var can = true
+        try {
+          if (fs.existsSync(m.mono) && fs.statSync(m.mono).mtimeMs > fs.statSync(m.nguon).mtimeMs) can = false
+        } catch (e) {}
+        j++
+        if (!can) { mot(); return }
+        var nsCpu = AiOTaiNguyen.chiaLuong(1)
+        cp.execFile(ffmpeg,
+          ['-y', '-threads', String(nsCpu.luongMoi), '-i', m.nguon,
+            '-vn', '-ac', '1', '-c:a', 'pcm_s16le', m.mono],
+          { windowsHide: true, maxBuffer: AiOTaiNguyen.tranDemLog() },
+          function (err, so, se) {
+            if (err) { thoatSync(t('tach_loi') + String(se || err).slice(-200)); return }
+            mot()
+          })
+      }
+      mot()
+    }
+
+    // ── 4. Dựng sequence qua HOST — toàn hàm có sẵn, đo lại từng bước ──
+    function dungSeqSync(micKq) {
+      nutS.textContent = t('sync_dang_dung')
+      napLaiHost(function (ok) {
+        if (!ok) { thoatSync(t('khong_nap_host')); return }
+        goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
+        if (pb !== 'v0.3.1') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
+        goiHost('pc_nhapMono("' + micKq.map(function (m) { return chuoiJsx(m.mono) }).join(';') + '")').then(function (rN) {
+        if (rN.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + rN); return }
+        var kvN = tachKv(rN)
+        if (parseInt(kvN.thay, 10) !== micKq.length) {
+          thoatSync(tp('mono_thieu', { thieu: kvN.thieu || '?' })); return
+        }
+        goiHost('pc_nhanBan("' + chuoiJsx(tenSeqGoc) + '","AiO Sync")').then(function (raw) {
+        if (raw.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + raw); return }
+        var tenThat = tachKv(raw).seq
+        if (!tenThat) { thoatSync(t('host_la') + '\n' + raw); return }
+        // Đặt lại HÌNH đúng y vị trí người dùng đã sync (giữ cả cam chung).
+        var dsHinh = camDs.map(function (tr) {
+          return tr.i + ',' + chuoiJsx(tr.duong) + ',' + tr.inPoint.toFixed(4) + ',' +
+            (tr.inPoint + (tr.ketThuc - tr.batDau)).toFixed(4) + ',' + tr.batDau.toFixed(4)
+        })
+        goiHost('pc_datHinh("' + chuoiJsx(tenThat) + '","' + dsHinh.join(';') + '")').then(function (r2) {
+        if (r2.indexOf('OK:') !== 0 || r2.indexOf('soLoi=0') < 0) { thoatSync(t('dung_loi') + r2); return }
+        goiHost('pc_donTieng("' + chuoiJsx(tenThat) + '")').then(function (r3) {
+        if (r3.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + r3); return }
+        // Mic k → track tiếng k, cắt đầu bằng setInPoint (đường pc_datTieng
+        // đã dùng hằng ngày cho từng mảnh cắt — không API mới nào cả).
+        var dsTieng = micKq.map(function (m, k) {
+          return k + ',' + chuoiJsx(m.mono) + ',' + m.catDau.toFixed(4) + ',' +
+            m.daiGiay.toFixed(4) + ',' + m.viTri.toFixed(4)
+        })
+        goiHost('pc_datTieng("' + chuoiJsx(tenThat) + '","' + dsTieng.join(';') + '")').then(function (r4) {
+        if (r4.indexOf('OK:') !== 0 || r4.indexOf('soLoi=0') < 0) { thoatSync(t('dung_loi') + r4); return }
+        goiHost('pc_doKetQua("' + chuoiJsx(tenThat) + '")').then(function (r5) {
+        if (r5.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + r5); return }
+        var kv = tachKv(r5)
+        var lech = []
+        if (parseInt(kv.tongHinh, 10) !== camDs.length) lech.push('hinh ' + kv.tongHinh + '/' + camDs.length)
+        if (parseInt(kv.tongTieng, 10) !== micKq.length) lech.push('tieng ' + kv.tongTieng + '/' + micKq.length)
+        if (lech.length) { thoatSync(tp('lech_do', { chiTiet: lech.join(' · ') })); return }
+        // Chuyển panel sang sequence mới — docThongTinSeq sẽ TỰ GỢI Ý gán.
+        goiHost('(typeof pc_chonSeq==="function")?pc_chonSeq("' + chuoiJsx(tenThat) + '"):"ERR"').then(function () {
+          thoatSync(null)
+          soi()
+        })
+        })})})})})})})
+      })
+    }
+
+    tachTiep()
   }
 
   /** Soát bước gán — trả chuỗi lỗi hoặc '' nếu ổn. */

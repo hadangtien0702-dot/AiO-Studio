@@ -8,7 +8,15 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 16:11 — panel v0.3.6, host v0.3.1.
+*Cập nhật lần cuối: 04/08/2026 22:29 — panel v0.4.0, host v0.3.1.
+Mới trong v0.4.0 — **"Thêm mic từ file — TỰ SYNC"** (giải triệt để bài toán
+đầu vào, anh Tiến duyệt tối 04/08): chọn 2–6 file mic → tool tự đo mốc bằng
+tương quan chéo (lệch PluralEyes 0,19–0,29 frame trên liệu thật) → tự dựng
+sequence "AiO Sync" → TỰ GỢI Ý gán theo thứ tự → bấm Cắt. E2E đo thật:
+sync 48s + cắt 32s = 103 lượt khớp từng số bản chuẩn, không thao tác tay.
+Kèm: cảnh báo "mic dán đầu clip cam", tự gợi ý gán cho sequence lạ, cổng
+kiểm mới kiem-sync 9/9. CHỜ TAY ANH: bấm nút thật (dialog chọn file em mới
+kiểm bằng stub), và nghe bản cắt.*
 Mới trong v0.3.6 (từ ca anh test "căn bản nhất" bị kẹt): lỗi gán chỉ ĐÍCH
 DANH ai thiếu gì; lỗi trước-khi-chạy đổi tiêu đề "CHƯA CHẠY — GÁN CHƯA ĐỦ";
 thông báo một-người-nói dạy luôn "cần FILE MIC RIÊNG trong sequence".
@@ -63,7 +71,7 @@ người bị cắt nhầm, không phải mất đoạn.
 | **Luật tài nguyên 50–70%** cho cả 7 panel | 12/12 mục kiểm; đo thật: ghim trần 70% còn nhanh hơn 31% | 04/08 |
 | Hai chốt an toàn: chặn gán tiếng cam làm mic · chặn bản dựng 1 lượt | tái hiện ca gán nhầm: chặn đúng, không dựng bậy | 02/08 |
 | Nhớ bước gán theo từng sequence | quay lại sequence cũ, bản đồ tự điền | 01/08 |
-| Tự sync bằng thuật toán (spike — chưa thành nút) | lệch 0,59 frame so với PluralEyes; import vào Premiere khớp 5/5 clip | 03/08 |
+| **Tự sync thành NÚT trong panel (v0.4.0)** — chọn file mic là tool tự đo mốc, tự dựng sequence, tự gợi ý gán | lệch PluralEyes 0,19–0,29 frame; E2E: sync 48s → cắt 32s → 103 lượt khớp từng số bản chuẩn; kiem-sync 9/9; từ chối nguồn không liên quan (2 nửa không khớp) | 04/08 |
 
 ## 🔧 CHƯA LÀM — tính năng còn thiếu (không phải lỗi)
 
