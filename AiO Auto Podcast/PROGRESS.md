@@ -1,5 +1,48 @@
 # AiO Auto Podcast - Nhat ky
 
+## [thu-linein] - 2026-08-04 15:10 - HAI PHEP THU: LINE-IN VA CHUAN HOA GAIN - CA HAI DEU KHONG CUU DUOC
+
+Anh Tien cho biet: mic cam TRUC TIEP vao line audio cua cam ("video Trong
+thi lay mic Trong luon"), nhan file mp3 dung nguoi, "chi co dieu hoi nho".
+=> Thu ngay 2 gia thuyet tren cung 12 moc loi.
+
+### PHEP THU 1: dung tieng LINE-IN cua cam lam mic
+Tach audio C4234 (cam Trong) + C4089 (cam Dilys), 16k mono:
+
+| Mic line-in | p10 / p50 / p90 (dBFS) |
+|---|---|
+| Trong (C4234) | -86,1 / **-75,5** / -59,9 — GAN NHU CAM |
+| Dilys (C4089) | -46,7 / **-39,7** / -30,6 — rat khoe |
+
+Lech gain **35 dB** giua hai duong thu. Nao so muc tuyet doi -> ra
+"1 doan, Dilys 100%". **Line-in cua Trong buoi nay gan nhu khong thu
+duoc gi** — duong nay CHET, khong phai do thuat toan.
+
+### PHEP THU 2: CHUAN HOA theo tung mic (keo p90 moi mic ve -20 dB)
+- Line-in chuan hoa: van Dilys 97% — keo gain len thi keo ca BLEED len,
+  phan "tieng" trong mic Trong chu yeu la giong Dilys vong sang.
+- **MP3 chuan hoa: TE HON han** (Trong 87%/Dilys 13%, 0/5 moc mat dung
+  — ban tho la 35/60). Gain mp3 von da deu, chuan hoa chi lam meo.
+=> **Chuan hoa gain KHONG phai phep mau.** Ghi lai de khoi thu lai lan
+nua: da thu 04/08, so do ro rang.
+
+### KET LUAN CUOI VE LOI SO 1 (giu nguyen chan doan 14:57, gio chac hon)
+1. "Hoi nho" dung MOT PHAN (72% cua so mu -> doan nhieu).
+2. Diem chet that: tai cac moc loi, giong Dilys nam trong MIC TRONG to
+   hon trong mic cua CHINH CO AY (6:31: chenh nguoc 10 dB). Vi tri/do
+   nhay mic luc thu — khong thuat toan so nang luong nao vuot qua duoc,
+   da chung minh bang 2 phep thu o tren.
+3. Line-in Trong cam — kiem tra duong tin hieu truoc buoi quay sau.
+
+### VIEC CODE CON LAM DUOC (chua lam)
+Nhom A (~2-3 moc): noi luat onset de doi hinh khi nghe ro nguoi kia noi
+du tieng ro thua. Co 12 moc lam thuoc + 28 phep kiem cu lam chot hoi quy.
+
+### CHO ANH TIEN QUYET
+- Buoi quay sau: mic cai sat mieng hon / tach xa nhau / kiem tra line-in
+  Trong; thu to hon (gain cao hon) cung giup giam vung mu.
+- Co lam nhom A ngay khong, hay dung o chan doan.
+
 ## [dap-an-tai] - 2026-08-04 14:57 - MO 12 MARKER CUA ANH TIEN: TIM RA HAI THU PHAM CUA LOI SO 1
 
 Anh Tien nghe ban dung "AiO-WIDE-TEST - Podcast Cut" va cham 12 marker
