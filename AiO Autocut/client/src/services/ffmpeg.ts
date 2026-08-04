@@ -67,18 +67,27 @@ export interface ExecResult {
  * Bài học này AiO Editing đã trả giá ở bản 0.10.0.
  */
 /**
- * Trần CPU cho mọi tiến trình con — 60% số luồng, theo yêu cầu của anh Tiến.
+ * Trần CPU cho mọi tiến trình con.
+ *
+ * ☠️ 2026-08-04 — anh Tiến chốt luật CHUNG cho cả 7 panel: *"RAM, CPU và GPU
+ * dùng toàn bộ ở mức tối thiểu 50% và tối đa 70%, cho toàn bộ tool chứ không
+ * riêng gì mỗi tool"*. Trước đó chỗ này để 60%; nay lấy TRẦN 70%.
+ * Nguồn chân lý: `design-system/tai-nguyen.js` (hàm `tranLuong`).
+ * Sửa tỉ lệ thì sửa ở đó trước, rồi chạy `design-system/kiem-tai-nguyen.ps1`
+ * để soi 7 panel còn khớp không.
  *
  * Bắt buộc phải ghim khi KHÔNG hạ ưu tiên IDLE: bỏ IDLE là bỏ luôn cái phanh của
  * hệ điều hành, không ghim thì FFmpeg bung hết 32 luồng và máy ì ngay lúc người
  * ta đang chờ. Ghim ở ĐÚNG MỘT CHỖ này — đó là chính sách dùng máy, không phải
  * tham số riêng của từng loại việc.
  */
+const TRAN_TAI_NGUYEN = 0.70 // design-system/tai-nguyen.js — TRAN
+
 export function soLuongCpu(): number {
   const req = nodeRequire()
   try {
     const n = req ? req('os').cpus().length : 8
-    return Math.max(2, Math.floor(n * 0.6))
+    return Math.max(2, Math.floor(n * TRAN_TAI_NGUYEN))
   } catch {
     return 8
   }

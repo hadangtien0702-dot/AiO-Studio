@@ -1,5 +1,143 @@
 # AiO Auto Podcast - Nhat ky
 
+## [tai-nguyen] - 2026-08-04 10:23 - LUAT 50-70% CHO CA 7 PANEL + DO THAT LAT NGUOC MOT GIA DINH
+
+Anh Tien chot luat CHUNG: CPU/RAM/GPU trong dai 50-70%, ap cho ca bo.
+Chi tiet day du: `E:\2026\Production\CLAUDE.md` muc "LUAT TAI NGUYEN".
+
+### KHAO SAT TRUOC (agent quet 7 panel)
+| Panel | Truoc 04/08 |
+|---|---|
+| Asset Manager + Power Bins | turbo 2-8 tien trinh x 2 luong (~50%), nen priority IDLE |
+| Autocut + Transcripts | 60% so luong, priority NORMAL |
+| **Auto Podcast** | **KHONG `-threads`, KHONG setPriority** |
+| **Auto Re-Frames** | **KHONG `-threads`, KHONG setPriority** |
+| Guide Frame | khong sinh tien trinh con — khong can |
+
+### DA LAM
+- Tao `design-system/tai-nguyen.js` (nguon chan ly) + `dong-bo-tai-nguyen.ps1`
+  + `kiem-tai-nguyen.ps1`. Panel KHONG build nap thang; 4 panel CO build giu
+  hang so `TRAN_TAI_NGUYEN = 0.70` tai cho (doi cau hinh build cua 4 panel
+  dang chay la rui ro lon hon loi ich).
+- Podcast + Re-Frames: ghim `-threads` theo `chiaLuong(1)`, `maxBuffer` theo
+  `tranDemLog()`.
+- Autocut + Transcripts: `0.6` -> `TRAN_TAI_NGUYEN = 0.70`.
+- Asset Manager + Power Bins: **GIU turbo o 50% co y** (do cu: nut that la
+  dau doc o cung, 16 luong CHAM HON 8) — chi ghim them tran cho che do NEN.
+- `kiem-tai-nguyen.ps1`: **12/12 muc kiem DAT** tren ca 7 panel.
+
+### ☠️ DO THAT LAT NGUOC GIA DINH CUA CHINH EM
+Em viet comment "khong ghim thi FFmpeg bung het 32 luong". Do that
+(encode 4K->720p libopenh264, may 32 luong, do CPU-time/wall-time):
+
+| Cau hinh | Luong that dung | % cua 32 | Thoi gian |
+|---|---|---|---|
+| **Khong ghim** | **10,5** | 32,8% | 5,2 giay |
+| **Ghim 22 (tran 70%)** | 16,0 | 50,0% | **3,6 giay** |
+| Ghim 16 (san 50%) | 13,9 | 43,4% | 3,8 giay |
+| Ghim 4 (doi chieu) | 4,4 | 13,8% | 9,0 giay |
+
+**Cau do SAI.** FFmpeg tu chon so luong theo codec, thuong chon THAP.
+`-threads` la cai TRAN chu khong phai muc ep dung — ghim tran RONG con
+nhanh hon 31%, ghim CHAT moi la thu lam cham. Da sua comment o ca 3 panel.
+
+Bay do luong da vap 2 lan trong phien nay, deu la bai hoc cu:
+1. Chay 3 cau hinh lien tiep roi so wall-time -> lan dau doc file 4K tu o G
+   chua cache nen cham oan. Sua: chay lan lam nong truoc, lay lan 2.
+2. `$p.TotalProcessorTime` doc SAU khi tien trinh thoat -> ra **0**. Phai
+   poll trong luc no con chay va giu gia tri cuoi.
+3. Duong dan `G:\Quay PV tuyen dung...` co dau cach -> `Start-Process
+   -ArgumentList` cat thanh "G:\Quay". Sua: trich lieu ra ten ASCII truoc.
+
+### DO TREN PANEL THAT
+Cai ban moi, reload panel: `AiOTaiNguyen.moTa()` tra
+"CPU 22/32 luong (tran 70%) · RAM tran 45 GB · GPU model turbo";
+`chiaLuong(4)` = 4 tien trinh x 5 luong = 20 <= 22. Dat.
+Tach WAV tu mp3 do duoc **8,4% CPU** (viec nhe, khong cham tran — dung
+nhu ky vong: tran khong phai muc ep dung).
+
+Lan chay 10:15 tren panel that voi nao SAN TU DO: ra **103 luot**
+(dung con so ban do offline), tao "Podcast Cut (3)". Van bao dung loi
+stereo con ton: "tieng 206/103" = gap doi -> viec 1 chua sua xong.
+
+## [thu-kenh] - 2026-08-04 10:08 - VIEC 1: DA CHUNG MINH WAV MONO LA LOI GIAI
+
+Anh Tien nhuong Premiere. Chay `thu-kenh.jsx` tren sequence THU RIENG
+(`AiO-THU-KENH`, clone tu ban goc roi go sach clip) — khong dung sequence
+nao cua anh.
+
+| Buoc | trackA | So clip tung track |
+|---|---|---|
+| Sau khi go sach | 2 | [0, 0] |
+| **Dat mp3 STEREO vao A1** | 2 | **[1, 1]** — TRAN sang A2 |
+| **Dat WAV MONO vao A2** | 2 | **[1, 2]** — nam gon 1 track |
+
+=> **Xac nhan bang thuc nghiem**: mp3 stereo an 2 track, WAV mono an 1
+track. Loi giai la dat tieng bang FILE MONO.
+
+Ghi chu: `sequence.deleteSequence()` KHONG ton tai trong Premiere Beta
+26.5 — sequence `AiO-THU-KENH` phai xoa tay. Item WAV thu da go duoc.
+
+### HAI DUONG SUA — chua chon, can do them
+- **A. Tach WAV 48k mono roi dat file do.** Chac chan dung (vua chung
+  minh). Gia: ~254 MB/mic cho 44 phut, phai import them item vao project
+  nguoi dung, va neu de trong %TEMP% thi bi don la media OFFLINE — nen
+  phai dat canh file goc (`<ten>.aio-mono.wav`, dung quy uoc Autocut).
+- **B. Cu dat mp3 nhu cu roi GO clip o track thua.** Vi mic lav la mono
+  that (L=R, do 04/08: ca hai kenh deu -50,6 dB) nen giu 1 kenh la du
+  tieng. Nhe, khong ton dia, khong them item. **RUI RO chua do:** clip
+  mono con lai co duoc pan CENTER khong, hay bi pan cung sang trai.
+  Phai export thu roi do L/R moi biet.
+=> Nghieng ve B neu do ra pan center (anh Tien chot "nhe de nhanh"),
+lui ve A neu B lam lech tai.
+
+## [autocut-da-podcast] - 2026-08-04 10:02 - ☠️ HAI TOOL TRONG CUNG BO DA NHAU: AUTOCUT XOA MIC, THAY BANG TIENG CAM
+
+Anh Tien chay Autocut "Cat tai cho" tren ban dung cua Podcast roi hoi
+"am thanh cua anh bi giam di nhieu khong". **Khong phai giam dB - la DOI
+NGUON TIENG.** Do that tren 3 sequence trong project cua anh:
+
+| Sequence | A1 | A2 | A3 | V |
+|---|---|---|---|---|
+| **Podcast Cut** (tool minh dung) | Mic-Trong x37 | Mic-Trong x37 + Mic-Dilys x37 | Mic-Dilys x37 | V2 C4234 x40 · V3 C4089 x39 |
+| **Podcast Cut (2)** sau Autocut | **C4234 x300** | **C4234 x300** | — | **V1 C4234 x300** |
+| **... - autocut 0908** | C4234 x317 + C4089 x688 | (nhu tren) | — | (nhu tren) |
+
+=> Autocut **don het ve V1/A1/A2** va dung TIENG GAN LIEN VOI CLIP HINH
+(tieng camera), **mic rieng bien mat hoan toan**. Mic-Trong/Mic-Dilys con
+0 clip trong ban sau Autocut.
+
+**Vi sao nghe nho han - do bang so:**
+
+| Nguon tieng | mean_volume | max_volume |
+|---|---|---|
+| Mic lav (Mic-Trong.mp3) | **-50,6 dB** | -23,4 dB |
+| Tieng cam (C4234.MP4) | **-66,2 dB** | -41,8 dB |
+| **Chenh** | **15,6 dB** | **18,4 dB** |
+
+Mic cai ao vs mic gan tren may quay cach ~2m: chenh 15-18 dB. Dung bang
+muc "giam di nhieu" anh nghe thay.
+
+### DAY LA LOI SAN PHAM, KHONG PHAI LOI THAO TAC CUA ANH TIEN
+Autocut duoc thiet ke cho video THUONG (1 hinh + tieng cua chinh no). No
+khong biet sequence multicam co MIC RIENG tren track khac. Chay noi tiep
+Podcast -> Autocut la duong di RAT TU NHIEN cua editor (cat theo nguoi
+noi xong thi cat khoang lang), ma di duong do la mat sach mic.
+
+**Chua sua.** Huong: (a) Autocut nhan ra sequence co track tieng khong
+gan clip hinh thi giu nguyen anh xa track; (b) hoac Podcast xuat ban
+dung o dang Autocut hieu duoc; (c) hoac chan + bao nguoi dung.
+=> Phai hoi anh Tien chon, vi no dong den CA HAI panel (bai hoc 5n: loi
+dung chung thi dung va rieng mot cho).
+
+### Cung xac nhan lai loi stereo (viec 1) bang so
+Ban "Podcast Cut" cho thay ro: Mic-Trong chiem **A1+A2**, Mic-Dilys chiem
+**A2+A3** — dung la moi mp3 stereo an 2 track lien tiep. `getAudio
+ChannelMapping()` KHONG ton tai trong Premiere Beta 26.5 (da thu, tra
+ReferenceError) nen phai sua bang duong khac: dat tieng bang file WAV
+MONO thay vi mp3 stereo. Da tach thu `THU-mono48.wav` (60 giay, 48kHz
+mono) va viet san `thu-kenh.jsx` — CHUA CHAY vi anh Tien dang thao tac.
+
 ## [san-tu-do] - 2026-08-04 09:47 - VIEC 2 XONG: BO SAN -50 dB CUNG, DUNG OTSU TU DO
 
 Anh Tien chot thu tu 1-2-3. Viec 2 lam xong truoc vi viec 1 phai cho

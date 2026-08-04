@@ -302,6 +302,7 @@
 
 <script src="./CSInterface.js"></script>
 <script src="./nao.js"></script>
+<script src="./tai-nguyen.js"></script>
 <script>
   var cs = new CSInterface()
 
@@ -781,8 +782,24 @@
         if (fs.existsSync(ra) && fs.statSync(ra).mtimeMs > fs.statSync(nguon).mtimeMs) canChay = false
       } catch (e) {}
       if (!canChay) { tachMot(i + 1, xong); return }
-      cp.execFile(ffmpeg, ['-y', '-i', nguon, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', ra],
-        { windowsHide: true, maxBuffer: 8 * 1024 * 1024 },
+      // ── Ngân sách CPU dùng chung cả bộ (design-system/tai-nguyen.js) ──
+      //    Tách WAV chạy TUẦN TỰ (mỗi lúc 1 tiến trình) nên cả trần rơi vào
+      //    một tiến trình.
+      //
+      //    ☠️ ĐO THẬT 04/08 — đừng tin câu "không ghim thì FFmpeg bung hết
+      //    máy", nó SAI. Encode 4K→720p bằng libopenh264 trên máy 32 luồng:
+      //      không ghim  → 10,5 luồng (32,8%) · 5,2 giây
+      //      ghim 22     → 16,0 luồng (50,0%) · 3,6 giây   ← NHANH HƠN 31%
+      //      ghim 4      →  4,4 luồng (13,8%) · 9,0 giây
+      //    FFmpeg tự chọn số luồng theo codec, thường THẤP hơn ta tưởng.
+      //    `-threads` là cái TRẦN, không phải mức ép dùng — đặt trần rộng
+      //    còn cho phép nó chạy nhanh hơn mà vẫn không vượt 70%.
+      //    (Tách WAV từ mp3 nhẹ hơn nhiều: đo được 8,4% CPU, xong ~2 giây.)
+      var nsCpu = AiOTaiNguyen.chiaLuong(1)
+      cp.execFile(ffmpeg,
+        ['-y', '-threads', String(nsCpu.luongMoi), '-i', nguon,
+          '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', ra],
+        { windowsHide: true, maxBuffer: AiOTaiNguyen.tranDemLog() },
         function (err, so, se) {
           if (err) { xong(t('tach_loi') + String(se || err).slice(-300)); return }
           tachMot(i + 1, xong)

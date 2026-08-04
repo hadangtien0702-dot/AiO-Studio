@@ -84,20 +84,51 @@ function getCpuInfo(
     return { limit: 8, yieldMs: 0, threadsPerJob }
   }
 
-  // Chế độ NỀN: giữ nguyên như cũ, KHÔNG ghim `-threads`.
-  // Ở đây `os.setPriority(pid, 19)` đã lo — FFmpeg dùng bao nhiêu nhân cũng
-  // được, Premiere cần CPU là hệ điều hành cắt ngay. Ghim thêm chỉ làm chậm
-  // mà không được gì.
+  /**
+   * ☠️ 2026-08-04 — anh Tiến chốt luật chung cả bộ: CPU/RAM/GPU dùng trong
+   * dải 50–70% (`design-system/tai-nguyen.js`).
+   *
+   * TURBO Ở TRÊN GIỮ NGUYÊN, CỐ Ý — và đây là chỗ dễ "tuân thủ luật" một
+   * cách máy móc rồi làm sản phẩm CHẬM ĐI. Trần turbo hiện là 8×2 = 16/32
+   * luồng = đúng SÀN 50%. Nâng lên 70% nghe thì đúng luật, nhưng đo cũ đã
+   * ghi ngay trên đầu hàm này: nút thắt của việc sinh thumbnail/sóng âm là
+   * ĐẦU ĐỌC Ổ CỨNG chứ không phải CPU — 16 luồng chạy CHẬM HƠN 8. Luật là
+   * cái TRẦN không được vượt, không phải hạn mức bắt buộc phải tiêu hết.
+   *
+   * CHẾ ĐỘ NỀN thì trước nay KHÔNG ghim `-threads` (để `setPriority(pid,19)`
+   * lo). Nay ghim trần thật để không bao giờ vượt 70% kể cả khi máy rảnh.
+   *
+   * ☠️ ĐO THẬT 04/08 — bỏ luôn câu "không ghim thì FFmpeg bung hết nhân",
+   * nó SAI. Encode 4K→720p libopenh264 trên máy 32 luồng:
+   *      không ghim → 10,5 luồng (32,8%) · 5,2 giây
+   *      ghim 22    → 16,0 luồng (50,0%) · 3,6 giây   ← nhanh hơn 31%
+   *      ghim 4     →  4,4 luồng (13,8%) · 9,0 giây
+   * FFmpeg tự chọn số luồng theo codec và thường chọn THẤP. `-threads` là
+   * cái TRẦN, không phải mức ép dùng. Nên ghim trần rộng không hy sinh tốc
+   * độ — ghim CHẶT mới là thứ làm chậm (xem dòng 'ghim 4').
+   */
   if (count <= 4) {
     // Máy yếu (≤4 nhân): 1 luồng nền, nghỉ 15ms giữa các job để nhường Premiere.
-    return { limit: 1, yieldMs: 15, threadsPerJob: 0 }
+    return { limit: 1, yieldMs: 15, threadsPerJob: 1 }
   }
   if (count <= 8) {
-    return { limit: 3, yieldMs: 4, threadsPerJob: 0 }
+    return { limit: 3, yieldMs: 4, threadsPerJob: nganSachLuong(count, 3) }
   }
   // Máy mạnh (>8 nhân logic, vd 5950X = 32): 6 worker song song.
   // An toàn vì mọi tiến trình FFmpeg đều chạy IDLE priority.
-  return { limit: 6, yieldMs: 2, threadsPerJob: 0 }
+  return { limit: 6, yieldMs: 2, threadsPerJob: nganSachLuong(count, 6) }
+}
+
+/**
+ * Chia ngân sách luồng cho N tiến trình song song sao cho N × kết quả ≤ 70%
+ * số luồng máy. Cùng công thức `chiaLuong` trong `design-system/tai-nguyen.js`
+ * — panel này build bằng TypeScript nên giữ bản chép, đừng sửa lệch.
+ */
+const TRAN_TAI_NGUYEN = 0.70 // design-system/tai-nguyen.js — TRAN
+
+function nganSachLuong(soLuongMay: number, soTienTrinh: number): number {
+  const tran = Math.max(1, Math.floor(soLuongMay * TRAN_TAI_NGUYEN))
+  return Math.max(1, Math.floor(tran / Math.max(1, soTienTrinh)))
 }
 
 /** Asset này còn thiếu gì cần xử lý nền không. */

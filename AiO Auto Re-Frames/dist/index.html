@@ -257,6 +257,7 @@
   </div>
 
 <script src="./CSInterface.js"></script>
+<script src="./tai-nguyen.js"></script>
 <script>
   var cs = new CSInterface()
 
@@ -690,15 +691,29 @@
 
         // -ss TRƯỚC -i: nhảy thẳng tới mốc (bài học skill CEP). -t = thời lượng.
         // libopenh264: encoder BSD trong bundle LGPL — sạch để bán.
+        // Ngân sách CPU dùng chung cả bộ (design-system/tai-nguyen.js).
+        // Xuất bản check chạy MỘT tiến trình mỗi lần bấm nên cả trần rơi
+        // vào tiến trình đó.
+        //
+        // ☠️ ĐO THẬT 04/08 trên ĐÚNG lệnh encode này (4K→720p libopenh264,
+        // máy 32 luồng) — kết quả ngược với điều ai cũng tưởng:
+        //   không ghim → 10,5 luồng (32,8%) · 5,2 giây
+        //   ghim 22    → 16,0 luồng (50,0%) · 3,6 giây   ← NHANH HƠN 31%
+        //   ghim 4     →  4,4 luồng (13,8%) · 9,0 giây
+        // FFmpeg KHÔNG tự bung hết máy; nó tự chọn theo codec và thường
+        // chọn thấp. `-threads` là TRẦN chứ không phải mức ép dùng — đặt
+        // trần rộng vừa nhanh hơn vừa vẫn dưới 70%.
+        var nsCpu = AiOTaiNguyen.chiaLuong(1)
         var thamSo = [
-          '-y', '-ss', tu.toFixed(3), '-i', goc, '-t', dai.toFixed(3),
+          '-y', '-threads', String(nsCpu.luongMoi),
+          '-ss', tu.toFixed(3), '-i', goc, '-t', dai.toFixed(3),
           '-vf', 'scale=-2:720',
           '-c:v', 'libopenh264', '-b:v', '2500k',
           '-c:a', 'aac', '-b:a', '128k',
           ra,
         ]
         var duoiLoi = ''
-        var con = cp.execFile(ffmpeg, thamSo, { windowsHide: true, maxBuffer: 8 * 1024 * 1024 }, function (err) {
+        var con = cp.execFile(ffmpeg, thamSo, { windowsHide: true, maxBuffer: AiOTaiNguyen.tranDemLog() }, function (err) {
           if (err) { xongXuat(null, t('xuat_loi') + (duoiLoi.slice(-300) || String(err))); return }
           var mb = '?'
           try { mb = (fs.statSync(ra.replace(/\//g, '\\')).size / 1048576).toFixed(1) } catch (e2) {
