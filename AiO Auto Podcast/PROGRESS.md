@@ -1,5 +1,44 @@
 # AiO Auto Podcast - Nhat ky
 
+## [dap-an-tai] - 2026-08-04 14:57 - MO 12 MARKER CUA ANH TIEN: TIM RA HAI THU PHAM CUA LOI SO 1
+
+Anh Tien nghe ban dung "AiO-WIDE-TEST - Podcast Cut" va cham 12 marker
+(hau het = "nguoi nu dang noi ma hinh nguoi nam"). Day la DAP AN TAI dau
+tien. Anh cung hoi: "voice tu file goc khoang -36 den -54 dB, qua be co
+phai ly do khong?"
+
+### CACH MO
+1. Doc 12 marker + tool dang chieu gi tai moc do (jsx qua panel).
+2. Voi tung moc: dem cua so +-1,5s — Trong RO / Dilys RO / MU (nguong
+   chenh 6dB, san tu do -54), p50 tung mic.
+3. Soi MAT 5 moc dang ngo nhat: rut 6 khung hinh/cam quanh moc tu ca
+   2 cam can (crop mat). **Ca 5/5 moc deu la DILYS dang noi** (mieng mo,
+   tay vung; Trong ngam mieng) — khop loi anh ta.
+
+### KET QUA — 12 moc chia 3 nhom
+| Nhom | So moc | Bang chung dien hinh |
+|---|---|---|
+| **B. MIC SAI PHIA** — Dilys noi ma mic TRONG to hon chinh mic co ay | ~5 (6:01, 6:31, 8:41, 15:17, 19:06) | 6:31: mat thay Dilys noi, mic Trong p50 -52,7 dB vs mic Dilys **-62,6 dB** (nho hon 10 dB!) |
+| **A. NAO NGHE DUNG MA KHONG DOI** — luat onset qua chat | ~2 (4:14, 5:49) | 4:14: Dilys ro 39 cua so vs Trong 1, van giu hinh Trong 2,3s — luat "phai day 15/25" chan cu doi hop le vi tieng ro bi bleed lam thua |
+| **C. Vung mu / doi dap nhanh** | ~5 (3:11, 4:53, 8:31, 13:12) | 55-90% cua so mu quanh moc; 8:31 la WIDE dung luc khong ai noi (co the anh danh dau vi khong ung wide?) |
+
+### TRA LOI CAU HOI "AUDIO QUA BE?"
+**Mot nua dung.** Thu be (p50 ~-54, sat nen) lam 72% cua so mu -> nao
+phai doan. NHUNG tang gain KHONG cuu duoc nhom B: gain tang ca hai mic
+nhu nhau, ti le chenh giu nguyen. Nhom B la loi VI TRI/HUONG MIC luc
+thu (hoac dan nhan file nguoc?) — giong Dilys vao mic Trong TO HON chinh
+mic co ay thi moi thuat toan so nang luong deu thua.
+
+### VIEC TIEP (chua lam trong phien nay)
+1. Sua duoc bang code: noi luat onset (nhom A) — dung 12 moc lam thuoc,
+   khong duoc pha cac cho khong bi danh dau.
+2. Nhom B can anh Tien xac nhan: buoi do dat mic KIEU GI (cai ao hay
+   boom dat ban?), va team co CHAC file "Mic-Trong"/"Mic-Dilys" dat ten
+   dung nguoi khong. Neu mic boom dat giua thi day la gioi han vat ly
+   cua so-nang-luong -> can huong thuat toan khac (khu bleed / tuong
+   quan) hoac huong dan thu am.
+3. Ca 8:31 goi y: co the can hoi anh co UNG cach ve wide khong.
+
 ## [v3-a3-khop] - 2026-08-04 12:28 - V/A KE CUNG MOT CHUYEN + BANG TRANG-THAI.md (v0.3.3)
 
 ### 1. Anh Tien: "V3 va A3 no dang khong khop voi nhau"

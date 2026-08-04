@@ -25,7 +25,7 @@ lỗi này chưa hết thì sản phẩm chưa xong.
 
 | # | Lỗi | Hiện trạng |
 |---|---|---|
-| 1 | **Cắt sai người trên liệu thật** (nhiều mốc: 00:38 · 02:58 · 03:13 · …) | Đã thử 1 hướng sửa (trừ tiếng rò rỉ) — đo bằng mắt 6 mốc: 1 thắng 1 thua 4 hoà, **chưa chứng minh được tốt hơn**. Cần bộ mốc sai từ tai anh để sửa có căn cứ |
+| 1 | **Cắt sai người trên liệu thật** — anh chấm 12 marker, "nữ nói mà hình nam" | **ĐÃ CÓ CHẨN ĐOÁN (14:57 04/08)** từ 12 marker + soi mắt 5 mốc: (B) ~5 mốc **mic sai phía** — Dilys nói mà mic Trọng to hơn chính mic cô ấy 10 dB → thuật toán nào so âm lượng cũng thua, gốc ở khâu THU; (A) ~2 mốc não nghe đúng mà luật đổi người quá chặt → sửa được bằng code; (C) ~5 mốc vùng mù/đối đáp nhanh. Chờ anh xác nhận cách đặt mic buổi đó |
 | 2 | **Hai người nói chồng nhau** — hình nhảy loạn hoặc kẹt một người | Chưa làm luật riêng; đợi cùng bộ đáp án với lỗi 1 |
 | 3 | **Sequence sync bằng Premiere chỉ có tiếng cam** → tool không chạy được, thông báo chưa dạy người dùng cách sửa | Mới có ghi chú xám "tiếng của cam V1"; chưa có hướng dẫn "sync kèm 2 file mic" ngay trên panel |
 | 4 | **Đầu bản dựng trống ~1,6 giây** (vùng phủ bắt đầu từ mốc mic, không phải 0) | Mới phát hiện 04/08 khi đo lỗ trống; nhìn như lỗi dù là chủ ý — cần quyết cách xử lý |
