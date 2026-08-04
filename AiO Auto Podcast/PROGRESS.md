@@ -1,5 +1,45 @@
 # AiO Auto Podcast - Nhat ky
 
+## [bao-loi-ro] - 2026-08-04 16:11 - ANH TEST "CAN BAN NHAT" KET: BAO LOI PHAI CHI DICH DANH (v0.3.6)
+
+Anh Tien tu sync "test thuc te" bang Premiere Synchronize roi bam — khung
+vang "Moi nguoi can dung mot track hinh va mot track tieng" hien ra, anh
+ket luan "tool nay that su co van de, test dang can ban nhat cung bi loi".
+Anh cung dan: "em khong them hay thay doi bat ki thu gi ben trong sequence
+nay cua anh" — tu day moi thao tac chi o PANEL va tai lieu, KHONG dung
+sequence, KHONG save project.
+
+### Do duoc gi (read-only)
+- Project da bi MO LAI KHONG LUU: chi con 2 sequence, mic em dat 15:44 +
+  cac ban Cut + item Mic-*.mp3 BAY SACH. Loi cua em: thay mic xong khong
+  nhac save/khong save — viec "da xong" bay hoi khong dau vet.
+- Khung vang lan nay la loi GAN: co chip "Nguoi 3" trong (anh bam Them
+  nguoi luc nao do) — cau bao chung chung khong noi AI thieu GI.
+- Sync cua anh: C4234 sau C4089 dung 9 frame (0,3754s); PluralEyes noi 10
+  frame. Lech 1 frame = trong dung sai. SYNC CUA ANH OK — van de la
+  sequence KHONG CO MIC (A1/A2 = tieng nhung cua cam, C4234 cam -75,6 dB).
+
+### Sua (v0.3.6 — chi panel, khong dung host)
+1. `soatGan` chi DICH DANH: "{ten} chua co {track hinh|track tieng|ca hai}
+   — gan cho du, hoac bam x tren chip {ten} de bot nguoi."
+2. Loi TRUOC-KHI-CHAY (gan thieu, thieu ffmpeg) doi tieu de khung thanh
+   "CHUA CHAY — GAN CHUA DU" (hien() them tham so tieudeKey). Truoc do
+   moi loi deu doi mu "TOOL DA CHAY" — sai su that voi loi gan.
+3. `mot_luot` day them mot cau day nguoi dung: track tieng dang ghi chu
+   "tieng cua cam" thi tool can FILE MIC RIENG nam trong sequence.
+
+### Kiem chung
+- Gac cong cai: kiem-nao 16/16 + stress 12/12. Cai + reload panel qua CDP.
+- DOM sau reload: 2 chip (Nguoi 3 tu bien — la trang thai tam chua luu),
+  gan du 4 track, toggle tieng-lien van ON.
+
+### Dang cho anh Tien chot
+Sequence cua anh khong co mic thi tool KHONG THE nghe ai noi (khong phai
+loi thuat toan — thieu dau vao). Hai duong, cho anh chon: (a) em dat 2 mic
+vao BAN SAO sequence (ban goc khong dung), (b) anh tu Synchronize lai co
+kem 2 file mic. File mic ten ASCII nam san o
+`file pr for test\podcast-buoi2\Mic-Trong.mp3 / Mic-Dilys.mp3`.
+
 ## [tieng-lien] - 2026-08-04 15:51 - TUY CHON "GIU TIENG LIEN MACH" (v0.3.5)
 
 Anh Tien thay step "Dang thay tieng cam bang tieng mic..." va hoi: "anh

@@ -8,7 +8,13 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 15:51 — panel v0.3.5, host v0.3.1.
+*Cập nhật lần cuối: 04/08/2026 16:11 — panel v0.3.6, host v0.3.1.
+Mới trong v0.3.6 (từ ca anh test "căn bản nhất" bị kẹt): lỗi gán chỉ ĐÍCH
+DANH ai thiếu gì; lỗi trước-khi-chạy đổi tiêu đề "CHƯA CHẠY — GÁN CHƯA ĐỦ";
+thông báo một-người-nói dạy luôn "cần FILE MIC RIÊNG trong sequence".
+⚠️ Project AiO-Podcast-Test bị mở lại không lưu → mic + các bản Cut hôm nay
+bay sạch; sequence "test thực tế" anh sync lại chỉ có tiếng cam (sync chuẩn,
+lệch PluralEyes đúng 1 frame) — đang chờ anh chốt đường đưa mic vào.*
 Mới trong v0.3.5: tuỳ chọn "Giữ tiếng liền mạch" cạnh nút Dựng (anh xin
 đường nghe thử — chỉ cắt hình, tiếng mic nguyên vẹn). Trước đó v0.3.4:
 thất bại hiện KHUNG TO kèm số đo từng người. "test thực tế" đã được thay

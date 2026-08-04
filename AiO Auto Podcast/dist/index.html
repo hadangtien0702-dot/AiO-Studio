@@ -382,6 +382,11 @@
       nut_dung: 'Cắt timeline theo người nói',
       tieng_lien: 'Giữ tiếng liền mạch — chỉ cắt hình, tiếng mic để nguyên',
       thieu_gan: 'Mỗi người cần đúng một track hình và một track tiếng — gán đủ rồi bấm.',
+      thieu_gan_ai: '{ten} chưa có {thieu} — gán cho đủ, hoặc bấm × trên chip {ten} để bớt người.',
+      thieu_hinh: 'track hình',
+      thieu_tieng: 'track tiếng',
+      thieu_ca: 'track hình lẫn track tiếng',
+      canlam_tieude_gan: 'CHƯA CHẠY — GÁN CHƯA ĐỦ',
       trung_track: '{a} và {b} đang dùng chung một track — mỗi người một track riêng.',
       track_nhieu_clip: '{track} có {n} clip — bản này cần track một clip liền (sync bằng Synchronize rồi để nguyên).',
       thieu_node: 'Panel không đọc được file (thiếu Node).',
@@ -396,7 +401,7 @@
       dang_thay_tieng: 'Đang thay tiếng cam bằng tiếng mic…',
       khong_phan_biet: 'Hai mic nghe giống nhau quá, không phân biệt được ai đang nói — kiểm tra lại: mỗi người một mic riêng, mic ai gần người nấy. (Cửa sổ nghe rõ: {ro}%)',
       mic_deu: 'Mic của {ten} (track {track}) có âm lượng đều suốt cả tập — nghe giống tiếng cam hoặc nhạc nền hơn là mic thu riêng một người. Kiểm tra lại bước gán rồi bấm lại.',
-      mot_luot: 'Nghe cả tập chỉ thấy MỘT người nói nên không dựng — dựng ra sẽ chỉ có một cảnh duy nhất. Thường do một mic không thu được tiếng (dây, gain) hoặc gán nhầm track.',
+      mot_luot: 'Nghe cả tập chỉ thấy MỘT người nói nên không dựng — dựng ra sẽ chỉ có một cảnh duy nhất. Thường do một mic không thu được tiếng (dây, gain) hoặc gán nhầm track. Track tiếng đang ghi chú "tiếng của cam"? Tool cần FILE MIC RIÊNG của từng người nằm trong sequence — tiếng cam không đủ để nghe ra ai đang nói.',
       canlam_tieude: 'Tool đã chạy — dừng lại vì',
       nghe_thay: 'Đo được: {chiTiet}.',
       nghe_mot_nguoi: '{ten} nghe rõ {pt}%',
@@ -440,6 +445,11 @@
       nut_dung: 'Cut the timeline by speaker',
       tieng_lien: 'Keep audio continuous — cut video only, leave mics uncut',
       thieu_gan: 'Each person needs exactly one video and one audio track — finish assigning, then hit cut.',
+      thieu_gan_ai: '{ten} has no {thieu} yet — assign it, or click × on the {ten} chip to remove them.',
+      thieu_hinh: 'video track',
+      thieu_tieng: 'audio track',
+      thieu_ca: 'video or audio track',
+      canlam_tieude_gan: 'NOT RUN YET — ASSIGNMENT INCOMPLETE',
       trung_track: '{a} and {b} share the same track — one track per person.',
       track_nhieu_clip: '{track} has {n} clips — this version needs one continuous clip per track (Synchronize, then leave as is).',
       thieu_node: 'Panel cannot read files (Node missing).',
@@ -454,7 +464,7 @@
       dang_thay_tieng: 'Swapping cam audio for mic audio…',
       khong_phan_biet: 'The mics sound too alike — cannot tell who is speaking. Check: one mic per person, each mic close to its person. (Clear windows: {ro}%)',
       mic_deu: 'The mic for {ten} (track {track}) has near-constant volume — it sounds like camera audio or a music bed, not a personal mic. Check the assignment and try again.',
-      mot_luot: 'The whole episode sounds like ONE person talking, so nothing was built — the result would be a single shot. Usually one mic recorded nothing (cable, gain) or a track is misassigned.',
+      mot_luot: 'The whole episode sounds like ONE person talking, so nothing was built — the result would be a single shot. Usually one mic recorded nothing (cable, gain) or a track is misassigned. Audio tracks marked "cam audio"? The tool needs SEPARATE MIC FILES for each person inside the sequence — camera scratch audio is not enough to tell who is speaking.',
       canlam_tieude: 'The tool ran — stopped because',
       nghe_thay: 'Measured: {chiTiet}.',
       nghe_mot_nguoi: '{ten} clearly heard {pt}%',
@@ -585,13 +595,15 @@
     var lenh = 'var __n="OK"; try { $.evalFile("' + ext + '/host/index.jsx") } catch(e) { __n="ERR:"+e } __n'
     cs.evalScript(lenh, function (kq) { xong(String(kq).indexOf('OK') === 0) })
   }
-  function hien(id, text) {
+  function hien(id, text, tieudeKey) {
     var el = document.getElementById(id)
     el.style.display = text ? '' : 'none'
     el.textContent = text || ''
     // Tiêu đề khung: nói rõ TOOL ĐÃ CHẠY — người dùng tưởng "bấm không chạy"
     // trong khi nó chạy xong và dừng đúng chốt an toàn (vấp thật 04/08).
-    if (id === 'canlam') el.setAttribute('data-tieude', t('canlam_tieude'))
+    // Lỗi GÁN (chưa chạy gì) thì tiêu đề phải nói CHƯA CHẠY — cùng ngày,
+    // anh Tiến gặp khung "TOOL ĐÃ CHẠY" cho lỗi thiếu gán và hiểu là tool hỏng.
+    if (id === 'canlam') el.setAttribute('data-tieude', t(tieudeKey || 'canlam_tieude'))
   }
   /** "Người 1 nghe rõ 2% · Người 2 nghe rõ 21%" — bằng chứng tool ĐÃ nghe. */
   function taNgheThay(thongKe) {
@@ -868,7 +880,12 @@
     var daDung = {}
     for (var i = 0; i < nguoiDs.length; i++) {
       var ng = nguoiDs[i]
-      if (ng.cam < 0 || ng.mic < 0) return t('thieu_gan')
+      // Chỉ đích danh AI thiếu GÌ — 04/08 anh Tiến kẹt ở chip "Người 3" trống
+      // mà câu chung chung không nói ra, tưởng tool hỏng.
+      if (ng.cam < 0 || ng.mic < 0) {
+        var thieu = ng.cam < 0 && ng.mic < 0 ? t('thieu_ca') : (ng.cam < 0 ? t('thieu_hinh') : t('thieu_tieng'))
+        return tp('thieu_gan_ai', { ten: tenNguoi(i), thieu: thieu })
+      }
       var kV = 'V' + ng.cam, kA = 'A' + ng.mic
       if (daDung[kV]) return tp('trung_track', { a: daDung[kV], b: tenNguoi(i) })
       if (daDung[kA]) return tp('trung_track', { a: daDung[kA], b: tenNguoi(i) })
@@ -902,14 +919,14 @@
     var loiGan = soatGan()
     hien('canlam', ''); hien('loi', '')
     document.getElementById('ketqua').className = 'ketqua'
-    if (loiGan) { hien('canlam', loiGan); return }
+    if (loiGan) { hien('canlam', loiGan, 'canlam_tieude_gan'); return }
 
     var fs = napNode('fs')
     var os = napNode('os')
     var cp = napNode('child_process')
     if (!fs || !os || !cp) { hien('loi', t('thieu_node')); return }
     var ffmpeg = timFfmpeg(fs)
-    if (!ffmpeg) { hien('canlam', t('thieu_ffmpeg')); return }
+    if (!ffmpeg) { hien('canlam', t('thieu_ffmpeg'), 'canlam_tieude_gan'); return }
 
     dangChay = true
     document.getElementById('nutDung').disabled = true
