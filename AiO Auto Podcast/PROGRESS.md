@@ -1,5 +1,54 @@
 # AiO Auto Podcast - Nhat ky
 
+## [viec-1-stereo] - 2026-08-04 11:17 - XONG: TIENG MIC KHONG CON XE 2 TRACK
+
+Anh Tien chot lam tiep viec 1. Sua GOC: dat tieng bang FILE MONO thay vi
+mp3 stereo.
+
+### KET QUA — do tren cung mot lieu, cung mot lan gan
+| | Ban cu "Podcast Cut (3)" | **Ban moi "Podcast Cut (4)"** |
+|---|---|---|
+| A1 | Mic-Trong x52 | **Mic-Trong.aio-mono.wav x52** |
+| A2 | Mic-Trong x52 + Mic-Dilys x51 | **Mic-Dilys.aio-mono.wav x51** |
+| A3 | Mic-Dilys x51 | — khong con |
+| Tong clip tieng | **206** (gap doi) | **103** (dung so luot) |
+| Panel bao loi | "tieng 206/103" | **khong bao gi** |
+
+Hinh giu nguyen: V1 = C4234 x52, V2 = C4089 x51.
+
+### CACH SUA
+- Panel tach them ban MONO giu nguyen sample rate goc (`-ac 1`, khong doi
+  `-ar`) -> `<ten mic>.aio-mono.wav` **DAT CANH FILE GOC**, khong de trong
+  %TEMP%: %TEMP% bi don thi project mo lai bao media OFFLINE. Cung quy uoc
+  voi bo dem nghe cua Autocut/Transcripts.
+- Co CACHE: file mono moi hon file goc thi khong tach lai.
+- Host them `pc_nhapMono(dsStr)`: nhap file vao bin rieng "AiO Podcast -
+  tieng mono", chi nhap file CHUA co (tranh item trung), roi **DOC LAI**
+  xem tim thay du chua — khong tin "khong bao loi" (bai hoc 5l).
+- `pc_phienBan` 'v0.2.0' -> **'v0.3.0'**, panel kiem khop moi chay.
+- Panel chan tu te neu nhap thieu: chi ro file nao, nhac kiem o dia va
+  quyen ghi.
+
+### GIA PHAI TRA — noi ro
+Moi mic sinh them mot file WAV **244 MB** cho 44 phut (48 kHz mono 16-bit).
+Hai mic = 488 MB nam canh lieu goc. Doi lai: cau truc track dung, khong
+mat tieng, khong lech kenh. Neu sau nay thay nang thi huong nhe hon la
+FLAC mono (~60% dung luong, Premiere doc duoc) — CHUA THU.
+
+Thoi gian: tach mono 2 mic 44 phut mat ~15 giay; tong ca lan chay
+(tach 16k + tach mono + nao + dung 103 doan) **~70 giay**.
+
+### KIEM CHUNG
+- `node tests/kiem-nao.mjs`: 16/16 DAT (khong pha gi)
+- Cu phap host + panel: hop le (node --check)
+- Chay THAT tren panel qua cong 8094: 103 luot, **0 loi**, cau truc track
+  dung nhu bang tren
+- `ffprobe` ban mono: pcm_s16le · 48000 Hz · **1 kenh** · 2654,976 giay
+
+### CON LAI
+Thuoc cuoi cung van la TAI anh Tien: mo "Podcast Cut (4)" nghe thu xem
+tieng co dung nguoi, dung nhip khong. May chi noi duoc "cau truc dung".
+
 ## [tai-nguyen] - 2026-08-04 10:23 - LUAT 50-70% CHO CA 7 PANEL + DO THAT LAT NGUOC MOT GIA DINH
 
 Anh Tien chot luat CHUNG: CPU/RAM/GPU trong dai 50-70%, ap cho ca bo.

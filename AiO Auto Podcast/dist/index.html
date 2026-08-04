@@ -339,6 +339,8 @@
       khong_nap_host: 'Không nạp được host/index.jsx từ thư mục extension.',
       thieu_ffmpeg: 'Không tìm thấy bộ xử lý media — cài kèm AiO Transcripts hoặc Autocut.',
       dang_tach: 'Đang tách tiếng mic {i}/{n}…',
+      dang_tach_mono: 'Đang chuẩn bị tiếng mic {i}/{n}…',
+      mono_thieu: 'Không nhập được bản tiếng mono vào project ({thieu}). Kiểm tra ổ đĩa còn chỗ và thư mục chứa mic có cho ghi không.',
       dang_nghe: 'Đang nghe ai nói lúc nào…',
       dang_nhan_ban: 'Đang nhân bản timeline…',
       dang_dung: 'Đang cắt đoạn {i}/{n}…',
@@ -387,6 +389,8 @@
       khong_nap_host: 'Could not load host/index.jsx from the extension folder.',
       thieu_ffmpeg: 'Media engine not found — install AiO Transcripts or Autocut alongside this panel.',
       dang_tach: 'Extracting mic audio {i}/{n}…',
+      dang_tach_mono: 'Preparing mic audio {i}/{n}…',
+      mono_thieu: 'Could not import the mono mic audio into the project ({thieu}). Check free disk space and whether the mic folder is writable.',
       dang_nghe: 'Listening for who speaks when…',
       dang_nhan_ban: 'Duplicating your timeline…',
       dang_dung: 'Cutting segment {i}/{n}…',
@@ -772,6 +776,31 @@
       return tmpDir + '/m-' + bamTen(String(c.duong).toLowerCase()) + '.wav'
     })
 
+    // ☠️ FILE TIENG MONO CHO VIEC DUNG — do that 04/08/2026.
+    //
+    // Mic cua nguoi dung thuong la mp3 STEREO (dual-mono: L va R giong het
+    // nhau, do duoc ca hai deu -50,6 dB). Dat clip stereo len track audio
+    // thi Premiere TACH 2 KENH ra 2 TRACK lien tiep -> Mic-Trong an A1+A2,
+    // Mic-Dilys an A2+A3, A2 chua ca hai nguoi va Premiere de them A4.
+    // Anh Tien thay tren timeline: cac clip dan nhan "L" va "R" roi rac.
+    //
+    // Thu nghiem tren sequence rieng:
+    //     mp3 STEREO vao A1 -> [1, 1]  <- tran sang A2
+    //     WAV MONO  vao A2  -> [1, 2]  <- nam gon 1 track
+    //
+    // API doi kieu kenh (`getAudioChannelMapping`) KHONG co trong Premiere
+    // Beta 26.5. Nen tach san file mono roi dat file do. Dung ban chat:
+    // mic cai ao VON LA MONO, vo stereo chi la tieng nhan doi.
+    //
+    // De CANH FILE GOC chu khong trong %TEMP%: %TEMP% bi don thi project
+    // cua nguoi dung mo lai se bao media offline. Cung quy uoc voi bo dem
+    // nghe cua Autocut/Transcripts.
+    function duongMono(nguon) {
+      var d = String(nguon).replace(/\\/g, '/')
+      return d.replace(/\.[^./]+$/, '') + '.aio-mono.wav'
+    }
+    var monoMic = viecMic.map(function (c) { return duongMono(c.duong) })
+
     function tachMot(i, xong) {
       if (i >= viecMic.length) { xong(null); return }
       nutChu(tp('dang_tach', { i: i + 1, n: viecMic.length }))
@@ -806,8 +835,36 @@
         })
     }
 
+    /**
+     * Tách bản MONO chất lượng gốc để ĐẶT LÊN TIMELINE (khác WAV 16 kHz ở
+     * trên — bản đó chỉ để não nghe, quá thấp để làm tiếng thành phẩm).
+     * Giữ nguyên sample rate của file gốc, chỉ trộn 2 kênh về 1.
+     */
+    function tachMono(i, xong) {
+      if (i >= viecMic.length) { xong(null); return }
+      nutChu(tp('dang_tach_mono', { i: i + 1, n: viecMic.length }))
+      var nguon = viecMic[i].duong
+      var ra = monoMic[i]
+      var canChay = true
+      try {
+        if (fs.existsSync(ra) && fs.statSync(ra).mtimeMs > fs.statSync(nguon).mtimeMs) canChay = false
+      } catch (e) {}
+      if (!canChay) { tachMono(i + 1, xong); return }
+      var ns2 = AiOTaiNguyen.chiaLuong(1)
+      cp.execFile(ffmpeg,
+        ['-y', '-threads', String(ns2.luongMoi), '-i', nguon,
+          '-vn', '-ac', '1', '-c:a', 'pcm_s16le', ra],
+        { windowsHide: true, maxBuffer: AiOTaiNguyen.tranDemLog() },
+        function (err, so, se) {
+          if (err) { xong(t('tach_loi') + String(se || err).slice(-300)); return }
+          tachMono(i + 1, xong)
+        })
+    }
+
     tachMot(0, function (loiTach) {
       if (loiTach) { thoat(loiTach, null); return }
+      tachMono(0, function (loiMono) {
+      if (loiMono) { thoat(loiMono, null); return }
 
       // ── 2. Não nghe ──
       nutChu(t('dang_nghe'))
@@ -851,7 +908,9 @@
         })
         var offMic = viecMic.map(function (c) { return c.inPoint - c.batDau })
         var duongCam = nguoiDs.map(function (ng) { return chuoiJsx(timTrack(trackV, ng.cam).duong) })
-        var duongMic = viecMic.map(function (c) { return chuoiJsx(c.duong) })
+        // ☠️ Tiếng lấy từ bản MONO, KHÔNG lấy file gốc — file gốc stereo thì
+        //    Premiere xé 2 kênh ra 2 track (xem khối chú thích ở `duongMono`).
+        var duongMic = monoMic.map(function (d) { return chuoiJsx(d) })
         var tenMoi = (tenSeqGoc || 'Podcast').replace(/[^\w\- ]/g, '').trim() || 'Podcast'
         tenMoi += ' - Podcast Cut'
 
@@ -861,7 +920,15 @@
           // Chốt phiên bản: evalFile có thể nuốt file GIỮA CHỪNG không báo
           // lỗi (đo 01/08) — hàm cuối file trả lời đúng = cả file đã nạp.
           goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-          if (pb !== 'v0.2.0') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+          if (pb !== 'v0.3.0') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+          // Nhập bản mono vào project — host tìm projectItem theo đường dẫn,
+          // chưa nhập thì `pc_datTieng` không thấy gì để đặt.
+          goiHost('pc_nhapMono("' + duongMic.join(';') + '")').then(function (rN) {
+          if (rN.indexOf('OK:') !== 0) { thoat(t('dung_loi') + rN, null); return }
+          var kvN = tachKv(rN)
+          if (parseInt(kvN.thay, 10) !== duongMic.length) {
+            thoat(tp('mono_thieu', { thieu: kvN.thieu || '?' }), null); return
+          }
           goiHost('pc_nhanBan("' + chuoiJsx(tenSeqGoc) + '","' + tenMoi + '")').then(function (raw) {
             if (raw.indexOf('OK:') !== 0) { thoat(t('dung_loi') + raw, null); return }
             var tenThat = tachKv(raw).seq
@@ -941,8 +1008,10 @@
             loHinh()
           })
           })
+          })
         })
       }, 30)
+    })
     })
   }
 

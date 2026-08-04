@@ -366,11 +366,75 @@ function pc_doKetQua(tenSeq) {
 }
 
 /**
+ * NHAP cac file tieng MONO vao project, tra ve so item tim thay.
+ *
+ * ☠️ VI SAO PHAI CO — do that 04/08/2026.
+ * File mic cua nguoi dung thuong la STEREO (mp3 dual-mono: L va R giong
+ * het nhau, do duoc ca hai deu -50,6 dB). Dat mot clip STEREO len track
+ * audio thi Premiere TACH 2 KENH ra 2 TRACK lien tiep:
+ *
+ *     Mic-Trong  -> A1 + A2       (A1 kenh L, A2 kenh R)
+ *     Mic-Dilys  -> A2 + A3
+ *     => A2 chua CA HAI nguoi, va Premiere de ra them track A4
+ *
+ * Do bang thuc nghiem tren sequence THU rieng:
+ *     dat mp3 STEREO vao A1  -> clip = [1, 1]   <- TRAN sang A2
+ *     dat WAV MONO  vao A2   -> clip = [1, 2]   <- nam gon 1 track
+ *
+ * `getAudioChannelMapping()` KHONG ton tai trong Premiere Beta 26.5 (da
+ * thu, tra ReferenceError) nen khong ep kieu kenh bang API duoc. Duong
+ * con lai: panel tach san file MONO bang FFmpeg roi nhap file do.
+ *
+ * Dung ban chat: mic cai ao VON LA MONO, cai vo stereo chi la tieng nhan
+ * doi. Chuyen ve mono khong mat gi.
+ *
+ * @param dsStr  duong dan cach nhau bang ';'
+ */
+function pc_nhapMono(dsStr) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var duong = String(dsStr).split(';');
+    var canNhap = [];
+    var i;
+    // Chi nhap file CHUA co trong project — nhap lai la de ra item trung.
+    for (i = 0; i < duong.length; i++) {
+      if (!duong[i]) continue;
+      if (!pc__item(duong[i])) canNhap.push(duong[i]);
+    }
+    if (canNhap.length) {
+      var bin = null;
+      try {
+        var root = app.project.rootItem;
+        for (var b = 0; b < root.children.numItems; b++) {
+          if (String(root.children[b].name) === 'AiO Podcast - tieng mono') {
+            bin = root.children[b]; break;
+          }
+        }
+        if (!bin) bin = root.createBin('AiO Podcast - tieng mono');
+      } catch (e) { bin = app.project.rootItem; }
+      try { app.project.importFiles(canNhap, true, bin, false); }
+      catch (e2) { return 'ERR:NHAP_LOI|' + e2.toString(); }
+    }
+    // DO LAI — khong tin "khong bao loi" la da nhap (bai hoc 5l).
+    pc__c = {};
+    var thay = 0, thieu = '';
+    for (i = 0; i < duong.length; i++) {
+      if (!duong[i]) continue;
+      if (pc__item(duong[i])) thay++;
+      else if (!thieu) thieu = duong[i];
+    }
+    return 'OK:daNhap=' + canNhap.length + '|thay=' + thay + '|thieu=' + thieu;
+  } catch (e) {
+    return pc_err('pc_nhapMono', e);
+  }
+}
+
+/**
  * Phien ban host — panel KIEM sau moi lan nap, khop moi duoc chay.
  * ☠️ Phai la ham CUOI FILE: evalFile co the nuot file GIUA CHUNG ma khong
  * bao loi (do that 01/08: nap xong pc_datTieng nhung pc_doKetQua van ban
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.2.0';
+  return 'v0.3.0';
 }
