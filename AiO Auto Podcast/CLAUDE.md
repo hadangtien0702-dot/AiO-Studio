@@ -3,12 +3,33 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 04/08/2026: panel v0.3.6 · host v0.3.1 — ĐÃ CÀI.**
+> **TRẠNG THÁI 05/08/2026 sáng: panel v0.5.0 · host v0.4.1 — ĐÃ CÀI.**
 > Trạng thái chi tiết từng tính năng (xong/chưa/lỗi mở): **`TRANG-THAI.md`**
 > — anh Tiến yêu cầu, mỗi phiên sửa code PHẢI cập nhật. Diễn biến: `PROGRESS.md`.
 > Giải thích chi tiết về Âm thanh & Quy trình Auto Cut: `GIAI-THICH-AUDIO-CHO-CLAUDE.md`.
 >
-> Chốt trong ngày 04/08:
+> **VIỆC KẾ TIẾP** (chờ anh Tiến, không tự làm):
+> 1. Anh bấm tay trên UI v0.5.0 — mọi phép đo tới giờ là em lái qua cổng
+>    8094; riêng **hộp thoại chọn file** của nút tự sync CHƯA qua tay thật.
+> 2. Anh **nghe bản cắt** rồi chấm mốc nào sai → đó là bộ đáp án để đụng
+>    vào ngưỡng. Chưa có nó thì KHÔNG sửa ngưỡng (bài học 5d: thước cùng
+>    vật liệu luôn tự khen mình).
+> 3. `PV_Buoi1/Buoi2` của anh: mic đang **2 clip/track** → nút Cắt tự khoá
+>    kèm lý do. Dọn về 1 clip liền là mở.
+>
+> Chốt trong ngày 04/08 → rạng sáng 05/08:
+> - **v0.4.0 TỰ SYNC** (`dist/sync.js` + `tests/kiem-sync.mjs`): chọn 2–6
+>   file mic → tool tự đo mốc bằng tương quan chéo → tự dựng sequence
+>   "AiO Sync" → tự gợi ý gán. Đo thật: lệch PluralEyes **0,19–0,29 frame**.
+>   ☠️ Chốt tin cậy bằng **HAI NỬA file phải cùng chỉ một mốc**, KHÔNG dùng
+>   ngưỡng r tuyệt đối — r=0,13–0,17 vẫn là mốc ĐÚNG (đã đối chiếu), ngưỡng
+>   r≥0,25 từng loại nhầm cặp đúng.
+> - **v0.4.1 MÀU NHÃN THEO NGƯỜI**: cam + mic cùng người cùng màu, tô ở mức
+>   projectItem (`pc_toMau`) nên mọi clip ở mọi sequence lên màu cùng lúc.
+> - **v0.5.0 GIAO DIỆN Studio Console** theo thiết kế anh Tiến chốt: gõ TÊN
+>   người thẳng vào track · monitor + dải nhát cắt · hộp **Cài đặt cắt** ăn
+>   thật vào engine (cắt sớm · cam ngắn/lâu nhất→đảo wide · ngưỡng dB · chế
+>   độ tiếng) · tự lưu project trước khi ghi.
 > - `dist/` ĐÃ vào git (commit f6c7e70, 03/08) — hết cảnh mất trắng.
 > - Sàn im lặng −50 dB cứng → **Otsu tự đo theo file** (bàn đo có đáp án:
 >   sàn cứng 0/6 ở tiếng nhỏ, tự đo 12/12). Ngưỡng chênh 6 dB giữ nguyên.
@@ -35,6 +56,7 @@
 | Cài dev | `powershell -File scripts/sign-install.ps1` (tự chạy bộ kiểm não trước khi ký) |
 | Đo trên panel | `scripts/do-tren-panel.ps1 -Expression "..."` (mặc định cổng 8094) |
 | Kiểm não | `node tests/kiem-nao.mjs` — 16 phép kiểm, có seed, thoát mã 1 nếu trượt |
+| Kiểm tự sync | `node tests/kiem-sync.mjs` — 9 phép kiểm, có seed, gác cổng cài |
 | Stress | `node tests/stress.mjs` — 12 ca khó (chồng lấn, cười chung, 60 phút, sample rate lẫn…), gác cổng cài |
 | Liệu thử | `node tests/sinh-lieu-media.mjs` → `../file pr for test/podcast-lieu/` |
 
