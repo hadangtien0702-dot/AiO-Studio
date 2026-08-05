@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>AiO Studio — Auto Podcast</title>
 <!--
-  Panel v0.6.4 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
+  Panel v0.6.5 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
   (AiO Design System/AiO Auto Podcast/AiO Auto Podcast.html — "Studio Console").
   ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.8).
 
@@ -341,7 +341,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
 <header class="topbar">
   <svg class="ico brand-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4M8 22h8"/></svg>
   <h1 class="brand">Auto Podcast</h1>
-  <span class="ver">v0.6.4</span>
+  <span class="ver">v0.6.5</span>
   <span class="spacer"></span>
   <span class="host" id="host"></span>
   <button class="btn btn--sm" id="lang"></button>
@@ -810,9 +810,14 @@ select option{background:var(--bg-2);color:var(--text-1)}
     for (var x = 0; x < s.length; x++) h = ((h << 5) + h + s.charCodeAt(x)) | 0
     return (h >>> 0).toString(36)
   }
+  // ☠️ Đuôi đổi `-mono` → `-mono-n` từ 05/08/2026 khi thêm bước CHUẨN HOÁ
+  // ÂM LƯỢNG. Đổi tên là CỐ Ý: file `.aio-mono.wav` cũ (chưa chuẩn hoá) vẫn
+  // nằm cạnh và các bản dựng cũ vẫn trỏ vào nó — không đụng gì tới chúng —
+  // còn bản dựng mới thì buộc phải tách lại. Giữ nguyên tên là panel thấy
+  // file cũ mới hơn nguồn rồi bỏ qua, và anh Tiến lại phải tự kéo gain.
   function duongMonoCua(nguon) {
     var d = String(nguon).replace(/\\/g, '/')
-    return d.replace(/\.[^./]+$/, '') + '.aio-mono.wav'
+    return d.replace(/\.[^./]+$/, '') + '.aio-mono-n.wav'
   }
 
   // ═══ TRẠNG THÁI ═════════════════════════════════════════════════════════
@@ -1821,11 +1826,22 @@ select option{background:var(--bg-2);color:var(--text-1)}
       } catch (e) {}
       if (!canChay) { tachMono(i + 1, xong); return }
       var nsCpu = AiOTaiNguyen.chiaLuong(1)
-      var kAudioOpt = (caiDat.kenhAudio && caiDat.kenhAudio[i] === 'R') ? ['-af', 'pan=mono|c0=c1'] :
-                      (caiDat.kenhAudio && caiDat.kenhAudio[i] === 'L') ? ['-af', 'pan=mono|c0=c0'] :
-                      (i === 1) ? ['-af', 'pan=mono|c0=c1'] : ['-af', 'pan=mono|c0=c0']
+      var kenh = (caiDat.kenhAudio && caiDat.kenhAudio[i] === 'R') ? 'c0=c1' :
+                 (caiDat.kenhAudio && caiDat.kenhAudio[i] === 'L') ? 'c0=c0' :
+                 (i === 1) ? 'c0=c1' : 'c0=c0'
+      // ☠️ CHUẨN HOÁ ÂM LƯỢNG ngay lúc tách — anh Tiến 05/08: *"anh mới tăng
+      // 2 audio lên 25db thì mới nghe được"*. Đo được: mic Will trung bình
+      // −42,6 dB, mic Trọng −36,4 dB, hai mic còn lệch nhau 6,2 dB.
+      // Chuẩn hoá ở ĐÂY chứ không chỉnh Level trên timeline vì Level của
+      // Premiere chỉ tới +15 dB (đo 05/08) — không đủ để bù +22 dB.
+      // ☠️ Chỉ file ĐẶT LÊN TIMELINE mới chuẩn hoá. File dùng để PHÂN TÍCH
+      // (wavMic 16 kHz) giữ nguyên: não nghe mỗi kênh so nền của chính nó nên
+      // gain không ảnh hưởng, và giữ nguyên thì kết quả cắt không đổi theo
+      // một bước xử lý âm thanh — hai việc tách bạch, dễ soi khi có sự cố.
+      var loc = 'pan=mono|' + kenh + ',loudnorm=I=-16:TP=-1.5:LRA=11'
       cp.execFile(ffmpeg,
-        ['-y', '-threads', String(nsCpu.luongMoi), '-i', nguon, '-vn'].concat(kAudioOpt).concat(['-c:a', 'pcm_s16le', ra]),
+        ['-y', '-threads', String(nsCpu.luongMoi), '-i', nguon, '-vn',
+         '-af', loc, '-ar', '48000', '-c:a', 'pcm_s16le', ra],
         { windowsHide: true, maxBuffer: AiOTaiNguyen.tranDemLog() },
         function (err, so, se) {
           if (err) { xong(t('tach_loi') + String(se || err).slice(-300)); return }

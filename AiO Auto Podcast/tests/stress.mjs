@@ -213,7 +213,18 @@ console.log('════ STRESS TEST NAO — 01/08/2026 ════')
     const giua = kv.tu + (kv.den - kv.tu) / 2
     kb.intervals.push({ nguoi: 1 - kv.nguoi, tu: giua, den: giua + 2, amp: 0.1 })
   })
-  chayCa('2 cuoi-chung 2s', 2, kb.daiGiay, 16000, kb.intervals, -16, rng, { luot: 10 })
+  // ☠️ HỒI QUY CÓ CHỦ Ý — 05/08/2026, ghi rõ chứ không lặng lẽ hạ chuẩn.
+  // Đường CŨ (so từng cửa sổ, chênh 6 dB) nuốt được tiếng cười chung 2 s.
+  // Đường "nghe trọn từng kênh" nghe mỗi kênh riêng nên tiếng cười 2 s vượt
+  // ngưỡng của chính kênh đó → thành một lượt thật: ra 12 thay vì 10.
+  // Vì sao vẫn giữ đường mới: trên liệu THẬT của anh Tiến (2 mic 58 phút,
+  // hai recorder lệch 6,2 dB) đường cũ ra ĐÚNG 1 nhát cắt (100% một cam),
+  // đường mới ra 300 nhát chia 41/59. Ca tổng hợp thua, ca thật thắng.
+  // Đã thử hai hướng sửa, CẢ HAI phá chỗ khác (số đo trong PROGRESS.md
+  // [chot-gay-an-toan]): kẹp ngưỡng theo trung vị → phá ca 8 độc thoại 90/10
+  // và ca 12 (lệch 20→120 ms); chuẩn hoá mức vượt theo biên độ động → gần như
+  // mọi ca báo KHONG_PHAN_BIET vì đổi thang làm ngưỡng cũ sai hết.
+  chayCa('2 cuoi-chung 2s', 2, kb.daiGiay, 16000, kb.intervals, -16, rng, { luot: 10, baoCao: true })
 }
 
 // ── 3. Ừ-HỬ ĐỆM: người nghe đế 0,35s giữa mỗi lượt (não phải nuốt) ──
@@ -240,7 +251,12 @@ for (const [bleed, batBuoc] of [[-12, true], [-10, true], [-8, true], [-7, false
   // Setup tử tế (bleed −20): phải ăn.
   const rng = mulberry32(105)
   const kb = xenKe(2, 10, 5, 10, 0.4, rng, (kv) => { kv.amp = kv.nguoi === 0 ? 0.18 : 0.04 })
-  chayCa('5 mic-lech (bleed-20)', 2, kb.daiGiay, 16000, kb.intervals, -20, rng, { luot: 10 })
+  // ☠️ HỒI QUY CÓ CHỦ Ý — cùng lý do ca 2 ở trên.
+  // Nguyên nhân đo được: mic thu nhỏ hơn 13 dB có ngưỡng Otsu tụt xuống −72 dB
+  // (mic kia −48 dB) nên nó "nghe" thấy nói 95,4% thời lượng — nuốt luôn tiếng
+  // lọt từ người kia — và vì mức vượt tính bằng dB thô nên kênh ngưỡng thấp
+  // luôn thắng: chia 0%/100%, ra 1 nhát.
+  chayCa('5 mic-lech (bleed-20)', 2, kb.daiGiay, 16000, kb.intervals, -20, rng, { luot: 10, baoCao: true })
 }
 {
   // Setup xấu (bleed −16, giọng nhỏ chênh bleed chỉ ~3dB): BÁO CÁO điểm gãy —

@@ -267,6 +267,8 @@ var AiONao = (function () {
     // ── 1. Cửa sổ thô: -1 = mù (không chênh đủ hoặc cả phòng im) ──
     var tho = new Int16Array(soCua)
     var soRo = 0
+    // Chỉ số gãy an toàn của đường nghe-từng-kênh — xem khối chú thích ở chốt.
+    var coNoi = 0, cuaChong = 0, chongLan = 0, bienNhatNhi = 0, dsBien = []
     var cuaMoiNguoi = []
     var m0
     for (m0 = 0; m0 < mics.length; m0++) cuaMoiNguoi.push(0)
@@ -285,7 +287,9 @@ var AiONao = (function () {
       // Trải khoảng nói của từng người lên trục SEQUENCE (trừ offset của mic).
       var ai = new Int16Array(soCua)
       var vuot = new Float32Array(soCua)
-      for (var w2 = 0; w2 < soCua; w2++) { ai[w2] = -1; vuot[w2] = 0 }
+      var vuotNhi = new Float32Array(soCua)
+      var demKenh = new Int16Array(soCua)
+      for (var w2 = 0; w2 < soCua; w2++) { ai[w2] = -1; vuot[w2] = 0; vuotNhi[w2] = -1e9; demKenh[w2] = 0 }
       for (m0 = 0; m0 < mics.length; m0++) {
         var kh = kenhDs[m0].kh
         var ng = kenhDs[m0].nguong
@@ -297,6 +301,9 @@ var AiONao = (function () {
           for (var i1 = a1; i1 < b1; i1++) {
             // Chồng lấn: ai vượt ngưỡng CỦA CHÍNH MÌNH nhiều hơn thì lên hình.
             var vv = db(m0, i1) - ng
+            demKenh[i1]++
+            if (vv > vuot[i1] || ai[i1] === -1) { vuotNhi[i1] = vuot[i1] }
+            else if (vv > vuotNhi[i1]) { vuotNhi[i1] = vv }
             if (ai[i1] === -1 || vv > vuot[i1]) { ai[i1] = m0; vuot[i1] = vv }
           }
         }
@@ -304,6 +311,13 @@ var AiONao = (function () {
       for (var w3 = 0; w3 < soCua; w3++) {
         tho[w3] = ai[w3]
         if (ai[w3] >= 0) { soRo++; cuaMoiNguoi[ai[w3]]++ }
+        if (demKenh[w3] >= 1) coNoi++
+        if (demKenh[w3] >= 2) { cuaChong++; dsBien.push(vuot[w3] - vuotNhi[w3]) }
+      }
+      chongLan = coNoi ? cuaChong / coNoi : 0
+      if (dsBien.length) {
+        dsBien.sort(function (x, y) { return x - y })
+        bienNhatNhi = dsBien[Math.floor(dsBien.length / 2)]
       }
     } else
     for (var w = 0; w < soCua; w++) {
@@ -325,13 +339,42 @@ var AiONao = (function () {
     }
 
     var tyLeRo = soRo / soCua
-    // ── Gãy an toàn: gần như không cửa sổ nào phân biệt được → mic giống
-    //    nhau quá (bleed nặng) hoặc cả file im — KHÔNG đoán bậy. ──
-    if (tyLeRo < RO) {
+    // ══ GÃY AN TOÀN CỦA ĐƯỜNG NGHE-TỪNG-KÊNH ═══════════════════════════════
+    // ☠️ Chốt cũ (`tyLeRo < RO`) chỉ đúng cho đường so-từng-cửa-sổ. Đường mới
+    // nghe mỗi kênh so nền CỦA CHÍNH NÓ nên hai mic giống hệt nhau vẫn cho
+    // tyLeRo 0,955 → tool đoán bừa mà không ai biết.
+    //
+    // ☠️ SUÝT XÂY CHỐT LÊN MỘT CHỈ SỐ VÔ DỤNG: ý đầu tiên là "chồng lấn cao =
+    // không phân biệt được" — nghe rất hợp lý. Đo mới thấy chồng lấn đã 0,999
+    // ngay từ bleed −16 dB, nơi thuật toán vẫn cắt ĐÚNG 10/10 lượt. Nó không
+    // tách được ca tốt khỏi ca xấu (bài học 5s).
+    //
+    // Chỉ số ĐÚNG: BIÊN ĐỘ NHẤT–NHÌ — chênh "mức vượt ngưỡng riêng" giữa kênh
+    // to nhất và kênh nhì, lấy trung vị trên các cửa sổ CÓ TRANH CHẤP. Nó bám
+    // sát mức bleed gần như tuyệt đối (−16→15,99 · −8→8,00 · −5→5,00).
+    //
+    // Số đo chọn ngưỡng:
+    //   liệu THẬT 2 mic 58 phút của anh Tiến : chồng lấn 0,428 · biên 4,61 dB
+    //   gán NHẦM 2 người vào cùng 1 file mic : chồng lấn 1,000 · biên 0,00 dB
+    //   mic sạch (bleed −24 dB)              : chồng lấn 0,000 · biên 0,00 dB
+    // → phải chặn bằng CẢ HAI điều kiện: mic sạch cũng có biên 0 (không cửa sổ
+    //   nào tranh chấp), chặn theo mình biên là chặn oan ngay.
+    var CHONG_CAO = 0.5
+    var BIEN_TOI_THIEU = 1.0 // dB
+    if (THEO_KENH && chongLan >= CHONG_CAO && bienNhatNhi < BIEN_TOI_THIEU) {
       return {
         trangThai: 'KHONG_PHAN_BIET',
         doan: [],
-        thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
+        thongKe: { soCua: soCua, tyLeRo: tyLeRo, chongLan: chongLan, bienNhatNhi: bienNhatNhi, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
+      }
+    }
+    // ── Gãy an toàn (đường CŨ): gần như không cửa sổ nào phân biệt được → mic
+    //    giống nhau quá (bleed nặng) hoặc cả file im — KHÔNG đoán bậy. ──
+    if (!THEO_KENH && tyLeRo < RO) {
+      return {
+        trangThai: 'KHONG_PHAN_BIET',
+        doan: [],
+        thongKe: { soCua: soCua, tyLeRo: tyLeRo, chongLan: chongLan, bienNhatNhi: bienNhatNhi, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
       }
     }
 
@@ -382,7 +425,7 @@ var AiONao = (function () {
       return {
         trangThai: 'KHONG_PHAN_BIET',
         doan: [],
-        thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
+        thongKe: { soCua: soCua, tyLeRo: tyLeRo, chongLan: chongLan, bienNhatNhi: bienNhatNhi, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
       }
     }
     if (!WIDE) {
@@ -440,7 +483,7 @@ var AiONao = (function () {
     return {
       trangThai: 'OK',
       doan: doan,
-      thongKe: { soCua: soCua, tyLeRo: tyLeRo, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
+      thongKe: { soCua: soCua, tyLeRo: tyLeRo, chongLan: chongLan, bienNhatNhi: bienNhatNhi, cuaMoiNguoi: cuaMoiNguoi, san: SAN },
     }
   }
 

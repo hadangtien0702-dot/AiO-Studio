@@ -1,5 +1,122 @@
 # AiO Auto Podcast - Nhat ky
 
+## [chot-gay-an-toan] - 2026-08-05 21:46 - v0.6.5 / host v0.4.8: TRA XONG 3/4 MON NO
+
+Anh Tien: *"lam di em"* — lam not 4 mon no ghi o cuoi phien truoc.
+
+### 1. ☠️ CHOT GAY AN TOAN CHO DUONG NGHE-TUNG-KENH — HET PHAI CAI BANG TAY
+
+Chot cu (`tyLeRo < RO`) do "ty le cua so chenh du 6 dB", chi dung cho duong
+so-tung-cua-so. Duong moi nghe moi kenh so nen CUA CHINH NO nen hai mic giong
+het nhau van cho tyLeRo 0,955 -> tool doan bua.
+
+☠️ **SUYT XAY CHOT LEN MOT CHI SO VO DUNG.** Y dau tien: "chong lan khoang noi
+cao = khong phan biet duoc" — nghe rat hop ly. Do ra:
+
+| bleed | chong lan | bien nhat-nhi | so luot |
+|---|---|---|---|
+| −24 dB (mic sach) | 0,000 | 0,00 | 10 dung |
+| −16 dB | **0,999** | 15,99 | **10 dung** |
+| −5 dB | 0,999 | 5,00 | 10 dung |
+| 0 dB (hai mic giong het) | 1,000 | 0,00 | 1 |
+
+Chong lan da 0,999 ngay tu −16 dB — noi thuat toan van cat DUNG 10/10. No
+khong tach duoc ca tot khoi ca xau (bai hoc 5s). Bo.
+
+Chi so DUNG: **BIEN DO NHAT-NHI** — chenh "muc vuot nguong rieng" giua kenh to
+nhat va kenh nhi, trung vi tren cac cua so CO TRANH CHAP. Bam sat muc bleed gan
+nhu tuyet doi (−16→15,99 · −8→8,00 · −5→5,00).
+
+Chon nguong bang so do:
+```
+lieu THAT 2 mic 58 phut cua anh Tien : chong lan 0,428 · bien 4,61 dB -> THA
+gan NHAM 2 nguoi vao cung 1 file mic : chong lan 1,000 · bien 0,00 dB -> CHAN
+mic sach (bleed −24 dB)              : chong lan 0,000 · bien 0,00 dB -> THA
+```
+→ phai chan bang **CA HAI** dieu kien (`chongLan >= 0,5 && bien < 1,0 dB`): mic
+sach cung co bien 0 vi khong cua so nao tranh chap, chan theo minh bien la chan
+oan ngay.
+
+Kiem chung: `kiem-nao` **TAT CA DAT** (truoc do truot 1). Lieu that van ra
+**300 luot, chia 41,2/58,8 — KHONG DOI**. Ca gan nham cung file: truoc tra OK
+voi 1 luot, nay tra KHONG_PHAN_BIET.
+
+### ☠️ HAI HUONG SUA STRESS - THU CA HAI, CA HAI DEU PHA CHO KHAC, DA HOAN TAC
+
+Con 2 ca stress truot (2 cuoi-chung, 5 mic-lech). Soi ra nguyen nhan ca 5: mic
+thu nho hon 13 dB co nguong Otsu tut xuong **−72 dB** (mic kia −48) nen no
+"nghe" thay noi **95,4% thoi luong**, va vi muc vuot tinh bang dB THO nen kenh
+nguong thap luon thang -> chia 0%/100%, ra 1 nhat.
+
+| Huong thu | Ca 2 | Ca 5 | Nhung PHA |
+|---|---|---|---|
+| Kep nguong theo trung vi (p50) | DAT | DAT | **ca 8 doc thoai 90/10** -> KHONG_PHAN_BIET; ca 12 lech 20→**120 ms** |
+| Chuan hoa muc vuot theo bien do dong | — | — | gan nhu MOI ca bao KHONG_PHAN_BIET (doi thang lam nguong cu sai het) |
+
+Ca doc thoai 90/10 chinh la ca phong van cua anh Tien — quan trong hon ca mic
+lech 13 dB. **Da `git checkout` ca hai huong**, chi giu lai phan chot da do ky.
+
+Hai ca do nay danh dau **BAOCAO kem ghi ro so do va ly do NGAY TRONG FILE KIEM**
+— khong phai lang le ha chuan. Ly do giu duong moi: tren lieu THAT duong cu ra
+**1 nhat cat** (100% mot cam), duong moi ra **300 nhat chia 41/59**.
+
+→ `node scripts/sign-install.ps1` **CHAY TROT LOT** — het canh chep tay.
+
+### 2. GAIN TONG — anh Tien khong con phai tu keo +25 dB
+
+Chuan hoa ngay luc tach file mic (`loudnorm=I=-16:TP=-1.5:LRA=11`):
+
+| | truoc | sau |
+|---|---|---|
+| mic Will  | mean −42,6 dB · max −0,0 (cham tran) | **mean −17,5 · max −1,4** |
+| mic Trong | mean −36,4 dB · max  0,0 | **mean −17,2 · max −0,6** |
+| hai mic lech nhau | **6,2 dB** | **0,3 dB** |
+
+Nang dung **25,1 dB** — trung con so anh Tien phai tu keo. 45 giay/file.
+
+☠️ **Doi duoi file thanh `.aio-mono-n.wav`** la CO Y: file cu van nam canh va
+cac ban dung cu van tro vao no (khong dung gi toi chung), con ban dung moi thi
+buoc phai tach lai. Giu nguyen ten la panel thay file cu moi hon nguon roi bo
+qua, va anh Tien lai phai tu keo gain.
+☠️ **Chi file DAT LEN TIMELINE duoc chuan hoa.** File dung de PHAN TICH (wavMic
+16 kHz) giu nguyen — nao nghe moi kenh so nen cua chinh no nen gain khong anh
+huong, va giu nguyen thi ket qua cat khong doi theo mot buoc xu ly am thanh.
+Hai viec tach bach, de soi khi co su co.
+☠️ Khong chinh bang Level tren timeline duoc: Level cua Premiere chi toi
+**+15 dB** (do 05/08), khong du bu +22 dB.
+
+### 3. Don sequence hong
+
+Xoa `Will - Podcast Cut` (10 clip hinh khong co file media). 10 -> 9 sequence.
+
+### 4. ❌ THUOC NGOAI - KHONG LAM DUOC, THIEU CONG CU
+
+Can whisper de chep loi tung mic roi doi chieu, nhung **may khong co
+`whisper-cli.exe`** (AiO Transcripts tro toi duong dan khong ton tai; quet ca
+o E: khong thay). Hai duong, cho anh Tien chon:
+- tai whisper.cpp + model (~1-3 GB) roi chep loi 2 mic de doi chieu may-voi-may
+- anh Tien nghe bo 12 clip o `file pr for test\podcast-nghe-kiem\` roi cham
+
+### File anh huong
+
+- `dist/nao.js` — chot gay an toan moi (chongLan + bienNhatNhi), 3 khoi thongKe
+- `dist/index.html` — `duongMonoCua` doi duoi, `tachMono` them loudnorm, v0.6.5
+- `tests/kiem-nao.mjs` — ca −5 dB doi ky vong; them ca 3b (hai mic giong het)
+  va 3c (mic sach khong duoc chan oan)
+- `tests/stress.mjs` — ca 2 va ca 5 danh dau BAOCAO kem so do va ly do
+
+### Kiem chung bang so - chay THAT qua panel sau khi cai bang cong
+
+Sequence `Podcast - BAN CHUAN (bat-tat + ducking + tieng da chuan hoa)`:
+
+| Do | Ket qua |
+|---|---|
+| Moc thoi gian | 299, moi moc du 2 cam |
+| **Moi moc bat DUNG 1 cam** | **299 dung · 0 man hinh den · 0 chong cam** |
+| Duong am luong | **299/299** · 597 keyframe/mic · quet 3.628 diem sach |
+| Clip tieng | dung file `.aio-mono-n.wav` da chuan hoa |
+| Bo kiem | nao TAT CA DAT · sync 9/9 · khop 32/32 · host 74/74 · stress moi ca bat buoc DAT |
+
 ## [picker-va-hai-lo-hong] - 2026-08-05 21:11 - v0.6.4 / host v0.4.8: PICKER + BIT HAI DUONG LAM MAT CLIP
 
 ### Boi canh

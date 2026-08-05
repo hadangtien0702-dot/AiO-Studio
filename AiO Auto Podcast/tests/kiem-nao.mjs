@@ -158,8 +158,54 @@ function chayCa(bleedDb, mongDoi) {
 // ── Ca 1+2: setup phòng tốt và mic gần nhau — phải ăn trọn ─────────────────
 chayCa(-16, 'OK')
 chayCa(-8, 'OK')
-// ── Ca 3: bleed −5 dB dưới ngưỡng chênh 6 dB — phải GÃY AN TOÀN ────────────
-chayCa(-5, 'GAY')
+// ── Ca 3: bleed −5 dB ──────────────────────────────────────────────────────
+// ☠️ SỬA 05/08/2026. Trước đây ca này đòi GÃY AN TOÀN, vì đường CŨ so từng cửa
+// sổ với ngưỡng chênh 6 dB nên −5 dB là dưới ngưỡng → mù hẳn.
+// Đường "nghe trọn từng kênh" (05/08) so mỗi kênh với nền CỦA CHÍNH NÓ, nên
+// −5 dB vẫn phân biệt được. Đo: bleed −5 → biên nhất–nhì 5,00 dB, ra ĐÚNG 10
+// lượt. Giữ nguyên kỳ vọng "phải gãy" là bắt sản phẩm dở đi để vừa phép kiểm.
+chayCa(-5, 'OK')
+
+// ── Ca 3b: HAI MIC GIỐNG HỆT NHAU — đây mới là ca phải GÃY AN TOÀN ─────────
+// Ca thật: người dùng gán nhầm CÙNG MỘT file mic cho hai người, hoặc hai mic
+// đặt sát nhau thu ra như nhau. Lúc đó không có tín hiệu nào để phân biệt.
+// Đo chọn ngưỡng (chồng lấn ≥0,5 VÀ biên nhất–nhì <1,0 dB):
+//   liệu THẬT của anh Tiến : chồng lấn 0,428 · biên 4,61 dB → THA
+//   hai mic giống hệt       : chồng lấn 1,000 · biên 0,00 dB → CHẶN
+//   mic sạch (bleed −24)    : chồng lấn 0,000 · biên 0,00 dB → THA
+// ☠️ Phải chặn bằng CẢ HAI điều kiện: mic sạch cũng có biên 0 (không cửa sổ
+// nào tranh chấp), chặn theo mình biên là chặn oan ngay.
+{
+  console.log('\n── Hai mic GIỐNG HỆT (gán nhầm cùng một file) ──')
+  const g = sinhNguon()
+  const pcms = tronMic(g.nguon, -16, g.rng)
+  const db0 = AiONao.doDb(pcms[0], SR)
+  const kq = AiONao.aiDangNoi(
+    [{ db: db0, offset: 0 }, { db: db0, offset: 0 }],
+    db0.length * AiONao.CUA_GIAY, {}
+  )
+  const tk = kq.thongKe || {}
+  kiem('☠️ gán nhầm cùng một mic → KHÔNG được đoán bậy',
+    kq.trangThai === 'KHONG_PHAN_BIET',
+    'trangThai=' + kq.trangThai + ' · biên=' + (tk.bienNhatNhi || 0).toFixed(2) + ' dB')
+  kiem('và không trả ra đoạn nào', !kq.doan || kq.doan.length === 0,
+    'doan=' + (kq.doan ? kq.doan.length : 0))
+}
+
+// ── Ca 3c: MIC SẠCH không được chặn oan ────────────────────────────────────
+{
+  console.log('\n── Mic sạch (bleed −24 dB) — không được chặn oan ──')
+  const g2 = sinhNguon()
+  const pcms2 = tronMic(g2.nguon, -24, g2.rng)
+  const kq = AiONao.aiDangNoi(
+    pcms2.map((p) => ({ db: AiONao.doDb(p, SR), offset: 0 })),
+    g2.daiGiay, {}
+  )
+  const tk = kq.thongKe || {}
+  kiem('mic sạch vẫn chạy bình thường', kq.trangThai === 'OK',
+    'trangThai=' + kq.trangThai + ' · chồng lấn=' + (tk.chongLan || 0).toFixed(3) +
+    ' · biên=' + (tk.bienNhatNhi || 0).toFixed(2))
+}
 
 // ── Ca 4: ba người — não phải chạy với N mic, không đóng đinh 2 ────────────
 {

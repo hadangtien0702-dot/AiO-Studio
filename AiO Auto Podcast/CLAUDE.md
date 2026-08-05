@@ -3,7 +3,33 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 21:11: panel v0.6.4 · host v0.4.8 — ĐÃ CÀI (bằng tay).**
+> **TRẠNG THÁI 05/08/2026 21:46: panel v0.6.5 · host v0.4.8 — CÀI QUA CỔNG CHUẨN.**
+>
+> ✅ **HẾT PHẢI CÀI TAY** — `scripts/sign-install.ps1` chạy trót lọt, 5/5 bộ kiểm.
+>
+> ☠️☠️ **CHỐT GÃY AN TOÀN CỦA ĐƯỜNG NGHE-TỪNG-KÊNH = `chongLan >= 0,5 && bienNhatNhi < 1,0 dB`.**
+> Phải **CẢ HAI** điều kiện. Số đo chọn ngưỡng:
+> liệu thật của anh Tiến `chồng lấn 0,428 · biên 4,61 dB` → tha ·
+> gán nhầm 2 người vào 1 file mic `1,000 · 0,00` → chặn ·
+> mic sạch `0,000 · 0,00` → tha (chặn theo mình biên là chặn oan ngay).
+> ☠️ **ĐỪNG dùng "chồng lấn" một mình làm chốt** — đo ra 0,999 ở cả bleed −16 dB
+> (nơi cắt ĐÚNG 10/10) lẫn −5 dB. Nghe rất hợp lý mà không phân biệt được gì.
+>
+> ☠️ **HAI HƯỚNG SỬA 2 CA STRESS CÒN LẠI ĐÃ THỬ VÀ ĐỀU PHÁ CHỖ KHÁC — đừng thử lại:**
+> kẹp ngưỡng theo trung vị p50 → hỏng **ca độc thoại 90/10** (chính là ca phỏng
+> vấn) và ca 12 lệch 20→120 ms; chuẩn hoá mức vượt theo biên độ động → gần như
+> mọi ca báo KHONG_PHAN_BIET vì đổi thang làm ngưỡng cũ sai hết.
+> Hai ca đó (2 cười-chung, 5 mic-lệch 13 dB) là **giới hạn đã biết**, đánh dấu
+> BAOCAO kèm số đo trong `tests/stress.mjs`. Giữ đường mới vì trên liệu THẬT
+> đường cũ ra **1 nhát cắt**, đường mới ra **300 nhát chia 41/59**.
+>
+> ☠️ **GAIN chuẩn hoá lúc TÁCH FILE, không chỉnh Level trên timeline** — Level
+> của Premiere chỉ tới **+15 dB**, không đủ bù +22 dB. `loudnorm=I=-16:TP=-1.5`
+> đưa mic Will −42,6 → −17,5 dB, Trọng −36,4 → −17,2 dB (hai mic từ lệch 6,2 dB
+> còn 0,3 dB). Đuôi `.aio-mono-n.wav` — đổi tên là CỐ Ý để bản dựng cũ không bị
+> đụng và bản mới buộc phải tách lại.
+> ☠️ **Chỉ file ĐẶT LÊN TIMELINE được chuẩn hoá; file PHÂN TÍCH giữ nguyên** —
+> để kết quả cắt không đổi theo một bước xử lý âm thanh.
 >
 > ✅ **PICKER** trong Cài đặt cắt (anh Tiến: *"click là được"*):
 > **Hình** `Bật / tắt clip` · `Cắt bỏ` — **Tiếng** `Ducking` · `Bật / tắt clip` ·

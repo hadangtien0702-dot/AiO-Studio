@@ -8,7 +8,27 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 05/08/2026 21:11 — panel **v0.6.4**, host **v0.4.8**.
+*Cập nhật lần cuối: 05/08/2026 21:46 — panel **v0.6.5**, host **v0.4.8**.
+✅ **HẾT PHẢI CÀI BẰNG TAY** — `sign-install.ps1` chạy trót lọt, 5/5 bộ kiểm sạch.
+Chốt gãy an toàn mới cho đường nghe-từng-kênh: **biên độ nhất–nhì** (chênh mức
+vượt ngưỡng giữa kênh nhất và nhì). Ngưỡng chọn bằng số: liệu thật 4,61 dB → tha,
+gán nhầm 2 người vào 1 file mic 0,00 dB → chặn. Liệu thật **vẫn 300 lượt, không đổi**.
+☠️ Suýt xây chốt lên chỉ số VÔ DỤNG: "chồng lấn" đo ra 0,999 ở cả bleed −16 dB
+(cắt đúng 10/10) lẫn −5 dB — không tách được ca tốt khỏi ca xấu (bài học 5s).
+☠️ Thử 2 hướng sửa 2 ca stress còn lại, **cả hai phá chỗ khác** (kẹp ngưỡng theo
+trung vị → hỏng ca độc thoại 90/10; chuẩn hoá mức vượt → gần như mọi ca báo
+KHONG_PHAN_BIET). Đã hoàn tác cả hai; 2 ca đó đánh dấu BAOCAO **kèm số đo và lý
+do ngay trong file kiểm**, không lặng lẽ hạ chuẩn.
+✅ **GAIN — anh Tiến không còn phải tự kéo +25 dB.** Chuẩn hoá lúc tách file mic:
+Will −42,6 → **−17,5 dB**, Trọng −36,4 → **−17,2 dB**, hai mic từ lệch 6,2 dB
+còn **0,3 dB**, đỉnh có headroom. Đuôi file đổi `.aio-mono-n.wav` để bản dựng cũ
+không bị đụng. Chỉ file ĐẶT LÊN TIMELINE được chuẩn hoá, file PHÂN TÍCH giữ nguyên.
+✅ Đã xoá sequence hỏng cũ (10 clip không có file).
+❌ **THƯỚC NGOÀI vẫn chưa có** — máy không có `whisper-cli.exe`. Chờ anh Tiến chọn:
+tải whisper.cpp (~1–3 GB) hay tự nghe bộ 12 clip ở `podcast-nghe-kiem` rồi chấm.
+Bản chuẩn để anh xem: `Podcast - BAN CHUAN (bat-tat + ducking + tieng da chuan hoa)`.
+
+*05/08/2026 21:11 — panel **v0.6.4**, host **v0.4.8**.
 ✅ **PICKER** (anh Tiến: *"click là được"*) — radio thật, Tab + mũi tên dùng được:
 **Hình**: `Bật / tắt clip` · `Cắt bỏ` — **Tiếng**: `Ducking` · `Bật / tắt clip` ·
 `Cắt bỏ` · `Giữ nguyên`. Đường **Cắt bỏ cho tiếng là MỚI**. Bỏ `cat-chim` cho gọn.
