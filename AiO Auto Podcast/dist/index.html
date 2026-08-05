@@ -1725,6 +1725,24 @@ select option{background:var(--bg-2);color:var(--text-1)}
   }
 
   // ═══ TIẾN ĐỘ TRÊN NÚT CHÍNH ═════════════════════════════════════════════
+  /**
+   * Ước lượng thời gian còn lại của một bước chạy dài.
+   * ☠️ Vì sao có: đo thật 05/08/2026 trên video 58 phút — bước đặt clip hình
+   * chiếm **184 giây trên tổng 211 giây (87%)**, mà người dùng chỉ thấy
+   * "260/299", không biết còn phải đợi bao lâu.
+   * Tính từ tốc độ THẬT của chính lần chạy này (đã xong / thời gian đã trôi),
+   * không dùng hằng số đoán trước — máy khác, liệu khác thì tốc độ khác.
+   * Chỉ hiện khi còn ≥ 10 giây: dưới mức đó con số nhảy loạn mà chẳng giúp gì.
+   */
+  function conLai(t0, daXong, tong) {
+    if (!t0 || daXong < 3 || daXong >= tong) return ''
+    var troi = (Date.now() - t0) / 1000
+    if (troi < 2) return ''
+    var giay = Math.round(troi / daXong * (tong - daXong))
+    if (giay < 10) return ''
+    if (giay < 90) return tp('con_lai_giay', { n: Math.round(giay / 5) * 5 })
+    return tp('con_lai_phut', { n: Math.round(giay / 60) })
+  }
   function tienDo(chu, pt) {
     document.getElementById('goLabel').textContent = chu
     if (pt !== undefined) document.getElementById('prog').style.width = Math.max(0, Math.min(100, pt)) + '%'
