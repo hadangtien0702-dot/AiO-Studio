@@ -1,5 +1,112 @@
 # AiO Auto Podcast - Nhat ky
 
+## [picker-va-hai-lo-hong] - 2026-08-05 21:11 - v0.6.4 / host v0.4.8: PICKER + BIT HAI DUONG LAM MAT CLIP
+
+### Boi canh
+
+Anh Tien: *"em dua cac option nay gon hang thanh option chon nhu sau: video:
+enable or disable hoac cut bo; audio co the: tat/mo, cut bo hoac ducking, hoac
+giu nguyen audio — dua gon gang thanh cac picker de nguoi dung chon nhanh luon,
+click la duoc"*. Kem: *"xoa giup anh 2 dong text du thua nay"* va *"cuoi cung
+em xem con van de gi can phai lam thi lam luon di em"*.
+
+### Thay doi 1 - PICKER
+
+O `select` doi thanh **radio that + label** (khong phai div + onclick):
+
+| Nhom | Lua chon |
+|---|---|
+| **Hinh** | `bat-tat` (mac dinh) · `cut-bo` |
+| **Tieng** | `duck` (mac dinh) · `bat-tat` · `cut-bo` · `giu` |
+
+- Duong **`cut-bo` cho TIENG la MOI** (khoi phuc khuon `theo` cu, gio co ten
+  dung nghia): chi dat mic nguoi dang noi, nguoi kia khong co clip.
+- Bo `cat-chim` (cat roi + chim) cho gon dung 4 duong anh liet ke.
+- Quy khuon cu trong localStorage: `theo`→`cut-bo`, `cat-tat`→`bat-tat`,
+  `cat-chim`→`duck`, `du-cam`/`1-cam`→`bat-tat`/`cut-bo`. Khong quy thi panel
+  mo ra voi picker trong va IM LANG chay sai duong.
+- Radio cho khong: Tab vao nhom, mui ten chuyen (quy tac vang #3, #4).
+- Xoa 2 dong chia muc "Hinh — cam nao thay ai" / "Tieng — mic rieng cua ai"
+  theo yeu cau; giu lai dung duong ke ngan giua nhom V va nhom A.
+
+☠️ **Do UI thi phai MO HOP THOAI RA MOI DO.** Lan do dau moi so ra **0** vi
+modal `#ov` dang `hidden` — dung bay quy tac vang #20. Mo ra roi do:
+
+| Do | Ket qua |
+|---|---|
+| 4 nut Tieng | cung mot hang, khong nut nao bi cat chu |
+| Cao nut | 22 px |
+| Tuong phan chu nut **DANG CHON** | **3,00 -> TRUOT AA** (chu trang tren nen cam #f86820) |
+| Sau khi doi sang chu toi | **6,43 DAT** |
+| Tuong phan nut thuong | 10,99 |
+
+Dung bai hoc so thiet ke #25: nen accent cam/vang rat hay truot AA, phai DO
+chu dung nhin.
+
+### Thay doi 2 - ☠️☠️ HAI DUONG LAM MAT CLIP VINH VIEN (soat ra, do lai, sua)
+
+Chay mot dot ra soat 5 goc nhin (host / luong panel / bo kiem / tai lieu / san
+pham), moi phat hien dang ke bi mot agent khac co gang BAC BO. Hai cai song sot,
+va em **do lai bang phep kiem cua minh** truoc khi tin (bai hoc 5r):
+
+**A. THIEU TRACK — clip bay luon, host van tra "OK".**
+`pc_sapXepClipsLenTrack` xoa sach moi clip TRUOC roi dat lai. Nhanh dat clip boc
+trong `if (tIdx < numTracks)` **khong co else** -> lenh tro vao track ngoai vung
+bi nuot IM LANG, `soLoi` khong tang. Panel chi doc `soLoi` nen bao "da khop N
+nguoi".
+Ca that de gap: keo 6 file cam vao mot sequence (clip don tren V0) roi bam
+**Auto Match** — `khop.js` danh so track theo SO NHOM TEN FILE, khong doc so
+track that, nen sinh `V,0..V,5` tren sequence chi co 1-3 track.
+Do bang app Premiere gia (nap chinh `host/podcast.jsx`, khong mock ham):
+
+```
+truoc khi sua:  OK:daDat=1|soLoi=0|loiDau=     <- ma timeline con 0 clip
+                OK:daDat=0|soLoi=0             <- audio mat sach 4 clip
+sau khi sua:    ERR:THIEU_TRACK|canV=6|coV=1|canA=0|coA=0   timeline con nguyen 6 clip
+                ERR:THIEU_TRACK|canV=0|coV=1|canA=5|coA=1   audio con nguyen 4 clip
+```
+
+Sua: chan **TRUOC KHI XOA**, cung cho voi chot `THIEU_ITEM`. **KHONG kep ve
+track cuoi** nhu `pc_datHinh` — kep la 4 cam de len nhau tren mot track, dung
+ky thuat nhung sai san pham. Tu choi va noi ro thieu bao nhieu.
+→ Day dung la HO CUA BAN VA v0.6.1: ban do bit duong "thieu ITEM" nhung bo sot
+duong "thieu TRACK" — cung ho, cung hau qua, cung tra "OK:".
+
+**B. Cat in/out hong bi nuot -> dat clip DAI SAI de chet clip ben canh.**
+`try { setInPoint; setOutPoint } catch (e) {}` — catch RONG roi van chay xuong
+`overwriteClip`. Item con mang in/out CU (hoac nguyen do dai media) -> clip dai
+sai, va vi la `overwriteClip` nen no de chet cac clip da dat truoc tren cung
+track. `daDat` van tang, `soLoi` van 0.
+```
+truoc khi sua:  OK:daDat=2|soLoi=0   (dat ca clip hong)
+sau khi sua:    OK:daDat=1|soLoi=1|loiDau=setInOut V: ...
+```
+`pc_datHinh` trong CUNG FILE xu ly dung tu dau; cho nay bi bo sot.
+
+**C. Nhan loi `seq_doi` khai bao ma KHONG CHO NAO GOI.** Host tra `ERR:SEQ_DOI`
+o 13 cho, panel dan thang MA THO ra man hinh — dung cai anh Tien nhin thay:
+`Build failed: ERR:SEQ_DOI|`. Them `cauLoiHost()` dich ma loi thanh cau noi
+nguoi dung LAM GI TIEP, noi vao **14 cho** dang dan ma tho.
+
+### File anh huong
+
+- `host/podcast.jsx` — chot THIEU_TRACK, sua 2 catch rong, v0.4.7 -> v0.4.8
+- `dist/index.html` — picker + CSS `.pick` + `docPick`/`datPick`/`quyKhuonCu` +
+  `cauLoiHost` + duong tieng `cut-bo` + xoa 2 dong chia muc, v0.6.1 -> v0.6.4
+- `tests/kiem-host.mjs` — them muc 2a2 (4 phep) va 2a3 (2 phep): **68 -> 74**
+
+### Kiem chung bang so
+
+- `kiem-host` **74/74 DAT** · `kiem-sync` 9/9 · `kiem-khop` 32/32
+- Cu phap panel sach; moi `t()` deu co khoa; moi `getElementById` deu co id that
+- Don code chet: 3 nhan i18n + bien `giuMic`. ☠️ Bo do code-chet dau tien bat
+  nham **5/9** (nhan truyen dang tham so chu khong qua `t()`), phai grep lai
+  tung cai — va chinh luc grep moi lo ra lo hong C o tren.
+- Chay THAT tren liue 58 phut, to hop `hinh=bat-tat` + `tieng=cut-bo`:
+  V0 299 clip (tat 150) · V1 299 clip (tat 149) · **A0 149 clip · A1 150 clip**
+  (149+150 = 299 = dung tong so doan) · 0 keyframe · 0 clip khong co file ·
+  `pc_doPhuHinh`: **299 moc, 299 bat dung 1 cam, 0 den, 0 chong**
+
 ## [du-cam-bat-tat] - 2026-08-05 20:38 - v0.6.3 / host v0.4.7: HINH CUNG BAT/TAT DUOC - 299/299 DUNG
 
 ### Boi canh

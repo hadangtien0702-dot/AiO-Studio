@@ -244,6 +244,61 @@ console.log('\n── 2. pc_sapXepClipsLenTrack: thieu item thi KHONG duoc dung 
   kiem('va khong xoa gi', v0.clips.numItems === 3, 'con=' + v0.clips.numItems)
 }
 
+// ═══ 2a2. ☠️ THIEU TRACK — lenh tro vao track KHONG TON TAI ══════════════
+// Ra soat 05/08 chi ra: v0.6.1 bit duong "thieu ITEM" nhung con nguyen duong
+// "thieu TRACK". Ca that: keo 6 file cam vao mot sequence (clip don tren V0)
+// roi bam Auto Match -> khop.js sinh V,0..V,5 theo SO NHOM TEN FILE, khong he
+// doc so track that -> lenh V,3..V,5 roi vao khoang trang.
+console.log('\n── 2a2. Track khong ton tai: KHONG duoc im lang nuot lenh ──')
+
+{
+  const v0 = taoTrackCoClip(6)          // 6 clip cam dang nam don tren V0
+  const app = dungApp([
+    taoItem('Cam1.mp4', 'X:/v/Cam1.mp4'),
+    taoItem('Cam2.mp4', 'X:/v/Cam2.mp4'),
+  ], [v0], [])
+  const { pc_sapXepClipsLenTrack } = napHost(app)
+  const ra = pc_sapXepClipsLenTrack('SEQ',
+    'V,0,X:/v/Cam1.mp4,0,10,0;V,5,X:/v/Cam2.mp4,0,10,0')
+
+  kiem('☠️ lenh tro vao V5 tren sequence 1 track -> PHAI bao loi',
+    ra.indexOf('OK:') !== 0 || !/soLoi=0(\||$)/.test(ra), ra)
+  kiem('☠️ va KHONG duoc xoa sach timeline roi bo do',
+    ra.indexOf('ERR:') === 0 ? v0.clips.numItems === 6 : v0.daDat.length === 2,
+    'con=' + v0.clips.numItems + ' daDat=' + v0.daDat.length + ' | ' + ra)
+}
+
+{
+  const a0 = taoTrackCoClip(4)
+  const app = dungApp([taoItem('Mic.wav', 'X:/a/Mic.wav')], [taoTrackCoClip(0)], [a0])
+  const { pc_sapXepClipsLenTrack } = napHost(app)
+  const ra = pc_sapXepClipsLenTrack('SEQ', 'A,4,X:/a/Mic.wav,0,10,0')
+  kiem('☠️ track AUDIO ngoai vung cung phai bao loi',
+    ra.indexOf('OK:') !== 0 || !/soLoi=0(\||$)/.test(ra), ra)
+  kiem('va timeline audio con nguyen', a0.clips.numItems === 4, 'con=' + a0.clips.numItems)
+}
+
+// ═══ 2a3. ☠️ setInPoint/setOutPoint HONG — khong duoc dat clip dai sai ════
+console.log('\n── 2a3. Cat in/out hong thi KHONG duoc dat clip ──')
+
+{
+  // Item nay tu choi setOutPoint (mo phong out vuot do dai media).
+  const xau = {
+    type: 1, name: 'Xau.mp4', getMediaPath: () => 'X:/v/Xau.mp4',
+    setInPoint() {}, setOutPoint() { throw new Error('out vuot do dai media') },
+    clearInPoint() {}, clearOutPoint() {},
+  }
+  const v0 = taoTrackCoClip(0)
+  const app = dungApp([taoItem('Tot.mp4', 'X:/v/Tot.mp4'), xau], [v0], [])
+  const { pc_sapXepClipsLenTrack } = napHost(app)
+  const ra = pc_sapXepClipsLenTrack('SEQ',
+    'V,0,X:/v/Tot.mp4,0,30,0;V,0,X:/v/Xau.mp4,0,30,30')
+
+  kiem('☠️ cat in/out hong -> PHAI dem vao soLoi', !/soLoi=0(\||$)/.test(ra), ra)
+  kiem('☠️ va KHONG dat clip do len track (tranh clip dai sai de clip ben canh)',
+    v0.daDat.length === 1, 'da dat ' + v0.daDat.length + ' clip')
+}
+
 // ═══ 2b. CA THAT 05/08: SEQUENCE TRUNG TEN THU MUC QUAY ══════════════════
 // Anh Tien dat ten sequence = ten thu muc quay ("Quay PV tuyen dung_DRT_1002").
 // Ten do nam trong duong dan cua MOI file trong buoi quay -> luat "chuoi con"

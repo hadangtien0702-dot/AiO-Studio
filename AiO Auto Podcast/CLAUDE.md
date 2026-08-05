@@ -3,7 +3,34 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 20:38: panel v0.6.3 · host v0.4.7 — ĐÃ CÀI (bằng tay).**
+> **TRẠNG THÁI 05/08/2026 21:11: panel v0.6.4 · host v0.4.8 — ĐÃ CÀI (bằng tay).**
+>
+> ✅ **PICKER** trong Cài đặt cắt (anh Tiến: *"click là được"*):
+> **Hình** `Bật / tắt clip` · `Cắt bỏ` — **Tiếng** `Ducking` · `Bật / tắt clip` ·
+> `Cắt bỏ` · `Giữ nguyên`. Dựng bằng **radio thật** nên có Tab + mũi tên.
+> ☠️ Mọi giá trị cũ phải đi qua `quyKhuonCu()`: `theo`→`cut-bo`,
+> `cat-tat`→`bat-tat`, `cat-chim`→`duck`, `du-cam`/`1-cam`→`bat-tat`/`cut-bo`.
+> Bỏ quy là panel mở ra với picker TRỐNG và im lặng chạy sai đường.
+>
+> ☠️☠️ **`pc_sapXepClipsLenTrack` XOÁ SẠCH TIMELINE TRƯỚC — nên MỌI điều kiện
+> phải chặn TRƯỚC KHI XOÁ, không phải trong vòng lặp đặt lại.** Hai lỗ hổng đã
+> bịt 05/08 (đo bằng app Premiere giả, nạp chính host):
+> - **THIẾU TRACK**: lệnh trỏ vào track ngoài vùng bị nuốt im lặng vì nhánh
+>   `if (tIdx < numTracks)` **không có else** → `OK:daDat=1|soLoi=0` mà timeline
+>   còn **0 clip**. Ca thật: kéo 6 cam vào một sequence rồi bấm Auto Match —
+>   `khop.js` đánh số track theo SỐ NHÓM TÊN FILE, không đọc số track thật.
+>   Nay trả `ERR:THIEU_TRACK`. **KHÔNG kẹp về track cuối** — kẹp là 4 cam đè
+>   nhau trên một track, đúng kỹ thuật nhưng sai sản phẩm.
+> - **CATCH RỖNG quanh `setInPoint/setOutPoint`** rồi vẫn `overwriteClip` →
+>   clip dài sai đè chết clip bên cạnh, `soLoi` vẫn 0.
+>
+> ☠️ **Mã lỗi host phải đi qua `cauLoiHost()`.** Nhãn `seq_doi` từng khai báo mà
+> KHÔNG chỗ nào gọi, nên anh Tiến nhận nguyên `Build failed: ERR:SEQ_DOI|` trên
+> màn hình. Nhãn lỗi nói người dùng LÀM GÌ TIẾP, không in tên hằng số ra.
+>
+> ☠️ **Đo UI thì phải MỞ HỘP THOẠI RA MỚI ĐO** — modal `#ov` đang `hidden` thì
+> mọi số ra 0. Và **chữ trắng trên nền accent cam chỉ đạt 3,00, TRƯỢT AA**;
+> chữ tối trên cùng nền đó đạt 6,43.
 >
 > ✅ **HÌNH CŨNG BẬT/TẮT ĐƯỢC** (anh Tiến 05/08: *"ở phần video anh cũng muốn
 > làm theo kiểu là các clip cut có thể theo dạng là enable hoặc disable luôn"*).

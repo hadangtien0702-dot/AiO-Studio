@@ -8,7 +8,27 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 05/08/2026 20:38 — panel **v0.6.3**, host **v0.4.7**.
+*Cập nhật lần cuối: 05/08/2026 21:11 — panel **v0.6.4**, host **v0.4.8**.
+✅ **PICKER** (anh Tiến: *"click là được"*) — radio thật, Tab + mũi tên dùng được:
+**Hình**: `Bật / tắt clip` · `Cắt bỏ` — **Tiếng**: `Ducking` · `Bật / tắt clip` ·
+`Cắt bỏ` · `Giữ nguyên`. Đường **Cắt bỏ cho tiếng là MỚI**. Bỏ `cat-chim` cho gọn.
+Mọi khuôn cũ trong localStorage đều được quy về khuôn mới (không thì picker mở ra
+trống và im lặng chạy sai đường). Đã xoá 2 dòng chia mục anh chỉ.
+Chạy thật **cả 4 tổ hợp** trên liệu 58 phút, đều đúng 299/299.
+☠️ **Tương phản chữ nút đang chọn ban đầu chỉ 3,00 — TRƯỢT AA**; đổi sang chữ tối
+thì 6,43. Và lần đo đầu mọi số ra **0** vì modal còn đóng (bẫy quy tắc vàng #20).
+☠️☠️ **BỊT HAI ĐƯỜNG LÀM MẤT CLIP VĨNH VIỄN** (rà soát 5 góc nhìn + phản biện, em
+đo lại bằng phép kiểm của mình trước khi tin):
+(A) lệnh trỏ vào **track không tồn tại** bị nuốt im lặng SAU KHI đã xoá sạch
+timeline → host trả `OK:daDat=1|soLoi=0` mà timeline còn 0 clip. Ca thật: kéo 6
+cam vào một sequence rồi bấm Auto Match. Nay chặn TRƯỚC KHI XOÁ → `ERR:THIEU_TRACK`,
+timeline còn nguyên. (B) `setInPoint/setOutPoint` hỏng bị catch rỗng nuốt rồi vẫn
+đặt clip → clip dài sai đè clip bên cạnh, `soLoi=0`. (C) nhãn `seq_doi` khai báo mà
+không chỗ nào gọi → anh nhận nguyên mã thô `Build failed: ERR:SEQ_DOI|`; nay có
+`cauLoiHost()` dịch, nối vào 14 chỗ.
+`kiem-host` **74/74** (68 → 74).
+
+*05/08/2026 20:38 — panel **v0.6.3**, host **v0.4.7**.
 ✅ **HÌNH CŨNG BẬT/TẮT ĐƯỢC — ĐÃ CHẠY THẬT, 299/299 ĐÚNG.** Anh Tiến: *"ở phần
 video anh cũng muốn làm theo kiểu là các clip cut có thể theo dạng là enable
 hoặc disable luôn"*. Ô mới **"Hình sau khi cắt"**: `Đủ cam — tắt cam không dùng`
