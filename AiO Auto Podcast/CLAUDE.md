@@ -3,7 +3,23 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 17:06: panel v0.6.2 · host v0.4.6 — ĐÃ CÀI (bằng tay).**
+> **TRẠNG THÁI 05/08/2026 20:38: panel v0.6.3 · host v0.4.7 — ĐÃ CÀI (bằng tay).**
+>
+> ✅ **HÌNH CŨNG BẬT/TẮT ĐƯỢC** (anh Tiến 05/08: *"ở phần video anh cũng muốn
+> làm theo kiểu là các clip cut có thể theo dạng là enable hoặc disable luôn"*).
+> Ô **"Hình sau khi cắt"**: `du-cam` (mặc định — mọi cam có clip ở mọi đoạn,
+> chỉ cam người nói được bật, đổi nhát cắt bằng Shift+E) / `1-cam` (khuôn cũ).
+> Đo thật: 299 mốc × 2 cam, **mỗi mốc bật đúng 1 cam — 299 đúng, 0 màn hình đen,
+> 0 chồng cam**. Độ nặng 598 clip: duyệt hết 189 ms vs 84 ms của 299 clip →
+> tuyến tính, không N².
+>
+> ☠️ **`pc_doPhuHinh` LÀ PHÉP KIỂM ĐÚNG CHO PHẦN HÌNH — đừng thay bằng đếm clip.**
+> Câu hỏi phải là *"tại mỗi mốc người xem thấy MẤY hình"*: 0 là màn hình đen,
+> 2 là cam trên che cam dưới. Đếm số clip không phát hiện được cả hai (bài học 5k).
+>
+> ☠️ **MỌI THƯỚC ĐO DỰNG LỊCH CẮT TỪ CLIP VIDEO PHẢI BỎ QUA CLIP ĐANG TẮT.**
+> Với `du-cam` mỗi mốc có 2 clip (1 bật 1 tắt) — đọc hết sẽ ra 598 "đoạn" và
+> gán nhầm người ở nửa số đó. Đã làm thước báo trượt oan 299 lần.
 >
 > ✅ **BỐN ĐƯỜNG TIẾNG, chọn bằng ô trong "Cài đặt cắt"** — cả bốn đã chạy thật
 > trên liệu 58 phút và đều **299/299 đúng**:

@@ -91,7 +91,8 @@ function dungApp(dsCon, trackV = [], trackA = [], tenSeq = 'SEQ') {
 function napHost(app) {
   const ma = readFileSync(join(GOC, 'host', 'podcast.jsx'), 'utf8')
   const f = new Function('app', ma + '\n; return { pc__item, pc_sapXepClipsLenTrack, pc_phienBan,' +
-    ' pc_veAmLuong, pc_xoaAmLuong, pc_docAmLuong, pc_datTrangThaiTieng, pc_doTrangThaiTieng };')
+    ' pc_veAmLuong, pc_xoaAmLuong, pc_docAmLuong, pc_datTrangThaiTieng, pc_doTrangThaiTieng,' +
+    ' pc_datTrangThaiHinh, pc_doPhuHinh };')
   return f(app)
 }
 
@@ -449,6 +450,66 @@ console.log('\n── 2e. pc_datTrangThaiTieng: khop clip theo start, tat dung c
   kiem('☠️ moc khong co clip -> dem vao khongThayClip', /khongThayClip=1\|/.test(ra), ra)
   kiem('va van dat duoc cai co that', /daDat=1\|/.test(ra), ra)
   kiem('khong tat nham clip khac', c0.disabled === false)
+}
+
+// ═══ 2f. HINH: DU CAM + BAT/TAT (anh Tien 05/08) ═════════════════════════
+console.log('\n── 2f. pc_datTrangThaiHinh + pc_doPhuHinh: moi moc DUNG 1 cam bat ──')
+
+{
+  //  doan:      0-1 (nguoi 0)   1-2 (nguoi 1)   2-3 (nguoi 0)
+  //  V0 = cam nguoi 0 : bat, TAT, bat
+  //  V1 = cam nguoi 1 : TAT, bat, TAT
+  const v00 = taoClipAudio(0), v01 = taoClipAudio(1), v02 = taoClipAudio(2)
+  const v10 = taoClipAudio(0), v11 = taoClipAudio(1), v12 = taoClipAudio(2)
+  const v0 = taoTrackAudio([v00, v01, v02])
+  const v1 = taoTrackAudio([v10, v11, v12])
+  const app = dungApp([], [v0, v1], [])
+  const { pc_datTrangThaiHinh, pc_doPhuHinh } = napHost(app)
+
+  const r0 = pc_datTrangThaiHinh('SEQ', 0, '0,0;1,1;2,0')
+  const r1 = pc_datTrangThaiHinh('SEQ', 1, '0,1;1,0;2,1')
+  kiem('V0 dat du 3, khong sot', /daDat=3\|/.test(r0) && /khongThayClip=0\|/.test(r0), r0)
+  kiem('V1 dat du 3, khong sot', /daDat=3\|/.test(r1) && /khongThayClip=0\|/.test(r1), r1)
+  kiem('V0 bat-TAT-bat', [v00.disabled, v01.disabled, v02.disabled].join(',') === 'false,true,false',
+    [v00.disabled, v01.disabled, v02.disabled].join(','))
+  kiem('V1 TAT-bat-TAT', [v10.disabled, v11.disabled, v12.disabled].join(',') === 'true,false,true',
+    [v10.disabled, v11.disabled, v12.disabled].join(','))
+
+  const rp = pc_doPhuHinh('SEQ')
+  kiem('☠️ moi moc DUNG 1 cam bat', /soMoc=3\|motBat=3\|khongBat=0\|nhieuBat=0\|/.test(rp), rp)
+}
+
+{
+  // Hai cam cung BAT o mot moc -> track tren che track duoi, phai bao.
+  const v00 = taoClipAudio(0), v10 = taoClipAudio(0)
+  const app = dungApp([], [taoTrackAudio([v00]), taoTrackAudio([v10])], [])
+  const { pc_datTrangThaiHinh, pc_doPhuHinh } = napHost(app)
+  pc_datTrangThaiHinh('SEQ', 0, '0,0')
+  pc_datTrangThaiHinh('SEQ', 1, '0,0')
+  const rp = pc_doPhuHinh('SEQ')
+  kiem('☠️ hai cam cung bat -> BAO nhieuBat', /nhieuBat=1\|/.test(rp), rp)
+  kiem('va noi ro moc nao', /cam cung bat @/.test(rp), rp)
+}
+
+{
+  // Khong cam nao bat o mot moc -> man hinh den, phai bao.
+  const v00 = taoClipAudio(0), v10 = taoClipAudio(0)
+  const app = dungApp([], [taoTrackAudio([v00]), taoTrackAudio([v10])], [])
+  const { pc_datTrangThaiHinh, pc_doPhuHinh } = napHost(app)
+  pc_datTrangThaiHinh('SEQ', 0, '0,1')
+  pc_datTrangThaiHinh('SEQ', 1, '0,1')
+  const rp = pc_doPhuHinh('SEQ')
+  kiem('☠️ khong cam nao bat -> BAO khongBat', /khongBat=1\|/.test(rp), rp)
+}
+
+{
+  // Moc lech theo luoi khung hinh van phai khop (giong duong tieng).
+  const v00 = taoClipAudio(2.2940)
+  const app = dungApp([], [taoTrackAudio([v00])], [])
+  const { pc_datTrangThaiHinh } = napHost(app)
+  const ra = pc_datTrangThaiHinh('SEQ', 0, '2.3000,1')
+  kiem('moc lech 6 ms van khop', /daDat=1\|/.test(ra) && /khongThayClip=0\|/.test(ra), ra)
+  kiem('va tat dung clip do', v00.disabled === true)
 }
 
 // ═══ 3. PHIEN BAN HOST ═══════════════════════════════════════════════════

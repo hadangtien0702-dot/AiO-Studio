@@ -957,6 +957,102 @@ function pc_datTrangThaiTieng(tenSeq, aIdx, dsStr, goc) {
 }
 
 /**
+ * BAT/TAT clip HINH — anh Tien 05/08/2026: *"o phan video anh cung muon lam
+ * theo kieu la cac clip cut co the theo dang la enable hoac disable luon"*.
+ *
+ * Y nghia voi nguoi dung: MOI cam deu co clip o MOI doan, chi cam cua nguoi
+ * dang noi duoc BAT. Muon doi cam o nhat nao thi tat cai dang bat, bat cai
+ * kia — mot phim, khong phai cat lai.
+ *
+ * ☠️ Track TREN che track DUOI. Nen luat la: tai moi doan chi duoc BAT DUNG
+ * MOT clip trong so cac track cam; tat het phan con lai. Lam vay thi dung du
+ * thu tu track the nao, va dung du co 2 hay 5 cam.
+ *
+ * @param tenSeq
+ * @param vIdx   chi so track video
+ * @param dsStr  "start,tat;..."  tat = 1 (disable) / 0 (bat)
+ * Tra "OK:daDat=n|khongThayClip=k|soLoi=k|loiDau=..."
+ */
+function pc_datTrangThaiHinh(tenSeq, vIdx, dsStr) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var i = parseInt(vIdx, 10);
+    if (!(i >= 0) || i >= seq.videoTracks.numTracks) return 'ERR:TRACK_LA|' + vIdx;
+    var tr = seq.videoTracks[i];
+
+    // Xem chu thich PC_GAN: overwriteClip dat theo luoi khung hinh nen phai
+    // khop GAN NHAT, va doc `start` mot lan vao mang thuong cho nhanh.
+    var dsStart = [], dsClip = [], c;
+    for (c = 0; c < tr.clips.numItems; c++) {
+      dsStart.push(tr.clips[c].start.seconds);
+      dsClip.push(tr.clips[c]);
+    }
+    function timGanNhat(t) {
+      var tot = -1, gan = PC_GAN;
+      for (var q = 0; q < dsStart.length; q++) {
+        var d = dsStart[q] - t;
+        if (d < 0) d = -d;
+        if (d < gan) { gan = d; tot = q; }
+      }
+      return tot >= 0 ? dsClip[tot] : null;
+    }
+
+    var manh = String(dsStr).split(';');
+    var daDat = 0, khongThay = 0, soLoi = 0, loiDau = '';
+    for (var k = 0; k < manh.length; k++) {
+      if (!manh[k]) continue;
+      var ph = manh[k].split(',');
+      if (ph.length !== 2) { soLoi++; if (!loiDau) loiDau = 'dinh dang: ' + manh[k]; continue; }
+      var cl = timGanNhat(parseFloat(ph[0]));
+      if (!cl) { khongThay++; if (!loiDau) loiDau = 'khong thay clip @' + ph[0]; continue; }
+      try { cl.disabled = (ph[1] === '1'); daDat++; }
+      catch (e1) { soLoi++; if (!loiDau) loiDau = e1.toString(); }
+    }
+    return 'OK:daDat=' + daDat + '|khongThayClip=' + khongThay +
+      '|soLoi=' + soLoi + '|loiDau=' + loiDau;
+  } catch (e) {
+    return pc_err('pc_datTrangThaiHinh', e);
+  }
+}
+
+/**
+ * DO LAI duong "du cam": moi moc thoi gian phai co DUNG MOT clip hinh dang BAT.
+ * Tra "OK:soMoc=n|motBat=n|khongBat=n|nhieuBat=n|mocLoiDau=..."
+ * ☠️ Day moi la phep kiem that: dem so clip khong noi len duoc gi, phai hoi
+ * "tai moi thoi diem, nguoi xem thay MAY hinh" (bai hoc 5k).
+ */
+function pc_doPhuHinh(tenSeq) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var moc = {}, t, c, cl, k;
+    for (t = 0; t < seq.videoTracks.numTracks; t++) {
+      var tr = seq.videoTracks[t];
+      for (c = 0; c < tr.clips.numItems; c++) {
+        cl = tr.clips[c];
+        k = cl.start.seconds.toFixed(1);
+        if (!moc[k]) moc[k] = { co: 0, bat: 0 };
+        moc[k].co++;
+        if (!cl.disabled) moc[k].bat++;
+      }
+    }
+    var soMoc = 0, motBat = 0, khongBat = 0, nhieuBat = 0, loiDau = '';
+    for (k in moc) {
+      if (!moc.hasOwnProperty(k)) continue;
+      soMoc++;
+      if (moc[k].bat === 1) motBat++;
+      else if (moc[k].bat === 0) { khongBat++; if (!loiDau) loiDau = 'khong cam nao bat @' + k; }
+      else { nhieuBat++; if (!loiDau) loiDau = moc[k].bat + ' cam cung bat @' + k; }
+    }
+    return 'OK:soMoc=' + soMoc + '|motBat=' + motBat + '|khongBat=' + khongBat +
+      '|nhieuBat=' + nhieuBat + '|mocLoiDau=' + loiDau;
+  } catch (e) {
+    return pc_err('pc_doPhuHinh', e);
+  }
+}
+
+/**
  * DO LAI duong "cat roi": dem clip tat / clip bat va muc Level cua chung.
  * Tra moi track: "A<i>|soClip|soTat|soBat|mucThapNhat|mucCaoNhat"
  */
@@ -1027,5 +1123,5 @@ function pc_nhanBanGiuClip(tenGoc, tenMoi) {
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.4.6';
+  return 'v0.4.7';
 }

@@ -8,7 +8,24 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 05/08/2026 17:06 — panel **v0.6.2**, host **v0.4.6**.
+*Cập nhật lần cuối: 05/08/2026 20:38 — panel **v0.6.3**, host **v0.4.7**.
+✅ **HÌNH CŨNG BẬT/TẮT ĐƯỢC — ĐÃ CHẠY THẬT, 299/299 ĐÚNG.** Anh Tiến: *"ở phần
+video anh cũng muốn làm theo kiểu là các clip cut có thể theo dạng là enable
+hoặc disable luôn"*. Ô mới **"Hình sau khi cắt"**: `Đủ cam — tắt cam không dùng`
+(mặc định) / `Chỉ cam người đang nói` (kiểu cũ).
+Đo trên `Podcast - DU CAM bat-tat + duong am luong`: 299 mốc, V1 299 clip
+(tắt 150), V2 299 clip (tắt 149), **mỗi mốc bật đúng 1 cam: 299 đúng · 0 màn
+hình đen · 0 chồng cam**; đường âm lượng đi kèm vẫn 299/299.
+Độ nặng: 598 clip duyệt hết **189 ms** vs 299 clip **84 ms** → tuyến tính, không
+có N². (Đây là chi phí API, không phải "kéo timeline có mượt không" — cái đó
+cần anh cảm nhận; thấy ì thì đổi ô về `Chỉ cam người đang nói`.)
+`kiem-host` **68/68** (58 → 68, thêm mục 2f).
+☠️ Lần thứ TƯ trong ngày công cụ đo sai trước sản phẩm: `kiem-am-luong.ps1` dựng
+lịch cắt từ MỌI clip video nên với đường "đủ cam" nó đọc ra 598 đoạn và báo
+trượt 299. Sửa: chỉ lấy clip **đang BẬT**. Đối chiếu ngược trên bản cũ vẫn
+299/299 → không phải nới lỏng cho qua.
+
+*05/08/2026 17:06 — panel **v0.6.2**, host **v0.4.6**.
 ✅ **Ô CHỌN 4 ĐƯỜNG TIẾNG — ĐÃ CHẠY THẬT CẢ BỐN TRÊN LIỆU 58 PHÚT, ĐỀU 299/299.**
 `duck` (mặc định, vẽ đường âm lượng) · `cat-tat` (cắt rời + tắt clip người kia,
 anh Tiến đề xuất) · `cat-chim` (cắt rời + chìm) · `giu`. Ô mức chìm −8/−15/−24 dB,

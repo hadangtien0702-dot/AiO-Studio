@@ -1,5 +1,100 @@
 # AiO Auto Podcast - Nhat ky
 
+## [du-cam-bat-tat] - 2026-08-05 20:38 - v0.6.3 / host v0.4.7: HINH CUNG BAT/TAT DUOC - 299/299 DUNG
+
+### Boi canh
+
+Anh Tien sau khi duyet 4 duong tieng: *"roi bay gio o phan video anh cung muon
+lam theo kieu la cac clip cut co the theo dang la enable hoac disable luon la
+dinh cua job em oi"*.
+
+Y nghia voi nguoi dung: thay vi chi dat clip cua cam nguoi dang noi (track kia
+de trong), nay **MOI cam co clip o MOI doan**, chi cam nguoi noi duoc BAT. Doi
+nhat cat nao thi tat cai dang bat, bat cai kia — **mot phim Shift+E, khong phai
+cat lai**.
+
+### Thay doi
+
+**Panel** — them o **"Hinh sau khi cat"** (nam tren o tieng):
+
+| Gia tri | Nghia |
+|---|---|
+| `du-cam` (mac dinh) | moi cam co clip o moi doan, tat cam khong dung |
+| `1-cam` | chi dat clip cua cam nguoi dang noi (khuon cu) |
+
+- `viecHinh` tu 1 dong/doan thanh n dong/doan (n = so cam, ke ca cam chung).
+- Buoc moi `trangThaiHinh()` chen giua dat hinh va don tieng.
+- `doLai` so `tongHinh` voi `viecHinh.length` (khong con la `doan.length`).
+
+**Host v0.4.7** — them:
+- `pc_datTrangThaiHinh(tenSeq, vIdx, dsStr)` — bat/tat clip hinh, khop moc theo
+  `PC_GAN` (khop gan nhat, vi luoi khung hinh).
+- `pc_doPhuHinh(tenSeq)` — **phep kiem that**: gom clip theo moc thoi gian roi
+  dem tai moi moc co MAY clip dang BAT. Phai dung 1.
+  ☠️ Day la cho de rot vao bay 5k: dem so clip khong noi len duoc gi. Cau hoi
+  dung la *"tai moi thoi diem nguoi xem thay may hinh"* — 0 la man hinh den,
+  2 la cam tren che cam duoi. Panel chan ca hai truong hop.
+
+### File anh huong
+
+- `host/podcast.jsx` — 2 ham moi, v0.4.6 -> v0.4.7
+- `dist/index.html` — o `cheDoHinh` + nhan VI/EN + `viecHinh`/`ttHinh` +
+  `trangThaiHinh()` + kiem `pc_doPhuHinh` trong `doLai`
+- `tests/kiem-host.mjs` — them muc 2f (10 phep): **58 -> 68 phep**
+
+### Kiem chung bang so (phan da co)
+
+- `node tests/kiem-host.mjs`: **68/68 DAT**. Trong do:
+  - V0 bat-TAT-bat / V1 TAT-bat-TAT dung theo lich cat
+  - `pc_doPhuHinh` bao dung `soMoc=3 motBat=3 khongBat=0 nhieuBat=0`
+  - **hai cam cung bat -> BAO `nhieuBat`** kem moc nao
+  - **khong cam nao bat -> BAO `khongBat`**
+  - moc lech 6 ms (luoi khung hinh) van khop dung clip
+- Cu phap panel sach (1 khoi script 2.136 dong); id/option/nhan VI+EN du.
+- Cai vao ban dev: panel nap host **v0.4.7**, o hien
+  "Every cam — disable unused".
+
+### Chay THAT tren liue 58 phut - sequence `Podcast - DU CAM bat-tat + duong am luong`
+
+| Do | Ket qua |
+|---|---|
+| So moc thoi gian | **299** |
+| V1 (cam Will, C4091) | 299 clip — tat 150, bat 149 |
+| V2 (cam Trong, C4236) | 299 clip — tat 149, bat 150 |
+| Moi moc co du 2 cam | **299 / 299** |
+| **Moi moc bat DUNG 1 cam** | **299 dung · 0 man hinh den · 0 chong cam** |
+| Duong am luong (di kem) | **299 / 299** · 597 keyframe/mic · quet 3.628 diem: 0 lan ca hai cung to, 0 lan ca hai cung chim |
+
+### ☠️ CONG CU DO SAI LAN THU TU - va lan nay la do chinh thay doi nay
+
+`kiem-am-luong.ps1` bao **TRUOT 299/598**. Nguyen nhan: no dung lich cat bang
+cach doc MOI clip video. Truoc day moi doan chi co 1 clip (tren track cua nguoi
+noi) nen dung; nay duong `du-cam` dat clip cho CA HAI cam o MOI doan, thanh ra
+no doc duoc "598 doan" va nua so do gan nham nguoi.
+
+Dau hieu de nhan ra la thuoc sai chu khong phai san pham sai: phep quet 3.628
+diem trong chinh script do van bao **0 lan ca hai cung to, 0 lan ca hai cung
+chim** — hai ket qua mau thuan nhau thi mot trong hai la cong cu do.
+
+Sua: chi lay clip **dang BAT** lam lich cat. Doi chieu nguoc tren ban cu (1 cam)
+van **299/299 DAT** -> thuoc khong bi noi long cho qua.
+
+→ **Bon lan trong mot ngay** cong cu do bao sai truoc khi san pham sai. Diem
+chung: moi lan doi CACH DU LIEU DUOC BAY RA thi thuoc do cu ngam gia dinh cu.
+
+### Do do nang - luat "NHE DE NHANH" cua anh Tien
+
+| Sequence | Clip hinh | Duyet toan bo (trung binh 3 lan) |
+|---|---|---|
+| `du-cam` | **598** | **189 ms** |
+| 1 cam (khuon cu) | 299 | 84 ms |
+
+Ty le 2,25x tren 2x so clip -> **tuyen tinh, khong co hieu ung N²**. File project
+1.639 KB.
+⚠️ Day la chi phi API, **khong phai** do "keo timeline co muot khong" — cai do
+phai tai anh Tien cam nhan. Neu thay i thi doi o "Hinh sau khi cat" ve
+`Chi cam nguoi dang noi`.
+
 ## [bon-duong-tieng] - 2026-08-05 17:06 - v0.6.2 / host v0.4.6: O CHON 4 DUONG TIENG - DA DO DU CA BON
 
 ### Boi canh
