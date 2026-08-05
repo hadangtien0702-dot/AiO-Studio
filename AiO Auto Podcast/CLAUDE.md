@@ -3,7 +3,31 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 15:48: panel v0.6.1 · host v0.4.3 — ĐÃ CÀI (bằng tay).**
+> **TRẠNG THÁI 05/08/2026 16:17: panel v0.6.1 · host v0.4.4 — ĐÃ CÀI (bằng tay).**
+>
+> ✅ **ĐƯỜNG ÂM LƯỢNG (ducking)** — ai nói thì mic người kia chìm **−15 dB**,
+> chuyển mượt 150 ms. Giữ 2 clip mic liền mạch + keyframe `Volume > Level` nên
+> editor kéo lại được; KHÔNG cắt tiếng, KHÔNG bake. Đo: 597 keyframe/mic,
+> **299/299 đoạn đúng**, quét 3.628 điểm → 0 lần cả hai cùng to, 0 lần cả hai
+> cùng chìm. Hàm host: `pc_docAmLuong` · `pc_veAmLuong` · `pc_xoaAmLuong` ·
+> `pc_nhanBanGiuClip`.
+>
+> ☠️☠️ **`Level = 0,177828` LÀ MẶC ĐỊNH CỦA PREMIERE = 0 dB.** Công thức quen
+> thuộc `dB = 20*log10(value)` đọc ra −15 dB — **SAI**, và nghe rất hợp lý nên
+> suýt tin. Bằng chứng: mọi clip audio ở mọi sequence (kể cả clip panel vừa đặt
+> tự động) đều đúng con số đó. Thang thật: `value = 10^((dB−15)/20)`, value 1.0
+> = +15 dB. → Vì vậy `pc_veAmLuong` **nhận HỆ SỐ NHÂN, không nhận dB**: đúng dù
+> offset thang là bao nhiêu, và không ghi đè chỉnh tay của người dùng.
+>
+> ☠️☠️ **MỐC KEYFRAME TÍNH THEO THỜI GIAN TRONG FILE, KHÔNG PHẢI SEQUENCE.**
+> Mọi mốc = `thờiGianSequence + clip.inPoint`. Sai là lệch cả 299 mốc 7 giây.
+> Đo bằng hai đường: keyframe đặt tại t=3534 được nhận nguyên vẹn dù vượt độ dài
+> clip trên timeline (3528,4) nhưng nằm trong media (3535,4); và thước NGOÀI —
+> đặt hố −40 dB trên **bản sao** rồi hỏi anh Tiến hố nằm ở đâu, anh trả lời
+> "khoảng 4:53" (= 300 − 7,007) → xác nhận.
+>
+> ☠️ Thử thứ nguy hiểm thì dùng `pc_nhanBanGiuClip` tạo **bản sao đầy đủ clip**
+> rồi thử trên đó — đừng thử trên bản dựng của anh Tiến (luật 3b).
 >
 > ✅ **ĐÃ RA BẢN DỰNG THẬT ĐẦU TIÊN** trên liệu 58 phút của anh Tiến —
 > sequence `Will - Podcast Cut (2)`: **299/299 nhát cắt**, V1 100% cam Will ·

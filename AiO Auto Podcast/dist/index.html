@@ -6,7 +6,7 @@
 <!--
   Panel v0.6.1 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
   (AiO Design System/AiO Auto Podcast/AiO Auto Podcast.html — "Studio Console").
-  ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.3).
+  ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.4).
 
   ☠️ v0.6.1 (05/08, phiên soát toàn bộ) — BỐN LỖI CÓ THỂ PHÁ TIMELINE THẬT.
   Bản v0.6.0 bấm "Auto Match" lúc một file media offline là XOÁ TRẮNG
@@ -1850,7 +1850,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
             if (!ok) { thoat(t('khong_nap_host'), null); return }
             tienDo(t('dang_nhan_ban'), 36)
             goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-            if (pb !== 'v0.4.3') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+            if (pb !== 'v0.4.4') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
             // "tự lưu project trước khi ghi" — lời hứa in trong Cài đặt cắt.
             // Bay sạch một buổi chiều 04/08 vì đóng không lưu — không lặp lại.
             // ☠️ save() KÉO activeSequence về tab timeline đang mở trước mặt
@@ -2237,7 +2237,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
       napLaiHost(function (ok) {
         if (!ok) { thoatSync(t('khong_nap_host')); return }
         goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-        if (pb !== 'v0.4.3') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
+        if (pb !== 'v0.4.4') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
         goiHost('pc_nhapMono("' + micKq.map(function (m) { return chuoiJsx(m.mono) }).join(';') + '")').then(function (rN) {
         if (rN.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + rN); return }
         var kvN = tachKv(rN)

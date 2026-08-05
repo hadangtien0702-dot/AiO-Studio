@@ -8,7 +8,21 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 05/08/2026 15:48 — panel **v0.6.1**, host **v0.4.3**.
+*Cập nhật lần cuối: 05/08/2026 16:17 — panel **v0.6.1**, host **v0.4.4**.
+✅ **ĐƯỜNG ÂM LƯỢNG (ducking)** — anh Tiến 05/08: *"khi Trọng nói audio mà cam
+đoạn đó được ẩn đi tôn lên audio của Trọng và ngược lại"*. Anh chọn: vẽ keyframe
+(giữ 2 clip mic liền mạch, anh kéo lại được), chìm **−15 dB**, chuyển mượt 150 ms.
+Đo: **597 keyframe/mic**, đối chiếu tâm **299/299 đoạn ĐẠT**, quét 3.628 điểm —
+**0 lần cả hai cùng to, 0 lần cả hai cùng chìm**. Xem PROGRESS.md [duong-am-luong].
+☠️ Hai cái bẫy đã đo chứ không đoán: (1) `Level = 0,177828` là **MẶC ĐỊNH = 0 dB**,
+không phải −15 dB như công thức `20*log10` quen thuộc gợi ý → hàm nhận **hệ số
+nhân**, không nhận dB, nên không phá mất chỉnh tay của người dùng; (2) mốc keyframe
+tính theo **thời gian trong FILE**, phải cộng `inPoint` — sai là lệch cả 299 mốc
+7 giây; xác nhận bằng thước ngoài (anh Tiến nhìn hố thử: "khoảng 4:53").
+CÒN NỢ: chưa có nút trong panel (đang chạy bằng script ngoài); chưa xử lý gain
+tổng (anh vẫn phải tự kéo +25 dB).
+
+*05/08/2026 15:48 — panel **v0.6.1**, host **v0.4.3**.
 ✅ **RA BẢN DỰNG THẬT ĐẦU TIÊN trên liệu 58 phút của anh Tiến** (sequence
 `Will - Podcast Cut (2)`): **299/299 nhát cắt**, V1 100% cam Will · V2 100% cam
 Trọng, A1/A2 đúng mic mono từng người liền mạch 0→3528,4s, **0 clip lạ, 0 lỗ

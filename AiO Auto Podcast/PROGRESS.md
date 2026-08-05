@@ -1,5 +1,99 @@
 # AiO Auto Podcast - Nhat ky
 
+## [duong-am-luong] - 2026-08-05 16:17 - host v0.4.4: DUCKING BANG KEYFRAME, 299/299 DUNG
+
+Anh Tien xem ban dung ra luc 15:48 roi bao hai viec:
+1. *"anh moi tang 2 audio len 25db thi moi nghe duoc"*
+2. *"hien tai em dang de 2 thanh audio de len nhau... cai anh muon la mau tim
+   cua Trong thi khi Trong noi audio ma cam doan do duoc an di ton len audio
+   cua Trong va nguoc lai"*
+
+Tuc: **ducking** — ai noi thi mic nguoi kia phai chim xuong.
+
+### Anh Tien chon (hoi bang AskUserQuestion, 2 cau)
+
+| Cau | Anh chon |
+|---|---|
+| Dang tieng | **Ve duong am luong** (giu 2 clip mic lien mach + keyframe Level). Khong cat tieng, khong bake — anh keo lai duoc bang tay |
+| Muc chim | **-15 dB** |
+
+### Do truoc khi lam - ba phep, ca ba deu doi huong ke hoach
+
+**1. Muc tieng that.** `volumedetect` tren 2 file mono:
+`Will mean -42,6 dB` · `Trong mean -36,4 dB` (max ca hai ~0 dB).
+Tieng thu rat nho VA hai mic lech nhau **6,2 dB** — dung la phai keo len moi nghe.
+
+**2. ☠️ THANG GIA TRI CUA `Level` — suyt sai vi tin cong thuc quen thuoc.**
+Doc `Volume > Level` cua clip audio: **0.17782793939114**. Cong thuc hay gap
+`dB = 20*log10(value)` cho ra **-15 dB** — nghe rat hop ly, va suyt tin.
+Do doi chieu: doc Level cua **moi clip audio o moi sequence** (ke ca clip panel
+vua dat tu dong, ke ca clip chi co 1 component) deu ra **dung con so do**. Giong
+het nhau o moi noi => day la **MAC DINH cua Premiere**, tuc **0 dB**, khong phai
+-15 dB. Thang that: `value = 10^((dB-15)/20)`, value 1.0 <-> +15 dB.
+→ Cach tranh phu thuoc: `pc_veAmLuong` **khong nhan dB, nhan HE SO NHAN**. Chim
+15 dB = nhan 10^(-15/20) vao gia tri DANG CO. Dung du offset thang la bao nhieu,
+va **khong pha mat chinh tay cua nguoi dung** (bai hoc 5j).
+
+**3. ☠️ MOC KEYFRAME TINH THEO THOI GIAN TRONG FILE, KHONG PHAI THOI GIAN SEQUENCE.**
+Clip mic: `start=0` `in=7,007` `end=3528,4` `out=3535,407`. Neu doan sai goc thoi
+gian thi **ca 299 moc lech 7 giay** — nghe ra ngay.
+- Phep do tu dong: dat keyframe tai **t=3534**. Moc do **ngoai** vung clip tren
+  sequence (3528,4) nhung **trong** vung media (3535,4). Premiere **nhan nguyen
+  ven, khong clamp** -> nghieng manh ve media-time.
+- Phep do NGOAI (khong tin mot dau hieu, bai hoc 5i/5d): dat mot **ho am luong
+  -40 dB dai 20 giay** tai keyframe 300-320 tren **BAN SAO** `THU-AM-LUONG`, roi
+  hoi anh Tien ho nam o dau. Anh tra loi **"khoang 4:53"** = 300 - 7,007.
+  → **XAC NHAN media-time.** Moi moc = `thoiGianSequence + inPoint`.
+
+☠️ Ca hai phep thu deu chay tren **ban sao** `pc_nhanBanGiuClip` tao ra, khong
+dung vao ban dung cua anh (luat 3b).
+
+### Thay doi
+
+- `host/podcast.jsx` v0.4.4, them 4 ham:
+  - `pc__propLevel(cl)` — lay property Volume > Level
+  - `pc_docAmLuong(tenSeq)` — CHI DOC: Level hien tai, da co keyframe chua, so key
+  - `pc_veAmLuong(tenSeq, aIdx, dsStr, goc)` — dat mot LO keyframe, `dsStr` =
+    `"t,heSo;..."`, gia tri ghi = `goc * heSo`
+  - `pc_xoaAmLuong(tenSeq, aIdx)` — go sach duong de ve lai (hoan tac duoc)
+  - `pc_nhanBanGiuClip(tenGoc, tenMoi)` — clone GIU NGUYEN clip, de thu an toan
+- Panel: doi moc kiem phien ban host sang v0.4.4 (2 cho).
+- Script van hanh (chua vao panel): `scratchpad/ve-am-luong.ps1` +
+  `scratchpad/kiem-am-luong.ps1`.
+
+### Kiem chung bang so
+
+Bo kiem host: **31/31 DAT**.
+
+Cach ve: moi ranh giua hai doan dat **2 keyframe** — `(T - 0,15s, muc cu)` va
+`(T, muc moi)` -> chuyen muot 150 ms, khong "cup". 299 moc -> **597 keyframe moi
+mic**, `soLoi=0`.
+
+Thuoc do KHONG chi dem: doc **toan bo 1.194 keyframe** ve, dung lai duong bac
+thang bang noi suy tuyen tinh (dung cach Premiere noi suy), roi doi chieu voi
+lich cat:
+
+| Phep | THU-AM-LUONG (ban thu) | Will - Podcast Cut (2) (that) |
+|---|---|---|
+| Doi chieu tam **299 doan**: mic nguoi noi ~0 dB VA mic kia <= -12 dB | **299 DAT / 0 TRUOT** | **299 DAT / 0 TRUOT** |
+| Quet **3.628 diem** deu tren 58 phut: ca hai cung TO | **0** | **0** |
+| Cung quet: ca hai cung CHIM | **0** | **0** |
+
+Ban thu `THU-AM-LUONG` da xoa sau khi do xong (4 -> 3 sequence).
+
+### CHUA lam duoc / con no
+
+1. **Chua vao PANEL.** Duong am luong hien ve bang script ngoai qua cong 8094,
+   chua co nut/o chon trong giao dien. Phai dua vao `dist/index.html` (cai dat
+   "Chim nguoi khong noi: -8 / -15 / -24 dB / tat").
+2. **Chua xu ly GAIN tong.** Anh Tien van phai tu keo +25 dB. Level dang o mac
+   dinh (0 dB) va em CO Y khong dung toi — anh chinh bang `Clip > Audio Gain`
+   thi no nam ngoai Level, ghi de la mat chinh tay cua anh. Bo sau nen chuan hoa
+   luc tach file mono (loudnorm ve -16 LUFS) chu khong chinh tren timeline.
+3. Van chua co thuoc ngoai cho **"cat dung nguoi"** (rieng goc thoi gian keyframe
+   thi da co - chinh la cau tra loi "4:53" cua anh Tien).
+4. Van cai BANG TAY: `kiem-nao` + `stress` con truot 2 phep (xem muc duoi).
+
 ## [chuoi-con-giet-ban-dung] - 2026-08-05 15:48 - host v0.4.3: RA BAN DUNG THAT DAU TIEN TREN LIEU 58 PHUT CUA ANH TIEN
 
 Anh Tien gui anh chup panel bao **"Verification found a mismatch: hinh 164/299"**

@@ -741,6 +741,165 @@ function pc_timFileMic() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+ * DUONG AM LUONG (ducking) — anh Tien dat 05/08/2026:
+ *   "khi trong noi audio ma cam doan do duoc an di ton len audio cua trong
+ *    va nguoc lai"
+ * Anh chon: VE DUONG AM LUONG (giu 2 clip mic lien mach, keyframe Level),
+ * muc chim -15 dB. Khong cat tieng, khong bake — anh keo lai duoc bang tay.
+ *
+ * ☠️ THANG GIA TRI CUA `Level` — DO THAT, DUNG SUY:
+ *   Doc Level cua MOI clip audio o MOI sequence (ke ca clip panel vua dat,
+ *   ke ca clip chi co 1 component) deu ra **0.177828**. Giong het nhau o
+ *   moi noi => day la MAC DINH cua Premiere, tuc **0 dB**.
+ *   Nghia la thang KHONG phai `dB = 20*log10(value)` (cong thuc do se doc
+ *   mac dinh thanh -15 dB, vo ly). Thang that: `value = 10^((dB-15)/20)`,
+ *   tuc value = 1.0 <-> +15 dB.
+ * ☠️ Vi the ham nay KHONG nhan dB — no nhan HE SO NHAN. Giam 15 dB la nhan
+ *   10^(-15/20) = 0.177828 vao gia tri DANG CO. Cach nay dung du offset cua
+ *   thang la bao nhieu, va **khong pha mat chinh tay cua nguoi dung**
+ *   (bai hoc 5j: dung chon chi so phu thuoc thu minh khong kiem soat).
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/** Lay property Volume > Level cua mot clip. null neu clip khong co. */
+function pc__propLevel(cl) {
+  try {
+    for (var c = 0; c < cl.components.numItems; c++) {
+      var cp = cl.components[c];
+      var ten = String(cp.displayName), mn = String(cp.matchName);
+      if (ten === 'Volume' || mn.indexOf('Volume') >= 0) {
+        for (var p = 0; p < cp.properties.numItems; p++) {
+          if (String(cp.properties[p].displayName) === 'Level') return cp.properties[p];
+        }
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+/**
+ * Doc trang thai duong am luong cua tung track audio. CHI DOC.
+ * Tra moi track mot dong: "A<i>|<soClip>|<Level hien tai>|<dangCoKeyframe>|<soKey>"
+ */
+function pc_docAmLuong(tenSeq) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var out = ['seq=' + pc__sach(seq.name)];
+    for (var a = 0; a < seq.audioTracks.numTracks; a++) {
+      var tr = seq.audioTracks[a];
+      if (!tr.clips.numItems) continue;
+      var cl = tr.clips[0];
+      var pr = pc__propLevel(cl);
+      var gt = '?', bd = '?', sk = -1;
+      if (pr) {
+        try { gt = String(pr.getValue()); } catch (e1) {}
+        try { bd = String(pr.isTimeVarying()); } catch (e2) {}
+        try { sk = pr.getKeys().length; } catch (e3) {}
+      }
+      out.push('A' + a + '|' + tr.clips.numItems + '|' + gt + '|' + bd + '|' + sk +
+        '|' + pc__sach(cl.name) + '|in=' + cl.inPoint.seconds.toFixed(4) +
+        '|start=' + cl.start.seconds.toFixed(4) + '|end=' + cl.end.seconds.toFixed(4));
+    }
+    return 'OK:' + out.join('\n');
+  } catch (e) {
+    return pc_err('pc_docAmLuong', e);
+  }
+}
+
+/**
+ * Dat mot LO keyframe len duong Level cua clip dau tien tren track audio.
+ * @param tenSeq
+ * @param aIdx   chi so track audio (0-based)
+ * @param dsStr  "t,heSo;t,heSo;..."  t = giay (goc theo pc_moc...), heSo nhan
+ *               vao gia tri GOC (1 = giu nguyen, 0.177828 = chim 15 dB)
+ * @param goc    gia tri Level goc (panel doc truoc bang pc_docAmLuong)
+ * Tra "OK:daDat=n|soLoi=k|soKey=m|loiDau=..."
+ */
+function pc_veAmLuong(tenSeq, aIdx, dsStr, goc) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var i = parseInt(aIdx, 10);
+    if (!(i >= 0) || i >= seq.audioTracks.numTracks) return 'ERR:TRACK_LA|' + aIdx;
+    var tr = seq.audioTracks[i];
+    if (!tr.clips.numItems) return 'ERR:TRACK_TRONG|A' + i;
+    var pr = pc__propLevel(tr.clips[0]);
+    if (!pr) return 'ERR:KHONG_CO_LEVEL|A' + i;
+    var g = parseFloat(goc);
+    if (!(g > 0)) return 'ERR:GOC_LA|' + goc;
+    try { if (!pr.isTimeVarying()) pr.setTimeVarying(true); } catch (e0) {}
+
+    var manh = String(dsStr).split(';');
+    var daDat = 0, soLoi = 0, loiDau = '';
+    for (var k = 0; k < manh.length; k++) {
+      if (!manh[k]) continue;
+      var ph = manh[k].split(',');
+      if (ph.length !== 2) { soLoi++; if (!loiDau) loiDau = 'dinh dang: ' + manh[k]; continue; }
+      var t = parseFloat(ph[0]), h = parseFloat(ph[1]);
+      if (!(t >= 0) || !(h > 0)) { soLoi++; if (!loiDau) loiDau = 'so la: ' + manh[k]; continue; }
+      try { pr.addKey(t); pr.setValueAtKey(t, g * h, true); daDat++; }
+      catch (e1) { soLoi++; if (!loiDau) loiDau = e1.toString(); }
+    }
+    var sk = -1;
+    try { sk = pr.getKeys().length; } catch (e2) {}
+    return 'OK:daDat=' + daDat + '|soLoi=' + soLoi + '|soKey=' + sk + '|loiDau=' + loiDau;
+  } catch (e) {
+    return pc_err('pc_veAmLuong', e);
+  }
+}
+
+/** Go SACH duong am luong tren mot track audio — de ve lai tu dau. */
+function pc_xoaAmLuong(tenSeq, aIdx) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var i = parseInt(aIdx, 10);
+    if (!(i >= 0) || i >= seq.audioTracks.numTracks) return 'ERR:TRACK_LA|' + aIdx;
+    var tr = seq.audioTracks[i];
+    if (!tr.clips.numItems) return 'ERR:TRACK_TRONG|A' + i;
+    var pr = pc__propLevel(tr.clips[0]);
+    if (!pr) return 'ERR:KHONG_CO_LEVEL|A' + i;
+    try { pr.setTimeVarying(false); } catch (e1) {}
+    var sk = -1;
+    try { sk = pr.getKeys().length; } catch (e2) {}
+    return 'OK:soKey=' + sk;
+  } catch (e) {
+    return pc_err('pc_xoaAmLuong', e);
+  }
+}
+
+/**
+ * NHAN BAN sequence GIU NGUYEN CLIP — de THU thu nguy hiem tren ban sao
+ * thay vi tren san pham cua nguoi dung (luat 3b: undo khong phai duong lui).
+ * Khac pc_nhanBan o cho KHONG go clip.
+ */
+function pc_nhanBanGiuClip(tenGoc, tenMoi) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var goc = pc__seqDangDung(tenGoc);
+    if (!goc) return 'ERR:SEQ_DOI|';
+    var idCu = {}, i;
+    for (i = 0; i < app.project.sequences.numSequences; i++) {
+      idCu[String(app.project.sequences[i].sequenceID)] = true;
+    }
+    try { goc.clone(); } catch (e) { return 'ERR:CLONE_LOI|' + e.toString(); }
+    var ban = null;
+    for (i = 0; i < app.project.sequences.numSequences; i++) {
+      if (!idCu[String(app.project.sequences[i].sequenceID)]) { ban = app.project.sequences[i]; break; }
+    }
+    if (!ban) return 'ERR:CLONE_KHONG_RA_SEQ|';
+    try { ban.name = pc__tenKhongTrung(String(tenMoi)); } catch (e2) {}
+    app.project.activeSequence = ban;
+    var nV = 0, nA = 0;
+    for (i = 0; i < ban.videoTracks.numTracks; i++) nV += ban.videoTracks[i].clips.numItems;
+    for (i = 0; i < ban.audioTracks.numTracks; i++) nA += ban.audioTracks[i].clips.numItems;
+    return 'OK:seq=' + ban.name + '|hinh=' + nV + '|tieng=' + nA;
+  } catch (e) {
+    return pc_err('pc_nhanBanGiuClip', e);
+  }
+}
+
 /**
  * Phien ban host — panel KIEM sau moi lan nap, khop moi duoc chay.
  * ☠️ Phai la ham CUOI FILE: evalFile co the nuot file GIUA CHUNG ma khong
@@ -748,5 +907,5 @@ function pc_timFileMic() {
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.4.3';
+  return 'v0.4.4';
 }
