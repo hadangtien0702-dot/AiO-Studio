@@ -8,7 +8,27 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 05/08/2026 16:17 — panel **v0.6.1**, host **v0.4.4**.
+*Cập nhật lần cuối: 05/08/2026 17:06 — panel **v0.6.2**, host **v0.4.6**.
+✅ **Ô CHỌN 4 ĐƯỜNG TIẾNG — ĐÃ CHẠY THẬT CẢ BỐN TRÊN LIỆU 58 PHÚT, ĐỀU 299/299.**
+`duck` (mặc định, vẽ đường âm lượng) · `cat-tat` (cắt rời + tắt clip người kia,
+anh Tiến đề xuất) · `cat-chim` (cắt rời + chìm) · `giu`. Ô mức chìm −8/−15/−24 dB,
+mặc định −15, tự ẩn khi chế độ không có chìm.
+Bốn sequence để anh nghe so sánh: `Podcast - DUONG AM LUONG -15 dB` ·
+`Podcast - CAT ROI + TAT clip nguoi kia` · `Podcast - CAT ROI + chim -15 dB` ·
+`Podcast - GIU NGUYEN 2 mic`. Cả bốn: 299 clip hình, 0 clip lạ.
+Bộ kiểm: `kiem-host` **58/58** · `kiem-sync` 9/9 · `kiem-khop` 32/32.
+☠️ **BA lần trong một phiên, CÔNG CỤ ĐO sai trước khi sản phẩm sai** — nếu tin
+thì đã đi sửa thứ không hỏng: (1) mốc "xong" lấy theo `nút.disabled` (nút vẫn
+disabled cả khi đã dừng); (2) khớp clip bằng `toFixed(2)` trong khi
+`overwriteClip` đặt theo **lưới khung hình** — panel gửi 2,3000, clip thật ở
+2,2940, lệch 6 ms, trượt 14/20 lệnh; (3) so `Level` bằng số thực dung sai `1e-9`
+trong khi Premiere lưu float 32-bit — lệch 1,4e-9 = **0,0000004 dB**, báo trượt
+oan cả 299 đoạn.
+❌ CÒN NỢ: `kiem-nao` + `stress` vẫn trượt 2 phép (nợ từ phiên đổi não, CỐ Ý
+chưa sửa — sửa là chạm vào não đang chạy đúng trên liệu thật) → **vẫn phải cài
+bằng tay**; chưa xử lý gain tổng; chưa có thước ngoài cho "cắt đúng người".
+
+*05/08/2026 16:17 — panel **v0.6.1**, host **v0.4.4**.
 ✅ **ĐƯỜNG ÂM LƯỢNG (ducking)** — anh Tiến 05/08: *"khi Trọng nói audio mà cam
 đoạn đó được ẩn đi tôn lên audio của Trọng và ngược lại"*. Anh chọn: vẽ keyframe
 (giữ 2 clip mic liền mạch, anh kéo lại được), chìm **−15 dB**, chuyển mượt 150 ms.

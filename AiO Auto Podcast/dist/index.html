@@ -6,7 +6,7 @@
 <!--
   Panel v0.6.1 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
   (AiO Design System/AiO Auto Podcast/AiO Auto Podcast.html — "Studio Console").
-  ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.4).
+  ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.6).
 
   ☠️ v0.6.1 (05/08, phiên soát toàn bộ) — BỐN LỖI CÓ THỂ PHÁ TIMELINE THẬT.
   Bản v0.6.0 bấm "Auto Match" lúc một file media offline là XOÁ TRẮNG
@@ -423,9 +423,19 @@ select option{background:var(--bg-2);color:var(--text-1)}
       </div>
       <div class="mrow">
         <span class="lbl"><b id="cdTiengT"></b><span id="cdTiengS"></span></span>
-        <select id="cheDoTieng" style="width:150px">
-          <option value="theo"></option>
+        <select id="cheDoTieng" style="width:190px">
+          <option value="duck"></option>
+          <option value="cat-tat"></option>
+          <option value="cat-chim"></option>
           <option value="giu"></option>
+        </select>
+      </div>
+      <div class="mrow" id="rowChim">
+        <span class="lbl"><b id="cdChimT"></b><span id="cdChimS"></span></span>
+        <select id="mucChim" style="width:112px">
+          <option value="8">-8 dB</option>
+          <option value="15" selected>-15 dB</option>
+          <option value="24">-24 dB</option>
         </select>
       </div>
       <div class="mrow" style="border-bottom:0">
@@ -537,6 +547,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
       dang_nhan_ban: 'Đang tạo sequence cắt mới…',
       dang_dung: 'Đang cắt đoạn {i}/{n}…',
       dang_thay_tieng: 'Đang thay tiếng mic thu riêng…',
+      dang_ve_am: 'Đang tôn tiếng người đang nói…',
       khong_phan_biet: 'Không phân biệt được mic giữa các người nói (cần mic thu riêng đặt sát người nấy).',
       mic_deu: 'Mic của {ten} (track {track}) có tín hiệu phẳng/đều — vui lòng kiểm tra lại mic thu.',
       mot_luot: 'Tool chỉ nghe thấy 1 người nói (thiếu file mic thu riêng). Vui lòng kéo đủ file mic thu riêng vào sequence.',
@@ -558,6 +569,11 @@ select option{background:var(--bg-2);color:var(--text-1)}
       cd_nguong_auto: 'Tự đo',
       cd_tieng: 'Tiếng sau khi cắt', cd_tieng_s: 'Giữ mọi mic thì còn tiếng cười, tiếng ừ-hử của người kia',
       cd_tieng_theo: 'Theo người nói', cd_tieng_giu: 'Giữ nguyên mọi mic',
+      cd_tieng_duck: 'Vẽ đường âm lượng',
+      cd_tieng_cattat: 'Cắt rời — tắt clip người kia',
+      cd_tieng_catchim: 'Cắt rời — chìm người kia',
+      cd_chim: 'Người không nói chìm bao nhiêu',
+      cd_chim_s: 'Càng sâu càng sạch, càng nông càng còn không khí phòng',
       cd_goc: 'Bản gốc', cd_goc_s: 'Panel luôn cắt một bản sao, tự lưu project trước khi ghi',
       cd_goc_ok: 'Không bị đụng',
       giay: 'giây', dong_chu: 'Đóng',
@@ -644,6 +660,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
       dang_nhan_ban: 'Creating new cut sequence…',
       dang_dung: 'Cutting segment {i}/{n}…',
       dang_thay_tieng: 'Swapping dedicated mic audio…',
+      dang_ve_am: 'Lifting the speaker over the others…',
       khong_phan_biet: 'Cannot distinguish speaker mics. Please check separate mic assignments.',
       mic_deu: 'Mic for {ten} (track {track}) has static volume — please check the mic track.',
       mot_luot: 'Only 1 speaker detected (missing separate mic files). Please drag separate mic files into the sequence.',
@@ -665,6 +682,11 @@ select option{background:var(--bg-2);color:var(--text-1)}
       cd_nguong_auto: 'Auto',
       cd_tieng: 'Audio after the cut', cd_tieng_s: 'Keeping every mic keeps laughs and uh-huhs from the other person',
       cd_tieng_theo: 'Follows the speaker', cd_tieng_giu: 'Keep every mic as is',
+      cd_tieng_duck: 'Draw a volume envelope',
+      cd_tieng_cattat: 'Split — disable the other clip',
+      cd_tieng_catchim: 'Split — duck the other clip',
+      cd_chim: 'Duck the non-speaker by',
+      cd_chim_s: 'Deeper is cleaner, shallower keeps more room tone',
       cd_goc: 'Your original', cd_goc_s: 'The panel always cuts a copy, and saves the project before writing',
       cd_goc_ok: 'Untouched',
       giay: 'sec', dong_chu: 'Close',
@@ -872,18 +894,38 @@ select option{background:var(--bg-2);color:var(--text-1)}
     var lead = soThuc(document.getElementById('lead').value); if (!(lead >= 0)) lead = 0
     var shot = soThuc(document.getElementById('shot').value); if (!(shot > 0)) shot = 1
     var max = soThuc(document.getElementById('maxShot').value); if (!(max > 0)) max = 18
+    // ☠️ Giá trị 'theo' là khuôn CŨ (≤ v0.6.1) — chỉ đặt mic người nói, không
+    // có clip của người kia nên không bật lại được. Nay quy về 'cat-tat':
+    // vẫn im hoàn toàn, nhưng còn clip để anh Tiến bấm Shift+E bật lại.
+    var tieng = document.getElementById('cheDoTieng').value
+    if (tieng === 'theo') tieng = 'cat-tat'
+    var chim = parseFloat(document.getElementById('mucChim').value)
+    if (!(chim > 0)) chim = 15
     return {
       lead: lead, shot: shot, max: max,
       nguong: document.getElementById('nguong').value,
-      tieng: document.getElementById('cheDoTieng').value,
+      tieng: tieng,
+      chim: chim,
     }
+  }
+  /** Nhãn của một chế độ tiếng — dùng cho cả ô chọn lẫn dòng tóm tắt. */
+  function tenCheDoTieng(v) {
+    if (v === 'giu') return t('cd_tieng_giu')
+    if (v === 'cat-tat') return t('cd_tieng_cattat')
+    if (v === 'cat-chim') return t('cd_tieng_catchim')
+    return t('cd_tieng_duck')
   }
   function apCaiDat() {
     var c = docCaiDat()
+    // Mức chìm chỉ có nghĩa với chế độ CÓ chìm — "giữ nguyên" và "tắt clip"
+    // thì ô đó là công tắc vô nghĩa (bài học sổ thiết kế #11), nên ẩn đi.
+    document.getElementById('rowChim').style.display =
+      (c.tieng === 'duck' || c.tieng === 'cat-chim') ? '' : 'none'
     document.getElementById('tomTat').textContent = tp('tomtat', {
       lead: vietSo(c.lead.toFixed(2)), shot: vietSo(c.shot.toFixed(1)), max: c.max,
       nguong: c.nguong === 'auto' ? t('tomtat_auto') : c.nguong + ' dB',
-      tieng: c.tieng === 'giu' ? t('cd_tieng_giu') : t('cd_tieng_theo'),
+      tieng: tenCheDoTieng(c.tieng) +
+        ((c.tieng === 'duck' || c.tieng === 'cat-chim') ? ' −' + c.chim + ' dB' : ''),
     })
     try { localStorage.setItem('aio-pc-caidat', JSON.stringify(c)) } catch (e) {}
     ve()
@@ -900,7 +942,9 @@ select option{background:var(--bg-2);color:var(--text-1)}
     if (c.shot !== undefined) document.getElementById('shot').value = vietSo(String(c.shot))
     if (c.max !== undefined) document.getElementById('maxShot').value = String(c.max)
     if (c.nguong) document.getElementById('nguong').value = c.nguong
-    if (c.tieng) document.getElementById('cheDoTieng').value = c.tieng
+    // 'theo' là khuôn cũ ≤ v0.6.1 — quy về 'cat-tat' (xem docCaiDat).
+    if (c.tieng) document.getElementById('cheDoTieng').value = (c.tieng === 'theo') ? 'cat-tat' : c.tieng
+    if (c.chim) document.getElementById('mucChim').value = String(c.chim)
   })()
 
   // ═══ KIỂM: đủ điều kiện dựng chưa — dựng luôn cầu nguoiDs cho engine ═════
@@ -954,7 +998,9 @@ select option{background:var(--bg-2);color:var(--text-1)}
   }
 
   function veTrack() {
-    var giuMic = docCaiDat().tieng === 'giu'
+    // Nhãn "tiếng liền mạch" chỉ đúng với hai đường KHÔNG cắt rời mic.
+    var tiengHT = docCaiDat().tieng
+    var giuMic = (tiengHT === 'giu' || tiengHT === 'duck')
     var kt = kiem()
     // nhắc thiếu mic ĐÚNG MỘT LẦN — ở hàng mic trống đầu tiên
     var kNhac = null
@@ -1850,7 +1896,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
             if (!ok) { thoat(t('khong_nap_host'), null); return }
             tienDo(t('dang_nhan_ban'), 36)
             goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-            if (pb !== 'v0.4.4') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+            if (pb !== 'v0.4.6') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
             // "tự lưu project trước khi ghi" — lời hứa in trong Cài đặt cắt.
             // Bay sạch một buổi chiều 04/08 vì đóng không lưu — không lặp lại.
             // ☠️ save() KÉO activeSequence về tab timeline đang mở trước mặt
@@ -1908,10 +1954,19 @@ select option{background:var(--bg-2);color:var(--text-1)}
                 })
               }
 
-              // TIẾNG: theo người nói = mảnh theo đoạn; "giữ nguyên mọi mic"
-              // = MỖI người một mảnh nguyên vẹn phủ trọn (tiếng liền mạch).
+              // ── TIẾNG: bốn đường, anh Tiến chốt 05/08 ──────────────────
+              //  giu      : mỗi người MỘT mảnh nguyên vẹn, không đụng âm lượng
+              //  duck     : như trên + VẼ ĐƯỜNG ÂM LƯỢNG (keyframe) — mặc định
+              //  cat-tat  : cắt rời từng đoạn cho CẢ HAI mic, tắt clip người kia
+              //  cat-chim : cắt rời như trên, nhưng hạ Level thay vì tắt
+              // ☠️ 'cat-*' đặt clip cho CẢ HAI người ở MỌI đoạn (không chỉ người
+              // nói) — đó là điểm khác khuôn 'theo' cũ: có clip thì anh Tiến bấm
+              // Shift+E bật lại được, chứ không phải đi tìm lại file.
+              var catRoi = (caiDat.tieng === 'cat-tat' || caiDat.tieng === 'cat-chim')
               var viecTieng = []
-              if (caiDat.tieng === 'giu') {
+              var trangThai = []   // [{mic, start, tat, heSo}] — dùng sau khi đặt xong
+              var heSoChim = Math.pow(10, -caiDat.chim / 20)
+              if (!catRoi) {
                 nguoiDs.forEach(function (ng, p) {
                   viecTieng.push(ng.mic + ',' + duongMic[p] + ',' +
                     (tu0 + offMic[p]).toFixed(4) + ',' + (den0 + offMic[p]).toFixed(4) + ',' +
@@ -1921,26 +1976,112 @@ select option{background:var(--bg-2);color:var(--text-1)}
                 doan.forEach(function (d) {
                   var segTu = tu0 + d.tu
                   var segDen = tu0 + d.den
-                  var dsNguoi = d.nguoi >= 0 ? [d.nguoi]
-                    : nguoiDs.map(function (x, p) { return p })
-                  dsNguoi.forEach(function (p) {
-                    viecTieng.push(nguoiDs[p].mic + ',' + duongMic[p] + ',' +
+                  nguoiDs.forEach(function (ng, p) {
+                    viecTieng.push(ng.mic + ',' + duongMic[p] + ',' +
                       (segTu + offMic[p]).toFixed(4) + ',' + (segDen + offMic[p]).toFixed(4) + ',' +
                       segTu.toFixed(4))
+                    // d.nguoi < 0 là đoạn cam chung — lúc đó KHÔNG ai bị chìm.
+                    var dangNoi = (d.nguoi < 0 || d.nguoi === p)
+                    trangThai.push({
+                      mic: ng.mic,
+                      start: segTu,
+                      tat: (!dangNoi && caiDat.tieng === 'cat-tat') ? 1 : 0,
+                      heSo: dangNoi ? 1 : heSoChim,
+                    })
                   })
                 })
               }
 
               var j = 0
               function loTieng() {
-                if (j >= viecTieng.length) { doLai(); return }
+                if (j >= viecTieng.length) { xuLyTieng(); return }
                 var cuoi = Math.min(j + LO, viecTieng.length)
-                tienDo(t('dang_thay_tieng'), 88 + 8 * cuoi / viecTieng.length)
+                tienDo(t('dang_thay_tieng'), 88 + 6 * cuoi / viecTieng.length)
                 var ds = viecTieng.slice(j, cuoi)
                 j = cuoi
                 goiHost('pc_datTieng("' + chuoiJsx(tenThat) + '","' + ds.join(';') + '")').then(function (r4) {
                   if (r4.indexOf('OK:') !== 0 || r4.indexOf('soLoi=0') < 0) { thoat(t('dung_loi') + r4, null); return }
                   loTieng()
+                })
+              }
+
+              // ── 3b. TÔN TIẾNG NGƯỜI ĐANG NÓI ─────────────────────────────
+              // Anh Tiến 05/08: "khi Trọng nói audio mà cam đoạn đó được ẩn đi
+              // tôn lên audio của Trọng và ngược lại".
+              // ☠️ Mốc keyframe tính theo THỜI GIAN TRONG FILE, không phải thời
+              // gian sequence: clip đặt tại start=tu0 với in=tu0+offMic[p], nên
+              // điểm sequence T ứng với media (T + offMic[p]). Sai chỗ này là
+              // lệch CẢ 299 mốc đúng bằng offMic — đã đo và xác nhận 05/08.
+              function xuLyTieng() {
+                if (caiDat.tieng === 'giu') { doLai(); return }
+                tienDo(t('dang_ve_am'), 94)
+                goiHost('pc_docAmLuong("' + chuoiJsx(tenThat) + '")').then(function (rA) {
+                  if (rA.indexOf('OK:') !== 0) { thoat(t('dung_loi') + rA, null); return }
+                  var gocCua = {}
+                  rA.slice(3).split('\n').forEach(function (dg) {
+                    var ph = dg.split('|')
+                    if (ph[0].charAt(0) !== 'A') return
+                    gocCua[parseInt(ph[0].slice(1), 10)] = parseFloat(ph[2])
+                  })
+                  var viec = []
+                  // Fade phải nhỏ hơn hẳn đoạn ngắn nhất, nếu không keyframe của
+                  // ranh này lùi qua ranh trước và đường âm lượng đảo ngược.
+                  var FADE = Math.min(0.15, caiDat.shot / 3)
+                  nguoiDs.forEach(function (ng, p) {
+                    var goc = gocCua[ng.mic]
+                    if (!(goc > 0)) return
+                    var ds = []
+                    if (catRoi) {
+                      for (var k = 0; k < trangThai.length; k++) {
+                        if (trangThai[k].mic !== ng.mic) continue
+                        ds.push(trangThai[k].start.toFixed(4) + ',' + trangThai[k].tat +
+                          ',' + trangThai[k].heSo.toFixed(8))
+                      }
+                    } else {
+                      var hCu = null
+                      doan.forEach(function (d, i) {
+                        var T = tu0 + d.tu
+                        var h = (d.nguoi < 0 || d.nguoi === p) ? 1 : heSoChim
+                        if (i === 0) ds.push((T + offMic[p]).toFixed(4) + ',' + h.toFixed(8))
+                        else if (h !== hCu) {
+                          ds.push((T - FADE + offMic[p]).toFixed(4) + ',' + hCu.toFixed(8))
+                          ds.push((T + offMic[p]).toFixed(4) + ',' + h.toFixed(8))
+                        }
+                        hCu = h
+                      })
+                    }
+                    viec.push({ mic: ng.mic, goc: goc, ds: ds })
+                  })
+                  var vi = 0, vj = 0
+                  function loAm() {
+                    if (vi >= viec.length) { doLai(); return }
+                    var v = viec[vi]
+                    if (vj >= v.ds.length) { vi++; vj = 0; loAm(); return }
+                    var cuoi = Math.min(vj + LO, v.ds.length)
+                    tienDo(t('dang_ve_am'), 94 + 3 * (vi + cuoi / v.ds.length) / viec.length)
+                    var manh = v.ds.slice(vj, cuoi).join(';')
+                    vj = cuoi
+                    var ham = catRoi ? 'pc_datTrangThaiTieng' : 'pc_veAmLuong'
+                    goiHost(ham + '("' + chuoiJsx(tenThat) + '",' + v.mic + ',"' + manh + '",' + v.goc + ')')
+                      .then(function (r6) {
+                        if (r6.indexOf('OK:') !== 0 || r6.indexOf('soLoi=0') < 0) {
+                          thoat(t('dung_loi') + r6, null); return
+                        }
+                        if (r6.indexOf('khongThayClip=0') < 0 && catRoi) {
+                          thoat(tp('lech_do', { chiTiet: r6.slice(3) }), null); return
+                        }
+                        loAm()
+                      })
+                  }
+                  // Vẽ lại từ đầu: gỡ đường cũ trước (chạy lại lần 2 không cộng dồn).
+                  var g = 0
+                  function goCu() {
+                    if (catRoi || g >= nguoiDs.length) { loAm(); return }
+                    var mic = nguoiDs[g].mic
+                    g++
+                    goiHost('pc_xoaAmLuong("' + chuoiJsx(tenThat) + '",' + mic + ')').then(goCu)
+                  }
+                  goCu()
                 })
               }
 
@@ -2040,7 +2181,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
     var caiDat = docCaiDat()
     tienDo(tp('kq_nut', {
       n: doan.length,
-      chiTiet: caiDat.tieng === 'giu' ? t('kq_tieng_giu') : t('kq_tieng_theo'),
+      chiTiet: tenCheDoTieng(caiDat.tieng),
     }), 0)
     setTimeout(function () {
       delete nut.dataset.state
@@ -2237,7 +2378,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
       napLaiHost(function (ok) {
         if (!ok) { thoatSync(t('khong_nap_host')); return }
         goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-        if (pb !== 'v0.4.4') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
+        if (pb !== 'v0.4.6') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
         goiHost('pc_nhapMono("' + micKq.map(function (m) { return chuoiJsx(m.mono) }).join(';') + '")').then(function (rN) {
         if (rN.indexOf('OK:') !== 0) { thoatSync(t('dung_loi') + rN); return }
         var kvN = tachKv(rN)
@@ -2310,8 +2451,12 @@ select option{background:var(--bg-2);color:var(--text-1)}
     document.querySelector('#nguong option[value=auto]').textContent = t('cd_nguong_auto')
     document.getElementById('cdTiengT').textContent = t('cd_tieng')
     document.getElementById('cdTiengS').textContent = t('cd_tieng_s')
-    document.querySelector('#cheDoTieng option[value=theo]').textContent = t('cd_tieng_theo')
+    document.querySelector('#cheDoTieng option[value=duck]').textContent = t('cd_tieng_duck')
+    document.querySelector('#cheDoTieng option[value="cat-tat"]').textContent = t('cd_tieng_cattat')
+    document.querySelector('#cheDoTieng option[value="cat-chim"]').textContent = t('cd_tieng_catchim')
     document.querySelector('#cheDoTieng option[value=giu]').textContent = t('cd_tieng_giu')
+    document.getElementById('cdChimT').textContent = t('cd_chim')
+    document.getElementById('cdChimS').textContent = t('cd_chim_s')
     document.getElementById('cdGocT').textContent = t('cd_goc')
     document.getElementById('cdGocS').textContent = t('cd_goc_s')
     document.getElementById('cdGocOk').textContent = t('cd_goc_ok')
@@ -2351,7 +2496,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
     f[x].focus()
     e.preventDefault()
   })
-  var dsCaiDat = ['lead', 'shot', 'maxShot', 'nguong', 'cheDoTieng']
+  var dsCaiDat = ['lead', 'shot', 'maxShot', 'nguong', 'cheDoTieng', 'mucChim']
   for (var iC = 0; iC < dsCaiDat.length; iC++) {
     document.getElementById(dsCaiDat[iC]).addEventListener('input', apCaiDat)
   }

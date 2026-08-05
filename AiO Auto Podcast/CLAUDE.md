@@ -3,7 +3,31 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 16:17: panel v0.6.1 · host v0.4.4 — ĐÃ CÀI (bằng tay).**
+> **TRẠNG THÁI 05/08/2026 17:06: panel v0.6.2 · host v0.4.6 — ĐÃ CÀI (bằng tay).**
+>
+> ✅ **BỐN ĐƯỜNG TIẾNG, chọn bằng ô trong "Cài đặt cắt"** — cả bốn đã chạy thật
+> trên liệu 58 phút và đều **299/299 đúng**:
+>
+> | Giá trị | Nghĩa | Người không nói |
+> |---|---|---|
+> | `duck` (mặc định) | 2 clip mic liền mạch + keyframe âm lượng | chìm −15 dB, mượt 150 ms |
+> | `cat-tat` | cắt rời từng đoạn cho CẢ HAI mic, tắt clip người kia | im hẳn (Shift+E bật lại) |
+> | `cat-chim` | cắt rời như trên, hạ Level thay vì tắt | chìm −15 dB |
+> | `giu` | 2 clip liền mạch, không đụng âm lượng | để nguyên |
+>
+> Ô mức chìm −8/−15/−24 dB (mặc định −15), tự ẩn với `cat-tat` và `giu`.
+> ☠️ `cat-*` đặt clip cho **CẢ HAI người ở MỌI đoạn** — đó là chỗ khác khuôn
+> `theo` cũ: có clip thì bật lại được, không phải đi tìm lại file.
+>
+> ☠️☠️ **`overwriteClip` ĐẶT CLIP THEO LƯỚI KHUNG HÌNH.** Panel gửi `2.3000`,
+> clip thật nằm ở `2.2940` — lệch 6 ms. Nên khớp clip theo mốc thời gian phải
+> **khớp GẦN NHẤT** (`PC_GAN = 0,06s ≈ 2 khung), không khớp bằng chính xác:
+> bản đầu dùng `toFixed(2)` trượt 14/20 lệnh. Đừng nới rộng thêm — 500 ms phải
+> vẫn trượt, và hai clip cách nhau 50 ms phải chọn đúng cái gần nhất.
+>
+> ☠️ **Premiere lưu `Level` dạng float 32-bit** — đọc về lệch ~1,4e-9 so với
+> thứ ghi vào. Mọi phép kiểm âm lượng phải **so bằng dB** (dung sai 0,05 dB),
+> đừng so số thực: dung sai `1e-9` báo trượt oan cả 299 đoạn.
 >
 > ✅ **ĐƯỜNG ÂM LƯỢNG (ducking)** — ai nói thì mic người kia chìm **−15 dB**,
 > chuyển mượt 150 ms. Giữ 2 clip mic liền mạch + keyframe `Volume > Level` nên

@@ -1,5 +1,152 @@
 # AiO Auto Podcast - Nhat ky
 
+## [bon-duong-tieng] - 2026-08-05 17:06 - v0.6.2 / host v0.4.6: O CHON 4 DUONG TIENG - DA DO DU CA BON
+
+### Boi canh
+
+Anh Tien xem ban ducking xong: *"ban ducking nay anh kiem tra da on roi em nha
+luu lai option nay va lam luon va ben cho panel em hay dua ra 1 su lua chon de
+chon em nha"*. Truoc do anh de xuat: *"them 1 option la em cut va enable/disable
+clip thi sao em ha?"*.
+
+Tuc: giu duong ducking, LAM THEM duong cat roi, va **dua ca hai vao panel thanh
+o chon** thay vi chay bang script ngoai.
+
+### Do truoc khi hua (khong doan API)
+
+- `TrackItem.disabled` la **boolean, ghi duoc va tra lai duoc**. Thu tren 1 clip
+  cua ban dung roi tra ve nguyen trang: `false -> true -> false`, 299 clip hinh
+  khong suy suyen.
+- `sequence.razor` **KHONG ton tai** trong Premiere Beta 26.5 -> khong cat bang
+  dao duoc. Khong can: panel dat tung doan bang `overwriteClip` nen clip da roi
+  san.
+
+### Thay doi
+
+**Panel** — o `cheDoTieng` doi tu 2 lua chon thanh **4 duong**:
+
+| Gia tri | Nghia | Tieng nguoi khong noi |
+|---|---|---|
+| `duck` (mac dinh) | 2 clip mic lien mach + VE DUONG AM LUONG | chim -15 dB, muot 150 ms |
+| `cat-tat` | cat roi tung doan cho CA HAI mic, TAT clip nguoi kia | im hoan toan (Shift+E bat lai) |
+| `cat-chim` | cat roi nhu tren, ha Level thay vi tat | chim -15 dB |
+| `giu` | 2 clip lien mach, khong dung toi am luong | de nguyen |
+
+- Them o **muc chim** (-8 / -15 / -24 dB), mac dinh **-15 dB** (muc anh Tien
+  duyet). O nay **an di** voi `cat-tat` va `giu` — o do no la cong tac vo nghia
+  (bai hoc so thiet ke #11).
+- ☠️ `cat-*` dat clip cho **CA HAI nguoi o MOI doan**, khong chi nguoi noi. Do la
+  cho khac khuon `theo` cu: co clip thi bat lai duoc, khong phai di tim lai file.
+  Gia tri `theo` cu trong localStorage tu dong quy ve `cat-tat`.
+- Buoc moi `xuLyTieng()` chen giua dat tieng va do lai; go duong cu truoc khi ve
+  (chay lai lan hai khong cong don).
+
+**Host v0.4.5** — them `pc_datTrangThaiTieng` (khop clip theo `start`, tat/dat
+Level) va `pc_doTrangThaiTieng` (do lai: so clip tat / bat / muc thap-cao).
+
+### File anh huong
+
+- `host/podcast.jsx` — 2 ham moi, v0.4.4 -> v0.4.5
+- `dist/index.html` — o chon 4 duong + o muc chim + `tenCheDoTieng()` +
+  `xuLyTieng()`; nhan VI/EN; 2 cho kiem phien ban host
+- `tests/kiem-host.mjs` — them muc 2d (11 phep) va 2e (11 phep): **31 -> 53 phep**
+
+### Kiem chung bang so (phan da co)
+
+- `node tests/kiem-host.mjs`: **53/53 DAT**. Trong do doi chieu lai bang dB:
+  he so 1 -> giu dung gia tri goc; he so 0,177828 -> dung **-15,0000 dB**.
+  Ca "moc khong co clip" cung duoc dem vao `khongThayClip` chu khong im lang.
+- Cu phap panel: 1 khoi script 2.046 dong parse sach; 5 id moi va 4 option moi
+  deu co that trong DOM.
+- Cai vao ban dev, panel nap host **v0.4.5**, o chon hien du 4 duong.
+
+### ☠️ LAN CHAY THAT THU NHAT - TRUOT, VA TRUOT DUNG CHO DA DOAN TRUOC
+
+Chay `cat-tat` tren liue 58 phut. Hinh + tieng dat du (**V=299, A=598**) nhung
+buoc dat trang thai bao:
+
+```
+daDat=6 | khongThayClip=14 | soLoi=0 | loiDau=khong thay clip @2.3000
+```
+
+Nguyen nhan that: host khop clip bang `start.toFixed(2)` — **bang chinh xac,
+dung sai 10 ms**. Nhung `overwriteClip` dat clip **theo LUOI KHUNG HINH**:
+panel gui **2.3000**, clip that nam o **2.2940** — lech **6 ms**, du de hai
+chuoi khac nhau. Truot **14/20 lenh** cua lo dau.
+
+Sua: `PC_GAN = 0.06s` (~2 khung o 29,97 fps) va **khop GAN NHAT** thay vi khop
+bang. Van duy nhat vi doan ngan nhat nguoi dung dat >= 1 giay. Doc `start` mot
+lan vao mang thuong truoc khi tim — doc `.seconds` trong vong lap long nhau la
+bat ExtendScript goi cau hang tram nghin lan.
+
+Them 6 phep kiem dung lai dung ca nay (**53 -> 58 phep, 58/58 DAT**):
+- moc lech vai ms van khop dung clip
+- lech 500 ms thi **KHONG** duoc khop bua (dung noi nguong cho no qua — 5j)
+- hai clip sat nhau 50 ms: phai chon cai **GAN NHAT**, khong phai cai gap truoc
+
+☠️ **Con mot cong cu do sai nua trong chinh phien nay**: script cho "chay xong"
+lay moc la `nut.disabled === false`. **Sai** — nut van `disabled=true` ca khi da
+dung. Moc dung: nhan nut con dau `…` la dang chay. Dung bai hoc 5f/5j: moc
+"xong" phai la tin hieu cua chinh no, va dung chon chi so minh khong kiem soat.
+
+### ☠️ CONG CU DO SAI LAN THU BA TRONG CUNG PHIEN - suyt bao "hong" oan
+
+Do `cat-chim` xong, thuoc bao **TRUOT 299/299**. Mo con so ra doc:
+
+```
+lv=0.03162277489901   mong doi=0.0316227763148914
+```
+
+Lech **1,4 x 10^-9**. Do la Premiere luu `Level` dang **float 32-bit**. Quy ra
+dB: **0,0000004 dB** — khong tai nao nghe duoc. Thuoc cua em so bang so thuc voi
+dung sai `1e-9` nen bat oan ca 299 doan.
+
+Sua thuoc: **so bang dB, dung sai 0,05 dB**. Do la chi so nguoi dung cam nhan
+duoc, va khong phu thuoc cach Premiere luu so (bai hoc 5 + 5j). Do lai thi ca
+`cat-chim` lan `cat-tat` deu **299/299 DAT**.
+
+→ **Ba lan trong mot phien, cong cu do bao sai truoc khi san pham sai**: (1) moc
+"xong" lay theo `nut.disabled`; (2) khop clip bang `toFixed(2)`; (3) so `Level`
+bang so thuc. Ca ba deu se dan den "di sua mot thu khong hong".
+
+### Kiem chung tren Premiere - chay THAT ca 4 duong tren liue 58 phut
+
+Moi duong chay tu PANEL (bam nut that qua cong 8094), roi do bang script doc
+THANG tu Premiere — khong tin bao cao cua panel.
+
+| Duong | Sequence | Hinh | Clip tieng | Doi chieu 299 doan | Rieng |
+|---|---|---|---|---|---|
+| `duck` | `Podcast - DUONG AM LUONG -15 dB` | 299 | 2 (lien mach) | **299 DAT / 0 truot** | 597 keyframe/mic · quet 3.628 diem: 0 lan ca hai cung to, 0 lan ca hai cung chim |
+| `cat-tat` | `Podcast - CAT ROI + TAT clip nguoi kia` | 299 | 598 | **299 DAT / 0 truot** | tat 150 (A1) + 149 (A2) = 299 = dung so doan cua nguoi kia · 0 keyframe |
+| `cat-chim` | `Podcast - CAT ROI + chim -15 dB` | 299 | 598 | **299 DAT / 0 truot** | 0 clip tat · muc chim dung -15 dB · 0 keyframe |
+| `giu` | `Podcast - GIU NGUYEN 2 mic` | 299 | 2 | — | 0 tat · 0 keyframe · khong dung toi am luong |
+
+Ca bon: **clip khong phai file media = 0/0**.
+
+Bo kiem: `kiem-host` **58/58** · `kiem-sync` **9/9** · `kiem-khop` **32/32**.
+
+### CON NO (khong tu sua trong phien nay, va ly do)
+
+1. ☠️ **`kiem-nao` va `stress` VAN TRUOT 2 phep** — no tu phien truoc, khi nao
+   doi ban chat sang duong "nghe tron tung kenh" ma chua sua 2 phep kiem viet
+   cho thuat toan CU:
+   - `kiem-nao` "bleed -5 dB -> gay an toan": duong moi nghe tung kenh RIENG nen
+     khong con khai niem "chenh lech giua hai mic" -> chot cu khong ap dung.
+     Chot moi dung phai la **ty le CHONG LAN khoang noi giua cac kenh**.
+   - `stress` ca 5 "mic-lech (bleed-20)": 1/10 luot.
+   **Vi sao khong sua ngay**: sua la cham vao NAO — thu dang cho ket qua dung
+   tren liue that cua anh Tien (299 nhat cat can doi 54,4/45,6). Them mot chot
+   an toan sai la tool tu choi dung tren chinh liue do. Muon sua an toan phai
+   co bo dap an (anh Tien cham marker) + do lai tren ca liue that lan bo tong
+   hop. Khong lam voi trong mot phien dang giao hang.
+2. Vi 2 phep do, **van phai CAI BANG TAY** (chep `host/podcast.jsx` +
+   `dist/index.html` vao ban da cai) thay vi qua `sign-install.ps1`.
+3. Chua xu ly **gain tong** — anh Tien van phai tu keo len moi nghe ro
+   (do that: Will mean -42,6 dB, Trong mean -36,4 dB).
+4. Van chua co thuoc NGOAI cho "cat dung nguoi".
+5. Sequence **`Will - Podcast Cut`** (khong so) la BAN HONG CU: 10 clip hinh +
+   10 clip tieng khong co file media. Anh Tien xoa duoc.
+
 ## [duong-am-luong] - 2026-08-05 16:17 - host v0.4.4: DUCKING BANG KEYFRAME, 299/299 DUNG
 
 Anh Tien xem ban dung ra luc 15:48 roi bao hai viec:

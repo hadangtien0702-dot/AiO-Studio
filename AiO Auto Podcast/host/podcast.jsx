@@ -176,6 +176,14 @@ function pc__seqDangDung(tenSeq) {
 var PC_DEM = 0.05;
 
 /**
+ * Dung sai khi khop mot clip theo moc thoi gian (giay).
+ * ☠️ overwriteClip dat clip theo LUOI KHUNG HINH: panel gui 2.3000 thi clip
+ * that nam o 2.2940 (do that 05/08/2026). 0.06s ~ 2 khung o 29,97 fps —
+ * du de bat duoc lam tron, va van duy nhat vi doan ngan nhat >= 1 giay.
+ */
+var PC_GAN = 0.06;
+
+/**
  * Doc trang thai re — panel goi moi giay. CHI DOC.
  * Tra "OK:ver|project|seqName|WxH|soTrackV|soTrackA".
  */
@@ -870,6 +878,118 @@ function pc_xoaAmLuong(tenSeq, aIdx) {
 }
 
 /**
+ * DAT TRANG THAI cho tung clip tieng — duong "CAT ROI" (anh Tien de xuat
+ * 05/08/2026: *"them 1 option la em cut va enable/disable clip thi sao"*).
+ *
+ * Khac duong ducking o cho: tieng da duoc cat roi thanh tung doan san, nen
+ * moi clip chi can MOT gia tri — khong keyframe nao. Nhin timeline la biet
+ * doan nao cua ai; anh Tien bat lai bang Shift+E.
+ *
+ * ☠️ KHOP CLIP THEO `start`, KHONG theo chi so mang. Chi so de lech khi
+ * Premiere gop/bo clip; `start` la thu ta dat ra nen doi chieu duoc
+ * (bai hoc 5i: khop bang thu co the trung lap thi bat nham — `start` tren
+ * MOT track thi duy nhat).
+ *
+ * @param tenSeq
+ * @param aIdx   chi so track audio
+ * @param dsStr  "start,tat,heSo;..."  tat = 1 (disable) / 0 (bat);
+ *               heSo nhan vao Level goc (1 = giu nguyen). Bo qua heSo neu tat=1.
+ * @param goc    gia tri Level goc
+ * Tra "OK:daDat=n|khongThayClip=k|soLoi=k|loiDau=..."
+ */
+function pc_datTrangThaiTieng(tenSeq, aIdx, dsStr, goc) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var i = parseInt(aIdx, 10);
+    if (!(i >= 0) || i >= seq.audioTracks.numTracks) return 'ERR:TRACK_LA|' + aIdx;
+    var tr = seq.audioTracks[i];
+    var g = parseFloat(goc);
+    if (!(g > 0)) return 'ERR:GOC_LA|' + goc;
+
+    // ☠️ KHOP GAN NHAT, KHONG khop bang chinh xac — do that 05/08/2026:
+    // `overwriteClip` dat clip theo LUOI KHUNG HINH, nen vi tri that lech vai
+    // mili giay so voi con so panel gui. Ban dau khop bang `toFixed(2)`
+    // (dung sai 10 ms) va truot 14/20 lenh dau: panel gui **2.3000**, clip
+    // that nam o **2.2940** — lech 6 ms, du de hai chuoi khac nhau.
+    // Dung sai PC_GAN = 0.06s = ~2 khung o 29,97 fps. Van duy nhat vi doan
+    // ngan nhat do nguoi dung dat toi thieu 1 giay.
+    // Doc start MOT LAN vao mang thuong — doc `.seconds` trong vong lap long
+    // nhau la cho ExtendScript bo ra hang tram nghin lan goi cau (cham).
+    var dsStart = [], dsClip = [], c;
+    for (c = 0; c < tr.clips.numItems; c++) {
+      dsStart.push(tr.clips[c].start.seconds);
+      dsClip.push(tr.clips[c]);
+    }
+    function timGanNhat(t) {
+      var tot = -1, gan = PC_GAN;
+      for (var q = 0; q < dsStart.length; q++) {
+        var d = dsStart[q] - t;
+        if (d < 0) d = -d;
+        if (d < gan) { gan = d; tot = q; }
+      }
+      return tot >= 0 ? dsClip[tot] : null;
+    }
+
+    var manh = String(dsStr).split(';');
+    var daDat = 0, khongThay = 0, soLoi = 0, loiDau = '';
+    for (var k = 0; k < manh.length; k++) {
+      if (!manh[k]) continue;
+      var ph = manh[k].split(',');
+      if (ph.length !== 3) { soLoi++; if (!loiDau) loiDau = 'dinh dang: ' + manh[k]; continue; }
+      var cl = timGanNhat(parseFloat(ph[0]));
+      if (!cl) { khongThay++; if (!loiDau) loiDau = 'khong thay clip @' + ph[0]; continue; }
+      var tat = ph[1] === '1';
+      try {
+        cl.disabled = tat;
+        if (!tat) {
+          var pr = pc__propLevel(cl);
+          if (pr) pr.setValue(g * parseFloat(ph[2]), true);
+        }
+        daDat++;
+      } catch (e1) { soLoi++; if (!loiDau) loiDau = e1.toString(); }
+    }
+    return 'OK:daDat=' + daDat + '|khongThayClip=' + khongThay +
+      '|soLoi=' + soLoi + '|loiDau=' + loiDau;
+  } catch (e) {
+    return pc_err('pc_datTrangThaiTieng', e);
+  }
+}
+
+/**
+ * DO LAI duong "cat roi": dem clip tat / clip bat va muc Level cua chung.
+ * Tra moi track: "A<i>|soClip|soTat|soBat|mucThapNhat|mucCaoNhat"
+ */
+function pc_doTrangThaiTieng(tenSeq) {
+  try {
+    var seq = pc__seqDangDung(tenSeq);
+    if (!seq) return 'ERR:SEQ_DOI|';
+    var out = ['seq=' + pc__sach(seq.name)];
+    for (var a = 0; a < seq.audioTracks.numTracks; a++) {
+      var tr = seq.audioTracks[a];
+      if (!tr.clips.numItems) continue;
+      var soTat = 0, soBat = 0, thap = 1e9, cao = -1e9;
+      for (var c = 0; c < tr.clips.numItems; c++) {
+        var cl = tr.clips[c];
+        if (cl.disabled) { soTat++; continue; }
+        soBat++;
+        var pr = pc__propLevel(cl);
+        if (pr) {
+          var v = pr.getValue();
+          if (v < thap) thap = v;
+          if (v > cao) cao = v;
+        }
+      }
+      out.push('A' + a + '|' + tr.clips.numItems + '|' + soTat + '|' + soBat +
+        '|' + (thap === 1e9 ? '-' : thap) + '|' + (cao === -1e9 ? '-' : cao));
+    }
+    return 'OK:' + out.join('\n');
+  } catch (e) {
+    return pc_err('pc_doTrangThaiTieng', e);
+  }
+}
+
+/**
  * NHAN BAN sequence GIU NGUYEN CLIP — de THU thu nguy hiem tren ban sao
  * thay vi tren san pham cua nguoi dung (luat 3b: undo khong phai duong lui).
  * Khac pc_nhanBan o cho KHONG go clip.
@@ -907,5 +1027,5 @@ function pc_nhanBanGiuClip(tenGoc, tenMoi) {
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.4.4';
+  return 'v0.4.6';
 }
