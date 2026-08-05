@@ -18,6 +18,7 @@
 
 /* ============ TOKENS — chép nguyên từ DESIGN-SYSTEM.md §15 ============ */
 :root{
+  color-scheme:dark;
   --bg-0:#0e0e0e; --bg-1:#141414; --bg-2:#181818; --bg-3:#1f1f1f;
   --bg-4:#282828; --bg-5:#333333; --bg-6:#161616;
   --bg-hover:rgb(255 255 255 /5%); --bg-active:rgb(255 255 255 /9%);
@@ -59,11 +60,15 @@ svg{display:block}
 :where(button,[tabindex],input,select):focus-visible{
   outline:none;border-color:var(--accent-line);box-shadow:var(--focus-ring)}
 
-/* thanh cuộn tối tuỳ biến — không để trắng mặc định Windows */
+/* thanh cuộn tối tuỳ biến — không để trắng mặc định Windows.
+   Ẩn khi không rê chuột tới: danh sách ngắn/panel thấp sẽ có phần trên cùng
+   của "viên thuốc" cuộn nằm ngay sát hàng tiêu đề, nhìn như MỘT CHẤM XÁM lạc quẻ
+   dù không ai đang cuộn gì cả. Chỉ hiện khi thật sự rê tới để cuộn. */
 *::-webkit-scrollbar{width:10px;height:10px}
 *::-webkit-scrollbar-track{background:transparent}
-*::-webkit-scrollbar-thumb{background:rgb(255 255 255 /14%);border-radius:var(--r-pill);
+*::-webkit-scrollbar-thumb{background:transparent;border-radius:var(--r-pill);
   border:2px solid transparent;background-clip:content-box}
+*:hover::-webkit-scrollbar-thumb{background:rgb(255 255 255 /14%)}
 *::-webkit-scrollbar-thumb:hover{background:rgb(255 255 255 /22%);background-clip:content-box}
 
 /* ============ THANH TRÊN — khuôn CHUNG cho cả 7 panel ============ */
@@ -77,7 +82,7 @@ svg{display:block}
 .spacer{flex:1}
 .host{font-size:var(--fs-sm);color:var(--text-3)}
 .host b{color:var(--text-2);font-weight:var(--fw-medium)}
-.host i{color:var(--line-2);font-style:normal;margin:0 var(--sp-2)}
+.host i{color:var(--text-3);font-style:normal;margin:0 var(--sp-2)}
 
 /* ============ NÚT — HAI họ, không hơn ============ */
 .btn{height:var(--h-ctrl);padding:0 var(--sp-4);display:inline-flex;align-items:center;gap:var(--sp-2);
@@ -108,13 +113,36 @@ svg{display:block}
 .card-t{font-size:var(--fs-md);font-weight:var(--fw-semibold)}
 
 /* dải vùng chọn */
-.selbar{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-4);
+.selbar{flex-wrap:wrap;row-gap:var(--sp-2);min-width:0;display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-4);
   background:var(--bg-3);border:1px solid var(--line-1);border-radius:var(--r-md);min-height:36px}
 .selbar .lbl{font-size:var(--fs-xs);color:var(--text-3)}
 .selbar .val{font-size:var(--fs-md);font-weight:var(--fw-medium)}
-.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 var(--sp-1);
-  background:var(--bg-4);border:1px solid var(--line-2);border-radius:var(--r-sm);
-  font-size:var(--fs-2xs);font-weight:var(--fw-semibold);color:var(--text-2)}
+
+/* combobox tự vẽ: select gốc để trình duyệt tự vẽ khi MỞ RA (hộp trắng, highlight xanh OS) —
+   không sửa được xuyên suốt mọi bản Chromium, nên tự dựng danh sách bằng div/ul, giữ đúng bàn phím. */
+.cbx{position:relative;min-width:0}
+.cbx-btn{width:100%;height:var(--h-ctrl);padding:0 var(--sp-2);display:inline-flex;align-items:center;
+  gap:var(--sp-2);min-width:0;text-align:left;background:var(--bg-0);border:1px solid var(--line-2);
+  border-radius:var(--r-sm);color:var(--text-1);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer}
+.cbx-btn:hover{border-color:var(--line-strong)}
+.cbx-btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbx-btn .chev{margin-left:auto;flex:0 0 auto;color:var(--text-3);transition:transform .15s}
+.cbx-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+/* danh sách MỞ RA thì cho rộng thoải mái theo chữ dài nhất — không ép theo bề ngang
+   cái nút đóng (nút đóng hẹp là chuyện của .selbar, không phải chuyện của người đang đọc/chọn) */
+.cbx-list{position:absolute;top:calc(100% + var(--sp-1));left:0;min-width:100%;width:max-content;
+  max-width:min(360px,calc(100vw - var(--sp-6) * 2));z-index:var(--z-dropdown);
+  margin:0;padding:var(--sp-1);list-style:none;max-height:220px;overflow-y:auto;
+  background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  box-shadow:0 8px 24px rgb(0 0 0 /40%)}
+.cbx-opt{padding:var(--sp-2) var(--sp-3);border-radius:var(--r-sm);font-size:var(--fs-sm);
+  color:var(--text-1);cursor:pointer;white-space:normal;overflow-wrap:break-word;
+  display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2)}
+.cbx-opt.active{background:var(--bg-4)}
+/* đang chọn: nói bằng CHỮ MÀU + dấu tích — không tô nền cam (chữ trắng trên cam 12px không đủ 4,5:1) */
+.cbx-opt[aria-selected="true"]{color:var(--accent-text);font-weight:var(--fw-semibold)}
+.cbx-opt .tick{width:14px;height:14px;flex:0 0 auto;color:var(--accent-text);visibility:hidden}
+.cbx-opt[aria-selected="true"] .tick{visibility:visible}
 
 /* lưới 2 cột — xếp dọc khi hẹp, không cắt chữ */
 .grid{display:grid;grid-template-columns:minmax(0,720fr) minmax(0,406fr);gap:var(--sp-4);flex:1;min-height:0}
@@ -212,7 +240,7 @@ tr[data-kept] td{background:rgb(248 104 32 /7%)}
 .opt:hover{background:var(--bg-4)}
 .opt[aria-checked="true"]{background:var(--bg-4);border-color:var(--accent-line);box-shadow:inset 0 0 0 1px var(--accent-line)}
 .opt .nm{display:block;font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1);margin-top:var(--sp-4)}
-.opt .sub{display:block;font-size:var(--fs-2xs);color:var(--text-3);margin-top:3px}
+.opt .sub{display:block;font-size:var(--fs-2xs);color:var(--text-2);margin-top:3px}
 .opt .tick{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:var(--r-pill);
   background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center}
 .opt[aria-checked="true"] .tick{display:flex}
@@ -233,6 +261,28 @@ tr[data-kept] td{background:rgb(248 104 32 /7%)}
 .cta{padding-top:var(--sp-1)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---- dock rất hẹp: dải vùng chọn phải xuống dòng, không được tràn ngang ---- */
+@media (max-width:520px){
+  .selbar{gap:var(--sp-2)}
+  .seqsel{flex:1 1 100%;max-width:none}
+}
+@media (max-width:320px){
+  .selbar .val{font-size:var(--fs-md)}
+}
+
+/* ---- dock hẹp: hai chỗ này Autocut còn thiếu, Asset Manager và Auto Podcast đã có ---- */
+@media (max-width:560px){
+  .host{display:none}                 /* tên project không đáng để tràn cả panel */
+  .card-hd{flex-wrap:wrap;row-gap:var(--sp-2)}
+  .legend{flex-wrap:wrap;row-gap:var(--sp-1)}
+}
+@media (max-width:320px){
+  .legend{display:none}               /* chú giải màu bỏ được — dải đã tự nói bằng màu */
+  .wrap{padding:var(--sp-3)}
+  .card{padding:var(--sp-4)}
+  .topbar{padding:0 var(--sp-3)}
+}
 </style>
 </head>
 <body>
@@ -253,12 +303,24 @@ tr[data-kept] td{background:rgb(248 104 32 /7%)}
 
   <!-- ============ VÙNG CHỌN ============ -->
   <div class="selbar">
-    <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)" aria-hidden="true"><path d="M9 4H5v16h4M15 4h4v16h-4"/></svg>
-    <span class="lbl">Đoạn đang chọn</span>
-    <span class="val">4 phút 27 giây</span>
+    <!-- Chọn sequence NGAY TRONG panel: không phải nhớ mình đang mở cái nào,
+         và chọn ở đây thì Premiere cũng nhảy sang sequence đó — một sự thật, một nơi. -->
+    <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)" aria-hidden="true"><path d="M2 6h20v12H2zM8 6v12M16 6v12"/></svg>
+    <label class="lbl" id="seqLbl">Sequence</label>
+    <div class="cbx seqsel" id="seqCbx">
+      <button type="button" class="cbx-btn" id="seqBtn" aria-haspopup="listbox" aria-expanded="false"
+        aria-controls="seqList" aria-labelledby="seqLbl seqBtnLabel">
+        <span id="seqBtnLabel"></span>
+        <svg class="chev" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <ul class="cbx-list" id="seqList" role="listbox" tabindex="-1" aria-label="Sequence" hidden></ul>
+    </div>
+
     <span class="spacer"></span>
-    <span class="lbl">Đổi vùng bằng phím</span>
-    <kbd class="kbd">I</kbd><kbd class="kbd">O</kbd>
+    <span class="lbl">Tổng thời gian</span>
+    <span class="val" id="selVal"></span>
   </div>
 
   <div class="grid">
@@ -373,15 +435,35 @@ tr[data-kept] td{background:rgb(248 104 32 /7%)}
 /* ================= DỮ LIỆU: khoảng lặng CÓ THẬT trong 4 phút 27 giây =================
    Chỗ lặng là chuyện của audio, không đổi. Cái ĐỔI theo "Mức cắt" là mình quyết định
    cắt những chỗ nào và chừa lại bao nhiêu đệm hai đầu. */
-const TOTAL=267, OFFSET=12+4/24;
-const rand=(s=>()=>((s=(s*1664525+1013904223)>>>0)/4294967296))(7);
-const norm=(a,t)=>{const k=t/a.reduce((x,y)=>x+y,0);return a.map(v=>v*k)};
-const sil =norm(Array.from({length:43},()=>0.6+rand()*3.6),115);
-const talk=norm(Array.from({length:44},()=>0.8+rand()*5.2),TOTAL-115);
-let _t=0; const SIL=sil.map((d,i)=>{_t+=talk[i];const o={start:_t,dur:d,db:-(38+rand()*8)};_t+=d;return o});
-/* nhiễu cố định -> vẽ lại bao nhiêu lần dạng sóng vẫn y hệt, không nhảy lung tung */
-const NOISE=Array.from({length:997},()=>rand());
-const nz=i=>NOISE[((i*7919)%997+997)%997];
+/* Sequence nào đang làm việc là NGUỒN của mọi con số phía dưới.
+   Đổi sequence -> vùng chọn, khoảng lặng, xem trước, danh sách, nút chính đổi hết. */
+const SEQS=[
+  /* im = phần trăm thời lượng là khoảng lặng. Mỗi buổi thu một khác — để cùng một
+     con số cho cả ba thì "còn lại" lúc nào cũng 57%, nhìn là biết số giả. */
+  {ten:'AiO-Podcast-Test',       dai:2653, vao:834, ra:1101, V:3, A:3, hat:7,  im:0.43},
+  {ten:'Test3 Insane - Doc 9-16',dai:3734, vao:0,   ra:3734, V:3, A:3, hat:19, im:0.31},
+  {ten:'Reel 60s - Cut 02',      dai:74,   vao:6,   ra:74,   V:1, A:1, hat:31, im:0.18},
+];
+let iSeq=0, TOTAL, OFFSET, SIL, NOISE, nz;
+
+function napSeq(){
+  const q=SEQS[iSeq];
+  TOTAL=q.ra-q.vao;
+  OFFSET=q.vao;
+  /* hạt riêng theo sequence -> mỗi sequence một dáng sóng, nhưng lần nào mở cũng y hệt */
+  const rand=(s=>()=>((s=(s*1664525+1013904223)>>>0)/4294967296))(q.hat);
+  const norm=(a,t)=>{const k=t/a.reduce((x,y)=>x+y,0);return a.map(v=>v*k)};
+  const n=Math.max(4,Math.round(TOTAL/6.2));           /* tập dài thì nhiều khoảng lặng hơn */
+  const imLang=TOTAL*q.im;
+  const sil =norm(Array.from({length:n},()=>0.6+rand()*3.6), imLang);
+  const talk=norm(Array.from({length:n+1},()=>0.8+rand()*5.2), TOTAL-imLang);
+  let _t=0;
+  SIL=sil.map((d,i)=>{_t+=talk[i];const o={start:_t,dur:d,db:-(38+rand()*8)};_t+=d;return o});
+  /* nhiễu cố định -> vẽ lại bao nhiêu lần dạng sóng vẫn y hệt, không nhảy lung tung */
+  NOISE=Array.from({length:997},()=>rand());
+  nz=i=>NOISE[((i*7919)%997+997)%997];
+}
+napSeq();
 
 /* ba mức: giữ nhịp cắt ít và chừa đệm rộng; cắt sạch bỏ hết, không chừa */
 const LEVELS={
@@ -420,7 +502,8 @@ function lanes(host,nclip,quietFn,total=170){
     clip.append(a); box.append(clip);
   }
 }
-lanes($('tlOrig'),3,quiet);   /* bản gốc vẽ MỘT lần — audio có đổi đâu mà vẽ lại */
+/* bản gốc chỉ vẽ lại khi ĐỔI SEQUENCE — đổi Mức cắt thì audio có đổi đâu */
+const veGoc=()=>lanes($('tlOrig'), Math.min(6,Math.max(1,Math.round(TOTAL/90))), quiet);
 
 /* ---------- vẽ lại mọi thứ phụ thuộc vào Mức cắt ---------- */
 function render(){
@@ -445,6 +528,10 @@ function render(){
   for(let i=0;i<cuts.length;i++) seams.append(el('i'));
 
   /* mọi con số nói về cùng một việc phải khớp nhau */
+  /* dải vùng chọn nói đúng sequence đang làm việc */
+  $('selVal').textContent=mins(TOTAL);
+  document.querySelectorAll('.trk-hd .meta')[0].textContent=mins(TOTAL);
+
   $('afterMeta').textContent=mins(keepSec);
   $('goneNum').textContent=mins(cutSec);
   $('tileDur').innerHTML=`${clock(TOTAL)} <span class="ar">→</span> <span class="v--ok">${clock(keepSec)}</span>`;
@@ -466,6 +553,57 @@ function render(){
     rows.append(tr);
   });
 }
+
+/* ---------- đổi sequence: TÍNH LẠI hết, không chỉ đổi cái tên ----------
+   Combobox tự vẽ (không phải <select> gốc) — trình duyệt nhúng trong Premiere
+   không tự vẽ đúng bảng màu tối cho danh sách mở ra, nên tự dựng bằng ul/li,
+   vẫn đủ bàn phím (mũi tên/Home/End/Enter/Esc) và vai trò ARIA của listbox. */
+(function(){
+  const cbx=$('seqCbx'), btn=$('seqBtn'), label=$('seqBtnLabel'), list=$('seqList');
+  let active=0;
+  const build=()=>{ list.innerHTML=SEQS.map((q,i)=>
+    `<li class="cbx-opt" id="seqOpt${i}" role="option" aria-selected="${i===iSeq}">
+      <span>${q.ten}</span>
+      <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </li>`).join(''); };
+  const syncLabel=()=>{ label.textContent=SEQS[iSeq].ten; btn.title=SEQS[iSeq].ten; };
+  const highlight=()=>{
+    [...list.children].forEach((li,i)=>li.classList.toggle('active',i===active));
+    list.setAttribute('aria-activedescendant','seqOpt'+active);
+    list.children[active]?.scrollIntoView({block:'nearest'});
+  };
+  const onDocClick=e=>{ if(!cbx.contains(e.target)) close(false); };
+  function open(){
+    build(); active=iSeq; list.hidden=false; btn.setAttribute('aria-expanded','true');
+    highlight(); list.focus();
+    document.addEventListener('click',onDocClick,true);
+  }
+  function close(focusBtn){
+    list.hidden=true; btn.setAttribute('aria-expanded','false');
+    document.removeEventListener('click',onDocClick,true);
+    if(focusBtn) btn.focus();
+  }
+  function choose(i){
+    iSeq=i; syncLabel();
+    [...list.children].forEach((li,k)=>li.setAttribute('aria-selected',k===i));
+    kept.clear(); napSeq(); veGoc(); render();
+  }
+  btn.addEventListener('click',()=>{ list.hidden ? open() : close(true); });
+  list.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){ e.preventDefault(); active=Math.min(SEQS.length-1,active+1); highlight(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); active=Math.max(0,active-1); highlight(); }
+    else if(e.key==='Home'){ e.preventDefault(); active=0; highlight(); }
+    else if(e.key==='End'){ e.preventDefault(); active=SEQS.length-1; highlight(); }
+    else if(e.key==='Enter'||e.key===' '){ e.preventDefault(); choose(active); close(true); }
+    else if(e.key==='Escape'){ e.preventDefault(); close(true); }
+    else if(e.key==='Tab'){ close(false); }
+  });
+  list.addEventListener('click',e=>{
+    const li=e.target.closest('.cbx-opt'); if(!li) return;
+    choose([...list.children].indexOf(li)); close(true);
+  });
+  build(); syncLabel();
+})();
 
 /* ---------- tương tác ---------- */
 function radio(group,btn){[...group.children].forEach(b=>b.setAttribute('aria-checked',b===btn))}
@@ -505,6 +643,7 @@ go.addEventListener('click',()=>{
   },260);
 });
 
+veGoc();
 render();
 </script>
 </body>
