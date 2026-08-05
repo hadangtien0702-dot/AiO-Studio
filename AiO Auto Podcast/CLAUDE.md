@@ -3,7 +3,54 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 sáng: panel v0.5.0 · host v0.4.1 — ĐÃ CÀI.**
+> **TRẠNG THÁI 05/08/2026 15:48: panel v0.6.1 · host v0.4.3 — ĐÃ CÀI (bằng tay).**
+>
+> ✅ **ĐÃ RA BẢN DỰNG THẬT ĐẦU TIÊN** trên liệu 58 phút của anh Tiến —
+> sequence `Will - Podcast Cut (2)`: **299/299 nhát cắt**, V1 100% cam Will ·
+> V2 100% cam Trọng, A1/A2 đúng mic mono từng người liền mạch 0→3528,4s,
+> **0 clip lạ · 0 lỗ đen**, nhát ngắn nhất 1,04s, chia 54,4/45,6.
+>
+> ☠️☠️ **`pc__item` CHỈ ĐƯỢC KHỚP CHẮC CHẮN — ĐỪNG BAO GIỜ THÊM LẠI LUẬT
+> "CHUỖI CON".** Ngày 05/08 luật đó (điểm 1) giết 135/299 nhát cắt trên
+> project thật: anh Tiến đặt tên sequence **trùng tên THƯ MỤC quay**, mà tên
+> thư mục nằm trong đường dẫn của *mọi* file trong buổi quay → file mic mono
+> chưa nhập "khớp" vào cái sequence đó → `pc_nhapMono` tưởng đã có sẵn, nhập
+> 0 file → `pc_datTieng` đặt cả một sequence 31 phút lên A1/A2, và vì nó là
+> clip có cả hình, Premiere thả hình xuống V1/V2 đè chết nửa đầu tập.
+> Ba luật cứng, đã cắm vào `tests/kiem-host.mjs` (31/31): (1) chỉ nhận điểm 4
+> (đường dẫn trùng) và 3 (tên file trùng); (2) **item không có media path
+> (sequence/bin) không bao giờ là ứng viên**; (3) **KHÔNG cache tra cứu** —
+> anh Tiến 05/08: *"remove cache"* — bắt nhầm một lần là nhầm suốt phiên.
+>
+> ☠️ **ĐẾM KHÔNG PHẢI LÀ KIỂM** — cùng ca đó `pc_doKetQua` báo "tiếng 2/2 đạt"
+> trong khi CẢ HAI clip tiếng là đồ đặt nhầm. Nay trả thêm `hinhLa`/`tiengLa`
+> (clip không phải file media) và panel chặn khi > 0.
+>
+> ☠️ **Bấm sang tab sequence khác KHÔNG còn giết bản dựng.** Chốt `SEQ_DOI` cũ
+> bỏ lại một sequence dựng dở 260 clip. Nay `pc__seqDangDung` ghim lại active
+> về đúng bản dựng theo TÊN; chỉ dừng tay khi bản dựng thật sự biến mất.
+>
+> ☠️ **CÀI BẰNG TAY, chưa qua `sign-install.ps1`** — vì `kiem-nao` và `stress`
+> đang TRƯỢT 2 phép: phiên trước đổi bản chất não sang đường "nghe trọn từng
+> kênh" (`dist/nao.js` 14:50) mà chưa sửa 2 phép kiểm viết cho thuật toán CŨ.
+> **Giữ não bản mới là CÓ Ý**: trên liệu này bản cũ chỉ ra **1 nhát cắt**
+> (100% một cam), bản mới ra 299 nhát cân đối. Việc kế tiếp: sửa 2 phép kiểm
+> đó rồi cài lại chuẩn.
+>
+> **v0.6.0 — NÚT "Auto Match"** (anh Tiến 05/08: *"anh sẽ kéo toàn bộ
+> source clip vào sequence bấm một nút auto match"*). Não: `dist/khop.js`
+> (thuần) + `tests/kiem-khop.mjs` 28/28. Một cú bấm điền cả bản đồ.
+> ☠️ **ĐỪNG THỬ GHÉP CAM↔MIC BẰNG TIẾNG CAM** — đã đo trên 4 cam thật của
+> anh, **trượt 3/4 ca**: mọi cam thu chung một phòng nên cặp nào cũng tương
+> quan r 0,53–0,74, biên độ nhất/nhì chỉ 0,017–0,056 (nhiễu); cặp "thắng"
+> là mic của người NÓI NHIỀU NHẤT, không phải người ngồi trước cam. Số đo
+> đầy đủ ở đầu `dist/khop.js` và `PROGRESS.md` mục [tu-khop].
+>
+> **Ba nhãn nút anh Tiến tự chốt 05/08 — giữ nguyên ở CẢ HAI ngôn ngữ:**
+> `Auto Match` (tự khớp bản đồ) · `Auto Sync` (thêm mic từ file, ẩn khi
+> không cần) · `Auto Podcast` (nút chính, cắt timeline theo người nói).
+> Anh chọn dạng tên-thương-hiệu chứ không phải mô tả việc — đừng "sửa lại
+> cho đúng luật nhãn nút", đây là quyết định của anh.
 > Trạng thái chi tiết từng tính năng (xong/chưa/lỗi mở): **`TRANG-THAI.md`**
 > — anh Tiến yêu cầu, mỗi phiên sửa code PHẢI cập nhật. Diễn biến: `PROGRESS.md`.
 > Giải thích chi tiết về Âm thanh & Quy trình Auto Cut: `GIAI-THICH-AUDIO-CHO-CLAUDE.md`.
@@ -57,6 +104,7 @@
 | Đo trên panel | `scripts/do-tren-panel.ps1 -Expression "..."` (mặc định cổng 8094) |
 | Kiểm não | `node tests/kiem-nao.mjs` — 16 phép kiểm, có seed, thoát mã 1 nếu trượt |
 | Kiểm tự sync | `node tests/kiem-sync.mjs` — 9 phép kiểm, có seed, gác cổng cài |
+| Kiểm tự khớp | `node tests/kiem-khop.mjs` — 28 phép kiểm, tất định, gác cổng cài |
 | Stress | `node tests/stress.mjs` — 12 ca khó (chồng lấn, cười chung, 60 phút, sample rate lẫn…), gác cổng cài |
 | Liệu thử | `node tests/sinh-lieu-media.mjs` → `../file pr for test/podcast-lieu/` |
 
@@ -74,6 +122,16 @@ nói thì hình cắt qua cam người đó và tiếng là mic người đó. B
 tiếng và đặt vài trăm nhát cắt chuyển cam bằng tay. Tool làm phần đó trong
 vài phút; editor chỉ tinh chỉnh nhịp. Đối thủ trực tiếp: **AutoPod $29/tháng**
 chỉ cho đúng tính năng này — mình offline, nằm trong bộ, một giá.
+
+### Tự khớp (auto match) — người xài
+Kéo hết clip nguồn vào một sequence rồi bấm **một nút**: panel tự điền cả bản
+đồ — track tiếng đi kèm cam thành "Không dùng", cam ghép với mic của đúng
+người, cam toàn cảnh thành cam chung, và tên người tự điền vào ô. Xong là bấm
+Cắt luôn. *Ví dụ đời thường:* như người trợ lý cầm đống băng lên đọc nhãn rồi
+xếp vào đúng ngăn — nó đọc **nhãn** (tên file), không "nghe" ra ai là ai.
+Nên đặt tên kiểu `Cam_Trọng.mp4` / `Mic_Trọng.mp3` là khớp đúng ngay; đặt kiểu
+`C4026.MP4` / `ZOOM0001.WAV` thì nó ghép theo thứ tự track và **nói thẳng là
+đang đoán** để mình kiểm lại.
 
 ### Builder — chạy thế nào, chỗ nào dễ hỏng
 - **Não** `dist/nao.js` — file THUẦN (không Node/CEP, kiểm được ngoài

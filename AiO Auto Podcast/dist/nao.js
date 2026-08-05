@@ -136,6 +136,88 @@ var AiONao = (function () {
   }
 
   /**
+   * ═══════════════════════════════════════════════════════════════════════
+   * NGHE TRỌN TỪNG KÊNH TRƯỚC — cách anh Tiến chỉ 05/08/2026
+   * ═══════════════════════════════════════════════════════════════════════
+   * Nguyên văn: *"anh muốn em trước tiên nghe toàn bộ A1, sau đó mute toàn bộ
+   * nghe toàn bộ A2, sau đó mới đưa ra các nhát cắt phù hợp"*.
+   *
+   * VÌ SAO ĐÚNG, VÀ VÌ SAO CÁCH CŨ KHÔNG BAO GIỜ CHỮA ĐƯỢC BẰNG VÁ:
+   * Cách cũ so TỪNG CỬA SỔ 20ms giữa hai mic ("mic nào to hơn ≥6 dB"). Ba hệ quả
+   * chết người, đo được cả ba trên liệu thật của anh (2 mic, 58 phút):
+   *   1. Phụ thuộc GAIN TƯƠNG ĐỐI. Hai recorder lệch 8 dB — chuyện thường —
+   *      là mù hẳn một người: Will thắng 0,2% thời lượng, bản dựng ra ĐÚNG
+   *      1 nhát cắt, 100% cam Trọng.
+   *   2. KHÔNG CÓ CHỖ ĐỂ VỨT TẠP ÂM. Anh Tiến: *"khi quay thực tế thì chắc
+   *      chắn có tạp âm, những câu nói vô nghĩa, những nụ cười... rất nhiều
+   *      âm thanh lọt vào"*. So theo cửa sổ thì tiếng cười 0,3s cũng là một
+   *      "lượt nói" ngang với câu 10 giây.
+   *   3. Mọi bản vá lên trên đều lệch thêm (đã thử bù gain theo p90 → phá ca
+   *      độc thoại; theo nền phòng → 70/30). Anh: *"em càng sửa thì lại càng
+   *      bị sai"*. Đúng — vì nền sai chứ không phải tham số sai.
+   *
+   * CÁCH MỚI — ba bước tách bạch:
+   *   B1. Nghe TRỌN kênh A1: ngưỡng riêng (Otsu trên chính nó) + hysteresis
+   *       vào/ra + NỐI khe lấy hơi + VỨT khoảng vụn → danh sách khoảng nói.
+   *   B2. Y hệt cho A2 (và A3, A4… nếu nhiều người).
+   *   B3. Hợp nhất các danh sách → nhát cắt.
+   * Gain lệch bao nhiêu không còn ảnh hưởng: mỗi kênh so với nền của chính nó.
+   * Không tăng âm, không bù, không thêm ô cấu hình nào cho người dùng.
+   *
+   * ĐO TRÊN 2 MIC THẬT CỦA ANH TIẾN (58 phút):
+   *   ngưỡng tự đo   Will −53,0 dB · Trọng −45,0 dB (tự chênh đúng phần gain)
+   *   B1 lọc ra      941 khoảng nói, VỨT 568 khoảng vụn
+   *   B2 lọc ra      839 khoảng nói, VỨT 921 khoảng vụn
+   *   B3 hợp nhất    271 nhát cắt · Will 54,6% / Trọng 45,4% · ngắn nhất 1,04s
+   *
+   *   Cách                              nhát cắt   Will / Trọng
+   *   so cửa sổ, chênh 6 dB (cũ)        1          0% / 100%
+   *   + bù gain theo p90                —          12,5% / 16,4%  (phá độc thoại)
+   *   + bù gain theo nền phòng          149        70,3% / 29,7%
+   *   NGHE TRỌN TỪNG KÊNH               271        54,6% / 45,4%  ← cân nhất
+   *
+   * ⚠️ Giới hạn phải nói ra: các số trên chứng minh "hết mù một người" và
+   * "có chỗ vứt tạp âm", KHÔNG chứng minh "cắt đúng chỗ" — thước vẫn làm bằng
+   * dB, cùng vật liệu với cái nó đo (bài học 5d). Chỉ tai anh Tiến chấm được.
+   *
+   * @param db  envelope dB của MỘT kênh
+   * @return { nguong, kh: [[tu,den]…], boVun }
+   */
+  function ngheMotKenh(db, opts) {
+    opts = opts || {}
+    var BIEN_VAO = opts.bienVao !== undefined ? opts.bienVao : 3    // vượt hẳn mới là bắt đầu nói
+    var BIEN_RA = opts.bienRa !== undefined ? opts.bienRa : 0       // tụt hẳn mới là thôi nói
+    var TOI_THIEU = opts.khoangToiThieu !== undefined ? opts.khoangToiThieu : 0.35
+    var NOI_KHE = opts.noiKhe !== undefined ? opts.noiKhe : 0.30    // khe lấy hơi giữa hai câu
+
+    var nguong = sanTuDo([{ db: db }])
+    var vao = nguong + BIEN_VAO
+    var ra = nguong + BIEN_RA
+
+    var tho = []
+    var dang = false, tu = 0, i
+    for (i = 0; i < db.length; i++) {
+      if (!dang && db[i] >= vao) { dang = true; tu = i }
+      else if (dang && db[i] < ra) { dang = false; tho.push([tu * CUA_GIAY, i * CUA_GIAY]) }
+    }
+    if (dang) tho.push([tu * CUA_GIAY, db.length * CUA_GIAY])
+
+    // Nối hai khoảng cách nhau quá gần — một câu bị ngắt bởi nhịp lấy hơi.
+    var noi = []
+    for (i = 0; i < tho.length; i++) {
+      if (noi.length && tho[i][0] - noi[noi.length - 1][1] <= NOI_KHE) noi[noi.length - 1][1] = tho[i][1]
+      else noi.push([tho[i][0], tho[i][1]])
+    }
+    // VỨT khoảng vụn — tiếng cười, ho, ghế kêu, "ừm". Đây là bước cách cũ
+    // KHÔNG CÓ, và là lý do tạp âm trước giờ đi thẳng vào phép so.
+    var sach = []
+    for (i = 0; i < noi.length; i++) {
+      if (noi[i][1] - noi[i][0] >= TOI_THIEU) sach.push(noi[i])
+    }
+    return { nguong: nguong, kh: sach, boVun: noi.length - sach.length }
+  }
+
+  /**
    * Quyết định AI ĐANG NÓI trên trục thời gian SEQUENCE.
    *
    * @param mics  [{ db: Float32Array, offset: giây }] — offset = mốc MEDIA trừ
@@ -186,7 +268,44 @@ var AiONao = (function () {
     var tho = new Int16Array(soCua)
     var soRo = 0
     var cuaMoiNguoi = []
-    for (var m0 = 0; m0 < mics.length; m0++) cuaMoiNguoi.push(0)
+    var m0
+    for (m0 = 0; m0 < mics.length; m0++) cuaMoiNguoi.push(0)
+
+    /**
+     * ĐƯỜNG MỚI (mặc định) — nghe TRỌN từng kênh trước rồi mới hợp nhất.
+     * Xem khối ghi chú của ngheMotKenh: đây là cách anh Tiến chỉ 05/08, và là
+     * đường duy nhất có CHỖ ĐỂ VỨT tiếng cười / tạp âm trước khi so.
+     * Đặt opts.theoCuaSo = true để chạy lại đường cũ (so từng cửa sổ).
+     */
+    var THEO_KENH = opts.theoCuaSo !== true && opts.nguongSan === undefined
+    var kenhDs = null
+    if (THEO_KENH) {
+      kenhDs = []
+      for (m0 = 0; m0 < mics.length; m0++) kenhDs.push(ngheMotKenh(mics[m0].db, opts))
+      // Trải khoảng nói của từng người lên trục SEQUENCE (trừ offset của mic).
+      var ai = new Int16Array(soCua)
+      var vuot = new Float32Array(soCua)
+      for (var w2 = 0; w2 < soCua; w2++) { ai[w2] = -1; vuot[w2] = 0 }
+      for (m0 = 0; m0 < mics.length; m0++) {
+        var kh = kenhDs[m0].kh
+        var ng = kenhDs[m0].nguong
+        for (var q = 0; q < kh.length; q++) {
+          var a1 = Math.floor((kh[q][0] - mics[m0].offset) / CUA_GIAY)
+          var b1 = Math.ceil((kh[q][1] - mics[m0].offset) / CUA_GIAY)
+          if (a1 < 0) a1 = 0
+          if (b1 > soCua) b1 = soCua
+          for (var i1 = a1; i1 < b1; i1++) {
+            // Chồng lấn: ai vượt ngưỡng CỦA CHÍNH MÌNH nhiều hơn thì lên hình.
+            var vv = db(m0, i1) - ng
+            if (ai[i1] === -1 || vv > vuot[i1]) { ai[i1] = m0; vuot[i1] = vv }
+          }
+        }
+      }
+      for (var w3 = 0; w3 < soCua; w3++) {
+        tho[w3] = ai[w3]
+        if (ai[w3] >= 0) { soRo++; cuaMoiNguoi[ai[w3]]++ }
+      }
+    } else
     for (var w = 0; w < soCua; w++) {
       var nhat = -1
       var dbNhat = -Infinity

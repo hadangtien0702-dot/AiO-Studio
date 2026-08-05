@@ -1,5 +1,313 @@
 # AiO Auto Podcast - Nhat ky
 
+## [chuoi-con-giet-ban-dung] - 2026-08-05 15:48 - host v0.4.3: RA BAN DUNG THAT DAU TIEN TREN LIEU 58 PHUT CUA ANH TIEN
+
+Anh Tien gui anh chup panel bao **"Verification found a mismatch: hinh 164/299"**
+va noi: *"anh khong can biet em sua cai gi... anh can video podcast dang len
+chieu nay con lai la viec cua em"*. Phien nay: tim goc, sua, chay ra ban dung,
+do lai bang thuoc doc lap.
+
+### Boi canh
+
+Liue that: sequence `Will` - 58:48 (3528,4s), 2 cam (C4091 = Will, C4236 = Trong),
+2 mic rieng da qua PluralEyes drift-correct. Ban do: V1 Will, V2 Trong, A1 Will,
+A2 Trong. Truoc phien nay project co **9 sequence "Podcast Cut" DEU HONG**.
+
+### Nguyen nhan that - do bang mo phong tren chinh project cua anh
+
+Chay lai dung phep cham diem cua `pc__item` cho duong dan file mic mono:
+
+```
+tim: ...\102 Quay Phim Will (2)_drift_corrected+0.084.aio-mono.wav
+  diem=1  Quay PV tuyen dung_DRT_1002   <- SEQUENCE, khong co file
+  diem=1  Will                          <- SEQUENCE, khong co file
+=> CHON: Quay PV tuyen dung_DRT_1002 (diem 1)
+```
+
+`pc__item` van con luat **"chuoi con" (diem 1)** lam phuong an cuoi. Anh Tien
+dat ten sequence **trung ten THU MUC quay**, ma ten thu muc do nam trong duong
+dan cua MOI file trong buoi quay -> moi file chua duoc nhap deu "khop" vao no.
+
+Do domino, do duoc tung buoc:
+1. `pc_nhapMono` hoi `pc__item` -> tuong 2 file mono **da co san** -> **nhap 0 file**.
+   Do doi chieu: tren dia co **4 file `.aio-mono.wav`** (tao 14:04-14:11 cung
+   ngay); trong project co **0 item** mang ten do.
+2. Vong kiem ngay sau do dung **chinh ham hong** de kiem -> bao `thay=2`, DAT.
+3. `pc_datTieng` dat cai sequence 31 phut do len A1 va A2. Vi no la clip **co ca
+   hinh**, Premiere tha hinh xuong V1 va V2: mot clip **0 -> 1877,167s** (31'17")
+   tren ca hai track hinh.
+4. Clip khong lo do de chet **135/299 nhat cat** dau tap. `pc_doKetQua` bat duoc
+   phan hinh (164/299) nhung **bao phan tieng LA DAT (2/2)** - vi no chi DEM so
+   clip, khong kiem clip do la FILE NAO (bai hoc 5k).
+
+Do them tren ca 9 sequence hong: **moi cai deu co dung 2 clip hinh + 2 clip
+tieng khong co duong dan media, cai dai nhat 1877,2s** - cung mot van tay.
+
+☠️ Loi thu hai cung phien: ban `Will - Podcast Cut (7)` dung do 260 clip vi
+`ERR:SEQ_DOI` - anh bam sang tab sequence khac trong luc panel dang dat clip.
+
+### Thay doi
+
+| Cho | Truoc | Sau |
+|---|---|---|
+| `pc__item` cham diem | 4 / 3 / 2 / 1 (co chuoi con) | **chi 4 (duong dan) va 3 (ten file)** |
+| Item khong co media path | van la ung vien | **khong bao gio la ung vien** |
+| Cache tra cuu `pc__c` | ghim ket qua theo duong dan | **BO** (anh Tien: "remove cache") - bat nham 1 lan la nham suot phien; nay chi giu de don in/out |
+| `pc__seqDangDung` | active lech ten -> `ERR:SEQ_DOI` | **ghim lai** active ve ban dung theo TEN; chi ERR khi ban dung that su bien mat |
+| `pc_doKetQua` | dem so clip | dem them **`hinhLa` / `tiengLa` / `tenLa`** = clip khong phai file media |
+| Panel `doLai()` | chi so dem | chan luon khi `hinhLa>0` hoac `tiengLa>0` |
+| `pc_phienBan` | v0.4.2 | **v0.4.3** (panel kiem 2 cho, da doi theo) |
+
+### File anh huong
+
+- `host/podcast.jsx` - `pc__item`, `pc__seqDangDung`, `pc_doKetQua`, `pc_phienBan`
+- `dist/index.html` - 2 cho kiem phien ban host, khoi `doLai()`
+- `tests/kiem-host.mjs` - them muc 2b (5 phep) va 2c (4 phep): **22 -> 31 phep**
+
+### Kiem chung bang so
+
+Bo kiem host: **31/31 DAT**. Trong do 2 phep dung lai dung cai bay cua anh:
+- `file mono CHUA nhap -> tra null, KHONG bat vao sequence` (truoc: bat nham)
+- `sau khi nhap: thay NGAY (khong bi cache ghim ket qua cu)`
+- `doi tab giua chung -> van dung viec, da ghim lai active ve ban dung`
+- `mat han ban dung -> SEQ_DOI (dung tay)` - chot an toan van con nguyen
+
+Chay that tren panel (bam nut qua cong 8094, 15:44-15:45), do lai bang script
+doc THANG tu Premiere - khong tin bao cao cua panel:
+
+| Do | Ban hong (Cut 6) | Ban moi (Cut 2) |
+|---|---|---|
+| Clip hinh | 164/299 | **299/299** |
+| V1 | 82 clip + 1 clip la | **149 clip, 100% C4091.MP4** (cam Will) |
+| V2 | 82 clip + 1 clip la | **150 clip, 100% C4236.MP4** (cam Trong) |
+| A1 | sequence dat nham | **mic Will mono, lien mach 0 -> 3528,4s** |
+| A2 | sequence dat nham | **mic Trong mono, lien mach 0 -> 3528,4s** |
+| Clip khong phai file media | hinh 2 · tieng 2 | **hinh 0 · tieng 0** |
+| Phu song hinh | 1 vung nhung 31' dau la do la | **1 vung lien, 0 -> 3528,48s, 0 lo den** |
+| Nhat ngan nhat | - | 1,04s (dung muc cai dat 1s) |
+| Chia thoi luong | - | Will 54,4% / Trong 45,6% |
+
+### CHUA lam duoc / con no - noi ro de phien sau khong tuong da xong
+
+1. ☠️ **VAN CHUA CO THUOC NGOAI cho "cat dung nguoi".** Moi so tren chung minh
+   "khong mat clip, dung track, dung cam, dung mic" - KHONG chung minh "cat dung
+   cho". Thuat toan cham bang dB, thuoc cung bang dB (bai hoc 5d). Can anh Tien
+   cham marker cho mot bo dap an.
+2. ☠️ **Cai bang tay, KHONG qua cong `sign-install.ps1`.** Vi `kiem-nao` va
+   `stress` dang TRUOT 2 phep - phien truoc doi ban chat nao (duong "nghe tron
+   tung kenh", `dist/nao.js` 14:50) ma chua sua 2 phep kiem viet cho thuat toan
+   CU. Da chep tay `host/podcast.jsx` + `dist/index.html` vao ban da cai (do lai
+   md5 khop). **Viec ke tiep: sua 2 phep kiem do roi cai lai chuan.**
+   - `kiem-nao` "bleed -5dB -> gay an toan": duong moi nghe tung kenh rieng nen
+     khong con khai niem "chenh lech" -> chot cu khong ap dung. Can chot khac
+     (vd: ty le CHONG LAN khoang noi giua cac kenh).
+   - `stress` ca 5 "mic-lech (bleed-20)": 1/10 luot.
+   Giu nao ban moi la CO Y: tren liue nay ban cu chi ra **1 nhat cat** (100% mot
+   cam), ban moi ra 299 nhat can doi.
+3. 9 sequence "Podcast Cut" hong anh Tien da tu xoa (con 2 truoc khi chay lai).
+
+
+
+Anh Tien: *"anh muon kiem tra va chot ha tool podcast nay"* -> chon muc
+**"v0.6.1 va soat toan bo"**. Phien nay KHONG dung toi nguong cat (chua co bo
+dap an tai anh), chi soat cau truc va sua cai gay hong.
+
+### Bat dau bang do - va bon bo kiem cu deu "DAT" trong luc bon loi nam trong san pham
+
+| Bo kiem | Ket qua truoc khi soat |
+|---|---|
+| kiem-nao | 16/16 DAT |
+| kiem-sync | 9/9 DAT |
+| kiem-khop | 32/32 DAT |
+| stress 12 ca | DAT het, ca 60 phut 227/227 luot |
+| Ban cai vs ma nguon | 5/5 file khop tung byte |
+| Luat tai nguyen | 12/12 khop |
+
+Tat ca mau xanh. Nhung KHONG bo nao cham toi `host/podcast.jsx` - va do dung
+la cho bon loi dang nam.
+
+☠️ Ghi lai mot cai bay do: `md5sum` cua Git Bash bao **5/5 file LECH** giua ma
+nguon va ban cai. `diff -q` va `Get-FileHash` cua PowerShell deu noi GIONG
+tung byte. Cong cu do sai, khong phai san pham sai (bai hoc 5).
+
+### Bon loi soat ra
+
+**A. `pc_sapXepClipsLenTrack` XOA SACH TIMELINE ROI MOI DI TIM ITEM.**
+Ham xoa het clip tren moi track video + audio, sau do moi goi `pc__item()`
+cho tung duong dan. Tim truot cai nao thi chi `soLoi++` roi `continue` - clip
+do BAY LUON khoi timeline that cua nguoi dung, khong tu hoan tac duoc.
+Sua: quet kho TRUOC, thieu mot item la tra `ERR:THIEU_ITEM` va khong dung toi
+timeline mot dong nao.
+
+**B. PANEL BO QUA GIA TRI HOST TRA VE.** `buocXep.then(function () {...})` -
+khong doc tham so, khong kiem `OK:`. Nen xep track that bai xong panel van
+chay tiep va bao "da khop N nguoi". Dung bai hoc 5l: khong bao loi khong co
+nghia la da ghi. Sua: doc ma loi + `soLoi`, hong thi hien khung loi to, kem
+cau bao dung dan (`khop_thieu_item` / `khop_xep_loi`, ca VI lan EN).
+
+**C. `pc__item` KHOP BANG CHUOI CON HAI CHIEU, LAY UNG VIEN GAP DAU TIEN.**
+`chuan.indexOf(p) >= 0 || p.indexOf(chuan) >= 0` - item ten "A.wav" an khop
+vao ".../mic_data.wav" (vi "data.wav" chua "a.wav") va thang chi vi no nam
+truoc trong bin. Dung bai hoc 5i: khop bang mot dau hieu yeu thi bat nham.
+Sua: cham diem 4 (duong dan tuyet doi) / 3 (ten file tuyet doi) / 2 (ten item)
+/ 1 (chuoi con - phuong an cuoi), duyet HET bin roi lay cao nhat.
+Day la ham DUNG CHUNG cua 6 ham khac (bai hoc 5n) nen co y KHONG siet chat -
+chi doi tu "gap dau tien" sang "khop nhat", ca dang chay dung van chay dung.
+
+**D. VONG LAP VO HAN.** `tuKhop()` thieu mic -> `tuTimVaSyncMicProject()` ->
+callback tra `true` chi can Project Bin co >=1 file mic (khong kiem da du 2
+mic chua) -> goi lai `tuKhop()` -> van thieu -> lap mai, **moi vong ghi de
+timeline**. Nang hon: neu chua ai duoc gan mic thi `lenh` rong, `pc_datTieng`
+khong dat gi, van `cb(true)` - lap vo han ma khong lam gi ca.
+Sua: them tham so `daThuPhucHoi`, chi duoc thu phuc hoi DUNG MOT LAN.
+
+### Bo kiem moi `tests/kiem-host.mjs` - 22 phep, dung `app` Premiere gia
+
+Viet de bit dung lo hong tren: chay `host/podcast.jsx` ngoai Premiere bang
+mot `app` gia (rootItem/children/getMediaPath/overwriteClip/clips.remove).
+
+**Va da do chinh cai thuoc**: chay bo kiem moi nguoc len ban v0.6.0 dang cai
+tren may anh Tien:
+
+| Phep kiem | v0.6.0 (dang cai) | v0.6.1 |
+|---|---|---|
+| "A.wav" an mat "mic_data.wav" | **TRUOT** - tra ve A.wav | DAT |
+| Thieu 1 file -> track video 3 clip | **con 0 clip - MAT SACH** | con nguyen 3 |
+| Thieu 1 file -> track audio 2 clip | **con 0 clip - MAT SACH** | con nguyen 2 |
+| Host bao gi khi truot | `OK:daDat=1\|soLoi=1` | `ERR:THIEU_ITEM\|so=1\|ds=...` |
+| Doi sequence giua chung | - | `ERR:SEQ_DOI`, khong xoa gi |
+| Panel kiem host version | v0.4.1 vs cho v0.4.2 | khop |
+|  | **16 dat / 6 truot** | **22 dat / 0 truot** |
+
+=> Ban anh dang co tren may: bam Auto Match luc mot file media offline la
+XOA TRANG timeline. Do duoc, khong phai suy doan.
+
+Da them `kiem-host.mjs` vao cong gac trong `sign-install.ps1` (nay 5 bo kiem
+chan truoc khi cai).
+
+### Do tren PREMIERE THAT sau khi cai
+
+- Host nap trong Premiere: `pc_phienBan()` = **v0.4.2** (khop cho panel kiem -
+  khong dinh bay "panel moi noi chuyen host cu").
+- Panel v0.6.1 reload sach: 3 nut `Auto Match` / `Auto Sync` / `Auto Podcast`,
+  `AiOKhop` nap duoc, hai cau i18n moi co mat, khong loi JS.
+- Chot chong lap SONG trong ban dang chay: `tuKhop.length` = **1**,
+  `/daThuPhucHoi/` = true, `/tuKhop\(true\)/` = true, `/THIEU_ITEM/` = true.
+- Duong thoat som tren Premiere that: goi `pc_sapXepClipsLenTrack` voi ten
+  sequence sai -> tra dung `ERR:SEQ_DOI|`, timeline khong bi dung toi.
+- Sequence "Will" cua anh sau tat ca phep do: **con nguyen clip** (V0 C4091,
+  V1 C4236, dai 7066s).
+
+☠️ **CO Y KHONG DO ca "thieu file" tren Premiere that.** Neu ban sua sai thi
+phep do do se xoa trang timeline that cua anh Tien (bai hoc 3b: thu tinh nang
+PHA HOAI thi thu tren ban sao). Ca do moi chi chung minh bang stub trong
+`kiem-host.mjs`; muon do that thi phai dung mot project rac rieng.
+
+### Con nguyen chua dung toi
+
+Loi so 1 (nhat cat sai nguoi tren lieu that) **khong dong duoc trong phien
+nay** - no can bo dap an tu tai anh Tien, chua co thi moi con so deu la thuoc
+lam bang cung vat lieu voi cai no do (bai hoc 5d).
+
+## [tu-khop] - 2026-08-05 09:50 - v0.6.0: NUT "TU KHOP CAM <-> MIC" (auto match)
+
+Anh Tien (kem anh chup panel, khoanh do nut "Add mics from files"): *"em xem
+va them cho anh mot tinh nang auto match duoc khong em - anh se keo toan bo
+source clip vao sequence bam mot nut auto match, em co the thay the nut do
+bang nut add mics nha em"*.
+
+### ☠️ DO TRUOC KHI XAY - VA PHEP DO GIET Y TUONG CHINH
+
+Y tuong dau tien (nghe rat hop ly): ghep cam voi mic bang TIENG CAM - cam cua
+nguoi nao thi line-in/mic gan may nghe nguoi do ro nhat, tuong quan cheo se
+chi ra dung cap. Truoc khi viet dong UI nao, tach audio 6 cam + 4 mic that cua
+anh Tien (G:\Quay PV ... _DRT_0902, 2 buoi, moi file 17GB, ffmpeg -vn 24-28s/file)
+roi do. Dap an lay tu ten file anh tu dat.
+
+| Ca | r voi mic nguoi A | r voi mic nguoi B | Ket |
+|---|---|---|---|
+| B1 Cam2_Thien | 0,578 (dung) | 0,635 | **SAI** |
+| B1 Cam3_Trong | 0,533 | 0,578 (dung) | dung |
+| B2 Cam2_Trong | 0,713 | 0,696 (dung) | **SAI** |
+| B2 Cam3_Dilys | 0,691 (dung) | 0,712 | **SAI** |
+
+**3 SAI / 4 CA.** Ly do: moi cam deu thu chung MOT can phong nen moi cap deu
+tuong quan cao (r 0,53-0,74); bien do giua cap nhat va cap nhi chi 0,017-0,056
+= nhieu, khong phai tin hieu. Cap "thang" gan nhu luon la mic cua NGUOI NOI
+NHIEU NHAT (anh Trong dan, thang 3/4 ca) - khong lien quan gi toi cam do quay
+ai. Neu tin y tuong nay ma xay tiep thi da giao cho anh mot nut "auto" chinh
+xac ngang tung dong xu.
+
+=> Bo hoan toan huong do. Da ghi CAM + so do vao dau `dist/khop.js` de phien
+sau khong thu lai (luat 5q: so tay chi co gia tri neu duoc mo ra dung luc).
+
+### Lam bang hai thu DANG TIN
+- **CAU TRUC** - track tieng co media TRUNG DUONG DAN voi track hinh thi chac
+  chan la tieng di kem cam -> tu dat "Khong dung". Dung 100%, khong suy doan.
+- **TEN FILE** - khop token co trong so nghich dao do pho bien (IDF):
+  trong so = (chu >=3 ky tu: 3 | con lai: 1) / (so cam chua no x so mic chua no).
+  Token hiem ("thien", "dilys", "a") an diem; token ai cung co ("cam", "mic",
+  "buoi", "1") tu roi ve gan 0. **KHONG co danh sach tu-vai-tro loai cung** -
+  "Cam" la ten nguoi that (Cam), loai cung chu "cam" la bat nham luon nguoi ta.
+  Ten khong noi gi -> tra 'thu-tu' va NOI THANG la DOAN.
+- Cam CHUNG nhan bang tu khoa ten (toancanh/wide/master/2shot...).
+- Ten nguoi lay tu token chung, GIU NGUYEN DAU ("Thien" -> "Thiện") nho
+  boDau anh xa 1 ky tu -> 1 ky tu nen cat token tren ban bo dau roi lay dung
+  khuc do o ban goc.
+
+### File
+- **MOI `dist/khop.js`** (thuan, ~300 dong) + **`tests/kiem-khop.mjs`** (28 phep
+  kiem, tat dinh, lieu lay TEN THAT tren o cua anh - khong bia mau cho de dau).
+  Da cam vao cong cai `sign-install.ps1`.
+- `dist/index.html` v0.6.0: nut `nutKhop` thay cho `nutSync` o chan the.
+  **Nut tu sync KHONG mat** - an di, tu hien lai khi DO RA la can: sequence
+  chua du 2 mic rieng, hoac mic dang dan dung dau clip cam.
+- `tuDongGoiYGan` (chay ngam khi mo sequence la) nay dung chung engine moi -
+  truoc do no ghep V/A theo thu tu va dat ten nguoi = ca ten file mic.
+
+### 3 BUG BAT DUOC BANG DO TREN PANEL THAT (khong phai doc code)
+1. Ten nguoi ra **"0001"/"0002"** voi file ZOOM0001.WAV (token rieng chi con
+   so). Sua: duong du phong chi nhan token MANH, con lai de rong cho panel
+   danh "Nguoi 1".
+2. Bam truot nhung nut **van xanh "Da khop 2 nguoi"** cua lan truoc (duong
+   thoat som khong xoa trang thai). Sua: xoa data-state ngay dau ham.
+3. Chu canh bao cam thua noi "chua cat duoc" - **sai su that**, cat van chay.
+   Sua: "chua gan ai - ban cat se khong dung toi cam nay".
+
+### Kiem chung (so do, khong phai cam nhan)
+- `node tests/kiem-khop.mjs` **28/28**; kiem-nao 16/16, kiem-sync 9/9,
+  stress 12/12 van dat (cong cai chay het truoc khi ky).
+- **Ban do gia lap 4 kich ban** tren panel that mo bang trinh duyet:
+  lieu that buoi 2 (3 cam + 3 tieng cam + 2 mic) -> V1=Trong V2=Dilys
+  V0="Trong, Dilys" (wide), A0-A2=Khong dung, A3=Dilys A4=Trong, nut Cat MO,
+  khong khung canh bao, nut sync AN. Ten vo nghia -> "Nguoi 1/2" + canh bao
+  DOAN. Chua co mic -> chan + hien nut sync. 3 cam 2 mic khong wide -> bao
+  cam thua.
+- **PANEL THAT trong Premiere 26.5** (cong 8094, sau khi reload): ver v0.6.0,
+  bam nut that tren sequence "PodTest Nguon" -> `Matched 2 people`, nguoi
+  A/B, V0=A V1=B, A0=Not used A1=A A2=B, nut Cat MO. 1 cu bam, 0 thao tac tay.
+
+### 10:0x - ANH TIEN CHOT LAI 3 NHAN NUT
+Nguyen van: *"3 button nay em lam ngan gon text lai cho anh nhe: 1. Auto Match
+2. Auto Sync 3. Auto Podcast"*. Da doi, **giu nguyen o CA HAI ngon ngu** (VI va
+EN cung mot chu - doc thanh mot ho). Sua kem: cau canh bao "mic dan dau cam"
+truoc do goi ten nut cu, nay noi 'bam "Auto Sync"'.
+Anh chon dang TEN THUONG HIEU chu khong phai mo ta viec (khac luat "nhan nut
+la VIEC no lam") - day la quyet dinh cua anh, dung tu sua lai.
+Do lai tren PANEL THAT sau khi cai + reload: `Auto Match` 91px · `Auto Sync`
+84px · `Auto Podcast` 169px, cao 28/34px = KHONG xuong dong (nhan cu
+"Auto match cams <-> mics" bi wrap 2 dong tren anh chup cua anh), khong tran
+ra ngoai chan the (-4px).
+
+### Chua lam / con no
+- CHUA bam Cat sau khi tu khop tren panel that (khong muon tu y tao them
+  sequence + tu luu project khi anh dang mo may) - `catDuoc=true` moi chung
+  minh cong kiem da qua, chua chung minh ban cat dung.
+- Cam CHUNG chi nhan ra bang TU KHOA TEN. Cam wide dat ten kieu "C4025" thi
+  khong nhan ra -> se roi vao "cam thua", panel co bao.
+- Khop bang ten nghia la **phu thuoc ky luat dat ten cua nguoi dung**. Ban
+  ban ra nuoc ngoai nen co man hinh day dat ten (Cam_<ten> / Mic_<ten>).
+
 ## [ui-studio-console] - 2026-08-04 23:44 - v0.5.0: GIAO DIEN MOI THEO THIET KE ANH TIEN + CAI DAT CAT
 
 Anh Tien chot thiet ke "Studio Console" (AiO Design System/AiO Auto

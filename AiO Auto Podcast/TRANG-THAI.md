@@ -8,7 +8,57 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 04/08/2026 23:44 — panel v0.5.0 (GIAO DIỆN MỚI theo
+*Cập nhật lần cuối: 05/08/2026 15:48 — panel **v0.6.1**, host **v0.4.3**.
+✅ **RA BẢN DỰNG THẬT ĐẦU TIÊN trên liệu 58 phút của anh Tiến** (sequence
+`Will - Podcast Cut (2)`): **299/299 nhát cắt**, V1 100% cam Will · V2 100% cam
+Trọng, A1/A2 đúng mic mono từng người liền mạch 0→3528,4s, **0 clip lạ, 0 lỗ
+đen**, nhát ngắn nhất 1,04s, chia 54,4/45,6. Xem PROGRESS.md mục
+[chuoi-con-giet-ban-dung].
+Sửa gốc lỗi "hình 164/299": `pc__item` còn luật **khớp chuỗi con** → tên
+sequence trùng tên THƯ MỤC quay ăn khớp vào mọi đường dẫn file → mic mono
+không được nhập → cả một sequence 31 phút bị đặt lên A1/A2 và kéo hình xuống
+V1/V2, giết 135/299 nhát. Nay chỉ nhận khớp chắc chắn, **item không có file
+media không bao giờ là ứng viên**, **bỏ cache tra cứu** (anh Tiến: "remove
+cache"). Bấm sang tab sequence khác không còn giết bản dựng (`ERR:SEQ_DOI`).
+`kiem-host` **22 → 31 phép, 31/31 đạt**.
+☠️ CÒN NỢ: (1) chưa có thước ngoài cho "cắt đúng người" — cần anh chấm marker;
+(2) cài BẰNG TAY vì `kiem-nao`/`stress` đang trượt 2 phép (phiên trước đổi bản
+chất não sang đường "nghe trọn từng kênh" mà chưa sửa phép kiểm cũ) — phải
+chỉnh 2 phép đó rồi cài lại qua `sign-install.ps1`.*
+
+*05/08/2026 14:03 — panel **v0.6.1**, host **v0.4.2**.
+**Phiên soát toàn bộ (anh Tiến: "kiểm tra và chốt hạ")** — tìm và sửa **4 lỗi
+có thể phá timeline thật**, xem PROGRESS.md mục [soat-toan-bo]:
+(A) `pc_sapXepClipsLenTrack` xoá sạch mọi clip TRƯỚC rồi mới tìm project item
+→ tìm trượt là clip bay luôn; (B) panel bỏ qua giá trị host trả về nên xếp
+hỏng vẫn báo "đã khớp N người"; (C) `pc__item` khớp chuỗi con hai chiều rồi
+lấy cái gặp đầu tiên → "A.wav" ăn khớp "mic_data.wav"; (D) vòng lặp vô hạn
+tuKhop ↔ tuTimVaSyncMicProject, mỗi vòng ghi đè timeline.
+☠️ **Bản v0.6.0 anh đang dùng sáng nay: bấm Auto Match lúc một file media
+offline là XOÁ TRẮNG timeline** — đo được bằng cách chạy bộ kiểm mới ngược
+lên nó (video 3 clip → 0, audio 2 → 0, mà host vẫn trả "OK:").
+Cổng kiểm mới **`node tests/kiem-host.mjs` 22/22** (dựng `app` Premiere giả),
+đã cắm vào `sign-install.ps1` — nay 5 bộ chặn trước khi cài.
+Bốn bộ kiểm cũ đều BÁO ĐẠT suốt thời gian 4 lỗi này nằm trong sản phẩm, vì
+không bộ nào chạm tới host.
+CHỜ TAY ANH: bấm Auto Match → Auto Podcast trên liệu thật.*
+
+*05/08/2026 09:50 — panel v0.6.0, host v0.4.1.
+Ba nhãn nút anh chốt 05/08 (giữ nguyên ở cả VI lẫn EN): **Auto Match** ·
+**Auto Sync** · **Auto Podcast**.
+Mới trong v0.6.0: **nút "Auto Match"** (anh Tiến đặt hàng: kéo hết
+source clip vào sequence rồi bấm một nút). Một cú bấm điền cả bản đồ: tiếng
+đi kèm cam → "Không dùng"; cam ↔ mic ghép theo TÊN FILE (token có trọng số
+IDF); cam toàn cảnh nhận theo từ khoá; tên người lấy từ token chung, giữ
+nguyên dấu. Tên không nói gì thì ghép theo thứ tự và NÓI THẲNG là đoán.
+Nút tự sync không mất — ẩn đi, tự hiện khi đo ra là cần.
+☠️ Hướng "ghép bằng TIẾNG CAM" đã đo trên 4 cam thật và **trượt 3/4** (mọi
+cam thu chung một phòng nên biên độ chỉ 0,017–0,056 = nhiễu) — đã ghi CẤM
+ở đầu `dist/khop.js`, đừng thử lại. Cổng kiểm mới: `kiem-khop` 28/28.
+Đo trên panel thật (Premiere 26.5): bấm 1 nút → V0=A, V1=B, A0=Not used,
+A1=A, A2=B, nút Cắt mở. CHỜ TAY ANH: bấm Cắt sau khi tự khớp.*
+
+*04/08/2026 23:44 — panel v0.5.0 (GIAO DIỆN MỚI theo
 thiết kế Studio Console anh Tiến chốt), host v0.4.1.
 Mới trong v0.5.0: gõ TÊN người thẳng vào track (cam chung = 2 tên, phẩy
 ngăn) · monitor + dải nhát cắt · hộp CÀI ĐẶT CẮT ăn thật (cắt sớm, cam

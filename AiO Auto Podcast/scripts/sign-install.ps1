@@ -66,15 +66,22 @@ foreach ($v in 9..12) {
 if (-not (Test-Path (Join-Path $root 'dist\index.html'))) { throw "Thieu dist\index.html." }
 if (-not (Test-Path (Join-Path $root 'dist\nao.js'))) { throw "Thieu dist\nao.js." }
 if (-not (Test-Path (Join-Path $root 'dist\sync.js'))) { throw "Thieu dist\sync.js." }
+if (-not (Test-Path (Join-Path $root 'dist\khop.js'))) { throw "Thieu dist\khop.js." }
 if (-not (Test-Path (Join-Path $root 'host\podcast.jsx'))) { throw "Thieu host\podcast.jsx." }
 
-# --- Bo kiem nao + SYNC + STRESS phai DAT truoc khi cai (do truoc, tin sau) ---
+# --- Bo kiem nao + SYNC + KHOP + HOST + STRESS phai DAT truoc khi cai (do truoc, tin sau) ---
 Push-Location $root
 try {
   node tests/kiem-nao.mjs | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "Bo kiem nao TRUOT - khong cai ban hong." }
   node tests/kiem-sync.mjs | Select-Object -Last 3 | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "Bo kiem SYNC TRUOT - khong cai ban hong." }
+  node tests/kiem-khop.mjs | Select-Object -Last 3 | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "Bo kiem TU KHOP TRUOT - khong cai ban hong." }
+  # HOST: hai ham co the LAM MAT CLIP tren timeline that (them 05/08 sau khi
+  # soat ra 4 loi ma bon bo kiem tren deu khong cham toi).
+  node tests/kiem-host.mjs | Select-Object -Last 3 | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "Bo kiem HOST TRUOT - khong cai ban hong." }
   node tests/stress.mjs | Select-Object -Last 3 | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "STRESS TEST TRUOT - khong cai ban hong." }
 } finally { Pop-Location }
