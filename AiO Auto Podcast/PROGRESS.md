@@ -233,7 +233,35 @@ skill do truoc, dung cho vap roi moi nho.
 - Khong sua ma nguon san pham. Chi them cong cu do:
   `scratchpad/thuoc2.ps1` (thuoc ngoai) va thu muc clip nghe kiem moi.
 
-## TRANG THAI HIEN TAI — 2026-08-06 10:41 +0700
+## ✅ ANH TIEN CHOT XONG TOOL — 2026-08-06 11:05 +0700
+
+> Nguyen van: *"san pham ra okie roi em — tool nay xong em nhe"*.
+>
+> **panel v0.6.6 · host v0.4.9 · cai qua cong chuan · commit `e3070f1`.**
+> Ban cai KHOP repo tung byte. 6/6 bo kiem sach:
+> `kiem-host` **86/86** · `kiem-nao` DAT · `kiem-sync` 9/9 · `kiem-khop` 32/32 ·
+> `kiem-wide` 11/11 · `stress` moi ca bat buoc DAT.
+>
+> **Lam duoc gi** (do that tren liue 58 phut cua anh Tien, 2 cam + 2 mic + 1 cam
+> toan canh):
+> - Cat theo nguoi dang noi, **588/588 moc bat dung 1 cam**, 0 man hinh den,
+>   0 chong cam. Cam chung chiem 28,7% so nhat.
+> - **2 duong HINH**: bat/tat clip (doi nhat cat bang Shift+E) hoac cat bo.
+> - **4 duong TIENG**: ducking · bat/tat clip · cat bo · giu nguyen.
+> - Tieng tu chuan hoa (-42,6 -> -17,5 dB), khong con phai keo tay +25 dB.
+> - Auto Match tu doi ten file trung: `C4091.MP4` x2 -> `Cam 2 - ...` / `Cam 1 - ...`
+> - Dong ho dem nguoc khi dung.
+>
+> ☠️ **CAI DUY NHAT CHUA CHUNG MINH DUOC: "cat DUNG NGUOI".** Moi so do tren chi
+> chung minh "khong mat clip, dung track, dung cam, dung mic, dung cau truc".
+> Thuoc ngoai bang whisper da cai va chay, nhung **chi phan xu duoc 16/299 doan
+> (5%)** vi bleed lam ca hai mic deu co loi. **Dung trich dan con so "50%" trong
+> do** — mau qua nho. Con 8 clip cho anh Tien nghe cham o
+> `file pr for test\podcast-nghe-kiem-2\` (STEREO: tai TRAI = mic Will, tai PHAI
+> = mic Trong); ca 8 doan sai deu LECH CUNG MOT CHIEU (tool chon cam Trong).
+> Co dap an do moi duoc dung vao nguong cat.
+
+## (trang thai truoc) — 2026-08-06 10:41 +0700
 > **panel v0.6.6 · host v0.4.9 · CAI QUA CONG CHUAN.** `kiem-host` **86/86**,
 > 6/6 bo kiem sach.
 >

@@ -3,6 +3,34 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
+> # ✅ ANH TIẾN CHỐT XONG TOOL — 06/08/2026 11:05
+> Nguyên văn: *"sản phẩm ra okie rồi em — tool này xong em nhé"*.
+> **panel v0.6.6 · host v0.4.9 · commit `e3070f1`.** 6/6 bộ kiểm sạch
+> (`kiem-host` **86/86** · `kiem-wide` 11/11 · nao · sync 9/9 · khớp 32/32 · stress).
+>
+> **Chạy thật trên liệu 58 phút (2 cam + 2 mic + 1 cam toàn cảnh): 588/588 mốc
+> bật đúng 1 cam, 0 màn hình đen, 0 chồng cam.** Cam chung chiếm 28,7% số nhát.
+>
+> ☠️☠️ **THỨ DUY NHẤT CHƯA CHỨNG MINH ĐƯỢC: "CẮT ĐÚNG NGƯỜI".** Mọi số đo chỉ
+> chứng minh *không mất clip, đúng track, đúng cam, đúng mic, đúng cấu trúc*.
+> Thước ngoài bằng whisper (đã cài ở `C:\AiO-Studio\whisper`) **chỉ phân xử được
+> 16/299 đoạn (5%)** vì bleed làm cả hai mic đều có lời — **đừng trích dẫn con số
+> "50%" trong đó**. Còn 8 clip stereo chờ anh Tiến chấm ở
+> `file pr for test\podcast-nghe-kiem-2\`; cả 8 đoạn sai đều **lệch cùng một
+> chiều** (tool chọn cam Trọng). Có đáp án đó mới được đụng vào ngưỡng cắt.
+>
+> ☠️ **[CHỜ] Lỗi có sẵn CHƯA sửa, cố ý:** panel lọc `parts.length >= 9` mà
+> `pc_docChiTietClips` trả **8 trường** ⇒ `dsClips` luôn rỗng ⇒ nhánh *"xếp lại
+> track khi clip bị dồn trên V1/A1"* **chưa bao giờ chạy**. Sửa là kích hoạt lần
+> đầu `pc_sapXepClipsLenTrack` (hàm xoá sạch timeline) trên sequence THẬT — phải
+> `pc_nhanBanGiuClip` tạo bản sao, thử trên đó, đo trước/sau rồi mới bật.
+>
+> ☠️ Auto Match **không tự nhận ra cam toàn cảnh** — `laCamChung` đọc TỪ KHOÁ
+> trong tên (`toancanh`/`wide`/`master`/`2shot`…). Gõ "Cam chung" vào ô tên, hoặc
+> đặt tên thư mục thẻ là `Cam 1 - Toan canh` thì tự nhận.
+>
+> ---
+>
 > **TRẠNG THÁI 06/08/2026 07:47: panel v0.6.6 · host v0.4.8 — CÀI QUA CỔNG CHUẨN.**
 >
 > 📊 **HIỆU NĂNG ĐÃ ĐO, ĐỪNG TỐI ƯU MÒ NỮA.** Một lượt dựng video 58 phút mất
