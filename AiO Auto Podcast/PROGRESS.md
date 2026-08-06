@@ -1,5 +1,39 @@
 # AiO Auto Podcast - Nhat ky
 
+> ## TRANG THAI HIEN TAI — 2026-08-06 08:01 +0700
+> **panel v0.6.6 · host v0.4.8 · CAI QUA CONG CHUAN** (`sign-install.ps1` chay
+> trot lot, 5/5 bo kiem). Ban cai KHOP repo tung byte. Commit cuoi `c53fe33`.
+>
+> **Dung o dau:** tool cat duoc tron ven tren lieu that cua anh Tien (2 cam +
+> 2 mic, 58 phut). Bon duong TIENG va hai duong HINH deu da chay that va do
+> **299/299**. Tieng da chuan hoa (anh khong con phai keo +25 dB). Mot luot dung
+> mat **211 giay**, co dong ho dem nguoc.
+>
+> **Ban de anh Tien xem:**
+> `Podcast - BAN CHUAN (bat-tat + ducking + tieng da chuan hoa)`
+> (con 5 sequence khac de nghe so sanh tung duong, ten tu noi ro no la gi)
+>
+> **[CHO] VIEC KE TIEP — theo thu tu:**
+> 1. ❌ **THUOC NGOAI cho "cat dung nguoi"** — DUNG vi may KHONG CO
+>    `whisper-cli.exe` (AiO Transcripts tro toi duong dan khong ton tai, quet ca
+>    o E: khong thay). Cho anh Tien chon: tai whisper.cpp + model (~1-3 GB) de
+>    doi chieu may-voi-may, HAY anh nghe 12 clip o
+>    `file pr for test\podcast-nghe-kiem\` roi cham marker.
+>    ☠️ **Chua co no thi moi con so ve do chinh xac chi duoc noi o muc "trong
+>    hop ly", KHONG duoc noi "cat dung"** — thuoc hien tai lam bang dB, cung vat
+>    lieu voi thuat toan (bai hoc 5d).
+> 2. **Hai ca stress con danh dau BAOCAO** (2 cuoi-chung · 5 mic-lech 13 dB) —
+>    gioi han da biet cua duong nghe-tung-kenh. Da thu HAI huong sua, ca hai pha
+>    cho khac, da hoan tac (chi tiet + so do o muc [chot-gay-an-toan]).
+>    **Dung thu lai hai huong do.**
+> 3. **Dot ra soat 06/08 con 2 agent phan bien bi chan giua chung** (het han muc
+>    phien) nen nhanh hieu nang chua duoc phan bien du; cac de xuat con lai chua xet.
+> 4. FFmpeg chua bundle rieng (ban ban moi can).
+>
+> **Doc gi truoc khi sua:** `CLAUDE.md` trong repo (dau file, phan ☠️) va
+> `TRANG-THAI.md`. Kinh nghiem API Premiere ve am luong/bat-tat clip nam o
+> `~/.claude/skills/adobe-cep-panel/SKILL.md` **muc 18**.
+
 ## [toi-uu-ui] - 2026-08-06 07:47 - v0.6.6: DOI THOI GIAN CHO + BIT HAI LOI UX
 
 Anh Tien: *"theo em giua mot nguoi dung va mot nguoi thiet ke, ap em toi uu hoa
