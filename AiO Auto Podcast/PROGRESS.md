@@ -1,6 +1,78 @@
 # AiO Auto Podcast - Nhat ky
 
-> ## TRANG THAI HIEN TAI — 2026-08-06 08:01 +0700
+## [thuoc-ngoai-whisper] - 2026-08-06 08:24 +0700 - CAI WHISPER, CHAY THUOC NGOAI: KHONG PHAN XU DUOC
+
+Anh Tien: *"whisper-cli.exe — E cai di em"*.
+
+### Da cai
+
+`C:\AiO-Studio\whisper\` — **dung cho panel Transcripts da thiet ke de tim**
+(`NOI_DE = ['C:/AiO-Studio/whisper']` trong `client/src/services/whisper.ts`),
+nen ca Transcripts lan Podcast deu dung duoc, khong phai cai hai lan.
+
+- `bin\Release\` — 44 file tu `whisper-cublas-12.4.0-bin-x64.zip` (639,5 MB),
+  release v1.9.2 cua `ggml-org/whisper.cpp`. Co `whisper-cli.exe`.
+- `models\ggml-large-v3-turbo.bin` — 1.549 MB, tai moi.
+  ☠️ **Co Y chon turbo, khong dung large-v3**: `CLAUDE.md` cua bo da ghi turbo
+  dinh GPU **67%** (duoi tran), large-v3 dinh **88% — VUOT tran 70%** anh chot.
+
+☠️ **May da co san mot nua tu truoc**: `models\ggml-large-v3.bin` 2.952 MB da
+nam do. Chi thieu dung **file exe**. Do la ly do panel Transcripts bao "chua cai"
+— khong phai thieu ca bo nhu em tuong luc quet o E:.
+
+Chay thu: nhan dung **RTX 4060 Ti, 16.379 MiB VRAM**, nap duoc CUDA backend.
+Toc do: 58 phut audio → **261 giay** (mic1) va **134 giay** (mic2).
+
+### ☠️ KET QUA: THUOC NGOAI BI MU BOI CHINH CAI NO DINH DO
+
+| Do | Ket qua |
+|---|---|
+| Whisper nghe ra | mic1 **1.946 khoi loi** · mic2 **1.381 khoi loi** |
+| Doan **phan xu duoc** | **16 / 299 (5%)** |
+| Khong phan xu duoc | **283** — ca hai mic deu co loi |
+| Trong 16 doan do | 8 dung / 8 sai |
+
+**283/299 khong phan xu duoc** vi bleed: mic Trong thu ca tieng Will, whisper
+chep duoc loi o CA HAI mic gan nhu moi luc. Thuoc ngoai dung bang mot he do khac
+(nhan dang loi noi thay vi nang luong dB) nhung **van bi chinh bleed lam mu**.
+
+☠️ **KHONG DUOC bao "tool cat dung 50%"** — mau 5% va thuoc dang mu thi con so
+do vo nghia. Ghi ro de phien sau khong trich dan nham.
+
+### Nhung co MOT tin hieu that: 8/8 doan sai DEU CUNG MOT CHIEU
+
+Ca 8 doan deu la *"tool cat cam 2 (Trong), whisper nghe nguoi 1 (Will)"*.
+**Khong mot doan nao nguoc lai.** Tung dong xu ra 8/8 cung chieu la 1/128.
+Khop voi chia thoi luong da do: **41,2% Will / 58,8% Trong**.
+
+→ Nghi van: **tool thien ve cam Trong o nhung doan tranh chap**. Chua ket luan
+duoc (mau 16, va whisper cung co the sai) — nhung du de di kiem bang tai.
+
+Da trich 8 doan do ra `file pr for test\podcast-nghe-kiem-2\`, dang **STEREO:
+tai TRAI = mic Will, tai PHAI = mic Trong**, tang 6 dB.
+Anh Tien nghe tai nao to hon la biet ai dang noi — **khong phai doan**.
+Neu tai TRAI to hon o phan lon 8 clip ⇒ tool that su thien ve cam Trong,
+va luc do moi co DAP AN de dung vao nguong.
+
+### ☠️ Hai bay tu vap khi viet script — CA HAI DA CO TRONG SO CUA CHINH MINH
+
+1. **Dau dong here-string `'@` phai o COT 0** — thut vao 2 dau cach la PowerShell
+   khong nhan, bao loi o dong khac hoan toan.
+2. **`2>&1` voi native exe tren PowerShell 5.1 boc TUNG DONG stderr thanh
+   ErrorRecord** va bat `$?` = false du exit code 0. whisper in thong tin CUDA ra
+   stderr → script chet ngay dong dau du whisper chay binh thuong.
+   Cach dung: ha `ErrorActionPreference` quanh loi goi, day stderr ra FILE, roi
+   **kiem bang KET QUA THAT** (file `.srt` co ra khong), khong tin ma tra ve.
+→ Ca hai deu nam san trong `~/.claude/skills/windows-scripting`. **So chi co gia
+tri neu duoc MO RA dung luc** (luat 5q) — viet script PowerShell dai thi doc lai
+skill do truoc, dung cho vap roi moi nho.
+
+### File anh huong
+
+- Khong sua ma nguon san pham. Chi them cong cu do:
+  `scratchpad/thuoc2.ps1` (thuoc ngoai) va thu muc clip nghe kiem moi.
+
+## TRANG THAI HIEN TAI — 2026-08-06 08:01 +0700
 > **panel v0.6.6 · host v0.4.8 · CAI QUA CONG CHUAN** (`sign-install.ps1` chay
 > trot lot, 5/5 bo kiem). Ban cai KHOP repo tung byte. Commit cuoi `c53fe33`.
 >
@@ -14,14 +86,17 @@
 > (con 5 sequence khac de nghe so sanh tung duong, ten tu noi ro no la gi)
 >
 > **[CHO] VIEC KE TIEP — theo thu tu:**
-> 1. ❌ **THUOC NGOAI cho "cat dung nguoi"** — DUNG vi may KHONG CO
->    `whisper-cli.exe` (AiO Transcripts tro toi duong dan khong ton tai, quet ca
->    o E: khong thay). Cho anh Tien chon: tai whisper.cpp + model (~1-3 GB) de
->    doi chieu may-voi-may, HAY anh nghe 12 clip o
->    `file pr for test\podcast-nghe-kiem\` roi cham marker.
->    ☠️ **Chua co no thi moi con so ve do chinh xac chi duoc noi o muc "trong
->    hop ly", KHONG duoc noi "cat dung"** — thuoc hien tai lam bang dB, cung vat
->    lieu voi thuat toan (bai hoc 5d).
+> 1. ⏳ **THUOC NGOAI — da cai whisper va chay duoc, nhung KHONG PHAN XU DUOC.**
+>    Chi **16/299 doan (5%)** phan xu duoc; 283 doan con lai ca hai mic deu co
+>    loi vi bleed. **Dung trich dan con so "50%"** — mau qua nho va thuoc dang mu.
+>    ☠️ Van CHUA duoc noi "cat dung"; moi con so do chinh xac chi o muc
+>    "trong hop ly" (bai hoc 5d).
+>    **Viec anh Tien lam duoc ngay:** nghe 8 clip o
+>    `file pr for test\podcast-nghe-kiem-2\` — dang STEREO, **tai TRAI = mic Will,
+>    tai PHAI = mic Trong**. Day la 8 doan whisper va tool KHONG dong y, va ca 8
+>    deu cung mot chieu (tool cat cam Trong, whisper nghe Will). Tai TRAI to hon
+>    o phan lon 8 clip ⇒ **tool thien ve cam Trong**, luc do moi co dap an de
+>    dung vao nguong.
 > 2. **Hai ca stress con danh dau BAOCAO** (2 cuoi-chung · 5 mic-lech 13 dB) —
 >    gioi han da biet cua duong nghe-tung-kenh. Da thu HAI huong sua, ca hai pha
 >    cho khac, da hoan tac (chi tiet + so do o muc [chot-gay-an-toan]).
