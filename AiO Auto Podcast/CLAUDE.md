@@ -3,7 +3,32 @@
 > Dự án thứ 7 của bộ AiO Studio. Anh Tiến giao 2026-08-01:
 > *"tiếp theo là podcast tool nha em"* — và cùng ngày: *"rồi vào việc đi em"*.
 >
-> **TRẠNG THÁI 05/08/2026 21:46: panel v0.6.5 · host v0.4.8 — CÀI QUA CỔNG CHUẨN.**
+> **TRẠNG THÁI 06/08/2026 07:47: panel v0.6.6 · host v0.4.8 — CÀI QUA CỔNG CHUẨN.**
+>
+> 📊 **HIỆU NĂNG ĐÃ ĐO, ĐỪNG TỐI ƯU MÒ NỮA.** Một lượt dựng video 58 phút mất
+> **211,7 s**, trong đó **đặt clip hình 184 s (87%)**. Nút thắt là
+> `overwriteClip` của Premiere — **0,30 giây mỗi clip**, không có đường vòng.
+> Hai thứ ai cũng nghi mà đo ra đều SAI: round-trip panel↔host **không phải**
+> (bước bật/tắt cùng 30 lô chỉ 6,1 s); bỏ cache **không tốn gì** (`pc__item`
+> 0,95 ms × 598 = 0,57 s = 0,27% tổng — project chỉ có 32 item).
+> Cách duy nhất giảm thật: đặt ít clip hơn (chọn "Cắt bỏ" thay "Bật/tắt").
+>
+> ☠️ **ƯỚC LƯỢNG THỜI GIAN PHẢI DÙNG CỬA SỔ TRƯỢT, KHÔNG TRUNG BÌNH TỪ ĐẦU.**
+> Tốc độ đặt clip CHẬM DẦN khi timeline đông clip, nên trung bình quá khứ lạc
+> quan 30–40% (báo "~2 phút" lúc còn 3,5 phút).
+>
+> ☠️ **`tuDienMic` NÉ TIẾNG CAM PHẢI CÓ ĐIỀU KIỆN.** Nó gán track tiếng cùng chỉ
+> số làm mic; nếu đó là tiếng cam thì người dùng làm đúng vẫn bị báo "trùng mic"
+> và khoá nút. Nhưng **bỏ qua tiếng cam vô điều kiện là giết luồng "không có mic
+> rời"** — lúc đó tiếng cam là mic duy nhất. Chỉ né khi sequence CÓ mic rời khác.
+>
+> ☠️ **BA NÚT PHẢI KHOÁ CÙNG NHAU khi bất kỳ việc nào đang ghi timeline.** Trước
+> 06/08, trong lúc dựng thì nút Auto Match vẫn bấm được → hai lượt xoá-và-đặt-lại
+> chồng nhau lên sequence GỐC. Dùng `khoaNut()`.
+> ☠️ **ĐỪNG bọc cả `tuKhop` bằng cờ** — nó có **11 đường return** + nhánh bất
+> đồng bộ + đệ quy `tuKhop(true)`; sót một chỗ hạ cờ là ba nút chết vĩnh viễn tới
+> khi reload. Chỉ khoá đúng đoạn ghi: đặt cờ ngay trước lệnh, hạ trong
+> `.then`/`.catch` của chính lệnh đó.
 >
 > ✅ **HẾT PHẢI CÀI TAY** — `scripts/sign-install.ps1` chạy trót lọt, 5/5 bộ kiểm.
 >

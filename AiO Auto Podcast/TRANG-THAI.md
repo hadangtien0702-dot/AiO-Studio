@@ -8,7 +8,26 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 05/08/2026 21:46 — panel **v0.6.5**, host **v0.4.8**.
+*Cập nhật lần cuối: 06/08/2026 07:47 — panel **v0.6.6**, host **v0.4.8**.
+✅ **ĐỒNG HỒ ĐẾM NGƯỢC** khi dựng: *"Đang cắt đoạn 260/299 · còn ~2 phút"*.
+☠️ Bản đầu tính trung bình từ đầu → **lạc quan 30–40%** (báo ~2 phút lúc thực tế
+còn 3,5 phút) vì tốc độ đặt clip CHẬM DẦN khi timeline đông clip. Sửa bằng **cửa
+sổ trượt** (chỉ nhìn ~15 giây gần nhất) → sai số còn ~15%.
+✅ **BỊT HAI LỖI UX** (rà soát 3 vai + phản biện, em kiểm chứng lại trước khi sửa):
+(A) `tuDienMic` gán tiếng cam làm mic → người dùng làm ĐÚNG vẫn bị báo "trùng mic"
+và khoá nút. Sửa CÓ ĐIỀU KIỆN — né tiếng cam chỉ khi sequence có mic rời khác,
+nếu không sẽ giết luồng "không có mic rời". (B) Trong lúc dựng, nút **Auto Match
+vẫn bấm được** → hai lượt xoá-và-đặt-lại chồng nhau lên timeline GỐC. Đo thật:
+trước `{dựng:khoá, match:MỞ, sync:MỞ}` → sau **`{khoá, khoá, khoá}`**.
+☠️ Không bọc cả hàm `tuKhop` bằng cờ (11 đường thoát + đệ quy — sót một chỗ là ba
+nút chết vĩnh viễn); chỉ khoá đúng đoạn ghi timeline: một chỗ đặt, một chỗ hạ.
+📊 **ĐO HIỆU NĂNG — hai nghi ngờ ban đầu đều SAI:** round-trip không phải thủ phạm
+(bước bật/tắt cùng 30 lô chỉ tốn 6,1 s vs 184 s của đặt clip); bỏ cache không tốn
+gì (`pc__item` 0,95 ms × 598 = **0,57 s trên tổng 211 s**). Nút thắt thật là
+`overwriteClip` của Premiere — **0,30 giây mỗi clip, chiếm 87%**. Phần công nghệ
+gần như không còn gì đáng tối ưu.
+
+*05/08/2026 21:46 — panel **v0.6.5**, host **v0.4.8**.
 ✅ **HẾT PHẢI CÀI BẰNG TAY** — `sign-install.ps1` chạy trót lọt, 5/5 bộ kiểm sạch.
 Chốt gãy an toàn mới cho đường nghe-từng-kênh: **biên độ nhất–nhì** (chênh mức
 vượt ngưỡng giữa kênh nhất và nhì). Ngưỡng chọn bằng số: liệu thật 4,61 dB → tha,

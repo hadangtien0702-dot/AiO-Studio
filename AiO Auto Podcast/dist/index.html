@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>AiO Studio — Auto Podcast</title>
 <!--
-  Panel v0.6.5 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
+  Panel v0.6.6 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
   (AiO Design System/AiO Auto Podcast/AiO Auto Podcast.html — "Studio Console").
   ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.8).
 
@@ -341,7 +341,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
 <header class="topbar">
   <svg class="ico brand-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4M8 22h8"/></svg>
   <h1 class="brand">Auto Podcast</h1>
-  <span class="ver">v0.6.5</span>
+  <span class="ver">v0.6.6</span>
   <span class="spacer"></span>
   <span class="host" id="host"></span>
   <button class="btn btn--sm" id="lang"></button>
@@ -830,6 +830,14 @@ select option{background:var(--bg-2);color:var(--text-1)}
   var seqDangNhin = ''
   var dangChay = false
   var dangSync = false
+  var dangXep = false   // đang GHI timeline trong Auto Match — xem chú thích ở tuKhop
+  /** Khoá/mở cả ba nút cùng lúc — việc nào chạy thì hai việc kia phải chờ. */
+  function khoaNut(khoa) {
+    ;['nutDung', 'nutKhop', 'nutSync'].forEach(function (id) {
+      var n = document.getElementById(id)
+      if (n) n.disabled = !!khoa
+    })
+  }
   var SEQ_DAI = 1          // giây — trục của dải nhát cắt
   var KE_HOACH = null      // [{tu, den, nguoi(-1=wide), mau, camK}] — SAU khi cắt
   var moc = 0
@@ -1305,11 +1313,33 @@ select option{background:var(--bg-2);color:var(--text-1)}
 
   // ═══ TƯƠNG TÁC BẢN ĐỒ ═══════════════════════════════════════════════════
   // V1 đi với A1, V2 với A2… — mic cùng số tự ăn theo, trừ khi đã chốt tay.
+  /**
+   * Gõ tên người vào ô cam Vn → tự gán luôn track tiếng An cho người đó.
+   *
+   * ☠️ SỬA 06/08/2026 — soát ra một bức tường chặn ngay lần chạy đầu.
+   * Editor làm ĐÚNG: gõ "Will" vào V1, "Trọng" vào V2, rồi gán 2 mic ZOOM ở
+   * A3/A4. Nhưng hàm này âm thầm gán thêm A1=Will, A2=Trọng theo luật
+   * "V1 đi với A1" — mà A1/A2 chính là TIẾNG CAM, đúng hàng panel vừa dán
+   * nhãn "Tiếng cam (Cần mic rời)". Thành ra mỗi người có 2 mic → `kiem()`
+   * trả `trung_mic` → nút chính khoá câm. Lỗi trỏ ngược vào mặt người làm đúng,
+   * và không một chữ nào trên màn hình chỉ ra đường thoát (đặt A1/A2 = Không dùng).
+   *
+   * ☠️ NHƯNG KHÔNG ĐƯỢC BỎ QUA TIẾNG CAM MỘT CÁCH VÔ ĐIỀU KIỆN: khi cả
+   * sequence KHÔNG có mic rời nào, tiếng cam chính là mic duy nhất và vẫn
+   * phải ghép được (đường này `khop.js` đang phục vụ). Nên chỉ né tiếng cam
+   * khi trong sequence CÓ ít nhất một track tiếng không phải tiếng cam.
+   */
   function tuDienMic(trV, ids) {
     var mic = trackA.filter(function (x) { return x.i === trV.i && x.soClip > 0 })[0]
     if (!mic) return
     var kM = 'A' + mic.i
     if (tuChinh.has(kM)) return
+    if (videoCungMedia(mic.duong) >= 0) {
+      var coMicRoi = trackA.some(function (x) {
+        return x.soClip > 0 && videoCungMedia(x.duong) === -1
+      })
+      if (coMicRoi) { gan.delete(kM); return }
+    }
     if (ids.length === 1) gan.set(kM, ids[0])
     else gan.delete(kM)
   }
@@ -1623,10 +1653,25 @@ select option{background:var(--bg-2);color:var(--text-1)}
       }
 
       var resXep = AiOKhop.phanNhomVaSapXepTrack(dsClips)
+      // ☠️ KHOÁ ĐÚNG ĐOẠN NGUY HIỂM, KHÔNG BỌC CẢ HÀM.
+      // Soát 06/08/2026: `tuKhop` chỉ chặn bằng `dangChay || dangSync`, mà hai
+      // cờ đó chỉ do nút Cắt và nút Sync đặt — nên bấm Auto Match hai lần liên
+      // tiếp là HAI lượt `pc_sapXepClipsLenTrack` chồng nhau, mà hàm đó XOÁ SẠCH
+      // CLIP TRƯỚC rồi mới đặt lại, trên sequence GỐC của người dùng.
+      // Hàm có 11 đường thoát + một nhánh bất đồng bộ + đệ quy `tuKhop(true)`;
+      // rải cờ bằng tay là chắc chắn sót một chỗ, và sót thì ba nút chết vĩnh
+      // viễn tới khi reload panel — hỏng nặng hơn lỗi đang sửa. Nên chỉ khoá từ
+      // ngay trước lệnh ghi tới lúc nó trả lời: đúng một chỗ đặt, đúng một chỗ
+      // hạ, không đường nào lọt. Các return TRƯỚC đây chưa đặt cờ nên vô hại.
       var buocXep = Promise.resolve()
 
       if (resXep.lenhXepStr && (resXep.dsCamKeys.length > 1 || resXep.dsMicKeys.length > 1)) {
+        if (dangXep) return          // cú bấm thứ hai rơi vào lúc đang ghi — bỏ
+        dangXep = true
+        khoaNut(true)
         buocXep = goiHost('pc_sapXepClipsLenTrack("' + chuoiJsx(seqDangNhin) + '","' + chuoiJsx(resXep.lenhXepStr) + '")')
+          .then(function (r) { dangXep = false; khoaNut(false); return r },
+                function (e) { dangXep = false; khoaNut(false); throw e })
       }
 
       buocXep.then(function (rXep) {
@@ -1734,14 +1779,30 @@ select option{background:var(--bg-2);color:var(--text-1)}
    * không dùng hằng số đoán trước — máy khác, liệu khác thì tốc độ khác.
    * Chỉ hiện khi còn ≥ 10 giây: dưới mức đó con số nhảy loạn mà chẳng giúp gì.
    */
-  function conLai(t0, daXong, tong) {
-    if (!t0 || daXong < 3 || daXong >= tong) return ''
-    var troi = (Date.now() - t0) / 1000
-    if (troi < 2) return ''
-    var giay = Math.round(troi / daXong * (tong - daXong))
+  function conLai(moc, daXong, tong) {
+    if (!moc || !moc.length || daXong >= tong) return ''
+    // ☠️ KHÔNG lấy trung bình từ đầu — đo thật 05/08/2026: tốc độ đặt clip
+    // CHẬM DẦN khi timeline đông clip, nên trung bình quá khứ luôn lạc quan.
+    // Bản đầu báo "~2 phút" lúc thực tế còn 3,5 phút, và "~85 giây" lúc còn
+    // 121 giây — hụt 30–40%. Nay chỉ nhìn tốc độ của CỬA SỔ GẦN ĐÂY.
+    var nay = Date.now()
+    var cu = moc[0]
+    for (var k = moc.length - 1; k >= 0; k--) {
+      if (nay - moc[k].t >= 15000) { cu = moc[k]; break }  // mốc cách đây ≥15 s
+    }
+    var troi = (nay - cu.t) / 1000
+    var lam = daXong - cu.n
+    if (troi < 3 || lam < 1) return ''
+    var giay = Math.round(troi / lam * (tong - daXong))
     if (giay < 10) return ''
     if (giay < 90) return tp('con_lai_giay', { n: Math.round(giay / 5) * 5 })
     return tp('con_lai_phut', { n: Math.round(giay / 60) })
+  }
+  /** Ghi mốc tiến độ cho conLai; giữ tối đa 40 mốc gần nhất. */
+  function ghiMoc(moc, n) {
+    moc.push({ t: Date.now(), n: n })
+    if (moc.length > 40) moc.shift()
+    return moc
   }
   function tienDo(chu, pt) {
     document.getElementById('goLabel').textContent = chu
@@ -1775,7 +1836,10 @@ select option{background:var(--bg-2);color:var(--text-1)}
 
     var caiDat = docCaiDat()
     dangChay = true
-    nut.disabled = true
+    // ☠️ Soát 06/08: bản cũ chỉ khoá nút Cắt, nên trong lúc dựng người dùng vẫn
+    // bấm được Auto Match — mà Auto Match XOÁ SẠCH CLIP rồi đặt lại. Hai việc
+    // ghi timeline chạy chồng nhau. Việc nào chạy thì hai việc kia phải chờ.
+    khoaNut(true)
     nut.dataset.state = 'run'
     var tenSeqGoc = seqDangNhin
 
@@ -1792,6 +1856,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
 
     function thoat(loiText, canLamText) {
       dangChay = false
+      khoaNut(false)
       delete nut.dataset.state
       nut.disabled = false
       tienDo(t('nut_dung'), 0)
@@ -1898,6 +1963,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
               tuTimVaSyncMicProject(function (okPhucHoi) {
                 if (okPhucHoi) {
                   dangChay = false
+                  khoaNut(false)
                   dungBan()
                 } else {
                   thoat(null, tp('mic_deu', { ten: tenNguoi(m), track: 'A' + (viecMic[m].i + 1) }))
@@ -1918,6 +1984,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
             tuTimVaSyncMicProject(function (okPhucHoi) {
               if (okPhucHoi) {
                 dangChay = false
+                khoaNut(false)
                 dungBan()
               } else {
                 var ro = kq.thongKe ? Math.round(kq.thongKe.tyLeRo * 100) : 0
@@ -2079,10 +2146,13 @@ select option{background:var(--bg-2);color:var(--text-1)}
               })
 
               var i = 0
+              var mocHinh = []   // mốc tiến độ để ước lượng thời gian còn lại
               function loHinh() {
                 if (i >= viecHinh.length) { trangThaiHinh(); return }
+                ghiMoc(mocHinh, i)
                 var cuoi = Math.min(i + LO, viecHinh.length)
-                tienDo(tp('dang_dung', { i: Math.round(cuoi / (duCam ? camDs.length : 1)), n: doan.length }),
+                tienDo(tp('dang_dung', { i: Math.round(cuoi / (duCam ? camDs.length : 1)), n: doan.length }) +
+                  conLai(mocHinh, i, viecHinh.length),
                   40 + 42 * cuoi / viecHinh.length)
                 var ds = viecHinh.slice(i, cuoi)
                 i = cuoi
@@ -2288,7 +2358,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
                   // "tại mỗi mốc, người xem thấy MẤY hình" (bài học 5k).
                   function chot() {
                     dangChay = false
-                    nut.disabled = false
+                    khoaNut(false)
                     if (lech.length) { hien('loi', tp('lech_do', { chiTiet: lech.join(' · ') })) }
                     veKetQua(doan, tu0, tenThat)
                     toMauNguoi(duongCam, duongMic, duongWide)

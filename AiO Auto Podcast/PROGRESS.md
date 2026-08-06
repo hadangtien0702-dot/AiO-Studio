@@ -1,5 +1,116 @@
 # AiO Auto Podcast - Nhat ky
 
+## [toi-uu-ui] - 2026-08-06 07:47 - v0.6.6: DOI THOI GIAN CHO + BIT HAI LOI UX
+
+Anh Tien: *"theo em giua mot nguoi dung va mot nguoi thiet ke, ap em toi uu hoa
+cong nghe va ui cho anh nua la xong tool nay"*.
+
+### ☠️ DO TRUOC KHI TOI UU - VA CA HAI NGHI NGO DEU SAI
+
+Bam gio tung buoc mot lan dung that (video 58 phut, 299 doan, 598 clip hinh):
+
+| Buoc | Thoi gian | Ty le |
+|---|---|---|
+| Phan tich tieng | 3 s | 1% |
+| **Dat clip hinh** | **184 s** | **87%** |
+| Bat/tat cam | 6,1 s | 3% |
+| Thay tieng mic | 9 s | 4% |
+| Ve duong am luong | 9,1 s | 4% |
+| **Tong** | **211,7 s** | |
+
+**Nghi ngo 1 — round-trip panel↔host:** SAI. Buoc bat/tat cung 598 lenh chia
+30 lo nhung chi ton 6,1 s, trong khi dat clip cung so lo ton 184 s. Tang kich
+thuoc lo se khong giup gi.
+
+**Nghi ngo 2 — bo cache lam cham:** SAI. Do truc tiep tren panel:
+```
+pc__item        0,95 ms/lan x 598 = 0,57 s  (0,27% tong)
+setIn/OutPoint  2,48 ms/lan x 598 = 1,5 s
+overwriteClip   ~182 s -> 0,30 s MOI CLIP   <- nut that
+```
+Project chi co **32 item** de duyet nen bo cache gan nhu mien phi. Quyet dinh
+"remove cache" cua anh Tien khong ton gi — do duoc bang so.
+
+→ **Nut that la API cua Premiere, khong phai code minh.** Khong co duong vong;
+cach duy nhat giam that la DAT IT CLIP HON (chon "Cat bo" thay "Bat/tat" cho
+hinh, tiet kiem ~92 s) — nhung do dung la thu anh Tien muon co, nen khong dung.
+Ket luan: **phan cong nghe gan nhu khong con gi dang toi uu.**
+
+### Cho dang toi uu la CAM GIAC CHO — them uoc luong thoi gian con lai
+
+184 giay cho ma chi thay "260/299". Them " · con ~2 phut".
+
+☠️ **Ban dau tinh trung binh tu dau -> LAC QUAN 30-40%:**
+
+| Thoi diem | Ban dau bao | Thuc te con |
+|---|---|---|
+| +8 s | ~2 phut | **3,5 phut** |
+| +96 s | ~85 giay | **121 giay** |
+| +176 s | ~35 giay | 41 giay |
+
+Nguyen nhan: toc do dat clip **CHAM DAN khi timeline dong clip**, nen trung binh
+qua khu luon lac quan. Sua: **cua so truot** — chi nhin toc do cua ~15 giay gan
+nhat. Do lai tren chinh so do that: +96 s bao "~2 phut" / thuc 121 giay. Sai so
+tu 30-40% xuong ~15%. Chi hien khi con >= 10 giay (duoi do so nhay loan vo nghia).
+
+### ☠️ HAI LOI UX SOAT RA - do bang cach dong vai nguoi dung lan dau
+
+Chay mot dot ra soat 3 vai (nguoi dung moi / nguoi thiet ke / ky su hieu nang),
+moi de xuat bi mot agent khac phan bien. Hai cai dang gia, ca hai da KIEM CHUNG
+lai bang doc code va do tren panel truoc khi sua (bai hoc 5r).
+
+**A. Panel do loi len dung nguoi lam DUNG.**
+`tuDienMic` gan track tieng CUNG CHI SO lam mic khi nguoi dung go ten vao o cam
+(luat "V1 di voi A1"). Neu A1 la TIENG CAM thi nguoi do thanh ra co 2 mic ->
+`kiem()` tra `trung_mic` -> nut chinh khoa cam. Editor go ten vao 2 cam roi gan
+2 mic ZOOM o A3/A4 la lam dung hoan toan, van bi chan, va khong mot chu nao chi
+ra duong thoat (dat A1/A2 = "Khong dung").
+☠️ **KHONG sua bang cach bo qua tieng cam VO DIEU KIEN** — de xuat ban dau la
+vay, nhung lam the la GIET luong "khong co mic roi", luc do tieng cam chinh la
+mic duy nhat va van phai ghep duoc. Sua co dieu kien: chi ne tieng cam khi trong
+sequence CO it nhat mot track tieng khong phai tieng cam.
+
+**B. Bam Auto Match hai lan = hai luot ghi de chong nhau len timeline GOC.**
+`tuKhop` chi chan bang `dangChay || dangSync`, ma hai co do chi do nut Cat va nut
+Sync dat. Va trong luc DUNG thi nut Auto Match van bam duoc — do that:
+`{dung:true, khop:FALSE, sync:FALSE}`. Auto Match goi
+`pc_sapXepClipsLenTrack` — ham XOA SACH CLIP TRUOC roi dat lai.
+☠️ **KHONG bao ca ham bang co**: `tuKhop` co **11 duong return** + mot nhanh bat
+dong bo + de quy `tuKhop(true)`. Rai co bang tay la chac chan sot mot cho, ma sot
+thi ba nut chet vinh vien toi khi reload — hong nang hon loi dang sua. Chi khoa
+**dung doan nguy hiem**: dat co ngay truoc lenh ghi, ha trong `.then`/`.catch`
+cua chinh lenh do. Mot cho dat, mot cho ha, khong duong nao lot.
+Them `khoaNut()` khoa ca ba nut; moi cho ha `dangChay` deu mo lai (kiem tung
+dong: 4/4 cho).
+
+☠️ **Mot bay minh tu tao trong lan sua nay:** dung `str.replace` long nhau de
+chen `khoaNut(false)` -> ra **11 ban trung lap sai thut le**, co ban nam ngoai
+khoi dung. Da don tay va doi chieu tung dong. Sua nhieu cho giong nhau thi doc
+lai TUNG CHO, dung tin replace hang loat.
+
+### File anh huong
+
+- `dist/index.html` — `conLai()` + `ghiMoc()` (uoc luong cua so truot), nhan
+  `con_lai_giay`/`con_lai_phut`, `tuDienMic` ne tieng cam co dieu kien,
+  `khoaNut()`, co `dangXep`, v0.6.5 -> v0.6.6
+
+### Kiem chung bang so
+
+- Cu phap panel sach; moi `t()` co khoa; moi `getElementById` co id that
+- `kiem-host` 74/74 · `kiem-khop` 32/32 · `sign-install.ps1` chay trot lot
+- Khoa nut, do TREN PANEL THAT trong luc dung:
+  truoc sua `{dung:true, khop:false, sync:false}` -> sau sua
+  **`{dung:true, khop:true, sync:true}`**
+- Ban do van khoi phuc dung sau khi sua `tuDienMic` (V1 Trong, V0 Will,
+  A0=1, A1=2, nut Cat MO) — khong hoi quy
+- Uoc luong thoi gian: kiem tren chinh chuoi so do that cua lan chay truoc
+
+### Con no
+
+1. ❌ **Thuoc ngoai cho "cat dung nguoi"** — may khong co `whisper-cli.exe`.
+2. Dot ra soat co **2 agent phan bien bi chan giua chung** (het han muc phien),
+   nen nhanh hieu nang chua duoc phan bien du. Cac de xuat con lai chua xet.
+
 ## [chot-gay-an-toan] - 2026-08-05 21:46 - v0.6.5 / host v0.4.8: TRA XONG 3/4 MON NO
 
 Anh Tien: *"lam di em"* — lam not 4 mon no ghi o cuoi phien truoc.
