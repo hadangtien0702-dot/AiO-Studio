@@ -6,7 +6,7 @@
 <!--
   Panel v0.6.6 — GIAO DIỆN theo thiết kế anh Tiến chốt 04/08/2026
   (AiO Design System/AiO Auto Podcast/AiO Auto Podcast.html — "Studio Console").
-  ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.8).
+  ENGINE giữ nguyên bản đã kiểm chứng (não nao.js + sync.js + host v0.4.9).
 
   ☠️ v0.6.1 (05/08, phiên soát toàn bộ) — BỐN LỖI CÓ THỂ PHÁ TIMELINE THẬT.
   Bản v0.6.0 bấm "Auto Match" lúc một file media offline là XOÁ TRẮNG
@@ -1652,6 +1652,36 @@ select option{background:var(--bg-2);color:var(--text-1)}
         }
       }
 
+      // ── TỰ ĐẶT TÊN CHỐNG TRÙNG ─────────────────────────────────────────
+      // Anh Tiến 06/08: *"bấm auto match — match tự kiểm tra file — trùng thì
+      // tự auto đổi tên cho editor là xong"*.
+      // Ca thật: máy quay đánh số trùng, cam toàn cảnh và cam Will đều tên
+      // `C4091.MP4`, chỉ khác thư mục. Nhìn timeline không phân biệt được.
+      // ☠️ CHỈ đổi NHÃN trong Premiere, KHÔNG đụng tên file trên ổ — đổi tên
+      // file là Premiere mất link cả project, mà đó là dữ liệu gốc trên thẻ.
+      // Host tự lo phần "chỉ đổi khi thật sự trùng" và "chạy lại không chồng
+      // tiền tố"; ở đây chỉ gom đường dẫn và gọi.
+      // ☠️ LẤY ĐƯỜNG DẪN TỪ `trackV/trackA`, KHÔNG từ `dsClips`.
+      // Đo 06/08/2026: `pc_docChiTietClips` trả **8 trường**, mà vòng lọc ở trên
+      // đòi `parts.length >= 9` → `dsClips` LUÔN RỖNG. Lỗi có sẵn từ trước và
+      // im lặng: Auto Match vẫn chạy được nhờ đường `docThongTinSeq`, nên không
+      // ai thấy. Hệ quả: nhánh "xếp lại track khi clip bị dồn trên V0" CHƯA BAO
+      // GIỜ CHẠY. Chưa sửa điều kiện đó ở đây — sửa là kích hoạt
+      // `pc_sapXepClipsLenTrack` (hàm XOÁ SẠCH timeline) lần đầu tiên trên
+      // sequence thật; phải thử trên BẢN SAO trước (luật 3b). Xem PROGRESS.md.
+      var dsDuong = []
+      trackV.concat(trackA).forEach(function (tr) {
+        if (tr.soClip > 0 && tr.duong && dsDuong.indexOf(tr.duong) < 0) dsDuong.push(tr.duong)
+      })
+      // ☠️ KHÔNG chặn luồng khớp chờ nó: đổi tên chỉ động vào NHÃN, còn việc
+      // khớp thì host dùng ĐƯỜNG DẪN TUYỆT ĐỐI nên không phụ thuộc tên. Bọc cả
+      // khối khớp vào một callback là thêm một tầng lồng nữa vào hàm vốn đã có
+      // 11 đường thoát — đúng thứ vừa suýt gây cờ kẹt. Panel tự vẽ lại mỗi giây
+      // (`soi`) nên tên mới sẽ hiện ra mà không cần ai gọi thêm.
+      if (dsDuong.length) {
+        goiHost('pc_datTenChongTrung("' + chuoiJsx(dsDuong.join(';')) + '")')
+      }
+
       var resXep = AiOKhop.phanNhomVaSapXepTrack(dsClips)
       // ☠️ KHOÁ ĐÚNG ĐOẠN NGUY HIỂM, KHÔNG BỌC CẢ HÀM.
       // Soát 06/08/2026: `tuKhop` chỉ chặn bằng `dangChay || dangSync`, mà hai
@@ -2084,7 +2114,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
             if (!ok) { thoat(t('khong_nap_host'), null); return }
             tienDo(t('dang_nhan_ban'), 36)
             goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-            if (pb !== 'v0.4.8') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
+            if (pb !== 'v0.4.9') { thoat(t('khong_nap_host') + ' [host=' + pb + ']', null); return }
             // "tự lưu project trước khi ghi" — lời hứa in trong Cài đặt cắt.
             // Bay sạch một buổi chiều 04/08 vì đóng không lưu — không lặp lại.
             // ☠️ save() KÉO activeSequence về tab timeline đang mở trước mặt
@@ -2645,7 +2675,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
       napLaiHost(function (ok) {
         if (!ok) { thoatSync(t('khong_nap_host')); return }
         goiHost('(typeof pc_phienBan==="function")?pc_phienBan():"THIEU"').then(function (pb) {
-        if (pb !== 'v0.4.8') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
+        if (pb !== 'v0.4.9') { thoatSync(t('khong_nap_host') + ' [host=' + pb + ']'); return }
         goiHost('pc_nhapMono("' + micKq.map(function (m) { return chuoiJsx(m.mono) }).join(';') + '")').then(function (rN) {
         if (rN.indexOf('OK:') !== 0) { thoatSync(cauLoiHost(rN)); return }
         var kvN = tachKv(rN)

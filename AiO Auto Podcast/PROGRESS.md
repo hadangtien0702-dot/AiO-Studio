@@ -1,5 +1,166 @@
 # AiO Auto Podcast - Nhat ky
 
+## [cam-chung-va-trung-ten] - 2026-08-06 09:30 +0700 - CAM THU BA + BIT LO HONG TRUNG TEN FILE
+
+### Boi canh
+
+Anh Tien: *"ban cuoi nay la qua xin roi em... anh co them 1 dieu nua la bay gio
+anh them 1 track video co hinh giua 2 nguoi nua thi em co the xu li them duoc
+khong em?"* — roi anh sync luon cam toan canh vao V3.
+
+**Duong CAM CHUNG da co san tu truoc**, khong phai viet moi:
+- Gan bang cach go vao o Ten cua track do: `Cam chung` / `Cam toan canh` /
+  `Toan canh` / `Wide` / `Master`... (`laChuCamChung`, nhan ca co dau lan khong).
+  Panel tu dich thanh "gan CA HAI nguoi" — do chinh la cach no nhan biet cam chung.
+- Luat chen (trong `dungBan`): mo dau 3,5s neu thoai bat tu dau · mot nguoi noi
+  lien tuc qua muc "O mot cam lau nhat" (mac dinh 18s) -> chen 3,5s · qua 6 luot
+  hoac 40s chua co wide -> chen 3s · **ca hai cung im qua 2s -> ve cam chung**
+  (`coWide` + `WIDE_GIAY` trong nao.js).
+- Rang buoc: track cam chung phai co **dung 1 clip lien**; chi duoc **MOT** cam chung.
+- Da co bo kiem rieng `tests/kiem-wide.mjs` — chay lai: **11/11 DAT**.
+
+### ☠️ NGUYEN NHAN THAT — MOT LO HONG DUOC PHAT HIEN NHO NHIN TEN CLIP
+
+Doc duong dan THAT cua 3 cam tren sequence nguon:
+
+```
+V1 cam Will       G:\...\Video\Cam 2\C4091.mp4
+V3 cam toan canh  G:\...\Video\Cam 1\C4091.mp4     <- TRUNG TEN
+V2 cam Trong      G:\...\Video\Cam 3\C4236.mp4
+```
+
+May quay danh so **trung ten file**, chi khac thu muc `Cam 2` / `Cam 1`.
+
+`pc__item` cham diem: **4 = duong dan trung tuyet doi · 3 = TEN FILE trung**.
+- Binh thuong khong sao: diem 4 luon thang diem 3, ra dung cam cua minh.
+- **Nhung khi mot file offline mot luc** (rut o G, doi thu muc, Premiere chua
+  relink), diem 4 bien mat -> diem 3 cua CAI CON LAI thang -> tool dat **cam
+  Will vao cho cam toan canh**, `soLoi=0`, khong mot dau hieu nao.
+
+Day la **lan thu HAI trong hai ngay** cung mot kieu loi: khop bang mot dau hieu
+CO THE TRUNG LAP. Lan truoc la ten sequence trung ten thu muc quay (giet 135/299
+nhat cat); lan nay la hai may quay danh trung so file.
+
+### Thay doi
+
+`pc__item` dem so ung vien cung diem cao nhat (`soBang`). **Diem 3 ma co tu hai
+ung vien tro len -> tra `null`**, de chot `THIEU_ITEM` chan lai va noi ten file
+ra. Tha dung tay va bao ro con hon dat nham im lang (bai hoc 5i).
+Diem 4 khong doi: van tra ngay khi gap, va van thang diem 3.
+
+### Thay doi 2 — TU DAT TEN CHONG TRUNG (host v0.4.9)
+
+Anh Tien: *"bam auto match - match tu kiem tra file - trung thi tu auto doi ten
+cho editor la xong mà em ha"*.
+
+`pc_datTenChongTrung(dsStr)` — Auto Match tu goi truoc khi xep track:
+- Gom duong dan cua moi clip dang co, nhom theo TEN FILE.
+- Nhom nao co **>= 2 item** -> doi ten thanh `<thu muc cha> - <ten cu>`,
+  vi du `Cam 1 - C4091.MP4` va `Cam 2 - C4091.MP4`.
+
+☠️☠️ **CHI DOI NHAN TRONG PREMIERE (`projectItem.name`), TUYET DOI KHONG DOI TEN
+FILE TREN DIA.** Doi ten file la Premiere mat link ca project dang mo, ma do la
+du lieu goc tren the nho — hong la khong lay lai duoc.
+
+Ba chot an toan:
+- **Chi doi khi THAT SU trung.** File khong trung ten thi khong dung toi — doi
+  ten hang loat khi khong can la tu y sua project cua nguoi ta.
+- **Chay lai ra CUNG KET QUA** (idempotent): item da mang tien to thi bo qua,
+  khong thanh `Cam 1 - Cam 1 - C4091.MP4`.
+- **Doc lai sau khi ghi** (`pi.name === tenMoi`) truoc khi dem la thanh cong —
+  bai hoc 5l.
+- Giu NGUYEN ten clip nguoi dung dang thay, chi them tien to. ☠️ Ban dau em lay
+  ten tu DUONG DAN nen doi luon chu hoa/thuong cua duoi file (`.MP4` -> `.mp4`)
+  — doi mot thu nguoi ta khong nho la minh doi. Bo kiem bat duoc.
+
+Panel goi **KHONG CHAN** luong khop: doi ten chi dong vao nhan, con viec khop
+thi host dung DUONG DAN TUYET DOI nen khong phu thuoc ten. Boc ca khoi khop vao
+mot callback la them mot tang long nua vao ham von da co 11 duong thoat — dung
+thu vua suyt gay co ket. Panel tu ve lai moi giay (`soi`) nen ten moi tu hien.
+
+☠️ **Viec nay giai quyet vu TRUNG TEN, KHONG giai quyet vu NHAN RA CAM TOAN CANH.**
+`laCamChung` trong `khop.js` doc TU KHOA trong ten (`toancanh`, `wide`, `master`,
+`2shot`...); ten `C4091.MP4` khong co tu khoa nao nen Auto Match van khong tu biet
+day la cam chung. Anh Tien van phai go "Cam chung" vao o ten (3 giay), HOAC dat
+ten thu muc luc do the la `Cam 1 - Toan canh` thi Auto Match doc duoc tu khoa va
+tu nhan. Da noi ro voi anh, anh chua chot chon duong nao.
+
+### File anh huong
+
+- `host/podcast.jsx` — `pc__item` them dem `soBang` + chot diem-3-trung-lap;
+  them `pc_datTenChongTrung`; v0.4.8 -> **v0.4.9**
+- `dist/index.html` — `tuKhop` goi `pc_datTenChongTrung` (khong chan)
+- `tests/kiem-host.mjs` — them 3 phep cho trung ten + 9 phep cho doi ten:
+  **74 -> 86 phep**
+
+### Kiem chung bang so
+
+- `kiem-host` **86/86 DAT**, trong do:
+  - doi dung 2 clip trung ten, ghep thu muc cha: `Cam 1 - C4091.MP4`
+  - file KHONG trung ten thi KHONG bi dung toi
+  - chay lai lan hai: `daDoi=0`, ten khong chong tien to
+  - cung MOT file truyen hai lan (cam + tieng cam) khong bi tinh la trung
+  - hai file trung ten: duong dan tuyet doi VAN ra dung cai cua minh
+    (`Cam 2\C4091` va `Cam 1\C4091` ra hai item khac nhau)
+  - ☠️ ten file trung 2 item -> **tra null, KHONG doan**
+  - ten file DUY NHAT thi van khop duoc khi media doi o (khong chan oan)
+- `kiem-wide` **11/11 DAT** · `sign-install.ps1` chay trot lot
+- Gan tren panel that: go "Cam chung" vao o ten V3 -> panel dich thanh
+  **"Will, Trọng"**, nut Cat MO. Ban do: V1 Will · V2 Trong · V3 cam chung ·
+  A1 Will · A2 Trong · A3 (tieng cam toan canh) de trong.
+
+### Kiem chung — CHAY THAT VOI 3 CAM tren liue 58 phut
+
+Sequence `Will - Podcast Cut (7)` (hinh `bat-tat` + tieng `duck -15 dB`):
+
+| Do | Ket qua |
+|---|---|
+| So moc thoi gian | **588** (khong phai 299 — luat chen cam chung cat them) |
+| V1 Will (C4091 / Cam 2) | 588 clip · **bat 214** |
+| V2 Trong (C4236) | 588 clip · **bat 205** |
+| **V3 cam chung (C4091 / Cam 1)** | 588 clip · **bat 169** |
+| Moi moc co du 3 cam | **588 / 588** |
+| **Moi moc bat DUNG 1 cam** | **588 dung · 0 man hinh den · 0 chong cam** |
+
+214 + 205 + 169 = 588 ✓. Cam chung chiem **28,7%** so nhat.
+Tong clip hinh: **1.764** (588 x 3). Thoi gian dung ~12 phut.
+
+☠️ **Them cam chung lam SO DOAN GAN GAP DOI** (299 -> 588): luat chen wide cat
+them o cho mot nguoi noi lau, sau 6 luot qua lai, va nhung khoang ca hai cung im.
+Nhan 3 cam thanh 1.764 clip — nen bao truoc cho nguoi dung khoi tuong treo.
+
+### ☠️ LOI CO SAN PHAT HIEN NHO LAM VIEC NAY — `dsClips` LUON RONG
+
+Noi lenh doi ten vao `tuKhop` thi lo ra: panel loc dong bang
+`if (parts.length >= 9)`, ma `pc_docChiTietClips` tra ve **8 truong**
+(`V|track|clip|ten|duong|start|in|end`). Do that:
+
+```
+so dong = 7
+dong 1: 8 truong -> V|0|0|Will|G:\...\Cam 2\C4091.mp4|0.0000|8.1331|3528.3999
+```
+
+⇒ **`dsClips` LUON RONG.** He qua: nhanh *"xep lai track khi clip bi don tren
+V0/A0"* (`phanNhomVaSapXepTrack` -> `pc_sapXepClipsLenTrack`) **CHUA BAO GIO
+CHAY**. Loi im lang vi Auto Match van lam viec duoc nho duong `docThongTinSeq`,
+nen khong ai thay.
+
+☠️ **CHUA SUA `>= 9` THANH `>= 8`** — va day la quyet dinh co y:
+sua la **kich hoat lan dau tien** duong `pc_sapXepClipsLenTrack` tren sequence
+THAT cua anh Tien, ma do dung la ham XOA SACH CLIP TRUOC roi dat lai — hai lan
+trong hai ngay no suyt lam mat clip. Phai thu tren **BAN SAO** truoc (luat 3b).
+Ghi vao muc [CHO] o dau file.
+Tam thoi lay duong dan tu `trackV/trackA` (da co san, an toan) de doi ten.
+
+### Kiem chung buoc doi ten — chay THAT qua nut Auto Match
+
+```
+truoc:  C4091.MP4          | C4236.MP4 | C4091.MP4
+sau :   Cam 2 - C4091.MP4  | C4236.MP4 | Cam 1 - C4091.MP4
+```
+File khong trung ten (C4236) **giu nguyen** — khong bi dung toi.
+Goi lai lan hai: `daDoi=0`, ten khong chong tien to.
+
 ## [thuoc-ngoai-whisper] - 2026-08-06 08:24 +0700 - CAI WHISPER, CHAY THUOC NGOAI: KHONG PHAN XU DUOC
 
 Anh Tien: *"whisper-cli.exe — E cai di em"*.
@@ -72,7 +233,32 @@ skill do truoc, dung cho vap roi moi nho.
 - Khong sua ma nguon san pham. Chi them cong cu do:
   `scratchpad/thuoc2.ps1` (thuoc ngoai) va thu muc clip nghe kiem moi.
 
-## TRANG THAI HIEN TAI — 2026-08-06 08:01 +0700
+## TRANG THAI HIEN TAI — 2026-08-06 10:41 +0700
+> **panel v0.6.6 · host v0.4.9 · CAI QUA CONG CHUAN.** `kiem-host` **86/86**,
+> 6/6 bo kiem sach.
+>
+> ✅ **BA CAM CHAY THAT XONG**: `Will - Podcast Cut (7)` — 588 moc, moi moc du
+> 3 cam, **moi moc bat DUNG 1 cam (588/588, 0 den, 0 chong)**. Cam chung chiem
+> **28,7%** so nhat (169/588).
+> ✅ **Auto Match tu doi ten file trung**: `C4091.MP4` x2 ->
+> `Cam 2 - C4091.MP4` va `Cam 1 - C4091.MP4`. Chi doi NHAN, khong dung ten file
+> tren dia. File khong trung giu nguyen.
+>
+> ☠️ **[CHO] LOI CO SAN CHUA SUA — CO Y**: panel loc `parts.length >= 9` ma
+> `pc_docChiTietClips` tra **8 truong** ⇒ `dsClips` LUON RONG ⇒ nhanh *"xep lai
+> track khi clip bi don tren V0/A0"* **chua bao gio chay**. **Dung sua vo tu**:
+> sua la kich hoat lan dau `pc_sapXepClipsLenTrack` (ham XOA SACH timeline) tren
+> sequence THAT. Phai dung `pc_nhanBanGiuClip` tao BAN SAO, thu tren do, do
+> truoc/sau, roi moi dam bat tren ban that.
+>
+> ☠️ Auto Match **van khong tu nhan ra CAM TOAN CANH** — `laCamChung` doc TU KHOA
+> trong ten (`toancanh`/`wide`/`master`/`2shot`...), ma `C4091.MP4` khong co.
+> Anh Tien go "Cam chung" vao o ten (3 giay), HOAC dat ten thu muc the la
+> `Cam 1 - Toan canh` thi tu nhan. Anh chua chot chon duong nao.
+>
+> Phan con lai cua trang thai: xem khoi ben duoi.
+
+## (trang thai truoc) — 2026-08-06 08:01 +0700
 > **panel v0.6.6 · host v0.4.8 · CAI QUA CONG CHUAN** (`sign-install.ps1` chay
 > trot lot, 5/5 bo kiem). Ban cai KHOP repo tung byte. Commit cuoi `c53fe33`.
 >

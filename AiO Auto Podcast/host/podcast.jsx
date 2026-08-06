@@ -105,13 +105,14 @@ function pc__item(duong) {
     return 0;
   }
 
-  var tot = null, diemTot = 0;
+  var tot = null, diemTot = 0, soBang = 0;
   function duyetBin(folder) {
     if (!folder || !folder.children) return;
     for (var k = 0; k < folder.children.numItems; k++) {
       var it = folder.children[k];
       var d = cham(it);
-      if (d > diemTot) { diemTot = d; tot = it; if (d === 4) return; }
+      if (d > diemTot) { diemTot = d; tot = it; soBang = 1; if (d === 4) return; }
+      else if (d > 0 && d === diemTot) { soBang++; }
       if (it && it.children && it.children.numItems > 0) {
         duyetBin(it);
         if (diemTot === 4) return;
@@ -120,6 +121,19 @@ function pc__item(duong) {
   }
 
   duyetBin(app.project.rootItem);
+
+  // ☠️☠️ TEN FILE TRUNG NHAU THI KHONG DUOC DOAN — do that 06/08/2026.
+  // Anh Tien them cam toan canh vao sequence, may quay danh so trung: cam
+  // toan canh VA cam Will deu ten "C4091.MP4", chi khac thu muc.
+  // Binh thuong khong sao: diem 4 (duong dan trung tuyet doi) luon thang diem 3.
+  // NHUNG neu media cua mot trong hai OFFLINE mot luc (rut o cung, doi thu muc,
+  // Premiere chua relink) thi diem 4 bien mat, va diem 3 cua CAI CON LAI thang
+  // — tool lang le dat cam Will vao cho cam toan canh, khong mot dau hieu nao.
+  // Dung bai hoc 5i: khop bang mot dau hieu co the trung lap thi phai BAT DUOC
+  // luc no trung. Co tu hai ung vien cung diem 3 -> tra null, de chot
+  // THIEU_ITEM chan lai va noi ten file ra, con hon dat nham im lang.
+  if (diemTot === 3 && soBang > 1) return null;
+
   if (tot) pc__c[chuan] = tot;       // chi de pc__donInOut don lai in/out
   return tot;
 }
@@ -1142,11 +1156,89 @@ function pc_nhanBanGiuClip(tenGoc, tenMoi) {
 }
 
 /**
+ * DAT LAI TEN CLIP cho cac file TRUNG TEN — anh Tien 06/08/2026:
+ * *"bam auto match - match tu kiem tra file - trung thi tu auto doi ten cho
+ * editor la xong"*.
+ *
+ * Ca that: may quay danh so trung, cam toan canh va cam Will deu ten
+ * "C4091.MP4", chi khac thu muc (`Cam 1` va `Cam 2`). Nhin timeline khong
+ * phan biet duoc cai nao la cai nao.
+ *
+ * ☠️☠️ CHI DOI NHAN TRONG PREMIERE (`projectItem.name`), TUYET DOI KHONG DOI
+ * TEN FILE TREN DIA. Doi ten file la Premiere mat link ca project dang mo, va
+ * do la du lieu goc tren the nho cua nguoi dung — hong la khong lay lai duoc.
+ *
+ * Ten moi = "<thu muc cha> - <ten file>", vi du "Cam 1 - C4091.MP4".
+ * ☠️ CHI doi khi THAT SU TRUNG (>= 2 item cung ten file). Doi ten hang loat khi
+ * khong can la tu y sua project cua nguoi ta.
+ * ☠️ Chay lai nhieu lan phai ra CUNG KET QUA: item da mang tien to roi thi bo
+ * qua, khong doi thanh "Cam 1 - Cam 1 - C4091.MP4".
+ *
+ * @param dsStr duong dan media cach nhau ';'
+ * Tra "OK:daDoi=n|nhomTrung=k|soLoi=k|ds=<ten moi, ...>"
+ */
+function pc_datTenChongTrung(dsStr) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var duong = String(dsStr).split(';');
+    var theoTen = {};   // ten file (thuong) -> [ {pi, duong} ]
+    var i, d;
+    for (i = 0; i < duong.length; i++) {
+      d = duong[i];
+      if (!d) continue;
+      var pi = pc__item(d);
+      if (!pi) continue;                       // thieu item thi chot khac lo
+      var chuan = String(d).replace(/\\/g, '/');
+      var ten = chuan.replace(/^.*\//, '').toLowerCase();
+      if (!theoTen[ten]) theoTen[ten] = [];
+      // Cung mot item xuat hien hai lan (vd cam va tieng cam) thi chi tinh mot
+      var da = false;
+      for (var q = 0; q < theoTen[ten].length; q++) {
+        if (theoTen[ten][q].duong === chuan) { da = true; break; }
+      }
+      if (!da) theoTen[ten].push({ pi: pi, duong: chuan });
+    }
+
+    var daDoi = 0, nhomTrung = 0, soLoi = 0, ds = [];
+    for (var k in theoTen) {
+      if (!theoTen.hasOwnProperty(k)) continue;
+      if (theoTen[k].length < 2) continue;     // khong trung thi khong dung toi
+      nhomTrung++;
+      for (i = 0; i < theoTen[k].length; i++) {
+        var it = theoTen[k][i];
+        var phan = it.duong.split('/');
+        var thuMuc = phan.length > 1 ? phan[phan.length - 2] : '';
+        if (!thuMuc) continue;
+        var tenCu = '';
+        try { tenCu = String(it.pi.name); } catch (e0) {}
+        if (!tenCu) continue;
+        var tienTo = thuMuc + ' - ';
+        // ☠️ Giu NGUYEN ten clip nguoi dung dang thay, chi them tien to. Lay ten
+        // tu duong dan thi doi luon ca chu hoa/thuong cua duoi file (`.MP4` ->
+        // `.mp4`) — doi mot thu nguoi ta khong nho minh doi.
+        if (tenCu.indexOf(tienTo) === 0) continue;   // da doi tu lan truoc
+        var tenMoi = tienTo + tenCu;
+        try {
+          it.pi.name = tenMoi;
+          // ☠️ DOC LAI — khong tin "khong bao loi" la da ghi (bai hoc 5l).
+          if (String(it.pi.name) === tenMoi) { daDoi++; ds.push(tenMoi); }
+          else { soLoi++; }
+        } catch (e1) { soLoi++; }
+      }
+    }
+    return 'OK:daDoi=' + daDoi + '|nhomTrung=' + nhomTrung +
+      '|soLoi=' + soLoi + '|ds=' + pc__sach(ds.join(', '));
+  } catch (e) {
+    return pc_err('pc_datTenChongTrung', e);
+  }
+}
+
+/**
  * Phien ban host — panel KIEM sau moi lan nap, khop moi duoc chay.
  * ☠️ Phai la ham CUOI FILE: evalFile co the nuot file GIUA CHUNG ma khong
  * bao loi (do that 01/08: nap xong pc_datTieng nhung pc_doKetQua van ban
  * cu). Ham cuoi file tra loi dung = ca file da nap tron ven.
  */
 function pc_phienBan() {
-  return 'v0.4.8';
+  return 'v0.4.9';
 }

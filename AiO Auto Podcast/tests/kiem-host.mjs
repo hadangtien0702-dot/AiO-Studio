@@ -92,7 +92,7 @@ function napHost(app) {
   const ma = readFileSync(join(GOC, 'host', 'podcast.jsx'), 'utf8')
   const f = new Function('app', ma + '\n; return { pc__item, pc_sapXepClipsLenTrack, pc_phienBan,' +
     ' pc_veAmLuong, pc_xoaAmLuong, pc_docAmLuong, pc_datTrangThaiTieng, pc_doTrangThaiTieng,' +
-    ' pc_datTrangThaiHinh, pc_doPhuHinh };')
+    ' pc_datTrangThaiHinh, pc_doPhuHinh, pc_datTenChongTrung };')
   return f(app)
 }
 
@@ -168,6 +168,37 @@ console.log('\n── 1. pc__item: chuoi con khong duoc thang khop tuyet doi ─
   const ra = pc__item('X:/cu/Mic_Trong.mp3')
   kiem('cung ten file o folder khac van nhan ra',
     ra && ra.name === 'Mic_Trong.mp3', 'ra=' + (ra ? ra.name : 'null'))
+}
+
+{
+  // ☠️ CA THAT 06/08/2026: anh Tien them cam toan canh, may quay danh so TRUNG.
+  //   V1 cam Will      G:\...\Video\Cam 2\C4091.mp4
+  //   V3 cam toan canh G:\...\Video\Cam 1\C4091.mp4
+  // Cung ten file, khac thu muc. Binh thuong diem 4 (duong dan trung tuyet doi)
+  // thang nen khong sao. NHUNG neu MOT trong hai offline mot luc (rut o, doi
+  // thu muc, chua relink) thi diem 3 (ten file trung) cua cai CON LAI se thang
+  // -> dat nham cam, IM LANG, khong mot dau hieu nao.
+  const app = dungApp([
+    taoItem('C4091.MP4', 'G:/quay/Video/Cam 2/C4091.mp4'),
+    taoItem('C4091.MP4', 'G:/quay/Video/Cam 1/C4091.mp4'),
+    taoItem('C4236.MP4', 'G:/quay/Video/Cam 3/C4236.mp4'),
+  ])
+  const { pc__item } = napHost(app)
+
+  const w = pc__item('G:/quay/Video/Cam 2/C4091.mp4')
+  const t = pc__item('G:/quay/Video/Cam 1/C4091.mp4')
+  kiem('hai file TRUNG TEN: duong dan tuyet doi van ra dung cai cua minh',
+    !!w && !!t && w !== t &&
+    w.getMediaPath().indexOf('Cam 2') >= 0 && t.getMediaPath().indexOf('Cam 1') >= 0,
+    'Will=' + (w ? w.getMediaPath() : 'null') + ' | wide=' + (t ? t.getMediaPath() : 'null'))
+
+  const ra2 = pc__item('D:/o-khac/C4091.mp4')
+  kiem('☠️ ten file trung 2 item -> KHONG doan, tra null',
+    ra2 === null || ra2 === undefined, 'ra=' + (ra2 ? ra2.getMediaPath() : 'null'))
+
+  const ra3 = pc__item('D:/o-khac/C4236.MP4')
+  kiem('ten file DUY NHAT thi van khop duoc khi media doi o',
+    !!ra3 && ra3.name === 'C4236.MP4', 'ra=' + (ra3 ? ra3.name : 'null'))
 }
 
 {
@@ -297,6 +328,57 @@ console.log('\n── 2a3. Cat in/out hong thi KHONG duoc dat clip ──')
   kiem('☠️ cat in/out hong -> PHAI dem vao soLoi', !/soLoi=0(\||$)/.test(ra), ra)
   kiem('☠️ va KHONG dat clip do len track (tranh clip dai sai de clip ben canh)',
     v0.daDat.length === 1, 'da dat ' + v0.daDat.length + ' clip')
+}
+
+// ═══ 2a4. TU DAT TEN CHONG TRUNG (anh Tien 06/08) ════════════════════════
+console.log('\n── 2a4. pc_datTenChongTrung: chi doi NHAN, chi doi khi THAT SU trung ──')
+
+/** Item cho phep GHI ten — de kiem buoc doi ten. */
+function taoItemGhiTen(ten, duong) {
+  const o = { type: 1, name: ten, getMediaPath: () => duong,
+    setInPoint() {}, setOutPoint() {}, clearInPoint() {}, clearOutPoint() {} }
+  return o
+}
+
+{
+  // Ca that: cam toan canh va cam Will deu ten C4091.MP4, khac thu muc.
+  const wide = taoItemGhiTen('C4091.MP4', 'G:/quay/Video/Cam 1/C4091.mp4')
+  const will = taoItemGhiTen('C4091.MP4', 'G:/quay/Video/Cam 2/C4091.mp4')
+  const trong = taoItemGhiTen('C4236.MP4', 'G:/quay/Video/Cam 3/C4236.mp4')
+  const app = dungApp([wide, will, trong])
+  const { pc_datTenChongTrung } = napHost(app)
+
+  const ra = pc_datTenChongTrung(
+    'G:/quay/Video/Cam 1/C4091.mp4;G:/quay/Video/Cam 2/C4091.mp4;G:/quay/Video/Cam 3/C4236.mp4')
+  kiem('bao OK, doi dung 2 clip trung ten', /daDoi=2\|/.test(ra) && /nhomTrung=1\|/.test(ra), ra)
+  kiem('☠️ ten moi ghep THU MUC CHA vao', wide.name === 'Cam 1 - C4091.MP4' && will.name === 'Cam 2 - C4091.MP4',
+    wide.name + ' | ' + will.name)
+  kiem('☠️ file KHONG trung ten thi KHONG bi dung toi', trong.name === 'C4236.MP4', trong.name)
+
+  // Chay lai lan hai phai ra CUNG KET QUA, khong doi chong len nhau.
+  const ra2 = pc_datTenChongTrung(
+    'G:/quay/Video/Cam 1/C4091.mp4;G:/quay/Video/Cam 2/C4091.mp4;G:/quay/Video/Cam 3/C4236.mp4')
+  kiem('☠️ chay lai: khong doi them lan nao', /daDoi=0\|/.test(ra2), ra2)
+  kiem('va ten khong bi chong tien to', wide.name === 'Cam 1 - C4091.MP4', wide.name)
+}
+
+{
+  // Khong co file nao trung -> khong duoc dung vao ten cua ai.
+  const a = taoItemGhiTen('Cam_A.mp4', 'X:/v/Cam_A.mp4')
+  const b = taoItemGhiTen('Cam_B.mp4', 'X:/v/Cam_B.mp4')
+  const { pc_datTenChongTrung } = napHost(dungApp([a, b]))
+  const ra = pc_datTenChongTrung('X:/v/Cam_A.mp4;X:/v/Cam_B.mp4')
+  kiem('khong trung -> daDoi=0, nhomTrung=0', /daDoi=0\|/.test(ra) && /nhomTrung=0\|/.test(ra), ra)
+  kiem('ten giu nguyen', a.name === 'Cam_A.mp4' && b.name === 'Cam_B.mp4', a.name + ' | ' + b.name)
+}
+
+{
+  // Cung MOT file duoc truyen hai lan (cam + tieng cam) khong duoc tinh la trung.
+  const c = taoItemGhiTen('C4091.MP4', 'G:/quay/Cam 1/C4091.mp4')
+  const { pc_datTenChongTrung } = napHost(dungApp([c]))
+  const ra = pc_datTenChongTrung('G:/quay/Cam 1/C4091.mp4;G:/quay/Cam 1/C4091.mp4')
+  kiem('☠️ cung mot file truyen 2 lan KHONG phai trung', /nhomTrung=0\|/.test(ra), ra)
+  kiem('nen ten giu nguyen', c.name === 'C4091.MP4', c.name)
 }
 
 // ═══ 2b. CA THAT 05/08: SEQUENCE TRUNG TEN THU MUC QUAY ══════════════════
