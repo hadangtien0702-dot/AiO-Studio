@@ -170,50 +170,66 @@ svg.ic.dim{stroke:var(--t3);}svg.ic.wh{stroke:#fff;}
 .ks-source{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg-3);border:1px solid var(--ln-1);border-radius:var(--r-md);}
 .ks-src-ico{width:28px;height:28px;border-radius:var(--r-sm);background:var(--acc-s);border:1px solid var(--acc-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ks-src-ico svg.ic{stroke:var(--acc);width:12px;height:12px;}
-.ks-src-info{flex:1;min-width:0;}
-.ks-src-lbl{font-size:var(--fs-2xs);font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:.06em;}
+/* ══ KEY FINDER — PREMIUM COMPACT */
+.key-panel{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;}
+
+/* Source bar */
+.ks-source{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-1);border:1px solid var(--ln-1);border-radius:var(--r-lg);box-shadow:inset 0 2px 10px rgba(0,0,0,.2);}
+.ks-src-ico{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--bg-3),var(--bg-4));border:1px solid var(--ln-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ks-src-ico svg.ic{stroke:var(--acc);width:14px;height:14px;}
+.ks-src-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+.ks-src-lbl{font-size:8px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
 .ks-src-name{font-size:var(--fs-sm);font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ks-analyze{height:28px;padding:0 12px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;font-size:var(--fs-xs);font-weight:700;font-family:var(--font);display:flex;align-items:center;gap:5px;cursor:pointer;box-shadow:0 2px 8px var(--acc-g);transition:all var(--dur);flex-shrink:0;}
-.ks-analyze svg.ic{stroke:#fff;width:10px;height:10px;}
-.ks-analyze:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.ks-analyze{height:30px;padding:0 14px;border-radius:var(--r-pill);background:var(--bg-4);border:1px solid var(--acc-l);color:var(--acc);font-size:var(--fs-xs);font-weight:700;font-family:var(--font);display:flex;align-items:center;gap:6px;cursor:pointer;transition:all var(--dur);flex-shrink:0;}
+.ks-analyze svg.ic{stroke:var(--acc);width:10px;height:10px;}
+.ks-analyze:hover{background:var(--acc-s);box-shadow:0 0 12px var(--acc-g);color:var(--acc2);}
 
 /* Key result row */
-.ks-result{display:flex;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(145deg,var(--bg-3),var(--bg-4));border:1px solid var(--ln-1);border-radius:var(--r-lg);}
-.ks-key-big{font-size:36px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:50px;}
-.ks-key-detail{flex:1;display:flex;flex-direction:column;gap:2px;}
-.ks-mode{font-size:var(--fs-sm);font-weight:600;color:var(--t2);}
-.ks-conf{display:flex;align-items:center;gap:6px;}
-.ks-conf-trk{flex:1;height:3px;background:var(--bg-0);border-radius:2px;overflow:hidden;max-width:120px;}
-.ks-conf-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px;transition:width .6s;}
-.ks-conf-pct{font-size:var(--fs-2xs);font-weight:700;color:var(--acc);}
+.ks-result{display:flex;align-items:center;gap:16px;padding:16px 20px;background:linear-gradient(180deg,var(--bg-3),var(--bg-1));border:1px solid var(--ln-1);border-radius:var(--r-xl);box-shadow:0 8px 24px rgba(0,0,0,.4);position:relative;overflow:hidden;}
+.ks-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent);opacity:0.3;}
+.ks-key-big{font-size:48px;font-weight:800;line-height:0.9;background:linear-gradient(135deg,#fff,var(--t3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:70px;text-align:center;}
+.ks-key-detail{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;}
+.ks-mode{font-size:var(--fs-md);font-weight:600;color:var(--acc);}
+.ks-conf-wrap{display:flex;flex-direction:column;gap:4px;}
+.ks-conf-header{display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.05em;}
+.ks-conf-pct{color:var(--acc);font-weight:800;}
+.ks-conf-trk{width:100%;height:4px;background:var(--bg-0);border-radius:2px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.5);}
+.ks-conf-fill{height:100%;background:linear-gradient(90deg,var(--acc),#ff9c5c);border-radius:2px;transition:width .8s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 0 8px var(--acc-g);}
 
 /* Compat keys row */
-.ks-compat{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.ks-compat-lbl{font-size:var(--fs-2xs);font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
-.ks-compat-pill{padding:3px 8px;border-radius:var(--r-pill);background:var(--bg-0);border:1px solid var(--ln-2);font-size:var(--fs-xs);font-weight:700;color:var(--t2);cursor:pointer;transition:all var(--dur);}
-.ks-compat-pill:hover{border-color:var(--acc-l);color:var(--acc2);background:var(--acc-s);}
-.ks-compat-pill.root{border-color:var(--acc-l);color:var(--acc2);background:var(--acc-s);}
+.ks-compat{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0;}
+.ks-compat-lbl{font-size:8px;font-weight:800;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;margin-right:4px;}
+.ks-compat-pill{padding:4px 10px;border-radius:4px;background:var(--bg-1);border:1px solid var(--ln-1);font-size:var(--fs-xs);font-weight:700;color:var(--t3);cursor:pointer;transition:all var(--dur);}
+.ks-compat-pill:hover{border-color:var(--acc);color:var(--t1);background:var(--bg-3);}
+.ks-compat-pill.root{border-color:var(--acc);color:var(--acc);background:var(--acc-s);box-shadow:0 0 10px var(--acc-g);}
 
 /* Suggested tracks section */
-.ks-suggest{flex:1;display:flex;flex-direction:column;gap:4px;min-height:0;}
-.ks-suggest-hd{display:flex;align-items:center;justify-content:space-between;padding:0 2px;}
-.ks-suggest-lbl{font-size:var(--fs-xs);font-weight:700;color:var(--t3);display:flex;align-items:center;gap:5px;}
-.ks-suggest-lbl svg.ic{width:10px;height:10px;}
-.ks-suggest-ct{font-size:var(--fs-2xs);color:var(--t4);}
-.ks-suggest-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
-.ks-sug-row{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg-3);border:1px solid var(--ln-0);border-radius:var(--r-md);cursor:pointer;transition:all var(--dur);}
-.ks-sug-row:hover{border-color:var(--ln-2);background:var(--bg-4);}
-.ks-sug-key{font-size:var(--fs-sm);font-weight:800;min-width:30px;text-align:center;}
-.ks-sug-key.exact{color:var(--acc);}
-.ks-sug-key.near{color:var(--acc2);}
-.ks-sug-info{flex:1;min-width:0;}
-.ks-sug-name{font-size:var(--fs-xs);font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ks-sug-tags{font-size:var(--fs-2xs);color:var(--t4);}
-.ks-sug-diff{font-size:var(--fs-2xs);font-weight:700;padding:2px 6px;border-radius:var(--r-pill);white-space:nowrap;}
-.ks-sug-diff.d0{color:var(--green);background:var(--grs);border:1px solid rgba(45,212,160,.2);}
-.ks-sug-diff.d1{color:var(--acc2);background:var(--acc-s);border:1px solid var(--acc-l);}
-.ks-sug-diff.d2{color:var(--t3);background:var(--bg-0);border:1px solid var(--ln-1);}
-.ks-sug-add{width:22px;height:22px;border-radius:var(--r-sm);background:var(--acc);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--dur);flex-shrink:0;}
+.ks-suggest{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;background:var(--bg-1);border-radius:var(--r-lg);border:1px solid var(--ln-1);padding:10px;}
+.ks-suggest-hd{display:flex;align-items:center;justify-content:space-between;padding:0 4px 6px 4px;border-bottom:1px solid var(--ln-0);}
+.ks-suggest-lbl{font-size:var(--fs-xs);font-weight:700;color:var(--t3);display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.05em;}
+.ks-suggest-lbl svg.ic{width:12px;height:12px;stroke:var(--t3);}
+.ks-suggest-ct{font-size:var(--fs-2xs);color:var(--t4);font-weight:600;}
+.ks-suggest-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-top:4px;}
+.ks-sug-row{display:flex;align-items:center;gap:12px;padding:8px 10px;background:transparent;border-radius:var(--r-md);cursor:pointer;transition:all var(--dur);border:1px solid transparent;}
+.ks-sug-row:hover{background:var(--bg-3);border-color:var(--ln-0);}
+.ks-sug-key{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);font-weight:800;flex-shrink:0;}
+.ks-sug-key.exact{background:var(--acc-s);color:var(--acc);border:1px solid var(--acc-l);}
+.ks-sug-key.near{background:var(--bg-3);color:var(--t3);border:1px solid var(--ln-1);}
+.ks-sug-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.ks-sug-name{font-size:var(--fs-xs);font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ks-sug-tags{font-size:8px;color:var(--t4);text-transform:uppercase;letter-spacing:.05em;}
+.ks-sug-diff{display:flex;align-items:center;gap:4px;font-size:var(--fs-2xs);font-weight:700;}
+.ks-sug-diff::before{content:'';width:6px;height:6px;border-radius:50%;}
+.ks-sug-diff.d0{color:var(--green);}
+.ks-sug-diff.d0::before{background:var(--green);box-shadow:0 0 6px var(--grg);}
+.ks-sug-diff.d1{color:var(--yellow);}
+.ks-sug-diff.d1::before{background:var(--yellow);box-shadow:0 0 6px rgba(251,191,36,.5);}
+.ks-sug-diff.d2{color:var(--t4);}
+.ks-sug-diff.d2::before{background:var(--t4);}
+.ks-sug-add{width:24px;height:24px;border-radius:50%;background:var(--bg-4);border:1px solid var(--ln-2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--dur);flex-shrink:0;}
+.ks-sug-add:hover{background:var(--acc);border-color:var(--acc);transform:scale(1.1);}
+.ks-sug-add svg.ic{stroke:var(--t2);width:10px;height:10px;}
+.ks-sug-add:hover svg.ic{stroke:#fff;}
 .ks-sug-add:hover{background:#ff7d3c;transform:scale(1.1);}
 .ks-sug-add svg.ic{stroke:#fff;width:9px;height:9px;}
 
@@ -507,10 +523,13 @@ svg.ic.dim{stroke:var(--t3);}svg.ic.wh{stroke:#fff;}
         <div class="ks-result">
           <div class="ks-key-big" id="ks-key-val">Cm</div>
           <div class="ks-key-detail">
-            <div class="ks-mode" id="ks-mode">Minor</div>
-            <div class="ks-conf">
+            <div class="ks-mode" id="ks-mode">Đô thứ</div>
+            <div class="ks-conf-wrap">
+              <div class="ks-conf-header">
+                <span>Confidence</span>
+                <span class="ks-conf-pct" id="ks-conf-pct">87%</span>
+              </div>
               <div class="ks-conf-trk"><div class="ks-conf-fill" id="ks-conf-fill" style="width:87%"></div></div>
-              <span class="ks-conf-pct" id="ks-conf-pct">87%</span>
             </div>
           </div>
         </div>
@@ -531,6 +550,85 @@ svg.ic.dim{stroke:var(--t3);}svg.ic.wh{stroke:#fff;}
             <span class="ks-suggest-ct" id="ks-sug-ct"></span>
           </div>
           <div class="ks-suggest-list" id="ks-sug-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODE: SOUND GUIDE -->
+    <div class="mode-pane" id="mode-guide">
+      <div class="guide-panel">
+        
+        <!-- Explainer -->
+        <div class="gd-card">
+          <div class="gd-head">
+            <div class="gd-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
+            <div class="gd-title-box">
+              <div class="gd-title">Video Giải Thích (Explainer)</div>
+              <div class="gd-creator">VD: Vox, Kurzgesagt</div>
+            </div>
+          </div>
+          <div class="gd-desc">Tạo không gian âm thanh trung lập, khách quan để người xem tập trung vào kiến thức.</div>
+          <div class="gd-specs">
+            <div class="gd-spec-col"><span class="gd-slbl">BPM</span><span class="gd-sval">90 – 120</span></div>
+            <div class="gd-spec-col"><span class="gd-slbl">Keys (Việt)</span><span class="gd-sval">Đô trưởng, La thứ</span></div>
+          </div>
+          <div class="gd-inst"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Marimba, Đàn dây gảy (Pizzicato), Glockenspiel. (Tạo tần số trống cho giọng đọc).</div>
+          <div class="gd-tip">Tip: Sử dụng hiệu ứng tiếng click chuột, lật trang, highlighter để đồng bộ với đồ hoạ (Animation).</div>
+        </div>
+
+        <!-- Vlog -->
+        <div class="gd-card">
+          <div class="gd-head">
+            <div class="gd-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4z"></path><rect x="3" y="6" width="12" height="12" rx="2" ry="2"></rect></svg></div>
+            <div class="gd-title-box">
+              <div class="gd-title">Vlog / Cuộc Sống (Daily Life)</div>
+              <div class="gd-creator">VD: Casey Neistat</div>
+            </div>
+          </div>
+          <div class="gd-desc">Nhạc tạo nên nhịp điệu và cá tính cho nhân vật, mang lại cảm giác đời thường, gần gũi.</div>
+          <div class="gd-specs">
+            <div class="gd-spec-col"><span class="gd-slbl">BPM</span><span class="gd-sval">85 – 110</span></div>
+            <div class="gd-spec-col"><span class="gd-slbl">Keys (Việt)</span><span class="gd-sval">Sol trưởng, Fa trưởng</span></div>
+          </div>
+          <div class="gd-inst"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Lofi Hip-hop, Jazz-hop, Guitar Acoustic, Trống điện tử.</div>
+          <div class="gd-tip">Tip: Cắt (cut) hình ảnh ngay đúng nhịp bass/snare. Thêm tiếng búng tay, chụp ảnh (camera shutter) để chuyển cảnh.</div>
+        </div>
+
+        <!-- Tutorial -->
+        <div class="gd-card">
+          <div class="gd-head">
+            <div class="gd-icon"><svg class="ic" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+            <div class="gd-title-box">
+              <div class="gd-title">Hướng Dẫn (Tutorial)</div>
+              <div class="gd-creator">VD: Peter McKinnon</div>
+            </div>
+          </div>
+          <div class="gd-desc">Nhạc nền mỏng nhẹ không lấn át lời nói, tạo cảm giác thư giãn, dễ tiếp thu kiến thức.</div>
+          <div class="gd-specs">
+            <div class="gd-spec-col"><span class="gd-slbl">BPM</span><span class="gd-sval">80 – 100</span></div>
+            <div class="gd-spec-col"><span class="gd-slbl">Keys (Việt)</span><span class="gd-sval">Rê thứ, Rê trưởng</span></div>
+          </div>
+          <div class="gd-inst"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Soft Piano, Bass trầm ấm, Lục lạc (Shaker). Hạn chế Synth chói tai.</div>
+          <div class="gd-tip">Tip: Tăng (ducking) nhạc nền nhỏ đi 15-20dB khi có lời nói. Layer thêm âm thanh hiện trường (Ambient) để tạo độ sâu.</div>
+        </div>
+
+        <!-- Entertainment / Challenge -->
+        <div class="gd-card">
+          <div class="gd-head">
+            <div class="gd-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
+            <div class="gd-title-box">
+              <div class="gd-title">Giải trí / Thử thách</div>
+              <div class="gd-creator">VD: MrBeast</div>
+            </div>
+          </div>
+          <div class="gd-desc">Nhạc thiết kế kỹ thuật để giữ chân người xem (Retention-Engineered), tạo sự tò mò và gay cấn.</div>
+          <div class="gd-specs">
+            <div class="gd-spec-col"><span class="gd-slbl">BPM</span><span class="gd-sval">110 – 140+</span></div>
+            <div class="gd-spec-col"><span class="gd-slbl">Keys (Việt)</span><span class="gd-sval">Mi thứ, Đô thứ</span></div>
+          </div>
+          <div class="gd-inst"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Brass (Kèn đồng), Trống dồn (Risers), Nhịp vỗ tay, Cú đập mạnh (Impact Hits).</div>
+          <div class="gd-tip">Tip: Chèn hiệu ứng "Swoosh" cực nhanh để chuyển cảnh. Dùng âm thanh "Riser" (âm vực cao dần) trước khi công bố kết quả.</div>
         </div>
 
       </div>
