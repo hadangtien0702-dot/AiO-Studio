@@ -1,5 +1,5 @@
 /**
- * guideframe.jsx — logic host cua AiO Auto Guiline Frame (v0.1.0)
+ * guideframe.jsx — logic host cua AiO Auto Guiline Frame (v0.2.0)
  *
  * Quy uoc tra ve: "OK:..." / "ERR:MA_LOI|chi tiet" — panel dich ra cau chu.
  * ASCII khong dau (ExtendScript ES3). KHONG dung JSON (host khong co).
@@ -29,15 +29,22 @@ function gf_thongTinSeq() {
   var seq = gf_laySeq_();
   if (!seq) return 'ERR:CHUA_MO_SEQ|';
   var w = 0, h = 0;
-  try { w = seq.frameSizeHorizontal; h = seq.frameSizeVertical; } catch (e) {}
+  try {
+    var st = seq.getSettings();
+    if (st) {
+      w = parseInt(st.videoFrameWidth, 10);
+      h = parseInt(st.videoFrameHeight, 10);
+    }
+  } catch (e1) {}
+  if (!w || !h) {
+    try { w = parseInt(seq.frameSizeHorizontal, 10); h = parseInt(seq.frameSizeVertical, 10); } catch (e2) {}
+  }
   if (!w || !h) return 'ERR:KHONG_DOC_DUOC_KHUNG|' + w + 'x' + h;
   var dai = 0;
   try {
-    // seq.end la chuoi ticks; 254016000000 ticks = 1 giay
     dai = parseFloat(seq.end) / 254016000000;
-  } catch (e) {}
+  } catch (e3) {}
   if (!dai || dai <= 0) {
-    // Du phong: quet clip cuoi cung tren cac track video
     try {
       for (var t = 0; t < seq.videoTracks.numTracks; t++) {
         var tr = seq.videoTracks[t];
@@ -46,11 +53,52 @@ function gf_thongTinSeq() {
           if (cu > dai) dai = cu;
         }
       }
-    } catch (e2) {}
+    } catch (e4) {}
   }
   var ten = '';
-  try { ten = seq.name; } catch (e3) {}
+  try { ten = seq.name; } catch (e5) {}
   return 'OK:' + w + '|' + h + '|' + dai + '|' + ten;
+}
+
+/**
+ * Danh sach sequence CO THAT trong project — de panel bay ra o o chon.
+ * Tra: "OK:<idDangMo>|<id>\t<ten>|<id>\t<ten>|..."
+ * Chi DOC, khong sua gi.
+ */
+function gf_dsSequence() {
+  var p = gf_layDuAn_();
+  if (!p) return 'ERR:CHUA_MO_DU_AN|';
+  var hienId = '';
+  try { if (p.activeSequence) hienId = String(p.activeSequence.sequenceID); } catch (e) {}
+  var ra = [];
+  try {
+    for (var i = 0; i < p.sequences.numSequences; i++) {
+      var s = p.sequences[i];
+      var ten = '';
+      try { ten = String(s.name); } catch (e1) {}
+      // '|' va tab la ky tu ngan cach cua giao thuc nay — thay bang dau cach
+      ten = ten.replace(/\|/g, ' ').replace(/\t/g, ' ');
+      ra.push(String(s.sequenceID) + '\t' + ten);
+    }
+  } catch (e2) {
+    return 'ERR:DOC_DS_HONG|' + e2;
+  }
+  return 'OK:' + hienId + '|' + ra.join('|');
+}
+
+/**
+ * Mo mot sequence theo sequenceID. Doc lai de chac Premiere DA chuyen that,
+ * khong tin gia tri tra ve cua openSequence. "OK:<ten>"
+ */
+function gf_moSequence(id) {
+  var p = gf_layDuAn_();
+  if (!p) return 'ERR:CHUA_MO_DU_AN|';
+  try { p.openSequence(String(id)); } catch (e) { return 'ERR:MO_HONG|' + e; }
+  var s = null;
+  try { s = p.activeSequence; } catch (e1) {}
+  if (!s) return 'ERR:MO_KHONG_AN|';
+  if (String(s.sequenceID) !== String(id)) return 'ERR:MO_KHONG_AN|' + s.sequenceID;
+  return 'OK:' + s.name;
 }
 
 /** Track co trong trong khoang [0, daiGiay) khong */
@@ -198,5 +246,5 @@ function gf_demOverlay() {
  * ca file da nap tron ven (bai hoc "evalFile nuot file giua chung" 01/08/2026).
  */
 function gf_phienBan() {
-  return '0.1.0';
+  return '0.2.0';
 }

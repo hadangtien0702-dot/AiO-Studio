@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AiO Studio — Auto Re-Frames · Thiết kế Tinh giản</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* ============ FONT ============ */
+@font-face{font-family:'Inter var';font-style:normal;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter.woff2') format('woff2');}
+@font-face{font-family:'Inter var';font-style:italic;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter-Italic.woff2') format('woff2');}
+
+/* ============ TOKENS STUDIO CONSOLE ============ */
+:root{
+  color-scheme:dark;
+  --bg-0:#0a0a0b; --bg-1:#0f0f11; --bg-2:#151517; --bg-3:#1c1c1f;
+  --bg-4:#232327; --bg-5:#2c2c31; --bg-6:#161618;
+  --bg-hover:rgb(255 255 255 / 5%); --bg-active:rgb(255 255 255 / 9%);
+  --line-1:rgb(255 255 255 / 6%); --line-2:rgb(255 255 255 / 10%); --line-strong:rgb(255 255 255 / 16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95; --text-meta:#9b9ba3; --icon-dim:#8f8f97;
+  --accent:#ff5714; --accent-hover:#ff7038; --accent-soft:rgb(255 87 20 / 16%);
+  --accent-line:rgb(255 87 20 / 40%); --accent-text:#ffb599; --accent-on:#150700;
+  --ok:#4ec98a; --warn:#e8c05a; --danger:#ff5f6d; --danger-strong:#ff4757; --heart:#ff6b81;
+  --font-ui:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --fs-2xs:10px; --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:19px;
+  --fw-normal:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh-tight:1.25; --lh:1.45;
+  --sp-1:4px; --sp-2:6px; --sp-3:8px; --sp-4:12px; --sp-5:16px;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --h-ctrl-sm:24px; --h-ctrl:28px; --h-ctrl-lg:34px; --h-topbar:44px;
+  --dur:150ms; --ease:cubic-bezier(0.32,0.72,0,1);
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%;overflow:hidden}
+body{
+  background:var(--bg-2);color:var(--text-1);
+  font:var(--fw-normal) var(--fs-md)/var(--lh) var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+  user-select:none;display:flex;flex-direction:column;
+}
+
+*::-webkit-scrollbar{width:5px;height:5px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgb(255 255 255 / 15%);border-radius:var(--r-pill)}
+*::-webkit-scrollbar-thumb:hover{background:rgb(255 255 255 / 30%)}
+
+.ico{
+  width:15px;height:15px;flex:none;
+  stroke:currentColor;fill:none;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+.ico-sm{width:13px;height:13px}
+
+/* Topbar Header */
+.topbar{
+  height:var(--h-topbar);background:var(--bg-1);
+  border-bottom:1px solid var(--line-1);
+  display:flex;align-items:center;gap:var(--sp-2);
+  padding:0 var(--sp-4);flex:none;
+}
+.brand{
+  display:flex;align-items:center;gap:var(--sp-2);
+  font-size:var(--fs-md);font-weight:var(--fw-bold);color:var(--text-1);
+}
+.brand__icon{
+  width:24px;height:24px;border-radius:var(--r-sm);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;
+}
+.topbar__ver{
+  padding:1px 6px;background:var(--bg-4);border:1px solid var(--line-2);
+  border-radius:var(--r-pill);color:var(--text-3);font-size:var(--fs-2xs);font-weight:var(--fw-semibold);
+}
+.topbar__host{
+  margin-left:auto;color:var(--text-3);font-size:var(--fs-xs);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;
+}
+.lang{
+  height:var(--h-ctrl-sm);padding:0 var(--sp-2);
+  border:1px solid var(--line-strong);border-radius:var(--r-sm);
+  background:var(--bg-3);color:var(--text-2);
+  font-family:var(--font-ui);font-size:var(--fs-2xs);font-weight:var(--fw-bold);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.lang:hover{background:var(--bg-hover);color:var(--text-1);border-color:var(--accent)}
+
+/* Body Content Wrap */
+.wrap{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:var(--sp-3) var(--sp-4);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+  max-width:680px;margin:0 auto;width:100%;
+}
+
+/* Active Sequence Monitor Bar */
+.selbar{
+  background:var(--bg-3);border:1px solid var(--line-1);
+  border-radius:var(--r-md);padding:var(--sp-2) var(--sp-3);
+  display:flex;align-items:center;justify-content:space-between;flex:none;
+}
+.den{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-xs);color:var(--text-2);min-width:0}
+.den__cham{
+  width:8px;height:8px;border-radius:50%;background:var(--text-3);flex:none;
+  transition:background var(--dur) var(--ease);
+}
+.den--ok .den__cham{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.den--cho .den__cham{background:var(--warn);box-shadow:0 0 6px var(--warn)}
+.den__text{font-weight:var(--fw-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Compact Ratio Segment Grid */
+.chon{display:flex;flex-direction:column;gap:4px;flex:none}
+.chon__nhan{
+  font-size:var(--fs-2xs);font-weight:var(--fw-semibold);
+  letter-spacing:0.05em;text-transform:uppercase;color:var(--text-3);
+  display:flex;align-items:center;gap:var(--sp-1);
+}
+.seg{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--sp-2);
+  background:var(--bg-0);border:1px solid var(--line-1);
+  border-radius:var(--r-md);padding:var(--sp-1);
+}
+.seg__nut{
+  height:38px;display:flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  background:transparent;border:1px solid transparent;border-radius:var(--r-sm);
+  color:var(--text-2);font-family:var(--font-ui);font-size:var(--fs-xs);font-weight:var(--fw-medium);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.seg__nut:hover{background:var(--bg-hover);color:var(--text-1)}
+.seg__nut--chon{
+  background:var(--accent-soft);border-color:var(--accent-line);
+  color:var(--accent-text);font-weight:var(--fw-semibold);
+}
+.seg__hinh{border:1.5px solid currentColor;border-radius:2px;flex:none;opacity:0.85}
+
+/* Main Shorts Section */
+.section-main{
+  background:var(--bg-3);border:1px solid var(--line-1);
+  border-radius:var(--r-lg);padding:var(--sp-3);
+  display:flex;flex-direction:column;gap:var(--sp-3);flex:1;min-height:0;
+}
+.section__header{display:flex;align-items:center;justify-content:space-between}
+.section__title{
+  font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1);
+  display:flex;align-items:center;gap:var(--sp-2);
+}
+.chon__mo{color:var(--text-3);font-size:var(--fs-xs);line-height:1.35}
+
+/* Q&A Segment List */
+.ds{
+  display:flex;flex-direction:column;gap:var(--sp-2);
+  overflow-y:auto;flex:1;min-height:120px;padding-right:2px;
+}
+.ds__muc{
+  display:flex;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-2);background:var(--bg-4);border:1px solid var(--line-2);
+  border-radius:var(--r-sm);cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.ds__muc:hover{background:var(--bg-5);border-color:var(--line-strong)}
+.ds__muc input{accent-color:var(--accent);width:14px;height:14px;flex:none;cursor:pointer}
+.ds__giay{
+  flex:none;padding:1px 5px;border-radius:var(--r-pill);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  font-size:var(--fs-2xs);font-weight:var(--fw-bold);color:var(--accent-text);
+}
+.ds__chu{
+  flex:1;font-size:var(--fs-xs);color:var(--text-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* Secondary Tools Row */
+.tools-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2);flex:none}
+
+/* Buttons */
+.btn-chinh{
+  height:var(--h-ctrl-lg);border:none;border-radius:var(--r-md);
+  background:var(--accent);color:var(--accent-on);
+  font-family:var(--font-ui);font-size:var(--fs-sm);font-weight:var(--fw-bold);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  width:100%;box-shadow:0 2px 8px rgb(255 87 20 / 25%);
+}
+.btn-chinh:hover:not(:disabled){background:var(--accent-hover);box-shadow:0 4px 12px rgb(255 87 20 / 35%)}
+.btn-chinh:disabled{opacity:0.45;cursor:not-allowed;box-shadow:none}
+
+.btn-phu{
+  height:var(--h-ctrl);border:1px solid var(--line-strong);border-radius:var(--r-md);
+  background:var(--bg-4);color:var(--text-2);
+  font-family:var(--font-ui);font-size:var(--fs-xs);font-weight:var(--fw-medium);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-2);width:100%;
+}
+.btn-phu:hover:not(:disabled){background:var(--bg-5);color:var(--text-1);border-color:var(--line-strong)}
+.btn-phu:disabled{opacity:0.4;cursor:not-allowed}
+
+.canlam{
+  padding:var(--sp-2) var(--sp-3);border-radius:var(--r-sm);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  color:var(--accent-text);font-size:var(--fs-xs);
+}
+
+/* Sticky Footer Action Bar */
+.footer-sticky{
+  padding:var(--sp-3) var(--sp-4);background:var(--bg-1);
+  border-top:1px solid var(--line-1);flex:none;
+  display:flex;flex-direction:column;gap:var(--sp-2);
+  max-width:680px;margin:0 auto;width:100%;
+}
+.ketqua{
+  background:var(--bg-0);border:1px solid var(--accent-line);
+  border-radius:var(--r-md);padding:var(--sp-3);
+  display:none;flex-direction:column;gap:var(--sp-2);
+}
+.ketqua--hien{display:flex}
+.ketqua__so{display:flex;gap:var(--sp-2)}
+.ketqua__so > div{
+  flex:1;background:var(--bg-3);border-radius:var(--r-sm);
+  border:1px solid var(--line-1);padding:var(--sp-2);text-align:center;
+}
+.ketqua__so b{display:block;font-size:var(--fs-lg);color:var(--accent)}
+.ketqua__so span{color:var(--text-3);font-size:var(--fs-2xs);text-transform:uppercase}
+.ketqua__dong{color:var(--text-2);font-size:var(--fs-xs)}
+.ketqua__dong b{color:var(--text-1)}
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand__icon">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M4 17v3h3M20 17v3h-3M9 12h6M12 9v6"/></svg>
+      </div>
+      <span>Re-Frames</span>
+    </div>
+    <span class="topbar__ver">v0.5.0</span>
+    <span class="topbar__host" id="host">Premiere 2026.5 · Demo Project</span>
+
+    <button class="lang" id="lang" onclick="doiNgonNgu()">
+      <span id="langText">EN</span>
+    </button>
+  </div>
+
+  <div class="wrap">
+    <!-- Active Sequence Monitor -->
+    <div class="selbar">
+      <div class="den den--ok" id="den">
+        <span class="den__cham"></span>
+        <span class="den__text" id="denChu">Đang mở «Podcast_Main_Episode» · 1920×1080 — sẵn sàng.</span>
+      </div>
+    </div>
+
+    <!-- Aspect Ratio Selector Grid -->
+    <div class="chon">
+      <span class="chon__nhan" id="nhanKhung">
+        <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg>
+        <span>Khung đích</span>
+      </span>
+      <div class="seg" id="seg"></div>
+      <p class="chon__mo" id="segMo">TikTok · Reels · Shorts — khung dọc toàn màn hình.</p>
+    </div>
+
+    <!-- Main Section: Shorts by Content -->
+    <div class="section-main">
+      <div class="section__header">
+        <span class="section__title">
+          <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--accent)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span id="nhanShort">Short theo nội dung</span>
+        </span>
+      </div>
+      
+      <button class="btn-chinh" id="nutTim" onclick="demoTimDoan()">
+        <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span id="nutTimText">Tìm đoạn theo nội dung video</span>
+      </button>
+
+      <p class="chon__mo" id="timMo">Tool đọc bản chép lời rồi tách từng câu hỏi được trả lời trọn ý — dài ngắn theo ý nói, không ép 60 giây.</p>
+      
+      <div class="ds" id="dsDoan" style="display:none"></div>
+    </div>
+
+    <!-- Secondary Tools Row -->
+    <div class="tools-row">
+      <button class="btn-phu" id="nut" onclick="demoLamDoc()">Tạo bản dọc 9:16 cho cả sequence</button>
+      <button class="btn-phu" id="nutXuat" onclick="demoXuatCheck()">
+        <svg class="ico ico-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span id="nutXuatText">Xuất check 720p</span>
+      </button>
+    </div>
+
+    <p class="canlam" id="canlam" style="display:none"></p>
+
+    <div class="ketqua" id="ketqua">
+      <div class="ketqua__so">
+        <div><b id="soClip">1</b><span id="nhanSoClip">clip bám chủ thể</span></div>
+        <div><b id="khung">1080×1920</b><span id="nhanKhungKq">khung hình</span></div>
+      </div>
+      <p class="ketqua__dong" id="kqDong">Đã tạo <b>Podcast_Main_Episode - Doc 9-16</b> trên timeline. Premiere đang bám chủ thể.</p>
+    </div>
+  </div>
+
+  <!-- Sticky Footer Action Bar -->
+  <div class="footer-sticky">
+    <button class="btn-chinh" id="nutTao" onclick="demoTaoShorts()" style="display:none"></button>
+    <p class="canlam" id="taoKq" style="display:none"></p>
+  </div>
+
+<script>
+  var NGON_NGU = {
+    vi: {
+      nhan_khung: 'Khung đích',
+      nhan_short: 'Short theo nội dung',
+      ti_916: 'Dọc 9:16', ti_11: 'Vuông 1:1', ti_45: 'Dọc 4:5',
+      mo_916: 'TikTok · Reels · Shorts — khung dọc toàn màn hình.',
+      mo_11: 'Bài đăng vuông — feed Facebook, LinkedIn.',
+      mo_45: 'Feed Instagram — dọc vừa phải.',
+      tim_doan: 'Tìm đoạn theo nội dung video',
+      tim_lai: 'Quét lại',
+      tim_mo: 'Tool đọc bản chép lời rồi tách từng câu hỏi được trả lời trọn ý — dài ngắn theo ý nói, không ép 60 giây.',
+      tao_short: 'Tạo {n} Short {ten}',
+      tao_ca_seq: 'Tạo bản {ten} cho cả sequence',
+      nhan_so_clip: 'clip bám chủ thể',
+      nhan_khung_kq: 'khung hình',
+      kq_dong: 'Đã tạo <b>{ten}</b> trên timeline. Premiere đang bám chủ thể.',
+      nut_xuat: 'Xuất check 720p',
+    },
+    en: {
+      nhan_khung: 'Target Frame',
+      nhan_short: 'Content Shorts',
+      ti_916: 'Vertical 9:16', ti_11: 'Square 1:1', ti_45: 'Portrait 4:5',
+      mo_916: 'TikTok · Reels · Shorts — full vertical.',
+      mo_11: 'Square — Facebook & LinkedIn feeds.',
+      mo_45: 'Instagram feed — portrait.',
+      tim_doan: 'Find segments from transcript',
+      tim_lai: 'Rescan',
+      tim_mo: 'Pulls full Q&A segments from transcript.',
+      tao_short: 'Create {n} {ten} Shorts',
+      tao_ca_seq: 'Whole Sequence ({ten})',
+      nhan_so_clip: 'clips tracked',
+      nhan_khung_kq: 'frame size',
+      kq_dong: 'Created <b>{ten}</b> on timeline. Sensei tracking.',
+      nut_xuat: 'Export 720p Draft',
+    }
+  }
+
+  var L = 'vi'
+  function t(k) { return NGON_NGU[L][k] || NGON_NGU.vi[k] || k }
+  function tp(k, thay) {
+    var s = t(k)
+    Object.keys(thay||{}).forEach(function(kk){ s = s.split('{'+kk+'}').join(String(thay[kk])) })
+    return s
+  }
+
+  var KHUNG = [
+    { w: 1080, h: 1920, nhan: 'Doc 9-16',  tenKey: 'ti_916', moKey: 'mo_916', hinhW: 10, hinhH: 18 },
+    { w: 1080, h: 1080, nhan: 'Vuong 1-1', tenKey: 'ti_11',  moKey: 'mo_11',  hinhW: 14, hinhH: 14 },
+    { w: 1080, h: 1350, nhan: 'Doc 4-5',   tenKey: 'ti_45',  moKey: 'mo_45',  hinhW: 13, hinhH: 16 },
+  ]
+  var dangChon = 0
+
+  function tenTiLe() { return t(KHUNG[dangChon].tenKey) }
+
+  function apNgonNgu() {
+    document.documentElement.lang = L
+    document.getElementById('langText').textContent = L === 'vi' ? 'EN' : 'VI'
+    document.getElementById('nhanKhung').querySelector('span').textContent = t('nhan_khung')
+    document.getElementById('nhanShort').textContent = t('nhan_short')
+    document.getElementById('nhanSoClip').textContent = t('nhan_so_clip')
+    document.getElementById('nhanKhungKq').textContent = t('nhan_khung_kq')
+    document.getElementById('nutXuatText').textContent = t('nut_xuat')
+    veSeg()
+  }
+
+  function doiNgonNgu() {
+    L = L === 'vi' ? 'en' : 'vi'
+    apNgonNgu()
+  }
+
+  function veSeg() {
+    var seg = document.getElementById('seg')
+    seg.innerHTML = ''
+    KHUNG.forEach(function (k, i) {
+      var b = document.createElement('button')
+      b.className = 'seg__nut' + (i === dangChon ? ' seg__nut--chon' : '')
+      var hinh = document.createElement('span')
+      hinh.className = 'seg__hinh'
+      hinh.style.width = k.hinhW + 'px'
+      hinh.style.height = k.hinhH + 'px'
+      b.appendChild(hinh)
+      b.appendChild(document.createTextNode(t(k.tenKey)))
+      b.onclick = function () {
+        dangChon = i
+        veSeg()
+      }
+      seg.appendChild(b)
+    })
+    document.getElementById('segMo').textContent = t(KHUNG[dangChon].moKey)
+    document.getElementById('nut').textContent = tp('tao_ca_seq', { ten: tenTiLe().toLowerCase() })
+  }
+
+  var demoDoan = [
+    { dai: 42, hoi: 'Bí quyết nào giúp thương hiệu phát triển nhanh trong năm 2026?' },
+    { dai: 68, hoi: 'Tại sao việc tự động hoá quy trình video lại quan trọng với Creator?' },
+    { dai: 35, hoi: 'Làm thế nào để tối ưu hoá thời gian làm nội dung podcast ngắn?' }
+  ]
+
+  function demoTimDoan() {
+    var ds = document.getElementById('dsDoan')
+    ds.innerHTML = ''
+    ds.style.display = ''
+    demoDoan.forEach(function(d) {
+      var hang = document.createElement('label')
+      hang.className = 'ds__muc'
+      var tick = document.createElement('input')
+      tick.type = 'checkbox'
+      tick.checked = true
+      tick.onchange = function() {
+        var n = [].filter.call(document.querySelectorAll('#dsDoan input'), function(t){return t.checked}).length
+        var nutTao = document.getElementById('nutTao')
+        nutTao.style.display = n ? '' : 'none'
+        nutTao.textContent = tp('tao_short', { n: n, ten: tenTiLe().toLowerCase() })
+      }
+      hang.appendChild(tick)
+      var giay = document.createElement('span')
+      giay.className = 'ds__giay'
+      giay.textContent = d.dai + 's'
+      hang.appendChild(giay)
+      var chu = document.createElement('span')
+      chu.className = 'ds__chu'
+      chu.textContent = d.hoi
+      hang.appendChild(chu)
+      ds.appendChild(hang)
+    })
+    var nutTao = document.getElementById('nutTao')
+    nutTao.style.display = ''
+    nutTao.textContent = tp('tao_short', { n: 3, ten: tenTiLe().toLowerCase() })
+    document.getElementById('nutTimText').textContent = t('tim_lai')
+  }
+
+  function demoTaoShorts() {
+    var kq = document.getElementById('ketqua')
+    document.getElementById('soClip').textContent = '3'
+    document.getElementById('khung').textContent = KHUNG[dangChon].w + '×' + KHUNG[dangChon].h
+    document.getElementById('kqDong').innerHTML = tp('kq_dong', { ten: '3 Short ' + tenTiLe() })
+    kq.className = 'ketqua ketqua--hien'
+  }
+
+  function demoLamDoc() {
+    var kq = document.getElementById('ketqua')
+    document.getElementById('soClip').textContent = '12'
+    document.getElementById('khung').textContent = KHUNG[dangChon].w + '×' + KHUNG[dangChon].h
+    document.getElementById('kqDong').innerHTML = tp('kq_dong', { ten: 'Podcast_Main_Episode - ' + KHUNG[dangChon].nhan })
+    kq.className = 'ketqua ketqua--hien'
+  }
+
+  function demoXuatCheck() {
+    var canlam = document.getElementById('canlam')
+    canlam.style.display = ''
+    canlam.textContent = 'Đã xuất Short 1-check-720.mp4 (42s · 12.4 MB) — nằm cạnh video gốc.'
+  }
+
+  apNgonNgu()
+</script>
+</body>
+</html>

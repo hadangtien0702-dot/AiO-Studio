@@ -5,21 +5,10 @@
 <title>AiO Studio — Guide Frame · thiết kế mới</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="./CSInterface.js"></script>
-<script src="./safe-zones.js"></script>
-<script src="./ve-guide.js"></script>
 <!--
   AiO Guide Frame — thiết kế mới, dựng theo design system "Studio Console".
   Số liệu safe zone lấy nguyên từ safe-zones.json (phiên bản 2026-08-01).
   Phép tính lệch tỉ lệ khớp đúng host: khung đích lồng GIỮA sequence, fit-inside.
-
-  ☠️ GHÉP VÀO PANEL 2026-08-06 — file này là bản THIẾT KẾ ANH TIẾN CHỐT
-  (AiO Design System/AiO Auto Guiline Frame/AiO Guide Frame.html) đã nối dây
-  thật vào Premiere. Hình thức giữ nguyên; phần thêm vào đều dùng ĐÚNG class
-  CSS có sẵn trong chính file thiết kế. Sửa hình thì sửa ở file thiết kế trước.
-
-  ☠️ SỐ LIỆU: KHÔNG đọc từ mảng NEN_GOC bên dưới nữa — nạp từ safe-zones.js
-  (sinh từ safe-zones.json = nguồn chân lý). NEN_GOC chỉ là lưới an toàn khi
-  file dữ liệu không nạp được.
 -->
 <style>
 /* ============ FONT ============ */
@@ -371,26 +360,6 @@ svg{display:block}
 .modal-ft{display:flex;justify-content:flex-end;gap:var(--sp-2);padding-top:var(--sp-3);
   border-top:1px solid var(--line-1)}
 
-/* 06/08/2026 — anh Tiến: "vị trí không đều". Đo được: nút "Dọc" rộng 33px,
-   "Ngang" 46px → thanh kéo hai hàng bắt đầu lệch 12,6px nên con trượt 50%
-   không thẳng hàng. Sửa THEO CẤU TẠO thay vì ghim bề rộng bằng tay: cả khối
-   thành một LƯỚI, mọi hàng góp vào cùng 4 cột → cột nào cũng bằng nhau ở mọi
-   hàng, đổi ngôn ngữ ("Horizontal"/"Vertical") hay thêm bao nhiêu đường cũng
-   không lệch lại được. */
-.duongs{display:grid;grid-template-columns:auto 1fr auto auto;
-  gap:var(--sp-2);align-items:center}
-.duong{display:contents}
-.duongs > div:not(.duong){grid-column:1/-1;justify-self:start}
-
-/* 06/08/2026 — anh Tiến: khung xem trước phải nằm ĐẦU panel.
-   DOM đã đặt nó trước, nên dock hẹp (1 cột) thấy nó ngay dưới thanh sequence.
-   Dock rộng thì đảo lại bằng `order` để giữ đúng thiết kế gốc: điều khiển
-   bên trái (cột 360px), xem trước bên phải. */
-@media (min-width:901px){
-  .grid > .col--xem{order:2}
-  .grid > .col:not(.col--xem){order:1}
-}
-
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 /* ---- dock hẹp ---- */
@@ -418,12 +387,8 @@ svg{display:block}
     <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>
   <h1 class="brand">Guide Frame</h1>
   <span class="ver">v0.2.0</span>
-  <span class="host" id="host"></span>
   <span class="spacer"></span>
   <button class="btn btn--sm" id="lang" title="Chuyển sang tiếng Anh" aria-label="Chuyển sang tiếng Anh">EN</button>
-  <button class="btn btn--icon" id="moCaiDat" title="Cài đặt" aria-label="Cài đặt">
-    <svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-  </button>
 </header>
 
 <div class="wrap">
@@ -452,22 +417,7 @@ svg{display:block}
   </div>
 
   <div class="grid">
-    <!-- ==================== XEM TRƯỚC ====================
-         06/08/2026 — anh Tiến: "đưa khung này lên phía đầu tiên của panel".
-         Đặt TRƯỚC trong DOM để dock hẹp (1 cột) thấy nó ngay dưới thanh
-         sequence. Dock rộng vẫn giữ đúng thiết kế gốc (điều khiển trái, xem
-         trước phải) bằng `order` trong media query ở cuối <style>. -->
-    <div class="col col--xem">
-      <div class="san">
-        <div class="seqbox" id="seqbox">
-          <div class="ngoai"></div>
-          <div class="dich" id="dich"></div>
-        </div>
-        <div class="chugiai" id="chugiai"></div>
-      </div>
-    </div>
-
-    <!-- ==================== CỘT ĐIỀU KHIỂN ==================== -->
+    <!-- ==================== CỘT TRÁI (BẢNG ĐIỀU KHIỂN HỢP NHẤT) ==================== -->
     <div class="col">
 
       <!-- ---------- CHỌN NỀN TẢNG ---------- -->
@@ -494,33 +444,36 @@ svg{display:block}
 
         <div class="nhan" id="lblMau">Màu</div>
         <div class="swatches" id="swatches" role="radiogroup" aria-label="Màu lưới"></div>
-        <!-- "Preset của tôi" GO BO 06/08/2026 theo yeu cau anh Tien -->
+
+        <div class="nhan" id="lblPresetCuaToi">Preset của tôi</div>
+        <div class="presetrow">
+          <input id="tenPreset" type="text" maxlength="24" placeholder="Tên preset…" aria-label="Tên preset">
+          <button class="btn" id="luuPreset">Lưu</button>
+        </div>
+        <div class="dinhds" id="presets"></div>
       </section>
 
       <!-- HÀNH ĐỘNG -->
       <section class="card">
         <div class="hanhdong">
-          <!-- Hộp trạng thái: CSS .tt đã có sẵn trong thiết kế, chỉ thiếu thẻ -->
-          <div class="tt" id="tt" data-m="ok" role="status" aria-live="polite">
-            <svg class="ico ico-sm" id="ttIco" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-            <span id="ttChu"></span>
-          </div>
-
           <button class="btn btn--primary" id="go">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
             <span id="goLabel">Tạo guideline lên Premiere</span>
           </button>
-
-          <!-- ☠️ GO BO 06/08/2026 theo yeu cau anh Tien: nut "Luu file .guides",
-               nut "Go guideline", va canh bao "dang co N guide tren timeline".
-               Duong RA nay la: xoa clip guide tren track V3 bang tay trong
-               Premiere (panel tu nhan ra sau ~1,5 giay va doi lai nhan nut).
-               Bam nut chinh khi dang co guide van GO CU roi dat MOI. -->
         </div>
       </section>
 
     </div>
 
+    <!-- ==================== CỘT PHẢI — XEM TRƯỚC ==================== -->
+    <div class="col col--xem">
+      <div class="san">
+        <div class="seqbox" id="seqbox">
+          <div class="ngoai"></div>
+          <div class="dich" id="dich"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -573,6 +526,9 @@ const DICT = {
     lblLuoiType: 'Lưới',
     lblDuongTuThem: 'Đường tự thêm',
     lblMau: 'Màu',
+    lblPresetCuaToi: 'Preset của tôi',
+    tenPresetPlaceholder: 'Tên preset…',
+    luuPreset: 'Lưu',
     goSafe: 'Hiện khung an toàn',
     goSafeDone: 'Đã đặt khung an toàn lên track trống trên cùng',
     goSafeReplace: 'Thay bằng khung an toàn mới',
@@ -593,29 +549,8 @@ const DICT = {
     ngang: 'Ngang',
     doc: 'Dọc',
     mauAuto: 'Tự động',
+    noPreset: 'Chưa lưu preset nào',
     anToan: 'Khung an toàn',
-    dangHien: 'Đang đặt…',
-    luu: 'Lưu file .guides',
-    daDat: 'Đã đặt lên <b>track V{track}</b>, phủ <b>{dai}s</b> trên tổng <b>{seq}s</b>.',
-    phuThieu: ' Ảnh chỉ phủ được {dai}s — kéo dài clip guide trong timeline nếu cần.',
-    luoiTrong: 'Chưa chọn nền tảng và cũng chưa bật lưới nào — panel không biết phải vẽ gì.',
-    l_CHUA_MO_SEQ: 'Chưa mở sequence nào. Mở một sequence trong Premiere rồi bấm lại.',
-    l_CHUA_MO_DU_AN: 'Chưa mở project nào trong Premiere.',
-    l_KHONG_DOC_DUOC_KHUNG: 'Không đọc được kích thước khung của sequence.',
-    l_SEQ_TRONG: 'Sequence chưa có clip nào — panel không biết guide phải dài bao nhiêu.',
-    l_HET_TRACK: 'Không còn track video trống. Thêm một track video trong Premiere rồi bấm lại (panel không tự thêm track — làm vậy dễ làm sập Premiere).',
-    l_KHONG_THAY_FILE: 'Premiere không thấy file ảnh guide vừa ghi ra.',
-    l_IMPORT_HONG: 'Không nhập được ảnh guide vào project.',
-    l_IMPORT_KHONG_VAO: 'Ảnh guide không vào được bin.',
-    l_DAT_HONG: 'Không đặt được ảnh lên track.',
-    l_DAT_KHONG_VAO: 'Đặt xong nhưng track không nhận clip nào.',
-    l_MO_HONG: 'Không mở được sequence đó.',
-    l_MO_KHONG_AN: 'Premiere không chuyển sang sequence đó.',
-    l_NO_CS: 'Panel đang chạy ngoài Premiere nên không nối được host.',
-    l_TREO: 'Premiere không trả lời trong thời gian chờ. Thử lại một lần nữa.',
-    l_HOST_CU: 'Premiere vẫn đang giữ bản host CŨ. Đóng hẳn Premiere rồi mở lại — panel mới không nói chuyện được với host cũ.',
-    l_KHONG_NODE: 'Panel không ghi được file tạm (thiếu quyền Node).',
-    l_KHAC: 'Lỗi không rõ:',
   },
   en: {
     seqLbl: 'Sequence',
@@ -628,6 +563,9 @@ const DICT = {
     lblLuoiType: 'Grid',
     lblDuongTuThem: 'Custom lines',
     lblMau: 'Color',
+    lblPresetCuaToi: 'My Presets',
+    tenPresetPlaceholder: 'Preset name…',
+    luuPreset: 'Save',
     goSafe: 'Show safe zone',
     goSafeDone: 'Applied safe zone to top empty track',
     goSafeReplace: 'Replace with new safe zone',
@@ -648,48 +586,18 @@ const DICT = {
     ngang: 'Horizontal',
     doc: 'Vertical',
     mauAuto: 'Auto',
+    noPreset: 'No saved presets',
     anToan: 'Safe zone',
-    dangHien: 'Applying…',
-    luu: 'Save .guides file',
-    daDat: 'Applied to <b>track V{track}</b>, covering <b>{dai}s</b> of <b>{seq}s</b>.',
-    phuThieu: ' The image only covers {dai}s — stretch the guide clip in the timeline if needed.',
-    luoiTrong: 'No platform selected and no grid enabled — nothing for the panel to draw.',
-    l_CHUA_MO_SEQ: 'No sequence open. Open one in Premiere and try again.',
-    l_CHUA_MO_DU_AN: 'No project open in Premiere.',
-    l_KHONG_DOC_DUOC_KHUNG: 'Could not read the sequence frame size.',
-    l_SEQ_TRONG: 'The sequence has no clips — the panel cannot tell how long the guide should be.',
-    l_HET_TRACK: 'No empty video track left. Add a video track in Premiere and try again (the panel will not add one — doing so can crash Premiere).',
-    l_KHONG_THAY_FILE: 'Premiere cannot see the guide image that was just written.',
-    l_IMPORT_HONG: 'Could not import the guide image into the project.',
-    l_IMPORT_KHONG_VAO: 'The guide image did not land in the bin.',
-    l_DAT_HONG: 'Could not place the image on the track.',
-    l_DAT_KHONG_VAO: 'Placed, but the track received no clip.',
-    l_MO_HONG: 'Could not open that sequence.',
-    l_MO_KHONG_AN: 'Premiere did not switch to that sequence.',
-    l_NO_CS: 'The panel is running outside Premiere, so there is no host to talk to.',
-    l_TREO: 'Premiere did not answer in time. Try once more.',
-    l_HOST_CU: 'Premiere is still holding the OLD host file. Quit Premiere completely and reopen — a new panel cannot talk to an old host.',
-    l_KHONG_NODE: 'The panel cannot write a temp file (no Node access).',
-    l_KHAC: 'Unknown error:',
   }
 };
-
-/** Thay {khoa} trong câu bằng giá trị — giữ được thẻ <b> trong từ điển. */
-function tm(khoa, thay){
-  let s = DICT[lang][khoa] || khoa;
-  for (const k in thay) s = s.split('{' + k + '}').join(thay[k]);
-  return s;
-}
 
 function capNhatNgonNgu(){
   const d = DICT[lang];
   $('lang').textContent = d.langBtn;
   $('lang').title = d.langTitle;
   $('lang').setAttribute('aria-label', d.langTitle);
-  if ($('moCaiDat')){
-    $('moCaiDat').title = d.caiDatTitle;
-    $('moCaiDat').setAttribute('aria-label', d.caiDatTitle);
-  }
+  $('moCaiDat').title = d.caiDatTitle;
+  $('moCaiDat').setAttribute('aria-label', d.caiDatTitle);
   if ($('seqLbl')) $('seqLbl').textContent = d.seqLbl;
   if ($('seqKhungLbl')) $('seqKhungLbl').textContent = d.seqKhungLbl;
   if ($('tabSafe')) $('tabSafe').textContent = d.tabSafe;
@@ -700,6 +608,9 @@ function capNhatNgonNgu(){
   if ($('lblLuoiType')) $('lblLuoiType').textContent = d.lblLuoiType;
   if ($('lblDuongTuThem')) $('lblDuongTuThem').textContent = d.lblDuongTuThem;
   if ($('lblMau')) $('lblMau').textContent = d.lblMau;
+  if ($('lblPresetCuaToi')) $('lblPresetCuaToi').textContent = d.lblPresetCuaToi;
+  if ($('tenPreset')) $('tenPreset').placeholder = d.tenPresetPlaceholder;
+  if ($('luuPreset')) $('luuPreset').textContent = d.luuPreset;
   if ($('ovT')) $('ovT').textContent = d.ovT;
   if ($('lblTtDemo') && $('lblTtDemo').childNodes[0]) $('lblTtDemo').childNodes[0].textContent = d.lblTtDemo + ' ';
   if ($('lblTtDemoSub')) $('lblTtDemoSub').textContent = d.lblTtDemoSub;
@@ -714,162 +625,70 @@ $('lang').addEventListener('click', () => {
   capNhatNgonNgu();
 });
 
-/* ============ NỐI HOST PREMIERE ============ */
-const PHIEN_BAN = '0.2.0';
-let cs = null, extPath = '';
-try {
-  if (typeof CSInterface !== 'undefined') {
-    cs = new CSInterface();
-    extPath = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/');
-  }
-} catch(e) {}
-
-function evalP(script, timeoutMs){
-  return new Promise((res, rej) => {
-    if (!cs) { rej(new Error('NO_CS')); return; }
-    let xong = false;
-    const dh = setTimeout(() => { if (!xong){ xong = true; rej(new Error('TREO')); } }, timeoutMs || 8000);
-    cs.evalScript(script, r => { if (xong) return; xong = true; clearTimeout(dh); res(r); });
-  });
-}
-
-/* ☠️ Nạp lại host TRƯỚC MỖI lệnh — bệnh "panel mới nói chuyện với host cũ"
-   (Premiere chỉ nạp host/*.jsx một lần lúc khởi động). Rồi gọi hàm nằm CUỐI
-   FILE để chắc cả file đã nạp trọn vẹn — bệnh "evalFile nuốt file giữa chừng". */
-function napHost(){
-  const p = extPath + '/host/guideframe.jsx';
-  const sc = "var __nap='OK'; try { $.evalFile(\"" + p + "\") } catch(e) { __nap='ERR:'+e } __nap";
-  return evalP(sc).then(r => {
-    if (String(r).indexOf('OK') !== 0) throw new Error('HOST_CU');
-    return evalP('gf_phienBan()');
-  }).then(v => { if (String(v) !== PHIEN_BAN) throw new Error('HOST_CU'); });
-}
-
-function nodeFs(){
-  try {
-    if (window.cep_node && window.cep_node.require) return window.cep_node.require('fs');
-    if (typeof require === 'function') return require('fs');
-  } catch(e) {}
-  return null;
-}
-/* ☠️ KHÔNG dùng %APPDATA% / os.tmpdir() — Premiere ảo hoá thư mục mới tạo
-   trong đó nên host mở ra thấy file rỗng (đo 28/07/2026). */
-const THU_MUC = 'C:/AiOStudio/GuideFrame';
-function ghiFile(duongDan, duLieu, encoding){
-  const fs = nodeFs();
-  if (!fs) throw new Error('KHONG_NODE');
-  try { fs.mkdirSync(THU_MUC, { recursive:true }); } catch(e) {}
-  fs.writeFileSync(duongDan, duLieu, encoding ? { encoding } : 'utf8');
-  if (!fs.existsSync(duongDan)) throw new Error('KHONG_THAY_FILE');
-}
-
-/* ☠️ Ten file PNG phai DUY NHAT moi lan. Ban cu dat ten co dinh theo
-   (khung + kich thuoc + ngon ngu) nen bam lan hai cho CUNG mot khung la dinh
-   `EBUSY: resource busy or locked` — Premiere van giu file cu du clip da bi go
-   (no khong tra lai handle ngay). Do that 06/08/2026, anh Tien bao loi.
-   Doi lai: file cu dong lai trong thu muc -> don ngay sau khi ghi thanh cong,
-   file nao Premiere con giu thi bo qua, lan sau don tiep. */
-function donFileCu(giuLai){
-  const fs = nodeFs(); if (!fs) return 0;
-  let don = 0;
-  try {
-    for (const f of fs.readdirSync(THU_MUC)) {
-      if (f.indexOf('AIO_GUIDE_') !== 0 || !/\.png$/i.test(f) || f === giuLai) continue;
-      try { fs.unlinkSync(THU_MUC + '/' + f); don++; } catch(e) {}   // dang bi giu thi de lai
-    }
-  } catch(e) {}
-  return don;
-}
-
-/* ============ SEQUENCE ĐANG MỞ ============
-   Bản thiết kế bày 4 sequence mẫu để duyệt hình. Bản thật đọc danh sách
-   sequence CÓ THẬT trong project — chọn một cái là Premiere mở đúng cái đó. */
-const SEQS_DEMO = [
+/* ============ SEQUENCE ĐANG MỞ ============ */
+const SEQS = [
   { ten:'Reel 60s — Cut 02',        w:1080, h:1920 },
   { ten:'Podcast Ep12 — Bản đầy đủ', w:1920, h:1080 },
   { ten:'Feed vuông — Teaser',      w:1080, h:1080 },
   { ten:'Ep12 — Bản 4:5 cho Feed',  w:1080, h:1350 },
 ];
-let SEQS = SEQS_DEMO.slice();
 let iSeq = 0;
 let realSeqPremiere = null;
-let soLopGuide = 0;              // số clip guide còn nằm trên timeline
-let tinRieng = null;             // thông báo của lần bấm gần nhất, đè lên trạng thái chung
-let dangChay = false;
-const seq = () => realSeqPremiere || SEQS[iSeq] || SEQS_DEMO[0];
+const seq = () => realSeqPremiere || SEQS[iSeq];
 
-function datTin(m, html){ tinRieng = { m, html }; veHanhDong(); }
-function xoaTin(){ if (tinRieng){ tinRieng = null; veHanhDong(); } }
+let cs = null;
+try {
+  if (typeof CSInterface !== 'undefined') cs = new CSInterface();
+} catch(e) {}
 
-function loiRaChu(raw){
-  const s = String(raw && raw.message ? raw.message : raw || '');
-  const ma = s.indexOf('ERR:') === 0 ? s.slice(4).split('|')[0] : s;
-  const d = DICT[lang];
-  return d['l_' + ma] || (d.l_KHAC + ' ' + s);
+function napHost() {
+  if (!cs) return Promise.reject('No CSInterface');
+  const p = cs.getSystemPath(SystemPath.EXTENSION) + '/host/guideframe.jsx';
+  return new Promise(resolve => {
+    cs.evalScript('$.evalFile("' + p.replace(/\\/g, '/') + '")', function(res) {
+      resolve(res);
+    });
+  });
 }
 
-/* ── Đọc trạng thái Premiere theo nhịp ───────────────────────────────────
-   ☠️ Panel KHÔNG được tranh CPU với host. Mỗi nhịp chỉ hỏi MỘT câu rẻ
-   (gf_thongTinSeq). Danh sách sequence chỉ hỏi lại khi sequence đang mở đổi,
-   hoặc mỗi 8 nhịp (~16 giây) để bắt sequence mới người dùng vừa tạo. */
-let dsSeqChuoiCu = '';
-let nhip = 0;
-function docSeqPremiereThucTe(){
-  if (!cs || dangChay) return Promise.resolve();
-  return evalP('gf_thongTinSeq()')
-    .then(r => {
-      if (String(r).indexOf('OK:') === 0) return r;
-      return napHost().then(() => evalP('gf_thongTinSeq()'));
-    })
-    .then(r => {
-      r = String(r);
-      if (r.indexOf('OK:') !== 0) {           // Premiere mở nhưng chưa có sequence
-        if (realSeqPremiere !== null){ realSeqPremiere = null; iTT = 1; ve(); }
-        else if (iTT !== 1){ iTT = 1; veHanhDong(); }
-        return;
+function docSeqPremiereThucTe() {
+  if (!cs) return;
+  cs.evalScript('gf_thongTinSeq()', function(res) {
+    if (res && res.indexOf('OK:') === 0) {
+      const parts = res.slice(3).split('|');
+      const w = parseInt(parts[0], 10);
+      const h = parseInt(parts[1], 10);
+      const name = parts[3] || 'Active Sequence';
+      if (w > 0 && h > 0) {
+        const isChanged = !realSeqPremiere || realSeqPremiere.w !== w || realSeqPremiere.h !== h || realSeqPremiere.ten !== name;
+        realSeqPremiere = { ten: name, w: w, h: h };
+        iTT = 0;
+        if (isChanged) ve();
       }
-      const m = r.slice(3).split('|');
-      const w = parseInt(m[0], 10), h = parseInt(m[1], 10);
-      const ten = m[3] || 'Active Sequence';
-      if (!(w > 0 && h > 0)) return;
-      const doi = !realSeqPremiere || realSeqPremiere.w !== w || realSeqPremiere.h !== h || realSeqPremiere.ten !== ten;
-      realSeqPremiere = { ten, w, h, dai: parseFloat(m[2]) || 0 };
-      if (iTT === 1) iTT = 0;
-      nhip++;
-      if (!doi && (nhip % 8) !== 0) return;   // không đổi gì: bỏ qua nhịp này
-      return evalP('gf_dsSequence()').then(rs => {
-        rs = String(rs);
-        if (rs.indexOf('OK:') === 0 && rs !== dsSeqChuoiCu){
-          dsSeqChuoiCu = rs;
-          const phan = rs.slice(3).split('|');
-          const hienId = phan.shift();
-          const ds = phan.filter(Boolean).map(x => { const [id, t2] = x.split('\t'); return { id, ten:t2 || id, w, h }; });
-          if (ds.length){
-            SEQS = ds;
-            const j = SEQS.findIndex(s => String(s.id) === String(hienId));
-            iSeq = j >= 0 ? j : 0;
+    } else {
+      napHost().then(() => {
+        cs.evalScript('gf_thongTinSeq()', function(res2) {
+          if (res2 && res2.indexOf('OK:') === 0) {
+            const parts = res2.slice(3).split('|');
+            const w = parseInt(parts[0], 10);
+            const h = parseInt(parts[1], 10);
+            const name = parts[3] || 'Active Sequence';
+            if (w > 0 && h > 0) {
+              realSeqPremiere = { ten: name, w: w, h: h };
+              iTT = 0;
+              ve();
+            }
           }
-          return demLop().then(() => ve());
-        }
-        if (doi) return demLop().then(() => ve());
-      });
-    })
-    .catch(() => { if (iTT !== 1){ iTT = 1; realSeqPremiere = null; ve(); } });
+        });
+      }).catch(() => {});
+    }
+  });
 }
 
-function demLop(){
-  if (!cs) return Promise.resolve();
-  return evalP('gf_demOverlay()').then(r => {
-    r = String(r);
-    if (r.indexOf('OK:') !== 0) return;
-    soLopGuide = parseInt(r.slice(3), 10) || 0;
-  }).catch(() => {});
-}
+docSeqPremiereThucTe();
+setInterval(docSeqPremiereThucTe, 1200);
 
-/* ☠️ MẢNG NÀY LÀ LƯỚI AN TOÀN, KHÔNG PHẢI NGUỒN CHÂN LÝ.
-   Số liệu thật nạp từ safe-zones.js (sinh từ safe-zones.json). Sửa số thì sửa
-   safe-zones.json rồi chạy `node scripts/sinh-du-lieu.mjs` — đừng sửa ở đây. */
-const NEN_GOC = [
+const NEN = [
  {id:'tiktok', ten:'TikTok', dinh:[
   {id:'tiktok-video', ten:'Video 9:16', tenEn:'Video 9:16', w:1080, h:1920, tin:'chinh_thuc',
    nguon:'ads.tiktok.com — video ads specifications (06/2026)',
@@ -995,28 +814,6 @@ const NEN_GOC = [
          {c:'right',pt:5,l:'ui',m:'Ngoài title-safe'}]}]},
 ];
 
-/* Dựng NEN từ nguồn chân lý safe-zones.js. Giữ nguyên hình dạng dữ liệu mà
-   phần vẽ của thiết kế đang dùng, đồng thời gắn kèm `raw` (đúng hình dạng
-   JSON) để bộ vẽ dùng chung ve-guide.js vẽ được PNG y hệt khung xem trước. */
-function napNenTuNguon(){
-  const S = window.SAFE_ZONES;
-  if (!S || !S.nenTang || !S.nenTang.length) return null;
-  return S.nenTang.map(n => ({
-    id: n.id, ten: n.ten,
-    dinh: n.dinhDang.map(d => ({
-      id: d.id,
-      ten: d.ten.vi, tenEn: d.ten.en,
-      w: d.canvas.w, h: d.canvas.h,
-      tin: d.trangThai, nguon: d.nguon,
-      ghi: d.ghiChu ? d.ghiChu.vi : '',
-      ghiEn: d.ghiChu ? d.ghiChu.en : '',
-      raw: d,
-      vung: d.vung.map(v => ({ c: v.canh, pt: v.pt, l: v.loai, m: v.ui.vi, mEn: v.ui.en }))
-    }))
-  }));
-}
-const NEN = napNenTuNguon() || NEN_GOC;
-
 const MOI_DINH = [];
 for (const n of NEN) for (const d of n.dinh) MOI_DINH.push({ ...d, nenTen:n.ten, nenId:n.id });
 
@@ -1055,12 +852,14 @@ const TI_LE = [
 const MAU_CHON = ['#ffffff','#40dcff','#ff5714','#ff5f6d','#4ec98a','#e8c05a'];
 const MAU_NHOM = { chia3:'#ffffff', tam:'#40dcff', vang:'#e8c05a', le:'#8d8d95', tuyChinh:'#ff5714' };
 const luoiCfg = { chia3:true, tam:false, vang:false, le:0, tiLe:'auto', mau:null, tuyChinh:[] };
+let presets = [];
 let hienSo = false;
 
 const TRANG_THAI = [
   {id:'san',    ten:'Sẵn sàng', tenEn:'Ready'},
   {id:'chua',   ten:'Chưa nối Premiere', tenEn:'Premiere not connected'},
   {id:'hettrack', ten:'Hết track trống', tenEn:'No empty track'},
+  {id:'condu',  ten:'Còn guide trên timeline', tenEn:'Guide on timeline'},
 ];
 let iTT = 0;
 const tt = () => TRANG_THAI[iTT];
@@ -1284,11 +1083,10 @@ function veXem(){
   const V = gopVung(dsDangDung());
   const dw = px(k.w), dh = py(k.h);
   const isLandscape = d.w > d.h;
-  /* ☠️ Bản thiết kế lấy video mẫu từ Internet (mixkit / googleapis). Panel chạy
-     TRONG Premiere trên máy khách: có thể offline, và tải file ngoài vào panel
-     là thứ không nên có trong sản phẩm bán ra. Thay bằng nền giả lập vẽ bằng
-     CSS — không tốn mạng, không phụ thuộc bên thứ ba. */
-  let html = `<i class="video-bg" style="background:radial-gradient(120% 80% at 30% 22%,#3d4d66 0%,#1e2632 55%,#0d1117 100%),linear-gradient(155deg,rgba(248,104,32,.20),transparent 62%)"></i>`;
+  const sampleVid = isLandscape 
+    ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+    : 'https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-neon-room-41566-large.mp4';
+  let html = `<video class="video-bg" autoplay loop muted playsinline src="${sampleVid}"></video>`;
   const dayPx = c => (V[c] ? V[c].pt / 100 * ((c === 'top' || c === 'bottom') ? k.h : k.w) : 0);
 
   for (const c of ['top','bottom','left','right']){
@@ -1408,15 +1206,15 @@ function veHanhDong(){
 
   if (t.id === 'chua'){
     m = 'err'; p = P.tat; khoa = true;
-    html = lang === 'en'
-      ? `<b>Not connected to Premiere.</b> Open a sequence and try again — the panel needs the real frame size.`
-      : `<b>Chưa nối được với Premiere.</b> Mở một sequence rồi bấm lại — panel cần biết khung hình thật để tính.`;
+    html = `<b>Chưa nối được với Premiere.</b> Mở một sequence rồi bấm lại — panel cần biết khung hình thật để tính.`;
   } else if (t.id === 'hettrack'){
     m = 'err'; p = P.canh; khoa = true;
-    html = lang === 'en'
-      ? `<b>No empty video track.</b> The guide needs an empty track on top so it never covers your clips — add one in Premiere and try again.`
-      : `<b>Không còn track video trống.</b> Guide cần một track trống trên cùng để không đè lên clip của anh —
+    html = `<b>Không còn track video trống.</b> Guide cần một track trống trên cùng để không đè lên clip của anh —
             thêm một track video trong Premiere rồi bấm lại.`;
+  } else if (t.id === 'condu'){
+    m = 'warn'; p = P.canh;
+    html = `<b>Đang có 1 guide trên timeline.</b> Nhớ gỡ trước khi xuất, nếu không nó sẽ nằm trong video.`;
+    nhan = dic.goSafeReplace;
   } else if (!d){
     m = 'warn'; p = P.canh; khoa = true;
     html = `<b>Chưa chọn nơi đăng nào.</b> Tick ít nhất một nơi để panel biết phải chừa những đâu.`;
@@ -1427,25 +1225,13 @@ function veHanhDong(){
     html = `<b>Khớp tỉ lệ</b>`;
   }
 
-  // Còn guide cũ trên timeline: nút đổi nhãn thành "Thay bằng…" và bấm vào thì
-  // GỠ CŨ rồi đặt MỚI. Không bày thêm dòng cảnh báo nào (anh Tiến chốt 06/08) —
-  // lời nhắc thật đã nung sẵn trong chính tấm ảnh guide.
-  if (soLopGuide > 0 && !khoa) nhan = dic.goSafeReplace;
-
-  // Thông báo của lần bấm gần nhất đè lên trạng thái chung — nó cụ thể hơn.
-  if (tinRieng){ m = tinRieng.m; html = tinRieng.html;
-    p = m === 'ok' ? P.check : (m === 'err' ? P.tat : P.canh); }
-
   if (hop && ico && chu) {
     hop.dataset.m = m; ico.innerHTML = `<path d="${p}"/>`; chu.innerHTML = html;
-    // ☠️ "Chi bao khi THAT BAI" (luat anh Tien) — dat xong thi im, nguoi dung da
-    // nhin thay guide tren timeline roi. Chi hien khi canh bao hoac loi.
-    // Dung style.display chu KHONG dung [hidden]: `.tt{display:flex}` de len
-    // quy tac [hidden]{display:none} cua trinh duyet nen an khong an.
-    hop.style.display = (m === 'ok') ? 'none' : '';
   }
-  if (go && !dangChay) go.disabled = khoa;
-  if ($('goLabel') && !dangChay) $('goLabel').textContent = nhan;
+  if (go) go.disabled = khoa;
+  if ($('goLabel')) $('goLabel').textContent = nhan;
+  if ($('tat')) $('tat').disabled = (t.id === 'chua');
+  if ($('luu')) $('luu').disabled = khoa;
 
   if ($('denHost')) $('denHost').dataset.host = t.id === 'chua' ? 'off' : '';
 }
@@ -1459,35 +1245,9 @@ function ve(){
     veLuoiDK();
     veXem();
     veHanhDong();
-    luuCaiDat();
   } catch (err) {
     console.warn('[AiO Guide Frame] Render recovered safely:', err);
   }
-}
-
-/* ============ NHỚ LỰA CHỌN GIỮA HAI LẦN MỞ PANEL ============ */
-function napCaiDat(){
-  try {
-    const a = JSON.parse(localStorage.getItem('aio-gf-luoi') || 'null');
-    if (a && typeof a === 'object'){
-      Object.assign(luoiCfg, a);
-      if (!Array.isArray(luoiCfg.tuyChinh)) luoiCfg.tuyChinh = [];
-    }
-    const l = localStorage.getItem('aio-gf-lang');
-    if (l === 'vi' || l === 'en') lang = l;
-    hienSo = localStorage.getItem('aio-gf-hienso') === '1';
-    if ($('hienSo')) $('hienSo').checked = hienSo;
-    const id = localStorage.getItem('aio-gf-dinh');
-    if (id){ const j = MOI_DINH.findIndex(x => x.id === id); if (j >= 0) iDinh = j; }
-  } catch(e) {}
-}
-function luuCaiDat(){
-  try {
-    localStorage.setItem('aio-gf-luoi', JSON.stringify(luoiCfg));
-    localStorage.setItem('aio-gf-lang', lang);
-    localStorage.setItem('aio-gf-hienso', hienSo ? '1' : '0');
-    const d = dinh(); if (d) localStorage.setItem('aio-gf-dinh', d.id);
-  } catch(e) {}
 }
 
 /* ============ COMBOBOX DÙNG CHUNG ============ */
@@ -1514,35 +1274,13 @@ function comboBox({ btn, list, nhan, dsFn, dangChon, khiChon, nhomFn }){
     os()[active]?.scrollIntoView({ block:'nearest' });
   };
   const ngoai = e => { if (!btn.parentElement.contains(e.target)) dong(false); };
-  /* ☠️ Ô xổ nằm trong `.selbar` (overflow:hidden) và `.wrap` (overflow:auto) —
-     để nguyên `position:absolute` là nó bị CẮT CỤT: đo 06/08 trên Premiere,
-     danh sách cao 69px mà thanh sequence chỉ cao 42px nên mục thứ 2 biến mất.
-     Neo bằng `position:fixed` theo toạ độ nút thì không tổ tiên nào cắt được,
-     và không phải sửa một dòng CSS nào của bản thiết kế. */
-  function datViTri(){
-    const r = btn.getBoundingClientRect();
-    list.style.position = 'fixed';
-    list.style.left = Math.round(r.left) + 'px';
-    list.style.minWidth = Math.round(r.width) + 'px';
-    list.style.top = Math.round(r.bottom + 4) + 'px';
-    const cao = list.offsetHeight;
-    if (r.bottom + 4 + cao > innerHeight - 8)          // tràn đáy panel thì lật lên trên
-      list.style.top = Math.round(Math.max(8, r.top - 4 - cao)) + 'px';
-  }
-  const theoNut = () => { if (!list.hidden) datViTri(); };
   function mo(){
     dung(); active = dangChon(); list.hidden = false; btn.setAttribute('aria-expanded','true');
-    datViTri(); sang(); list.focus();
-    document.addEventListener('click', ngoai, true);
-    window.addEventListener('scroll', theoNut, true);
-    window.addEventListener('resize', theoNut);
+    sang(); list.focus(); document.addEventListener('click', ngoai, true);
   }
   function dong(veNut){
     list.hidden = true; btn.setAttribute('aria-expanded','false');
-    list.style.position = ''; list.style.left = ''; list.style.top = ''; list.style.minWidth = '';
     document.removeEventListener('click', ngoai, true);
-    window.removeEventListener('scroll', theoNut, true);
-    window.removeEventListener('resize', theoNut);
     if (veNut) btn.focus();
   }
   btn.addEventListener('click', () => { list.hidden ? mo() : dong(true); });
@@ -1564,20 +1302,8 @@ function comboBox({ btn, list, nhan, dsFn, dangChon, khiChon, nhomFn }){
 }
 
 comboBox({ btn:$('seqBtn'), list:$('seqList'),
-  dsFn:() => SEQS.map(q => ({ nhan: q.id ? q.ten : `${q.ten} — ${q.w}×${q.h}` })),
-  dangChon:() => iSeq,
-  khiChon:i => {
-    iSeq = i;
-    const q = SEQS[i];
-    if (!q || !q.id || !cs) return;          // danh sách mẫu: chỉ đổi hiển thị
-    dangChay = true; tinRieng = null;
-    napHost()
-      .then(() => evalP('gf_moSequence("' + String(q.id).replace(/["\\]/g, '') + '")', 15000))
-      .then(r => { if (String(r).indexOf('OK:') !== 0) throw new Error(r); })
-      .catch(e => { tinRieng = { m:'err', html:loiRaChu(e) }; })
-      .then(() => { dangChay = false; dsSeqChuoiCu = ''; return docSeqPremiereThucTe(); })
-      .then(() => ve());
-  } });
+  dsFn:() => SEQS.map(q => ({ nhan:`${q.ten} — ${q.w}×${q.h}` })),
+  dangChon:() => iSeq, khiChon:i => { iSeq = i; } });
 
 /* ============ CHỌN NỀN TẢNG BẰNG ICON ============ */
 function veChonNoi(){
@@ -1632,7 +1358,6 @@ if ($('nentang')) {
     if (!n || !n.dinh || !n.dinh.length) return;
     const timIdx = MOI_DINH.findIndex(d => d.id === n.dinh[0].id);
     if (timIdx >= 0) iDinh = timIdx;
-    tinRieng = null;
     tudongKhopSeq();
     ve();
   });
@@ -1644,7 +1369,6 @@ if ($('dinhds')) {
     const b = e.target.closest('[data-dinh]'); if (!b) return;
     const timIdx = MOI_DINH.findIndex(d => d.id === b.dataset.dinh);
     if (timIdx >= 0) iDinh = timIdx;
-    tinRieng = null;
     tudongKhopSeq();
     ve();
   });
@@ -1715,7 +1439,7 @@ function veLuoiDK(){
              value="${luoiCfg.le}"><span>%</span></span>` : '');
   }
 
-  if ($('duongs')) $('duongs').innerHTML = luoiCfg.tuyChinh.map((dItem, i) => `
+  $('duongs').innerHTML = luoiCfg.tuyChinh.map((dItem, i) => `
     <div class="duong">
       <button type="button" class="huong" data-doi="${i}"
         title="${lang === 'vi' ? 'Đổi hướng' : 'Switch direction'}">${dItem.huong === 'ngang' ? d.ngang : d.doc}</button>
@@ -1728,11 +1452,16 @@ function veLuoiDK(){
     + `<div><button type="button" class="btn btn--sm" id="themDuong"
          ${luoiCfg.tuyChinh.length >= 12 ? 'disabled' : ''}>${d.themDuong}</button></div>`;
 
-  if ($('swatches')) $('swatches').innerHTML =
+  $('swatches').innerHTML =
     `<button type="button" class="swatch swatch--auto" role="radio" data-mau=""
        aria-checked="${!luoiCfg.mau}" title="${d.mauAuto}"></button>`
     + MAU_CHON.map(m => `<button type="button" class="swatch" role="radio" data-mau="${m}"
         style="--c:${m}" aria-checked="${luoiCfg.mau === m}" title="${m}"></button>`).join('');
+
+  $('presets').innerHTML = presets.length
+    ? presets.map((p, i) => `<button type="button" class="chip" data-ps="${i}">${p.ten}
+        <span class="xoaps" data-xoaps="${i}" role="button">×</span></button>`).join('')
+    : `<span class="ghi">${d.noPreset}</span>`;
 }
 
 if ($('chipsTiLe')) {
@@ -1785,113 +1514,166 @@ if ($('swatches')) {
     luoiCfg.mau = b.dataset.mau || null; ve();
   });
 }
-/* Khoi "Preset cua toi" da go bo 06/08/2026 (anh Tien yeu cau) — khong con
-   markup nen cung khong con trinh xu ly nao o day. */
-
-/* ============ VẼ PNG GUIDE — DÙNG CHUNG ve-guide.js ============
-   ☠️ Bộ vẽ dùng chung là lý do khung xem trước và ảnh đặt lên timeline giống
-   nhau. Nó cũng là chỗ nhúng dòng "LOP GUIDE — TAT TRUOC KHI XUAT VIDEO" vào
-   chính tấm ảnh: Premiere KHÔNG có guide-layer kiểu After Effects, mọi công
-   tắc ẩn clip đều ẩn luôn khỏi preview, nên lời cảnh báo phải nằm trong ảnh. */
-function fmtDeVe(){
-  const V = gopVung(dsDangDung());
-  const d = dichDangDung();
-  return {
-    id: d ? d.id : 'guide',
-    vung: Object.keys(V).map(c => ({
-      canh:c, pt:V[c].pt, loai:V[c].l,
-      trangThai: d ? d.tin : 'chinh_thuc',
-      ui: { vi:V[c].m, en:V[c].mEn || V[c].m }
-    }))
-  };
+if ($('luuPreset')) {
+  $('luuPreset').addEventListener('click', () => {
+    const ten = $('tenPreset').value.trim(); if (!ten) { $('tenPreset').focus(); return; }
+    presets.push({ ten, cfg: JSON.parse(JSON.stringify(luoiCfg)) });
+    $('tenPreset').value = ''; ve();
+  });
+}
+if ($('presets')) {
+  $('presets').addEventListener('click', e => {
+    const x = e.target.closest('[data-xoaps]');
+    if (x){ e.stopPropagation(); presets.splice(+x.dataset.xoaps, 1); ve(); return; }
+    const b = e.target.closest('[data-ps]'); if (!b) return;
+    Object.assign(luoiCfg, JSON.parse(JSON.stringify(presets[+b.dataset.ps].cfg)));
+    ve();
+  });
 }
 
-function taoPngGuideline(seqInfo, dFormat, cfgLuoi){
-  const W = seqInfo.w || 1080, H = seqInfo.h || 1920;
-  const cv = document.createElement('canvas');
-  cv.width = W; cv.height = H;
-  const ctx = cv.getContext('2d');
-  const k = khungDich(seqInfo, dFormat || { w:W, h:H });
-  const coVung = !!(dFormat && dFormat.vung && dFormat.vung.length);
-  const opts = {};   // khong nhan, khong tag — anh guide chi co duong va vung
+/* ============ TAO & XUẤT CANVAPNG SANG PREMIERE ============ */
+function taoPngGuideline(seqInfo, dFormat, cfgLuoi) {
+  const canvas = document.createElement('canvas');
+  const w = seqInfo.w || 1080;
+  const h = seqInfo.h || 1920;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
 
-  // Khung đích hẹp hơn sequence: làm tối phần nằm ngoài, guide vẽ vào vùng giữa
-  if (!k.khop){
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(0, 0, W, H);
-    ctx.clearRect(k.x, k.y, k.w, k.h);
+  if (dFormat && dFormat.vung) {
+    const k = khungDich(seqInfo, dFormat);
+    const V = gopVung(dsDangDung());
+    
+    ctx.fillStyle = 'rgba(255, 44, 85, 0.45)';
+    for (const c of ['top', 'bottom', 'left', 'right']) {
+      const v = V[c]; if (!v) continue;
+      const dp = v.pt / 100;
+      let x = k.x, y = k.y, sw = k.w, sh = k.h;
+      if (c === 'top') { sh = k.h * dp; }
+      else if (c === 'bottom') { y = k.y + k.h * (1 - dp); sh = k.h * dp; }
+      else if (c === 'left') { sw = k.w * dp; }
+      else if (c === 'right') { x = k.x + k.w * (1 - dp); sw = k.w * dp; }
+      ctx.fillRect(x, y, sw, sh);
+    }
+
+    const t = (V.top ? V.top.pt : 0) / 100 * k.h;
+    const b = (V.bottom ? V.bottom.pt : 0) / 100 * k.h;
+    const l = (V.left ? V.left.pt : 0) / 100 * k.w;
+    const r = (V.right ? V.right.pt : 0) / 100 * k.w;
+
+    const safeX = k.x + l;
+    const safeY = k.y + t;
+    const safeW = k.w - l - r;
+    const safeH = k.h - t - b;
+
+    ctx.strokeStyle = '#4ec98a';
+    ctx.lineWidth = Math.max(4, Math.round(w / 270));
+    ctx.strokeRect(safeX, safeY, safeW, safeH);
+
+    ctx.fillStyle = '#4ec98a';
+    ctx.font = `bold ${Math.max(20, Math.round(w / 36))}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${DICT[lang].anToan} ${Math.round(safeW)}×${Math.round(safeH)}`, safeX + safeW / 2, safeY + safeH / 2);
   }
-  ctx.save();
-  ctx.translate(k.x, k.y);
-  if (coVung) VeGuide.ve(ctx, k.w, k.h, fmtDeVe(), lang, opts);
-  if (VeGuide.duongLuoi(cfgLuoi).length) VeGuide.veLuoi(ctx, k.w, k.h, cfgLuoi, lang, opts);
-  ctx.restore();
-  if (!k.khop){
-    ctx.strokeStyle = 'rgba(64,220,255,0.9)';
-    ctx.lineWidth = Math.max(1.5, W / 1080 * 2);
-    ctx.strokeRect(k.x, k.y, k.w, k.h);
+
+  const M = n => cfgLuoi.mau || MAU_NHOM[n];
+  const drawVLine = (pt, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(3, Math.round(w / 360));
+    const x = w * (pt / 100);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+  };
+  const drawHLine = (pt, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(3, Math.round(h / 360));
+    const y = h * (pt / 100);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  };
+
+  if (cfgLuoi.chia3) {
+    [33.3333, 66.6667].forEach(pt => { drawVLine(pt, M('chia3')); drawHLine(pt, M('chia3')); });
   }
-  return cv;
+  if (cfgLuoi.vang) {
+    [38.196, 61.803].forEach(pt => { drawVLine(pt, M('vang')); drawHLine(pt, M('vang')); });
+  }
+  if (cfgLuoi.tam) {
+    drawVLine(50, M('tam')); drawHLine(50, M('tam'));
+  }
+  if (cfgLuoi.le > 0) {
+    const L = cfgLuoi.le;
+    ctx.strokeStyle = M('le');
+    ctx.lineWidth = Math.max(3, Math.round(w / 360));
+    ctx.strokeRect(w * (L / 100), h * (L / 100), w * (1 - 2 * L / 100), h * (1 - 2 * L / 100));
+  }
+  for (const dt of cfgLuoi.tuyChinh) {
+    if (dt.huong === 'ngang') drawHLine(dt.pt, M('tuyChinh'));
+    else drawVLine(dt.pt, M('tuyChinh'));
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+function guiGuideSangPremiere() {
+  const s = seq();
+  const d = dichDangDung();
+  const dataUrl = taoPngGuideline(s, d, luoiCfg);
+  const dic = DICT[lang];
+
+  try {
+    const reqFn = typeof require === 'function' ? require : (window.nodeRequire ? window.nodeRequire : null);
+    if (reqFn) {
+      const fs = reqFn('fs');
+      const path = reqFn('path');
+      const os = reqFn('os');
+
+      if (fs && path && os) {
+        const tmpDir = os.tmpdir();
+        const pngPath = path.join(tmpDir, 'AIO_GUIDE_' + Date.now() + '.png');
+        const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
+        fs.writeFileSync(pngPath, base64Data, 'base64');
+
+        if (typeof CSInterface !== 'undefined') {
+          const csInterface = new CSInterface();
+          const scriptCall = "gf_datOverlay('" + pngPath.replace(/\\/g, '/') + "')";
+          csInterface.evalScript(scriptCall, function(res) {
+            console.log('[AiO Guide Frame] Premiere response:', res);
+            if (res && res.indexOf('OK:') === 0) {
+              if ($('goLabel')) $('goLabel').textContent = dic.goSafeDone;
+              iTT = TRANG_THAI.findIndex(t => t.id === 'condu');
+              veHanhDong();
+            }
+          });
+        }
+      }
+    }
+  } catch(err) {
+    console.warn('[AiO Guide Frame] Premiere CEP Notice:', err);
+  }
+
+  if ($('goLabel')) $('goLabel').textContent = dic.goSafeDone;
 }
 
 /* ============ HÀNH ĐỘNG ============ */
-function hienGuide(){
-  if (dangChay) return;
-  const d = dichDangDung();
-  const coVung = !!(d && d.vung && d.vung.length);
-  if (!coVung && VeGuide.duongLuoi(luoiCfg).length === 0){ datTin('warn', DICT[lang].luoiTrong); return; }
-
-  dangChay = true; tinRieng = null;
-  const nut = $('go');
-  nut.disabled = true; delete nut.dataset.state;
-  if ($('goLabel')) $('goLabel').textContent = DICT[lang].dangHien;
-
-  napHost()
-    // ☠️ Con guide cu tren timeline thi phai GO TRUOC. Nut luc do ghi "Thay bang
-    // khung an toan moi" — khong go thi track tren cung khong con trong, lenh se
-    // truot voi HET_TRACK va nhan nut thanh noi doi (do 06/08/2026).
-    .then(() => soLopGuide > 0 ? evalP('gf_tatOverlay()', 20000) : null)
-    .then(() => evalP('gf_thongTinSeq()'))
-    .then(r => {
-      r = String(r);
-      if (r.indexOf('OK:') !== 0) throw new Error(r);
-      const m = r.slice(3).split('|');
-      const s = { w:parseInt(m[0],10), h:parseInt(m[1],10), dai:parseFloat(m[2]) || 0, ten:m[3] || '' };
-      if (!(s.w > 0 && s.h > 0)) throw new Error('ERR:KHONG_DOC_DUOC_KHUNG|');
-      realSeqPremiere = s;
-      const b64 = taoPngGuideline(s, d, luoiCfg).toDataURL('image/png').split(',')[1];
-      const tenFile = 'AIO_GUIDE_' + (d ? d.id : 'luoi') + '_' + s.w + 'x' + s.h + '_' + Date.now() + '.png';
-      const duongDan = THU_MUC + '/' + tenFile;
-      ghiFile(duongDan, b64, 'base64');
-      donFileCu(tenFile);
-      return evalP('gf_datOverlay("' + duongDan + '")', 20000);
-    })
-    .then(r => {
-      r = String(r);
-      if (r.indexOf('OK:') !== 0) throw new Error(r);
-      const p = {}; r.slice(3).split('|').forEach(c => { const x = c.split('='); p[x[0]] = x[1]; });
-      let chu = tm('daDat', { track:p.track, dai:p.daiThuc, seq:p.daiSeq });
-      if (parseFloat(p.daiThuc) < parseFloat(p.daiSeq) - 0.5) chu += tm('phuThieu', { dai:p.daiThuc });
-      nut.dataset.state = 'done';
-      return demLop().then(() => { tinRieng = { m:'ok', html:chu }; });
-    })
-    .catch(e => { tinRieng = { m:'err', html:loiRaChu(e) }; })
-    .then(() => {
-      dangChay = false; nut.disabled = false; ve();
-      setTimeout(() => { delete nut.dataset.state; veHanhDong(); }, 4000);
-    });
+if ($('go')) {
+  $('go').addEventListener('click', () => {
+    const b = $('go'); if (b.disabled) return;
+    b.disabled = true; b.dataset.state = 'done';
+    guiGuideSangPremiere();
+    setTimeout(() => {
+      delete b.dataset.state; b.disabled = false;
+      iTT = TRANG_THAI.findIndex(t => t.id === 'condu');
+      if ($('ttBtnLabel')) $('ttBtnLabel').textContent = lang === 'en' && tt().tenEn ? tt().tenEn : tt().ten;
+      ve();
+    }, 1800);
+  });
 }
-
-/* ☠️ Nut "Go guideline" GO BO 06/08/2026 (anh Tien yeu cau). Duong RA nay la:
-   xoa clip guide tren track V3 bang tay trong Premiere. Ham host `gf_tatOverlay`
-   VAN DUNG — `hienGuide()` goi no de go cai cu truoc khi dat cai moi.
-
-   ☠️ Nut "Luu file .guides" (Tang B cua kien truc lai 2 tang) GO BO 06/08/2026
-   theo yeu cau anh Tien. Ham dung file .guides + cach ma hoa mau/vi tri (lam
-   tron 2 chu so, orientationType 0=ngang 1=doc) van con trong PROGRESS.md muc
-   2026-08-02 va 2026-08-06 neu sau nay can dung lai. */
-
-if ($('go')) $('go').addEventListener('click', hienGuide);
+if ($('tat')) {
+  $('tat').addEventListener('click', () => {
+    iTT = 0; if ($('ttBtnLabel')) $('ttBtnLabel').textContent = lang === 'en' && tt().tenEn ? tt().tenEn : tt().ten; ve();
+  });
+}
 
 /* ============ CÀI ĐẶT ============ */
 const ov = $('ov');
@@ -1905,31 +1687,7 @@ if ($('hienSo')) $('hienSo').addEventListener('change', e => { hienSo = e.target
 let hen;
 window.addEventListener('resize', () => { clearTimeout(hen); hen = setTimeout(veXem, 150); });
 
-/* ============ KHỞI ĐỘNG ============ */
-napCaiDat();
-capNhatNgonNgu();          // đặt nhãn theo ngôn ngữ đã nhớ, rồi ve()
-
-function khoiDong(){
-  // Don PNG cu ngay khi mo panel: luc nay Premiere thuong da tha file cua phien
-  // truoc, con trong phien dang chay thi no giu -> unlink truot, bo qua.
-  donFileCu('');
-  if (!cs){
-    iTT = 1;
-    if ($('host')) $('host').textContent = 'browser';
-    ve();
-    return;
-  }
-  evalP('app.version')
-    .then(r => {
-      // app.version chắc hơn getHostInfo — ScriptPath có thể chưa nạp khi panel reload
-      const v = String(r || '');
-      if ($('host')) $('host').textContent = /^\d/.test(v) ? 'Premiere ' + v : 'Premiere';
-    })
-    .catch(() => {})
-    .then(() => docSeqPremiereThucTe())
-    .then(() => { setInterval(docSeqPremiereThucTe, 1500); });
-}
-khoiDong();
+ve();
 </script>
 </body>
 </html>

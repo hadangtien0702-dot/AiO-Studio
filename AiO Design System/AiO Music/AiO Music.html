@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AiO Music — Studio Console</title>
+<style>
+  /* =========================================================================
+     AiO STUDIO — TOKENS (STUDIO CONSOLE DESIGN SYSTEM)
+     ========================================================================= */
+  :root {
+    --bg-0: #0e0e0e;
+    --bg-1: #141414;
+    --bg-2: #181818;
+    --bg-3: #1f1f1f;
+    --bg-4: #282828;
+    --bg-5: #333333;
+    --bg-6: #161616;
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    --bg-active: rgba(255, 255, 255, 0.09);
+
+    --line-1: rgba(255, 255, 255, 0.06);
+    --line-2: rgba(255, 255, 255, 0.10);
+    --line-strong: rgba(255, 255, 255, 0.16);
+
+    --text-1: #f5f5f7;
+    --text-2: #c3c3c8;
+    --text-3: #8d8d95;
+    --text-meta: #9b9ba3;
+    --icon-dim: #8f8f97;
+
+    --accent: #f86820;
+    --accent-hover: #ff7d3c;
+    --accent-pressed: #e0590e;
+    --accent-soft: rgba(248, 104, 32, 0.16);
+    --accent-line: rgba(248, 104, 32, 0.40);
+    --accent-text: #ffb891;
+    --accent-on: #ffffff;
+
+    --ok: #4ec98a;
+    --warn: #e8c05a;
+    --danger: #ff5f6d;
+    --danger-strong: #ff4757;
+
+    --pr-video: #729acc;
+    --pr-audio: #1d7021;
+    --pr-music: #2a829e;
+
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    --fs-2xs: 10px;
+    --fs-xs: 11px;
+    --fs-sm: 12px;
+    --fs-md: 13px;
+    --fs-lg: 15px;
+    --fs-xl: 19px;
+
+    --fw-normal: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+
+    --lh-tight: 1.25;
+    --lh: 1.45;
+
+    --sp-1: 4px;
+    --sp-2: 6px;
+    --sp-3: 8px;
+    --sp-4: 12px;
+    --sp-5: 16px;
+    --sp-6: 24px;
+
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-pill: 999px;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-pop: 0 18px 52px rgba(0, 0, 0, 0.62);
+
+    --h-ctrl-sm: 24px;
+    --h-ctrl: 28px;
+    --h-ctrl-lg: 34px;
+
+    --h-topbar: 44px;
+    --dur: 150ms;
+    --ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --focus-ring: 0 0 0 3px var(--accent-soft);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; width: 100%; overflow-x: hidden; }
+  body {
+    background: var(--bg-2);
+    color: var(--text-1);
+    font-family: var(--font-ui);
+    font-size: var(--fs-md);
+    line-height: var(--lh);
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Custom Scrollbar */
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: var(--r-pill);
+  }
+  *::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+
+  :focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+  /* Icon Base */
+  .ico {
+    width: 16px; height: 16px; flex: none;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .ico-sm { width: 14px; height: 14px; }
+  .ico-xs { width: 12px; height: 12px; }
+  .ico-lg { width: 20px; height: 20px; }
+
+  /* Layout Container */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--bg-2);
+    border-left: 1px solid var(--line-1);
+    border-right: 1px solid var(--line-1);
+  }
+
+  /* Topbar Header */
+  .topbar {
+    height: var(--h-topbar);
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line-1);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 var(--sp-4);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .brand {
+    display: flex; align-items: center; gap: var(--sp-2);
+    font-size: var(--fs-md); font-weight: var(--fw-bold); color: var(--text-1);
+  }
+  .brand__icon {
+    width: 26px; height: 26px; border-radius: var(--r-sm);
+    background: var(--accent-soft); border: 1px solid var(--accent-line);
+    color: var(--accent); display: flex; align-items: center; justify-content: center;
+  }
+  .topbar__title { font-weight: var(--fw-bold); font-size: var(--fs-md); color: var(--text-1); }
+  .topbar__ver {
+    padding: 2px 6px; background: var(--bg-4); border: 1px solid var(--line-2);
+    border-radius: var(--r-pill); color: var(--text-3); font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+  }
+  .topbar__right { display: flex; align-items: center; gap: var(--sp-2); }
+
+  .status-badge {
+    display: flex; align-items: center; gap: var(--sp-1);
+    font-size: var(--fs-xs); color: var(--text-2); background: var(--bg-3);
+    padding: 3px 8px; border-radius: var(--r-pill); border: 1px solid var(--line-2);
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--ok);
+    box-shadow: 0 0 6px var(--ok);
+  }
+
+  .btn-icon {
+    width: var(--h-ctrl-sm); height: var(--h-ctrl-sm);
+    border-radius: var(--r-sm); border: 1px solid var(--line-2);
+    background: var(--bg-3); color: var(--text-2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .btn-icon:hover { background: var(--bg-4); color: var(--text-1); border-color: var(--line-strong); }
+
+  .lang-btn {
+    height: var(--h-ctrl-sm); padding: 0 var(--sp-2);
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    background: var(--bg-3); color: var(--text-2);
+    font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .lang-btn:hover { background: var(--bg-hover); color: var(--text-1); border-color: var(--accent); }
+
+  /* Active Sequence & Target Track Banner */
+  .target-banner {
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line-1);
+    padding: var(--sp-3) var(--sp-4);
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  }
+  .target-info { display: flex; align-items: center; gap: var(--sp-2); overflow: hidden; }
+  .target-icon { color: var(--accent); flex-shrink: 0; }
+  .target-seq { font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .target-time { font-size: var(--fs-2xs); color: var(--text-3); }
+
+  .target-select-wrap { display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0; }
+  .target-label { font-size: var(--fs-2xs); color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .select-ctrl {
+    height: var(--h-ctrl-sm); background: var(--bg-4); color: var(--text-1);
+    border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    padding: 0 var(--sp-2); font-size: var(--fs-xs); font-weight: var(--fw-medium);
+    cursor: pointer; outline: none;
+  }
+  .select-ctrl:hover { border-color: var(--line-strong); }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex; background: var(--bg-1);
+    padding: var(--sp-2) var(--sp-4);
+    gap: var(--sp-1); border-bottom: 1px solid var(--line-1);
+  }
+  .nav-tab {
+    flex: 1; height: var(--h-ctrl);
+    border-radius: var(--r-sm); border: 1px solid transparent;
+    background: transparent; color: var(--text-3);
+    font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .nav-tab:hover { color: var(--text-1); background: var(--bg-hover); }
+  .nav-tab.active {
+    background: var(--bg-3); color: var(--text-1);
+    border-color: var(--line-2); box-shadow: var(--shadow-sm);
+  }
+  .nav-tab.active .ico { color: var(--accent); }
+
+  /* Main Body Content */
+  .content-area {
+    padding: var(--sp-4);
+    display: flex; flex-direction: column; gap: var(--sp-4); flex: 1;
+  }
+
+  .tab-pane { display: none; flex-direction: column; gap: var(--sp-4); }
+  .tab-pane.active { display: flex; }
+
+  /* Controls Section Box */
+  .section-box {
+    background: var(--bg-3); border: 1px solid var(--line-1);
+    border-radius: var(--r-lg); padding: var(--sp-4);
+    display: flex; flex-direction: column; gap: var(--sp-3);
+  }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title {
+    font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--text-1);
+    display: flex; align-items: center; gap: var(--sp-2);
+  }
+
+  /* Search & Filter Bar */
+  .search-box {
+    position: relative; width: 100%;
+  }
+  .search-input {
+    width: 100%; height: var(--h-ctrl);
+    background: var(--bg-0); border: 1px solid var(--line-2);
+    border-radius: var(--r-sm); padding: 0 var(--sp-3) 0 32px;
+    color: var(--text-1); font-size: var(--fs-xs); font-family: var(--font-ui);
+    transition: all var(--dur) var(--ease);
+  }
+  .search-input:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-3); pointer-events: none;
+  }
+
+  /* Chip Filter Grid */
+  .chip-group { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+  .chip {
+    height: var(--h-ctrl-sm); padding: 0 var(--sp-3);
+    border-radius: var(--r-pill); border: 1px solid var(--line-2);
+    background: var(--bg-4); color: var(--text-2);
+    font-size: var(--fs-xs); font-weight: var(--fw-medium);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .chip:hover { border-color: var(--line-strong); color: var(--text-1); }
+  .chip.active {
+    background: var(--accent-soft); border-color: var(--accent-line);
+    color: var(--accent-text); font-weight: var(--fw-semibold);
+  }
+
+  /* BGM Track Card */
+  .track-card {
+    background: var(--bg-4); border: 1px solid var(--line-1);
+    border-radius: var(--r-md); padding: var(--sp-3);
+    display: flex; flex-direction: column; gap: var(--sp-3);
+    transition: border-color var(--dur) var(--ease);
+  }
+  .track-card:hover { border-color: var(--line-strong); }
+  .track-card.playing { border-color: var(--accent-line); background: rgba(248, 104, 32, 0.04); }
+
+  .track-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+  .track-meta { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; flex: 1; }
+  
+  .play-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent); border: none; color: var(--accent-on);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: transform var(--dur) var(--ease), background var(--dur);
+  }
+  .play-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+  .play-btn:active { background: var(--accent-pressed); transform: scale(0.96); }
+
+  .track-details { min-width: 0; display: flex; flex-direction: column; }
+  .track-title {
+    font-size: var(--fs-md); font-weight: var(--fw-bold); color: var(--text-1);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .track-tags { display: flex; align-items: center; gap: var(--sp-2); margin-top: 2px; }
+  .track-tag { font-size: var(--fs-2xs); color: var(--text-3); background: var(--bg-0); padding: 1px 6px; border-radius: var(--r-sm); }
+
+  .track-badges { display: flex; align-items: center; gap: var(--sp-1); flex-shrink: 0; }
+  .badge {
+    font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+    padding: 2px 6px; border-radius: var(--r-sm); background: var(--bg-0);
+    color: var(--text-2); border: 1px solid var(--line-1);
+  }
+  .badge-bpm { color: var(--warn); border-color: rgba(232, 192, 90, 0.2); }
+
+  /* Waveform Visualization Container */
+  .waveform-wrap {
+    height: 36px; background: var(--bg-0); border-radius: var(--r-sm);
+    padding: var(--sp-1) var(--sp-2); display: flex; align-items: center; gap: 2px;
+    position: relative; cursor: pointer; overflow: hidden;
+  }
+  .wave-bar {
+    flex: 1; height: 20%; background: var(--line-strong);
+    border-radius: 1px; transition: height var(--dur) var(--ease), background var(--dur);
+  }
+  .waveform-wrap.playing .wave-bar { background: var(--accent-soft); }
+  .waveform-wrap.playing .wave-bar.played { background: var(--accent); }
+  .wave-time {
+    position: absolute; right: 8px; bottom: 3px;
+    font-size: var(--fs-2xs); color: var(--text-3); font-variant-numeric: tabular-nums;
+  }
+
+  /* Stem Toggles Section */
+  .stems-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+    background: var(--bg-0); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-sm);
+  }
+  .stems-label { font-size: var(--fs-2xs); font-weight: var(--fw-bold); color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stem-chips { display: flex; gap: var(--sp-1); }
+  .stem-chip {
+    font-size: var(--fs-2xs); font-weight: var(--fw-semibold); padding: 3px 8px;
+    border-radius: var(--r-sm); border: 1px solid var(--line-2); background: var(--bg-3);
+    color: var(--text-3); cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .stem-chip.active {
+    background: rgba(78, 201, 138, 0.15); border-color: rgba(78, 201, 138, 0.4);
+    color: var(--ok);
+  }
+
+  /* Track Bottom Actions */
+  .track-bottom { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+  .btn-insert {
+    height: var(--h-ctrl-lg); padding: 0 var(--sp-4); flex: 1;
+    background: var(--accent); border: none; border-radius: var(--r-sm);
+    color: var(--accent-on); font-size: var(--fs-md); font-weight: var(--fw-bold);
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+    cursor: pointer; transition: background var(--dur) var(--ease), transform var(--dur);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-insert:hover { background: var(--accent-hover); }
+  .btn-insert:active { background: var(--accent-pressed); transform: scale(0.98); }
+
+  .btn-sec {
+    height: var(--h-ctrl-lg); padding: 0 var(--sp-3);
+    background: var(--bg-3); border: 1px solid var(--line-2); border-radius: var(--r-sm);
+    color: var(--text-2); font-size: var(--fs-xs); font-weight: var(--fw-medium);
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-1);
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .btn-sec:hover { background: var(--bg-5); color: var(--text-1); border-color: var(--line-strong); }
+
+  /* Sliders & Switches (Auto-Ducking Pane) */
+  .control-row {
+    display: flex; flex-direction: column; gap: var(--sp-1);
+  }
+  .control-label-wrap {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .control-title { font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--text-2); }
+  .control-val { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  .range-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px; border-radius: 3px;
+    background: var(--bg-0); outline: none; margin: var(--sp-1) 0;
+  }
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg-2);
+    cursor: pointer; transition: transform var(--dur) var(--ease);
+  }
+  .range-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* Toggle Switch */
+  .switch-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-4); padding: var(--sp-3); border-radius: var(--r-md);
+    border: 1px solid var(--line-1);
+  }
+  .switch-info { display: flex; flex-direction: column; }
+  .switch-name { font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--text-1); }
+  .switch-desc { font-size: var(--fs-2xs); color: var(--text-3); }
+
+  .toggle-switch {
+    position: relative; display: inline-block; width: 38px; height: 22px;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .slider-round {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--bg-5); transition: .2s; border-radius: 22px;
+    border: 1px solid var(--line-2);
+  }
+  .slider-round:before {
+    position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
+    background-color: var(--text-2); transition: .2s; border-radius: 50%;
+  }
+  input:checked + .slider-round { background-color: var(--accent); border-color: var(--accent-line); }
+  input:checked + .slider-round:before { transform: translateX(16px); background-color: var(--accent-on); }
+
+  /* Timeline Simulator Box */
+  .timeline-sim {
+    background: var(--bg-0); border: 1px solid var(--line-2);
+    border-radius: var(--r-md); padding: var(--sp-3);
+    display: flex; flex-direction: column; gap: var(--sp-2);
+  }
+  .sim-title { font-size: var(--fs-2xs); font-weight: var(--fw-bold); color: var(--text-3); text-transform: uppercase; }
+  .sim-track {
+    height: 24px; border-radius: var(--r-sm); display: flex; align-items: center;
+    padding: 0 var(--sp-2); font-size: var(--fs-2xs); font-weight: var(--fw-semibold);
+  }
+  .sim-track-voice { background: rgba(114, 154, 204, 0.25); border: 1px solid rgba(114, 154, 204, 0.5); color: var(--pr-video); }
+  .sim-track-music {
+    background: rgba(42, 130, 158, 0.2); border: 1px solid rgba(42, 130, 158, 0.4); color: var(--pr-music);
+    position: relative; overflow: hidden;
+  }
+  .sim-duck-dip {
+    position: absolute; top: 0; bottom: 0; left: 25%; width: 40%;
+    background: rgba(248, 104, 32, 0.25); border-left: 2px stroke var(--accent); border-right: 2px stroke var(--accent);
+    display: flex; align-items: center; justify-content: center; color: var(--accent-text); font-size: 9px;
+  }
+
+  /* SFX Grid Pane */
+  .sfx-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-2); }
+  .sfx-card {
+    background: var(--bg-4); border: 1px solid var(--line-1);
+    border-radius: var(--r-sm); padding: var(--sp-3);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; transition: all var(--dur) var(--ease);
+  }
+  .sfx-card:hover { border-color: var(--accent-line); background: var(--bg-5); transform: translateY(-1px); }
+  .sfx-info { display: flex; flex-direction: column; }
+  .sfx-name { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--text-1); }
+  .sfx-cat { font-size: var(--fs-2xs); color: var(--text-3); }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--bg-0); border: 1px solid var(--accent-line);
+    color: var(--text-1); padding: var(--sp-2) var(--sp-4); border-radius: var(--r-pill);
+    font-size: var(--fs-xs); font-weight: var(--fw-semibold); display: flex; align-items: center; gap: var(--sp-2);
+    box-shadow: var(--shadow-pop); transition: transform 250ms var(--ease); z-index: 1000;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast-icon { color: var(--ok); }
+
+  /* Footer Info */
+  .footer-info {
+    text-align: center; font-size: var(--fs-2xs); color: var(--text-3);
+    padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--line-1); background: var(--bg-1);
+    margin-top: auto;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- TOPBAR HEADER -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__icon">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2M6 18a3 3 0 100-6 3 3 0 000 6zm12 0a3 3 0 100-6 3 3 0 000 6z"/></svg>
+      </div>
+      <span class="topbar__title">AiO Music</span>
+      <span class="topbar__ver">v1.0</span>
+    </div>
+
+    <div class="topbar__right">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span id="txt-connected">Premiere Ready</span>
+      </div>
+      <button class="lang-btn" id="btn-lang" onclick="toggleLanguage()">VI</button>
+      <button class="btn-icon" title="Làm mới" onclick="refreshPanel()">
+        <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- TARGET BANNER -->
+  <div class="target-banner">
+    <div class="target-info">
+      <svg class="ico ico-sm target-icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      <span class="target-seq">Sequence: <strong id="seq-name" style="color:var(--text-1);">Vlog_KyNiem_2026.prproj</strong></span>
+      <span class="target-time">(03:45.00)</span>
+    </div>
+    <div class="target-select-wrap">
+      <span class="target-label" id="lbl-target-track">Target Track:</span>
+      <select class="select-ctrl" id="select-audio-track">
+        <option value="A2">Audio 2 (BGM)</option>
+        <option value="A3">Audio 3 (SFX)</option>
+        <option value="A4">Audio 4 (Ambience)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('bgm')" id="tab-btn-bgm">
+      <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/></svg>
+      <span id="txt-tab-bgm">Kho Nhạc BGM</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('ducking')" id="tab-btn-ducking">
+      <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M12 2v20M17 5v14M7 9v6M2 11v2M22 11v2"/></svg>
+      <span id="txt-tab-ducking">Auto-Ducking</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('beatsync')" id="tab-btn-beatsync">
+      <svg class="ico ico-xs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span id="txt-tab-beatsync">Beat Sync</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('sfx')" id="tab-btn-sfx">
+      <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07"/></svg>
+      <span id="txt-tab-sfx">Sound FX</span>
+    </button>
+  </nav>
+
+  <!-- CONTENT AREA -->
+  <main class="content-area">
+
+    <!-- TAB 1: KHO NHẠC BGM -->
+    <div class="tab-pane active" id="pane-bgm">
+      <!-- Search & Filters -->
+      <div class="section-box">
+        <div class="search-box">
+          <svg class="ico ico-xs search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="inp-search" placeholder="Tìm tên bài hát, mood (Cinematic, Upbeat, Lo-Fi)..." onkeyup="filterTracks()">
+        </div>
+
+        <div class="chip-group" id="chip-filters">
+          <button class="chip active" onclick="setFilter(this, 'all')">Tất cả</button>
+          <button class="chip" onclick="setFilter(this, 'Cinematic')">Cinematic</button>
+          <button class="chip" onclick="setFilter(this, 'Upbeat')">Upbeat</button>
+          <button class="chip" onclick="setFilter(this, 'Lo-Fi')">Lo-Fi</button>
+          <button class="chip" onclick="setFilter(this, 'Vlog')">Vlog Travel</button>
+          <button class="chip" onclick="setFilter(this, 'Corporate')">Corporate</button>
+          <button class="chip" onclick="setFilter(this, 'Suspense')">Dramatic</button>
+        </div>
+      </div>
+
+      <!-- Track List Container -->
+      <div id="track-list-container" style="display:flex; flex-direction:column; gap: var(--sp-3);">
+
+        <!-- TRACK ITEM 1 -->
+        <div class="track-card" data-mood="Cinematic" data-title="Epic Horizon Rising">
+          <div class="track-top">
+            <div class="track-meta">
+              <button class="play-btn" onclick="togglePlay(this)">
+                <svg class="ico ico-xs" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="track-details">
+                <span class="track-title">Epic Horizon Rising</span>
+                <div class="track-tags">
+                  <span class="track-tag">Cinematic</span>
+                  <span class="track-tag">Inspirational</span>
+                </div>
+              </div>
+            </div>
+            <div class="track-badges">
+              <span class="badge badge-bpm">120 BPM</span>
+              <span class="badge">C Minor</span>
+            </div>
+          </div>
+
+          <!-- Waveform Visual -->
+          <div class="waveform-wrap" onclick="seekTrack(this, event)">
+            <!-- Waveform bars generated dynamically via JS -->
+            <span class="wave-time">02:34</span>
+          </div>
+
+          <!-- Stem Separator -->
+          <div class="stems-bar">
+            <span class="stems-label">Stems:</span>
+            <div class="stem-chips">
+              <span class="stem-chip active" onclick="toggleStem(this)">Melody</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Drums</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Bass</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Vocal</span>
+            </div>
+          </div>
+
+          <div class="track-bottom">
+            <button class="btn-insert" onclick="insertTrack('Epic Horizon Rising')">
+              <svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span class="txt-insert-btn">Chèn vào Timeline</span>
+            </button>
+            <button class="btn-sec" title="Nghe thử đúng độ dài video" onclick="fitToTimeline('Epic Horizon Rising')">
+              <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4"/></svg>
+              <span>Fit Length</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TRACK ITEM 2 -->
+        <div class="track-card" data-mood="Upbeat Vlog" data-title="Sunny Morning Chill">
+          <div class="track-top">
+            <div class="track-meta">
+              <button class="play-btn" onclick="togglePlay(this)">
+                <svg class="ico ico-xs" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="track-details">
+                <span class="track-title">Sunny Morning Chill</span>
+                <div class="track-tags">
+                  <span class="track-tag">Lo-Fi</span>
+                  <span class="track-tag">Vlog</span>
+                </div>
+              </div>
+            </div>
+            <div class="track-badges">
+              <span class="badge badge-bpm">95 BPM</span>
+              <span class="badge">G Major</span>
+            </div>
+          </div>
+
+          <div class="waveform-wrap" onclick="seekTrack(this, event)">
+            <span class="wave-time">01:58</span>
+          </div>
+
+          <div class="stems-bar">
+            <span class="stems-label">Stems:</span>
+            <div class="stem-chips">
+              <span class="stem-chip active" onclick="toggleStem(this)">Melody</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Drums</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Bass</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Vocal</span>
+            </div>
+          </div>
+
+          <div class="track-bottom">
+            <button class="btn-insert" onclick="insertTrack('Sunny Morning Chill')">
+              <svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span class="txt-insert-btn">Chèn vào Timeline</span>
+            </button>
+            <button class="btn-sec" onclick="fitToTimeline('Sunny Morning Chill')">
+              <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4"/></svg>
+              <span>Fit Length</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TRACK ITEM 3 -->
+        <div class="track-card" data-mood="Corporate" data-title="Tech Future Innovations">
+          <div class="track-top">
+            <div class="track-meta">
+              <button class="play-btn" onclick="togglePlay(this)">
+                <svg class="ico ico-xs" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="track-details">
+                <span class="track-title">Tech Future Innovations</span>
+                <div class="track-tags">
+                  <span class="track-tag">Corporate</span>
+                  <span class="track-tag">Modern</span>
+                </div>
+              </div>
+            </div>
+            <div class="track-badges">
+              <span class="badge badge-bpm">115 BPM</span>
+              <span class="badge">A Minor</span>
+            </div>
+          </div>
+
+          <div class="waveform-wrap" onclick="seekTrack(this, event)">
+            <span class="wave-time">03:12</span>
+          </div>
+
+          <div class="stems-bar">
+            <span class="stems-label">Stems:</span>
+            <div class="stem-chips">
+              <span class="stem-chip active" onclick="toggleStem(this)">Melody</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Drums</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Bass</span>
+              <span class="stem-chip active" onclick="toggleStem(this)">Vocal</span>
+            </div>
+          </div>
+
+          <div class="track-bottom">
+            <button class="btn-insert" onclick="insertTrack('Tech Future Innovations')">
+              <svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span class="txt-insert-btn">Chèn vào Timeline</span>
+            </button>
+            <button class="btn-sec" onclick="fitToTimeline('Tech Future Innovations')">
+              <svg class="ico ico-xs" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4"/></svg>
+              <span>Fit Length</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: AUTO-DUCKING & FADE -->
+    <div class="tab-pane" id="pane-ducking">
+      <div class="switch-row">
+        <div class="switch-info">
+          <span class="switch-name" id="txt-duck-toggle">Bật Smart Auto-Ducking</span>
+          <span class="switch-desc" id="txt-duck-desc">Tự động hạ nhỏ tiếng nhạc khi có giọng nói (Voiceover)</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chk-ducking" checked onchange="updateDuckingSim()">
+          <span class="slider-round"></span>
+        </label>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title">
+          <svg class="ico ico-xs" style="color:var(--accent);" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+          <span id="txt-duck-settings">Thông số Né Giọng (Ducking)</span>
+        </div>
+
+        <!-- Control Slider 1: Duck Amount -->
+        <div class="control-row">
+          <div class="control-label-wrap">
+            <span class="control-title" id="lbl-duck-amount">Mức Giảm Âm Lượng (Duck Amount)</span>
+            <span class="control-val" id="val-duck-amount">-18 dB</span>
+          </div>
+          <input type="range" class="range-slider" min="-30" max="-6" value="-18" id="rng-duck-amount" oninput="document.getElementById('val-duck-amount').innerText = this.value + ' dB'; updateDuckingSim();">
+        </div>
+
+        <!-- Control Slider 2: Sensitivity -->
+        <div class="control-row">
+          <div class="control-label-wrap">
+            <span class="control-title" id="lbl-duck-sens">Độ Nhạy Phát Hiện Giọng Nói</span>
+            <span class="control-val" id="val-duck-sens">75%</span>
+          </div>
+          <input type="range" class="range-slider" min="10" max="100" value="75" id="rng-duck-sens" oninput="document.getElementById('val-duck-sens').innerText = this.value + '%';">
+        </div>
+
+        <!-- Control Slider 3: Fade Duration -->
+        <div class="control-row">
+          <div class="control-label-wrap">
+            <span class="control-title" id="lbl-fade-time">Thời Gian Transition (Fade In / Out)</span>
+            <span class="control-val" id="val-fade-time">0.8 Giây</span>
+          </div>
+          <input type="range" class="range-slider" min="0.2" max="2.5" step="0.1" value="0.8" id="rng-fade-time" oninput="document.getElementById('val-fade-time').innerText = this.value + ' Giây';">
+        </div>
+      </div>
+
+      <!-- Timeline Simulator -->
+      <div class="timeline-sim">
+        <span class="sim-title" id="txt-sim-title">Mô phỏng hạ nhạc tự động trên Timeline:</span>
+        <div class="sim-track sim-track-voice">
+          🎤 Audio 1: Voiceover (Giọng thoại phát ra tại 01:10)
+        </div>
+        <div class="sim-track sim-track-music" id="sim-bgm-track">
+          🎵 Audio 2: Nhạc BGM (Bình thường)
+          <div class="sim-duck-dip" id="sim-dip">Tự động giảm <span id="sim-db-txt">-18dB</span></div>
+        </div>
+      </div>
+
+      <button class="btn-insert" onclick="applyDucking()">
+        <svg class="ico ico-xs" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="txt-apply-duck">Áp dụng Auto-Ducking vào Timeline</span>
+      </button>
+    </div>
+
+    <!-- TAB 3: BEAT SYNC & AUTO-FIT -->
+    <div class="tab-pane" id="pane-beatsync">
+      <div class="section-box">
+        <div class="section-title">
+          <svg class="ico ico-xs" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M12 2v20M17 5v14M7 9v6M2 11v2M22 11v2"/></svg>
+          <span id="txt-beatsync-title">Tự Động Khớp Nhịp (Auto Beat Matching)</span>
+        </div>
+        <p style="font-size: var(--fs-xs); color: var(--text-2);" id="txt-beatsync-desc">
+          Công cụ phân tích tiết tấu bài hát và tự động thêm các Marker nhịp phách (Beat Markers) vào Premiere Pro để hỗ trợ cắt dựng theo nhạc cực nhanh.
+        </p>
+
+        <div class="control-row">
+          <div class="control-label-wrap">
+            <span class="control-title" id="lbl-beat-grid">Mật độ Beat Marker:</span>
+            <span class="control-val" id="val-beat-grid">Mỗi 1/4 Beat (Chi tiết)</span>
+          </div>
+          <select class="select-ctrl" style="width:100%; height: var(--h-ctrl);" id="sel-beat-density">
+            <option value="1/4">Mỗi 1/4 Beat (Phù hợp dựng nhịp nhanh)</option>
+            <option value="1/2">Mỗi 1/2 Beat (Phù hợp Vlog / Phim ngắn)</option>
+            <option value="drop">Chỉ đánh dấu điểm Drop / Cao trào</option>
+          </select>
+        </div>
+
+        <button class="btn-insert" style="background: var(--bg-4); border: 1px solid var(--line-2); color: var(--text-1);" onclick="generateBeatMarkers()">
+          <svg class="ico ico-xs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          <span id="txt-gen-markers">Tạo Beat Markers trên Sequence</span>
+        </button>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title">
+          <svg class="ico ico-xs" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4"/></svg>
+          <span id="txt-autofit-title">Auto-Fit (Cắt Nhạc Vừa Khít Độ Dài Video)</span>
+        </div>
+        <p style="font-size: var(--fs-xs); color: var(--text-2);" id="txt-autofit-desc">
+          Tự động phối lại (re-arrange) bài nhạc để kết thúc tự nhiên đúng thời lượng 03:45.00 của video hiện tại mà không bị gắt.
+        </p>
+        <button class="btn-insert" onclick="executeAutoFit()">
+          <svg class="ico ico-xs" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+          <span id="txt-fit-now">Cắt & Phối Nhạc Theo Độ Dài Video</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 4: SOUND EFFECTS (SFX) -->
+    <div class="tab-pane" id="pane-sfx">
+      <div class="search-box">
+        <svg class="ico ico-xs search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" placeholder="Tìm Sound FX (Whoosh, Riser, Impact)...">
+      </div>
+
+      <div class="section-title">
+        <svg class="ico ico-xs" style="color:var(--accent);" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07"/></svg>
+        <span id="txt-sfx-quick">Thư viện Sound Effects Nhanh</span>
+      </div>
+
+      <div class="sfx-grid">
+        <div class="sfx-card" onclick="insertSFX('Cinematic Whoosh Soft')">
+          <div class="sfx-info">
+            <span class="sfx-name">Whoosh Soft</span>
+            <span class="sfx-cat">Transition • 0.8s</span>
+          </div>
+          <button class="btn-icon"><svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="sfx-card" onclick="insertSFX('Sub Impact Heavy')">
+          <div class="sfx-info">
+            <span class="sfx-name">Sub Impact</span>
+            <span class="sfx-cat">Trailer Hit • 1.5s</span>
+          </div>
+          <button class="btn-icon"><svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="sfx-card" onclick="insertSFX('Tension Riser 3s')">
+          <div class="sfx-info">
+            <span class="sfx-name">Tension Riser</span>
+            <span class="sfx-cat">Suspense • 3.0s</span>
+          </div>
+          <button class="btn-icon"><svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="sfx-card" onclick="insertSFX('Pop UI Click')">
+          <div class="sfx-info">
+            <span class="sfx-name">Pop UI Click</span>
+            <span class="sfx-cat">Interface • 0.2s</span>
+          </div>
+          <button class="btn-icon"><svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="sfx-card" onclick="insertSFX('Camera Shutter Click')">
+          <div class="sfx-info">
+            <span class="sfx-name">Camera Shutter</span>
+            <span class="sfx-cat">Foley • 0.4s</span>
+          </div>
+          <button class="btn-icon"><svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="sfx-card" onclick="insertSFX('Vinyl Scratch Stop')">
+          <div class="sfx-info">
+            <span class="sfx-name">Vinyl Scratch</span>
+            <span class="sfx-cat">Retro • 0.9s</span>
+          </div>
+          <button class="btn-icon"><svg class="ico ico-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-info">
+    AiO Studio Console Design System • Native Premiere Pro CEP Extension
+  </footer>
+
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast-notify">
+  <svg class="ico ico-sm toast-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-text">Đã chèn bài hát vào Timeline thành công!</span>
+</div>
+
+<script>
+  let currentLang = 'VI';
+
+  const dict = {
+    VI: {
+      connected: 'Premiere Ready',
+      targetTrack: 'Target Track:',
+      tabBgm: 'Kho Nhạc BGM',
+      tabDucking: 'Auto-Ducking',
+      tabBeatSync: 'Beat Sync',
+      tabSfx: 'Sound FX',
+      duckToggle: 'Bật Smart Auto-Ducking',
+      duckDesc: 'Tự động hạ nhỏ tiếng nhạc khi có giọng nói (Voiceover)',
+      duckSettings: 'Thông số Né Giọng (Ducking)',
+      duckAmount: 'Mức Giảm Âm Lượng (Duck Amount)',
+      duckSens: 'Độ Nhạy Phát Hiện Giọng Nói',
+      fadeTime: 'Thời Gian Transition (Fade In / Out)',
+      simTitle: 'Mô phỏng hạ nhạc tự động trên Timeline:',
+      applyDuck: 'Áp dụng Auto-Ducking vào Timeline',
+      beatsyncTitle: 'Tự Động Khớp Nhịp (Auto Beat Matching)',
+      beatsyncDesc: 'Công cụ phân tích tiết tấu bài hát và tự động thêm các Marker nhịp phách (Beat Markers) vào Premiere Pro để hỗ trợ cắt dựng theo nhạc cực nhanh.',
+      beatGrid: 'Mật độ Beat Marker:',
+      genMarkers: 'Tạo Beat Markers trên Sequence',
+      autofitTitle: 'Auto-Fit (Cắt Nhạc Vừa Khít Độ Dài Video)',
+      autofitDesc: 'Tự động phối lại (re-arrange) bài nhạc để kết thúc tự nhiên đúng thời lượng 03:45.00 của video hiện tại mà không bị gắt.',
+      fitNow: 'Cắt & Phối Nhạc Theo Độ Dài Video',
+      sfxQuick: 'Thư viện Sound Effects Nhanh',
+      insertBtn: 'Chèn vào Timeline'
+    },
+    EN: {
+      connected: 'Premiere Ready',
+      targetTrack: 'Target Track:',
+      tabBgm: 'BGM Library',
+      tabDucking: 'Auto-Ducking',
+      tabBeatSync: 'Beat Sync',
+      tabSfx: 'Sound FX',
+      duckToggle: 'Enable Smart Auto-Ducking',
+      duckDesc: 'Automatically lowers background music when voiceover is detected',
+      duckSettings: 'Ducking Parameters',
+      duckAmount: 'Duck Reduction Amount',
+      duckSens: 'Voice Detection Sensitivity',
+      fadeTime: 'Fade In / Out Transition',
+      simTitle: 'Timeline Audio Ducking Simulation:',
+      applyDuck: 'Apply Auto-Ducking to Timeline',
+      beatsyncTitle: 'Auto Beat Matching',
+      beatsyncDesc: 'Analyzes music rhythm and places Premiere Pro beat markers automatically for seamless video editing.',
+      beatGrid: 'Beat Marker Density:',
+      genMarkers: 'Generate Beat Markers on Sequence',
+      autofitTitle: 'Auto-Fit Music Duration',
+      autofitDesc: 'Intelligently re-arranges the music track to end naturally matching your video sequence length (03:45.00).',
+      fitNow: 'Fit & Re-arrange Music to Video',
+      sfxQuick: 'Quick Sound Effects Library',
+      insertBtn: 'Insert to Timeline'
+    }
+  };
+
+  // Generate Waveform bars for preview cards
+  document.querySelectorAll('.waveform-wrap').forEach(wrap => {
+    for (let i = 0; i < 38; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'wave-bar';
+      const heightPercent = Math.floor(Math.random() * 70) + 20;
+      bar.style.height = heightPercent + '%';
+      wrap.appendChild(bar);
+    }
+  });
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'VI' ? 'EN' : 'VI';
+    document.getElementById('btn-lang').innerText = currentLang;
+
+    const t = dict[currentLang];
+    document.getElementById('txt-connected').innerText = t.connected;
+    document.getElementById('lbl-target-track').innerText = t.targetTrack;
+    document.getElementById('txt-tab-bgm').innerText = t.tabBgm;
+    document.getElementById('txt-tab-ducking').innerText = t.tabDucking;
+    document.getElementById('txt-tab-beatsync').innerText = t.tabBeatSync;
+    document.getElementById('txt-tab-sfx').innerText = t.tabSfx;
+    document.getElementById('txt-duck-toggle').innerText = t.duckToggle;
+    document.getElementById('txt-duck-desc').innerText = t.duckDesc;
+    document.getElementById('txt-duck-settings').innerText = t.duckSettings;
+    document.getElementById('lbl-duck-amount').innerText = t.duckAmount;
+    document.getElementById('lbl-duck-sens').innerText = t.duckSens;
+    document.getElementById('lbl-fade-time').innerText = t.fadeTime;
+    document.getElementById('txt-sim-title').innerText = t.simTitle;
+    document.getElementById('txt-apply-duck').innerText = t.applyDuck;
+    document.getElementById('txt-beatsync-title').innerText = t.beatsyncTitle;
+    document.getElementById('txt-beatsync-desc').innerText = t.beatsyncDesc;
+    document.getElementById('lbl-beat-grid').innerText = t.beatGrid;
+    document.getElementById('txt-gen-markers').innerText = t.genMarkers;
+    document.getElementById('txt-autofit-title').innerText = t.autofitTitle;
+    document.getElementById('txt-autofit-desc').innerText = t.autofitDesc;
+    document.getElementById('txt-fit-now').innerText = t.fitNow;
+    document.getElementById('txt-sfx-quick').innerText = t.sfxQuick;
+
+    document.querySelectorAll('.txt-insert-btn').forEach(el => el.innerText = t.insertBtn);
+  }
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+    document.getElementById(`tab-btn-${tabId}`).classList.add('active');
+    document.getElementById(`pane-${tabId}`).classList.add('active');
+  }
+
+  function togglePlay(btn) {
+    const card = btn.closest('.track-card');
+    const wave = card.querySelector('.waveform-wrap');
+    const isPlaying = card.classList.contains('playing');
+
+    document.querySelectorAll('.track-card').forEach(c => {
+      c.classList.remove('playing');
+      c.querySelector('.waveform-wrap').classList.remove('playing');
+      c.querySelector('.play-btn').innerHTML = '<svg class="ico ico-xs" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+    });
+
+    if (!isPlaying) {
+      card.classList.add('playing');
+      wave.classList.add('playing');
+      btn.innerHTML = '<svg class="ico ico-xs" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+      showToast(currentLang === 'VI' ? 'Đang phát bản nghe thử...' : 'Playing track preview...');
+    }
+  }
+
+  function seekTrack(wrap, event) {
+    const rect = wrap.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const pct = clickX / rect.width;
+
+    const bars = wrap.querySelectorAll('.wave-bar');
+    const playedIndex = Math.floor(pct * bars.length);
+
+    bars.forEach((bar, idx) => {
+      if (idx <= playedIndex) {
+        bar.classList.add('played');
+      } else {
+        bar.classList.remove('played');
+      }
+    });
+  }
+
+  function toggleStem(chip) {
+    chip.classList.toggle('active');
+    const name = chip.innerText;
+    const state = chip.classList.contains('active') ? 'On' : 'Off';
+    showToast(`Stem ${name}: ${state}`);
+  }
+
+  function setFilter(btn, filter) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cards = document.querySelectorAll('.track-card');
+    cards.forEach(card => {
+      if (filter === 'all' || card.dataset.mood.includes(filter)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function filterTracks() {
+    const query = document.getElementById('inp-search').value.toLowerCase();
+    document.querySelectorAll('.track-card').forEach(card => {
+      const text = (card.dataset.title + ' ' + card.dataset.mood).toLowerCase();
+      if (text.includes(query)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function updateDuckingSim() {
+    const enabled = document.getElementById('chk-ducking').checked;
+    const dbVal = document.getElementById('rng-duck-amount').value;
+    const dip = document.getElementById('sim-dip');
+    document.getElementById('sim-db-txt').innerText = dbVal + 'dB';
+
+    if (enabled) {
+      dip.style.display = 'flex';
+    } else {
+      dip.style.display = 'none';
+    }
+  }
+
+  function applyDucking() {
+    const track = document.getElementById('select-audio-track').value;
+    const db = document.getElementById('rng-duck-amount').value;
+    showToast(currentLang === 'VI' ? `Đã áp dụng Ducking ${db}dB vào ${track}` : `Applied ${db}dB Ducking to ${track}`);
+  }
+
+  function generateBeatMarkers() {
+    const density = document.getElementById('sel-beat-density').value;
+    showToast(currentLang === 'VI' ? `Đã tạo 42 Beat Markers (${density}) trên Sequence!` : `Generated 42 Beat Markers (${density}) on Sequence!`);
+  }
+
+  function executeAutoFit() {
+    showToast(currentLang === 'VI' ? 'Đã cắt & phối lại nhạc vừa khít 03:45.00!' : 'Re-arranged music to fit 03:45.00!');
+  }
+
+  function fitToTimeline(trackName) {
+    showToast(currentLang === 'VI' ? `Đã tự động cắt ${trackName} theo độ dài Video!` : `Auto-fitted ${trackName} to Video length!`);
+  }
+
+  function insertTrack(name) {
+    const track = document.getElementById('select-audio-track').value;
+    showToast(currentLang === 'VI' ? `Đã chèn "${name}" vào track ${track}!` : `Inserted "${name}" into track ${track}!`);
+  }
+
+  function insertSFX(name) {
+    showToast(currentLang === 'VI' ? `Đã chèn Sound FX "${name}" tại CTI!` : `Inserted Sound FX "${name}" at playhead!`);
+  }
+
+  function refreshPanel() {
+    showToast(currentLang === 'VI' ? 'Đã đồng bộ lại với Premiere Pro!' : 'Re-synced with Premiere Pro!');
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast-notify');
+    document.getElementById('toast-text').innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2400);
+  }
+</script>
+
+</body>
+</html>

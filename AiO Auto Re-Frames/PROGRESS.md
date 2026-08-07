@@ -1,5 +1,10 @@
 # AiO Auto Re-Frames - Nhat ky
 
+## [0.5.1] - 2026-08-06 22:06 (UTC+7) - REDESIGN UI THEO CHUAN STUDIO CONSOLE DESIGN SYSTEM
+
+1. **Redesign UI dist/index.html**: Nang cap toan bo giao dien panel AiO Auto Re-Frames theo chuan Studio Console Design System (topbar brand logo, bar selbar giam sat sequence real-time, live preview dynamic animation bam chu the, aspect ratio selector grid, card Shorts theo noi dung voi list checkbox & badge thoi luong).
+2. **Xuat file Design System HTML**: Tao file `AiO Auto Re-Frames.html` trong thu muc `AiO Design System/AiO Auto Re-Frames/` khop chuan voi bo file showcase Design System.
+
 ## [0.5.0] - 2026-08-01 15:09 (UTC+7) - BAN PHAT HANH DAU TIEN + day bao hiem
 
 1. **Tu luu project truoc khi ghi timeline** (`rf__luuTruoc`): gan vao ca 3 ham

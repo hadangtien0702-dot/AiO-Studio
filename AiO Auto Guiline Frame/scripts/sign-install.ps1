@@ -68,6 +68,12 @@ if (-not (Test-Path (Join-Path $root 'dist\index.html')))    { throw "Thieu dist
 if (-not (Test-Path (Join-Path $root 'dist\safe-zones.js'))) { throw "Thieu dist\safe-zones.js." }
 if (-not (Test-Path (Join-Path $root 'dist\ve-guide.js')))   { throw "Thieu dist\ve-guide.js." }
 if (-not (Test-Path (Join-Path $root 'host\guideframe.jsx'))){ throw "Thieu host\guideframe.jsx." }
+# Font Inter DONG GOI: thiet ke tro toi '../fonts/Inter.woff2' tu dist/index.html.
+# Thieu thu muc nay la panel roi ve font he thong (tren Windows SF Pro cai tach
+# roi tung weight nen font-weight khong an) - do 06/08/2026.
+if (-not (Test-Path (Join-Path $root 'fonts\Inter.woff2'))) {
+  throw "Thieu fonts\Inter.woff2 - chep tu 'AiO Design System\fonts\' sang."
+}
 
 # --- 3. Staging sach ---
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
@@ -75,6 +81,7 @@ New-Item -ItemType Directory -Path $stage -Force | Out-Null
 Copy-Item (Join-Path $root 'CSXS') (Join-Path $stage 'CSXS') -Recurse
 Copy-Item (Join-Path $root 'dist') (Join-Path $stage 'dist') -Recurse
 Copy-Item (Join-Path $root 'host') (Join-Path $stage 'host') -Recurse
+Copy-Item (Join-Path $root 'fonts') (Join-Path $stage 'fonts') -Recurse
 if (Test-Path (Join-Path $root '.debug')) {
   Copy-Item (Join-Path $root '.debug') (Join-Path $stage '.debug')
 }

@@ -5,9 +5,9 @@
    API:
      VeGuide.tinhVungPx(fmt, W, H)  -> [{canh,x,y,w,h,pt,px,loai,trangThai,ui}]
      VeGuide.ve(ctx, W, H, fmt, lang, opts) -> ve vao ctx (0,0,W,H)
-        opts: { tag: true|false  — dong chu "REMOVE BEFORE EXPORT" nhung vao anh
-                tenNenTang: chuoi hien trong tag
-                phienBanDuLieu: chuoi ngay du lieu }
+        opts: { nhan: true|false — nhan %/px tren tung canh, CHI bat o ban
+                                   xem truoc noi bo, khong bat trong panel }
+        (opts.tag da bo 06/08/2026 — anh Tien khong muon chu trong anh guide)
    Ham tinhVungPx la HAM THUAN — dung de do kiem tu dong, khong dung DOM. */
 (function () {
   'use strict';
@@ -144,21 +144,11 @@
       }
     }
 
-    // 5) Tag nhac nho — chi nhung vao anh xuat len sequence
-    if (opts.tag) {
-      var d1 = 'AiO Guide Frame · ' + (opts.tenNenTang || '') + ' · ' + (opts.phienBanDuLieu || '');
-      var d2 = (lang === 'vi') ? 'LOP GUIDE — TAT TRUOC KHI XUAT VIDEO' : 'GUIDE LAYER — REMOVE BEFORE EXPORT';
-      var yTag = (sUi ? sUi.y : 0) + pad * 2 + co;
-      ctx.save();
-      ctx.font = '600 ' + co + 'px "SF Pro Text", "Segoe UI", sans-serif';
-      var rong = Math.max(ctx.measureText(d1).width, ctx.measureText(d2).width);
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      var xTag = (sUi ? sUi.x : 0) + pad;
-      ctx.fillRect(xTag, yTag - co, rong + pad * 2, co * 2.9);
-      ctx.restore();
-      veChu(ctx, d1, xTag + pad, yTag - co * 0.1, co, 'left');
-      veChu(ctx, d2, xTag + pad, yTag + co * 1.2, co, 'left');
-    }
+    /* ☠️ Nhan "LOP GUIDE — TAT TRUOC KHI XUAT VIDEO" DA GO BO 06/08/2026 theo
+       yeu cau anh Tien ("text nay anh khong can"). Truoc do da doi cho no 1 lan
+       (tu mep vung an toan xuong sat day khung) vi no de len mat nhan vat.
+       -> Nay anh guide KHONG con chu nhac nho nao. Nguoi dung tu nho tat lop
+       guide truoc khi xuat. */
   }
 
   /* ── UI THẬT của từng nền tảng (yêu cầu anh Tiến 02/08) ───────────────
@@ -567,16 +557,6 @@
     }
     if (cfg.le > 0) {
       veChu(ctx, cfg.le + '%', W * cfg.le / 100 + co * 0.6, H * 0.06 + co, co, 'left');
-    }
-    if (opts.tag) {
-      var d2 = (lang === 'vi') ? 'LOP GUIDE — TAT TRUOC KHI XUAT VIDEO' : 'GUIDE LAYER — REMOVE BEFORE EXPORT';
-      var xTag = W * 0.04, yTag = H * 0.06;
-      ctx.save();
-      ctx.font = '600 ' + co + 'px "SF Pro Text", "Segoe UI", sans-serif';
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(xTag - co * 0.6, yTag - co, ctx.measureText(d2).width + co * 1.2, co * 1.8);
-      ctx.restore();
-      veChu(ctx, d2, xTag, yTag - co * 0.1, co, 'left');
     }
   }
 

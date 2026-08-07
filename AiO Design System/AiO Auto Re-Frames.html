@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AiO Studio — Auto Re-Frames · Concise Description</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* ============ FONT ============ */
+@font-face{font-family:'Inter var';font-style:normal;font-weight:100 900;
+  font-display:swap;src:url('./fonts/Inter.woff2') format('woff2');}
+@font-face{font-family:'Inter var';font-style:italic;font-weight:100 900;
+  font-display:swap;src:url('./fonts/Inter-Italic.woff2') format('woff2');}
+@font-face{font-family:'Inter var';font-style:normal;font-weight:100 900;
+  font-display:swap;src:url('../fonts/Inter.woff2') format('woff2');}
+
+/* ============ TOKENS STUDIO CONSOLE ============ */
+:root{
+  color-scheme:dark;
+  --bg-0:#0a0a0b; --bg-1:#0f0f11; --bg-2:#151517; --bg-3:#1c1c1f;
+  --bg-4:#232327; --bg-5:#2c2c31; --bg-6:#161618;
+  --bg-hover:rgb(255 255 255 / 5%); --bg-active:rgb(255 255 255 / 9%);
+  --line-1:rgb(255 255 255 / 6%); --line-2:rgb(255 255 255 / 10%); --line-strong:rgb(255 255 255 / 16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95; --text-meta:#9b9ba3;
+  --accent:#ff5714; --accent-hover:#ff7038; --accent-soft:rgb(255 87 20 / 16%);
+  --accent-line:rgb(255 87 20 / 40%); --accent-text:#ffb599; --accent-on:#150700;
+  --ok:#4ec98a; --warn:#e8c05a; --danger:#ff5f6d;
+  --font-ui:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-display:'SF Pro Display','Inter var','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --fs-2xs:10px; --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:19px;
+  --fw-normal:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --lh:1.45; --sp-1:4px; --sp-2:6px; --sp-3:8px; --sp-4:12px;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --h-ctrl-sm:24px; --h-ctrl:28px; --h-ctrl-lg:34px; --h-topbar:44px;
+  --dur:150ms; --ease:cubic-bezier(0.32,0.72,0,1);
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%;}
+body{
+  background:var(--bg-2);color:var(--text-1);
+  font:var(--fw-normal) var(--fs-md)/var(--lh) var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+  user-select:none;
+}
+
+*::-webkit-scrollbar{width:6px;height:6px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgb(255 255 255 / 14%);border-radius:var(--r-pill)}
+*::-webkit-scrollbar-thumb:hover{background:rgb(255 255 255 / 25%)}
+
+.ico{
+  width:16px;height:16px;flex:none;
+  stroke:currentColor;fill:none;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+.ico-sm{width:14px;height:14px}
+.ico-2xs{width:10px;height:10px}
+
+.topbar{
+  height:var(--h-topbar);background:var(--bg-1);
+  border-bottom:1px solid var(--line-1);
+  display:flex;align-items:center;gap:var(--sp-3);
+  padding:0 var(--sp-4);position:sticky;top:0;z-index:100;
+}
+.brand{
+  display:flex;align-items:center;gap:var(--sp-2);
+  font-size:var(--fs-md);font-weight:var(--fw-bold);color:var(--text-1);
+}
+.brand__icon{
+  width:26px;height:26px;border-radius:var(--r-sm);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;
+}
+.topbar__ten{font-weight:var(--fw-semibold);font-size:var(--fs-md);color:var(--text-1)}
+.topbar__ver{
+  padding:2px 6px;background:var(--bg-4);border:1px solid var(--line-2);
+  border-radius:var(--r-pill);color:var(--text-3);font-size:var(--fs-2xs);font-weight:var(--fw-semibold);
+}
+.topbar__host{
+  margin-left:auto;color:var(--text-3);font-size:var(--fs-xs);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;
+}
+.topbar__actions{display:flex;align-items:center;gap:var(--sp-2)}
+.btn-icon{
+  width:var(--h-ctrl-sm);height:var(--h-ctrl-sm);
+  border-radius:var(--r-sm);border:1px solid var(--line-2);
+  background:var(--bg-3);color:var(--text-2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.btn-icon:hover{background:var(--bg-4);color:var(--text-1);border-color:var(--line-strong)}
+
+.lang{
+  height:var(--h-ctrl-sm);padding:0 var(--sp-3);
+  border:1px solid var(--line-strong);border-radius:var(--r-sm);
+  background:var(--bg-3);color:var(--text-2);
+  font-family:var(--font-ui);font-size:var(--fs-2xs);font-weight:var(--fw-bold);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.lang:hover{background:var(--bg-hover);color:var(--text-1);border-color:var(--accent)}
+
+.than{
+  max-width:640px;margin:0 auto;
+  padding:var(--sp-4);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+}
+
+.hd{
+  background:linear-gradient(135deg, var(--bg-3), var(--bg-4));
+  border:1px solid var(--accent-line);
+  border-radius:var(--r-lg);padding:var(--sp-4);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+}
+.hd__header{display:flex;align-items:center;justify-content:space-between}
+.hd__title{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--accent-text);display:flex;align-items:center;gap:var(--sp-2)}
+.hd__buoc{display:flex;align-items:flex-start;gap:var(--sp-3);font-size:var(--fs-sm);color:var(--text-2)}
+.hd__so{
+  flex:none;width:20px;height:20px;border-radius:50%;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);
+  font-size:var(--fs-2xs);font-weight:var(--fw-bold);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.hd__ok{align-self:flex-end}
+
+.mh{
+  background:var(--bg-3);border:1px solid var(--line-1);
+  border-radius:var(--r-lg);padding:var(--sp-4);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+}
+.mh__header{display:flex;align-items:center;justify-content:space-between}
+.mh__title{font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-1);display:flex;align-items:center;gap:var(--sp-2)}
+
+.mh__khung{
+  position:relative;width:100%;max-width:520px;margin:0 auto;
+  aspect-ratio:16 / 9;min-height:200px;
+  background:radial-gradient(circle at 50% 50%, #1e1e24 0%, #08080a 100%);
+  border:1px solid var(--accent-line);border-radius:var(--r-md);
+  overflow:hidden;box-shadow:0 4px 24px rgb(0 0 0 / 60%), inset 0 0 30px rgb(0 0 0 / 80%);
+}
+.mh__grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgb(255 87 20 / 7%) 1px, transparent 1px),
+                    linear-gradient(90deg, rgb(255 87 20 / 7%) 1px, transparent 1px);
+  background-size:24px 24px;opacity:0.7;
+}
+
+.mh__scan{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow:0 0 10px var(--accent);
+  z-index:4;opacity:0.8;
+  animation:mhLaser 2.8s ease-in-out infinite alternate;
+}
+@keyframes mhLaser {
+  0% { top: 6px; }
+  100% { top: calc(100% - 8px); }
+}
+
+.mh__cua{
+  position:absolute;z-index:3;
+  border:2px solid var(--accent);border-radius:var(--r-sm);
+  box-shadow:0 0 0 9999px rgb(0 0 0 / 70%), 0 0 20px var(--accent);
+  transition:left 0.45s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s var(--ease), height 0.3s var(--ease);
+}
+.mh__hud{
+  position:absolute;top:4px;left:6px;right:6px;
+  display:flex;justify-content:space-between;align-items:center;
+  pointer-events:none;z-index:5;
+}
+.mh__hud-tag{
+  font-size:8px;font-weight:var(--fw-bold);letter-spacing:0.06em;
+  color:var(--accent-on);background:var(--accent);
+  padding:1px 5px;border-radius:3px;text-transform:uppercase;
+  box-shadow:0 0 8px var(--accent);
+}
+.mh__hud-acc{
+  font-size:8px;font-weight:var(--fw-bold);color:var(--ok);
+  font-family:monospace;text-shadow:0 0 4px var(--ok);
+}
+
+.mh__goc{position:absolute;width:8px;height:8px;border:2px solid var(--accent-text)}
+.mh__goc--tl{top:-2px;left:-2px;border-right:none;border-bottom:none;border-top-left-radius:3px}
+.mh__goc--tr{top:-2px;right:-2px;border-left:none;border-bottom:none;border-top-right-radius:3px}
+.mh__goc--bl{bottom:-2px;left:-2px;border-right:none;border-top:none;border-bottom-left-radius:3px}
+.mh__goc--br{bottom:-2px;right:-2px;border-left:none;border-top:none;border-bottom-right-radius:3px}
+
+.mh__nguoi{
+  position:absolute;z-index:2;
+  transition:left 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  filter:drop-shadow(0 4px 12px rgb(0 0 0 / 80%));
+}
+.mh__dau{border-radius:50%;background:linear-gradient(180deg, var(--text-1), var(--text-2));margin:0 auto;box-shadow:0 0 10px rgb(255 255 255 / 25%)}
+.mh__minh{border-radius:8px 8px 3px 3px;background:linear-gradient(180deg, var(--accent-text), var(--bg-5));opacity:0.9}
+.mh__chu{color:var(--text-2);font-size:var(--fs-xs);line-height:1.45;text-align:left}
+.mh__chu b{color:var(--text-1);font-weight:var(--fw-semibold)}
+
+.pills-row{display:flex;align-items:center;gap:var(--sp-2)}
+.btn-pill{
+  height:32px;padding:0 var(--sp-3);
+  border-radius:var(--r-pill);border:1px solid var(--line-strong);
+  background:var(--bg-3);color:var(--text-2);
+  font-family:var(--font-ui);font-size:var(--fs-xs);font-weight:var(--fw-medium);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;transition:all var(--dur) var(--ease);white-space:nowrap;flex:1;
+}
+.btn-pill:hover:not(:disabled){background:var(--bg-4);color:var(--text-1);border-color:var(--accent-line);box-shadow:0 2px 8px rgb(255 87 20 / 15%)}
+.btn-pill:disabled{opacity:0.45;cursor:not-allowed}
+
+.pill-group{
+  display:inline-flex;align-items:center;
+  border-radius:var(--r-pill);border:1px solid var(--line-strong);
+  background:var(--bg-3);flex:1;position:relative;
+  height:32px;
+  transition:border-color var(--dur) var(--ease);
+}
+.pill-group:hover{border-color:var(--accent-line)}
+.btn-pill--left{
+  height:100%;padding:0 var(--sp-3);border:none;
+  border-top-left-radius:var(--r-pill);border-bottom-left-radius:var(--r-pill);
+  background:transparent;color:var(--text-2);
+  font-family:var(--font-ui);font-size:var(--fs-xs);font-weight:var(--fw-medium);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;transition:all var(--dur) var(--ease);flex:1;
+}
+.btn-pill--left:hover:not(:disabled){background:var(--bg-4);color:var(--text-1)}
+
+.custom-dropdown{
+  position:relative;
+  display:inline-flex;height:100%;
+}
+.custom-dropdown__trigger{
+  height:100%;padding:0 10px;border:none;border-left:1px solid var(--line-2);
+  border-top-right-radius:var(--r-pill);border-bottom-right-radius:var(--r-pill);
+  background:var(--bg-4);color:var(--accent-text);
+  font-family:var(--font-ui);font-size:var(--fs-xs);font-weight:var(--fw-bold);
+  display:inline-flex;align-items:center;gap:4px;
+  cursor:pointer;outline:none;
+  transition:all var(--dur) var(--ease);
+}
+.custom-dropdown__trigger:hover{
+  background:var(--bg-5);color:var(--accent-hover);
+}
+
+.custom-dropdown__menu{
+  position:absolute;top:calc(100% + 4px);right:0;z-index:9999;
+  min-width:100px;
+  background:var(--bg-3);border:1px solid var(--accent-line);
+  border-radius:var(--r-md);padding:4px;
+  box-shadow:0 8px 24px rgb(0 0 0 / 70%), 0 0 16px rgb(255 87 20 / 20%);
+  display:flex;flex-direction:column;gap:2px;
+  backdrop-filter:blur(12px);
+  animation:ddFadeIn 150ms var(--ease);
+}
+@keyframes ddFadeIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.custom-dropdown__item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;border-radius:var(--r-sm);
+  color:var(--text-2);font-size:var(--fs-xs);font-weight:var(--fw-medium);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.custom-dropdown__item:hover{
+  background:var(--bg-hover);color:var(--text-1);
+}
+.custom-dropdown__item--selected{
+  background:var(--accent-soft);color:var(--accent-text);font-weight:var(--fw-bold);
+}
+.custom-dropdown__item .res-check{
+  opacity:0;color:var(--accent);transition:opacity var(--dur) var(--ease);
+}
+.custom-dropdown__item--selected .res-check{
+  opacity:1;
+}
+
+.chon{
+  background:var(--bg-3);border:1px solid var(--line-1);
+  border-radius:var(--r-lg);padding:var(--sp-4);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+}
+.chon__nhan{
+  font-size:var(--fs-xs);font-weight:var(--fw-semibold);
+  letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);
+  display:flex;align-items:center;gap:var(--sp-2);
+}
+
+.seg{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--sp-2);
+  background:var(--bg-0);border:1px solid var(--line-1);
+  border-radius:var(--r-md);padding:var(--sp-1);
+}
+.seg__nut{
+  height:46px;display:flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  background:transparent;border:1px solid transparent;border-radius:var(--r-sm);
+  color:var(--text-2);font-family:var(--font-ui);font-size:var(--fs-sm);font-weight:var(--fw-medium);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.seg__nut:hover{background:var(--bg-hover);color:var(--text-1)}
+.seg__nut--chon{
+  background:var(--accent-soft);border-color:var(--accent-line);
+  color:var(--accent-text);font-weight:var(--fw-semibold);
+  box-shadow:inset 0 0 12px rgb(255 87 20 / 10%);
+}
+.seg__hinh{border:1.5px solid currentColor;border-radius:3px;flex:none;opacity:0.85;transition:transform var(--dur) var(--ease)}
+.seg__nut--chon .seg__hinh{transform:scale(1.1);opacity:1}
+
+.btn-chinh{
+  height:var(--h-ctrl-lg);border:none;border-radius:var(--r-md);
+  background:var(--accent);color:var(--accent-on);
+  font-family:var(--font-ui);font-size:var(--fs-md);font-weight:var(--fw-bold);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+  width:100%;display:flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  box-shadow:0 2px 8px rgb(255 87 20 / 25%);
+}
+.btn-chinh:hover:not(:disabled){background:var(--accent-hover);box-shadow:0 4px 14px rgb(255 87 20 / 40%)}
+.btn-chinh:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
+
+.btn-phu{
+  height:var(--h-ctrl);border:1px solid var(--line-strong);border-radius:var(--r-md);
+  background:var(--bg-4);color:var(--text-1);
+  font-family:var(--font-ui);font-size:var(--fs-sm);font-weight:var(--fw-medium);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-2);width:100%;
+}
+.btn-phu:hover:not(:disabled){background:var(--bg-5);border-color:var(--line-strong);color:var(--text-1)}
+.btn-phu:disabled{opacity:0.45;cursor:not-allowed}
+
+.ds{
+  display:flex;flex-direction:column;gap:var(--sp-2);
+  max-height:240px;overflow-y:auto;padding-right:2px;
+}
+.ds__muc{
+  display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-2) var(--sp-3);background:var(--bg-4);
+  border:1px solid var(--line-2);border-radius:var(--r-sm);
+  cursor:pointer;transition:all var(--dur) var(--ease);
+}
+.ds__muc:hover{background:var(--bg-5);border-color:var(--line-strong)}
+.ds__muc input{accent-color:var(--accent);width:15px;height:15px;flex:none;cursor:pointer;border-radius:3px}
+.ds__giay{
+  flex:none;padding:2px 6px;border-radius:var(--r-pill);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  font-size:var(--fs-2xs);font-weight:var(--fw-bold);color:var(--accent-text);
+  font-variant-numeric:tabular-nums;
+}
+.ds__chu{
+  flex:1;font-size:var(--fs-xs);color:var(--text-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+.canlam{
+  padding:var(--sp-3);border-radius:var(--r-md);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  color:var(--accent-text);font-size:var(--fs-xs);line-height:1.4;
+}
+
+.ketqua{
+  background:var(--bg-0);border:1px solid var(--accent-line);
+  border-radius:var(--r-lg);padding:var(--sp-4);
+  display:none;flex-direction:column;gap:var(--sp-3);
+  box-shadow:0 0 16px rgb(255 87 20 / 10%);
+}
+.ketqua--hien{display:flex}
+.ketqua__so{display:flex;gap:var(--sp-3)}
+.ketqua__so > div{
+  flex:1;background:var(--bg-3);border-radius:var(--r-md);
+  border:1px solid var(--line-1);padding:var(--sp-3);text-align:center;
+}
+.ketqua__so b{display:block;font-size:var(--fs-xl);color:var(--accent);font-family:var(--font-display);letter-spacing:var(--ls-display)}
+.ketqua__so span{color:var(--text-3);font-size:var(--fs-2xs);text-transform:uppercase}
+.ketqua__dong{color:var(--text-2);font-size:var(--fs-xs)}
+.ketqua__dong b{color:var(--text-1);font-weight:var(--fw-semibold)}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand__icon">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M4 17v3h3M20 17v3h-3M9 12h6M12 9v6"/></svg>
+      </div>
+      <span class="topbar__ten">Re-Frames</span>
+    </div>
+    <span class="topbar__ver">v0.5.0</span>
+    <span class="topbar__host" id="host">Premiere 2026.5 · Demo Project</span>
+
+    <div class="topbar__actions">
+      <button class="btn-icon" title="Hướng dẫn / Guide" onclick="toggleHuongDan()">
+        <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      </button>
+      <button class="lang" id="lang" onclick="doiNgonNgu()"><span id="langText">EN</span></button>
+    </div>
+  </div>
+
+  <div class="than">
+    <div class="hd" id="hd" style="display:none">
+      <div class="hd__header">
+        <span class="hd__title">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span id="hdTitle">Hướng dẫn nhanh</span>
+        </span>
+      </div>
+      <div class="hd__buoc"><span class="hd__so">1</span><span id="hd1">Mở sequence NGANG chứa video dài (podcast, phỏng vấn…).</span></div>
+      <div class="hd__buoc"><span class="hd__so">2</span><span id="hd2">Bấm "Tìm đoạn theo nội dung video" — tool đọc lời thoại, tách từng câu hỏi được trả lời trọn ý.</span></div>
+      <div class="hd__buoc"><span class="hd__so">3</span><span id="hd3">Tick đoạn ưng → "Tạo short" — mỗi đoạn thành một bản dọc tự bám người nói, nằm ngay trên timeline.</span></div>
+      <button class="btn-phu hd__ok" id="hdOk" onclick="dongHuongDan()">Đã hiểu</button>
+    </div>
+
+    <div class="mh">
+      <div class="mh__header">
+        <span class="mh__title">
+          <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--accent)"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span id="mhTieuDe">Minh hoạ bám chủ thể</span>
+        </span>
+      </div>
+      <div class="mh__khung">
+        <div class="mh__grid"></div>
+        <div class="mh__scan"></div>
+        <div class="mh__cua">
+          <div class="mh__hud">
+            <span class="mh__hud-tag">SENSEI TRACKING</span>
+            <span class="mh__hud-acc" id="mhHudAcc">99.4%</span>
+          </div>
+          <div class="mh__goc mh__goc--tl"></div>
+          <div class="mh__goc mh__goc--tr"></div>
+          <div class="mh__goc mh__goc--bl"></div>
+          <div class="mh__goc mh__goc--br"></div>
+        </div>
+        <div class="mh__nguoi"><div class="mh__dau"></div><div class="mh__minh"></div></div>
+      </div>
+      <p class="mh__chu" id="mhChu">Tự động đổi khung hình & bám đuổi chủ thể từng clip. <b>Bản gốc giữ nguyên.</b></p>
+    </div>
+
+    <div class="pills-row">
+      <button class="btn-pill" id="nut" onclick="demoLamDoc()">
+        <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M4 17v3h3M20 17v3h-3M9 12h6M12 9v6"/></svg>
+        <span id="nutText">Cả sequence (Dọc 9:16)</span>
+      </button>
+
+      <div class="pill-group">
+        <button class="btn-pill--left" id="nutXuat" onclick="demoXuatCheck()">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="nutXuatText">Xuất check 720p</span>
+        </button>
+
+        <div class="custom-dropdown" id="resDropdown">
+          <button class="custom-dropdown__trigger" id="resTrigger" onclick="toggleResMenu(event)">
+            <span id="resCurText">720p</span>
+            <svg class="ico ico-2xs" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="custom-dropdown__menu" id="resMenu" style="display:none">
+            <div class="custom-dropdown__item" data-val="360" onclick="chonRes('360')">
+              <span>360p</span>
+              <svg class="ico ico-sm res-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="custom-dropdown__item" data-val="480" onclick="chonRes('480')">
+              <span>480p</span>
+              <svg class="ico ico-sm res-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="custom-dropdown__item custom-dropdown__item--selected" data-val="720" onclick="chonRes('720')">
+              <span>720p</span>
+              <svg class="ico ico-sm res-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chon">
+      <span class="chon__nhan" id="nhanKhung">Khung đích</span>
+      <div class="seg" id="seg"></div>
+    </div>
+
+    <div class="chon">
+      <span class="chon__nhan" id="nhanShort">Short theo nội dung</span>
+      <button class="btn-chinh" id="nutTim" onclick="demoTimDoan()">Tìm đoạn theo nội dung video</button>
+      <div class="ds" id="dsDoan" style="display:none"></div>
+      <button class="btn-chinh" id="nutTao" onclick="demoTaoShorts()" style="display:none"></button>
+      <p class="canlam" id="taoKq" style="display:none"></p>
+    </div>
+
+    <p class="canlam" id="canlam" style="display:none"></p>
+
+    <div class="ketqua" id="ketqua">
+      <div class="ketqua__so">
+        <div><b id="soClip">1</b><span id="nhanSoClip">clip bám chủ thể</span></div>
+        <div><b id="khung">1080×1920</b><span id="nhanKhungKq">khung hình</span></div>
+      </div>
+      <p class="ketqua__dong" id="kqDong">Đã tạo <b>Podcast_Main_Episode - Doc 9-16</b> trên timeline.</p>
+    </div>
+  </div>
+
+<script>
+  var NGON_NGU = {
+    vi: {
+      hd_title: 'Hướng dẫn nhanh',
+      mh_tieu_de: 'Minh hoạ bám chủ thể',
+      mh_chu: 'Tự động đổi khung hình & bám đuổi chủ thể từng clip. <b>Bản gốc giữ nguyên.</b>',
+      nhan_khung: 'Khung đích',
+      nhan_short: 'Short theo nội dung',
+      ti_916: 'Dọc 9:16', ti_11: 'Vuông 1:1', ti_45: 'Dọc 4:5',
+      tim_doan: 'Tìm đoạn theo nội dung video',
+      tim_lai: 'Tìm lại',
+      tao_short: 'Tạo {n} short {ten}',
+      tao_ca_seq: 'Cả sequence ({ten})',
+      nhan_so_clip: 'clip bám chủ thể',
+      nhan_khung_kq: 'khung hình',
+      kq_dong: 'Đã tạo <b>{ten}</b> trên timeline.',
+      nut_xuat: 'Xuất check {res}',
+      hd_1: 'Mở sequence NGANG chứa video dài (podcast, phỏng vấn…).',
+      hd_2: 'Bấm "Tìm đoạn theo nội dung video" — tool đọc lời thoại, tách từng câu hỏi được trả lời trọn ý.',
+      hd_3: 'Tick đoạn ưng → "Tạo short" — mỗi đoạn thành một bản dọc tự bám người nói, nằm ngay trên timeline.',
+      hd_ok: 'Đã hiểu',
+    },
+    en: {
+      hd_title: 'Quick Guide',
+      mh_tieu_de: 'Subject Tracking Demo',
+      mh_chu: 'Auto-reframes sequence & tracks subject per clip. <b>Original stays untouched.</b>',
+      nhan_khung: 'Target frame',
+      nhan_short: 'Shorts from content',
+      ti_916: 'Vertical 9:16', ti_11: 'Square 1:1', ti_45: 'Portrait 4:5',
+      tim_doan: 'Find segments from video content',
+      tim_lai: 'Rescan',
+      tao_short: 'Create {n} {ten} shorts',
+      tao_ca_seq: 'Whole sequence ({ten})',
+      nhan_so_clip: 'clips tracked',
+      nhan_khung_kq: 'frame size',
+      kq_dong: 'Created <b>{ten}</b> on timeline.',
+      nut_xuat: 'Export {res} draft',
+      hd_1: 'Open horizontal sequence with main video.',
+      hd_2: 'Hit "Find segments from video content".',
+      hd_3: 'Tick preferred segments → "Create shorts".',
+      hd_ok: 'Got it',
+    }
+  }
+
+  var L = 'vi'
+  var doNhanXuat = '720'
+  function t(k) { return NGON_NGU[L][k] || NGON_NGU.vi[k] || k }
+  function tp(k, thay) {
+    var s = t(k)
+    Object.keys(thay||{}).forEach(function(kk){ s = s.split('{'+kk+'}').join(String(thay[kk])) })
+    return s
+  }
+
+  function toggleResMenu(e) {
+    if (e) e.stopPropagation()
+    var menu = document.getElementById('resMenu')
+    if (!menu) return
+    menu.style.display = (menu.style.display === 'none' || !menu.style.display) ? 'flex' : 'none'
+  }
+
+  function chonRes(val) {
+    doNhanXuat = val || '720'
+    var curT = document.getElementById('resCurText')
+    if (curT) curT.textContent = doNhanXuat + 'p'
+    var nutXText = document.getElementById('nutXuatText')
+    if (nutXText) {
+      nutXText.textContent = tp('nut_xuat', { res: doNhanXuat + 'p' })
+    }
+    var items = document.querySelectorAll('.custom-dropdown__item')
+    items.forEach(function (it) {
+      if (it.getAttribute('data-val') === doNhanXuat) {
+        it.classList.add('custom-dropdown__item--selected')
+      } else {
+        it.classList.remove('custom-dropdown__item--selected')
+      }
+    })
+    var menu = document.getElementById('resMenu')
+    if (menu) menu.style.display = 'none'
+  }
+
+  document.addEventListener('click', function () {
+    var menu = document.getElementById('resMenu')
+    if (menu) menu.style.display = 'none'
+  })
+
+  var KHUNG = [
+    { w: 1080, h: 1920, nhan: 'Doc 9-16',  tenKey: 'ti_916', moKey: 'mo_916', hinhW: 12, hinhH: 21 },
+    { w: 1080, h: 1080, nhan: 'Vuong 1-1', tenKey: 'ti_11',  moKey: 'mo_11',  hinhW: 17, hinhH: 17 },
+    { w: 1080, h: 1350, nhan: 'Doc 4-5',   tenKey: 'ti_45',  moKey: 'mo_45',  hinhW: 16, hinhH: 20 },
+  ]
+  var dangChon = 0
+
+  function tenTiLe() { return t(KHUNG[dangChon].tenKey) }
+
+  function apNgonNgu() {
+    document.documentElement.lang = L
+    document.getElementById('langText').textContent = L === 'vi' ? 'EN' : 'VI'
+    document.getElementById('hdTitle').textContent = t('hd_title')
+    document.getElementById('mhTieuDe').textContent = t('mh_tieu_de')
+    document.getElementById('mhChu').innerHTML = t('mh_chu')
+    document.getElementById('nhanKhung').textContent = t('nhan_khung')
+    document.getElementById('nhanShort').textContent = t('nhan_short')
+    document.getElementById('nutXuatText').textContent = tp('nut_xuat', { res: doNhanXuat + 'p' })
+    document.getElementById('hd1').textContent = t('hd_1')
+    document.getElementById('hd2').textContent = t('hd_2')
+    document.getElementById('hd3').textContent = t('hd_3')
+    document.getElementById('hdOk').textContent = t('hd_ok')
+    veSeg()
+  }
+
+  function doiNgonNgu() {
+    L = L === 'vi' ? 'en' : 'vi'
+    apNgonNgu()
+  }
+
+  function veSeg() {
+    var seg = document.getElementById('seg')
+    seg.innerHTML = ''
+    KHUNG.forEach(function (k, i) {
+      var b = document.createElement('button')
+      b.className = 'seg__nut' + (i === dangChon ? ' seg__nut--chon' : '')
+      var hinh = document.createElement('span')
+      hinh.className = 'seg__hinh'
+      hinh.style.width = k.hinhW + 'px'
+      hinh.style.height = k.hinhH + 'px'
+      b.appendChild(hinh)
+      b.appendChild(document.createTextNode(t(k.tenKey)))
+      b.onclick = function () {
+        dangChon = i
+        veSeg()
+        capNhatKhungCua()
+      }
+      seg.appendChild(b)
+    })
+    document.getElementById('nutText').textContent = tp('tao_ca_seq', { ten: tenTiLe().toLowerCase() })
+  }
+
+  var animTimer = null
+  var buocAnim = 0
+
+  function capNhatKhungCua() {
+    var khung = document.querySelector('.mh__khung')
+    var cua = document.querySelector('.mh__cua')
+    var k = KHUNG[dangChon]
+    if (!khung || !cua) return
+    var W = khung.clientWidth || 520
+    var H = Math.round(W * 9 / 16)
+    khung.style.height = H + 'px'
+    var vien = 8
+    var caoCua = H - vien * 2
+    var rongCua = Math.round(caoCua * k.w / k.h)
+    cua.style.top = vien + 'px'
+    cua.style.height = caoCua + 'px'
+    cua.style.width = rongCua + 'px'
+  }
+
+  function veMinhHoa() {
+    var khung = document.querySelector('.mh__khung')
+    var cua = document.querySelector('.mh__cua')
+    var nguoi = document.querySelector('.mh__nguoi')
+    var dau = document.querySelector('.mh__dau')
+    var minh = document.querySelector('.mh__minh')
+    var acc = document.getElementById('mhHudAcc')
+    var k = KHUNG[dangChon]
+    if (!khung || !cua || !nguoi) return
+
+    var W = khung.clientWidth || 520
+    if (W < 200) W = 520
+    var H = Math.round(W * 9 / 16)
+    khung.style.height = H + 'px'
+
+    var caoNguoi = Math.round(H * 0.52)
+    var rongNguoi = Math.round(caoNguoi * 0.44)
+    var dDau = Math.round(rongNguoi * 0.65)
+    nguoi.style.width = rongNguoi + 'px'
+    nguoi.style.height = caoNguoi + 'px'
+    nguoi.style.bottom = Math.round(H * 0.1) + 'px'
+    dau.style.width = dDau + 'px'
+    dau.style.height = dDau + 'px'
+    minh.style.width = rongNguoi + 'px'
+    minh.style.height = (caoNguoi - dDau - 4) + 'px'
+    minh.style.marginTop = '4px'
+
+    capNhatKhungCua()
+    var vien = 8
+    var caoCua = H - vien * 2
+    var rongCua = Math.round(caoCua * k.w / k.h)
+
+    var cacViTri = [0.28, 0.68, 0.45, 0.76]
+    var posRatio = cacViTri[buocAnim % cacViTri.length]
+    buocAnim++
+
+    var tamNguoi = Math.round(W * posRatio)
+    var traiNguoi = tamNguoi - Math.round(rongNguoi / 2)
+    var traiCua = tamNguoi - Math.round(rongCua / 2)
+    if (traiCua < vien) traiCua = vien
+    if (traiCua > W - rongCua - vien) traiCua = W - rongCua - vien
+
+    nguoi.style.left = traiNguoi + 'px'
+    cua.style.left = traiCua + 'px'
+
+    if (acc) {
+      acc.textContent = (98.5 + (Math.random() * 1.2)).toFixed(1) + '%'
+    }
+  }
+
+  function batDauAnimLoop() {
+    if (animTimer) clearInterval(animTimer)
+    veMinhHoa()
+    animTimer = setInterval(veMinhHoa, 2200)
+  }
+
+  function toggleHuongDan() {
+    var el = document.getElementById('hd')
+    el.style.display = (el.style.display === 'none') ? '' : 'none'
+  }
+  function dongHuongDan() {
+    document.getElementById('hd').style.display = 'none'
+  }
+
+  var demoDoan = [
+    { dai: 42, hoi: 'Bí quyết nào giúp thương hiệu phát triển nhanh trong năm 2026?' },
+    { dai: 68, hoi: 'Tại sao việc tự động hoá quy trình video lại quan trọng với Creator?' },
+    { dai: 35, hoi: 'Làm thế nào để tối ưu hoá thời gian làm nội dung podcast ngắn?' }
+  ]
+
+  function demoTimDoan() {
+    var ds = document.getElementById('dsDoan')
+    ds.innerHTML = ''
+    ds.style.display = ''
+    demoDoan.forEach(function(d) {
+      var hang = document.createElement('label')
+      hang.className = 'ds__muc'
+      var tick = document.createElement('input')
+      tick.type = 'checkbox'
+      tick.checked = true
+      tick.onchange = function() {
+        var n = [].filter.call(document.querySelectorAll('#dsDoan input'), function(t){return t.checked}).length
+        var nutTao = document.getElementById('nutTao')
+        nutTao.style.display = n ? '' : 'none'
+        nutTao.textContent = tp('tao_short', { n: n, ten: tenTiLe().toLowerCase() })
+      }
+      hang.appendChild(tick)
+      var giay = document.createElement('span')
+      giay.className = 'ds__giay'
+      giay.textContent = d.dai + 's'
+      hang.appendChild(giay)
+      var chu = document.createElement('span')
+      chu.className = 'ds__chu'
+      chu.textContent = d.hoi
+      hang.appendChild(chu)
+      ds.appendChild(hang)
+    })
+    var nutTao = document.getElementById('nutTao')
+    nutTao.style.display = ''
+    nutTao.textContent = tp('tao_short', { n: 3, ten: tenTiLe().toLowerCase() })
+    document.getElementById('nutTim').textContent = t('tim_lai')
+  }
+
+  function demoTaoShorts() {
+    var kq = document.getElementById('ketqua')
+    document.getElementById('soClip').textContent = '3'
+    document.getElementById('khung').textContent = KHUNG[dangChon].w + '×' + KHUNG[dangChon].h
+    document.getElementById('kqDong').innerHTML = tp('kq_dong', { ten: '3 Short ' + tenTiLe() })
+    kq.className = 'ketqua ketqua--hien'
+  }
+
+  function demoLamDoc() {
+    var kq = document.getElementById('ketqua')
+    document.getElementById('soClip').textContent = '12'
+    document.getElementById('khung').textContent = KHUNG[dangChon].w + '×' + KHUNG[dangChon].h
+    document.getElementById('kqDong').innerHTML = tp('kq_dong', { ten: 'Podcast_Main_Episode - ' + KHUNG[dangChon].nhan })
+    kq.className = 'ketqua ketqua--hien'
+  }
+
+  function demoXuatCheck() {
+    var canlam = document.getElementById('canlam')
+    canlam.style.display = ''
+    canlam.textContent = 'Đã xuất Short 1-check-' + doNhanXuat + 'p.mp4 (42s · 12.4 MB) — nằm cạnh video gốc.'
+  }
+
+  window.addEventListener('resize', function(){ capNhatKhungCua() })
+  document.addEventListener('DOMContentLoaded', function() { apNgonNgu(); batDauAnimLoop(); })
+  window.addEventListener('load', function() { batDauAnimLoop(); })
+  apNgonNgu()
+  batDauAnimLoop()
+</script>
+</body>
+</html>

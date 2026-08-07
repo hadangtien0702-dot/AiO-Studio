@@ -18,11 +18,11 @@
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                          3 TRỤ CỘT QUẢN TRỊ CỦA MỘT CMO 20 NĂM                         │
 ├──────────────────────────────┬──────────────────────────┬──────────────────────────────┤
-│ TRỤ CỘT 1: PRODUCT-MARKET FIT│ TRỤ CỘT 2: HỆ THỐNG ADS &│ TRỤ CỘT 3: HỆ THỐNG         │
-│ & BẮT MỒI (THE HOOK)         │ QUY MÔ (UNIT ECONOMICS)  │ ĐỘI NGŨ ĐẠI LÝ (AFFILIATES) │
+│ TRỤ CỘT 1: SPEARHEAD FEATURE │ TRỤ CỘT 2: UNIT ECONOMICS│ TRỤ CỘT 3: HỆ THỐNG         │
+│ (CHIẾN THUẬT MŨI NHỌN)       │ (KINH TẾ ĐƠN VỊ TÀI CHÍNH)│ ĐẠI LÝ AFFILIATE NETWORKS   │
 ├──────────────────────────────┼──────────────────────────┼──────────────────────────────┤
-│ Xác định 1 feature mũi nhọn  │ Chỉ chi $1 Ads khi biết  │ Đóng gói 30-40% hoa hồng để  │
-│ để "đâm thủng" thị trường    │ thu về $3 (LTV/CAC > 3)  │ hàng ngàn Creators bán hộ   │
+│ Xác định 1 feature mũi nhọn  │ Chỉ chi $1 Ads khi biết  │ Đóng gói tối đa 15% hoa hồng │
+│ để "đâm thủng" thị trường    │ thu về $3 (LTV/CAC > 3)  │ để Creators bán hộ          │
 └──────────────────────────────┴──────────────────────────┴──────────────────────────────┘
 ```
 
@@ -39,14 +39,14 @@
 ### 🔑 TRỤ CỘT 2: KINH TẾ ĐƠN VỊ & BÀI TOÁN TÀI CHÍNH (UNIT ECONOMICS)
 Một CMO lão luyện luôn quản trị bằng 3 chỉ số sinh tử này:
 1. **CAC (Customer Acquisition Cost - Chi phí để có 1 khách mua):** Phải giữ dưới **$30**.
-2. **LTV (Lifetime Value - Giá trị khách hàng trả cho mình):** Gói $129 Lifetime hoặc $69/năm.
+2. **LTV (Lifetime Value - Giá trị khách hàng trả cho mình):** Gói $69/năm hoặc $14.90/tháng.
 3. **Tỷ lệ LTV / CAC:** Phải lớn hơn **3 lần**. (Nghĩa là bỏ 1 đồng Ads phải mang về ít nhất 3 đồng doanh thu).
 
 ---
 
-### 🔑 TRỤ CỘT 3: KÍCH HOẠT HỆ THỐNG AFFILIATE (BÍ QUYẾT 200 TỶ CỦA SUBMAGIC)
-- Bài học từ Submagic ($8M/năm với 13 người): Họ không tự chạy ads một mình! Họ biến **10.000 YouTuber, TikToker & Editor thành đội ngũ bán hàng cho họ** bằng chính sách **30% - 40% Recurring Commission**.
-- **Anh Tiến cần làm:** Dùng nền tảng **LemonSqueezy Affiliate**. Tạo link cho các YouTuber chuyên về Premiere Pro/DaVinci ở Mỹ/Châu Âu. Mỗi khi có khách mua qua link của họ, họ nhận $35 - $40 USD. Đội ngũ này sẽ tự làm video review khen AiO Studio lên tận mây xanh!
+### 🔑 TRỤ CỘT 3: KÍCH HOẠT HỆ THỐNG AFFILIATE (BÍ QUYẾT TĂNG TRƯỜNG DỄ DÀNG)
+- Bài học từ Submagic: Họ không tự chạy ads một mình! Họ biến **10.000 YouTuber, TikToker & Editor thành đội ngũ bán hàng cho họ** bằng chính sách **hoa hồng Affiliate tối đa 15% (10% - 15%)**.
+- **Anh Tiến cần làm:** Dùng nền tảng **LemonSqueezy Affiliate**. Tạo link cho các YouTuber chuyên về Premiere Pro/DaVinci ở Mỹ/Châu Âu. Mỗi khi có khách mua qua link của họ, họ nhận 10% - 15% hoa hồng. Đội ngũ này sẽ tự làm video review khen AiO Studio lên tận mây xanh!
 
 ---
 
@@ -55,6 +55,27 @@ Một CMO lão luyện luôn quản trị bằng 3 chỉ số sinh tử này:
 ```mermaid
 graph TD
     P1[GIAI ĐOẠN 1: ĐÓNG GÓI SẢN PHẨM & CỔNG THANH TOÁN (1 - 2 Tuần)] --> P2[GIAI ĐOẠN 2: THỬ NGHIỆM ĐỊNH HƯỚNG & SOFT LAUNCH (2 Tuần)]
+    P2 --> P3[GIAI ĐOẠN 3: KÍCH HOẠT AFFILIATE & PRODUCTHUNT LAUNCH (1 Thắng)]
+    P3 --> P4[GIAI ĐOẠN 4: SCALE ADS & TỰ ĐỘNG HÓA TẬP TẬP (Vận Hành Ổn Định)]
+```
+
+### 📍 GIAI ĐOẠN 1: Chuẩn Bị Hạ Tầng & Đóng Gói (Product & Checkout Readiness)
+1. **Hoàn thiện Website `AiO WebDesign` 100% Tiếng Anh:**
+   - Đưa tính năng mũi nhọn (Auto Podcast & Auto Cut) lên đầu.
+   - Hiện Bảng giá $14.90 / $69 USD.
+   - Tích hợp cổng **LemonSqueezy**.
+2. **Hệ thống cấp Key tự động & 7-Day Free Trial:** Khách tải về dùng thử không cần nhập thẻ Visa.
+
+### 📍 GIAI ĐOẠN 2: Thử Nghiệm Thị Trường (Soft Launch & Validation)
+1. **Không nạp ngân sách Ads lớn ngay!** Chỉ bỏ **$100 - $200** chạy thử nghiệm 3 mẫu Video Ads ngắn trên Facebook/Instagram (Target Mỹ & Âu).
+2. **Đo lường chỉ số:**
+   - Có bao nhiêu người tải dùng thử (Free Trials)?
+   - Tỷ lệ người từ Trial chuyển sang Mua thật là bao nhiêu %? (Mục tiêu > 2.5%).
+3. Lắng nghe phản hồi của 20-50 khách hàng đầu tiên để sửa lỗi (bugs) nếu có.
+
+### 📍 GIAI ĐOẠN 3: Đẩy Mạnh Affiliate & Bán Hàng Toàn Cầu (Scale & Viral)
+1. **ProductHunt Launch Day:** Đăng tải AiO Studio lên ProductHunt (Sự kiện săn tool lớn nhất thế giới).
+2. **Outreach 50 YouTuber Creator ngành Video Editing:** Gửi tặng họ License Free + Link Affiliate tối đa 15% hoa hồng. Nhờ họ làm video review. SẢN PHẨM & CỔNG THANH TOÁN (1 - 2 Tuần)] --> P2[GIAI ĐOẠN 2: THỬ NGHIỆM ĐỊNH HƯỚNG & SOFT LAUNCH (2 Tuần)]
     P2 --> P3[GIAI ĐOẠN 3: KÍCH HOẠT AFFILIATE & PRODUCTHUNT LAUNCH (1 Thắng)]
     P3 --> P4[GIAI ĐOẠN 4: SCALE ADS & TỰ ĐỘNG HÓA TẬP TẬP (Vận Hành Ổn Định)]
 ```
@@ -75,7 +96,7 @@ graph TD
 
 ### 📍 GIAI ĐOẠN 3: Đẩy Mạnh Affiliate & Bán Hàng Toàn Cầu (Scale & Viral)
 1. **ProductHunt Launch Day:** Đăng tải AiO Studio lên ProductHunt (Sự kiện săn tool lớn nhất thế giới).
-2. **Outreach 50 YouTuber Creator ngành Video Editing:** Gửi tặng họ License Vĩnh Viễn + Link Affiliate 35% hoa hồng. Nhờ họ làm video review.
+2. **Outreach 50 YouTuber Creator ngành Video Editing:** Gửi tặng họ License Free + Link Affiliate tối đa 15% hoa hồng. Nhờ họ làm video review.
 3. **Kích hoạt Ads Google Search:** Chạy các từ khóa đối thủ (`AutoPod alternative`, `Silence remover Premiere Pro`).
 
 ### 📍 GIAI ĐOẠN 4: Tự Động Hóa & Thu Thu Lợi Nhuận (Automation)

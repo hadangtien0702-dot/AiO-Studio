@@ -1,0 +1,19 @@
+YÊU CẦU THIẾT KẾ VÀ PHÁT TRIỂN EXTENSION: AIO MUSIC (BGM & SOUND EFFECTS MANAGER)
+
+1. TỔNG QUAN SẢN PHẨM:
+AiO Music là CEP Extension Native chạy trực tiếp trong Adobe Premiere Pro & DaVinci Resolve, giúp Video Editor quản lý kho nhạc nền, tự động hạ nhạc theo tiếng thoại (Smart Auto-Ducking), tự động khớp nhịp (Auto Beat Sync), cắt dồn nhạc vừa khít độ dài video (Auto-Fit Length), tách Stems và chèn Sound Effects nhanh.
+
+2. CÁC TÍNH NĂNG CHÍNH NẰM TRÊN GIAO DIỆN (UI):
+- Topbar Header 44px chuẩn Studio Console (`#141414`), logo thương hiệu, phiên bản v1.0, trạng thái Premiere Ready & nút đổi ngôn ngữ VI/EN.
+- Target Track Banner: Chọn Audio Track đích (Audio 2 BGM, Audio 3 SFX, Audio 4 Ambience).
+- Segmented Navigation Tabs:
+  + Tab 1: Kho Nhạc BGM (Tìm kiếm, Lọc Mood/Genre/BPM/Duration, Waveform tương tác, Tách Stems Melody/Drums/Bass/Vocal, Nút Fit Length & Nút CTA Chèn vào Timeline cam đặc 34px).
+  + Tab 2: Smart Auto-Ducking & Fade (Công tắc Bật/Tắt Né Giọng, Slider Duck Amount -dB, Slider Sensitivity, Fade In/Out, và Timeline Visual Simulator).
+  + Tab 3: Beat Sync & Auto-Fit Music (Phân tích tiết tấu bài hát, tự động đánh dấu Beat Markers 1/4 or 1/2 beat, Auto-Fit cắt & dồn nhạc tự nhiên vừa khít 03:45.00).
+  + Tab 4: Thư viện Sound Effects Nhanh (Risers, Whooshes, Sub Impacts, Pop UI Clicks, Camera Shutters 1-click preview & chèn CTI).
+
+3. TIÊU CHUẨN THIẾT KẾ (DESIGN SYSTEM):
+- Tuân thủ 100% Studio Console Design System (`design-system/tokens.css`).
+- Tone màu tối trung tính (`--bg-1: #141414`, `--bg-2: #181818`, `--bg-3: #1f1f1f`), Accent Cam `#f86820`.
+- Control height 3 bậc chuẩn: 24px (phụ/chip), 28px (mặc định), 34px (CTA chính).
+- Tương thích kích thước panel Premiere (từ 220px đến 640px).

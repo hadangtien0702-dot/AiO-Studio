@@ -296,3 +296,51 @@ cụ đo báo sai **bốn lần** và mỗi lần đều suýt làm sửa hỏng
 đúng — `activeDuration` không chứa delay; `playState` vẫn "running" khi pane ẩn;
 quét tràn bắt nhầm phần tử trong `clipPath`; đo layout của thứ có animation mà
 quên ép về trạng thái cuối.
+
+---
+
+## ☠️ LUẬT ICON — BẮT BUỘC TỪ 2026-08-07
+
+> *Thêm sau bug emoji phủ đen toàn màn hình panel AiO Music (ngày 07/08/2026).*
+
+### LUẬT 01 — CẤM TUYỆT ĐỐI EMOJI TRONG UI
+
+Emoji được thiết kế cho tin nhắn — **không phải cho application UI**. Cấm dùng trong:
+
+- Mọi file `.html`, `.css`, `.js`, `.jsx`, `.tsx` của panel
+- `innerHTML`, `textContent`, `content:` CSS pseudo-element
+
+**Tại sao:** Emoji render khác nhau giữa hệ điều hành; trên Windows Segoe UI Emoji khi thu nhỏ panel xuống dưới 200px bị render thành ký tự đen to phủ lên toàn bộ UI. Không scale vector, không tô màu CSS được.
+
+### LUẬT 02 — ICON = SVG INLINE
+
+Mọi icon phải là SVG inline trong HTML, tuân thủ:
+
+```html
+<svg class="ic ic-sm" viewBox="0 0 24 24" fill="none"
+     stroke="var(--acc)" stroke-width="1.9"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- path data -->
+</svg>
+```
+
+| Thuộc tính | Giá trị bắt buộc |
+|---|---|
+| `viewBox` | `"0 0 24 24"` |
+| `fill` | `"none"` |
+| `stroke` | `"currentColor"` hoặc token CSS |
+| `stroke-width` | `1.9` |
+| `stroke-linecap` | `"round"` |
+| `stroke-linejoin` | `"round"` |
+
+**Bị cấm:** `<i class="fa-...">`, `<span class="material-icon">`, `<img src="*.png">`, bất kỳ CDN icon font nào.
+
+### LUẬT 03 — MÀU ICON THEO TOKEN
+
+| Ngữ cảnh | Token | Giá trị |
+|---|---|---|
+| Icon inactive | `var(--t3)` | `#6f7185` |
+| Icon active / accent | `var(--acc)` | `#f86820` |
+| Icon trên nền cam | hardcode | `#ffffff` |
+
+**Quy tắc đầy đủ trong:** `.agents/AGENTS.md`
