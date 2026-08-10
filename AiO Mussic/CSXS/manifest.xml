@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0"
+    ExtensionBundleId="com.aiostudio.music"
+    ExtensionBundleVersion="1.0.0"
+    ExtensionBundleName="AiO Studio - Music"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <ExtensionList>
+    <Extension Id="com.aiostudio.music.panel" Version="1.0.0" />
+  </ExtensionList>
+
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="PPRO" Version="[15.0,99.9]" />
+    </HostList>
+    <LocaleList>
+      <Locale Code="All" />
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="9.0" />
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+
+  <DispatchInfoList>
+    <Extension Id="com.aiostudio.music.panel">
+      <DispatchInfo>
+        <Resources>
+          <!-- Panel KHONG CAN BUILD nen de thang o goc, khong co thu muc dist/.
+               ☠️ Da vap 08/08: tung doi sang ./dist/index.html trong luc
+               Premiere DANG CHAY -> panel bao ERR_FILE_NOT_FOUND, vi CEP doc
+               manifest DUNG MOT LAN luc khoi dong. Sua manifest thi phai tat
+               han Premiere; de nguyen o goc thi doi/mo lai panel la du.
+               ScriptPath: thieu dong nay thi evalScript khong goi duoc ham nao.
+               (cau-noi.js con tu $.evalFile lai host truoc moi lenh, nen van
+               chay duoc ngay ca khi ScriptPath chua kip co hieu luc.) -->
+          <MainPath>./index.html</MainPath>
+          <ScriptPath>./host/index.jsx</ScriptPath>
+          <CEFCommandLine>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--mixed-context</Parameter>
+            <Parameter>--allow-file-access</Parameter>
+            <Parameter>--allow-file-access-from-files</Parameter>
+            <Parameter>--disable-renderer-backgrounding</Parameter>
+            <Parameter>--disable-background-timer-throttling</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <!-- Panel = DOCK duoc, cung chuan voi 6 panel kia (Asset Manager /
+               Power Bins la 380x640). User dock chung mot cot roi keo rong khi
+               can. UI da lam responsive: dep tu ~360px (dock hep) toi ~900px.
+               Doi Type BAT BUOC tat han Premiere roi mo lai. -->
+          <Type>Panel</Type>
+          <Menu>AiO Studio - Music</Menu>
+          <Geometry>
+            <Size>
+              <Height>680</Height>
+              <Width>420</Width>
+            </Size>
+            <MinSize>
+              <Height>430</Height>
+              <Width>300</Width>
+            </MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>

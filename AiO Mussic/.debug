@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Remote debug cho CEP panel Music.
+  Cong 8097 (khong trung 8088-8096 cua cac panel khac).
+  Mo http://localhost:8097 de xem DevTools cua panel dang chay trong Premiere.
+-->
+<ExtensionList>
+  <Extension Id="com.aiostudio.music.panel">
+    <HostList>
+      <Host Name="PPRO" Port="8097" />
+    </HostList>
+  </Extension>
+</ExtensionList>
