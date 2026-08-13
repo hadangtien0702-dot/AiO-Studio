@@ -1,3 +1,4 @@
+import { dich } from '../ngonngu'
 /**
  * whisper.ts — nhận dạng tiếng nói bằng whisper.cpp chạy trên GPU.
  *
@@ -78,13 +79,13 @@ export const MO_HINH = [
     // ☠️ BAN THUONG MAI: mo ta nay len TOOLTIP cua nut. Khong neu thong so
     // noi bo (toc do gap may lan, muc GPU, ten mo hinh) — anh Tien 30/07:
     // *"khong de nguoi dung biet minh dung gi va lam gi"*.
-    mo: 'Chép nhanh hơn · câu ngắn, nhiều khối',
+    mo: dich('Chép nhanh hơn · câu ngắn, nhiều khối'),
   },
   {
     ma: 'v3',
-    ten: 'Phụ đề câu dài',
+    ten: dich('Phụ đề câu dài'),
     file: 'ggml-large-v3.bin',
-    mo: 'Nghe kỹ hơn · câu phụ đề dài hơn',
+    mo: dich('Nghe kỹ hơn · câu phụ đề dài hơn'),
   },
 ] as const
 
@@ -152,8 +153,8 @@ export function thieuGi(): string {
   const fs = getFs()
   const path = getPath()
   const goc = thuMucWhisper()
-  if (!fs || !path) return 'Panel không dùng được Node.js.'
-  if (!goc) return 'Không xác định được thư mục cài đặt của bộ nghe hiểu.'
+  if (!fs || !path) return dich('Panel không dùng được Node.js.')
+  if (!goc) return dich('Không xác định được thư mục cài đặt của bộ nghe hiểu.')
   const exe = path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
   const model = path.join(goc, 'models', 'ggml-large-v3.bin')
   const thieu: string[] = []
@@ -161,10 +162,10 @@ export function thieuGi(): string {
     // ☠️ BAN THUONG MAI: khong neu ten cong cu nen. Anh Tien 30/07:
     // *"ban thuong mai khong de nguoi dung biet minh dung gi va lam gi"*.
     // Khach biet panel boc mot cong cu ma nguon mo la tu chay duoc, khoi mua.
-    if (!fs.existsSync(exe)) thieu.push('bộ nghe hiểu')
-    if (!fs.existsSync(model)) thieu.push('dữ liệu nghe hiểu (khoảng 3 GB)')
+    if (!fs.existsSync(exe)) thieu.push(dich('bộ nghe hiểu'))
+    if (!fs.existsSync(model)) thieu.push(dich('dữ liệu nghe hiểu (khoảng 3 GB)'))
   } catch {
-    return 'Không đọc được thư mục ' + goc
+    return dich('Không đọc được thư mục ') + goc
   }
   if (!thieu.length) return ''
   return `Chưa có ${thieu.join(' và ')} trong:\n${goc}`
@@ -181,10 +182,10 @@ export async function trichTieng(
 ): Promise<{ wav: string; fps: number; duration: number }> {
   const req = nodeRequire()
   const path = getPath()
-  if (!req || !path) throw new Error('Panel không dùng được Node.js')
+  if (!req || !path) throw new Error(dich('Panel không dùng được Node.js'))
   const os = req('os')
   const ffmpeg = getFFmpegPath()
-  if (!ffmpeg) throw new Error('Thiếu thành phần xử lý media của panel')
+  if (!ffmpeg) throw new Error(dich('Thiếu thành phần xử lý media của panel'))
 
   const ra = path.join(os.tmpdir(), `aio-autocut-${Date.now()}.wav`)
   // Tiện thể lấy luôn fps + thời lượng từ log của chính lệnh này, khỏi phải mở
@@ -303,7 +304,7 @@ export async function nghe(
   const req = nodeRequire()
   const fs = getFs()
   const path = getPath()
-  if (!req || !fs || !path) throw new Error('Panel không dùng được Node.js')
+  if (!req || !fs || !path) throw new Error(dich('Panel không dùng được Node.js'))
 
   // whisper-cli tự thêm đuôi .srt vào tên đưa cho `-of`.
   //
@@ -480,7 +481,7 @@ export function docJson(noiDung: string): KetQuaNghe {
   try {
     j = JSON.parse(noiDung)
   } catch {
-    throw new Error('Không đọc được kết quả nghe hiểu (dữ liệu hỏng)')
+    throw new Error(dich('Không đọc được kết quả nghe hiểu (dữ liệu hỏng)'))
   }
   const cau: Cau[] = []
   const tu: TuTinCay[] = []

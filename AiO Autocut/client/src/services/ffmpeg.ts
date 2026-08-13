@@ -1,3 +1,4 @@
+import { dich } from '../ngonngu'
 /**
  * ffmpeg.ts — gọi FFmpeg đã đóng gói sẵn trong `bin/win64/`.
  *
@@ -140,12 +141,12 @@ export function execFileAsync(
   return new Promise((resolve, reject) => {
     const req = nodeRequire()
     if (!req) {
-      reject(new Error('Không dùng được Node.js trong panel'))
+      reject(new Error(dich('Không dùng được Node.js trong panel')))
       return
     }
     const cp = req('child_process')
     if (!cp || !cp.execFile) {
-      reject(new Error('Không dùng được child_process.execFile'))
+      reject(new Error(dich('Không dùng được child_process.execFile')))
       return
     }
 
@@ -208,7 +209,7 @@ export async function detectSilence(
   opt: DetectOptions,
 ): Promise<{ silences: Silence[]; duration: number; fps: number }> {
   const exe = getFFmpegPath()
-  if (!exe) throw new Error('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất')
+  if (!exe) throw new Error(dich('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất'))
 
   const { stderr } = await execFileAsync(
     exe,

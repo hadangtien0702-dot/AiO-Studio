@@ -1309,16 +1309,22 @@ export default function App() {
           <div className="ket-gon">
             {/* Chưa phân tích thì CHỈ hiện độ dài vùng. Vẽ "4:27 → 4:27" lúc
                 chưa cắt gì là nói dối bằng dấu mũi tên. */}
-            {tongGiay <= 0 ? (
-              <span className="ket-gon__v">—</span>
-            ) : xemTruoc ? (
+            {/* ☠️ CHƯA CHẠY THÌ KHÔNG ĐƯỢC HIỆN SỐ. Anh Tiến bắt lỗi 13/08:
+                *"chỗ này chưa chạy mà có kết quả hả em"*.
+                Bản đầu của tôi hiện `mmssGon(tongGiay)` = độ dài vùng đang
+                khoanh. Con số ấy ĐÚNG, nhưng nằm dưới nhãn "Kết quả" thì người
+                đọc hiểu là ĐÃ CẮT XONG còn ngần đó — sai hoàn toàn.
+                Cùng loại lỗi đã ghi trong file này từ trước: vẽ "4:27 → 4:27"
+                lúc chưa cắt gì là nói dối bằng dấu mũi tên. Tôi vá chỗ mũi tên
+                mà quên chính con số đứng một mình cũng nói dối y như vậy. */}
+            {xemTruoc && tongGiay > 0 ? (
               <>
                 <span className="ket-gon__cu">{mmssGon(tongGiay)}</span>
                 <span className="ket-gon__ar">→</span>
                 <span className="ket-gon__moi">{mmssGon(conGiay)}</span>
               </>
             ) : (
-              <span className="ket-gon__v">{mmssGon(tongGiay)}</span>
+              <span className="ket-gon__v">—</span>
             )}
           </div>
         </section>
