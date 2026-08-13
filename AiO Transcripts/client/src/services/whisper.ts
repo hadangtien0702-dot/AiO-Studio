@@ -168,7 +168,9 @@ export function thieuGi(): string {
     return dich('Không đọc được thư mục ') + goc
   }
   if (!thieu.length) return ''
-  return `Chưa có ${thieu.join(' và ')} trong:\n${goc}`
+  // Khoá chứa cả câu có chỗ trống `{x}`; chữ nối `' và '` cũng phải dịch, không
+  // thì ra câu nửa Anh nửa Việt ("the speech recognition engine và the model").
+  return dich('Chưa có {x} trong:\n').replace('{x}', thieu.join(dich(' và '))) + goc
 }
 
 /**

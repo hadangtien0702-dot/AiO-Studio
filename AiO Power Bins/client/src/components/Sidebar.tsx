@@ -404,8 +404,14 @@ export default function Sidebar() {
                       subs.length === 0
                         ? undefined
                         : open
-                          ? `Bấm lần nữa để thu gọn ${subs.length} thư mục`
-                          : `Bấm để xổ ${subs.length} thư mục bên trong`
+                          ? dich('Bấm lần nữa để thu gọn {n} thư mục').replace(
+                              '{n}',
+                              String(subs.length),
+                            )
+                          : dich('Bấm để xổ {n} thư mục bên trong').replace(
+                              '{n}',
+                              String(subs.length),
+                            )
                     }
                     onClick={() => {
                       // Bấm lại chính mục đang mở = cụp danh sách thư mục con.
@@ -460,7 +466,11 @@ export default function Sidebar() {
                            */
                           title={
                             sf.totalAll > sf.count
-                              ? `${sf.count.toLocaleString()} ${dich(label).toLowerCase()} — cả thư mục có ${sf.totalAll.toLocaleString()} file mọi loại\n${sf.key}`
+                              ? dich('{n} {loai} — cả thư mục có {tong} file mọi loại')
+                                  .replace('{n}', sf.count.toLocaleString())
+                                  .replace('{loai}', () => dich(label).toLowerCase())
+                                  .replace('{tong}', sf.totalAll.toLocaleString()) +
+                                `\n${sf.key}`
                               : `${sf.count.toLocaleString()} ${dich(label).toLowerCase()}\n${sf.key}`
                           }
                           onClick={toggle}
@@ -477,8 +487,14 @@ export default function Sidebar() {
                           <span className="nav-count">{sf.count}</span>
                           <button
                             className="nav-sub__refresh"
-                            title={`Quét lại riêng thư mục ${sf.name}`}
-                            aria-label={`Quét lại riêng thư mục ${sf.name}`}
+                            title={dich('Quét lại riêng thư mục {ten}').replace(
+                              '{ten}',
+                              () => sf.name,
+                            )}
+                            aria-label={dich('Quét lại riêng thư mục {ten}').replace(
+                              '{ten}',
+                              () => sf.name,
+                            )}
                             disabled={scanning}
                             onClick={(e) => {
                               e.stopPropagation()
@@ -524,7 +540,7 @@ export default function Sidebar() {
                     <button
                       className="foot-row__del"
                       title={dich('Gỡ thư mục khỏi thư viện')}
-                      aria-label={`Gỡ thư mục ${f}`}
+                      aria-label={dich('Gỡ thư mục {ten}').replace('{ten}', () => f)}
                       onClick={() => removeFolder(f)}
                     >
                       <IconClose size={10} />

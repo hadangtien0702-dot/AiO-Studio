@@ -90,10 +90,16 @@
  * ══════════════════════════════════════════════════════════════════════════
  * ☠️ THU CO Y KHONG NAM TRONG BANG NAY
  * ══════════════════════════════════════════════════════════════════════════
- * 1. **49 chuoi co `${...}` ben trong** (template literal). Chung khong bao gio
- *    khop khoa duoc vi noi dung doi theo du lieu. Phai sua tay o ma nguon:
- *    tach phan chu ra `dich()`, hoac doi sang `tp('… {n} …', { n })`.
- *    Danh sach day du nam trong bao cao cua phien 13/08.
+ * 1. ~~**49 chuoi co `${...}` ben trong**~~ — **DA XU LY 13/08/2026 (dot 2).**
+ *    Xem muc "CHUOI CO CHO TRONG" o CUOI bang. Cach lam: khoa chua CA CAU voi
+ *    cho trong `{ten}` / `{n}`, ma nguon goi
+ *    `dich('… {n} …').replace('{n}', String(n))`.
+ *    KHONG tach cau thanh manh vun: manh dich roi ghep lai ra cau nua Anh nua
+ *    Viet, te hon la de nguyen tieng Viet (luat 4).
+ *    ⚠️ Cho trong nao nhan **chu do NGUOI DUNG go** (ten brand, ten khay, ten
+ *    file, duong dan) thi phai dung dang HAM: `.replace('{ten}', () => ten)`.
+ *    Dang chuoi thuong se dich `$&` `$'` `` $` `` trong ten file thanh thu
+ *    khac — ten thu muc `Nhac $& Loop` se ra sai.
  * 2. **Ten thuong hieu**: `Power Bins` · `Brand Kit` · `Asset Manager` ·
  *    `Premiere` · `Mogrt` · `Import` — von da la tieng Anh, giu nguyen o ca hai
  *    thu tieng. Khong co trong bang = tra lai nguyen van. DUNG "dich cho du".
@@ -108,6 +114,38 @@
  *    VE RA chu khong boc trong mang.
  * 5. **`services/library.ts` 'Lưu thư viện thất bại:'** — do la `console.error`,
  *    nguoi dung khong bao gio thay.
+ *
+ * ══════════════════════════════════════════════════════════════════════════
+ * ☠️ CON HAI CHO CHUA XONG — NAM NGOAI `client/src`, DO THAT 13/08/2026
+ * ══════════════════════════════════════════════════════════════════════════
+ * A. **`host/ppro.jsx` con 6 cau bao loi TIENG VIET KHONG DAU, VA CHUNG HIEN
+ *    RA MAN HINH THAT.** Grep theo dau khong thay chung — dung bay 2 o tren.
+ *      'Chua mo project' · 'Chua mo sequence nao' · 'Import that bai' ·
+ *      'Chen MOGRT that bai' ·
+ *      'Moi track {am thanh|video} deu co clip tai vi tri nay, va khong them
+ *       duoc track moi. Hay them mot track trong roi thu lai.' ·
+ *      'Moi track video deu co clip tai vi tri nay, va khong them duoc track
+ *       moi. Hay them mot track video trong roi thu lai.'
+ *    Duong di da do: `parseResult()` (lib/cep.ts) cat 'ERR:' roi tra `message`
+ *    -> `store.ts:703` (`sendToTimeline`, chi hien khi THAT BAI) va
+ *    `store.ts:512` (`addTimelineSelectionToPowerBin`). Cac cau 'OK:…' KHONG
+ *    bao gio hien (ca hai cho deu boc trong `if (!res.ok)`), nen chi 6 cau ERR
+ *    la thay duoc.
+ *    -> CHUA SUA vi hai le: (1) sua `host/*.jsx` thi Premiere phai TAT HAN roi
+ *    mo lai moi nap ban moi, khong kiem chung duoc trong phien nay; (2) cach
+ *    dung khong phai dich thang trong jsx ma la cho host tra ve MA LOI
+ *    ('ERR:NO_SEQUENCE'…) roi panel tra bang — de con lai jsx tu dich la sau
+ *    nay co hai bang chu o hai noi.
+ *
+ * B. **`services/cachePaths.ts:28` con dinh dung cai bay `process.env`** ma
+ *    dau muc nay canh bao. Doc ban build 13/08: `var Om = {}` roi
+ *    `typeof process<"u"&&Om.APPDATA` -> luon `undefined`.
+ *    `ngonngu.tsx` va `services/ffmpeg.ts` DA sua xong (do lai: ca hai nay doc
+ *    `cep_node.process` / `bienMT()` luc chay, khong con chu `process.env`).
+ *    -> CHUA SUA vi day la duong LUI cua `userDataPath()`, ma trong Premiere
+ *    thi `userDataPath()` luon co gia tri nen nhanh nay chua tung chay. Bat
+ *    mot nhanh chua tung chay o cho GIAI DUONG DAN KHO CACHE la viec phai do
+ *    tren Premiere that truoc, khong lam ke ben mot viec dich chu.
  */
 import type { BangChu } from './ngonngu'
 
@@ -175,7 +213,6 @@ export const CHU: BangChu = {
       'A brand is a set of identity assets you reuse in every Premiere project',
 
     // ─── components\Grid.tsx — nut va nhan ───
-    'Bấm': 'Press',
     'Xem to': 'Large view',
     'Xem vừa': 'Medium view',
     'Bật tiếng': 'Unmute',
@@ -203,8 +240,15 @@ export const CHU: BangChu = {
     'Chọn một khay ở menu bên trái trước đã.': 'Pick a bin in the left menu first.',
     'Bấm (hoặc rê chuột) vào một asset trước, rồi bấm đây để chèn':
       'Pick an asset first (click or hover), then press here to add it',
-    'ở thanh trên để quét asset trên máy (video, Mogrt, âm thanh, ảnh).':
-      'in the top bar to scan assets on this computer (video, Mogrt, audio, images).',
+    // ☠️ Man hinh DAU TIEN cua panel. Ban cu chi sang nut "Thêm thư mục" /
+    // "Add folder" — nut do nam trong nhanh `isLibrary` cua Toolbar.tsx, ma
+    // `activeMasterTab` khoi tao 'powerbin' va `setActiveMasterTab` KHONG duoc
+    // goi o dau ca (do 13/08), nen nhanh do khong bao gio chay. Cau moi chi
+    // dung "Thêm từ timeline" — nut CO THAT tren thanh dau cua panel nay.
+    'Tạo brand và khay ở menu bên trái, rồi bấm':
+      'Create a brand and a bin in the left menu, then press',
+    'ở thanh trên — hoặc kéo thẳng file từ Explorer vào đây.':
+      'in the top bar — or drag files straight from Explorer into this grid.',
     'Không đọc được đường dẫn file. Kéo thả chỉ chạy khi mở trong Premiere.':
       'Could not read the file path. Drag and drop only works inside Premiere.',
     'Chọn một khay ở menu bên trái, hoặc gán asset vào khay để dùng chung cho mọi dự án.':
@@ -287,5 +331,101 @@ export const CHU: BangChu = {
       'You cannot choose a folder inside the current cache location.',
     'Không ghi được vào thư mục mới. Kiểm tra lại quyền ghi của ổ đĩa.':
       'Could not write to the new folder. Check the write permissions on that drive.',
+
+    // ══════════════════════════════════════════════════════════════════════
+    // CHUOI CO CHO TRONG — cau tron ven, ma nguon dien so bang `.replace()`
+    // ══════════════════════════════════════════════════════════════════════
+    // `{ten}` `{khay}` `{loai}` nhan CHU, `{n}` `{tong}` `{loi}` nhan SO.
+    // Cho trong nhan chu nguoi dung go thi ben ma nguon phai dung dang ham:
+    // `.replace('{ten}', () => ten)` — xem ghi chu dau file.
+
+    // ─── components\PowerBinHub.tsx — ☠️ HAI HOP THOAI XOA ───
+    // Day la cho nguy hiem nhat panel: nguoi dung EN bam Xoa ma doc khong
+    // hieu minh dang dong y xoa cai gi thi ho mat du lieu.
+    'Xoá khay {ten}': 'Delete bin {ten}',
+    'Xoá brand {ten}': 'Delete brand {ten}',
+    'Thêm khay vào brand {ten}': 'Add a bin to brand {ten}',
+    'Xoá khay "{ten}"? Asset gốc trên đĩa không bị xoá.':
+      'Delete the bin "{ten}"? The source files on disk are not deleted.',
+    'Xoá brand "{ten}"?\n\nCác khay bên trong KHÔNG bị xoá — chúng chuyển sang mục "Khay chung".':
+      'Delete the brand "{ten}"?\n\nThe bins inside are NOT deleted — they move to "Shared bins".',
+
+    // ─── components\Grid.tsx ───
+    'Chèn {ten} vào timeline': 'Add {ten} to the timeline',
+    'Đã thêm {n} file vào khay': 'Added {n} files to the bin',
+    'Bỏ {ten} khỏi khay': 'Remove {ten} from the bin',
+    'Âm lượng {n}% — bấm để tắt tiếng': 'Volume {n}% — press to mute',
+    'Chèn "{ten}" vào timeline tại playhead': 'Add "{ten}" to the timeline at the playhead',
+    'Bỏ "{ten}" khỏi khay (không xoá file trên đĩa)':
+      'Remove "{ten}" from the bin (the file on disk is not deleted)',
+    'Cao độ {n} nửa cung — đổi cao độ thì tốc độ nghe thử đổi theo':
+      'Pitch {n} semitones — changing the pitch changes the preview speed with it',
+
+    // ─── components\AssetCard.tsx ───
+    'Bỏ yêu thích {ten}': 'Remove {ten} from favorites',
+    'Đánh dấu yêu thích {ten}': 'Add {ten} to favorites',
+    'Bấm để xem · Kéo thả vào timeline, hoặc bấm nút Import':
+      'Click to view · Drag and drop onto the timeline, or press Import',
+    'Bấm để nghe (bấm vào sóng âm để nghe từ đoạn đó) · Kéo thả vào timeline, hoặc bấm nút Import':
+      'Click to listen (click the waveform to play from that point) · Drag and drop onto the timeline, or press Import',
+
+    // ─── components\SettingsModal.tsx ───
+    '{n} sóng âm': '{n} waveforms',
+    'Dọn {n} file': 'Clean up {n} files',
+    '{n} ảnh xem trước': '{n} thumbnails',
+    '{n} bản xem nhanh': '{n} proxies',
+    'Đã dọn {n} file thừa': 'Cleaned up {n} leftover files',
+    'Đang dùng cho {n} asset': 'In use by {n} assets',
+    'Đã chuyển {n} file rác vào Thùng rác': 'Moved {n} junk files to the Recycle Bin',
+    '{n} file thừa ({dung}) — dọn đi không mất gì':
+      '{n} leftover files ({dung}) — cleaning them up costs you nothing',
+    'Chuyển {n} file rác vào Thùng rác Windows — khôi phục lại được nếu cần':
+      'Move {n} junk files to the Windows Recycle Bin — you can restore them if you need to',
+    'Đã chuyển {n} file vào Thùng rác — {loi} file không chuyển được (đang mở?)':
+      'Moved {n} files to the Recycle Bin — {loi} files could not be moved (still open?)',
+    '{n} file thừa ({dung}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được':
+      '{n} leftover files ({dung}) left behind by unzipping Mac archives — not audio or video, and Premiere cannot open them either',
+
+    // ─── components\Sidebar.tsx ───
+    'Gỡ thư mục {ten}': 'Remove the folder {ten}',
+    'Quét lại riêng thư mục {ten}': 'Rescan only the folder {ten}',
+    'Bấm để xổ {n} thư mục bên trong': 'Press to expand the {n} folders inside',
+    'Bấm lần nữa để thu gọn {n} thư mục': 'Press again to collapse the {n} folders',
+    '{n} {loai} — cả thư mục có {tong} file mọi loại':
+      '{n} {loai} — the whole folder holds {tong} files of every kind',
+
+    // ─── components\Toolbar.tsx ───
+    'Dừng render ({n}/{tong})': 'Stop rendering ({n}/{tong})',
+    'Cả {n} asset trong thư viện đã render xong.':
+      'All {n} assets in the library have finished rendering.',
+    '{n} file đọc không ra (hỏng hoặc sai định dạng).':
+      '{n} files could not be read (damaged, or in an unsupported format).',
+    'Cả {n} asset trong thư viện đều đã có preview. Bấm để kiểm tra lại.':
+      'All {n} assets in the library already have a preview. Press to check again.',
+    '{n} file Mogrt không có ảnh xem trước kèm trong gói — file vẫn tốt, Premiere dùng bình thường, chỉ là không có gì để hiện.':
+      '{n} Mogrt files carry no thumbnail inside the package — the files are fine and Premiere uses them normally, there is simply nothing to show.',
+    'Đang render {n}/{tong} asset còn thiếu preview — tính trên TOÀN thư viện {all} asset, không riêng thư mục đang chọn.\nMáy chạy hết sức nên Premiere có thể hơi ì. Bấm để DỪNG; phần đã render vẫn giữ nguyên.':
+      'Rendering {n}/{tong} assets that are missing a preview — counted across the WHOLE library of {all} assets, not just the folder you picked.\nYour machine runs at full speed, so Premiere may feel sluggish. Press to STOP; whatever is already rendered is kept.',
+    'Render preview cho {n} asset còn thiếu ảnh/sóng âm — tính trên TOÀN thư viện {all} asset, không riêng thư mục đang chọn.\nMáy sẽ bận trong lúc chạy — bấm lần nữa để dừng bất cứ lúc nào.':
+      'Render previews for {n} assets missing a thumbnail or waveform — counted across the WHOLE library of {all} assets, not just the folder you picked.\nYour machine will be busy while it runs — press again to stop at any time.',
+
+    // ─── state\store.ts ───
+    'Đã tạo brand: {ten}': 'Brand created: {ten}',
+    'Đã tạo khay: {ten}': 'Bin created: {ten}',
+    'Đã quét {n} asset': 'Scanned {n} assets',
+    'Đã bỏ "{ten}" khỏi khay': 'Removed "{ten}" from the bin',
+    'Đã gán nhãn cho {n} asset': 'Tagged {n} assets',
+    'Đã quét lại {ten}: {n} file': 'Rescanned {ten}: {n} files',
+    'Đã thêm {n} file từ timeline': 'Added {n} files from the timeline',
+    'Đã thêm {n} file từ timeline vào khay "{khay}"':
+      'Added {n} files from the timeline to the bin "{khay}"',
+
+    // ─── services\cacheMove.ts ───
+    'Đã chuyển {n} file sang chỗ mới.': 'Moved {n} files to the new location.',
+    'Đã chuyển {n} file, {loi} file không chuyển được (đang mở?).':
+      'Moved {n} files, {loi} files could not be moved (still open?).',
+
+    // ─── services\timelineImport.ts ───
+    'Đã đọc {n} file từ timeline': 'Read {n} files from the timeline',
   },
 }

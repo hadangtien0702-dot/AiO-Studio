@@ -61,7 +61,11 @@ export async function getSelectedTimelineClipPaths(): Promise<TimelinePathsResul
     }
   }
 
-  return { ok: true, paths, message: `Đã đọc ${paths.length} file từ timeline` }
+  return {
+    ok: true,
+    paths,
+    message: dich('Đã đọc {n} file từ timeline').replace('{n}', String(paths.length)),
+  }
 }
 
 /**

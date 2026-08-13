@@ -98,9 +98,12 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
    * số — mà đây đúng là câu người dùng cần đọc nhanh trước khi bấm nút phá huỷ.
    */
   const wipeList = [
-    cache.usedThumbs > 0 && `${cache.usedThumbs.toLocaleString()} ảnh xem trước`,
-    cache.usedWaveforms > 0 && `${cache.usedWaveforms.toLocaleString()} sóng âm`,
-    cache.usedProxies > 0 && `${cache.usedProxies.toLocaleString()} bản xem nhanh`,
+    cache.usedThumbs > 0 &&
+      dich('{n} ảnh xem trước').replace('{n}', cache.usedThumbs.toLocaleString()),
+    cache.usedWaveforms > 0 &&
+      dich('{n} sóng âm').replace('{n}', cache.usedWaveforms.toLocaleString()),
+    cache.usedProxies > 0 &&
+      dich('{n} bản xem nhanh').replace('{n}', cache.usedProxies.toLocaleString()),
   ]
     .filter(Boolean)
     .join(', ')
@@ -189,7 +192,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                   nói — bản cũ nói ở cả hai chỗ nên mắt phải đọc hai lần cùng
                   một thông tin ("không có rác" / "không có file thừa nào"). */}
               <span className="setting-row__desc">
-                {`Đang dùng cho ${usedTotal.toLocaleString()} asset`}
+                {dich('Đang dùng cho {n} asset').replace('{n}', usedTotal.toLocaleString())}
               </span>
             </div>
             <div className="setting-row__value">{cache.formattedSize}</div>
@@ -201,7 +204,9 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               <span className="setting-row__label">{dich('Dọn rác')}</span>
               <span className="setting-row__desc">
                 {cache.orphanCount > 0
-                  ? `${cache.orphanCount.toLocaleString()} file thừa (${cache.formattedOrphan}) — dọn đi không mất gì`
+                  ? dich('{n} file thừa ({dungluong}) — dọn đi không mất gì')
+                      .replace('{n}', cache.orphanCount.toLocaleString())
+                      .replace('{dungluong}', cache.formattedOrphan)
                   : dich('Không có file thừa')}
               </span>
             </div>
@@ -214,7 +219,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 setCache(analyzeCache(assets))
                 showToast(
                   res.count > 0
-                    ? `Đã dọn ${res.count.toLocaleString()} file thừa`
+                    ? dich('Đã dọn {n} file thừa').replace('{n}', res.count.toLocaleString())
                     : dich('Không có file thừa nào'),
                 )
               }}
@@ -243,7 +248,11 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               <div className="setting-row__info">
                 <span className="setting-row__label">{dich('Rác macOS trên ổ')}</span>
                 <span className="setting-row__desc">
-                  {`${junk.paths.length.toLocaleString()} file thừa (${doDung(junk.bytes)}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được`}
+                  {dich(
+                    '{n} file thừa ({dungluong}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được',
+                  )
+                    .replace('{n}', junk.paths.length.toLocaleString())
+                    .replace('{dungluong}', doDung(junk.bytes))}
                 </span>
               </div>
               <button
@@ -252,7 +261,9 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 title={
                   confirmJunk
                     ? dich('Bấm lần nữa để chuyển vào Thùng rác Windows')
-                    : `Chuyển ${junk.paths.length.toLocaleString()} file rác vào Thùng rác Windows — khôi phục lại được nếu cần`
+                    : dich(
+                        'Chuyển {n} file rác vào Thùng rác Windows — khôi phục lại được nếu cần',
+                      ).replace('{n}', junk.paths.length.toLocaleString())
                 }
                 onClick={() => {
                   if (!confirmJunk) {
@@ -268,8 +279,15 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     setJunkBusy(false)
                     showToast(
                       res.failed > 0
-                        ? `Đã chuyển ${res.moved.toLocaleString()} file vào Thùng rác — ${res.failed.toLocaleString()} file không chuyển được (đang mở?)`
-                        : `Đã chuyển ${res.moved.toLocaleString()} file rác vào Thùng rác`,
+                        ? dich(
+                            'Đã chuyển {n} file vào Thùng rác — {loi} file không chuyển được (đang mở?)',
+                          )
+                            .replace('{n}', res.moved.toLocaleString())
+                            .replace('{loi}', res.failed.toLocaleString())
+                        : dich('Đã chuyển {n} file rác vào Thùng rác').replace(
+                            '{n}',
+                            res.moved.toLocaleString(),
+                          ),
                     )
                     void findMacJunk(useLibrary.getState().folders).then(setJunk)
                   })
@@ -281,7 +299,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     ? dich('Đang dọn…')
                     : confirmJunk
                       ? dich('Bấm lần nữa để dọn')
-                      : `Dọn ${junk.paths.length.toLocaleString()} file`}
+                      : dich('Dọn {n} file').replace('{n}', junk.paths.length.toLocaleString())}
                 </span>
               </button>
             </div>

@@ -16,6 +16,39 @@ import { getFs, getPath } from '../lib/node'
 /** Khoá lưu lựa chọn của người dùng. localStorage của panel sống qua mọi lần mở. */
 const STORAGE_KEY = 'aio.cacheRoot'
 
+/**
+ * ☠️ [13/08/2026] LẤY BIẾN MÔI TRƯỜNG — TUYỆT ĐỐI KHÔNG VIẾT `process.env`.
+ *
+ * Vite THAY chữ `process.env` bằng một object RỖNG ngay lúc build. Đọc bản đã
+ * đóng gói (`dist/index.html`) của bản trước thì thấy đúng cảnh đó:
+ *
+ *     var Rm = {};                                              // Vite sinh ra
+ *     ... typeof process < "u" ? Rm.APPDATA || "" : ""          // -> "" luôn
+ *
+ * Nên nhánh dự phòng `%APPDATA%` của `defaultCacheRoot()` **chưa bao giờ chạy
+ * được trong bản build**. Panel vẫn hoạt động chỉ vì `userDataPath()` (CEP) trả
+ * về giá trị trước nó — không phải vì nhánh này đúng. Ngày nào CEP không trả
+ * được userData thì cache mất chỗ, mà không có gì báo.
+ *
+ * Cách đúng — giống hệt `services/ffmpeg.ts`: truy cập LÚC CHẠY, và truy cập
+ * ĐỘNG bằng `[...]` để Vite không nhận ra chuỗi `process.env` mà thay thế.
+ */
+function bienMT(ten: string): string | null {
+  const w = window as any
+  try {
+    const p = w?.cep_node?.process
+    const e = p && p['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {}
+  try {
+    const req = w?.cep_node?.require || (typeof require === 'function' ? require : null)
+    const pr = req ? req('process') : null
+    const e = pr && pr['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {}
+  return null
+}
+
 let memoRoot: string | null = null
 let memoThumbs: string | null = null
 let memoProxies: string | null = null
@@ -24,8 +57,7 @@ let memoProxies: string | null = null
 export function defaultCacheRoot(): string {
   const path = getPath()
   if (!path) return ''
-  const base =
-    userDataPath() || (typeof process !== 'undefined' ? process.env.APPDATA || '' : '')
+  const base = userDataPath() || bienMT('APPDATA') || ''
   return base ? path.join(base, 'AiOStudio') : ''
 }
 

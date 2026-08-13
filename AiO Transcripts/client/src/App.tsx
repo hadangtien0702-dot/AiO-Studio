@@ -352,9 +352,12 @@ export default function App() {
       const doiToc = vung.clips.filter((c) => Math.abs(c.speed - 1) > 0.01)
       if (doiToc.length) {
         setCanLam(
-          // ⚠️ Vế đầu có `${}` bên trong nên KHÔNG khớp khoá nào trong `chu.ts`
-          // — còn nguyên tiếng Việt, phải tách khoá riêng mới dịch được.
-          `Trong vùng có ${doiToc.length} clip đã đổi tốc độ (${(doiToc[0].speed * 100).toFixed(0)}%). ` +
+          // ☠️ Vế đầu có `${}` nên KHÔNG khớp khoá nào nếu để nguyên template
+          // literal. Không tách nhỏ ra dịch từng mẩu (mẩu rời không đọc được),
+          // mà dùng MỘT khoá chứa cả câu có chỗ trống rồi `.replace()`.
+          dich('Trong vùng có {n} clip đã đổi tốc độ ({p}%). ')
+            .replace('{n}', String(doiToc.length))
+            .replace('{p}', (doiToc[0].speed * 100).toFixed(0)) +
             dich('Panel chưa quy đổi được thời gian cho clip đổi tốc độ — trả về 100% rồi chạy lại.'),
         )
         return
@@ -399,7 +402,9 @@ export default function App() {
         if (demCu) {
           buoc.push({
             ten: dich('Dùng lại kết quả nghe đã có'),
-            ket: `${demCu.cau.length} câu · ${demCu.tu.length} từ · không phải nghe lại`,
+            ket: dich('{a} câu · {b} từ · không phải nghe lại')
+              .replace('{a}', String(demCu.cau.length))
+              .replace('{b}', String(demCu.tu.length)),
             giay: 0,
           })
           daNghe.set(c.path, demCu)
@@ -419,20 +424,20 @@ export default function App() {
         buoc.push({
           ten: dich('Tách tiếng khỏi video'),
           ket:
-            (duration > 0 ? `${duration.toFixed(0)}s tiếng` : 'xong') +
-            (co > 0 ? ` · đọc ${(co / 1073741824).toFixed(2)} GB` : '') +
+            (duration > 0 ? dich('{n}s tiếng').replace('{n}', duration.toFixed(0)) : dich('xong')) +
+            (co > 0 ? dich(' · đọc {n} GB').replace('{n}', (co / 1073741824).toFixed(2)) : '') +
             (tocDo > 0 ? ` · ${tocDo.toFixed(0)} MB/s` : ''),
           giay: giayTrich,
         })
 
-        baoBuoc(`Đang nghe hiểu lời nói${nhan}`, 2)
+        baoBuoc(dich('Đang nghe hiểu lời nói') + nhan, 2)
         t0 = Date.now()
         const ketNghe = await nghe(wav, boMay, (p) =>
           // Bước dài nhất của cả luồng (3-8 phút). p = -1 nghĩa là còn đang nạp
           // mô hình lên GPU, chưa nghe — lúc đó thanh chạy qua lại chứ không
           // đứng ở 0%, vì đứng ở 0% thì nhìn y như treo.
           baoBuoc(
-            p < 0 ? `Đang nạp mô hình lên GPU${nhan}` : `Đang nghe hiểu lời nói${nhan}`,
+            (p < 0 ? dich('Đang nạp mô hình lên GPU') : dich('Đang nghe hiểu lời nói')) + nhan,
             2,
             p,
           ),
@@ -441,8 +446,12 @@ export default function App() {
         buoc.push({
           ten: dich('Nghe hiểu lời nói (GPU)'),
           ket:
-            `${ketNghe.cau.length} câu · ${ketNghe.tu.length} từ` +
-            (ketNghe.ngonNgu ? ` · nghe ra tiếng ${tenNgonNgu(ketNghe.ngonNgu)}` : ''),
+            dich('{a} câu · {b} từ')
+              .replace('{a}', String(ketNghe.cau.length))
+              .replace('{b}', String(ketNghe.tu.length)) +
+            (ketNghe.ngonNgu
+              ? dich(' · nghe ra tiếng {x}').replace('{x}', () => tenNgonNgu(ketNghe.ngonNgu!))
+              : ''),
           giay: (Date.now() - t0) / 1000,
         })
 
@@ -495,9 +504,17 @@ export default function App() {
       if (xepTheoDoDai.length > 1) {
         const boQua = xepTheoDoDai.slice(1).reduce((t, [, ds]) => t + ds.length, 0)
         setCanLam(
-          `Vùng này có ${xepTheoDoDai.length} file khác nhau. Mới làm phụ đề cho ` +
-            `"${pathChinh.split(/[\\/]/).pop()}" (${clipsChinh.length} clip); ` +
-            `${boQua} clip của file khác chưa được chép.`,
+          dich(
+            'Vùng này có {n} file khác nhau. Mới làm phụ đề cho "{f}" ({c} clip); {b} clip của file khác chưa được chép.',
+          )
+            .replace('{n}', String(xepTheoDoDai.length))
+            // ☠️ Tên file là chữ NGƯỜI DÙNG đặt: `.replace()` với chuỗi thay
+            // thế sẽ hiểu `$&` `$'` `` $` `` là ký hiệu, làm méo câu. Truyền
+            // HÀM thì chuỗi được lấy nguyên văn. Cùng luật cho mọi chỗ trống
+            // nhận chữ tự do (tham số host ở `cep.ts`).
+            .replace('{f}', () => String(pathChinh.split(/[\\/]/).pop()))
+            .replace('{c}', String(clipsChinh.length))
+            .replace('{b}', String(boQua)),
         )
       }
 
@@ -549,7 +566,7 @@ export default function App() {
         const cho = chonChoSoat(nghedDuoc.tu, keepsNguyen, 0.6, 60, bangMoc)
         const dong = cho.map((c) => `${c.giay.toFixed(3)}|${c.chu}|${c.p.toFixed(3)}|tu`)
         if (dong.length) {
-          setDangChay(`Đang đánh dấu ${dong.length} chỗ cần soát…`)
+          setDangChay(dich('Đang đánh dấu {n} chỗ cần soát…').replace('{n}', String(dong.length)))
           // Ghim lại lần nữa — bước gắn phụ đề có thể mất vài giây.
           if (idSeqChay.current) await moSequenceTheoId(idSeqChay.current)
           const { daDat } = await datMarker(dong.join(';'))
@@ -804,10 +821,11 @@ export default function App() {
                         const r = await xoaPhuDe()
                         if (r.loi) setCanLam(r.loi.message)
                         else
-                          // ⚠️ Vế đầu có `${}` nên không khớp khoá nào — còn tiếng Việt.
                           setCanLam(
-                            `Đã gỡ ${r.daXoa} phụ đề khỏi project. File trên đĩa vẫn còn — ` +
-                              dich('panel không tự xoá file của anh.'),
+                            dich('Đã gỡ {n} phụ đề khỏi project. File trên đĩa vẫn còn — ').replace(
+                              '{n}',
+                              String(r.daXoa),
+                            ) + dich('panel không tự xoá file của anh.'),
                           )
                       } catch (e: any) {
                         setLoi(String(e?.message ?? e))
@@ -820,7 +838,10 @@ export default function App() {
                 >
                   {dangDon === 'phude'
                     ? dich('Đang gỡ…')
-                    : `Gỡ ${daTao.itemSrt} file phụ đề khỏi project`}
+                    : dich('Gỡ {n} file phụ đề khỏi project').replace(
+                        '{n}',
+                        String(daTao.itemSrt),
+                      )}
                 </button>
               )}
               {daTao.marker > 0 && (
@@ -836,7 +857,12 @@ export default function App() {
                         if (!(await napLaiHost())) throw new Error(dich('Không nạp được host.'))
                         const r = await xoaMarker()
                         if (r.loi) setCanLam(r.loi.message)
-                        else setCanLam(`Đã xoá ${r.daXoa} marker. Còn lại ${r.conLai} marker trên sequence.`)
+                        else
+                          setCanLam(
+                            dich('Đã xoá {n} marker. Còn lại {m} marker trên sequence.')
+                              .replace('{n}', String(r.daXoa))
+                              .replace('{m}', String(r.conLai)),
+                          )
                       } catch (e: any) {
                         setLoi(String(e?.message ?? e))
                       } finally {
@@ -846,7 +872,9 @@ export default function App() {
                     })()
                   }}
                 >
-                  {dangDon === 'marker' ? dich('Đang xoá…') : `Xoá ${daTao.marker} marker`}
+                  {dangDon === 'marker'
+                    ? dich('Đang xoá…')
+                    : dich('Xoá {n} marker').replace('{n}', String(daTao.marker))}
                 </button>
               )}
             </div>

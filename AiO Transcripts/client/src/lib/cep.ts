@@ -202,24 +202,29 @@ export function dichLoi(raw: string): HostLoi {
     case 'CLIP_DA_DOI':
       return {
         canLam: true,
-        message: `Timeline đã thay đổi giữa chừng (${tham}). Bấm lại để chạy từ đầu.`,
+        // ☠️ Câu có `${}` thì template literal KHÔNG khớp khoá nào. Dùng một
+        // khoá chứa CẢ CÂU với chỗ trống `{x}` rồi `.replace()` — đừng tách
+        // thành mấy mẩu rời, mẩu rời dịch ra đọc không thành câu.
+        message: dich('Timeline đã thay đổi giữa chừng ({x}). Bấm lại để chạy từ đầu.').replace('{x}', () => tham),
       }
     case 'CON_CLIP_SAU_VUNG':
       return {
         canLam: true,
         message:
-          // ⚠️ Câu đầu có `${}` nên không khớp khoá nào — còn nguyên tiếng Việt.
-          `Sau vùng anh khoanh còn ${tham} clip nữa, nên không cắt tại chỗ được.\n` +
+          dich('Sau vùng anh khoanh còn {n} clip nữa, nên không cắt tại chỗ được.\n').replace('{n}', () => tham) +
           dich('Cắt tại chỗ làm ngắn phần trong vùng lại, mà Premiere không cho panel dồn ') +
           dich('phần phía sau lên — sẽ hở một khoảng trống.\n') +
           dich('Cách làm: khoanh tới hết timeline, hoặc đổi sang "Tạo sequence mới".'),
       }
     case 'THIEU_API':
-      return { canLam: false, message: `Bản Premiere này không có \`${tham}\`.` }
+      return { canLam: false, message: dich('Bản Premiere này không có `{x}`.').replace('{x}', () => tham) }
     case 'TAO_SEQ_LOI':
-      return { canLam: false, message: `Tạo sequence mới thất bại: ${tham}` }
+      return { canLam: false, message: dich('Tạo sequence mới thất bại: {x}').replace('{x}', () => tham) }
     case 'SEQ_MOI_KHONG_CO_TRACK':
-      return { canLam: false, message: `Sequence mới không có track ${tham} nào.` }
+      return {
+        canLam: false,
+        message: dich('Sequence mới không có track {x} nào.').replace('{x}', () => tham),
+      }
     case 'MAT_SEQUENCE_GOC':
     case 'MAT_SEQUENCE_MOI':
       return {
@@ -232,16 +237,21 @@ export function dichLoi(raw: string): HostLoi {
       return {
         canLam: false,
         message:
-          // ⚠️ Câu đầu có `${}` nên không khớp khoá nào — còn nguyên tiếng Việt.
-          `Premiere không đọc được file phụ đề:\n${tham}\n` +
+          dich('Premiere không đọc được file phụ đề:\n{x}\n').replace('{x}', () => tham) +
           dich(
             'Nếu file nằm trong %APPDATA% thì Premiere Beta không thấy — phải để cạnh video gốc.',
           ),
       }
     case 'NHAP_SRT_LOI':
-      return { canLam: false, message: `Không nhập được file phụ đề vào project: ${tham}` }
+      return {
+        canLam: false,
+        message: dich('Không nhập được file phụ đề vào project: {x}').replace('{x}', () => tham),
+      }
     case 'TAO_CAPTION_LOI':
-      return { canLam: false, message: `Không tạo được track phụ đề: ${tham}` }
+      return {
+        canLam: false,
+        message: dich('Không tạo được track phụ đề: {x}').replace('{x}', () => tham),
+      }
     default:
       return { canLam: false, message: raw }
   }

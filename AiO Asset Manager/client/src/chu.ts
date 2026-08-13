@@ -5,28 +5,36 @@
  * nguyen van cau do -> quen dich mot cau chi lam no hien tieng Viet, khong lam
  * vo giao dien. Xem giai thich day du o `ngonngu.tsx`.
  *
- * Sinh tu do that ngay 13/08/2026 — con so lay bang script, khong uoc luong:
+ * Sinh tu do that ngay 13/08/2026 — con so lay bang script, khong uoc luong.
  *
- *   168  chuoi bo quet ra (xoa comment truoc, roi lay string literal + JSX text)
- *   -49  co `${...}` ben trong  -> khong lam khoa duoc, xu ly tay (xem muc 3)
- *   ----
- *   119
- *   -15  khong vao bang nguyen van:  9 khong phai giao dien (muc 4)
- *                                    6 la JSX nhieu dong -> gom khoang trang lai
- *   ----
- *   104  vao thang bang
- *   +17  THEM TAY:  6 ban gom khoang trang cua 6 dong tren
- *                   7 manh bi cat boi mot bieu thuc `{...}` giua cau
- *                   2 chuoi ASCII (`Xem to`, `Khay chung`) — luoi dau bo sot
- *                   2 chuoi bi regex template nuot (`AssetCard.tsx:392`)
+ * DOT 1 (sang 13/08): 121 khoa. Con bo sot 49 chuoi co `${...}` ben trong va
+ * 2 khoa la MANH GIUA CAU (`xem`, `nghe (bam vao song am…)`).
+ *
+ * DOT 2 (chieu 13/08) — sua dung 4 loi da xac dinh:
+ *
+ *   121  khoa cu
+ *    -2  XOA hai khoa manh (xem muc "KHONG DICH MANH" ben duoi)
+ *   +50  cau tron ven moi, phan lon la cau co CHO TRONG `{...}`
  *   ====
- *   121  khoa
+ *   169  khoa
  *
- * Da kiem: 121 khoa, 0 khoa trung, 0 loi `tsc --noEmit`. 115/121 khoa khop
- * NGUYEN VAN mot chuoi that trong ma nguon; 6 khoa con lai (`Đang quét`,
- * `file…`, `Đang quét thêm…`, `Đang xem`, `trong`, `— cuộn tiếp để xem thêm`)
- * CHUA khop duoc vi cau goc con dinh lien mot `{...}` — chung chi song khi
- * buoc boc tach dung cau do ra. Boc khac di la 6 khoa nay thanh rac.
+ * ══════════════════════════════════════════════════════════════════════════
+ * ☠️ SO DO CUOI CUNG — DO TREN BAN DA BUILD, KHONG PHAI TREN MA NGUON
+ * ══════════════════════════════════════════════════════════════════════════
+ * Ma nguon dung KHONG chung minh duoc ban build dung: Vite thay `process.env`
+ * bang object rong, va bo minify doi `\n` thanh xuong dong THAT (chinh cho nay
+ * lam phep do dau tien bao nham "thieu 3 ban dich" trong khi ca 3 deu co).
+ *
+ *   169/169  khoa tieng Viet co trong `dist/index.html`
+ *   169/169  ban dich tieng Anh co trong `dist/index.html`
+ *   165/166  cau duoc `dich('...')` goi that trong ma nguon -> tra ra tieng Anh
+ *            (cau con lai `{n} {loai}` giong nhau o hai thu tieng — co y)
+ *        0   khoa trung · 0 loi `tsc --noEmit` · build sach
+ *
+ * Bon khoa `Xem to` · `Xem vừa` · `Âm thanh` · `Hình ảnh` KHONG xuat hien
+ * trong bat ky `dich('...')` nao — chung duoc goi qua BIEN (`dich(label)`,
+ * `dich(title)`, `dich(TYPE_NAME[asset.type])`) vi la hang tang module. Do la
+ * cach dung DUNG, dung tuong la khoa rac ma xoa.
  *
  * ☠️ VI SAO PHAI XOA COMMENT TRUOC KHI QUET: ma nguon panel nay ghi chu rat
  * day bang tieng Viet (co file 60% dong la ghi chu). Grep tho ra gap ~8 lan so
@@ -76,9 +84,18 @@
  *    Autocut). Khong co trong bang = tra lai nguyen van. DUNG "dich cho du".
  * 2. TU GIONG NHAU O HAI THU TIENG: `Video` · `Mogrt` · `Preset` · `File`.
  *    Cho vao bang chi lam bang dai them ma khong doi gi tren man hinh.
- * 3. CHUOI CO `${...}` BEN TRONG (49 chuoi): da noi san nen khong khop khoa
- *    duoc. Phai tach o cho goi roi moi boc — xem bao cao, KHONG tu them vao
- *    day mot khoa co `${...}`, no se khong bao gio khop.
+ * 3. CHUOI CO `${...}` BEN TRONG: da noi san nen khong khop khoa duoc.
+ *    ☠️ KHONG BAO GIO them vao bang mot khoa co `${...}` — no se khong bao
+ *    gio khop, vi luc chay JS da noi chuoi xong roi.
+ *    Cach lam (dot 2, 13/08): doi cho goi tu template sang CAU CO CHO TRONG
+ *    `{ten}` / `{n}` / `{tong}`, roi dien bang `.replace()`:
+ *
+ *        `Đã tạo brand: ${name}`
+ *        -> dich('Đã tạo brand: {ten}').replace('{ten}', name)
+ *
+ *    Loi the: khoa la MOT CAU DOC DUOC, va tieng Anh duoc dat lai cho trong
+ *    dung trat tu cua no (`Bỏ yêu thích {ten}` -> `Remove {ten} from
+ *    favorites`) — thu ma noi chuoi bang `+` khong lam duoc.
  * 4. CHUOI KHONG PHAI GIAO DIEN (9 chuoi):
  *      1  `console.error('Luu thu vien that bai:')` — chi ra devtools
  *      5  ten nhan mau trong `store.ts` (`tags`: Do/Vang/Xanh la/Xanh duong/
@@ -86,6 +103,31 @@
  *         hinh bao gio. Ngay nao co man hinh nhan mau thi them vao day.
  *      3  trong `dev/mockData.ts` — chi chay khi mo panel bang trinh duyet,
  *         khong lot vao ban build production.
+ *
+ * ══════════════════════════════════════════════════════════════════════════
+ * ☠️☠️ KHONG DICH MANH GIUA CAU — TE HON LA DE NGUYEN TIENG VIET
+ * ══════════════════════════════════════════════════════════════════════════
+ * Vap that o dot 1 (13/08), sua o dot 2. `AssetCard.tsx` boc dung HAI TU nam
+ * lot giua mot cau tieng Viet de nguyen:
+ *
+ *     title={`… Bấm để ${type === 'audio' ? dich('nghe (…)') : dich('xem')} ·
+ *            Kéo thả vào timeline, hoặc bấm nút Import`}
+ *
+ * O che do EN, tooltip cua MOI THE ASSET doc ra:
+ *     "Bấm để view · Kéo thả vào timeline, hoặc bấm nút Import"
+ *
+ * Nua Anh nua Viet kho doc hon han mot cau tieng Viet tron ven — nguoi dung
+ * EN khong doc duoc phan Viet, ma nguoi dung VI thi vap phai chu la. Va no
+ * KHONG lo ra khi dem: bo quet van thay "da boc `dich()`" o dong do.
+ *
+ * -> Luat: dich CA CAU. Cau bi mot bieu thuc cat doi thi TACH THANH NHIEU
+ *    KHOA TRON VEN, moi khoa chon theo dieu kien — dung boc rieng cai manh.
+ *    Neu cho trong la DU LIEU (ten file, con so) thi dung `{...}` + `.replace()`
+ *    nhu muc 3, vi cho trong khong phai la mot manh cau.
+ *
+ * Cung ho o `store.ts`: ` vào khay "${bin.name}"` ghep vao duoi cau khac —
+ * mot manh khong doc duoc doc lap. Nay la hai khoa tron ven, chon theo viec
+ * co biet ten khay hay khong.
  *
  * ══════════════════════════════════════════════════════════════════════════
  * ☠️ HAI CHO DE VO KHI BOC (ghi truoc cho phien sau)
@@ -125,6 +167,19 @@ export const CHU: BangChu = {
       'Rendering at full speed — the machine will be busy. Press again to stop.',
     'Chọn clip trên timeline rồi bấm đây để thêm file gốc của chúng vào khay':
       'Select clips on the timeline, then press here to add their source files to the bin',
+    'Dừng render ({xong}/{tong})': 'Stop rendering ({xong}/{tong})',
+    'Cả {n} asset trong thư viện đã render xong.':
+      'All {n} assets in the library have finished rendering.',
+    '{n} file đọc không ra (hỏng hoặc sai định dạng).':
+      '{n} files could not be read (corrupt or an unsupported format).',
+    'Cả {n} asset trong thư viện đều đã có preview. Bấm để kiểm tra lại.':
+      'All {n} assets in the library already have a preview. Press to check again.',
+    '{n} file Mogrt không có ảnh xem trước kèm trong gói — file vẫn tốt, Premiere dùng bình thường, chỉ là không có gì để hiện.':
+      '{n} Mogrt files ship without a preview image inside the package — the files are fine and Premiere uses them normally, there is just nothing to show.',
+    'Render preview cho {n} asset còn thiếu ảnh/sóng âm — tính trên TOÀN thư viện {thuvien} asset, không riêng thư mục đang chọn.\nMáy sẽ bận trong lúc chạy — bấm lần nữa để dừng bất cứ lúc nào.':
+      'Render previews for the {n} assets still missing a thumbnail or waveform — counted across the WHOLE library of {thuvien} assets, not just the selected folder.\nThe machine will be busy while it runs — press again to stop at any time.',
+    'Đang render {xong}/{tong} asset còn thiếu preview — tính trên TOÀN thư viện {thuvien} asset, không riêng thư mục đang chọn.\nMáy chạy hết sức nên Premiere có thể hơi ì. Bấm để DỪNG; phần đã render vẫn giữ nguyên.':
+      'Rendering {xong}/{tong} assets that are still missing a preview — counted across the WHOLE library of {thuvien} assets, not just the selected folder.\nThe machine is running at full speed, so Premiere may feel sluggish. Press to STOP; everything already rendered is kept.',
 
     // ─── Grid.tsx — luoi + thanh thao tac ───
     'file': 'files',
@@ -170,6 +225,16 @@ export const CHU: BangChu = {
       'Drag files from Explorer in here, or select clips on the timeline and press “Add from timeline”.',
     'Brand là bộ nhận diện dùng lại ở mọi dự án: logo, intro, nhạc nền… Tạo brand đầu tiên bằng nút':
       'A brand is an identity kit you reuse in every project: logo, intro, background music… Create your first brand with',
+    // Grid.tsx — cau co CHO TRONG, dien bang `.replace()` o cho goi (xem muc 3)
+    'Đã thêm {n} file vào khay': 'Added {n} files to the bin',
+    'Chèn {ten} vào timeline': 'Insert {ten} into the timeline',
+    'Bỏ {ten} khỏi khay': 'Remove {ten} from the bin',
+    'Âm lượng {n}% — bấm để tắt tiếng': 'Volume {n}% — press to mute',
+    'Chèn “{ten}” vào timeline tại playhead': 'Insert “{ten}” into the timeline at the playhead',
+    'Bỏ “{ten}” khỏi khay (không xoá file trên đĩa)':
+      'Remove “{ten}” from the bin (the file on disk is not deleted)',
+    'Cao độ {n} nửa cung — đổi cao độ thì tốc độ nghe thử đổi theo':
+      'Pitch {n} semitones — changing the pitch changes the preview speed too',
 
     // ─── Sidebar.tsx — menu trai ───
     'Âm thanh': 'Audio',
@@ -184,15 +249,25 @@ export const CHU: BangChu = {
     'Kéo để xem tên thư mục dài': 'Drag to see long folder names',
     'Kéo để đổi bề rộng menu (hoặc dùng phím mũi tên trái/phải)':
       'Drag to resize the menu (or use the left/right arrow keys)',
+    'Gỡ thư mục {ten}': 'Remove the folder {ten}',
+    'Quét lại riêng thư mục {ten}': 'Rescan only the folder {ten}',
+    'Bấm để xổ {n} thư mục bên trong': 'Press to expand the {n} folders inside',
+    'Bấm lần nữa để thu gọn {n} thư mục': 'Press again to collapse {n} folders',
+    // `{loai}` la ten loai asset da dich roi ha chu thuong (audio / images / video…)
+    '{n} {loai} — cả thư mục có {tong} file mọi loại':
+      '{n} {loai} — the whole folder has {tong} files of every type',
 
     // ─── AssetCard.tsx — the asset ───
-    'xem': 'view',
     'Bỏ yêu thích': 'Remove from favorites',
     'Đánh dấu yêu thích': 'Add to favorites',
     'Không đọc được file': 'Could not read file',
     'Đang tạo sóng âm…': 'Building waveform…',
-    'nghe (bấm vào sóng âm để nghe từ đoạn đó)':
-      'listen (click the waveform to play from that point)',
+    'Bỏ yêu thích {ten}': 'Remove {ten} from favorites',
+    'Đánh dấu yêu thích {ten}': 'Add {ten} to favorites',
+    'Bấm để xem · Kéo thả vào timeline, hoặc bấm nút Import':
+      'Click to preview · Drag it into the timeline, or press Import',
+    'Bấm để nghe (bấm vào sóng âm để nghe từ đoạn đó) · Kéo thả vào timeline, hoặc bấm nút Import':
+      'Click to listen (click the waveform to play from that point) · Drag it into the timeline, or press Import',
 
     // ─── SettingsModal.tsx — hop Cai dat ───
     'Cài đặt': 'Settings',
@@ -224,6 +299,21 @@ export const CHU: BangChu = {
       '— until they are back, the cards show icons only. Library, brands, bins and favorites are untouched.',
     'Chưa có ảnh xem trước nào để xoá. Thư viện, brand, khay và yêu thích không nằm trong bộ nhớ đệm.':
       'There are no thumbnails to clear yet. Library, brands, bins and favorites are not stored in the cache.',
+    'Dọn {n} file': 'Clean up {n} files',
+    '{n} sóng âm': '{n} waveforms',
+    '{n} ảnh xem trước': '{n} thumbnails',
+    '{n} bản xem nhanh': '{n} proxies',
+    'Đang dùng cho {n} asset': 'In use by {n} assets',
+    'Đã dọn {n} file thừa': 'Cleaned up {n} leftover files',
+    'Đã chuyển {n} file rác vào Thùng rác': 'Moved {n} junk files to the Recycle Bin',
+    '{n} file thừa ({dungluong}) — dọn đi không mất gì':
+      '{n} leftover files ({dungluong}) — cleaning them up costs nothing',
+    'Chuyển {n} file rác vào Thùng rác Windows — khôi phục lại được nếu cần':
+      'Move {n} junk files to the Windows Recycle Bin — you can restore them if you need to',
+    'Đã chuyển {n} file vào Thùng rác — {loi} file không chuyển được (đang mở?)':
+      'Moved {n} files to the Recycle Bin — {loi} files could not be moved (still open?)',
+    '{n} file thừa ({dungluong}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được':
+      '{n} leftover files ({dungluong}) left behind by unzipping Mac archives — not audio or video, and Premiere cannot open them either',
 
     // ─── PowerBinHub.tsx — menu trai cua Power Bins ───
     'Lưu': 'Save',
@@ -237,6 +327,13 @@ export const CHU: BangChu = {
       'Create a new brand (an identity kit reused in every project)',
     'Mỗi brand là một bộ tài nguyên nhận diện dùng lại ở mọi dự án Premiere':
       'Each brand is a set of identity assets you reuse in every Premiere project',
+    'Xoá khay {ten}': 'Delete bin {ten}',
+    'Xoá brand {ten}': 'Delete brand {ten}',
+    'Thêm khay vào brand {ten}': 'Add a bin to the brand {ten}',
+    'Xoá khay “{ten}”? Asset gốc trên đĩa không bị xoá.':
+      'Delete the bin “{ten}”? The source assets on disk are not deleted.',
+    'Xoá brand “{ten}”?\n\nCác khay bên trong KHÔNG bị xoá — chúng chuyển sang mục “Khay chung”.':
+      'Delete the brand “{ten}”?\n\nThe bins inside it are NOT deleted — they move to “Ungrouped bins”.',
 
     // ─── state\store.ts — thong bao ───
     'Quét lỗi: ': 'Scan failed: ',
@@ -250,6 +347,15 @@ export const CHU: BangChu = {
       'Node.js is not available — open the panel inside Premiere to use it.',
     'Đã xoá brand. Các khay bên trong được giữ lại ở mục Khay chung.':
       'Brand deleted. The bins inside it are kept under Ungrouped bins.',
+    'Đã quét {n} asset': 'Scanned {n} assets',
+    'Đã tạo khay: {ten}': 'Bin created: {ten}',
+    'Đã tạo brand: {ten}': 'Brand created: {ten}',
+    'Đã bỏ “{ten}” khỏi khay': 'Removed “{ten}” from the bin',
+    'Đã gán nhãn cho {n} asset': 'Tagged {n} assets',
+    'Đã quét lại {thumuc}: {n} file': 'Rescanned {thumuc}: {n} files',
+    'Đã thêm {n} file từ timeline': 'Added {n} files from the timeline',
+    'Đã thêm {n} file từ timeline vào khay “{khay}”':
+      'Added {n} files from the timeline to the bin “{khay}”',
 
     // ─── lib\cep.ts — bao loi tu Premiere ───
     'Chọn thư mục asset': 'Pick an asset folder',
@@ -261,10 +367,14 @@ export const CHU: BangChu = {
       'This only works while the panel is open inside Premiere.',
     'Chưa chọn clip nào trên timeline (hoặc clip không có file gốc).':
       'No clips selected on the timeline (or the clips have no source file).',
+    'Đã đọc {n} file từ timeline': 'Read {n} files from the timeline',
 
     // ─── services\cacheMove.ts — doi cho luu bo nho dem ───
     'Chưa chọn thư mục.': 'No folder selected.',
     'Không truy cập được hệ thống file.': 'Could not reach the file system.',
+    'Đã chuyển {n} file sang chỗ mới.': 'Moved {n} files to the new location.',
+    'Đã chuyển {n} file, {loi} file không chuyển được (đang mở?).':
+      'Moved {n} files, {loi} files could not be moved (still open?).',
     'Đang lưu ở đúng thư mục này rồi.': 'The cache is already stored in that folder.',
     'Không xác định được chỗ lưu hiện tại.': 'Could not determine the current location.',
     'Không chọn được thư mục nằm bên trong chỗ lưu hiện tại.':

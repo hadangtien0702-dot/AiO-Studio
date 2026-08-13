@@ -394,9 +394,13 @@ export default function AssetCard({ asset }: { asset: Asset }) {
        */
       draggable
       onDragStart={onDragStart}
-      title={`${asset.fileName} — ${dich(TYPE_NAME[asset.type])}${resStr ? ' · ' + resStr : ''}\nBấm để ${
-        asset.type === 'audio' ? 'nghe (bấm vào sóng âm để nghe từ đoạn đó)' : 'xem'
-      } · Kéo thả vào timeline, hoặc bấm nút Import`}
+      title={`${asset.fileName} — ${dich(TYPE_NAME[asset.type])}${resStr ? ' · ' + resStr : ''}\n${
+        asset.type === 'audio'
+          ? dich(
+              'Bấm để nghe (bấm vào sóng âm để nghe từ đoạn đó) · Kéo thả vào timeline, hoặc bấm nút Import',
+            )
+          : dich('Bấm để xem · Kéo thả vào timeline, hoặc bấm nút Import')
+      }`}
     >
       <div className="card-asset__thumb">
         {asset.type === 'audio' ? (
@@ -598,8 +602,8 @@ export default function AssetCard({ asset }: { asset: Asset }) {
           title={asset.favorite ? dich('Bỏ yêu thích') : dich('Đánh dấu yêu thích')}
           aria-label={
             asset.favorite
-              ? `Bỏ yêu thích ${asset.name}`
-              : `Đánh dấu yêu thích ${asset.name}`
+              ? dich('Bỏ yêu thích {ten}').replace('{ten}', () => asset.name)
+              : dich('Đánh dấu yêu thích {ten}').replace('{ten}', () => asset.name)
           }
           aria-pressed={!!asset.favorite}
           onClick={(e) => {

@@ -91,11 +91,18 @@ export default function PowerBinHub() {
         <span className="hub__count">{countByBin.get(id) ?? 0}</span>
         <button
           className="hub__del"
-          title={`Xoá khay ${name}`}
-          aria-label={`Xoá khay ${name}`}
+          title={dich('Xoá khay {ten}').replace('{ten}', () => name)}
+          aria-label={dich('Xoá khay {ten}').replace('{ten}', () => name)}
           onClick={(e) => {
             e.stopPropagation()
-            if (confirm(`Xoá khay "${name}"? Asset gốc trên đĩa không bị xoá.`)) {
+            if (
+              confirm(
+                dich('Xoá khay "{ten}"? Asset gốc trên đĩa không bị xoá.').replace(
+                  '{ten}',
+                  () => name,
+                ),
+              )
+            ) {
               deletePowerBinFolder(id)
             }
           }}
@@ -177,13 +184,15 @@ export default function PowerBinHub() {
                   <span className="hub__count">{countOfBrand(b.id)}</span>
                   <button
                     className="hub__del"
-                    title={`Xoá brand ${b.name}`}
-                    aria-label={`Xoá brand ${b.name}`}
+                    title={dich('Xoá brand {ten}').replace('{ten}', () => b.name)}
+                    aria-label={dich('Xoá brand {ten}').replace('{ten}', () => b.name)}
                     onClick={(e) => {
                       e.stopPropagation()
                       if (
                         confirm(
-                          `Xoá brand "${b.name}"?\n\nCác khay bên trong KHÔNG bị xoá — chúng chuyển sang mục "Khay chung".`,
+                          dich(
+                            'Xoá brand "{ten}"?\n\nCác khay bên trong KHÔNG bị xoá — chúng chuyển sang mục "Khay chung".',
+                          ).replace('{ten}', () => b.name),
                         )
                       ) {
                         deleteBrand(b.id)
@@ -224,7 +233,7 @@ export default function PowerBinHub() {
                     ) : (
                       <button
                         className="hub__add-row"
-                        title={`Thêm khay vào brand ${b.name}`}
+                        title={dich('Thêm khay vào brand {ten}').replace('{ten}', () => b.name)}
                         onClick={() => setCreatingBin(true)}
                       >
                         <IconPlus size={11} />

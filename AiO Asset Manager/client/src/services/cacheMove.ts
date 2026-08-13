@@ -150,8 +150,10 @@ export function moveCacheTo(
       repathed,
       message:
         failed > 0
-          ? `Đã chuyển ${moved.toLocaleString()} file, ${failed.toLocaleString()} file không chuyển được (đang mở?).`
-          : `Đã chuyển ${moved.toLocaleString()} file sang chỗ mới.`,
+          ? dich('Đã chuyển {n} file, {loi} file không chuyển được (đang mở?).')
+              .replace('{n}', moved.toLocaleString())
+              .replace('{loi}', failed.toLocaleString())
+          : dich('Đã chuyển {n} file sang chỗ mới.').replace('{n}', moved.toLocaleString()),
     },
     assets: nextAssets,
   }

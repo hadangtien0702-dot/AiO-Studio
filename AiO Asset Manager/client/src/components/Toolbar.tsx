@@ -187,23 +187,42 @@ export default function Toolbar() {
                */
               title={
                 queueProgress
-                  ? `Đang render ${queueProgress.done.toLocaleString()}/${queueProgress.total.toLocaleString()} asset còn thiếu preview — tính trên TOÀN thư viện ${assets.length.toLocaleString()} asset, không riêng thư mục đang chọn.\nMáy chạy hết sức nên Premiere có thể hơi ì. Bấm để DỪNG; phần đã render vẫn giữ nguyên.`
+                  ? dich(
+                      'Đang render {xong}/{tong} asset còn thiếu preview — tính trên TOÀN thư viện {thuvien} asset, không riêng thư mục đang chọn.\nMáy chạy hết sức nên Premiere có thể hơi ì. Bấm để DỪNG; phần đã render vẫn giữ nguyên.',
+                    )
+                      .replace('{xong}', queueProgress.done.toLocaleString())
+                      .replace('{tong}', queueProgress.total.toLocaleString())
+                      .replace('{thuvien}', assets.length.toLocaleString())
                   : missingPreview > 0
-                    ? `Render preview cho ${missingPreview.toLocaleString()} asset còn thiếu ảnh/sóng âm — tính trên TOÀN thư viện ${assets.length.toLocaleString()} asset, không riêng thư mục đang chọn.\nMáy sẽ bận trong lúc chạy — bấm lần nữa để dừng bất cứ lúc nào.`
+                    ? dich(
+                        'Render preview cho {n} asset còn thiếu ảnh/sóng âm — tính trên TOÀN thư viện {thuvien} asset, không riêng thư mục đang chọn.\nMáy sẽ bận trong lúc chạy — bấm lần nữa để dừng bất cứ lúc nào.',
+                      )
+                        .replace('{n}', missingPreview.toLocaleString())
+                        .replace('{thuvien}', assets.length.toLocaleString())
                     : failedPreview > 0
                       ? [
-                          `Cả ${assets.length.toLocaleString()} asset trong thư viện đã render xong.`,
+                          dich('Cả {n} asset trong thư viện đã render xong.').replace(
+                            '{n}',
+                            assets.length.toLocaleString(),
+                          ),
                           noPreviewMogrt > 0
-                            ? `${noPreviewMogrt.toLocaleString()} file Mogrt không có ảnh xem trước kèm trong gói — file vẫn tốt, Premiere dùng bình thường, chỉ là không có gì để hiện.`
+                            ? dich(
+                                '{n} file Mogrt không có ảnh xem trước kèm trong gói — file vẫn tốt, Premiere dùng bình thường, chỉ là không có gì để hiện.',
+                              ).replace('{n}', noPreviewMogrt.toLocaleString())
                             : '',
                           brokenFiles > 0
-                            ? `${brokenFiles.toLocaleString()} file đọc không ra (hỏng hoặc sai định dạng).`
+                            ? dich('{n} file đọc không ra (hỏng hoặc sai định dạng).').replace(
+                                '{n}',
+                                brokenFiles.toLocaleString(),
+                              )
                             : '',
                           dich('Bấm để thử lại những file đó.'),
                         ]
                           .filter(Boolean)
                           .join('\n')
-                      : `Cả ${assets.length.toLocaleString()} asset trong thư viện đều đã có preview. Bấm để kiểm tra lại.`
+                      : dich(
+                          'Cả {n} asset trong thư viện đều đã có preview. Bấm để kiểm tra lại.',
+                        ).replace('{n}', assets.length.toLocaleString())
               }
               /**
                * [1.2.0-dev.3] Đang chạy thì nút KHÔNG khoá nữa mà đổi thành
@@ -236,7 +255,9 @@ export default function Toolbar() {
               )}
               <span>
                 {queueProgress
-                  ? `Dừng render (${queueProgress.done.toLocaleString()}/${queueProgress.total.toLocaleString()})`
+                  ? dich('Dừng render ({xong}/{tong})')
+                      .replace('{xong}', queueProgress.done.toLocaleString())
+                      .replace('{tong}', queueProgress.total.toLocaleString())
                   : missingPreview > 0
                     ? `Render preview (${missingPreview.toLocaleString()})`
                     : dich('Preview đã đủ')}

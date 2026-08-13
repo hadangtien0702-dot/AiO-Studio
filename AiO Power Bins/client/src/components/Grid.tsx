@@ -95,11 +95,16 @@ function BottomDock() {
         disabled={!activeAsset}
         title={
           activeAsset
-            ? `Chèn "${activeAsset.name}" vào timeline tại playhead`
+            ? dich('Chèn "{ten}" vào timeline tại playhead').replace(
+                '{ten}',
+                () => activeAsset.name,
+              )
             : dich('Bấm (hoặc rê chuột) vào một asset trước, rồi bấm đây để chèn')
         }
         aria-label={
-          activeAsset ? `Chèn ${activeAsset.name} vào timeline` : dich('Chèn vào timeline')
+          activeAsset
+            ? dich('Chèn {ten} vào timeline').replace('{ten}', () => activeAsset.name)
+            : dich('Chèn vào timeline')
         }
         onClick={() => activeAsset && void sendToTimeline(activeAsset)}
       >
@@ -117,8 +122,11 @@ function BottomDock() {
       {canRemove && (
         <button
           className="view-switch__remove"
-          title={`Bỏ "${activeAsset!.name}" khỏi khay (không xoá file trên đĩa)`}
-          aria-label={`Bỏ ${activeAsset!.name} khỏi khay`}
+          title={dich('Bỏ "{ten}" khỏi khay (không xoá file trên đĩa)').replace(
+            '{ten}',
+            () => activeAsset!.name,
+          )}
+          aria-label={dich('Bỏ {ten} khỏi khay').replace('{ten}', () => activeAsset!.name)}
           onClick={() => removeFromPowerBin(activeAsset!.id)}
         >
           <IconClose size={12} />
@@ -167,7 +175,7 @@ function AudioPreviewBar() {
           title={
             muted || volume === 0
               ? dich('Đang tắt tiếng — bấm để bật')
-              : `Âm lượng ${volumePercent}% — bấm để tắt tiếng`
+              : dich('Âm lượng {n}% — bấm để tắt tiếng').replace('{n}', String(volumePercent))
           }
           aria-label={muted ? dich('Bật tiếng') : dich('Tắt tiếng')}
           aria-pressed={muted}
@@ -208,7 +216,10 @@ function AudioPreviewBar() {
           step="1"
           value={pitch}
           aria-label={dich('Cao độ nghe thử, tính bằng nửa cung')}
-          title={`Cao độ ${pitch > 0 ? '+' : ''}${pitch} nửa cung — đổi cao độ thì tốc độ nghe thử đổi theo`}
+          title={dich('Cao độ {n} nửa cung — đổi cao độ thì tốc độ nghe thử đổi theo').replace(
+            '{n}',
+            (pitch > 0 ? '+' : '') + pitch,
+          )}
           onChange={(e) => setPitch(parseInt(e.target.value, 10))}
         />
 
@@ -469,9 +480,15 @@ export default function Grid() {
           <IconFile size={34} />
         </div>
         <p className="state__title">{dich('Chưa có asset nào')}</p>
+        {/* ☠️ Câu này CHỈ được nhắc tới nút CÓ THẬT trên thanh đầu của panel.
+            Bản cũ chỉ sang "Thêm thư mục" — nút đó nằm trong nhánh `isLibrary`
+            của Toolbar.tsx, mà `activeMasterTab` khởi tạo là 'powerbin' và
+            `setActiveMasterTab` không được gọi ở đâu cả (đo 13/08), nên nhánh
+            đó không bao giờ chạy. Người đọc đi tìm một nút không tồn tại. */}
         <p className="state__hint">
-          {dich('Bấm')} <b>{dich('Thêm thư mục')}</b>{' '}
-          {dich('ở thanh trên để quét asset trên máy (video, Mogrt, âm thanh, ảnh).')}
+          {dich('Tạo brand và khay ở menu bên trái, rồi bấm')}{' '}
+          <b>{dich('Thêm từ timeline')}</b>{' '}
+          {dich('ở thanh trên — hoặc kéo thẳng file từ Explorer vào đây.')}
         </p>
       </div>
     )
@@ -540,7 +557,7 @@ export default function Grid() {
     }
 
     const added = addPathsToPowerBin(selectedPowerBinFolderId, paths)
-    if (added > 0) showToast(`Đã thêm ${added} file vào khay`)
+    if (added > 0) showToast(dich('Đã thêm {n} file vào khay').replace('{n}', String(added)))
     else showToast(dich('Các file này đã có trong khay rồi'))
   }
 

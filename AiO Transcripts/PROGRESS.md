@@ -1,5 +1,57 @@
 # AiO Transcript - Nhat ky
 
+## [song-ngu] - 2026-08-13 17:15 (UTC+7) - DICH NOT 24 CAU CON SOT + CHONG BAY `$` CUA replace()
+
+### Boi canh
+Bang dich `chu.ts` da co tu truoc (152 khoa) nhung vong quet cu chi bat CHUOI
+LITERAL. Cau von la **template literal** (`` `Xoa ${n} marker` ``) khong khop
+khoa nao va cung khong lot vao vong quet -> chay o che do EN van hien tieng Viet.
+
+### Nguyen nhan that
+Quet lai bang bo loc chat hon (xoa comment VA regex literal, nhin nguoc QUA
+NHIEU DONG de biet chuoi da nam trong `dich(` chua, bat them tieng Viet khong
+dau): **93 chuoi bao "chua boc"**. Doc tay tung cho thi 24 la thuc su con tieng
+Viet, phan con lai la hang tang module DA duoc boc o cho ve ra.
+
+### Thay doi
+Them **25 khoa** vao `chu.ts` (152 -> 177). Dang khoa moi: **CA CAU co cho
+trong** `{n}` `{x}` `{f}`, thay bang `.replace()` o chinh cho goi.
+- KHONG tach cau ra dich tung manh: manh roi ghep lai ra "Removed 3 phu de khoi
+  project" - nua Anh nua Viet, te hon la de nguyen tieng Viet.
+
+| File | Sua gi |
+|---|---|
+| `App.tsx` | 2 nhan NUT (`Xoa {n} marker`, `Go {n} file phu de khoi project`), 3 nhan tien trinh, 4 cau bao ket qua, 6 dong `buoc[].ket` |
+| `lib/cep.ts` | 8 cau bao loi tu host co tham so |
+| `services/whisper.ts` | cau "Chua co ... trong:" + chu noi `' va '` |
+
+☠️ **Bat them mot loi CO SAN luc doc lai diff:** `String.replace(chuoi, chuoi)`
+hieu `$&` `$'` `` $` `` trong ve THAY THE la ky hieu. Ten file va tham so host
+la chu tu do -> file ten `A$'B.mp4` se lam meo cau. Sua: truyen **HAM**
+(`.replace('{f}', () => ten)`) cho moi cho trong nhan chu tu do (9 cho).
+
+### Da kiem chung bang so
+- `tsc --noEmit` **0 loi** · `npm run build` **xong, 208,09 kB**
+- Doi chieu hai chieu khoa goi <-> bang: **0 khoa goi ma bang khong co**
+- Quet lai: 93 -> **0 chuoi HIEN THI con tieng Viet** (55 cho con bao la hang
+  tang module da boc o cho ve ra · ten class CSS `xong`/`dang` · chuoi giao thuc
+  gui host · toa do SVG · ten sequence cua nguoi dung - khong duoc dich)
+- Thu thay cho trong ca hai thu tieng, ke ca ten file co `$'`: **7/7 ra cau tron
+  ven, khong sot cho trong nao**
+- ĐO TREN BAN BUILD (khong tin ma nguon): `dist/index.html` - **0 cho** co mau
+  `={}` roi `.APPDATA`; 12/12 chuoi EN moi CO trong bundle
+
+### Con lai, CO Y khong lam
+- `AppNewUI.tsx` + `AppCyberpunkUI.tsx` con **26 chuoi tieng Viet**. Do la BAN
+  MOCKUP giao dien, `main.tsx` khong ve chung - do that: chuoi "PRO ENGINE" /
+  "Studio Presets" **khong co trong `dist/index.html`**, Vite da loai han.
+- ☠️ **`npm run kiem` DANG CHET, va chet TU TRUOC phien nay.** `lib/cep.ts` o
+  ban HEAD da `import { dich } from '../ngonngu'`; script kiem bien dich cep.ts
+  rieng le nen (1) thieu `--jsx`, (2) `tests/js/cep.js` di tim
+  `tests/ngonngu` khong co that. Nghia la bo tu kiem - **ke ca 9 phep do muc 9b
+  canh hai loi quy doi moc lich su** - chua chay duoc lan nao ke tu luc them
+  song ngu. CHUA SUA vi nam ngoai pham vi viec nay; can sua o buoc rieng.
+
 ## [bin-chung] - 2026-08-13 11:08 (UTC+7) - KHO FFmpeg DUNG CHUNG (sua theo Autocut)
 
 ### Boi canh

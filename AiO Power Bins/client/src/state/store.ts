@@ -409,7 +409,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     // Tạo xong thì MỞ LUÔN brand đó — người dùng vừa tạo là muốn thêm đồ vào.
     set({ brands, selectedBrandId: brand.id })
     persistAll(get())
-    get().showToast(`Đã tạo brand: ${name}`)
+    get().showToast(dich('Đã tạo brand: {ten}').replace('{ten}', () => name))
   },
 
   renameBrand: (id: string, name: string) => {
@@ -455,7 +455,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     const updated = [...get().powerBinFolders, newFolder]
     set({ powerBinFolders: updated })
     persistAll({ ...get(), powerBinFolders: updated })
-    get().showToast(`Đã tạo khay: ${name}`)
+    get().showToast(dich('Đã tạo khay: {ten}').replace('{ten}', () => name))
   },
 
   deletePowerBinFolder: (id: string) => {
@@ -515,10 +515,15 @@ export const useLibrary = create<LibraryState>((set, get) => ({
 
     const added = get().addPathsToPowerBin(binId, res.paths)
     const bin = get().powerBinFolders.find((f) => f.id === binId)
-    const where = bin ? ` vào khay "${bin.name}"` : ''
+    // Hai khoa RIENG chu khong ghep manh ` vào khay "…"` vao cau: manh dich roi
+    // ghep lai se ra cau nua Anh nua Viet. Ket qua hien ra y het ban cu.
     get().showToast(
       added > 0
-        ? `Đã thêm ${added} file từ timeline${where}`
+        ? bin
+          ? dich('Đã thêm {n} file từ timeline vào khay "{khay}"')
+              .replace('{n}', String(added))
+              .replace('{khay}', () => bin.name)
+          : dich('Đã thêm {n} file từ timeline').replace('{n}', String(added))
         : dich('Các file này đã có trong khay rồi'),
     )
   },
@@ -542,7 +547,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     })
     set({ assets, activeAsset: null, pinnedId: '', pinnedAsset: null })
     persistAll({ ...get(), assets })
-    get().showToast(`Đã bỏ "${target.name}" khỏi khay`)
+    get().showToast(dich('Đã bỏ "{ten}" khỏi khay').replace('{ten}', () => target.name))
   },
 
   toggleSelectAsset: (id: string, isMulti: boolean) => {
@@ -579,7 +584,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     })
     set({ assets })
     persistAll({ ...get(), assets })
-    get().showToast(`Đã gán nhãn cho ${selected.length} asset`)
+    get().showToast(dich('Đã gán nhãn cho {n} asset').replace('{n}', String(selected.length)))
   },
 
   toggleMuted: () => set({ muted: !get().muted }),
@@ -739,7 +744,11 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       const favIds = new Set(prev.filter((a) => a.favorite).map((a) => a.id))
       all = all.map((a) => (favIds.has(a.id) ? { ...a, favorite: true } : a))
 
-      set({ assets: all, scanning: false, toast: `Đã quét ${all.length} asset` })
+      set({
+        assets: all,
+        scanning: false,
+        toast: dich('Đã quét {n} asset').replace('{n}', String(all.length)),
+      })
       persist(folders, all)
       void startBackgroundProcessing(all)
       setTimeout(() => get().toast && set({ toast: '' }), 3000)
@@ -804,7 +813,11 @@ export const useLibrary = create<LibraryState>((set, get) => ({
        * tự bịa việc. Kèm tên thư mục vào là hết mơ hồ.
        */
       const tenThuMuc = subPath.split(/[\\/]/).filter(Boolean).pop() || subPath
-      get().showToast(`Đã quét lại ${tenThuMuc}: ${merged.length} file`)
+      get().showToast(
+        dich('Đã quét lại {ten}: {n} file')
+          .replace('{ten}', () => tenThuMuc)
+          .replace('{n}', String(merged.length)),
+      )
       persist(get().folders, assets)
       void startBackgroundProcessing(assets)
     } catch (e: any) {

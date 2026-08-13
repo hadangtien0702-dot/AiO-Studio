@@ -151,6 +151,29 @@ export const CHU: BangChu = {
     'Làm phụ đề': 'Create captions',
     'Chép lại': 'Transcribe again',
 
+    // ══════════════════════════════════════════════════════════════════════
+    // ☠️ KHOA CO CHO TRONG `{...}` — cho cau von la TEMPLATE LITERAL
+    // ══════════════════════════════════════════════════════════════════════
+    // Cau co `${bien}` o giua thi template literal KHONG khop khoa nao, va
+    // vong quet chuoi cung khong bat duoc. Hai cach sai da tranh:
+    //   - de nguyen tieng Viet  -> nguoi dung EN doc mot cau Viet
+    //   - tach ra dich tung manh -> "Removed 3 phụ đề khỏi project", nua no nua
+    //     kia, TE HON la de nguyen
+    // Cach dung: MOT khoa chua CA CAU, cho trong dat ten theo nghia
+    // (`{n}` so luong · `{x}` tham so host · `{f}` ten file), roi `.replace()`
+    // o chinh cho goi. Doi ten cho trong thi phai sua CA HAI ben.
+    'Trong vùng có {n} clip đã đổi tốc độ ({p}%). ':
+      '{n} clips in this range have a speed change ({p}%). ',
+    'Vùng này có {n} file khác nhau. Mới làm phụ đề cho "{f}" ({c} clip); {b} clip của file khác chưa được chép.':
+      'This range has {n} different source files. Captions were made only for "{f}" ({c} clips); {b} clips from the other files were not transcribed.',
+    'Đang đánh dấu {n} chỗ cần soát…': 'Placing markers at {n} spots to review…',
+    'Đã gỡ {n} phụ đề khỏi project. File trên đĩa vẫn còn — ':
+      'Removed {n} caption files from the project. The files on disk are still there — ',
+    'Gỡ {n} file phụ đề khỏi project': 'Remove {n} caption files from the project',
+    'Đã xoá {n} marker. Còn lại {m} marker trên sequence.':
+      'Deleted {n} markers. {m} markers left on the sequence.',
+    'Xoá {n} marker': 'Delete {n} markers',
+
     // ─── App.tsx — cac buoc chay (`CAC_BUOC` va `buoc[]`) ───
     'Đọc vùng đã khoanh': 'Read the marked range',
     'Tách tiếng khỏi video': 'Extract audio from video',
@@ -163,6 +186,17 @@ export const CHU: BangChu = {
     'Đang gắn phụ đề lên timeline': 'Adding captions to the timeline',
     'Đang gắn phụ đề lên timeline…': 'Adding captions to the timeline…',
     'Đang quy đổi mốc thời gian…': 'Converting timecodes…',
+    'Đang nghe hiểu lời nói': 'Recognizing speech',
+    'Đang nạp mô hình lên GPU': 'Loading the model onto the GPU',
+    // `buoc[].ket` — dong ket qua cua tung buoc. CHUA VE RA MAN HINH (khoi
+    // "may da lam nhung gi" da go 29/07), nhung van dich: no van duoc thu
+    // thap de go loi, va bat lai khoi la mot dong nua Anh nua Viet.
+    'xong': 'done',
+    '{a} câu · {b} từ': '{a} lines · {b} words',
+    '{a} câu · {b} từ · không phải nghe lại': '{a} lines · {b} words · no need to listen again',
+    '{n}s tiếng': '{n}s of audio',
+    ' · đọc {n} GB': ' · read {n} GB',
+    ' · nghe ra tiếng {x}': ' · detected {x}',
 
     // ─── App.tsx — khoi ket qua ───
     'câu đã chép': 'lines transcribed',
@@ -249,8 +283,26 @@ export const CHU: BangChu = {
       'Lost track of the sequence (Premiere may have restarted). Press again to start over.',
     'Chưa khoanh vùng cần cắt.\nTrên timeline: đặt điểm vào bằng phím I, điểm ra bằng phím O, rồi bấm lại.':
       'No range marked.\nOn the timeline: set the in point with I, the out point with O, then press again.',
+    // Bao loi tu host CO THAM SO — khoa chua ca cau, `{x}` la tham so host gui
+    // ve (ten API, ten track, duong dan). Xem khoi "KHOA CO CHO TRONG" o tren.
+    'Bản Premiere này không có `{x}`.': 'This version of Premiere does not have `{x}`.',
+    'Tạo sequence mới thất bại: {x}': 'Could not create the new sequence: {x}',
+    'Sequence mới không có track {x} nào.': 'The new sequence has no {x} track.',
+    'Không tạo được track phụ đề: {x}': 'Could not create the caption track: {x}',
+    'Không nhập được file phụ đề vào project: {x}':
+      'Could not import the caption file into the project: {x}',
+    'Premiere không đọc được file phụ đề:\n{x}\n':
+      'Premiere could not read the caption file:\n{x}\n',
+    'Timeline đã thay đổi giữa chừng ({x}). Bấm lại để chạy từ đầu.':
+      'The timeline changed while running ({x}). Press again to start over.',
+    'Sau vùng anh khoanh còn {n} clip nữa, nên không cắt tại chỗ được.\n':
+      'There are still {n} clips after the marked range, so cutting in place is not possible.\n',
 
     // ─── services\whisper.ts ───
+    // `' và '` la CHU NOI trong cau "Chua co A va B trong:". Dich no la bat
+    // buoc — de nguyen thi ra "the speech recognition engine và the model".
+    ' và ': ' and ',
+    'Chưa có {x} trong:\n': 'Could not find {x} in:\n',
     'Nhanh': 'Fast',
     'bộ nghe hiểu': 'the speech recognition engine',
     'Phụ đề câu dài': 'Long-line captions',

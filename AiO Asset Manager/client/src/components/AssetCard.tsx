@@ -87,8 +87,10 @@ export function preloadAndDecodeImage(url: string): void {
 
 /**
  * ☠️ HẰNG TẦNG MODULE — KHÔNG bọc `dich()` ở đây (chạy lúc import, trước khi
- * React gắn bảng chữ). Nó chỉ được dùng trong một template có `${...}` ở
- * `title` của thẻ; câu đó CHƯA dịch được, xem báo cáo.
+ * React gắn bảng chữ, nên sẽ trả tiếng Việt VĨNH VIỄN). Bọc ở CHỖ VẼ RA:
+ * `dich(TYPE_NAME[asset.type])` trong `title` bên dưới. `Âm thanh` / `Hình ảnh`
+ * đã có trong `chu.ts`; bốn giá trị còn lại giống nhau ở hai thứ tiếng nên cố ý
+ * không cho vào bảng (xem mục 2 đầu `chu.ts`).
  */
 const TYPE_NAME: Record<Asset['type'], string> = {
   video: 'Video',
@@ -394,9 +396,26 @@ export default function AssetCard({ asset }: { asset: Asset }) {
        */
       draggable
       onDragStart={onDragStart}
-      title={`${asset.fileName} — ${TYPE_NAME[asset.type]}${resStr ? ' · ' + resStr : ''}\nBấm để ${
-        asset.type === 'audio' ? dich('nghe (bấm vào sóng âm để nghe từ đoạn đó)') : dich('xem')
-      } · Kéo thả vào timeline, hoặc bấm nút Import`}
+      /**
+       * ☠️ [13/08/2026] ĐỪNG DỊCH MẢNH GIỮA CÂU.
+       *
+       * Bản cũ bọc đúng HAI TỪ (`xem` / `nghe (bấm vào sóng âm…)`) nằm lọt giữa
+       * một câu tiếng Việt để nguyên. Ở chế độ EN, tooltip của MỌI thẻ asset đọc
+       * ra nửa Anh nửa Việt:
+       *     "Bấm để view · Kéo thả vào timeline, hoặc bấm nút Import"
+       * Nửa Anh nửa Việt còn khó đọc hơn là để nguyên tiếng Việt.
+       *
+       * Nay tách thành HAI CÂU TRỌN VẸN, mỗi câu là một khoá riêng. Dòng đầu
+       * (tên file · loại · độ phân giải) là dữ liệu nên giữ template.
+       */
+      title={
+        `${asset.fileName} — ${dich(TYPE_NAME[asset.type])}${resStr ? ' · ' + resStr : ''}\n` +
+        (asset.type === 'audio'
+          ? dich(
+              'Bấm để nghe (bấm vào sóng âm để nghe từ đoạn đó) · Kéo thả vào timeline, hoặc bấm nút Import',
+            )
+          : dich('Bấm để xem · Kéo thả vào timeline, hoặc bấm nút Import'))
+      }
     >
       <div className="card-asset__thumb">
         {asset.type === 'audio' ? (
@@ -598,8 +617,8 @@ export default function AssetCard({ asset }: { asset: Asset }) {
           title={asset.favorite ? dich('Bỏ yêu thích') : dich('Đánh dấu yêu thích')}
           aria-label={
             asset.favorite
-              ? `Bỏ yêu thích ${asset.name}`
-              : `Đánh dấu yêu thích ${asset.name}`
+              ? dich('Bỏ yêu thích {ten}').replace('{ten}', asset.name)
+              : dich('Đánh dấu yêu thích {ten}').replace('{ten}', asset.name)
           }
           aria-pressed={!!asset.favorite}
           onClick={(e) => {
