@@ -1125,3 +1125,68 @@
     grid-column: auto;
   }
 }
+
+/* ── Đổi ngôn ngữ VI · EN (13/08/2026) ──────────────────────────────────
+   ☠️ Anh Tiến bảo BỎ cờ và BỎ khung nút: *"chỉ cần để là EN và VI là xong,
+   xóa đi 2 lá cờ và nút đi cho nó gọn"*. Nay chỉ còn hai chữ, cái đang chọn
+   thì sáng lên. Đừng bọc nền/viền lại. */
+.aio-ngonngu {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.aio-ngonngu__gach {
+  margin: 0 4px;
+  color: var(--chu-phu, #5f6368);
+  font-size: 11px;
+}
+.aio-ngonngu__nut {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--chu-phu, #9aa0a6);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.aio-ngonngu__nut:hover {
+  color: var(--chu, #e8eaed);
+}
+.aio-ngonngu__nut.la-chon {
+  color: var(--nhan, #ff7a1a);
+  font-weight: 700;
+}
+.aio-ngonngu__nut:focus-visible {
+  outline: 1px solid var(--nhan, #ff7a1a);
+  outline-offset: 2px;
+}
+
+/* ── Kết quả: một dòng "cũ → mới" (13/08/2026) ──────────────────────────
+   Anh Tiến: *"chỗ kết quả này anh cần đưa ra một thông báo ngắn gọn:
+   tổng thời cũ - tổng thời gian mới"*. Ba ô cũ đã gỡ, xem App.tsx. */
+.ket-gon {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 12px 16px;
+  font-variant-numeric: tabular-nums;
+}
+.ket-gon__cu,
+.ket-gon__v {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--chu-phu, #9aa0a6);
+}
+.ket-gon__ar {
+  font-size: 20px;
+  color: var(--chu-phu, #5f6368);
+}
+.ket-gon__moi {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ok, #34c759);
+}

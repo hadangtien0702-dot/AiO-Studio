@@ -52,7 +52,25 @@
                  - Doi Type BAT BUOC tat han Premiere roi mo lai; reload panel
                    khong an.
                Muon quay ve dock thi doi lai <Type>Panel</Type>. -->
-          <Type>Modeless</Type>
+
+          <!-- ☠️ DAO NGUOC 2026-08-13 — ANH TIEN DOI Y, QUAY VE DOCK CHUNG.
+               Nguyen van: *"khi mo panel auto cut thi no lai mo mot panel rieng
+               (day la yeu cau luc truoc cua anh) em sua lai phan nay va cho no
+               mo chung cho voi cac panel nha em"*.
+
+               Nen ca khoi ghi chu Modeless o TREN da HET HIEU LUC - giu lai de
+               biet vi sao tung lam vay, dung doc no roi doi nguoc lai.
+
+               GIA PHAI TRA (da biet tu 03/08, van dung):
+                 - Dock ben phai chi rong ~360px -> luoi HAI COT roi ve MOT COT.
+                   Da do o kho toi thieu 280x320: tran ngang 0, chu khong bi cat,
+                   nut chinh van ghim day -> xau hon chu khong vo.
+                 - Muon lai bo cuc 2 cot thi keo panel ra thanh cua so noi, hoac
+                   dock vao vung rong hon.
+
+               ☠️ DOI Type BAT BUOC TAT HAN PREMIERE ROI MO LAI. Reload panel
+               KHONG an - da kiem chung 03/08. -->
+          <Type>Panel</Type>
           <Menu>AiO Studio - Autocut</Menu>
           <!-- KHO MO MAC DINH, doi 2026-08-03.
                Anh Tien: *"khi minh bam vao extension minh cu mo mot cua so moi

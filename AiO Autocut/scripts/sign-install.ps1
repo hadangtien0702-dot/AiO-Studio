@@ -70,9 +70,30 @@ Copy-Item (Join-Path $root 'host') (Join-Path $stage 'host') -Recurse
 if (Test-Path (Join-Path $root '.debug')) {
   Copy-Item (Join-Path $root '.debug') (Join-Path $stage '.debug')
 }
-# Phase 2 se them thu muc bin/ (ffmpeg, ffprobe) - tu dong dong goi neu co
+# Thu muc bin/ (ffmpeg) - tu dong dong goi neu co
 if (Test-Path (Join-Path $root 'bin')) {
   Copy-Item (Join-Path $root 'bin') (Join-Path $stage 'bin') -Recurse
+
+  # !!! [13/08/2026] KHONG dong goi ffprobe.exe cho Autocut.
+  #
+  # Panel nay KHONG BAO GIO goi ffprobe. No lay thoi luong + fps bang cach doc
+  # stderr cua chinh lenh ffmpeg (parseDuration/parseVideoFps trong
+  # services/silencelog.ts) - xem ghi chu san o whisper.ts:190.
+  # Do that 13/08: dist/ bundle nhac "ffprobe" 0 lan, "ffmpeg" 1 lan.
+  #
+  # Truoc khi bo: goi .zxp = 91,7 MB, trong do ffprobe.exe chiem 45,7 MB nen
+  # (109,3 MB goc) = mot nua bo cai cho mot file khong ai goi.
+  #
+  # CHU Y: Asset Manager va Power Bins thi CO dung that (services/probe.ts doc
+  # metadata dang JSON) - dung chep luat nay sang hai panel do.
+  #
+  # Neu sau nay Autocut can ffprobe: bo khoi block nay, va nho do lai kich thuoc.
+  $boFfprobe = Join-Path $stage 'bin\win64\ffprobe.exe'
+  if (Test-Path $boFfprobe) {
+    $mb = [math]::Round((Get-Item $boFfprobe).Length / 1MB, 1)
+    Remove-Item $boFfprobe -Force
+    Write-Host ("  [BO] ffprobe.exe (" + $mb + " MB) - Autocut khong dung") -ForegroundColor DarkGray
+  }
 }
 Write-Host "  [OK] Staging" -ForegroundColor Green
 

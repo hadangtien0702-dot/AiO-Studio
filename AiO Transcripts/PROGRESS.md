@@ -1,5 +1,33 @@
 # AiO Transcript - Nhat ky
 
+## [bin-chung] - 2026-08-13 11:08 (UTC+7) - KHO FFmpeg DUNG CHUNG (sua theo Autocut)
+
+### Boi canh
+Panel nay KHONG nam trong ban Beta cuoi tuan (Beta chi co Autocut / Asset
+Manager / Power Bins). Sua o day la de **khong lech voi Autocut** - luat cua du
+an: *"dinh voi Autocut ~80% ma, sua ffmpeg.ts thi nho chep sang"*.
+
+### Nguyen nhan that
+Do 13/08: bay panel dong goi DUNG MOT file ffmpeg.exe - bam SHA-256
+`4CBB08190774`, 109,5 MB, giong nhau o ca 4 panel. Goi `.zxp` 91,5 MB thi
+99,7% la FFmpeg lap lai.
+
+### Thay doi
+`client/src/services/ffmpeg.ts` - `getFFmpegPath()` them mot ung vien CUOI DANH
+SACH: `%APPDATA%\AiOStudio\bin\win64\ffmpeg.exe`.
+- Dat CUOI la co y -> ban cu con `bin/` rieng chay y nhu truoc, khong hoi quy.
+- Dat NGOAI `Adobe\CEP\extensions\` vi thu muc do bi Premiere quet tim extension.
+Cai kho chung bang `../design-system/cai-bin-chung.ps1` (co `-Go` de go).
+
+CHUA them `-BinChung` vao `scripts/package-release.ps1` cua panel nay - chi 3
+panel Beta duoc them. Panel nay van dong goi kem `bin/` nhu cu.
+
+### Kiem chung
+`tsc --noEmit`: **0 loi**. Kho chung da cai that (218,9 MB, hash khop nguon).
+CHUA chay tren Premiere that.
+
+---
+
 ## [2.4.0] - 2026-07-31 18:17 (UTC+7) - O CHON SEQUENCE + GHIM THEO ID + nut go noi that
 
 Anh Tien bao ba chuyen (31/07): (1) *"nen cho chon sequence"* vi ket qua

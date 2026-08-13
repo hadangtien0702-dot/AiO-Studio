@@ -8,7 +8,17 @@
 #
 #  Chay:  powershell -ExecutionPolicy Bypass -File scripts\package-release.ps1
 #  Khong can quyen Admin. ASCII-only cho Windows PowerShell 5.1.
+#
+#  -BinChung : KHONG kem FFmpeg vao goi. Panel se lay tu kho dung chung
+#              %APPDATA%\AiOStudio\bin\win64 (cai bang design-system\
+#              cai-bin-chung.ps1). Goi tut tu ~46 MB xuong ~0,3 MB.
+#              MAC DINH TAT - bat len thi goi KHONG tu chay duoc neu may chua
+#              co kho chung, nen chi dung khi dong bo cai ghep ca bo.
 # =====================================================================
+param(
+  [switch]$BinChung
+)
+
 $ErrorActionPreference = 'Stop'
 
 $root     = Split-Path -Parent $PSScriptRoot
@@ -75,8 +85,27 @@ New-Item -ItemType Directory -Path $stage -Force | Out-Null
 Copy-Item (Join-Path $root 'CSXS') (Join-Path $stage 'CSXS') -Recurse
 Copy-Item (Join-Path $root 'dist') (Join-Path $stage 'dist') -Recurse
 Copy-Item (Join-Path $root 'host') (Join-Path $stage 'host') -Recurse
-if (Test-Path (Join-Path $root 'bin')) {
+if ($BinChung) {
+  # Bo qua bin/ hoan toan - panel se tim FFmpeg o kho dung chung
+  # %APPDATA%\AiOStudio\bin\win64 (ung vien cuoi trong getFFmpegPath()).
+  Write-Host "  [BIN CHUNG] Khong kem FFmpeg - goi se can kho chung tren may" -ForegroundColor Yellow
+} elseif (Test-Path (Join-Path $root 'bin')) {
   Copy-Item (Join-Path $root 'bin') (Join-Path $stage 'bin') -Recurse
+
+  # !!! [13/08/2026] KHONG dong goi ffprobe.exe cho Autocut. Luat giong het
+  # sign-install.ps1 - doc giai thich day du o do.
+  #
+  # Tom tat: panel doc thoi luong/fps tu stderr cua ffmpeg (silencelog.ts),
+  # khong bao gio goi ffprobe. Do that: dist/ nhac "ffprobe" 0 lan.
+  # Bo di thi ban phat hanh nhe bot 45,7 MB nen (109,3 MB goc).
+  #
+  # CHU Y: Asset Manager / Power Bins CO dung that (probe.ts) - dung chep sang do.
+  $boFfprobe = Join-Path $stage 'bin\win64\ffprobe.exe'
+  if (Test-Path $boFfprobe) {
+    $mb = [math]::Round((Get-Item $boFfprobe).Length / 1MB, 1)
+    Remove-Item $boFfprobe -Force
+    Write-Host ("  [BO] ffprobe.exe (" + $mb + " MB) - Autocut khong dung") -ForegroundColor DarkGray
+  }
 }
 # [2.0.0] LGPL BAT BUOC: ban ra thi phai kem toan van giay phep + ghi ro dung
 # FFmpeg ban nao, lay nguon o dau. Thieu hai file nay la vi pham.

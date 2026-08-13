@@ -1,5 +1,49 @@
 # AiO Asset Manager - Nhat ky
 
+## [bin-chung] - 2026-08-13 11:08 (UTC+7) - KHO FFmpeg DUNG CHUNG CHO CA BO
+
+### Boi canh
+Anh Tien chot 13/08: cuoi tuan phat Beta gom 3 panel (Autocut / Asset Manager /
+Power Bins), va do la GOI FREE. Anh nhan xet *"3 bo cai roi ma nang qua em ha"*.
+
+### Nguyen nhan that
+Do that: goi `.zxp` 91,5 MB thi **91,5 MB la FFmpeg**, code panel chi 0,09 MB
+(0,1%). Va bay panel dong goi DUNG MOT file - bam SHA-256 doi chieu:
+`4CBB08190774` (ffmpeg 109,5 MB) + `6E3A2FB316B3` (ffprobe 109,3 MB), giong nhau
+o ca 4 panel. Nguoi dung tai 3 goi = tai cung mot FFmpeg 3 lan.
+
+### Thay doi
+1. `client/src/services/ffmpeg.ts` - `getFFmpegPath()` VA `getFFprobePath()` deu
+   them mot duong dan ung vien CUOI DANH SACH:
+   `%APPDATA%\AiOStudio\bin\win64\<ten>.exe`.
+   Dat CUOI la co y -> ban cu con `bin/` rieng chay y nhu truoc, khong hoi quy.
+   Dat NGOAI `Adobe\CEP\extensions\` vi thu muc do bi Premiere quet tim extension.
+2. `scripts/package-release.ps1` - them tham so `-BinChung` (MAC DINH TAT).
+   Bat len thi khong kem `bin/`.
+3. Moi: `../design-system/cai-bin-chung.ps1` - cai kho chung, co `-Go` de go.
+
+!!! PANEL NAY CAN CA HAI FILE - `probe.ts` doc metadata dang JSON bang ffprobe.
+Khac Autocut: Autocut khong bao gio goi ffprobe nen da bo han khoi goi cua no.
+Kho chung vi vay phai co du ca ffmpeg.exe lan ffprobe.exe.
+
+### File anh huong
+`client/src/services/ffmpeg.ts` (2 ham) - `scripts/package-release.ps1`
+Sua giong het o Power Bins (luat ~90% ma dung chung) va Transcripts/Autocut.
+
+### Kiem chung
+- `tsc --noEmit`: **0 loi** (do o ca 4 panel).
+- Chay THAT `cai-bin-chung.ps1`: 218,9 MB vao `%APPDATA%\AiOStudio\bin\win64`,
+  doc lai bam hash **khop nguon ca 2 file**.
+- Dung lai staging voi `-BinChung`: goi panel nay **91,5 MB -> 0,09 MB**.
+  Tong 3 goi 229,1 -> 0,46 MB. **Nhung tong THAT ma user tai la ~92 MB**
+  (con kho chung ~91,5 MB khi nen), tuc 274,7 -> ~92 MB, giam 67%.
+
+### CHUA lam
+**CHUA chay tren Premiere that.** Chua co lan nao panel that su lay FFmpeg tu
+kho chung. Phai dong goi `-BinChung` roi chay thu truoc khi phat beta.
+
+---
+
 ## [design-system] - 2026-07-29 21:47 (UTC+7)
 
 ### Added - BON PANEL DUNG CHUNG MOT BO TOKEN

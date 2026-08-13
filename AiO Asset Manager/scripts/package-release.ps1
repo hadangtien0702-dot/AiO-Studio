@@ -10,7 +10,18 @@
 #
 #  Chay:  powershell -ExecutionPolicy Bypass -File scripts\package-release.ps1
 #  Khong can quyen Admin. ASCII-only cho Windows PowerShell 5.1.
+#
+#  -BinChung : KHONG kem FFmpeg vao goi. Panel se lay tu kho dung chung
+#              %APPDATA%\AiOStudio\bin\win64 (cai bang design-system\
+#              cai-bin-chung.ps1). Goi tut tu ~91,5 MB xuong ~0,2 MB.
+#              MAC DINH TAT - bat len thi goi KHONG tu chay duoc neu may chua
+#              co kho chung, nen chi dung khi dong bo cai ghep ca bo.
+#              CHU Y: panel nay can CA ffmpeg.exe LAN ffprobe.exe (probe.ts).
 # =====================================================================
+param(
+  [switch]$BinChung
+)
+
 $ErrorActionPreference = 'Stop'
 
 $root     = Split-Path -Parent $PSScriptRoot
@@ -76,7 +87,12 @@ New-Item -ItemType Directory -Path $stage -Force | Out-Null
 Copy-Item (Join-Path $root 'CSXS') (Join-Path $stage 'CSXS') -Recurse
 Copy-Item (Join-Path $root 'dist') (Join-Path $stage 'dist') -Recurse
 Copy-Item (Join-Path $root 'host') (Join-Path $stage 'host') -Recurse
-if (Test-Path (Join-Path $root 'bin')) {
+if ($BinChung) {
+  # [13/08/2026] Bo qua bin/ - panel tim FFmpeg o kho dung chung
+  # %APPDATA%\AiOStudio\bin\win64 (ung vien cuoi trong getFFmpegPath /
+  # getFFprobePath). Panel nay can CA HAI file.
+  Write-Host "  [BIN CHUNG] Khong kem FFmpeg - goi se can kho chung tren may" -ForegroundColor Yellow
+} elseif (Test-Path (Join-Path $root 'bin')) {
   Copy-Item (Join-Path $root 'bin') (Join-Path $stage 'bin') -Recurse
 }
 # [2.0.0] LGPL BAT BUOC: ban ra thi phai kem toan van giay phep + ghi ro dung

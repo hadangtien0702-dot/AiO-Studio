@@ -42,6 +42,16 @@ export function getFFmpegPath(): string {
         'ffmpeg.exe'
       )
     )
+
+    // ☠️ [13/08/2026] KHO FFmpeg DÙNG CHUNG cho cả bộ AiO Studio.
+    // Bốn panel đóng gói ĐÚNG MỘT file ffmpeg.exe (SHA-256 `4CBB08190774`,
+    // 109,5 MB). Ba bộ cài beta 274,7 MB, 99,7% là FFmpeg lặp lại -> ~92 MB.
+    // Đặt ngoài `Adobe\CEP\extensions\` vì thư mục đó bị Premiere quét tìm
+    // extension. ĐẶT CUỐI DANH SÁCH để bản cũ có `bin/` riêng không hồi quy.
+    // Cài bằng: `AiO Studio/design-system/cai-bin-chung.ps1`
+    candidates.push(
+      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe')
+    )
   }
 
   for (const cand of candidates) {
@@ -91,6 +101,14 @@ export function getFFprobePath(): string {
         'win64',
         'ffprobe.exe'
       )
+    )
+
+    // ☠️ [13/08/2026] Kho DÙNG CHUNG — xem giải thích ở getFFmpegPath().
+    // ⚠️ Panel NÀY thật sự dùng ffprobe (probe.ts đọc metadata dạng JSON), khác
+    // Autocut — Autocut không gọi bao giờ nên đã bỏ ffprobe khỏi gói của nó.
+    // Kho chung vì vậy PHẢI có đủ cả ffmpeg.exe lẫn ffprobe.exe.
+    candidates.push(
+      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffprobe.exe')
     )
   }
 

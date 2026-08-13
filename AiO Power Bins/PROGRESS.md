@@ -1,5 +1,45 @@
 # AiO Power Bins - Nhat ky
 
+## [bin-chung] - 2026-08-13 11:08 (UTC+7) - KHO FFmpeg DUNG CHUNG CHO CA BO
+
+### Boi canh
+Anh Tien chot 13/08: cuoi tuan phat Beta gom 3 panel (Autocut / Asset Manager /
+Power Bins), do la GOI FREE. Anh nhan xet *"3 bo cai roi ma nang qua em ha"*.
+
+### Nguyen nhan that
+Goi `.zxp` 91,5 MB thi **91,5 MB la FFmpeg**, code panel chi 0,09 MB (0,1%).
+Bay panel dong goi DUNG MOT file - bam SHA-256: `4CBB08190774` (ffmpeg) +
+`6E3A2FB316B3` (ffprobe), giong nhau ca 4 panel.
+
+### Thay doi
+1. `client/src/services/ffmpeg.ts` - `getFFmpegPath()` VA `getFFprobePath()`
+   them ung vien CUOI DANH SACH `%APPDATA%\AiOStudio\bin\win64\<ten>.exe`.
+   Dat CUOI -> ban cu con `bin/` rieng khong hoi quy.
+   Dat NGOAI `Adobe\CEP\extensions\` vi Premiere quet thu muc do tim extension.
+2. `scripts/package-release.ps1` - tham so `-BinChung` (MAC DINH TAT).
+3. Moi: `../design-system/cai-bin-chung.ps1`, co `-Go` de go.
+
+!!! PANEL NAY CAN CA HAI FILE (`probe.ts` doc metadata bang ffprobe). Khac
+Autocut - Autocut khong goi ffprobe bao gio nen da bo han khoi goi cua no.
+
+### File anh huong
+`client/src/services/ffmpeg.ts` (2 ham) - `scripts/package-release.ps1`
+Sua giong het o Asset Manager (luat ~90% ma dung chung).
+
+### Kiem chung
+- `tsc --noEmit`: **0 loi**.
+- Chay THAT `cai-bin-chung.ps1`: 218,9 MB, doc lai bam hash **khop nguon**.
+- Staging voi `-BinChung`: goi nay **91,5 MB -> 0,09 MB**. Tong 3 goi
+  229,1 -> 0,46 MB, **nhung tong THAT user tai la ~92 MB** (con kho chung
+  ~91,5 MB khi nen): 274,7 -> ~92 MB, giam 67%.
+- Chua do lai `AiOStudio\library.json` vi lan sua nay khong dung toi duong ghi
+  dia. (Luat cua du an: moi lan sua cho ghi dia phai do lai file do KHONG DOI.)
+
+### CHUA lam
+**CHUA chay tren Premiere that** - chua co lan nao panel lay FFmpeg tu kho chung.
+
+---
+
 ## [2.0.0] - 2026-08-01 15:09 (UTC+7) - SUA TEN PANEL bi nham + cai lai cho khop nguon
 
 - `client/index.html`: `<title>` van con la "AiO Studio — Asset Manager" (di

@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { BangDoan, BangMau } from './BangDoan'
+import { NutDoiNgonNgu, dich } from './ngonngu'
+// `BangDoan` / `BangMau` THÔI DÙNG 13/08 (anh Tiến bảo gỡ khối "Đoạn sẽ cắt").
+// File `BangDoan.tsx` vẫn còn nguyên — muốn bật lại thì import lại ở đây và
+// dựng lại khối trong phần JSX (chỗ đã ghi chú rõ).
 // `DaiSong.tsx` (canvas sóng dB + đường ngưỡng cam) KHÔNG xoá, chỉ thôi dùng:
 // thiết kế 03/08 vẽ timeline kiểu Premiere. Giữ file vì đường ngưỡng nhấp nhô
 // theo nền ồn là thứ chứng minh tool không cắt nhầm lời người ngồi xa mic —
@@ -1056,6 +1059,19 @@ export default function App() {
     )
   }
 
+  /* ☠️ BA THỨ DƯỚI ĐÂY TẠM THỜI KHÔNG AI GỌI — GIỮ CÓ CHỦ Ý, 13/08/2026.
+     Chúng chỉ phục vụ khối "Đoạn sẽ cắt" mà anh Tiến bảo gỡ hôm nay:
+       doiGiu      — bấm "Giữ lại" một đoạn để đoạn đó khỏi bị cắt
+       tcode       — đổi giây trong vùng thành timecode tuyệt đối HH:MM:SS:FF
+       conPhanTram — phần trăm còn lại sau khi cắt
+     KHÔNG xoá vì cả ba đều đã đo kỹ và `BangDoan.tsx` vẫn còn nguyên: bật lại
+     bảng thì import lại là chạy, khỏi viết lại từ đầu.
+     `void` ở đây chỉ để trình biên dịch thôi báo "khai báo mà không dùng" —
+     nó không chạy gì cả. Bật lại bảng thì XOÁ dòng này đi. */
+  void doiGiu
+  void tcode
+  void conPhanTram
+
   return (
     <div className="app">
       <header className="topbar">
@@ -1078,6 +1094,10 @@ export default function App() {
             Kiem 3 cho khop nhau: `node design-system/version.mjs`. */}
         <span className="ver">v{__VERSION__}</span>
         <span className="spacer" />
+        {/* Nút đổi ngôn ngữ VI/EN. Đặt ở thanh đầu vì nó tác động lên CẢ panel,
+            không thuộc riêng bước nào. Đổi ở đây thì mọi panel AiO đổi theo —
+            lựa chọn lưu ở `%APPDATA%\AiOStudio\ngonngu.json`, dùng chung cả bộ. */}
+        <NutDoiNgonNgu />
         <p className="host" title={host}>
           {host}
         </p>
@@ -1155,30 +1175,20 @@ export default function App() {
           )}
         </section>
 
-        {/* DANH SÁCH ĐOẠN. Chưa phân tích thì bày BẢNG MẪU — anh Tiến 03/08:
-            *"em có thể tạo 1 bảng mockup giả để khách hàng hình dung cũng
-            được"*. Bảng mẫu tự nói nó là ví dụ, xem `BangMau`. */}
-        <section className="card card--list">
-          <div className="card-hd">
-            <h2 className="card-t">
-              {xemTruoc ? `${catThat.length} đoạn sẽ cắt` : 'Đoạn sẽ cắt'}
-            </h2>
-            {giuLai.length > 0 && (
-              <span className="giu-dem">{giuLai.length} chỗ đang giữ, sẽ không cắt</span>
-            )}
-          </div>
-          {xemTruoc && cat.length > 0 ? (
-            <BangDoan
-              cat={cat}
-              mucAm={xemTruoc}
-              giuLai={giuLai}
-              onDoiGiu={doiGiu}
-              tcode={tcode}
-            />
-          ) : (
-            <BangMau />
-          )}
-        </section>
+        {/* ☠️ KHỐI "ĐOẠN SẼ CẮT" ĐÃ GỠ 2026-08-13 — anh Tiến: *"xóa luôn cho anh
+            chỗ đoạn sẽ cắt đi em, nó dư thừa"*.
+
+            Đảo ngược quyết định 03/08 (*"em có thể tạo 1 bảng mockup giả để
+            khách hàng hình dung cũng được"*). Bảng đó chiếm gần nửa chiều cao
+            cột trái mà nói lại đúng thứ dải "Xem trước kết quả" ngay trên nó đã
+            vẽ ra rồi — một thông điệp nói ở hai nơi.
+
+            CÁI MẤT ĐI, ghi ra để sau này ai cần thì biết đường bật lại:
+              - nút "Giữ lại" từng đoạn (chừa một khoảng lặng khỏi bị cắt)
+              - mốc thời gian + độ dài + dạng sóng của từng đoạn
+            `BangDoan.tsx` GIỮ NGUYÊN trong mã nguồn, chỉ thôi dùng. `giuLai` /
+            `doiGiu` vẫn chạy nên bật lại là thấy đúng trạng thái cũ. Cùng lối
+            đã làm với `DaiSong.tsx` và `MinhHoaNoiDat.tsx` hồi 03/08. */}
 
         {/* Cột phải gộp làm HAI NHÓM, mỗi nhóm khoá vào một hàng của lưới —
             nhờ vậy mốc nối giữa hai nhóm luôn thẳng với mốc nối bên trái. */}
@@ -1286,36 +1296,30 @@ export default function App() {
           <div className="card-hd">
             <h2 className="card-t">Kết quả</h2>
           </div>
-          <div className="tiles">
-            <div className="tile">
-              <div className="k">Thời lượng</div>
-              {/* Chưa phân tích thì CHỈ hiện độ dài vùng. Vẽ "4:27 → 4:27"
-                  lúc chưa cắt gì là nói dối bằng dấu mũi tên. */}
-              <div className="v">
-                {tongGiay <= 0 ? (
-                  '—'
-                ) : xemTruoc ? (
-                  <>
-                    {mmssGon(tongGiay)} <span className="ar">→</span>{' '}
-                    <span className="v--ok">{mmssGon(conGiay)}</span>
-                  </>
-                ) : (
-                  mmssGon(tongGiay)
-                )}
-              </div>
-            </div>
-            <div className="tile">
-              <div className="k">{xemTruoc ? 'Đoạn sẽ cắt' : 'Mức đang chọn'}</div>
-              {/* Nhãn đã nói "đoạn" rồi, giá trị khỏi lặp lại — cắt chữ thừa,
-                  và chuỗi ngắn đi thì ô hẹp mấy cũng không bị cắt cụt. */}
-              <div className="v v--ok">
-                {xemTruoc ? catThat.length : mucIdx >= 0 ? MUC[mucIdx].ten : 'chỉnh tay'}
-              </div>
-            </div>
-            <div className="tile">
-              <div className="k">{xemTruoc ? 'Còn lại' : 'Ước còn lại'}</div>
-              <div className="v v--ok">{conPhanTram != null ? `${conPhanTram}%` : '—'}</div>
-            </div>
+          {/* ☠️ RÚT CÒN MỘT DÒNG 2026-08-13 — anh Tiến: *"chỗ kết quả này anh cần
+              đưa ra một thông báo ngắn gọn: tổng thời cũ - tổng thời gian mới"*.
+
+              Đã bỏ hai ô kia, và bỏ có lý do chứ không phải cho gọn mắt — cả hai
+              đều NÓI LẠI thứ đã có sẵn trên màn hình (luật "một thông điệp chỉ
+              nói ở MỘT nơi"):
+                - "Mức đang chọn"  → khối `Mức cắt` ngay trên đã tô sáng mức đó
+                - "Còn lại %"      → dải `Sau khi cắt` đã ghi `còn 57%`
+                - "Đoạn sẽ cắt"    → ô `Nhát cắt` bên dưới đã đếm rồi
+              Nên gỡ đi không mất thông tin nào cả. */}
+          <div className="ket-gon">
+            {/* Chưa phân tích thì CHỈ hiện độ dài vùng. Vẽ "4:27 → 4:27" lúc
+                chưa cắt gì là nói dối bằng dấu mũi tên. */}
+            {tongGiay <= 0 ? (
+              <span className="ket-gon__v">—</span>
+            ) : xemTruoc ? (
+              <>
+                <span className="ket-gon__cu">{mmssGon(tongGiay)}</span>
+                <span className="ket-gon__ar">→</span>
+                <span className="ket-gon__moi">{mmssGon(conGiay)}</span>
+              </>
+            ) : (
+              <span className="ket-gon__v">{mmssGon(tongGiay)}</span>
+            )}
           </div>
         </section>
         {/* Dòng cảnh báo "Sửa thẳng vào sequence đang mở — Ctrl+Z để hoàn tác"
@@ -1574,28 +1578,39 @@ function DangChay({
   cacBuoc: readonly { readonly ten: string; readonly uoc: number }[]
 }) {
   const doDuoc = phanTram >= 0
+
+  // ☠️ GIẤU QUY TRÌNH 13/08/2026 — anh Tiến: *"khi chạy không được để lộ thông
+  // tin là mình đang làm gì, chỉ cần để là loading là được rồi"*, và khi thấy
+  // dòng "Đang nạp mô hình lên GPU": *"cái trạng thái này cũng vậy"*.
+  //
+  // Đã bỏ HAI thứ:
+  //   1. `nhan` — tên việc đang chạy ("Đang tách tiếng khỏi video",
+  //      "Đang nạp mô hình lên GPU"…)
+  //   2. danh sách 5 bước có dấu ✓ / ● / ○
+  //
+  // Vì sao đúng cho bản bán: hai thứ đó đọc ra là biết nguyên pipeline —
+  // tách tiếng → nghe hiểu bằng mô hình trên GPU → dựng sequence. Đó là phần
+  // giá trị nhất của tool, phơi ra cho người quay màn hình là cho không.
+  //
+  // ☠️ GIỮ LẠI đồng hồ và phần trăm, CÓ CHỦ Ý: bỏ nốt thì người dùng không biết
+  // máy còn chạy hay đã treo. Luật của chính anh Tiến — *"nút phải có trạng thái
+  // XONG rõ ràng"*. Giấu VIỆC ĐANG LÀM, không giấu TIẾN ĐỘ.
+  //
+  // `buocIdx` / `cacBuoc` vẫn nhận vào nhưng thôi dùng — bộ đếm bước bên trong
+  // vẫn chạy, bật lại danh sách chỉ là thêm mấy dòng JSX.
+  void nhan
+  void buocIdx
+  void cacBuoc
+
   return (
     <div className="chay">
       <div className={doDuoc ? 'chay__thanh' : 'chay__thanh chay__thanh--troi'}>
         {doDuoc && <div className="chay__day" style={{ width: `${phanTram}%` }} />}
         <span className="chay__chu">
-          {nhan}
-          {doDuoc && <b>{phanTram}%</b>}
+          {dich('Đang xử lý')}…{doDuoc && <b>{phanTram}%</b>}
         </span>
         <span className="chay__gio">{dongHo(giay)}</span>
       </div>
-
-      <ol className="chay__buoc">
-        {cacBuoc.map((b, i) => {
-          const tt = i < buocIdx ? 'xong' : i === buocIdx ? 'dang' : 'cho'
-          return (
-            <li key={b.ten} className={`chay__buoc--${tt}`}>
-              <span className="chay__cham">{tt === 'xong' ? '✓' : tt === 'dang' ? '●' : '○'}</span>
-              {b.ten}
-            </li>
-          )
-        })}
-      </ol>
     </div>
   )
 }

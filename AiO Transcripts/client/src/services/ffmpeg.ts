@@ -38,6 +38,16 @@ export function getFFmpegPath(): string {
     candidates.push(
       path.join(process.env.APPDATA, 'Adobe', 'CEP', 'extensions', EXT_ID, 'bin', 'win64', 'ffmpeg.exe'),
     )
+
+    // ☠️ [13/08/2026] KHO FFmpeg DÙNG CHUNG cho cả bộ AiO Studio.
+    // Bốn panel đóng gói ĐÚNG MỘT file ffmpeg.exe (SHA-256 `4CBB08190774`).
+    // Gộp về một chỗ: ba bộ cài beta 274,7 MB -> ~92 MB.
+    // Đặt ngoài `Adobe\CEP\extensions\` vì thư mục đó bị Premiere quét tìm
+    // extension. ĐẶT CUỐI DANH SÁCH để bản cũ có `bin/` riêng không hồi quy.
+    // Cài bằng: `AiO Studio/design-system/cai-bin-chung.ps1`
+    candidates.push(
+      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe'),
+    )
   }
 
   for (const c of candidates) {

@@ -1,5 +1,127 @@
 # AiO Autocut - Nhat ky
 
+## [bin-chung] - 2026-08-13 11:08 - KHO FFmpeg DUNG CHUNG CHO CA BO (buoc 2)
+
+Tiep theo muc [goi-nhe] ben duoi. Buoc 1 bo ffprobe khoi rieng Autocut;
+buoc nay gop FFmpeg cua CA BO ve mot cho.
+
+### Nguyen nhan
+Bay panel dong goi DUNG MOT file ffmpeg.exe - da bam SHA-256 doi chieu:
+`4CBB08190774` (109,5 MB) va `6E3A2FB316B3` (109,3 MB), giong nhau o ca 4 panel.
+Nguoi dung tai 3 goi beta = tai cung mot file FFmpeg 3 lan.
+
+### Thay doi
+1. `client/src/services/ffmpeg.ts` - them mot duong dan ung vien CUOI DANH SACH:
+   `%APPDATA%\AiOStudio\bin\win64\ffmpeg.exe`.
+   ĐAT CUOI la co y: ban cu con `bin/` rieng van chay y nhu truoc, khong hoi quy.
+   Dat NGOAI `Adobe\CEP\extensions\` vi thu muc do bi Premiere quet tim extension.
+2. `scripts/package-release.ps1` - them tham so `-BinChung`. Bat len thi KHONG
+   kem `bin/` vao goi. MAC DINH TAT, nen hom nay khong doi hanh vi gi.
+3. Moi: `design-system/cai-bin-chung.ps1` - cai kho chung, co ca `-Go` de go.
+
+Sua giong het o 3 panel kia (Asset Manager / Power Bins / Transcripts) de khong
+lech nhau - dung luat "sua ffmpeg.ts thi nho chep sang panel anh em".
+
+### Da kiem chung
+- `tsc --noEmit` ca 4 panel: **0 loi**.
+- Parse 5 script .ps1: OK. Ngoai-ASCII: cai-bin-chung 0, sign-install 0,
+  3 file package-release con 3 byte moi cai (dau gach ngang co san tu [1.0.1],
+  khong phai lan sua nay).
+- `(Get-Command ...).Parameters` xac nhan ca 3 script nhan `-BinChung`.
+- Chay THAT `cai-bin-chung.ps1`: cai 218,9 MB vao `%APPDATA%\AiOStudio\bin\win64`,
+  doc lai bam hash **khop nguon ca 2 file** (khong chi tin la Copy-Item khong bao loi).
+- Dung lai staging voi `-BinChung` bat, roi can:
+
+| Goi | Truoc | Sau |
+|---|---|---|
+| Autocut | 46,1 MB | **0,29 MB** |
+| Asset Manager | 91,5 MB | **0,09 MB** |
+| Power Bins | 91,5 MB | **0,09 MB** |
+| **Tong 3 goi** | **229,1 MB** | **0,46 MB** |
+
+!!! DUNG DOC "0,46 MB" NHU LA TAT CA. Nguoi dung con phai tai kho chung
+(~91,5 MB khi nen). Tong that: **274,7 MB -> ~92 MB (-67%)**.
+
+### Cai bay da vap khi lam
+`cai-bin-chung.ps1` chet ngay lan chay dau: `Select-Object -Unique` tra ve MOT
+CHUOI khi chi con 1 gia tri duy nhat, nen `$khac[0]` lay ra mot [char] va
+`.Substring()` nem loi. Phai boc `@()`. Da ghi canh bao ngay trong script.
+-> Script chua tung chay khong phai la script da kiem.
+
+### CHUA lam - de lai
+- **CHUA chay tren Premiere that.** Bang chung hien co chi la: code bien dich
+  sach, kho chung cai dung cho, hash khop. CHUA co lan nao panel that su lay
+  FFmpeg tu kho chung. Phai dong goi `-BinChung` roi chay thu MOI panel mot lan
+  truoc khi phat beta.
+- Bo cai GHEP ca bo (`SETUP.exe`) chua co - do la cho se goi `cai-bin-chung.ps1`.
+
+---
+
+## [goi-nhe] - 2026-08-13 10:55 - BO ffprobe KHOI BO CAI: 91,7 -> 46,0 MB (-50%)
+
+### Boi canh
+Anh Tien chot 13/08: cuoi tuan phat ban Beta/Demo gom 3 panel (Auto Cut /
+Asset Manager / Power Bins), va dung 3 cai do la GOI FREE. Anh nhan xet
+*"3 bo cai roi ma nang qua em ha"* - tong 3 goi la 274,7 MB.
+
+### Nguyen nhan: 99,7% bo cai KHONG phai code cua tool
+
+Mo bung .zxp (thuc chat la zip da ky) ra dem:
+
+| Trong 1 goi | Nen | Goc |
+|---|---|---|
+| bin/win64/ffmpeg.exe | 45,8 MB | 109,5 MB |
+| bin/win64/ffprobe.exe | 45,7 MB | 109,3 MB |
+| **Toan bo code panel** | **0,3 MB** | 0,5 MB |
+
+Bam SHA-256: ca 4 panel dong goi Y HET mot file.
+ffmpeg 4CBB08190774 - ffprobe 6E3A2FB316B3.
+
+### Autocut dong goi mot file no KHONG BAO GIO goi
+
+Soi ma nguon: `client/src/` khong co dong nao goi ffprobe. Panel lay thoi luong
++ fps bang cach doc stderr cua chinh lenh ffmpeg (`parseDuration` /
+`parseVideoFps` trong `services/silencelog.ts`). Ghi chu co san tu phien truoc
+o `whisper.ts:190`: *"Tien the lay luon fps + thoi luong tu log cua chinh lenh
+nay, khoi phai mo ffprobe"*.
+
+Kiem chung tren THU SE SHIP (khong chi ma nguon): quet `dist/` -> "ffprobe"
+**0 lan**, "ffmpeg" 1 lan.
+
+`ffprobe` chi con xuat hien o README, PROGRESS.md, THIRD-PARTY-NOTICE.txt va
+2 script dong goi - tuc script van chep no vao du khong ai goi.
+
+### Da sua
+- `scripts/sign-install.ps1` (dong ~94) va `scripts/package-release.ps1`
+  (dong ~92): sau khi chep `bin/`, xoa `bin\win64\ffprobe.exe` khoi STAGE.
+- Chi xoa o stage, `bin/` trong repo GIU NGUYEN - khong dung toi file goc.
+- Sua ca 2 script vi `sign-install` la ban dev, `package-release` moi la ban
+  di toi tay khach; sua mot cai la ban beta van nang.
+
+### Da kiem chung
+Dung lai dung cac buoc staging trong thu muc tam roi can (khong chay script
+that vi no sua registry + cai de len Premiere anh Tien sap mo):
+
+| | Giai nen | Nen |
+|---|---|---|
+| Truoc | 219,4 MB | 91,7 MB |
+| **Sau** | **110,1 MB** | **46,0 MB** |
+| Giam | 109,3 MB | **45,7 MB (-50%)** |
+
+Parse cu phap 2 script: OK. Byte ngoai ASCII: sign-install 0, package-release 3
+(la dau gach ngang co san tu [1.0.1] o dong 239, khong phai do lan sua nay).
+
+### CHUA lam - de lai
+- **CHUA chay tren Premiere that.** Bang chung hien co la ma nguon + dist deu
+  khong nhac ffprobe. Truoc khi phat beta phai chay AUTO CUT mot lan tren video
+  that voi goi moi de chac panel khong bao thieu file.
+- **CHU Y: Asset Manager va Power Bins CO dung ffprobe that** (`probe.ts` doc
+  metadata dang JSON). DUNG chep luat nay sang 2 panel do.
+- Buoc tiep theo de giam nua: **mot thu muc bin/ dung chung** cho ca bo
+  -> 229 MB con ~92 MB (-67%). Gop luon vao luc dung SETUP.exe cho beta.
+
+---
+
 ## [cat-dong-bo] - 2026-08-04 10:57 - SUA LOI AUTOCUT XOA MAT MIC CUA SEQUENCE MULTICAM
 
 Anh Tien cat podcast bang AiO Auto Podcast roi chay Autocut "Cat tai cho".
