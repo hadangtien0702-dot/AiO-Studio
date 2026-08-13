@@ -14,6 +14,52 @@ export type { Silence }
 
 const EXT_ID = 'com.aiostudio.transcript'
 
+/**
+ * ☠️☠️ [13/08/2026] ĐỌC BIẾN MÔI TRƯỜNG LÚC CHẠY — ĐỪNG VIẾT CHỮ `process`
+ * NỐI THẲNG VỚI `.env` TRONG FILE NÀY.
+ * ══════════════════════════════════════════════════════════════════════════
+ * Vite THAY chuỗi đó bằng một object RỖNG ngay lúc đóng gói. Đọc bản đã build
+ * thấy nguyên hình:
+ *
+ *     var Ua = {};                                              // Vite sinh ra
+ *     const n = typeof process < "u" && Ua ? Ua.APPDATA : null; // -> undefined
+ *
+ * Hậu quả THẬT ở chính file này: nhánh dò `%APPDATA%` luôn bị bỏ qua, nên kho
+ * FFmpeg dùng chung `%APPDATA%\AiOStudio\bin\win64` **CHƯA BAO GIỜ được dò
+ * tới**. Panel vẫn chạy — nhưng vì bản cài có `bin/` riêng nên ứng viên đầu
+ * danh sách đã thắng, KHÔNG phải vì kho chung hoạt động.
+ *
+ * ☠️ Vì sao đo mãi không ra: gõ thẳng vào console thì ĐÚNG (console không đi
+ * qua Vite), còn mã đã đóng gói thì đọc `{}.APPDATA`. **Đo trên console không
+ * chứng minh được mã ĐÃ BUILD chạy đúng** — cùng họ bài học 5ah.
+ *
+ * → Cách đúng: truy cập lúc chạy, và truy cập ĐỘNG bằng `['env']` để bundler
+ *   không nhận diện được mẫu cần thay.
+ */
+function bienMT(ten: string): string | null {
+  // 1. `process` của Node do CEP gắn sẵn vào `window.cep_node`.
+  try {
+    const w = window as any
+    const p = w?.cep_node?.process
+    const e = p && p['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {
+    /* bỏ qua — còn đường thứ hai */
+  }
+
+  // 2. Nạp thẳng module 'process' qua require của Node.
+  try {
+    const req = nodeRequire()
+    const pr = req ? req('process') : null
+    const e = pr && pr['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {
+    /* bỏ qua — không có Node thì trả null, phía gọi tự bỏ ứng viên đó */
+  }
+
+  return null
+}
+
 let cachedFFmpeg: string | null = null
 
 /** Đường dẫn tuyệt đối tới ffmpeg.exe ('' nếu không tìm thấy). */
@@ -34,9 +80,11 @@ export function getFFmpegPath(): string {
     candidates.push(path.join(cwd, 'bin', 'win64', 'ffmpeg.exe'))
     candidates.push(path.join(cwd, '..', 'bin', 'win64', 'ffmpeg.exe'))
   }
-  if (typeof process !== 'undefined' && process.env && process.env.APPDATA) {
+  // ☠️ Lấy %APPDATA% bằng bienMT() — xem ghi chú đầu file, KHÔNG đọc thẳng.
+  const appData = bienMT('APPDATA')
+  if (appData) {
     candidates.push(
-      path.join(process.env.APPDATA, 'Adobe', 'CEP', 'extensions', EXT_ID, 'bin', 'win64', 'ffmpeg.exe'),
+      path.join(appData, 'Adobe', 'CEP', 'extensions', EXT_ID, 'bin', 'win64', 'ffmpeg.exe'),
     )
 
     // ☠️ [13/08/2026] KHO FFmpeg DÙNG CHUNG cho cả bộ AiO Studio.
@@ -46,7 +94,7 @@ export function getFFmpegPath(): string {
     // extension. ĐẶT CUỐI DANH SÁCH để bản cũ có `bin/` riêng không hồi quy.
     // Cài bằng: `AiO Studio/design-system/cai-bin-chung.ps1`
     candidates.push(
-      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe'),
+      path.join(appData, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe'),
     )
   }
 

@@ -90,27 +90,145 @@ export type BangChu = { en: Record<string, string> }
 
 // ═══ ĐỌC / GHI FILE DÙNG CHUNG ════════════════════════════════════════════
 
+/**
+ * ☠️☠️ [13/08/2026] ĐỪNG VIẾT `process.env.APPDATA` Ở ĐÂY — BUNDLER XOÁ NÓ
+ * ══════════════════════════════════════════════════════════════════════════
+ * Triệu chứng đo được trên panel THẬT đang chạy trong Premiere (cổng 8089):
+ *
+ *     localStorage.getItem('aio-lang')                  ->  "en"    (đúng)
+ *     fs.existsSync(%APPDATA%\AiOStudio\ngonngu.json)   ->  false   (SAI)
+ *
+ * Tức `ghiRaDia()` THẤT BẠI TRONG IM LẶNG, và mất đúng thứ file này sinh ra để
+ * làm: đổi ngôn ngữ ở một panel thì cả bộ đổi theo.
+ *
+ * Bốn nguyên nhân bị nghi lúc đầu — đo trên panel thật thì **SAI CẢ BỐN**:
+ *
+ *   | Nghi                      | Đo được trên panel đang chạy              |
+ *   |---------------------------|-------------------------------------------|
+ *   | `napNode('fs')` trả null  | trả object thật; `cep_node.require` = hàm |
+ *   | đường dẫn sai             | ...\AiOStudio\ngonngu.json — ĐÚNG         |
+ *   | thư mục chưa có           | ĐÃ CÓ (bin · library.json · proxies…)     |
+ *   | không có quyền ghi        | ghi thử + đọc lại: ĐẠT                    |
+ *
+ * Thủ phạm nằm ở **BƯỚC ĐÓNG GÓI**, không nằm ở lúc chạy. Đọc bản đã build
+ * (`dist/index.html`) thì thấy Vite thay `process.env` bằng một object **RỖNG**
+ * ngay lúc build:
+ *
+ *     var Ua = {};                                       // Vite sinh ra
+ *     const n = typeof process < "u" && Ua ? Ua.APPDATA : null;   // -> undefined
+ *
+ * Nên `duongDanChung()` trả `null`, và `ghiRaDia()` thoát ngay ở dòng
+ * `if (!p) return` — **chưa từng vào tới `try`, nên cũng chưa từng có lỗi để
+ * bắt**. Catch rỗng không phải thủ phạm, nhưng nó xoá mất mọi dấu vết.
+ *
+ * ☠️ Vì sao bảng đo trên nhìn "xanh hết" mà sản phẩm vẫn hỏng: gõ
+ * `process.env.APPDATA` vào console thì ĐÚNG (console KHÔNG đi qua Vite), còn
+ * mã đã đóng gói thì đọc `{}.APPDATA`. **Đo trên console không chứng minh được
+ * mã ĐÃ BUILD chạy đúng** — cùng họ bài học 5ah ("đã push" ≠ "đã ăn").
+ *
+ * → Luật: lấy biến môi trường bằng **truy cập lúc chạy** (`cep_node.process`,
+ *   `require('process')`, `os.homedir()`), đừng viết chữ `process.env` cho
+ *   bundler nhìn thấy.
+ *
+ * ⚠️ CÙNG LỖI NÀY CÒN NẰM Ở `services/ffmpeg.ts` (2 chỗ đọc
+ *   `process.env.APPDATA`, build ra `El={}` rồi `El.APPDATA`). Nghĩa là kho
+ *   FFmpeg dùng chung `%APPDATA%\AiOStudio\bin\win64` hiện **không bao giờ
+ *   được dò tới**; panel vẫn chạy vì bản cài có `bin/` riêng nên ứng viên đầu
+ *   danh sách đã thắng. CHƯA sửa ở đây để giữ đúng phạm vi việc này.
+ */
+
+/**
+ * Ghi lý do thất bại ra console, tiền tố `[AiO ngonngu]` để lần sau chẩn đoán
+ * được mà không phải dựng lại bàn đo.
+ *
+ * ☠️ **Nói MỘT LẦN cho mỗi lý do.** `docTuDia()` bị gọi lại mỗi 2 giây (xem
+ * `NhaNgonNgu`), nên warn thẳng tay là ngập console khi panel chạy ngoài
+ * Premiere — lúc đó không có `fs` là chuyện BÌNH THƯỜNG, không phải lỗi.
+ * Chỉ báo khi THẤT BẠI, không báo lúc thành công.
+ */
+const _daNoi = new Set<string>()
+function canhBao(viec: string, e?: unknown): void {
+  const chiTiet = e === undefined ? '' : ': ' + String((e as any)?.message ?? e)
+  const msg = viec + chiTiet
+  if (_daNoi.has(msg)) return
+  _daNoi.add(msg)
+  try {
+    console.warn('[AiO ngonngu] ' + msg)
+  } catch {
+    /* không có console thì thôi — đừng để việc ghi log làm hỏng luồng chính */
+  }
+}
+
 function napNode(mod: string): any {
   try {
     const w = window as any
     if (w.cep_node && w.cep_node.require) return w.cep_node.require(mod)
-  } catch {
-    /* ngoài Premiere thì không có */
+  } catch (e) {
+    canhBao('cep_node.require("' + mod + '") hỏng', e)
   }
   try {
     if (typeof require === 'function') return require(mod)
-  } catch {
-    /* bỏ qua */
+  } catch (e) {
+    canhBao('require("' + mod + '") hỏng', e)
   }
+  return null
+}
+
+/**
+ * Thư mục `%APPDATA%` — lấy bằng ba đường CHẠY LÚC RUNTIME, không đường nào
+ * viết chữ `process.env` ra cho bundler thấy (xem ghi chú đầu mục).
+ * Đường 1 đã đo trên panel thật 13/08: trả đúng `C:\Users\...\AppData\Roaming`.
+ */
+function layAppData(): string | null {
+  // 1. `process` của Node do CEP gắn sẵn vào `window.cep_node` — truy cập
+  //    thuộc tính lúc chạy nên Vite không đụng tới được.
+  try {
+    const w = window as any
+    const pr = w.cep_node && w.cep_node.process
+    if (pr && pr.env && pr.env.APPDATA) return String(pr.env.APPDATA)
+  } catch (e) {
+    canhBao('doc cep_node.process.env.APPDATA hỏng', e)
+  }
+
+  // 2. Nạp thẳng module 'process' — dùng khi chạy Node kiểu khác.
+  try {
+    const pr = napNode('process')
+    if (pr && pr.env && pr.env.APPDATA) return String(pr.env.APPDATA)
+  } catch (e) {
+    canhBao('doc require("process").env.APPDATA hỏng', e)
+  }
+
+  // 3. Suy từ thư mục nhà. Đường lùi cuối, chỉ đúng trên Windows — mà panel
+  //    CEP của bộ này vốn chỉ chạy Windows.
+  try {
+    const os = napNode('os')
+    const path = napNode('path')
+    if (os && path && typeof os.homedir === 'function') {
+      const nha = os.homedir()
+      if (nha) return path.join(nha, 'AppData', 'Roaming')
+    }
+  } catch (e) {
+    canhBao('suy %APPDATA% tu os.homedir() hỏng', e)
+  }
+
+  canhBao('khong tim duoc %APPDATA% — bo qua file chung, chi dung localStorage')
   return null
 }
 
 function duongDanChung(): string | null {
   const path = napNode('path')
-  if (!path) return null
-  const appdata = typeof process !== 'undefined' && process.env ? process.env.APPDATA : null
+  if (!path) {
+    canhBao('khong nap duoc module `path` — panel dang chay ngoai Premiere?')
+    return null
+  }
+  const appdata = layAppData()
   if (!appdata) return null
-  return path.join(appdata, 'AiOStudio', 'ngonngu.json')
+  try {
+    return path.join(appdata, 'AiOStudio', 'ngonngu.json')
+  } catch (e) {
+    canhBao('path.join dung duong dan chung hỏng', e)
+    return null
+  }
 }
 
 function docTuDia(): MaNgonNgu | null {
@@ -118,26 +236,62 @@ function docTuDia(): MaNgonNgu | null {
   const p = duongDanChung()
   if (!fs || !p) return null
   try {
+    // Chưa có file là chuyện BÌNH THƯỜNG (lần chạy đầu) — không cảnh báo.
     if (!fs.existsSync(p)) return null
     const o = JSON.parse(String(fs.readFileSync(p, 'utf8')))
-    return o && (o.lang === 'vi' || o.lang === 'en') ? o.lang : null
-  } catch {
+    if (o && (o.lang === 'vi' || o.lang === 'en')) return o.lang
+    canhBao('file chung co ma ngon ngu la: ' + JSON.stringify(o && o.lang))
+    return null
+  } catch (e) {
+    canhBao('doc file chung ' + p + ' hỏng', e)
     return null
   }
 }
 
-function ghiRaDia(ma: MaNgonNgu): void {
+/**
+ * Ghi lựa chọn ra file dùng chung.
+ *
+ * ☠️ **ĐỌC LẠI SAU KHI GHI là bắt buộc** (luật của dự án: "không báo lỗi"
+ * KHÔNG có nghĩa là "đã ghi"). `writeFileSync` không ném lỗi chỉ chứng minh
+ * lệnh chạy trót lọt, không chứng minh đĩa có dữ liệu đúng.
+ *
+ * Trả `true` khi đã ghi VÀ đọc lại khớp. Người gọi không bắt buộc dùng giá trị
+ * này — `datNgonNgu()` vẫn ghi localStorage làm đường lùi.
+ */
+function ghiRaDia(ma: MaNgonNgu): boolean {
   const fs = napNode('fs')
   const path = napNode('path')
   const p = duongDanChung()
-  if (!fs || !path || !p) return
+  if (!fs) {
+    canhBao('khong nap duoc module `fs` — khong ghi duoc file chung')
+    return false
+  }
+  if (!path || !p) return false
+
   try {
+    // Tạo thư mục TRƯỚC. `recursive: true` không kêu ca nếu đã có sẵn.
     const thuMuc = path.dirname(p)
     if (!fs.existsSync(thuMuc)) fs.mkdirSync(thuMuc, { recursive: true })
     fs.writeFileSync(p, JSON.stringify({ lang: ma }), 'utf8')
-  } catch {
-    /* ghi không được thì vẫn còn localStorage — không làm hỏng panel vì việc này */
+  } catch (e) {
+    // Ghi không được thì vẫn còn localStorage — không làm hỏng panel vì việc
+    // này, nhưng PHẢI nói ra lý do.
+    canhBao('ghi file chung ' + p + ' hỏng', e)
+    return false
   }
+
+  try {
+    const lai = JSON.parse(String(fs.readFileSync(p, 'utf8')))
+    if (!lai || lai.lang !== ma) {
+      canhBao('ghi xong doc lai KHONG khop — mong "' + ma + '", nhan duoc: ' + JSON.stringify(lai))
+      return false
+    }
+  } catch (e) {
+    canhBao('doc lai de xac nhan ' + p + ' hỏng', e)
+    return false
+  }
+
+  return true
 }
 
 /**
@@ -150,18 +304,21 @@ export function docNgonNgu(): MaNgonNgu {
   try {
     const v = localStorage.getItem(KHOA)
     if (v === 'vi' || v === 'en') return v
-  } catch {
-    /* bỏ qua */
+  } catch (e) {
+    canhBao('doc localStorage hỏng — dung mac dinh "' + MAC_DINH + '"', e)
   }
   return MAC_DINH
 }
 
 export function datNgonNgu(ma: MaNgonNgu): void {
+  // Ghi hai nơi. `ghiRaDia` trả false thì đã tự nói lý do ra console rồi —
+  // ở đây không chặn luồng, vì localStorage vẫn cứu được panel hiện tại.
   ghiRaDia(ma)
   try {
     localStorage.setItem(KHOA, ma)
-  } catch {
-    /* bỏ qua */
+  } catch (e) {
+    // Hỏng chỗ này là mất NỐT đường lùi cuối cùng — phải nói ra.
+    canhBao('ghi localStorage hỏng — lua chon se mat khi mo lai panel', e)
   }
 }
 
@@ -277,44 +434,59 @@ export function useNgonNgu(): GiaTri {
 // ═══ NÚT ĐỔI NGÔN NGỮ ═════════════════════════════════════════════════════
 
 /**
- * Đổi ngôn ngữ — CHỈ HAI CHỮ `VI` · `EN`, không cờ, không khung nút.
+ * Đổi ngôn ngữ — **MỘT NÚT DUY NHẤT**, bấm một cái là đổi.
  *
- * ☠️ ĐÃ CÓ CỜ SVG, ANH TIẾN BẢO BỎ 13/08/2026: *"chỗ này chỉ cần để là EN và VI
- * là xong, xóa đi 2 lá cờ và nút đi cho nó gọn"*. Đừng vẽ cờ lại.
+ * ☠️ HAI ĐỜI TRƯỚC ĐÃ BỎ, ĐỪNG DỰNG LẠI:
+ *   1. Hai lá cờ SVG — anh Tiến 13/08/2026: *"chỗ này chỉ cần để là EN và VI là
+ *      xong, xóa đi 2 lá cờ và nút đi cho nó gọn"*.
+ *      (Và **ngôn ngữ không phải quốc gia** — tiếng Anh đâu chỉ của một nước.
+ *      Ghi chú "đừng dùng emoji quốc kỳ" ở đầu file vẫn còn giá trị nếu sau này
+ *      ai định thêm cờ lại.)
+ *   2. Hai nút `VI · EN` trong `role="radiogroup"` — anh Tiến 13/08/2026:
+ *      *"nút này anh muốn để là 1 button thôi, bấm vào là đổi cho gọn chứ không
+ *      phải là 2 phần như thế này"*.
  *
- * Ghi chú "đừng dùng emoji quốc kỳ" ở đầu file vẫn giữ nguyên giá trị — nếu sau
- * này ai định thêm cờ lại thì đọc chỗ đó trước, đừng dùng emoji.
+ * ══════════════════════════════════════════════════════════════════════════
+ * ☠️ NHÃN LÀ NGÔN NGỮ **ĐANG DÙNG**, KHÔNG PHẢI NGÔN NGỮ SẼ ĐỔI SANG
+ * ══════════════════════════════════════════════════════════════════════════
+ * Đang tiếng Anh → nút ghi `EN`. Bấm một cái thành `VI`. Bấm nữa về `EN`.
  *
- * Và **ngôn ngữ không phải quốc gia**: bỏ cờ đi lại đúng hơn về mặt này, vì
- * tiếng Anh đâu chỉ của một nước.
+ * Đây đúng mô hình anh Tiến đã chốt cho nút **"Render preview"** bên Asset
+ * Manager (28/07/2026): *"chưa render hết thì màu đỏ — render xong là xanh"* —
+ * **một nút vừa là NÚT BẤM vừa là ĐÈN BÁO**, nhìn là biết đang ở trạng thái nào,
+ * khỏi đọc thêm gì.
  *
- * Vẫn dựng bằng `<button role="radio">` trong `role="radiogroup"` — nhìn như
- * chữ thường nhưng đi được bằng Tab + mũi tên, và đọc màn hình vẫn hiểu đây là
- * một lựa chọn hai giá trị.
+ * Nếu ghi ngôn ngữ **sẽ** đổi sang thì hỏng đúng chỗ đó: màn hình đang tiếng
+ * Anh mà nút ghi `VI` → người dùng đọc `VI` lại tưởng đang ở tiếng Việt. Nhãn
+ * và màn hình chọi nhau, mà nhãn thì luôn thua vì màn hình to hơn.
+ *
+ * Việc nó LÀM thì nói ở `title` (tooltip) — và nói bằng **thứ tiếng sẽ đổi
+ * sang**, để đúng người cần nó đọc được:
+ *     đang EN → "Chuyển sang tiếng Việt"
+ *     đang VI → "Switch to English"
+ *
+ * `aria-label` thì ngược lại — viết bằng **thứ tiếng đang hiện**, vì đó là thứ
+ * tiếng người đang dùng panel đọc được; và nó phải nói cả TRẠNG THÁI lẫn VIỆC,
+ * bởi chữ trên nút chỉ có hai ký tự.
+ *
+ * Không dùng `role="radio"`/`radiogroup` nữa: đây không còn là lựa chọn nhiều
+ * giá trị bày sẵn, mà là MỘT nút bấm. Cũng không dùng `aria-pressed` — nút này
+ * không có nghĩa bật/tắt, nó xoay vòng giữa hai thứ tiếng.
  */
 export function NutDoiNgonNgu({ className }: { className?: string }) {
   const { L, doiNgonNgu } = useNgonNgu()
-  const ds: { ma: MaNgonNgu; ten: string }[] = [
-    { ma: 'vi', ten: 'VI' },
-    { ma: 'en', ten: 'EN' },
-  ]
+  const dangEN = L === 'en'
   return (
-    <div className={'aio-ngonngu ' + (className || '')} role="radiogroup" aria-label="Language">
-      {ds.map(({ ma, ten }, i) => (
-        <span key={ma}>
-          {i > 0 && <span className="aio-ngonngu__gach">·</span>}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={L === ma}
-            className={'aio-ngonngu__nut' + (L === ma ? ' la-chon' : '')}
-            onClick={() => doiNgonNgu(ma)}
-            title={ma === 'vi' ? 'Tiếng Việt' : 'English'}
-          >
-            {ten}
-          </button>
-        </span>
-      ))}
-    </div>
+    <button
+      type="button"
+      className={'aio-ngonngu ' + (className || '')}
+      onClick={() => doiNgonNgu(dangEN ? 'vi' : 'en')}
+      title={dangEN ? 'Chuyển sang tiếng Việt' : 'Switch to English'}
+      aria-label={
+        dangEN ? 'Language: English — switch to Vietnamese' : 'Ngôn ngữ: Tiếng Việt — chuyển sang tiếng Anh'
+      }
+    >
+      {dangEN ? 'EN' : 'VI'}
+    </button>
   )
 }

@@ -13,6 +13,50 @@ import { parseSilenceLog, parseDuration, parseVideoFps, type Silence } from './s
 
 export type { Silence }
 
+/**
+ * ☠️☠️ [13/08/2026] LẤY BIẾN MÔI TRƯỜNG BẰNG TRUY CẬP LÚC CHẠY — ĐỪNG VIẾT
+ * CHỮ `process` NỐI `.env` RA CHO BUNDLER NHÌN THẤY.
+ * ══════════════════════════════════════════════════════════════════════════
+ * Vite thay cụm chữ đó bằng một object **RỖNG** ngay lúc build. Đọc bản đã
+ * đóng gói (`dist/index.html`) thấy đúng như vầy:
+ *
+ *     var Ua = {};                                              // Vite sinh ra
+ *     const n = typeof process < "u" && Ua ? Ua.APPDATA : null; // -> undefined
+ *
+ * Nên mọi mệnh đề canh gác kiểu `... && <cụm đó>.APPDATA` đều rơi vào nhánh
+ * SAI trong bản đã build, dù gõ thẳng vào console lại ĐÚNG (console không đi
+ * qua Vite). **Đo trên console không chứng minh được mã ĐÃ BUILD chạy đúng.**
+ *
+ * Hậu quả THẬT ở chính file này: đường dò tới kho FFmpeg dùng chung
+ * `%APPDATA%\AiOStudio\bin\win64` (ứng viên cuối, thêm 13/08) **chưa bao giờ
+ * được chạy tới**. Panel vẫn chạy chỉ vì bản cài có `bin/` riêng nên ứng viên
+ * ĐẦU danh sách đã thắng — không phải vì kho chung hoạt động.
+ *
+ * Cách đúng: truy cập ĐỘNG bằng `[]` để Vite không nhận diện được cụm chữ.
+ * Cùng cách làm với `layAppData()` trong `src/ngonngu.tsx`.
+ */
+function bienMT(ten: string): string | null {
+  const w = window as any
+  // 1. `process` của Node do CEP gắn sẵn vào `window.cep_node`.
+  try {
+    const p = w?.cep_node?.process
+    const e = p && p['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {
+    /* không có thì đi đường 2 */
+  }
+  // 2. Nạp thẳng module 'process' — dùng khi chạy Node kiểu khác.
+  try {
+    const req = w?.cep_node?.require || (typeof require === 'function' ? require : null)
+    const pr = req ? req('process') : null
+    const e = pr && pr['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {
+    /* chịu — trả null, phía gọi tự bỏ qua ứng viên đường dẫn đó */
+  }
+  return null
+}
+
 const EXT_ID = 'com.aiostudio.autocut'
 
 let cachedFFmpeg: string | null = null
@@ -35,9 +79,12 @@ export function getFFmpegPath(): string {
     candidates.push(path.join(cwd, 'bin', 'win64', 'ffmpeg.exe'))
     candidates.push(path.join(cwd, '..', 'bin', 'win64', 'ffmpeg.exe'))
   }
-  if (typeof process !== 'undefined' && process.env && process.env.APPDATA) {
+  // ☠️ Phải lấy qua `bienMT()` — viết thẳng biến môi trường ra là bị Vite thay
+  // bằng object rỗng lúc build, cả hai ứng viên dưới đây chết câm (xem đầu file).
+  const appData = bienMT('APPDATA')
+  if (appData) {
     candidates.push(
-      path.join(process.env.APPDATA, 'Adobe', 'CEP', 'extensions', EXT_ID, 'bin', 'win64', 'ffmpeg.exe'),
+      path.join(appData, 'Adobe', 'CEP', 'extensions', EXT_ID, 'bin', 'win64', 'ffmpeg.exe'),
     )
 
     // ☠️ [13/08/2026] KHO FFmpeg DÙNG CHUNG cho cả bộ AiO Studio.
@@ -56,7 +103,7 @@ export function getFFmpegPath(): string {
     //
     // Cài kho chung bằng: `AiO Studio/design-system/cai-bin-chung.ps1`
     candidates.push(
-      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe'),
+      path.join(appData, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe'),
     )
   }
 

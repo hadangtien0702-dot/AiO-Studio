@@ -1,3 +1,4 @@
+import { dich } from './ngonngu'
 /**
  * DaiSong.tsx — hai dải sóng: TRƯỚC và SAU khi cắt, cùng tỉ lệ.
  *
@@ -204,7 +205,9 @@ function mmss(giay: number): string {
 function dai(giay: number): string {
   const g = Math.max(0, Math.round(giay))
   const p = Math.floor(g / 60)
-  return p > 0 ? `${p} phút ${g % 60} giây` : `${g} giây`
+  return p > 0
+    ? `${p} ${dich('phút')} ${g % 60} ${dich('giây')}`
+    : `${g} ${dich('giây')}`
 }
 
 interface PropsXem {

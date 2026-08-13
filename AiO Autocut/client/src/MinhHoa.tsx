@@ -26,6 +26,7 @@
  * Vẽ bằng SVG inline: không tải ảnh, không đọc file, không tính toán gì — nhẹ
  * đúng như anh Tiến dặn *"nhẹ để nhanh, không nặng để đẹp"*.
  */
+import { dich } from './ngonngu'
 
 /**
  * Các khoảng SẼ BỎ, tính theo phần trăm chiều dài — số ước lệ cho dễ nhìn.
@@ -232,14 +233,14 @@ export default function MinhHoa({ muc }: { muc: number }) {
           lại. Không có key thì React chỉ sửa thuộc tính, keyframes đã chạy xong
           một lần rồi thì thôi. */}
 
-      <span className="mh__nhan">Bản gốc</span>
+      <span className="mh__nhan">{dich('Bản gốc')}</span>
       <svg
         key={`raw-${muc}`}
         viewBox={`0 0 ${W} ${CAO_TL}`}
         className="mh__hinh"
         preserveAspectRatio="none"
         role="img"
-        aria-label="Timeline gốc, chỗ tô đỏ là dead silent sẽ bị bỏ"
+        aria-label={dich('Timeline gốc, chỗ tô đỏ là dead silent sẽ bị bỏ')}
       >
         {veTimeline(giuGoc, 0, 'truoc')}
         {k.bo.map(([tu, dai], i) => (
@@ -261,8 +262,8 @@ export default function MinhHoa({ muc }: { muc: number }) {
           một ý lần thứ hai. */}
 
       <span className="mh__nhan mh__nhan--sau">
-        Sau khi cắt
-        <i>còn {conLai}%</i>
+        {dich('Sau khi cắt')}
+        <i>{dich('còn')} {conLai}%</i>
       </span>
       {/* Bọc để đặt vệt sáng đè lên dải. Vệt chạy SAU khi đoạn cuối ghép xong:
           1250ms (thời lượng rơi+ghép) + độ trễ của đoạn cuối. */}
@@ -302,7 +303,12 @@ export default function MinhHoa({ muc }: { muc: number }) {
           CUT TIMELINE · còn X%", sát cạnh dải mà nó nói về. Nhắc lại lần nữa ở
           đây là bắt mắt đọc hai lần cùng một ý.
           Nguyên tắc của anh Tiến: một thông điệp chỉ nói ở MỘT nơi. */}
-      <p className="mh__chu">{k.mo}</p>
+      {/* ☠️ Dịch Ở ĐÂY, đừng bọc `dich()` vào chính `KIEU`: `KIEU` là const tầng
+          module, chạy lúc import — lúc đó `NhaNgonNgu` chưa vẽ nên bảng chữ
+          (`_bang`) còn null, `dich()` trả lại nguyên văn tiếng Việt và ĐÓNG CỨNG
+          ở đó, đổi ngôn ngữ không ăn. Gọi trong thân component thì mỗi lần vẽ
+          lại là dịch lại. Ba câu `mo` đều có trong `chu.ts`. */}
+      <p className="mh__chu">{dich(k.mo)}</p>
     </div>
   )
 }

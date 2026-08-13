@@ -21,6 +21,7 @@
  * đè lên dải audio.
  */
 import type { MucAm, Quang } from './services/amluong'
+import { dich } from './ngonngu'
 
 function mmss(giay: number): string {
   const g = Math.max(0, Math.round(giay))
@@ -31,7 +32,9 @@ function mmss(giay: number): string {
 function dai(giay: number): string {
   const g = Math.max(0, Math.round(giay))
   const p = Math.floor(g / 60)
-  return p > 0 ? `${p} phút ${g % 60} giây` : `${g} giây`
+  return p > 0
+    ? `${p} ${dich('phút')} ${g % 60} ${dich('giây')}`
+    : `${g} ${dich('giây')}`
 }
 
 /** Số vạch sóng trải trên toàn dải. Đo thiết kế: 171 vạch cho 3 clip. */
@@ -180,7 +183,7 @@ function DaiSau({ mucAm, cat, tong, conLai, boDi, nhanBoDi }: PropsSau) {
                 <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
               </svg>
               <span className="n">{nhanBoDi}</span>
-              <span className="l">đã cắt bỏ</span>
+              <span className="l">{dich('đã cắt bỏ')}</span>
             </>
           )}
         </div>
@@ -211,13 +214,13 @@ export function XemTruoc({ mucAm, cat, soClip }: PropsXem) {
   return (
     <>
       <div className="trk-hd">
-        <span>Bản gốc</span>
+        <span>{dich('Bản gốc')}</span>
         <span className="meta">{dai(tong)}</span>
       </div>
       <DaiGoc mucAm={mucAm} cat={cat} tong={tong} soClip={soClip} />
 
       <div className="trk-hd" style={{ marginTop: 'var(--sp-5)' }}>
-        <span>Sau khi cắt</span>
+        <span>{dich('Sau khi cắt')}</span>
         <span className="meta">
           {dai(conLai)}
           <i>−{mmss(boDi)}</i>
@@ -243,7 +246,7 @@ export function XemTruoc({ mucAm, cat, soClip }: PropsXem) {
           máy luôn cắt NHIỀU HƠN hình vẽ ở đây. Gỡ đi thì người dùng đọc con số
           như thể nó chính xác. Cần nói lại thì để ở màn KẾT QUẢ sau khi cắt,
           chỗ đã có số thật để so. */}
-      <p className="xem__luu">Đỏ là chỗ sẽ bỏ.</p>
+      <p className="xem__luu">{dich('Đỏ là chỗ sẽ bỏ.')}</p>
     </>
   )
 }
@@ -287,7 +290,7 @@ export function TimelineMau({ muc, soClip }: { muc: number; soClip: number }) {
           không ai đọc lướt qua được. */}
       <div className="trk-hd">
         <span>
-          Bản gốc <em className="vd">ví dụ</em>
+          {dich('Bản gốc')} <em className="vd">{dich('ví dụ')}</em>
         </span>
       </div>
       <div className="tl">
@@ -309,9 +312,9 @@ export function TimelineMau({ muc, soClip }: { muc: number; soClip: number }) {
       </div>
 
       <div className="trk-hd" style={{ marginTop: 'var(--sp-5)' }}>
-        <span>Sau khi cắt</span>
+        <span>{dich('Sau khi cắt')}</span>
         <span className="meta">
-          còn <i>{Math.round(m.conLai * 100)}%</i>
+          {dich('còn')} <i>{Math.round(m.conLai * 100)}%</i>
         </span>
       </div>
       <div className="tl tl--after">
@@ -328,7 +331,7 @@ export function TimelineMau({ muc, soClip }: { muc: number; soClip: number }) {
         <div className="gone" />
       </div>
 
-      <p className="xem__luu">{m.mo}</p>
+      <p className="xem__luu">{dich(m.mo)}</p>
     </>
   )
 }

@@ -24,6 +24,7 @@
  *   - Tạo mới : các đoạn RƠI XUỐNG dải dưới — dải trên vẫn còn đủ, kể cả chỗ đỏ
  *   - Tại chỗ : chỗ đỏ TAN ĐI, các đoạn TRƯỢT NGANG dồn lại trên chính dải đó
  */
+import { dich } from './ngonngu'
 
 const W = 320
 const CAO_V = 7 //  track hình
@@ -131,8 +132,8 @@ export default function MinhHoaNoiDat({ noi }: { noi: 'moi' | 'taicho' }) {
       role="img"
       aria-label={
         taiCho
-          ? 'Cắt thẳng vào sequence đang mở: chỗ lặng biến mất, các đoạn dồn lại trên chính nó'
-          : 'Tạo sequence mới: bản gốc còn nguyên, sinh thêm một sequence đã cắt bên dưới'
+          ? dich('Cắt thẳng vào sequence đang mở: chỗ lặng biến mất, các đoạn dồn lại trên chính nó')
+          : dich('Tạo sequence mới: bản gốc còn nguyên, sinh thêm một sequence đã cắt bên dưới')
       }
     >
       {/* ── BẢN GỐC ────────────────────────────────────────────────────────

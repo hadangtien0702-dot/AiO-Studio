@@ -20,6 +20,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import type { MucAm, Quang } from './services/amluong'
+import { dich } from './ngonngu'
 
 /** Số vạch mỗi dạng sóng. 45 vạch đủ thấy nhịp mà không thành cái lược. */
 const SO_VACH = 45
@@ -105,11 +106,11 @@ export function BangDoan({ cat, mucAm, giuLai, onDoiGiu, tcode }: Props) {
       <table className="tbl">
         <thead>
           <tr>
-            <th>Bắt đầu</th>
-            <th>Kết thúc</th>
-            <th>Dài</th>
-            <th>Dạng sóng</th>
-            <th>Thao tác</th>
+            <th>{dich('Bắt đầu')}</th>
+            <th>{dich('Kết thúc')}</th>
+            <th>{dich('Dài')}</th>
+            <th>{dich('Dạng sóng')}</th>
+            <th>{dich('Thao tác')}</th>
           </tr>
         </thead>
         <tbody>
@@ -136,7 +137,7 @@ export function BangDoan({ cat, mucAm, giuLai, onDoiGiu, tcode }: Props) {
                     aria-pressed={giu}
                     onClick={() => onDoiGiu(c)}
                   >
-                    {giu ? 'Đang giữ' : 'Giữ lại'}
+                    {giu ? dich('Đang giữ') : dich('Giữ lại')}
                   </button>
                 </td>
               </tr>
@@ -181,18 +182,19 @@ export function BangMau() {
       {/* Nói TRƯỚC khi người ta kịp đọc số. Đây là chỗ dễ hiểu nhầm nhất trong
           cả panel: bảng nhìn y như thật. */}
       <p className="mau__nhan">
-        Ví dụ cho dễ hình dung — chưa phải clip của bạn. Bấm <b>Cắt khoảng lặng</b> để
-        panel nghe clip đang khoanh rồi liệt kê đúng chỗ im của nó.
+        {dich('Ví dụ cho dễ hình dung — chưa phải clip của bạn. Bấm')}{' '}
+        <b>{dich('Cắt khoảng lặng')}</b>{' '}
+        {dich('để panel nghe clip đang khoanh rồi liệt kê đúng chỗ im của nó.')}
       </p>
       <div className="mau__bang" aria-hidden="true">
         <table className="tbl">
           <thead>
             <tr>
-              <th>Bắt đầu</th>
-              <th>Kết thúc</th>
-              <th>Dài</th>
-              <th>Dạng sóng</th>
-              <th>Thao tác</th>
+              <th>{dich('Bắt đầu')}</th>
+              <th>{dich('Kết thúc')}</th>
+              <th>{dich('Dài')}</th>
+              <th>{dich('Dạng sóng')}</th>
+              <th>{dich('Thao tác')}</th>
             </tr>
           </thead>
           <tbody>
@@ -205,7 +207,7 @@ export function BangMau() {
                   <Song cao={r.song} giu={false} />
                 </td>
                 <td>
-                  <span className="btn btn--sm">Giữ lại</span>
+                  <span className="btn btn--sm">{dich('Giữ lại')}</span>
                 </td>
               </tr>
             ))}

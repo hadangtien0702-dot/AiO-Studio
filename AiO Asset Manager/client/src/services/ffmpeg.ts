@@ -1,6 +1,39 @@
 import { extensionPath } from '../lib/cep'
 import { getFs, getPath, nodeRequire } from '../lib/node'
 
+/**
+ * ☠️ [13/08/2026] LẤY BIẾN MÔI TRƯỜNG — TUYỆT ĐỐI KHÔNG VIẾT `process.env`.
+ *
+ * Vite THAY chữ `process.env` bằng một object RỖNG ngay lúc build:
+ *
+ *     var Ua = {};                                              // Vite sinh ra
+ *     const n = typeof process < "u" && Ua ? Ua.APPDATA : null; // -> undefined
+ *
+ * Nên mọi đoạn đọc `process.env.APPDATA` đều trả `undefined` TRONG BẢN ĐÃ BUILD,
+ * dù gõ thử trên console vẫn ra đúng (console không đi qua Vite).
+ * Hậu quả thật: nhánh kho FFmpeg dùng chung `%APPDATA%\AiOStudio\bin\win64`
+ * CHƯA BAO GIỜ được chạy tới. Panel vẫn chạy chỉ vì bản cài có `bin/` riêng nên
+ * ứng viên đầu danh sách đã thắng — không phải vì kho chung hoạt động.
+ *
+ * Cách đúng: truy cập LÚC CHẠY, và truy cập ĐỘNG bằng `[...]` để Vite không
+ * nhận diện được chuỗi `process.env` mà thay thế.
+ */
+function bienMT(ten: string): string | null {
+  const w = window as any
+  try {
+    const p = w?.cep_node?.process
+    const e = p && p['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {}
+  try {
+    const req = w?.cep_node?.require || (typeof require === 'function' ? require : null)
+    const pr = req ? req('process') : null
+    const e = pr && pr['env']
+    if (e && e[ten]) return String(e[ten])
+  } catch {}
+  return null
+}
+
 let cachedFFmpegPath: string | null = null
 let cachedFFprobePath: string | null = null
 
@@ -29,10 +62,11 @@ export function getFFmpegPath(): string {
   }
 
   // APPDATA candidate
-  if (typeof process !== 'undefined' && process.env && process.env.APPDATA) {
+  const appData = bienMT('APPDATA')
+  if (appData) {
     candidates.push(
       path.join(
-        process.env.APPDATA,
+        appData,
         'Adobe',
         'CEP',
         'extensions',
@@ -50,7 +84,7 @@ export function getFFmpegPath(): string {
     // extension. ĐẶT CUỐI DANH SÁCH để bản cũ có `bin/` riêng không hồi quy.
     // Cài bằng: `AiO Studio/design-system/cai-bin-chung.ps1`
     candidates.push(
-      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe')
+      path.join(appData, 'AiOStudio', 'bin', 'win64', 'ffmpeg.exe')
     )
   }
 
@@ -89,10 +123,11 @@ export function getFFprobePath(): string {
     candidates.push(path.join(cwd, '..', 'bin', 'win64', 'ffprobe.exe'))
   }
 
-  if (typeof process !== 'undefined' && process.env && process.env.APPDATA) {
+  const appData = bienMT('APPDATA')
+  if (appData) {
     candidates.push(
       path.join(
-        process.env.APPDATA,
+        appData,
         'Adobe',
         'CEP',
         'extensions',
@@ -108,7 +143,7 @@ export function getFFprobePath(): string {
     // Autocut — Autocut không gọi bao giờ nên đã bỏ ffprobe khỏi gói của nó.
     // Kho chung vì vậy PHẢI có đủ cả ffmpeg.exe lẫn ffprobe.exe.
     candidates.push(
-      path.join(process.env.APPDATA, 'AiOStudio', 'bin', 'win64', 'ffprobe.exe')
+      path.join(appData, 'AiOStudio', 'bin', 'win64', 'ffprobe.exe')
     )
   }
 

@@ -47,6 +47,10 @@ export const CHU: BangChu = {
     // ─── Khoi tien trinh (13/08: giau quy trinh, chi con mot chu) ───
     'Đang xử lý': 'Loading',
 
+    // ─── Don vi thoi gian (13/08: do tren panel that thay '7 phut 39 giay' con tieng Viet) ───
+    'phút': 'min',
+    'giây': 'sec',
+
     // ─── App.tsx — nhan va o nhap ───
     'Hình': 'Video',
     'Tiếng': 'Audio',

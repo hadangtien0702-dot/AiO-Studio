@@ -215,7 +215,7 @@ function docBangSua(): ThayTu[] {
 }
 
 export default function App() {
-  const [host, setHost] = useState('(đang kiểm tra…)')
+  const [host, setHost] = useState(dich('(đang kiểm tra…)'))
   const [dangChay, setDangChay] = useState('')
   /**
    * Đồng hồ chạy suốt lúc làm việc.
@@ -390,7 +390,7 @@ export default function App() {
 
   useEffect(() => {
     if (!isInHost()) {
-      setHost('KHÔNG chạy trong Premiere (đang mở bằng trình duyệt)')
+      setHost(dich('KHÔNG chạy trong Premiere (đang mở bằng trình duyệt)'))
       return
     }
     // Nạp lại host TRƯỚC khi hỏi bất cứ điều gì — nếu không, panel mới sẽ nói
@@ -450,7 +450,7 @@ export default function App() {
   }
 
   async function autoCut(chiPhuDe = false) {
-    baoBuoc('Đang đọc vùng đã khoanh…', 0)
+    baoBuoc(dich('Đang đọc vùng đã khoanh…'), 0)
     setLoi('')
     setCanLam('')
     setKet(null)
@@ -459,20 +459,20 @@ export default function App() {
     const batDau = Date.now()
 
     try {
-      if (!nodeAvailable()) throw new Error('Panel không dùng được Node.js — không gọi được bộ xử lý media.')
-      if (!getFFmpegPath()) throw new Error('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất.')
+      if (!nodeAvailable()) throw new Error(dich('Panel không dùng được Node.js — không gọi được bộ xử lý media.'))
+      if (!getFFmpegPath()) throw new Error(dich('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất.'))
 
       // Nạp lại host mỗi lần bấm: rẻ, và chắc chắn panel nói chuyện với đúng bản
       // code vừa cài chứ không phải bản Premiere giữ từ lúc khởi động.
       if (!(await napLaiHost())) {
-        throw new Error('Không nạp được host/index.jsx từ thư mục extension.')
+        throw new Error(dich('Không nạp được host/index.jsx từ thư mục extension.'))
       }
 
       // ── 1. Vùng anh khoanh bằng phím I / O ──
       const { vung, loi: loiVung } = await getRangeClips()
       if (!vung) {
         if (loiVung?.canLam) setCanLam(loiVung.message)
-        else setLoi(loiVung?.message ?? 'Không đọc được vùng đã khoanh')
+        else setLoi(loiVung?.message ?? dich('Không đọc được vùng đã khoanh'))
         return
       }
 
@@ -485,7 +485,7 @@ export default function App() {
       if (doiToc.length) {
         setCanLam(
           `Trong vùng có ${doiToc.length} clip đã đổi tốc độ (${(doiToc[0].speed * 100).toFixed(0)}%). ` +
-            'Autocut chưa quy đổi được thời gian cho clip đổi tốc độ — trả về 100% rồi chạy lại.',
+            dich('Autocut chưa quy đổi được thời gian cho clip đổi tốc độ — trả về 100% rồi chạy lại.'),
         )
         return
       }
@@ -528,7 +528,7 @@ export default function App() {
         // **321 câu bị cắt mất quá nửa lời**. Thà không cắt còn hơn cắt hỏng
         // vào dự án thật của người dùng — cắt nhầm là mất công dựng lại.
         setCanLam(
-          'Chưa cài bộ nghe hiểu nên chưa cắt được. Autocut bắt buộc phải có nó: ' +
+          dich('Chưa cài bộ nghe hiểu nên chưa cắt được. Autocut bắt buộc phải có nó: ') +
             'cắt chỉ dựa vào độ to đã đo thật là mất 321 câu nói.\n' +
             thieuGi(),
         )
@@ -549,7 +549,7 @@ export default function App() {
         daXong++
         const nhan = soFile > 1 ? ` (file ${daXong}/${soFile})` : ''
 
-        baoBuoc('Đang tách tiếng khỏi video' + nhan, 1)
+        baoBuoc(dich('Đang tách tiếng khỏi video') + nhan, 1)
         let t0 = Date.now()
         const { wav, fps, duration } = await trichTieng(c.path, (giayXong) =>
           setDangChay(`Đang tách tiếng khỏi video${nhan}… ${dongHo(giayXong)}`),
@@ -561,7 +561,7 @@ export default function App() {
         const co = doDaiFile(c.path)
         const tocDo = co > 0 && giayTrich > 0 ? co / 1048576 / giayTrich : 0
         buoc.push({
-          ten: 'Tách tiếng khỏi video',
+          ten: dich('Tách tiếng khỏi video'),
           ket:
             (duration > 0 ? `${duration.toFixed(0)}s tiếng` : 'xong') +
             (co > 0 ? ` · đọc ${(co / 1073741824).toFixed(2)} GB` : '') +
@@ -573,17 +573,17 @@ export default function App() {
         //
         // Đo trên BẢN ĐÃ LỌC dải giọng nói (300–3400 Hz): tách giọng khỏi nền
         // rộng thêm 3,6 dB. Whisper thì vẫn nghe bản GỐC — xem `locDaiGiongNoi`.
-        baoBuoc('Đang đo mức âm' + nhan, 2)
+        baoBuoc(dich('Đang đo mức âm') + nhan, 2)
         t0 = Date.now()
         const wavLoc = await locDaiGiongNoi(wav)
         const mucAm = docWav(wavLoc || wav)
         buoc.push({
-          ten: 'Đo mức âm của file',
+          ten: dich('Đo mức âm của file'),
           ket: mucAm
             ? `nền ${mucAm.nenOn.toFixed(1)} dB · giọng ${mucAm.mucGiong.toFixed(1)} dB ` +
               `· cách nhau ${(mucAm.mucGiong - mucAm.nenOn).toFixed(1)} dB` +
-              (wavLoc ? ' · đã lọc dải giọng nói' : '')
-            : 'không đọc được WAV — dùng ngưỡng đặt sẵn',
+              (wavLoc ? dich(' · đã lọc dải giọng nói') : '')
+            : dich('không đọc được WAV — dùng ngưỡng đặt sẵn'),
           giay: (Date.now() - t0) / 1000,
         })
         const nguongDau = mucAm ? mucAm.nguongOtsu : noiseDb
@@ -597,7 +597,7 @@ export default function App() {
         // dừng, đỡ bắt người dùng bấm thêm một cái không để làm gì.
         if (mucAm && !daHoiXemTruoc && !chiPhuDe) {
           daHoiXemTruoc = true
-          setDangChay('Chờ anh chọn mức')
+          setDangChay(dich('Chờ anh chọn mức'))
           setXemTruoc(mucAm)
           await new Promise<void>((r) => {
             tiepTucRef.current = r
@@ -654,7 +654,7 @@ export default function App() {
         ])
         const giayNghe = (Date.now() - t0) / 1000
         buoc.push({
-          ten: doNhanh ? 'Dò khoảng lặng' : 'Đo biên độ',
+          ten: doNhanh ? dich('Dò khoảng lặng') : dich('Đo biên độ'),
           ket: `${doBienDo.silences.length} khoảng im lặng ở ${nguongDau} dB`,
           giay: doNhanh ? giayDo : giayNghe,
         })
@@ -662,10 +662,10 @@ export default function App() {
           // Nghe mới thì ghi lại làm bước đệm cho lần sau (và cho Auto Transcript).
           if (!demCu) luuDem(c.path, maMoHinh, ketNghe)
           buoc.push({
-            ten: demCu ? 'Dùng lại kết quả nghe đã có' : 'Nghe hiểu tiếng Việt (GPU)',
+            ten: demCu ? dich('Dùng lại kết quả nghe đã có') : dich('Nghe hiểu tiếng Việt (GPU)'),
             ket:
               `${ketNghe.cau.length} câu · ${ketNghe.tu.length} từ` +
-              (demCu ? ' · không phải nghe lại' : ''),
+              (demCu ? dich(' · không phải nghe lại') : ''),
             giay: demCu ? 0 : giayNghe,
           })
         }
@@ -695,7 +695,7 @@ export default function App() {
           const phu = vung.reduce((t, v) => t + (v.den - v.tu), 0)
           cachDo = `giao lời nói với năng lượng · biên +${bienD} dB trên nền cục bộ`
           buoc.push({
-            ten: 'Khoanh vùng đang nói',
+            ten: dich('Khoanh vùng đang nói'),
             ket:
               `${vung.length} vùng · phủ ${((phu / dai) * 100).toFixed(1)}% thời lượng · ` +
               `${silences.length} khoảng được phép cắt`,
@@ -706,10 +706,10 @@ export default function App() {
           ngoNgo = vungNgoNgo(vung, ketNghe.tu.map((t) => t.giay))
           if (ngoNgo.length) {
             buoc.push({
-              ten: 'Chỗ máy không chắc',
+              ten: dich('Chỗ máy không chắc'),
               ket:
                 `${ngoNgo.length} chỗ · ${ngoNgo.reduce((t, v) => t + (v.den - v.tu), 0).toFixed(1)}s ` +
-                `— nghe có tiếng nhưng không ra chữ, GIỮ lại và đánh dấu`,
+                dich(`— nghe có tiếng nhưng không ra chữ, GIỮ lại và đánh dấu`),
               giay: 0,
             })
           }
@@ -725,7 +725,7 @@ export default function App() {
           const truoc = silences.length
           silences = silences.filter((s) => !giu.some((g) => s.start < g.den && s.end > g.tu))
           buoc.push({
-            ten: 'Chừa chỗ anh bấm Giữ lại',
+            ten: dich('Chừa chỗ anh bấm Giữ lại'),
             ket: `${giu.length} chỗ · bỏ ${truoc - silences.length} nhát · còn ${silences.length}`,
             giay: 0,
           })
@@ -753,7 +753,7 @@ export default function App() {
         const c0 = vung.clips[0]
         const doDuoc0 = c0 ? daDo.get(c0.path) : undefined
         if (!c0 || !doDuoc0?.cauNoi?.length) {
-          setCanLam('Không nghe ra câu nào trong vùng này. Kiểm lại xem clip có tiếng không.')
+          setCanLam(dich('Không nghe ra câu nào trong vùng này. Kiểm lại xem clip có tiếng không.'))
           return
         }
         // Bảng quy đổi mốc là MỘT đoạn chạy suốt vùng — mốc giữ nguyên như file
@@ -788,7 +788,7 @@ export default function App() {
       }
 
       // ── 4. Tính các đoạn CẦN GIỮ cho từng clip trong vùng ──
-      baoBuoc('Đang tính điểm cắt', 4)
+      baoBuoc(dich('Đang tính điểm cắt'), 4)
       const phan: string[] = []
       let soKhoangLang = 0
       let giayTruoc = 0
@@ -825,16 +825,16 @@ export default function App() {
       }
 
       if (!phan.length) {
-        setCanLam('Không còn đoạn nào để giữ — chọn mức nhẹ tay hơn rồi chạy lại.')
+        setCanLam(dich('Không còn đoạn nào để giữ — chọn mức nhẹ tay hơn rồi chạy lại.'))
         return
       }
       if (soKhoangLang === 0) {
-        setCanLam('Không có khoảng lặng nào đủ dài để cắt trong vùng này. Chưa dựng gì cả.')
+        setCanLam(dich('Không có khoảng lặng nào đủ dài để cắt trong vùng này. Chưa dựng gì cả.'))
         return
       }
 
       buoc.push({
-        ten: 'Tính điểm cắt',
+        ten: dich('Tính điểm cắt'),
         ket:
           `${soKhoangLang} chỗ cắt` +
           (soCuu > 0 ? ` · GIỮ LẠI ${soCuu} chỗ vì có câu nói trong đó` : '') +
@@ -895,7 +895,7 @@ export default function App() {
             : await buildKeep(lo.join(';'), tenSeqMoi, i === 0)
         if (!r.kq) {
           if (r.loi?.canLam) setCanLam(r.loi.message)
-          else setLoi(r.loi?.message ?? 'Dựng thất bại')
+          else setLoi(r.loi?.message ?? dich('Dựng thất bại'))
           return
         }
         kq = r.kq // lô cuối mang số liệu đầy đủ nhất của cả sequence
@@ -910,13 +910,13 @@ export default function App() {
         const r = await dongBoChay()
         if (!r.kq) {
           if (r.loi?.canLam) setCanLam(r.loi.message)
-          else setLoi(r.loi?.message ?? 'Cắt đồng bộ thất bại')
+          else setLoi(r.loi?.message ?? dich('Cắt đồng bộ thất bại'))
           return
         }
         kq = r.kq
       }
       if (!kq) {
-        setLoi('Dựng thất bại — không có lô nào chạy')
+        setLoi(dich('Dựng thất bại — không có lô nào chạy'))
         return
       }
       // Host chỉ biết số của LÔ CUỐI; số "yêu cầu" phải là tổng của cả loạt,
@@ -925,7 +925,7 @@ export default function App() {
       kq = { ...kq, yeuCauDoan: phan.length, yeuCauGiay: giaySau }
 
       buoc.push({
-        ten: 'Dựng sequence mới',
+        ten: dich('Dựng sequence mới'),
         ket: `${kq.hinhClip} đoạn hình + ${kq.tiengClip} đoạn tiếng`,
         giay: (Date.now() - tDung) / 1000,
       })
@@ -1037,7 +1037,9 @@ export default function App() {
   function dai(giay: number): string {
     const g = Math.round(giay)
     const p = Math.floor(g / 60)
-    return p > 0 ? `${p} phút ${g % 60} giây` : `${g} giây`
+    return p > 0
+    ? `${p} ${dich('phút')} ${g % 60} ${dich('giây')}`
+    : `${g} ${dich('giây')}`
   }
 
   /**
@@ -1125,10 +1127,10 @@ export default function App() {
           >
             <path d="M9 4H5v16h4M15 4h4v16h-4" />
           </svg>
-          <span className="lbl">Đoạn đang chọn</span>
-          <span className="val">{vungTin ? dai(vungTin.dai) : 'chưa khoanh'}</span>
+          <span className="lbl">{dich('Đoạn đang chọn')}</span>
+          <span className="val">{vungTin ? dai(vungTin.dai) : dich('chưa khoanh')}</span>
           <span className="spacer" />
-          <span className="lbl">Đổi vùng bằng phím</span>
+          <span className="lbl">{dich('Đổi vùng bằng phím')}</span>
           <kbd className="kbd">I</kbd>
           <kbd className="kbd">O</kbd>
         </div>
@@ -1150,7 +1152,7 @@ export default function App() {
             dùng KHÔNG đọc. Phân tích xong thì thay bằng dải sóng THẬT. */}
         <section className="card card--xem">
           <div className="card-hd">
-            <h2 className="card-t">Xem trước kết quả</h2>
+            <h2 className="card-t">{dich('Xem trước kết quả')}</h2>
             {xemTruoc && (
               <div className="legend">
                 <span>
@@ -1159,7 +1161,7 @@ export default function App() {
                 </span>
                 <span>
                   <i className="sw sw--keep" />
-                  Giữ lại
+                  {dich('Giữ lại')}
                 </span>
               </div>
             )}
@@ -1196,9 +1198,9 @@ export default function App() {
 
         <section className="card card--muc">
           <div className="card-hd">
-            <h2 className="card-t">Mức cắt</h2>
+            <h2 className="card-t">{dich('Mức cắt')}</h2>
           </div>
-          <div className="seg" role="radiogroup" aria-label="Mức cắt">
+          <div className="seg" role="radiogroup" aria-label={dich('Mức cắt')}>
             {MUC.map((m, i) => (
               <button
                 key={m.ten}
@@ -1224,9 +1226,9 @@ export default function App() {
             nào là thấy ngay cái đó làm gì — không còn một hình chung ở dưới. */}
         <section className="card card--fill">
           <div className="card-hd">
-            <h2 className="card-t">Nơi đặt kết quả</h2>
+            <h2 className="card-t">{dich('Nơi đặt kết quả')}</h2>
           </div>
-          <div className="opts" role="radiogroup" aria-label="Nơi đặt kết quả">
+          <div className="opts" role="radiogroup" aria-label={dich('Nơi đặt kết quả')}>
             <button
               type="button"
               role="radio"
@@ -1249,8 +1251,8 @@ export default function App() {
                   <i /><i /><i /><i /><i />
                 </span>
               </span>
-              <span className="nm">Sequence mới</span>
-              <span className="sub">Bản gốc còn nguyên</span>
+              <span className="nm">{dich('Sequence mới')}</span>
+              <span className="sub">{dich('Bản gốc còn nguyên')}</span>
             </button>
 
             <button
@@ -1272,8 +1274,8 @@ export default function App() {
                   <i /><i /><i className="gone" /><i /><i /><i className="gone" /><i />
                 </span>
               </span>
-              <span className="nm">Cắt tại chỗ</span>
-              <span className="sub">Sửa thẳng sequence này</span>
+              <span className="nm">{dich('Cắt tại chỗ')}</span>
+              <span className="sub">{dich('Sửa thẳng sequence này')}</span>
             </button>
           </div>
         </section>
@@ -1294,7 +1296,7 @@ export default function App() {
             lúc đó là máy đang làm đến đâu. Chạy xong hiện lại ngay. */}
         <section className={dangChay && !xemTruoc ? 'card card--res an' : 'card card--res'}>
           <div className="card-hd">
-            <h2 className="card-t">Kết quả</h2>
+            <h2 className="card-t">{dich('Kết quả')}</h2>
           </div>
           {/* ☠️ RÚT CÒN MỘT DÒNG 2026-08-13 — anh Tiến: *"chỗ kết quả này anh cần
               đưa ra một thông báo ngắn gọn: tổng thời cũ - tổng thời gian mới"*.
@@ -1400,7 +1402,7 @@ export default function App() {
               </svg>
               {catThat.length > 0
                 ? `Cắt ${catThat.length} khoảng lặng`
-                : 'Không có đoạn nào để cắt'}
+                : dich('Không có đoạn nào để cắt')}
             </button>
           ) : (
             /* Đang chạy thì nút vẫn ở đó nhưng KHOÁ — để ô tiến trình phía
@@ -1417,7 +1419,7 @@ export default function App() {
                 <circle cx="6" cy="18" r="3" />
                 <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
               </svg>
-              Cắt khoảng lặng
+              {dich('Cắt khoảng lặng')}
             </button>
           )}
 
@@ -1442,7 +1444,7 @@ export default function App() {
                   setLoi('')
                   setCanLam('')
                   try {
-                    if (!(await napLaiHost())) throw new Error('Không nạp được host.')
+                    if (!(await napLaiHost())) throw new Error(dich('Không nạp được host.'))
                     const r = await hoanTacTaiCho(vungGoc)
                     if (r.loi) {
                       setCanLam(r.loi.message)
@@ -1451,7 +1453,7 @@ export default function App() {
                     // Đo LẠI trên timeline chứ không tin "không báo lỗi".
                     setCanLam(
                       `Đã dựng lại: ${r.hinhClip} clip · ${r.hinhGiay.toFixed(2)}s. ` +
-                        'Sequence về như trước khi cắt.',
+                        dich('Sequence về như trước khi cắt.'),
                     )
                     setKet(null)
                     setVungGoc(null)
@@ -1463,9 +1465,9 @@ export default function App() {
                 })()
               }}
             >
-              {dangHoanTac ? 'Đang dựng lại…' : '↩ Hoàn tác cắt'}
+              {dangHoanTac ? dich('Đang dựng lại…') : dich('↩ Hoàn tác cắt')}
             </button>
-            <span>Dựng lại sequence như trước khi cắt</span>
+            <span>{dich('Dựng lại sequence như trước khi cắt')}</span>
           </div>
         )}
         </div>
@@ -1490,10 +1492,10 @@ export default function App() {
           thành true là hiện lại ngay, không phải viết lại từ đầu. */}
       {HIEN_THAM_SO && !xemTruoc && (
       <details className="fold">
-        <summary>Tham số đo</summary>
+        <summary>{dich('Tham số đo')}</summary>
         <div className="params">
           <label>
-            <span>Biên trên nền ồn (dB)</span>
+            <span>{dich('Biên trên nền ồn (dB)')}</span>
             <input
               type="number"
               step="1"
@@ -1502,7 +1504,7 @@ export default function App() {
               onChange={(e) => chinhTay(() => setBien(Number(e.target.value)))}
             />
             <em>
-              To hơn nền ồn <b>quanh chỗ đó</b> bao nhiêu dB thì tính là đang nói. Nền
+              {dich('To hơn nền ồn')} <b>{dich('quanh chỗ đó')}</b> bao nhiêu dB thì tính là đang nói. Nền
               đo theo từng 30 giây, không phải một số cho cả file — video 58 phút của
               anh nền dao động <b>7,9 dB</b> giữa các phút vì nhiều cam. Đo thật, số câu
               bị cắt mất quá nửa lời: +2 dB → <b>0 câu</b> · +3 → 3 · +4 → 9 · +6 → 31.
@@ -1510,7 +1512,7 @@ export default function App() {
             </em>
           </label>
           <label>
-            <span>Khoảng lặng tối thiểu (giây)</span>
+            <span>{dich('Khoảng lặng tối thiểu (giây)')}</span>
             <input
               type="number"
               step="0.05"
@@ -1525,7 +1527,7 @@ export default function App() {
             </em>
           </label>
           <label>
-            <span>Ngưỡng im lặng (dB) — dự phòng</span>
+            <span>{dich('Ngưỡng im lặng (dB) — dự phòng')}</span>
             <input
               type="number"
               step="1"
@@ -1533,12 +1535,14 @@ export default function App() {
               onChange={(e) => chinhTay(() => setNoiseDb(Number(e.target.value)))}
             />
             <em>
-              <b>Chỉ dùng khi TẮT nghe hiểu.</b> Lúc đó không có lời nói để đối chiếu
-              nên tool phải đoán bằng mình độ to — kém chính xác hơn hẳn.
+              <b>{dich('Chỉ dùng khi TẮT nghe hiểu.')}</b>{' '}
+              {dich(
+                'Lúc đó không có lời nói để đối chiếu nên tool phải đoán bằng mình độ to — kém chính xác hơn hẳn.',
+              )}
             </em>
           </label>
           <label>
-            <span>Đệm giữ lại hai đầu (giây)</span>
+            <span>{dich('Đệm giữ lại hai đầu (giây)')}</span>
             <input
               type="number"
               step="0.01"
@@ -1547,8 +1551,9 @@ export default function App() {
               onChange={(e) => chinhTay(() => setPad(Number(e.target.value)))}
             />
             <em>
-              Chừa <b>{pad.toFixed(2)}s</b> ở hai đầu mỗi khoảng lặng, nên mỗi mối nối còn
-              lại <b>{(pad * 2).toFixed(2)}s</b> im lặng. Sát quá thì cụt hơi.
+              {dich('Chừa')} <b>{pad.toFixed(2)}s</b>{' '}
+              {dich('ở hai đầu mỗi khoảng lặng, nên mỗi mối nối còn lại')}{' '}
+              <b>{(pad * 2).toFixed(2)}s</b> {dich('im lặng. Sát quá thì cụt hơi.')}
             </em>
           </label>
         </div>
@@ -1680,12 +1685,12 @@ async function ganPhuDeVao(
 ): Promise<NonNullable<Ket['phuDe']>> {
   const fs = getFs()
   const path = getPath()
-  if (!fs || !path) throw new Error('Panel không dùng được Node.js')
+  if (!fs || !path) throw new Error(dich('Panel không dùng được Node.js'))
 
   const batDau = Date.now()
-  bao('Đang quy đổi mốc thời gian…')
+  bao(dich('Đang quy đổi mốc thời gian…'))
   const { noiDung, soCau, soBo } = sinhSrt(cau as Cau[], keeps, bangSua)
-  if (!soCau) throw new Error('Không câu nào rơi vào phần đã giữ lại.')
+  if (!soCau) throw new Error(dich('Không câu nào rơi vào phần đã giữ lại.'))
 
   // Ghi cạnh video gốc — chỗ chắc chắn ExtendScript đọc được.
   //
@@ -1702,7 +1707,7 @@ async function ganPhuDeVao(
   const srtPath = path.join(thuMuc, `${ten}-autocut-${dau}.srt`)
   fs.writeFileSync(srtPath, noiDung, 'utf8')
 
-  bao('Đang gắn phụ đề lên timeline…')
+  bao(dich('Đang gắn phụ đề lên timeline…'))
   const { ok } = await ganPhuDe(srtPath)
 
   return {
@@ -1731,31 +1736,31 @@ function KetQuaPhuDe({ ket }: { ket: KetPhuDe }) {
       <div className="ketqua__so">
         <div>
           <b>{ket.soCau.toLocaleString('vi-VN')}</b>
-          <span>câu đã chép</span>
+          <span>{dich('câu đã chép')}</span>
         </div>
         <div>
           <b>{mmss(ket.giayTong)}</b>
-          <span>chạy mất</span>
+          <span>{dich('chạy mất')}</span>
         </div>
         <div>
           <b className={ket.soat?.soCho ? 'canh' : undefined}>{ket.soat?.soCho ?? 0}</b>
-          <span>chỗ cần soát</span>
+          <span>{dich('chỗ cần soát')}</span>
         </div>
       </div>
 
       <p className="ketqua__dong">
         {ket.ganDuoc ? (
-          <>Phụ đề đã gắn lên sequence đang mở.</>
+          <>{dich('Phụ đề đã gắn lên sequence đang mở.')}</>
         ) : (
-          <>Đã tạo file phụ đề nhưng chưa gắn được lên timeline — mở tay từ đường dẫn dưới.</>
+          <>{dich('Đã tạo file phụ đề nhưng chưa gắn được lên timeline — mở tay từ đường dẫn dưới.')}</>
         )}
       </p>
       <p className="ketqua__duong">{ket.duongDan}</p>
 
       {!!ket.soat?.soCho && (
         <p className="ketqua__dong">
-          <b>{ket.soat.soCho} marker</b> trên timeline — bấm <kbd>M</kbd> để đi tới từng chỗ
-          máy nghe không chắc.
+          <b>{ket.soat.soCho} marker</b> {dich('trên timeline — bấm')} <kbd>M</kbd>{' '}
+          {dich('để đi tới từng chỗ máy nghe không chắc.')}
         </p>
       )}
 
@@ -1785,15 +1790,15 @@ function KetQua({ ket }: { ket: Ket }) {
     <div className="ket">
       <div className="oso">
         <div className="o">
-          <span className="o__nhan">Nhát cắt</span>
+          <span className="o__nhan">{dich('Nhát cắt')}</span>
           <b className="o__so">{ket.soKhoangLang}</b>
         </div>
         <div className="o">
-          <span className="o__nhan">Rút ngắn</span>
+          <span className="o__nhan">{dich('Rút ngắn')}</span>
           <b className="o__so">{mmss(ket.giayBo)}</b>
         </div>
         <div className="o">
-          <span className="o__nhan">Chạy mất</span>
+          <span className="o__nhan">{dich('Chạy mất')}</span>
           <b className="o__so">{ket.giayChay.toFixed(1)}s</b>
         </div>
       </div>
@@ -1801,7 +1806,7 @@ function KetQua({ ket }: { ket: Ket }) {
       <p className={dat ? 'ketluan' : 'ketluan ketluan--nghi'}>
         {dat
           ? `Xong. Sequence mới: “${kq.seqMoi}” — ${mmss(ket.giayTruoc)} → ${mmss(ket.giaySau)}.`
-          : 'Dựng xong nhưng số đo không khớp — xem phần đối chiếu bên dưới.'}
+          : dich('Dựng xong nhưng số đo không khớp — xem phần đối chiếu bên dưới.')}
       </p>
 
       {/* CHỖ CẦN SOÁT ở NGOÀI — đây là thứ người dựng phải làm tiếp, không
@@ -1809,8 +1814,11 @@ function KetQua({ ket }: { ket: Ket }) {
           sách chỗ cần soát. */}
       {ket.soat && ket.soat.soCho > 0 && (
         <p className="soat">
-          <b>{ket.soat.soCho} chỗ cần nghe lại</b> — bấm <kbd>M</kbd> trên timeline để đi
-          tới từng chỗ. Máy đã <b>GIỮ</b> nguyên, không tự cắt.
+          <b>
+            {ket.soat.soCho} {dich('chỗ cần nghe lại')}
+          </b>{' '}
+          — bấm <kbd>M</kbd> {dich('trên timeline để đi tới từng chỗ. Máy đã')} <b>GIỮ</b>{' '}
+          {dich('nguyên, không tự cắt.')}
         </p>
       )}
 
@@ -1823,26 +1831,28 @@ function KetQua({ ket }: { ket: Ket }) {
           Mở SẴN khi số đo không khớp — lúc đó nó không còn là chi tiết thừa
           mà là bằng chứng có gì đó sai. */}
       <details className="fold" open={!dat}>
-        <summary>Chi tiết kỹ thuật</summary>
+        <summary>{dich('Chi tiết kỹ thuật')}</summary>
       <dl className="doi">
         <div>
-          <dt>Cách phân tích</dt>
+          <dt>{dich('Cách phân tích')}</dt>
           <dd>
-            {ket.cachDo ?? 'đo biên độ trên file gốc'}
+            {ket.cachDo ?? dich('đo biên độ trên file gốc')}
             {/* Bỏ chữ "phụ đề" ở đây 29/07: Auto Cut không tạo phụ đề nữa.
                 Nói còn tạo là nói sai việc máy vừa làm. */}
-            {ket.dungAI && ' · đánh dấu chỗ cần nghe lại'}
+            {ket.dungAI && dich(' · đánh dấu chỗ cần nghe lại')}
             {ket.soCuu > 0 && (
               <>
                 {' · '}
-                <b>giữ lại {ket.soCuu} chỗ vì có câu nói trong đó</b>
+                <b>
+                  {dich('giữ lại')} {ket.soCuu} {dich('chỗ vì có câu nói trong đó')}
+                </b>
               </>
             )}
             {ket.soBoVe > 0 && ` · bỏ qua ${ket.soBoVe} nhịp ngắt quá ngắn`}
           </dd>
         </div>
         <div>
-          <dt>Hình</dt>
+          <dt>{dich('Hình')}</dt>
           <dd>
             {kq.hinhClip} đoạn · {kq.hinhGiay.toFixed(2)}s
             {coLoTrong
@@ -1851,28 +1861,28 @@ function KetQua({ ket }: { ket: Ket }) {
           </dd>
         </div>
         <div>
-          <dt>Tiếng</dt>
+          <dt>{dich('Tiếng')}</dt>
           <dd>
             {kq.tiengClip === 0
-              ? 'KHÔNG có tiếng trên A1'
+              ? dich('KHÔNG có tiếng trên A1')
               : `${kq.tiengClip} đoạn · ${kq.tiengGiay.toFixed(2)}s · ${
                   tiengKhop ? 'khớp với hình' : 'LỆCH so với hình'
                 }${kq.tiengTuTheo ? '' : ' (phải đặt riêng)'}`}
           </dd>
         </div>
         <div>
-          <dt>Yêu cầu</dt>
+          <dt>{dich('Yêu cầu')}</dt>
           <dd>
             {kq.yeuCauDoan} đoạn · {kq.yeuCauGiay.toFixed(2)}s
           </dd>
         </div>
         <div>
-          <dt>Thông số sequence</dt>
-          <dd>{kq.thongSo === 'chep-tu-goc' ? 'chép từ sequence gốc' : kq.thongSo}</dd>
+          <dt>{dich('Thông số sequence')}</dt>
+          <dd>{kq.thongSo === 'chep-tu-goc' ? dich('chép từ sequence gốc') : kq.thongSo}</dd>
         </div>
         {kq.soLoi > 0 && (
           <div>
-            <dt>Lỗi khi đặt</dt>
+            <dt>{dich('Lỗi khi đặt')}</dt>
             <dd>
               {kq.soLoi} đoạn — {kq.loiDau}
             </dd>
