@@ -23,6 +23,8 @@
  * thật về ngôn ngữ. Đã nói với anh Tiến 30/07 và anh chốt vẫn làm dạng cờ.
  */
 
+import { dich } from './ngonngu'
+
 /** Cờ vẽ trong viewBox 24×16 (tỉ lệ 3:2). Đơn giản hoá cho cỡ ~20px. */
 type VeCo = () => JSX.Element
 
@@ -167,7 +169,16 @@ export default function DaiCo() {
           const c = CO[ma]
           if (!c) return null
           return (
-            <span className="daico__mot" key={`${ma}-${i}`} title={`Tiếng ${c.ten}`}>
+            // ☠️ `title` cũ là `` `Tiếng ${c.ten}` `` — có `${}` bên trong nên
+            // KHÔNG khớp khoá nào trong `chu.ts`. Ghép tay từ hai khoá có sẵn:
+            // `'tiếng '` (bản EN là chuỗi rỗng) + tên ngôn ngữ. Tiếng Việt ra
+            // "tiếng Việt", tiếng Anh ra "Vietnamese" — đúng cách mỗi thứ tiếng
+            // tự gọi tên mình.
+            <span
+              className="daico__mot"
+              key={`${ma}-${i}`}
+              title={dich('tiếng ') + dich(c.ten)}
+            >
               <svg
                 className="daico__co"
                 viewBox="0 0 24 16"
@@ -177,7 +188,8 @@ export default function DaiCo() {
               >
                 {c.ve()}
               </svg>
-              <span className="daico__ten">{c.ten}</span>
+              {/* Bọc ở chỗ VẼ RA — hằng `CO` nằm ngoài component. */}
+              <span className="daico__ten">{dich(c.ten)}</span>
             </span>
           )
         })}

@@ -2,6 +2,7 @@ import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, use
 import { useLibrary } from '../state/store'
 import { filesFromDropEvent } from '../services/timelineImport'
 import { setQueuePriorityIds } from '../services/jobQueue'
+import { dich } from '../ngonngu'
 import AssetCard from './AssetCard'
 import {
   IconFile,
@@ -40,6 +41,11 @@ const OVERSCAN = 4
  */
 const PAGE = 1000
 
+/**
+ * ☠️ HẰNG TẦNG MODULE — KHÔNG bọc `dich()` trong mảng này. Nó chạy lúc IMPORT,
+ * trước khi React gắn bảng chữ, nên sẽ khoá cứng tiếng Việt và đổi ngôn ngữ
+ * không bao giờ ăn. Bọc ở CHỖ VẼ RA (xem `SIZES.map` bên dưới).
+ */
 const SIZES: {
   key: 'M' | 'L'
   title: string
@@ -83,17 +89,17 @@ function BottomDock() {
     activeMasterTab === 'powerbin' && !!activeAsset?.powerBinFolderId
 
   return (
-    <div className="view-switch" role="group" aria-label="Thanh thao tác lưới">
+    <div className="view-switch" role="group" aria-label={dich('Thanh thao tác lưới')}>
       <button
         className="view-switch__insert"
         disabled={!activeAsset}
         title={
           activeAsset
             ? `Chèn "${activeAsset.name}" vào timeline tại playhead`
-            : 'Bấm (hoặc rê chuột) vào một asset trước, rồi bấm đây để chèn'
+            : dich('Bấm (hoặc rê chuột) vào một asset trước, rồi bấm đây để chèn')
         }
         aria-label={
-          activeAsset ? `Chèn ${activeAsset.name} vào timeline` : 'Chèn vào timeline'
+          activeAsset ? `Chèn ${activeAsset.name} vào timeline` : dich('Chèn vào timeline')
         }
         onClick={() => activeAsset && void sendToTimeline(activeAsset)}
       >
@@ -116,7 +122,7 @@ function BottomDock() {
           onClick={() => removeFromPowerBin(activeAsset!.id)}
         >
           <IconClose size={12} />
-          <span>Bỏ khỏi khay</span>
+          <span>{dich('Bỏ khỏi khay')}</span>
         </button>
       )}
 
@@ -126,8 +132,8 @@ function BottomDock() {
         <button
           key={key}
           className={`view-switch__btn ${cardSize === key ? 'view-switch__btn--active' : ''}`}
-          title={title}
-          aria-label={title}
+          title={dich(title)}
+          aria-label={dich(title)}
           aria-pressed={cardSize === key}
           onClick={() => setCardSize(key)}
         >
@@ -154,16 +160,16 @@ function AudioPreviewBar() {
   const volumePercent = Math.round((muted ? 0 : volume) * 100)
 
   return (
-    <div className="audio-bar" role="group" aria-label="Điều khiển nghe thử âm thanh">
+    <div className="audio-bar" role="group" aria-label={dich('Điều khiển nghe thử âm thanh')}>
       <div className="audio-ctrl">
         <button
           className="icon-btn"
           title={
             muted || volume === 0
-              ? 'Đang tắt tiếng — bấm để bật'
+              ? dich('Đang tắt tiếng — bấm để bật')
               : `Âm lượng ${volumePercent}% — bấm để tắt tiếng`
           }
-          aria-label={muted ? 'Bật tiếng' : 'Tắt tiếng'}
+          aria-label={muted ? dich('Bật tiếng') : dich('Tắt tiếng')}
           aria-pressed={muted}
           onClick={toggleMuted}
         >
@@ -177,7 +183,7 @@ function AudioPreviewBar() {
           max="1"
           step="0.05"
           value={muted ? 0 : volume}
-          aria-label="Âm lượng nghe thử"
+          aria-label={dich('Âm lượng nghe thử')}
           onChange={(e) => setVolume(parseFloat(e.target.value))}
         />
 
@@ -187,8 +193,8 @@ function AudioPreviewBar() {
       <div className="audio-ctrl">
         <button
           className="icon-btn"
-          title="Cao độ khi nghe thử — bấm để về nguyên bản (0)"
-          aria-label="Đưa cao độ về nguyên bản"
+          title={dich('Cao độ khi nghe thử — bấm để về nguyên bản (0)')}
+          aria-label={dich('Đưa cao độ về nguyên bản')}
           onClick={() => setPitch(0)}
         >
           <IconPitch />
@@ -201,7 +207,7 @@ function AudioPreviewBar() {
           max="12"
           step="1"
           value={pitch}
-          aria-label="Cao độ nghe thử, tính bằng nửa cung"
+          aria-label={dich('Cao độ nghe thử, tính bằng nửa cung')}
           title={`Cao độ ${pitch > 0 ? '+' : ''}${pitch} nửa cung — đổi cao độ thì tốc độ nghe thử đổi theo`}
           onChange={(e) => setPitch(parseInt(e.target.value, 10))}
         />
@@ -453,7 +459,7 @@ export default function Grid() {
   } else if (scanning && assets.length === 0) {
     overlay = (
       <div className="state">
-        Đang quét… <b>{scanCount}</b> file
+        {dich('Đang quét…')} <b>{scanCount}</b> {dich('file')}
       </div>
     )
   } else if (assets.length === 0) {
@@ -462,10 +468,10 @@ export default function Grid() {
         <div className="state__icon">
           <IconFile size={34} />
         </div>
-        <p className="state__title">Chưa có asset nào</p>
+        <p className="state__title">{dich('Chưa có asset nào')}</p>
         <p className="state__hint">
-          Bấm <b>Thêm thư mục</b> ở thanh trên để quét asset trên máy (video,
-          Mogrt, âm thanh, ảnh).
+          {dich('Bấm')} <b>{dich('Thêm thư mục')}</b>{' '}
+          {dich('ở thanh trên để quét asset trên máy (video, Mogrt, âm thanh, ảnh).')}
         </p>
       </div>
     )
@@ -477,19 +483,22 @@ export default function Grid() {
       overlay = brands.length === 0 ? (
         <div className="state state--empty">
           <div className="state__icon"><IconZap size={34} /></div>
-          <p className="state__title">Chưa có brand nào</p>
+          <p className="state__title">{dich('Chưa có brand nào')}</p>
           <p className="state__hint">
-            Brand là bộ nhận diện dùng lại ở mọi dự án: logo, intro, nhạc nền…
-            Tạo brand đầu tiên bằng nút <b>Tạo brand</b> ở menu bên trái.
+            {dich(
+              'Brand là bộ nhận diện dùng lại ở mọi dự án: logo, intro, nhạc nền… Tạo brand đầu tiên bằng nút',
+            )}{' '}
+            <b>{dich('Tạo brand')}</b> {dich('ở menu bên trái.')}
           </p>
         </div>
       ) : (
         <div className="state state--empty">
           <div className="state__icon"><IconZap size={34} /></div>
-          <p className="state__title">Khay này chưa có gì</p>
+          <p className="state__title">{dich('Khay này chưa có gì')}</p>
           <p className="state__hint">
-            Chọn một khay ở menu bên trái, hoặc gán asset vào khay để dùng chung
-            cho mọi dự án.
+            {dich(
+              'Chọn một khay ở menu bên trái, hoặc gán asset vào khay để dùng chung cho mọi dự án.',
+            )}
           </p>
         </div>
       )
@@ -499,8 +508,8 @@ export default function Grid() {
           <div className="state__icon">
             <IconSearch size={34} />
           </div>
-          <p className="state__title">Không tìm thấy asset nào</p>
-          <p className="state__hint">Thử đổi từ khoá hoặc chọn loại asset khác.</p>
+          <p className="state__title">{dich('Không tìm thấy asset nào')}</p>
+          <p className="state__hint">{dich('Thử đổi từ khoá hoặc chọn loại asset khác.')}</p>
         </div>
       )
     }
@@ -520,19 +529,19 @@ export default function Grid() {
     setDragOver(false)
 
     if (!selectedPowerBinFolderId) {
-      showToast('Chọn một khay ở menu bên trái trước đã.')
+      showToast(dich('Chọn một khay ở menu bên trái trước đã.'))
       return
     }
 
     const paths = filesFromDropEvent(e.nativeEvent as DragEvent)
     if (paths.length === 0) {
-      showToast('Không đọc được đường dẫn file. Kéo thả chỉ chạy khi mở trong Premiere.')
+      showToast(dich('Không đọc được đường dẫn file. Kéo thả chỉ chạy khi mở trong Premiere.'))
       return
     }
 
     const added = addPathsToPowerBin(selectedPowerBinFolderId, paths)
     if (added > 0) showToast(`Đã thêm ${added} file vào khay`)
-    else showToast('Các file này đã có trong khay rồi')
+    else showToast(dich('Các file này đã có trong khay rồi'))
   }
 
   return (
@@ -552,13 +561,16 @@ export default function Grid() {
             nhắc thêm ở đây là lặp lại. */}
         {activeMasterTab === 'powerbin' && canDrop && (
           <div className="dropzone-hint">
-            Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm
-            “Thêm từ timeline”.
+            {dich(
+              'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
+            )}
           </div>
         )}
 
         {scanning && assets.length > 0 && (
-          <div className="scan-banner">Đang quét thêm… {scanCount} file</div>
+          <div className="scan-banner">
+            {dich('Đang quét thêm…')} {scanCount} {dich('file')}
+          </div>
         )}
 
         {overlay ?? (
@@ -592,8 +604,8 @@ export default function Grid() {
             */}
           {limit < visible.length && (
             <div className="grid-more">
-              Đang xem {shown.length.toLocaleString()} trong{' '}
-              {visible.length.toLocaleString()} — cuộn tiếp để xem thêm
+              {dich('Đang xem')} {shown.length.toLocaleString()} {dich('trong')}{' '}
+              {visible.length.toLocaleString()} {dich('— cuộn tiếp để xem thêm')}
             </div>
           )}
           </>

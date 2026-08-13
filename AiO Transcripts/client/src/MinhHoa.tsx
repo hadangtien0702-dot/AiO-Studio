@@ -30,6 +30,8 @@
  * kéo mắt người dựng trong lúc họ đang làm việc. Muốn xem lại thì bấm vào hình.
  */
 
+import { dich } from './ngonngu'
+
 /** Bề ngang viewBox. Thanh giãn ngang theo panel — xem `preserveAspectRatio`. */
 const W = 320
 
@@ -142,8 +144,8 @@ export function MinhHoaMoHinh({ ma }: { ma: string }) {
       role="img"
       aria-label={
         ma === 'turbo'
-          ? 'Chia thành nhiều khối phụ đề ngắn'
-          : 'Chia thành ít khối phụ đề, mỗi khối dài hơn'
+          ? dich('Chia thành nhiều khối phụ đề ngắn')
+          : dich('Chia thành ít khối phụ đề, mỗi khối dài hơn')
       }
     >
       {khoi.map(([tu, dai], i) => (
@@ -203,7 +205,9 @@ export default function MinhHoa({ lan }: { lan: number }) {
          310px khi panel kéo rộng 1600px (đã đo ở panel Autocut 29/07). */
       preserveAspectRatio="none"
       role="img"
-      aria-label="Máy nghe hết đoạn, chép lời thành phụ đề gắn lên timeline, và cắm cờ ở chỗ nghe không chắc"
+      aria-label={dich(
+        'Máy nghe hết đoạn, chép lời thành phụ đề gắn lên timeline, và cắm cờ ở chỗ nghe không chắc',
+      )}
     >
       <defs>
         {/* Vệt quét mờ dần hai bên — mép cứng nhìn như một thanh chắn đang

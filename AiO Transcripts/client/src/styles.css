@@ -747,3 +747,62 @@ body {
   background: var(--bg-4);
   color: var(--text-1);
 }
+
+/* ── Đổi ngôn ngữ — MỘT NÚT (13/08/2026) ────────────────────────────────
+   Chép khuôn từ `AiO Autocut/client/src/giao-dien.css` (khối cùng tên), đổi
+   tên biến sang token CỦA PANEL NÀY — Autocut dùng `--chu` / `--nhan` (tên
+   riêng trong bản thiết kế anh Tiến tự dựng), panel này dùng `--text-1` /
+   `--accent`. Chép nguyên tên biến của Autocut sang đây là rơi hết về màu
+   dự phòng gõ cứng, tức là bốn panel lại lệch nhau lần nữa.
+
+   Anh Tiến: *"nút này anh muốn để là 1 button thôi, bấm vào là đổi cho gọn
+   chứ không phải là 2 phần như thế này"*.
+
+   Nhãn là ngôn ngữ ĐANG DÙNG (`EN` khi đang tiếng Anh) — cùng mô hình nút
+   "Render preview" bên Asset Manager: một nút vừa bấm được vừa làm đèn báo.
+   Lý do đầy đủ nằm ở `ngonngu.tsx`, đừng chép lại ở đây.
+
+   ☠️ MỘT CHỮ `EN` ĐỨNG TRẦN KHÔNG NHÌN RA LÀ NÚT — nó nằm ngay cạnh nhãn
+   `v2.4.0`, mắt đọc thành hai cái nhãn. Nên nút đơn BẮT BUỘC có viền + nền. */
+.aio-ngonngu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--h-ctrl-sm);
+  min-width: 34px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.aio-ngonngu:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-5);
+  color: var(--accent);
+}
+.aio-ngonngu:active {
+  background: var(--bg-active);
+}
+/* KHÔNG viết lại `:focus-visible` ở đây — quy tắc chung đầu file này
+   (`outline: 2px solid var(--accent)`) đã lo, thêm nữa là hai luật chọi nhau. */
+
+/* Gom nút + dòng host về cùng mép phải, giống thanh đầu của Autocut
+   (`[icon][tên][ver] ——— [EN][host]`). `.topbar__host` vốn tự đẩy mình sang
+   phải bằng `margin-left: auto`; nếu để nguyên thì nút đứng lại bên trái cạnh
+   số phiên bản và hở một khoảng trống giữa hai thứ vốn nên đi cùng nhau.
+   Nên chuyển cái đẩy đó sang nút. */
+.topbar .aio-ngonngu {
+  margin-left: auto;
+}
+.topbar .aio-ngonngu + .topbar__host {
+  margin-left: 0;
+}

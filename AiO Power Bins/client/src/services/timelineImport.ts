@@ -15,6 +15,7 @@
  * bằng HTML5 drop (xem `filesFromDropEvent`).
  */
 import { evalScript, isInHost } from '../lib/cep'
+import { dich } from '../ngonngu'
 
 /** Kết quả lấy đường dẫn từ host. */
 export interface TimelinePathsResult {
@@ -33,14 +34,14 @@ export async function getSelectedTimelineClipPaths(): Promise<TimelinePathsResul
     return {
       ok: false,
       paths: [],
-      message: 'Chức năng này chỉ chạy khi panel mở trong Premiere.',
+      message: dich('Chức năng này chỉ chạy khi panel mở trong Premiere.'),
     }
   }
 
   const raw = await evalScript('ppro_getSelectedClipPaths()')
 
   if (!raw) {
-    return { ok: false, paths: [], message: 'Không có phản hồi từ Premiere.' }
+    return { ok: false, paths: [], message: dich('Không có phản hồi từ Premiere.') }
   }
   if (raw.indexOf('ERR:') === 0) {
     return { ok: false, paths: [], message: raw.slice(4) }
@@ -56,7 +57,7 @@ export async function getSelectedTimelineClipPaths(): Promise<TimelinePathsResul
     return {
       ok: false,
       paths: [],
-      message: 'Chưa chọn clip nào trên timeline (hoặc clip không có file gốc).',
+      message: dich('Chưa chọn clip nào trên timeline (hoặc clip không có file gốc).'),
     }
   }
 

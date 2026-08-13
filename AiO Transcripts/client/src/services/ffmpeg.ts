@@ -6,6 +6,7 @@
  * bằng cách đóng gói kèm — Autocut chép lại y cách đó.
  */
 
+import { dich } from '../ngonngu'
 import { extensionPath } from '../lib/cep'
 import { getFs, getPath, nodeRequire } from '../lib/node'
 import { parseSilenceLog, parseDuration, parseVideoFps, type Silence } from './silencelog'
@@ -179,12 +180,12 @@ export function execFileAsync(
   return new Promise((resolve, reject) => {
     const req = nodeRequire()
     if (!req) {
-      reject(new Error('Không dùng được Node.js trong panel'))
+      reject(new Error(dich('Không dùng được Node.js trong panel')))
       return
     }
     const cp = req('child_process')
     if (!cp || !cp.execFile) {
-      reject(new Error('Không dùng được child_process.execFile'))
+      reject(new Error(dich('Không dùng được child_process.execFile')))
       return
     }
 
@@ -247,7 +248,7 @@ export async function detectSilence(
   opt: DetectOptions,
 ): Promise<{ silences: Silence[]; duration: number; fps: number }> {
   const exe = getFFmpegPath()
-  if (!exe) throw new Error('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất')
+  if (!exe) throw new Error(dich('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất'))
 
   const { stderr } = await execFileAsync(
     exe,
@@ -269,7 +270,9 @@ export async function detectSilence(
   )
 
   if (/Output file .*does not contain any stream|Invalid data found|No such file/i.test(stderr)) {
-    throw new Error('Không đọc được file này:\n' + stderr.split(/\r?\n/).slice(-6).join('\n'))
+    throw new Error(
+      dich('Không đọc được file này:\n') + stderr.split(/\r?\n/).slice(-6).join('\n'),
+    )
   }
 
   const duration = parseDuration(stderr)

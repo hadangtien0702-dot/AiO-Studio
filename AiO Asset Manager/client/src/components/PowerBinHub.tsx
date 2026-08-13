@@ -10,6 +10,7 @@
  */
 import { useMemo, useState } from 'react'
 import { useLibrary } from '../state/store'
+import { dich } from '../ngonngu'
 import { IconZap, IconClose, IconFolder, IconPlus } from './Icons'
 
 export default function PowerBinHub() {
@@ -111,7 +112,7 @@ export default function PowerBinHub() {
       <div className="hub__header">
         <span
           className="hub__title"
-          title="Mỗi brand là một bộ tài nguyên nhận diện dùng lại ở mọi dự án Premiere"
+          title={dich('Mỗi brand là một bộ tài nguyên nhận diện dùng lại ở mọi dự án Premiere')}
         >
           <IconZap size={11} /> Brand Kit
         </span>
@@ -120,11 +121,11 @@ export default function PowerBinHub() {
       {!creatingBrand && (
         <button
           className="hub__add-main"
-          title="Tạo brand mới (bộ nhận diện dùng lại ở mọi dự án)"
+          title={dich('Tạo brand mới (bộ nhận diện dùng lại ở mọi dự án)')}
           onClick={() => setCreatingBrand(true)}
         >
           <IconPlus size={13} />
-          <span>Tạo brand</span>
+          <span>{dich('Tạo brand')}</span>
         </button>
       )}
 
@@ -139,14 +140,14 @@ export default function PowerBinHub() {
           <input
             type="text"
             className="hub__input"
-            placeholder="Tên brand (vd: Kênh A)…"
-            aria-label="Tên brand mới"
+            placeholder={dich('Tên brand (vd: Kênh A)…')}
+            aria-label={dich('Tên brand mới')}
             value={newBrandName}
             onChange={(e) => setNewBrandName(e.target.value)}
             autoFocus
           />
           <button type="submit" className="hub__submit">
-            Lưu
+            {dich('Lưu')}
           </button>
         </form>
       )}
@@ -210,14 +211,14 @@ export default function PowerBinHub() {
                         <input
                           type="text"
                           className="hub__input"
-                          placeholder="Tên khay (vd: Logo)…"
-                          aria-label="Tên khay mới"
+                          placeholder={dich('Tên khay (vd: Logo)…')}
+                          aria-label={dich('Tên khay mới')}
                           value={newBinName}
                           onChange={(e) => setNewBinName(e.target.value)}
                           autoFocus
                         />
                         <button type="submit" className="hub__submit">
-                          Lưu
+                          {dich('Lưu')}
                         </button>
                       </form>
                     ) : (
@@ -227,7 +228,7 @@ export default function PowerBinHub() {
                         onClick={() => setCreatingBin(true)}
                       >
                         <IconPlus size={11} />
-                        <span>Thêm khay</span>
+                        <span>{dich('Thêm khay')}</span>
                       </button>
                     )}
                   </>
@@ -242,7 +243,7 @@ export default function PowerBinHub() {
       {loneBins.length > 0 && (
         <>
           <div className="hub__header">
-            <span className="hub__title">Khay chung</span>
+            <span className="hub__title">{dich('Khay chung')}</span>
           </div>
           <div className="hub__list">
             {loneBins.map((f) => (

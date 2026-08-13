@@ -14,6 +14,7 @@
  * Bước nào lỗi thì dừng và trả về số liệu thật, không báo "xong" khống.
  */
 import { getFs, getPath } from '../lib/node'
+import { dich } from '../ngonngu'
 import type { Asset } from '../types'
 import { getCacheRoot, setCacheRoot } from './cachePaths'
 
@@ -64,17 +65,17 @@ export function moveCacheTo(
     assets,
   })
 
-  if (!fs || !path) return fail('Không truy cập được hệ thống file.')
-  if (!newRoot) return fail('Chưa chọn thư mục.')
-  if (!oldRoot) return fail('Không xác định được chỗ lưu hiện tại.')
+  if (!fs || !path) return fail(dich('Không truy cập được hệ thống file.'))
+  if (!newRoot) return fail(dich('Chưa chọn thư mục.'))
+  if (!oldRoot) return fail(dich('Không xác định được chỗ lưu hiện tại.'))
 
   const sameRoot = newRoot.replace(/[\\/]+$/, '').toLowerCase() ===
     oldRoot.replace(/[\\/]+$/, '').toLowerCase()
-  if (sameRoot) return fail('Đang lưu ở đúng thư mục này rồi.')
+  if (sameRoot) return fail(dich('Đang lưu ở đúng thư mục này rồi.'))
 
   // Không cho chọn thư mục NẰM TRONG cache cũ (sẽ tự chuyển vào chính mình).
   if (newRoot.toLowerCase().startsWith(oldRoot.toLowerCase() + path.sep)) {
-    return fail('Không chọn được thư mục nằm bên trong chỗ lưu hiện tại.')
+    return fail(dich('Không chọn được thư mục nằm bên trong chỗ lưu hiện tại.'))
   }
 
   let moved = 0
@@ -97,7 +98,7 @@ export function moveCacheTo(
         else failed++
       }
     } catch {
-      return fail('Không ghi được vào thư mục mới. Kiểm tra lại quyền ghi của ổ đĩa.')
+      return fail(dich('Không ghi được vào thư mục mới. Kiểm tra lại quyền ghi của ổ đĩa.'))
     }
   }
 

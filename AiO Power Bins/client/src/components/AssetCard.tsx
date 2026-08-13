@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { dich } from '../ngonngu'
 import type { Asset } from '../types'
 import { mediaUrl } from '../services/mediaServer'
 import { getMogrtThumb } from '../services/mogrtThumb'
@@ -84,6 +85,11 @@ export function preloadAndDecodeImage(url: string): void {
   }
 }
 
+/**
+ * ☠️ ĐỪNG bọc `dich()` vào chính bảng này. Hằng tầng module chạy lúc IMPORT,
+ * trước khi React gắn bảng chữ -> tiếng Việt đóng cứng vĩnh viễn. Bọc ở CHỖ
+ * VẼ RA: `dich(TYPE_NAME[asset.type])` dưới phần `title` của thẻ.
+ */
 const TYPE_NAME: Record<Asset['type'], string> = {
   video: 'Video',
   mogrt: 'Mogrt',
@@ -388,7 +394,7 @@ export default function AssetCard({ asset }: { asset: Asset }) {
        */
       draggable
       onDragStart={onDragStart}
-      title={`${asset.fileName} — ${TYPE_NAME[asset.type]}${resStr ? ' · ' + resStr : ''}\nBấm để ${
+      title={`${asset.fileName} — ${dich(TYPE_NAME[asset.type])}${resStr ? ' · ' + resStr : ''}\nBấm để ${
         asset.type === 'audio' ? 'nghe (bấm vào sóng âm để nghe từ đoạn đó)' : 'xem'
       } · Kéo thả vào timeline, hoặc bấm nút Import`}
     >
@@ -434,14 +440,14 @@ export default function AssetCard({ asset }: { asset: Asset }) {
                */
               <div className="card-asset__waveform-wait card-asset__waveform-wait--failed">
                 <IconMusic size={20} />
-                <span>Không đọc được file</span>
+                <span>{dich('Không đọc được file')}</span>
               </div>
             ) : (
               // Sóng âm do FFmpeg sinh ở hàng đợi nền — chưa có thì nói rõ đang
               // chờ, đừng để ô trống làm người dùng tưởng file lỗi.
               <div className="card-asset__waveform-wait">
                 <IconMusic size={20} />
-                <span>Đang tạo sóng âm…</span>
+                <span>{dich('Đang tạo sóng âm…')}</span>
               </div>
             )}
           </div>
@@ -589,7 +595,7 @@ export default function AssetCard({ asset }: { asset: Asset }) {
       <div className="card-asset__actions">
         <button
           className={`fav-btn ${asset.favorite ? 'fav-btn--on' : ''}`}
-          title={asset.favorite ? 'Bỏ yêu thích' : 'Đánh dấu yêu thích'}
+          title={asset.favorite ? dich('Bỏ yêu thích') : dich('Đánh dấu yêu thích')}
           aria-label={
             asset.favorite
               ? `Bỏ yêu thích ${asset.name}`

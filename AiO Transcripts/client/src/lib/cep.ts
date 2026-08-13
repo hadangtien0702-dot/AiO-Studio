@@ -1,6 +1,11 @@
+import { dich } from '../ngonngu'
+
 /**
  * cep.ts — lớp bọc CSInterface (đã nạp global qua <script> trong index.html).
  * Chép cách làm từ AiO Editing — đã chạy thật trong Premiere từ 1.0.0.
+ *
+ * Câu báo lỗi ở đây dùng `dich()` chứ KHÔNG dùng `useNgonNgu()`: đây là hàm
+ * thường, không phải component — gọi hook trong này là vi phạm luật hook.
  */
 
 declare global {
@@ -52,7 +57,7 @@ export interface HostResult {
 
 /** Phân tích chuỗi "OK:..." / "ERR:..." từ ExtendScript. */
 export function parseResult(raw: string): HostResult {
-  if (!raw) return { ok: false, message: 'Không có phản hồi từ Premiere' }
+  if (!raw) return { ok: false, message: dich('Không có phản hồi từ Premiere') }
   if (raw.indexOf('OK:') === 0) return { ok: true, message: raw.slice(3) }
   if (raw.indexOf('ERR:') === 0) return { ok: false, message: raw.slice(4) }
   return { ok: false, message: raw }
@@ -172,22 +177,28 @@ export function dichLoi(raw: string): HostLoi {
 
   switch (ma) {
     case 'CHUA_MO_PROJECT':
-      return { canLam: true, message: 'Chưa mở project nào.' }
+      return { canLam: true, message: dich('Chưa mở project nào.') }
     case 'CHUA_MO_SEQUENCE':
-      return { canLam: true, message: 'Chưa mở sequence nào.' }
+      return { canLam: true, message: dich('Chưa mở sequence nào.') }
     case 'CHUA_KHOANH_VUNG':
       return {
         canLam: true,
-        message:
+        message: dich(
           'Chưa khoanh vùng cần cắt.\nTrên timeline: đặt điểm vào bằng phím I, điểm ra bằng phím O, rồi bấm lại.',
+        ),
       }
     case 'VUNG_KHONG_CO_CLIP':
       return {
         canLam: true,
-        message: 'Vùng vừa khoanh không trùm lên clip nào có file gốc. Khoanh lại cho trúng clip.',
+        message: dich(
+          'Vùng vừa khoanh không trùm lên clip nào có file gốc. Khoanh lại cho trúng clip.',
+        ),
       }
     case 'KHONG_CO_DOAN_GIU':
-      return { canLam: true, message: 'Không còn đoạn nào để giữ — nới ngưỡng im lặng rồi chạy lại.' }
+      return {
+        canLam: true,
+        message: dich('Không còn đoạn nào để giữ — nới ngưỡng im lặng rồi chạy lại.'),
+      }
     case 'CLIP_DA_DOI':
       return {
         canLam: true,
@@ -197,10 +208,11 @@ export function dichLoi(raw: string): HostLoi {
       return {
         canLam: true,
         message:
+          // ⚠️ Câu đầu có `${}` nên không khớp khoá nào — còn nguyên tiếng Việt.
           `Sau vùng anh khoanh còn ${tham} clip nữa, nên không cắt tại chỗ được.\n` +
-          'Cắt tại chỗ làm ngắn phần trong vùng lại, mà Premiere không cho panel dồn ' +
-          'phần phía sau lên — sẽ hở một khoảng trống.\n' +
-          'Cách làm: khoanh tới hết timeline, hoặc đổi sang "Tạo sequence mới".',
+          dich('Cắt tại chỗ làm ngắn phần trong vùng lại, mà Premiere không cho panel dồn ') +
+          dich('phần phía sau lên — sẽ hở một khoảng trống.\n') +
+          dich('Cách làm: khoanh tới hết timeline, hoặc đổi sang "Tạo sequence mới".'),
       }
     case 'THIEU_API':
       return { canLam: false, message: `Bản Premiere này không có \`${tham}\`.` }
@@ -212,15 +224,19 @@ export function dichLoi(raw: string): HostLoi {
     case 'MAT_SEQUENCE_MOI':
       return {
         canLam: true,
-        message:
+        message: dich(
           'Mất dấu sequence giữa chừng (có thể Premiere đã được khởi động lại). Bấm lại để chạy từ đầu.',
+        ),
       }
     case 'SRT_KHONG_DOC_DUOC':
       return {
         canLam: false,
         message:
+          // ⚠️ Câu đầu có `${}` nên không khớp khoá nào — còn nguyên tiếng Việt.
           `Premiere không đọc được file phụ đề:\n${tham}\n` +
-          'Nếu file nằm trong %APPDATA% thì Premiere Beta không thấy — phải để cạnh video gốc.',
+          dich(
+            'Nếu file nằm trong %APPDATA% thì Premiere Beta không thấy — phải để cạnh video gốc.',
+          ),
       }
     case 'NHAP_SRT_LOI':
       return { canLam: false, message: `Không nhập được file phụ đề vào project: ${tham}` }

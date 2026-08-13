@@ -6,6 +6,7 @@
  * nên có một CTA chính).
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { dich } from '../ngonngu'
 import { useLibrary } from '../state/store'
 import type { Asset, AssetFilter, AssetType } from '../types'
 import PowerBinHub from './PowerBinHub'
@@ -286,6 +287,10 @@ function buildSubfolders(assets: Asset[]): Map<AssetType, SubfolderRow[]> {
  * Nhãn loại asset. Quy ước: CHỈ viết hoa chữ cái đầu, không viết hoa toàn bộ và
  * không thêm hậu tố ("Clips", "Templates", "& Nhạc"...) — nhãn ngắn để quét mắt
  * nhanh, và viết hoa đồng bộ với mọi nhãn khác trong menu.
+ *
+ * ☠️ ĐỪNG bọc `dich()` vào chính mảng này. Hằng tầng module chạy lúc IMPORT,
+ * trước khi React gắn bảng chữ -> tiếng Việt bị đóng cứng vĩnh viễn, đổi ngôn
+ * ngữ không bao giờ ăn. Bọc ở CHỖ VẼ RA: `{dich(label)}` bên dưới.
  */
 const TYPE_ITEMS: {
   key: AssetFilter
@@ -351,7 +356,7 @@ export default function Sidebar() {
           <PowerBinHub />
         ) : (
           <>
-            <div className="nav-section">Tổng quan</div>
+            <div className="nav-section">{dich('Tổng quan')}</div>
 
             <button
               type="button"
@@ -364,7 +369,7 @@ export default function Sidebar() {
               }}
             >
               <IconGridMedium size={13} />
-              <span className="nav-label">Tất cả asset</span>
+              <span className="nav-label">{dich('Tất cả asset')}</span>
               <span className="nav-count">{assets.length.toLocaleString()}</span>
             </button>
 
@@ -379,11 +384,11 @@ export default function Sidebar() {
               <span className="nav-heart">
                 <IconHeart size={13} filled={onlyFavorites} />
               </span>
-              <span className="nav-label">Yêu thích</span>
+              <span className="nav-label">{dich('Yêu thích')}</span>
               <span className="nav-count">{favCount}</span>
             </button>
 
-            <div className="nav-section">Loại asset</div>
+            <div className="nav-section">{dich('Loại asset')}</div>
             {TYPE_ITEMS.map(({ key, label, Icon }) => {
               const active = filter === key && !onlyFavorites
               const subs = subfoldersByType.get(key as AssetType) ?? []
@@ -420,7 +425,7 @@ export default function Sidebar() {
                     }}
                   >
                     <Icon size={13} />
-                    <span className="nav-label">{label}</span>
+                    <span className="nav-label">{dich(label)}</span>
                     <span className="nav-count">{countOf(key)}</span>
                     {/* Mũi tên cho biết mục này XỔ RA ĐƯỢC — không có nó thì
                         không ai đoán được bấm vào sẽ có thư mục con hiện ra. */}
@@ -455,8 +460,8 @@ export default function Sidebar() {
                            */
                           title={
                             sf.totalAll > sf.count
-                              ? `${sf.count.toLocaleString()} ${label.toLowerCase()} — cả thư mục có ${sf.totalAll.toLocaleString()} file mọi loại\n${sf.key}`
-                              : `${sf.count.toLocaleString()} ${label.toLowerCase()}\n${sf.key}`
+                              ? `${sf.count.toLocaleString()} ${dich(label).toLowerCase()} — cả thư mục có ${sf.totalAll.toLocaleString()} file mọi loại\n${sf.key}`
+                              : `${sf.count.toLocaleString()} ${dich(label).toLowerCase()}\n${sf.key}`
                           }
                           onClick={toggle}
                           onKeyDown={(e) => {
@@ -502,7 +507,7 @@ export default function Sidebar() {
               aria-expanded={showFolders}
             >
               <Caret open={showFolders} />
-              <span>Nguồn đã thêm</span>
+              <span>{dich('Nguồn đã thêm')}</span>
               <span className="nav-count">{folders.length}</span>
             </button>
 
@@ -511,14 +516,14 @@ export default function Sidebar() {
           {showFolders && (
             <div className="foot-list">
               {folders.length === 0 ? (
-                <div className="nav-empty">Chưa có thư mục nào</div>
+                <div className="nav-empty">{dich('Chưa có thư mục nào')}</div>
               ) : (
                 folders.map((f) => (
                   <div className="foot-row" key={f} title={f}>
                     <span className="foot-row__path">{f}</span>
                     <button
                       className="foot-row__del"
-                      title="Gỡ thư mục khỏi thư viện"
+                      title={dich('Gỡ thư mục khỏi thư viện')}
                       aria-label={`Gỡ thư mục ${f}`}
                       onClick={() => removeFolder(f)}
                     >
@@ -537,9 +542,9 @@ export default function Sidebar() {
         className="sidebar__resizer"
         role="separator"
         aria-orientation="vertical"
-        aria-label="Kéo để đổi bề rộng menu (hoặc dùng phím mũi tên trái/phải)"
+        aria-label={dich('Kéo để đổi bề rộng menu (hoặc dùng phím mũi tên trái/phải)')}
         tabIndex={0}
-        title="Kéo để xem tên thư mục dài"
+        title={dich('Kéo để xem tên thư mục dài')}
         onMouseDown={resize.onMouseDown}
         onKeyDown={resize.onKeyDown}
       />

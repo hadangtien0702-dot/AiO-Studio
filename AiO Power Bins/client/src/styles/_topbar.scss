@@ -49,6 +49,59 @@
   white-space: nowrap;
 }
 
+// ── Đổi ngôn ngữ — MỘT NÚT (13/08/2026) ──────────────────────────────────
+//  Anh Tiến: *"nút này anh muốn để là 1 button thôi, bấm vào là đổi cho gọn
+//  chứ không phải là 2 phần như thế này"*.
+//
+//  Nhãn là ngôn ngữ ĐANG DÙNG (`EN` khi đang tiếng Anh) — cùng mô hình nút
+//  "Render preview" ngay cạnh: một nút vừa bấm được vừa làm đèn báo.
+//  Lý do đầy đủ nằm ở `design-system/ngonngu.tsx`, đừng chép lại ở đây.
+//
+//  ☠️ ĐỜI TRƯỚC ĐỂ CHỮ TRẦN, KHÔNG NHÌN RA LÀ NÚT. Một chữ `EN` đứng trơ giữa
+//  thanh đầu thì không khác gì cái nhãn bên cạnh — không ai biết bấm được. Nên
+//  nút đơn BẮT BUỘC có viền + nền, mượn đúng dạng `.btn` khổ nhỏ để nó là
+//  "một họ" với các nút khác trong panel.
+//  Màu lấy hết từ token của panel (`_tokens.scss`) — không đặt màu cứng.
+.aio-ngonngu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: var(--h-ctrl-sm);
+  min-width: 34px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.aio-ngonngu:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-5);
+  color: var(--accent);
+}
+
+.aio-ngonngu:active {
+  background: var(--bg-active);
+}
+
+// Không đặt `outline: none` trần — `_base.scss` đã lo viền sáng khi Tab tới;
+// đây chỉ thêm đường viền cho nổi cùng lúc.
+.aio-ngonngu:focus-visible {
+  border-color: var(--accent-line);
+}
+
 // ── Dải 2: tìm kiếm ──────────────────────────────────────────────────────
 .contextbar {
   display: flex;

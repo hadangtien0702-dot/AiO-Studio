@@ -4,6 +4,7 @@
  */
 import type { Asset, AssetType } from '../types'
 import { getFs, getPath } from '../lib/node'
+import { dich } from '../ngonngu'
 
 /** Map đuôi file -> loại asset. */
 const EXT_MAP: Record<string, AssetType> = {}
@@ -49,7 +50,7 @@ async function walk(
 ): Promise<RawFile[]> {
   const fs = getFs()
   const path = getPath()
-  if (!fs || !path) throw new Error('Node fs/path không khả dụng (ngoài CEP).')
+  if (!fs || !path) throw new Error(dich('Node fs/path không khả dụng (ngoài CEP).'))
 
   const out: RawFile[] = []
   const stack: string[] = [root]

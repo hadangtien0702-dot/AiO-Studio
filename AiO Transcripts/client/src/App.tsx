@@ -64,6 +64,7 @@ import {
 } from './services/srt'
 import MinhHoa from './MinhHoa'
 import DaiCo, { SO_NGON_NGU } from './Co'
+import { NutDoiNgonNgu, dich } from './ngonngu'
 
 /**
  * Các bước của một lần chạy — để vẽ ra cho người dùng thấy đang ở đâu.
@@ -141,7 +142,7 @@ function docBangSua(): ThayTu[] {
 }
 
 export default function App() {
-  const [host, setHost] = useState('(đang kiểm tra…)')
+  const [host, setHost] = useState(dich('(đang kiểm tra…)'))
   const [dangChay, setDangChay] = useState('')
   /**
    * Đồng hồ chạy suốt lúc làm việc.
@@ -238,7 +239,7 @@ export default function App() {
 
   useEffect(() => {
     if (!isInHost()) {
-      setHost('KHÔNG chạy trong Premiere (đang mở bằng trình duyệt)')
+      setHost(dich('KHÔNG chạy trong Premiere (đang mở bằng trình duyệt)'))
       return
     }
     // Nạp lại host TRƯỚC khi hỏi bất cứ điều gì — nếu không, panel mới sẽ nói
@@ -310,27 +311,29 @@ export default function App() {
   }
 
   async function lamPhuDe() {
-    baoBuoc('Đang đọc vùng đã khoanh…', 0)
+    baoBuoc(dich('Đang đọc vùng đã khoanh…'), 0)
     setLoi('')
     setCanLam('')
     setKet(null)
     const batDau = Date.now()
 
     try {
-      if (!nodeAvailable()) throw new Error('Panel không dùng được Node.js — không gọi được bộ xử lý media.')
-      if (!getFFmpegPath()) throw new Error('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất.')
+      if (!nodeAvailable())
+        throw new Error(dich('Panel không dùng được Node.js — không gọi được bộ xử lý media.'))
+      if (!getFFmpegPath())
+        throw new Error(dich('Thiếu thành phần xử lý media của panel — cài lại bản mới nhất.'))
 
       // Nạp lại host mỗi lần bấm: rẻ, và chắc chắn panel nói chuyện với đúng bản
       // code vừa cài chứ không phải bản Premiere giữ từ lúc khởi động.
       if (!(await napLaiHost())) {
-        throw new Error('Không nạp được host/index.jsx từ thư mục extension.')
+        throw new Error(dich('Không nạp được host/index.jsx từ thư mục extension.'))
       }
 
       // ── 1. Vùng anh khoanh bằng phím I / O ──
       const { vung, loi: loiVung } = await getRangeClips()
       if (!vung) {
         if (loiVung?.canLam) setCanLam(loiVung.message)
-        else setLoi(loiVung?.message ?? 'Không đọc được vùng đã khoanh')
+        else setLoi(loiVung?.message ?? dich('Không đọc được vùng đã khoanh'))
         return
       }
 
@@ -349,8 +352,10 @@ export default function App() {
       const doiToc = vung.clips.filter((c) => Math.abs(c.speed - 1) > 0.01)
       if (doiToc.length) {
         setCanLam(
+          // ⚠️ Vế đầu có `${}` bên trong nên KHÔNG khớp khoá nào trong `chu.ts`
+          // — còn nguyên tiếng Việt, phải tách khoá riêng mới dịch được.
           `Trong vùng có ${doiToc.length} clip đã đổi tốc độ (${(doiToc[0].speed * 100).toFixed(0)}%). ` +
-            'Panel chưa quy đổi được thời gian cho clip đổi tốc độ — trả về 100% rồi chạy lại.',
+            dich('Panel chưa quy đổi được thời gian cho clip đổi tốc độ — trả về 100% rồi chạy lại.'),
         )
         return
       }
@@ -359,7 +364,7 @@ export default function App() {
       // này không còn gì để làm.
       const boMay = timBoMay(maMoHinh)
       if (!boMay) {
-        setCanLam('Chưa cài bộ nghe hiểu nên chưa chép lời được.\n' + thieuGi())
+        setCanLam(dich('Chưa cài bộ nghe hiểu nên chưa chép lời được.\n') + thieuGi())
         return
       }
 
@@ -393,7 +398,7 @@ export default function App() {
         const demCu = docDem(c.path, maMoHinh)
         if (demCu) {
           buoc.push({
-            ten: 'Dùng lại kết quả nghe đã có',
+            ten: dich('Dùng lại kết quả nghe đã có'),
             ket: `${demCu.cau.length} câu · ${demCu.tu.length} từ · không phải nghe lại`,
             giay: 0,
           })
@@ -401,10 +406,10 @@ export default function App() {
           continue
         }
 
-        baoBuoc('Đang tách tiếng khỏi video' + nhan, 1)
+        baoBuoc(dich('Đang tách tiếng khỏi video') + nhan, 1)
         let t0 = Date.now()
         const { wav, duration } = await trichTieng(c.path, (giayXong) =>
-          setDangChay(`Đang tách tiếng khỏi video${nhan}… ${dongHo(giayXong)}`),
+          setDangChay(`${dich('Đang tách tiếng khỏi video')}${nhan}… ${dongHo(giayXong)}`),
         )
         const giayTrich = (Date.now() - t0) / 1000
         // Bước này bị ĐĨA quyết định, không phải CPU. In ra tốc độ đọc thật để
@@ -412,7 +417,7 @@ export default function App() {
         const co = doDaiFile(c.path)
         const tocDo = co > 0 && giayTrich > 0 ? co / 1048576 / giayTrich : 0
         buoc.push({
-          ten: 'Tách tiếng khỏi video',
+          ten: dich('Tách tiếng khỏi video'),
           ket:
             (duration > 0 ? `${duration.toFixed(0)}s tiếng` : 'xong') +
             (co > 0 ? ` · đọc ${(co / 1073741824).toFixed(2)} GB` : '') +
@@ -434,7 +439,7 @@ export default function App() {
         )
         donWav(wav)
         buoc.push({
-          ten: 'Nghe hiểu lời nói (GPU)',
+          ten: dich('Nghe hiểu lời nói (GPU)'),
           ket:
             `${ketNghe.cau.length} câu · ${ketNghe.tu.length} từ` +
             (ketNghe.ngonNgu ? ` · nghe ra tiếng ${tenNgonNgu(ketNghe.ngonNgu)}` : ''),
@@ -455,7 +460,7 @@ export default function App() {
       //
       // Nên bảng quy đổi phải dựng từ MỌI clip trong vùng, dùng vị trí THẬT
       // của từng clip (`seqTu`) chứ không cộng dồn — clip có thể hở nhau.
-      baoBuoc('Đang gắn phụ đề lên timeline', 3)
+      baoBuoc(dich('Đang gắn phụ đề lên timeline'), 3)
 
       // ☠️ GHIM SEQUENCE — vấp thật anh Tiến báo 31/07: trong mấy phút panel
       // nghe hiểu, luồng shorts (hoặc chính người dùng) đổi sequence đang mở
@@ -484,7 +489,7 @@ export default function App() {
       const [pathChinh, clipsChinh] = xepTheoDoDai[0] ?? ['', []]
       const nghedDuoc = pathChinh ? daNghe.get(pathChinh) : undefined
       if (!clipsChinh.length || !nghedDuoc?.cau.length) {
-        setCanLam('Không nghe ra câu nào trong vùng này. Kiểm lại xem clip có tiếng không.')
+        setCanLam(dich('Không nghe ra câu nào trong vùng này. Kiểm lại xem clip có tiếng không.'))
         return
       }
       if (xepTheoDoDai.length > 1) {
@@ -589,6 +594,12 @@ export default function App() {
             lan panel chay ban cu ma khong ai biet, phai do qua cong debug moi thay.
             Kiem 3 cho khop nhau: `node design-system/version.mjs`. */}
         <span className="topbar__ver">v{__VERSION__}</span>
+        {/* Nút đổi ngôn ngữ VI/EN. Đặt ở thanh đầu vì nó tác động lên CẢ panel,
+            không thuộc riêng bước nào. Đổi ở đây thì mọi panel AiO đổi theo —
+            lựa chọn lưu ở `%APPDATA%\AiOStudio\ngonngu.json`, dùng chung cả bộ.
+            Đặt TRƯỚC dòng host vì `.topbar__host` giãn hết chỗ còn lại
+            (`flex: 1` + `margin-left: auto`), nút đứng sau sẽ bị đẩy ra rìa. */}
+        <NutDoiNgonNgu />
         <p className="topbar__host" title={host}>
           {host}
         </p>
@@ -616,22 +627,24 @@ export default function App() {
                 `.chon__mo` nói hệ quả của chính nó. Nói ở hai nơi là bắt mắt
                 đọc hai lần, mà còn dễ nói dối khi logic đổi. */}
             <p className="chidan">
-              Khoanh đoạn cần <b>chép lời</b> bằng <kbd>I</kbd> và <kbd>O</kbd>. Chọn khung
-              và cách chép rồi bấm.
+              {dich('Khoanh đoạn cần')} <b>{dich('chép lời')}</b> {dich('bằng')} <kbd>I</kbd>{' '}
+              {dich('và')} <kbd>O</kbd>
+              {dich('. Chọn khung và cách chép rồi bấm.')}
             </p>
 
             <div className="mh">
               <button
                 type="button"
                 className="mh__nut"
-                title="Bấm để xem lại"
+                title={dich('Bấm để xem lại')}
                 onClick={() => setLanMinhHoa((n) => n + 1)}
               >
                 <MinhHoa lan={lanMinhHoa} />
               </button>
               <p className="mh__chu">
-                Máy nghe hết đoạn → chép thành <b>phụ đề</b> đặt đúng chỗ người ta nói →
-                cắm <b>cờ đỏ</b> ở chỗ nó nghe không chắc.
+                {dich('Máy nghe hết đoạn → chép thành')} <b>{dich('phụ đề')}</b>{' '}
+                {dich('đặt đúng chỗ người ta nói → cắm')} <b>{dich('cờ đỏ')}</b>{' '}
+                {dich('ở chỗ nó nghe không chắc.')}
               </p>
             </div>
           </section>
@@ -677,20 +690,23 @@ export default function App() {
               )}
 
               <div className="chon">
-                <span className="chon__nhan">Khung hình</span>
+                <span className="chon__nhan">{dich('Khung hình')}</span>
                 <div className="seg">
                   {KHUNG.map((k) => (
                     <button
                       key={k.ma}
                       className={k.ma === khung ? 'seg__nut seg__nut--chon' : 'seg__nut'}
-                      title={k.mo}
+                      // ☠️ Bọc `dich()` Ở CHỖ VẼ RA, không bọc trong hằng `KHUNG`.
+                      // Hằng nằm ngoài component nên chạy lúc IMPORT — trước khi
+                      // React kịp gắn bảng chữ, và không chạy lại khi đổi ngôn ngữ.
+                      title={dich(k.mo)}
                       onClick={() => setKhung(k.ma)}
                     >
-                      {k.ten}
+                      {dich(k.ten)}
                     </button>
                   ))}
                 </div>
-                <p className="chon__mo">{KHUNG.find((k) => k.ma === khung)?.mo}</p>
+                <p className="chon__mo">{dich(KHUNG.find((k) => k.ma === khung)?.mo ?? '')}</p>
               </div>
 
               {/* ══════════════════════════════════════════════════════════════
@@ -705,23 +721,23 @@ export default function App() {
                   Hình minh hoạ ở giữa hai nút cũng gỡ theo — anh Tiến thấy nó
                   chen vào giữa nhìn kì, mà nhãn đúng thì đã tự nói được rồi. */}
               <div className="chon">
-                <span className="chon__nhan">Cách chép</span>
+                <span className="chon__nhan">{dich('Cách chép')}</span>
                 <div className="seg">
                   {MO_HINH.map((m) => (
                     <button
                       key={m.ma}
                       className={m.ma === maMoHinh ? 'seg__nut seg__nut--chon' : 'seg__nut'}
-                      title={m.mo}
+                      title={dich(m.mo)}
                       onClick={() => setMaMoHinh(m.ma)}
                     >
-                      {m.ma === 'turbo' ? 'Câu ngắn' : 'Câu dài'}
+                      {m.ma === 'turbo' ? dich('Câu ngắn') : dich('Câu dài')}
                     </button>
                   ))}
                 </div>
                 <p className="chon__mo">
                   {maMoHinh === 'turbo'
-                    ? 'Câu ngắn, nhiều khối · chạy nhanh hơn'
-                    : 'Câu dài, ít khối · nghe kỹ hơn'}
+                    ? dich('Câu ngắn, nhiều khối · chạy nhanh hơn')
+                    : dich('Câu dài, ít khối · nghe kỹ hơn')}
                 </p>
               </div>
             </>
@@ -737,7 +753,7 @@ export default function App() {
             />
           ) : (
             <button className="btn btn--primary" onClick={() => void lamPhuDe()}>
-              {ket ? 'Chép lại' : 'Làm phụ đề'}
+              {ket ? dich('Chép lại') : dich('Làm phụ đề')}
             </button>
           )}
 
@@ -765,11 +781,12 @@ export default function App() {
             mà vẫn không có nút nói dối. */}
         {!dangChay && daTao && (
           <div className="don">
-            <span className="don__nhan">Dọn thứ panel đã tạo</span>
+            <span className="don__nhan">{dich('Dọn thứ panel đã tạo')}</span>
             {daTao.marker === 0 && daTao.itemSrt === 0 && (
               <p className="don__mo">
-                Sequence này chưa có gì do panel tạo — chạy "Làm phụ đề" xong thì
-                nút xoá phụ đề và marker sẽ hiện ở đây.
+                {dich(
+                  'Sequence này chưa có gì do panel tạo — chạy "Làm phụ đề" xong thì nút xoá phụ đề và marker sẽ hiện ở đây.',
+                )}
               </p>
             )}
             <div className="don__nut">
@@ -783,13 +800,14 @@ export default function App() {
                       setLoi('')
                       setCanLam('')
                       try {
-                        if (!(await napLaiHost())) throw new Error('Không nạp được host.')
+                        if (!(await napLaiHost())) throw new Error(dich('Không nạp được host.'))
                         const r = await xoaPhuDe()
                         if (r.loi) setCanLam(r.loi.message)
                         else
+                          // ⚠️ Vế đầu có `${}` nên không khớp khoá nào — còn tiếng Việt.
                           setCanLam(
                             `Đã gỡ ${r.daXoa} phụ đề khỏi project. File trên đĩa vẫn còn — ` +
-                              'panel không tự xoá file của anh.',
+                              dich('panel không tự xoá file của anh.'),
                           )
                       } catch (e: any) {
                         setLoi(String(e?.message ?? e))
@@ -800,7 +818,9 @@ export default function App() {
                     })()
                   }}
                 >
-                  {dangDon === 'phude' ? 'Đang gỡ…' : `Gỡ ${daTao.itemSrt} file phụ đề khỏi project`}
+                  {dangDon === 'phude'
+                    ? dich('Đang gỡ…')
+                    : `Gỡ ${daTao.itemSrt} file phụ đề khỏi project`}
                 </button>
               )}
               {daTao.marker > 0 && (
@@ -813,7 +833,7 @@ export default function App() {
                       setLoi('')
                       setCanLam('')
                       try {
-                        if (!(await napLaiHost())) throw new Error('Không nạp được host.')
+                        if (!(await napLaiHost())) throw new Error(dich('Không nạp được host.'))
                         const r = await xoaMarker()
                         if (r.loi) setCanLam(r.loi.message)
                         else setCanLam(`Đã xoá ${r.daXoa} marker. Còn lại ${r.conLai} marker trên sequence.`)
@@ -826,12 +846,12 @@ export default function App() {
                     })()
                   }}
                 >
-                  {dangDon === 'marker' ? 'Đang xoá…' : `Xoá ${daTao.marker} marker`}
+                  {dangDon === 'marker' ? dich('Đang xoá…') : `Xoá ${daTao.marker} marker`}
                 </button>
               )}
             </div>
             <p className="don__mo">
-              Chỉ xoá thứ panel tạo ra. Phụ đề và marker anh tự làm không bị chạm.
+              {dich('Chỉ xoá thứ panel tạo ra. Phụ đề và marker anh tự làm không bị chạm.')}
               {/* ☠️ NÓI THẬT GIỚI HẠN — anh Tiến 31/07: "bấm vào xoá thì nó
                   không có tác dụng". Nút gỡ được FILE trong project; còn TRACK
                   caption trên timeline thì Premiere KHÔNG mở API cho tool nào
@@ -839,8 +859,14 @@ export default function App() {
                   nút thành nút nói dối. */}
               {daTao.itemSrt > 0 && (
                 <>
-                  {' '}Track caption trên timeline Premiere không cho tool xoá —
-                  chuột phải vào đầu track → <b>Delete Track</b>.
+                  {' '}
+                  {dich(
+                    'Track caption trên timeline Premiere không cho tool xoá — chuột phải vào đầu track →',
+                  )}{' '}
+                  {/* `Delete Track` là TÊN MỤC MENU THẬT của Premiere — cố ý
+                      KHÔNG có trong bảng dịch, dịch là người dùng không tìm
+                      thấy nó trong menu nữa. */}
+                  <b>Delete Track</b>.
                 </>
               )}
             </p>
@@ -856,7 +882,12 @@ export default function App() {
           <div className="mh mh--nho">
             <DaiCo />
             <p className="mh__chu">
-              Tự nhận ngôn ngữ — <b>{SO_NGON_NGU}+ thứ tiếng</b>, không phải chọn tay.
+              {dich('Tự nhận ngôn ngữ —')}{' '}
+              <b>
+                {SO_NGON_NGU}
+                {dich('+ thứ tiếng')}
+              </b>
+              {dich(', không phải chọn tay.')}
             </p>
           </div>
         )}
@@ -921,7 +952,9 @@ function DangChay({
           return (
             <li key={b.ten} className={`chay__buoc--${tt}`}>
               <span className="chay__cham">{tt === 'xong' ? '✓' : tt === 'dang' ? '●' : '○'}</span>
-              {b.ten}
+              {/* Bọc ở chỗ VẼ RA — `CAC_BUOC` là hằng ngoài component, bọc trong
+                  đó là chạy lúc import và khoá cứng vào tiếng Việt. */}
+              {dich(b.ten)}
             </li>
           )
         })}
@@ -954,22 +987,29 @@ function KetQuaPhuDe({
       {/* Chỉ cảnh khi ĐANG MỞ sequence khác — mở đúng thì im lặng. */}
       {khacSeq && (
         <p className="ketqua__dong">
-          <b className="canh">Số liệu dưới đây là của «{tenSeqKet}»</b> — anh đang mở «
-          {tenSeqDangMo}». Muốn chép cho sequence này thì khoanh vùng rồi bấm lại.
+          <b className="canh">
+            {dich('Số liệu dưới đây là của «')}
+            {tenSeqKet}»
+          </b>{' '}
+          {dich('— anh đang mở «')}
+          {tenSeqDangMo}
+          {dich('». Muốn chép cho sequence này thì khoanh vùng rồi bấm lại.')}
         </p>
       )}
       <div className="ketqua__so">
         <div>
+          {/* `'vi-VN'` là MÃ VÙNG của `toLocaleString`, không phải chữ hiện ra —
+              đừng bọc `dich()` quanh nó. */}
           <b>{ket.soCau.toLocaleString('vi-VN')}</b>
-          <span>câu đã chép</span>
+          <span>{dich('câu đã chép')}</span>
         </div>
         <div>
           <b>{mmss(ket.giayTong)}</b>
-          <span>chạy mất</span>
+          <span>{dich('chạy mất')}</span>
         </div>
         <div>
           <b className={ket.soat?.soCho ? 'canh' : undefined}>{ket.soat?.soCho ?? 0}</b>
-          <span>chỗ cần soát</span>
+          <span>{dich('chỗ cần soát')}</span>
         </div>
       </div>
 
@@ -977,8 +1017,13 @@ function KetQuaPhuDe({
         {ket.ganDuoc
           ? // Ghi TÊN THẬT, không ghi "sequence đang mở" — câu đó đúng lúc chạy
             // xong nhưng thành nói dối ngay khi người dùng đổi sequence.
-            <>Phụ đề đã gắn lên sequence {tenSeqKet ? <b>«{tenSeqKet}»</b> : 'đã chạy'}.</>
-          : 'Đã tạo file phụ đề nhưng chưa gắn được lên timeline — mở tay từ đường dẫn dưới.'}
+            <>
+              {dich('Phụ đề đã gắn lên sequence')}{' '}
+              {tenSeqKet ? <b>«{tenSeqKet}»</b> : dich('đã chạy')}.
+            </>
+          : dich(
+              'Đã tạo file phụ đề nhưng chưa gắn được lên timeline — mở tay từ đường dẫn dưới.',
+            )}
         {/* ☠️ PHẢI NÓI RA ngôn ngữ nó nhận được. Panel dùng `-l auto` nên nếu nó
             nghe sai thứ tiếng thì cả bản chép là rác — mà không nói ra thì người
             dùng chỉ biết sau khi đọc hết phụ đề. Đây cũng là chỗ duy nhất báo
@@ -986,8 +1031,16 @@ function KetQuaPhuDe({
         {ket.ngonNgu && (
           <>
             {' '}
-            Nghe ra <b>tiếng {tenNgonNgu(ket.ngonNgu)}</b>
-            {nhomNgonNgu(ket.ngonNgu) === 'cjk' && ' — cắt dòng theo chuẩn chữ vuông'}.
+            {/* ☠️ `'tiếng '` (CÓ dấu cách cuối) dịch sang EN là CHUỖI RỖNG:
+                tiếng Việt phải có chữ "tiếng" đằng trước ("tiếng Việt"), tiếng
+                Anh thì không ("Vietnamese"). Dấu cách nằm TRONG khoá, không nằm
+                ngoài `dich()` — xem ghi chú đầu `chu.ts`. */}
+            {dich('Nghe ra')}{' '}
+            <b>
+              {dich('tiếng ')}
+              {tenNgonNgu(ket.ngonNgu)}
+            </b>
+            {nhomNgonNgu(ket.ngonNgu) === 'cjk' && dich(' — cắt dòng theo chuẩn chữ vuông')}.
           </>
         )}
       </p>
@@ -1005,13 +1058,20 @@ function KetQuaPhuDe({
               nửa. Không bị trần thì giữ câu gọn, đừng bắt người ta đọc thêm. */}
           {ket.soat.tongCho > ket.soat.soCho ? (
             <>
-              Máy không chắc ở <b>{ket.soat.tongCho.toLocaleString('vi-VN')} chỗ</b> — đã cắm
-              marker <b>{ket.soat.soCho} chỗ tệ nhất</b>. Bấm <kbd>M</kbd> để đi tới từng chỗ.
+              {dich('Máy không chắc ở')}{' '}
+              <b>
+                {ket.soat.tongCho.toLocaleString('vi-VN')} {dich('chỗ')}
+              </b>{' '}
+              {dich('— đã cắm marker')}{' '}
+              <b>
+                {ket.soat.soCho} {dich('chỗ tệ nhất')}
+              </b>
+              {dich('. Bấm')} <kbd>M</kbd> {dich('để đi tới từng chỗ.')}
             </>
           ) : (
             <>
-              <b>{ket.soat.soCho} marker</b> trên timeline — bấm <kbd>M</kbd> để đi tới từng chỗ
-              máy nghe không chắc.
+              <b>{ket.soat.soCho} marker</b> {dich('trên timeline — bấm')} <kbd>M</kbd>{' '}
+              {dich('để đi tới từng chỗ máy nghe không chắc.')}
             </>
           )}
         </p>
@@ -1069,7 +1129,10 @@ const TEN_NGON_NGU: Record<string, string> = {
 
 function tenNgonNgu(ma: string): string {
   const m = (ma || '').toLowerCase()
-  return TEN_NGON_NGU[m] ?? m
+  // Bọc ở đây chứ không bọc trong hằng `TEN_NGON_NGU` (hằng chạy lúc import).
+  // Mã lạ thì `dich()` trả lại chính nó — đúng ý bản gốc: thà hiện "sw" còn
+  // hơn bịa ra một cái tên.
+  return dich(TEN_NGON_NGU[m] ?? m)
 }
 
 /** Giây -> "m:ss" cho đồng hồ trên nút. */
@@ -1110,9 +1173,9 @@ async function ganPhuDeVao(
 ): Promise<{ soCau: number; soBo: number; duongDan: string; ganDuoc: boolean }> {
   const fs = getFs()
   const path = getPath()
-  if (!fs || !path) throw new Error('Panel không dùng được Node.js')
+  if (!fs || !path) throw new Error(dich('Panel không dùng được Node.js'))
 
-  bao('Đang quy đổi mốc thời gian…')
+  bao(dich('Đang quy đổi mốc thời gian…'))
   const { noiDung, soCau, soBo } = sinhSrt(
     cau as Cau[],
     keeps,
@@ -1121,7 +1184,7 @@ async function ganPhuDeVao(
     gioiHan,
     tuTinCay,
   )
-  if (!soCau) throw new Error('Không câu nào rơi vào phần đã giữ lại.')
+  if (!soCau) throw new Error(dich('Không câu nào rơi vào phần đã giữ lại.'))
 
   // Tên có GIỜ PHÚT GIÂY, không ghi đè file cũ. Hai lý do:
   //   1. Premiere đọc nội dung .srt vào bộ nhớ lúc import; ghi đè file trên đĩa
@@ -1136,7 +1199,7 @@ async function ganPhuDeVao(
   const srtPath = path.join(thuMuc, `${ten}-autocut-${dau}.srt`)
   fs.writeFileSync(srtPath, noiDung, 'utf8')
 
-  bao('Đang gắn phụ đề lên timeline…')
+  bao(dich('Đang gắn phụ đề lên timeline…'))
   const { ok } = await ganPhuDe(srtPath)
 
   return { soCau, soBo, duongDan: srtPath, ganDuoc: ok }

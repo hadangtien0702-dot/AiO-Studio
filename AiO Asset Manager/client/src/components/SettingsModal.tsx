@@ -10,6 +10,7 @@ import { useLibrary } from '../state/store'
 import { analyzeCache, type CacheBreakdown } from '../services/cacheService'
 import { getCacheRoot } from '../services/cachePaths'
 import { findMacJunk, moveToRecycleBin, type MacJunkResult } from '../services/macJunk'
+import { dich } from '../ngonngu'
 import { IconSettings, IconClose, IconTrash, IconFolder } from './Icons'
 
 /** Đổi byte sang câu chữ ngắn. Rác macOS thường chỉ vài KB mỗi file. */
@@ -109,18 +110,18 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
       <div
         className="modal-box"
         role="dialog"
-        aria-label="Cài đặt"
+        aria-label={dich('Cài đặt')}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
           <span className="modal-title">
-            <IconSettings size={14} /> Cài đặt
+            <IconSettings size={14} /> {dich('Cài đặt')}
           </span>
           <button
             className="icon-btn"
             onClick={onClose}
-            title="Đóng (Esc)"
-            aria-label="Đóng cài đặt"
+            title={dich('Đóng (Esc)')}
+            aria-label={dich('Đóng cài đặt')}
           >
             <IconClose size={13} />
           </button>
@@ -156,17 +157,19 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               {/* "Nơi lưu bộ nhớ đệm" đứng ngay trên hàng "Bộ nhớ đệm" thành ra
                   đọc hai nhãn na ná nhau. Ở trong hộp Cài đặt thì "Nơi lưu" đã
                   đủ rõ nó là nơi lưu cái gì. */}
-              <span className="setting-row__label">Nơi lưu</span>
+              <span className="setting-row__label">{dich('Nơi lưu')}</span>
               {/* Đường dẫn dài nên cho xuống dòng thay vì cắt cụt — người dùng
                   cần đọc được nó đang nằm ở ổ nào. */}
               <span className="setting-row__desc setting-row__desc--path" title={cacheRoot}>
-                {cacheRoot || '(chưa xác định)'}
+                {cacheRoot || dich('(chưa xác định)')}
               </span>
             </div>
             <button
               className="btn btn--sm"
               disabled={running}
-              title="Chuyển ảnh xem trước sang ổ khác — panel sẽ chuyển file và sửa đường dẫn giúp anh"
+              title={dich(
+                'Chuyển ảnh xem trước sang ổ khác — panel sẽ chuyển file và sửa đường dẫn giúp anh',
+              )}
               onClick={() => {
                 changeCacheLocation()
                 setCache(analyzeCache(useLibrary.getState().assets))
@@ -174,14 +177,14 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               }}
             >
               <IconFolder size={12} />
-              <span>Đổi chỗ…</span>
+              <span>{dich('Đổi chỗ…')}</span>
             </button>
           </div>
 
           {/* ── Bộ nhớ đệm ────────────────────────────────────── */}
           <div className="setting-row">
             <div className="setting-row__info">
-              <span className="setting-row__label">Bộ nhớ đệm</span>
+              <span className="setting-row__label">{dich('Bộ nhớ đệm')}</span>
               {/* CHỈ nói phần đang dùng. Chuyện rác để hàng "Dọn rác" ngay dưới
                   nói — bản cũ nói ở cả hai chỗ nên mắt phải đọc hai lần cùng
                   một thông tin ("không có rác" / "không có file thừa nào"). */}
@@ -195,29 +198,29 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
           {/* VIỆC NÊN LÀM: dọn rác. Không thẻ nào mất ảnh, không render lại gì. */}
           <div className="setting-row">
             <div className="setting-row__info">
-              <span className="setting-row__label">Dọn rác</span>
+              <span className="setting-row__label">{dich('Dọn rác')}</span>
               <span className="setting-row__desc">
                 {cache.orphanCount > 0
                   ? `${cache.orphanCount.toLocaleString()} file thừa (${cache.formattedOrphan}) — dọn đi không mất gì`
-                  : 'Không có file thừa'}
+                  : dich('Không có file thừa')}
               </span>
             </div>
             <button
               className="btn btn--sm"
               disabled={cache.orphanCount === 0}
-              title="Chỉ xoá file cache không asset nào còn dùng"
+              title={dich('Chỉ xoá file cache không asset nào còn dùng')}
               onClick={() => {
                 const res = cleanOrphanCache()
                 setCache(analyzeCache(assets))
                 showToast(
                   res.count > 0
                     ? `Đã dọn ${res.count.toLocaleString()} file thừa`
-                    : 'Không có file thừa nào',
+                    : dich('Không có file thừa nào'),
                 )
               }}
             >
               <IconTrash size={12} />
-              <span>Dọn rác</span>
+              <span>{dich('Dọn rác')}</span>
             </button>
           </div>
 
@@ -238,7 +241,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
           {junk !== null && junk.paths.length > 0 && (
             <div className="setting-row">
               <div className="setting-row__info">
-                <span className="setting-row__label">Rác macOS trên ổ</span>
+                <span className="setting-row__label">{dich('Rác macOS trên ổ')}</span>
                 <span className="setting-row__desc">
                   {`${junk.paths.length.toLocaleString()} file thừa (${doDung(junk.bytes)}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được`}
                 </span>
@@ -248,7 +251,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 disabled={junkBusy}
                 title={
                   confirmJunk
-                    ? 'Bấm lần nữa để chuyển vào Thùng rác Windows'
+                    ? dich('Bấm lần nữa để chuyển vào Thùng rác Windows')
                     : `Chuyển ${junk.paths.length.toLocaleString()} file rác vào Thùng rác Windows — khôi phục lại được nếu cần`
                 }
                 onClick={() => {
@@ -275,9 +278,9 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 <IconTrash size={12} />
                 <span>
                   {junkBusy
-                    ? 'Đang dọn…'
+                    ? dich('Đang dọn…')
                     : confirmJunk
-                      ? 'Bấm lần nữa để dọn'
+                      ? dich('Bấm lần nữa để dọn')
                       : `Dọn ${junk.paths.length.toLocaleString()} file`}
                 </span>
               </button>
@@ -290,13 +293,16 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
           <p className="setting-note">
             {hasUsed ? (
               <>
-                Xoá tất cả thì phải tạo lại <b>{wipeList}</b> — trong lúc đó các
-                thẻ chỉ hiện icon. Thư viện, brand, khay và yêu thích giữ nguyên.
+                {dich('Xoá tất cả thì phải tạo lại')} <b>{wipeList}</b>{' '}
+                {dich(
+                  '— trong lúc đó các thẻ chỉ hiện icon. Thư viện, brand, khay và yêu thích giữ nguyên.',
+                )}
               </>
             ) : (
               <>
-                Chưa có ảnh xem trước nào để xoá. Thư viện, brand, khay và yêu
-                thích không nằm trong bộ nhớ đệm.
+                {dich(
+                  'Chưa có ảnh xem trước nào để xoá. Thư viện, brand, khay và yêu thích không nằm trong bộ nhớ đệm.',
+                )}
               </>
             )}
           </p>
@@ -306,8 +312,8 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             disabled={running || cache.totalBytes === 0}
             title={
               confirmWipe
-                ? 'Bấm lần nữa để xoá thật'
-                : 'Xoá toàn bộ ảnh xem trước đã tạo (phải tạo lại từ đầu)'
+                ? dich('Bấm lần nữa để xoá thật')
+                : dich('Xoá toàn bộ ảnh xem trước đã tạo (phải tạo lại từ đầu)')
             }
             onClick={() => {
               if (!confirmWipe) {
@@ -320,11 +326,13 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               setConfirmWipe(false)
               clearCacheAndReset()
               setCache(analyzeCache(useLibrary.getState().assets))
-              showToast('Đã xoá bộ nhớ đệm — đang tạo lại từ đầu…')
+              showToast(dich('Đã xoá bộ nhớ đệm — đang tạo lại từ đầu…'))
             }}
           >
             <IconTrash size={12} />
-            <span>{confirmWipe ? 'Bấm lần nữa để xoá thật' : 'Xoá tất cả'}</span>
+            <span>
+              {confirmWipe ? dich('Bấm lần nữa để xoá thật') : dich('Xoá tất cả')}
+            </span>
           </button>
         </div>
       </div>

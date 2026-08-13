@@ -2,6 +2,7 @@
  * cep.ts — lớp bọc TypeScript cho CSInterface (đã nạp global qua <script>).
  * Giúp gọi ExtendScript kiểu Promise/async, và đọc thông tin host an toàn.
  */
+import { dich } from '../ngonngu'
 
 declare global {
   interface Window {
@@ -124,7 +125,7 @@ export interface HostResult {
 
 /** Phân tích chuỗi "OK:..." / "ERR:..." từ ExtendScript. */
 function parseResult(raw: string): HostResult {
-  if (!raw) return { ok: false, message: 'Không có phản hồi từ Premiere' }
+  if (!raw) return { ok: false, message: dich('Không có phản hồi từ Premiere') }
   if (raw.indexOf('OK:') === 0) return { ok: true, message: raw.slice(3) }
   if (raw.indexOf('ERR:') === 0) return { ok: false, message: raw.slice(4) }
   return { ok: false, message: raw }
@@ -177,7 +178,7 @@ export function userDataPath(): string {
 }
 
 /** Mở hộp thoại chọn thư mục (CEP). Trả về đường dẫn hoặc '' nếu huỷ. */
-export function pickFolder(title = 'Chọn thư mục asset'): string {
+export function pickFolder(title = dich('Chọn thư mục asset')): string {
   const w = window as any
   if (w.cep && w.cep.fs && typeof w.cep.fs.showOpenDialog === 'function') {
     // showOpenDialog(allowMulti, chooseDir, title, initialPath, fileTypes)

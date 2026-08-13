@@ -2,6 +2,7 @@
  * store.ts — trạng thái thư viện asset (zustand).
  */
 import { create } from 'zustand'
+import { dich } from '../ngonngu'
 import type { Asset, AssetFilter, SortBy, Tag, AppSettings, Brand, PowerBinFolder, AssetPack } from '../types'
 import { scanFolder, assetsFromPaths } from '../services/scanner'
 import { getSelectedTimelineClipPaths } from '../services/timelineImport'
@@ -433,7 +434,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       selectedBrandId: get().selectedBrandId === id ? '' : get().selectedBrandId,
     })
     persistAll(get())
-    get().showToast('Đã xoá brand. Các khay bên trong được giữ lại ở mục Khay chung.')
+    get().showToast(dich('Đã xoá brand. Các khay bên trong được giữ lại ở mục Khay chung.'))
   },
 
   setSelectedBrandId: (id: string) => {
@@ -472,7 +473,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
 
     const incoming = assetsFromPaths(paths)
     if (incoming.length === 0) {
-      get().showToast('Không có file nào dùng được (đuôi file không hỗ trợ).')
+      get().showToast(dich('Không có file nào dùng được (đuôi file không hỗ trợ).'))
       return 0
     }
 
@@ -502,7 +503,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
 
   addTimelineSelectionToPowerBin: async (binId: string) => {
     if (!binId) {
-      get().showToast('Chọn một khay ở menu bên trái trước đã.')
+      get().showToast(dich('Chọn một khay ở menu bên trái trước đã.'))
       return
     }
 
@@ -518,7 +519,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     get().showToast(
       added > 0
         ? `Đã thêm ${added} file từ timeline${where}`
-        : `Các file này đã có trong khay rồi`,
+        : dich('Các file này đã có trong khay rồi'),
     )
   },
 
@@ -667,7 +668,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
 
     // Dữ liệu lưu từ bản cũ: logic ghép cặp preview đã đổi -> quét lại tự động.
     if (lib.version < LIBRARY_VERSION && lib.folders.length) {
-      set({ toast: 'Đang cập nhật thư viện theo chuẩn mới…' })
+      set({ toast: dich('Đang cập nhật thư viện theo chuẩn mới…') })
       void get().rescan()
     } else if (pruned.assets.length) {
       // Ghi lại ngay phần đã dọn, để lần mở sau không phải dọn lại.
@@ -680,7 +681,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     if (!nodeAvailable()) return
     const url = await startMediaServer()
     set({ mediaReady: !!url })
-    if (!url) set({ error: 'Không khởi động được máy chủ preview nội bộ.' })
+    if (!url) set({ error: dich('Không khởi động được máy chủ preview nội bộ.') })
   },
 
   sendToTimeline: async (asset) => {
@@ -705,7 +706,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
 
   addFolder: async () => {
     if (!nodeAvailable()) {
-      set({ error: 'Node không khả dụng — mở panel trong Premiere để dùng.' })
+      set({ error: dich('Node không khả dụng — mở panel trong Premiere để dùng.') })
       return
     }
     const folder = pickFolder()
@@ -720,7 +721,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       persist(folders, assets)
       void startBackgroundProcessing(assets)
     } catch (e: any) {
-      set({ scanning: false, error: 'Quét lỗi: ' + (e?.message ?? e) })
+      set({ scanning: false, error: dich('Quét lỗi: ') + (e?.message ?? e) })
     }
   },
 
@@ -743,7 +744,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       void startBackgroundProcessing(all)
       setTimeout(() => get().toast && set({ toast: '' }), 3000)
     } catch (e: any) {
-      set({ scanning: false, error: 'Quét lỗi: ' + (e?.message ?? e) })
+      set({ scanning: false, error: dich('Quét lỗi: ') + (e?.message ?? e) })
     }
   },
 
@@ -807,7 +808,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
       persist(get().folders, assets)
       void startBackgroundProcessing(assets)
     } catch (e: any) {
-      set({ scanning: false, error: 'Quét lỗi: ' + (e?.message ?? e) })
+      set({ scanning: false, error: dich('Quét lỗi: ') + (e?.message ?? e) })
     }
   },
 
@@ -850,7 +851,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
   },
 
   changeCacheLocation: () => {
-    const dir = pickFolder('Chọn thư mục lưu bộ nhớ đệm')
+    const dir = pickFolder(dich('Chọn thư mục lưu bộ nhớ đệm'))
     if (!dir) return
 
     // Dừng hàng đợi trước: đang có FFmpeg ghi file vào thư mục cũ mà chuyển

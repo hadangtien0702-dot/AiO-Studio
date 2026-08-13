@@ -6,6 +6,7 @@
  * Cố ý KHÔNG có: dãy chip loại asset (trùng menu trái), dãy chip sắp xếp,
  * nút Chụp/Dán/Export. Cụm chọn dạng hiển thị nằm ở góc phải dưới (Grid).
  */
+import { NutDoiNgonNgu, dich } from '../ngonngu'
 import { useLibrary } from '../state/store'
 import type { MasterTab } from '../state/store'
 import {
@@ -111,7 +112,7 @@ export default function Toolbar() {
 
         {scanning && (
           <span className="topbar__scanning" aria-live="polite">
-            Đang quét {scanCount.toLocaleString()} file…
+            {dich('Đang quét')} {scanCount.toLocaleString()} {dich('file…')}
           </span>
         )}
 
@@ -119,10 +120,15 @@ export default function Toolbar() {
             về một việc, đặt cạnh nhau thành hai nguồn tin phải đối chiếu. Tiến
             độ giờ nằm NGAY TRÊN nút — một việc, một chỗ. */}
 
+        {/* Nút đổi ngôn ngữ VI/EN. Đặt ở thanh đầu vì nó tác động lên CẢ panel,
+            không thuộc riêng khối nào. Đổi ở đây thì mọi panel AiO đổi theo —
+            lựa chọn lưu ở `%APPDATA%\AiOStudio\ngonngu.json`, dùng chung cả bộ. */}
+        <NutDoiNgonNgu />
+
         <button
           className="icon-btn"
-          title="Cài đặt (chất lượng proxy, xoá cache)"
-          aria-label="Mở cài đặt"
+          title={dich('Cài đặt (chất lượng proxy, xoá cache)')}
+          aria-label={dich('Mở cài đặt')}
           onClick={() => setSettingsOpen(true)}
         >
           <IconSettings size={14} />
@@ -187,7 +193,7 @@ export default function Toolbar() {
                           brokenFiles > 0
                             ? `${brokenFiles.toLocaleString()} file đọc không ra (hỏng hoặc sai định dạng).`
                             : '',
-                          'Bấm để thử lại những file đó.',
+                          dich('Bấm để thử lại những file đó.'),
                         ]
                           .filter(Boolean)
                           .join('\n')
@@ -204,14 +210,14 @@ export default function Toolbar() {
               onClick={() => {
                 if (queueProgress) {
                   stopPreviewRender()
-                  showToast('Đã dừng render. Phần đã xong vẫn giữ nguyên.')
+                  showToast(dich('Đã dừng render. Phần đã xong vẫn giữ nguyên.'))
                   return
                 }
                 regeneratePreviews()
                 showToast(
                   missingPreview > 0 || failedPreview > 0
-                    ? 'Đang render hết sức — máy sẽ bận. Bấm lại để dừng.'
-                    : 'Đã kiểm tra: mọi asset đều có preview.',
+                    ? dich('Đang render hết sức — máy sẽ bận. Bấm lại để dừng.')
+                    : dich('Đã kiểm tra: mọi asset đều có preview.'),
                 )
               }}
             >
@@ -227,18 +233,18 @@ export default function Toolbar() {
                   ? `Dừng render (${queueProgress.done.toLocaleString()}/${queueProgress.total.toLocaleString()})`
                   : missingPreview > 0
                     ? `Render preview (${missingPreview.toLocaleString()})`
-                    : 'Preview đã đủ'}
+                    : dich('Preview đã đủ')}
               </span>
             </button>
 
             <button
               className="btn btn--primary btn--sm"
-              title="Chọn thư mục trên máy để thêm vào thư viện"
+              title={dich('Chọn thư mục trên máy để thêm vào thư viện')}
               onClick={addFolder}
               disabled={scanning}
             >
               <IconFolderPlus size={13} />
-              <span>Thêm thư mục</span>
+              <span>{dich('Thêm thư mục')}</span>
             </button>
           </>
         )}
@@ -248,14 +254,14 @@ export default function Toolbar() {
             className="btn btn--primary btn--sm"
             title={
               selectedPowerBinFolderId
-                ? 'Chọn clip trên timeline rồi bấm đây để thêm file gốc của chúng vào khay'
-                : 'Chọn một khay ở menu bên trái trước đã'
+                ? dich('Chọn clip trên timeline rồi bấm đây để thêm file gốc của chúng vào khay')
+                : dich('Chọn một khay ở menu bên trái trước đã')
             }
             disabled={!selectedPowerBinFolderId}
             onClick={() => addTimelineSelectionToPowerBin(selectedPowerBinFolderId)}
           >
             <IconAddFromTimeline size={13} />
-            <span>Thêm từ timeline</span>
+            <span>{dich('Thêm từ timeline')}</span>
           </button>
         )}
       </header>
@@ -267,16 +273,16 @@ export default function Toolbar() {
           </span>
           <input
             className="searchbox__input"
-            placeholder="Tìm asset theo tên…"
-            aria-label="Tìm asset theo tên"
+            placeholder={dich('Tìm asset theo tên…')}
+            aria-label={dich('Tìm asset theo tên')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           {search && (
             <button
               className="searchbox__clear"
-              title="Xoá từ khoá"
-              aria-label="Xoá từ khoá tìm kiếm"
+              title={dich('Xoá từ khoá')}
+              aria-label={dich('Xoá từ khoá tìm kiếm')}
               onClick={() => setSearch('')}
             >
               <IconClose size={11} />
