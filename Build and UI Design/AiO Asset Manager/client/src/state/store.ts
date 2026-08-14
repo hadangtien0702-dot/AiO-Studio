@@ -560,7 +560,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
 
     const res = await getSelectedTimelineClipPaths()
     if (!res.ok) {
-      get().showToast(res.message)
+      get().showToast(dich(res.message))
       return
     }
 
@@ -770,7 +770,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     // là thừa. Chỉ lên tiếng khi THẤT BẠI, vì lúc đó màn hình không đổi gì và
     // người dùng cần biết vì sao.
     if (!res.ok) {
-      set({ toast: res.message })
+      set({ toast: dich(res.message) })
       setTimeout(() => {
         if (get().toast) set({ toast: '' })
       }, 3500)

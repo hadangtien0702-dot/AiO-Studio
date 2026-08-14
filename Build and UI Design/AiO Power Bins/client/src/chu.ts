@@ -427,5 +427,14 @@ export const CHU: BangChu = {
 
     // ─── services\timelineImport.ts ───
     'Đã đọc {n} file từ timeline': 'Read {n} files from the timeline',
+
+    // --- [14/08] 3 bien the loi "moi track deu co clip" tu host (cau noi chuoi) ---
+    'Moi track am thanh deu co clip tai vi tri nay, va khong them duoc track moi. Hay them mot track trong roi thu lai.':
+      'Every audio track already has a clip at this position and no new track could be added. Add an empty track and try again.',
+    'Moi track video deu co clip tai vi tri nay, va khong them duoc track moi. Hay them mot track trong roi thu lai.':
+      'Every video track already has a clip at this position and no new track could be added. Add an empty track and try again.',
+    'Moi track video deu co clip tai vi tri nay, va khong them duoc track moi. Hay them mot track video trong roi thu lai.':
+      'Every video track already has a clip at this position and no new track could be added. Add an empty video track and try again.',
+
   },
 }

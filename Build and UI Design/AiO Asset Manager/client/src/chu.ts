@@ -385,5 +385,21 @@ export const CHU: BangChu = {
 
     // ─── services\scanner.ts ───
     'Node fs/path không khả dụng (ngoài CEP).': 'Node fs/path is not available (outside CEP).',
+
+    // --- Loi tu host/ppro.jsx (14/08) ---
+    // Host viet tieng Viet KHONG DAU (ExtendScript khong an Unicode tot).
+    // Khoa o day = DUNG chuoi khong dau do. Panel boc dich(res.message) o cho
+    // hien thi; khong sua host nen khong can tat Premiere nap lai.
+    'Chua mo project': 'No project is open.',
+    'Chua mo sequence nao': 'No sequence is open.',
+    'Import that bai': 'Import failed',
+    'Chen MOGRT that bai': 'MOGRT insert failed',
+    'Moi track am thanh deu co clip tai vi tri nay, va khong them duoc track moi. Hay them mot track trong roi thu lai.':
+      'Every audio track already has a clip at this position and no new track could be added. Add an empty track and try again.',
+    'Moi track video deu co clip tai vi tri nay, va khong them duoc track moi. Hay them mot track trong roi thu lai.':
+      'Every video track already has a clip at this position and no new track could be added. Add an empty track and try again.',
+    'Moi track video deu co clip tai vi tri nay, va khong them duoc track moi. Hay them mot track video trong roi thu lai.':
+      'Every video track already has a clip at this position and no new track could be added. Add an empty video track and try again.',
+
   },
 }
