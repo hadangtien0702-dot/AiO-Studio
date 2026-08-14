@@ -1164,6 +1164,59 @@ export default function Home() {
           </div>
         </section>
 
+        {/* [14/08] BETA MIEN PHI — 3 tool free, anh Tien chot 13/08.
+            Dung nguyen class cua pricing (price-card / plan-perks / primary-cta)
+            de dong bo giao dien, khong them CSS moi. CTA mailto la duong nhan
+            don DUY NHAT dang co that — co form/backend roi thi thay. */}
+        <section className="pricing-section section-shell" id="beta" style={{ marginTop: "90px" }}>
+          <div className="section-intro">
+            <span className="lesson-number">BETA MIỄN PHÍ</span>
+            <div>
+              <h2>Dùng Thử Miễn Phí 3 Tool — Bản Beta Windows</h2>
+              <p>Cài một file duy nhất (92 MB), không cần quyền Admin. Windows 10/11 · Premiere Pro.</p>
+            </div>
+          </div>
+
+          <div className="pricing-cards-grid">
+            <div className="price-card">
+              <span className="plan-label">Auto Cut</span>
+              <p className="plan-desc">Dò khoảng lặng, cắt và dồn timeline một cú bấm.</p>
+              <ul className="plan-perks">
+                <li><Check size={16} color="var(--green)" /> 6:29 video ➔ 54 nhát cắt trong 23s</li>
+                <li><Check size={16} color="var(--green)" /> Hoàn tác một nút</li>
+              </ul>
+            </div>
+            <div className="price-card">
+              <span className="plan-label">Asset Manager</span>
+              <p className="plan-desc">Kho asset ngay trong Premiere — tìm, nghe thử, kéo thả.</p>
+              <ul className="plan-perks">
+                <li><Check size={16} color="var(--green)" /> 28.000+ asset, preview &lt;1s</li>
+                <li><Check size={16} color="var(--green)" /> Mục &quot;Dùng gần đây&quot; tự ghi nhớ</li>
+              </ul>
+            </div>
+            <div className="price-card">
+              <span className="plan-label">Power Bins</span>
+              <p className="plan-desc">Brand Kit hiện ở mọi project — logo, intro, nhạc nền đi theo bạn.</p>
+              <ul className="plan-perks">
+                <li><Check size={16} color="var(--green)" /> Mở project mới vẫn thấy nguyên khay</li>
+                <li><Check size={16} color="var(--green)" /> Thumbnail &amp; preview render sẵn</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: "28px" }}>
+            <a
+              className="primary-cta"
+              href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20Beta%20-%20Xin%20link%20tai&body=May%20minh%20la%20Windows%2010%2F11%2C%20Premiere%20Pro%20phien%20ban%3A%20"
+            >
+              Nhận Link Tải Beta Qua Email <ArrowRight size={16} />
+            </a>
+            <p style={{ marginTop: "10px", fontSize: "13px", opacity: 0.7 }}>
+              Song ngữ Việt/Anh · 100% offline · Cả ba tool miễn phí kể cả sau beta
+            </p>
+          </div>
+        </section>
+
         {/* PRICING SECTION - CLEAN HIGH-CONTRAST */}
         <section className="pricing-section section-shell" id="pricing" style={{ marginTop: "90px" }}>
           <div className="section-intro">

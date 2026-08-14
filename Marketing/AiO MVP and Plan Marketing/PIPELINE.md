@@ -97,6 +97,21 @@ này đè lên panel kia. Đã có lỗi thật: bộ cài Autocut từng cài v
 
 ## 4. ☠️ CÒN THIẾU GÌ ĐỂ BÁN ĐƯỢC — xếp theo mức chặn
 
+> ### ⚡ CẬP NHẬT 2026-08-14 — nhiều dòng bên dưới ĐÃ LỖI THỜI, đọc khối này trước
+>
+> | Mục cũ bên dưới | Hiện trạng 14/08 |
+> |---|---|
+> | Chữ ký số thương mại (~$200–400/năm) | **BỎ — anh Tiến chốt không tốn tiền** (*"dẹp, anh không tốn tiền cho mấy thứ này"*). Và nó KHÔNG phải cửa tử: bộ cài tự bật PlayerDebugMode, khách chỉ còn 1 cú "Run anyway" ở SmartScreen |
+> | Bộ cài GHÉP các panel | ✅ **XONG** — `Release/2026-08-14-beta-01/AiO-Studio-Beta-3-panel.zip` (91,9 MB, 3 panel free + kho FFmpeg chung + CAI-DAT.bat) |
+> | Bộ cài nặng (91,5 MB/panel) | ✅ **XONG** — kho FFmpeg dùng chung `%APPDATA%\AiOStudio\bin\win64`: 274,7 → 91,9 MB cả bộ |
+> | UI song ngữ Việt–Anh | ✅ **XONG cho 3 panel beta + Transcripts** — đo trên panel thật: 0 chữ sót ở EN |
+> | "MỘT bộ cài MỘT giá" (mục 1) | **HẾT HIỆU LỰC 13/08** — có gói FREE (Auto Cut · Asset Manager · Power Bins), phần còn lại trả tiền. Web đã có section Beta |
+> | Khoá bản quyền · macOS · Silero VAD · FCPXML | vẫn CHƯA — đúng như bảng dưới |
+>
+> Phạm vi anh Tiến chốt 14/08: **chỉ chắc chắn 3 tool** (Asset Manager · Power
+> Bins · Auto Cut) — đừng đánh bóng 5 panel còn lại lúc này.
+
+
 ### 4.1. Chặn NIỀM TIN — nguy nhất, khách bỏ đi vì cái này
 
 **Autocut: chưa chứng minh được "không cắt mất lời".**
