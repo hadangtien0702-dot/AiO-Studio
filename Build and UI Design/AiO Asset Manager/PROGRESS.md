@@ -1,5 +1,25 @@
 # AiO Asset Manager - Nhat ky
 
+## [chot-phien] - 2026-08-14 13:57 (UTC+7) - DICH LOI HOST + TRANG THAI DONG BANG
+
+### Trang thai hien tai
+Anh Tien chot 14/08: *"Asset Manager rat on roi - tool nay tam dung o day de
+chuan bi release"*. DONG BANG tinh nang - viec moi phai hoi anh truoc.
+Ban cuoi: song ngu (do that cong 8088: EN sot 0 loi that - 7 chuoi con lai
+la TEN THU MUC ASSET cua nguoi dung, khong duoc dich) + muc "Dung gan day"
+(anh da tu test duong ghi, chay dung). Nam trong goi FREE cua Beta
+(Release/2026-08-14-beta-01).
+
+### Dot cuoi trong ngay
+- 6 cau loi tu host/ppro.jsx (tieng Viet khong dau): dich o tang hien thi,
+  boc dich(res.message) 2 cho trong store.ts + 7 khoa vao chu.ts. Khong sua
+  host. Kiem: cau EN co trong ban da cai 1/1.
+- Truoc do cung ngay: sua dich MANH giua cau o AssetCard (tooltip nua Anh
+  nua Viet - TE HON khong dich), boc store.ts:522 bi sot (cung mot cau ra
+  hai thu tieng o hai duong), cachePaths.ts process.env -> bienMT().
+
+---
+
 ## [dung-gan-day] - 2026-08-14 09:22 (UTC+7) - MUC "DUNG GAN DAY" O MENU TRAI
 
 ### Boi canh

@@ -1,5 +1,47 @@
 # AiO Power Bins - Nhat ky
 
+## [song-ngu] - 2026-08-14 13:57 (UTC+7) - SONG NGU VI/EN HOAN CHINH + 4 LOI SUA KEM
+
+### Trang thai hien tai
+Panel nam trong GOI FREE cua ban Beta (Release/2026-08-14-beta-01, goi
+AiO-Studio-Power-Bins-2.0.0.zxp). Song ngu do tren panel that (cong 8090):
+che do EN con 0 chu Viet sot, doi chung VI ra 2. Viec ke tiep: anh Tien cai
+thu ban beta tren may sach (may nha).
+
+### Da lam (13-14/08, nhieu dot commit)
+1. Song ngu VI/EN: chu.ts 169 khoa (khoa = CHINH CAU TIENG VIET, quen dich
+   thi hien cau nguon), nut 1 button o thanh dau, luu chung ca bo qua
+   %APPDATA%\AiOStudio\ngonngu.json.
+2. HAI HOP THOAI XOA (PowerBinHub.tsx:98/186) dich duoc - cho nguy nhat
+   panel vi "khong doc duoc" = "mat du lieu". Khoa CA CAU co cho trong
+   {ten}, dien bang .replace() dang HAM de ten file chua $& khong bi hong.
+3. Man hinh dau CHI SAI NUT: cau chao tro nut "Them thu muc" nam o nhanh
+   isLibrary KHONG BAO GIO CHAY o panel nay (activeMasterTab='powerbin'
+   co dinh) -> doi tro "Them tu timeline" (nut co that). Loi co san tu ban
+   tieng Viet.
+4. 6 cau loi tu host/ppro.jsx (tieng Viet KHONG DAU nen grep theo dau mu):
+   dich o TANG HIEN THI - boc dich(res.message) tai 2 cho store.ts, khoa =
+   dung chuoi khong dau (7 khoa ke ca 3 bien the cau noi chuoi). KHONG sua
+   host nen khong can tat Premiere.
+5. cachePaths.ts:28 con process.env -> ban build ra `var Om={}` roi
+   Om.APPDATA (Vite thay process.env bang object RONG luc build). Sua bang
+   bienMT() doc dong p['env'][ten]. Do lai ban build: 0 bien-rong-doc-APPDATA.
+6. scripts/package-release.ps1 hardcode ten file "AiO-Studio-Asset-Manager-"
+   o 3 dong (chep tu Asset Manager quen doi) -> goi panel nay DE goi Asset
+   Manager that khi gom chung thu muc beta. Ruot goi van dung (BundleId
+   powerbin). Da doi thanh "AiO-Studio-Power-Bins-". Cung ho loi 29/07.
+
+### Kiem chung
+- Song ngu tren panel THAT cong 8090: EN sot 0 / doi chung VI 2 / file chung ghi dung.
+- Ban build da cai: cau EN loi-host co mat 1/1; 0 dau hieu Vite xoa env.
+- tsc + build + sign-install chay tron tu duong dan moi (Build and UI Design\).
+
+### [CHO]
+- pc_sapXepClipsLenTrack van la duong chua tung chay (parts.length >= 9 vs
+  8 truong) - giu nguyen theo quyet dinh cu, dung bat.
+
+---
+
 ## [bin-chung] - 2026-08-13 11:08 (UTC+7) - KHO FFmpeg DUNG CHUNG CHO CA BO
 
 ### Boi canh

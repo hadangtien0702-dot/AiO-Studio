@@ -1,5 +1,44 @@
 # AiO Autocut - Nhat ky
 
+## [song-ngu-ui] - 2026-08-14 13:57 (UTC+7) - SONG NGU + 4 DOI UI ANH TIEN CHOT 13/08
+
+### Trang thai hien tai
+v1.5.0, nam trong GOI FREE cua Beta (Release/2026-08-14-beta-01, goi khong
+kem ffprobe, ho tro kho FFmpeg dung chung). Song ngu do tren panel that
+(8089): EN con 4 chuoi - CA 4 DUNG THIET KE (ten project nguoi dung + 3 muc
+cat giu nguyen thuong hieu). Viec ke tiep: anh Tien cai thu ban beta may
+sach; sau beta moi quay lai Silero VAD + FCPXML.
+
+### Bon doi UI anh Tien chot 13/08 (dao nguoc mot so quyet dinh cu - CO Y)
+1. manifest Type: Modeless -> Panel (dock chung voi cac panel khac). DAO
+   NGUOC quyet dinh 03/08 "cua so rieng" - anh doi y, ghi chu cu trong
+   manifest da danh dau HET HIEU LUC. Doi Type phai TAT HAN Premiere.
+2. Go khoi "Doan se cat" (bang mau + nut Giu lai) - anh: "no du thua".
+   BangDoan.tsx GIU trong ma nguon, chi thoi dung; doiGiu/tcode/conPhanTram
+   giu bang void, bat lai duoc.
+3. O "Ket qua" rut con MOT DONG "cu -> moi" (vd 6:29 -> 6:12). Sua kem loi
+   toi tu gay: chua chay ma hien do dai vung duoi nhan "Ket qua" - anh bat
+   ("chua chay ma co ket qua ha em"). Chua chay = hien "-".
+4. GIAU QUY TRINH luc chay: bo ten buoc + danh sach 5 buoc, chi con
+   "Dang xu ly / Loading + % + dong ho". Giau VIEC, khong giau TIEN DO.
+   Luu y: ten buoc van nam trong bundle (bo dem tien do dung), chi khong ve.
+
+### Song ngu
+- 130 cho boc dich() (98 App.tsx + 4 component + 24 cau bao loi .ts truoc do)
+- chu.ts ~190 khoa, khoa = CHINH CAU TIENG VIET; 3 muc cat giu nguyen
+- ~15 template literal ${} van tieng Viet (chi hien thoang luc chay) - [CHO]
+- Nut 1 button (anh chot, bo 2 la co), luu chung ca bo qua ngonngu.json
+- ffmpeg.ts: process.env -> bienMT() (Vite thay process.env bang {} luc
+  build lam kho FFmpeg chung KHONG BAO GIO duoc do toi - loi chi thay o
+  ban build, ma nguon viet dung)
+
+### Kiem chung
+EN sot 4 (deu hop le) / doi chung VI 21 / ngonngu.json ghi dung. Ban build
+0 dau hieu Vite xoa env. Cai lai nhieu dot, dot cuoi sau khi sua "phut/giay"
+-> min/sec (do that moi loi ra "7 phut 39 giay").
+
+---
+
 ## [bin-chung] - 2026-08-13 11:08 - KHO FFmpeg DUNG CHUNG CHO CA BO (buoc 2)
 
 Tiep theo muc [goi-nhe] ben duoi. Buoc 1 bo ffprobe khoi rieng Autocut;

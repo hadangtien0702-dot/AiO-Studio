@@ -307,7 +307,18 @@ Cách ghép (đã làm, giữ nguyên lối này cho các panel sau):
   **đường ngưỡng cam nhấp nhô theo nền ồn** — thứ chứng minh tool không cắt nhầm
   lời người ngồi xa mic. Thiết kế mới không có chỗ cho nó. Cần trưng lại thì có sẵn.
 
-**Panel nay là CỬA SỔ RIÊNG**, không dock được nữa: `<Type>Modeless</Type>`,
+**☠️ HẾT HIỆU LỰC 13/08/2026 — ANH TIẾN ĐỔI Ý, VỀ LẠI `Panel` DOCK CHUNG.**
+Nguyên văn: *"em sửa lại phần này và cho nó mở chung chỗ với các panel nha em"*.
+Giá đã biết từ 03/08 vẫn đúng: dock phải ~360px thì lưới 2 cột rơi về 1 cột
+(đo ở 280x320: tràn 0, chữ không cắt — xấu hơn chứ không vỡ). Muốn 2 cột thì
+kéo panel ra thành cửa sổ nổi. Đổi `Type` vẫn phải TẮT HẲN Premiere.
+Kèm 13/08 (anh chốt, đảo vài quyết định cũ — xem PROGRESS [song-ngu-ui]):
+gỡ khối "Đoạn sẽ cắt" (BangDoan.tsx giữ nguồn, thôi dùng) · Kết quả một dòng
+cũ→mới · giấu quy trình lúc chạy (chỉ Loading + %) · song ngữ VI/EN.
+→ Câu "Ô Ước còn lại đang NÓI DỐI" bên dưới cũng HẾT HIỆU LỰC: ô đó đã gỡ
+cùng khối ba ô 13/08.
+
+Đoạn cũ giữ để biết vì sao từng làm vậy: ~~**Panel nay là CỬA SỔ RIÊNG**, không dock được nữa: `<Type>Modeless</Type>`,~~
 kho mở 1280x800. Anh Tiến: *"khi bấm vào thì mặc định mình sẽ bung một cửa sổ
 riêng biệt nằm ngoài luôn với UI gốc đẹp nhất"*. Dock bên phải chỉ được 360px
 thì lưới hai cột luôn rơi về một cột. ☠️ Đổi `Type` **bắt buộc tắt hẳn Premiere**
