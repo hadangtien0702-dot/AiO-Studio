@@ -6,8 +6,9 @@ export const metadata: Metadata = {
   description:
     "Workflow suite cho Premiere Pro: quản lý asset không giới hạn, preview tức thì, dùng lại Brand Kit, tạo rough cut và transcript.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/AiO Logo 3.png",
+    shortcut: "/AiO Logo 3.png",
+    apple: "/AiO Logo 3.png",
   },
 };
 

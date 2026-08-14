@@ -1,15 +1,19 @@
 "use client";
 
 import {
+  Activity,
   ArrowRight,
   Box,
   Captions,
   Check,
   ChevronRight,
+  Cpu,
   Film,
   FolderOpen,
+  Layers,
   Layers3,
   Lightbulb,
+  Maximize2,
   Menu,
   MonitorPlay,
   MousePointer2,
@@ -17,7 +21,12 @@ import {
   Play,
   RotateCcw,
   Scissors,
+  ShieldCheck,
+  Sliders,
   Sparkles,
+  Video,
+  Volume2,
+  VolumeX,
   WandSparkles,
   X,
   Zap,
@@ -35,110 +44,171 @@ type ToolId =
   | "cutshort";
 
 const lessons = [
-  { id: "top", label: "Overview", short: "01", width: "20%" },
-  { id: "basics", label: "Pain Points", short: "02", width: "20%" },
-  { id: "lab", label: "8 Native Tools", short: "03", width: "25%" },
-  { id: "comparison", label: "Vs Competitors", short: "04", width: "20%" },
-  { id: "pricing", label: "Pricing", short: "05", width: "15%" },
+  { id: "top", label: "Overview", short: "01", width: 20 },
+  { id: "basics", label: "Pain Points", short: "02", width: 20 },
+  { id: "lab", label: "8 Native Tools", short: "03", width: 25 },
+  { id: "comparison", label: "Vs Competitors", short: "04", width: 20 },
+  { id: "pricing", label: "Pricing", short: "05", width: 15 },
 ] as const;
 
 const tools = [
   {
-    id: "assets" as const,
-    name: "Asset Manager",
-    category: "Media & Brand",
-    childName: "28,000+ Assets at Instant Preview",
-    icon: Layers3,
-    color: "orange",
-    oneLine: "Organize 28,000+ B-rolls, SFX, and music without slowing down your NLE.",
-    explanation: "Scans your drives instantly. Preview audio waveform and video in under 1s, then drag directly into your Premiere Pro timeline on empty tracks.",
-    steps: ["Scan 28k+ local assets", "Instant <1s Waveform & Video preview", "Drag & Drop directly to active track"],
-  },
-  {
-    id: "powerbins" as const,
-    name: "Power Bins",
-    category: "Media & Brand",
-    childName: "Universal Brand Kit Across Projects",
-    icon: Box,
-    color: "blue",
-    oneLine: "Set up logos, intros, outros & watermarks once. Access them in every new project.",
-    explanation: "Power Bins acts as a universal brand vault. When you open a fresh Premiere Pro project, all your brand assets are already standing by.",
-    steps: ["Set up Brand Kit once", "Open any new project", "Assets appear automatically without re-importing"],
-  },
-  {
     id: "autocut" as const,
     name: "Auto Cut",
-    category: "Rough Cut & Editing",
-    childName: "1-Click Silence & Filler Removal",
+    category: "Rough Cut",
+    headline: "Cắt Khoảng Lặng 1-Click",
+    speed: "0.8s xử lý",
+    image: "/assets/autocut-420.png",
     icon: Scissors,
-    color: "purple",
-    oneLine: "Detect dead air, silences, and filler pauses. Ripple delete in 1 second.",
-    explanation: "Eliminates boring rough-cut labor. Automatically analyzes waveform thresholds and performs clean ripple cuts right on your timeline with 1-click undo.",
-    steps: ["Analyze audio waveform", "Detect silence thresholds", "Ripple delete & tighten timeline"],
-  },
-  {
-    id: "transcripts" as const,
-    name: "Auto Transcripts",
-    category: "Captions & AI",
-    childName: "60-Min Audio Transcribed in 14s",
-    icon: Captions,
-    color: "green",
-    oneLine: "100% offline speech-to-text with auto-formatted captions for TikTok & Reels.",
-    explanation: "Transcribes a 60-minute episode in just 14 seconds. Auto-formats long lines (193 -> 42 chars) to ensure zero overlap and perfect reading pace.",
-    steps: ["Fast offline Speech-to-Text", "Auto-wrap lines for social mobile viewing", "Export native .SRT or timeline captions"],
-  },
-  {
-    id: "reframe" as const,
-    name: "Auto Re-Frames",
-    category: "Framing & Layout",
-    childName: "Smart 16:9 to 9:16 Vertical Reframer",
-    icon: MonitorPlay,
-    color: "yellow",
-    oneLine: "Convert horizontal sequence to 9:16 vertical while tracking the subject.",
-    explanation: "Powered by deep subject tracking, automatically duplicates horizontal sequences into vertical 9:16 aspect ratio while keeping the speaker centered.",
-    steps: ["Select horizontal sequence", "Apply subject tracking", "Generate ready-to-post 9:16 vertical video"],
+    color: "orange",
+    tag: "Tiết kiệm 80% thời gian",
+    bullets: [
+      "Quét và phát hiện dải sóng âm tự động",
+      "Xóa sạch khoảng lặng thừa & dồn timeline tức thì",
+      "Undo 1-click trực tiếp, an toàn tuyệt đối",
+    ],
   },
   {
     id: "podcast" as const,
     name: "Auto Podcast",
-    category: "Rough Cut & Editing",
-    childName: "Director-Level Multi-Cam Auto Switching",
+    category: "Multicam AI",
+    headline: "Đạo Diễn Multicam Tự Động",
+    speed: "0ms lip-sync drift",
+    image: "/assets/autocut-800.png",
     icon: WandSparkles,
+    color: "purple",
+    tag: "Chống trôi hình >90 phút",
+    bullets: [
+      "Chuyển góc camera theo mic người nói",
+      "Tự động chèn reaction shots tự nhiên",
+      "Hỗ trợ trộn sample rate 44.1k & 48k",
+    ],
+  },
+  {
+    id: "transcripts" as const,
+    name: "Auto Transcripts",
+    category: "Phụ Đề AI",
+    headline: "60 Phút Audio ➔ 14 Giây",
+    speed: "14s siêu tốc",
+    image: "/assets/transcripts-420.png",
+    icon: Captions,
+    color: "green",
+    tag: "100% Offline GPU",
+    bullets: [
+      "AI chuyển giọng nói thành văn bản siêu tốc",
+      "Tự ngắt dòng chuẩn hiển thị TikTok/Reels",
+      "Xuất file .SRT hoặc Premiere Captions",
+    ],
+  },
+  {
+    id: "reframe" as const,
+    name: "Auto Re-Frames",
+    category: "Social 9:16",
+    headline: "Chuyển 16:9 Sang 9:16 Tự Động",
+    speed: "0.2s tạo sequence",
+    image: "/assets/re-frames-420.png",
+    icon: MonitorPlay,
+    color: "yellow",
+    tag: "Bám chủ thể AI",
+    bullets: [
+      "Deep tracking giữ chủ thể luôn ở trung tâm",
+      "Tự động nhân bản sequence dọc trong 1 click",
+      "Giữ nguyên độ sắc nét và khung hình gốc",
+    ],
+  },
+  {
+    id: "assets" as const,
+    name: "Asset Manager",
+    category: "Quản Lý Kho",
+    headline: "28.000+ Assets Preview <1s",
+    speed: "<1s xem trước",
+    image: "/assets/asset-manager-420.png",
+    icon: Layers3,
+    color: "blue",
+    tag: "Không lag NLE",
+    bullets: [
+      "Quét toàn bộ ổ cứng không làm chậm máy",
+      "Xem trước video và sóng âm thanh dưới 1s",
+      "Kéo thả trực tiếp vào timeline Premiere",
+    ],
+  },
+  {
+    id: "powerbins" as const,
+    name: "Power Bins",
+    category: "Brand Kit",
+    headline: "Brand Kit Dùng Chung Mọi Project",
+    speed: "Sẵn sàng tức thì",
+    image: "/assets/power-bins-420.png",
+    icon: Box,
     color: "orange",
-    oneLine: "Auto-switch multi-cam podcast angles based on active speakers without lip-sync drift.",
-    explanation: "Analyzes multi-mic audio tracks to switch camera angles like a live director. Handles mixed sample rates (44.1k/48k) with 0 lip-sync drift even on 90+ min shows.",
-    steps: ["Assign speaker mics to angles", "AI detects active talkers & reaction shots", "Generates full multicam cuts in seconds"],
+    tag: "Cài 1 lần dùng mãi",
+    bullets: [
+      "Kho lưu trữ logo, intro, outro thương hiệu",
+      "Mở project mới là có sẵn tài nguyên",
+      "Không bao giờ phải import lại từ đầu",
+    ],
   },
   {
     id: "guideframe" as const,
     name: "Guide Frame",
-    category: "Framing & Layout",
-    childName: "0.2s Safe Zone Overlays for 10 Platforms",
+    category: "Bố Cục",
+    headline: "Safe Zone 10 Nền Tảng",
+    speed: "0.2s bật/tắt",
+    image: "/assets/re-frames-800.png",
     icon: Sparkles,
     color: "blue",
-    oneLine: "Instant safe zone overlays for TikTok, Shorts, Reels, Shopee & composition grids.",
-    explanation: "Overlay exact UI safe zones for 10+ social platforms and 53 danger areas in 0.2s. Ensures your titles and captions are never hidden behind avatar buttons.",
-    steps: ["Select target social platform", "Overlay UI Safe Zone & Golden Ratio grid in 0.2s", "Clean remove anytime without clutter"],
+    tag: "Chuẩn 53 vùng nguy hiểm",
+    bullets: [
+      "Lưới an toàn TikTok, Reels, Shorts, Shopee",
+      "Tránh tiêu đề bị che bởi avatar và nút tim",
+      "Bật tắt nhanh trong 0.2s không rác timeline",
+    ],
   },
   {
     id: "cutshort" as const,
     name: "Auto Cut Short",
-    category: "Rough Cut & Editing",
-    childName: "Extract Viral Short Clips from Long Video",
+    category: "Viral Clip",
+    headline: "Tách Video Ngắn 60s Tự Động",
+    speed: "1-Click trích xuất",
+    image: "/assets/AiO Welcome.png",
     icon: Zap,
     color: "purple",
-    oneLine: "Identify high-engagement moments in long-form videos & extract 60s shorts.",
-    explanation: "Analyzes transcript density and voice emotion to pull viral-ready 60-second highlight clips from hours of raw footage, complete with dynamic captions.",
-    steps: ["Scan long-form video transcript", "Rank top hook moments", "Export ready-to-post 60s Shorts"],
+    tag: "Bắt trọn hook viral",
+    bullets: [
+      "Quét đoạn cao trào trong video dài",
+      "Tự động trích xuất clip 60 giây nổi bật",
+      "Sẵn sàng xuất bản đa nền tảng mạng xã hội",
+    ],
   },
 ];
 
-function BrandMark() {
+function AiOLogo({ size = 28, className = "" }: { size?: number; className?: string }) {
   return (
-    <span className="brand-mark" aria-hidden="true">
-      <i />
-      <i />
-      <i />
+    <span
+      className={`aio-logo-wrap ${className}`}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+      aria-hidden="true"
+    >
+      <img
+        src="/AiO Logo 3.png"
+        alt="AiO Studio"
+        width={size}
+        height={size}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          display: "block",
+          borderRadius: "4px",
+        }}
+      />
     </span>
   );
 }
@@ -147,7 +217,7 @@ function Header({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (op
   return (
     <header className="site-header">
       <a className="brand" href="#top" aria-label="AiO Studio - Trang chủ">
-        <BrandMark />
+        <AiOLogo size={26} />
         <span>AiO Studio</span>
         <small>Workflow Suite</small>
       </a>
@@ -171,7 +241,24 @@ function Header({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (op
   );
 }
 
-function LessonRail({ progress, active }: { progress: number; active: string }) {
+function LessonRail({
+  progress,
+  active,
+  onSelectSection,
+}: {
+  progress: number;
+  active: string;
+  onSelectSection: (id: string) => void;
+}) {
+  const activeIndex = Math.max(0, lessons.findIndex((l) => l.id === active));
+
+  let cumPercent = 0;
+  for (let i = 0; i < activeIndex; i++) {
+    cumPercent += lessons[i].width;
+  }
+  const currentTabWidth = lessons[activeIndex].width;
+  const playheadPercent = Math.min(98.5, Math.max(1.5, cumPercent + currentTabWidth / 2));
+
   return (
     <nav className="lesson-rail" aria-label="Các bài học trên trang">
       <div className="lesson-rail-label">
@@ -181,59 +268,413 @@ function LessonRail({ progress, active }: { progress: number; active: string }) 
       </div>
       <div className="lesson-track">
         {lessons.map((lesson) => (
-          <a
+          <button
             key={lesson.id}
-            href={`#${lesson.id}`}
+            type="button"
             className={active === lesson.id ? "is-active" : ""}
-            style={{ width: lesson.width }}
+            style={{ width: `${lesson.width}%` }}
+            onClick={() => onSelectSection(lesson.id)}
             aria-current={active === lesson.id ? "location" : undefined}
           >
             <small>{lesson.short}</small>
             <span>{lesson.label}</span>
             <Check size={13} />
-          </a>
+          </button>
         ))}
-        <i className="lesson-playhead" style={{ left: `${progress * 100}%` }} aria-hidden="true" />
+        <i
+          className="lesson-playhead"
+          style={{ left: `${playheadPercent}%` }}
+          aria-hidden="true"
+        />
       </div>
     </nav>
   );
 }
 
-function FirstEditAnimation({ run }: { run: number }) {
+type HeroSimMode = "autocut" | "podcast" | "transcripts" | "reframe";
+
+function HeroConsoleSimulator({ run }: { run: number }) {
+  const [activeMode, setActiveMode] = useState<HeroSimMode>("autocut");
+  const [cutApplied, setCutApplied] = useState(true);
+
+  useEffect(() => {
+    setCutApplied(false);
+    const timer = setTimeout(() => {
+      setCutApplied(true);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [run, activeMode]);
+
   return (
-    <div className={run > 0 ? "first-edit is-running" : "first-edit"} key={run} aria-label="Mô phỏng đưa asset từ thư viện vào timeline">
-      <div className="editor-topbar">
-        <span><i /><i /><i /></span>
-        <strong>Product_Launch_01</strong>
-        <time>00:00:06</time>
+    <div className={`hero-console-simulator ${cutApplied ? "cut-processed" : ""}`} key={`${activeMode}-${run}`}>
+      {/* Streamlined Mode Switcher */}
+      <div className="sim-mode-bar" role="tablist" aria-label="Chế độ mô phỏng">
+        <button
+          type="button"
+          className={`sim-mode-btn ${activeMode === "autocut" ? "is-active" : ""}`}
+          onClick={() => { setActiveMode("autocut"); setCutApplied(false); }}
+        >
+          <Scissors size={14} />
+          <span>Auto Cut</span>
+        </button>
+        <button
+          type="button"
+          className={`sim-mode-btn ${activeMode === "podcast" ? "is-active" : ""}`}
+          onClick={() => { setActiveMode("podcast"); setCutApplied(false); }}
+        >
+          <Video size={14} />
+          <span>Auto Podcast</span>
+        </button>
+        <button
+          type="button"
+          className={`sim-mode-btn ${activeMode === "transcripts" ? "is-active" : ""}`}
+          onClick={() => { setActiveMode("transcripts"); setCutApplied(false); }}
+        >
+          <Captions size={14} />
+          <span>Transcripts AI</span>
+        </button>
+        <button
+          type="button"
+          className={`sim-mode-btn ${activeMode === "reframe" ? "is-active" : ""}`}
+          onClick={() => { setActiveMode("reframe"); setCutApplied(false); }}
+        >
+          <MonitorPlay size={14} />
+          <span>Auto Re-Frames</span>
+        </button>
       </div>
-      <div className="editor-canvas">
-        <div className="media-shelf">
-          <span className="ui-label"><FolderOpen size={14} /> Asset Library</span>
-          <div className="media-thumb thumb-sky"><Film size={18} /><small>Bầu_trời.mp4</small></div>
-          <div className="media-thumb thumb-music"><Music2 size={18} /><small>Nhạc_vui.mp3</small></div>
+
+      {/* Premiere Pro Main Container */}
+      <div className="nle-window-frame">
+        {/* NLE Topbar */}
+        <div className="nle-topbar">
+          <div className="nle-window-dots">
+            <span className="dot dot-close" />
+            <span className="dot dot-min" />
+            <span className="dot dot-max" />
+          </div>
+          <div className="nle-title">
+            <span className="pr-tag">Pr</span>
+            <strong>Podcast_Episode_42_RoughCut.prproj</strong>
+            <span className="seq-info">4K UHD · 23.98 fps</span>
+          </div>
+          <div className="nle-engine-status">
+            <span className="pulse-dot" />
+            <small>AiO Local GPU: Active</small>
+          </div>
         </div>
-        <div className="preview-screen">
-          <span className="sun" />
-          <span className="hill hill-one" />
-          <span className="hill hill-two" />
-          <strong>Render Preview</strong>
-          <Play size={22} fill="currentColor" />
+
+        {/* NLE Workspace: Monitor + AiO Dock */}
+        <div className="nle-workspace-grid">
+          {/* Monitor Screen */}
+          <div className="nle-monitor">
+            <div className="monitor-header">
+              <span>Program: Main_Sequence</span>
+              <span className="timecode">00:14:32:18</span>
+            </div>
+
+            <div className="monitor-viewport">
+              <div className={`video-scene mode-${activeMode}`}>
+                {activeMode === "autocut" && (
+                  <div className="scene-speaker-wrap">
+                    <div className="speaker-avatar-frame host-frame">
+                      <div className="speaker-silhouette">
+                        <div className="host-head" />
+                        <div className="host-body" />
+                      </div>
+                      <span className="speaker-tag">Host Mic (A1)</span>
+                    </div>
+                    {cutApplied ? (
+                      <div className="cut-tag-badge">
+                        <Scissors size={13} /> 142 khoảng lặng đã cắt bỏ (0.8s)
+                      </div>
+                    ) : (
+                      <div className="silence-detected-badge">
+                        <Activity size={13} /> Đang quét dải sóng âm...
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeMode === "podcast" && (
+                  <div className="scene-multicam-wrap">
+                    <div className="multicam-view cam-a is-talking">
+                      <div className="cam-badge">Cam A (Host) · ACTIVE TALKER</div>
+                      <div className="speaker-silhouette mini">
+                        <div className="host-head" />
+                        <div className="host-body" />
+                      </div>
+                    </div>
+                    <div className="multicam-view cam-b">
+                      <div className="cam-badge">Cam B (Guest)</div>
+                      <div className="speaker-silhouette mini guest">
+                        <div className="host-head" />
+                        <div className="host-body" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeMode === "transcripts" && (
+                  <div className="scene-transcript-wrap">
+                    <div className="speaker-silhouette">
+                      <div className="host-head" />
+                      <div className="host-body" />
+                    </div>
+                    <div className="live-caption-bubble">
+                      <span>AiO Studio tự động chuyển </span>
+                      <span className="highlight-word">60 phút audio </span>
+                      <span>thành phụ đề trong </span>
+                      <span className="highlight-word orange">14 giây.</span>
+                    </div>
+                  </div>
+                )}
+
+                {activeMode === "reframe" && (
+                  <div className="scene-reframe-wrap">
+                    <div className="horizontal-bg">
+                      <div className="speaker-silhouette">
+                        <div className="host-head" />
+                        <div className="host-body" />
+                      </div>
+                    </div>
+                    <div className="vertical-frame-guide">
+                      <span className="aspect-label">9:16 Auto-Tracking</span>
+                      <div className="safe-zone-box">
+                        <small>TikTok Safe Zone</small>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Audio VU Meters */}
+                <div className="audio-vu-meter">
+                  <div className="vu-bar left">
+                    <i /><i /><i /><i /><i /><i /><i /><i /><i /><i />
+                  </div>
+                  <div className="vu-bar right">
+                    <i /><i /><i /><i /><i /><i /><i /><i /><i /><i />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* AiO Studio Native Panel (Docked in Premiere) */}
+          <div className="nle-aio-dock">
+            <div className="dock-header">
+              <AiOLogo size={16} />
+              <strong>AiO Studio</strong>
+              <span className="dock-pill">Native Panel</span>
+            </div>
+
+            <div className="dock-body">
+              {activeMode === "autocut" && (
+                <div className="dock-controls">
+                  <div className="dock-control-row">
+                    <span>Ngưỡng âm (Threshold)</span>
+                    <strong>-34 dB</strong>
+                  </div>
+                  <div className="dock-slider-mock">
+                    <div className="slider-fill" style={{ width: "65%" }} />
+                    <div className="slider-thumb" style={{ left: "65%" }} />
+                  </div>
+
+                  <div className="dock-control-row">
+                    <span>Lặng tối thiểu</span>
+                    <strong>0.30s</strong>
+                  </div>
+                  <div className="dock-slider-mock">
+                    <div className="slider-fill" style={{ width: "40%" }} />
+                    <div className="slider-thumb" style={{ left: "40%" }} />
+                  </div>
+
+                  <button
+                    type="button"
+                    className={`dock-action-btn ${cutApplied ? "applied" : ""}`}
+                    onClick={() => setCutApplied(!cutApplied)}
+                  >
+                    <Scissors size={14} />
+                    <span>{cutApplied ? "Đã Cắt Dồn (Undo 1-Click)" : "Cắt Dồn Ripple Delete (1-Click)"}</span>
+                  </button>
+                </div>
+              )}
+
+              {activeMode === "podcast" && (
+                <div className="dock-controls">
+                  <div className="dock-control-row">
+                    <span>Chế độ Multicam</span>
+                    <strong>AI Live Director</strong>
+                  </div>
+                  <div className="dock-control-row">
+                    <span>Chống trôi Lip-Sync</span>
+                    <strong style={{ color: "var(--green)" }}>0.00ms Drift</strong>
+                  </div>
+                  <div className="dock-control-row">
+                    <span>Reaction Shots</span>
+                    <strong>25%</strong>
+                  </div>
+                  <button type="button" className="dock-action-btn applied">
+                    <Video size={14} />
+                    <span>Tự Động Chuyển Góc Cam</span>
+                  </button>
+                </div>
+              )}
+
+              {activeMode === "transcripts" && (
+                <div className="dock-controls">
+                  <div className="dock-control-row">
+                    <span>Thuật toán AI</span>
+                    <strong>Offline Engine v2.4</strong>
+                  </div>
+                  <div className="dock-control-row">
+                    <span>Tốc độ xử lý</span>
+                    <strong style={{ color: "var(--green)" }}>14s / 60 phút</strong>
+                  </div>
+                  <div className="dock-control-row">
+                    <span>Định dạng xuất</span>
+                    <strong>Native .SRT / Pr Captions</strong>
+                  </div>
+                  <button type="button" className="dock-action-btn applied">
+                    <Captions size={14} />
+                    <span>Tạo Phụ Đề Tức Thì</span>
+                  </button>
+                </div>
+              )}
+
+              {activeMode === "reframe" && (
+                <div className="dock-controls">
+                  <div className="dock-control-row">
+                    <span>Mục tiêu xuất</span>
+                    <strong>9:16 TikTok / Reels</strong>
+                  </div>
+                  <div className="dock-control-row">
+                    <span>Subject Tracking</span>
+                    <strong style={{ color: "var(--green)" }}>Bám chủ thể AI</strong>
+                  </div>
+                  <div className="dock-control-row">
+                    <span>Safe Zone Overlays</span>
+                    <strong>Tự động 0.2s</strong>
+                  </div>
+                  <button type="button" className="dock-action-btn applied">
+                    <MonitorPlay size={14} />
+                    <span>Tạo Sequence 9:16 Tự Động</span>
+                  </button>
+                </div>
+              )}
+
+              <div className="dock-footer-metric">
+                <ShieldCheck size={13} color="var(--green)" />
+                <small>100% Local GPU · Bảo mật dữ liệu</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* NLE Multi-Track Timeline */}
+        <div className="nle-timeline-area">
+          {/* Timeline Header & Time Ruler */}
+          <div className="timeline-ruler">
+            <div className="ruler-track-labels">TRACKS</div>
+            <div className="ruler-marks">
+              <span>00:00:00</span>
+              <span>00:05:00</span>
+              <span>00:10:00</span>
+              <span>00:15:00</span>
+              <span>00:20:00</span>
+              <span>00:25:00</span>
+            </div>
+          </div>
+
+          {/* Timeline Tracks Grid */}
+          <div className="timeline-tracks-body">
+            {/* Playhead */}
+            <div className="timeline-playhead-line" />
+
+            {/* Track V2 */}
+            <div className="nle-track-row">
+              <span className="track-id">V2</span>
+              <div className="track-content">
+                <div className="track-block block-graphics" style={{ width: "26%", left: "10%" }}>
+                  <Layers size={11} /> <span>B-Roll_Drone_04.mp4</span>
+                </div>
+                <div className="track-block block-graphics" style={{ width: "24%", left: "60%" }}>
+                  <Layers size={11} /> <span>Social_Title_Preset</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Track V1 */}
+            <div className="nle-track-row">
+              <span className="track-id">V1</span>
+              <div className="track-content">
+                <div className="track-block block-video" style={{ width: "24%", left: "0%" }}>
+                  <Video size={11} /> <span>CamA_Host_4K</span>
+                </div>
+                <div className="track-block block-video alt" style={{ width: "28%", left: "25%" }}>
+                  <Video size={11} /> <span>CamB_Guest_4K</span>
+                </div>
+                <div className="track-block block-video" style={{ width: "45%", left: "54%" }}>
+                  <Video size={11} /> <span>CamA_Host_4K</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Track A1 */}
+            <div className="nle-track-row track-audio">
+              <span className="track-id">A1</span>
+              <div className="track-content waveform-track">
+                <div className="waveform-clip host-audio">
+                  <span className="clip-label">Mic_Host_Clean.wav</span>
+                  <div className="waveform-bars">
+                    {[40, 75, 90, 60, 85, 30, 95, 100, 70, 45, 80, 90, 60, 20, 10, 5, 0, 0, 0, 5, 10, 40, 85, 95, 70, 85, 60, 90, 75, 40, 0, 0, 0, 0, 15, 60, 85, 90, 70, 50, 80, 95, 60, 30, 0, 0, 10, 70, 85, 95, 60, 40, 80].map((h, i) => (
+                      <i
+                        key={i}
+                        className={h <= 10 ? "is-silence" : "is-active-voice"}
+                        style={{ height: `${Math.max(4, h)}%` }}
+                      />
+                    ))}
+                  </div>
+                  {!cutApplied && <span className="silence-overlay-indicator" />}
+                </div>
+              </div>
+            </div>
+
+            {/* Track A2 */}
+            <div className="nle-track-row track-audio">
+              <span className="track-id">A2</span>
+              <div className="track-content waveform-track">
+                <div className="waveform-clip guest-audio">
+                  <span className="clip-label">Mic_Guest_Clean.wav</span>
+                  <div className="waveform-bars">
+                    {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 30, 70, 90, 95, 80, 60, 85, 90, 70, 30, 0, 0, 0, 10, 60, 85, 95, 90, 75, 50, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 40, 75, 85, 90, 60, 30, 0, 0].map((h, i) => (
+                      <i
+                        key={i}
+                        className={h <= 10 ? "is-silence" : "is-active-voice"}
+                        style={{ height: `${Math.max(4, h)}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Bottom Status Ribbon */}
+          <div className="timeline-status-ribbon">
+            <div className="status-left">
+              <Zap size={13} color="var(--orange)" />
+              <span>
+                {cutApplied
+                  ? "✓ Đã loại bỏ 142 khoảng lặng thừa ➔ Timeline dồn gọn tức thì (Tiết kiệm 47 phút)"
+                  : "Đang phân tích dải sóng âm... Nhấn Cắt Dồn để thực thi Ripple Delete"}
+              </span>
+            </div>
+            <div className="status-right">
+              <span className="time-savings-tag">Tiết kiệm 80% thời gian</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="teaching-tip">
-        <Zap size={16} />
-        <span><strong>Không ngắt nhịp:</strong> preview asset trước khi import, rồi kéo thẳng xuống timeline.</span>
-      </div>
-      <div className="simple-timeline">
-        <span className="track-name">V1</span>
-        <div className="drop-zone"><small>Kéo asset vào timeline</small></div>
-        <span className="track-name">A1</span>
-        <div className="audio-zone"><small>Audio track</small></div>
-        <i className="demo-playhead" />
-      </div>
-      <div className="moving-clip"><Film size={15} /> Bầu_trời.mp4</div>
-      <MousePointer2 className="demo-cursor" size={24} fill="currentColor" />
     </div>
   );
 }
@@ -265,7 +706,7 @@ function ToolVisual({ active, run }: { active: ToolId; run: number }) {
     return (
       <div className="tool-animation bins-animation" key={`${active}-${run}`}>
         <div className="brand-box">
-          <BrandMark />
+          <AiOLogo size={28} />
           <strong>Brand Kit</strong>
           <span>Logo · Intro · Nhạc</span>
         </div>
@@ -336,11 +777,17 @@ export default function Home() {
       setProgress(scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0);
 
       let current = "top";
-      const threshold = window.innerHeight * 0.48;
-      lessons.forEach((lesson) => {
-        const element = document.getElementById(lesson.id);
-        if (element && element.getBoundingClientRect().top <= threshold) current = lesson.id;
-      });
+      const navOffset = 180;
+      for (let i = lessons.length - 1; i >= 0; i--) {
+        const element = document.getElementById(lessons[i].id);
+        if (element) {
+          const top = element.getBoundingClientRect().top;
+          if (top <= navOffset) {
+            current = lessons[i].id;
+            break;
+          }
+        }
+      }
       setActiveSection(current);
     };
 
@@ -352,6 +799,19 @@ export default function Home() {
       window.removeEventListener("resize", updateProgress);
     };
   }, []);
+
+  const scrollToSection = (id: string) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      const navOffset = 120;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: Math.max(0, elementPosition - navOffset),
+        behavior: "smooth",
+      });
+    }
+  };
 
   const selectTool = (id: ToolId) => {
     setActiveTool(id);
@@ -366,280 +826,414 @@ export default function Home() {
     <div className="learning-page" id="top">
       <a className="skip-link" href="#main-content">Đi đến nội dung chính</a>
       <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <LessonRail progress={progress} active={activeSection} />
+      <LessonRail
+        progress={progress}
+        active={activeSection}
+        onSelectSection={scrollToSection}
+      />
 
       <main id="main-content">
         <section className="hero section-shell">
           <div className="hero-copy">
-            <span className="eyebrow"><Sparkles size={16} /> Workflow suite cho Premiere Pro editor</span>
-            <h1>Đừng dùng giờ sáng tạo cho <em>việc lặp lại.</em></h1>
-            <p>AiO Studio xử lý khoảng thời gian bị mất giữa media thô và timeline sẵn sàng — để bạn dành năng lượng cho nhịp dựng, câu chuyện và chất lượng cuối.</p>
-            <div className="hero-actions">
-              <button className="primary-cta" onClick={() => setHeroRun((value) => value + 1)}>
-                {heroRun === 0 ? "Xem workflow thực tế" : "Xem lại workflow"}
-                {heroRun === 0 ? <Play size={17} fill="currentColor" /> : <RotateCcw size={17} />}
-              </button>
-              <a className="secondary-cta" href="#journey">Tính thời gian lấy lại <ArrowRight size={17} /></a>
+            <div className="hero-eyebrow">
+              <Zap size={13} />
+              <span>BỘ 8 CÔNG CỤ NATIVE CHO PREMIERE PRO & DAVINCI</span>
             </div>
-            <div className="hero-promise" aria-label="Giá trị nổi bật">
-              <span><Check size={16} /> Không giới hạn thư viện asset</span>
-              <span><Check size={16} /> Render preview trong tích tắc</span>
-              <span><Check size={16} /> Kết quả đưa thẳng vào timeline</span>
+            <h1>
+              Biến 3 giờ dựng thô <br />
+              <span className="hero-gradient-text">thành 15 phút.</span>
+            </h1>
+            <p className="hero-lead">
+              Tự động lọc khoảng lặng, chuyển multicam podcast và tạo phụ đề AI ngay trên Timeline — 100% Offline GPU, không giới hạn số phút.
+            </p>
+            <div className="hero-actions">
+              <a className="primary-cta" href="#lab">
+                Trải Nghiệm 8 Tool Native <ArrowRight size={16} />
+              </a>
+              <button
+                type="button"
+                className="secondary-cta replay-hero-btn"
+                onClick={() => setHeroRun((value) => value + 1)}
+              >
+                <RotateCcw size={15} /> Replay Dựng Thử
+              </button>
+            </div>
+            <div className="hero-feature-chips" aria-label="Đặc điểm cốt lõi">
+              <span><Check size={14} color="var(--green)" /> 100% Native Timeline</span>
+              <span><Check size={14} color="var(--green)" /> 100% Offline GPU</span>
+              <span><Check size={14} color="var(--green)" /> Không giới hạn phút</span>
             </div>
           </div>
           <div className="hero-demo">
-            <div className="demo-caption">
-              <span>WORKFLOW PROOF</span>
-              <strong>Từ Asset Library đến Premiere timeline</strong>
-              <small>Nhấn để xem luồng xử lý</small>
-            </div>
-            <FirstEditAnimation run={heroRun} />
+            <HeroConsoleSimulator run={heroRun} />
           </div>
         </section>
 
         <section className="confidence-strip" aria-label="Bằng chứng sản phẩm">
-          <span><b>∞</b><strong>Asset không giới hạn</strong><small>Quản lý hàng chục nghìn file</small></span>
-          <span><b>&lt;1s</b><strong>Preview tức thì</strong><small>Xem trước mà không ngắt nhịp dựng</small></span>
-          <span><b>1×</b><strong>Thiết lập một lần</strong><small>Brand Kit dùng lại ở mọi project</small></span>
+          <span><b>∞</b><strong>Asset Không Giới Hạn</strong><small>Quản lý hàng chục nghìn file</small></span>
+          <span><b>&lt;1s</b><strong>Preview Tức Thì</strong><small>Xem trước không ngắt nhịp dựng</small></span>
+          <span><b>100%</b><strong>Offline Local GPU</strong><small>Bảo mật tuyệt đối source footage</small></span>
         </section>
 
+        {/* PAIN POINTS SECTION - CONNECTED TIMELINE PROCESS LINE FLOW */}
         <section className="basics section-shell" id="basics">
           <div className="section-intro">
-            <span className="lesson-number">ĐIỂM NGHẼN</span>
+            <span className="lesson-number">WORKFLOW PIPELINE</span>
             <div>
-              <h2>Editor không chậm vì thiếu kỹ năng.</h2>
-              <p>Bạn chậm vì những việc nhỏ này lặp lại trong từng project.</p>
+              <h2>Quy Trình 4 Bước Dựng Tối Ưu Với AiO Studio</h2>
+              <p>Loại bỏ các điểm nghẽn thủ công theo từng giai đoạn làm việc của một video editor.</p>
             </div>
           </div>
-          <div className="concept-grid">
-            <article className="concept-card media-concept">
-              <span className="concept-icon"><FolderOpen size={28} /></span>
-              <small>TRƯỚC KHI DỰNG</small>
-              <h3>Tìm media</h3>
-              <p>Mở từng thư mục, tìm lại đúng phiên bản và chờ file đủ nhanh để xem.</p>
-              <div className="concept-picture media-pieces"><i /><i /><i /></div>
-            </article>
-            <article className="concept-card timeline-concept">
-              <span className="concept-icon"><Film size={28} /></span>
-              <small>MỖI PROJECT</small>
-              <h3>Import lại Brand Kit</h3>
-              <p>Logo, intro và nhạc thương hiệu được lặp lại dù chúng không thay đổi.</p>
-              <div className="concept-picture timeline-pieces"><i /><i /><i /><b /></div>
-            </article>
-            <article className="concept-card cut-concept">
-              <span className="concept-icon"><Scissors size={28} /></span>
-              <small>DỰNG THÔ</small>
-              <h3>Cắt khoảng lặng</h3>
-              <p>Thời gian sáng tạo bị dùng cho việc dò và cắt những đoạn trống.</p>
-              <div className="concept-picture cut-pieces"><i /><b /><i /></div>
-            </article>
-            <article className="concept-card export-concept">
-              <span className="concept-icon"><MonitorPlay size={28} /></span>
-              <small>HOÀN THIỆN</small>
-              <h3>Gõ lại lời thoại</h3>
-              <p>Nghe, dừng, gõ và căn phụ đề là một chuỗi việc lặp lại rất dài.</p>
-              <div className="concept-picture preview-picture"><Play size={22} fill="currentColor" /></div>
-            </article>
-          </div>
-          <div className="remember-rule">
-            <Lightbulb size={22} />
-            <p><strong>Điểm khác biệt:</strong> AiO Studio không dựng thay bạn. Nó dọn phần việc lặp lại để khi mở timeline, bạn có thể bắt đầu từ quyết định sáng tạo.</p>
+
+          <div className="pipeline-line-flow">
+            {/* Background Horizontal Connecting Rail */}
+            <div className="pipeline-rail" aria-hidden="true">
+              <div className="rail-track-line" />
+              <div className="rail-progress-glow" />
+            </div>
+
+            {/* 4 Pipeline Connected Steps */}
+            <div className="pipeline-steps-grid">
+              {/* Step 1 */}
+              <div className="pipeline-step-item">
+                <div className="step-node-anchor">
+                  <span className="step-node-dot">01</span>
+                </div>
+                <article className="pipeline-card">
+                  <div className="pipeline-card-header">
+                    <div className="pipeline-icon tone-orange">
+                      <FolderOpen size={20} />
+                    </div>
+                    <div>
+                      <span className="pipeline-phase">BƯỚC 01 · CHUẨN BỊ</span>
+                      <h3>Tìm & Lục Media</h3>
+                    </div>
+                  </div>
+                  <div className="pipeline-flow-comparison">
+                    <div className="flow-row old">
+                      <span className="flow-badge old-badge">Cũ</span>
+                      <p>Mất 15-30p lục lọi các ổ cứng</p>
+                    </div>
+                    <div className="flow-arrow-down"><ArrowRight size={13} /></div>
+                    <div className="flow-row aio">
+                      <span className="flow-badge aio-badge">AiO</span>
+                      <p>Preview sóng âm &lt;1s & kéo thả</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              {/* Step 2 */}
+              <div className="pipeline-step-item">
+                <div className="step-node-anchor">
+                  <span className="step-node-dot">02</span>
+                </div>
+                <article className="pipeline-card">
+                  <div className="pipeline-card-header">
+                    <div className="pipeline-icon tone-blue">
+                      <Box size={20} />
+                    </div>
+                    <div>
+                      <span className="pipeline-phase">BƯỚC 02 · KHỞI TẠO</span>
+                      <h3>Brand Kit & Logo</h3>
+                    </div>
+                  </div>
+                  <div className="pipeline-flow-comparison">
+                    <div className="flow-row old">
+                      <span className="flow-badge old-badge">Cũ</span>
+                      <p>Import lại logo & intro thủ công</p>
+                    </div>
+                    <div className="flow-arrow-down"><ArrowRight size={13} /></div>
+                    <div className="flow-row aio">
+                      <span className="flow-badge aio-badge">AiO</span>
+                      <p>Power Bins có sẵn 100% tự động</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              {/* Step 3 */}
+              <div className="pipeline-step-item">
+                <div className="step-node-anchor">
+                  <span className="step-node-dot active">03</span>
+                </div>
+                <article className="pipeline-card is-highlight">
+                  <div className="pipeline-card-header">
+                    <div className="pipeline-icon tone-purple">
+                      <Scissors size={20} />
+                    </div>
+                    <div>
+                      <span className="pipeline-phase">BƯỚC 03 · DỰNG THÔ</span>
+                      <h3>Cắt Khoảng Lặng</h3>
+                    </div>
+                  </div>
+                  <div className="pipeline-flow-comparison">
+                    <div className="flow-row old">
+                      <span className="flow-badge old-badge">Cũ</span>
+                      <p>Ngồi dò & cắt từng khoảng trống (3h)</p>
+                    </div>
+                    <div className="flow-arrow-down"><ArrowRight size={13} /></div>
+                    <div className="flow-row aio">
+                      <span className="flow-badge aio-badge">AiO</span>
+                      <p>1-Click Ripple Delete tự động (15p)</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              {/* Step 4 */}
+              <div className="pipeline-step-item">
+                <div className="step-node-anchor">
+                  <span className="step-node-dot">04</span>
+                </div>
+                <article className="pipeline-card">
+                  <div className="pipeline-card-header">
+                    <div className="pipeline-icon tone-green">
+                      <Captions size={20} />
+                    </div>
+                    <div>
+                      <span className="pipeline-phase">BƯỚC 04 · XUẤT BẢN</span>
+                      <h3>Tạo Phụ Đề & Social</h3>
+                    </div>
+                  </div>
+                  <div className="pipeline-flow-comparison">
+                    <div className="flow-row old">
+                      <span className="flow-badge old-badge">Cũ</span>
+                      <p>Nghe & gõ tay từng câu thoại</p>
+                    </div>
+                    <div className="flow-arrow-down"><ArrowRight size={13} /></div>
+                    <div className="flow-row aio">
+                      <span className="flow-badge aio-badge">AiO</span>
+                      <p>AI Speech-to-Text 14s siêu tốc</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
           </div>
         </section>
 
+        {/* 8 NATIVE TOOLS - REAL UI SCREENSHOT SHOWCASE */}
         <section className="lab" id="lab">
           <div className="section-shell">
             <div className="section-intro lab-intro">
-              <span className="lesson-number">SOLUTION</span>
+              <span className="lesson-number">8 NATIVE PANELS</span>
               <div>
-                <h2>8 Native Tools. Zero Workflow Interruptions.</h2>
-                <p>Select any tool to see input, how AiO processes it locally, and what lands on your active timeline.</p>
+                <h2>Hệ Sinh Thái 8 Công Cụ Native Cho Premiere Pro</h2>
+                <p>Khám phá giao diện thực tế và tính năng đột phá của từng công cụ trong Suite.</p>
               </div>
             </div>
 
-            <div className="tool-picker" role="tablist" aria-label="Select AiO Studio tool to view workflow">
-              {tools.map(({ id, name, childName, icon: Icon, color }) => (
+            {/* Sleek Tool Dock Switcher (Clean, no text truncation) */}
+            <div className="studio-dock-bar" role="tablist" aria-label="Chọn công cụ AiO Studio">
+              {tools.map(({ id, name, icon: Icon, color }) => (
                 <button
                   key={id}
+                  type="button"
                   role="tab"
                   aria-selected={activeTool === id}
-                  className={`tool-tab tone-${color}${activeTool === id ? " is-active" : ""}`}
+                  className={`dock-tool-btn tone-${color}${activeTool === id ? " is-active" : ""}`}
                   onClick={() => selectTool(id)}
                 >
-                  <span><Icon size={22} /></span>
-                  <div><small>{name}</small><strong>{childName}</strong></div>
-                  <ChevronRight size={18} />
+                  <Icon size={16} />
+                  <span>{name}</span>
                 </button>
               ))}
             </div>
 
-            <div className={`learning-lab tone-${currentTool.color}`}>
-              <div className="lab-copy">
-                <span className="tool-badge"><CurrentToolIcon size={19} /> {currentTool.name}</span>
-                <h3>{currentTool.childName}</h3>
-                <strong>{currentTool.oneLine}</strong>
-                <p>{currentTool.explanation}</p>
-                <ol>
-                  {currentTool.steps.map((step, index) => (
-                    <li key={step}><span>{index + 1}</span>{step}</li>
-                  ))}
-                </ol>
-                <button className="replay-button" onClick={() => setToolRun((value) => value + 1)}>
-                  <RotateCcw size={17} /> Replay Animation
-                </button>
-              </div>
-              <div className="lab-stage" aria-live="polite">
-                <div className="stage-topbar">
-                  <span><Play size={12} fill="currentColor" /> Live Workflow Demo</span>
-                  <strong>{currentTool.name}</strong>
+            {/* Studio Spotlight Console Frame */}
+            <div className={`studio-spotlight-console tone-${currentTool.color}`}>
+              <div className="spotlight-topbar">
+                <div className="spotlight-dots">
+                  <span className="dot dot-close" />
+                  <span className="dot dot-min" />
+                  <span className="dot dot-max" />
                 </div>
-                <ToolVisual active={activeTool} run={toolRun} />
+                <strong className="spotlight-title">
+                  AiO Studio Native Panel — {currentTool.name}
+                </strong>
+                <span className="spotlight-engine-status">
+                  <span className="pulse-dot" /> 100% Offline GPU
+                </span>
+              </div>
+
+              <div className="spotlight-body-grid">
+                {/* Left Side: Punchy Details & Highlights */}
+                <div className="spotlight-info-panel">
+                  <div className="spotlight-category-row">
+                    <span className="spotlight-cat-tag">{currentTool.category}</span>
+                    <span className="spotlight-speed-badge"><Zap size={13} /> {currentTool.speed}</span>
+                  </div>
+                  <h3>{currentTool.headline}</h3>
+                  <span className="spotlight-highlight-tag">{currentTool.tag}</span>
+
+                  <ul className="spotlight-perks">
+                    {currentTool.bullets.map((bullet) => (
+                      <li key={bullet}>
+                        <Check size={16} color="var(--green)" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="spotlight-actions">
+                    <a className="primary-cta" href="#pricing" style={{ minHeight: "44px", fontSize: "14px" }}>
+                      Sở Hữu Trọn Bộ 8 Tool <ArrowRight size={16} />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Right Side: Real UI Panel Display */}
+                <div className="spotlight-visual-panel">
+                  <div className="spotlight-image-container">
+                    <img
+                      src={currentTool.image}
+                      alt={`Giao diện thực tế ${currentTool.name}`}
+                      className="spotlight-ui-img"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="comparison-section section-shell" id="comparison" style={{ marginTop: "100px" }}>
+        {/* COMPARISON SECTION - 3 STREAMLINED VISUAL CARDS */}
+        <section className="comparison-section section-shell" id="comparison" style={{ marginTop: "90px" }}>
           <div className="section-intro">
-            <span className="lesson-number">WHY AIO STUDIO</span>
+            <span className="lesson-number">SO SÁNH</span>
             <div>
-              <h2>Built for Pros Who Refuse Web Clutter.</h2>
-              <p>Compare AiO Studio against subscription web SaaS and single-purpose plugins.</p>
+              <h2>Tại Sao Editor Chuyên Nghiệp Chọn AiO Studio?</h2>
+              <p>Khác biệt hoàn toàn so với giải pháp Web SaaS và các plugin đơn lẻ trên thị trường.</p>
             </div>
           </div>
 
-          <div style={{ overflowX: "auto", marginTop: "32px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--panel)", borderRadius: "16px", overflow: "hidden", border: "1px solid var(--line)" }}>
-              <thead>
-                <tr style={{ background: "var(--panel-2)", borderBottom: "1px solid var(--line)" }}>
-                  <th style={{ padding: "18px 24px", textAlign: "left" }}>Feature / Metric</th>
-                  <th style={{ padding: "18px 20px", textAlign: "center" }}>AutoPod.fm</th>
-                  <th style={{ padding: "18px 20px", textAlign: "center" }}>Submagic (Web)</th>
-                  <th style={{ padding: "18px 20px", textAlign: "center", background: "var(--orange-soft)", color: "var(--orange-light)" }}>AiO Studio Suite</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: "1px solid var(--line-soft)" }}>
-                  <td style={{ padding: "16px 24px", fontWeight: "600" }}>Monthly Price</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", color: "var(--dim)" }}>$29 / mo</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", color: "var(--dim)" }}>$20 - $50 / mo</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", fontWeight: "bold", color: "var(--green)", background: "rgba(118, 217, 106, 0.05)" }}>$29 / mo</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid var(--line-soft)" }}>
-                  <td style={{ padding: "16px 24px", fontWeight: "600" }}>Lifetime Pass Option</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", color: "#ff6b6b" }}>✕ None (Subscription only)</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", color: "#ff6b6b" }}>✕ None (Subscription only)</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", fontWeight: "bold", color: "var(--orange-light)", background: "rgba(255, 107, 44, 0.08)" }}>✓ $299 One-Time Forever</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid var(--line-soft)" }}>
-                  <td style={{ padding: "16px 24px", fontWeight: "600" }}>Environment</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center" }}>Native Plugin</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center" }}>Web Browser (Export & Upload)</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", fontWeight: "bold", color: "var(--text)", background: "rgba(255, 255, 255, 0.03)" }}>✓ 100% Native Premiere Panels</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid var(--line-soft)" }}>
-                  <td style={{ padding: "16px 24px", fontWeight: "600" }}>Privacy & Offline</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center" }}>Server Connected</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", color: "#ff6b6b" }}>✕ Cloud Upload Required</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", fontWeight: "bold", color: "var(--green)", background: "rgba(118, 217, 106, 0.05)" }}>✓ 100% OFFLINE Local Processing</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid var(--line-soft)" }}>
-                  <td style={{ padding: "16px 24px", fontWeight: "600" }}>Audio/Video Hours Limit</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center" }}>Unlimited</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", color: "#ff6b6b" }}>✕ Strictly Limited Credits</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", fontWeight: "bold", color: "var(--green)", background: "rgba(118, 217, 106, 0.05)" }}>✓ UNLIMITED Processing</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: "16px 24px", fontWeight: "600" }}>Number of Tools Included</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center" }}>3 Tools</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center" }}>1 Tool</td>
-                  <td style={{ padding: "16px 20px", textAlign: "center", fontWeight: "bold", color: "var(--yellow)", background: "rgba(255, 209, 102, 0.05)" }}>★ FULL 8-IN-1 SUITE</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="comparison-cards-grid">
+            {/* Card 1: Web SaaS */}
+            <div className="comp-card card-saas">
+              <div className="comp-card-header">
+                <small>WEB SAAS</small>
+                <h3>Submagic / CapCut Web</h3>
+                <span className="comp-price">$20 – $50 <span>/ tháng</span></span>
+              </div>
+              <ul className="comp-list">
+                <li className="bad"><X size={15} /> Bắt buộc upload video GBs lên web</li>
+                <li className="bad"><X size={15} /> Giới hạn credit & số phút audio</li>
+                <li className="bad"><X size={15} /> Nguy cơ rò rỉ source của khách hàng</li>
+                <li className="bad"><X size={15} /> Chỉ làm được 1 tính năng phụ đề</li>
+                <li className="bad"><X size={15} /> Không có gói mua vĩnh viễn (Lifetime)</li>
+              </ul>
+            </div>
+
+            {/* Card 2: Single Plugin */}
+            <div className="comp-card card-plugin">
+              <div className="comp-card-header">
+                <small>PLUGIN ĐƠN LẺ</small>
+                <h3>AutoPod.fm</h3>
+                <span className="comp-price">$29 <span>/ tháng</span></span>
+              </div>
+              <ul className="comp-list">
+                <li className="good"><Check size={15} /> Plugin Native trên Premiere</li>
+                <li className="bad"><X size={15} /> Chỉ có 3 công cụ đơn lẻ</li>
+                <li className="bad"><X size={15} /> Không có Brand Kit & Kho Asset</li>
+                <li className="bad"><X size={15} /> Không có tính năng phụ đề & Safe Zone</li>
+                <li className="bad"><X size={15} /> Phải thuê bao $29/tháng hàng năm</li>
+              </ul>
+            </div>
+
+            {/* Card 3: AiO Studio Suite */}
+            <div className="comp-card card-aio is-featured">
+              <span className="featured-badge">KHUYÊN DÙNG CHO EDITOR</span>
+              <div className="comp-card-header">
+                <small>SUITE TOÀN DIỆN</small>
+                <h3>AiO Studio Suite</h3>
+                <span className="comp-price">$299 <span>vĩnh viễn / hoặc $149/năm</span></span>
+              </div>
+              <ul className="comp-list">
+                <li className="good"><Check size={15} /> Trọn bộ 8 công cụ Native trong 1 panel</li>
+                <li className="good"><Check size={15} /> 100% Offline GPU — 0 rò rỉ dữ liệu</li>
+                <li className="good"><Check size={15} /> Xử lý không giới hạn số phút video</li>
+                <li className="good"><Check size={15} /> Có tùy chọn Mua 1 Lần Sở Hữu Vĩnh Viễn</li>
+                <li className="good"><Check size={15} /> Tương thích cả Windows & macOS</li>
+              </ul>
+              <a className="primary-cta comp-cta" href="#pricing">
+                Xem Bảng Giá Ưu Đãi <ArrowRight size={16} />
+              </a>
+            </div>
           </div>
         </section>
 
-        <section className="pricing-section section-shell" id="pricing" style={{ marginTop: "100px" }}>
+        {/* PRICING SECTION - CLEAN HIGH-CONTRAST */}
+        <section className="pricing-section section-shell" id="pricing" style={{ marginTop: "90px" }}>
           <div className="section-intro">
-            <span className="lesson-number">PREMIUM PRICING</span>
+            <span className="lesson-number">BẢNG GIÁ</span>
             <div>
-              <h2>Crafted with 5 Years of Professional NLE Passion.</h2>
-              <p>Choose the plan that fits your studio. Own the entire 8-tool native suite forever or subscribe yearly.</p>
+              <h2>Đầu Tư Một Lần. Tăng Tốc Dựng Trọn Đời.</h2>
+              <p>Chọn gói phù hợp với nhu cầu của bạn. 100% không giới hạn dung lượng.</p>
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px", marginTop: "40px" }}>
-            <div style={{ padding: "32px", background: "var(--panel)", borderRadius: "20px", border: "1px solid var(--line)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <span style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--dim)", fontWeight: "600" }}>Starter Pass</span>
-                <h3 style={{ fontSize: "36px", margin: "16px 0 8px 0" }}>$29 <span style={{ fontSize: "16px", color: "var(--dim)" }}>/ month</span></h3>
-                <p style={{ color: "var(--muted)", fontSize: "14px", marginBottom: "24px" }}>Perfect for trying out the full suite for a single project.</p>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", color: "var(--text)", fontSize: "14px" }}>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> Access to all 8 Native Panels</li>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> 1 Active Workstation Device</li>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> 100% Offline Data Privacy</li>
-                </ul>
-              </div>
-              <button className="secondary-cta" style={{ marginTop: "32px", width: "100%", justifyContent: "center" }}>
-                Start Monthly Pass
+          <div className="pricing-cards-grid">
+            <div className="price-card">
+              <span className="plan-label">Starter Pass</span>
+              <div className="price-tag">$29 <small>/ tháng</small></div>
+              <p className="plan-desc">Trải nghiệm toàn bộ 8 tool cho 1 dự án lớn.</p>
+              <ul className="plan-perks">
+                <li><Check size={16} color="var(--green)" /> Trọn bộ 8 Native Panels</li>
+                <li><Check size={16} color="var(--green)" /> 1 Workstation Device</li>
+                <li><Check size={16} color="var(--green)" /> 100% Offline Data Privacy</li>
+              </ul>
+              <button type="button" className="secondary-cta plan-btn">Bắt Đầu Gói Tháng</button>
+            </div>
+
+            <div className="price-card is-popular">
+              <span className="popular-pill">TIẾT KIỆM 57%</span>
+              <span className="plan-label" style={{ color: "var(--orange-light)" }}>Annual Pro Pass</span>
+              <div className="price-tag">$149 <small>/ năm</small></div>
+              <p className="plan-desc">Lựa chọn tối ưu cho Freelancer & Studio dựng phim.</p>
+              <ul className="plan-perks">
+                <li><Check size={16} color="var(--green)" /> Trọn bộ 8 Native Panels</li>
+                <li><Check size={16} color="var(--green)" /> 1 Workstation Device</li>
+                <li><Check size={16} color="var(--green)" /> 1 Năm Miễn Phí Cập Nhật AI</li>
+                <li><Check size={16} color="var(--green)" /> Support Discord Ưu Tiên 24/7</li>
+              </ul>
+              <button type="button" className="primary-cta plan-btn">
+                Đăng Ký Gói Năm <ArrowRight size={16} />
               </button>
             </div>
 
-            <div style={{ padding: "32px", background: "var(--panel-2)", borderRadius: "20px", border: "2px solid var(--orange)", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <span style={{ position: "absolute", top: "-14px", right: "24px", background: "var(--orange)", color: "#fff", padding: "4px 14px", borderRadius: "999px", fontSize: "12px", fontWeight: "bold" }}>POPULAR PRO CHOICE</span>
-              <div>
-                <span style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--orange-light)", fontWeight: "600" }}>Annual Pro Pass</span>
-                <h3 style={{ fontSize: "36px", margin: "16px 0 8px 0" }}>$149 <span style={{ fontSize: "16px", color: "var(--dim)" }}>/ year</span></h3>
-                <p style={{ color: "var(--muted)", fontSize: "14px", marginBottom: "24px" }}>Save 57% compared to monthly. Best for busy video editors.</p>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", color: "var(--text)", fontSize: "14px" }}>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> Access to all 8 Native Panels</li>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> 1 Active Workstation Device</li>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> 1 Year of Free Feature Updates</li>
-                  <li><Check size={16} color="var(--green)" style={{ display: "inline", marginRight: "8px" }} /> Priority 24/7 VIP Discord Support</li>
-                </ul>
-              </div>
-              <button className="primary-cta" style={{ marginTop: "32px", width: "100%", justifyContent: "center" }}>
-                Get Annual Pass <ArrowRight size={17} />
-              </button>
-            </div>
-
-            <div style={{ padding: "32px", background: "linear-gradient(145deg, var(--panel), var(--orange-soft))", borderRadius: "20px", border: "2px solid var(--yellow)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <span style={{ fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", fontWeight: "600" }}>Lifetime Studio Pass</span>
-                <h3 style={{ fontSize: "36px", margin: "16px 0 8px 0" }}>$299 <span style={{ fontSize: "16px", color: "var(--yellow)" }}>one-time</span></h3>
-                <p style={{ color: "var(--muted)", fontSize: "14px", marginBottom: "24px" }}>Pay once, own forever. Zero subscriptions, zero limits.</p>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", color: "var(--text)", fontSize: "14px" }}>
-                  <li><Check size={16} color="var(--yellow)" style={{ display: "inline", marginRight: "8px" }} /> Full 8-Tool Native Suite Forever</li>
-                  <li><Check size={16} color="var(--yellow)" style={{ display: "inline", marginRight: "8px" }} /> 1 Active Workstation Device</li>
-                  <li><Check size={16} color="var(--yellow)" style={{ display: "inline", marginRight: "8px" }} /> LIFETIME Free Product Updates</li>
-                  <li><Check size={16} color="var(--yellow)" style={{ display: "inline", marginRight: "8px" }} /> 1-on-1 VIP Direct Founder Support</li>
-                </ul>
-              </div>
-              <button className="primary-cta" style={{ marginTop: "32px", width: "100%", justifyContent: "center", background: "var(--yellow)", color: "#000" }}>
-                Claim Lifetime Suite Pass <Sparkles size={17} />
+            <div className="price-card is-lifetime">
+              <span className="plan-label" style={{ color: "var(--yellow)" }}>Lifetime Studio Pass</span>
+              <div className="price-tag" style={{ color: "var(--yellow)" }}>$299 <small style={{ color: "var(--yellow)" }}>one-time</small></div>
+              <p className="plan-desc">Trả 1 lần, sở hữu vĩnh viễn. Không phí duy trì.</p>
+              <ul className="plan-perks">
+                <li><Check size={16} color="var(--yellow)" /> Trọn bộ 8 Tool Vĩnh Viễn</li>
+                <li><Check size={16} color="var(--yellow)" /> 1 Workstation Device</li>
+                <li><Check size={16} color="var(--yellow)" /> Cập Nhật Miễn Phí Trọn Đời</li>
+                <li><Check size={16} color="var(--yellow)" /> Direct Founder VIP Support</li>
+              </ul>
+              <button type="button" className="primary-cta plan-btn lifetime-btn">
+                Sở Hữu Trọn Đời ($299) <Sparkles size={16} />
               </button>
             </div>
           </div>
         </section>
 
-        <section className="journey section-shell" id="journey" style={{ marginTop: "100px" }}>
+        {/* ROI VALUE CALCULATOR - STREAMLINED */}
+        <section className="journey section-shell" id="journey" style={{ marginTop: "90px" }}>
           <div className="section-intro">
-            <span className="lesson-number">VALUE CALCULATOR</span>
+            <span className="lesson-number">TÍNH TOÁN ROI</span>
             <div>
-              <h2>How Many Hours Are You Losing to Repetitive Clicks?</h2>
-              <p>Adjust the sliders to match your editing workload and calculate your annual time recovery.</p>
+              <h2>Bạn Thu Hồi Bao Nhiêu Thời Gian Mỗi Năm?</h2>
+              <p>Kéo thanh trượt để tính số giờ lao động thủ công được giải phóng.</p>
             </div>
           </div>
 
           <div className="roi-calculator">
             <div className="roi-controls">
-              <div className="roi-heading">
-                <span><Zap size={17} /> Estimated Hours Recovered</span>
-                <strong>Repetitive Tasks Only</strong>
-              </div>
               <label>
-                <span><b>Projects Edited Per Month</b><output>{projectsPerMonth} projects</output></span>
+                <span><b>Số Project Dựng Mỗi Tháng</b><output>{projectsPerMonth} projects</output></span>
                 <input
                   type="range"
                   min="1"
@@ -649,7 +1243,7 @@ export default function Home() {
                 />
               </label>
               <label>
-                <span><b>Minutes Saved Per Project</b><output>{minutesSaved} mins</output></span>
+                <span><b>Số Phút Tiết Kiệm Mỗi Project</b><output>{minutesSaved} phút</output></span>
                 <input
                   type="range"
                   min="15"
@@ -659,44 +1253,31 @@ export default function Home() {
                   onChange={(event) => setMinutesSaved(Number(event.target.value))}
                 />
               </label>
-              <p>Based on hours spent finding media assets, re-importing brand kits, silence trimming, and transcription.</p>
             </div>
             <div className="roi-result" aria-live="polite">
-              <small>ANNUAL TIME RECOVERED</small>
-              <strong>{hoursRecovered}<span> hrs</span></strong>
-              <p>Equivalent to roughly <b>{Math.max(1, Math.round(hoursRecovered / 8))} full work days</b> dedicated back to storytelling or taking on more clients.</p>
-              <a href="#pricing">Claim Your 8-Tool Suite <ArrowRight size={16} /></a>
+              <small>THỜI GIAN THU HỒI MỖI NĂM</small>
+              <strong>{hoursRecovered}<span> giờ</span></strong>
+              <p>Tương đương <b>{Math.max(1, Math.round(hoursRecovered / 8))} ngày làm việc trọn vẹn</b> để nhận thêm dự án hoặc nghỉ ngơi.</p>
+              <a href="#pricing">Sở Hữu 8 Công Cụ Ngay <ArrowRight size={16} /></a>
             </div>
-          </div>
-
-          <div className="safe-learning" style={{ marginTop: "40px" }}>
-            <div>
-              <span className="eyebrow"><Zap size={15} /> 5 Years NLE Experience</span>
-              <h2>Built by an Editor. For Editors.</h2>
-              <p>AiO Studio was crafted from real post-production battle scars to give you raw editing speed without altering your muscle memory.</p>
-            </div>
-            <ul>
-              <li><Check size={18} /><span><strong>Does not replace Premiere Pro</strong> — edit in the timeline you already love.</span></li>
-              <li><Check size={18} /><span><strong>100% Local Privacy</strong> — no cloud uploads, zero client data leaks.</span></li>
-              <li><Check size={18} /><span><strong>30-Day Money-Back Guarantee</strong> — 100% risk-free trial for your peace of mind.</span></li>
-            </ul>
           </div>
         </section>
 
+        {/* FINAL CTA SECTION */}
         <section className="final-cta section-shell">
           <div>
             <span className="eyebrow"><Sparkles size={15} /> AiO Studio Workflow Suite</span>
-            <h2>Stop Editing Silences. Start Creating Stories.</h2>
-            <p>Get all 8 native panels inside Premiere Pro. Backed by a 30-day money-back guarantee.</p>
+            <h2>Dừng Cắt Khoảng Lặng Thủ Công. Bắt Đầu Sáng Tạo.</h2>
+            <p>Trọn bộ 8 panel native bên cạnh Timeline. Cam kết hoàn tiền trong 30 ngày nếu không hài lòng.</p>
           </div>
-          <a className="primary-cta" href="#pricing">Get Lifetime Suite Pass ($299) <ArrowRight size={17} /></a>
+          <a className="primary-cta" href="#pricing">Sở Hữu Ngay ($299) <ArrowRight size={17} /></a>
         </section>
       </main>
 
       <footer className="site-footer section-shell">
-        <a className="brand" href="#top"><BrandMark /><span>AiO Studio</span></a>
-        <p>Professional Workflow Suite for Premiere Pro & DaVinci Editors.</p>
-        <span>Asset Manager · Power Bins · Auto Cut · Transcripts · Re-Frames · Auto Podcast · Guide Frame · Cut Short</span>
+        <a className="brand" href="#top"><AiOLogo size={24} /><span>AiO Studio</span></a>
+        <p>Hệ sinh thái công cụ dựng phim chuyên nghiệp cho Premiere Pro & DaVinci Resolve.</p>
+        <span>Auto Cut · Auto Podcast · Auto Transcripts · Auto Re-Frames · Asset Manager · Power Bins · Guide Frame · Cut Short</span>
       </footer>
     </div>
   );
