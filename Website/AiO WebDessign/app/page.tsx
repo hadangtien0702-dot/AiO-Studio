@@ -57,7 +57,7 @@ const tools = [
     name: "Auto Cut",
     category: "Rough Cut",
     headline: "Cắt Khoảng Lặng 1-Click",
-    speed: "0.8s xử lý",
+    speed: "6:29 video ➔ 23s",
     image: "/assets/autocut-420.png",
     icon: Scissors,
     color: "orange",
@@ -65,7 +65,7 @@ const tools = [
     bullets: [
       "Quét và phát hiện dải sóng âm tự động",
       "Xóa sạch khoảng lặng thừa & dồn timeline tức thì",
-      "Undo 1-click trực tiếp, an toàn tuyệt đối",
+      "Hoàn tác một nút — panel tự nhớ trạng thái gốc",
     ],
   },
   {
@@ -73,14 +73,14 @@ const tools = [
     name: "Auto Podcast",
     category: "Multicam AI",
     headline: "Đạo Diễn Multicam Tự Động",
-    speed: "0ms lip-sync drift",
+    speed: "588/588 mốc đúng cam",
     image: "/assets/autocut-800.png",
     icon: WandSparkles,
     color: "purple",
-    tag: "Chống trôi hình >90 phút",
+    tag: "Luôn cắt trên bản sao",
     bullets: [
       "Chuyển góc camera theo mic người nói",
-      "Tự động chèn reaction shots tự nhiên",
+      "Cắt trên bản sao — bản gốc không bị đụng tới",
       "Hỗ trợ trộn sample rate 44.1k & 48k",
     ],
   },
@@ -88,8 +88,8 @@ const tools = [
     id: "transcripts" as const,
     name: "Auto Transcripts",
     category: "Phụ Đề AI",
-    headline: "60 Phút Audio ➔ 14 Giây",
-    speed: "14s siêu tốc",
+    headline: "60 Phút Audio ➔ 2,4 Phút",
+    speed: "chạy lại chỉ 14s",
     image: "/assets/transcripts-420.png",
     icon: Captions,
     color: "green",
@@ -169,11 +169,11 @@ const tools = [
     name: "Auto Cut Short",
     category: "Viral Clip",
     headline: "Tách Video Ngắn 60s Tự Động",
-    speed: "1-Click trích xuất",
-    image: "/assets/AiO Welcome.png",
+    speed: "Sắp ra mắt",
+    image: "/assets/AiO Welcome.webp",
     icon: Zap,
     color: "purple",
-    tag: "Bắt trọn hook viral",
+    tag: "Coming Soon — đang phát triển",
     bullets: [
       "Quét đoạn cao trào trong video dài",
       "Tự động trích xuất clip 60 giây nổi bật",
@@ -385,7 +385,7 @@ function HeroConsoleSimulator({ run }: { run: number }) {
                     </div>
                     {cutApplied ? (
                       <div className="cut-tag-badge">
-                        <Scissors size={13} /> 142 khoảng lặng đã cắt bỏ (0.8s)
+                        <Scissors size={13} /> 54 khoảng lặng đã cắt bỏ (23s)
                       </div>
                     ) : (
                       <div className="silence-detected-badge">
@@ -665,7 +665,7 @@ function HeroConsoleSimulator({ run }: { run: number }) {
               <Zap size={13} color="var(--orange)" />
               <span>
                 {cutApplied
-                  ? "✓ Đã loại bỏ 142 khoảng lặng thừa ➔ Timeline dồn gọn tức thì (Tiết kiệm 47 phút)"
+                  ? "✓ Đã loại bỏ 54 khoảng lặng thừa ➔ Timeline dồn gọn (6:29 ➔ 6:12)"
                   : "Đang phân tích dải sóng âm... Nhấn Cắt Dồn để thực thi Ripple Delete"}
               </span>
             </div>
@@ -837,7 +837,7 @@ export default function Home() {
           <div className="hero-copy">
             <div className="hero-eyebrow">
               <Zap size={13} />
-              <span>BỘ 8 CÔNG CỤ NATIVE CHO PREMIERE PRO & DAVINCI</span>
+              <span>BỘ CÔNG CỤ NATIVE CHO PREMIERE PRO · WINDOWS</span>
             </div>
             <h1>
               Biến 3 giờ dựng thô <br />
@@ -975,7 +975,7 @@ export default function Home() {
                     <div className="flow-arrow-down"><ArrowRight size={13} /></div>
                     <div className="flow-row aio">
                       <span className="flow-badge aio-badge">AiO</span>
-                      <p>1-Click Ripple Delete tự động (15p)</p>
+                      <p>1-Click Ripple Delete tự động</p>
                     </div>
                   </div>
                 </article>
@@ -1004,7 +1004,7 @@ export default function Home() {
                     <div className="flow-arrow-down"><ArrowRight size={13} /></div>
                     <div className="flow-row aio">
                       <span className="flow-badge aio-badge">AiO</span>
-                      <p>AI Speech-to-Text 14s siêu tốc</p>
+                      <p>AI Speech-to-Text — 60 phút còn 2,4 phút</p>
                     </div>
                   </div>
                 </article>
@@ -1155,7 +1155,7 @@ export default function Home() {
                 <li className="good"><Check size={15} /> 100% Offline GPU — 0 rò rỉ dữ liệu</li>
                 <li className="good"><Check size={15} /> Xử lý không giới hạn số phút video</li>
                 <li className="good"><Check size={15} /> Có tùy chọn Mua 1 Lần Sở Hữu Vĩnh Viễn</li>
-                <li className="good"><Check size={15} /> Tương thích cả Windows & macOS</li>
+                <li className="good"><Check size={15} /> Windows 10/11 — cài một file, không cần quyền Admin</li>
               </ul>
               <a className="primary-cta comp-cta" href="#pricing">
                 Xem Bảng Giá Ưu Đãi <ArrowRight size={16} />
@@ -1184,7 +1184,9 @@ export default function Home() {
                 <li><Check size={16} color="var(--green)" /> 1 Workstation Device</li>
                 <li><Check size={16} color="var(--green)" /> 100% Offline Data Privacy</li>
               </ul>
-              <button type="button" className="secondary-cta plan-btn">Bắt Đầu Gói Tháng</button>
+              {/* [14/08] Chua co cong thanh toan — mailto la duong VE DON that duy nhat.
+                  Co checkout roi thi thay href, dung de nut chet. */}
+              <a className="secondary-cta plan-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Goi%20Thang%20%2429">Bắt Đầu Gói Tháng</a>
             </div>
 
             <div className="price-card is-popular">
@@ -1198,9 +1200,9 @@ export default function Home() {
                 <li><Check size={16} color="var(--green)" /> 1 Năm Miễn Phí Cập Nhật AI</li>
                 <li><Check size={16} color="var(--green)" /> Support Discord Ưu Tiên 24/7</li>
               </ul>
-              <button type="button" className="primary-cta plan-btn">
+              <a className="primary-cta plan-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Goi%20Nam%20%24149">
                 Đăng Ký Gói Năm <ArrowRight size={16} />
-              </button>
+              </a>
             </div>
 
             <div className="price-card is-lifetime">
@@ -1213,9 +1215,9 @@ export default function Home() {
                 <li><Check size={16} color="var(--yellow)" /> Cập Nhật Miễn Phí Trọn Đời</li>
                 <li><Check size={16} color="var(--yellow)" /> Direct Founder VIP Support</li>
               </ul>
-              <button type="button" className="primary-cta plan-btn lifetime-btn">
+              <a className="primary-cta plan-btn lifetime-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Lifetime%20%24299">
                 Sở Hữu Trọn Đời ($299) <Sparkles size={16} />
-              </button>
+              </a>
             </div>
           </div>
         </section>
