@@ -1,0 +1,41 @@
+AiO Studio BETA - bo 3 panel cho Adobe Premiere Pro (Windows)
+  - AiO Autocut        : do khoang lang -> cat + don clip
+  - AiO Asset Manager  : kho asset - tim, nghe thu, keo vao timeline
+  - AiO Power Bins     : Brand Kit hien o MOI project Premiere
+
+YEU CAU
+  - Windows 10/11
+  - Adobe Premiere Pro (da kiem chung tren Beta 26.5 / CEP 12)
+  - KHONG can cai them gi: khong Python, khong Node, khong FFmpeg
+    (da nam san trong bo), khong can quyen Admin.
+
+TRUOC KHI GIAI NEN - LAM BUOC NAY TRUOC CHO DO VUONG
+  File tai tu mang (Drive, Gmail...) bi Windows danh dau 'tu Internet',
+  bam dup CAI-DAT.bat se hien bang xanh chan lai.
+  Cach tranh: chuot phai file ZIP -> Properties -> tick 'Unblock' -> OK,
+  roi moi giai nen.
+  Neu lo giai nen truoc: khi bang xanh hien ra bam 'More info' ->
+  'Run anyway'. Do chi la canh bao cho file tai tu mang, khong sao ca.
+
+CACH CAI
+  1. Dong han Premiere Pro.
+  2. Bam dup CAI-DAT.bat.
+  3. Mo Premiere -> Window -> Extensions -> chon panel muon dung.
+
+DOI NGON NGU / SWITCH LANGUAGE
+  Moi panel co nut VI / EN o thanh tren cung - bam la doi ca bo.
+  Every panel has a VI / EN button in its top bar - one click switches
+  the whole suite.
+
+GO CAI DAT
+  Xoa 3 thu muc trong %APPDATA%\Adobe\CEP\extensions\ :
+    com.aiostudio.autocut
+    com.aiostudio.assetmanager
+    com.aiostudio.powerbin
+  va thu muc kho dung chung %APPDATA%\AiOStudio\bin\win64
+
+GOP Y / BAO LOI
+  Nhan tin truc tiep cho nguoi gui ban ban beta nay.
+
+FFmpeg trong bo nay la ban LGPL (xem LICENSE-FFmpeg.txt va
+THIRD-PARTY-NOTICE.txt). Nguon build: BtbN/FFmpeg-Builds.

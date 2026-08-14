@@ -106,7 +106,7 @@ Write-Host "  [OK] Staging (khong kem .debug)" -ForegroundColor Green
 
 # --- 3. Ky ---
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-$zxpOut = Join-Path $outDir ("AiO-Studio-Asset-Manager-" + $version + ".zxp")
+$zxpOut = Join-Path $outDir ("AiO-Studio-Power-Bins-" + $version + ".zxp")
 if (Test-Path $zxpOut) { Remove-Item $zxpOut -Force }
 
 & $sign.FullName -sign $stage $zxpOut $certP12 $certPass -tsa "http://timestamp.digicert.com" 2>&1 | Out-Host
@@ -241,10 +241,10 @@ pause
 
 # Gom thanh MOT file de gui di.
 #
-# [1.0.1] SUA LOI: truoc day goi bang `$outDir\*` — thu muc release giu ca cac ban
+# [1.0.1] SUA LOI: truoc day goi bang `$outDir\*` â€” thu muc release giu ca cac ban
 # CU nen goi phinh gap doi (97 MB thay vi 49 MB), va bo cai co the vo phai file
 # .zxp cua ban cu. Nay liet ke DUNG 4 file cua ban dang dong goi.
-$bundle = Join-Path (Join-Path $root 'build') ("AiO-Studio-Asset-Manager-" + $version + "-SETUP.zip")
+$bundle = Join-Path (Join-Path $root 'build') ("AiO-Studio-Power-Bins-" + $version + "-SETUP.zip")
 if (Test-Path $bundle) { Remove-Item $bundle -Force }
 Compress-Archive -Path @($zxpOut, $installBat, $installPs1, $guide) -DestinationPath $bundle -CompressionLevel Optimal
 $bundleMb = [math]::Round((Get-Item $bundle).Length / 1MB, 1)
@@ -253,7 +253,7 @@ $bundleMb = [math]::Round((Get-Item $bundle).Length / 1MB, 1)
 #  Ban .zip o tren bat nguoi nhan giai nen roi tim dung file de bam. Dem qua may
 #  khac cho nguoi khac cai thi moi buoc thua la mot cho de sai. File .exe nay
 #  bam dup la tu giai nen va tu cai. Chi tiet trong scripts/make-setup-exe.ps1.
-$setupExe = Join-Path (Join-Path $root 'build') ("AiO-Studio-Asset-Manager-" + $version + "-SETUP.exe")
+$setupExe = Join-Path (Join-Path $root 'build') ("AiO-Studio-Power-Bins-" + $version + "-SETUP.exe")
 if (Test-Path $setupExe) { Remove-Item $setupExe -Force }
 & (Join-Path $PSScriptRoot 'make-setup-exe.ps1') -ReleaseDir $outDir -OutExe $setupExe -Version $version
 

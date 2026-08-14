@@ -69,3 +69,10 @@ env/
 Thumbs.db
 ehthumbs.db
 *.log
+
+# [14/08/2026] Bo cai Beta gop - chi giu SCRIPT va HUONG DAN trong git.
+# Binary (ffmpeg da co luat *.exe chan) + goi .zxp + zip phat hanh la do build
+# ra duoc, khong phai ma nguon. Luat viet HEP theo duong dan cu the (bai hoc 5p:
+# luat rong nhu *.sql tung nuot file moi trong im lang).
+/build-beta/panels/
+/AiO-Studio-Beta-3-panel.zip
