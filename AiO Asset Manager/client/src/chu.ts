@@ -241,6 +241,7 @@ export const CHU: BangChu = {
     'Hình ảnh': 'Images',
     'Tổng quan': 'Overview',
     'Yêu thích': 'Favorites',
+    'Dùng gần đây': 'Recently used',
     'Loại asset': 'Asset type',
     'Tất cả asset': 'All assets',
     'Nguồn đã thêm': 'Added sources',

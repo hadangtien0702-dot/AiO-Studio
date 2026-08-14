@@ -310,6 +310,8 @@ export default function Grid() {
   const addPathsToPowerBin = useLibrary((s) => s.addPathsToPowerBin)
   const showToast = useLibrary((s) => s.showToast)
   const onlyFavorites = useLibrary((s) => s.onlyFavorites)
+  const onlyRecent = useLibrary((s) => s.onlyRecent)
+  const recentIds = useLibrary((s) => s.recentIds)
   const sortBy = useLibrary((s) => s.sortBy)
   const sortDesc = useLibrary((s) => s.sortDesc)
 
@@ -350,6 +352,13 @@ export default function Grid() {
 
     if (filter !== 'all') list = list.filter((a) => a.type === filter)
     if (onlyFavorites) list = list.filter((a) => a.favorite)
+    // [13/08/2026] "Dùng gần đây": lọc theo danh sách id đã Import.
+    // Lọc qua tập asset hiện có nên id trỏ tới asset ĐÃ XOÁ tự rơi ra —
+    // đúng bài học 0.16.0 (đường dẫn treo), không cần dọn danh sách.
+    if (onlyRecent) {
+      const co = new Set(recentIds)
+      list = list.filter((a) => co.has(a.id))
+    }
     // Thư mục con đang chọn ở menu (list "như trong folder"): lấy mọi file
     // NẰM DƯỚI thư mục đó (kể cả cấp sâu hơn). So sánh prefix + đúng ký tự
     // phân cách ngay sau — tránh "E:\Nhac" khớp nhầm "E:\Nhac cu".
@@ -362,6 +371,14 @@ export default function Grid() {
       )
     }
     if (q) list = list.filter((a) => (lowerById.get(a.id) ?? '').includes(q))
+
+    // [13/08/2026] Ở chế độ "Dùng gần đây", THỨ TỰ chính là nội dung: vừa dùng
+    // đứng đầu, theo đúng recentIds. Áp sortBy vào đây là phá mất ý nghĩa
+    // "gần đây" — nên nhảy qua khối sort thường.
+    if (onlyRecent) {
+      const bac = new Map(recentIds.map((id, i) => [id, i]))
+      return [...list].sort((a, b) => (bac.get(a.id) ?? 999) - (bac.get(b.id) ?? 999))
+    }
 
     const dir = sortDesc ? -1 : 1
     return [...list].sort((a, b) => {
@@ -380,6 +397,8 @@ export default function Grid() {
     deferredSearch,
     selectedPath,
     onlyFavorites,
+    onlyRecent,
+    recentIds,
     sortBy,
     sortDesc,
     activeMasterTab,
@@ -414,7 +433,7 @@ export default function Grid() {
     if (el) el.scrollTop = 0
     setScrollTop(0)
     setLimit(PAGE)
-  }, [filter, search, selectedPath, onlyFavorites, activeMasterTab, selectedPowerBinFolderId, el])
+  }, [filter, search, selectedPath, onlyFavorites, onlyRecent, activeMasterTab, selectedPowerBinFolderId, el])
 
   /** Phần thật sự đưa vào lưới. Cắt SAU khi đã lọc + sắp xếp. */
   const shown = limit >= visible.length ? visible : visible.slice(0, limit)

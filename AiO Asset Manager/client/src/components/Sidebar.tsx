@@ -11,6 +11,7 @@ import type { Asset, AssetFilter, AssetType } from '../types'
 import { dich } from '../ngonngu'
 import PowerBinHub from './PowerBinHub'
 import {
+  IconClock,
   IconClose,
   IconHeart,
   IconFolder,
@@ -312,6 +313,9 @@ export default function Sidebar() {
   const setFilter = useLibrary((s) => s.setFilter)
   const onlyFavorites = useLibrary((s) => s.onlyFavorites)
   const toggleOnlyFavorites = useLibrary((s) => s.toggleOnlyFavorites)
+  const onlyRecent = useLibrary((s) => s.onlyRecent)
+  const toggleOnlyRecent = useLibrary((s) => s.toggleOnlyRecent)
+  const recentIds = useLibrary((s) => s.recentIds)
   const removeFolder = useLibrary((s) => s.removeFolder)
 
   const selectedPath = useLibrary((s) => s.selectedPath)
@@ -342,13 +346,22 @@ export default function Sidebar() {
     return { favCount: fav, countByType: byType }
   }, [assets])
 
+  // Đếm "Dùng gần đây" = số id CÒN TỒN TẠI trong thư viện, không phải độ dài
+  // recentIds — id có thể trỏ tới asset đã xoá (bài học 0.16.0). Số trên menu
+  // phải khớp số thẻ hiện ra khi bấm vào, lệch một cái là người dùng mất tin.
+  const recentCount = useMemo(() => {
+    if (recentIds.length === 0) return 0
+    const co = new Set(assets.map((a) => a.id))
+    return recentIds.filter((id) => co.has(id)).length
+  }, [assets, recentIds])
+
   const countOf = (f: AssetFilter) =>
     f === 'all' ? assets.length : countByType.get(f) ?? 0
 
   /** Thư mục con cấp 1 theo loại — "list như trong folder" của chủ dự án. */
   const subfoldersByType = useMemo(() => buildSubfolders(assets), [assets])
 
-  const allActive = filter === 'all' && !onlyFavorites
+  const allActive = filter === 'all' && !onlyFavorites && !onlyRecent
 
   return (
     <aside className="sidebar">
@@ -367,6 +380,7 @@ export default function Sidebar() {
                 setFilter('all')
                 setSelectedPath('')
                 if (onlyFavorites) toggleOnlyFavorites()
+                if (onlyRecent) toggleOnlyRecent()
               }}
             >
               <IconGridMedium size={13} />
@@ -389,9 +403,25 @@ export default function Sidebar() {
               <span className="nav-count">{favCount}</span>
             </button>
 
+            {/* [13/08/2026] "Dùng gần đây" — anh Tiến chốt. Ghi ở sendToTimeline
+                khi Import THÀNH CÔNG, trần 20, thứ tự vừa-dùng-đứng-đầu.
+                Cùng khuôn nút Yêu thích ngay trên để menu tự nhất quán. */}
+            <button
+              type="button"
+              className={`nav-item ${onlyRecent ? 'nav-item--active' : ''}`}
+              aria-pressed={onlyRecent}
+              onClick={() => {
+                if (!onlyRecent) toggleOnlyRecent()
+              }}
+            >
+              <IconClock size={13} />
+              <span className="nav-label">{dich('Dùng gần đây')}</span>
+              <span className="nav-count">{recentCount}</span>
+            </button>
+
             <div className="nav-section">{dich('Loại asset')}</div>
             {TYPE_ITEMS.map(({ key, label, Icon }) => {
-              const active = filter === key && !onlyFavorites
+              const active = filter === key && !onlyFavorites && !onlyRecent
               const subs = subfoldersByType.get(key as AssetType) ?? []
               const open = active && subs.length > 0 && !collapsed.has(key)
               return (
@@ -429,6 +459,7 @@ export default function Sidebar() {
                       setFilter(key)
                       setSelectedPath('')
                       if (onlyFavorites) toggleOnlyFavorites()
+                      if (onlyRecent) toggleOnlyRecent()
                     }}
                   >
                     <Icon size={13} />

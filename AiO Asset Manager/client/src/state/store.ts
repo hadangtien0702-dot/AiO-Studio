@@ -76,6 +76,26 @@ interface LibraryState {
   setPinned: (id: string, asset?: Asset | null) => void
   /** Chỉ hiện asset yêu thích. */
   onlyFavorites: boolean
+  /**
+   * [13/08/2026] "Dùng gần đây" — anh Tiến chốt (chọn 1 trong 3 đề xuất UX):
+   * *"Dựng một dự án thường quay lại đúng vài asset vừa dùng"*.
+   *
+   * `recentIds` là id asset đã Import thành công, MỚI NHẤT ĐỨNG ĐẦU, trần 20.
+   * Ghi ở `sendToTimeline` khi `res.ok` — KHÔNG ghi ở kéo-thả: onDragStart
+   * không biết cú thả có đáp xuống timeline hay không, ghi ở đó là danh sách
+   * đầy rác kéo hụt.
+   *
+   * Lưu localStorage (khoá `aio-am-dung-gan-day`), KHÔNG lưu vào library.json:
+   * đây là trạng thái tiện dùng theo máy, không phải dữ liệu thư viện — và
+   * không đụng cấu trúc file 15 MB đang giữ 28.846 asset của người dùng.
+   *
+   * ☠️ id trong danh sách có thể trỏ tới asset ĐÃ XOÁ khỏi thư viện (bài học
+   * 0.16.0: đường dẫn treo). Mọi chỗ đọc phải lọc qua danh sách asset hiện có,
+   * đừng tin id còn sống.
+   */
+  recentIds: string[]
+  /** Chỉ hiện asset dùng gần đây. */
+  onlyRecent: boolean
   sortBy: SortBy
   sortDesc: boolean
 
@@ -132,6 +152,7 @@ interface LibraryState {
   updateSettings: (patch: Partial<AppSettings>) => void
   showToast: (msg: string) => void
   toggleOnlyFavorites: () => void
+  toggleOnlyRecent: () => void
   setSort: (by: SortBy) => void
   toggleFavorite: (id: string) => void
   updateAsset: (id: string, patch: Partial<Asset>) => void
@@ -241,6 +262,33 @@ function flushPatches(): void {
 function schedulePatchFlush(): void {
   if (patchTimer) return
   patchTimer = setTimeout(flushPatches, PATCH_FLUSH_MS)
+}
+
+// ── "Dùng gần đây" (13/08/2026) — xem ghi chú ở khai báo `recentIds` ─────────
+
+const KHOA_RECENT = 'aio-am-dung-gan-day'
+const TRAN_RECENT = 20
+
+function docRecentTuDia(): string[] {
+  try {
+    const raw = localStorage.getItem(KHOA_RECENT)
+    if (!raw) return []
+    const v = JSON.parse(raw)
+    // Chỉ nhận đúng hình dạng mong đợi — localStorage là dữ liệu ngoài,
+    // hỏng thì coi như chưa có, đừng để nó làm chết cả store lúc khởi động.
+    if (!Array.isArray(v)) return []
+    return v.filter((x): x is string => typeof x === 'string').slice(0, TRAN_RECENT)
+  } catch {
+    return []
+  }
+}
+
+function ghiRecentRaDia(ids: string[]): void {
+  try {
+    localStorage.setItem(KHOA_RECENT, JSON.stringify(ids))
+  } catch {
+    /* đầy quota thì thôi — mất tiện ích, không được làm hỏng việc Import */
+  }
 }
 
 /** Gộp assets mới vào cũ theo id, giữ lại cờ favorite của bản cũ. */
@@ -376,6 +424,8 @@ export const useLibrary = create<LibraryState>((set, get) => ({
   pinnedAsset: null,
   setPinned: (id, asset) => set({ pinnedId: id, pinnedAsset: id ? asset ?? null : null }),
   onlyFavorites: false,
+  recentIds: docRecentTuDia(),
+  onlyRecent: false,
   sortBy: 'name',
   sortDesc: false,
   // Đổi không gian làm việc = dọn sạch mọi bộ lọc đang bám lại từ chỗ cũ,
@@ -386,6 +436,7 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     selectedPath: tab === 'library' ? get().selectedPath : '',
     filter: 'all',
     onlyFavorites: false,
+    onlyRecent: false,
     selectedTagId: '',
     search: '',
     selectedAssetIds: [],
@@ -619,7 +670,13 @@ export const useLibrary = create<LibraryState>((set, get) => ({
     persist(get().folders, assets)
   },
 
-  toggleOnlyFavorites: () => set({ onlyFavorites: !get().onlyFavorites }),
+  // Hai bộ lọc "Yêu thích" / "Dùng gần đây" LOẠI TRỪ nhau — bật cái này là tắt
+  // cái kia, cùng khuôn với nút "Tất cả asset" vốn đã dọn sạch bộ lọc cũ.
+  // Để cả hai cùng bật thì lưới hiện GIAO của hai tập — màn hình trống mà không
+  // ai hiểu vì sao.
+  toggleOnlyFavorites: () => set({ onlyFavorites: !get().onlyFavorites, onlyRecent: false }),
+
+  toggleOnlyRecent: () => set({ onlyRecent: !get().onlyRecent, onlyFavorites: false }),
 
   setSort: (by) =>
     set((s) => (s.sortBy === by ? { sortDesc: !s.sortDesc } : { sortBy: by, sortDesc: false })),
@@ -701,6 +758,14 @@ export const useLibrary = create<LibraryState>((set, get) => ({
         : // Gửi kèm loại + thời lượng: host cần cả hai để chọn ĐÚNG TRACK và
           // KHÔNG đè lên clip đang có ở chỗ playhead.
           await importToTimeline(asset.path, asset.type, asset.duration ?? 0)
+    // [13/08/2026] Import THÀNH CÔNG thì ghi vào "Dùng gần đây".
+    // Chỉ ghi khi res.ok — Import trượt mà vẫn vào danh sách thì mục này
+    // thành nhật ký bấm nút chứ không phải "asset mình hay dùng".
+    if (res.ok) {
+      const ids = [asset.id, ...get().recentIds.filter((x) => x !== asset.id)].slice(0, TRAN_RECENT)
+      set({ recentIds: ids })
+      ghiRecentRaDia(ids)
+    }
     // Chèn xong THÌ THẤY NGAY trên timeline — báo thêm một hộp nổi che mất lưới
     // là thừa. Chỉ lên tiếng khi THẤT BẠI, vì lúc đó màn hình không đổi gì và
     // người dùng cần biết vì sao.

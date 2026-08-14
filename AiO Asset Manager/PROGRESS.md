@@ -1,5 +1,44 @@
 # AiO Asset Manager - Nhat ky
 
+## [dung-gan-day] - 2026-08-14 09:22 (UTC+7) - MUC "DUNG GAN DAY" O MENU TRAI
+
+### Boi canh
+Anh Tien khen panel test okie roi hoi de xuat toi uu giao dien. Dua 3 de xuat
+(duyet bang phim / loc theo thoi luong / dung gan day), anh chot lam DUNG MOT
+cai: *"Muc Dung gan day o menu trai - them cho anh moi cai nay them nha em"*.
+
+### Thay doi
+- store.ts: them `recentIds` (tran 20, moi nhat dau) + `onlyRecent` +
+  `toggleOnlyRecent`. Ghi o `sendToTimeline` CHI KHI res.ok — khong ghi o
+  keo-tha vi onDragStart khong biet cu tha co dap xuong timeline khong.
+  Luu localStorage khoa `aio-am-dung-gan-day`, KHONG dua vao library.json
+  (trang thai tien dung theo may, khong phai du lieu thu vien).
+- Grid.tsx: loc theo recentIds; o che do nay THU TU la noi dung (vua dung
+  dung dau), nhay qua khoi sortBy thuong.
+- Sidebar.tsx: nut moi canh Yeu thich, IconClock co san, dem = so id CON TON
+  TAI trong thu vien (id co the tro asset da xoa — bai hoc 0.16.0). Hai bo loc
+  Yeu thich / Dung gan day LOAI TRU nhau; nut Tat ca + nut loai deu don ca hai.
+- chu.ts: khoa 'Dung gan day' -> 'Recently used'.
+
+### Kiem chung tren PANEL THAT (cong 8088)
+1. Nap 2 id asset that vao localStorage, reload: nut hien dem = 2.
+2. Bam nut: aria-pressed=true, luoi loc con DUNG 2 the (Red,
+   [zenomade] Trending 01.mogrt) — khop 2 id da nap.
+3. Doi chung: ve "Tat ca asset" luoi hien lai day (21 the trong khung nhin),
+   don du lieu moi ve [], reload: dem = 0, localStorage = [].
+
+### CHUA kiem
+Duong GHI (sendToTimeline luc res.ok) chua chay that — bam Import luc do la
+chen clip vao project THAT dang mo cua anh Tien (PV tuyen dung_1). Can anh
+Import mot lan roi nhin nut dem tang len 1 la khep.
+
+### Ghi chu pham vi
+CHI Asset Manager. Power Bins dung chung ~90% ma nhung KHONG chep tinh nang
+nay sang — anh chot "them cho anh moi cai nay" cho panel nay; ben Power Bins
+luong Import khac (khay/brand), muon co thi anh se bao.
+
+---
+
 ## [bin-chung] - 2026-08-13 11:08 (UTC+7) - KHO FFmpeg DUNG CHUNG CHO CA BO
 
 ### Boi canh
