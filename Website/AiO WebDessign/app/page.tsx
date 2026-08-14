@@ -839,23 +839,34 @@ export default function Home() {
               <Zap size={13} />
               <span>BỘ CÔNG CỤ NATIVE CHO PREMIERE PRO · WINDOWS</span>
             </div>
-            <h1>
-              Biến 3 giờ dựng thô <br />
-              <span className="hero-gradient-text">thành 15 phút.</span>
+            {/* [14/08 REDESIGN] CHU KY CUA TRANG: headline tu cat chinh no.
+                "3 giờ" bi khoanh do (dung cach panel Autocut danh dau "doan se
+                bo") → nhat dao quet → sap lai → "15 phút" mau track xanh don
+                vao + chip −92%. San pham tu demo tren chinh cau chao cua no.
+                key={heroRun} de nut Replay chay lai ca headline lan simulator. */}
+            <h1 className="rz" key={heroRun}>
+              Dựng thô{" "}
+              <span className="rz-cut rz-chay" aria-hidden="true">
+                <s>3 giờ</s>
+                <i />
+              </span>
+              <span className="sr-only">từ 3 giờ</span>
+              <span className="rz-new">còn 15 phút.</span>
+              <span className="rz-chip">−92%</span>
             </h1>
             <p className="hero-lead">
-              Tự động lọc khoảng lặng, chuyển multicam podcast và tạo phụ đề AI ngay trên Timeline — 100% Offline GPU, không giới hạn số phút.
+              Cắt khoảng lặng, chuyển cam theo người nói, phụ đề AI — chạy thẳng trên Timeline Premiere, 100% offline, không giới hạn phút.
             </p>
             <div className="hero-actions">
-              <a className="primary-cta" href="#lab">
-                Trải Nghiệm 8 Tool Native <ArrowRight size={16} />
+              <a className="primary-cta cta-free" href="#beta">
+                Tải Beta miễn phí — 3 tool <ArrowRight size={16} />
               </a>
               <button
                 type="button"
                 className="secondary-cta replay-hero-btn"
                 onClick={() => setHeroRun((value) => value + 1)}
               >
-                <RotateCcw size={15} /> Replay Dựng Thử
+                <RotateCcw size={15} /> Xem cắt lại
               </button>
             </div>
             <div className="hero-feature-chips" aria-label="Đặc điểm cốt lõi">

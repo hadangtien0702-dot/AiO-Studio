@@ -1,28 +1,46 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
+/* ═══════════════════════════════════════════════════════════════════════
+   REDESIGN 14/08/2026 — "Trang web là một cửa sổ Premiere"
+   Anh Tiến chốt thiết kế lại hẳn sau khi đo: 26 cỡ chữ / 35 màu / 11 weight.
+
+   Nguồn màu: hệ ĐEN + CAM #ff5714 của chính bộ panel (design-system MASTER),
+   nền graphite nhiều lớp như chrome của Premiere. Màu CÓ NGHĨA lấy từ thế
+   giới người dựng: clip audio Premiere màu XANH LÁ → mọi thứ FREE/Beta mang
+   màu track xanh; CAM = thương hiệu/trả tiền; ĐỎ chỉ dành cho "đoạn bị cắt"
+   (đúng ngôn ngữ panel Autocut).
+
+   Chữ 3 vai: Barlow Condensed (display — chất nhãn broadcast/NLE, luôn
+   uppercase) · IBM Plex Sans (thân) · IBM Plex Mono (timecode, số liệu).
+   Token GIỮ NGUYÊN TÊN cũ (--bg, --panel, --orange…) để 2.800 dòng CSS phía
+   dưới tự ăn theo — đổi giá trị ở đây là cả trang thay da.
+   ═══════════════════════════════════════════════════════════════════════ */
 :root {
-  --bg: #0d0f13;
-  --bg-soft: #12151a;
-  --panel: #181c22;
-  --panel-2: #20252d;
-  --line: #343b46;
-  --line-soft: rgba(255, 255, 255, 0.08);
-  --text: #f8f9fb;
-  --muted: #c2c7cf;
-  --dim: #9198a3;
-  --orange: #ff6b2c;
-  --orange-light: #ffad7e;
-  --orange-soft: #3b2117;
-  --blue: #6ea8ff;
-  --blue-soft: #172942;
-  --purple: #b58cff;
-  --purple-soft: #2b2040;
-  --green: #76d96a;
-  --green-soft: #1b3520;
-  --yellow: #ffd166;
-  --max: 1240px;
-  --font-ui: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
-  --font-display: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+  --bg: #0b0b0d;
+  --bg-soft: #101013;
+  --panel: #141418;
+  --panel-2: #1c1c22;
+  --line: #2a2a32;
+  --line-soft: rgba(255, 255, 255, 0.07);
+  --text: #f2f2f4;
+  --muted: #a8aab3;
+  --dim: #7e8089;
+  --orange: #ff5714;
+  --orange-light: #ff7a40;
+  --orange-soft: #2b1509;
+  --blue: #5b9dff;
+  --blue-soft: #131e30;
+  --purple: #a78bfa;
+  --purple-soft: #201a33;
+  --green: #3fbf63;      /* mau clip audio Premiere — danh cho FREE/Beta */
+  --green-soft: #10240f;
+  --yellow: #f5c518;
+  --red-cut: #e5484d;    /* "doan se bo" — dung nhu trong panel Autocut */
+  --max: 1140px;
+  --font-ui: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
 }
 
 * {
@@ -68,13 +86,125 @@ a:focus-visible {
   outline-offset: 3px;
 }
 
+/* Display = Barlow Condensed, LUON uppercase — chat nhan tren mat ban dung.
+   h3 va nut GIU Plex Sans: cap thap can de doc hon can ca tinh. */
 h1,
 h2,
+.brand {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.015em;
+  font-weight: 700;
+}
+
 h3,
-.brand,
 .primary-cta,
 .secondary-cta {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* Nhan timecode / so lieu — mot vai chu rieng cho the gioi NLE */
+.tc,
+time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── CTA FREE (xanh track audio) — dung cho moi loi keu goi ve Beta ────── */
+.primary-cta.cta-free {
+  background: var(--green);
+  border-color: var(--green);
+  color: #06170b;
+}
+.primary-cta.cta-free:hover {
+  background: #4fd177;
+  border-color: #4fd177;
+}
+
+/* ── CHU KY: headline tu cat chinh no (khuon danh dau cua panel Autocut:
+      do = doan se bo → nhat cat → don lai → so moi mau track xanh) ──────── */
+.rz {
+  position: relative;
+}
+.rz-cut {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  color: var(--muted);
+  max-width: 6em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.rz-cut::before,
+.rz-cut::after {
+  /* hai ngoac vuong do — dung cach panel khoanh "doan se bo" */
+  content: "";
+  position: absolute;
+  top: 6%;
+  bottom: 6%;
+  width: 0.14em;
+  border: 2px solid var(--red-cut);
+  opacity: 0;
+  animation: rzDanhDau 0.3s ease-out 0.35s forwards;
+}
+.rz-cut::before { left: 0; border-right: 0; }
+.rz-cut::after { right: 0; border-left: 0; }
+.rz-cut > i {
+  /* nhat dao quet doc qua doan bi cat */
+  position: absolute;
+  top: -8%;
+  bottom: -8%;
+  left: 0;
+  width: 2px;
+  background: var(--red-cut);
+  box-shadow: 0 0 12px var(--red-cut);
+  opacity: 0;
+  animation: rzQuet 0.45s cubic-bezier(0.7, 0, 0.3, 1) 0.95s forwards;
+}
+.rz-cut > s {
+  text-decoration: none;
+  display: inline-block;
+}
+.rz-cut.rz-chay {
+  animation: rzSap 0.5s cubic-bezier(0.8, 0, 0.2, 1) 1.5s forwards;
+}
+.rz-new {
+  display: inline-block;
+  color: var(--green);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  animation: rzMoi 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 1.9s forwards;
+}
+.rz-chip {
+  display: inline-block;
+  margin-left: 14px;
+  padding: 3px 9px;
+  border: 1px solid var(--green);
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.32em;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--green);
+  vertical-align: 0.55em;
+  opacity: 0;
+  animation: rzChip 0.35s ease-out 2.25s forwards;
+}
+@keyframes rzDanhDau { to { opacity: 1; } }
+@keyframes rzQuet { 0% { opacity: 1; left: 0; } 100% { opacity: 0; left: 100%; } }
+@keyframes rzSap { to { max-width: 0; opacity: 0; } }
+@keyframes rzMoi { to { max-width: 5em; opacity: 1; } }
+@keyframes rzChip { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  /* khong dien hoat canh cat — hien thang KET QUA cuoi */
+  .rz-cut.rz-chay, .rz-cut { display: none; }
+  .rz-new { max-width: none; opacity: 1; animation: none; }
+  .rz-chip { opacity: 1; animation: none; }
 }
 
 time {
