@@ -859,7 +859,7 @@ export default function Home() {
             </p>
             <div className="hero-actions">
               <a className="primary-cta cta-free" href="#beta">
-                Tải Beta miễn phí — 3 tool <ArrowRight size={16} />
+                Tải Demo miễn phí — Asset Manager <ArrowRight size={16} />
               </a>
               <button
                 type="button"
@@ -1088,8 +1088,10 @@ export default function Home() {
                   </ul>
 
                   <div className="spotlight-actions">
-                    <a className="primary-cta" href="#pricing" style={{ minHeight: "44px", fontSize: "14px" }}>
-                      Sở Hữu Trọn Bộ 8 Tool <ArrowRight size={16} />
+                    {/* [16/08] Bo fontSize 14px inline — no de mat 19px cua .primary-cta
+                        (19px la dieu kien de trang/cam dat chuan tuong phan) */}
+                    <a className="primary-cta" href="#pricing" style={{ minHeight: "44px" }}>
+                      Mở Khóa Cả 8 Tool — $17/tháng <ArrowRight size={16} />
                     </a>
                   </div>
                 </div>
@@ -1133,7 +1135,7 @@ export default function Home() {
                 <li className="bad"><X size={15} /> Giới hạn credit & số phút audio</li>
                 <li className="bad"><X size={15} /> Nguy cơ rò rỉ source của khách hàng</li>
                 <li className="bad"><X size={15} /> Chỉ làm được 1 tính năng phụ đề</li>
-                <li className="bad"><X size={15} /> Không có gói mua vĩnh viễn (Lifetime)</li>
+                <li className="bad"><X size={15} /> Phải có Internet mới xử lý được</li>
               </ul>
             </div>
 
@@ -1149,7 +1151,7 @@ export default function Home() {
                 <li className="bad"><X size={15} /> Chỉ có 3 công cụ đơn lẻ</li>
                 <li className="bad"><X size={15} /> Không có Brand Kit & Kho Asset</li>
                 <li className="bad"><X size={15} /> Không có tính năng phụ đề & Safe Zone</li>
-                <li className="bad"><X size={15} /> Phải thuê bao $29/tháng hàng năm</li>
+                <li className="bad"><X size={15} /> Đắt hơn 70% so với AiO ($29 vs $17)</li>
               </ul>
             </div>
 
@@ -1159,13 +1161,13 @@ export default function Home() {
               <div className="comp-card-header">
                 <small>SUITE TOÀN DIỆN</small>
                 <h3>AiO Studio Suite</h3>
-                <span className="comp-price">$299 <span>vĩnh viễn / hoặc $149/năm</span></span>
+                <span className="comp-price">$17 <span>/ tháng — đủ cả 8 tool</span></span>
               </div>
               <ul className="comp-list">
                 <li className="good"><Check size={15} /> Trọn bộ 8 công cụ Native trong 1 panel</li>
                 <li className="good"><Check size={15} /> 100% Offline GPU — 0 rò rỉ dữ liệu</li>
                 <li className="good"><Check size={15} /> Xử lý không giới hạn số phút video</li>
-                <li className="good"><Check size={15} /> Có tùy chọn Mua 1 Lần Sở Hữu Vĩnh Viễn</li>
+                <li className="good"><Check size={15} /> Demo Asset Manager miễn phí — thử trước, trả sau</li>
                 <li className="good"><Check size={15} /> Windows 10/11 — cài một file, không cần quyền Admin</li>
               </ul>
               <a className="primary-cta comp-cta" href="#pricing">
@@ -1175,42 +1177,29 @@ export default function Home() {
           </div>
         </section>
 
-        {/* [14/08] BETA MIEN PHI — 3 tool free, anh Tien chot 13/08.
+        {/* [16/08] DEMO MIEN PHI — anh Tien chot 16/08: demo chi con MOT tool
+            (Asset Manager); 7 tool con lai nam trong goi Pro $17/thang.
+            (Phu dinh quyet dinh 13/08 "3 tool free".)
             Dung nguyen class cua pricing (price-card / plan-perks / primary-cta)
-            de dong bo giao dien, khong them CSS moi. CTA mailto la duong nhan
-            don DUY NHAT dang co that — co form/backend roi thi thay. */}
+            de dong bo giao dien. CTA mailto la duong nhan don DUY NHAT dang co
+            that — co form/backend roi thi thay. */}
         <section className="pricing-section section-shell" id="beta" style={{ marginTop: "90px" }}>
           <div className="section-intro">
-            <span className="lesson-number">BETA MIỄN PHÍ</span>
+            <span className="lesson-number">DEMO MIỄN PHÍ</span>
             <div>
-              <h2>Dùng Thử Miễn Phí 3 Tool — Bản Beta Windows</h2>
-              <p>Cài một file duy nhất (92 MB), không cần quyền Admin. Windows 10/11 · Premiere Pro.</p>
+              <h2>Dùng Thử Miễn Phí Asset Manager — Bản Windows</h2>
+              <p>Cài một file duy nhất, không cần quyền Admin. Windows 10/11 · Premiere Pro.</p>
             </div>
           </div>
 
-          <div className="pricing-cards-grid">
-            <div className="price-card">
-              <span className="plan-label">Auto Cut</span>
-              <p className="plan-desc">Dò khoảng lặng, cắt và dồn timeline một cú bấm.</p>
-              <ul className="plan-perks">
-                <li><Check size={16} color="var(--green)" /> 6:29 video ➔ 54 nhát cắt trong 23s</li>
-                <li><Check size={16} color="var(--green)" /> Hoàn tác một nút</li>
-              </ul>
-            </div>
+          <div className="pricing-cards-grid one-plan">
             <div className="price-card">
               <span className="plan-label">Asset Manager</span>
               <p className="plan-desc">Kho asset ngay trong Premiere — tìm, nghe thử, kéo thả.</p>
               <ul className="plan-perks">
                 <li><Check size={16} color="var(--green)" /> 28.000+ asset, preview &lt;1s</li>
+                <li><Check size={16} color="var(--green)" /> Kéo thả thẳng vào timeline</li>
                 <li><Check size={16} color="var(--green)" /> Mục &quot;Dùng gần đây&quot; tự ghi nhớ</li>
-              </ul>
-            </div>
-            <div className="price-card">
-              <span className="plan-label">Power Bins</span>
-              <p className="plan-desc">Brand Kit hiện ở mọi project — logo, intro, nhạc nền đi theo bạn.</p>
-              <ul className="plan-perks">
-                <li><Check size={16} color="var(--green)" /> Mở project mới vẫn thấy nguyên khay</li>
-                <li><Check size={16} color="var(--green)" /> Thumbnail &amp; preview render sẵn</li>
               </ul>
             </div>
           </div>
@@ -1218,12 +1207,12 @@ export default function Home() {
           <div style={{ textAlign: "center", marginTop: "28px" }}>
             <a
               className="primary-cta"
-              href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20Beta%20-%20Xin%20link%20tai&body=May%20minh%20la%20Windows%2010%2F11%2C%20Premiere%20Pro%20phien%20ban%3A%20"
+              href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20Demo%20-%20Xin%20link%20tai&body=May%20minh%20la%20Windows%2010%2F11%2C%20Premiere%20Pro%20phien%20ban%3A%20"
             >
-              Nhận Link Tải Beta Qua Email <ArrowRight size={16} />
+              Nhận Link Tải Demo Qua Email <ArrowRight size={16} />
             </a>
             <p style={{ marginTop: "10px", fontSize: "13px", opacity: 0.7 }}>
-              Song ngữ Việt/Anh · 100% offline · Cả ba tool miễn phí kể cả sau beta
+              Song ngữ Việt/Anh · 100% offline · Miễn phí mãi, không cần thẻ tín dụng
             </p>
           </div>
         </section>
@@ -1233,54 +1222,43 @@ export default function Home() {
           <div className="section-intro">
             <span className="lesson-number">BẢNG GIÁ</span>
             <div>
-              <h2>Đầu Tư Một Lần. Tăng Tốc Dựng Trọn Đời.</h2>
-              <p>Chọn gói phù hợp với nhu cầu của bạn. 100% không giới hạn dung lượng.</p>
+              <h2>Bắt Đầu Miễn Phí. Nâng Cấp Khi Cần Cả Bộ.</h2>
+              <p>Hai gói duy nhất — không phí ẩn, hủy bất kỳ lúc nào.</p>
             </div>
           </div>
 
-          <div className="pricing-cards-grid">
+          {/* [16/08] Bang gia moi anh Tien chot: 2 goi (Demo free + Pro $17/thang).
+              BO han goi mua-mot-lan va goi nam — anh noi chua san sang ban kieu do.
+              Danh sach chuoi cam quay lai nam trong tests/rendered-html.test.mjs. */}
+          <div className="pricing-cards-grid two-plans">
             <div className="price-card">
-              <span className="plan-label">Starter Pass</span>
-              <div className="price-tag">$29 <small>/ tháng</small></div>
-              <p className="plan-desc">Trải nghiệm toàn bộ 8 tool cho 1 dự án lớn.</p>
+              <span className="plan-label">Demo Pass</span>
+              <div className="price-tag">$0 <small>miễn phí mãi</small></div>
+              <p className="plan-desc">Asset Manager đầy đủ — dùng không giới hạn thời gian.</p>
               <ul className="plan-perks">
-                <li><Check size={16} color="var(--green)" /> Trọn bộ 8 Native Panels</li>
-                <li><Check size={16} color="var(--green)" /> 1 Workstation Device</li>
-                <li><Check size={16} color="var(--green)" /> 100% Offline Data Privacy</li>
+                <li><Check size={16} color="var(--green)" /> Asset Manager đầy đủ tính năng</li>
+                <li><Check size={16} color="var(--green)" /> 28.000+ asset, preview &lt;1s</li>
+                <li><Check size={16} color="var(--green)" /> Không cần thẻ tín dụng</li>
               </ul>
-              {/* [14/08] Chua co cong thanh toan — mailto la duong VE DON that duy nhat.
-                  Co checkout roi thi thay href, dung de nut chet. */}
-              <a className="secondary-cta plan-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Goi%20Thang%20%2429">Bắt Đầu Gói Tháng</a>
+              <a className="secondary-cta plan-btn" href="#beta">Tải Demo Miễn Phí</a>
             </div>
 
             <div className="price-card is-popular">
-              <span className="popular-pill">TIẾT KIỆM 57%</span>
-              <span className="plan-label" style={{ color: "var(--orange-light)" }}>Annual Pro Pass</span>
-              <div className="price-tag">$149 <small>/ năm</small></div>
-              <p className="plan-desc">Lựa chọn tối ưu cho Freelancer & Studio dựng phim.</p>
+              <span className="popular-pill">RẺ HƠN AUTOPOD 41%</span>
+              <span className="plan-label" style={{ color: "var(--orange-light)" }}>Pro Pass</span>
+              <div className="price-tag">$17 <small>/ tháng</small></div>
+              <p className="plan-desc">Mở khóa cả 8 tool — xử lý không giới hạn số phút.</p>
               <ul className="plan-perks">
                 <li><Check size={16} color="var(--green)" /> Trọn bộ 8 Native Panels</li>
+                <li><Check size={16} color="var(--green)" /> Không giới hạn số phút video</li>
+                <li><Check size={16} color="var(--green)" /> 100% Offline Data Privacy</li>
                 <li><Check size={16} color="var(--green)" /> 1 Workstation Device</li>
-                <li><Check size={16} color="var(--green)" /> 1 Năm Miễn Phí Cập Nhật AI</li>
-                <li><Check size={16} color="var(--green)" /> Support Discord Ưu Tiên 24/7</li>
+                <li><Check size={16} color="var(--green)" /> Hủy bất kỳ lúc nào</li>
               </ul>
-              <a className="primary-cta plan-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Goi%20Nam%20%24149">
-                Đăng Ký Gói Năm <ArrowRight size={16} />
-              </a>
-            </div>
-
-            <div className="price-card is-lifetime">
-              <span className="plan-label" style={{ color: "var(--yellow)" }}>Lifetime Studio Pass</span>
-              <div className="price-tag" style={{ color: "var(--yellow)" }}>$299 <small style={{ color: "var(--yellow)" }}>one-time</small></div>
-              <p className="plan-desc">Trả 1 lần, sở hữu vĩnh viễn. Không phí duy trì.</p>
-              <ul className="plan-perks">
-                <li><Check size={16} color="var(--yellow)" /> Trọn bộ 8 Tool Vĩnh Viễn</li>
-                <li><Check size={16} color="var(--yellow)" /> 1 Workstation Device</li>
-                <li><Check size={16} color="var(--yellow)" /> Cập Nhật Miễn Phí Trọn Đời</li>
-                <li><Check size={16} color="var(--yellow)" /> Direct Founder VIP Support</li>
-              </ul>
-              <a className="primary-cta plan-btn lifetime-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Lifetime%20%24299">
-                Sở Hữu Trọn Đời ($299) <Sparkles size={16} />
+              {/* [14/08] Chua co cong thanh toan — mailto la duong VE DON that duy nhat.
+                  Co checkout roi thi thay href, dung de nut chet. */}
+              <a className="primary-cta plan-btn" href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20-%20Goi%20Pro%20%2417%2Fthang">
+                Đăng Ký Gói Pro — $17/tháng <ArrowRight size={16} />
               </a>
             </div>
           </div>
@@ -1324,7 +1302,7 @@ export default function Home() {
               <small>THỜI GIAN THU HỒI MỖI NĂM</small>
               <strong>{hoursRecovered}<span> giờ</span></strong>
               <p>Tương đương <b>{Math.max(1, Math.round(hoursRecovered / 8))} ngày làm việc trọn vẹn</b> để nhận thêm dự án hoặc nghỉ ngơi.</p>
-              <a href="#pricing">Sở Hữu 8 Công Cụ Ngay <ArrowRight size={16} /></a>
+              <a href="#pricing">Dùng Đủ 8 Tool — $17/tháng <ArrowRight size={16} /></a>
             </div>
           </div>
         </section>
@@ -1334,9 +1312,9 @@ export default function Home() {
           <div>
             <span className="eyebrow"><Sparkles size={15} /> AiO Studio Workflow Suite</span>
             <h2>Dừng Cắt Khoảng Lặng Thủ Công. Bắt Đầu Sáng Tạo.</h2>
-            <p>Trọn bộ 8 panel native bên cạnh Timeline. Cam kết hoàn tiền trong 30 ngày nếu không hài lòng.</p>
+            <p>Trọn bộ 8 panel native bên cạnh Timeline. Bắt đầu miễn phí với Asset Manager — nâng cấp khi sẵn sàng.</p>
           </div>
-          <a className="primary-cta" href="#pricing">Sở Hữu Ngay ($299) <ArrowRight size={17} /></a>
+          <a className="primary-cta" href="#pricing">Xem Bảng Giá — Từ $0 <ArrowRight size={17} /></a>
         </section>
       </main>
 

@@ -245,6 +245,8 @@ time {
   color: white;
   background: var(--orange);
   font-weight: 700;
+  /* [16/08] Cung ly do voi .primary-cta: >=18.66px dam thi trang/cam 3.17 dat chuan */
+  font-size: 19px;
   transform: translateY(-160%);
 }
 
@@ -348,6 +350,9 @@ time {
   padding-inline: 18px;
   color: white;
   background: var(--orange);
+  /* [16/08] Cung ly do voi .primary-cta: >=18.66px dam thi trang/cam 3.17 dat chuan */
+  font-size: 19px;
+  font-weight: 700;
 }
 
 .site-nav .nav-cta:hover {
@@ -579,6 +584,10 @@ time {
   color: white;
   background: var(--orange);
   box-shadow: 0 8px 24px rgba(248, 104, 32, 0.28);
+  /* [16/08] 19px de dat WCAG: trang/cam do duoc 3.17 — chu thuong can 4.5
+     (truot), chu LON (>=18.66px dam) chi can 3.0 (dat). Giu nguyen mau cam
+     anh Tien chon 02/08, chi nang co chu. Doi mau la truot lai. */
+  font-size: 19px;
 }
 
 .primary-cta:hover {
@@ -671,6 +680,10 @@ time {
 
 .sim-mode-bar {
   display: flex;
+  /* [16/08] Va loi do 14/08: 4 pill can 371px, khung 375px chi co 346px ->
+     pill "Auto Re-Frames" bi cat mep ma khong cuon duoc. Cho xuong dong;
+     desktop du cho nen khong doi gi. */
+  flex-wrap: wrap;
   gap: 4px;
   padding: 4px;
   background: #121419;
@@ -2050,7 +2063,9 @@ time {
   top: -12px;
   right: 20px;
   background: var(--orange);
-  color: #fff;
+  /* [16/08] Chu 10px thi trang/cam (3.17) khong co cua dat 4.5 — chu toi
+     tren cam do duoc 5.68, dat. Nut lon van chu trang (xem .primary-cta). */
+  color: #16181d;
   padding: 3px 12px;
   border-radius: 999px;
   font-size: 10px;
@@ -2075,6 +2090,32 @@ time {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 44px;
+}
+
+/* [16/08] Bang gia 2 goi (Demo + Pro $17) va demo 1 card — anh Tien chot 16/08 */
+.pricing-cards-grid.two-plans {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 780px;
+  margin-inline: auto;
+}
+
+.pricing-cards-grid.one-plan {
+  grid-template-columns: minmax(0, 460px);
+  justify-content: center;
+}
+
+/* [16/08] Va loi do 14/08: hai luoi nay khong co breakpoint nen o man hep
+   3 cot van ep hang ngang -> card AiO trong bang so sanh bi day han ra ngoai
+   man hinh (do that: cot can 518px, khung chi 347px o kho 375). Xep doc lai. */
+@media (max-width: 900px) {
+  .comparison-cards-grid,
+  .pricing-cards-grid,
+  .pricing-cards-grid.two-plans,
+  .pricing-cards-grid.one-plan {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 560px;
+    margin-inline: auto;
+  }
 }
 
 .price-card {
@@ -2148,21 +2189,12 @@ time {
   top: -12px;
   right: 20px;
   background: var(--orange);
-  color: #fff;
+  /* [16/08] Cung ly do .featured-badge: 10.5px khong dat noi voi chu trang */
+  color: #16181d;
   padding: 3px 12px;
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
-}
-
-.price-card.is-lifetime {
-  background: linear-gradient(155deg, #1a1814, #121418);
-  border: 2px solid var(--yellow);
-}
-
-.lifetime-btn {
-  background: var(--yellow) !important;
-  color: #000 !important;
 }
 
 .asset-animation {

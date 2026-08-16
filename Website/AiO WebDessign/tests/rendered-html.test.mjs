@@ -47,26 +47,46 @@ test("khong hua qua so do — cau da go khong duoc quay lai", async () => {
   assert.match(page, /PREMIERE PRO · WINDOWS/);
 });
 
-test("section Beta 3 tool free con song va tro dung cho", async () => {
+/* [16/08] VIET LAI test nay: anh Tien doi bang gia — demo free CHI Asset
+   Manager, goi Pro $17/thang du 8 tool, BO Lifetime/goi nam ("chua san sang
+   lam one-time"). Test cu khoa "3 tool free" (quyet dinh 13/08) nen phai doi
+   thuoc theo quyet dinh moi (bai hoc 5u). */
+test("demo free = CHI Asset Manager, khong con dau vet gia cu", async () => {
   const page = await readFile(new URL("page.tsx", appRoot), "utf8");
 
   assert.match(page, /id="beta"/);
-  assert.match(page, /Dùng Thử Miễn Phí 3 Tool/);
-  // Dung 3 tool free anh Tien chot 13-14/08 — khong hon khong kem
-  assert.match(page, /Auto Cut/);
-  assert.match(page, /Asset Manager/);
-  assert.match(page, /Power Bins/);
-  assert.match(page, /Cả ba tool miễn phí kể cả sau beta/);
+  assert.match(page, /Dùng Thử Miễn Phí Asset Manager/);
+  assert.match(page, /Miễn phí mãi, không cần thẻ tín dụng/);
+  // Cau cua thoi "3 tool free" khong duoc quay lai
+  assert.doesNotMatch(page, /Cả ba tool miễn phí/);
+  assert.doesNotMatch(page, /Dùng Thử Miễn Phí 3 Tool/);
   // Cut Short chua co code — phai con nhan Coming Soon
   assert.match(page, /Coming Soon/);
 });
 
-test("nut gia va nut beta khong duoc chet — moi CTA tien phai co duong di", async () => {
+test("bang gia 16/08: 2 goi Demo+Pro $17/thang, CAM lifetime/goi nam quay lai", async () => {
   const page = await readFile(new URL("page.tsx", appRoot), "utf8");
 
-  // 3 nut gia + 1 nut beta = it nhat 4 mailto (placeholder toi khi co checkout)
+  // Phai co 2 goi moi
+  assert.match(page, /Demo Pass/);
+  assert.match(page, /Pro Pass/);
+  assert.match(page, /\$17 <small>\/ tháng<\/small>/);
+  // Gia/goi da bo KHONG duoc quay lai (anh Tien 16/08: "khong co goi
+  // one-time payment, minh chua san sang")
+  const cam = [/\$299/, /\$149/, /Lifetime/, /one-time/, /Vĩnh Viễn/i, /TIẾT KIỆM 57/, /hoàn tiền/];
+  for (const re of cam) {
+    assert.doesNotMatch(page, re, "Gia/loi hua da bo xuat hien lai: " + re);
+  }
+});
+
+test("nut gia va nut demo khong duoc chet — moi CTA tien phai co duong di", async () => {
+  const page = await readFile(new URL("page.tsx", appRoot), "utf8");
+
+  // 1 nut Pro + 1 nut demo = it nhat 2 mailto (placeholder toi khi co checkout)
   const soMailto = (page.match(/mailto:dreamtalentmarketing@gmail\.com/g) || []).length;
-  assert.ok(soMailto >= 4, "chi con " + soMailto + " mailto — nut tien nao do da chet");
+  assert.ok(soMailto >= 2, "chi con " + soMailto + " mailto — nut tien nao do da chet");
+  assert.match(page, /subject=AiO%20Studio%20Demo%20-%20Xin%20link%20tai/);
+  assert.match(page, /subject=AiO%20Studio%20-%20Goi%20Pro%20%2417%2Fthang/);
   // Khong con <button> tran trong khoi gia (da doi het sang <a>)
   assert.doesNotMatch(page, /<button type="button" className="[^"]*plan-btn[^"]*">/);
 });
