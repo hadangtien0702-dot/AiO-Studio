@@ -18,6 +18,12 @@ dist/
 !/AiO Auto Guiline Frame/dist/
 !/AiO WELCOME/dist/
 build/
+# ☠️ NGOAI LE 2026-08-17: thu muc MA NGUON ten "build" cua website — chua
+# sites-vite-plugin.ts ma vite.config.ts import. Luat "build/" o tren da nuot
+# no trong im lang -> repo tren GitHub THIEU file, Vercel/clone build fail
+# (type error "Cannot find module ./build/sites-vite-plugin"). Cung ho voi
+# ngoai le dist/ ben tren: phai un-ignore CHINH THU MUC.
+!/Website/AiO WebDessign/build/
 bin/
 .next/
 .wrangler/
