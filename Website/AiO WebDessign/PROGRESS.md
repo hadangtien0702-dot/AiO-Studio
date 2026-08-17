@@ -1,9 +1,244 @@
 # PROGRESS — AiO WebDessign (website ban hang)
 
 > Nhat ky sua doi. Muc moi ghi LEN TREN. Gio lay bang lenh `Get-Date`, khong bia.
-> Code goc do anh Tien tu dung (29/07) — sua noi dung/bo cuc phai theo loi anh dan.
+
+## TRANG THAI HIEN TAI (chot phien 2026-08-17 13:38)
+
+- **Trang da DAP XAY MOI 100%** (17/08, anh Tien cam tai dung y ban Gemini —
+  co bai test chot chan; ban cu o git tag `ban-cu-17-08`). Kien truc:
+  `page.tsx` server component + island client DUY NHAT `PluginLab.tsx`;
+  du lieu 8 plugin o `plugins.ts` (nguon duy nhat); design system da hieu
+  chinh brand o `design-system/aio-studio-website/MASTER.md` — LAM UI PHAI
+  DOC FILE DO TRUOC.
+- **Trang gom:** header vien nang · hero "tu dien" (playhead quet, chu dat
+  xuong theo nhip, timeline chim 2 lop — y anh chi dinh) · 8 plugin bam mo
+  DEMO TUONG TAC · bang gia 2 goi $0/$17 (card Pro liet ke du 8 ten) · footer.
+- **Anh Tien da duyet:** "kha hon Gemini nhieu" + 9 chi dao chi tiet da lam
+  het (go 5 khoi chu, viet lai cot so, 2 cau anh tu doc da khoa trong test).
+- `[CHO]` **6 demo con lai cho anh duyet KHUON** "panel + timeline" (da lam
+  mau tren Auto Cut, 10/10 hanh vi dat): Podcast · Transcripts · Re-Frames ·
+  Asset · Power Bins · Guide Frame. Ly do dung: nhan ra 7 cai truoc khi anh
+  gat la rui ro sua 7 lan.
+- `[CHO]` **CHUA PUSH** — anh dan lam local truoc. Live (ai-o-studio.vercel.app)
+  van la BAN GEMINI cu. Push len main la Vercel tu build (~30s, vercel.json
+  da lo). Toan bo ban moi da commit local (xem git log).
+- Xem local: `npx serve out -l 4173` (build: `STATIC_EXPORT=1 npx next build`).
+  Test: `node --test tests/rendered-html.test.mjs` — dang 5/5.
 
 ---
+
+## 2026-08-17 11:40 — Demo Auto Cut nang thanh khuon "PANEL + TIMELINE"
+
+**Boi canh:** anh Tien gui anh chup demo cua doi thu (AutoCut.fm) va noi
+*"anh tinh lam cho tuong tac nhu the nay — CHI lay y tuong, khong copy
+nguyen mang"*. Y lay: demo = mo phong panel that dung canh timeline, chinh
+thong so duoc, bam nut thay ket qua tren timeline. KHONG lay: bo cuc,
+preset, chu, waveform cua ho.
+
+**Khuon moi (lam mau tren Auto Cut, anh duyet roi nhan ra 7 demo kia):**
+- Trai: panel "Auto Cut" (logo + cham xanh san sang) voi thong so THAT cua
+  panel minh: Nguong am −34 dB (tinh) + slider "Lang toi thieu" 0,20–1,00s
+  (mac dinh 0,30s nhu ban that)
+- Keo slider = thay truoc hau qua: "Se cat N khoang lang — gon X,XX giay"
+  + cac khoang sap cat SANG CAM tren timeline (luat 63: nhan tham so noi
+  hau qua bang so). Nguong cao qua -> bao ro + KHOA nut (khong de bam roi
+  khong co gi xay ra)
+- Phai: timeline 4 clip + 3 khoang lang do dai khac nhau (0,25/0,45/0,90s
+  — be rong ti le do dai that). Bam "Cat khoang lang": chi khoang >= nguong
+  chay do roi don, khoang nho hon GIU NGUYEN. Lam lai ve trang thai dau.
+
+**Kiem chung (bam thu that, build tinh):** 10/10 hanh vi dat — mac dinh
+"Se cat 2 — 1,35 giay" dung so hoc; keo 0,20 -> "Se cat 3"; keo 1,00 ->
+khoa nut; bam cat -> dung 2 khoang bien mat, khoang 0,25s con nguyen;
+lam lai OK. Mobile 375: xep 1 cot, 0 tran, slider cham 24px (accent-color
+cam). Test 5/5 · build sach.
+
+**CHO ANH DUYET KHUON** roi nhan ra: Podcast · Transcripts · Re-Frames ·
+Asset · Power Bins · Guide Frame (Cut Short giu "sap co").
+
+## 2026-08-17 11:27 — Hero "tu dien" + section 8 plugin TUONG TAC + card Pro liet ke du 8 ten
+
+**Ba yeu cau cua anh Tien (17/08):**
+1. *"Hero chua creative"* → concept **"trang tu dien nhu mot phien dung"**:
+   playhead quet MOT LAN (2,2s roi dung — luat "ke xong thi thoi"), tung
+   dong headline duoc "dat xuong" bang clip-path quet theo nhip playhead
+   (khong scaleY — bai hoc bop meo chu), tung clip tren timeline nen THA
+   xuong lan luot (delay inline theo track+thu tu).
+2. *"Bam vao xem tuong tac duoc voi cac tinh nang"* → **PluginLab.tsx**:
+   island client DUY NHAT (page.tsx van server 0-JS — ly do dung "use
+   client" ghi tai day va trong comment file). Bam hang plugin mo demo
+   bam-thu-duoc: AutoCut (bam cat, lang chay do roi don) · Podcast (chon
+   ai noi, cam do live) · Transcripts (1 cham, 3 dong phu de go ra) ·
+   Re-Frames (16:9 ⇄ 9:16, chu the giu giua) · Asset (go loc kho tuc thi)
+   · Power Bins (doi project, khay brand giu nguyen) · Guide Frame (chon
+   nen tang, vung che doi) · Cut Short (bao sap co).
+3. *"Ca 8 plugin chung chung qua"* → card Pro liet ke **du 8 ten** (map tu
+   PLUGINS, 2 cot) — du lieu don ve `app/plugins.ts` lam nguon duy nhat
+   cho ca 3 noi.
+
+**Kem:** them `animation-delay: 0` vao reduced-motion (thieu la nguoi tat
+hieu ung nhin man trong 1,55s cho chu hien); test doc noi dung tu 3 file,
+cam "use client" moi ngoai PluginLab, khoa aria-expanded.
+
+**Kiem chung (build tinh, localhost:4173, BAM THU THAT tung demo):**
+- 12 phep do hanh vi: **9 dat truc tiep**; 3 phep do TRANSITION baO truot
+  nhung co DOI CHUNG thuoc hong: mot transition toi gian tu dung cung dung
+  im (10px -> van 10px sau 400ms) => pane an khong tick transition; state
+  + chu ket qua cua ca 3 demo deu doi dung. May that se muot.
+- Accordion: mo dung 1 panel mot luc, aria-expanded dung, demo reset khi
+  dong/mo lai (chu dich — moi lan mo la ban demo sach)
+- Card Pro: dem duoc 8/8 ten · 0 tran ngang · test 5/5 · build sach
+- JS chi tai cho section demo (island), phan con lai van tinh
+
+**CHUA push.**
+
+## 2026-08-17 10:58 — Go cau "Khong the, khong rang buoc." duoi tieu de bang gia
+
+Anh Tien khoanh do bao remove. Da go; bang gia gio chi con tieu de + 2 card
+(y "khong can the" van song trong bullet cua goi Demo — mot thong diep mot
+noi). Kiem: build sach, 0 vet chuoi tren out/index.html, test 5/5.
+
+## 2026-08-17 10:56 — Chay skill ui-ux-pro-max bai ban cho du an + polish hero
+
+**Boi canh:** anh Tien: *"su dung skill nay cho du an moi — truoc tien la
+phan hero"*.
+
+**1. Sinh + LUU design system:** `design-system/aio-studio-website/MASTER.md`
+(nguon chan ly cho cac phien sau). DB goi y style **"Exaggerated
+Minimalism"** (chu kho dai, khoang trong lon) — xac nhan dung huong hero.
+☠️ **DA HIEU CHINH MASTER truoc khi dung:** bang mau/font DB sinh ra
+(slate + xanh la + Inter) bi THAY bang brand that (cam #FF5714, Space
+Grotesk/Inter/JetBrains, cac luat tuong phan da do) — khong sua thi phien
+sau doc MASTER se ap mau sai (bai hoc 02/08: DB nay nghieng landing chung).
+Ghi kem luat: Space Grotesk max 700 (khai 800/900 la gia-dam), @import
+font phai truoc tailwind, trang/cam chi dat >=18.66px dam.
+
+**2. Polish hero theo style DB:**
+- Headline max 138 -> **158px** o man rong (van cap 14vh giu CTA trong fold)
+- Nhip hien 3 tang khi tai: nhan -> headline -> nut (60/120/180ms, 420ms,
+  ease-out); timeline nen fade-in 700ms sau mot nhip — lop chu vao truoc,
+  lop may vao sau. CSS thuan, reduced-motion da phu.
+
+**Kiem chung (build tinh, localhost:4173):** 3/3 tang co nhip dung delay ·
+nen chay `nenHien` · CTA bottom 665 <= 720 (van trong man dau) · 0 tran ·
+test 5/5 · build sach.
+
+**CHUA push.**
+
+## 2026-08-17 10:52 — Tinh chinh theo anh Tien duyet truc tiep (7 chi dao lien tiep)
+
+**Boi canh:** anh Tien duyet ban moi tung phan, gui anh chup + chi dao ngan.
+Ket qua tung cai (deu do lai tren build tinh, localhost:4173):
+
+1. **Header "chua noi bat"** → vien nang NOI: 880x62, bo tron 999px, vien +
+   blur + bong, cach mep 14px, dinh dung khi cuon; link nav sang/to hon.
+2. **Hero "can layer truoc sau"** → 2 LOP: lop truoc = chu (eyebrow +
+   headline + nut); lop sau = TIMELINE PREMIERE CHIM MO (y anh chi dinh):
+   thuoc khung hinh + 2 track video + 2 track audio dang song (14 clip,
+   3 clip cam) + playhead cam troi 18s. Ve 100% bang CSS, mask mo dan len
+   tren. Reduced-motion: playhead dung im.
+3. **Go dai 3 con so** (23s / 2,4 phut / <1s) — so da nam trong cot so cua
+   danh sach plugin, mot thong diep mot noi.
+4. **Cot so plugin "viet lai de hieu hon"** → loi thuong: "6:29 xu ly trong
+   23s" -> "cat video 6 phut trong 23 giay", "588/588 moc dung" -> "dung
+   588/588 lan chuyen cam"...
+5. **Mo ta plugin theo loi anh doc**: Asset Manager = "Keo hang ngan asset
+   dang ngu dong trong folder song lai" (sua "hang hang" -> "hang ngan");
+   Transcripts = "1 cham tao phu de"; cac tool khac viet giong "Tu lam gi..."
+   → test khoa 2 cau anh doc: go phai hoi anh.
+6. **Go cau "Cai mot file. Windows 10/11..."** + **go ghi chu duoi bang gia**
+   + **go cau dan hero** ("8 plugin AI chay thang...") — hero gio chi con
+   eyebrow + headline + 2 nut.
+
+**He qua do duoc:** CTA hero TRO LAI man dau (bottom 651 <= 720; truoc do
+bi day xuong 721 — chinh viec go cau dan cuu no). Mobile 375: CTA bottom
+589 <= 812 ✓. Trang 2.463px desktop / 3.324px mobile. 0 tran · 0 chong lap
+· test 5/5 · build sach. CSS chet cua 3 khoi go da don sach (grep = 0).
+
+**CHUA push** — anh dang duyet tiep tren local.
+
+## 2026-08-17 10:35 — XAY MOI 100%: cam moi y tuong Gemini, font moi, copy moi
+
+**Boi canh:** anh Tien hoi *"em co chac la khong lay y tuong tu ban cu
+khong?"* — em do va khai that: code moi (2/237 class trung) NHUNG co 2 y
+ke thua (headline "Dung tho 3 gio con 15 phut" + y niem dai-tu-cat).
+Anh chot: *"KHONG duoc lay bat ky y tuong cu hoac code cu — ban cu cua
+Gemini ngu va xau"* → lam lai sach.
+
+**Bo them nhung gi (so voi ban 09:59):**
+- Headline: "Dung tho 3 gio / Con 15 phut" → **"Cắt. Phụ đề. Multicam.
+  Tự động▌"** (tu "Tự động" mau cam + CON TRO DANG GO nhay — hinh ky moi
+  thay cho y dai-tu-cat)
+- Font: cap cu cua Gemini → **Space Grotesk 500/700 + Inter 400/600 +
+  JetBrains Mono 500** (da kiem ca 3 co subset tieng Viet THAT — lan dau
+  do bao False ca 3, hoa ra UA rut gon lam Google tra ban khong chia
+  subset: lai mot lan thuoc do sai truoc khi san pham sai)
+- Title/description (cau cua Gemini) → "AiO Studio — 8 plugin AI cho
+  Premiere Pro"
+- Hero can giua → can TRAI; 8 plugin tu luoi the → **danh sach hang mong**
+  (icon · ten · mo ta · so) — bo cuc khac han moi ban truoc
+- "−92%" (dan xuat tu headline cu) → bo; bang so dung SO GOC: 23s · 2,4
+  phut · <1s
+- Copy viet lai tung dong (mo ta 8 plugin, gia, ghi chu)
+
+**Chot chan moi trong test:** bai "y tuong ban Gemini khong duoc quay lai"
+cam: headline cu, −92%, title cu, ten font cu, moi class cu (dai-cat,
+hero-console, sim-mode, comp-card...). 5/5 dat.
+
+**Kiem chung bang so (build tinh, localhost:4173):**
+- Font moi 3/3 nap that (document.fonts.check = true ca ba)
+- Tuong phan: 63 khoi chu, **0 truot** · **0 chong lap** · 0 tran ngang
+  (1265px va 375px) · 0 link chet · 4 mailto · logo ok
+- Moi vung bam mobile >=44px (sua not link logo 27px -> them padding)
+- Trang cao 2.870px desktop · 8 hang plugin · test 5/5 · build sach
+
+**CHUA push** — cho anh Tien duyet.
+
+## 2026-08-17 09:59 — ☠️ DAP DI XAY LAI TOAN BO theo huong TOI GIAN
+
+**Boi canh:** anh Tien: *"dap di xay lai toan bo"*, chot qua cau hoi:
+pham vi = **dap sach lam trang moi hoan toan**, huong = **toi gian, it chu,
+nhieu khoang trong** (nen toi, mot cau lon, mot nut).
+
+**Duong lui:** ban cu da commit `3017a88` + git tag **`ban-cu-17-08`** —
+quay lai bat ky luc nao bang `git checkout ban-cu-17-08 -- "Website/AiO WebDessign"`.
+
+**Trang moi (page.tsx + globals.css viet lai tu so 0):**
+- 5 khoi: header dinh · hero (mot cau lon "DUNG THO 3 GIO. CON 15 PHUT."
+  + mot nut cam + dai timeline tu cat bang CSS) · dai 3 so that
+  (−92% · 60p→2,4p · <1s) · luoi 8 tool (moi tool 1 dong + 1 so da do) ·
+  bang gia 2 goi ($0 Demo / $17 Pro) · footer 1 dong
+- **Server component, khong chi thi client** → JS gui xuong nguoi xem chi
+  **12,8KB** (runtime Next toi thieu). Hieu ung duy nhat = CSS thuan.
+- Font chi nap weight CO THAT va DUNG dung: Barlow 700+800, Plex Sans
+  400+600, Mono 500 (het canh 13 muc dam gia nhu ban cu)
+- Giu: gia 16/08, so that da kiem, logo mark, mau cam, mailto, mo ta tool
+  ban gon, "Plugins cho Premiere Pro · DaVinci Resolve" (y anh 17/08 —
+  van la loi hua di truoc code, xem ghi chu trong test)
+- layout.tsx: description doi theo thong diep moi
+
+**Bo test viet lai** (5 bai): cam hua qua + cam gia cu + mailto song +
+khoi da go khong quay lai + khung suon (skip-link, reduced-motion,
+breakpoints, **@import font phai TRUOC tailwind** — chot chan loi rot font,
+va cam "use client" quay lai ma khong ghi ly do).
+
+**2 loi tu bat duoc trong luc xay (deu sua roi):**
+1. ☠️ Rule `.dau-trang nav a` de mat mau+co chu cua nut cam trong header →
+   chu XAM tren nen CAM, tuong phan **1.22**. Sua bang `:not(.nut-chinh)`
+   (dung bai hoc 57: khai dang tren chinh class).
+2. Nav mobile 38px < san 44px → noi padding, do lai 50px.
+
+**Kiem chung bang so (build tinh, localhost:4173):**
+- Tuong phan: 63 khoi chu, **0 truot** (3 nut cam deu 3.17/3.0 o 19px dam)
+- **0 cap chu de nhau** (ca trang) · 0 tran ngang o 1265px va 375px
+- 0 link chet · 4 mailto song · logo 3/3 tai ok
+- Dai cat: keyframe dung (tua toi cuoi: lang bien mat, chu thich hien) —
+  khung do treo animation vi pane an, may that chay binh thuong
+- Mobile: moi vung bam >=50px · luoi tool/gia ve 1 cot
+- Chieu cao trang: desktop 2.792px (ban cu 3.349) · test 5/5 · build sach
+- ☠️ Nhac lai: **doc `clientWidth` truoc khi tin so do** — pane an tra ve 0
+
+**CHUA push** — cho anh Tien duyet ban moi tren local truoc.
 
 ## 2026-08-17 09:35 — Cat gon chu toan trang + hero "mot co may" + sua footer vo
 

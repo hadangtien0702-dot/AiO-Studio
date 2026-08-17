@@ -3,150 +3,138 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 /**
- * VIET LAI 14/08/2026. Ban cu tim chu cua trang PHIEN BAN TRUOC (truoc khi anh
- * Tien redesign) nen 4/5 bai truot du trang chay tot — thuoc cu do trang moi
- * (bai hoc 5u: doi cach bay du lieu thi thuoc cu bao "san pham hong" chu khong
- * bao "toi hong").
+ * VIET LAI 17/08/2026 — trang XAY MOI 100% theo lenh anh Tien: "khong duoc
+ * lay bat ky y tuong cu hoac code cu (ban Gemini)". Ban cu: tag `ban-cu-17-08`.
  *
- * Ban nay lam CHOT CHAN cho cac quyet dinh 14/08:
- *  1. Trang KHONG duoc hua qua so do (danh sach cam ben duoi — moi cau tung
- *     nam tren trang va da bi go co chu dich, kem so that thay the).
- *  2. Section Beta + 3 nut gia mailto phai con song.
- * Ai them lai cau cam / lam chet nut la do ngay tai day, truoc khi len mang.
- *
- * Van la kiem TREN MA NGUON (grep), khong phai HTML da render — du de bat
- * chu-bi-them-lai; con "trang co chay khong" thi `npm run build` (chay truoc
- * test trong `npm run test`) da tra loi.
+ * Chot chan cho cac quyet dinh dang hieu luc:
+ *  1. Y TUONG GEMINI khong duoc quay lai (headline cu, font cu, class cu).
+ *  2. KHONG hua qua so do (moi cau tung bi go co chu dich).
+ *  3. Bang gia 16/08: CHI 2 goi Demo $0 + Pro $17/thang. Cam gia cu.
+ *  4. Duong nhan don (mailto) phai song.
+ *  5. @import font PHAI TRUOC tailwind (loi rot font 17/08).
  */
 
 const appRoot = new URL("../app/", import.meta.url);
 
-test("khong hua qua so do — cau da go khong duoc quay lai", async () => {
-  const page = await readFile(new URL("page.tsx", appRoot), "utf8");
+/* [17/08] Noi dung gio nam o 3 file: page.tsx + plugins.ts (du lieu 8
+   plugin dung chung) + PluginLab.tsx (section demo tuong tac). Cac phep
+   kiem NOI DUNG doc tren tong ca ba. */
+async function docNoiDung() {
+  const [page, plugins, lab] = await Promise.all([
+    readFile(new URL("page.tsx", appRoot), "utf8"),
+    readFile(new URL("plugins.ts", appRoot), "utf8"),
+    readFile(new URL("PluginLab.tsx", appRoot), "utf8"),
+  ]);
+  return { page, plugins, lab, tong: page + "\n" + plugins + "\n" + lab };
+}
 
-  /* ☠️ [17/08] ANH TIEN DAO QUYET DINH 14/08: yeu cau hero ghi "Plugins ho tro
-     cho PR - Davinci". Nen BO lenh cam /DAVINCI/ o day.
-     NHUNG SU THAT KY THUAT KHONG DOI, ghi lai de phien sau khong hieu nham:
-     da grep ca 8 panel ngay 17/08 — 0 dong code nao cho DaVinci Resolve
-     (moi ket qua "resolve" deu la `Promise.resolve` cua JavaScript).
-     Day la loi hua di TRUOC san pham; neu anh Tien doi y thi sua lai
-     `.hero-eyebrow` trong page.tsx va bat lai lenh cam nay. */
-  // Moi dong: [cau cam, vi sao cam]
+test("y tuong ban Gemini khong duoc quay lai", async () => {
+  const { page, plugins, lab } = await docNoiDung();
+  const css = await readFile(new URL("globals.css", appRoot), "utf8");
+  const layout = await readFile(new URL("layout.tsx", appRoot), "utf8");
+
+  const camGemini = [
+    [/Dựng thô 3 giờ/i, "headline cu cua Gemini"],
+    [/Còn 15 phút/i, "headline cu cua Gemini"],
+    [/−92%|-92%/, "con so dan xuat tu headline cu"],
+    [/Trả lại thời gian sáng tạo/, "title cu cua Gemini"],
+    [/Barlow|IBM Plex/, "cap font cu cua Gemini"],
+    [/dai-cat|hero-console|sim-mode|lesson-|confidence-strip|comp-card|roi-|final-cta/, "class/khoi cua ban cu"],
+  ];
+  for (const [re, viSao] of camGemini) {
+    for (const [ten, src] of [["page", page], ["plugins", plugins], ["PluginLab", lab], ["css", css], ["layout", layout]]) {
+      assert.doesNotMatch(src, re, "Y cu quay lai trong " + ten + ": " + viSao);
+    }
+  }
+});
+
+test("khong hua qua so do — cau da go khong duoc quay lai", async () => {
+  const { tong: page } = await docNoiDung();
+
+  /* ☠️ "DaVinci Resolve" la loi hua di TRUOC san pham: 17/08 da grep ca 8
+     panel — 0 dong code cho DaVinci (moi "resolve" la Promise.resolve cua
+     JS). Anh Tien van chot ghi (17/08). Neu doi y, them lenh cam:
+     [/DaVinci/i, "chua co code DaVinci"]. */
   const cam = [
-    [/Tương thích cả Windows & macOS/, "macOS chua ton tai — khach Mac mua la hoan tien"],
-    [/142 khoảng lặng/, "so bia; so that tu test 14/08 la 54 nhat / video 6:29"],
-    [/0\.8s xử lý/, "so bia; that la 23s cho video 6:29, 19 phut cho video 1 gio"],
+    [/Tương thích cả Windows & macOS/, "macOS chua ton tai"],
+    [/142 khoảng lặng/, "so bia; so that la 54 nhat / video 6:29"],
+    [/0\.8s xử lý/, "so bia; that la 23s"],
     [/reaction shots/, "tinh nang khong ton tai"],
-    [/an toàn tuyệt đối/, "khong duoc hua tuyet doi o cho undo — noi co che that"],
-    [/60 Phút Audio ➔ 14 Giây/, "14s chi khi co cache; lan dau 143s ≈ 2,4 phut"],
-    [/lip-sync drift/, "chua chung minh duoc 'cat dung nguoi' — khong duoc khoe do chinh xac"],
+    [/an toàn tuyệt đối/, "khong hua tuyet doi"],
+    [/14 Giây/, "14s chi khi co cache; lan dau 2,4 phut"],
+    [/lip-sync/, "chua chung minh 'cat dung nguoi'"],
   ];
   for (const [re, viSao] of cam) {
     assert.doesNotMatch(page, re, "Cau bi CAM xuat hien lai: " + re + " — " + viSao);
   }
 
-  // So THAT thay the phai con do
-  assert.match(page, /54 khoảng lặng/);
-  assert.match(page, /6:29 video ➔ 23s/);
-  assert.match(page, /60 Phút Audio ➔ 2,4 Phút/);
-  assert.match(page, /588\/588 mốc đúng cam/);
-  /* [17/08] Eyebrow doi tu "BO CONG CU NATIVE CHO PREMIERE PRO · WINDOWS"
-     sang "Plugins ho tro cho Premiere Pro · DaVinci Resolve" (y anh Tien). */
-  assert.match(page, /Plugins hỗ trợ cho Premiere Pro/);
+  // So THAT phai con do — [17/08] anh Tien bao viet cot so "de hieu hon"
+  // nen chuoi doi sang loi thuong, con so van la so da do that
+  assert.match(page, /cắt video 6 phút trong 23 giây/);
+  assert.match(page, /2,4 phút/);
+  assert.match(page, /28\.000\+/);
+  assert.match(page, /588\/588/);
+  assert.match(page, /Plugins cho Premiere Pro/);
+  // Hai cau anh Tien tu doc (17/08) — go phai hoi anh
+  assert.match(page, /ngủ đông/);
+  assert.match(page, /1 chạm tạo phụ đề/);
 });
 
-/* [16/08] VIET LAI test nay: anh Tien doi bang gia — demo free CHI Asset
-   Manager, goi Pro $17/thang du 8 tool, BO Lifetime/goi nam ("chua san sang
-   lam one-time"). Test cu khoa "3 tool free" (quyet dinh 13/08) nen phai doi
-   thuoc theo quyet dinh moi (bai hoc 5u). */
-/* [17/08] Anh Tien go tiep section DEMO va section SO SANH. Demo free gio
-   chi con song o card "Demo Pass" trong bang gia — va DUONG TAI phai theo
-   sang cung (mailto nam trong section vua go). */
-test("demo free = CHI Asset Manager, khong con dau vet gia cu", async () => {
-  const page = await readFile(new URL("page.tsx", appRoot), "utf8");
+test("bang gia 16/08: 2 goi Demo $0 + Pro $17/thang, CAM gia cu", async () => {
+  const { page, tong } = await docNoiDung();
 
-  assert.match(page, /Demo Pass/);
-  assert.match(page, /Asset Manager đầy đủ tính năng/);
-  // Cau cua thoi "3 tool free" khong duoc quay lai
-  assert.doesNotMatch(page, /Cả ba tool miễn phí/);
-  assert.doesNotMatch(page, /Dùng Thử Miễn Phí 3 Tool/);
-  // Cut Short chua co code — phai con nhan Coming Soon
-  assert.match(page, /Coming Soon/);
-});
-
-test("hai section da go 17/08 khong duoc quay lai (ke ca CSS)", async () => {
-  const page = await readFile(new URL("page.tsx", appRoot), "utf8");
-  const css = await readFile(new URL("globals.css", appRoot), "utf8");
-
-  const daGo = [
-    [/id="beta"/, "section demo mien phi"],
-    [/id="comparison"/, "section so sanh 3 card"],
-    [/comparison-cards-grid|comp-card|featured-badge/, "khoi so sanh"],
-    [/href="#beta"/, "link tro toi section da go"],
-  ];
-  for (const [re, ten] of daGo) {
-    assert.doesNotMatch(page, re, "Da go ma quay lai: " + ten);
-  }
-  assert.doesNotMatch(css, /comparison-cards-grid|\.comp-card|featured-badge/, "CSS chet quay lai");
-  // Nhung class TRUNG TEN o section khac phai con nguyen
-  assert.match(css, /pipeline-flow-comparison/);
-});
-
-test("bang gia 16/08: 2 goi Demo+Pro $17/thang, CAM lifetime/goi nam quay lai", async () => {
-  const page = await readFile(new URL("page.tsx", appRoot), "utf8");
-
-  // Phai co 2 goi moi
-  assert.match(page, /Demo Pass/);
-  assert.match(page, /Pro Pass/);
+  assert.match(page, /className="tien">\$0/);
   assert.match(page, /\$17 <small>\/ tháng<\/small>/);
-  // Gia/goi da bo KHONG duoc quay lai (anh Tien 16/08: "khong co goi
-  // one-time payment, minh chua san sang")
-  const cam = [/\$299/, /\$149/, /Lifetime/, /one-time/, /Vĩnh Viễn/i, /TIẾT KIỆM 57/, /hoàn tiền/];
+  assert.match(page, /Asset Manager trọn bộ/);
+  /* [17/08] Anh Tien: "Ca 8 plugin" chung chung — card Pro phai LIET KE
+     du 8 ten (render tu PLUGINS qua .goi-plugins) */
+  assert.match(page, /className="goi-plugins"/);
+  assert.doesNotMatch(page, /Cả 8 plugin/);
+
+  const cam = [/\$299/, /\$149/, /\$29(?!\d)/, /Lifetime/, /one-time/, /Vĩnh Viễn/i, /TIẾT KIỆM/, /hoàn tiền/, /AutoPod/];
   for (const re of cam) {
-    assert.doesNotMatch(page, re, "Gia/loi hua da bo xuat hien lai: " + re);
+    assert.doesNotMatch(tong, re, "Gia/loi hua da bo xuat hien lai: " + re);
   }
 });
 
-test("nut gia va nut demo khong duoc chet — moi CTA tien phai co duong di", async () => {
+test("duong nhan don khong duoc chet", async () => {
   const page = await readFile(new URL("page.tsx", appRoot), "utf8");
 
-  // 1 nut Pro + 1 nut demo = it nhat 2 mailto (placeholder toi khi co checkout)
-  const soMailto = (page.match(/mailto:dreamtalentmarketing@gmail\.com/g) || []).length;
-  assert.ok(soMailto >= 2, "chi con " + soMailto + " mailto — nut tien nao do da chet");
-  assert.match(page, /subject=AiO%20Studio%20Demo%20-%20Xin%20link%20tai/);
-  assert.match(page, /subject=AiO%20Studio%20-%20Goi%20Pro%20%2417%2Fthang/);
-  // Khong con <button> tran trong khoi gia (da doi het sang <a>)
-  assert.doesNotMatch(page, /<button type="button" className="[^"]*plan-btn[^"]*">/);
+  const soMailto = (page.match(/MAILTO_DEMO|MAILTO_PRO/g) || []).length;
+  assert.ok(soMailto >= 4, "duong mailto bi dut — kiem MAILTO_DEMO/MAILTO_PRO");
+  assert.match(page, /AiO%20Studio%20Demo%20-%20Xin%20link%20tai/);
+  assert.match(page, /Goi%20Pro%20%2417%2Fthang/);
+  for (const [, id] of page.matchAll(/href="#([a-z-]+)"/g)) {
+    assert.ok(page.includes(`id="${id}"`), `link #${id} tro toi id khong ton tai`);
+  }
 });
 
-test("khung suon trang van production-ready (phan con dung tu bo test cu)", async () => {
-  const page = await readFile(new URL("page.tsx", appRoot), "utf8");
+test("khung suon ban toi gian van production-ready", async () => {
+  const { page, tong } = await docNoiDung();
   const layout = await readFile(new URL("layout.tsx", appRoot), "utf8");
   const css = await readFile(new URL("globals.css", appRoot), "utf8");
 
   assert.match(page, /className="skip-link"/);
-  /* [17/08] Bo phep kiem aria-live: vung song duy nhat la ket qua ROI, ma
-     khoi do da go. Phan dong con lai (tab chon tool) dung role=tab +
-     aria-selected — dung chuan, khong can live region. */
-  assert.match(page, /role="tab"/);
-  assert.match(page, /aria-selected/);
-  /* [17/08] BO hai phep kiem "#journey" + "hoursRecovered": anh Tien chot go
-     section ROI, dai 3 chi so, nhan cam dau section va khoi CTA cuoi. Thuoc cu
-     khoa dung nhung thu vua go nen bao do — doi thuoc theo quyet dinh moi
-     (bai hoc 5u), va them chot chan cam chung quay lai. */
-  const daGo = [
-    [/lesson-number/, "nhan cam dau section"],
-    [/confidence-strip/, "dai 3 o chi so"],
-    [/roi-calculator|hoursRecovered/, "khoi tinh ROI"],
-    [/final-cta/, "khoi CTA cuoi trang"],
-    [/href="#journey"/, "link nav toi section da go"],
-  ];
-  for (const [re, ten] of daGo) {
-    assert.doesNotMatch(page, re, "Khoi da go xuat hien lai: " + ten);
-    assert.doesNotMatch(css, re, "CSS chet cua khoi da go quay lai: " + ten);
-  }
-  assert.match(layout, /Trả lại thời gian sáng tạo cho editor/);
-  assert.match(css, /@keyframes scissorsCut/);
+  assert.match(page, /aria-label="Điều hướng chính"/);
+  assert.match(tong, /SẮP CÓ/); // Cut Short chua co code — phai giu nhan (nam trong plugins.ts)
+  assert.match(layout, /8 plugin AI cho Premiere Pro/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /@media \(max-width: 620px\)/);
+  assert.match(css, /@media \(max-width: 860px\)/);
+  assert.match(css, /:not\(\.nut-cam\)/); // chot chan loi nut header 17/08
+
+  /* ☠️ Loi rot font 17/08 khong duoc tai dien */
+  const viTriFont = css.indexOf("fonts.googleapis.com");
+  const viTriTailwind = css.indexOf('@import "tailwindcss"');
+  assert.ok(viTriFont > -1 && viTriTailwind > -1, "thieu mot trong hai dong @import");
+  assert.ok(viTriFont < viTriTailwind, "☠️ @import font dang SAU tailwind — build tinh se vut font");
+
+  /* page.tsx van la server component. "use client" CHI duoc phep o
+     PluginLab.tsx (island demo tuong tac — anh Tien yeu cau 17/08).
+     Them island moi phai ghi ly do vao PROGRESS.md. */
+  assert.doesNotMatch(page, /['"]use client['"]/);
+  const lab = await readFile(new URL("PluginLab.tsx", appRoot), "utf8");
+  assert.match(lab, /^"use client";/, "PluginLab phai la client component");
+  // Moi hang plugin la nut mo demo — phai co trang thai cho may doc
+  assert.match(lab, /aria-expanded/);
 });
