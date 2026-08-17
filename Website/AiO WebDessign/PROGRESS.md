@@ -2,6 +2,152 @@
 
 > Nhat ky sua doi. Muc moi ghi LEN TREN. Gio lay bang lenh `Get-Date`, khong bia.
 
+## 2026-08-17 14:51 — BO HAN kieu "the tut xuong duoi bang" (anh Tien chot)
+
+**Boi canh:** anh Tien soi DevTools, chi vao `button#tab-autocut.lab-tab
+264 × 48.8` va noi *"no dai o duoi an o duoi bang ne"*, roi chot:
+*"lam gon lai cho khung va border no ngan lai — **khi hover vao bi loi** do em"*.
+
+**Loi hover anh noi la gi:** `.lab-tab:hover` doi nen sang `#16161a`, ma nen
+do **SANG HON nen bang** (`#121214`). 30px duoi cung cua the nam duoi bang,
+nen mang sang khi hover bi bang **cat phang** o mep -> ra dung cai "hop bi
+xen" anh da che 2 lan truoc. Bay them mot loi thu hai cung cho: `.lab-tab
+:hover` khai bao TRUOC `.lab-tab.chon` va **cung do dac hieu (2 class)** ->
+hover vao the DANG CHON thi khong co phan hoi gi.
+
+### ☠️ KET LUAN SAU 3 LAN SUA: KIEU "TUT XUONG DUOI" LA CAI BAY, DA BO
+Ba lan bat loi cua anh Tien deu **cung mot co che**: *bat cu thu gi ve o
+vung bi che deu bi bang cat phang giua chung.*
+
+| Lan | Thu ve o vung bi che | Ket qua anh thay |
+|---|---|---|
+| 1 | the chon cho `z-index: 2` | loi han ra, 7 the kia bi xen -> 2 kieu choi nhau; con de mat chu "A" cua tieu de |
+| 2 | vien CAM cua the chon | 2 net cam dam vao bang roi cut lung |
+| 3 | mang sang luc HOVER | y nhu lan 2, chi khac la chi thay khi ro chuot vao |
+
+Moi lan sua chi bit duoc **mot** thu ve vao do — con cai tiep theo. **Go
+nguyen nhan** thay vi bit tung cai: khong tut nua.
+
+**Da sua (globals.css):**
+- `.lab-khoi`: cot tab **264px -> 234px**, them `gap: 16px`. Bo
+  `margin-left: -30px` cua bang, bo `padding-left: 58px` (ve 28px deu).
+- `.lab-tab`: `padding` 12px 44px -> **12px 15px** (om sat chu), tra lai
+  `border-right` + `border-radius: 13px` ca 4 goc.
+- `.lab-tab:hover` -> **`.lab-tab:not(.chon):hover`** (sua loi thu hai).
+- Bo `box-shadow` bong do trai cua bang (chi ton tai de gia lap chieu sau
+  cho kieu tut — nay khong con tut).
+- Go 5 luat thua trong `@media (max-width: 860px)` vi desktop khong con tut
+  thi man hep khong phai "tra lai" gi nua.
+- Kem 2 don dep khi ra soat: `transition: transform` (khong co transform
+  nao) -> `box-shadow`; bo `position: relative` thua tren `.lab-tab`.
+
+**Kiem chung bang so (14:50), 8/8 tab:** `phan tho duoi bang = **−16**`
+(so AM = het chui, cach 16px) · `margin-left cua bang = **0px**` ·
+`border-right the = 0,67px` (co lai that) · `border-radius = 13px` ca 4 goc ·
+**0 chu bi tab de** · cao bang = cao cot tab (451/451, 522/522) · 0 tran
+ngang o 1440 va 375 · `node --test` **5/5** · build sach 14:49:43.
+**Da nhin bang mat**, ke ca **anh chup trang thai HOVER ep bang CSS** —
+khung khep kin 4 canh, khong con canh nao bi cat.
+
+---
+
+## 2026-08-17 14:17 — The dang chon: bo VIEN CAM, doi sang THANH CAM DOC
+
+**Boi canh:** anh Tien khoanh do the "Auto Cut" dang chon va noi *"van bi ne
+em"*. Em suyt tra loi sai — nhin anh thi tuong the van noi len TREN bang
+(loi cu). **Phong to 3x + do PIXEL** moi ra su that: viben cam KHONG bo goc,
+no **cat phang dung mep bang** -> the dang nam DUOI bang, phan da sua truoc
+do van dung.
+
+**Loi that (khac cai em tuong):** the dang chon dung nen `--tam` **y het nen
+bang**, nen mat noi hai vung thanh MOT KHOI, va hai net cam tren/duoi chay
+vao bang roi **cut lung giua chung** — doc thanh "cai hop bi xen". Bay the
+kia khong lo vi vien chung mau xam mo; rieng the chon vien CAM SANG nen loi.
+
+**Da sua (globals.css):**
+- Moi the: `border-right: 0` + `border-radius: 13px 0 0 13px` — canh phai
+  khong co net va khong bo goc, vi no nam duoi bang; net nao ve o do cung bi
+  cat. The nhin nhu cai **luoi cam vao bang**, khong phai hop bi xen.
+- The dang chon: **bo vien cam**, danh dau bang `box-shadow: inset 3px 0 0
+  var(--cam)` = **thanh cam doc ben TRAI** (cho khong bi bang de) + nen lien
+  mau bang + chu trang.
+- Man hep (≤860px): the khong tut duoi bang nua -> **tra lai** vien phai +
+  bo goc 4 phia + vien cam cho the chon (khong thi the ho mot canh).
+
+**Kiem chung bang PIXEL (14:16)** — do tren anh chup that, mep trai bang o
+cot 424:
+
+| Quet hang | Truoc | Sau |
+|---|---|---|
+| Canh tren the chon | cam tu cot 188 → **289** (dam vao bang roi cut) | cam chi **194–196** (thanh trai) |
+| Canh duoi the chon | cam dam vao bang roi cut | cam chi **195–197** |
+
+`node --test` **5/5** · build sach (14:16:49) · 375px the chon van co vien
+cam du 4 canh (do khong tut). **Da nhin bang mat** anh phong to 3x.
+
+### ☠️ Bai hoc thu 4 cua buoi: DUNG DOAN NGUYEN NHAN TU ANH CHUP CO 1x
+Anh chup o co thuong, net vien 1px trong nhu bo goc — em suyt ket luan
+"the van noi len tren" va di sua z-index (thu da dung roi). **Phong to +
+do mau pixel truoc khi ket luan.** Chi phi: 20 giay. Neu khong lam, em da
+sua nham cho va bao cao sai voi anh Tien lan thu hai.
+
+---
+
+## 2026-08-17 14:02 — Anh Tien chup man hinh bat 3 loi MA SO DO BAO SACH
+
+**Boi canh:** ngay sau khi doi sang the tab doc (muc 14:00 duoi day), anh Tien
+gui 2 anh chup va noi *"loi ti le UI bi sai"*. Luc do phep do DOM cua em dang
+bao: 8/8 tab chay, 0 tran ngang, chu trong tab khong loi ra — **tat ca deu
+xanh**. Ba loi anh thay bang mat, khong cai nao lot vao thuoc do:
+
+| Loi anh chup duoc | Vi sao thuoc do khong bat |
+|---|---|
+| Tieu de trong bang bi the tab nuot mat chu dau ("Auto Cut" -> "uto Cut") | Em chi do **chu trong TAB co loi qua mep bang khong**, khong do **chieu nguoc lai** |
+| The dang chon LOI HAN RA truoc bang (vien cam bao tron) trong khi 7 the kia bi xen phang -> 2 kieu hinh dang choi nhau | z-index la thu **khong hien ra trong so do hinh hoc** |
+| Hop long hop: bang lon (--tam, bo 22px) chua demo cung nen cung vien (bo 14px), hai duong vien song song cach 28px | Khong co phep do nao hoi *"co bao nhieu lop hop trung mau long nhau"* |
+
+**Da sua (globals.css + PluginLab.tsx):**
+- **Bo z-index cua the dang chon.** Nay MOI the deu tut xuong duoi bang nhu
+  nhau (dung hinh mau anh gui); the dang chon phan biet bang MAU — vien cam
+  + nen sang bang bang + chu trang — khong bang do noi.
+- **Bang chua le trai 58px** = 30px bi the tab de len + 28px le that.
+  Ha xuong la nuot chu lan nua (da ghi canh bao ngay tren dong CSS do).
+- **Go nen + vien cua `.lab-demo` va `.lab2`** — tu khi demo nam TRONG bang
+  thi hai lop do thanh hop long hop. Gio chung chi lo xep chu.
+- **Ti le:** bang cao bang cot tab (`align-items: stretch`) nen demo ngan la
+  ho mot mang trong o DAY (do that: Transcripts trong 230px duoi day). Cho
+  hang demo an het cho con lai roi **can giua** -> trong chia deu tren/duoi.
+- **375px:** cot "so" khong co lai duoc nen no bop tieu de vo doi ("Auto /
+  cat video 6 phut… / Cut") -> cho xuong hang rieng. Ten tool ha 12,5px de
+  "Auto Transcripts" vua 1 dong (do that: the rong 156px, cho chu 105px).
+
+**Kiem chung bang so (14:01), sau khi sua:** 8/8 tab — **0 chu bi tab de**
+(truoc: mat chu "A") · **0 lop hop trung mau bang** (truoc: 1) · bang cao
+dung bang cot tab 509/509 va 523/523 · 0 tran ngang o 1440 va 375 ·
+`node --test` **5/5** · build tinh sach.
+**Va da NHIN bang mat** (3 anh chup: Auto Cut 1440, Transcripts 1440, 375px).
+
+### ☠️ BA CAI BAY DO DAC vap trong dung mot buoi — dung de lap lai
+
+1. **Thuoc do MOT CHIEU thi mu chieu con lai.** Do "A co de len B khong" ma
+   khong do "B co de len A khong" = coi nhu chua do. Hai vat de nhau thi
+   phai hoi CA HAI PHIA. Anh Tien bat duoc cai em bo sot.
+2. **☠️ Chrome headless EP VIEWPORT TOI THIEU 500px.** Chup
+   `--window-size=375,900` ra anh **nhin nhu tran ngang be nat** — that ra
+   trang render o **500px** roi anh bi CAT xuong 375. Suyt di sua mot thu
+   khong he hong. Cach phat hien: in thang `innerWidth` len trang luc chup
+   (`vw=500 scrollW=500 clientW=500`). Cach chup 375 THAT: nhet trang vao
+   **iframe rong 375px** trong mot trang 500px — media query trong iframe
+   theo kich thuoc iframe.
+3. **☠️ `npx serve out` GIU THU MUC -> `next build` khong ghi duoc.** Build
+   van in "✓ Compiled successfully" nhung kem mot dong `EBUSY: rmdir out`,
+   va `out/` VAN LA BAN CU. Dau hieu bat duoc: anh chup moi **dung y byte**
+   anh cu (72070 bytes ca hai lan). Luat: build tinh thi **dung server
+   truoc**, va sau build **doi `stat` cua `out/index.html`** xem co moi
+   khong — dung tin dong "Compiled successfully".
+
+---
+
 ## 2026-08-17 14:00 — [Ghi bo sung] Section plugin: accordion -> THE TAB DOC
 
 **Boi canh:** thay doi thuc hien trong nhanh phien buoi chieu 17/08 theo

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Studio — Welcome (2D)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#191919;
+    --card-top:#232121;
+    --card-bot:#1a1919;
+    --stroke:rgba(255,255,255,.075);
+    --stroke-strong:rgba(255,255,255,.13);
+    --orange:#F0741F;
+    --text-cream:#F2EBDD;
+    --muted:#A5A09A;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(1200px 620px at 50% -8%, #262524 0%, rgba(38,37,36,0) 62%),
+      var(--bg);
+    color:#EDE9E1;
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;justify-content:center;
+    padding:34px 24px 56px;
+  }
+  .app{width:100%;max-width:1290px}
+
+  .brand{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px}
+  .brand-name{font-size:23px;letter-spacing:-.015em;color:var(--text-cream)}
+  .brand-name b{font-weight:700}
+  .brand-name span{font-weight:400;color:#D8D2C7}
+
+  .title{
+    font-family:"Playfair Display",Georgia,serif;font-weight:400;
+    font-size:clamp(64px,8.6vw,116px);line-height:1.02;letter-spacing:-.02em;
+    text-align:center;color:#F5EFE2;margin-top:26px;
+  }
+  .subtitle{text-align:center;margin-top:16px;font-size:20px;color:#A8A39C}
+
+  .grid{margin-top:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+
+  .card{
+    position:relative;
+    background:linear-gradient(180deg,var(--card-top) 0%,var(--card-bot) 100%);
+    border:1px solid var(--stroke);
+    border-radius:var(--radius);
+    padding:22px 22px 18px;
+    display:flex;flex-direction:column;min-height:312px;
+    transition:border-color .22s ease, transform .22s ease, box-shadow .22s ease;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(120% 70% at 50% 0%, rgba(240,116,31,.08) 0%, rgba(240,116,31,0) 60%);
+    opacity:0;transition:opacity .22s ease;
+  }
+  .card:hover{border-color:rgba(240,116,31,.35);transform:translateY(-3px);box-shadow:0 18px 40px -22px rgba(0,0,0,.9)}
+  .card:hover::before{opacity:1}
+
+  .card-head{display:flex;align-items:center;gap:9px}
+  .card-head .ic{width:19px;height:19px;flex:none;color:var(--orange)}
+  .card-title{font-size:16.5px;font-weight:600;color:var(--orange);letter-spacing:-.01em}
+  /* description is a single line — never wraps, never clips a word in half */
+  .card-desc{
+    margin-top:9px;font-size:13.5px;line-height:1.5;color:var(--muted);
+    height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
+  .art{flex:1;display:flex;align-items:center;justify-content:center;padding:10px 0 14px}
+  /* flat 2D: no blur filters, crisp edges, geometric precision */
+  .art svg{
+    width:100%;max-width:178px;height:auto;display:block;
+    shape-rendering:geometricPrecision;
+  }
+
+  .open{
+    display:flex;align-items:center;justify-content:space-between;width:100%;
+    background:transparent;border:1px solid var(--stroke-strong);border-radius:10px;
+    padding:11px 14px;color:#D6D1CA;font-family:inherit;font-size:14.5px;font-weight:500;
+    cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease;
+  }
+  .open svg{width:14px;height:14px;opacity:.75;transition:transform .18s ease}
+  .open:hover{background:rgba(240,116,31,.1);border-color:rgba(240,116,31,.45);color:#F6D9C2}
+  .open:hover svg{transform:translate(2px,-2px)}
+
+  @media (max-width:1100px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr;gap:18px} .subtitle{font-size:17px} }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M15.9 3.4 26.6 27.4c.3.7-.2 1.4-.9 1.4h-3.6a1 1 0 0 1-.9-.6L16 15.6l-2.6 6h4.2l1.9 4.3H7.1c-.8 0-1.3-.8-.9-1.5L15.9 3.4Z" fill="#F0741F"/>
+      </svg>
+      <div class="brand-name"><b>AiO</b> <span>Studio</span></div>
+    </div>
+    <h1 class="title">Welcome</h1>
+    <p class="subtitle">All-in-One AI Audio Workflow</p>
+  </header>
+
+  <!--
+    2D SYSTEM
+    fills only — no gradients, no blur, no drop shadows
+    neutral  #4C4844 light · #3B3835 base · #232120 deep
+    orange   #FFA45C light · #F0741F base · #B5480F deep
+    cream    #F2EBDD
+  -->
+  <main class="grid">
+
+    <!-- ============ 1 · Power Bins ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+        <h2 class="card-title">Power Bins</h2>
+      </div>
+      <p class="card-desc">Smart audio file organization</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <!-- bin body -->
+          <path d="M30 46h100l-9 62a6 6 0 0 1-6 5H45a6 6 0 0 1-6-5L30 46Z" fill="#F0741F"/>
+          <path d="M84 46h46l-9 62a6 6 0 0 1-6 5H75l9-67Z" fill="#D2600F"/>
+          <!-- lid -->
+          <rect x="20" y="28" width="120" height="18" rx="5" fill="#3B3835"/>
+          <rect x="20" y="28" width="120" height="7" rx="3.5" fill="#4C4844"/>
+          <!-- handle -->
+          <rect x="66" y="16" width="28" height="12" rx="4" fill="#3B3835"/>
+          <rect x="72" y="20" width="16" height="4" rx="2" fill="#232120"/>
+          <!-- bolt -->
+          <path d="M86 56 60 90h13l-4 24 27-34H83l3-24Z" fill="#F2EBDD"/>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 2 · Asset Manager ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+        <h2 class="card-title">Asset Manager</h2>
+      </div>
+      <p class="card-desc">Manage and preview assets</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <!-- back folder -->
+          <path d="M14 26a5 5 0 0 1 5-5h20a3 3 0 0 1 2.4 1.2L45 26h34a5 5 0 0 1 5 5v34a5 5 0 0 1-5 5H19a5 5 0 0 1-5-5V26Z" fill="#3B3835"/>
+          <!-- mid folder -->
+          <path d="M30 40a5 5 0 0 1 5-5h22a3 3 0 0 1 2.4 1.2L62 40h36a5 5 0 0 1 5 5v34a5 5 0 0 1-5 5H35a5 5 0 0 1-5-5V40Z" fill="#4C4844"/>
+          <!-- front folder -->
+          <path d="M50 54a5 5 0 0 1 5-5h24a3 3 0 0 1 2.4 1.2L84 54h42a5 5 0 0 1 5 5v34a5 5 0 0 1-5 5H55a5 5 0 0 1-5-5V54Z" fill="#232120"/>
+          <path d="M50 54a5 5 0 0 1 5-5h24a3 3 0 0 1 2.4 1.2L84 54h42a5 5 0 0 1 5 5v34a5 5 0 0 1-5 5H55a5 5 0 0 1-5-5V54Z" stroke="#F0741F" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M50 62h81" stroke="#F0741F" stroke-width="3"/>
+          <g fill="#F0741F">
+            <rect x="60" y="80" width="5" height="12" rx="2.5"/>
+            <rect x="69" y="72" width="5" height="20" rx="2.5"/>
+            <rect x="78" y="66" width="5" height="26" rx="2.5"/>
+            <rect x="87" y="76" width="5" height="16" rx="2.5"/>
+            <rect x="96" y="70" width="5" height="22" rx="2.5"/>
+            <rect x="105" y="78" width="5" height="14" rx="2.5"/>
+            <rect x="114" y="83" width="5" height="9" rx="2.5"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 3 · Auto Silent Cut ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+        <h2 class="card-title">Auto Silent Cut</h2>
+      </div>
+      <p class="card-desc">Remove silences automatically</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <rect x="4" y="16" width="58" height="80" rx="4" stroke="#6E6963" stroke-width="2" stroke-dasharray="6 5"/>
+          <rect x="98" y="16" width="58" height="80" rx="4" stroke="#6E6963" stroke-width="2" stroke-dasharray="6 5"/>
+          <g fill="#F2EBDD">
+            <rect x="12" y="44" width="6" height="24" rx="3"/>
+            <rect x="22" y="34" width="6" height="44" rx="3"/>
+            <rect x="32" y="26" width="6" height="60" rx="3"/>
+            <rect x="42" y="40" width="6" height="32" rx="3"/>
+            <rect x="52" y="32" width="6" height="48" rx="3"/>
+            <rect x="106" y="38" width="6" height="36" rx="3"/>
+            <rect x="116" y="28" width="6" height="56" rx="3"/>
+            <rect x="126" y="44" width="6" height="24" rx="3"/>
+            <rect x="136" y="34" width="6" height="44" rx="3"/>
+            <rect x="146" y="46" width="6" height="20" rx="3"/>
+          </g>
+          <circle cx="80" cy="56" r="26" fill="#F0741F"/>
+          <g transform="translate(80 56) scale(1.42) translate(-12 -12)"
+             stroke="#231F1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 4 · Sound Design ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>
+        <h2 class="card-title">Sound Design</h2>
+      </div>
+      <p class="card-desc">Design and edit unique sounds</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <rect x="8" y="22" width="144" height="76" rx="8" fill="#3B3835"/>
+          <rect x="8" y="22" width="144" height="8" rx="4" fill="#4C4844"/>
+          <!-- big knob -->
+          <circle cx="38" cy="56" r="17" fill="#232120"/>
+          <circle cx="38" cy="56" r="9" fill="#4C4844"/>
+          <path d="M38 56 28 46" stroke="#F0741F" stroke-width="4" stroke-linecap="round"/>
+          <path d="M23 66a17 17 0 0 0 30 0" stroke="#F0741F" stroke-width="3" stroke-linecap="round"/>
+          <!-- small knobs -->
+          <circle cx="72" cy="46" r="10" fill="#232120"/>
+          <path d="M72 46 66 40" stroke="#F2EBDD" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="98" cy="46" r="10" fill="#232120"/>
+          <path d="M98 46 104 40" stroke="#F2EBDD" stroke-width="3" stroke-linecap="round"/>
+          <!-- buttons -->
+          <rect x="62" y="62" width="20" height="10" rx="5" fill="#232120"/>
+          <rect x="88" y="62" width="20" height="10" rx="5" fill="#232120"/>
+          <!-- fader -->
+          <rect x="22" y="80" width="86" height="8" rx="4" fill="#232120"/>
+          <rect x="70" y="74" width="12" height="20" rx="4" fill="#4C4844"/>
+          <!-- screen -->
+          <rect x="116" y="38" width="30" height="44" rx="5" fill="#232120"/>
+          <g fill="#F0741F">
+            <rect x="121" y="62" width="4" height="14" rx="2"/>
+            <rect x="128" y="52" width="4" height="24" rx="2"/>
+            <rect x="135" y="46" width="4" height="30" rx="2"/>
+            <rect x="141" y="56" width="4" height="20" rx="2"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 5 · Auto Reframes ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg>
+        <h2 class="card-title">Auto Reframes</h2>
+      </div>
+      <p class="card-desc">Automatically reframe video</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <rect x="20" y="26" width="120" height="68" rx="8" fill="#3B3835"/>
+          <rect x="28" y="34" width="104" height="52" rx="4" fill="#232120"/>
+          <circle cx="80" cy="60" r="20" fill="#F0741F"/>
+          <path d="M74 50 92 60l-18 10V50Z" fill="#231F1C"/>
+          <g stroke="#F0741F" stroke-width="5" stroke-linecap="round" fill="none">
+            <path d="M6 32V14a4 4 0 0 1 4-4h18"/>
+            <path d="M132 10h18a4 4 0 0 1 4 4v18"/>
+            <path d="M154 88v18a4 4 0 0 1-4 4h-18"/>
+            <path d="M28 110H10a4 4 0 0 1-4-4V88"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 6 · Auto Podcast ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+        <h2 class="card-title">Auto Podcast</h2>
+      </div>
+      <p class="card-desc">Enhance podcast audio</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <rect x="6" y="26" width="148" height="66" rx="8" fill="#3B3835"/>
+          <g fill="#F0741F">
+            <rect x="16" y="52" width="5" height="14" rx="2.5"/>
+            <rect x="25" y="44" width="5" height="30" rx="2.5"/>
+            <rect x="34" y="36" width="5" height="46" rx="2.5"/>
+            <rect x="43" y="48" width="5" height="22" rx="2.5"/>
+            <rect x="52" y="40" width="5" height="38" rx="2.5"/>
+            <rect x="103" y="40" width="5" height="38" rx="2.5"/>
+            <rect x="112" y="48" width="5" height="22" rx="2.5"/>
+            <rect x="121" y="36" width="5" height="46" rx="2.5"/>
+            <rect x="130" y="44" width="5" height="30" rx="2.5"/>
+            <rect x="139" y="52" width="5" height="14" rx="2.5"/>
+          </g>
+          <!-- microphone -->
+          <rect x="66" y="14" width="28" height="58" rx="14" fill="#4C4844"/>
+          <g stroke="#232120" stroke-width="2" opacity=".55">
+            <path d="M67 26h26M67 36h26M67 46h26M67 56h26"/>
+          </g>
+          <path d="M56 54a24 24 0 0 0 48 0" stroke="#4C4844" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <rect x="76" y="74" width="8" height="22" rx="2" fill="#4C4844"/>
+          <rect x="58" y="94" width="44" height="10" rx="5" fill="#4C4844"/>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 7 · Auto Short Clip ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><path d="m3 8 3-5 4 4M11 8l3-5 4 4"/></svg>
+        <h2 class="card-title">Auto Short Clip</h2>
+      </div>
+      <p class="card-desc">Extract short clips in seconds</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <rect x="6" y="20" width="148" height="66" rx="6" fill="#3B3835"/>
+          <g fill="#232120">
+            <rect x="12" y="24" width="9" height="7" rx="2"/><rect x="27" y="24" width="9" height="7" rx="2"/>
+            <rect x="42" y="24" width="9" height="7" rx="2"/><rect x="57" y="24" width="9" height="7" rx="2"/>
+            <rect x="72" y="24" width="9" height="7" rx="2"/><rect x="87" y="24" width="9" height="7" rx="2"/>
+            <rect x="102" y="24" width="9" height="7" rx="2"/><rect x="117" y="24" width="9" height="7" rx="2"/>
+            <rect x="132" y="24" width="9" height="7" rx="2"/>
+            <rect x="12" y="75" width="9" height="7" rx="2"/><rect x="27" y="75" width="9" height="7" rx="2"/>
+            <rect x="42" y="75" width="9" height="7" rx="2"/><rect x="57" y="75" width="9" height="7" rx="2"/>
+            <rect x="72" y="75" width="9" height="7" rx="2"/><rect x="87" y="75" width="9" height="7" rx="2"/>
+            <rect x="102" y="75" width="9" height="7" rx="2"/><rect x="117" y="75" width="9" height="7" rx="2"/>
+            <rect x="132" y="75" width="9" height="7" rx="2"/>
+          </g>
+          <rect x="12" y="36" width="44" height="34" rx="3" fill="#232120"/>
+          <rect x="60" y="36" width="44" height="34" rx="3" fill="#232120"/>
+          <rect x="108" y="36" width="44" height="34" rx="3" fill="#232120"/>
+          <g fill="#4C4844">
+            <circle cx="34" cy="47" r="6"/><path d="M22 70c2-11 22-11 24 0H22Z"/>
+            <circle cx="82" cy="47" r="6"/><path d="M70 70c2-11 22-11 24 0H70Z"/>
+            <circle cx="130" cy="47" r="6"/><path d="M118 70c2-11 22-11 24 0h-24Z"/>
+          </g>
+          <rect x="56" y="32" width="52" height="42" rx="4" stroke="#F0741F" stroke-width="4"/>
+          <circle cx="82" cy="90" r="18" fill="#F0741F"/>
+          <g transform="translate(82 90) scale(1) translate(-12 -12)"
+             stroke="#231F1C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 8 · Auto Transcripts ============ -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+        <h2 class="card-title">Auto Transcripts</h2>
+      </div>
+      <p class="card-desc">Generate transcripts instantly</p>
+
+      <div class="art">
+        <svg viewBox="0 0 160 120" fill="none">
+          <rect x="8" y="12" width="104" height="70" rx="8" fill="#3B3835"/>
+          <g stroke="#F0741F" stroke-width="6" stroke-linecap="round">
+            <path d="M24 30h62M24 44h72M24 58h48"/>
+          </g>
+          <path d="M84 56h60a8 8 0 0 1 8 8v28a8 8 0 0 1-8 8h-40l-14 14V100a8 8 0 0 1-8-8V64a8 8 0 0 1 8-8Z" fill="#4C4844"/>
+          <g stroke="#B9B3AC" stroke-width="5" stroke-linecap="round">
+            <path d="M96 72h40M96 86h26"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+  </main>
+</div>
+</body>
+</html>

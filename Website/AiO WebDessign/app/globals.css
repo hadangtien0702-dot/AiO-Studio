@@ -433,20 +433,29 @@ body {
 }
 
 /* ── [17/08 chieu] THE TAB DOC — bo cuc anh Tien gui hinh mau ──────────
-   Cot trai 8 the xep doc; dau phai MOI the tut xuong DUOI mep bang lon
-   (bang keo -30px de nuot 30px cua the) nen nhin nhu ngan ho so.
-   ☠️ SUA 17/08 sau khi anh Tien gui anh: ban dau cho the DANG CHON noi
-   len TREN bang (z-index 2) — sai. Anh chup lai: the chon loi han ra
-   thanh mot hop roi vien cam, trong khi 7 the kia bi xen phang -> hai
-   kieu hinh dang choi nhau, va no de mat chu "A" cua tieu de trong bang
-   ("Auto Cut" -> "uto Cut"). Nay MOI the deu tut nhu nhau; the dang chon
-   phan biet bang MAU (vien cam + nen sang + chu trang), khong bang do noi.
-   ☠️ 30px do da tinh vao padding-right cua .lab-tab VA padding-left cua
-   .lab-than — bot mot trong hai la de mat chu.
+   Cot trai 8 the xep doc + bang lon ben phai.
+
+   ☠️ LICH SU 3 LAN SUA — DUNG QUAY LAI KIEU "THE TUT XUONG DUOI BANG".
+   Ban dau lam theo hinh mau: the dai 264px, 30px duoi cung chui xuong duoi
+   bang (bang keo margin-left -30px) cho giong ngan ho so. Anh Tien bat loi
+   BA LAN lien tiep, va lan nao cung cung MOT co che: **bat cu thu gi ve o
+   30px do deu bi bang CAT PHANG giua chung**.
+     lan 1 — the dang chon cho z-index 2 -> no loi han ra, 7 the kia bi xen
+             -> hai kieu hinh dang choi nhau; va no de mat chu "A" cua tieu
+             de trong bang ("Auto Cut" -> "uto Cut").
+     lan 2 — bo z-index, nhung VIEN CAM cua the chon van chay vao bang roi
+             cut lung giua chung -> doc thanh "cai hop bi xen".
+     lan 3 — bo not net + bo goc canh phai thi het cut, nhung lai mat luon
+             cam giac tut; va **HOVER** lam nen the sang HON nen bang, mang
+             sang do lai bi cat phang o mep -> ra dung cai loi cu.
+   Anh chot: *"lam gon lai cho khung va border no ngan lai — khi hover vao
+   bi loi do em"*. NAY: **KHONG tut nua**. The dung sat, cach bang 16px,
+   khung vien khep kin ca 4 canh. Het cho de sinh net cut.
    Bo cuc cu (danh sach 8 hang, class .hang-plugin*) da GO HET 17/08. */
 .lab-khoi {
   display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  grid-template-columns: 234px minmax(0, 1fr);
+  gap: 16px;
   /* stretch: bang tu cao bang cot tab, khong de tab tho ra duoi day bang */
   align-items: stretch;
 }
@@ -454,16 +463,15 @@ body {
 .lab-tabs {
   display: grid;
   gap: 9px;
-  padding-block: 26px;
+  align-content: start;
 }
 
 .lab-tab {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  /* 44px ben phai: 30px nam duoi bang + 14px tho */
-  padding: 12px 44px 12px 15px;
+  /* The om sat chu — khong con 30px thua chui xuong duoi bang */
+  padding: 12px 15px;
   border: 1px solid var(--vien);
   border-radius: 13px;
   /* Toi hon nen bang (--tam #121214) mot chut: the thuong nhin nhu THUT
@@ -477,7 +485,9 @@ body {
   letter-spacing: -0.01em;
   text-align: left;
   cursor: pointer;
-  transition: background 140ms ease, border-color 140ms ease, transform 160ms ease;
+  /* box-shadow chu KHONG phai transform: thanh cam cua the dang chon ve
+     bang box-shadow, con transform thi khong dung o dau ca. */
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .lab-tab svg {
@@ -488,17 +498,22 @@ body {
   white-space: nowrap;
 }
 
-.lab-tab:hover {
+/* ☠️ `:not(.chon)`: khong co no thi hover vao the DANG CHON se do mau voi
+   luat .lab-tab.chon (cung do dac hieu 2 class) va the dang mo bi nhap
+   nhay doi mau vo nghia. */
+.lab-tab:not(.chon):hover {
   background: #16161a;
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* The dang chon: KHONG noi len tren bang (xem ghi chu dau khoi) — chi
-   sang len va vien cam. Nen dung mau bang -> nhin nhu no da "an" vao bang. */
+/* The dang chon: vien cam khep kin ca 4 canh (dung duoc tro lai tu khi bo
+   phan tut — khong con canh nao bi bang cat) + nen sang bang mau bang +
+   chu trang. Kem thanh cam doc ben trai cho ro tu xa. */
 .lab-tab.chon {
   background: var(--tam);
   border-color: var(--cam);
   color: #fff;
+  box-shadow: inset 3px 0 0 var(--cam);
 }
 
 .lab-tab.chon svg {
@@ -522,12 +537,7 @@ body {
 
 /* ── Bang lon: mo ta + so do that + demo bam thu duoc ─────────────────── */
 .lab-than {
-  position: relative;
-  z-index: 1;
-  margin-left: -30px;
-  /* ☠️ trai 58px = 30px bi the tab de len + 28px le that. Ha xuong 28px
-     la tieu de bi the tab nuot mat chu dau (anh Tien bat duoc 17/08). */
-  padding: 26px 28px 30px 58px;
+  padding: 26px 28px 30px;
   border: 1px solid var(--vien);
   border-radius: 22px;
   background: var(--tam);
@@ -1123,8 +1133,8 @@ body {
   }
 
   /* Man hep: 8 the tab xep thanh luoi 2 cot NAM TREN bang (khong cuon
-     ngang — cuon ngang la giau mat 5/8 the ma khong bao). Bang tro lai
-     thang hang, khong con tut duoi the nua. */
+     ngang — cuon ngang la giau mat 5/8 the ma khong bao). Khoang cach
+     tab/bang do `gap` cua .lab-khoi lo. */
   .lab-khoi {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1132,21 +1142,13 @@ body {
   .lab-tabs {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    padding-block: 0;
   }
 
-  .lab-tab,
-  .lab-tab.chon {
+  .lab-tab {
     padding: 11px 13px;
   }
 
-  .lab-tab.chon::after {
-    display: none;
-  }
-
   .lab-than {
-    margin-left: 0;
-    margin-top: 16px;
     padding: 20px 18px 24px;
     border-radius: 18px;
   }

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Studio — Header</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS — maps 1:1 to DESIGN-SYSTEM.md · §15 tokens.css
+   In production: drop this block and import tokens.css
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --bg-0:#0e0e0e; --bg-1:#141414; --bg-2:#181818; --bg-3:#1f1f1f;
+  --bg-4:#282828; --bg-5:#333333; --bg-6:#161616;
+  --line-1:rgb(255 255 255 /6%); --line-2:rgb(255 255 255 /10%); --line-strong:rgb(255 255 255 /16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95;
+
+  --accent:#f86820; --accent-hover:#ff7d3c; --accent-pressed:#e0590e;
+  --accent-soft:rgb(248 104 32 /16%); --accent-line:rgb(248 104 32 /40%);
+  --accent-on:#ffffff;
+
+  /* real Premiere colours — DESIGN-SYSTEM §1, used by the editor backdrop */
+  --pr-video:#729ACC; --pr-video-head:#5b7ea8; --pr-audio:#1D7021;
+  --pr-caption:#e8c05a; --pr-playhead:#8fd0ff;
+
+  --font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --shadow-md:0 8px 24px rgb(0 0 0 /45%); --shadow-pop:0 18px 52px rgb(0 0 0 /62%);
+  --dur:150ms; --ease:cubic-bezier(.32,.72,0,1);
+  --h-nav:60px;
+  --z-sticky:200; --z-modal:300;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg-0);color:var(--text-1);
+  font-family:var(--font-ui);-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-sm)}
+
+/* ═══════════════════════════════════════════════════════════════
+   1 · SCROLL PROGRESS — 2px, top edge of the viewport
+   ═══════════════════════════════════════════════════════════════ */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--accent-pressed),var(--accent),var(--accent-hover));
+  z-index:calc(var(--z-sticky) + 10);
+  transition:width 80ms linear;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2 · HEADER
+   ═══════════════════════════════════════════════════════════════ */
+.nav{
+  position:fixed;top:18px;left:50%;
+  width:min(1180px, calc(100% - 28px));
+  transform:translateX(-50%);
+  z-index:var(--z-sticky);
+  display:flex;align-items:center;gap:20px;
+  height:var(--h-nav);
+  padding:0 8px 0 18px;
+  border-radius:var(--r-pill);
+  border:1px solid var(--line-1);
+  background:rgb(20 20 20 /42%);
+  -webkit-backdrop-filter:blur(10px) saturate(150%);
+  backdrop-filter:blur(10px) saturate(150%);
+  transition:
+    width 520ms var(--ease), top 380ms var(--ease), height 380ms var(--ease),
+    background 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
+}
+/* scrolled state: narrower, more opaque, thin orange border */
+.nav.is-stuck{
+  top:10px;
+  width:min(920px, calc(100% - 28px));
+  height:54px;
+  background:rgb(18 18 18 /88%);
+  border-color:var(--line-2);
+  box-shadow:var(--shadow-pop), 0 0 0 1px rgb(248 104 32 /10%);
+}
+/* travelling orange border — only after scroll, kept restrained */
+.nav::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+  background:conic-gradient(from var(--ang), transparent 0deg, var(--accent-line) 40deg, transparent 110deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0;transition:opacity 400ms ease;pointer-events:none;
+}
+.nav.is-stuck::before{opacity:1;animation:spin 6s linear infinite}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin{to{--ang:360deg}}
+
+/* ── brand ── */
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand .mark{
+  width:26px;height:26px;flex:none;
+  filter:drop-shadow(0 0 10px rgb(248 104 32 /35%));
+  transition:transform 420ms var(--ease), filter 320ms ease;
+}
+.brand:hover .mark{transform:scale(1.08) rotate(-4deg);filter:drop-shadow(0 0 16px rgb(248 104 32 /60%))}
+.brand .word{font-size:16px;font-weight:700;letter-spacing:-.015em}
+.brand .word i{font-style:normal;font-weight:400;color:var(--text-2)}
+.ver{
+  font-family:var(--font-mono);font-size:10px;font-weight:500;line-height:1;
+  color:var(--accent);background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-pill);
+  padding:4px 7px;margin-left:2px;
+}
+.nav.is-stuck .ver{opacity:0;width:0;padding:0;margin:0;border-width:0;overflow:hidden;transition:all 300ms var(--ease)}
+
+/* ── links + sliding indicator ── */
+.links{position:relative;display:flex;align-items:center;gap:2px;margin-left:auto;margin-right:auto}
+.links a{
+  position:relative;z-index:1;
+  padding:9px 14px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:500;color:var(--text-2);
+  transition:color var(--dur) var(--ease);
+  white-space:nowrap;
+}
+.links a:hover,.links a[aria-current]{color:var(--text-1)}
+.links a[aria-current]{font-weight:600}
+.ink{
+  position:absolute;top:50%;left:0;height:34px;width:0;
+  transform:translateY(-50%);
+  border-radius:var(--r-pill);
+  background:rgb(255 255 255 /7%);
+  border:1px solid var(--line-1);
+  opacity:0;pointer-events:none;
+  transition:left 380ms var(--ease), width 380ms var(--ease), opacity 200ms ease;
+}
+.links:hover .ink{opacity:1}
+
+/* ── actions ── */
+.actions{display:flex;align-items:center;gap:8px;flex:none}
+.lang{
+  position:relative;display:flex;align-items:center;flex:none;
+  height:32px;padding:3px;border-radius:var(--r-pill);
+  background:var(--bg-4);border:1px solid var(--line-1);
+}
+.lang-ink{
+  position:absolute;top:3px;left:3px;height:26px;width:38px;border-radius:var(--r-pill);
+  background:var(--accent);box-shadow:0 2px 8px -3px rgb(248 104 32 /80%);
+  transition:transform 320ms var(--ease);
+}
+.lang-btn{
+  position:relative;z-index:1;width:38px;height:26px;border-radius:var(--r-pill);
+  font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.04em;
+  color:var(--text-3);transition:color 220ms var(--ease);
+}
+.lang-btn:hover{color:var(--text-2)}
+.lang-btn[aria-pressed="true"]{color:var(--accent-on);font-weight:600}
+.lang-btn[aria-pressed="true"]:hover{color:var(--accent-on)}
+
+.ghost{
+  padding:9px 14px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:500;color:var(--text-2);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.ghost:hover{background:rgb(255 255 255 /5%);color:var(--text-1)}
+
+.cta{
+  position:relative;overflow:hidden;
+  display:inline-flex;align-items:center;gap:8px;
+  height:42px;padding:0 20px;border-radius:var(--r-pill);
+  background:var(--accent);color:var(--accent-on);
+  font-size:14px;font-weight:700;letter-spacing:-.005em;
+  box-shadow:0 6px 18px -8px rgb(248 104 32 /70%);
+  transition:background var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.cta:hover{background:var(--accent-hover);box-shadow:0 10px 26px -8px rgb(248 104 32 /85%)}
+.cta:active{background:var(--accent-pressed);transform:translateY(1px)}
+.cta svg{width:15px;height:15px;transition:transform 260ms var(--ease)}
+.cta:hover svg{transform:translateX(3px)}
+/* shine sweeping across the button */
+.cta::after{
+  content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;
+  background:linear-gradient(100deg,transparent,rgb(255 255 255 /38%),transparent);
+  transform:skewX(-18deg);
+}
+.cta:hover::after{animation:sweep 850ms var(--ease)}
+@keyframes sweep{to{left:150%}}
+
+/* ── menu button (mobile) ── */
+.burger{
+  display:none;width:42px;height:42px;border-radius:var(--r-pill);
+  align-items:center;justify-content:center;
+  border:1px solid var(--line-1);
+}
+.burger:hover{background:rgb(255 255 255 /5%)}
+.burger span{display:block;width:16px;height:1.5px;background:var(--text-1);border-radius:2px;transition:transform 300ms var(--ease),opacity 200ms}
+.burger span+span{margin-top:4px}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+/* ── mobile menu sheet ── */
+.sheet{
+  position:fixed;inset:0;z-index:calc(var(--z-sticky) - 1);
+  background:rgb(14 14 14 /92%);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;justify-content:center;gap:6px;
+  padding:0 28px;
+  opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 280ms;
+}
+.sheet.open{opacity:1;visibility:visible}
+.sheet a{
+  font-size:28px;font-weight:700;letter-spacing:-.02em;padding:12px 0;
+  border-bottom:1px solid var(--line-1);
+  opacity:0;transform:translateY(12px);
+}
+.sheet.open a{animation:sheetIn 420ms var(--ease) forwards}
+.sheet.open a:nth-child(2){animation-delay:50ms}
+.sheet.open a:nth-child(3){animation-delay:100ms}
+.sheet.open a:nth-child(4){animation-delay:150ms}
+@keyframes sheetIn{to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════════════════════════
+   3 · HERO + EDITOR BACKDROP
+   ═══════════════════════════════════════════════════════════════ */
+.hero{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center}
+
+/* ── backdrop: mock NLE window ── */
+.editor{
+  position:absolute;left:50%;top:50%;
+  width:min(1520px,104%);aspect-ratio:16/9.1;
+  transform:translate(-50%,-50%) perspective(2200px) rotateX(4deg) scale(1);
+  transform-origin:50% 50%;
+  opacity:.72;filter:saturate(.85);
+  will-change:transform;
+}
+.veil{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg, rgb(14 14 14 /97%) 0%, rgb(14 14 14 /93%) 30%, rgb(14 14 14 /62%) 52%, rgb(14 14 14 /14%) 74%, rgb(14 14 14 /22%) 100%),
+    radial-gradient(62% 52% at 26% 46%, rgb(14 14 14 /92%) 0%, rgb(14 14 14 /55%) 55%, transparent 100%),
+    linear-gradient(180deg, rgb(14 14 14 /92%) 0%, transparent 18%, transparent 66%, rgb(14 14 14 /94%) 100%);
+}
+/* orange glow behind the headline — the ONLY accent moment */
+.glow{
+  position:absolute;left:26%;top:46%;width:820px;height:560px;
+  transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(closest-side, rgb(248 104 32 /15%), transparent 72%);
+  filter:blur(14px);
+}
+
+/* NLE window chrome */
+.nle{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  border:1px solid var(--line-2);border-radius:14px;
+  background:var(--bg-2);overflow:hidden;
+  box-shadow:0 60px 140px -50px #000;
+}
+
+/* --- top bar --- */
+.nle-top{
+  height:38px;flex:none;display:flex;align-items:center;gap:16px;
+  padding:0 14px;background:var(--bg-1);border-bottom:1px solid var(--line-1);
+}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--bg-4)}
+.menus{display:flex;gap:14px;font-size:11px;color:var(--text-3)}
+.wtabs{margin-left:auto;display:flex;gap:4px}
+.wtabs span{
+  font-size:11px;color:var(--text-3);padding:4px 10px;border-radius:var(--r-sm);
+}
+.wtabs .on{background:var(--bg-3);color:var(--text-1)}
+
+/* --- middle row: 3 panels --- */
+.nle-mid{flex:1;display:grid;grid-template-columns:190px 1fr 210px;gap:1px;background:var(--line-1);min-height:0}
+.panel{background:var(--bg-2);display:flex;flex-direction:column;min-height:0}
+.ptitle{
+  height:26px;flex:none;display:flex;align-items:center;gap:6px;
+  padding:0 10px;font-size:10.5px;color:var(--text-3);
+  border-bottom:1px solid var(--line-1);background:var(--bg-1);
+}
+.ptitle b{color:var(--text-2);font-weight:500}
+
+/* Project panel */
+.bins{padding:0}
+.bin-list{padding:8px 8px;display:flex;flex-direction:column;gap:5px;overflow:hidden}
+.bin{
+  display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:var(--r-sm);
+  font-size:10.5px;color:var(--text-3);
+}
+.bin.sel{background:var(--bg-3);color:var(--text-2)}
+.swatch{width:8px;height:8px;border-radius:2px;flex:none}
+.bin .len{margin-left:auto;font-family:var(--font-mono);font-size:9.5px;opacity:.7}
+
+/* Program Monitor panel */
+.monitor{align-items:stretch}
+.screen{
+  flex:1;margin:12px;border-radius:var(--r-md);background:var(--bg-0);
+  position:relative;overflow:hidden;border:1px solid var(--line-1);
+}
+.frame-img{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(62% 72% at 42% 38%, #56565c 0%, #34343a 46%, #1b1b1e 100%);
+}
+.frame-img::after{ /* abstract figure */
+  content:"";position:absolute;left:50%;bottom:-6%;width:34%;height:66%;
+  transform:translateX(-50%);
+  background:radial-gradient(50% 38% at 50% 22%, #6a6a72 0%, #45454b 60%, transparent 62%),
+             radial-gradient(46% 62% at 50% 100%, #53535a 0%, transparent 72%);
+}
+/* 9:16 guide frame — the Auto Re-Frames product */
+.guide916{
+  position:absolute;top:6%;bottom:6%;left:50%;transform:translateX(-50%);
+  aspect-ratio:9/16;border:1.5px solid var(--accent);border-radius:3px;
+  box-shadow:0 0 0 9999px rgb(14 14 14 /26%);
+}
+.guide916::before,.guide916::after{
+  content:"";position:absolute;left:6%;right:6%;height:1px;background:rgb(248 104 32 /35%);
+}
+.guide916::before{top:8%} .guide916::after{bottom:8%}
+/* burned-in caption — the Transcripts product */
+.sub{
+  position:absolute;left:50%;bottom:9%;transform:translateX(-50%);
+  font-size:10px;font-weight:600;color:#fff;white-space:nowrap;
+  background:rgb(0 0 0 /55%);padding:3px 8px;border-radius:3px;
+}
+.transport{
+  height:26px;flex:none;display:flex;align-items:center;gap:12px;justify-content:center;
+  border-top:1px solid var(--line-1);background:var(--bg-1);
+  font-family:var(--font-mono);font-size:10px;color:var(--text-3);
+}
+.transport svg{width:11px;height:11px;color:var(--text-2)}
+
+/* Effect Controls panel */
+.fx-list{padding:10px;display:flex;flex-direction:column;gap:11px}
+.fx-row{display:flex;flex-direction:column;gap:5px}
+.fx-row span{font-size:10px;color:var(--text-3);display:flex;justify-content:space-between}
+.fx-row span em{font-style:normal;font-family:var(--font-mono);color:var(--text-2)}
+.slider{height:3px;border-radius:2px;background:var(--bg-4);position:relative}
+.slider i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--accent)}
+.slider i::after{
+  content:"";position:absolute;right:-5px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;background:var(--text-2);
+}
+
+/* --- timeline --- */
+.nle-tl{flex:none;height:36%;background:var(--bg-2);border-top:1px solid var(--line-2);position:relative;display:flex;flex-direction:column}
+.ruler{
+  height:22px;flex:none;position:relative;
+  border-bottom:1px solid var(--line-1);background:var(--bg-1);
+  padding-left:52px;
+}
+.ruler .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line-1)}
+.ruler .tc{
+  position:absolute;top:5px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);
+  transform:translateX(4px);
+}
+.tracks{flex:1;display:flex;flex-direction:column;min-height:0}
+.track{flex:1;display:flex;min-height:0;border-bottom:1px solid var(--line-1)}
+.thead{
+  width:52px;flex:none;display:flex;align-items:center;gap:5px;padding-left:9px;
+  background:var(--bg-1);border-right:1px solid var(--line-1);
+  font-size:9.5px;font-weight:600;color:var(--text-3);
+}
+.thead b{width:5px;height:5px;border-radius:50%;background:var(--bg-5)}
+.lane{flex:1;position:relative;background:
+  repeating-linear-gradient(90deg, transparent 0 39px, rgb(255 255 255 /2%) 39px 40px);}
+
+/* clip */
+.clip{position:absolute;top:3px;bottom:3px;border-radius:3px;overflow:hidden}
+.clip .head{position:absolute;top:0;left:0;right:0;height:5px}
+.clip .name{
+  position:absolute;left:5px;top:7px;font-size:8.5px;font-weight:500;
+  color:rgb(255 255 255 /80%);white-space:nowrap;overflow:hidden;
+}
+.clip.v{background:var(--pr-video)} .clip.v .head{background:var(--pr-video-head)}
+.clip.a{background:var(--pr-audio)}
+.clip.c{background:var(--pr-caption)}
+.clip.c .name{color:rgb(0 0 0 /70%);top:3px;font-weight:600}
+.clip.sel{outline:1.5px solid var(--accent);outline-offset:-1px;box-shadow:0 0 12px rgb(248 104 32 /45%)}
+.wave{position:absolute;left:2px;right:2px;bottom:3px;top:8px;display:flex;align-items:center;gap:1px}
+.wave i{flex:1;background:rgb(255 255 255 /45%);border-radius:1px}
+
+/* removed silence — the Autocut product */
+.gap{
+  position:absolute;top:0;bottom:0;
+  background:repeating-linear-gradient(45deg, rgb(248 104 32 /9%) 0 4px, transparent 4px 8px);
+  border-left:1px dashed rgb(248 104 32 /45%);border-right:1px dashed rgb(248 104 32 /45%);
+}
+
+/* playhead — light blue, as in Premiere */
+.playhead{
+  position:absolute;top:0;bottom:0;width:1.5px;background:var(--pr-playhead);
+  left:8%;z-index:3;box-shadow:0 0 8px rgb(143 208 255 /55%);
+  animation:scrub 30s cubic-bezier(.5,0,.5,1) infinite alternate;
+}
+.playhead::before{
+  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-top:9px solid var(--pr-playhead);
+}
+@keyframes scrub{from{left:9%}to{left:88%}}
+
+/* render bar */
+.renderbar{position:absolute;left:52px;right:0;top:22px;height:2px;background:transparent;z-index:2}
+.renderbar i{display:block;height:100%;width:62%;background:var(--accent);opacity:.55}
+
+
+/* floating AiO panel — the "progress" component from DESIGN-SYSTEM §5 */
+.aio-pop{
+  position:absolute;right:5%;top:50%;transform:translateY(-50%);width:314px;z-index:3;
+  background:var(--bg-3);border:1px solid var(--line-2);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-pop);padding:12px 13px;
+}
+.ap-head{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text-1)}
+.ap-head svg{width:13px;height:13px;fill:var(--accent)}
+.ap-head b{margin-left:auto;font-family:var(--font-mono);font-size:9.5px;font-weight:500;
+  color:var(--accent);background:var(--accent-soft);border-radius:var(--r-pill);padding:2px 6px}
+.ap-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:13px;
+  font-size:11px;color:var(--text-3)}
+.ap-row em{font-style:normal;font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text-1)}
+.ap-bar{height:5px;border-radius:2px;background:var(--bg-0);margin-top:6px;overflow:hidden}
+.ap-bar i{display:block;height:100%;border-radius:2px;background:var(--accent);
+  animation:fill 9s cubic-bezier(.32,.72,0,1) infinite}
+@keyframes fill{0%{width:6%}70%{width:83%}100%{width:96%}}
+.ap-meta{margin-top:9px;font-size:10px;color:var(--text-3);line-height:1.5}
+.ap-meta u{text-decoration:none;color:var(--text-2)}
+@media (max-width:900px){ .aio-pop{position:static;transform:none;width:auto;margin:26px 0 0;max-width:340px} }
+
+/* ── hero content ── */
+.hero-in{position:relative;z-index:2;width:min(1180px,calc(100% - 48px));margin:0 auto;padding-top:60px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:22px;
+}
+h1{
+  font-size:clamp(48px,7.2vw,104px);line-height:.96;font-weight:800;
+  letter-spacing:-.038em;color:var(--text-1);
+}
+h1 em{font-style:normal;color:var(--accent);display:block}
+/* lede: conversational, hard-locked to 2 lines */
+.lede{
+  margin-top:26px;font-size:17px;line-height:1.55;color:var(--text-2);
+  max-width:52ch;height:53px;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.btn-lg{
+  display:inline-flex;align-items:center;gap:9px;height:52px;padding:0 26px;
+  border-radius:var(--r-pill);font-size:15px;font-weight:700;
+}
+.btn-lg.primary{background:var(--accent);color:var(--accent-on);box-shadow:0 10px 30px -10px rgb(248 104 32 /75%)}
+.btn-lg.primary:hover{background:var(--accent-hover)}
+.btn-lg.secondary{border:1px solid var(--line-2);color:var(--text-1)}
+.btn-lg.secondary:hover{background:rgb(255 255 255 /5%);border-color:var(--line-strong)}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   5 · ROTATING HEADLINE — 8 words for 8 plugins, swapped in place
+   ═══════════════════════════════════════════════════════════════ */
+h1{font-size:clamp(44px,6.6vw,96px)}
+.h-line{position:relative;display:flex;align-items:center;gap:24px;min-height:.96em}
+.h-line:last-child{padding-bottom:.14em}
+.h-line .w{display:block;white-space:nowrap}
+.h-line .w.out{position:absolute;left:0;top:0;width:100%;pointer-events:none}
+.h-line .w b{display:inline-block;font-weight:inherit;will-change:transform,opacity,filter}
+.w.in b{animation:wIn 640ms var(--ease) both}
+.w.out b{animation:wOut 460ms var(--ease) both}
+@keyframes wIn{from{opacity:0;transform:translateY(.44em) scale(.965);filter:blur(7px)}
+               to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes wOut{from{opacity:1;transform:none;filter:blur(0)}
+                to{opacity:0;transform:translateY(-.4em) scale(.98);filter:blur(7px)}}
+
+/* plugin label matching the word on that line */
+.h-tag{
+  flex:none;display:flex;align-items:center;gap:12px;white-space:nowrap;
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.03em;color:var(--text-3);
+}
+.h-tag .rule{width:40px;height:1px;flex:none;background:linear-gradient(90deg,transparent,var(--line-strong))}
+.h-tag .tname{transition:opacity 260ms ease,transform 380ms var(--ease)}
+.h-tag.swap .tname{opacity:0;transform:translateY(6px)}
+
+/* "Automated." — shine sweeping through the text + underline drawing in */
+.auto{
+  display:inline-block;position:relative;color:var(--accent);
+  background:linear-gradient(100deg,var(--accent) 0%,var(--accent) 34%,#ffe3ce 46%,var(--accent) 59%,var(--accent) 100%);
+  background-size:280% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:sheen 5.4s ease-in-out infinite;
+}
+@keyframes sheen{0%{background-position:135% 0}58%,100%{background-position:-35% 0}}
+.auto::after{
+  content:"";position:absolute;left:.02em;right:.16em;bottom:-.13em;height:.05em;border-radius:99px;
+  background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;
+  animation:ruleDraw 5.4s var(--ease) infinite;
+}
+@keyframes ruleDraw{0%{transform:scaleX(0);transform-origin:0 50%}
+                    16%,74%{transform:scaleX(1);transform-origin:0 50%}
+                    100%{transform:scaleX(0);transform-origin:100% 50%}}
+
+/* marks showing position in the 8-plugin cycle */
+.steps{display:flex;gap:6px;margin-top:34px}
+.steps i{width:18px;height:2px;border-radius:2px;background:var(--line-2);
+  transition:background 320ms ease,width 320ms var(--ease)}
+.steps i.on{background:var(--accent);width:30px}
+
+@media (max-width:900px){ .h-tag{display:none} }
+@media (prefers-reduced-motion:reduce){ .auto::after{display:none} }
+
+/* scroll room so the header state change is visible */
+.after{height:150vh;background:linear-gradient(180deg,var(--bg-0),var(--bg-2));
+  display:flex;align-items:flex-start;justify-content:center;padding-top:90px;
+  color:var(--text-3);font-size:13px}
+
+/* ═══════════════════════════════════════════════════════════════
+   4 · RESPONSIVE — 1024 / 768 / 375 per DESIGN-SYSTEM §14
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width:1024px){
+  .links{display:none}
+  .ghost{display:none}
+  .lang{margin-left:auto}
+  .burger{display:flex}
+  .nav{width:calc(100% - 24px);padding:0 8px 0 16px}
+  .nav.is-stuck{width:calc(100% - 24px)}
+  .editor{width:210%;opacity:.5}
+}
+@media (max-width:768px){
+  .nle-mid{grid-template-columns:1fr}
+  .bins,.fx{display:none}
+  .hero-in{padding-top:40px}
+}
+@media (max-width:420px){
+  .brand .word{font-size:15px}
+  .cta{height:38px;padding:0 15px;font-size:13px}
+  .ver{display:none}
+}
+
+/* respect users who turn motion off */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition-duration:1ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="AiO Studio" data-i18n-aria="a11y.brand">
+    <svg class="mark" viewBox="0 0 385.89 351.31" fill="var(--accent)" aria-hidden="true">
+      <path d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+      <path d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+    </svg>
+    <span class="word">AiO <i>Studio</i></span>
+    <span class="ver">v1.5</span>
+  </a>
+
+  <nav class="links" id="links" aria-label="Main navigation" data-i18n-aria="a11y.nav">
+    <span class="ink" id="ink" aria-hidden="true"></span>
+    <a href="#" aria-current="page" data-i18n="nav.plugins">Plugins</a>
+    <a href="#" data-i18n="nav.features">Features</a>
+    <a href="#" data-i18n="nav.pricing">Pricing</a>
+    <a href="#" data-i18n="nav.docs">Docs</a>
+  </nav>
+
+  <div class="actions">
+    <div class="lang" role="group" aria-label="Language">
+      <span class="lang-ink" id="langInk" aria-hidden="true"></span>
+      <button class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
+      <button class="lang-btn" data-lang="vi" aria-pressed="false">VI</button>
+    </div>
+    <a class="ghost" href="#" data-i18n="nav.signin">Sign in</a>
+    <a class="cta" href="#">
+      <span data-i18n="cta.demo">Get the demo</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" data-i18n-aria="a11y.menu" aria-expanded="false" aria-controls="sheet">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="sheet" id="sheet">
+  <a href="#" data-i18n="nav.plugins">Plugins</a><a href="#" data-i18n="nav.features">Features</a><a href="#" data-i18n="nav.pricing">Pricing</a><a href="#" data-i18n="nav.docs">Docs</a>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="top">
+
+  <!-- backdrop: mock NLE window -->
+  <div class="editor" id="editor" aria-hidden="true">
+    <div class="nle">
+
+      <div class="nle-top">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <nav class="menus"><span>File</span><span>Edit</span><span>Clip</span><span>Sequence</span><span>Graphics</span><span>Window</span></nav>
+        <div class="wtabs"><span class="on">Edit</span><span>Color</span><span>Audio</span><span>Effects</span></div>
+      </div>
+
+      <div class="nle-mid">
+        <!-- Project -->
+        <div class="panel bins">
+          <div class="ptitle" data-i18n="ed.project"><b>Project</b> · aio_demo.prproj</div>
+          <div class="bin-list" id="binList"></div>
+        </div>
+
+        <!-- Program Monitor -->
+        <div class="panel monitor">
+          <div class="ptitle" data-i18n="ed.program"><b>Program</b> · Sequence 01</div>
+          <div class="screen">
+            <div class="frame-img"></div>
+            <div class="guide916"></div>
+            <div class="sub" data-i18n="ed.sub">…one click and it cuts the whole thing.</div>
+          </div>
+          <div class="transport">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h3v14H6zM11 5l9 7-9 7z"/></svg>
+            <span>00:04:18:07</span>
+            <span style="opacity:.5">/ 00:12:40:00</span>
+          </div>
+        </div>
+
+        <!-- Effect Controls -->
+        <div class="panel fx">
+          <div class="ptitle" data-i18n="ed.params"><b>AiO Autocut</b> · parameters</div>
+          <div class="fx-list" id="fxList"></div>
+        </div>
+      </div>
+
+
+
+      <!-- Timeline -->
+      <div class="nle-tl">
+        <div class="ruler" id="ruler"></div>
+        <div class="renderbar"><i></i></div>
+        <div class="tracks" id="tracks"></div>
+        <div class="playhead"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="veil"></div>
+  <div class="glow"></div>
+
+  <!-- floating product panel over the editor -->
+  <div class="aio-pop">
+    <div class="ap-head">
+      <svg viewBox="0 0 385.89 351.31"><path d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>
+      <span class="ap-name">AiO Autocut</span> <b data-i18n="panel.badge">running</b>
+    </div>
+    <div class="ap-row"><span>Analysing waveform · Mic 1</span><em id="apPct">78%</em></div>
+    <div class="ap-bar"><i></i></div>
+    <div class="ap-meta">Found <u>214 silences</u> · saved <u>04:12</u> · about 12 s left</div>
+  </div>
+
+
+  <div class="hero-in">
+    <p class="eyebrow" data-i18n="hero.eyebrow">Plugins for Premiere Pro · DaVinci Resolve</p>
+    <h1>
+      <span class="h-line" id="l0"><span class="h-tag"><i class="rule"></i><span class="tname"></span></span></span>
+      <span class="h-line" id="l1"><span class="h-tag"><i class="rule"></i><span class="tname"></span></span></span>
+      <span class="h-line" id="l2"><span class="h-tag"><i class="rule"></i><span class="tname"></span></span></span>
+      <span class="h-line"><em class="auto" data-i18n="hero.auto">Automated.</em></span>
+    </h1>
+    <div class="steps" id="steps"></div>
+    <p class="lede" data-i18n="hero.lede">I got sick of trimming silence at 2am. So I built eight plugins to do it — right inside Premiere.</p>
+    <div class="hero-cta">
+      <a class="btn-lg primary" href="#"><span data-i18n="hero.primary">Get the free demo</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn-lg secondary" href="#" data-i18n="hero.secondary">See pricing</a>
+    </div>
+  </div>
+</section>
+
+<section class="after" data-i18n="after.note">Scroll to see the header shrink · orange border switch on · progress bar fill</section>
+
+<script>
+/* ═══════════ editor backdrop data (fixed, not random) ═══════════ */
+const STR = {
+  en:{
+    'a11y.brand':'AiO Studio — back to top', 'a11y.nav':'Main navigation', 'a11y.menu':'Open menu',
+    'a11y.menuClose':'Close menu',
+    'nav.plugins':'Plugins','nav.features':'Features','nav.pricing':'Pricing','nav.docs':'Docs',
+    'nav.signin':'Sign in','cta.demo':'Get the demo',
+    'hero.eyebrow':'Plugins for Premiere Pro · DaVinci Resolve',
+    'hero.auto':'Automated.',
+    'hero.lede':'I got sick of trimming silence at 2am. So I built eight plugins to do it — right inside Premiere.',
+    'hero.primary':'Get the free demo','hero.secondary':'See pricing',
+    'after.note':'Scroll to see the header shrink · orange border switch on · progress bar fill',
+    'ed.project':'<b>Project</b> · aio_demo.prproj',
+    'ed.program':'<b>Program</b> · Sequence 01',
+    'ed.params':'<b>AiO Autocut</b> · parameters',
+    'ed.sub':'…one click and it cuts the whole thing.',
+    'panel.badge':'running','panel.left':'about 12 s left','clip.caption':'Auto subtitles',
+  },
+  vi:{
+    'a11y.brand':'AiO Studio — về đầu trang', 'a11y.nav':'Điều hướng chính', 'a11y.menu':'Mở menu',
+    'a11y.menuClose':'Đóng menu',
+    'nav.plugins':'Plugin','nav.features':'Tính năng','nav.pricing':'Bảng giá','nav.docs':'Hướng dẫn',
+    'nav.signin':'Đăng nhập','cta.demo':'Tải Demo',
+    'hero.eyebrow':'Plugins cho Premiere Pro · DaVinci Resolve',
+    'hero.auto':'Tự động.',
+    'hero.lede':'Mình chán cảnh 2 giờ sáng còn ngồi cắt khoảng lặng. Nên mình làm 8 plugin làm hộ, ngay trong Premiere.',
+    'hero.primary':'Tải Demo miễn phí','hero.secondary':'Xem bảng giá',
+    'after.note':'Cuộn xuống để xem header co lại · viền cam bật lên · thanh tiến độ chạy',
+    'ed.project':'<b>Project</b> · aio_demo.prproj',
+    'ed.program':'<b>Program</b> · Sequence 01',
+    'ed.params':'<b>AiO Autocut</b> · thông số',
+    'ed.sub':'…mình bấm một nút là nó tự cắt hết.',
+    'panel.badge':'đang chạy','panel.left':'còn khoảng 12 giây','clip.caption':'Phụ đề tự động',
+  }
+};
+
+const FX_STR = {
+  en:[['Silence threshold','-32 dB',68],['Minimum length','0.35 s',34],['Head / tail pad','120 ms',22],['Keep breaths','on',80]],
+  vi:[['Ngưỡng im lặng','-32 dB',68],['Độ dài tối thiểu','0.35 s',34],['Đệm đầu / cuối','120 ms',22],['Giữ nhịp thở','bật',80]],
+};
+
+const BINS = [
+  ['#729ACC','Cam A — master','12:40'],
+  ['#729ACC','Cam B — wide','12:40'],
+  ['#1D7021','Mic 1 — host','12:38'],
+  ['#1D7021','Mic 2 — guest','12:38'],
+  ['#e8c05a','Transcript .srt','—'],
+  ['#8d8d95','B-roll / pack 01','04:12'],
+];
+document.getElementById('binList').innerHTML = BINS.map((b,i)=>
+  `<div class="bin${i===0?' sel':''}"><span class="swatch" style="background:${b[0]}"></span>${b[1]}<span class="len">${b[2]}</span></div>`
+).join('');
+
+function buildFx(lang){
+  document.getElementById('fxList').innerHTML = FX_STR[lang].map(f=>
+    `<div class="fx-row"><span>${f[0]}<em>${f[1]}</em></span><div class="slider"><i style="width:${f[2]}%"></i></div></div>`
+  ).join('');
+}
+
+/* time ruler */
+let ruler = '';
+for (let i=0;i<=10;i++){
+  const p = i/10;
+  ruler += `<span class="tick" style="left:calc(52px + (100% - 52px) * ${p})"></span>`;
+  ruler += `<span class="tc" style="left:calc(52px + (100% - 52px) * ${p})">00:0${Math.floor(i*1.2)}:${String((i*17)%60).padStart(2,'0')}</span>`;
+}
+document.getElementById('ruler').innerHTML = ruler;
+
+/* tracks — true Premiere order: captions ON TOP, then V, then A */
+const TRACKS = [
+  {name:'C1', cls:'c', clips:[[6,14,'__CAPTION__'],[23,17,'…'],[45,20,'…'],[70,18,'…']]},
+  {name:'V2', cls:'v', clips:[[10,16,'B-roll 01'],[40,12,'B-roll 02'],[74,14,'Lower third']]},
+  {name:'V1', cls:'v', clips:[[2,20,'Cam A'],[24,16,'Cam B'],[43,22,'Cam A'],[68,26,'Cam B'], ], sel:2},
+  {name:'A1', cls:'a', clips:[[2,20,'Mic 1'],[24,16,'Mic 1'],[43,22,'Mic 1'],[68,26,'Mic 1']]},
+  {name:'A2', cls:'a', clips:[[2,42,'Mic 2'],[46,48,'Mic 2']]},
+];
+const GAPS = [[22.2,1.6],[41.2,1.6],[65.2,2.6]]; /* silences Autocut removed */
+
+function waveBars(n, seed){
+  let s = seed, out = '';
+  for (let i=0;i<n;i++){
+    s = (s*9301 + 49297) % 233280;
+    const h = 22 + (s/233280)*78;
+    out += `<i style="height:${h}%"></i>`;
+  }
+  return out;
+}
+
+function buildTracks(lang){
+document.getElementById('tracks').innerHTML = TRACKS.map((t,ti)=>{
+  const clips = t.clips.map((c,ci)=>{
+    const sel = (t.sel===ci) ? ' sel' : '';
+    const inner = t.cls==='a'
+      ? `<div class="wave">${waveBars(Math.round(c[1]*1.6), 7+ti*31+ci*13)}</div><span class="name">${c[2]}</span>`
+      : (t.cls==='v' ? `<span class="head"></span><span class="name">${c[2]}</span>` : `<span class="name">${c[2]}</span>`);
+    return `<div class="clip ${t.cls}${sel}" style="left:${c[0]}%;width:${c[1]}%">${inner}</div>`;
+  }).join('');
+  const gaps = (t.cls==='v'||t.cls==='a')
+    ? GAPS.map(g=>`<div class="gap" style="left:${g[0]}%;width:${g[1]}%"></div>`).join('') : '';
+  return `<div class="track"><span class="thead"><b></b>${t.name}</span><div class="lane">${clips}${gaps}</div></div>`;
+}).join('').replace(/__CAPTION__/g, STR[lang]['clip.caption']);
+}
+
+/* percentage kept in sync with the progress bar */
+const apPct = document.getElementById('apPct');
+const apBar = document.querySelector('.ap-bar i');
+if (apPct && apBar && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+  setInterval(()=>{ apPct.textContent = Math.round(parseFloat(getComputedStyle(apBar).width)
+    / parseFloat(getComputedStyle(apBar.parentElement).width) * 100) + '%'; }, 120);
+}
+
+
+/* ═══════════ 8 plugins ⇄ 8 headline words ═══════════ */
+const TOOLS_ALL = { en:[
+  ['Cut.',       'Auto Silent Cut',  'Cutting silences · Mic 1',        'Found <u>214 silences</u> · saved <u>04:12</u>'],
+  ['Subtitles.', 'Auto Transcripts', 'Transcribing · auto language',    'Recognised <u>1,842 words</u> · <u>96%</u> match'],
+  ['Multicam.',  'Auto Podcast',     'Syncing 3 mics · picking angles', 'Synced <u>3 cameras</u> · <u>12:40</u> long'],
+  ['Reframe.',   'Auto Reframes',    'Tracking subject · export 9:16',  'Placed <u>128 keyframes</u> · <u>4 scenes</u>'],
+  ['Shorts.',    'Auto Short Clip',  'Finding highlights · scoring',    'Picked <u>9 clips</u> · <u>30–60 s</u>'],
+  ['Organise.',  'Power Bins',       'Cleaning bins · colour labels',   'Sorted <u>142 clips</u> into <u>6 bins</u>'],
+  ['Assets.',    'Asset Manager',    'Scanning library · previews',     'Indexed <u>2,410 assets</u> · <u>18 GB</u>'],
+  ['Sound.',     'Sound Design',     'Matching SFX to scenes',          'Placed <u>76 SFX</u> on <u>5 layers</u>'],
+], vi:[
+  ['Cắt.',        'Auto Silent Cut',  'Cắt khoảng lặng · Mic 1',      'Đã tìm <u>214 khoảng lặng</u> · rút ngắn <u>04:12</u>'],
+  ['Phụ đề.',     'Auto Transcripts', 'Bóc băng · tiếng Việt',        'Đã nhận <u>1.842 từ</u> · khớp <u>96%</u>'],
+  ['Multicam.',   'Auto Podcast',     'Đồng bộ 3 mic · chọn góc',     'Đã ghép <u>3 camera</u> · dài <u>12:40</u>'],
+  ['Dọc 9:16.',   'Auto Reframes',    'Bám chủ thể · xuất 9:16',      'Đã đặt <u>128 keyframe</u> · <u>4 cảnh</u>'],
+  ['Clip ngắn.',  'Auto Short Clip',  'Tìm đoạn hay · chấm điểm',     'Đã chọn <u>9 clip</u> · <u>30–60 giây</u>'],
+  ['Sắp xếp.',    'Power Bins',       'Dọn bin · gán nhãn màu',       'Đã xếp <u>142 clip</u> vào <u>6 bin</u>'],
+  ['Kho FX.',     'Asset Manager',    'Quét thư viện · dựng preview', 'Đã lập <u>2.410 asset</u> · <u>18 GB</u>'],
+  ['Tiếng động.', 'Sound Design',     'Ghép SFX theo cảnh',           'Đã đặt <u>76 SFX</u> trên <u>5 lớp</u>'],
+]};
+let LANG = 'en';
+let TOOLS = TOOLS_ALL[LANG];
+const SLOTS = [document.getElementById('l0'),document.getElementById('l1'),document.getElementById('l2')];
+const stepsEl = document.getElementById('steps');
+stepsEl.innerHTML = TOOLS.map(()=>'<i></i>').join('');
+const stepDots = [...stepsEl.children];
+const softMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function paint(slot, word, tool, first){
+  const old = slot.querySelector('.w');
+  const w = document.createElement('span');
+  w.className = 'w' + (first || softMotion ? '' : ' in');
+  [...word].forEach((ch,i)=>{
+    const b = document.createElement('b');
+    b.textContent = ch === ' ' ? '\u00A0' : ch;
+    b.style.animationDelay = (i*28) + 'ms';
+    w.appendChild(b);
+  });
+  slot.insertBefore(w, slot.firstChild);
+  if (old){
+    if (softMotion){ old.remove(); }
+    else {
+      old.className = 'w out';
+      [...old.children].forEach((b,i)=>b.style.animationDelay = (i*22)+'ms');
+      setTimeout(()=>old.remove(), 760);
+    }
+  }
+  const tag = slot.querySelector('.h-tag');
+  tag.classList.add('swap');
+  setTimeout(()=>{ tag.querySelector('.tname').textContent = tool; tag.classList.remove('swap'); }, 230);
+}
+
+/* the AiO panel follows whichever plugin sits on the first line */
+const apTitle = document.querySelector('.ap-name');
+const apLabel = document.querySelector('.ap-row span');
+const apMeta  = document.querySelector('.ap-meta');
+function syncPanel(t){
+  if (!apTitle) return;
+  document.querySelector('.ap-name').textContent = 'AiO ' + t[1];
+  apLabel.textContent = t[2];
+  apMeta.innerHTML = t[3] + ' · ' + STR[LANG]['panel.left'];
+}
+
+let k = 0;
+let timer = null;
+function cycle(first){
+  for (let n=0;n<3;n++){
+    const t = TOOLS[(k+n) % TOOLS.length];
+    setTimeout(()=>paint(SLOTS[n], t[0], t[1], first), first ? 0 : n*190);
+  }
+  stepDots.forEach((d,i)=>d.classList.toggle('on', [0,1,2].some(n=>(k+n)%TOOLS.length===i)));
+  syncPanel(TOOLS[k % TOOLS.length]);
+  k = (k + 3) % TOOLS.length;
+}
+/* ═══════════ language switch — English by default ═══════════ */
+const langInk = document.getElementById('langInk');
+function setLang(lang){
+  LANG = lang;
+  TOOLS = TOOLS_ALL[lang];
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const v = STR[lang][el.dataset.i18n];
+    if (v != null) el.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
+    const v = STR[lang][el.dataset.i18nAria];
+    if (v != null) el.setAttribute('aria-label', v);
+  });
+
+  document.querySelectorAll('.lang-btn').forEach(b=>
+    b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  langInk.style.transform = `translateX(${lang === 'vi' ? 38 : 0}px)`;
+
+  buildFx(lang);
+  buildTracks(lang);
+
+  k = 0;
+  cycle(true);
+  if (timer) clearInterval(timer);
+  if (!softMotion) timer = setInterval(()=>cycle(false), 4600);
+}
+document.querySelectorAll('.lang-btn').forEach(b=>
+  b.addEventListener('click', ()=>{ if (b.dataset.lang !== LANG) setLang(b.dataset.lang); }));
+
+setLang('en');   /* mặc định tiếng Anh */
+
+/* ═══════════ header: scroll state + progress bar ═══════════ */
+const nav = document.getElementById('nav');
+const progress = document.getElementById('progress');
+let ticking = false;
+function onScroll(){
+  const y = window.scrollY;
+  nav.classList.toggle('is-stuck', y > 28);
+  const max = document.documentElement.scrollHeight - innerHeight;
+  progress.style.width = (max > 0 ? (y/max)*100 : 0) + '%';
+  ticking = false;
+}
+addEventListener('scroll', ()=>{ if(!ticking){ ticking = true; requestAnimationFrame(onScroll); } }, {passive:true});
+onScroll();
+
+/* ═══════════ sliding indicator under the links ═══════════ */
+const links = document.getElementById('links');
+const ink = document.getElementById('ink');
+function moveInk(el){
+  ink.style.left = el.offsetLeft + 'px';
+  ink.style.width = el.offsetWidth + 'px';
+}
+links.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('mouseenter', ()=>moveInk(a));
+  a.addEventListener('focus', ()=>{ moveInk(a); ink.style.opacity = 1; });
+  a.addEventListener('blur', ()=>{ ink.style.opacity = ''; });
+});
+const current = links.querySelector('[aria-current]');
+if (current) moveInk(current);
+addEventListener('resize', ()=>{ if(current) moveInk(current); });
+
+/* ═══════════ mobile menu ═══════════ */
+const burger = document.getElementById('burger');
+const sheet = document.getElementById('sheet');
+burger.addEventListener('click', ()=>{
+  const open = burger.getAttribute('aria-expanded') === 'true';
+  burger.setAttribute('aria-expanded', String(!open));
+  burger.setAttribute('aria-label', STR[LANG][open ? 'a11y.menu' : 'a11y.menuClose']);
+  sheet.classList.toggle('open', !open);
+  document.body.style.overflow = !open ? 'hidden' : '';
+});
+addEventListener('keydown', e=>{
+  if (e.key === 'Escape' && sheet.classList.contains('open')) burger.click();
+});
+
+/* ═══════════ backdrop drifts gently with the pointer (parallax) ═══════════ */
+const editor = document.getElementById('editor');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!reduce && matchMedia('(pointer:fine)').matches){
+  let tx = 0, ty = 0, cx = 0, cy = 0, raf;
+  addEventListener('mousemove', e=>{
+    tx = (e.clientX / innerWidth - .5) * 22;
+    ty = (e.clientY / innerHeight - .5) * 14;
+    if (!raf) raf = requestAnimationFrame(loop);
+  }, {passive:true});
+  function loop(){
+    cx += (tx - cx) * .06; cy += (ty - cy) * .06;
+    editor.style.transform =
+      `translate(calc(-50% + ${cx}px), calc(-50% + ${cy}px)) perspective(2200px) rotateX(5deg) scale(1.02)`;
+    raf = (Math.abs(tx-cx) > .1 || Math.abs(ty-cy) > .1) ? requestAnimationFrame(loop) : null;
+  }
+}
+</script>
+</body>
+</html>

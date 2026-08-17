@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Studio — Welcome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#191919;
+    --card-top:#232121;
+    --card-bot:#1a1919;
+    --stroke:rgba(255,255,255,.075);
+    --stroke-strong:rgba(255,255,255,.13);
+    --orange:#F0741F;
+    --text-cream:#F2EBDD;
+    --muted:#A5A09A;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(1200px 620px at 50% -8%, #262524 0%, rgba(38,37,36,0) 62%),
+      var(--bg);
+    color:#EDE9E1;
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;justify-content:center;
+    padding:34px 24px 56px;
+  }
+  .app{width:100%;max-width:1290px}
+
+  /* ---------- Header ---------- */
+  .brand{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px}
+  .brand-name{font-size:23px;letter-spacing:-.015em;color:var(--text-cream)}
+  .brand-name b{font-weight:700}
+  .brand-name span{font-weight:400;color:#D8D2C7}
+
+  .title{
+    font-family:"Playfair Display",Georgia,serif;font-weight:400;
+    font-size:clamp(64px,8.6vw,116px);line-height:1.02;letter-spacing:-.02em;
+    text-align:center;color:#F5EFE2;margin-top:26px;
+  }
+  .subtitle{text-align:center;margin-top:16px;font-size:20px;color:#A8A39C}
+
+  /* ---------- Grid ---------- */
+  .grid{margin-top:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+
+  .card{
+    position:relative;
+    background:linear-gradient(180deg,var(--card-top) 0%,var(--card-bot) 100%);
+    border:1px solid var(--stroke);
+    border-radius:var(--radius);
+    padding:22px 22px 18px;
+    display:flex;flex-direction:column;min-height:308px;
+    transition:border-color .22s ease, transform .22s ease, box-shadow .22s ease;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(120% 70% at 50% 0%, rgba(240,116,31,.08) 0%, rgba(240,116,31,0) 60%);
+    opacity:0;transition:opacity .22s ease;
+  }
+  .card:hover{border-color:rgba(240,116,31,.35);transform:translateY(-3px);box-shadow:0 18px 40px -22px rgba(0,0,0,.9)}
+  .card:hover::before{opacity:1}
+
+  .card-head{display:flex;align-items:center;gap:9px}
+  .card-head .ic{width:19px;height:19px;flex:none;color:var(--orange)}
+  .card-title{font-size:16.5px;font-weight:600;color:var(--orange);letter-spacing:-.01em}
+  .card-desc{margin-top:9px;font-size:13.5px;line-height:1.5;color:var(--muted);max-width:19ch}
+
+  .art{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 0 16px}
+  .art svg{width:100%;max-width:190px;height:auto;display:block}
+
+  .open{
+    display:flex;align-items:center;justify-content:space-between;width:100%;
+    background:transparent;border:1px solid var(--stroke-strong);border-radius:10px;
+    padding:11px 14px;color:#D6D1CA;font-family:inherit;font-size:14.5px;font-weight:500;
+    cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease;
+  }
+  .open svg{width:14px;height:14px;opacity:.75;transition:transform .18s ease}
+  .open:hover{background:rgba(240,116,31,.1);border-color:rgba(240,116,31,.45);color:#F6D9C2}
+  .open:hover svg{transform:translate(2px,-2px)}
+
+  @media (max-width:1100px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr;gap:18px} .subtitle{font-size:17px} }
+</style>
+</head>
+<body>
+
+<!-- shared 3D defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="dropBig" x="-40%" y="-40%" width="180%" height="180%">
+    <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000" flood-opacity=".62"/>
+  </filter>
+  <filter id="dropMid" x="-40%" y="-40%" width="180%" height="180%">
+    <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity=".55"/>
+  </filter>
+  <filter id="glowOrange" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <radialGradient id="ground" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#000" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#000" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="metalTop" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#6E6963"/><stop offset=".5" stop-color="#4A4642"/><stop offset="1" stop-color="#33302D"/>
+  </linearGradient>
+  <linearGradient id="metalFace" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#413E3A"/><stop offset=".35" stop-color="#514D48"/><stop offset="1" stop-color="#24221F"/>
+  </linearGradient>
+  <linearGradient id="panelFace" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#33302E"/><stop offset=".55" stop-color="#262423"/><stop offset="1" stop-color="#1A1918"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#FFA75C"/><stop offset=".32" stop-color="#F58227"/><stop offset=".78" stop-color="#D45D18"/><stop offset="1" stop-color="#A8430F"/>
+  </linearGradient>
+  <linearGradient id="orangeTop" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFC08A"/><stop offset="1" stop-color="#F0741F"/>
+  </linearGradient>
+  <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset=".18" stop-color="#EFE9DF"/><stop offset="1" stop-color="#948E86"/>
+  </linearGradient>
+  <linearGradient id="barOrange" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC489"/><stop offset=".25" stop-color="#F58A2E"/><stop offset="1" stop-color="#B84E12"/>
+  </linearGradient>
+  <radialGradient id="discOrange" cx="35%" cy="28%" r="80%">
+    <stop offset="0" stop-color="#FFB169"/><stop offset=".45" stop-color="#F0741F"/><stop offset="1" stop-color="#8E3A0C"/>
+  </radialGradient>
+  <linearGradient id="screenGlass" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#1B1A19"/><stop offset=".5" stop-color="#111010"/><stop offset="1" stop-color="#080808"/>
+  </linearGradient>
+  <linearGradient id="edgeLight" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="paperFace" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3B3835"/><stop offset=".6" stop-color="#2A2827"/><stop offset="1" stop-color="#1D1C1B"/>
+  </linearGradient>
+</defs></svg>
+
+<div class="app">
+
+  <!-- ================= Header ================= -->
+  <header>
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M15.9 3.4 26.6 27.4c.3.7-.2 1.4-.9 1.4h-3.6a1 1 0 0 1-.9-.6L16 15.6l-2.6 6h4.2l1.9 4.3H7.1c-.8 0-1.3-.8-.9-1.5L15.9 3.4Z" fill="#F0741F"/>
+      </svg>
+      <div class="brand-name"><b>AiO</b> <span>Studio</span></div>
+    </div>
+    <h1 class="title">Welcome</h1>
+    <p class="subtitle">All-in-One AI Audio Workflow</p>
+  </header>
+
+  <!-- ================= Grid ================= -->
+  <main class="grid">
+
+    <!-- 1 · Power Bins -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+        <h2 class="card-title">Power Bins</h2>
+      </div>
+      <p class="card-desc">Smart organization for all your audio files</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="128" rx="70" ry="9" fill="url(#ground)"/>
+          <g filter="url(#dropBig)">
+            <!-- bin body: front + right side -->
+            <path d="M40 62h120l-11 55a8 8 0 0 1-7.9 6.4H58.9A8 8 0 0 1 51 117L40 62Z" fill="url(#orangeFace)"/>
+            <path d="M124 62h36l-11 55a8 8 0 0 1-7.9 6.4h-30.2L124 62Z" fill="#000" opacity=".16"/>
+            <path d="M40 62h120l-1.6 8H41.6L40 62Z" fill="#000" opacity=".2"/>
+            <!-- embossed bolt -->
+            <path d="M107 74 84 106h13.5l-4.5 22 24-32h-14l4-22Z" fill="#000" opacity=".22" transform="translate(0,2)"/>
+            <path d="M107 74 84 106h13.5l-4.5 22 24-32h-14l4-22Z" fill="#FFF1DF" opacity=".95"/>
+            <!-- lid: top face + front face -->
+            <path d="M34 46h132l-13-14H47L34 46Z" fill="url(#metalTop)"/>
+            <path d="M26 46h148v10a7 7 0 0 1-7 7H33a7 7 0 0 1-7-7V46Z" fill="url(#metalFace)"/>
+            <path d="M47 32h106l-3 3.4H50L47 32Z" fill="#fff" opacity=".16"/>
+            <rect x="26" y="46" width="148" height="2.4" fill="url(#edgeLight)"/>
+            <path d="M26 58h148v.6a6 6 0 0 1-6 5.4H32a6 6 0 0 1-6-5.4V58Z" fill="#000" opacity=".3"/>
+            <!-- handle -->
+            <path d="M86 32v-4a6 6 0 0 1 6-6h16a6 6 0 0 1 6 6v4h-6v-3a3 3 0 0 0-3-3h-10a3 3 0 0 0-3 3v3h-6Z" fill="url(#metalTop)"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 2 · Asset Manager -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+        <h2 class="card-title">Asset Manager</h2>
+      </div>
+      <p class="card-desc">Manage and preview all your assets</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="104" cy="128" rx="72" ry="8" fill="url(#ground)"/>
+
+          <!-- back folder -->
+          <g filter="url(#dropMid)" transform="translate(12,26) scale(.82)">
+            <path d="M0 12a8 8 0 0 1 8-8h27a5 5 0 0 1 4 2l5 6h58a8 8 0 0 1 8 8v46a8 8 0 0 1-8 8H8a8 8 0 0 1-8-8V12Z" fill="#302D2B"/>
+            <path d="M4 30h102a4 4 0 0 1 4 4v32a8 8 0 0 1-8 8H8a8 8 0 0 1-8-8V34a4 4 0 0 1 4-4Z" fill="#3D3936"/>
+            <path d="M4 30h102a4 4 0 0 1 4 4H0a4 4 0 0 1 4-4Z" fill="#fff" opacity=".1"/>
+          </g>
+
+          <!-- mid folder -->
+          <g filter="url(#dropMid)" transform="translate(34,40) scale(.88)">
+            <path d="M0 12a8 8 0 0 1 8-8h27a5 5 0 0 1 4 2l5 6h58a8 8 0 0 1 8 8v46a8 8 0 0 1-8 8H8a8 8 0 0 1-8-8V12Z" fill="#3A3734"/>
+            <path d="M4 30h102a4 4 0 0 1 4 4v32a8 8 0 0 1-8 8H8a8 8 0 0 1-8-8V34a4 4 0 0 1 4-4Z" fill="#4A4642"/>
+            <path d="M4 30h102a4 4 0 0 1 4 4H0a4 4 0 0 1 4-4Z" fill="#fff" opacity=".12"/>
+          </g>
+
+          <!-- front folder (orange rim + waveform) -->
+          <g filter="url(#dropBig)" transform="translate(66,52) scale(1.05)">
+            <path d="M0 12a8 8 0 0 1 8-8h27a5 5 0 0 1 4 2l5 6h58a8 8 0 0 1 8 8v46a8 8 0 0 1-8 8H8a8 8 0 0 1-8-8V12Z" fill="#241F1B" stroke="#F0741F" stroke-width="1.6"/>
+            <path d="M4 30h102a4 4 0 0 1 4 4v32a8 8 0 0 1-8 8H8a8 8 0 0 1-8-8V34a4 4 0 0 1 4-4Z" fill="url(#panelFace)" stroke="#F0741F" stroke-width="1.6"/>
+            <g fill="url(#barOrange)">
+              <rect x="14" y="52" width="4" height="12" rx="2"/>
+              <rect x="23" y="44" width="4" height="20" rx="2"/>
+              <rect x="32" y="36" width="4" height="28" rx="2"/>
+              <rect x="41" y="48" width="4" height="16" rx="2"/>
+              <rect x="50" y="40" width="4" height="24" rx="2"/>
+              <rect x="59" y="32" width="4" height="32" rx="2"/>
+              <rect x="68" y="46" width="4" height="18" rx="2"/>
+              <rect x="77" y="38" width="4" height="26" rx="2"/>
+              <rect x="86" y="50" width="4" height="14" rx="2"/>
+              <rect x="95" y="55" width="4" height="9" rx="2"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 3 · Auto Silent Cut -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+        <h2 class="card-title">Auto Silent Cut</h2>
+      </div>
+      <p class="card-desc">Remove silences automatically and save time</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="126" rx="76" ry="8" fill="url(#ground)"/>
+
+          <rect x="8" y="22" width="72" height="82" rx="5" fill="#fff" fill-opacity=".02" stroke="#8A8580" stroke-width="1.4" stroke-dasharray="7 6"/>
+          <rect x="120" y="22" width="72" height="82" rx="5" fill="#fff" fill-opacity=".02" stroke="#8A8580" stroke-width="1.4" stroke-dasharray="7 6"/>
+
+          <g filter="url(#dropMid)">
+            <g fill="url(#barGrad)">
+              <rect x="16" y="56" width="6" height="34" rx="3"/>
+              <rect x="25" y="44" width="6" height="46" rx="3"/>
+              <rect x="34" y="32" width="6" height="58" rx="3"/>
+              <rect x="43" y="50" width="6" height="40" rx="3"/>
+              <rect x="52" y="38" width="6" height="52" rx="3"/>
+              <rect x="61" y="58" width="6" height="32" rx="3"/>
+              <rect x="70" y="46" width="6" height="44" rx="3"/>
+              <rect x="128" y="58" width="6" height="32" rx="3"/>
+              <rect x="137" y="42" width="6" height="48" rx="3"/>
+              <rect x="146" y="30" width="6" height="60" rx="3"/>
+              <rect x="155" y="52" width="6" height="38" rx="3"/>
+              <rect x="164" y="40" width="6" height="50" rx="3"/>
+              <rect x="173" y="60" width="6" height="30" rx="3"/>
+            </g>
+            <g fill="#000" opacity=".22">
+              <rect x="20" y="56" width="2" height="34"/><rect x="29" y="44" width="2" height="46"/>
+              <rect x="38" y="32" width="2" height="58"/><rect x="47" y="50" width="2" height="40"/>
+              <rect x="56" y="38" width="2" height="52"/><rect x="65" y="58" width="2" height="32"/>
+              <rect x="74" y="46" width="2" height="44"/>
+              <rect x="132" y="58" width="2" height="32"/><rect x="141" y="42" width="2" height="48"/>
+              <rect x="150" y="30" width="2" height="60"/><rect x="159" y="52" width="2" height="38"/>
+              <rect x="168" y="40" width="2" height="50"/><rect x="177" y="60" width="2" height="30"/>
+            </g>
+          </g>
+
+          <!-- 3D scissors disc -->
+          <g filter="url(#dropBig)">
+            <circle cx="100" cy="76" r="23" fill="url(#discOrange)"/>
+            <ellipse cx="93" cy="64" rx="13" ry="8" fill="#fff" opacity=".22"/>
+            <circle cx="100" cy="76" r="23" fill="none" stroke="#FFCA9B" stroke-opacity=".45" stroke-width="1.2"/>
+            <g stroke="#2A1405" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".92">
+              <circle cx="93.5" cy="84.5" r="3.4"/><circle cx="93.5" cy="69.5" r="3.4"/>
+              <path d="M110 66.5 97 81M105.5 80.6 110 87M97 73l3.2 3.4"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 4 · Sound Design -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>
+        <h2 class="card-title">Sound Design</h2>
+      </div>
+      <p class="card-desc">Create, edit and design unique sounds</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="126" rx="74" ry="8" fill="url(#ground)"/>
+          <g filter="url(#dropBig)">
+            <!-- top face (perspective) -->
+            <path d="M22 44h156l-14-16H36L22 44Z" fill="url(#metalTop)"/>
+            <path d="M36 28h128l-2.6 3H38.6L36 28Z" fill="#fff" opacity=".16"/>
+            <!-- front face -->
+            <path d="M22 44h156v56a10 10 0 0 1-10 10H32a10 10 0 0 1-10-10V44Z" fill="url(#panelFace)"/>
+            <rect x="22" y="44" width="156" height="2.2" fill="url(#edgeLight)"/>
+
+            <!-- big knob (cylinder) -->
+            <ellipse cx="49" cy="76" rx="17" ry="16" fill="#1B1A19"/>
+            <ellipse cx="49" cy="73" rx="17" ry="16" fill="url(#metalTop)"/>
+            <ellipse cx="49" cy="72" rx="12" ry="11" fill="#3A3733"/>
+            <ellipse cx="45" cy="66" rx="7" ry="4" fill="#fff" opacity=".16"/>
+            <path d="M49 72 41 63" stroke="#F0741F" stroke-width="3" stroke-linecap="round"/>
+            <path d="M32 84a17 16 0 0 0 34 0" stroke="#F0741F" stroke-opacity=".5" stroke-width="2" fill="none"/>
+
+            <!-- small knobs -->
+            <ellipse cx="84" cy="63" rx="9" ry="8.5" fill="#191817"/>
+            <ellipse cx="84" cy="61" rx="9" ry="8.5" fill="url(#metalTop)"/>
+            <path d="M84 61 79 55" stroke="#EDE7DD" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="108" cy="63" rx="9" ry="8.5" fill="#191817"/>
+            <ellipse cx="108" cy="61" rx="9" ry="8.5" fill="url(#metalTop)"/>
+            <path d="M108 61 113 55" stroke="#EDE7DD" stroke-width="2" stroke-linecap="round"/>
+
+            <!-- buttons -->
+            <rect x="76" y="76" width="17" height="11" rx="5.5" fill="#151413"/>
+            <rect x="76" y="74.5" width="17" height="11" rx="5.5" fill="#4A4642"/>
+            <rect x="99" y="76" width="17" height="11" rx="5.5" fill="#151413"/>
+            <rect x="99" y="74.5" width="17" height="11" rx="5.5" fill="#4A4642"/>
+
+            <!-- fader -->
+            <rect x="34" y="94" width="82" height="7" rx="3.5" fill="#0F0E0E"/>
+            <rect x="34" y="94" width="82" height="2" rx="1" fill="#000" opacity=".7"/>
+            <rect x="82" y="88" width="11" height="19" rx="3.5" fill="#151413"/>
+            <rect x="82" y="86.5" width="11" height="19" rx="3.5" fill="url(#metalTop)"/>
+
+            <!-- screen -->
+            <rect x="124" y="56" width="46" height="48" rx="7" fill="#0C0B0B"/>
+            <rect x="125.5" y="55" width="43" height="46" rx="6" fill="url(#screenGlass)" stroke="#5A5652" stroke-width="1"/>
+            <g fill="url(#barOrange)" filter="url(#glowOrange)">
+              <rect x="131" y="80" width="4" height="16" rx="2"/>
+              <rect x="138" y="70" width="4" height="26" rx="2"/>
+              <rect x="145" y="62" width="4" height="34" rx="2"/>
+              <rect x="152" y="74" width="4" height="22" rx="2"/>
+              <rect x="159" y="66" width="4" height="30" rx="2"/>
+            </g>
+            <path d="M126 56h42l-42 22V56Z" fill="#fff" opacity=".05"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 5 · Auto Reframes -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg>
+        <h2 class="card-title">Auto Reframes</h2>
+      </div>
+      <p class="card-desc">Automatically reframe your video</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="128" rx="72" ry="8" fill="url(#ground)"/>
+          <g filter="url(#dropBig)">
+            <!-- screen slab with thickness -->
+            <path d="M26 30h148a10 10 0 0 1 10 10v62a10 10 0 0 1-10 10H26a10 10 0 0 1-10-10V40a10 10 0 0 1 10-10Z" fill="#131212"/>
+            <path d="M26 26h148a10 10 0 0 1 10 10v62a10 10 0 0 1-10 10H26a10 10 0 0 1-10-10V36a10 10 0 0 1 10-10Z" fill="url(#panelFace)" stroke="#4E4A46" stroke-width="1.2"/>
+            <rect x="17" y="27" width="166" height="2.2" rx="1" fill="url(#edgeLight)"/>
+            <!-- inner video area -->
+            <rect x="30" y="40" width="140" height="54" rx="6" fill="url(#screenGlass)"/>
+            <path d="M30 40h140v18L30 84V40Z" fill="#fff" opacity=".035"/>
+            <!-- 3D play button -->
+            <circle cx="100" cy="67" r="24" fill="#000" opacity=".45"/>
+            <circle cx="100" cy="65" r="24" fill="url(#discOrange)"/>
+            <ellipse cx="93" cy="53" rx="13" ry="8" fill="#fff" opacity=".22"/>
+            <path d="M94 55.5 112 65l-18 9.5v-19Z" fill="#2A1405" opacity=".85"/>
+          </g>
+          <!-- crop brackets -->
+          <g stroke="#F0741F" stroke-width="3.4" stroke-linecap="round" fill="none" filter="url(#glowOrange)">
+            <path d="M10 44V22a4 4 0 0 1 4-4h22"/>
+            <path d="M164 18h22a4 4 0 0 1 4 4v22"/>
+            <path d="M190 96v22a4 4 0 0 1-4 4h-22"/>
+            <path d="M36 122H14a4 4 0 0 1-4-4V96"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 6 · Auto Podcast -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+        <h2 class="card-title">Auto Podcast</h2>
+      </div>
+      <p class="card-desc">Enhance and optimize podcast audio</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="128" rx="70" ry="8" fill="url(#ground)"/>
+          <!-- back panel -->
+          <g filter="url(#dropMid)">
+            <path d="M18 34h164a10 10 0 0 1 10 10v52a10 10 0 0 1-10 10H18A10 10 0 0 1 8 96V44a10 10 0 0 1 10-10Z" fill="url(#panelFace)" stroke="#4A4744" stroke-width="1.2"/>
+            <rect x="9" y="35" width="182" height="2" rx="1" fill="url(#edgeLight)"/>
+          </g>
+          <g fill="url(#barOrange)" filter="url(#glowOrange)">
+            <rect x="18" y="66" width="4" height="14" rx="2"/>
+            <rect x="26" y="56" width="4" height="34" rx="2"/>
+            <rect x="34" y="46" width="4" height="54" rx="2"/>
+            <rect x="42" y="60" width="4" height="26" rx="2"/>
+            <rect x="50" y="50" width="4" height="46" rx="2"/>
+            <rect x="58" y="64" width="4" height="18" rx="2"/>
+            <rect x="138" y="64" width="4" height="18" rx="2"/>
+            <rect x="146" y="50" width="4" height="46" rx="2"/>
+            <rect x="154" y="60" width="4" height="26" rx="2"/>
+            <rect x="162" y="46" width="4" height="54" rx="2"/>
+            <rect x="170" y="56" width="4" height="34" rx="2"/>
+            <rect x="178" y="66" width="4" height="14" rx="2"/>
+          </g>
+
+          <!-- 3D microphone -->
+          <g filter="url(#dropBig)">
+            <!-- base -->
+            <ellipse cx="100" cy="116" rx="26" ry="7" fill="#22201F"/>
+            <ellipse cx="100" cy="113" rx="26" ry="7" fill="url(#metalTop)"/>
+            <!-- stem -->
+            <rect x="96" y="86" width="8" height="28" fill="url(#metalFace)"/>
+            <!-- yoke -->
+            <path d="M76 66a24 24 0 0 0 48 0" stroke="url(#metalFace)" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <!-- capsule body -->
+            <rect x="86" y="24" width="28" height="60" rx="14" fill="#1D1C1B"/>
+            <rect x="86" y="22" width="28" height="60" rx="14" fill="url(#metalFace)"/>
+            <!-- grille -->
+            <g stroke="#8E8984" stroke-width="1.1" opacity=".7">
+              <path d="M87 32h26M87 40h26M87 48h26M87 56h26M87 64h26M87 72h26"/>
+            </g>
+            <g stroke="#8E8984" stroke-width="1" opacity=".45">
+              <path d="M94 24v56M100 22v60M106 24v56"/>
+            </g>
+            <!-- specular -->
+            <rect x="89" y="26" width="6" height="50" rx="3" fill="#fff" opacity=".14"/>
+            <rect x="86" y="22" width="28" height="60" rx="14" fill="none" stroke="#6E6963" stroke-width="1.2"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 7 · Auto Short Clip -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><path d="m3 8 3-5 4 4M11 8l3-5 4 4"/></svg>
+        <h2 class="card-title">Auto Short Clip</h2>
+      </div>
+      <p class="card-desc">Extract perfect short clips in seconds</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="126" rx="74" ry="8" fill="url(#ground)"/>
+          <g filter="url(#dropBig)">
+            <!-- strip with thickness -->
+            <rect x="10" y="28" width="180" height="80" rx="7" fill="#121111"/>
+            <rect x="10" y="24" width="180" height="80" rx="7" fill="#282625" stroke="#4B4845" stroke-width="1.2"/>
+            <rect x="11" y="25" width="178" height="2" rx="1" fill="url(#edgeLight)"/>
+            <g fill="#0E0D0D">
+              <rect x="17" y="29" width="10" height="7" rx="2"/><rect x="34" y="29" width="10" height="7" rx="2"/>
+              <rect x="51" y="29" width="10" height="7" rx="2"/><rect x="68" y="29" width="10" height="7" rx="2"/>
+              <rect x="85" y="29" width="10" height="7" rx="2"/><rect x="102" y="29" width="10" height="7" rx="2"/>
+              <rect x="119" y="29" width="10" height="7" rx="2"/><rect x="136" y="29" width="10" height="7" rx="2"/>
+              <rect x="153" y="29" width="10" height="7" rx="2"/><rect x="170" y="29" width="10" height="7" rx="2"/>
+              <rect x="17" y="92" width="10" height="7" rx="2"/><rect x="34" y="92" width="10" height="7" rx="2"/>
+              <rect x="51" y="92" width="10" height="7" rx="2"/><rect x="68" y="92" width="10" height="7" rx="2"/>
+              <rect x="85" y="92" width="10" height="7" rx="2"/><rect x="102" y="92" width="10" height="7" rx="2"/>
+              <rect x="119" y="92" width="10" height="7" rx="2"/><rect x="136" y="92" width="10" height="7" rx="2"/>
+              <rect x="153" y="92" width="10" height="7" rx="2"/><rect x="170" y="92" width="10" height="7" rx="2"/>
+            </g>
+            <!-- frames -->
+            <rect x="17" y="42" width="52" height="44" rx="3" fill="url(#screenGlass)"/>
+            <rect x="74" y="42" width="52" height="44" rx="3" fill="#201F1E"/>
+            <rect x="131" y="42" width="52" height="44" rx="3" fill="url(#screenGlass)"/>
+            <g fill="#4E4A47">
+              <circle cx="43" cy="58" r="7"/><path d="M27 86c3-13 29-13 32 0H27Z"/>
+              <circle cx="100" cy="58" r="7"/><path d="M84 86c3-13 29-13 32 0H84Z"/>
+              <circle cx="157" cy="58" r="7"/><path d="M141 86c3-13 29-13 32 0h-32Z"/>
+            </g>
+            <rect x="17" y="42" width="166" height="12" fill="#fff" opacity=".035"/>
+          </g>
+
+          <!-- selection -->
+          <rect x="70" y="38" width="60" height="52" rx="5" fill="none" stroke="#F0741F" stroke-width="2.6" filter="url(#glowOrange)"/>
+
+          <!-- scissors disc -->
+          <g filter="url(#dropBig)">
+            <circle cx="100" cy="106" r="18" fill="url(#discOrange)"/>
+            <ellipse cx="95" cy="97" rx="10" ry="6" fill="#fff" opacity=".22"/>
+            <g stroke="#2A1405" stroke-width="2" stroke-linecap="round" fill="none" opacity=".92">
+              <circle cx="95" cy="112" r="2.8"/><circle cx="95" cy="100" r="2.8"/>
+              <path d="M108 98 97.5 109M105 108.6 108 113M97.5 102.5l2.6 2.6"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- 8 · Auto Transcripts -->
+    <article class="card">
+      <div class="card-head">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+        <h2 class="card-title">Auto Transcripts</h2>
+      </div>
+      <p class="card-desc">Generate accurate transcripts instantly</p>
+
+      <div class="art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="130" rx="72" ry="8" fill="url(#ground)"/>
+
+          <!-- main document card -->
+          <g filter="url(#dropBig)">
+            <rect x="16" y="18" width="122" height="80" rx="11" fill="#121111"/>
+            <rect x="16" y="14" width="122" height="80" rx="11" fill="url(#paperFace)" stroke="#514D49" stroke-width="1.2"/>
+            <rect x="17" y="15" width="120" height="2" rx="1" fill="url(#edgeLight)"/>
+            <g stroke="url(#barOrange)" stroke-width="5" stroke-linecap="round" filter="url(#glowOrange)">
+              <path d="M32 34h74M32 48h90M32 62h60M32 76h82"/>
+            </g>
+          </g>
+
+          <!-- speech-bubble card -->
+          <g filter="url(#dropBig)">
+            <path d="M112 58h66a10 10 0 0 1 10 10v34a10 10 0 0 1-10 10h-52l-14 14v-14h-.4A9.6 9.6 0 0 1 102 102V68a10 10 0 0 1 10-10Z" fill="#141313"/>
+            <path d="M112 54h66a10 10 0 0 1 10 10v34a10 10 0 0 1-10 10h-52l-14 14v-14h-.4A9.6 9.6 0 0 1 102 98V64a10 10 0 0 1 10-10Z" fill="#454240" stroke="#67625E" stroke-width="1.2"/>
+            <rect x="103" y="55" width="84" height="2" rx="1" fill="url(#edgeLight)"/>
+            <g stroke="#9A948E" stroke-width="4.4" stroke-linecap="round">
+              <path d="M116 72h56M116 88h34"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <button class="open">Open
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+  </main>
+</div>
+</body>
+</html>

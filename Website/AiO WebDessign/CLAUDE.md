@@ -17,6 +17,16 @@ Manager) hoac Pro $17/thang (du 8 tool) → bam nut la mo email xin link tai
 - `app/page.tsx` = server component (0 JS). Island client DUY NHAT:
   `app/PluginLab.tsx` (demo tuong tac — anh yeu cau). Them island moi phai
   ghi ly do vao PROGRESS.md (test canh).
+- Section 8 plugin = **THE TAB DOC**: cot 8 the ben trai (234px) + bang lon
+  ben phai, **cach nhau 16px**. Hai luat khong duoc pha:
+  ☠️ (1) **KHONG cho the chui xuong duoi bang.** Hinh mau anh gui ban dau co
+  kieu do va em da lam 3 lan, lan nao anh cung bat loi — vi **bat cu thu gi
+  ve o phan bi che deu bi bang CAT PHANG giua chung**: vien cam cua the chon,
+  net bo goc, va ca mang sang luc HOVER. Anh chot 17/08: *"lam gon lai cho
+  khung va border no ngan lai — khi hover vao bi loi do em"*. The nay om sat
+  chu, vien khep kin 4 canh. Muon lam lai kieu tut thi doc PROGRESS.md truoc.
+  (2) lop demo ben trong **khong duoc co nen/vien** — bang lo phan hop roi,
+  them nua la hop long hop (anh cung da chup loi nay).
 - `app/plugins.ts` = NGUON DUY NHAT ve 8 plugin (PluginLab + card Pro cung
   doc). Them/sua tool o day.
 - ☠️ `globals.css`: dong `@import` font PHAI TRUOC `@import "tailwindcss"`
