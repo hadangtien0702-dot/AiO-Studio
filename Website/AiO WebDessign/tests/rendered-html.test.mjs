@@ -135,6 +135,16 @@ test("khung suon ban toi gian van production-ready", async () => {
   assert.doesNotMatch(page, /['"]use client['"]/);
   const lab = await readFile(new URL("PluginLab.tsx", appRoot), "utf8");
   assert.match(lab, /^"use client";/, "PluginLab phai la client component");
-  // Moi hang plugin la nut mo demo — phai co trang thai cho may doc
-  assert.match(lab, /aria-expanded/);
+  /* [17/08 chieu] Bo cuc doi accordion -> THE TAB DOC (anh Tien gui hinh).
+     aria-expanded het dung nghia (khong con dong/mo), thay bang bo ba
+     chuan cua tablist. Va phim mui ten PHAI chay — tablist khong co ban
+     phim la nguoi dung tab-key ket o the dau. */
+  assert.match(lab, /role="tablist"/);
+  assert.match(lab, /role="tab"/);
+  assert.match(lab, /aria-selected=\{/);
+  assert.match(lab, /role="tabpanel"/);
+  assert.match(lab, /ArrowDown/, "tablist phai chay duoc bang phim mui ten");
+  /* Soi cho DUNG THAT (co dau "="), khong soi chu trong ghi chu — luat cu
+     viet /aria-expanded/ da bat nham chinh comment giai thich no. */
+  assert.doesNotMatch(lab, /aria-expanded=/, "tab thi khong dung aria-expanded");
 });

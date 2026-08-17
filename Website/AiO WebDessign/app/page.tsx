@@ -120,10 +120,11 @@ export default function Home() {
             (anh Tien yeu cau 17/08). PluginLab la "dao" client duy nhat —
             phan con lai cua trang van tinh. */}
         <section className="muc khung" id="plugin">
-          {/* [17/08] Anh Tien go cau "Cai mot file. Windows 10/11..." */}
+          {/* [17/08] Anh Tien go cau "Cai mot file. Windows 10/11..." va
+              (chieu 17/08) go not dong "Bam tung plugin de thu ngay tren
+              trang" — bo cuc tab da tu noi len la bam duoc, khong can chu. */}
           <div className="muc-dau">
             <h2>Tám plugin, một chỗ.</h2>
-            <p>Bấm từng plugin để thử ngay trên trang.</p>
           </div>
           <PluginLab />
         </section>

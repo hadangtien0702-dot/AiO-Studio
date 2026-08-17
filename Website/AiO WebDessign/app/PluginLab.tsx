@@ -221,41 +221,79 @@ const DEMOS: Partial<Record<PluginId, () => React.ReactElement>> = {
   guideframe: DemoGuideFrame,
 };
 
+/* ── [17/08 chieu] BO CUC MOI: THE TAB DOC (anh Tien gui hinh mau) ──────
+   Bo danh sach 8 hang mo/dong kieu accordion. Nay: cot trai la 8 the tab
+   xep doc, dau phai cua the TUT XUONG DUOI mep bang lon ben phai; the
+   dang chon NOI LEN TREN nen nhin nhu cai luoi keo ra khoi ngan ho so.
+   Doi accordion -> tab thi ARIA cung phai doi: aria-expanded (dong/mo)
+   KHONG con dung nghia, phai la role=tab + aria-selected + tablist, va
+   phim mui ten phai chay duoc (test canh dong nay). */
 export default function PluginLab() {
-  const [mo, setMo] = useState<PluginId | null>("autocut");
+  const [mo, setMo] = useState<PluginId>("autocut");
+  const chon = PLUGINS.find((p) => p.id === mo) ?? PLUGINS[0];
+  const Demo = DEMOS[chon.id];
+
+  /* Tablist chuan: mui ten len/xuong (va trai/phai khi man hep xep ngang),
+     Home/End ve dau/cuoi. Chuyen tab xong phai KEO LUON focus theo, khong
+     thi nguoi dung ban phim mat dau con tro. */
+  function phim(e: React.KeyboardEvent, i: number) {
+    const buoc: Record<string, number> = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
+    let toi = -1;
+    if (e.key in buoc) toi = (i + buoc[e.key] + PLUGINS.length) % PLUGINS.length;
+    else if (e.key === "Home") toi = 0;
+    else if (e.key === "End") toi = PLUGINS.length - 1;
+    if (toi < 0) return;
+    e.preventDefault();
+    setMo(PLUGINS[toi].id);
+    document.getElementById(`tab-${PLUGINS[toi].id}`)?.focus();
+  }
+
   return (
-    <div className="hang-plugin">
-      {PLUGINS.map(({ id, icon: Icon, ten, mota, so, nhan }) => {
-        const Demo = DEMOS[id];
-        const dangMo = mo === id;
-        return (
-          <article key={id} className={dangMo ? "mo" : ""}>
+    <div className="lab-khoi">
+      <div className="lab-tabs" role="tablist" aria-orientation="vertical" aria-label="Tám plugin">
+        {PLUGINS.map(({ id, icon: Icon, ten, nhan }, i) => {
+          const dangChon = mo === id;
+          return (
             <button
+              key={id}
+              id={`tab-${id}`}
               type="button"
-              className="hang-plugin-nut"
-              aria-expanded={dangMo}
-              onClick={() => setMo(dangMo ? null : id)}
+              role="tab"
+              aria-selected={dangChon}
+              aria-controls={`bang-${id}`}
+              tabIndex={dangChon ? 0 : -1}
+              className={`lab-tab${dangChon ? " chon" : ""}`}
+              onClick={() => setMo(id)}
+              onKeyDown={(e) => phim(e, i)}
             >
-              <Icon size={19} aria-hidden="true" />
-              <h3>
-                {ten}
-                {nhan && <span className={nhan === "FREE" ? "free" : "soon"}>{nhan}</span>}
-              </h3>
-              <p>{mota}</p>
-              <span className="so">{so}</span>
+              <Icon size={17} aria-hidden="true" />
+              <span className="lab-tab-ten">{ten}</span>
+              {nhan && <span className={nhan === "FREE" ? "free" : "soon"}>{nhan}</span>}
             </button>
-            {dangMo && (
-              <div className="lab-panel" role="region" aria-label={`Thử ${ten}`}>
-                {Demo ? <Demo /> : (
-                  <div className="lab-demo">
-                    <p className="lab-mo">Đang phát triển — có mặt trong bản cập nhật tới.</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </article>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* key=id: doi plugin la bang ve lai tu dau (chay lai hieu ung hien) */}
+      <div
+        key={chon.id}
+        className="lab-than"
+        id={`bang-${chon.id}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${chon.id}`}
+        tabIndex={0}
+      >
+        <div className="lab-than-dau">
+          <h3>{chon.ten}</h3>
+          <span className="so">{chon.so}</span>
+          <p>{chon.mota}</p>
+        </div>
+        {Demo ? <Demo /> : (
+          <div className="lab-demo">
+            <p className="lab-mo">Đang phát triển — có mặt trong bản cập nhật tới.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

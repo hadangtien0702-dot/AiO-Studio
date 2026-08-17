@@ -2,7 +2,31 @@
 
 > Nhat ky sua doi. Muc moi ghi LEN TREN. Gio lay bang lenh `Get-Date`, khong bia.
 
-## TRANG THAI HIEN TAI (chot phien 2026-08-17 13:38)
+## 2026-08-17 14:00 — [Ghi bo sung] Section plugin: accordion -> THE TAB DOC
+
+**Boi canh:** thay doi thuc hien trong nhanh phien buoi chieu 17/08 theo
+hinh anh Tien gui, ghi bo sung vao nhat ky khi chot so lai (hook bat dung —
+3 file nguon moi hon nhat ky).
+
+**Thay doi (4 file, +244/−105 dong):**
+- `PluginLab.tsx`: bo cuc accordion (bam hang xo xuong) doi thanh **the tab
+  DOC** — cot ten plugin ben trai la `role="tablist"`, khu demo ben phai la
+  `role="tabpanel"`; chay duoc bang **phim mui ten** (ArrowDown/ArrowUp).
+- `page.tsx`: go dong "Bam tung plugin de thu ngay tren trang" — bo cuc tab
+  da tu noi len la bam duoc.
+- `tests/`: doi chot chan theo bo cuc moi (bat bo ba tablist/tab/tabpanel +
+  ArrowDown; CAM `aria-expanded=`). ☠️ Kem mot sua thuoc: luat cu soi
+  /aria-expanded/ tung BAT NHAM chinh comment giai thich no — doi thanh soi
+  co dau `=` (chi khop thuoc tinh that).
+- `globals.css`: style cho bo cuc tab doc.
+
+**Kiem chung bang so (14:00):** `node --test` **5/5** · build tinh sach ·
+ban build co "tablist" that (do tren HTTP 200 cua localhost:4173 sau khi
+dung lai server — server cu bi ngat ngoai y muon, log khong co loi).
+
+---
+
+## TRANG THAI HIEN TAI (chot phien 2026-08-17 13:38 · cap nhat 14:00)
 
 - **Trang da DAP XAY MOI 100%** (17/08, anh Tien cam tai dung y ban Gemini —
   co bai test chot chan; ban cu o git tag `ban-cu-17-08`). Kien truc:
@@ -11,8 +35,9 @@
   chinh brand o `design-system/aio-studio-website/MASTER.md` — LAM UI PHAI
   DOC FILE DO TRUOC.
 - **Trang gom:** header vien nang · hero "tu dien" (playhead quet, chu dat
-  xuong theo nhip, timeline chim 2 lop — y anh chi dinh) · 8 plugin bam mo
-  DEMO TUONG TAC · bang gia 2 goi $0/$17 (card Pro liet ke du 8 ten) · footer.
+  xuong theo nhip, timeline chim 2 lop — y anh chi dinh) · 8 plugin dang
+  **THE TAB DOC** (cot ten trai + khu demo TUONG TAC phai, phim mui ten
+  chay duoc) · bang gia 2 goi $0/$17 (card Pro liet ke du 8 ten) · footer.
 - **Anh Tien da duyet:** "kha hon Gemini nhieu" + 9 chi dao chi tiet da lam
   het (go 5 khoi chu, viet lai cot so, 2 cau anh tu doc da khoa trong test).
 - `[CHO]` **6 demo con lai cho anh duyet KHUON** "panel + timeline" (da lam

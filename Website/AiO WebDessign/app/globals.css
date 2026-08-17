@@ -432,102 +432,159 @@ body {
   letter-spacing: -0.035em;
 }
 
-.muc-dau p {
-  margin: 12px 0 0;
-  color: var(--mo);
-  font-size: 15.5px;
-}
-
-.hang-plugin {
+/* ── [17/08 chieu] THE TAB DOC — bo cuc anh Tien gui hinh mau ──────────
+   Cot trai 8 the xep doc; dau phai MOI the tut xuong DUOI mep bang lon
+   (bang keo -30px de nuot 30px cua the) nen nhin nhu ngan ho so.
+   ☠️ SUA 17/08 sau khi anh Tien gui anh: ban dau cho the DANG CHON noi
+   len TREN bang (z-index 2) — sai. Anh chup lai: the chon loi han ra
+   thanh mot hop roi vien cam, trong khi 7 the kia bi xen phang -> hai
+   kieu hinh dang choi nhau, va no de mat chu "A" cua tieu de trong bang
+   ("Auto Cut" -> "uto Cut"). Nay MOI the deu tut nhu nhau; the dang chon
+   phan biet bang MAU (vien cam + nen sang + chu trang), khong bang do noi.
+   ☠️ 30px do da tinh vao padding-right cua .lab-tab VA padding-left cua
+   .lab-than — bot mot trong hai la de mat chu.
+   Bo cuc cu (danh sach 8 hang, class .hang-plugin*) da GO HET 17/08. */
+.lab-khoi {
   display: grid;
-  gap: 0;
-  border-top: 1px solid var(--vien);
+  grid-template-columns: 264px minmax(0, 1fr);
+  /* stretch: bang tu cao bang cot tab, khong de tab tho ra duoi day bang */
+  align-items: stretch;
 }
 
-/* Moi plugin la MOT HANG mong. [17/08] Ca hang gio la NUT (bam mo demo
-   tuong tac ben duoi — anh Tien yeu cau) nen grid don sang .hang-plugin-nut. */
-.hang-plugin article {
-  border-bottom: 1px solid var(--vien);
-}
-
-.hang-plugin-nut {
-  width: 100%;
+.lab-tabs {
   display: grid;
-  grid-template-columns: 30px minmax(150px, 220px) 1fr auto;
-  align-items: center;
-  gap: 20px;
-  padding: 19px 6px;
-  background: none;
-  border: 0;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 140ms ease;
+  gap: 9px;
+  padding-block: 26px;
 }
 
-.hang-plugin-nut:hover {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.hang-plugin article.mo .hang-plugin-nut {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.hang-plugin svg {
-  color: var(--cam-sang);
-}
-
-.hang-plugin h3 {
-  margin: 0;
-  font-family: var(--font-lon);
-  font-weight: 500;
-  font-size: 17px;
-  letter-spacing: -0.01em;
+.lab-tab {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
+  /* 44px ben phai: 30px nam duoi bang + 14px tho */
+  padding: 12px 44px 12px 15px;
+  border: 1px solid var(--vien);
+  border-radius: 13px;
+  /* Toi hon nen bang (--tam #121214) mot chut: the thuong nhin nhu THUT
+     VAO, the dang chon dung mau bang nen nhu NOI RA. Cung mau thi mat
+     khong phan biet duoc cai nao dang mo. */
+  background: #0e0e11;
+  color: var(--cam-sang);
+  font-family: var(--font-lon);
+  font-weight: 500;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, transform 160ms ease;
 }
 
-.hang-plugin h3 span {
-  padding: 2px 9px;
+.lab-tab svg {
+  flex: none;
+}
+
+.lab-tab-ten {
+  white-space: nowrap;
+}
+
+.lab-tab:hover {
+  background: #16161a;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* The dang chon: KHONG noi len tren bang (xem ghi chu dau khoi) — chi
+   sang len va vien cam. Nen dung mau bang -> nhin nhu no da "an" vao bang. */
+.lab-tab.chon {
+  background: var(--tam);
+  border-color: var(--cam);
+  color: #fff;
+}
+
+.lab-tab.chon svg {
+  color: var(--cam-sang);
+}
+
+.lab-tab .free,
+.lab-tab .soon {
+  padding: 2px 7px;
   border-radius: 999px;
   border: 1px solid currentColor;
   font-family: var(--font-chu);
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
-.hang-plugin .free { color: #4ade80; }
-.hang-plugin .soon { color: var(--mo); }
+.lab-tab .free { color: #4ade80; }
+.lab-tab .soon { color: var(--mo); }
 
-.hang-plugin p {
+/* ── Bang lon: mo ta + so do that + demo bam thu duoc ─────────────────── */
+.lab-than {
+  position: relative;
+  z-index: 1;
+  margin-left: -30px;
+  /* ☠️ trai 58px = 30px bi the tab de len + 28px le that. Ha xuong 28px
+     la tieu de bi the tab nuot mat chu dau (anh Tien bat duoc 17/08). */
+  padding: 26px 28px 30px 58px;
+  border: 1px solid var(--vien);
+  border-radius: 22px;
+  background: var(--tam);
+  animation: tangHien 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  /* Bang cao bang cot tab (align-items:stretch) nen demo ngan la ho mot
+     mang trong o DAY — anh Tien chup lai va goi la "loi ti le". Cho hang
+     demo an het cho con lai roi CAN GIUA no: trong chia deu tren/duoi,
+     khong keo meo demo. */
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.lab-than:focus-visible {
+  outline: 2px solid var(--cam-sang);
+  outline-offset: 3px;
+}
+
+.lab-than-dau {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 5px 22px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--vien);
+}
+
+.lab-than-dau h3 {
+  margin: 0;
+  font-family: var(--font-lon);
+  font-weight: 700;
+  font-size: 23px;
+  letter-spacing: -0.02em;
+}
+
+.lab-than-dau p {
+  grid-column: 1 / -1;
   margin: 0;
   color: var(--mo);
   font-size: 14.5px;
 }
 
-.hang-plugin .so {
+.lab-than-dau .so {
   color: var(--cam-sang);
   font-family: var(--font-so);
   font-size: 12.5px;
   white-space: nowrap;
 }
 
-/* ── [17/08] KHU DEMO TUONG TAC (PluginLab) ─────────────────────────── */
-.lab-panel {
-  padding: 6px 6px 26px 56px;
-  animation: tangHien 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
-
+/* [17/08 chieu] GO NEN+VIEN: tu khi demo nam TRONG bang lon (.lab-than,
+   cung mau --tam, cung 1px --vien) thi lop nay thanh HOP LONG HOP — hai
+   duong vien chay song song cach nhau 28px, anh Tien chup lai. Chi giu
+   phan xep chu, con "cai hop" la viec cua .lab-than. */
 .lab-demo {
   display: grid;
   gap: 16px;
-  padding: 20px;
-  border-radius: 14px;
-  background: var(--tam);
-  border: 1px solid var(--vien);
+  align-content: center;
 }
 
 .lab-hang-nut {
@@ -602,14 +659,12 @@ body {
 
 /* [17/08] Demo kieu "PANEL + TIMELINE" (khuon mau — y anh Tien lay tu cach
    doi thu trinh bay, dung bo cuc va chu RIENG cua minh) */
+/* Nhu .lab-demo: bo nen+vien de khong long hop trong .lab-than */
 .lab2 {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
-  gap: 14px;
-  padding: 18px;
-  border-radius: 14px;
-  background: var(--tam);
-  border: 1px solid var(--vien);
+  gap: 18px;
+  align-content: center;
 }
 
 .lab2-panel {
@@ -1067,18 +1122,46 @@ body {
     padding-block: 92px;
   }
 
-  .hang-plugin-nut {
-    grid-template-columns: 26px 1fr auto;
+  /* Man hep: 8 the tab xep thanh luoi 2 cot NAM TREN bang (khong cuon
+     ngang — cuon ngang la giau mat 5/8 the ma khong bao). Bang tro lai
+     thang hang, khong con tut duoi the nua. */
+  .lab-khoi {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Man hep: dong mo ta xuong hang rieng duoi ten */
-  .hang-plugin-nut > p {
-    grid-column: 2 / -1;
-    grid-row: 2;
+  .lab-tabs {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-block: 0;
   }
 
-  .lab-panel {
-    padding-left: 6px;
+  .lab-tab,
+  .lab-tab.chon {
+    padding: 11px 13px;
+  }
+
+  .lab-tab.chon::after {
+    display: none;
+  }
+
+  .lab-than {
+    margin-left: 0;
+    margin-top: 16px;
+    padding: 20px 18px 24px;
+    border-radius: 18px;
+  }
+
+  /* ☠️ Man hep: cot "so" khong co lai duoc nen no BOP tieu de vo doi
+     ("Auto / cat video 6 phut… / Cut" — do that o 375px). Cho no xuong
+     hang rieng duoi ten. */
+  .lab-than-dau {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .lab-than-dau .so {
+    white-space: normal;
+    order: 3;
   }
 
   .lab-cams,
@@ -1119,8 +1202,15 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .hang-plugin .so {
-    display: none;
+  /* 375px: ten tool + nhan FREE khong du cho tren 1 dong -> cho xuong
+     dong thay vi cat chu (do that: xem PROGRESS.md 17/08) */
+  /* 375px: do that — the rong 156px, cho chu con 105px. "Auto Transcripts"
+     o 13,5px chiem 108px nen bi day xuong dong duoi icon. Ha 12,5px la vua
+     mot dong; rieng NHAN (FREE / SAP CO) van duoc xuong dong. */
+  .lab-tab {
+    flex-wrap: wrap;
+    gap: 5px 8px;
+    font-size: 12.5px;
   }
 
   .chan .khung {
