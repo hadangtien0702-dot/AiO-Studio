@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-08-17 08:45 — Sua .gitignore goc: luat build/ nuot file nguon cua web
+
+**Boi canh:** cu push dau tien sau khi co vercel.json bi Vercel bao Error.
+**Nguyen nhan that:** `.gitignore` GOC repo co luat `build/` khong neo → nuot
+`Website/AiO WebDessign/build/sites-vite-plugin.ts` (file nguon that ma
+`vite.config.ts` import). Repo GitHub THIEU file nay tu dau — clone ve cung
+khong chay duoc, khong rieng gi Vercel. Cung cai bay voi ngoai le `dist/`
+da ghi 03/08 ngay trong chinh file .gitignore do.
+**Thay doi:** them `!/Website/AiO WebDessign/build/` + ghi chu ☠️ tai cho;
+commit `0d6f48c`.
+**Kiem chung bang so:**
+- `git check-ignore` hai chieu: file nguon HET bi chan; out/ va dist/ VAN bi chan
+- Push xong Vercel tu build: **Ready sau 33s** (truoc: Error sau 30s)
+- Do live sau auto-build: 200 · co "$17"/"Demo Pass"/logo · 0 vet "$299"
+→ Tu gio: **push len main la web tu len song**, khong can deploy tay.
+
 ## 2026-08-17 08:36 — Len song Vercel: ai-o-studio.vercel.app (xuat tinh)
 
 **Boi canh:** anh Tien tu noi repo GitHub vao Vercel (project `ai-o-studio`)
