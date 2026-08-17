@@ -5,6 +5,34 @@
 
 ---
 
+## 2026-08-17 08:36 — Len song Vercel: ai-o-studio.vercel.app (xuat tinh)
+
+**Boi canh:** anh Tien tu noi repo GitHub vao Vercel (project `ai-o-studio`)
+va dang nhap vercel CLI, nho em deploy. Ban dashboard build ra **404** vi
+build o GOC repo (khong co web) va site von dung vinext/Cloudflare Worker —
+khong chay native tren Vercel.
+
+**Nguyen nhan that / cach giai:** landing page la "use client" thuan, khong
+can server → xuat HTML TINH bang Next chuan roi phuc vu tinh tren Vercel.
+Khong dung vao duong vinext/Cloudflare (dev van chay nhu cu).
+
+**Thay doi:**
+- `next.config.ts`: them co `STATIC_EXPORT=1` → `output: "export"` (khong dat
+  co thi config y nguyen)
+- `vercel.json` MOI o GOC repo: installCommand skip, buildCommand
+  `cd "Website/AiO WebDessign" && npm ci && STATIC_EXPORT=1 npx next build`,
+  outputDirectory `Website/AiO WebDessign/out` — de moi lan push GitHub,
+  Vercel tu build DUNG thu muc (khong co file nay la no build goc → de 404
+  len production)
+- Deploy tay lan dau: `next build` (3/3 trang tinh, out/ 49 file 7,1 MB)
+  → `vercel deploy --prebuilt --prod`
+
+**Kiem chung bang so (tren LIVE, bai hoc 5ah):**
+- https://ai-o-studio.vercel.app → HTTP 200, co "$17" + "Demo Pass",
+  0 vet "$299" ✓
+- `git check-ignore` hai chieu: out/ · .vercel · .env.local deu bi chan,
+  khong lot len GitHub ✓
+
 ## 2026-08-16 14:00 — Sua not 2 loi treo tu bao cao kiem UI 14/08
 
 **Boi canh:** anh Tien gat "sua luon 2 loi con treo" (nut cam chu trang truot

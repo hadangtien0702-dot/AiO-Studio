@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "echo 'install chay trong buildCommand'",
+  "buildCommand": "cd \"Website/AiO WebDessign\" && npm ci && STATIC_EXPORT=1 npx next build",
+  "outputDirectory": "Website/AiO WebDessign/out",
+  "framework": null
+}
