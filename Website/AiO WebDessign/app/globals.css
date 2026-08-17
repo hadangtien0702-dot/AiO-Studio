@@ -1,5 +1,10 @@
-@import "tailwindcss";
+/* [17/08] Font PHAI dung TRUOC tailwind: "@import tailwindcss" bung ca nghin
+   dong CSS vao truoc no, day dong font xuong giua file -> luat CSS "@import
+   phai o dau" bi vi pham -> ban build tinh VUT dong font trong im lang (do
+   that: CSS prod 51KB khong con chu googleapis nao) -> live rot het font,
+   headline tu-cat do sai be rong, "15 PHUT" thanh "15 PI". */
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════
    REDESIGN 14/08/2026 — "Trang web là một cửa sổ Premiere"
@@ -230,8 +235,7 @@ time {
 }
 
 #basics,
-#lab,
-#journey {
+#lab {
   scroll-margin-top: 190px;
 }
 
@@ -495,10 +499,68 @@ time {
   min-height: 760px;
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(580px, 1.1fr);
+  /* [17/08] Hang 1 = thanh tinh nang CHUNG (chay ngang ca hai cot),
+     hang 2 = chu ben trai + mo phong ben phai. */
+  grid-template-rows: auto minmax(0, 1fr);
   align-items: center;
   gap: clamp(40px, 5vw, 72px);
   padding-block: 84px 76px;
 }
+
+/* [17/08] Thanh tinh nang chung — anh Tien khoanh do vung nay 17/08 */
+.hero-toolbar {
+  grid-column: 1 / -1;
+  align-self: start;
+  margin-bottom: 8px;
+}
+
+/* =========================================================================
+   [17/08] HERO "MOT CO MAY" — anh Tien: "2 cot roi rac, chua an tuong".
+   Y do: thay vi 2 khoi troi noi, ca hero doc ra nhu MOT CO MAY dang chay:
+   thanh tinh nang o tren, ben trai la bang dieu khien, ben phai la man hinh.
+   Ba thu tao ra cam giac do — deu la HINH, khong them mot chu nao:
+     1. Cot trai co be mat rieng (vien + nen) khop voi khung cua so ben phai
+     2. Mot duong noi chay tu cot trai sang man hinh (nhu day tin hieu)
+     3. Nhip hien dan theo tang khi tai trang (dung DB goi y "stagger")
+   ========================================================================= */
+.hero-copy {
+  padding: 30px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 62%),
+    rgba(15, 17, 21, 0.72);
+}
+
+/* Day tin hieu noi bang dieu khien -> man hinh. An o man hep vi luc do
+   hai khoi xep doc, ke ngang se sai huong. */
+.hero-copy::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: clamp(40px, 5vw, 72px);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(248, 104, 32, 0.55), rgba(248, 104, 32, 0));
+  pointer-events: none;
+}
+
+/* Nhip hien dan: eyebrow -> tieu de -> cau dan -> nut -> chip.
+   60ms moi tang, theo goi y "stagger" cua DB thiet ke. */
+@keyframes heroTangHien {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-copy > * {
+  animation: heroTangHien 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.hero-copy > *:nth-child(1) { animation-delay: 60ms; }
+.hero-copy > *:nth-child(2) { animation-delay: 120ms; }
+.hero-copy > *:nth-child(3) { animation-delay: 180ms; }
+.hero-copy > *:nth-child(4) { animation-delay: 240ms; }
+.hero-copy > *:nth-child(5) { animation-delay: 300ms; }
 
 .hero-copy {
   position: relative;
@@ -898,9 +960,11 @@ time {
   border-radius: 4px;
 }
 
+/* [17/08] ☠️ Truoc day badge nay `position:absolute; bottom:-6px` nen no DE
+   LEN nhan "Host Mic (A1)" (do that: chong 66x15px). Cho no thanh mot muc
+   flex binh thuong cua .scene-speaker-wrap => xep duoi nhan THEO CAU TAO,
+   khong the de nhau nua du chu dai ngan the nao. */
 .cut-tag-badge {
-  position: absolute;
-  bottom: -6px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -914,9 +978,8 @@ time {
   white-space: nowrap;
 }
 
+/* [17/08] Cung ly do voi .cut-tag-badge — bo absolute de khong de len nhan */
 .silence-detected-badge {
-  position: absolute;
-  bottom: -6px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1316,31 +1379,32 @@ time {
   overflow: hidden;
 }
 
+/* [17/08] ☠️ Truoc day nhan ten file `position:absolute` nam DE LEN cac cot
+   song am (do that: 8 lan chong nhau). Doi thanh xep DOC — nhan mot dong,
+   song am mot dong — nen khong the de nhau nua. */
 .waveform-clip {
   width: 100%;
   height: 100%;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
   position: relative;
-  padding: 0 6px;
+  padding: 2px 6px;
 }
 
 .clip-label {
-  position: absolute;
-  top: 2px;
-  left: 6px;
   font-size: 8px;
+  line-height: 1;
   color: #6a7280;
-  z-index: 2;
 }
 
 .waveform-bars {
   width: 100%;
-  height: 18px;
+  height: 15px;
   display: flex;
   align-items: center;
   gap: 1.5px;
-  margin-top: 6px;
 }
 
 .waveform-bars i {
@@ -1408,76 +1472,22 @@ time {
   }
 }
 
-
-.confidence-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-block: 1px solid var(--line-soft);
-  background: rgba(17, 20, 25, 0.9);
-}
-
-.confidence-strip > span {
-  min-height: 94px;
-  display: grid;
-  grid-template-columns: 54px 1fr;
-  align-content: center;
-  gap: 2px 12px;
-  padding: 18px clamp(24px, 5vw, 70px);
-}
-
-.confidence-strip > span + span {
-  border-left: 1px solid var(--line-soft);
-}
-
-.confidence-strip b {
-  width: 50px;
-  height: 36px;
-  grid-row: 1 / 3;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  color: #111318;
-  background: var(--yellow);
-  font-size: 14px;
-}
-
-.confidence-strip strong {
-  font-size: 14px;
-}
-
-.confidence-strip small {
-  color: var(--dim);
-  font-size: 12px;
-}
-
-.basics,
-.journey {
+.basics {
   padding-block: 126px;
 }
 
+/* [17/08] Cot 88px truoc day danh cho nhan cam dau moi section — anh Tien bo
+   nhan thi phai bo luon cot, khong la moi tieu de bi thut vao 116px vo co
+   (bai hoc: xoa phan tu = phai don lai khoang cach no dang ganh). */
 .section-intro {
   display: grid;
-  grid-template-columns: 88px minmax(0, 780px);
+  grid-template-columns: minmax(0, 780px);
   gap: 28px;
   align-items: start;
 }
 
-.lesson-number {
-  min-height: 32px;
-  display: inline-grid;
-  place-items: center;
-  border: 1px solid #5a3828;
-  border-radius: 8px;
-  color: var(--orange-light);
-  background: var(--orange-soft);
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-}
-
 .section-intro h2,
-.safe-learning h2,
-.final-cta h2 {
+.safe-learning h2 {
   margin: 0;
   font-size: clamp(40px, 5vw, 66px);
   line-height: 1.04;
@@ -1972,118 +1982,6 @@ time {
   transform: scale(1.02);
 }
 
-/* Comparison Cards Grid */
-.comparison-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 44px;
-}
-
-.comp-card {
-  padding: 30px 24px;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.comp-card-header small {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--dim);
-}
-
-.comp-card-header h3 {
-  margin: 8px 0 6px 0;
-  font-size: 22px;
-  color: #fff;
-}
-
-.comp-price {
-  display: block;
-  font-size: 18px;
-  font-weight: 800;
-  color: #8c93a1;
-  margin-bottom: 24px;
-}
-
-.comp-price span {
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.comp-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.comp-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13.5px;
-  line-height: 1.4;
-}
-
-.comp-list li.bad {
-  color: #8b919e;
-}
-
-.comp-list li.bad svg {
-  color: #ff5f56;
-  flex-shrink: 0;
-}
-
-.comp-list li.good {
-  color: #e5e7eb;
-}
-
-.comp-list li.good svg {
-  color: var(--green);
-  flex-shrink: 0;
-}
-
-.comp-card.is-featured {
-  background: linear-gradient(170deg, #1d1916, #14161c);
-  border: 2px solid var(--orange);
-  position: relative;
-  box-shadow: 0 20px 50px rgba(248, 104, 32, 0.15);
-}
-
-.featured-badge {
-  position: absolute;
-  top: -12px;
-  right: 20px;
-  background: var(--orange);
-  /* [16/08] Chu 10px thi trang/cam (3.17) khong co cua dat 4.5 — chu toi
-     tren cam do duoc 5.68, dat. Nut lon van chu trang (xem .primary-cta). */
-  color: #16181d;
-  padding: 3px 12px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-}
-
-.comp-card.is-featured .comp-price {
-  color: var(--orange-light);
-}
-
-.comp-cta {
-  margin-top: 28px;
-  width: 100%;
-  justify-content: center;
-  min-height: 44px;
-}
-
 /* Pricing Grid */
 .pricing-cards-grid {
   display: grid;
@@ -2099,19 +1997,11 @@ time {
   margin-inline: auto;
 }
 
-.pricing-cards-grid.one-plan {
-  grid-template-columns: minmax(0, 460px);
-  justify-content: center;
-}
-
-/* [16/08] Va loi do 14/08: hai luoi nay khong co breakpoint nen o man hep
-   3 cot van ep hang ngang -> card AiO trong bang so sanh bi day han ra ngoai
-   man hinh (do that: cot can 518px, khung chi 347px o kho 375). Xep doc lai. */
+/* [16/08] Luoi gia khong co breakpoint thi o man hep van ep hang ngang, card
+   bi day ra ngoai man hinh ma trang khong cuon ngang duoc. Xep doc lai. */
 @media (max-width: 900px) {
-  .comparison-cards-grid,
   .pricing-cards-grid,
-  .pricing-cards-grid.two-plans,
-  .pricing-cards-grid.one-plan {
+  .pricing-cards-grid.two-plans {
     grid-template-columns: minmax(0, 1fr);
     max-width: 560px;
     margin-inline: auto;
@@ -2189,7 +2079,7 @@ time {
   top: -12px;
   right: 20px;
   background: var(--orange);
-  /* [16/08] Cung ly do .featured-badge: 10.5px khong dat noi voi chu trang */
+  /* [16/08] Chu 10.5px tren nen cam: trang do 3.17 (can 4.5) — chu toi do 5.6 */
   color: #16181d;
   padding: 3px 12px;
   border-radius: 999px;
@@ -2674,158 +2564,6 @@ time {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.roi-calculator {
-  min-height: 430px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 390px;
-  margin-top: 58px;
-  overflow: hidden;
-  border: 1px solid #4a515d;
-  border-radius: 22px;
-  background: #171a20;
-}
-
-.roi-controls {
-  padding: 40px;
-}
-
-.roi-heading {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-}
-
-.roi-heading > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: white;
-  font-size: 16px;
-  font-weight: 750;
-}
-
-.roi-heading > span svg {
-  color: var(--orange);
-}
-
-.roi-heading > strong {
-  color: var(--dim);
-  font-size: 11px;
-  font-weight: 650;
-}
-
-.roi-controls label {
-  display: block;
-  margin-top: 30px;
-}
-
-.roi-controls label > span {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.roi-controls label b {
-  color: #dfe2e7;
-  font-size: 14px;
-}
-
-.roi-controls output {
-  min-width: 92px;
-  padding: 7px 10px;
-  border: 1px solid #4a515d;
-  border-radius: 8px;
-  color: var(--orange-light);
-  background: #22272f;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 750;
-}
-
-.roi-controls input[type="range"] {
-  width: 100%;
-  height: 28px;
-  margin-top: 14px;
-  accent-color: var(--orange);
-  cursor: pointer;
-}
-
-.roi-controls > p {
-  max-width: 700px;
-  margin: 24px 0 0;
-  color: var(--dim);
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.roi-result {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 38px;
-  border-left: 1px solid #5c3b2c;
-  background:
-    radial-gradient(circle at 50% 24%, rgba(255, 107, 44, 0.2), transparent 34%),
-    linear-gradient(145deg, #2a1d17, #18191d 72%);
-}
-
-.roi-result > small {
-  color: var(--orange-light);
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 0.1em;
-}
-
-.roi-result > strong {
-  margin-top: 16px;
-  color: white;
-  font-family: var(--font-display);
-  font-size: clamp(72px, 8vw, 104px);
-  line-height: 0.9;
-  letter-spacing: -0.07em;
-}
-
-.roi-result > strong span {
-  color: var(--orange);
-  font-size: 30px;
-  letter-spacing: -0.04em;
-}
-
-.roi-result > p {
-  margin: 24px 0 0;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.roi-result > p b {
-  color: white;
-}
-
-.roi-result > a {
-  min-height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 24px;
-  border: 1px solid #69432f;
-  border-radius: 10px;
-  color: white;
-  background: #38251c;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.roi-result > a:hover {
-  border-color: var(--orange);
-  background: #42281b;
-}
-
 .mission-board {
   display: grid;
   grid-template-columns: 1fr 54px 1fr 54px 1fr;
@@ -2968,60 +2706,38 @@ time {
   color: white;
 }
 
-.final-cta {
-  min-height: 340px;
+/* [17/08] Truoc: `1fr auto 1fr` KHONG CO GAP -> 3 khoi dam vao nhau, danh
+   sach 8 tool vo 2 dong de len cau gioi thieu. Nay con 2 khoi, co gap. */
+.site-footer {
+  min-height: 112px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 60px;
-  margin-bottom: 90px;
-  padding: 58px;
-  border: 1px solid #5b3c2c;
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at 82% 50%, rgba(255, 107, 44, 0.18), transparent 27%),
-    linear-gradient(130deg, #241b16, #17191e 60%);
-}
-
-.final-cta > div {
-  max-width: 780px;
-}
-
-.final-cta h2 {
-  margin-top: 16px;
-}
-
-.final-cta p {
-  margin: 18px 0 0;
-  color: var(--muted);
-  font-size: 18px;
-}
-
-.final-cta > .primary-cta {
-  flex: 0 0 auto;
-}
-
-.site-footer {
-  min-height: 112px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 32px;
   border-top: 1px solid var(--line-soft);
   color: var(--dim);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .site-footer p {
   margin: 0;
-}
-
-.site-footer > span {
-  justify-self: end;
+  text-align: right;
 }
 
 @media (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
+  }
+
+  /* [17/08] Man hep: 2 khoi xep DOC nen day tin hieu ngang sai huong -> an.
+     Be mat cot trai cung hep lai cho do chiem cho. */
+  .hero-copy::after {
+    display: none;
+  }
+
+  .hero-copy {
+    padding: 24px 22px;
   }
 
   .hero-copy {
@@ -3049,13 +2765,6 @@ time {
     grid-template-columns: 340px minmax(0, 1fr);
   }
 
-  .site-footer {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .site-footer p {
-    display: none;
-  }
 }
 
 @media (max-width: 820px) {
@@ -3064,8 +2773,7 @@ time {
   }
 
   #basics,
-  #lab,
-  #journey {
+  #lab {
     scroll-margin-top: 154px;
   }
 
@@ -3137,15 +2845,6 @@ time {
     padding-block: 82px 72px;
   }
 
-  .confidence-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .confidence-strip > span + span {
-    border-top: 1px solid var(--line-soft);
-    border-left: 0;
-  }
-
   .learning-lab {
     grid-template-columns: 1fr;
   }
@@ -3153,16 +2852,6 @@ time {
   .lab-copy {
     border-right: 0;
     border-bottom: 1px solid var(--line);
-  }
-
-  .roi-calculator {
-    grid-template-columns: 1fr;
-  }
-
-  .roi-result {
-    min-height: 360px;
-    border-top: 1px solid #5c3b2c;
-    border-left: 0;
   }
 
   .mission-board {
@@ -3178,11 +2867,6 @@ time {
   .safe-learning {
     grid-template-columns: 1fr;
     gap: 42px;
-  }
-
-  .final-cta {
-    align-items: flex-start;
-    flex-direction: column;
   }
 }
 
@@ -3276,8 +2960,7 @@ time {
     100% { border-color: var(--orange); background: linear-gradient(90deg, #6f4935 0 58%, #171a1f 58%); }
   }
 
-  .basics,
-  .journey {
+  .basics {
     padding-block: 92px;
   }
 
@@ -3287,13 +2970,8 @@ time {
     gap: 18px;
   }
 
-  .lesson-number {
-    width: 76px;
-  }
-
   .section-intro h2,
-  .safe-learning h2,
-  .final-cta h2 {
+  .safe-learning h2 {
     font-size: 40px;
   }
 
@@ -3422,49 +3100,21 @@ time {
     min-height: 330px;
   }
 
-  .roi-controls,
-  .roi-result {
-    padding: 28px 22px;
-  }
-
-  .roi-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .roi-controls label > span {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .roi-result > strong {
-    font-size: 78px;
-  }
-
   .safe-learning {
     margin-top: 66px;
     padding: 34px 24px;
   }
 
-  .final-cta {
-    min-height: 410px;
-    margin-bottom: 62px;
-    padding: 34px 24px;
-  }
-
   .site-footer {
-    min-height: 150px;
-    display: flex;
+    min-height: 120px;
     align-items: flex-start;
     flex-direction: column;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
   }
 
-  .site-footer > span {
-    line-height: 1.6;
+  .site-footer p {
+    text-align: left;
   }
 }
 

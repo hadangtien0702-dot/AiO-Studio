@@ -47,8 +47,7 @@ const lessons = [
   { id: "top", label: "Overview", short: "01", width: 20 },
   { id: "basics", label: "Pain Points", short: "02", width: 20 },
   { id: "lab", label: "8 Native Tools", short: "03", width: 25 },
-  { id: "comparison", label: "Vs Competitors", short: "04", width: 20 },
-  { id: "pricing", label: "Pricing", short: "05", width: 15 },
+  { id: "pricing", label: "Pricing", short: "04", width: 35 },
 ] as const;
 
 const tools = [
@@ -63,9 +62,9 @@ const tools = [
     color: "orange",
     tag: "Tiết kiệm 80% thời gian",
     bullets: [
-      "Quét và phát hiện dải sóng âm tự động",
-      "Xóa sạch khoảng lặng thừa & dồn timeline tức thì",
-      "Hoàn tác một nút — panel tự nhớ trạng thái gốc",
+      "Dò sóng âm tự động",
+      "Xoá lặng & dồn timeline",
+      "Hoàn tác một nút",
     ],
   },
   {
@@ -79,9 +78,9 @@ const tools = [
     color: "purple",
     tag: "Luôn cắt trên bản sao",
     bullets: [
-      "Chuyển góc camera theo mic người nói",
-      "Cắt trên bản sao — bản gốc không bị đụng tới",
-      "Hỗ trợ trộn sample rate 44.1k & 48k",
+      "Đổi cam theo người đang nói",
+      "Cắt trên bản sao, gốc nguyên vẹn",
+      "Trộn được 44.1k & 48k",
     ],
   },
   {
@@ -95,9 +94,9 @@ const tools = [
     color: "green",
     tag: "100% Offline GPU",
     bullets: [
-      "AI chuyển giọng nói thành văn bản siêu tốc",
-      "Tự ngắt dòng chuẩn hiển thị TikTok/Reels",
-      "Xuất file .SRT hoặc Premiere Captions",
+      "Giọng nói thành văn bản",
+      "Tự ngắt dòng chuẩn TikTok/Reels",
+      "Xuất .SRT hoặc Premiere Captions",
     ],
   },
   {
@@ -111,9 +110,9 @@ const tools = [
     color: "yellow",
     tag: "Bám chủ thể AI",
     bullets: [
-      "Deep tracking giữ chủ thể luôn ở trung tâm",
-      "Tự động nhân bản sequence dọc trong 1 click",
-      "Giữ nguyên độ sắc nét và khung hình gốc",
+      "AI bám chủ thể giữa khung",
+      "Nhân bản sequence dọc 1 click",
+      "Giữ nguyên độ nét gốc",
     ],
   },
   {
@@ -127,9 +126,9 @@ const tools = [
     color: "blue",
     tag: "Không lag NLE",
     bullets: [
-      "Quét toàn bộ ổ cứng không làm chậm máy",
-      "Xem trước video và sóng âm thanh dưới 1s",
-      "Kéo thả trực tiếp vào timeline Premiere",
+      "Quét cả ổ cứng, máy không lag",
+      "Preview video & sóng âm <1s",
+      "Kéo thả thẳng vào timeline",
     ],
   },
   {
@@ -143,9 +142,9 @@ const tools = [
     color: "orange",
     tag: "Cài 1 lần dùng mãi",
     bullets: [
-      "Kho lưu trữ logo, intro, outro thương hiệu",
-      "Mở project mới là có sẵn tài nguyên",
-      "Không bao giờ phải import lại từ đầu",
+      "Kho logo, intro, outro thương hiệu",
+      "Project mới là có sẵn",
+      "Khỏi import lại từ đầu",
     ],
   },
   {
@@ -159,9 +158,9 @@ const tools = [
     color: "blue",
     tag: "Chuẩn 53 vùng nguy hiểm",
     bullets: [
-      "Lưới an toàn TikTok, Reels, Shorts, Shopee",
-      "Tránh tiêu đề bị che bởi avatar và nút tim",
-      "Bật tắt nhanh trong 0.2s không rác timeline",
+      "Lưới an toàn TikTok, Reels, Shorts",
+      "Chữ không bị avatar che mất",
+      "Bật tắt 0.2s, không rác timeline",
     ],
   },
   {
@@ -175,9 +174,9 @@ const tools = [
     color: "purple",
     tag: "Coming Soon — đang phát triển",
     bullets: [
-      "Quét đoạn cao trào trong video dài",
-      "Tự động trích xuất clip 60 giây nổi bật",
-      "Sẵn sàng xuất bản đa nền tảng mạng xã hội",
+      "Dò đoạn cao trào trong video dài",
+      "Trích clip 60 giây nổi bật",
+      "Xuất thẳng ra mạng xã hội",
     ],
   },
 ];
@@ -197,7 +196,7 @@ function AiOLogo({ size = 28, className = "" }: { size?: number; className?: str
       aria-hidden="true"
     >
       <img
-        src="/AiO Logo 3.png"
+        src="/AiO Logo Mark.png"
         alt="AiO Studio"
         width={size}
         height={size}
@@ -224,7 +223,6 @@ function Header({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (op
       <nav className={menuOpen ? "site-nav is-open" : "site-nav"} aria-label="Điều hướng chính">
         <a href="#basics" onClick={() => setMenuOpen(false)}>Vấn đề</a>
         <a href="#lab" onClick={() => setMenuOpen(false)}>Sản phẩm</a>
-        <a href="#journey" onClick={() => setMenuOpen(false)}>Giá trị</a>
         <a className="nav-cta" href="#lab" onClick={() => setMenuOpen(false)}>
           Xem workflow <Play size={15} fill="currentColor" />
         </a>
@@ -293,8 +291,43 @@ function LessonRail({
 
 type HeroSimMode = "autocut" | "podcast" | "transcripts" | "reframe";
 
-function HeroConsoleSimulator({ run }: { run: number }) {
-  const [activeMode, setActiveMode] = useState<HeroSimMode>("autocut");
+/* [17/08] Thanh 4 tinh nang tach RA KHOI simulator de thanh MOT THANH CHUNG
+   chay ngang ca hero (anh Tien khoanh do 17/08). Vi vay `activeMode` phai
+   nang len component cha — simulator nhan mode qua prop, khong tu giu nua. */
+const HERO_MODES: { id: HeroSimMode; label: string; icon: typeof Scissors }[] = [
+  { id: "autocut", label: "Auto Cut", icon: Scissors },
+  { id: "podcast", label: "Auto Podcast", icon: Video },
+  { id: "transcripts", label: "Transcripts AI", icon: Captions },
+  { id: "reframe", label: "Auto Re-Frames", icon: MonitorPlay },
+];
+
+function HeroModeBar({
+  mode,
+  onChange,
+}: {
+  mode: HeroSimMode;
+  onChange: (m: HeroSimMode) => void;
+}) {
+  return (
+    <div className="hero-toolbar sim-mode-bar" role="tablist" aria-label="Chế độ mô phỏng">
+      {HERO_MODES.map(({ id, label, icon: Icon }) => (
+        <button
+          key={id}
+          type="button"
+          role="tab"
+          aria-selected={mode === id}
+          className={`sim-mode-btn ${mode === id ? "is-active" : ""}`}
+          onClick={() => onChange(id)}
+        >
+          <Icon size={14} />
+          <span>{label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function HeroConsoleSimulator({ run, activeMode }: { run: number; activeMode: HeroSimMode }) {
   const [cutApplied, setCutApplied] = useState(true);
 
   useEffect(() => {
@@ -307,42 +340,6 @@ function HeroConsoleSimulator({ run }: { run: number }) {
 
   return (
     <div className={`hero-console-simulator ${cutApplied ? "cut-processed" : ""}`} key={`${activeMode}-${run}`}>
-      {/* Streamlined Mode Switcher */}
-      <div className="sim-mode-bar" role="tablist" aria-label="Chế độ mô phỏng">
-        <button
-          type="button"
-          className={`sim-mode-btn ${activeMode === "autocut" ? "is-active" : ""}`}
-          onClick={() => { setActiveMode("autocut"); setCutApplied(false); }}
-        >
-          <Scissors size={14} />
-          <span>Auto Cut</span>
-        </button>
-        <button
-          type="button"
-          className={`sim-mode-btn ${activeMode === "podcast" ? "is-active" : ""}`}
-          onClick={() => { setActiveMode("podcast"); setCutApplied(false); }}
-        >
-          <Video size={14} />
-          <span>Auto Podcast</span>
-        </button>
-        <button
-          type="button"
-          className={`sim-mode-btn ${activeMode === "transcripts" ? "is-active" : ""}`}
-          onClick={() => { setActiveMode("transcripts"); setCutApplied(false); }}
-        >
-          <Captions size={14} />
-          <span>Transcripts AI</span>
-        </button>
-        <button
-          type="button"
-          className={`sim-mode-btn ${activeMode === "reframe" ? "is-active" : ""}`}
-          onClick={() => { setActiveMode("reframe"); setCutApplied(false); }}
-        >
-          <MonitorPlay size={14} />
-          <span>Auto Re-Frames</span>
-        </button>
-      </div>
-
       {/* Premiere Pro Main Container */}
       <div className="nle-window-frame">
         {/* NLE Topbar */}
@@ -766,10 +763,11 @@ export default function Home() {
   const [progress, setProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("top");
   const [heroRun, setHeroRun] = useState(0);
+  /* [17/08] Nang len day de thanh tinh nang CHUNG (nam ngoai simulator) va
+     simulator cung doc mot nguon trang thai. */
+  const [heroMode, setHeroMode] = useState<HeroSimMode>("autocut");
   const [activeTool, setActiveTool] = useState<ToolId>("assets");
   const [toolRun, setToolRun] = useState(1);
-  const [projectsPerMonth, setProjectsPerMonth] = useState(12);
-  const [minutesSaved, setMinutesSaved] = useState(45);
 
   useEffect(() => {
     const updateProgress = () => {
@@ -820,7 +818,6 @@ export default function Home() {
 
   const currentTool = tools.find((tool) => tool.id === activeTool) ?? tools[0];
   const CurrentToolIcon = currentTool.icon;
-  const hoursRecovered = Math.round((projectsPerMonth * minutesSaved * 12) / 60);
 
   return (
     <div className="learning-page" id="top">
@@ -834,10 +831,15 @@ export default function Home() {
 
       <main id="main-content">
         <section className="hero section-shell">
+          {/* [17/08] Thanh tinh nang CHUNG — chay het be ngang hero, nam tren
+              ca hai cot (grid-column: 1 / -1). Truoc day no nam trong cot phai
+              nen nhin nhu hai khoi roi rac. */}
+          <HeroModeBar mode={heroMode} onChange={setHeroMode} />
+
           <div className="hero-copy">
             <div className="hero-eyebrow">
               <Zap size={13} />
-              <span>BỘ CÔNG CỤ NATIVE CHO PREMIERE PRO · WINDOWS</span>
+              <span>Plugins hỗ trợ cho Premiere Pro · DaVinci Resolve</span>
             </div>
             {/* [14/08 REDESIGN] CHU KY CUA TRANG: headline tu cat chinh no.
                 "3 giờ" bi khoanh do (dung cach panel Autocut danh dau "doan se
@@ -854,11 +856,14 @@ export default function Home() {
               <span className="rz-new">còn 15 phút.</span>
               <span className="rz-chip">−92%</span>
             </h1>
+            {/* [17/08] Rut gon theo y anh Tien. Bo "100% offline" va "khong
+                gioi han phut" o day vi 3 chip ngay ben duoi da noi roi —
+                mot thong diep chi noi o MOT noi. */}
             <p className="hero-lead">
-              Cắt khoảng lặng, chuyển cam theo người nói, phụ đề AI — chạy thẳng trên Timeline Premiere, 100% offline, không giới hạn phút.
+              Cắt lặng, chuyển cam, phụ đề AI — ngay trên Timeline.
             </p>
             <div className="hero-actions">
-              <a className="primary-cta cta-free" href="#beta">
+              <a className="primary-cta cta-free" href="#pricing">
                 Tải Demo miễn phí — Asset Manager <ArrowRight size={16} />
               </a>
               <button
@@ -876,23 +881,19 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-demo">
-            <HeroConsoleSimulator run={heroRun} />
+            <HeroConsoleSimulator run={heroRun} activeMode={heroMode} />
           </div>
         </section>
 
-        <section className="confidence-strip" aria-label="Bằng chứng sản phẩm">
-          <span><b>∞</b><strong>Asset Không Giới Hạn</strong><small>Quản lý hàng chục nghìn file</small></span>
-          <span><b>&lt;1s</b><strong>Preview Tức Thì</strong><small>Xem trước không ngắt nhịp dựng</small></span>
-          <span><b>100%</b><strong>Offline Local GPU</strong><small>Bảo mật tuyệt đối source footage</small></span>
-        </section>
+        {/* [17/08] Anh Tien bo: dai 3 o chi so (trung voi chip ngay trong hero)
+            + toan bo nhan cam dau section + section ROI + khoi CTA cuoi. */}
 
         {/* PAIN POINTS SECTION - CONNECTED TIMELINE PROCESS LINE FLOW */}
         <section className="basics section-shell" id="basics">
           <div className="section-intro">
-            <span className="lesson-number">WORKFLOW PIPELINE</span>
             <div>
-              <h2>Quy Trình 4 Bước Dựng Tối Ưu Với AiO Studio</h2>
-              <p>Loại bỏ các điểm nghẽn thủ công theo từng giai đoạn làm việc của một video editor.</p>
+              <h2>Bốn bước dựng, bốn điểm nghẽn</h2>
+              <p>Mỗi bước, một việc tay bị xoá đi.</p>
             </div>
           </div>
 
@@ -1028,10 +1029,9 @@ export default function Home() {
         <section className="lab" id="lab">
           <div className="section-shell">
             <div className="section-intro lab-intro">
-              <span className="lesson-number">8 NATIVE PANELS</span>
               <div>
-                <h2>Hệ Sinh Thái 8 Công Cụ Native Cho Premiere Pro</h2>
-                <p>Khám phá giao diện thực tế và tính năng đột phá của từng công cụ trong Suite.</p>
+                <h2>8 tool. Một panel.</h2>
+                <p>Giao diện thật của từng tool.</p>
               </div>
             </div>
 
@@ -1112,118 +1112,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* COMPARISON SECTION - 3 STREAMLINED VISUAL CARDS */}
-        <section className="comparison-section section-shell" id="comparison" style={{ marginTop: "90px" }}>
-          <div className="section-intro">
-            <span className="lesson-number">SO SÁNH</span>
-            <div>
-              <h2>Tại Sao Editor Chuyên Nghiệp Chọn AiO Studio?</h2>
-              <p>Khác biệt hoàn toàn so với giải pháp Web SaaS và các plugin đơn lẻ trên thị trường.</p>
-            </div>
-          </div>
-
-          <div className="comparison-cards-grid">
-            {/* Card 1: Web SaaS */}
-            <div className="comp-card card-saas">
-              <div className="comp-card-header">
-                <small>WEB SAAS</small>
-                <h3>Submagic / CapCut Web</h3>
-                <span className="comp-price">$20 – $50 <span>/ tháng</span></span>
-              </div>
-              <ul className="comp-list">
-                <li className="bad"><X size={15} /> Bắt buộc upload video GBs lên web</li>
-                <li className="bad"><X size={15} /> Giới hạn credit & số phút audio</li>
-                <li className="bad"><X size={15} /> Nguy cơ rò rỉ source của khách hàng</li>
-                <li className="bad"><X size={15} /> Chỉ làm được 1 tính năng phụ đề</li>
-                <li className="bad"><X size={15} /> Phải có Internet mới xử lý được</li>
-              </ul>
-            </div>
-
-            {/* Card 2: Single Plugin */}
-            <div className="comp-card card-plugin">
-              <div className="comp-card-header">
-                <small>PLUGIN ĐƠN LẺ</small>
-                <h3>AutoPod.fm</h3>
-                <span className="comp-price">$29 <span>/ tháng</span></span>
-              </div>
-              <ul className="comp-list">
-                <li className="good"><Check size={15} /> Plugin Native trên Premiere</li>
-                <li className="bad"><X size={15} /> Chỉ có 3 công cụ đơn lẻ</li>
-                <li className="bad"><X size={15} /> Không có Brand Kit & Kho Asset</li>
-                <li className="bad"><X size={15} /> Không có tính năng phụ đề & Safe Zone</li>
-                <li className="bad"><X size={15} /> Đắt hơn 70% so với AiO ($29 vs $17)</li>
-              </ul>
-            </div>
-
-            {/* Card 3: AiO Studio Suite */}
-            <div className="comp-card card-aio is-featured">
-              <span className="featured-badge">KHUYÊN DÙNG CHO EDITOR</span>
-              <div className="comp-card-header">
-                <small>SUITE TOÀN DIỆN</small>
-                <h3>AiO Studio Suite</h3>
-                <span className="comp-price">$17 <span>/ tháng — đủ cả 8 tool</span></span>
-              </div>
-              <ul className="comp-list">
-                <li className="good"><Check size={15} /> Trọn bộ 8 công cụ Native trong 1 panel</li>
-                <li className="good"><Check size={15} /> 100% Offline GPU — 0 rò rỉ dữ liệu</li>
-                <li className="good"><Check size={15} /> Xử lý không giới hạn số phút video</li>
-                <li className="good"><Check size={15} /> Demo Asset Manager miễn phí — thử trước, trả sau</li>
-                <li className="good"><Check size={15} /> Windows 10/11 — cài một file, không cần quyền Admin</li>
-              </ul>
-              <a className="primary-cta comp-cta" href="#pricing">
-                Xem Bảng Giá Ưu Đãi <ArrowRight size={16} />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* [16/08] DEMO MIEN PHI — anh Tien chot 16/08: demo chi con MOT tool
-            (Asset Manager); 7 tool con lai nam trong goi Pro $17/thang.
-            (Phu dinh quyet dinh 13/08 "3 tool free".)
-            Dung nguyen class cua pricing (price-card / plan-perks / primary-cta)
-            de dong bo giao dien. CTA mailto la duong nhan don DUY NHAT dang co
-            that — co form/backend roi thi thay. */}
-        <section className="pricing-section section-shell" id="beta" style={{ marginTop: "90px" }}>
-          <div className="section-intro">
-            <span className="lesson-number">DEMO MIỄN PHÍ</span>
-            <div>
-              <h2>Dùng Thử Miễn Phí Asset Manager — Bản Windows</h2>
-              <p>Cài một file duy nhất, không cần quyền Admin. Windows 10/11 · Premiere Pro.</p>
-            </div>
-          </div>
-
-          <div className="pricing-cards-grid one-plan">
-            <div className="price-card">
-              <span className="plan-label">Asset Manager</span>
-              <p className="plan-desc">Kho asset ngay trong Premiere — tìm, nghe thử, kéo thả.</p>
-              <ul className="plan-perks">
-                <li><Check size={16} color="var(--green)" /> 28.000+ asset, preview &lt;1s</li>
-                <li><Check size={16} color="var(--green)" /> Kéo thả thẳng vào timeline</li>
-                <li><Check size={16} color="var(--green)" /> Mục &quot;Dùng gần đây&quot; tự ghi nhớ</li>
-              </ul>
-            </div>
-          </div>
-
-          <div style={{ textAlign: "center", marginTop: "28px" }}>
-            <a
-              className="primary-cta"
-              href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20Demo%20-%20Xin%20link%20tai&body=May%20minh%20la%20Windows%2010%2F11%2C%20Premiere%20Pro%20phien%20ban%3A%20"
-            >
-              Nhận Link Tải Demo Qua Email <ArrowRight size={16} />
-            </a>
-            <p style={{ marginTop: "10px", fontSize: "13px", opacity: 0.7 }}>
-              Song ngữ Việt/Anh · 100% offline · Miễn phí mãi, không cần thẻ tín dụng
-            </p>
-          </div>
-        </section>
+        {/* [17/08] Anh Tien bo section SO SANH (3 card doi thu) va section
+            DEMO MIEN PHI. Duong tai demo KHONG mat: mailto von nam trong
+            section demo da duoc chuyen thang vao nut cua goi Demo Pass o
+            bang gia ben duoi. */}
 
         {/* PRICING SECTION - CLEAN HIGH-CONTRAST */}
         <section className="pricing-section section-shell" id="pricing" style={{ marginTop: "90px" }}>
           <div className="section-intro">
-            <span className="lesson-number">BẢNG GIÁ</span>
             <div>
-              <h2>Bắt Đầu Miễn Phí. Nâng Cấp Khi Cần Cả Bộ.</h2>
-              <p>Hai gói duy nhất — không phí ẩn, hủy bất kỳ lúc nào.</p>
+              <h2>Bắt đầu miễn phí.</h2>
+              <p>Hai gói. Không phí ẩn. Hủy lúc nào cũng được.</p>
             </div>
           </div>
 
@@ -1234,20 +1133,27 @@ export default function Home() {
             <div className="price-card">
               <span className="plan-label">Demo Pass</span>
               <div className="price-tag">$0 <small>miễn phí mãi</small></div>
-              <p className="plan-desc">Asset Manager đầy đủ — dùng không giới hạn thời gian.</p>
+              <p className="plan-desc">Asset Manager đầy đủ, dùng mãi.</p>
               <ul className="plan-perks">
                 <li><Check size={16} color="var(--green)" /> Asset Manager đầy đủ tính năng</li>
                 <li><Check size={16} color="var(--green)" /> 28.000+ asset, preview &lt;1s</li>
                 <li><Check size={16} color="var(--green)" /> Không cần thẻ tín dụng</li>
               </ul>
-              <a className="secondary-cta plan-btn" href="#beta">Tải Demo Miễn Phí</a>
+              {/* [17/08] Truoc day tro toi section demo (da go) — nut nay nhan
+                  LUON mailto, neu khong thi duong tai demo bien mat. */}
+              <a
+                className="secondary-cta plan-btn"
+                href="mailto:dreamtalentmarketing@gmail.com?subject=AiO%20Studio%20Demo%20-%20Xin%20link%20tai&body=May%20minh%20la%20Windows%2010%2F11%2C%20Premiere%20Pro%20phien%20ban%3A%20"
+              >
+                Nhận Link Tải Demo
+              </a>
             </div>
 
             <div className="price-card is-popular">
               <span className="popular-pill">RẺ HƠN AUTOPOD 41%</span>
               <span className="plan-label" style={{ color: "var(--orange-light)" }}>Pro Pass</span>
               <div className="price-tag">$17 <small>/ tháng</small></div>
-              <p className="plan-desc">Mở khóa cả 8 tool — xử lý không giới hạn số phút.</p>
+              <p className="plan-desc">Cả 8 tool, không giới hạn phút.</p>
               <ul className="plan-perks">
                 <li><Check size={16} color="var(--green)" /> Trọn bộ 8 Native Panels</li>
                 <li><Check size={16} color="var(--green)" /> Không giới hạn số phút video</li>
@@ -1264,64 +1170,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ROI VALUE CALCULATOR - STREAMLINED */}
-        <section className="journey section-shell" id="journey" style={{ marginTop: "90px" }}>
-          <div className="section-intro">
-            <span className="lesson-number">TÍNH TOÁN ROI</span>
-            <div>
-              <h2>Bạn Thu Hồi Bao Nhiêu Thời Gian Mỗi Năm?</h2>
-              <p>Kéo thanh trượt để tính số giờ lao động thủ công được giải phóng.</p>
-            </div>
-          </div>
-
-          <div className="roi-calculator">
-            <div className="roi-controls">
-              <label>
-                <span><b>Số Project Dựng Mỗi Tháng</b><output>{projectsPerMonth} projects</output></span>
-                <input
-                  type="range"
-                  min="1"
-                  max="40"
-                  value={projectsPerMonth}
-                  onChange={(event) => setProjectsPerMonth(Number(event.target.value))}
-                />
-              </label>
-              <label>
-                <span><b>Số Phút Tiết Kiệm Mỗi Project</b><output>{minutesSaved} phút</output></span>
-                <input
-                  type="range"
-                  min="15"
-                  max="120"
-                  step="15"
-                  value={minutesSaved}
-                  onChange={(event) => setMinutesSaved(Number(event.target.value))}
-                />
-              </label>
-            </div>
-            <div className="roi-result" aria-live="polite">
-              <small>THỜI GIAN THU HỒI MỖI NĂM</small>
-              <strong>{hoursRecovered}<span> giờ</span></strong>
-              <p>Tương đương <b>{Math.max(1, Math.round(hoursRecovered / 8))} ngày làm việc trọn vẹn</b> để nhận thêm dự án hoặc nghỉ ngơi.</p>
-              <a href="#pricing">Dùng Đủ 8 Tool — $17/tháng <ArrowRight size={16} /></a>
-            </div>
-          </div>
-        </section>
-
-        {/* FINAL CTA SECTION */}
-        <section className="final-cta section-shell">
-          <div>
-            <span className="eyebrow"><Sparkles size={15} /> AiO Studio Workflow Suite</span>
-            <h2>Dừng Cắt Khoảng Lặng Thủ Công. Bắt Đầu Sáng Tạo.</h2>
-            <p>Trọn bộ 8 panel native bên cạnh Timeline. Bắt đầu miễn phí với Asset Manager — nâng cấp khi sẵn sàng.</p>
-          </div>
-          <a className="primary-cta" href="#pricing">Xem Bảng Giá — Từ $0 <ArrowRight size={17} /></a>
-        </section>
       </main>
 
+      {/* [17/08] Footer cu la luoi 3 cot `1fr auto 1fr` khong co gap: cau dai
+          o giua va danh sach 8 ten tool o phai dam vao nhau, chu vo dong loan.
+          Sua: 2 cot co gap, bo danh sach 8 tool (lap lai muc "8 tool" ngay
+          tren), cau gioi thieu rut tu 80 -> 41 ky tu. */}
       <footer className="site-footer section-shell">
         <a className="brand" href="#top"><AiOLogo size={24} /><span>AiO Studio</span></a>
-        <p>Hệ sinh thái công cụ dựng phim chuyên nghiệp cho Premiere Pro & DaVinci Resolve.</p>
-        <span>Auto Cut · Auto Podcast · Auto Transcripts · Auto Re-Frames · Asset Manager · Power Bins · Guide Frame · Cut Short</span>
+        <p>Plugin dựng phim cho Premiere Pro · DaVinci</p>
       </footer>
     </div>
   );

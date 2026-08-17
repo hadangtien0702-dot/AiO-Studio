@@ -5,6 +5,205 @@
 
 ---
 
+## 2026-08-17 09:35 — Cat gon chu toan trang + hero "mot co may" + sua footer vo
+
+**Boi canh:** anh Tien: *"rat nhieu noi dung du thua, cau cu kha dai, cat bot
+di"* + *"ap skill ui-ux-pro-max thiet ke lai hero cho creative hon"* + anh
+chup footer bao *"phan nay cung dang bi loi"*.
+
+**1. Cat chu (do bang so ky tu tren trang that)**
+Tong chu cua cac cau >=28 ky tu: **1.032 -> 634 ky tu (-39%)**, so cau dai
+23 -> 19. Cau dai nhat con lai 53 ky tu (truoc: 82).
+- Hero lead 81 -> 53 · footer 80 -> 41
+- H2: "He sinh thai 8 cong cu native cho Premiere Pro" -> **"8 tool. Mot panel."**
+  · "Quy trinh 4 buoc dung toi uu voi AiO Studio" -> "Bon buoc dung, bon diem nghen"
+  · "Bat dau mien phi. Nang cap khi can ca bo." -> "Bat dau mien phi."
+- 24 dong mo ta tool (8 tool x 3): rut het, vd "Xem truoc video va song am
+  thanh duoi 1s" -> "Preview video & song am <1s"
+- 2 dong plan-desc o bang gia
+
+**2. Hero "mot co may" (dung skill ui-ux-pro-max)**
+DB goi y **Bento Grids + variance 8 + stagger motion**. LAY phan CAU TRUC,
+**KHONG lay bang mau/font cua no** (#22C55E + Inter) — cam #FF5714 anh chot
+02/08 va Barlow Condensed la ban sac, doi la mat chat (dung bai hoc 02/08:
+DB nay nghieng landing page chung chung).
+Van de anh che la *"2 cot roi rac"* -> giai bang HINH, khong them chu nao:
+- Cot trai co BE MAT rieng (vien 1px + nen + bo goc 16px) khop voi khung cua
+  so ben phai -> hai ben doc ra nhu hai tam cua CUNG mot co may
+- Mot **day tin hieu** gradient cam chay tu cot trai sang man hinh
+  (`.hero-copy::after`, 64px) — man hep thi AN vi luc do hai khoi xep doc,
+  ke ngang se sai huong
+- **Nhip hien dan theo tang** khi tai trang: 5 tang x 60ms, 420ms/tang,
+  easing (0.22,1,0.36,1). Lam bang CSS thuan, KHONG them thu vien (bai hoc
+  "nhe de nhanh"); da co san `@media (prefers-reduced-motion)` phu
+
+**3. Footer bi vo**
+Nguyen nhan: luoi `1fr auto 1fr` **khong co gap** -> 3 khoi dam vao nhau,
+danh sach 8 ten tool vo 2 dong de len cau gioi thieu. Sua: flex 2 khoi co
+gap 32px, bo danh sach 8 tool (lap lai muc "8 tool" ngay tren).
+
+**Kiem chung bang so (build tinh, localhost:4173):**
+- Chu: 1.032 -> 634 ky tu (-39%)
+- Hero desktop 1265px: 0 cho de nhau · thanh chung phu khit hero · cot trai
+  484px co vien+nen · day noi hien 64px · 5/5 tang co nhip hien (60→300ms)
+- Footer: cao 112px, hai khoi cach nhau **808px**, **0 cho de nhau**
+  (truoc: chong chit)
+- Mobile 375px: 0 phan tu tran · day noi da an · footer xep doc
+- Chieu cao trang: 3.484 -> 3.349 px · `node --test` 6/6 dat
+
+☠️ **Lai bi thuoc do lua lan hai:** bao "tran ngang 192px, hero de nhau 5 cho"
+— that ra `innerWidth = 0` (khung xem khong ve). Mo lai preview thi 0/0.
+Luat: **doc `clientWidth` TRUOC khi tin bat ky so do hinh hoc nao.**
+
+**CHUA push** — anh Tien dan lam tren local truoc.
+
+## 2026-08-17 09:20 — Hero: thanh tinh nang CHUNG + het chu de nhau + doi thong diep
+
+**Boi canh:** anh Tien: *"phan hero chua an tuong, 2 cot roi rac va noi dung
+dang de len nhau"* + khoanh do vung tren cung: *"cac tinh nang se la mot thanh
+chung"*. Sau do: *"giam chu noi dung lai, noi dung se la Plugins ho tro cho
+PR - Davinci"*.
+
+**1. Thanh tinh nang thanh THANH CHUNG**
+Truoc: `.sim-mode-bar` nam BEN TRONG simulator (cot phai) -> nhin nhu 2 khoi
+roi rac. Nay tach ra thanh component `HeroModeBar`, la con truc tiep cua
+`.hero` voi `grid-column: 1 / -1`, hero them `grid-template-rows: auto 1fr`.
+Vi tach ra nen `activeMode` phai NANG LEN component cha (`heroMode` o Home),
+simulator nhan qua prop. Them `role="tab"` + `aria-selected` (truoc khong co).
+
+**2. Het chu de nhau — sua theo CAU TAO, khong sua bang toa do**
+- `.cut-tag-badge` / `.silence-detected-badge` dang `position:absolute;
+  bottom:-6px` -> de len nhan "Host Mic (A1)" **66x15px**. Bo absolute, cho
+  thanh muc flex binh thuong -> xep duoi nhan, khong the de nhau nua.
+- `.clip-label` (ten file .wav) absolute -> de len cot song am **8 lan**.
+  Doi `.waveform-clip` sang xep DOC (nhan mot dong, song am mot dong).
+→ Chon cach nay vi no lam viec de nhau thanh KHONG THE XAY RA, thay vi
+  chinh toa do roi phai kiem lai moi lan doi chu (bai hoc 5h).
+
+**3. Chu hero gon lai + thong diep moi**
+- Eyebrow: "BO CONG CU NATIVE CHO PREMIERE PRO · WINDOWS" ->
+  "Plugins ho tro cho Premiere Pro · DaVinci Resolve"
+- Lead: 148 -> **81 ky tu** (bo "100% offline" va "khong gioi han phut" vi
+  3 chip ngay ben duoi da noi — mot thong diep chi noi o MOT noi)
+
+**☠️ CANH BAO PHAI GHI LAI — loi hua di TRUOC san pham:**
+Test chot chan tu 14/08 CAM chu "DAVINCI" voi ly do *"chua co mot dong code
+nao cho DaVinci"*. Anh Tien 17/08 yeu cau nguoc lai. Da bo lenh cam va lam
+theo, NHUNG su that ky thuat khong doi: grep ca 8 panel ngay 17/08 ->
+**0 dong code cho DaVinci Resolve** (moi ket qua "resolve" tim duoc deu la
+`Promise.resolve` cua JavaScript — khop chu chu khong khop nghia). Da ghi ro
+trong `tests/rendered-html.test.mjs` kem cach bat lai lenh cam neu doi y.
+
+**Kiem chung bang so (build tinh, localhost:4173):**
+- Thanh chung: trai 63 / phai 1203 — **trung khit hero (63/1203)**, rong
+  1140px, nam tren ca 2 cot; 4 nut moi nut 280px
+- Chu de nhau trong hero: **1 cap -> 0 cap**; nhan de song am: **8 -> 0**
+- Bam thu ca 4 tab: 4/4 doi dung canh (mode-autocut/podcast/transcripts/
+  reframe), `aria-selected` dung; do lai sau khi doi tab: **0 cho de nhau**
+- Mobile 375px: thanh chung 347px vua khung, tu xuong 2 hang, nut cao 34px,
+  **0 phan tu tran**
+- `node --test`: 6/6 dat
+
+**CHUA push** — anh Tien dan lam tren local truoc.
+
+## 2026-08-17 09:10 — Go tiep section SO SANH va section DEMO MIEN PHI
+
+**Boi canh:** anh Tien gui 2 anh chup, noi "remove 2 cai vo van nay".
+Trang gio con 4 section: hero · quy trinh 4 buoc · 8 tool · bang gia.
+
+**☠️ Cho nguy hiem nhat — suyt cat mat duong ban hang:** nut mailto "Nhan
+Link Tai Demo" NAM TRONG section demo vua go, va 2 cho khac deu tro toi
+`#beta` (nut hero + nut goi Demo Pass). Go khong thi trang con nhan "Tai Demo
+mien phi" nhung KHONG con duong nao lay duoc file.
+→ Da chuyen mailto thang vao nut cua card Demo Pass; nut hero doi sang
+`#pricing`. Do lai: 2 mailto con song, 0 link chet.
+
+**Thay doi khac:**
+- `lessons` rail: bo muc "Vs Competitors", danh lai so 04 cho Pricing va chia
+  lai width (20+20+25+35 = 100; truoc do bo 1 muc ma khong chia lai thi vach
+  tien do dung o 80%)
+- Don CSS chet: 17 rule (comp-card, comparison-cards-grid, featured-badge,
+  one-plan...) — 60.326 -> 58.312 ky tu
+- ☠️ Script don CSS co CHOT CHAN: khong dua chu "comparison" tran vao danh
+  sach chet, vi `.pipeline-flow-comparison` la class KHAC dang dung o section
+  quy trinh; va script tu doi chieu page.tsx truoc khi xoa
+
+**Kiem chung bang so (build tinh, localhost:4173):**
+- 2 section da go: 0 dau vet text, 0 phan tu DOM (`#beta`, `#comparison`,
+  `.comp-card`, `.featured-badge`)
+- Section con lai: hero · basics · lab · pricing ✓
+- 0 link chet (moi anchor deu tro toi id CO THAT)
+- 2 mailto song: "Xin link tai" + "Goi Pro $17/thang"
+- Rail: 4 muc, tong width = 100 ✓
+- Desktop 1265px: 0 phan tu tran; mobile 375px: 0 tran, 2 card gia xep doc
+  (mep phai 361 <= 375)
+- Chieu cao trang desktop: 4.866 -> 3.484 px
+- `pipeline-flow-comparison` con nguyen ✓
+- `node --test`: 6/6 dat (them 1 bai chot chan 2 section khong quay lai)
+
+☠️ **Do bi lua mot lan:** `clientWidth` tra 0 -> moi so do hinh hoc vo nghia.
+Khong phai trang hong ma la khung xem khong ve. Mo lai preview thi do dung.
+(Dung bai hoc: so do vo ly thi nghi CONG CU DO truoc.)
+
+**CHUA push** — anh Tien dan lam tren local truoc.
+
+## 2026-08-17 09:04 — Go 4 khoi noi dung theo y anh Tien + doi logo chi-bieu-tuong
+
+**Boi canh:** anh Tien chi anh chup 4 cho va noi "remove", kem yeu cau
+"update lai file logo only".
+
+**Thay doi (`page.tsx`):**
+- Go dai 3 o chi so (∞ / <1s / 100%) — trung y voi chip ngay trong hero
+- Go 5 nhan cam dau section (WORKFLOW PIPELINE · 8 NATIVE PANELS · SO SANH ·
+  DEMO MIEN PHI · BANG GIA)
+- Go nguyen section ROI (tinh gio thu hoi) + 2 state + bien dan xuat
+- Go nguyen khoi CTA cuoi trang
+- Go link nav "Gia tri" (tro toi section vua go — neu de lai la link chet)
+- Logo: 3 cho `AiO Logo 3.png` -> `AiO Logo Mark.png`; layout.tsx doi ca
+  favicon/apple-icon
+
+**Logo moi:** cat tu `AiO Logo 3.png` (253x310) bo phan chu "AiO Studio" ben
+duoi -> `AiO Logo Mark.png` (253x230), cat bang System.Drawing (khong chep
+tay base64). O co 16-32px thi phan chu chi la vet mo, bo di ro net hon.
+
+**Don CSS chet:** script co kiem soat, chi xoa rule ma MOI selector deu chet
+(rule tron selector con song thi giu) -> 38 rule, CSS 65.251 -> 60.744 ky tu.
+☠️ Bat duoc mot cho quan trong: `.section-intro` la luoi 2 cot, cot 88px
+VON DE CHUA nhan cam. Bo nhan ma giu cot = moi tieu de thut vao 116px vo co.
+Da doi ve 1 cot (bai hoc "xoa phan tu = phai don khoang cach no dang ganh").
+
+**Kiem chung bang so (build tinh, serve localhost:4173):**
+- 4 khoi da go: 0 dau vet trong text VA trong DOM (`.lesson-number`,
+  `.confidence-strip`, `.roi-calculator`, `.final-cta` = 0 phan tu)
+- Noi dung ban hang CON DU: "$17" xuat hien 5 lan, Demo Pass + Pro Pass,
+  6 nut CTA deu song, 0 vet "$299"
+- Tieu de het thut: le trai h2 = 0px so voi khung (truoc: 116px)
+- Logo: 3/3 anh tai duoc, 253x230 ✓
+- Nav: 0 link `#journey` con lai
+- Chieu cao trang 6.374 -> 4.866 px (gon 24%)
+- Mobile 375px: 0 phan tu tran
+- `node --test`: 5/5 dat (da sua thuoc theo quyet dinh moi + them chot chan
+  cam 4 khoi quay lai, ke ca trong CSS)
+
+**CHUA push** — cho anh Tien xem local truoc.
+
+## 2026-08-17 09:05 — Sua loi rot font tren ban build tinh ("15 PHUT" thanh "15 PI")
+
+**Boi canh:** anh Tien gui anh chup live: headline hien "CON 15 PI", font sai.
+**Nguyen nhan that:** `globals.css` co `@import "tailwindcss"` TRUOC dong
+`@import` Google Fonts. Tailwind bung ca nghin dong CSS vao truoc → dong font
+vi pham luat "@import phai o dau file" → trinh toi uu cua build tinh VUT no
+trong im lang. Do that: CSS prod 51KB, 0 chu "googleapis". Live rot ve font
+he thong → headline tu-cat (do be rong chu bang font) cat sai → "15 PI".
+Dev local di duong vite nen KHONG lo — dung ho bai hoc 5ak/5ah: phai do tren
+ban BUILD, console/dev sach khong chung minh gi.
+**Thay doi:** dao dong font len TRUOC `@import "tailwindcss"` (kem comment ☠️).
+**Kiem chung bang so:**
+- Build lai: het warning @import; CSS prod CO "googleapis", nam dau file
+- Serve out/ o localhost:4173, do `document.fonts`: Barlow Condensed ✓,
+  IBM Plex Sans ✓ (34 font faces); H1 doc du "CON 15 PHUT." ✓
+- CHUA push — cho anh Tien xem local truoc theo yeu cau.
+
 ## 2026-08-17 08:45 — Sua .gitignore goc: luat build/ nuot file nguon cua web
 
 **Boi canh:** cu push dau tien sau khi co vercel.json bi Vercel bao Error.
