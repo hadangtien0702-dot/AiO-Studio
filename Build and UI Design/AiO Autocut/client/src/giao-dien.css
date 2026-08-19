@@ -1282,6 +1282,8 @@
 .chon-seq {
   max-width: 220px;
   min-width: 0;
+  /* Cùng bộ token với `.seqpick` của panel Transcripts — panel đó đã có ô chọn
+     sequence từ trước, nên đây là khuôn có sẵn, không tự chế thêm kiểu mới. */
   height: var(--h-ctrl-sm);
   padding: 0 var(--sp-2);
   background: var(--bg-4);
@@ -1299,4 +1301,24 @@
 .chon-seq:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ☠️ DANH SÁCH XỔ XUỐNG CỦA `<select>` DO HỆ ĐIỀU HÀNH VẼ — CSS THƯỜNG
+   KHÔNG VỚI TỚI. Chỉ `color-scheme` đổi được.
+   ══════════════════════════════════════════════════════════════════════════
+   Anh Tiến chụp 19/08: ô chọn sequence xổ ra NỀN TRẮNG CHỮ ĐEN giữa một panel
+   tối thui. Không phải quên style — `.chon-seq` đã ăn đủ token; phần xổ xuống
+   nằm ngoài tầm CSS của trang.
+
+   Đặt ở `:root` chứ không riêng `select`: nó chữa MỌI control do hệ điều hành
+   vẽ trong panel (danh sách xổ, ô nhập số, thanh cuộn phụ, lịch…), nên sau này
+   thêm control mới cũng không dính lại lỗi này.
+
+   ⚠️ Panel Transcripts có cùng lỗi (`.seqpick` cũng là `<select>` native, cũng
+   không khai `color-scheme`) — nên đưa dòng này lên `design-system/tokens.css`
+   để cả bộ dùng chung. CHƯA làm ở đây vì sửa nguồn chân lý là chạm cả 4 panel,
+   phải đồng bộ và đo lại từng cái. */
+:root {
+  color-scheme: dark;
 }

@@ -1,5 +1,47 @@
 # AiO Autocut - Nhat ky
 
+## [dropdown-toi] - 2026-08-19 13:01 (UTC+7) - O CHON SEQUENCE: DANH SACH XO XUONG HET NEN TRANG
+
+### Trang thai hien tai
+v1.6.0. O chon sequence nay dong bo voi phan con lai cua panel, ke ca phan xo
+xuong. Cho anh Tien nhin mat xac nhan (phan do HE DIEU HANH ve, khong chup lai
+duoc qua cong go loi).
+
+### Boi canh
+Anh Tien: *"chinh lai UI dropdown cho dong bo voi may tool khac nha em"*, kem
+anh chup: o chon xo ra **NEN TRANG CHU DEN** giua panel toi thui.
+
+### Nguyen nhan that
+KHONG phai quen style. `.chon-seq` da an du token (nen/vien/bo goc/co chu).
+**Danh sach option cua `<select>` do HE DIEU HANH ve, CSS cua trang khong voi
+toi.** Chi khai `color-scheme` moi doi duoc.
+
+### Thay doi
+- `giao-dien.css`: them `:root { color-scheme: dark }`.
+  Dat o `:root` chu khong rieng `select` — no chua MOI control do he dieu hanh
+  ve trong panel (danh sach xo, o nhap so, lich...), nen sau nay them control
+  moi cung khong dinh lai loi nay.
+- `.chon-seq`: ghi chu ro la dung cung bo token voi `.seqpick` cua panel
+  Transcripts (panel do da co o chon sequence tu truoc) — khuon co san, khong
+  tu che kieu moi.
+
+### Kiem chung bang so (panel that)
+- `getComputedStyle(:root).colorScheme` = **dark**, tren `select` cung = **dark**
+- style o chon vs phim I/O ngay canh no tren cung thanh:
+  nen **rgb(40,40,40)** = **rgb(40,40,40)** · vien **rgba(255,255,255,.1)** =
+  **rgba(255,255,255,.1)** -> dong bo
+- ☠️ Phan XO XUONG khong do duoc bang script (he dieu hanh ve, khong nam trong
+  DOM). Do duoc CO CHE da bat; con MAT NHIN thi phai anh Tien xac nhan.
+
+### ☠️ PANEL TRANSCRIPTS CO CUNG LOI — chua sua
+`.seqpick` cua Transcripts cung la `<select>` native va cung khong khai
+`color-scheme` => xo ra cung nen trang. Chua sua o day vi dung ra phai dua
+`color-scheme` len `design-system/tokens.css` (nguon chan ly) roi dong bo ca bo,
+ma cham nguon chan ly la cham 4 panel — phai do lai tung cai.
+Da tao mot viec rieng cho vien do (chip trong phien lam viec).
+
+---
+
 ## [het-no] - 2026-08-19 12:51 (UTC+7) - LAM NOT BON MON NO
 
 ### Trang thai hien tai
