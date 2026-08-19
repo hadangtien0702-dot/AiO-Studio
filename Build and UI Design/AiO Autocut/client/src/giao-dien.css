@@ -1272,3 +1272,31 @@
   text-align: center;
   line-height: 1.5;
 }
+
+/* ── Ô CHỌN SEQUENCE trên thanh vùng (2026-08-19) ────────────────────────
+   Chỉ hiện khi project có từ 2 sequence trở lên — một sequence thì ô chọn
+   là thứ bấm vào không đổi được gì (luật: nút bấm được mà không đổi kết quả
+   là công tắc vô nghĩa).
+   Kẹp bề ngang: tên sequence của anh Tiến dài ("test - autocut 1103"), thả
+   tự do là nó đẩy cụm phím I/O ra khỏi thanh ở panel dock hẹp. */
+.chon-seq {
+  max-width: 220px;
+  min-width: 0;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-2);
+  background: var(--bg-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+.chon-seq:hover:not(:disabled) {
+  background: var(--bg-5);
+}
+.chon-seq:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

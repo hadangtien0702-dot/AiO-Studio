@@ -18,6 +18,9 @@ import {
   evalScript,
   napLaiHost,
   getRange,
+  dsSequence,
+  moSequence,
+  type MotSequence,
   getRangeClips,
   buildKeep,
   catTaiCho,
@@ -311,6 +314,10 @@ export default function App() {
    * `fps` giữ lại để bảng danh sách in được timecode thật (00:00:12:04), thay
    * vì số giây tương đối mà người dựng phải tự cộng vào mốc vùng.
    */
+  /* Danh sach sequence cho o chon tren thanh vung. Cap nhat trong CUNG vong
+     tham do I/O — chi hoi lai khi ten sequence dang mo doi, nen dung yen
+     thi khong ton them luot goi host nao. */
+  const [dsSeq, setDsSeq] = useState<MotSequence[]>([])
   const [vungTin, setVungTin] = useState<{
     tu: number
     dai: number
@@ -485,6 +492,10 @@ export default function App() {
           // `seqName` đã đi kèm sẵn trong lời gọi này nên không tốn gì thêm.
           if (r.seqName !== seqTruoc) {
             seqTruoc = r.seqName
+            // Sequence doi (hoac vua mo panel) -> nap lai danh sach cho o chon.
+            void dsSequence()
+              .then((ds) => { if (con) setDsSeq(ds) })
+              .catch(() => {})
             void evalScript('getHostInfo()')
               .then((raw) => {
                 if (!con) return
@@ -632,7 +643,8 @@ export default function App() {
         // vào dự án thật của người dùng — cắt nhầm là mất công dựng lại.
         setCanLam(
           dich('Chưa cài bộ nghe hiểu nên chưa cắt được. Autocut bắt buộc phải có nó: ') +
-            'cắt chỉ dựa vào độ to đã đo thật là mất 321 câu nói.\n' +
+            dich('cắt chỉ dựa vào độ to đã đo thật là mất 321 câu nói.') +
+            '\n' +
             thieuGi(),
         )
         return
@@ -1300,6 +1312,48 @@ export default function App() {
           </svg>
           <span className="lbl">{dich('Đoạn đang chọn')}</span>
           <span className="val">{vungTin ? dai(vungTin.dai) : dich('chưa khoanh')}</span>
+
+          {/* ══════════════════════════════════════════════════════════════
+              Ô CHỌN SEQUENCE — anh Tiến đề xuất 19/08
+              ══════════════════════════════════════════════════════════════
+              Anh nêu khi tưởng panel không nhảy được sang sequence mới. Đo lại
+              thì panel nhảy đúng rồi (vòng thăm dò bắt được `seqName` đổi), nên
+              ô này KHÔNG còn là bản vá lỗi — nó là tiện: khỏi đi tìm trong
+              Project panel.
+
+              ☠️ CHỌN LÀ **MỞ** SEQUENCE ĐÓ RA, không phải "cắt từ xa".
+              Cho panel cắt thẳng vào một sequence đang khuất là mời gọi tai
+              nạn: người dùng không nhìn thấy thứ mình vừa sửa. Mở nó ra thì
+              vòng thăm dò I/O tự bắt và mọi thứ chạy như thường — tiện mà
+              không mù.
+
+              ☠️ `value` dùng `id`, KHÔNG dùng tên: Premiere cho phép trùng tên,
+              và project của anh Tiến đã có sẵn cảnh đó. */}
+          {dsSeq.length > 1 && (
+            <select
+              className="chon-seq"
+              aria-label={dich('Chọn sequence')}
+              disabled={!!dangChay}
+              value={dsSeq.find((s) => s.dangMo)?.id ?? ''}
+              onChange={(e) => {
+                const id = e.target.value
+                if (!id) return
+                void (async () => {
+                  if (!(await napLaiHost())) return
+                  await moSequence(id)
+                  // Không tự đặt lại state ở đây: vòng thăm dò I/O sẽ thấy
+                  // `seqName` đổi và cập nhật đủ mọi thứ trong ~1 giây.
+                })()
+              }}
+            >
+              {dsSeq.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.ten}
+                </option>
+              ))}
+            </select>
+          )}
+
           <span className="spacer" />
           <span className="lbl">{dich('Đổi vùng bằng phím')}</span>
           <kbd className="kbd">I</kbd>

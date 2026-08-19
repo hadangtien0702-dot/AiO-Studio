@@ -702,6 +702,57 @@ function ac_mediaPath(clip) {
  * chi doc 4 gia tri, khong cham vao track nao.
  * Chi khi thay in/out DOI THAT thi panel moi goi ham nang kia mot lan.
  */
+/**
+ * DANH SACH SEQUENCE trong project, kem dau X cho cai dang mo.
+ *
+ * Dung cho o chon sequence tren panel. Anh Tien de xuat 19/08 khi tuong panel
+ * khong nhay duoc sang sequence moi — do lai thi panel nhay dung roi, nhung o
+ * chon van tien: khoi phai di tim trong Project panel.
+ *
+ * ☠️ Tra ve CA sequenceID de ben goi mo dung cai duoc chon. Ten co the TRUNG
+ * NHAU (Premiere cho phep), nen KHONG duoc dinh danh bang ten.
+ */
+function ac_dsSequence() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var dang = null;
+    try { dang = app.project.activeSequence; } catch (e) {}
+    var dangId = dang ? dang.sequenceID : '';
+    var out = [];
+    for (var i = 0; i < app.project.sequences.numSequences; i++) {
+      var s = app.project.sequences[i];
+      // id \t dangMo \t ten  — ten de CUOI vi no co the chua ky tu la.
+      out.push('seq=' + s.sequenceID + '\t' + (s.sequenceID === dangId ? '1' : '0') + '\t' + s.name);
+    }
+    return 'OK:' + out.join('\n');
+  } catch (e) {
+    return ac_err('ac_dsSequence', e);
+  }
+}
+
+/**
+ * MO mot sequence theo id — tuc CHUYEN sang no, khong phai "cat tu xa".
+ *
+ * ☠️ CO Y lam kieu nay thay vi cho panel cat thang vao sequence dang khuat:
+ * cat vao thu nguoi dung KHONG NHIN THAY la moi goi tai nan. Mo no ra roi
+ * panel theo nhu thuong (vong tham do I/O tu bat) — tien ma khong mu.
+ */
+function ac_moSequence(id) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    for (var i = 0; i < app.project.sequences.numSequences; i++) {
+      var s = app.project.sequences[i];
+      if (String(s.sequenceID) === String(id)) {
+        app.project.openSequence(s.sequenceID);
+        return 'OK:ten=' + s.name;
+      }
+    }
+    return 'ERR:KHONG_THAY_SEQUENCE|' + id;
+  } catch (e) {
+    return ac_err('ac_moSequence', e);
+  }
+}
+
 function ac_getRange() {
   try {
     if (!app.project) return 'ERR:CHUA_MO_PROJECT|';

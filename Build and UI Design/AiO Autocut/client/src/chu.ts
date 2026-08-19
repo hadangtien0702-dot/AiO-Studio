@@ -85,6 +85,15 @@ export const CHU: BangChu = {
     // "Se cat · 0 doan". Thuoc do cu cua toi bo sot vi loc `childElementCount===0`,
     // ma the nay co <i> ben trong. Nay quet bang TEXT NODE, khong loc theo the.
     'Sẽ cắt': 'Will cut',
+    // Ba chuoi ghep dong CON HIEN RA cho nguoi dung (dong canh bao + bao hoan
+    // tac). Ra soat 19/08 sau khi anh Tien hoi "con no gi khong": cac chuoi
+    // ghep khac nam trong nhan tien trinh, ma `DangChay` da `void nhan` — khong
+    // ve ra nua (luat 13/08 giau quy trinh), nen khong phai loi hien thi.
+    'Trong vùng có': 'The range contains',
+    'clip đã đổi tốc độ': 'clips with changed speed',
+    'cắt chỉ dựa vào độ to đã đo thật là mất 321 câu nói.':
+      'cutting on loudness alone was measured to drop 321 spoken lines.',
+    'Đã dựng lại:': 'Rebuilt:',
     'Cắt': 'Cut',
     'khoảng lặng': 'silences',
     'đoạn': 'segments',

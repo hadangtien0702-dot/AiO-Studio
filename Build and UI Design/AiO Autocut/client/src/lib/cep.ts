@@ -253,6 +253,39 @@ export async function getRange(): Promise<{
   }
 }
 
+export interface MotSequence {
+  id: string
+  ten: string
+  dangMo: boolean
+}
+
+/**
+ * Danh sách sequence trong project. CHỈ ĐỌC.
+ *
+ * ☠️ Định danh bằng `id`, KHÔNG bằng tên — Premiere cho phép hai sequence
+ * trùng tên, và trong project của anh Tiến đã có sẵn cảnh đó (`test` và
+ * `test - autocut 1103` sinh ra từ cùng một gốc).
+ */
+export async function dsSequence(): Promise<MotSequence[]> {
+  const res = parseResult(await evalScript('ac_dsSequence()'))
+  if (!res.ok) return []
+  const ra: MotSequence[] = []
+  for (const line of res.message.split(/\r?\n/)) {
+    if (!line.startsWith('seq=')) continue
+    const f = line.slice(4).split('\t')
+    if (f.length < 3) continue
+    // Tên để CUỐI và ghép lại: nó có thể chứa dấu tab của người dùng.
+    ra.push({ id: f[0], dangMo: f[1] === '1', ten: f.slice(2).join('\t') })
+  }
+  return ra
+}
+
+/** Chuyển Premiere sang sequence khác. GHI — nhưng chỉ đổi cái đang mở. */
+export async function moSequence(id: string): Promise<boolean> {
+  const res = parseResult(await evalScript(`ac_moSequence(${JSON.stringify(id)})`))
+  return res.ok
+}
+
 /** Đọc vùng I–O đang khoanh và các clip nằm trong đó. CHỈ ĐỌC. */
 export async function getRangeClips(): Promise<{ vung: VungCat | null; loi: HostLoi | null }> {
   const res = parseResult(await evalScript('ac_getRangeClips()'))

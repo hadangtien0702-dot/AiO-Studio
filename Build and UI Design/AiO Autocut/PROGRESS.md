@@ -1,5 +1,78 @@
 # AiO Autocut - Nhat ky
 
+## [het-no] - 2026-08-19 12:51 (UTC+7) - LAM NOT BON MON NO
+
+### Trang thai hien tai
+v1.6.0. **Bon mon no da xong het**, moi mon do that tren Premiere. Cho anh Tien
+duyet. Con lai la no DAI HAN cua du an (thuoc do tu ngoai, toc do 19 phut/gio),
+khong phai no cua phien nay.
+
+### Mon 4 — ra soat chuoi ghep dong con tieng Viet
+Doc `DangChay`: no `void nhan` — **nhan tien trinh KHONG duoc ve ra** (luat
+13/08 giau quy trinh, chi con "Dang xu ly… %"). Nen moi template trong
+`baoBuoc()`/`setDangChay()` khong phai loi hien thi. Cac `buoc.push({ket})` cung
+vay: chung chi vao "Chi tiet ky thuat" — da go 18/08.
+Con **DUNG BA cho** thuc su hien ra, da dich het:
+- `Trong vùng có N clip đã đổi tốc độ` -> The range contains N clips with changed speed
+- `cắt chỉ dựa vào độ to… mất 321 câu nói.` -> cutting on loudness alone…
+- `Đã dựng lại: N clip · Xs.` -> Rebuilt: …
+
+### Mon 2 — nghe hieu chay THAT (truoc gio luon trung bo dem)
+Doi ten 4 file `.autocut-nghe.json` thanh `.tam` (KHONG xoa) roi chay lai.
+| | Co bo dem | **Khong bo dem** |
+|---|---|---|
+| Thoi gian | 1,5s | **8,1s** |
+| Toi man xem truoc | - | 3,0s |
+=> Nhanh nghe-tu-dau CHAY DUOC sau khi tach luong hai giai doan.
+Ket qua: 4 nhat cat, sequence 5 clip / 22,680s / **ho 0** (vung 25s - 2,3s ✓).
+Bo dem moi sinh ra co **md5 GIONG HET** ban goc => nghe lai cho ket qua y nguyen.
+Da tra du 4 file `.tam` ve ten cu.
+
+### Mon 3 — nhieu file NOI DUNG KHAC NHAU that
+Tu tao 2 video bang ffmpeg: cat doan **2-17s** va **32-47s** cua nguon -> hai
+file noi dung khac han. Nhap vao bin rieng `AIO-TEST-BIN`, dung sequence 2 clip.
+| | |
+|---|---|
+| Vung | 30 sec |
+| **Original** | **30 sec** (= 15 + 15, gop du HAI file) |
+| Ket qua | 5 nhat cat, 6 clip, **28,240s**, **ho 0** |
+| Tu file | AIO-TEST-A.mp4 **+** AIO-TEST-B.mp4 |
+☠️ **Bang chung manh nhat: hai bo dem nghe co KICH THUOC KHAC NHAU** —
+809 bytes va 2974 bytes. Neu la cung mot noi dung thi phai bang nhau.
+Da xoa sequence + bin + file tam. (Hai .mp4 con bi Premiere giu handle, nam
+trong scratchpad cua toi, tu nha khi dong Premiere.)
+
+### Mon 1 — o chon sequence: LAM KHAC Y BAN DAU, co ly do
+Anh Tien de xuat khi tuong panel khong nhay duoc sang sequence moi. Do lai thi
+panel nhay dung roi => o chon khong con la ban va loi.
+☠️ **KHONG lam kieu "cat tu xa"**: cho panel cat thang vao sequence dang khuat
+la moi goi tai nan — nguoi dung khong nhin thay thu minh vua sua.
+=> Lam kieu **CHON LA MO SEQUENCE DO RA**, roi vong tham do I/O tu bat va panel
+   theo nhu thuong. Tien (khoi tim trong Project panel) ma khong mu.
+
+Them: `ac_dsSequence()` + `ac_moSequence(id)` (host) · `dsSequence()` +
+`moSequence()` (cep.ts) · `<select class="chon-seq">` tren thanh vung.
+- Chi hien khi project co **tu 2 sequence tro len** (mot cai thi o chon la nut
+  bam khong doi duoc gi — luat "cong tac vo nghia").
+- Dinh danh bang **sequenceID, KHONG bang ten**: Premiere cho trung ten, va
+  project anh Tien da co san canh do.
+- Danh sach nap trong CUNG vong tham do, chi hoi lai khi `seqName` doi => dung
+  yen thi khong ton them luot goi host nao.
+- Khoa khi dang chay.
+
+### File anh huong
+`host/autocut.jsx` · `client/src/lib/cep.ts` · `client/src/App.tsx` ·
+`client/src/chu.ts` · `client/src/giao-dien.css`
+
+### Kiem chung bang so (panel that)
+O chon: **3 sequence**, dang chon khop Premiere.
+Doi thu: chon "test" -> Premiere `activeSequence` doi thanh **test** (0.00-53.68),
+panel "Selected range" theo thanh **54 sec**, o chon tu dong bo. Da tra ve
+`test - autocut 1103` cua anh Tien.
+
+---
+
+
 ## [v1.6.0] - 2026-08-19 12:17 (UTC+7) - LEN v1.6.0 + VET NOT SONG NGU (thuoc do cu BO SOT)
 
 ### Trang thai hien tai
