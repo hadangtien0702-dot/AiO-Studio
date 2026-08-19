@@ -1,0 +1,54 @@
+/* Ban do cac kieu GON cho khoi "Noi dat ket qua" */
+.ban-do .wrap { overflow: auto; }
+.tieude { font-size: 18px; margin: 0 0 4px; color: var(--text-1); }
+.dan { margin: 0 0 20px; color: var(--text-3); font-size: 13px; }
+.bay { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+.o { width: 318px; }
+.nhan { font-size: 12px; color: var(--text-2); margin-bottom: 8px; min-height: 32px; }
+.hop { width: 318px; }
+.so { margin-top: 8px; font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.so .g { color: var(--text-3); }
+.so .x { color: #33c46f; }
+.so .d { color: #ff7a6b; }
+
+/* ── Dau chon dung chung cho G1/G2: vong tron LUON THAY o ca hai lua chon,
+   nen hai dau nam THANG HANG nhau. Cai duoc chon thi to mau + co dau tick. */
+.tick2 {
+  flex: none;
+  width: 18px; height: 18px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-2);
+  background: var(--bg-0);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.opt--chon .tick2 { background: var(--accent); border-color: var(--accent); }
+/* Dau tick goc (absolute, treo goc phai tren) khong dung o day nua */
+.g1 .opt .tick, .g2 .opt .tick { position: static; display: flex; width: auto; height: auto; background: none; }
+
+/* ── G1: giu hinh, dau chon ve cung hang voi ten ─────────────────────── */
+.g1 .dong { display: flex; align-items: center; gap: var(--sp-2); }
+.g1 .opt .nm { margin-top: 0; font-size: var(--fs-sm); }
+.g1 .dia { margin-top: var(--sp-3); height: 34px; }
+.g1 .opt { padding: var(--sp-3); }
+
+/* ── G2: bo hinh, hai o VAN NAM NGANG ────────────────────────────────────
+   ☠️ Ban dau xep DOC (`grid-template-columns:1fr`) va do ra 228px — CAO HON
+   ban goc 28px, nguoc han muc tieu "lam gon". Bo hinh ma xep doc thi hai
+   dong cong lai con dai hon mot hang co hinh. Giu ngang moi gon that. */
+.g2 .opts { grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.g2 .opt {
+  display: flex; flex-direction: column; align-items: stretch; gap: var(--sp-2);
+  padding: var(--sp-3);
+}
+.g2 .opt > .tick2 { align-self: flex-start; }
+.g2 .chu { display: flex; flex-direction: column; min-width: 0; }
+.g2 .opt .nm { margin-top: 0; }
+.g2 .opt .sub { margin-top: 2px; }
+
+/* ── G3: thanh hai nut, dung kieu voi "Muc cat" ───────────────────────── */
+.g3 .seg__sub {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  line-height: 1.5;
+}

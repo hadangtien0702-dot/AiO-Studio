@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Autocut v2 — ba phương án, cùng khổ 936×1008</title>
+<style>
+  :root {
+    --bg: #0d0d0f; --bg2: #161619; --line: #2a2a30;
+    --tx: #e8e8ea; --tx2: #9a9aa2; --tx3: #6b6b73; --cam: #ff5c1a; --xanh: #33c46f;
+    --khung-w: 936px; --khung-h: 1008px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--tx);
+    font: 14px/1.5 "Inter var", "Segoe UI", system-ui, sans-serif;
+    padding: 24px 24px 64px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em; }
+  .sub { color: var(--tx2); margin: 0 0 20px; font-size: 13px; }
+  .sub b { color: var(--tx); font-weight: 600; }
+
+  .thanh {
+    position: sticky; top: 0; z-index: 10; background: var(--bg);
+    padding: 12px 0 16px; margin-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .gat { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .gat button {
+    background: var(--bg2); color: var(--tx2); border: 0; padding: 8px 16px;
+    font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .gat button[aria-pressed="true"] { background: var(--cam); color: #fff; font-weight: 600; }
+  .ghichu { color: var(--tx3); font-size: 12px; }
+
+  .hang { display: flex; gap: 24px; align-items: flex-start; overflow-x: auto; padding-bottom: 16px; }
+  .cot { flex: 0 0 auto; }
+  .dau { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  .ma {
+    display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+    background: var(--cam); color: #fff; border-radius: 6px; font-weight: 700; font-size: 12px;
+  }
+  .ten { font-weight: 600; font-size: 14px; }
+  .mota { color: var(--tx2); font-size: 12px; margin: 0 0 10px; max-width: var(--khung-w); line-height: 1.55; }
+  .mota .tot { color: var(--xanh); }
+  .mota .xau { color: #ff7a6b; }
+
+  .khung {
+    width: var(--khung-w); height: var(--khung-h);
+    border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5); background: #000;
+  }
+  iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+  .so { margin-top: 10px; font-size: 12px; color: var(--tx2); font-variant-numeric: tabular-nums; }
+  .so table { border-collapse: collapse; width: 100%; }
+  .so td { padding: 3px 8px 3px 0; }
+  .so td:last-child { text-align: right; color: var(--tx); }
+  .so .ok { color: var(--xanh); }
+  .so .no { color: #ff7a6b; }
+</style>
+</head>
+<body>
+
+<h1>Autocut — cân lại hai cột</h1>
+<p class="sub">
+  Ba phương án dựng từ <b>markup thật lấy ra khỏi panel đang chạy</b> (cổng 8089), dùng
+  <b>đúng file CSS của panel</b> — nên nhìn ở đây thế nào thì trong Premiere thế đó.
+  Khung dưới đây đúng khổ panel anh đang mở: <b>936 × 1008</b>.
+</p>
+
+<div class="thanh">
+  <div class="gat" role="group" aria-label="Trạng thái">
+    <button type="button" data-tt="chua" aria-pressed="false">Chưa chạy</button>
+    <button type="button" data-tt="xong" aria-pressed="true">Chạy xong</button>
+  </div>
+  <span class="ghichu">Đã gỡ theo yêu cầu 18/08: dòng đỏ “số đo không khớp” + khối “Chi tiết kỹ thuật”. Bản đang chạy: nút “Hoàn tác cắt” ở y 1004–1032 — <b>vượt đáy màn hình 24px</b>.</span>
+</div>
+
+<div class="hang" id="hang"></div>
+
+<script>
+const PA = [
+  { ma: 'A', ten: 'Dải sóng vừa — giữ dáng Premiere',
+    mota: 'Dải sóng <b>92 → 240px</b> (gấp 2,6), tỉ lệ hình:tiếng ép về 1:2 như Premiere thật. <span class="tot">Còn ra dáng timeline.</span> <span class="xau">Đổi lại: trống 255px ở đáy card bên trái.</span>' },
+  { ma: 'B', ten: 'Dải sóng giãn hết — lấp kín cột trái',
+    mota: 'Thả cho dải sóng ăn hết chiều cao, <b>92 → 367px</b> (gấp 4). <span class="tot">Cột trái kín, chỉ dư 1px.</span> <span class="xau">Đổi lại: tỉ lệ hình:tiếng thành 1:2 nhưng mỗi dải cao 367px — nhìn ra hai khối đặc hơn là timeline.</span>' },
+];
+
+const hang = document.getElementById('hang');
+hang.innerHTML = PA.map(p => `
+  <div class="cot">
+    <div class="dau"><span class="ma">${p.ma}</span><span class="ten">${p.ten}</span></div>
+    <p class="mota">${p.mota}</p>
+    <div class="khung"><iframe data-pa="${p.ma.toLowerCase()}" src="pa-${p.ma.toLowerCase()}-xong.html" title="Phương án ${p.ma}"></iframe></div>
+    <div class="so" id="so-${p.ma.toLowerCase()}">đang đo…</div>
+  </div>`).join('');
+
+let tt = 'xong';
+document.querySelectorAll('.gat button').forEach(b => {
+  b.addEventListener('click', () => {
+    tt = b.dataset.tt;
+    document.querySelectorAll('.gat button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll('iframe').forEach(f => { f.src = `pa-${f.dataset.pa}-${tt}.html`; });
+    setTimeout(do_het, 400);
+  });
+});
+
+// Do THAT trong tung iframe: nut chinh o dau, nut hoan tac co trong man hinh khong,
+// con bao nhieu cho trong o duoi cot trai.
+function do_het() {
+  document.querySelectorAll('iframe').forEach(f => {
+    const o = document.getElementById('so-' + f.dataset.pa);
+    try {
+      const d = f.contentDocument, w = f.contentWindow;
+      if (!d || !d.querySelector('.grid')) { o.textContent = 'chưa nạp xong'; return; }
+      const H = w.innerHeight;
+      const r = e => e ? e.getBoundingClientRect() : null;
+      const nut = r(d.querySelector('.btn--primary'));
+      const lui = r(d.querySelector('.lui'));
+      const wrap = d.querySelector('.wrap');
+      const duCuon = wrap ? Math.max(0, wrap.scrollHeight - wrap.clientHeight) : 0;
+      const rows = [];
+      if (nut) rows.push(['Nút chính ở', Math.round(nut.top) + 'px (' + Math.round(nut.top / H * 100) + '%)', nut.top / H < 0.5 ? 'ok' : '']);
+      if (lui) rows.push(['Nút Hoàn tác đáy', Math.round(lui.bottom) + 'px / ' + H, lui.bottom <= H ? 'ok' : 'no']);
+      rows.push(['Phải cuộn', duCuon + 'px', duCuon === 0 ? 'ok' : 'no']);
+      o.innerHTML = '<table>' + rows.map(x => `<tr><td>${x[0]}</td><td class="${x[2] || ''}">${x[1]}</td></tr>`).join('') + '</table>';
+    } catch (e) { o.textContent = 'không đo được: ' + e.message; }
+  });
+}
+window.addEventListener('load', () => setTimeout(do_het, 500));
+</script>
+</body>
+</html>

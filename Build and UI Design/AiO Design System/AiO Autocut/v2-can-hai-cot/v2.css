@@ -1,0 +1,104 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Autocut v2 — CAN LAI HAI COT.  De DE len panel.css (CSS that cua panel).
+   Chi chua phan KHAC bien so voi ban dang chay.
+
+   ── Nguyen nhan goc (do that tren panel 8089, 18/08/2026, kho 936x1008)
+   1. Luoi 2 cot x 2 hang dung cho 4 o. Ngay 13/08 go khoi "Doan se cat"
+      => o (cot1,hang2) TRONG HAN: 564 x 540 px trang.
+   2. Ca cot phai don vao 318px: nut(34) + ket(354) + hoan tac(28) = 436px,
+      day nut "Hoan tac cat" xuong y=1004..1032 — VUOT day man hinh 24px.
+      Vung cuon duy nhat (.wrap) chi du 25px => phai cuon het co moi bam duoc.
+
+   ── Anh Tien chot 18/08: GO HAN hai khoi
+   `.ketluan` (dong do "so do khong khop") va `.fold` ("Chi tiet ky thuat",
+   225px = 52% khoi ket qua — thu pham chinh cua muc 2).
+   Go xong thi "Ket qua" chi con BA CON SO, va cot phai chi con ~490px.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Bo cuc chung cho ca hai phuong an ──────────────────────────────────
+   Cot trai: mot khoi "Xem truoc" gian het chieu cao.
+   Cot phai: mot cot doc lien, di theo dung THU TU LAM VIEC —
+   Muc cat -> Noi dat -> BAM NUT -> Ket qua hien ngay duoi nut -> Hoan tac.
+   Bo han luoi 2 HANG: khong con o thu 4 thi khong con moc ngang de le. */
+.grid {
+  grid-template-rows: minmax(0, 1fr);
+}
+.grid .card--xem  { grid-column: 1; grid-row: 1; }
+.grid .nhom--phai { grid-column: 2; grid-row: 1; }
+.nhom--phai {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+  min-height: 0;
+}
+/* Cho du chay vao O KET QUA, khong phai vao the chon. Do lan 1: de
+   `.card--fill` gian thi no phinh 223 -> 336px va day nut xuong 56% man
+   hinh. Ep no ve dung noi dung => nut len 43%. */
+.card--fill { flex: none; }
+.cta { flex: none; }
+
+/* ☠️ O ket qua VUA NOI DUNG, khong gian.
+   Do lan 2 (sau khi go `.fold`): de `flex:1` thi o cao ~450px ma chi co ba
+   con so nam o dau => lai rong ruot dung nhu cai vua sua. Con lai bao nhieu
+   thi de TRONG O DAY cot (khong vien) — de nhin hon mot cai o rong co khung. */
+.card--ketqua {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: none;
+}
+.card--ketqua .ket--rong {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+/* Chua chay: giu cho bang mot dong chu => VI TRI NUT KHONG NHAY giua hai
+   trang thai, va khong co o nao rong ruot khong loi giai thich. */
+.trong-nn {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  text-align: center;
+}
+.card--ketqua-trong .ket--rong { justify-content: center; }
+
+/* ── DAI SONG GIAN THAT ─────────────────────────────────────────────────
+   ☠️ Card gian ma ruot dung yen thi chi la DOI CHO khoang trong.
+   Do lan 1: card--xem cao 882px ma hai dai song van 92px => 490px TRANG
+   ben trong. Nguyen nhan: `.tl{height:92px}` va `.tl .lanes{height:66px}`
+   deu CO DINH. Song ve bang `height: %` nen bo tran cung la no cao theo. */
+.card--xem { display: flex; flex-direction: column; min-height: 0; }
+.card--xem .tl {
+  flex: 1; height: auto; min-height: 92px;
+  display: flex; flex-direction: column;
+}
+.card--xem .tl .lanes { height: auto; flex: 1; }
+/* ☠️ `.tl--after` von la flex ROW (kept | gone). Dat flex-direction:column
+   o tren se lat no thanh doc — phai ghi de lai. (Bai hoc 03/08 muc 4:
+   ghi de MOT thuoc tinh khong ghi de CA NHOM.) */
+.card--xem .tl--after { flex-direction: row; }
+.card--xem .tl--after .kept { display: flex; flex-direction: column; }
+.card--xem .tl--after .kept .lanes { flex: 1; margin-top: 10px; }
+/* Ti le hinh:tieng ep ve 1:2 nhu Premiere, thay vi hinh khoa cung 22px */
+.card--xem .tl .v { height: auto; flex: 1; }
+.card--xem .tl .a { flex: 2; }
+
+/* ── KHAC BIET DUY NHAT GIUA HAI PHUONG AN ──────────────────────────────
+   A: kep tran 240px moi dai — to gap ~2 lan ban cu (92px) ma van ra dang
+      timeline. Doi lai: con khoang trong o day cot trai.
+   B: tha cho gian het — khong con cho trong nao, nhung dai tieng cao 310px
+      va ti le hinh:tieng thanh 1:14, nhin ra hai khoi xanh dac. */
+.grid--a .card--xem .tl { max-height: 240px; }
+/* ☠️ HAI HUONG DA THU DE XOA 160px TRONG O DAY CARD — CA HAI DEU HONG,
+   da hoan tac ca hai (bai hoc 5v: hai huong deu pha cho khac thi bo ca hai):
+   1. `align-self:start`  -> card co ve min-content, dai song tut lai 92px,
+      NUA DUOI MAN HINH trong tron. Ly do: `.tl{flex:1}` ma cha khong cao
+      thi khong co gi de chia.
+   2. `justify-content:space-between` -> nhan "Ban goc" bi day cach dai song
+      cua no 70px, nhin nhu hai thu khong lien quan (vo nguyen tac gom nhom).
+   => Giu nguyen: cho du 160px nam o DAY card. Muon het han cho trong thi
+      phai tha tran ra 367px, ma do dung la phuong an B.
+   Con so quyet dinh: de lap kin 882px thi moi dai phai cao (882-148)/2 = 367px.
+   Khong co muc trung gian nao vua "dep dang timeline" vua "lap kin". */

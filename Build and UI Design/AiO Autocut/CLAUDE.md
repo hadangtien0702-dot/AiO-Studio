@@ -101,11 +101,18 @@ ai đang nói mà không cần nhìn hình.
 - Ba mức nói bằng tiếng nghề, và bấm mức nào là thấy ngay **hình timeline mô
   phỏng** (đỏ là chỗ bỏ):
 
-  | Mức | Mô tả | Còn lại |
-  |---|---|---|
-  | Giữ nhịp | Bỏ dead silent dài · giữ nhịp nói tự nhiên | **87%** |
-  | Vừa | Bỏ phần lớn dead silent · vẫn còn khoảng thở | **74%** |
-  | Cắt sạch | Bỏ sạch dead silent · nhịp dồn liên tục | **57%** |
+  | Mức (VI) | Mức (EN) | Mô tả | Còn lại |
+  |---|---|---|---|
+  | Giữ nhịp | **Light** | Bỏ dead silent dài · giữ nhịp nói tự nhiên | **87%** |
+  | Vừa | **Medium** | Bỏ phần lớn dead silent · vẫn còn khoảng thở | **74%** |
+  | Cắt sạch | **Aggressive** | Bỏ sạch dead silent · nhịp dồn liên tục | **57%** |
+
+  ☠️ **Cột EN thêm 19/08 — ĐẢO NGƯỢC luật 13/08.** Trước đó ba chữ này cố ý
+  KHÔNG dịch, coi là tên thương hiệu. Anh Tiến tự mở bản EN ra nhìn và gọi đó
+  là lỗi: *"phần chuyển đổi giữa tiếng Anh và tiếng Việt nó đang bị còn giữ 3
+  chữ tiếng Việt nè em"*. Nay đã vào bảng dịch `chu.ts`.
+  Bài học: *"giữ nguyên làm thương hiệu"* chỉ đúng khi người dùng ĐỌC RA nó là
+  thương hiệu — chính người Việt còn thấy chướng thì editor nước ngoài càng không.
 
 - Chạy một lúc thì **dừng lại cho xem dải sóng THẬT** của chính clip mình, ưng
   rồi mới bấm **CẮT ĐI**

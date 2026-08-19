@@ -494,3 +494,107 @@ function otsu(hist: Int32Array): Omit<MucAm, 'soCua' | 'cua' | 'nenCucBo' | 'buo
     tyLeIm: tong ? c0 / tong : 0,
   }
 }
+
+/**
+ * CẮT KẾT QUẢ ĐO VỀ ĐÚNG VÙNG I–O NGƯỜI DÙNG KHOANH.
+ * ══════════════════════════════════════════════════════════════════════════
+ * Vì sao cần: `trichTieng()` tách tiếng từ **CẢ FILE**, nên `doMucAm()` cũng
+ * đo cả file — đúng cho bước dò khoảng lặng (nó cần toàn cảnh để tính nền ồn
+ * cục bộ), nhưng SAI cho màn xem trước.
+ *
+ * ☠️ Đo thật 2026-08-19, anh Tiến bắt: khoanh 53,68s / 40s / **16s** — cả ba
+ * lần màn xem trước đều hiện *"Original 54 sec · Cắt 5 khoảng lặng"*. Ba vùng
+ * khác nhau, ba lần cùng một con số, vì nó vẽ cả file.
+ * Trong khi bước cắt THẬT lại chỉ làm trong vùng (`lapKeHoach` nhận
+ * `srcIn`/`srcDen` đã kẹp theo I–O). Tức panel nói một đằng, cắt một nẻo —
+ * phạm đúng luật "nhãn nút phải là VIỆC nó làm".
+ *
+ * ☠️ GIỮ NGUYÊN các số thống kê (`nguongOtsu`, `nenOn`, `mucGiong`, `tyLeIm`)
+ * — CỐ Ý, không phải bỏ sót. Bước cắt thật lấy ngưỡng từ bản đo CẢ FILE
+ * (`nguongDau = mucAm.nguongOtsu`); tính lại ngưỡng riêng cho vùng thì xem
+ * trước sẽ vẽ theo một ngưỡng khác với ngưỡng đem đi cắt — lại lệch, chỉ khác
+ * kiểu. Ở đây chỉ đổi PHẠM VI, không đổi THƯỚC.
+ *
+ * @param tuGiay  mốc đầu vùng, tính theo thời gian NGUỒN của file (`srcTu`)
+ * @param denGiay mốc cuối vùng (`srcDen`)
+ */
+export function catMucAmTheoVung(m: MucAm, tuGiay: number, denGiay: number): MucAm {
+  const b = m.buocGiay
+  if (!(b > 0) || !Number.isFinite(tuGiay) || !Number.isFinite(denGiay)) return m
+
+  const i0 = Math.max(0, Math.floor(tuGiay / b))
+  const i1 = Math.min(m.cua.length, Math.ceil(denGiay / b))
+  // Vùng rỗng / nằm ngoài dữ liệu đo: thà trả nguyên bản còn hơn trả mảng rỗng
+  // rồi vẽ ra một dải sóng trắng trơn mà không ai hiểu vì sao.
+  if (i1 - i0 < 1) return m
+  // Đã trùng khít cả file thì khỏi tạo bản sao.
+  if (i0 === 0 && i1 === m.cua.length) return m
+
+  const cua = m.cua.slice(i0, i1)
+  const nenCucBo = m.nenCucBo.slice(i0, i1)
+  return { ...m, soCua: cua.length, cua, nenCucBo }
+}
+
+
+/** Một mảnh cần vẽ: lấy từ bản đo `m`, khoảng nguồn [tu, den] giây. */
+export interface LatDo {
+  m: MucAm
+  tu: number
+  den: number
+}
+
+/**
+ * GỘP NHIỀU MẢNH — kể cả từ NHIỀU FILE KHÁC NHAU — thành một dải liền mạch.
+ * ══════════════════════════════════════════════════════════════════════════
+ * Vì sao cần: `trichTieng()` tách tiếng theo TỪNG FILE, nên mỗi file có một
+ * bản đo riêng. Còn vùng I–O người dùng khoanh thì cắt ngang mọi thứ:
+ *   - sequence đã Auto Cut lần đầu  → nhiều mảnh của CÙNG một file
+ *   - sequence ghép nhiều nguồn      → mảnh của NHIỀU file
+ *
+ * ☠️ Ba đời đã sai ở chỗ này, ghi lại để không quay về:
+ *   1. vẽ CẢ FILE               → vùng 16s hiện "Original 54 sec" (19/08 sáng)
+ *   2. cắt theo clip ĐẦU        → vùng 19s hiện "Original 6 sec"  (19/08 trưa)
+ *   3. gộp mảnh cùng một file   → đúng khi vùng một file, thiếu khi nhiều file
+ *   4. (đây) gộp mọi mảnh mọi file
+ *
+ * ⚠️ Bên gọi phải truyền `lat` ĐÚNG THỨ TỰ TIMELINE (theo `seqTu`), vì chỉ bên
+ * đó mới biết thứ tự đó — ở đây chỉ thấy mốc nguồn, mà mốc nguồn của hai file
+ * khác nhau không so được với nhau.
+ *
+ * Thống kê (`nguongOtsu`…) lấy của mảnh ĐẦU: bước cắt thật cũng chấm ngưỡng
+ * theo từng file bằng chính bản đo của file đó, nên ở đây không có một con số
+ * chung nào đúng cho mọi file. Xem thêm `catMucAmTheoVung`.
+ */
+export function gopLatMucAm(lat: LatDo[]): MucAm | null {
+  const dung = lat.filter((l) => l.m && l.m.buocGiay > 0)
+  if (!dung.length) return null
+
+  const mau = dung[0].m
+  const b = mau.buocGiay
+
+  const mieng: Float32Array[] = []
+  const mieng2: Float32Array[] = []
+  let tong = 0
+  for (const l of dung) {
+    // Mỗi mảnh đọc theo bước của CHÍNH bản đo nó — hai file có thể khác nhau
+    // (dù thực tế đều 20 ms, đừng dựa vào đó).
+    const bl = l.m.buocGiay
+    const i0 = Math.max(0, Math.floor(l.tu / bl))
+    const i1 = Math.min(l.m.cua.length, Math.ceil(l.den / bl))
+    if (i1 - i0 < 1) continue
+    mieng.push(l.m.cua.subarray(i0, i1))
+    mieng2.push(l.m.nenCucBo.subarray(i0, i1))
+    tong += i1 - i0
+  }
+  if (!tong) return null
+
+  const cua = new Float32Array(tong)
+  const nenCucBo = new Float32Array(tong)
+  let o = 0
+  for (let k = 0; k < mieng.length; k++) {
+    cua.set(mieng[k], o)
+    nenCucBo.set(mieng2[k], o)
+    o += mieng[k].length
+  }
+  return { ...mau, soCua: tong, cua, nenCucBo, buocGiay: b }
+}

@@ -34,11 +34,25 @@
  * dong vao bang tren de lan sau khong dich kieu khac.
  *
  * ══════════════════════════════════════════════════════════════════════════
- * ☠️ BA MUC CAT KHONG NAM TRONG BANG NAY — CO Y
+ * ☠️ BA MUC CAT: LUAT 13/08 DA HET HIEU LUC — NAY CO DICH
  * ══════════════════════════════════════════════════════════════════════════
- * `Giu nhip` · `Vua` · `Cat sach` la TEN THUONG HIEU, anh Tien chot 13/08 giu
- * nguyen o ca hai thu tieng (giong `Auto Match` / `Auto Sync` ben Podcast).
- * Khong co trong bang = tra lai nguyen van. DUNG "dich cho du".
+ * Cho nay TRUOC ghi: *"`Giu nhip` · `Vua` · `Cat sach` la TEN THUONG HIEU,
+ * anh Tien chot 13/08 giu nguyen o ca hai thu tieng. Khong co trong bang =
+ * tra lai nguyen van. DUNG 'dich cho du'."*
+ *
+ * ANH TIEN DAO NGUOC 19/08, sau khi tu mo ban EN ra nhin:
+ * *"phan chuyen doi giua tieng Anh va tieng Viet no dang bi con giu 3 chu
+ * tieng Viet ne em"* — tuc anh doc ba chu do la LOI, khong phai thuong hieu.
+ * Anh chon bo chu **Light · Medium · Aggressive** (kieu dat ten cac tool tu
+ * dong hay dung; khach quen AutoCut/Descript doc la hieu ngay).
+ *
+ * => Ba khoa do NAY NAM TRONG BANG (xem muc 'Giu nhip' ben duoi). Do lai tren
+ *    panel that 19/08: ban EN con DUNG MOT chuoi tieng Viet — ten project cua
+ *    nguoi dung, thu khong duoc phep dich.
+ *
+ * Bai hoc de lai: "giu nguyen lam thuong hieu" chi dung khi NGUOI DUNG doc no
+ * ra thuong hieu. Anh Tien la nguoi Viet ma con thay chuong mat, thi editor
+ * nuoc ngoai cang khong doc ra y do.
  */
 import type { BangChu } from './ngonngu'
 
@@ -60,6 +74,14 @@ export const CHU: BangChu = {
     'Giữ lại': 'Keep',
     'giữ lại': 'kept',
     'Kết quả': 'Result',
+    'Vùng chọn đã đổi — bấm lại để phân tích vùng mới.':
+      'The selected range changed — press again to analyse the new range.',
+    'Chưa chạy — bấm nút ở trên.': 'Not run yet — press the button above.',
+    // Ba mức cắt — anh Tiến chốt 19/08, đảo quyết định 14/08 ("giữ nguyên
+    // tiếng Việt làm thương hiệu"). Bộ chữ theo kiểu các tool tự động.
+    'Giữ nhịp': 'Light',
+    'Vừa': 'Medium',
+    'Cắt sạch': 'Aggressive',
     'Yêu cầu': 'Requested',
     'chạy mất': 'took',
     'Chạy mất': 'Took',

@@ -17,6 +17,7 @@ import {
   isInHost,
   evalScript,
   napLaiHost,
+  getRange,
   getRangeClips,
   buildKeep,
   catTaiCho,
@@ -32,6 +33,8 @@ import { getFs, getPath, nodeAvailable } from './lib/node'
 import { detectSilence, getFFmpegPath } from './services/ffmpeg'
 import { lapKeHoach, mmss, type CauNoi, type Segment } from './services/plan'
 import {
+  gopLatMucAm,
+  type LatDo,
   doMucAm,
   khoangKhongNoi,
   timKhoangLang,
@@ -217,6 +220,12 @@ function docBangSua(): ThayTu[] {
 export default function App() {
   const [host, setHost] = useState(dich('(đang kiểm tra…)'))
   const [dangChay, setDangChay] = useState('')
+  /* Gương của `dangChay` cho vòng thăm dò I–O đọc: effect đó chạy MỘT lần
+     (deps rỗng) nên đọc thẳng state sẽ mãi thấy giá trị lúc mở panel. */
+  const dangChayRef = useRef('')
+  useEffect(() => {
+    dangChayRef.current = dangChay
+  }, [dangChay])
   /**
    * Đồng hồ chạy suốt lúc làm việc.
    *
@@ -338,6 +347,9 @@ export default function App() {
   // một kiểu. Phải đọc qua ref.
   const [xemTruoc, setXemTruoc] = useState<MucAm | null>(null)
   const tiepTucRef = useRef<(() => void) | null>(null)
+  /* Bật lên khi vùng I–O đổi trong lúc luồng đang treo ở bước xem trước —
+     báo cho luồng biết là "đừng cắt nữa, số vừa đo thuộc về vùng cũ". */
+  const huyXemTruocRef = useRef(false)
   const thamSoRef = useRef({ bien: MAC_DINH.bien, minSilence: MAC_DINH.minSilence, pad: MAC_DINH.pad })
   useEffect(() => {
     thamSoRef.current = { bien, minSilence, pad }
@@ -415,7 +427,15 @@ export default function App() {
   useEffect(() => {
     if (!isInHost()) return
     let con = true
-    const doc = () => {
+    // Mốc lần đọc trước — để biết vùng có ĐỔI THẬT không, chứ không hỏi lại
+    // hàm nặng mỗi nhịp.
+    let mocTruoc = ''
+    // Tên sequence lần đọc trước. Đổi sequence / đổi project thì tên này đổi
+    // theo, và đó là lúc phải hỏi lại thanh trên.
+    let seqTruoc = ''
+
+    /** Hỏi hàm NẶNG (duyệt clip) — chỉ gọi khi mốc đã đổi. */
+    const docDayDu = () => {
       void getRangeClips()
         .then(({ vung }) => {
           if (!con || !vung) return
@@ -428,13 +448,96 @@ export default function App() {
         })
         .catch(() => {})
     }
+
+    /** Nhịp thăm dò: chỉ đọc 4 con số, so mốc, đổi mới hỏi tiếp. */
+    const nhip = () => {
+      // ☠️ ĐANG CHẠY THÌ IM — nhưng "đang chạy" KHÔNG PHẢI là `dangChay` khác
+      // rỗng. Ở BƯỚC XEM TRƯỚC `dangChay` vẫn mang nhãn "Chờ anh chọn mức":
+      // máy không chạy gì cả, nó đang ĐỢI NGƯỜI DÙNG bấm.
+      //
+      // Bản đầu (19/08 sáng) viết `if (dangChayRef.current) return` nên vòng
+      // thăm dò CHẾT ĐỨNG đúng lúc người dùng hay đổi vùng nhất. Đo được:
+      // 0 lời gọi host trong 3,2 giây, panel hiện "2 sec" trong khi Premiere
+      // báo vùng 53,68s — anh Tiến bắt được ngay ở lần test đầu tiên.
+      // Cùng cái bẫy đã ghi trong file này từ 03/08 (nhánh `dangChay` ăn
+      // trước `xemTruoc` làm NÚT CẮT không bao giờ hiện). Lặp lại lần hai.
+      //
+      // Dấu hiệu "đang đợi người dùng" có sẵn: `tiepTucRef.current` khác null
+      // đúng bằng khoảng thời gian luồng treo ở bước xem trước.
+      if (dangChayRef.current && !tiepTucRef.current) return
+      void getRange()
+        .then((r) => {
+          if (!con) return
+          if (!r) {
+            // Bỏ khoanh vùng / đóng sequence → xoá số cũ, đừng để nó nằm đó
+            // như thể vẫn đúng.
+            if (mocTruoc !== '') {
+              mocTruoc = ''
+              setVungTin(null)
+            }
+            return
+          }
+          // ☠️ THANH TRÊN CŨNG PHẢI THEO NGƯỜI DÙNG.
+          // Trước đây tên project/phiên bản Premiere chỉ đọc ĐÚNG MỘT LẦN lúc
+          // mở panel (`useEffect` deps rỗng). Anh Tiến đổi sang project khác
+          // giữa chừng là nó nói sai tên — cùng loại lỗi với ô "Đoạn đang
+          // chọn" đứng im, chỉ chưa ai thấy vì hiếm khi đổi project.
+          // `seqName` đã đi kèm sẵn trong lời gọi này nên không tốn gì thêm.
+          if (r.seqName !== seqTruoc) {
+            seqTruoc = r.seqName
+            void evalScript('getHostInfo()')
+              .then((raw) => {
+                if (!con) return
+                const phan = raw.split('|')
+                setHost(`Premiere ${phan[0] || '?'} · ${phan[phan.length - 1] || '?'}`)
+              })
+              .catch(() => {})
+          }
+
+          const moc = r.tu.toFixed(3) + '|' + r.den.toFixed(3)
+          if (moc === mocTruoc) return
+          const doiThat = mocTruoc !== ''
+          mocTruoc = moc
+
+          // ══════════════════════════════════════════════════════════════════
+          // ☠️ VÙNG ĐỔI GIỮA CHỪNG = MỌI SỐ ĐANG HIỆN THUỘC VỀ VÙNG CŨ
+          // ══════════════════════════════════════════════════════════════════
+          // Đây là lỗi NGUY HIỂM NHẤT trong đợt này, anh Tiến bắt 19/08: panel
+          // hiện "Selected range 2 sec" mà bên cạnh vẫn là "Original 54 sec ·
+          // Cắt 16 khoảng lặng · 0:54 → 0:47" của lần đo TRƯỚC.
+          //
+          // Không chỉ hiển thị sai: lúc đó luồng `autoCut` đang TREO ở bước
+          // xem trước, ôm nguyên danh sách điểm cắt của vùng cũ. Bấm nút là nó
+          // cắt theo vùng CŨ — trên sequence THẬT của người dùng.
+          //
+          // Nên vùng đổi thì phải HUỶ hẳn bước xem trước, không phải chỉ cập
+          // nhật con số. Thà bắt bấm lại còn hơn cắt nhầm chỗ.
+          if (doiThat && tiepTucRef.current) {
+            huyXemTruocRef.current = true
+            tiepTucRef.current()
+          }
+          // Cập nhật NGAY độ dài từ số vừa đọc — người dùng thấy con số nhảy
+          // trong vòng một nhịp, không phải đợi hàm nặng chạy xong.
+          setVungTin((cu) => ({
+            tu: r.tu,
+            dai: r.den - r.tu,
+            fps: r.fps,
+            soClip: cu?.soClip ?? 1,
+          }))
+          docDayDu()
+        })
+        .catch(() => {})
+    }
+
     // Chờ host nạp xong ở effect trên rồi mới hỏi lần đầu.
-    const id = window.setTimeout(doc, 600)
-    window.addEventListener('focus', doc)
+    const idDau = window.setTimeout(nhip, 600)
+    const idLap = window.setInterval(nhip, 1000)
+    window.addEventListener('focus', nhip)
     return () => {
       con = false
-      window.clearTimeout(id)
-      window.removeEventListener('focus', doc)
+      window.clearTimeout(idDau)
+      window.clearInterval(idLap)
+      window.removeEventListener('focus', nhip)
     }
   }, [])
 
@@ -539,16 +642,41 @@ export default function App() {
 
       // ☠️ Bước xem trước phải hỏi ĐÚNG MỘT LẦN. Vòng đo chạy cho TỪNG clip
       // trong vùng — không có cờ này thì vùng ba clip là hỏi ba lần.
-      let daHoiXemTruoc = false
       // Tham số chốt sau khi người dùng chọn mức ở màn xem trước. Khai báo ở
       // đây (ngoài vòng lặp) vì bước tính điểm cắt bên dưới cũng cần dùng.
       let tsChot = thamSoRef.current
-      let daXong = 0
+      // ══════════════════════════════════════════════════════════════════
+      // GIAI ĐOẠN A — TRÍCH TIẾNG + ĐO MỨC ÂM CHO **MỌI FILE** TRONG VÙNG
+      // ══════════════════════════════════════════════════════════════════
+      // ☠️ Vì sao phải tách hẳn ra thành một vòng riêng, chạy TRƯỚC:
+      // màn xem trước phải vẽ đủ mọi mảnh trong vùng, mà mỗi FILE có một bản
+      // đo riêng (`trichTieng` tách theo từng file). Bản cũ hỏi xem trước ngay
+      // giữa vòng — lúc đó mới đo xong file đầu — nên chỉ vẽ được file đầu.
+      //
+      // Ba đời đã sai ở đúng chỗ này (19/08, anh Tiến bắt cả ba):
+      //   1. vẽ CẢ FILE            → vùng 16s hiện "Original 54 sec"
+      //   2. cắt theo clip ĐẦU     → vùng 19s hiện "Original 6 sec"
+      //   3. gộp mảnh CÙNG file    → đúng khi một file, thiếu khi nhiều file
+      //
+      // Giá phải trả, biết trước: vùng nhiều file thì phải trích hết mới thấy
+      // xem trước, tức chờ lâu hơn trước khi được nhìn. Đổi lại con số hiện ra
+      // là con số THẬT của cả vùng. Vùng một file (ca thường gặp) không đổi gì.
+      // WAV giữ tới cuối luồng thay vì dọn sớm — ~2 MB mỗi phút tiếng, chấp nhận.
+      const daTrich = new Map<
+        string,
+        {
+          wav: string
+          wavLoc: string | null
+          mucAm: ReturnType<typeof docWav>
+          fps: number
+          duration: number
+        }
+      >()
+      let daTrichXong = 0
       for (const c of vung.clips) {
-        if (daDo.has(c.path)) continue
-        daXong++
-        const nhan = soFile > 1 ? ` (file ${daXong}/${soFile})` : ''
-
+        if (daTrich.has(c.path)) continue
+        daTrichXong++
+        const nhan = soFile > 1 ? ` (file ${daTrichXong}/${soFile})` : ''
         baoBuoc(dich('Đang tách tiếng khỏi video') + nhan, 1)
         let t0 = Date.now()
         const { wav, fps, duration } = await trichTieng(c.path, (giayXong) =>
@@ -587,6 +715,9 @@ export default function App() {
           giay: (Date.now() - t0) / 1000,
         })
         const nguongDau = mucAm ? mucAm.nguongOtsu : noiseDb
+        void nguongDau
+        daTrich.set(c.path, { wav, wavLoc, mucAm, fps, duration })
+      }
 
         // ══════════════════════════════════════════════════════════════════
         // DỪNG LẠI CHO NGƯỜI DỰNG NHÌN — trước khi tốn 8 phút nghe hiểu
@@ -595,18 +726,58 @@ export default function App() {
         // là bấm được lần hai, chạy chồng hai luồng lên nhau.
         // Làm phụ đề thì không cắt gì, nên ba mức cắt vô nghĩa — bỏ luôn bước
         // dừng, đỡ bắt người dùng bấm thêm một cái không để làm gì.
-        if (mucAm && !daHoiXemTruoc && !chiPhuDe) {
-          daHoiXemTruoc = true
+        // Gộp MỌI mảnh trong vùng, từ MỌI file — theo đúng thứ tự trên
+        // timeline (`vung.clips` đã xếp sẵn theo `seqTu`; `gopLatMucAm` không tự
+        // sắp được vì mốc nguồn của hai file khác nhau không so với nhau được).
+        // Lọc `kind` để clip tiếng đi kèm không bị đếm thành mảnh thứ hai.
+        const kindChinh = vung.clips[0]?.kind
+        const latVe: LatDo[] = []
+        for (const x of vung.clips) {
+          if (x.kind !== kindChinh) continue
+          const m = daTrich.get(x.path)?.mucAm
+          if (m) latVe.push({ m, tu: x.srcTu, den: x.srcDen })
+        }
+        const gopVe = latVe.length ? gopLatMucAm(latVe) : null
+
+        if (gopVe && !chiPhuDe) {
           setDangChay(dich('Chờ anh chọn mức'))
-          setXemTruoc(mucAm)
+          setXemTruoc(gopVe)
           await new Promise<void>((r) => {
             tiepTucRef.current = r
           })
           tiepTucRef.current = null
           setXemTruoc(null)
+
+          // ☠️ Thoát nếu vùng I–O đã đổi trong lúc đang treo ở đây. Mọi số vừa
+          // đo (mức âm, điểm cắt) thuộc về vùng CŨ — chạy tiếp là cắt nhầm chỗ
+          // trên sequence thật. Xem chú thích dài ở vòng thăm dò I–O.
+          // Dừng bằng `return` chứ không `throw`: đây không phải lỗi của máy,
+          // mà là người dùng vừa đổi ý — báo bằng dòng "cần làm", không phải
+          // vệt đỏ. `finally` vẫn chạy nên `dangChay` được dọn sạch.
+          if (huyXemTruocRef.current) {
+            huyXemTruocRef.current = false
+            setCanLam(dich('Vùng chọn đã đổi — bấm lại để phân tích vùng mới.'))
+            return
+          }
+
           // Đọc LẠI tham số: người dùng vừa có cơ hội đổi mức ở màn xem trước.
           tsChot = thamSoRef.current
         }
+
+      let daXong = 0
+      for (const c of vung.clips) {
+        if (daDo.has(c.path)) continue
+        daXong++
+        const nhan = soFile > 1 ? ` (file ${daXong}/${soFile})` : ''
+
+        // Bấm giờ riêng cho giai đoạn B (giai đoạn A có mốc riêng của nó).
+        let t0 = Date.now()
+        const daTrichRoi = daTrich.get(c.path)
+        if (!daTrichRoi) continue
+        const { wav, wavLoc, mucAm, fps, duration } = daTrichRoi
+        void fps
+        void duration
+        const nguongDau = mucAm ? mucAm.nguongOtsu : noiseDb
         const minSilenceD = tsChot.minSilence
         const bienD = tsChot.bien
 
@@ -1192,9 +1363,23 @@ export default function App() {
             `doiGiu` vẫn chạy nên bật lại là thấy đúng trạng thái cũ. Cùng lối
             đã làm với `DaiSong.tsx` và `MinhHoaNoiDat.tsx` hồi 03/08. */}
 
-        {/* Cột phải gộp làm HAI NHÓM, mỗi nhóm khoá vào một hàng của lưới —
-            nhờ vậy mốc nối giữa hai nhóm luôn thẳng với mốc nối bên trái. */}
-        <div className="nhom nhom--tren">
+        {/* ══════════════════════════════════════════════════════════════════
+            CỘT PHẢI — MỘT NHÓM LIỀN, 2026-08-18
+            ══════════════════════════════════════════════════════════════════
+            Trước đây cột phải chẻ làm hai nhóm khoá vào hai hàng lưới, để mốc
+            nối giữa chúng thẳng với mốc nối bên trái. Ràng buộc đó nay KHÔNG
+            CÒN LÝ DO: bảng "Đoạn sẽ cắt" ở ô (trái, hàng 2) đã gỡ 13/08, nên
+            bên trái chỉ còn MỘT khối — không còn mốc nào để mà thẳng hàng.
+
+            Cái giá của việc để nguyên lưới 4 ô khi chỉ còn 3: đo trên panel
+            thật 18/08 (936x1008) ra **564 x 540px trắng** ở ô trống, trong khi
+            cả cột phải phải nhồi vào 318px và đẩy nút "Hoàn tác cắt" vượt đáy
+            màn hình 24px.
+
+            Nay: một cột dọc liền, đi đúng THỨ TỰ LÀM VIỆC —
+              Mức cắt → Nơi đặt → BẤM → Kết quả hiện ngay dưới nút → Hoàn tác.
+            Đo lại: nút chính từ 59% lên 33% màn hình, hết phải cuộn. */}
+        <div className="nhom nhom--phai">
 
         <section className="card card--muc">
           <div className="card-hd">
@@ -1210,126 +1395,70 @@ export default function App() {
                 disabled={!!dangChay}
                 onClick={() => chonMuc(i)}
               >
-                {m.ten}
+                {/* ☠️ ĐẢO NGƯỢC quyết định 14/08. Nhật ký hôm đó ghi ba mức
+                    cắt CỐ Ý giữ tiếng Việt ở bản EN, coi là "thương hiệu" —
+                    nên chỗ này để `{m.ten}` trần, không qua `dich()`.
+                    Anh Tiến 19/08 nhìn bản EN và gọi đó là lỗi: *"phần chuyển
+                    đổi giữa tiếng Anh và tiếng Việt nó đang bị còn giữ 3 chữ
+                    tiếng Việt"*. Anh chốt bộ chữ Light · Medium · Aggressive
+                    (kiểu đặt tên các tool tự động hay dùng, khách quen
+                    AutoCut/Descript đọc là hiểu ngay).
+                    Sau lần này, bản EN chỉ còn ĐÚNG MỘT chuỗi tiếng Việt là
+                    tên project của người dùng — thứ không được phép dịch. */}
+                {dich(m.ten)}
               </button>
             ))}
           </div>
         </section>
-        {/* NƠI ĐẶT KẾT QUẢ.
-            ☠️ Chỗ này BẮT BUỘC phải có hình, không thay bằng chữ được. Anh Tiến
-            30/07: *"chỗ này hôm qua anh có bảo là tạo một animation timeline để
-            giải thích mà sao em không làm?"*. Khác biệt ở đây là KHÔNG GIAN —
-            một dải hay hai dải, tức bản gốc có bị đụng hay không. Chữ thì phải
-            đọc rồi tưởng tượng; hình cho thấy ngay.
+        {/* NƠI ĐẶT KẾT QUẢ — THANH HAI NÚT, cùng khuôn với "Mức cắt" ngay trên.
+            ══════════════════════════════════════════════════════════════════
+            Anh Tiến chốt 2026-08-18: *"làm gọn phần này"*, chọn kiểu thanh
+            2 nút và dặn *"chỉ để trong khung đỏ"* — tức lấy đúng tiêu đề +
+            thanh nút, KHÔNG lấy dòng mô tả bên dưới.
+            Đo thật: khối này 199px → 97px, bằng chằn chặn "Mức cắt" (97px),
+            nên hai thanh đọc thành một cặp.
 
-            Thiết kế 03/08 đưa hình vào THẲNG trong hai thẻ chọn, nên bấm cái
-            nào là thấy ngay cái đó làm gì — không còn một hình chung ở dưới. */}
+            ☠️ ĐẢO NGƯỢC quyết định 30/07 (*"chỗ này hôm qua anh có bảo là tạo
+            một animation timeline để giải thích mà sao em không làm?"*) và
+            thiết kế 03/08. Hình hai dải đã gỡ. CÁI MẤT ĐI:
+              - hình minh hoạ: một dải hay hai dải, tức bản gốc có bị đụng
+                không — thứ chữ không nói thay được, phải đọc rồi tưởng tượng
+              - chữ "Bản gốc còn nguyên" / "Sửa thẳng sequence này"
+            ⇒ NHÃN NÚT NAY PHẢI TỰ NÓI HẾT Ý. "Cắt tại chỗ" là dấu hiệu duy
+              nhất còn lại báo sequence gốc sẽ bị sửa thẳng — ĐỪNG đổi nhãn
+              này thành thứ gì mơ hồ hơn. Đường lùi vẫn còn: nút "Hoàn tác
+              cắt" hiện sau khi cắt.
+            Markup cũ (hai thẻ có hình) xem git log phiên 18/08. */}
         <section className="card card--fill">
           <div className="card-hd">
             <h2 className="card-t">{dich('Nơi đặt kết quả')}</h2>
           </div>
-          <div className="opts" role="radiogroup" aria-label={dich('Nơi đặt kết quả')}>
+          <div className="seg" role="radiogroup" aria-label={dich('Nơi đặt kết quả')}>
             <button
               type="button"
               role="radio"
               aria-checked={noiCat === 'moi'}
-              className={noiCat === 'moi' ? 'opt opt--chon' : 'opt'}
+              className={noiCat === 'moi' ? 'seg__nut seg__nut--chon' : 'seg__nut'}
               disabled={!!dangChay}
               onClick={() => setNoiCat('moi')}
             >
-              <span className="tick">
-                <svg className="ico" viewBox="0 0 24 24" style={{ width: 10, height: 10, strokeWidth: 3 }} aria-hidden="true">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              </span>
-              {/* Hai dải = bản gốc còn nguyên, kết quả nằm ở dải mới. */}
-              <span className="dia">
-                <span className="bar">
-                  <i className="mute" />
-                </span>
-                <span className="bar hi">
-                  <i /><i /><i /><i /><i />
-                </span>
-              </span>
-              <span className="nm">{dich('Sequence mới')}</span>
-              <span className="sub">{dich('Bản gốc còn nguyên')}</span>
+              {dich('Sequence mới')}
             </button>
-
             <button
               type="button"
               role="radio"
               aria-checked={noiCat === 'taicho'}
-              className={noiCat === 'taicho' ? 'opt opt--chon' : 'opt'}
+              className={noiCat === 'taicho' ? 'seg__nut seg__nut--chon' : 'seg__nut'}
               disabled={!!dangChay}
               onClick={() => setNoiCat('taicho')}
             >
-              <span className="tick">
-                <svg className="ico" viewBox="0 0 24 24" style={{ width: 10, height: 10, strokeWidth: 3 }} aria-hidden="true">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              </span>
-              {/* MỘT dải, có chỗ bị khoét đỏ = chính nó bị sửa. */}
-              <span className="dia">
-                <span className="bar">
-                  <i /><i /><i className="gone" /><i /><i /><i className="gone" /><i />
-                </span>
-              </span>
-              <span className="nm">{dich('Cắt tại chỗ')}</span>
-              <span className="sub">{dich('Sửa thẳng sequence này')}</span>
+              {dich('Cắt tại chỗ')}
             </button>
           </div>
         </section>
 
-        </div>
-        <div className="nhom nhom--duoi">
-
-        {/* BA Ô KẾT QUẢ. Chưa phân tích thì đây là ƯỚC LƯỢNG theo mức (đo thật
-            trên video 58:37) — có số để bấm ba mức mà so. Phân tích xong là số
-            THẬT của chính clip đang mở. Nhãn đổi theo để không nói dối:
-            "Ước còn lại" ≠ "Còn lại". */}
-        {/* ☠️ ẨN khi đang chạy — nhường chỗ cho ô tiến trình.
-            Đo ở khổ cửa sổ thật (1005x682): ô tiến trình cao 247px mà chỗ
-            trống chỉ 51px; để nguyên cả hai thì nút chính bị đẩy xuống y=849,
-            tức rơi hẳn khỏi màn hình cao 682.
-            Ẩn ở đây không mất gì: lúc đang chạy, ba con số kia mới là ƯỚC
-            LƯỢNG theo mức, chưa phải kết quả thật — mà thứ người dùng cần biết
-            lúc đó là máy đang làm đến đâu. Chạy xong hiện lại ngay. */}
-        <section className={dangChay && !xemTruoc ? 'card card--res an' : 'card card--res'}>
-          <div className="card-hd">
-            <h2 className="card-t">{dich('Kết quả')}</h2>
-          </div>
-          {/* ☠️ RÚT CÒN MỘT DÒNG 2026-08-13 — anh Tiến: *"chỗ kết quả này anh cần
-              đưa ra một thông báo ngắn gọn: tổng thời cũ - tổng thời gian mới"*.
-
-              Đã bỏ hai ô kia, và bỏ có lý do chứ không phải cho gọn mắt — cả hai
-              đều NÓI LẠI thứ đã có sẵn trên màn hình (luật "một thông điệp chỉ
-              nói ở MỘT nơi"):
-                - "Mức đang chọn"  → khối `Mức cắt` ngay trên đã tô sáng mức đó
-                - "Còn lại %"      → dải `Sau khi cắt` đã ghi `còn 57%`
-                - "Đoạn sẽ cắt"    → ô `Nhát cắt` bên dưới đã đếm rồi
-              Nên gỡ đi không mất thông tin nào cả. */}
-          <div className="ket-gon">
-            {/* Chưa phân tích thì CHỈ hiện độ dài vùng. Vẽ "4:27 → 4:27" lúc
-                chưa cắt gì là nói dối bằng dấu mũi tên. */}
-            {/* ☠️ CHƯA CHẠY THÌ KHÔNG ĐƯỢC HIỆN SỐ. Anh Tiến bắt lỗi 13/08:
-                *"chỗ này chưa chạy mà có kết quả hả em"*.
-                Bản đầu của tôi hiện `mmssGon(tongGiay)` = độ dài vùng đang
-                khoanh. Con số ấy ĐÚNG, nhưng nằm dưới nhãn "Kết quả" thì người
-                đọc hiểu là ĐÃ CẮT XONG còn ngần đó — sai hoàn toàn.
-                Cùng loại lỗi đã ghi trong file này từ trước: vẽ "4:27 → 4:27"
-                lúc chưa cắt gì là nói dối bằng dấu mũi tên. Tôi vá chỗ mũi tên
-                mà quên chính con số đứng một mình cũng nói dối y như vậy. */}
-            {xemTruoc && tongGiay > 0 ? (
-              <>
-                <span className="ket-gon__cu">{mmssGon(tongGiay)}</span>
-                <span className="ket-gon__ar">→</span>
-                <span className="ket-gon__moi">{mmssGon(conGiay)}</span>
-              </>
-            ) : (
-              <span className="ket-gon__v">—</span>
-            )}
-          </div>
-        </section>
+        {/* Ô KẾT QUẢ nay nằm NGAY DƯỚI NÚT (xem khối `.cta` bên dưới) —
+            bấm ở đâu thì kết quả hiện ở đó, mắt không phải nhảy đi tìm. */}
         {/* Dòng cảnh báo "Sửa thẳng vào sequence đang mở — Ctrl+Z để hoàn tác"
             đã BỎ 29/07. Hai lý do:
               1. Anh Tiến chỉ thẳng là nó thừa.
@@ -1426,8 +1555,57 @@ export default function App() {
         {canLam && <p className="canlam">{canLam}</p>}
         {loi && <pre className="loi">{loi}</pre>}
 
-        {ket && <KetQua ket={ket} />}
-        {ketPD && <KetQuaPhuDe ket={ketPD} />}
+        {/* ══════════════════════════════════════════════════════════════════
+            Ô "KẾT QUẢ" — NGAY DƯỚI NÚT, 2026-08-18
+            ══════════════════════════════════════════════════════════════════
+            Gộp làm một thẻ duy nhất: dòng cũ→mới (anh Tiến chốt 13/08) + ba
+            con số. Trước đây hai thứ này nằm hai chỗ khác nhau — dòng cũ→mới ở
+            thẻ "Kết quả" TRÊN nút, ba con số ở DƯỚI nút — nên cùng một chuyện
+            mà mắt phải đọc hai nơi.
+
+            ☠️ Ô này LUÔN CÓ MẶT, kể cả lúc chưa chạy (hiện một dòng chữ mời
+            bấm). Cố ý: nhờ vậy VỊ TRÍ NÚT KHÔNG NHẢY giữa hai trạng thái. Đừng
+            "tối ưu" bằng cách ẩn nó khi rỗng — nút sẽ nhích lên rồi tụt xuống
+            mỗi lần chạy xong.
+
+            ☠️ ẨN khi đang chạy — nhường chỗ cho ô tiến trình. Đo ở khổ cửa sổ
+            thật (1005x682): ô tiến trình cao 247px mà chỗ trống chỉ 51px; để
+            cả hai thì nút chính bị đẩy xuống y=849, rơi khỏi màn hình cao 682.
+            Lúc đang chạy ô này cũng chưa có số thật, nên ẩn không mất gì. */}
+        <section className={dangChay && !xemTruoc ? 'card card--res an' : 'card card--res'}>
+          <div className="card-hd">
+            <h2 className="card-t">{dich('Kết quả')}</h2>
+          </div>
+          {/* ☠️ RÚT CÒN MỘT DÒNG 2026-08-13 — anh Tiến: *"chỗ kết quả này anh
+              cần đưa ra một thông báo ngắn gọn: tổng thời cũ - tổng thời gian
+              mới"*. Ba ô cũ bỏ vì đều NÓI LẠI thứ đã có sẵn trên màn hình
+              (luật "một thông điệp chỉ nói ở MỘT nơi"):
+                - "Mức đang chọn"  → khối `Mức cắt` ngay trên đã tô sáng
+                - "Còn lại %"      → dải `Sau khi cắt` đã ghi `còn 57%`
+                - "Đoạn sẽ cắt"    → ô `Nhát cắt` bên dưới đã đếm rồi */}
+          <div className="ket-gon">
+            {/* ☠️ CHƯA CHẠY THÌ KHÔNG ĐƯỢC HIỆN SỐ. Anh Tiến bắt lỗi 13/08:
+                *"chỗ này chưa chạy mà có kết quả hả em"*.
+                Bản đầu hiện `mmssGon(tongGiay)` = độ dài vùng đang khoanh. Con
+                số ấy ĐÚNG, nhưng nằm dưới nhãn "Kết quả" thì người đọc hiểu là
+                ĐÃ CẮT XONG còn ngần đó — sai hoàn toàn. Cùng loại lỗi với việc
+                vẽ "4:27 → 4:27" lúc chưa cắt gì: nói dối bằng dấu mũi tên. */}
+            {xemTruoc && tongGiay > 0 ? (
+              <>
+                <span className="ket-gon__cu">{mmssGon(tongGiay)}</span>
+                <span className="ket-gon__ar">→</span>
+                <span className="ket-gon__moi">{mmssGon(conGiay)}</span>
+              </>
+            ) : ket ? null : (
+              /* ☠️ KHÔNG dùng `.ket-gon__v` cho câu này. Class đó để hiện dấu
+                 "—" nên cỡ chữ 26px/600 — đo bản build 18/08: câu mời bấm hiện
+                 to như tiêu đề, chiếm hai dòng. Câu chữ thì phải cỡ chữ. */
+              <span className="ket-gon__moibam">{dich('Chưa chạy — bấm nút ở trên.')}</span>
+            )}
+          </div>
+          {ket && <KetQua ket={ket} />}
+          {ketPD && <KetQuaPhuDe ket={ketPD} />}
+        </section>
 
         {/* ĐƯỜNG RA của cắt tại chỗ. Chỉ hiện khi đã cắt thẳng vào sequence
             đang mở — đường tạo-sequence-mới không đụng bản gốc nên khỏi cần.
@@ -1475,7 +1653,7 @@ export default function App() {
             cùng một chỗ để mắt không phải nhảy đi tìm. */}
 
         </div>
-        {/* ↑ .nhom--duoi */}
+        {/* ↑ .nhom--phai — cot phai lien mot cot, KHONG con chia hai hang */}
         </div>
         {/* ↑ .grid */}
 
@@ -1803,11 +1981,35 @@ function KetQua({ ket }: { ket: Ket }) {
         </div>
       </div>
 
-      <p className={dat ? 'ketluan' : 'ketluan ketluan--nghi'}>
-        {dat
-          ? `Xong. Sequence mới: “${kq.seqMoi}” — ${mmss(ket.giayTruoc)} → ${mmss(ket.giaySau)}.`
-          : dich('Dựng xong nhưng số đo không khớp — xem phần đối chiếu bên dưới.')}
-      </p>
+      {/* ══════════════════════════════════════════════════════════════════
+          ☠️ DÒNG KẾT LUẬN + KHỐI "CHI TIẾT KỸ THUẬT" ĐÃ GỠ 2026-08-18
+          ══════════════════════════════════════════════════════════════════
+          Anh Tiến khoanh đỏ đúng hai khối này: *"remove bỏ cho anh cái này
+          anh không cần xem nó đó em"*.
+
+          Đây là lần thứ BA cùng một thứ bị chỉ tên (29/07 hai lần cho khối
+          "máy đã làm những gì", nay tới lượt phần đối chiếu) — nên gỡ khỏi
+          màn hình, không gấp lại nữa.
+
+          ĐO ĐƯỢC LÚC GỠ: `.fold` cao 225px = 52% cả khối kết quả, và chính
+          nó đẩy nút "Hoàn tác cắt" xuống y=1004..1032, tức VƯỢT ĐÁY màn hình
+          1008px 24px; vùng cuộn chỉ dư 25px nên phải cuộn hết cỡ mới bấm tới.
+
+          ☠️ CÁI MẤT ĐI — ghi ra để không ai tưởng là bỏ quên:
+          dòng đỏ đó là THỨ DUY NHẤT báo tool dựng sai. Ngay lần chạy đang
+          xem nó bắt được hở 46,046s (yêu cầu 17 đoạn/46.96s mà dựng ra 51
+          đoạn/141.02s). Từ nay lỗi kiểu đó IM LẶNG — không có dấu hiệu nào
+          trên màn hình.
+          Đã nói lại với anh Tiến và anh vẫn chốt gỡ. Muốn bật lại thì bỏ
+          `void` bên dưới và trả hai khối JSX về (git log phiên 18/08).
+
+          `dat` / `coLoTrong` / `tiengKhop` GIỮ NGUYÊN phép tính — rẻ, và là
+          thứ duy nhất chứng minh máy có tự soát. Chỉ thôi vẽ ra màn hình.
+          Cùng lối đã làm với `BangDoan.tsx` (13/08) và khối "máy đã làm
+          những gì" (29/07). */}
+      {void dat}
+      {void coLoTrong}
+      {void tiengKhop}
 
       {/* CHỖ CẦN SOÁT ở NGOÀI — đây là thứ người dựng phải làm tiếp, không
           được giấu trong mục gấp. `CLAUDE.md`: giữ lại đúng ba con số và danh
@@ -1822,74 +2024,6 @@ function KetQua({ ket }: { ket: Ket }) {
         </p>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════
-          KHỐI SỐ KỸ THUẬT — anh Tiến 29/07: *"ở phần chi tiết em có thể ẩn
-          hoặc remove đi vì anh thấy dư thừa, cái đó chủ yếu là thuật toán
-          của mình thôi"*.
-          Gấp lại chứ KHÔNG xoá: `CLAUDE.md` dặn *"đừng xoá code đo — chỉ
-          giấu khỏi màn hình chính, lần sau sửa thuật toán lại cần"*.
-          Mở SẴN khi số đo không khớp — lúc đó nó không còn là chi tiết thừa
-          mà là bằng chứng có gì đó sai. */}
-      <details className="fold" open={!dat}>
-        <summary>{dich('Chi tiết kỹ thuật')}</summary>
-      <dl className="doi">
-        <div>
-          <dt>{dich('Cách phân tích')}</dt>
-          <dd>
-            {ket.cachDo ?? dich('đo biên độ trên file gốc')}
-            {/* Bỏ chữ "phụ đề" ở đây 29/07: Auto Cut không tạo phụ đề nữa.
-                Nói còn tạo là nói sai việc máy vừa làm. */}
-            {ket.dungAI && dich(' · đánh dấu chỗ cần nghe lại')}
-            {ket.soCuu > 0 && (
-              <>
-                {' · '}
-                <b>
-                  {dich('giữ lại')} {ket.soCuu} {dich('chỗ vì có câu nói trong đó')}
-                </b>
-              </>
-            )}
-            {ket.soBoVe > 0 && ` · bỏ qua ${ket.soBoVe} nhịp ngắt quá ngắn`}
-          </dd>
-        </div>
-        <div>
-          <dt>{dich('Hình')}</dt>
-          <dd>
-            {kq.hinhClip} đoạn · {kq.hinhGiay.toFixed(2)}s
-            {coLoTrong
-              ? ` · HỞ ${hoHong.toFixed(3)}s (điểm cuối ${kq.hinhCuoi.toFixed(2)}s)`
-              : ' · liền mạch'}
-          </dd>
-        </div>
-        <div>
-          <dt>{dich('Tiếng')}</dt>
-          <dd>
-            {kq.tiengClip === 0
-              ? dich('KHÔNG có tiếng trên A1')
-              : `${kq.tiengClip} đoạn · ${kq.tiengGiay.toFixed(2)}s · ${
-                  tiengKhop ? 'khớp với hình' : 'LỆCH so với hình'
-                }${kq.tiengTuTheo ? '' : ' (phải đặt riêng)'}`}
-          </dd>
-        </div>
-        <div>
-          <dt>{dich('Yêu cầu')}</dt>
-          <dd>
-            {kq.yeuCauDoan} đoạn · {kq.yeuCauGiay.toFixed(2)}s
-          </dd>
-        </div>
-        <div>
-          <dt>{dich('Thông số sequence')}</dt>
-          <dd>{kq.thongSo === 'chep-tu-goc' ? dich('chép từ sequence gốc') : kq.thongSo}</dd>
-        </div>
-        {kq.soLoi > 0 && (
-          <div>
-            <dt>{dich('Lỗi khi đặt')}</dt>
-            <dd>
-              {kq.soLoi} đoạn — {kq.loiDau}
-            </dd>
-          </div>
-        )}
-      </dl>
-      </details>
 
       {/* ══════════════════════════════════════════════════════════════════
           ☠️ KHỐI "MÁY ĐÃ LÀM NHỮNG GÌ" ĐÃ GỠ KHỎI MÀN HÌNH — 29/07

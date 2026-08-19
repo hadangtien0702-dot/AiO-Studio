@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<title>Nơi đặt kết quả — các kiểu gọn</title>
+<link rel="stylesheet" href="panel.css">
+<link rel="stylesheet" href="v2.css">
+<link rel="stylesheet" href="noidat.css">
+</head><body class="ban-do">
+<div class="app">
+<div class="wrap">
+<h1 class="tieude">“Nơi đặt kết quả” — các kiểu gọn</h1>
+<p class="dan">Cùng bề rộng <b>318px</b> đúng như cột phải trong panel. Số cao đo thật ở dưới mỗi khối.</p>
+<div class="bay">
+<div class="o" data-i="0">
+  <div class="nhan">Bản đang chạy</div>
+  <div class="hop"><section class="card card--fill"><div class="card-hd"><h2 class="card-t">Nơi đặt kết quả</h2></div><div class="opts" role="radiogroup" aria-label="Nơi đặt kết quả"><button type="button" role="radio" aria-checked="false" class="opt"><span class="tick"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width: 10px; height: 10px; stroke-width: 3;"><path d="M20 6 9 17l-5-5"></path></svg></span><span class="dia"><span class="bar"><i class="mute"></i></span><span class="bar hi"><i></i><i></i><i></i><i></i><i></i></span></span><span class="nm">Sequence mới</span><span class="sub">Bản gốc còn nguyên</span></button><button type="button" role="radio" aria-checked="true" class="opt opt--chon"><span class="tick"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width: 10px; height: 10px; stroke-width: 3;"><path d="M20 6 9 17l-5-5"></path></svg></span><span class="dia"><span class="bar"><i></i><i></i><i class="gone"></i><i></i><i></i><i class="gone"></i><i></i></span></span><span class="nm">Cắt tại chỗ</span><span class="sub">Sửa thẳng sequence này</span></button></div></section></div>
+  <div class="so" id="so-0">—</div>
+</div>
+<div class="o" data-i="1">
+  <div class="nhan">G1 — giữ hình, dấu chọn cùng hàng với tên</div>
+  <div class="hop"><section class="card card--fill g1">
+<div class="card-hd"><h2 class="card-t">Nơi đặt kết quả</h2></div>
+<div class="opts" role="radiogroup" aria-label="Nơi đặt kết quả">
+<button type="button" role="radio" aria-checked="false" class="opt">
+<span class="dong"><span class="tick2"></span><span class="nm">Sequence mới</span></span>
+<span class="dia"><span class="bar"><i class="mute"></i></span><span class="bar hi"><i></i><i></i><i></i><i></i><i></i></span></span>
+<span class="sub">Bản gốc còn nguyên</span>
+</button>
+<button type="button" role="radio" aria-checked="true" class="opt opt--chon">
+<span class="dong"><span class="tick2"><span class="tick"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width:10px;height:10px;stroke-width:3"><path d="M20 6 9 17l-5-5"></path></svg></span></span><span class="nm">Cắt tại chỗ</span></span>
+<span class="dia"><span class="bar"><i></i><i></i><i class="gone"></i><i></i><i></i><i class="gone"></i><i></i></span></span>
+<span class="sub">Sửa thẳng sequence này</span>
+</button>
+</div>
+</section></div>
+  <div class="so" id="so-1">—</div>
+</div>
+<div class="o" data-i="2">
+  <div class="nhan">G2 — bỏ hình, mỗi lựa chọn một dòng</div>
+  <div class="hop"><section class="card card--fill g2">
+<div class="card-hd"><h2 class="card-t">Nơi đặt kết quả</h2></div>
+<div class="opts" role="radiogroup" aria-label="Nơi đặt kết quả">
+<button type="button" role="radio" aria-checked="false" class="opt">
+<span class="tick2"></span>
+<span class="chu"><span class="nm">Sequence mới</span><span class="sub">Bản gốc còn nguyên</span></span>
+</button>
+<button type="button" role="radio" aria-checked="true" class="opt opt--chon">
+<span class="tick2"><span class="tick"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width:10px;height:10px;stroke-width:3"><path d="M20 6 9 17l-5-5"></path></svg></span></span>
+<span class="chu"><span class="nm">Cắt tại chỗ</span><span class="sub">Sửa thẳng sequence này</span></span>
+</button>
+</div>
+</section></div>
+  <div class="so" id="so-2">—</div>
+</div>
+<div class="o" data-i="3">
+  <div class="nhan">G3 — thanh 2 nút như “Mức cắt”</div>
+  <div class="hop"><section class="card card--fill g3">
+<div class="card-hd"><h2 class="card-t">Nơi đặt kết quả</h2></div>
+<div class="seg" role="radiogroup" aria-label="Nơi đặt kết quả">
+<button type="button" role="radio" aria-checked="false" class="seg__nut">Sequence mới</button>
+<button type="button" role="radio" aria-checked="true" class="seg__nut seg__nut--chon">Cắt tại chỗ</button>
+</div>
+<p class="seg__sub">Cắt tại chỗ — sửa thẳng sequence này, bản gốc không còn nguyên.</p>
+</section></div>
+  <div class="so" id="so-3">—</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+addEventListener('load', () => {
+  document.querySelectorAll('.o').forEach(o => {
+    const c = o.querySelector('.card--fill');
+    const goc = document.querySelector('.o[data-i="0"] .card--fill').getBoundingClientRect().height;
+    const h = c.getBoundingClientRect().height;
+    const d = Math.round(h - goc);
+    o.querySelector('.so').innerHTML = Math.round(h) + 'px' +
+      (d === 0 ? ' <span class="g">(bản gốc)</span>' : ' <span class="' + (d < 0 ? 'x' : 'd') + '">' + (d < 0 ? '−' : '+') + Math.abs(d) + 'px</span>');
+  });
+});
+</script>
+</body></html>

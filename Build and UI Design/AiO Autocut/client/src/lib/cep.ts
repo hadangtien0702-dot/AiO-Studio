@@ -222,6 +222,37 @@ export interface VungCat {
   clips: ClipVung[]
 }
 
+/**
+ * Đọc MỖI mốc I–O, không duyệt clip. CHỈ ĐỌC.  (2026-08-18)
+ *
+ * Dùng cho vòng thăm dò mỗi giây: người dùng bấm I/O trong Premiere thì panel
+ * không hề hay biết — không có sự kiện nào bắn sang. Hàm này rẻ nên hỏi liên
+ * tục được; `getRangeClips()` bên dưới duyệt mọi clip trên mọi track nên chỉ
+ * gọi khi mốc ĐÃ ĐỔI THẬT.
+ */
+export async function getRange(): Promise<{
+  tu: number
+  den: number
+  fps: number
+  seqName: string
+} | null> {
+  const res = parseResult(await evalScript('ac_getRange()'))
+  if (!res.ok) return null
+  const kv = parseKV(res.message)
+  const tu = Number(kv.in)
+  const den = Number(kv.out)
+  const fps = Number(kv.fps)
+  if (!Number.isFinite(tu) || !Number.isFinite(den) || den <= tu) return null
+  // `seqName` đi kèm sẵn trong cùng lời gọi — dùng nó làm dấu hiệu "người dùng
+  // đã đổi sang sequence khác", khỏi tốn thêm một lượt hỏi host.
+  return {
+    tu,
+    den,
+    fps: Number.isFinite(fps) && fps > 0 ? fps : 30,
+    seqName: kv.seqName ?? '',
+  }
+}
+
 /** Đọc vùng I–O đang khoanh và các clip nằm trong đó. CHỈ ĐỌC. */
 export async function getRangeClips(): Promise<{ vung: VungCat | null; loi: HostLoi | null }> {
   const res = parseResult(await evalScript('ac_getRangeClips()'))

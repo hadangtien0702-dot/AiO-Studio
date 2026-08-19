@@ -691,6 +691,37 @@ function ac_mediaPath(clip) {
  * TREN FILE GOC. Hai cai do lech nhau khi clip da bi trim dau — dung cho du an
  * anh em AiO Sub da vap, nen quy doi ngay tai day roi tra ca hai ra.
  */
+/**
+ * DOC MOC I-O THOI — khong duyet clip.  (Them 2026-08-18)
+ *
+ * Vi sao phai co ham rieng: `ac_getRangeClips` ben duoi duyet MOI clip tren
+ * MOI track de dung lich cat. Tren sequence that cua anh Tien (588 clip) do
+ * la viec nang, khong duoc goi lien tuc.
+ * Panel can biet vung I-O doi hay chua theo NHIP GIAY (nguoi dung bam I/O
+ * trong Premiere, panel khong he hay biet), nen no goi ham nay — do that:
+ * chi doc 4 gia tri, khong cham vao track nao.
+ * Chi khi thay in/out DOI THAT thi panel moi goi ham nang kia mot lan.
+ */
+function ac_getRange() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+
+    var vungA = ac_seqInSec(seq);
+    var vungB = ac_seqOutSec(seq);
+    if (vungA < 0 || vungB < 0 || vungB <= vungA) return 'ERR:CHUA_KHOANH_VUNG|';
+
+    var fr = seq.getSettings().videoFrameRate;
+    var fps = (fr && fr.seconds > 0) ? (1 / fr.seconds) : 30;
+
+    return 'OK:seqName=' + seq.name + '\nfps=' + fps +
+           '\nin=' + vungA + '\nout=' + vungB;
+  } catch (e) {
+    return ac_err('ac_getRange', e);
+  }
+}
+
 function ac_getRangeClips() {
   try {
     if (!app.project) return 'ERR:CHUA_MO_PROJECT|';

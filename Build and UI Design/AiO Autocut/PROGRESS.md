@@ -1,5 +1,600 @@
 # AiO Autocut - Nhat ky
 
+## [nhieu-file] - 2026-08-19 11:50 (UTC+7) - XEM TRUOC GOP DU MOI FILE + SU CO GHI DE IN/OUT
+
+### Trang thai hien tai
+v1.5.0. Man xem truoc nay ve DUNG ca vung, du vung gom bao nhieu manh, tu bao
+nhieu file. Ba doi loi da di het:
+CA FILE (54s cho vung 16s) -> CLIP DAU (6s cho vung 19s) -> CUNG-MOT-FILE ->
+**MOI FILE**. Cho anh Tien duyet.
+
+### Thay doi - TACH LUONG `autoCut` LAM HAI GIAI DOAN
+Truoc: mot vong lap lam ca trich tieng + do muc am + hoi xem truoc + whisper.
+Hoi xem truoc nam GIUA vong, ngay sau file dau -> chi ve duoc file dau.
+
+Nay:
+- **Giai doan A**: vong rieng, trich tieng + do muc am cho **MOI file** trong
+  vung, cat vao `daTrich` (Map theo path).
+- **Hoi xem truoc**: gop moi manh cua moi file bang `gopLatMucAm()`, theo dung
+  thu tu timeline (`vung.clips` da xep theo `seqTu`).
+- **Giai doan B**: vong cu, bo phan trich/do, doc lai tu `daTrich`; whisper +
+  do khoang lang giu nguyen.
+
+`services/amluong.ts`: bo `gopMucAmTheoDoan` (chi gop trong MOT ban do), thay
+bang **`gopLatMucAm(lat: LatDo[])`** - gop duoc lat tu nhieu ban do khac nhau.
+Moi lat doc theo `buocGiay` cua CHINH ban do no (dung gia dinh moi file 20ms).
+
+**Gia phai tra, biet truoc:** vung nhieu file thi phai trich HET moi thay xem
+truoc -> cho lau hon truoc khi duoc nhin. Doi lai con so hien ra la con so THAT
+cua ca vung. Vung mot file (ca thuong gap) khong doi gi.
+WAV giu toi cuoi luong thay vi don som - ~2 MB moi phut tieng.
+
+### File anh huong
+`client/src/services/amluong.ts` · `client/src/App.tsx`
+
+### Kiem chung bang so - TU DUNG moi truong test
+Do truoc: 4 project item trong bin tro toi **4 file KHAC NHAU** (4 duong dan
+rieng), chi trung do dai 53,74s -> dung duoc de dung ca nhieu file that.
+
+Tu dung `AIO-TEST-2FILE`: 2 clip cua HAI video khac nhau, moi clip 10 giay.
+
+| | Ket qua |
+|---|---|
+| Selected range | 20 sec |
+| **Original** | **20 sec** (= 10 + 10, gop du CA HAI file) |
+| After the cut | 18 sec -0:02 |
+| Nut | Cat 3 khoang lang |
+
+Neu van chi ve file dau thi phai ra **10 sec**. Ra 20 => gop dung.
+Don dep: xoa het sequence AIO-TEST-*, active tra ve `test - autocut 1103`,
+con dung 3 sequence cua anh Tien.
+
+### ☠️☠️ SU CO: TOI GHI DE IN/OUT CUA 4 PROJECT ITEM TRONG BIN ANH TIEN
+Script dung sequence test dat in/out len chinh **project item** (de cat ra tung
+manh), roi "tra lai" bang cach dat ve `0..do dai do duoc`. Sai o cho: no chon
+clip theo tieu chi **"dai nhat"** — ma sau khi bi ghi de, clip do NGAN LAI, nen
+lan chay sau can vao clip khac. Ba lan chay = hong in/out cua ba clip.
+Phat hien khi sequence test moi tao chi dai **1,48 giay** thay vi 53,72.
+
+Sua cung khong de:
+- Premiere **KHONG co** `projectItem.clearInOutPoints()` (da thu: not a function)
+- dat `out = 99999` thi no **NHAN LUON 99999**, khong kep ve do dai media
+- dung sequence tam de doc do dai cung ra 99999
+=> Phai lay ffmpeg CUA CHINH PANEL do lai media: **53,74s**, roi `setOutPoint`.
+   Nay ca 4 clip ve **0.00-53.72** - khop con so `nguonDai=53.72` do dau phien.
+
+**Bai hoc, dung ngay ca khi da theo luat 3a "tu dung moi truong test":**
+tu dung moi truong VAN co the dung vao DU LIEU DUNG CHUNG. Sequence la cua toi,
+nhung **project item la cua anh Tien** — va toi da ghi len no.
+=> Phai **CAT GIU gia tri cu TRUOC TUNG LAN CHAY** roi tra lai nguyen van,
+   KHONG duoc tinh lai bang cong thuc. Script `tao-seq-2file.js` da lam dung:
+   `catGiu()` truoc, tra lai trong cung lan chay, va in ra de doi chieu.
+=> Va **do bang ffmpeg cua panel** la duong lay do dai media dang tin nhat khi
+   Premiere khong cho hoi thang.
+
+### CON LAI
+Chua do ca vung nhieu file voi NOI DUNG khac nhau that (4 file trong bin deu
+cung do dai, nhieu kha nang cung mot ban render). Luong chay da chung minh dung;
+con so tren noi dung khac nhau thi chua.
+
+---
+
+
+## [cat-lan-hai] - 2026-08-19 11:27 (UTC+7) - XEM TRUOC GOP DU CAC MANH + UI MAN 24 INCH
+
+### Trang thai hien tai
+v1.5.0. Ca **CAT LAN HAI** (cat lan 1 o Light roi cat tiep o Aggressive) da chay
+dung. UI da toi uu cho man 24 inch cua anh Tien. Cho anh duyet.
+
+### 1. UI MAN 24 INCH - ha nguong hai cot 900px -> 700px
+Anh Tien: *"anh dang dung o man 24 inch thi UI cua Panel cung chua duoc toi uu"*.
+
+Do panel THAT tren may anh: **728 x 1062 CSS px** (man 2048x1153, dpr 1.5).
+728 < 900 nen roi ve MOT cot. Hau qua do duoc:
+- nut chinh o **y=871 = 82%** man hinh
+- **205px TRONG** giua "Noi dat ket qua" (het 657) va nut (bat dau 862)
+
+Nguong 900 dat tu 03/08, hoi do cot trai con phai chua ca bang "Doan se cat".
+Bang go 13/08 roi -> hai cot o 728px van thoai mai (moi cot ~342px).
+
+| | Truoc | Sau |
+|---|---|---|
+| So cot | 1 | **2** (342/342) |
+| Nut chinh | 82% | **31%** |
+| Trong giua "Noi dat" va nut | 205px | **0** |
+| Lech day hai cot | - | **0px** |
+
+Da dung thu o dung kho 728x1062 TRUOC khi cai: chu "Aggressive" khong tran,
+khong khoi nao vo.
+☠️ Con **577px trong o day = 54%** chieu cao panel. Anh Tien chot phuong an
+**"keo panel thap lai"** (~520-560px vua khit), KHONG doi code.
+
+### 2. LOI: cat lan hai bao "Original 6 sec" cho vung 19 giay
+Anh Tien: *"anh cat mot lan (lan 1 che do light), anh muon cat tiep lan 2 o che
+do aggressive thi no lai bi loi tracking khong dung"*.
+
+**Nguyen nhan that** (do bang `ac_getRangeClips()`): sequence sau lan cat dau
+gom nhieu clip, moi clip mot manh cua file goc. Vung 72,52-91,56 = **19,04s**
+chua **3 clip**: src 0-5,72 · 6,2-13,76 · 14,16-19,92.
+Man xem truoc chi ve mucAm cua **clip DAU** -> hien "Original 6 sec · Se cat 0
+doan" cho mot vung 19 giay.
+
+☠️ Ban va sang nay (cat mucAm theo `srcTu/srcDen` clip dau) **lam lo loi nay
+ro hon chu khong tao ra no**: truoc do no ve CA FILE (54s) nen cung sai, chi sai
+theo huong nguoc lai. Da ghi san gioi han nay trong muc [xem-truoc-theo-vung].
+
+### Thay doi
+- `services/amluong.ts` - them **`gopMucAmTheoDoan(m, doan[])`**: noi cac lat
+  `cua`/`nenCucBo` cua nhieu doan thanh mot mang lien mach. Sap theo moc nguon
+  truoc khi noi (nguoi dung dao doan duoc, ma dai song phai doc trai->phai).
+- `App.tsx` - gop moi clip trong vung CUNG `path` + CUNG `kind`, thay vi chi
+  lay clip dau. Cung file thi dung chung ban do da co, khoi do lai; loc `kind`
+  de clip A di kem khong bi dem thanh manh thu hai.
+
+### File anh huong
+`client/src/services/amluong.ts` · `client/src/App.tsx` · `client/src/giao-dien.css`
+
+### Kiem chung bang so - TU DUNG moi truong test (dung luat 3a)
+Tu dung `AIO-TEST-3CLIP`: tao sequence tu clip roi `ac_datClip` them 2 doan
+nua -> **3 clip, vung 19,04s**, giong het ca anh Tien gap.
+
+| | Truoc sua | Sau sua |
+|---|---|---|
+| Selected range | 19 sec | 19 sec |
+| Original | **6 sec** | **19 sec** |
+| Nut (muc Medium) | - | No segments to cut (0 doan) |
+| Nut (muc **Aggressive**) | - | **Cat 2 khoang lang** |
+
+Muc Medium ra 0 doan / Aggressive ra 2 doan - dung logic, va dung ca anh Tien
+muon (cat lan 2 manh tay hon).
+Don dep: sequence 4 -> 3, active tra ve `test - autocut 1103`, vung 72,52-91,56
+nguyen ven.
+
+### CON LAI - chua giai
+Neu vung chua clip cua **NHIEU FILE KHAC NHAU** thi xem truoc van chi ve cac
+manh cua file dau. Muon du thi phai do muc am TAT CA file truoc roi moi hoi xem
+truoc - tuc tach vong lap `autoCut` lam hai giai doan (do het -> hoi -> whisper),
+thay doi lon hon nen chua lam.
+
+---
+
+
+## [xem-truoc-theo-vung] - 2026-08-19 11:12 (UTC+7) - MAN XEM TRUOC DA THEO DUNG VUNG I/O
+
+### Trang thai hien tai
+v1.5.0. Ba loi anh Tien bao trong dot test that DA SUA XONG va do that tren
+Premiere: (1) Selected range dung im, (2) khong nhay sang sequence moi, (3) man
+xem truoc ve CA FILE thay vi vung da khoanh.
+**CHO ANH TIEN DUYET loi 3.** Viec ke tiep dang xep hang: **UI o man 24 inch
+chua toi uu** (anh bao 19/08 11:10) - panel dock ~790px CSS nen roi ve MOT COT,
+nhanh do chua duoc toi uu bao gio.
+
+### Boi canh
+Anh Tien test that, bao them mot ca: *"anh cat mot lan (lan 1 che do light),
+anh muon cat tiep lan 2 o che do aggressive thi no lai bi loi tracking khong
+dung"*. Anh chup: sequence `test - autocut 1103`, Selected range **31 sec**,
+ma panel van hien *"Original 54 sec · Cat 16 khoang lang · 0:54 -> 0:47"*.
+
+### Nguyen nhan that
+`trichTieng(c.path, ...)` tach tieng tu **CA FILE**, `docWav()` do ca file, roi
+`setXemTruoc(mucAm)` nhan nguyen ban do do. Man xem truoc **khong he biet vung
+I/O ton tai**.
+
+Trong khi buoc cat THAT lai dung: `lapKeHoach` nhan `srcIn: c.srcTu`,
+`srcOut: c.srcDen` - hai moc nay host DA KEP theo vung.
+=> Panel noi mot dang, cat mot neo. Pham dung luat *"nhan nut phai la VIEC no lam"*.
+
+### Bang chung (do truoc khi sua, tren sequence TU DUNG)
+| Vung khoanh | Original hien | Nut |
+|---|---|---|
+| 53,68s | 54 sec | Cat 5 khoang lang |
+| 40s | 54 sec | Cat 5 khoang lang |
+| **16s** | **54 sec** | Cat 5 khoang lang |
+
+Ba vung khac nhau, ba lan CUNG MOT CON SO.
+Va do thang vao co che: dat vung 12..28 -> `ac_getRangeClips()` tra
+`seqTu=12, seqDen=28, srcTu=12, srcDen=28` = **dai dung 16s** => buoc cat that
+nhan dung vung, chi man xem truoc sai.
+
+### Thay doi
+- `services/amluong.ts` - them **`catMucAmTheoVung(m, tuGiay, denGiay)`**: cat
+  `cua` + `nenCucBo` ve khoang [tu, den].
+  ☠️ GIU NGUYEN `nguongOtsu` / `nenOn` / `mucGiong` / `tyLeIm` - CO Y. Buoc cat
+  that lay nguong tu ban do CA FILE (`nguongDau = mucAm.nguongOtsu`); tinh lai
+  nguong rieng cho vung thi xem truoc ve theo mot nguong KHAC voi nguong dem di
+  cat - lai lech, chi khac kieu. Chi doi PHAM VI, khong doi THUOC.
+- `App.tsx` - `setXemTruoc(catMucAmTheoVung(mucAm, c.srcTu, c.srcDen))`.
+  `mucAm` goc GIU NGUYEN cho `timKhoangLang` ben duoi (no can toan canh de tinh
+  nen on cuc bo) - dung doi cho do.
+
+### File anh huong
+`client/src/services/amluong.ts` · `client/src/App.tsx`
+
+### Kiem chung bang so - do that tren Premiere, sequence TU DUNG
+| Vung | Original | Nut | Truoc khi sua |
+|---|---|---|---|
+| 16s | **16 sec** | Cat 2 khoang lang | 54 sec · Cat 5 |
+| 40s | **40 sec** | Cat 5 khoang lang | 54 sec · Cat 5 |
+| 10s | **10 sec** | Cat 2 khoang lang | 54 sec · Cat 5 |
+
+Moi vung nay ra so RIENG va khop dung do dai vung - truoc do ca ba cung mot so.
+Don dep: sequence 4 -> 3, active tra ve `test - autocut 1103` (7 clip, ban cat
+cua anh Tien - khong dung vao).
+
+### ☠️ CON MOT GIOI HAN CHUA GIAI - phai noi voi anh Tien
+Man xem truoc chi ve mucAm cua **CLIP DAU TIEN** trong vung (`daHoiXemTruoc`
+chan hoi lan hai). Voi sequence da cat lan 1 (`test - autocut 1103` co **7
+clip**), xem truoc chi phan anh doan dau, khong phai ca vung.
+Sau ban va nay no da dung PHAM VI cua clip dau, nhung van chua phai toan vung.
+=> Ca "cat lan 2 tren sequence da cat" cua anh Tien VAN chua duoc giai tron ven.
+   Chua sua vi day la thay doi lon hon (phai gop mucAm nhieu clip), va dang cho
+   anh duyet loi 3 truoc.
+
+---
+
+
+## [vung-doi-giua-chung] - 2026-08-19 11:01 (UTC+7) - SUA LOI VUNG I/O DUNG IM + TU DUNG MOI TRUONG TEST
+
+### Trang thai hien tai
+v1.5.0. Loi 1 (Selected range dung im) DA SUA, da test THAT tren Premiere cua
+anh Tien va DAT. Loi 2 (khong nhay sang sequence moi) hoa ra CUNG MOT GOC, tu
+khoi. **Phat hien LOI 3 chua sua** (xem duoi) - dang cho anh Tien duyet loi 1
+truoc khi dong vao, dung yeu cau *"sua tung phan den khi nao anh duyet"*.
+
+### Boi canh
+Anh Tien test that va bao hai loi:
+1. *"Range Selector la 2s ma ket qua la 0:54 -> 0:47 - day la du lieu truong hop
+   clip truoc do"*
+2. *"anh da tao sequence moi nhung tool khong nhay sang sequence moi"*
+
+### Nguyen nhan that - NGUOC voi suy doan ban dau
+Do tren panel: Premiere bao vung **53,68s**, panel hien **"2 sec"**, con khoi
+Preview hien **"54 sec"**. => Thu DUNG IM la **Selected range**, KHONG phai
+khoi Preview nhu anh Tien (va toi) tuong luc dau.
+
+**Thu pham: chinh chot chan toi them sang 19/08** - `if (dangChayRef.current) return`.
+O BUOC XEM TRUOC, `dangChay` van mang nhan "Cho anh chon muc": may KHONG chay,
+no dang DOI NGUOI DUNG bam. Vong tham do chet dung dung luc nguoi dung hay doi
+vung nhat.
+
+Xac nhan bang HAI phep do doc lap:
+- boc `evalScript` dem 3,2 giay: **0 loi goi** host
+- ba nut muc cat **disabled=true** (chi khoa khi `dangChay` khac rong)
+
+☠️ Cai bay nay DA GHI SAN trong chinh `App.tsx` tu 03/08 (nhanh `dangChay` an
+truoc `xemTruoc` lam NUT CAT khong bao gio hien). Doc roi van dinh lai lan hai.
+
+### Loi NGUY HIEM HON nam ngay duoi
+Khong chi hien thi sai: luc dung o buoc xem truoc, luong `autoCut` dang TREO va
+om nguyen danh sach diem cat cua vung CU. Doi vung roi bam "Cat 5 khoang lang"
+= **cat theo vung cu, tren sequence that**.
+
+### Thay doi
+- `App.tsx` - dieu kien chan doi thanh `dangChayRef.current && !tiepTucRef.current`.
+  `tiepTucRef.current` khac null dung bang khoang thoi gian luong treo o buoc xem
+  truoc, nen dung lam dau hieu "dang doi nguoi dung" - khong can them ref moi.
+- `App.tsx` - them `huyXemTruocRef`. Vung doi giua chung -> vong tham do bat co
+  + goi `tiepTucRef.current()` de go treo; luong tinh day roi `return` kem dong
+  bao. Dung `return` chu khong `throw`: day khong phai loi cua may.
+- `chu.ts` - them khoa dich cau bao.
+
+### File anh huong
+`client/src/App.tsx` · `client/src/chu.ts`
+
+### Kiem chung bang so - TEST THAT TREN PREMIERE
+☠️ Truoc khi do: panel dang chay BAN CU (`coBanVaSua=false`) vi anh Tien chua
+mo lai panel sau khi cai. Da tu `location.reload()` panel. **Neu bo qua buoc
+kiem nay thi da do tren ban cu va ket luan sai** (bai hoc "da push khong bang
+da an").
+
+| Buoc | Do duoc |
+|---|---|
+| Nap ban moi | Selected range **2 sec -> 54 sec** (Premiere 53,68s) |
+| Bam nut -> man xem truoc | 3,6s · nut "Cat 5 khoang lang" · 3 muc khoa |
+| Doi vung 10..30 giua luc treo | Selected range **20 sec** · man xem truoc **BIEN MAT** · nut ve "Cut silences" · hien dong "The selected range changed..." · 3 muc **mo khoa** |
+| Tra vung ve goc | `test\|0\|53.678625\|1` **khop 100%** |
+
+### LOI 2 - cung mot goc, tu khoi
+Tao sequence moi -> do lai: Premiere `activeSequence=AIO-TEST-TU-DONG`, panel
+hien **"no in/out points"** (dung, vi sequence moi chua khoanh vung). Dat in/out
+5..45 -> panel hien **"40 sec"** trong ~2s.
+=> Truoc day panel "khong nhay sang sequence moi" chi vi vong tham do dang bi
+   chan. Sua loi 1 la het. **CHUA can lam nut dropdown chon sequence** - nhung
+   van nen hoi anh Tien co muon co khong.
+
+### ☠️ LOI 3 MOI PHAT HIEN - CHUA SUA, dang cho duyet
+Dat vung **40 sec** (5..45) tren sequence test, chay den man xem truoc:
+khoi Preview van hien **"Original 54 sec"** = do dai CA FILE.
+
+Doc code: `trichTieng(c.path, ...)` tach tieng tu **CA FILE**, roi `docWav` do
+ca file. Nen `xemTruoc` (mucAm) luon la muc am cua toan bo clip, bat ke nguoi
+dung khoanh bao nhieu.
+=> Man xem truoc dang ve dai song va dem "5 khoang lang" tren CA FILE, khong
+   phai tren vung da khoanh. CHUA do duoc buoc cat that co loc theo vung khong
+   - phai kiem tiep truoc khi ket luan muc do nghiem trong.
+
+### ☠️ BAI HOC ANH TIEN DAY - da ghi vao brain TOAN CUC
+Toi test bang cach muon sequence `test` anh Tien tao san. Anh chinh ngay:
+*"em test la em phai TU DONG MO SEQUENCE MOI va test chu khong phai em test tren
+moi truong khac. Day la dieu dac biet ghi nho vao brain"*.
+=> Da ghi muc **3a** vao `~/.claude/CLAUDE.md` (tang toan cuc, dung o moi du an).
+=> Da lam lai cho dung: tu tao `AIO-TEST-TU-DONG` bang
+   `createNewSequenceFromClips` (tra so truoc: `createNewSequence()` MO HOP THOAI
+   roi treo ca ExtendScript), test tren do, xong **tu xoa** bang `deleteSequence`
+   va mo lai sequence `test` cua anh.
+   Do lai sau khi don: **3 -> 2 sequence · active=test · in=0 · out=53.678625 ·
+   1 clip** - dung nhu truoc khi toi dung vao.
+=> Bay them: so ten clip co DAU TIENG VIET trong ExtendScript **that bai** (chuoi
+   meo khi truyen qua PowerShell - bai hoc 5j). Phai do bang DAU HIEU CAU TRUC
+   (type=1 + co media path + duoi .mp4 + dai nhat).
+
+---
+
+
+## [thanh-tren-theo-doi] - 2026-08-19 10:34 (UTC+7) - THANH TREN CUNG PHAI THEO NGUOI DUNG
+
+### Trang thai hien tai
+v1.5.0. Bo cuc hai cot CHOT (649/649, lech day 0px). Ban EN con dung MOT chuoi
+tieng Viet = ten project nguoi dung. Vung I/O + thanh tren nay deu tu theo doi
+thao tac trong Premiere.
+**Viec ke tiep: ANH TIEN TU TEST vai truong hop that** (anh chot 19/08) -> cho
+anh bao ba loai loi: cat mat loi / cat hut nhip tho / dang cat ma khong cat.
+CHUA sua gi them cho toi khi co ket qua test.
+
+### Boi canh - anh Tien chot mot luat SAN PHAM
+Sau khi sua xong o "Doan dang chon", anh noi:
+*"cai quan trong la gi? tool minh build ra no LUON LUON THEO DOI THAO TAC cua
+nguoi dung - lam cho nguoi dung se cam thay duoc a app minh bo tien ra mua no
+DANG DONG HANH CUNG MINH do em"*.
+Va: *"anh muon minh lam tool la phai TU TIN VAO TOOL cua minh - minh DUNG TRUOC
+KHI BAN RA. Day la gia tri cot loi cua mot nguoi editor, la tool cho editor dung"*.
+Kem chi dao uu tien: *"truoc tien minh cu tap trung HOAN THANH AUTO CUT truoc"*.
+
+=> Da ghi ca hai luat vao `E:\2026\Production\CLAUDE.md` (tang dung chung cho
+   CA 8 PANEL, khong de rieng Autocut).
+=> Luat "dung truoc khi ban" chinh la LOI GIAI cho mon no lon nhat cua Autocut
+   ("khong co thuoc do doc lap" - da bao "0 cau bi cat mat" BA LAN, ba lan anh
+   Tien van nghe ra cho mat). Anh Tien dung bai that = thuoc do TU NGOAI.
+
+### Nguyen nhan that
+Ra soat theo dung cau hoi cua luat moi (*"nguoi dung doi mot thu TRONG Premiere
+chu khong dung vao panel - panel co biet khong?"*) thi lo them MOT cho cung loai
+loi, chua ai thay:
+
+**Thanh tren (`Premiere 27.0.0 · <ten project>`) chi doc DUNG MOT LAN luc mo
+panel** (`useEffect` deps rong, goi `getHostInfo()`). Doi project / doi sequence
+giua chung -> no van hien ten CU, khong bao gi.
+Chua lo ra vi hiem khi doi project dang lam do - dung kieu hong im lang.
+
+### Thay doi
+- `lib/cep.ts` - `getRange()` tra them **`seqName`**. Gia tri nay VON DA co san
+  trong ket qua `ac_getRange()`, truoc gio bo di khong dung.
+- `App.tsx` - trong vong tham do 1 giay da co: neu `seqName` doi -> goi
+  `getHostInfo()` cap nhat thanh tren.
+  **KHONG ton them mot luot hoi host nao** - dung du lieu da co trong tay.
+
+### File anh huong
+`client/src/lib/cep.ts` · `client/src/App.tsx`
+
+### Kiem chung bang so
+- Do truoc khi sua (panel that): thanh tren hien
+  `Premiere 27.0.0 · 1808-S-Phoebe-Kinn Chi phi y te.prproj`, doi chieu
+  `getHostInfo()` -> KHOP. Nhung khop vi anh Tien CHUA doi project -
+  phep do nay chi chung minh lan doc dau tien dung, khong chung minh no theo doi.
+- `tsc -b` + `vite build` sach, da ky va cai.
+- ☠️ **CHUA CHUNG MINH duoc thanh tren nhay khi DOI PROJECT that** - can anh Tien
+  mo project khac roi do lai. Cung dang cho nhu muc [can-hai-cot] tung cho, va
+  lan do da chung minh duoc bang cach anh doi vung (6 sec -> 21 sec).
+
+### Cho da do XONG trong phien nay (nhac lai de khoi tim)
+Hai cot **649/649** · day trai/phai **485/485 (lech 0)** · dai song **114px** ·
+nut chinh **26%** man hinh · phai cuon **0px** · ba muc cat ra
+**Light/Medium/Aggressive** · vung I/O: panel **21 sec** vs Premiere **20,85s**.
+
+---
+
+
+## [hai-cot-bang-nhau] - 2026-08-19 10:20 (UTC+7) - HAI COT BANG NHAU + DICH 3 MUC CAT
+
+> Tiep muc [can-hai-cot] ben duoi (18/08 16:06). Phien lam viec keo qua ngay,
+> nen tach muc rieng. ☠️ Vai comment trong ma nguon viet hom nay tung ghi nham
+> "18/08" - da sua lai thanh 19/08 (chi nhung cho thuoc viec HOM NAY: luoi 1:1,
+> tran dai song 140px, dich 3 muc). Cac moc 18/08 con lai la dung.
+
+### Trang thai hien tai
+v1.5.0. Bo cuc hai cot da CHOT theo yeu cau anh Tien. Ban EN nay chi con DUNG
+MOT chuoi tieng Viet: ten project cua nguoi dung. Viec ke tiep: anh Tien cai
+thu ban beta may sach; sau beta moi quay lai Silero VAD + FCPXML.
+
+### 1. HAI COT BANG NHAU - anh Tien chot
+*"cot nay em lam nho gon bang cot ben phai duoc khong em?"* -> chon gon CA HAI
+CHIEU. Sau do khoanh do dai trong duoi card trai: *"lam cho no bang nhau la
+okie roi do em"*.
+
+DOI GI:
+- `grid-template-columns`: `720fr 406fr` (63,9:36,1) -> **`1fr 1fr`**
+- `.card--xem .tl`: bo tran 240px -> **`flex:1` + `max-height:140px`**
+- `.grid`: **`flex: none`** (tho luoi cao dung noi dung)
+
+☠️ BA LAN MOI DUNG - ghi ca hai lan hong, dung thu lai:
+| Lan | Lam gi | Do ra |
+|---|---|---|
+| 1 | `align-items: start` | card trai **HUT 45px** - dung cho anh khoanh do |
+| 2 | bo `start`, de `stretch` (luoi van `flex:1`) | card trai **THUA 201px** (578 vs 377) - lech nguoc chieu |
+| 3 | them **`flex: none`** cho luoi | **lech 0px** |
+
+Lan 2 hong vi luoi dang `flex:1` nen no cao het khung `.wrap`, `stretch` keo
+card trai cao theo. Cot phai KHONG CO VIEN nen phan trong cua no vo hinh, card
+trai co vien nen lo ngay -> nhin tuong "card trai phinh", that ra **ca luoi phinh**.
+=> Bai hoc: khi mot ben co vien mot ben khong, mat chi thay ben co vien. Phai
+   do CA HAI, dung tin cai nhin thay.
+
+SO DO CUOI (panel that 1342x1266): cot **649/649** · day trai/phai **485/485**
+(**lech 0**) · dai song **114px** (chua cham tran 140) · nut chinh y=330 =
+**26%** man hinh · phai cuon **0px**.
+
+### 2. DICH BA MUC CAT - DAO NGUOC luat 13/08
+Anh Tien: *"phan chuyen doi giua tieng Anh va tieng Viet no dang bi con giu 3
+chu tieng Viet ne em"*.
+
+Luat cu (13/08, ghi trong `chu.ts` va PROGRESS): *"Giu nhip · Vua · Cat sach la
+TEN THUONG HIEU, giu nguyen o ca hai thu tieng. DUNG 'dich cho du'."*
+Anh Tien tu mo ban EN ra nhin va doc no la LOI, khong phai thuong hieu.
+
+Bo chu anh chon: **Light · Medium · Aggressive** (kieu dat ten cac tool tu dong;
+khach quen AutoCut/Descript doc la hieu ngay). Ba lua chon khac da dua ra de anh
+so: Gentle/Balanced/Tight va Keep pace/Moderate/Clean cut.
+
+SUA: `App.tsx` boc `{dich(m.ten)}` (truoc de `{m.ten}` tran) + 3 khoa vao `chu.ts`.
+DA SUA TAI LIEU GHI SAI: khoi comment dau `chu.ts` (cam dich 3 muc) va bang ba
+muc trong `CLAUDE.md` - neu de nguyen thi phien sau doc xong se go ra.
+
+KIEM CHUNG (panel that, che do EN): 3 nut ra **Light/Medium/Aggressive** · quet
+toan panel con **DUNG 1** chuoi tieng Viet = ten project nguoi dung (khong duoc
+phep dich).
+
+Bai hoc: *"giu nguyen lam thuong hieu"* chi dung khi NGUOI DUNG doc ra thuong
+hieu. Chinh nguoi Viet con thay chuong mat thi editor nuoc ngoai cang khong.
+
+### 3. VUNG I/O - GIO MOI CHUNG MINH DUOC DAY DU
+Muc 18/08 ghi *"CHUA CHUNG MINH: so co nhay khi anh Tien BAM I/O that hay khong"*.
+Nay co: lan do truoc panel hien **6 sec**, lan nay **21 sec** - anh Tien doi vung
+trong Premiere va panel tu chay theo, khong can bam gi vao panel.
+Doi chieu: Premiere that **20,85s** -> lam tron **21 sec** -> KHOP.
+
+### 4. ☠️ LAY NGAY BANG LENH - suyt ghi sai lan nua
+Phien keo dai qua nua dem. Theo quan tinh dinh ghi tiep "18/08" cho viec hom
+nay; chay `date` moi thay da la **19/08 10:20**. Da sua 3 cho trong ma nguon.
+Dung bai hoc da ghi trong brain (5q) - va no van suyt lap lai.
+
+---
+
+
+## [can-hai-cot] - 2026-08-18 16:06 (UTC+7) - CAN LAI HAI COT + GO 2 KHOI + DONG BO VUNG I/O
+
+### Trang thai hien tai
+v1.5.0. Ba viec trong mot phien: (1) can lai bo cuc hai cot, (2) go dong do
+"so do khong khop" + khoi "Chi tiet ky thuat" theo yeu cau anh Tien, (3) SUA
+LOI THAT: o "Doan dang chon" khong doi khi nguoi dung bam I/O trong Premiere.
+Viec ke tiep: anh Tien chot dung panel o kho RONG (2 cot) hay kho DOCK HEP
+(1 cot) - hai nhanh la hai bo cuc khac nhau, nhanh 1 cot CHUA toi uu.
+
+### 1. LOI THAT: vung I-O khong dong bo (anh Tien bat)
+Anh Tien: *"khi anh selected range cua doan clip thi so o day khong thay doi"*.
+DO DUOC: panel hien **47 sec**, Premiere that **5,71s** (in=0, out=5.714)
+- lech hon 8 lan.
+
+NGUYEN NHAN GOC - khong phai cho hien thi sai, ma la KHONG AI DI HOI LAI.
+Panel chi doc vung I-O dung HAI luc: mot lan sau 600ms khi mo, va moi khi
+cua so panel nhan `focus`. Nguoi dung bam I/O tren timeline thi panel khong
+nhan focus, va Premiere khong ban su kien nao sang panel.
+
+SUA:
+- `host/autocut.jsx`: them `ac_getRange()` - CHI doc seqName/fps/in/out,
+  KHONG duyet clip. Do that: **1 ms** (ham nang `ac_getRangeClips` 6 ms tren
+  vung 2 clip, va no duyet MOI clip tren MOI track nen tren sequence 588 clip
+  se dat hon nhieu - khong duoc goi moi giay).
+- `client/src/lib/cep.ts`: them `getRange()`.
+- `client/src/App.tsx`: doi effect thanh VONG THAM DO 1 giay. So moc in/out
+  voi lan truoc; **chi khi doi that** moi goi ham nang mot lan de dem clip.
+  Hai chot chan kem theo:
+    - `dangChayRef` - dang chay thi NGUNG hoi. ExtendScript mot luong, hoi
+      them luc host dang dung la chen hang vao chinh viec cat.
+    - bo khoanh vung / dong sequence -> `setVungTin(null)`, khong de so cu
+      nam do nhu the van dung.
+
+KIEM CHUNG (do tren panel that, cong 8089):
+- panel hien **6 sec** / Premiere **5,71s** -> khop (ham `dai()` lam tron giay)
+- boc `evalScript` dem trong 3,2 giay: `ac_getRange` **3 lan** (dung nhip 1s),
+  `ac_getRangeClips` **0 lan** (vung khong doi -> khong goi ham nang). Da
+  khoi phuc `evalScript` ve nguyen trang.
+- CHUA CHUNG MINH: so co nhay khi anh Tien BAM I/O that hay khong. Moi chung
+  minh duoc vong tham do dang chay va so hien tai dung. Can anh bam thu.
+
+### 2. GO hai khoi theo yeu cau anh Tien
+Anh Tien khoanh do: *"remove bo cho anh cai nay anh khong can xem no do em"*.
+Go `.ketluan` (dong do "Dung xong nhung so do khong khop") va `.fold`
+("Chi tiet ky thuat").
+
+☠️ CAI MAT DI - da noi truoc voi anh Tien va anh van chot go:
+Dong do do la THU DUY NHAT bao tool dung sai. Ngay lan chay dang xem no bat
+duoc **ho 46,046s** (yeu cau 17 doan/46.96s ma dung ra 51 doan/141.02s). Tu
+nay loi kieu do IM LANG. Phep tinh `dat`/`coLoTrong`/`tiengKhop` GIU NGUYEN
+(bang `void`), chi thoi ve ra - bat lai duoc.
+
+### 3. CAN LAI HAI COT
+Anh Tien: *"cot trai trong nua duoi"* + *"cot phai phai cuon moi thay nut"*.
+
+DO TRUOC KHI SUA (panel that 936x1008):
+- o (cot1, hang2) TRONG HAN **564 x 540px** - hau qua cua viec go bang
+  "Doan se cat" ngay 13/08 ma khong sap lai luoi
+- `.fold` cao **225px = 52%** khoi ket qua, day nut "Hoan tac cat" xuong
+  y=1004..1032 - **VUOT DAY man hinh 24px**, ma `.wrap` chi cuon duoc 25px
+  -> phai cuon het co moi bam toi
+
+DOI GI:
+- luoi 2 cot x 2 HANG -> 2 cot x MOT hang. Rang buoc "moc ngang thang giua
+  hai cot" (03/08) nay vo nghia vi cot trai chi con MOT khoi.
+- `.nhom--tren`/`.nhom--duoi` -> mot `.nhom--phai` lien, di dung thu tu lam
+  viec: Muc cat -> Noi dat -> BAM -> Ket qua ngay duoi nut -> Hoan tac.
+- go `margin-top:auto` cua `.cta` (luat cu day nut xuong day; nay ket qua nam
+  duoi nut nen day nut la day luon ca ket qua ra khoi man hinh - do: 91%).
+- o "Ket qua" gop lam MOT the: dong cu->moi + ba con so. Truoc do hai thu nay
+  o hai cho khac nhau.
+- o Ket qua LUON co mat (chua chay thi hien mot dong moi bam) -> VI TRI NUT
+  KHONG NHAY giua hai trang thai.
+- dai song: bo tran cung `height:92px`, cho gian toi **240px**, ti le
+  hinh:tieng ep ve 1:2 nhu Premiere.
+
+SO DO (ban nhap, kho 936x1008): nut chinh 59% -> **33%**, nut Hoan tac tu
+tran 24px -> trong man hinh, phai cuon 25px -> **0px**.
+
+### 4. "Noi dat ket qua" gon lai - anh Tien chot kieu G3
+Anh Tien: *"lam gon phan nay"*, chon thanh 2 nut, dan *"chi de trong khung do"*
+(tieu de + thanh nut, KHONG lay dong mo ta).
+Do: **199px -> 97px**, bang chan chan "Muc cat" (97px).
+
+☠️ MAT: hinh minh hoa hai dai (thu anh yeu cau 30/07: *"khac biet o day la
+KHONG GIAN, chu thi phai doc roi tuong tuong"*) va chu "Ban goc con nguyen" /
+"Sua thang sequence nay". => NHAN NUT NAY PHAI TU NOI HET Y. "Cat tai cho"
+la dau hieu duy nhat con lai bao sequence goc se bi sua thang - DUNG doi nhan
+nay. Duong lui van con: nut "Hoan tac cat".
+
+### 5. HAI THU DA THU VA HONG - da hoan tac ca hai, dung thu lai
+Muon xoa not 255px trong o day card "Xem truoc":
+- `align-self:start` -> card co ve min-content, dai song tut lai 92px, NUA
+  DUOI man hinh trong tron. Vi `.tl{flex:1}` ma cha khong cao thi khong co gi
+  de chia.
+- `justify-content:space-between` -> nhan "Ban goc" bi day cach dai song cua
+  no 70px, nhin nhu hai thu khong lien quan.
+Con so quyet dinh: muon lap kin 882px thi moi dai phai cao **367px**; khong co
+muc trung gian nao vua dep dang timeline vua lap kin. Phan du de o day card.
+
+### 6. HAI LOI TU BAT DUOC truoc khi giao (dung bang build, khong doi anh Tien)
+- Cau "Chua chay - bam nut o tren" muon class `.ket-gon__v` (26px/600, von de
+  hien dau "—") nen hien TO NHU TIEU DE, tran hai dong. Tach class rieng
+  `.ket-gon__moibam`.
+- Viet `var(--fw-regular)` trong khi token that ten `--fw-normal` - bien sai
+  thi CSS IM LANG bo qua, khong bao gi. Da sua.
+- Them khoa dich EN cho cau moi (`chu.ts`).
+
+### 7. ☠️ CHUA XONG: panel dang o kho MOT COT
+Do that sau khi anh Tien mo lai: panel **752 x 840 CSS px**. Nguong doi sang
+mot cot la 900px -> toan bo bo cuc hai cot O TREN KHONG HIEN RA. O kho nay:
+nut chinh nam 81% man hinh, dai song van 92px (cot trai khong cao de ma gian).
+Dau phien panel la 936x1008 (dung anh anh Tien gui, co hai cot).
+=> CHO ANH TIEN CHOT: dung kho rong (>900px, 2 cot) hay kho dock hep (1 cot).
+Hai nhanh la hai bo cuc khac nhau, nhanh 1 cot CHUA duoc toi uu.
+
+### File ban nhap de duyet
+`AiO Design System/AiO Autocut/v2-can-hai-cot/` - so-sanh.html (hai phuong an
+canh nhau, kho that, co nut gat trang thai) + noi-dat.html (4 kieu khoi "Noi
+dat ket qua"). Dung markup THAT lay ra tu panel dang chay + dung file CSS that
+cua panel, nen nhin o trinh duyet the nao thi trong Premiere the do.
+
+---
+
+
 ## [song-ngu-ui] - 2026-08-14 13:57 (UTC+7) - SONG NGU + 4 DOI UI ANH TIEN CHOT 13/08
 
 ### Trang thai hien tai

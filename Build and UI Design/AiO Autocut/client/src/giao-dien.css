@@ -254,116 +254,163 @@
   color: var(--text-2);
 }
 
-/* ── LƯỚI 2 CỘT × 2 HÀNG ─────────────────────────────────────────────────
-   ☠️ MỐC NGANG PHẢI THẲNG GIỮA HAI CỘT — bảo đảm theo CẤU TẠO.
-   Anh Tiến 03/08: *"tỉ lệ cột ở đây chưa đều nhau"*. Đo được: bề rộng đúng tỉ
-   lệ 63,9:36,1, khoảng cách thẻ đều 12px — nhưng chỗ NỐI giữa hai thẻ lệch
-   20px (trái 440/452, phải 420/432). Trong thiết kế nó chỉ lệch 2px, mà đó là
-   ăn may theo nội dung: thêm bớt một dòng chữ là lệch lại.
-   ⇒ Hai HÀNG grid dùng chung cho cả hai cột. Hàng nào cũng kết thúc cùng một
-   mốc, bất kể nội dung dài ngắn ra sao. Không phải căn lại bằng mắt lần nào nữa. */
+/* ── LƯỚI 2 CỘT × MỘT HÀNG (2026-08-18) ──────────────────────────────────
+   Trước là 2 cột × 2 HÀNG, để mốc ngang giữa hai cột thẳng theo CẤU TẠO
+   (anh Tiến 03/08: *"tỉ lệ cột ở đây chưa đều nhau"* — chỗ nối lệch 20px).
+   Ràng buộc đó nay VÔ NGHĨA: cột trái chỉ còn MỘT khối sau khi gỡ bảng
+   "Đoạn sẽ cắt" (13/08), không còn mốc nào để mà thẳng hàng.
+
+   ☠️ Giá của việc để nguyên lưới 4 ô khi chỉ còn 3 khối — đo trên panel
+   thật 18/08 (936x1008): ô (trái, hàng 2) trống hẳn **564 x 540px**, trong
+   khi cột phải phải nhồi 436px vào 540px và đẩy nút "Hoàn tác cắt" xuống
+   y=1004..1032 — VƯỢT ĐÁY màn hình 24px.
+
+   Nay MỘT hàng: mỗi cột tự lo chiều cao của mình, chung nhau đúng một mốc
+   là ĐÁY lưới (grid stretch) — vẫn là ràng buộc theo cấu tạo, không phải
+   căn tay. */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 720fr) minmax(0, 406fr);
-  /* ☠️ ĐỪNG đặt sàn bằng `minmax(min-content, 1fr)`. Sàn của một HÀNG lấy theo
-     min-content của MỌI ô trong hàng — mà ô bên trái là bảng: nó khai theo đủ
-     số hàng dữ liệu, kéo sàn lên 336px trong khi chỗ thật chỉ có 215px. Hàng
-     phình ra thì cả trang phải cuộn, đúng thứ anh Tiến bảo bỏ.
-     (`overflow: hidden` trên bảng KHÔNG chữa được: nó đổi "kích thước tối
-     thiểu tự động", còn sàn hàng đọc "min-content contribution" — hai thứ khác
-     nhau, đã thử và đo ra vẫn 336px.)
-     Sàn thuộc về ai cần nó: đặt `min-height` trên chính `.nhom--duoi`. */
-  grid-template-rows: auto minmax(0, 1fr);
+  /* ☠️ HAI CỘT BẰNG NHAU — anh Tiến chốt 19/08: *"cột này em làm nhỏ gọn
+     bằng cột bên phải được không em?"*, và chọn gọn CẢ HAI CHIỀU.
+     Trước là 720:406 (63,9 : 36,1) — tỉ lệ của thiết kế 03/08, hồi đó cột
+     trái còn phải chứa cả bảng "Đoạn sẽ cắt". Bảng gỡ 13/08, dải sóng lại
+     giãn to lên 240px, nên cột trái thành ra chiếm gần hết màn hình.
+     Nay 1:1. Giá phải trả, ghi rõ: dải sóng hẹp lại nên nhìn được ít chi
+     tiết hơn theo chiều dài clip — đổi lại cột phải rộng ra, chữ đỡ chật. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto;
+  /* ☠️ `align-items: start` ĐÃ BỎ. Nó cho mỗi cột cao đúng nội dung, nhưng
+     đo ra hai cột LỆCH ĐÁY 45px — anh Tiến khoanh đỏ đúng dải trống đó:
+     *"làm cho nó bằng nhau là okie rồi"*.
+     Nay để `stretch` (mặc định): hai cột luôn kết thúc cùng một mốc, bất kể
+     bên phải dài ngắn ra sao. Ràng buộc theo CẤU TẠO, không căn bằng mắt. */
   gap: var(--sp-4);
-  flex: 1;
+  /* ☠️ `flex: 1` ĐÃ BỎ — và đây là chỗ đã sửa hỏng một lần, ghi lại cho rõ.
+     `flex: 1` cho LƯỚI cao hết khung `.wrap`, mà `stretch` thì kéo card trái
+     (có viền) cao theo: đo ra **578px** trong khi cột phải chỉ **377px**.
+     Tức vẫn lệch, chỉ đổi chiều — trước card trái HỤT 45px, sau card trái
+     THỪA 201px. Cột phải không có viền nên phần trống của nó vô hình, card
+     trái có viền nên lộ ngay.
+     `flex: none` ⇒ lưới cao đúng nội dung; hàng `auto` = cột dài nhất;
+     `stretch` kéo cột kia cho bằng. Phần dư nằm NGOÀI lưới (nền trơn). */
+  flex: none;
   min-height: 0;
 }
-/* Đặt chỗ TƯỜNG MINH: thứ tự trong DOM không quyết định chỗ ngồi, nhờ vậy giữ
-   được thứ tự đọc hợp lý của mã nguồn mà vẫn ràng được mốc ngang. */
+/* Đặt chỗ TƯỜNG MINH: thứ tự trong DOM không quyết định chỗ ngồi. */
 .card--xem {
   grid-column: 1;
   grid-row: 1;
+  /* Cột trái nay chỉ có mình nó, nên nó nhận hết chiều cao — và phải CHIA
+     lại cho hai dải sóng, xem khối "DẢI SÓNG GIÃN" bên dưới. */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
-.card--list {
-  grid-column: 1;
-  grid-row: 2;
-  /* ☠️ `overflow: hidden` ở đây KHÔNG phải để cắt — nó đặt "kích thước tối
-     thiểu tự động" của ô lưới về 0. Không có nó, bảng khai min-content theo
-     ĐỦ CẢ 27 HÀNG, kéo sàn hàng 2 lên ~290px; hàng 2 phình ra thì nhóm phải
-     hết chỗ và nút chính đè lên ô Kết quả. Bảng vẫn cuộn bình thường ở
-     `.scroller` bên trong. */
-  overflow: hidden;
+
+/* ── DẢI SÓNG GIÃN THEO CHIỀU CAO CỘT (2026-08-18) ───────────────────────
+   ☠️ Card giãn mà RUỘT đứng yên thì chỉ là ĐỔI CHỖ khoảng trống.
+   Đo lần đầu: `.card--xem` cao 882px mà hai dải sóng vẫn 92px như cũ →
+   490px trắng nằm bên trong card. Thủ phạm: `.tl { height: 92px }` và
+   `.tl .lanes { height: 66px }` đều là số CỨNG.
+   Sóng vẽ bằng `height: %` (xem `Timeline.tsx`) nên bỏ trần cứng ra là nó
+   cao theo ngay — 92 → 240px, to gấp 2,6 lần, nhìn rõ chỗ nào bị cắt.
+
+   TRẦN 240px là con số CHỌN CÓ LÝ DO, đừng nới bừa: thả tự do thì mỗi dải
+   cao 367px, tỉ lệ hình:tiếng ra hai khối đặc, hết ra dáng timeline. Muốn
+   lấp kín 882px thì buộc phải 367px — không có mức trung gian nào vừa đẹp
+   dáng vừa kín, nên phần dư ~255px cứ để ở đáy card.
+   ☠️ ĐÃ THỬ HAI CÁCH XOÁ PHẦN DƯ ĐÓ, HỎNG CẢ HAI, ĐỪNG THỬ LẠI:
+     - `align-self: start` → card co về min-content, dải sóng tụt lại 92px,
+       nửa dưới màn hình trống trơn. Vì `.tl{flex:1}` mà cha không cao thì
+       không có gì để chia.
+     - `justify-content: space-between` → nhãn "Bản gốc" bị đẩy cách dải
+       sóng của nó 70px, nhìn như hai thứ không liên quan.                */
+.card--xem .tl {
+  /* Hai cột phải bằng đáy (xem `.grid`), nên cột trái LUÔN cao bằng cột
+     phải. Phần chênh đó phải chảy vào ĐÂU ĐÓ — cho nó chảy vào dải sóng,
+     đừng để thành khoảng trắng dưới đáy card.
+     ☠️ TRẦN 140px là chỗ chốt giữa hai yêu cầu của anh Tiến trong cùng một
+     buổi: *"làm nhỏ gọn"* (nên không quay lại 240px, càng không 367px) và
+     *"làm cho nó bằng nhau"* (nên không khoá cứng 92px, vì khoá cứng là
+     lệch đáy 45px — đúng chỗ anh khoanh đỏ).
+     Đo: chưa chạy thì mỗi dải ~114px, chạy xong cột phải dài ra thì dải nở
+     tới trần 140px rồi dừng. */
+  flex: 1;
+  height: auto;
+  min-height: 92px;
+  max-height: 140px;
+  display: flex;
+  flex-direction: column;
 }
-.nhom--tren {
+.card--xem .tl .lanes {
+  height: auto;
+  flex: 1;
+}
+/* ☠️ `.tl--after` vốn là flex ROW (kept | gone). Đặt `flex-direction: column`
+   ở trên sẽ lật nó thành dọc — phải ghi đè lại. (Bài học 03/08: ghi đè MỘT
+   thuộc tính không ghi đè CẢ NHÓM.) */
+.card--xem .tl--after {
+  flex-direction: row;
+}
+.card--xem .tl--after .kept {
+  display: flex;
+  flex-direction: column;
+}
+.card--xem .tl--after .kept .lanes {
+  flex: 1;
+  margin-top: 10px;
+}
+/* Tỉ lệ hình:tiếng ép về 1:2 như Premiere, thay vì hình khoá cứng 22px —
+   không thì dải hình mỏng dính trên một khối tiếng cao gấp 10. */
+.card--xem .tl .v {
+  height: auto;
+  flex: 1;
+}
+.card--xem .tl .a {
+  flex: 2;
+}
+/* ══════════════════════════════════════════════════════════════════════
+   CỘT PHẢI — MỘT NHÓM LIỀN (2026-08-18)
+   ══════════════════════════════════════════════════════════════════════
+   `.nhom--tren` / `.nhom--duoi` ĐÃ BỎ. Chúng sinh ra để hai mốc nối trong
+   cột phải thẳng hàng với mốc nối bên trái — mà bên trái nay chỉ còn MỘT
+   khối (bảng "Đoạn sẽ cắt" gỡ 13/08), không còn mốc nào để thẳng.
+
+   Đo trên panel thật 18/08 (936x1008) khi vẫn để lưới 4 ô cho 3 khối:
+     - ô (trái, hàng 2) trống hẳn 564 x 540px
+     - cột phải nhồi 436px vào ô 540px, đẩy `.lui` xuống y=1004..1032
+       — vượt đáy màn hình 24px, mà `.wrap` chỉ cuộn được 25px
+   Nay một cột dọc liền: nút chính từ 59% lên 33% màn hình, cuộn 0px.        */
+.nhom--phai {
   grid-column: 2;
   grid-row: 1;
-}
-.nhom--duoi {
-  grid-column: 2;
-  grid-row: 2;
-}
-.nhom {
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
   min-width: 0;
   min-height: 0;
 }
-/* ☠️ NÚT CHÍNH PHẢI NẰM NGOÀI VÙNG CUỘN, KHÔNG PHẢI GHIM ĐÈ LÊN NÓ.
-   Bản trước cho `.nhom--duoi` cuộn rồi để nút `sticky bottom:0` — nút dính đáy
-   khung cuộn nên **đè thẳng lên card "Kết quả"** đang cuộn phía sau. Anh Tiến
-   03/08 chụp đúng cảnh đó: nút cam nằm vắt ngang giữa ô Thời lượng và ô Đoạn
-   sẽ cắt.
-   Sửa gốc: nhóm KHÔNG cuộn. Phần co được là ruột card Kết quả; nút là hàng
-   cuối cùng, cố định, không bao giờ chồng lên ai. */
-/* Nhóm dưới không bao giờ co dưới nội dung của chính nó — đó là điều kiện để
-   ô Kết quả và nút không chồng lên nhau. Chỉ MỘT mình nó có sàn, nên bảng bên
-   trái không bị kéo theo. */
-.nhom--duoi {
-  overflow: visible;
-  min-height: min-content;
-}
-/* Ba thông số nay chỉ tốn một hàng nên card vừa đúng nội dung, KHÔNG giãn.
-   Để `flex: 1` thì ở cửa sổ cao ô phình lên 219px — một hàng chữ trong cái ô
-   cao bằng ba, nhìn rỗng ruột. Chỗ dư để ra ngoài card, giữa card và nút. */
+/* ☠️ NÚT CHÍNH KHÔNG BAO GIỜ ĐƯỢC `sticky`.
+   Đã thử và hỏng 03/08: nút dính đáy khung cuộn thì đè thẳng lên ô Kết quả
+   phía sau — anh Tiến chụp được cảnh nút cam nằm vắt ngang giữa hai ô.
+   Nay khỏi cần mẹo gì: cột không cuộn, nút là một hàng bình thường. */
+
+/* Ô Kết quả vừa đúng nội dung, KHÔNG giãn.
+   ☠️ Đo 18/08: để `flex: 1` thì ô cao 452px mà bên trong chỉ có ba con số
+   nằm ở đầu — rỗng ruột y như cái vừa sửa. Chỗ dư cứ để ở ĐÁY CỘT (không
+   viền), dễ nhìn hơn một cái ô rỗng có khung. */
 .card--res {
   flex: none;
   display: flex;
   flex-direction: column;
 }
-/* ── Ô "Nơi đặt kết quả" ăn hết chỗ dư của hàng ────────────────────────
-   Anh Tiến 03/08: *"chỗ này chưa đều ô với các phần kia"*. Đo được: hàng 1
-   cao 369px, mà Mức cắt (97) + Nơi đặt (203) chỉ chiếm 312 → **dư 57px chết**
-   nằm dưới đáy nhóm, nhìn ra ngay là hai cột không cân.
-   Cho chỗ dư chảy vào hai thẻ chọn: thẻ cao hơn = hình minh hoạ to hơn = dễ
-   bấm hơn. Không cho "Mức cắt" giãn — thanh 3 nút mà cao lên thì rỗng ruột. */
+/* "Nơi đặt kết quả" nay là THANH HAI NÚT — cùng khuôn `.seg` với "Mức cắt"
+   ngay trên nó, nên cao bằng nhau đúng 97px và đọc thành một cặp.
+   ☠️ KHÔNG cho giãn: thanh nút mà cao lên thì rỗng ruột.
+   Luật cũ `.card--fill { flex: 1 }` (cho hình minh hoạ ăn chỗ dư của hàng)
+   đã BỎ cùng lúc với hình — xem chú thích ở `App.tsx`. */
 .card--fill {
-  flex: 1;
-  min-height: 0;
-}
-.card--fill .opts {
-  flex: 1;
-  align-content: stretch;
-}
-/* ☠️ Đổi `.opt` từ block sang flex thì CON KHÔNG CÒN TỰ FULL WIDTH nữa.
-   Con của block mặc định rộng hết cha; flex item thì co theo nội dung, mà
-   `.opt` computed ra `align-items: flex-start`. Hậu quả đo được 03/08: hình
-   minh hoạ `.dia` co từ 200px xuống **14px** — hai dải timeline biến thành hai
-   ô vuông tí xíu, anh Tiến chụp lại ngay. `stretch` là chỗ phải ghi rõ. */
-.opt {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-.card--fill .dia {
-  flex: 1;
-  min-height: 44px;
-  /* Trần: dư nhiều quá thì hình giãn thành cái băng dài, hết ra hình timeline. */
-  max-height: 96px;
-}
-/* Nhãn tụt xuống đáy thẻ, không trôi theo hình. */
-.opt .nm {
-  margin-top: var(--sp-4);
+  flex: none;
 }
 /* Nút chính tụt xuống đáy nhóm — mỗi màn hình một nút chính, và nó nằm ở chỗ
    mắt kết thúc hành trình: chọn mức → chọn nơi đặt → xem số → bấm.
@@ -372,13 +419,11 @@
    1020x700, nội dung cao 784px nên nút nằm ở y=749 — phải cuộn 84px mới thấy
    cái nút chính của cả panel. Cửa sổ đủ cao thì không cuộn, sticky vô hình,
    bố cục y như thiết kế. */
-/* ☠️ KHÔNG `sticky` ở đây. Đã thử và hỏng: nút dính đáy khung cuộn thì nó đè
-   thẳng lên ô Kết quả cùng nhóm — anh Tiến chụp được đúng cảnh nút cam nằm
-   vắt ngang giữa hai ô. Nút là hàng cuối của nhóm, `margin-top: auto` đẩy nó
-   xuống đáy; nhóm luôn đủ chỗ nhờ sàn hàng 2, nên không cần ghim. */
-.nhom--duoi .cta {
-  margin-top: auto;
-}
+/* ☠️ `margin-top: auto` ĐÃ BỎ 18/08 (luật cũ: `.nhom--duoi .cta`).
+   Nó đẩy nút xuống ĐÁY cột — đúng khi cột phải còn chia hai hàng và nút là
+   thứ cuối cùng. Nay kết quả nằm NGAY DƯỚI nút, nên đẩy nút xuống đáy là
+   đẩy luôn cả kết quả ra khỏi màn hình. Đo bản nháp: để `auto` thì nút rơi
+   xuống 91% màn hình; bỏ đi thì nút ở 33% và mọi thứ vừa khít. */
 
 /* ── XEM TRƯỚC ───────────────────────────────────────────────────────── */
 .legend {
@@ -964,7 +1009,21 @@
    ========================================================================= */
 
 /* ---- ≤900px: một cột, sắp lại theo THỨ TỰ VIỆC PHẢI LÀM ---- */
-@media (max-width: 900px) {
+/* ══════════════════════════════════════════════════════════════════════════
+   NGƯỠNG RƠI VỀ MỘT CỘT: 900px → 700px  (2026-08-19)
+   ══════════════════════════════════════════════════════════════════════════
+   Anh Tiến: *"anh đang dùng ở màn 24 inch thì UI của Panel cũng chưa được tối
+   ưu"*. Đo panel thật trên máy anh: **728 × 1062 CSS px** (màn 2048×1153,
+   dpr 1.5). 728 < 900 nên nó rơi về một cột, và hậu quả đo được:
+     - nút chính nằm ở **y=871 = 82%** màn hình
+     - **205px TRỐNG** giữa "Nơi đặt kết quả" (hết ở 657) và nút (bắt đầu 862)
+     - bề ngang 728px chỉ dùng một cột
+   Ngưỡng 900 đặt từ 03/08, hồi đó cột trái còn phải chứa cả bảng "Đoạn sẽ
+   cắt" nên hai cột dưới 900px là chật thật. Bảng gỡ 13/08 rồi, cột trái chỉ
+   còn dải sóng — hai cột ở 728px vẫn thoải mái (mỗi cột ~342px).
+   ⇒ Hạ xuống 700px. Dock hẹp thật (≤700px) vẫn về một cột như cũ.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 700px) {
   /* Hai nhóm tan ra, mọi thẻ thành ô lưới của một cột duy nhất. */
   .nhom {
     display: contents;
@@ -1023,7 +1082,7 @@
     overflow: auto;
     padding-bottom: calc(var(--h-ctrl-lg) + var(--sp-5) * 2);
   }
-  .nhom--duoi {
+  .nhom--phai {
     overflow: visible;
   }
   .card--fill {
@@ -1034,10 +1093,10 @@
   }
 
   /* NÚT CHÍNH GHIM ĐÁY — nó vừa là nút vừa là đèn báo, không được trôi mất.
-     ☠️ Selector phải ĐỦ ĐẶC HIỆU để thắng `.nhom--duoi .cta` ở bản rộng
+     ☠️ Selector phải ĐỦ ĐẶC HIỆU để thắng luật `.cta` ở bản rộng
      (0,2,0). Viết `.cta` trần (0,1,0) thì `sticky` của bản rộng đè mất
      `fixed` này — đo được ngay: cuộn hết xuống, nút bay lên y = −995. */
-  .nhom--duoi .cta,
+  .nhom--phai .cta,
   .cta {
     position: fixed;
     inset: auto 0 0;
@@ -1201,4 +1260,15 @@
   font-size: 32px;
   font-weight: 700;
   color: var(--ok, #34c759);
+}
+/* Câu mời bấm lúc CHƯA CHẠY — giữ chỗ để vị trí nút không nhảy giữa hai
+   trạng thái. ☠️ Phải có class riêng: mượn `.ket-gon__v` (26px/600, dành cho
+   dấu "—") thì câu chữ hiện to như tiêu đề và tràn hai dòng — đo được trên
+   bản build 18/08. Chữ thì phải cỡ chữ. */
+.ket-gon__moibam {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-normal);
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.5;
 }
