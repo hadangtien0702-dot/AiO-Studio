@@ -3,6 +3,24 @@
 > Nạp tự động mỗi phiên trong thư mục dự án, và **đi theo mã nguồn**.
 > Lập 2026-07-27 · viết lại 2026-07-29 sau khi tách phần phụ đề ra panel riêng.
 
+## ☠️ ANH TIẾN CHỐT 19/08/2026: AUTO CUT **100% DONE** — NGƯNG PHÁT TRIỂN
+
+Nguyên văn: *"auto cut 100% done nha em"*, sau khi anh tự cài v1.6.0, tự dựng
+một bài thật rồi **nghe lại — không mất lời** (*"anh gọn không có gì để chê"*).
+
+**Nghĩa là:** panel này vào trạng thái như Asset Manager (đóng băng 14/08).
+**Việc mới về Autocut phải HỎI ANH TRƯỚC khi làm** — đừng tự mở ra sửa tiếp.
+
+Còn ba thứ **anh biết và chấp nhận**, không phải việc đang làm dở:
+1. Cài thử trên máy sạch (chỉ anh làm được)
+2. Video 1 giờ ~19 phút — đường ra đã biết: xuất FCPXML
+3. Ba ca chưa đo lại: nhiều người + xa mic · nhạc nền · video >30 phút
+
+Cả ba đã ghi vào **file hướng dẫn trong bộ cài**, nên người mua đọc là biết ranh
+giới — không giấu.
+
+---
+
 ## Đọc trước khi sửa
 
 1. `PLAN.md` — mục tiêu, quyết định đã chốt, **rủi ro lớn nhất**
