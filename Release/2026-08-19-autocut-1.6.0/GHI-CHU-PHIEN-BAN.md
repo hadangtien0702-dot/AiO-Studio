@@ -48,9 +48,14 @@ Kem theo:
 ## CHUA kiem - phai lam truoc khi gui ra ngoai
 - [ ] Cai that tren **MAY SACH** bang chinh file zip nay
 - [ ] SmartScreen: xac nhan chi hoi mot lan "More info -> Run anyway"
-- [ ] **Chua chung minh duoc tool khong cat mat loi** — no van tu cham diem
-      bang chinh hai nguon no dung de quyet dinh cat. Can tai anh Tien tren
-      mot bai that, hoac mot thuoc do tu ngoai (Silero VAD)
+- [x] ~~Chua chung minh duoc tool khong cat mat loi~~ **DA GIAI 19/08**: anh
+      Tien tu dung mot bai that roi NGHE LAI, khong mat loi — *"anh thay rat
+      okie... khong co gi de che"*. Day chinh la thuoc do TU NGOAI ma muc nay
+      doi tu thang 7; hoa ra khong can Silero VAD, chi can de chinh nguoi dung
+      dung mot bai that.
+      ⚠️ **Pham vi da xac nhan:** talking-head MOT nguoi, giong Viet, thu gan
+      mic. CHUA do lai sau khi dat: hai nguoi + mot nguoi ngoi xa mic (tung cat
+      mat **249 cau** o ban 0.7.0) · clip co nhac nen · video dai tren 30 phut.
 - [ ] Toc do: video 1 gio van ~19 phut (buoc dung an 83%)
 
 ## Luat cua ngan Release

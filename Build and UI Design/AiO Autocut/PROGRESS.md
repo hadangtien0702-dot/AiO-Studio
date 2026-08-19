@@ -1,5 +1,56 @@
 # AiO Autocut - Nhat ky
 
+## [anh-tien-duyet] - 2026-08-19 13:47 (UTC+7) - ANH TIEN TU DUNG BAI THAT VA DUYET -> GIAI MON NO LON NHAT
+
+### Trang thai hien tai  (CHOT)
+**v1.6.0**. Anh Tien tu cai, tu dung mot bai that, **nghe lai va khong mat loi**:
+*"anh test xong roi anh thay rat okie cho tool nay roi do em - anh gon khong co
+gi de che"*.
+
+=> **MON NO LAU NHAT CUA DU AN DA GIAI.** Bang MVP trong `CLAUDE.md` doi tu
+CHUA DAT sang **DAT** cho muc *"Tin duoc la khong cat mat loi"*.
+
+### Vi sao day la cot moc, khong phai mot loi khen
+`KE-HOACH.md` tu 28/07 goi day la **"van de goc chua giai"**: thuoc do lam bang
+CUNG VAT LIEU voi cai no do — lay Whisper + nang luong quyet dinh cat, roi lay
+chinh Whisper + nang luong cham diem viec cat. Vong quanh, luon tu khen minh.
+Da bao *"0 cau bi mat"* **BA LAN**, ba lan anh Tien van nghe ra cho mat.
+
+Ke hoach cu du tinh giai bang **Silero VAD** (mot mo hinh KHAC lam thuoc ngoai).
+Hoa ra khong can: thu giai duoc no la **de chinh nguoi dung dung mot bai that**.
+Re hon, va dung hon — tai nguoi la thu khach hang cuoi cung dung de cham.
+Dung luat anh Tien chot sang cung ngay: *"lam tool phai TU TIN vao tool cua
+minh - minh DUNG TRUOC KHI BAN ra"*.
+
+### GHI DUNG PHAM VI - dung nang thanh "dung moi ca"
+**Da xac nhan:** talking-head MOT nguoi, giong Viet, thu gan mic
+(bai `1808-S-Phoebe-Kinn`).
+**CHUA do lai sau khi dat** — ba ca nay tung lam hong tool:
+- hai nguoi + mot nguoi ngoi XA MIC -> ban 0.7.0 tung cat mat **249 cau**
+- clip co nhac nen / phong on -> nen on dao dong 7,9 dB giua cac phut
+- video dai tren 30 phut -> mau nho tung giau loi: 82 giay chay hoan hao ma
+  58 phut thi gan nhu khong cat gi
+
+### Thay doi (tai lieu, khong dong ma nguon)
+- `CLAUDE.md` - bang MVP: muc do sang **DAT**, ghi ro pham vi + ba ca chua do.
+  Doan luat *"chua co thuoc ngoai thi khong duoc noi da dung"* danh dau HET
+  HIEU LUC **cho dung pham vi da xac nhan**, giu nguyen cho cac ca con lai.
+- `scripts/package-release.ps1` - file huong dan nguoi dung: doi tu
+  *"!!! CHUA CHUNG MINH DUOC..."* sang *"DA KIEM 19/08... pham vi..."* + liet ke
+  ba ca nen nghe lai. Nguoi mua doc phai biet ranh gioi that.
+- `Release/2026-08-19-autocut-1.6.0/GHI-CHU-PHIEN-BAN.md` - tich muc da giai.
+- Dong goi lai va thay file trong ngan Release.
+
+### File anh huong
+`CLAUDE.md` · `scripts/package-release.ps1` · `Release/2026-08-19-autocut-1.6.0/`
+
+### Con lai trong danh sach chan beta
+1. Cai thu tren **MAY SACH** (chua lam)
+2. **Toc do**: video 1 gio ~19 phut, buoc dung an 83 phan tram -> can FCPXML
+3. Ba ca kho o tren, khi nao anh Tien gap bai that thi do luon
+
+---
+
 ## [bo-cai-1.6.0] - 2026-08-19 13:23 (UTC+7) - BO CAI THU v1.6.0 + BAT LOI FILE HUONG DAN NOI SAI
 
 ### Trang thai hien tai  (CHOT CUOI PHIEN 19/08)

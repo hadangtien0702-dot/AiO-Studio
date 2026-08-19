@@ -244,12 +244,25 @@ câu thật có năng lượng y hệt nhau (70,8%/70,8%). Chỉ phụ đề là
 
 | | MVP = xong khi | Vì sao chưa đạt |
 |---|---|---|
-| **Tin được là không cắt mất lời** | Có **thước đo TỪ NGOÀI** xác nhận | Đang lấy chính Whisper + năng lượng để chấm điểm việc cắt do chúng quyết định — **vòng quanh, nó luôn tự khen mình**. Đã báo "0 câu mất" **ba lần**, ba lần anh Tiến vẫn nghe ra chỗ mất. → Cần **Silero VAD** (mô hình khác) hoặc tai anh Tiến. |
+| **Tin được là không cắt mất lời** | Có **thước đo TỪ NGOÀI** xác nhận | ✅ **ĐẠT 19/08/2026 — anh Tiến tự dựng bài thật rồi NGHE LẠI, không mất lời.** Đây chính là thước đo từ ngoài mà mục này đợi từ tháng 7. ⚠️ **Phạm vi đã xác nhận:** talking-head MỘT người, giọng Việt, thu gần mic (bài `1808-S-Phoebe-Kinn`). Ca khó **chưa đo lại sau khi đạt**: hai người + một người ngồi xa mic (từng cắt mất **249 câu** ở bản 0.7.0), clip có nhạc nền, video dài trên 30 phút. |
 | **Đủ nhanh để bán** | Video 1 giờ chạy **dưới 5 phút** | Nay **19 phút**; bước dựng ăn 83% (`overwriteClip` của Adobe, không sửa được từ ExtendScript). → Cần **xuất FCPXML** rồi import một lần. |
 | Chữ ký thương mại · khoá bản quyền · macOS | | Chưa có |
 
-☠️ **Chừng nào chưa có thước từ ngoài, mọi con số chỉ được nói ở mức "khá hơn
-lần trước", KHÔNG được nói "đã đúng".** Và phải nói rõ giới hạn đó với anh Tiến.
+☠️ **HẾT HIỆU LỰC 19/08/2026 cho ca talking-head một người** — đã có thước từ
+ngoài: anh Tiến tự dựng bài thật rồi nghe lại, *"anh thấy rất okie... không có gì
+để chê"*. Đoạn luật cũ giữ nguyên bên dưới vì **vẫn đúng cho các ca chưa đo**:
+
+~~Chừng nào chưa có thước từ ngoài, mọi con số chỉ được nói ở mức "khá hơn lần
+trước", KHÔNG được nói "đã đúng".~~ → Nay đọc là: **chỉ được nói "đã đúng" trong
+đúng PHẠM VI đã có tai người xác nhận.** Ngoài phạm vi đó (nhiều người, xa mic,
+nhạc nền, video dài) thì vẫn là "khá hơn lần trước", và vẫn phải nói rõ giới hạn
+với anh Tiến.
+
+**Bài học chốt lại:** thứ giải được món nợ này không phải một mô hình thứ hai
+(Silero VAD) như kế hoạch cũ dự tính — mà là **để chính người dùng dựng một bài
+thật**. Rẻ hơn, và đúng hơn: tai người là thứ khách hàng cuối cũng dùng để chấm.
+Luật anh Tiến chốt cùng ngày: *"làm tool phải tự tin vào tool của mình — mình
+dùng trước khi bán ra"*.
 
 **Ngoài MVP — cố ý CHƯA làm:** cắt từ đệm/câu lặp (mốc từ Whisper hỏng 7–16%),
 podcast nhiều mic (chưa đọc được A1/A2/A3 riêng), đa ngôn ngữ.

@@ -44,7 +44,11 @@ CAN BIET TRUOC
   - Ctrl+Z KHONG hoan tac duoc muc Cat tai cho (moi doan la mot buoc undo).
     Dung nut Hoan tac cat tren panel.
 
-  !!! CHUA CHUNG MINH DUOC LA KHONG CAT MAT LOI.
-  Tool tu cham diem bang chinh hai nguon no dung de quyet dinh cat, nen con
-  so 0 cau bi mat chua dang tin tuyet doi. Lan dau chay tren bai that:
-  chon Sequence moi, va nghe lai truoc khi giao hang.
+  DA KIEM: 19/08/2026 tac gia tu dung mot bai that roi NGHE LAI - khong mat
+  loi. Pham vi da xac nhan: talking-head MOT nguoi, giong Viet, thu gan mic.
+
+  CHUA do trong ba ca sau, chay thi nen nghe lai truoc khi giao hang:
+    - hai nguoi tro len, co nguoi ngoi XA MIC
+    - clip co nhac nen hoac phong on
+    - video dai tren 30 phut
+  Lan dau chay tren bai that: chon Sequence moi cho chac (ban goc con nguyen).
