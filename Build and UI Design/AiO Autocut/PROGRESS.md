@@ -1,5 +1,84 @@
 # AiO Autocut - Nhat ky
 
+## [v1.6.0] - 2026-08-19 12:17 (UTC+7) - LEN v1.6.0 + VET NOT SONG NGU (thuoc do cu BO SOT)
+
+### Trang thai hien tai
+**v1.6.0** (tu 1.5.0 dat tu 14/08). Ban EN nay sach: chi con 3 chuoi tieng Viet
+va CA BA deu hop le. Cho anh Tien chot 4 mon no con lai (xem cuoi muc).
+
+### 1. LEN v1.6.0
+Anh Tien hoi *"day la version may day em"* — va do la thieu sot: panel doi rat
+nhieu tu 14/08 ma so phien ban dung yen o 1.5.0.
+Chon 1.6.0 (khong phai 1.5.1): co TINH NANG MOI (panel tu theo doi thao tac
+trong Premiere) + DOI KIEN TRUC (tach `autoCut` lam hai giai doan), nhung khong
+pha tuong thich.
+Doi o BA cho: `client/package.json` · `CSXS/manifest.xml` (2 dong).
+Do tren panel that sau khi cai: nhan **v1.6.0**. Khong can tat Premiere — so
+hien tren panel lay tu bundle, khong lay tu manifest.
+
+**Vi sao khong phai chuyen hinh thuc:** cai chong ban moi len ban cu ma so khong
+doi thi khong phan biet duoc dang chay ban nao. Chinh hom nay da vap: panel anh
+Tien mo la ban CU, nhin be ngoai y het, phai so md5 moi biet.
+
+### 2. ☠️ THUOC DO SONG NGU CUA TOI BO SOT — anh Tien chup man hinh chi ra
+Toi bao *"ban EN chi con DUNG MOT chuoi tieng Viet"*. **SAI.**
+Thuoc do loc `e.childElementCount === 0` de lay "the la" — ma nhan
+"Se cat · N doan" nam trong `<span>` co `<i>` ben trong nen **bi bo qua**.
+
+Quet lai bang **TEXT NODE** (khong loc theo the, co ca `title`/`aria-label`):
+ra **5 chuoi**, khong phai 1.
+
+| Chuoi | Xu ly |
+|---|---|
+| ten project (text + title) | HOP LE - khong dich duoc |
+| "Se cat ·" / "doan" | **LOI - da dich**: Will cut / segments |
+| nut chinh "Cat N khoang lang" | **LOI - da dich**: Cut N silences |
+| tooltip "Chuyen sang tieng Viet" | HOP LE - CO Y, noi bang thu tieng SE DOI SANG |
+
+Nut chinh dang le phai bat tu dau: PROGRESS 14/08 xep ~15 template literal vao
+muc [CHO] voi ly do *"chi hien thoang luc chay"* — rieng cai nay KHONG thoang,
+no la nhan cua NUT CHINH, hien suot man xem truoc.
+
+**Bai hoc ve thuoc do:** loc theo CAU TRUC THE (`childElementCount`) la gia dinh
+ve cach chu duoc boc. Chu nam trong the co icon ben trong thi tuot. Quet text
+node khong co gia dinh nao ca.
+=> Con so "1 chuoi" truoc do la con so cua THUOC DO HONG, khong phai su that.
+   Da sua lai comment dau `chu.ts` (cho do dang ghi sai).
+
+### File anh huong
+`client/package.json` · `CSXS/manifest.xml` · `client/src/App.tsx` · `client/src/chu.ts`
+
+### Kiem chung bang so (panel that, che do EN)
+- nhan xem truoc: **"Will cut · 3 segments"** (truoc: "Se cat · 3 doan")
+- nut chinh: **"Cut 3 silences"** (truoc: "Cat 3 khoang lang")
+- quet text node: **3 chuoi**, ca ba hop le
+- phien ban hien tren panel: **v1.6.0**
+
+### CHAY TRON MOT LAN CAT THAT — cho tu dau phien CHUA kiem
+Sau khi tach luong hai giai doan, phan nghe hieu + dung sequence (giai doan B)
+**chua chay lan nao**. Da chay tron tren sequence tu dung, che do "Sequence moi":
+| | |
+|---|---|
+| Chay het | 1,5s, khong loi |
+| Ket qua | 6 nhat cat, rut 3,3s |
+| Vung 30s - 3,3s = 26,7 | sequence dung ra **26,720s** |
+| Hinh / Tieng | **7 / 7 clip, cung ket 26,720s** |
+| **Ho giua cac manh** | **0 cho, lon nhat 0,000s** |
+Dung ba chi tieu MVP: Hinh = Tieng = Yeu cau, timeline lien mach.
+
+### CON NO — anh Tien chua chot
+1. **Nut dropdown chon sequence** — anh de xuat khi bao loi 2; do ra panel da tu
+   nhay dung nen toi noi "chua can", anh CHUA chot bo hay lam.
+2. **Nghe hieu chay that chua test** — moi lan chay deu trung bo dem (1,5s cho
+   30s tieng). Nhanh nghe tu dau chua chay sau khi tach luong.
+3. **Nhieu file NOI DUNG khac nhau** — 4 file trong bin deu 53,74s, nhieu kha
+   nang cung mot ban render. Luong dung, con so tren noi dung khac thi chua.
+4. **~13 chuoi ghep dong con tieng Viet** — phan lon nam trong nhan tien trinh
+   (khong hien vi luat 13/08 giau quy trinh), nhung CHUA ra tung cai.
+
+---
+
+
 ## [nhieu-file] - 2026-08-19 11:50 (UTC+7) - XEM TRUOC GOP DU MOI FILE + SU CO GHI DE IN/OUT
 
 ### Trang thai hien tai

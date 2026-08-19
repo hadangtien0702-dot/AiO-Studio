@@ -46,9 +46,16 @@
  * Anh chon bo chu **Light · Medium · Aggressive** (kieu dat ten cac tool tu
  * dong hay dung; khach quen AutoCut/Descript doc la hieu ngay).
  *
- * => Ba khoa do NAY NAM TRONG BANG (xem muc 'Giu nhip' ben duoi). Do lai tren
- *    panel that 19/08: ban EN con DUNG MOT chuoi tieng Viet — ten project cua
- *    nguoi dung, thu khong duoc phep dich.
+ * => Ba khoa do NAY NAM TRONG BANG (xem muc 'Giu nhip' ben duoi).
+ *
+ * ☠️ VA MOT BAI HOC VE THUOC DO, ghi ngay day de khong lap lai:
+ * Sau khi dich ba muc, toi bao "ban EN chi con DUNG MOT chuoi tieng Viet".
+ * SAI. Thuoc do cua toi loc `e.childElementCount === 0` de lay the la — ma
+ * nhan "Se cat · N doan" nam trong <span> co <i> ben trong, nen bi bo qua.
+ * Anh Tien chup man hinh chi ra. Quet lai bang TEXT NODE (khong loc theo the)
+ * thi ra **5 chuoi**: ten project (2 cho, hop le) · "Se cat ·" · "doan" ·
+ * tooltip nut ngon ngu (CO Y — noi bang thu tieng SE DOI SANG, xem `ngonngu.tsx`).
+ * => Con so "mot chuoi" truoc do la con so cua THUOC DO HONG, khong phai su that.
  *
  * Bai hoc de lai: "giu nguyen lam thuong hieu" chi dung khi NGUOI DUNG doc no
  * ra thuong hieu. Anh Tien la nguoi Viet ma con thay chuong mat, thi editor
@@ -74,6 +81,13 @@ export const CHU: BangChu = {
     'Giữ lại': 'Keep',
     'giữ lại': 'kept',
     'Kết quả': 'Result',
+    // Nhan chu thich o khoi Xem truoc — anh Tien bat 19/08: ban EN van hien
+    // "Se cat · 0 doan". Thuoc do cu cua toi bo sot vi loc `childElementCount===0`,
+    // ma the nay co <i> ben trong. Nay quet bang TEXT NODE, khong loc theo the.
+    'Sẽ cắt': 'Will cut',
+    'Cắt': 'Cut',
+    'khoảng lặng': 'silences',
+    'đoạn': 'segments',
     'Vùng chọn đã đổi — bấm lại để phân tích vùng mới.':
       'The selected range changed — press again to analyse the new range.',
     'Chưa chạy — bấm nút ở trên.': 'Not run yet — press the button above.',

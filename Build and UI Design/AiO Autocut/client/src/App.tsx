@@ -1328,7 +1328,7 @@ export default function App() {
               <div className="legend">
                 <span>
                   <i className="sw sw--cut" />
-                  Sẽ cắt · <b>{catThat.length}</b>&nbsp;đoạn
+                  {dich('Sẽ cắt')} · <b>{catThat.length}</b>&nbsp;{dich('đoạn')}
                 </span>
                 <span>
                   <i className="sw sw--keep" />
@@ -1530,7 +1530,12 @@ export default function App() {
                 <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
               </svg>
               {catThat.length > 0
-                ? `Cắt ${catThat.length} khoảng lặng`
+                ? // ☠️ NUT CHINH, hien suot man xem truoc — khong duoc de
+                  // chuoi ghep tieng Viet o day. PROGRESS 14/08 xep ~15 template
+                  // literal vao muc [CHO] voi ly do "chi hien thoang luc chay";
+                  // rieng cai nay KHONG thoang: no la nhan cua nut chinh.
+                  // Anh Tien bat 19/08 khi soi lai ban EN.
+                  `${dich('Cắt')} ${catThat.length} ${dich('khoảng lặng')}`
                 : dich('Không có đoạn nào để cắt')}
             </button>
           ) : (

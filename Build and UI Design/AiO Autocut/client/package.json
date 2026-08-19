@@ -1,7 +1,7 @@
 {
   "name": "aio-studio-autocut",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.6.0",
   "type": "module",
   "description": "AiO Studio - Autocut: tu cat khoang lang tren timeline Premiere",
   "scripts": {
