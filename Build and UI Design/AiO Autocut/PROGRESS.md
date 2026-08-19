@@ -2,10 +2,32 @@
 
 ## [bo-cai-1.6.0] - 2026-08-19 13:23 (UTC+7) - BO CAI THU v1.6.0 + BAT LOI FILE HUONG DAN NOI SAI
 
-### Trang thai hien tai
-v1.6.0. Da co bo cai mot file de gui di:
-`build/AiO-Studio-Autocut-1.6.0-SETUP.zip` (46 MB).
-Giai nen -> bam dup `CAI-DAT.bat`, khong can ZXP Installer.
+### Trang thai hien tai  (CHOT CUOI PHIEN 19/08)
+**v1.6.0** (tu 1.5.0 dat 14/08). Bo cai nam o
+`AiO Studio/Release/2026-08-19-autocut-1.6.0/` — mot file zip 46 MB, giai nen
+roi bam dup `CAI-DAT.bat`, khong can ZXP Installer.
+Sau commit trong ngay, cay git SACH, **CHUA PUSH**.
+
+**Phien 19/08 lam gi:** anh Tien test that va bat 4 loi, sua het + do het tren
+Premiere (chi tiet o 9 muc ben duoi). Kem: len v1.6.0 · o chon sequence ·
+UI hai cot cho man 24 inch · dong goi ban cai.
+
+**VIEC KE TIEP — theo thu tu:**
+1. **Anh Tien cai thu tren MAY SACH** bang chinh file zip do. Day la mon dang
+   chan beta, va la thu duy nhat chung minh goi chay duoc ngoai may dev.
+2. **Anh Tien dung tool tren mot bai THAT** — luat anh chot 19/08: *"lam tool
+   phai tu tin vao tool cua minh, minh dung truoc khi ban ra"*. Day cung la
+   loi giai cho mon no lau nhat: chua co thuoc do TU NGOAI.
+3. Sau do moi tinh: Silero VAD (thuoc do ngoai) · FCPXML (toc do, 1 gio van
+   ~19 phut, buoc dung an 83%).
+
+**[CHO] chua lam, co ly do:**
+- `color-scheme: dark` moi sua RIENG Autocut; panel **Transcripts co cung loi**
+  (`.seqpick` cung la select native). Dung ra phai dua len
+  `design-system/tokens.css` roi dong bo ca bo — cham nguon chan ly la cham 4
+  panel nen phai do lai tung cai. Da tach thanh viec rieng.
+- Thu muc `build/release/` con `0.1.0.zxp` va `1.5.0.zxp`. Chua xoa — de anh
+  Tien quyet, ban cu doi khi con dung de doi chieu.
 
 ### Goi gi trong do (da MO RA DOI CHIEU, khong tin ten file)
 | | |
