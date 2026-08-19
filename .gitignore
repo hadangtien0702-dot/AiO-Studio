@@ -82,6 +82,9 @@ ehthumbs.db
 # luat rong nhu *.sql tung nuot file moi trong im lang).
 /Release/2026-08-14-beta-01/panels/
 /Release/2026-08-14-beta-01/AiO-Studio-Beta-3-panel.zip
+# [19/08/2026] Ban cai thu chi co Autocut 1.6.0 — cung luat: giu ghi chu +
+# script, bo file zip 46 MB (build lai duoc bang scripts\package-release.ps1).
+/Release/2026-08-19-autocut-1.6.0/AiO-Studio-Autocut-1.6.0-SETUP.zip
 
 # Temporary measurement / test scripts
 *-tmp.mjs
