@@ -138,8 +138,7 @@ Write-Host ("  [OK] Da tao: " + $zxpOut + "  (" + $sizeMb + " MB)") -ForegroundC
 $guide = Join-Path $outDir 'HUONG-DAN-CAI-DAT.txt'
 $lines = @(
   ("AiO Studio - Autocut  " + $version),
-  "Cong cu tu cat khoang lang tren timeline Premiere (Windows).
-  *** BAN THAM DO 0.1.x - CHUA PHAI CONG CU HOAN CHINH ***",
+  "Cong cu tu cat khoang lang tren timeline Premiere (Windows).",
   "",
   "YEU CAU",
   "  - Windows 10/11",
@@ -161,16 +160,33 @@ $lines = @(
   "  Dung ZXP Installer, hoac xoa thu muc:",
   "  %APPDATA%\Adobe\CEP\extensions\com.aiostudio.autocut",
   "",
-  "TRANG THAI",
-  "  Ban 0.1.x moi la BAN THAM DO: panel chi co 3 nut de kiem tra xem Premiere",
-  "  cho lam nhung gi. CHUA cat duoc khoang lang. Dung chay tren du an that.",
+  "DUNG THE NAO",
+  "  1. Mo sequence, khoanh vung bang phim I va O.",
+  "  2. Chon muc cat: Light (giu nhip) / Medium (can bang) / Aggressive (cat sat).",
+  "  3. Chon noi dat ket qua:",
+  "       Sequence moi  - ban goc con nguyen (nen dung khi moi lam quen)",
+  "       Cat tai cho   - sua thang sequence dang mo, co nut Hoan tac cat",
+  "  4. Bam Cut silences. Tool dung lai cho xem truoc dai song that cua chinh",
+  "     clip do; ung roi bam tiep thi no cat.",
   "",
-  "  Da do duoc (Premiere Beta 26.5):",
-  "    - Cat (razor): CHAY, nhan chuoi timecode dang 00:00:10:00",
-  "    - Cat tac dong ca track video lan audio cung luc",
-  "    - Xoa doan: CHAY",
-  "    - Don (ripple): KHONG chay, de lai lo trong",
-  "  -> Kien truc da chuyen sang DUNG LAI cac doan can giu bang overwriteClip."
+  "TOOL LAM GI",
+  "  Cat bang GIAO cua hai nguon: khong nghe ra chu O DO, VA nang luong duoi",
+  "  nen on cuc bo. Dung mot nguon thoi la hong - da tra gia ca hai lan.",
+  "  Cho nao hai nguon khong dong y thi GIU LAI va dat marker vang de nguoi",
+  "  dung tu quyet, chu may khong tu cat.",
+  "",
+  "CAN BIET TRUOC",
+  "  - Lan chay dau tren mot file phai nghe hieu ca file, mat vai phut; lan sau",
+  "    tren cung file nhanh hon nhieu vi da co bo dem.",
+  "  - Video 1 gio hien mat khoang 19 phut. Dang lam cho nhanh hon.",
+  "  - Tool NGHE tieng Viet. Tieng khac chua do rieng nen chua bao dam.",
+  "  - Ctrl+Z KHONG hoan tac duoc muc Cat tai cho (moi doan la mot buoc undo).",
+  "    Dung nut Hoan tac cat tren panel.",
+  "",
+  "  !!! CHUA CHUNG MINH DUOC LA KHONG CAT MAT LOI.",
+  "  Tool tu cham diem bang chinh hai nguon no dung de quyet dinh cat, nen con",
+  "  so 0 cau bi mat chua dang tin tuyet doi. Lan dau chay tren bai that:",
+  "  chon Sequence moi, va nghe lai truoc khi giao hang."
 )
 $lines | Out-File -FilePath $guide -Encoding utf8
 

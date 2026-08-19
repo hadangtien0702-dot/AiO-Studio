@@ -1,5 +1,58 @@
 # AiO Autocut - Nhat ky
 
+## [bo-cai-1.6.0] - 2026-08-19 13:23 (UTC+7) - BO CAI THU v1.6.0 + BAT LOI FILE HUONG DAN NOI SAI
+
+### Trang thai hien tai
+v1.6.0. Da co bo cai mot file de gui di:
+`build/AiO-Studio-Autocut-1.6.0-SETUP.zip` (46 MB).
+Giai nen -> bam dup `CAI-DAT.bat`, khong can ZXP Installer.
+
+### Goi gi trong do (da MO RA DOI CHIEU, khong tin ten file)
+| | |
+|---|---|
+| So file trong .zxp | 16 |
+| Co `.debug` | **KHONG** (dung, ban phat hanh khong mo cong go loi) |
+| Co `ffmpeg.exe` | **CO** (114,8 MB) - cai may sach chay duoc ngay |
+| Giay phep LGPL + THIRD-PARTY | **CO** (bat buoc de ban) |
+| Version trong manifest cua goi | **1.6.0** |
+| Ham host moi | `ac_getRange` · `ac_dsSequence` · `ac_moSequence` deu CO |
+
+Gap **kem FFmpeg** chu khong dung `-BinChung`: may anh Tien co kho chung
+(`%APPDATA%\AiOStudioin\win64`) nhung MAY SACH thi chua — ma dung cai
+dang can la cai thu tren may sach.
+
+### ☠️☠️ BAT DUOC: FILE HUONG DAN NOI SAI VE CHINH SAN PHAM
+Mo `HUONG-DAN-CAI-DAT.txt` ra doc thi thay noi dung con la cua ban **0.1.0**
+tu thang 7:
+> *"BAN THAM DO 0.1.x - CHUA PHAI CONG CU HOAN CHINH"*
+> *"panel chi co 3 nut... **CHUA cat duoc khoang lang. Dung chay tren du an that.**"*
+> *"Don (ripple): KHONG chay, de lai lo trong"*
+
+Tieu de tu lay so `1.6.0` tu manifest nen **nhin luot thi tuong da cap nhat** —
+phan than la van ban cu, chua ai sua tu thang 7.
+Gui di la nguoi dung doc thay tool KHONG CAT DUOC GI.
+
+Dung bai hoc 5af: *"khop ten file roi suy ra noi dung = chua kiem gi ca. MO RA
+DOC."* Lan nay la file do CHINH script cua minh sinh ra, van sai.
+
+**Da viet lai** phan than: cach dung 4 buoc · tool lam gi (giao hai nguon) ·
+can biet truoc (lan dau nghe ca file, 1 gio ~19 phut, chi do tieng Viet, Ctrl+Z
+khong hoan tac duoc Cat tai cho) · va giu nguyen loi canh bao that:
+*"CHUA CHUNG MINH DUOC LA KHONG CAT MAT LOI"* + khuyen dung Sequence moi lan dau.
+
+### Hai loi phu bat duoc khi sua
+- PowerShell thoat chuoi bang **backtick**, khong phai backslash. Viet `\"` la
+  loi cu phap `Unexpected token`. Bo han dau ngoac kep cho gon.
+- Emoji trong file .txt bi meo thanh `â˜ ï¸`. Doi thanh `!!!`.
+  => Luat cu cua du an (*"khong dau, khong emoji"*) hoa ra dung ca cho file
+     huong dan giao cho nguoi dung, khong rieng file ky thuat.
+
+### CON LAI trong thu muc phat hanh
+Van con `AiO-Studio-Autocut-0.1.0.zxp` va `1.5.0.zxp`. Chua xoa - de anh Tien
+quyet, vi ban cu doi khi con dung de doi chieu.
+
+---
+
 ## [dropdown-toi] - 2026-08-19 13:01 (UTC+7) - O CHON SEQUENCE: DANH SACH XO XUONG HET NEN TRANG
 
 ### Trang thai hien tai
