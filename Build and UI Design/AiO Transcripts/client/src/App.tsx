@@ -155,11 +155,13 @@ const KHOA_KIEU_CAPTION = 'aio-transcript-kieu-caption'
 function docKieuCaption(): KieuCaption {
   try {
     const s = localStorage.getItem(KHOA_KIEU_CAPTION) as KieuCaption | null
-    if (s && KIEU_CAPTION.some((k) => k.ma === s)) return s
+    // [2.5.1] Ô này chỉ còn chọn KIỂU HIỆU ỨNG — 'mac-dinh' (caption track) đã
+    // thành nút riêng, nên giá trị cũ 'mac-dinh' lưu từ 2.5.0 coi như chưa chọn.
+    if (s && KIEU_CAPTION.some((k) => k.ma === s && k.mogrt)) return s
   } catch {
     /* không đọc được thì mặc định */
   }
-  return 'mac-dinh'
+  return 'hormozi'
 }
 
 /** Độ dài vùng đang chọn — "35,2 s" dưới một phút, "1:12" từ một phút trở lên. */
@@ -265,6 +267,9 @@ export default function App() {
    */
   const [dsKieu, setDsKieu] = useState<MoTaKieuCaption[]>(KIEU_CAPTION)
   const kieuDangChon = timKieu(kieuCaption, dsKieu)
+  /** Kiểu cho nút "Làm hiệu ứng" — luôn là một kiểu CÓ .mogrt (kiểu riêng bị xoá
+   *  khỏi thư mục thì rơi về kiểu hiệu ứng đầu tiên, không âm thầm ra caption track). */
+  const kieuHieuUng = kieuDangChon.mogrt ? kieuDangChon : (dsKieu.find((k) => !!k.mogrt) ?? kieuDangChon)
   useEffect(() => {
     const quet = () => setDsKieu(quetDsKieu())
     quet()
@@ -451,7 +456,12 @@ export default function App() {
     setPhanTram(pt)
   }
 
-  async function lamPhuDe() {
+  /**
+   * [2.5.1] HAI NÚT (anh Tiến 22/08 đêm): `caption` = caption track C1 chữ mặc
+   * định (nút chính); `hieuung` = graphic MOGRT theo kiểu đang chọn (nút phụ).
+   * Cùng một đường nghe/quy đổi — khác nhau đúng ở bước gắn lên sequence.
+   */
+  async function lamPhuDe(cheDo: 'caption' | 'hieuung' = 'caption') {
     baoBuoc(dich('Đang đọc vùng đã khoanh…'), 0)
     setLoi('')
     setCanLam('')
@@ -686,7 +696,9 @@ export default function App() {
         nghedDuoc.tu,
         // [2.5.0] Kiểu caption + khung: kiểu hiệu ứng thì đặt MOGRT thay vì
         // caption track (file .srt vẫn ghi ra làm bản nguồn để sửa/chạy lại).
-        kieuDangChon,
+        // [2.5.1] Nút "Làm phụ đề" LUÔN là caption track; chỉ "Làm hiệu ứng" mới
+        // dùng kiểu đang chọn.
+        cheDo === 'hieuung' ? kieuHieuUng : timKieu('mac-dinh', dsKieu),
         khung,
         vungTin?.w ?? 0,
       )
@@ -899,57 +911,6 @@ export default function App() {
               </div>
 
               {/* ══════════════════════════════════════════════════════════════
-                  1b. KIỂU CAPTION — [2.5.0] anh Tiến 22/08: *"thêm option hiệu
-                  ứng captions giống Alex Hormozi… cho anh 5 kiểu"*.
-                  Mặc định = caption track như cũ. 5 kiểu kia = mỗi khối một
-                  graphic MOGRT (bấm vào sửa chữ/màu được trên timeline).
-                  Tên kiểu là TÊN RIÊNG (Hormozi/Beast/…) — không dịch.
-                  ══════════════════════════════════════════════════════════════ */}
-              <div className="chon">
-                <span className="chon__nhan">{dich('Kiểu caption')}</span>
-                <div className="seg seg--luoi">
-                  {dsKieu.map((k) => (
-                    <button
-                      key={k.ma}
-                      className={k.ma === kieuCaption ? 'seg__nut seg__nut--chon' : 'seg__nut'}
-                      title={k.tuyChinh ? k.mogrtPath : dich(k.mo)}
-                      onClick={() => {
-                        setKieuCaption(k.ma)
-                        try {
-                          localStorage.setItem(KHOA_KIEU_CAPTION, k.ma)
-                        } catch {
-                          /* không lưu được thì thôi */
-                        }
-                      }}
-                    >
-                      {k.ma === 'mac-dinh' ? dich(k.ten) : k.ten}
-                    </button>
-                  ))}
-                </div>
-                <p className="chon__mo">
-                  {dich(kieuDangChon.mo)}
-                  {/* Đường VÀO cho kiểu riêng: mở thư mục, thả .mogrt xuất từ AE vào,
-                      quay lại panel là nút mới hiện (quét lại khi panel focus). */}
-                  {trongHost && (
-                    <>
-                      {' · '}
-                      <button
-                        type="button"
-                        className="lien-ket"
-                        title={thuMucKieuRieng()}
-                        onClick={() => {
-                          moThuMucKieuRieng()
-                          window.setTimeout(() => setDsKieu(quetDsKieu()), 2500)
-                        }}
-                      >
-                        {dich('Thêm kiểu từ After Effects…')}
-                      </button>
-                    </>
-                  )}
-                </p>
-              </div>
-
-              {/* ══════════════════════════════════════════════════════════════
                   2. CÁCH CHÉP
                   ══════════════════════════════════════════════════════════════
                   ☠️ Hai nhãn phải nằm trên CÙNG MỘT TRỤC so sánh. Bản trước là
@@ -995,6 +956,70 @@ export default function App() {
             <button className="btn btn--primary" onClick={() => void lamPhuDe()}>
               {ket ? dich('Chép lại') : dich('Làm phụ đề')}
             </button>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════════════
+              [2.5.1] HIỆU ỨNG — nút thứ hai (anh Tiến 22/08 đêm: *"chia thành 2
+              nút: nút đầu là làm phụ đề, nút thứ hai là làm hiệu ứng"*, và
+              *"editor cần sửa thì sửa trên graphics là đủ"*).
+              Thay cho lưới "Kiểu caption" 6 ô của 2.5.0. Nút chính vẫn là MỘT.
+              ☠️ Đo 22/08: graphic làm từ Premiere KHÔNG nhận chữ qua API (Adobe
+              xác nhận API chỉ cho MOGRT từ AE) và không có API "Upgrade caption
+              to graphic" → hiệu ứng vẫn là MOGRT AE; nói thẳng giá phải trả
+              (nặng hơn caption track) ngay dưới nút, không giấu.
+              ══════════════════════════════════════════════════════════════════ */}
+          {!dangChay && (
+            <div className="hieuung">
+              <span className="chon__nhan">{dich('Hiệu ứng')}</span>
+              <div className="hieuung__hang">
+                <select
+                  className="seqpick"
+                  value={kieuHieuUng.ma}
+                  title={kieuHieuUng.tuyChinh ? kieuHieuUng.mogrtPath : dich(kieuHieuUng.mo)}
+                  onChange={(e) => {
+                    const ma = e.target.value as KieuCaption
+                    setKieuCaption(ma)
+                    try {
+                      localStorage.setItem(KHOA_KIEU_CAPTION, ma)
+                    } catch {
+                      /* không lưu được thì thôi */
+                    }
+                  }}
+                >
+                  {dsKieu
+                    .filter((k) => !!k.mogrt)
+                    .map((k) => (
+                      <option key={k.ma} value={k.ma}>
+                        {k.ten}
+                      </option>
+                    ))}
+                </select>
+                <button className="btn btn--hieuung" onClick={() => void lamPhuDe('hieuung')}>
+                  {dich('Làm hiệu ứng')}
+                </button>
+              </div>
+              <p className="chon__mo">
+                {dich('Mỗi caption là một graphic MOGRT — sửa chữ ngay trên graphic. Nặng hơn caption track, hợp short.')}
+                {/* Đường VÀO cho kiểu riêng: mở thư mục, thả .mogrt xuất từ AE vào,
+                    quay lại panel là mục mới hiện (quét lại khi panel focus). */}
+                {trongHost && (
+                  <>
+                    {' · '}
+                    <button
+                      type="button"
+                      className="lien-ket"
+                      title={thuMucKieuRieng()}
+                      onClick={() => {
+                        moThuMucKieuRieng()
+                        window.setTimeout(() => setDsKieu(quetDsKieu()), 2500)
+                      }}
+                    >
+                      {dich('Thêm kiểu từ After Effects…')}
+                    </button>
+                  </>
+                )}
+              </p>
+            </div>
           )}
 
           {canLam && <p className="canlam">{canLam}</p>}

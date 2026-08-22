@@ -1010,6 +1010,26 @@ function ac_datChuMogrt(prop, chu) {
 var ac_loiDatCaption = '';
 
 /**
+ * Comp cua template MOGRT dai 10 s (mogrt-src/build-mogrt.jsx: addComp(..., 10, 30)).
+ * MOGRT tu AE KHONG keo dai qua comp: khoi 11 s thi caption TAT o giay 10 roi
+ * trong, host khong bao gi. Do 22/08: 21 khoi > 10 s tren video EN 26 phut (khoi
+ * "bia" 30 s cua Whisper). -> Khoi dai thi chia thanh nhieu clip LIEN TIEP cung chu.
+ * Tra ve so clip da dat.
+ */
+var AC_MOGRT_COMP_GIAY = 9.9;
+function ac_datCaptionDai(seq, p, vIdx, aIdx, tu, den, chu, hl, viTriY, co) {
+  var n = 0, a = tu;
+  while (a < den) {
+    var b = a + AC_MOGRT_COMP_GIAY;
+    if (b > den) b = den;
+    if (!(b > a)) break;
+    if (ac_datMotCaption(seq, p, vIdx, aIdx, a, b, chu, hl, viTriY, co)) n++;
+    a = b;
+  }
+  return n;
+}
+
+/**
  * Dat MOT clip caption: importMGT -> keo dai -> ghi chu + tham so. Tra ve true
  * neu clip da nam tren track (tham so co the thieu, van tinh la dat duoc).
  */
@@ -1018,6 +1038,13 @@ function ac_datMotCaption(seq, p, vIdx, aIdx, tu, den, chu, hl, viTriY, co) {
   try { ti = seq.importMGT(p, String(Math.round(tu * AC_TICK)), vIdx, aIdx); }
   catch (e1) { if (!ac_loiDatCaption) ac_loiDatCaption = 'importMGT: ' + e1.toString(); return false; }
   if (!ti) { if (!ac_loiDatCaption) ac_loiDatCaption = 'importMGT tra null tai ' + tu; return false; }
+
+  // Ten clip PHAI bat dau bang AC_CAPTION_TIEN_TO — ac_xoaCaptionAiO / ac_demCaptionAiO
+  // / ac_getRangeClips nhan caption cua AiO bang tien to nay. Template cua bo 5 kieu
+  // dat ten san; KIEU RIENG (file .mogrt nguoi dung tu dat ten) thi khong -> chay lai
+  // CHONG hai lop va moi lan them mot track (vong soat 22/08). Dat ten o day thi moi
+  // kieu deu ve mot moi.
+  try { if (String(ti.name).indexOf(AC_CAPTION_TIEN_TO) !== 0) ti.name = AC_CAPTION_TIEN_TO + ' - ' + ti.name; } catch (eTen) {}
 
   try { var tEnd = new Time(); tEnd.seconds = den; ti.end = tEnd; }
   catch (e2) { if (!ac_loiDatCaption) ac_loiDatCaption = 'end: ' + e2.toString(); }
@@ -1069,6 +1096,10 @@ function ac_datCaptionMogrt(mogrtPath, vIdxStr, viTriYStr, duLieu) {
     var p = String(mogrtPath).replace(/\\/g, '/');
     if (!new File(p).exists) return 'ERR:MOGRT_KHONG_CO|' + p;
     var aIdx = seq.audioTracks.numTracks > 0 ? seq.audioTracks.numTracks - 1 : 0;
+    // Mot khung hinh cua sequence (giay). Khong doc duoc thi lay 1/24 — an toan hon 0,02.
+    var khungGiay = 1 / 24;
+    try { var fr = seq.getSettings().videoFrameRate.seconds; if (fr > 0 && fr < 1) khungGiay = fr; } catch (eFr) {}
+    if (khungGiay < 0.02) khungGiay = 0.02;
 
     var khoi = String(duLieu).split('\u001E');
     ac_loiDatCaption = '';
@@ -1094,15 +1125,22 @@ function ac_datCaptionMogrt(mogrtPath, vIdxStr, viTriYStr, duLieu) {
         for (var m = 0; m < phanMoc.length; m++) { var v = parseFloat(phanMoc[m]); if (!isNaN(v)) mocArr.push(v); }
       }
       if (mocArr.length > 1) {
+        // Nguong = MOT KHUNG HINH cua sequence (do 22/08 tren 23.627 clip con that:
+        // nguong cu 0,02 s cho lot 586 clip ngan hon mot khung @24fps = 2,5%, Premiere
+        // bat luoi khung -> clip 0 khung hoac de len clip ke).
         for (var k2 = 0; k2 < mocArr.length; k2++) {
           var a2 = tu + mocArr[k2];
           var b2 = (k2 + 1 < mocArr.length) ? tu + mocArr[k2 + 1] : den;
           if (b2 > den) b2 = den;
-          if (!(b2 > a2 + 0.02)) continue;   // hai tu cung moc -> bo, tu sau se hien
-          if (ac_datMotCaption(seq, p, vIdx, aIdx, a2, b2, chu, k2 + 1, viTriY, co)) daDat++;
+          if (!(b2 > a2 + khungGiay)) continue;   // ngan hon mot khung -> bo, tu sau se hien
+          daDat += ac_datCaptionDai(seq, p, vIdx, aIdx, a2, b2, chu, k2 + 1, viTriY, co);
         }
       } else {
-        if (ac_datMotCaption(seq, p, vIdx, aIdx, tu, den, chu, hl, viTriY, co)) daDat++;
+        // Khoi MOT tu cua kieu karaoke (co moc nhung chi mot moc): panel gui hl=0 ->
+        // tu do khong bao gio sang (do 22/08: 322/5.506 khoi = 5,8%). Mot tu thi to
+        // dung tu do.
+        if (mocArr.length === 1 && hl === 0) hl = 1;
+        daDat += ac_datCaptionDai(seq, p, vIdx, aIdx, tu, den, chu, hl, viTriY, co);
       }
       if (msDau < 0) msDau = new Date().getTime() - t0;
     }

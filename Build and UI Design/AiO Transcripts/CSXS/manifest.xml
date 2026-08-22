@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionManifest Version="7.0"
     ExtensionBundleId="com.aiostudio.transcript"
-    ExtensionBundleVersion="2.5.0"
+    ExtensionBundleVersion="2.5.1"
     ExtensionBundleName="AiO Studio - Transcript"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <ExtensionList>
-    <Extension Id="com.aiostudio.transcript.panel" Version="2.5.0" />
+    <Extension Id="com.aiostudio.transcript.panel" Version="2.5.1" />
   </ExtensionList>
 
   <ExecutionEnvironment>

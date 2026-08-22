@@ -1,5 +1,49 @@
 # AiO Transcript - Nhat ky
 
+## [2.5.1] - 2026-08-22 23:47 (UTC+7) - HAI NUT Lam phu de / Lam hieu ung + va 6 loi vong soat + DO CHET 3 duong "native"
+
+### Anh Tien chot 22/08 dem
+- *"chia thanh 2 nut: nut dau la lam phu de - nut thu hai la lam hieu ung cho phu de"*
+- *"neu editor can sua thi editor cung co the sua tren graphics la du"* -> tool KHONG can doc lai C1
+- *"khi minh lam text ben AE thi PR se cho no la mot file import se rat nang timeline"* -> muon
+  hieu ung native, MOGRT AE de danh cho "AiO Text Effect" sau nay
+- *"em build xong nho kiem tra song song voi pr nhe, anh di ngu"* -> tu test tren Premiere dem nay
+
+### DA DO TREN PREMIERE 27.0 (sequence TU TAO, tu xoa; chup bang PrintWindow vi cua so Claude che)
+| Duong native | Ket qua | Bang chung |
+|---|---|---|
+| API "Upgrade caption to graphic" | KHONG CO | reflect: 0/42 ham sequence, 0/63 ham QE, `seq.captionTracks` undefined |
+| Graphic lam tu Premiere (template Adobe `Bold Web Caption.mogrt`, authorApp=ppro) + `importMGT` + `components.Text.Source Text.setValue(chuoi)` | setValue tra TRUE, getValue doc lai dung, NHUNG chu TRONG tren hinh (Text panel: `<empty>`) | anh-pw.png; Adobe (B. Bullis, thread 13571912) xac nhan API MOGRT chi cho AE |
+| Caption track native + style | `createCaptionTrack(pi,0,fmt,'style')` -> "Illegal Parameter type"; style = mac dinh/lan dung cuoi cua Premiere | anh-C2.png (font monospace anh tung chon) |
+=> "Lam hieu ung" van la MOGRT AE. Noi thang duoi nut: "Nang hon caption track, hop short". Quyet dinh giu/bo la cua anh.
+
+### Thay doi
+- App.tsx: `lamPhuDe(cheDo)` - 'caption' (nut chinh, LUON caption track) / 'hieuung' (nut phu, kieu dang chon).
+  Luoi "Kieu caption" 6 o -> go. Hang HIEU UNG duoi nut chinh: o xo kieu (5 kieu + kieu rieng) + nut
+  "Lam hieu ung" + dong su that + link "Them kieu tu After Effects". `docKieuCaption` mac dinh 'hormozi'.
+- host/autocut.jsx: (1) ac_chonTrackCaption chon track TREN hinh cao nhat (truoc: track trong dau tien
+  -> V1 trong ma hinh o V2 la caption bi che); (2) ghi chu that bai -> bao loi, khong im lang; (3) karaoke
+  nguong = 1 KHUNG HINH cua sequence (truoc 0,02 s); (4) khoi 1 tu (1 moc) -> hl=1, khong con tu khong
+  bao gio sang; (5) ac_datCaptionDai: khoi > 9,9 s chia nhieu clip (comp MOGRT 10 s); (6) ten clip ep
+  tien to "AiO Caption" -> kieu rieng chay lai THAY duoc.
+- cep.ts dichLoi: them HET_TRACK / TRACK_SAI / VUNG_SAI / MOGRT_KHONG_CO. chu.ts: khoa moi (VI/EN).
+- styles.css: .hieuung / .btn--hieuung. Version 2.5.1 (package.json + manifest + TOOL_VERSION_TRACKER).
+
+### Kiem chung (E2E tren sequence tu tao "AiO-test-E2E": V1 TRONG, hinh o V2, I/O 0-20 s, bam nut THAT qua CDP)
+- Lam hieu ung (Clean): 16 caption -> **V3** (tren hinh), 1,5 s (bo dem nghe). anh-E2E-hieuung.png: chu
+  "cua nguoi Viet / o My, dac" hien tren hinh, Text panel liet ke V3 co chu. TRUOC VA: rot xuong V1 bi che.
+- Lam phu de: caption track C1 tao xong 0,2 s, 16 cau. anh-E2E-phude.png (C1 + graphic cung hien ->
+  nguoi dung tu tat mat C1 neu chong chu; tool khong xoa duoc caption track).
+- Doi Hormozi, chay lai: V3 = 23 (THAY, khong 16+23). anh-E2E-hormozi.png: "CUA NGUOI / VIET O" tu
+  NGUOI to vang.
+- Kieu rieng (copy Boxed thanh "Thu Rieng Dem.mogrt" o %APPDATA%/AiOStudio/caption-styles): 18 caption
+  V3, ten clip co tien to, chay lai V3=18, soTrack=3 (khong them track). %APPDATA% KHONG bi ao hoa.
+- `npm run kiem:caption`: tat ca dat. `npm run build` sach. Da cai dev (sign-install), panel v2.5.1.
+- Don: deleteSequence=true, item .srt + file .srt do test sinh ra da xoa, kieu rieng test da xoa,
+  project 5 -> 5 item, sequence cua anh mo lai dung. KHONG luu project cua anh (dang co dau *).
+- CHUA: anh dung bai that; `npm run kiem` (kiem-tinh-toan) HONG SAN tu 13/08 vi cep.ts import
+  ngonngu.tsx (khong phai do lan nay) - chua sua.
+
 ## [2.5.0-soat] - 2026-08-22 22:54 (UTC+7) - VONG SOAT CODE: 45/51 agent chet vi han muc, 2 loi host da va, 4 loi con lai DA DO co so nhung CHUA sua
 
 ### Boi canh

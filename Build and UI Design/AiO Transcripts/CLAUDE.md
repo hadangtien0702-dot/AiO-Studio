@@ -317,34 +317,23 @@ chạy theo từ) · bộ kiểm **tất cả đạt** trên 5 bộ dữ liệu 
 >1920 px chữ không tự scale · Autocut chưa vá lỗi (6) (đóng băng, hỏi anh) · nút gỡ
 caption chưa nối UI.
 
-**☠️ HƯỚNG MỚI anh Tiến nêu 22/08 tối — CHƯA CHỐT CÁCH LÀM, đọc trước khi đụng mục 9:**
-> *"khi mình làm text bên AE thì PR sẽ cho nó là một file import sẽ rất nặng timeline"*.
-Anh muốn: bước 1 = caption track C1 như hiện tại; bước 2 = bấm "Làm phụ đề" thì caption
-→ **"Upgrade caption to graphic" ngay trong Premiere**, hiệu ứng làm tại đó; MOGRT từ
-AE chỉ để dành cho sản phẩm **"AiO Text Effect"** sau này.
-- **Đo 22/08 (reflect, chỉ đọc, Premiere 27.0):** KHÔNG có API "upgrade caption to
-  graphic" — 0/42 hàm `sequence`, 0/63 hàm QE; `seq.captionTracks` = `undefined`.
-  Script chỉ có `createCaptionTrack` + `importMGT` + `importMGTFromLibrary`. Chi tiết:
-  skill `adobe-cep-panel`, mục "Do that 22/08/2026".
-- Tra web 22/08: caption track native = **một style tĩnh cho cả track**, không tô từng
-  từ; Premiere **26.3 (06/2026)** có caption "Single word" native. "Upgrade Caption to
-  Graphic" là lệnh menu, không có API.
-- ⇒ Hai đường khả thi, chờ anh chọn: (a) MOGRT **xuất từ chính Premiere** (Essential
-  Graphics → Export as MOGRT, không qua AE) + `importMGT` — graphic native, nhẹ, nhưng
-  **không tô từng từ** (không có expression); (b) caption track native + style theo track
-  (+ "Single word" cho karaoke) — nhẹ nhất, không graphic nào, style do người dùng chọn
-  một lần trong panel Text.
-- Các lỗi đã đo của đường AE-MOGRT (karaoke < 1 khung 2,5% @24fps · khối 1 từ hl=0
-  5,8% · khối > 10 s vượt comp · kiểu riêng không thay) ghi ở `PROGRESS.md`
-  [2.5.0-soat] — **chưa sửa**, vì đường này có thể bị thay.
-- **Đo thêm 22/08 đêm (sequence tự tạo, tự xoá):** template Adobe `Bold Web Caption.mogrt`
-  (làm bằng Premiere) `importMGT` **262 ms/clip**, không phí nạp; `getMGTComponent()` =
-  null nhưng `components → Text → Source Text` **setValue(chuỗi thô) = true, đọc lại đúng**
-  (tiếng Việt, CR/LF); `ti.end`/`ti.name` đặt được; `deleteSequence` dọn được trên 27.0.
-  Style không có tham số → **nướng sẵn trong template** (mỗi kiểu = 1 .mogrt làm tay trong
-  Essential Graphics). ☠️ Chưa nhìn thấy chữ trên hình (ảnh chụp bị che) — phải chứng
-  minh bằng ảnh trước khi nói "được". Anh Tiến chốt thêm 22/08: **editor sửa chữ ngay trên
-  graphic là đủ** → tool KHÔNG cần đọc lại C1; luồng = 2 nút *Làm phụ đề* / *Làm hiệu ứng*.
+**☠️ 2.5.1 (22/08 đêm) — HAI NÚT, và ba đường "native" ĐÃ ĐO CHẾT. Đọc trước khi đụng mục 9:**
+Anh Tiến chốt 22/08: *"chia thành 2 nút: Làm phụ đề / Làm hiệu ứng"*, *"editor cần sửa thì sửa
+trên graphic là đủ"* (tool KHÔNG đọc lại C1), và không muốn MOGRT từ AE vì *"nặng timeline"*.
+- **Người xài thấy gì (2.5.1):** nút chính **Làm phụ đề** = caption track C1 chữ mặc định (style
+  = style caption gần nhất của Premiere, user đổi trong Text panel). Hàng **Hiệu ứng** bên dưới:
+  ô xổ kiểu (Hormozi/Beast/Karaoke/Boxed/Clean + kiểu riêng) + nút **Làm hiệu ứng** = graphic
+  MOGRT trên track video **TRÊN hình**, chạy lại thì thay; sửa chữ ngay trên graphic. Dòng sự
+  thật dưới nút: *"Nặng hơn caption track, hợp short."* C1 và graphic cùng hiện → user tắt mắt C1.
+- **Đã đo (Premiere 27.0, sequence tự tạo, chụp PrintWindow):** (1) KHÔNG có API "Upgrade
+  caption to graphic" (0/42 DOM, 0/63 QE, `captionTracks` undefined); (2) graphic làm từ
+  Premiere (`Bold Web Caption.mogrt` của Adobe, authorApp=ppro): `Source Text.setValue` trả
+  **true** nhưng chữ **TRỐNG** trên hình — Adobe (B. Bullis) xác nhận API MOGRT chỉ cho AE;
+  (3) `createCaptionTrack` không nhận style (tham số 4 → Illegal Parameter). ⇒ hiệu ứng **vẫn là
+  MOGRT AE**; tô-từng-từ/karaoke chỉ có ở đường này. Giữ hay bỏ nút "Làm hiệu ứng" là việc của anh.
+- Tra web 22/08: caption native = một style tĩnh/track; Premiere 26.3 có caption "Single word".
+- Vòng soát 22/08 đã vá 6 lỗi (PROGRESS [2.5.1]): caption rơi dưới hình · chữ mẫu im lặng ·
+  karaoke < 1 khung · khối 1 từ không sáng · khối > 10 s · kiểu riêng không thay.
   Chi tiết số đo: skill `adobe-cep-panel`, mục "MOGRT LAM TU PREMIERE".
 
 ---

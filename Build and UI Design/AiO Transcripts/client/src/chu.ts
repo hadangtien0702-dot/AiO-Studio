@@ -157,6 +157,17 @@ export const CHU: BangChu = {
     'Kiểu riêng — file .mogrt trong thư mục kiểu caption':
       'Custom style — a .mogrt file in the caption styles folder',
     'Thêm kiểu từ After Effects…': 'Add a style from After Effects…',
+    // ─── [2.5.1] hai nut: Lam phu de / Lam hieu ung (anh Tien 22/08 dem) ───
+    'Hiệu ứng': 'Effects',
+    'Làm hiệu ứng': 'Add effects',
+    'Mỗi caption là một graphic MOGRT — sửa chữ ngay trên graphic. Nặng hơn caption track, hợp short.':
+      'Each caption becomes a MOGRT graphic — edit the text right on it. Heavier than a caption track; best for shorts.',
+    'Track video {x} không còn — timeline vừa đổi, bấm lại để chạy từ đầu.':
+      'Video track {x} is gone — the timeline changed, click again to start over.',
+    'Vùng caption không hợp lệ ({x}). Khoanh lại vùng rồi bấm lại.':
+      'Invalid caption range ({x}). Set the range again and retry.',
+    'Thiếu file kiểu caption:\n{x}\nCài lại panel, hoặc thả lại file .mogrt vào thư mục kiểu riêng.':
+      'Caption style file missing:\n{x}\nReinstall the panel, or drop the .mogrt back into the custom styles folder.',
     '({c} clip — mỗi từ một clip để từ đang nói sáng lên)':
       '({c} clips — one per word so the spoken word lights up)',
 

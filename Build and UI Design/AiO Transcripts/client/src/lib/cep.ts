@@ -252,6 +252,28 @@ export function dichLoi(raw: string): HostLoi {
         canLam: false,
         message: dich('Không tạo được track phụ đề: {x}').replace('{x}', () => tham),
       }
+    // [2.5.1] Bốn mã của đường caption hiệu ứng (ac_chonTrackCaption / ac_datCaptionMogrt).
+    // Thiếu là UI hiện mã thô "HET_TRACK|" — vòng soát 22/08 bắt được.
+    case 'HET_TRACK':
+      return {
+        canLam: true,
+        message: dich('Không còn track video trống trong vùng — thêm một track video rồi chạy lại.'),
+      }
+    case 'TRACK_SAI':
+      return {
+        canLam: true,
+        message: dich('Track video {x} không còn — timeline vừa đổi, bấm lại để chạy từ đầu.').replace('{x}', () => tham),
+      }
+    case 'VUNG_SAI':
+      return {
+        canLam: true,
+        message: dich('Vùng caption không hợp lệ ({x}). Khoanh lại vùng rồi bấm lại.').replace('{x}', () => tham),
+      }
+    case 'MOGRT_KHONG_CO':
+      return {
+        canLam: false,
+        message: dich('Thiếu file kiểu caption:\n{x}\nCài lại panel, hoặc thả lại file .mogrt vào thư mục kiểu riêng.').replace('{x}', () => tham),
+      }
     default:
       return { canLam: false, message: raw }
   }

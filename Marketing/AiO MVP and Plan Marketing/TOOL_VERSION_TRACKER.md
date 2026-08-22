@@ -1,7 +1,7 @@
 # AiO Studio — BẢNG THEO DÕI CÁC APP
 
 > **Số phiên bản đọc thẳng từ `CSXS/manifest.xml` của từng panel, không chép tay.**
-> Đối soát gần nhất: **2026-08-22** (Transcripts lên 2.5.0; các dòng khác giữ số 19/08)
+> Đối soát gần nhất: **2026-08-22** (Transcripts lên 2.5.1; các dòng khác giữ số 19/08)
 >
 > ☠️ File này từng đối soát 07/08 rồi để nguyên 12 ngày — Autocut đã lên 1.6.0 mà
 > bảng vẫn ghi 1.5.0. **Mỗi lần bump version một panel thì sửa luôn dòng đó ở đây.**
@@ -20,7 +20,7 @@
 | 1 | **AiO Autocut** | **1.6.0** | `com.aiostudio.autocut` | 8089 | ✅ **XONG** | Anh Tiến tự dùng bài thật + **nghe lại, không mất lời** (19/08). Bộ cài `Release/2026-08-19-autocut-1.6.0/` |
 | 2 | AiO Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` | 8088 | 🧊 Đóng băng | Anh chốt 14/08: *"rất ổn rồi, tạm dừng ở đây"*. Việc mới phải hỏi anh trước |
 | 3 | AiO Power Bins | 2.0.0 | `com.aiostudio.powerbin` | 8090 | 🟢 Chạy được | Brand Kit hiện ở mọi project |
-| 4 | AiO Transcripts | **2.5.0** | `com.aiostudio.transcript` | 8091 | 🟢 Chạy được | **22/08:** 5 kiểu caption hiệu ứng (Hormozi/Beast/Karaoke/Boxed/Clean = graphic MOGRT sửa được) + kiểu riêng từ AE + ô "Đoạn đang chọn" bám I/O + tự nhận khung + responsive 2 cột. Chưa qua vòng anh dùng bài thật. ⚠️ Ô chọn sequence còn lỗi nền trắng (xem mục 3) |
+| 4 | AiO Transcripts | **2.5.1** | `com.aiostudio.transcript` | 8091 | 🟢 Chạy được | **22/08 đêm:** HAI NÚT — *Làm phụ đề* (caption C1) / *Làm hiệu ứng* (graphic MOGRT, chọn kiểu trong ô xổ) theo ý anh 22/08; vá 5 lỗi vòng soát (caption rơi dưới hình, chữ mẫu im lặng, karaoke < 1 khung, khối 1 từ không sáng, khối > 10 s, kiểu riêng không thay); E2E trên sequence tự tạo: 16/23 caption lên V3 trên hình, chạy lại THAY không chồng. ☠️ Đã đo: Premiere 27 KHÔNG cho API đặt chữ vào graphic native / upgrade caption → hiệu ứng vẫn là MOGRT AE (nặng hơn caption track). Chưa qua vòng anh dùng bài thật |
 | 5 | AiO WELCOME | 1.5.0 | `com.aio.welcome` | 8087 | 🟢 Chạy được | Panel chào mừng |
 | 6 | AiO Auto Re-Frames | 0.5.0 | `com.aiostudio.reframe` | 8092 | 🟡 Đang làm | Dọc 9:16 bám chủ thể |
 | 7 | AiO Auto Guideline Frame | 0.2.0 | `com.aiostudio.guideframe` | 8096 | 🟡 Đang làm | Safe zone 10 nền tảng / 53 vùng |

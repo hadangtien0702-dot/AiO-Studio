@@ -917,3 +917,42 @@ body {
 .topbar .aio-ngonngu + .topbar__host {
   margin-left: 0;
 }
+
+/* ── [2.5.1] HAI NÚT — Làm phụ đề / Làm hiệu ứng (anh Tiến 22/08 đêm) ────────
+   Anh chốt: *"chia thành 2 nút: nút đầu là làm phụ đề — nút thứ hai là làm hiệu
+   ứng cho phụ đề"*, và *"editor cần sửa thì sửa trên graphics là đủ"*.
+   Nút chính (cam) vẫn là MỘT: Làm phụ đề. Hiệu ứng là hàng phụ: chọn kiểu + nút
+   viền, không tranh chú ý. Hàng này thay cho lưới "Kiểu caption" 6 ô cũ (đã gỡ). */
+.hieuung {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line-1);
+}
+.hieuung__hang {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.hieuung__hang select {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 34px;
+}
+.btn--hieuung {
+  flex: 0 0 auto;
+  height: 34px;
+  border-color: var(--line-strong);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+.btn--hieuung:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--bg-5);
+}
