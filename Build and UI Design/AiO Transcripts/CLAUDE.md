@@ -317,6 +317,27 @@ chạy theo từ) · bộ kiểm **tất cả đạt** trên 5 bộ dữ liệu 
 >1920 px chữ không tự scale · Autocut chưa vá lỗi (6) (đóng băng, hỏi anh) · nút gỡ
 caption chưa nối UI.
 
+**☠️ HƯỚNG MỚI anh Tiến nêu 22/08 tối — CHƯA CHỐT CÁCH LÀM, đọc trước khi đụng mục 9:**
+> *"khi mình làm text bên AE thì PR sẽ cho nó là một file import sẽ rất nặng timeline"*.
+Anh muốn: bước 1 = caption track C1 như hiện tại; bước 2 = bấm "Làm phụ đề" thì caption
+→ **"Upgrade caption to graphic" ngay trong Premiere**, hiệu ứng làm tại đó; MOGRT từ
+AE chỉ để dành cho sản phẩm **"AiO Text Effect"** sau này.
+- **Đo 22/08 (reflect, chỉ đọc, Premiere 27.0):** KHÔNG có API "upgrade caption to
+  graphic" — 0/42 hàm `sequence`, 0/63 hàm QE; `seq.captionTracks` = `undefined`.
+  Script chỉ có `createCaptionTrack` + `importMGT` + `importMGTFromLibrary`. Chi tiết:
+  skill `adobe-cep-panel`, mục "Do that 22/08/2026".
+- Tra web 22/08: caption track native = **một style tĩnh cho cả track**, không tô từng
+  từ; Premiere **26.3 (06/2026)** có caption "Single word" native. "Upgrade Caption to
+  Graphic" là lệnh menu, không có API.
+- ⇒ Hai đường khả thi, chờ anh chọn: (a) MOGRT **xuất từ chính Premiere** (Essential
+  Graphics → Export as MOGRT, không qua AE) + `importMGT` — graphic native, nhẹ, nhưng
+  **không tô từng từ** (không có expression); (b) caption track native + style theo track
+  (+ "Single word" cho karaoke) — nhẹ nhất, không graphic nào, style do người dùng chọn
+  một lần trong panel Text.
+- Các lỗi đã đo của đường AE-MOGRT (karaoke < 1 khung 2,5% @24fps · khối 1 từ hl=0
+  5,8% · khối > 10 s vượt comp · kiểu riêng không thay) ghi ở `PROGRESS.md`
+  [2.5.0-soat] — **chưa sửa**, vì đường này có thể bị thay.
+
 ---
 
 ## ☠️ ĐỪNG BỎ `-mc 0` — nó chữa việc Whisper BỊA suốt 26 phút
