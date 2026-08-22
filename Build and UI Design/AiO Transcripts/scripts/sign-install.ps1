@@ -74,6 +74,15 @@ if (Test-Path (Join-Path $root '.debug')) {
 if (Test-Path (Join-Path $root 'bin')) {
   Copy-Item (Join-Path $root 'bin') (Join-Path $stage 'bin') -Recurse
 }
+# [2.5.0] Caption kieu hieu ung: CHI lay file .mogrt (bo .aep/.png/.txt cua buoc
+# build AE) + font OFL (Montserrat, Bangers) de may khach co font ma render.
+if (Test-Path (Join-Path $root 'mogrt')) {
+  New-Item -ItemType Directory -Path (Join-Path $stage 'mogrt') -Force | Out-Null
+  Copy-Item (Join-Path $root 'mogrt\*.mogrt') (Join-Path $stage 'mogrt')
+}
+if (Test-Path (Join-Path $root 'fonts')) {
+  Copy-Item (Join-Path $root 'fonts') (Join-Path $stage 'fonts') -Recurse
+}
 Write-Host "  [OK] Staging" -ForegroundColor Green
 
 # --- 3. Ky thanh ZXP ---

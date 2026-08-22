@@ -272,6 +272,51 @@ như tức thì.
 - ☠️ **Dùng nhầm đệm là ra phụ đề của video khác** — hỏng âm thầm, kiểu lỗi tệ nhất
 - **Cố ý dùng chung với Autocut.** Vì bán chung một bộ nên khách luôn có cả hai.
 
+### 9. CAPTION KIỂU HIỆU ỨNG — Hormozi · Beast · Karaoke · Boxed · Clean (2.5.0, 22/08)
+
+**Người xài thấy gì:** hàng **Kiểu caption** (Mặc định + 5 kiểu + kiểu riêng). Chọn
+Hormozi → bấm → mỗi khối caption là **một graphic trên track video trống** (V2/V3…),
+chữ in hoa viền đen, **từ khoá tô vàng**, pop khi vào; bấm vào clip là sửa chữ/đổi màu
+trong Essential Graphics như text thường. Karaoke: từ đang nói sáng lên. Chạy lại thì
+**thay** caption cũ, không chồng. Nút *"Thêm kiểu từ After Effects…"* mở thư mục
+`%APPDATA%\AiOStudio\caption-styles` — thả `.mogrt` xuất từ AE vào là hiện nút mới
+(xem `mogrt-src/HUONG-DAN-LAM-KIEU-RIENG.md`).
+
+*Ví dụ đời thường:* caption track của Premiere là **phụ đề rạp phim** — đúng chuẩn,
+nhưng không ai làm short kiểu Hormozi bằng nó. Kiểu hiệu ứng là **bộ chữ động của
+CapCut/Submagic** nhưng nằm ngay trong Premiere và **sửa được từng chữ**.
+
+**Builder phải biết:**
+- Ba tầng: template `mogrt-src/build-mogrt.jsx` (chạy trong **AE qua BridgeTalk** từ
+  Premiere — `AfterFX -r` không chạy trên Beta 27) → `mogrt/*.mogrt` · tính toán thuần
+  `services/caption-kieu.ts` (kiểm bằng `npm run kiem:caption`) · host
+  `ac_datCaptionMogrt` / `ac_chonTrackCaption` / `ac_xoaCaptionAiO` / `ac_getRange`.
+- ☠️ **SÁU LUẬT ĐÃ TRẢ GIÁ TRÊN PREMIERE** (chi tiết + số đo: `PROGRESS.md` [2.5.0]):
+  (1) slider lên EG kẹp 0..100 → mọi số là % · (2) **expression chỉ chạy dạng MỘT
+  BIỂU THỨC**, nhiều dòng thì im lặng giữ giá trị tĩnh — 14 template thử A→N mới ra ·
+  (3) keyframe tham số MOGRT qua API không đổi hình → karaoke = **clip con theo từng
+  từ** · (4) export MOGRT đòi project đã lưu + không thay đổi chưa lưu · (5) AE cần
+  pref cho script ghi file, và AE ghi đè prefs lúc tắt · (6) clip MOGRT có
+  `getMediaPath()` = file .mogrt → `ac_getRangeClips` phải bỏ qua, không thì panel
+  từ chối chạy lại ("đổi tốc độ 2083%").
+- Tô từ = Text Animator + **Range Selector** (Index, Words), Start/End mỗi cái một
+  biểu thức đọc slider `Highlight Word`. Expression Selector (`textIndex`) KHÔNG chạy.
+- Khối KHÔNG được đè nhau trên track; từ Latin dài hơn dòng thì **giữ nguyên từ + co
+  `Text Size`** (không bẻ theo ký tự như luật CJK); kiểu hiệu ứng luôn cắt cho vừa
+  2 dòng (`luonCat`) vì graphic không tự co như caption track.
+- Panel **tự nhận khung** Ngang/Dọc theo w/h sequence (reload panel từng làm
+  caption tràn hai mép vì khung về mặc định Ngang).
+- Font: Montserrat có trên Adobe Fonts (máy khách tự sync); **Bangers thì không** →
+  bộ cài phải cài `fonts/` (CHƯA làm). Máy anh Tiến đã cài 4 font per-user 22/08.
+
+**MVP:** ✅ 5 kiểu ảnh thật đúng (từ nổi bật một từ, pop, Text Size, hộp nền, karaoke
+chạy theo từ) · bộ kiểm **tất cả đạt** trên 5 bộ dữ liệu thật tới 803 câu/11.723 từ
+(0 mất chữ, 0 vượt 2 dòng) · Hormozi 23 clip 2–4 s, Karaoke 83 clip 9,1 s · ô "Đoạn
+đang chọn" bám I/O 630 ms · kiểu riêng quét được.
+**☠️ CHƯA ĐẠT:** anh Tiến chưa dùng trên bài thật · bộ cài chưa cài font · sequence
+>1920 px chữ không tự scale · Autocut chưa vá lỗi (6) (đóng băng, hỏi anh) · nút gỡ
+caption chưa nối UI.
+
 ---
 
 ## ☠️ ĐỪNG BỎ `-mc 0` — nó chữa việc Whisper BỊA suốt 26 phút

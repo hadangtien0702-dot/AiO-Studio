@@ -4,3 +4,8 @@ build/
 certs/
 bin/
 tests/js/
+# mogrt/: GIU cac file .mogrt (panel can luc chay); bo rac cua buoc build AE
+mogrt/*.aep
+mogrt/*.png
+mogrt/*.txt
+mogrt/Adobe After Effects Auto-Save/

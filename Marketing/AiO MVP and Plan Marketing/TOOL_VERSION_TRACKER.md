@@ -1,7 +1,7 @@
 # AiO Studio — BẢNG THEO DÕI CÁC APP
 
 > **Số phiên bản đọc thẳng từ `CSXS/manifest.xml` của từng panel, không chép tay.**
-> Đối soát gần nhất: **2026-08-19 17:18**
+> Đối soát gần nhất: **2026-08-22** (Transcripts lên 2.5.0; các dòng khác giữ số 19/08)
 >
 > ☠️ File này từng đối soát 07/08 rồi để nguyên 12 ngày — Autocut đã lên 1.6.0 mà
 > bảng vẫn ghi 1.5.0. **Mỗi lần bump version một panel thì sửa luôn dòng đó ở đây.**
@@ -20,7 +20,7 @@
 | 1 | **AiO Autocut** | **1.6.0** | `com.aiostudio.autocut` | 8089 | ✅ **XONG** | Anh Tiến tự dùng bài thật + **nghe lại, không mất lời** (19/08). Bộ cài `Release/2026-08-19-autocut-1.6.0/` |
 | 2 | AiO Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` | 8088 | 🧊 Đóng băng | Anh chốt 14/08: *"rất ổn rồi, tạm dừng ở đây"*. Việc mới phải hỏi anh trước |
 | 3 | AiO Power Bins | 2.0.0 | `com.aiostudio.powerbin` | 8090 | 🟢 Chạy được | Brand Kit hiện ở mọi project |
-| 4 | AiO Transcripts | 2.4.0 | `com.aiostudio.transcript` | 8091 | 🟢 Chạy được | ⚠️ Ô chọn sequence còn lỗi nền trắng (xem mục 3) |
+| 4 | AiO Transcripts | **2.5.0** | `com.aiostudio.transcript` | 8091 | 🟢 Chạy được | **22/08:** 5 kiểu caption hiệu ứng (Hormozi/Beast/Karaoke/Boxed/Clean = graphic MOGRT sửa được) + kiểu riêng từ AE + ô "Đoạn đang chọn" bám I/O + tự nhận khung + responsive 2 cột. Chưa qua vòng anh dùng bài thật. ⚠️ Ô chọn sequence còn lỗi nền trắng (xem mục 3) |
 | 5 | AiO WELCOME | 1.5.0 | `com.aio.welcome` | 8087 | 🟢 Chạy được | Panel chào mừng |
 | 6 | AiO Auto Re-Frames | 0.5.0 | `com.aiostudio.reframe` | 8092 | 🟡 Đang làm | Dọc 9:16 bám chủ thể |
 | 7 | AiO Auto Guideline Frame | 0.2.0 | `com.aiostudio.guideframe` | 8096 | 🟡 Đang làm | Safe zone 10 nền tảng / 53 vùng |
@@ -56,6 +56,9 @@ Không có lifetime, không có gói năm. (Bản 13/08 ghi "3 tool free" đã *
 | `color-scheme: dark` cho cả bộ | Transcripts + panel khác | Mới sửa riêng Autocut. Đưa lên `design-system/tokens.css` là chạm 4 panel, phải đo lại từng cái |
 | "Cắt đúng người" | Auto Podcast | Thước đo bị mù bởi chính vấn đề nó đo (tiếng lọt mic) |
 | 5 câu hỏi sản phẩm | Auto Cut Short | Chờ anh Tiến chốt mới viết code |
+| **Bộ cài phải CÀI FONT** (Montserrat ×3 + Bangers, OFL, trong `fonts/`) | Transcripts | Caption MOGRT cần font trên máy khách; Montserrat có trên Adobe Fonts (tự sync) nhưng Bangers thì không. Chưa sửa `package-release.ps1`/bộ cài |
+| **Autocut đếm clip caption MOGRT như clip video** → từ chối chạy ("đổi tốc độ 2083%") trên sequence đã có caption AiO | Autocut | Cùng hàm `ac_getRangeClips`; Transcripts đã vá (bỏ qua `.mogrt`). Autocut ĐÓNG BĂNG → **hỏi anh** trước khi vá 1 dòng |
+| Anh Tiến dùng caption kiểu hiệu ứng trên bài thật | Transcripts | Mới đo trên sequence test 20 s; chưa có thước tai người |
 
 ---
 

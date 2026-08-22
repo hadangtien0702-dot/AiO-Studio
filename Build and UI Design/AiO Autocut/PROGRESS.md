@@ -1,5 +1,21 @@
 # AiO Autocut - Nhat ky
 
+## [va-1-dong] - 2026-08-22 16:06 (UTC+7) - BO QUA CLIP CAPTION MOGRT TRONG ac_getRangeClips
+
+(Gio tren la gio ghi lai bang lenh `date`; ban dau ghi "13:05" la suy tu muc truoc,
+SAI — dung bai hoc 5q. Host sua ~16:04, da cai vao panel dang mo bang
+sign-install.ps1, kiem `ac_getRangeClips()` van tra OK.)
+
+Panel dang DONG BANG (19/08). Day KHONG phai tinh nang moi: mot dong `continue`
+trong `ac_getRangeClips` de bo qua clip co media path `.mogrt` hoac ten bat dau
+`AiO Caption` — do Transcripts 2.5.0 dat caption kieu hieu ung len track video
+bang MOGRT, ma clip MOGRT co `getMediaPath()` = file template nen ham nay dem no
+nhu clip video voi "toc do 2083%" (in/out template 10 s / do dai clip) -> panel
+tu choi chay ("Trong vung co 23 clip da doi toc do"). Do that 22/08 tren
+Transcripts; Autocut dung CUNG ham. Anh Tien bao "tiep tuc" sau khi em hoi.
+CHUA build/cai lai Autocut (host jsx doc thang tu dia qua napLaiHost() nen ban
+dang cai se an dong nay khi copy host/; bo cai 1.6.0 trong Release KHONG doi).
+
 ## [100-phan-tram] - 2026-08-19 17:19 (UTC+7) - ANH TIEN CHOT: AUTO CUT 100% DONE
 
 ### Trang thai hien tai  (CHOT)

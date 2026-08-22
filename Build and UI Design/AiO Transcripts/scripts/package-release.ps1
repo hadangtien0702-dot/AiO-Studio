@@ -78,6 +78,14 @@ Copy-Item (Join-Path $root 'host') (Join-Path $stage 'host') -Recurse
 if (Test-Path (Join-Path $root 'bin')) {
   Copy-Item (Join-Path $root 'bin') (Join-Path $stage 'bin') -Recurse
 }
+# [2.5.0] Caption kieu hieu ung: file .mogrt + font OFL (xem sign-install.ps1).
+if (Test-Path (Join-Path $root 'mogrt')) {
+  New-Item -ItemType Directory -Path (Join-Path $stage 'mogrt') -Force | Out-Null
+  Copy-Item (Join-Path $root 'mogrt\*.mogrt') (Join-Path $stage 'mogrt')
+}
+if (Test-Path (Join-Path $root 'fonts')) {
+  Copy-Item (Join-Path $root 'fonts') (Join-Path $stage 'fonts') -Recurse
+}
 # [2.0.0] LGPL BAT BUOC: ban ra thi phai kem toan van giay phep + ghi ro dung
 # FFmpeg ban nao, lay nguon o dau. Thieu hai file nay la vi pham.
 foreach ($gp in 'LICENSE-FFmpeg.txt', 'THIRD-PARTY-NOTICE.txt') {
@@ -89,7 +97,10 @@ Write-Host "  [OK] Staging (khong kem .debug)" -ForegroundColor Green
 
 # --- 3. Ky ---
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-$zxpOut = Join-Path $outDir ("AiO-Studio-Autocut-" + $version + ".zxp")
+# [2.5.0] Ten goi tung la "AiO-Studio-Autocut-..." (chep tu script Autocut, quen doi)
+# -> khach tai ve tuong nham goi Autocut. Cung ho loi 3d: file minh tu sinh ra van
+# noi sai ve san pham. Ten dung:
+$zxpOut = Join-Path $outDir ("AiO-Studio-Transcript-" + $version + ".zxp")
 if (Test-Path $zxpOut) { Remove-Item $zxpOut -Force }
 
 & $sign.FullName -sign $stage $zxpOut $certP12 $certPass -tsa "http://timestamp.digicert.com" 2>&1 | Out-Host
@@ -107,14 +118,31 @@ Write-Host ("  [OK] Da tao: " + $zxpOut + "  (" + $sizeMb + " MB)") -ForegroundC
 
 # --- 5. Huong dan cai dat di kem ---
 $guide = Join-Path $outDir 'HUONG-DAN-CAI-DAT.txt'
+# [2.5.0] Phan than TAY cua file nay tung la van ban cua ban Autocut 0.1.x
+# ("tu cat khoang lang... BAN THAM DO... CHUA cat duoc") suot tu thang 7 - dung
+# cai bay 3d da vap o Autocut 19/08: tieu de tu lay so phien ban nen nhin luot
+# tuong da cap nhat. MO RA DOC HET truoc khi gui.
 $lines = @(
   ("AiO Studio - Transcript  " + $version),
-  "Cong cu tu cat khoang lang tren timeline Premiere (Windows).
-  *** BAN THAM DO 0.1.x - CHUA PHAI CONG CU HOAN CHINH ***",
+  "Chep loi tren timeline Premiere thanh PHU DE (caption), gan thang len sequence",
+  "dang mo, cam marker o cho may nghe khong chac. Tu 2.5.0: them 5 KIEU CAPTION",
+  "HIEU UNG (Hormozi / Beast / Karaoke / Boxed / Clean) - moi khoi caption la mot",
+  "graphic tren track video, bam vao sua chu/doi mau nhu text thuong; va tu them",
+  "kieu rieng: xuat .mogrt tu After Effects, tha vao thu muc la hien nut.",
   "",
   "YEU CAU",
   "  - Windows 10/11",
-  "  - Adobe Premiere Pro (da kiem chung tren Beta 26.5 / CEP 12)",
+  "  - Adobe Premiere Pro 2025 tro len (da kiem tren Beta 26.5 va 27.0 / CEP 12)",
+  "  - Khoanh vung bang phim I / O roi bam LAM PHU DE. Panel tu theo vung I/O va",
+  "    tu nhan khung Ngang 16:9 / Doc 9:16 theo sequence.",
+  "  - Font cho caption hieu ung (Montserrat, Bangers - giay phep OFL, trong thu muc",
+  "    fonts/) duoc CAI-DAT.bat cai cho tai khoan dang dung (khong can Admin).",
+  "",
+  "GIOI HAN DA BIET (khong giau)",
+  "  - Kieu Karaoke dat MOI TU mot clip (tu dang noi sang len) -> nhieu clip tren",
+  "    timeline; video dai thi dat lau hon (~0,1 s/clip).",
+  "  - Sequence rong hon 1920 px: chu caption khong tu phong to theo.",
+  "  - Tieng Viet va tieng Anh da do tren video that; thu tieng khac moi 'chay duoc'.",
   "",
   "CACH CAI (cach 1 - de nhat, khong can cai them gi)",
   "  1. Dong han Premiere Pro.",
@@ -131,17 +159,11 @@ $lines = @(
   "GO CAI DAT",
   "  Dung ZXP Installer, hoac xoa thu muc:",
   "  %APPDATA%\Adobe\CEP\extensions\com.aiostudio.transcript",
+  "  Font da cai nam o %LOCALAPPDATA%\Microsoft\Windows\Fonts (xoa tay neu muon).",
   "",
-  "TRANG THAI",
-  "  Ban 0.1.x moi la BAN THAM DO: panel chi co 3 nut de kiem tra xem Premiere",
-  "  cho lam nhung gi. CHUA cat duoc khoang lang. Dung chay tren du an that.",
-  "",
-  "  Da do duoc (Premiere Beta 26.5):",
-  "    - Cat (razor): CHAY, nhan chuoi timecode dang 00:00:10:00",
-  "    - Cat tac dong ca track video lan audio cung luc",
-  "    - Xoa doan: CHAY",
-  "    - Don (ripple): KHONG chay, de lai lo trong",
-  "  -> Kien truc da chuyen sang DUNG LAI cac doan can giu bang overwriteClip."
+  "THU MUC KIEU RIENG",
+  "  %APPDATA%\AiOStudio\caption-styles  - tha file .mogrt (xuat tu After Effects)",
+  "  vao day, quay lai panel la thay nut kieu moi. Template chi can lo tham so 'Text'."
 )
 $lines | Out-File -FilePath $guide -Encoding utf8
 
@@ -180,6 +202,30 @@ Get-ChildItem $tmp -Recurse -File | ForEach-Object {
   try { Copy-Item $_.FullName $dst -Force -ErrorAction Stop } catch { $locked += $rel }
 }
 Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
+
+# [2.5.0] Cai FONT cho caption hieu ung (Montserrat x3 + Bangers, OFL) vao tai
+# khoan dang dung: chep vao %LOCALAPPDATA%\Microsoft\Windows\Fonts + ghi HKCU.
+# Khong can Admin. Premiere/AE doc font nay sau khi MO LAI. Khong broadcast
+# WM_FONTCHANGE (tung treo script 2 phut khi co cua so khong tra loi).
+$fontDir = Join-Path $target 'fonts'
+if (Test-Path $fontDir) {
+  $userFonts = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts'
+  New-Item -ItemType Directory -Path $userFonts -Force | Out-Null
+  $regFonts = 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+  if (-not (Test-Path $regFonts)) { New-Item -Path $regFonts -Force | Out-Null }
+  $soFont = 0
+  Get-ChildItem $fontDir -Filter '*.ttf' | ForEach-Object {
+    $dst = Join-Path $userFonts $_.Name
+    try {
+      Copy-Item $_.FullName $dst -Force -ErrorAction Stop
+      # Ten hien thi: "Montserrat-Black.ttf" -> "Montserrat Black (TrueType)"
+      $ten = ($_.BaseName -replace '-', ' ') + ' (TrueType)'
+      New-ItemProperty -Path $regFonts -Name $ten -Value $dst -PropertyType String -Force | Out-Null
+      $soFont++
+    } catch { Write-Host ("  [canh bao] khong cai duoc font " + $_.Name) -ForegroundColor Yellow }
+  }
+  if ($soFont -gt 0) { Write-Host ("  Da cai " + $soFont + " font cho caption hieu ung.") -ForegroundColor Gray }
+}
 
 # Premiere doi extension phai duoc ky; bat co cho phep chay ban ky self-signed.
 foreach ($v in 9..12) {
@@ -221,10 +267,10 @@ pause
 
 # Gom thanh MOT file de gui di.
 #
-# [1.0.1] SUA LOI: truoc day goi bang `$outDir\*` — thu muc release giu ca cac ban
+# [1.0.1] SUA LOI: truoc day goi bang `$outDir\*` - thu muc release giu ca cac ban
 # CU nen goi phinh gap doi (97 MB thay vi 49 MB), va bo cai co the vo phai file
 # .zxp cua ban cu. Nay liet ke DUNG 4 file cua ban dang dong goi.
-$bundle = Join-Path (Join-Path $root 'build') ("AiO-Studio-Autocut-" + $version + "-SETUP.zip")
+$bundle = Join-Path (Join-Path $root 'build') ("AiO-Studio-Transcript-" + $version + "-SETUP.zip")
 if (Test-Path $bundle) { Remove-Item $bundle -Force }
 Compress-Archive -Path @($zxpOut, $installBat, $installPs1, $guide) -DestinationPath $bundle -CompressionLevel Optimal
 $bundleMb = [math]::Round((Get-Item $bundle).Length / 1MB, 1)

@@ -124,6 +124,42 @@ export const CHU: BangChu = {
     '. Chọn khung và cách chép rồi bấm.':
       '. Pick the aspect ratio and transcription method, then press.',
 
+    // ─── [2.5.0] App.tsx — doan dang chon (bam theo I/O, chep tu Autocut) ───
+    'Đoạn đang chọn': 'Selected range',
+    'chưa khoanh': 'no in/out points',
+    'Đổi vùng bằng phím': 'Change the range with',
+
+    // ─── [2.5.0] App.tsx + caption-kieu.ts — kieu caption hieu ung ───
+    // Ten kieu (Hormozi/Beast/Karaoke/Boxed/Clean) la TEN RIENG, khong dich.
+    'Kiểu caption': 'Caption style',
+    'Mặc định': 'Default',
+    'Caption track thường của Premiere — sửa chữ trong Text panel':
+      'Standard Premiere caption track — edit text in the Text panel',
+    'Chữ in hoa, viền đen dày, từ khoá tô vàng, pop khi vào — kiểu Alex Hormozi':
+      'Uppercase, thick black stroke, yellow keyword, pop-in — Alex Hormozi style',
+    'Chữ to màu vàng, viền + bóng đậm, pop mạnh — kiểu MrBeast':
+      'Big yellow text, heavy stroke + shadow, strong pop — MrBeast style',
+    'Câu đủ 1–2 dòng, từng từ sáng xanh theo lúc nói':
+      'Full 1–2 line sentences, each word lights up green as it is spoken',
+    'Chữ trắng trên hộp đen bo góc — gọn, dễ đọc':
+      'White text on a rounded black box — compact, easy to read',
+    'Chữ mảnh, bóng mềm, không hiệu ứng — cho video dài':
+      'Light text, soft shadow, no effects — for long-form video',
+    'Đang đặt caption lên timeline…': 'Placing captions on the timeline…',
+    'Đang đặt caption {a}/{b}…': 'Placing captions {a}/{b}…',
+    'Không còn track video trống trong vùng — thêm một track video rồi chạy lại.':
+      'No free video track in this range — add a video track and run again.',
+    'Không đặt được caption lên timeline: {l}': 'Could not place captions on the timeline: {l}',
+    'Đã đặt {n} caption kiểu {k} lên V{t} của sequence':
+      'Placed {n} {k} captions on V{t} of sequence',
+    'Mỗi caption là một graphic — bấm vào là sửa chữ, đổi màu như text thường.':
+      'Each caption is a graphic — click it to edit the text or colors like any text layer.',
+    'Kiểu riêng — file .mogrt trong thư mục kiểu caption':
+      'Custom style — a .mogrt file in the caption styles folder',
+    'Thêm kiểu từ After Effects…': 'Add a style from After Effects…',
+    '({c} clip — mỗi từ một clip để từ đang nói sáng lên)':
+      '({c} clips — one per word so the spoken word lights up)',
+
     // ─── App.tsx — hinh minh hoa ───
     'phụ đề': 'captions',
     'cờ đỏ': 'red markers',

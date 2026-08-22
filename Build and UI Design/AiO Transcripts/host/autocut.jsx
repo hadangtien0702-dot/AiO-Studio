@@ -725,6 +725,12 @@ function ac_getRangeClips() {
 
           var p = ac_mediaPath(c);
           if (!p) continue; // title, mau, clip tong hop — khong do tieng duoc
+          // [2.5.0] Clip caption MOGRT (do chinh panel dat, hoac bat ky .mogrt nao)
+          // CO media path = duong dan file template, nhung khong phai media: no
+          // khong co tieng, va in/out cua template (10s) chia cho do dai clip ra
+          // "toc do" vo nghia (do 22/08: 23 caption -> "2083%" -> panel tu choi
+          // chay lai tren vung da co caption). Bo qua nhu title/mau.
+          if (/\.mogrt$/i.test(p) || String(c.name).indexOf(AC_CAPTION_TIEN_TO) === 0) continue;
 
           var si = c.inPoint.seconds, sr = c.outPoint.seconds;
           var speed = (e2 - s) > 0 ? ((sr - si) / (e2 - s)) : 1;
@@ -811,6 +817,319 @@ function ac_ganPhuDe(srtPath) {
     return 'OK:' + out.join('\n');
   } catch (e) {
     return ac_err('ac_ganPhuDe', e);
+  }
+}
+
+/**
+ * Doc MOI moc I-O cua sequence dang mo, khong duyet clip. CHI DOC. (2.5.0, chep
+ * tu Autocut 19/08) — cho vong tham do moi giay: nguoi dung bam I/O ben
+ * Premiere thi panel khong he hay biet (Adobe khong ban su kien nao sang).
+ */
+function ac_getRange() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var vungA = ac_seqInSec(seq);
+    var vungB = ac_seqOutSec(seq);
+    if (vungA < 0 || vungB < 0 || vungB <= vungA) return 'ERR:CHUA_KHOANH_VUNG|';
+    var fr = seq.getSettings().videoFrameRate;
+    var fps = (fr && fr.seconds > 0) ? (1 / fr.seconds) : 30;
+    // [2.5.0] Kem KICH THUOC KHUNG — panel tu nhan Ngang/Doc theo sequence thay
+    // vi bat nguoi dung nho bam (22/08: reload panel -> ve "Ngang" tren sequence
+    // 1080x1920 -> caption tran hai mep). Doc thuoc tinh, khong ton gi them.
+    var w = 0, h = 0;
+    try { w = seq.frameSizeHorizontal; h = seq.frameSizeVertical; } catch (e2) {}
+    return 'OK:seqName=' + seq.name + '\nfps=' + fps + '\nin=' + vungA + '\nout=' + vungB +
+           '\nw=' + w + '\nh=' + h;
+  } catch (e) {
+    return ac_err('ac_getRange', e);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CAPTION KIEU HIEU UNG (MOGRT) — 2.5.0, anh Tien chot 22/08/2026
+   ═══════════════════════════════════════════════════════════════════════════
+   Moi khoi caption = mot clip Motion Graphics Template dat bang `seq.importMGT`,
+   chu + tham so ghi qua `trackItem.getMGTComponent()`. Tham so trong template
+   (xem mogrt-src/build-mogrt.jsx): Text · Position Y (% chieu cao) · Highlight
+   Word (stt tu, 0 = khong) · Highlight Color · Pop In · Word Timing (karaoke).
+
+   ☠️ DO THAT 22/08 (Premiere Beta 27.0):
+   - importMGT(path, ticksStr, vIdx, aIdx): lan dau ~2,5 s, sau ~100 ms/clip.
+   - Slider dua len EG bi kep 0..100 -> Position Y la PHAN TRAM.
+   - trackItem.end = Time la cach keo dai clip graphic (doc lai dung).
+   - Text param: getValue() tra JSON co "textEditValue": ... -> thay bang regex,
+     KHONG parse JSON (ES3 khong co JSON).
+   - Khong JSON-escape chu la vo: dau " trong loi noi lam hong ca chuoi.
+   ═══════════════════════════════════════════════════════════════════════════ */
+var AC_CAPTION_TIEN_TO = 'AiO Caption';
+var AC_TICK = 254016000000;   // ticks / giay cua Premiere
+
+function ac_clipDeLen(c, start, end) {
+  return c.start.seconds < end && c.end.seconds > start;
+}
+
+/** Track co trong suot [start,end) khong — hoi DUNG KHOANG, khong hoi "track rong". */
+function ac_trackTrongTrong(track, start, end) {
+  try {
+    for (var i = 0; i < track.clips.numItems; i++) {
+      if (ac_clipDeLen(track.clips[i], start, end)) return false;
+    }
+    return true;
+  } catch (e) {
+    return false; // khong doc duoc thi coi nhu ban — tuyet doi khong de len clip nguoi ta
+  }
+}
+
+/** Them MOT track video (QE DOM, khong chinh thuc) — goi xong DOC LAI so track. */
+function ac_themTrackVideo(seq) {
+  try {
+    var truoc = seq.videoTracks.numTracks;
+    app.enableQE();
+    var qs = qe.project.getActiveSequence();
+    qs.addTracks(1, truoc, 0, 0);
+    var sau = seq.videoTracks.numTracks;
+    if (sau > truoc) return sau - 1;
+  } catch (e) {}
+  return -1;
+}
+
+/**
+ * Go cac clip caption do CHINH AiO dat (ten bat dau "AiO Caption") de len
+ * [tu,den] — de chay lai khong chong hai lop caption. Clip nguoi dung tu dat
+ * ten khac thi khong dung toi. remove(false,false) = NHAC DI (khong ripple),
+ * dung y cho track graphic.
+ */
+function ac_xoaCaptionAiO(tuStr, denStr) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var tu = parseFloat(tuStr), den = parseFloat(denStr);
+    if (!(den > tu)) return 'ERR:VUNG_SAI|' + tuStr + '..' + denStr;
+    var daXoa = 0, loiDau = '';
+    for (var t = 0; t < seq.videoTracks.numTracks; t++) {
+      var track = seq.videoTracks[t];
+      // Duyet NGUOC: remove lam mang clips co lai.
+      for (var i = track.clips.numItems - 1; i >= 0; i--) {
+        var c = track.clips[i];
+        if (String(c.name).indexOf(AC_CAPTION_TIEN_TO) !== 0) continue;
+        if (!ac_clipDeLen(c, tu, den)) continue;
+        try { c.remove(false, false); daXoa++; } catch (e) { if (!loiDau) loiDau = e.toString(); }
+      }
+    }
+    return 'OK:daXoa=' + daXoa + (loiDau ? '\nloiDau=' + loiDau : '');
+  } catch (e) {
+    return ac_err('ac_xoaCaptionAiO', e);
+  }
+}
+
+/**
+ * Chon track video TRONG suot [tu,den] va NAM TREN moi clip hinh trong vung.
+ *
+ * BAY DA VAP (22/08): ban cu duyet t = 0 di len va lay track trong DAU TIEN.
+ * Premiere ghep hinh TU DUOI LEN, nen neu V1 trong ma hinh o V2 (hay gap: keo
+ * file vao thi clip xuong A1/V2, hoac cat xong don len track tren) thi caption
+ * roi xuong V1, bi clip V2 che kin — dat xong hang tram caption ma KHONG THAY
+ * CHU NAO, panel van bao "da dat". Hong IM LANG, khong bao loi.
+ */
+function ac_chonTrackCaption(tuStr, denStr) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var tu = parseFloat(tuStr), den = parseFloat(denStr);
+    if (!(den > tu)) return 'ERR:VUNG_SAI|' + tuStr + '..' + denStr;
+    var soTrack = seq.videoTracks.numTracks;
+
+    // 1. Track hinh CAO NHAT co clip de len vung. Bo qua clip caption cua chinh
+    //    AiO — chung se bi xoa truoc khi dat lai, khong tinh la "hinh".
+    var tranHinh = -1;
+    for (var t = 0; t < soTrack; t++) {
+      var tr = seq.videoTracks[t];
+      try {
+        for (var i = 0; i < tr.clips.numItems; i++) {
+          var c = tr.clips[i];
+          if (String(c.name).indexOf(AC_CAPTION_TIEN_TO) === 0) continue;
+          if (ac_clipDeLen(c, tu, den)) { tranHinh = t; break; }
+        }
+      } catch (e1) { tranHinh = t; }   // doc khong duoc thi coi nhu CO hinh
+    }
+
+    // 2. Track trong dau tien NAM TREN tran hinh do.
+    var vIdx = -1;
+    for (var t2 = tranHinh + 1; t2 < soTrack; t2++) {
+      if (ac_trackTrongTrong(seq.videoTracks[t2], tu, den)) { vIdx = t2; break; }
+    }
+    var them = 0;
+    if (vIdx < 0) { vIdx = ac_themTrackVideo(seq); them = 1; }
+    if (vIdx < 0) return 'ERR:HET_TRACK|';
+    // Track vua them nam TREN CUNG nen chac chan > tranHinh; kiem lai cho chac.
+    if (vIdx <= tranHinh) return 'ERR:HET_TRACK|';
+    return 'OK:vIdx=' + vIdx + '\nthem=' + them + '\nsoTrack=' + seq.videoTracks.numTracks;
+  } catch (e) {
+    return ac_err('ac_chonTrackCaption', e);
+  }
+}
+
+/** JSON-escape mot chuoi (ES3 khong co JSON.stringify). */
+function ac_jsonChuoi(s) {
+  var r = '';
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i), code = s.charCodeAt(i);
+    if (ch === '"') r += '\\"';
+    else if (ch === '\\') r += '\\\\';
+    else if (ch === '\r') r += '\\r';
+    else if (ch === '\n') r += '\\n';
+    else if (ch === '\t') r += '\\t';
+    else if (code < 32) r += '\\u' + ('000' + code.toString(16)).slice(-4);
+    else r += ch;
+  }
+  return r;
+}
+
+function ac_thamSo(props, ten) {
+  for (var p = 0; p < props.numItems; p++) {
+    if (props[p].displayName === ten) return props[p];
+  }
+  return null;
+}
+
+/** Ghi chu vao tham so Text cua MOGRT: giu nguyen moi truong khac, chi thay textEditValue. */
+function ac_datChuMogrt(prop, chu) {
+  var cur = String(prop.getValue());
+  var re = /"textEditValue"\s*:\s*"(?:[^"\\]|\\.)*"/;
+  if (!re.test(cur)) return false;
+  // `$` trong chuoi thay the la ky hieu cua replace() -> nhan doi truoc.
+  var moi = cur.replace(re, '"textEditValue":"' + ac_jsonChuoi(chu).replace(/\$/g, '$$$$') + '"');
+  return prop.setValue(moi, true);
+}
+
+/** Loi dau tien cua lan dat gan nhat — ac_datCaptionMogrt doc roi xoa. */
+var ac_loiDatCaption = '';
+
+/**
+ * Dat MOT clip caption: importMGT -> keo dai -> ghi chu + tham so. Tra ve true
+ * neu clip da nam tren track (tham so co the thieu, van tinh la dat duoc).
+ */
+function ac_datMotCaption(seq, p, vIdx, aIdx, tu, den, chu, hl, viTriY, co) {
+  var ti = null;
+  try { ti = seq.importMGT(p, String(Math.round(tu * AC_TICK)), vIdx, aIdx); }
+  catch (e1) { if (!ac_loiDatCaption) ac_loiDatCaption = 'importMGT: ' + e1.toString(); return false; }
+  if (!ti) { if (!ac_loiDatCaption) ac_loiDatCaption = 'importMGT tra null tai ' + tu; return false; }
+
+  try { var tEnd = new Time(); tEnd.seconds = den; ti.end = tEnd; }
+  catch (e2) { if (!ac_loiDatCaption) ac_loiDatCaption = 'end: ' + e2.toString(); }
+
+  try {
+    var comp = ti.getMGTComponent();
+    if (comp) {
+      var props = comp.properties;
+      var pText = ac_thamSo(props, 'Text');
+      if (!pText) {
+        // Template khong co tham so "Text" -> clip nam tren timeline nhung hien
+        // CHU MAU cua template. Truoc day im lang -> panel bao "da dat du".
+        if (!ac_loiDatCaption) ac_loiDatCaption = 'template thieu tham so "Text" — clip hien chu mau, khong phai loi thoai';
+      } else if (!ac_datChuMogrt(pText, chu)) {
+        if (!ac_loiDatCaption) ac_loiDatCaption = 'khong ghi duoc chu vao tham so "Text" (textEditValue khong khop)';
+      }
+      var pHL = ac_thamSo(props, 'Highlight Word');
+      if (pHL) pHL.setValue(hl, true);
+      var pY = ac_thamSo(props, 'Position Y');
+      if (pY && !isNaN(viTriY) && viTriY >= 0) pY.setValue(viTriY, true);
+      // Co chu rieng khoi nay (tu Latin dai tran khung). Template khong co tham
+      // so thi bo qua, khong loi.
+      var pCo = ac_thamSo(props, 'Text Size');
+      if (pCo && co < 100) pCo.setValue(co, true);
+    } else if (!ac_loiDatCaption) ac_loiDatCaption = 'getMGTComponent null';
+  } catch (e3) { if (!ac_loiDatCaption) ac_loiDatCaption = 'thamso: ' + e3.toString(); }
+  return true;
+}
+
+/**
+ * DAT MOT LO caption MOGRT len track vIdx.
+ *
+ * @param mogrtPath duong dan .mogrt (dau `/`)
+ * @param vIdxStr   chi so track video (lay tu ac_chonTrackCaption)
+ * @param viTriYStr % chieu cao comp (doc ~75, ngang ~70); < 0 = giu mac dinh template
+ * @param duLieu    "tu␟den␟chu␟hl␟moc␞tu␟den␟..."  (U+001F giua truong, U+001E giua khoi)
+ *
+ * Panel gui theo LO (~25 khoi) de cap nhat tien do va khong giu ExtendScript
+ * qua lau (Premiere mot luong — dang goi la UI dung im).
+ */
+function ac_datCaptionMogrt(mogrtPath, vIdxStr, viTriYStr, duLieu) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var vIdx = parseInt(vIdxStr, 10);
+    if (isNaN(vIdx) || vIdx < 0 || vIdx >= seq.videoTracks.numTracks) return 'ERR:TRACK_SAI|' + vIdxStr;
+    var viTriY = parseFloat(viTriYStr);
+    var p = String(mogrtPath).replace(/\\/g, '/');
+    if (!new File(p).exists) return 'ERR:MOGRT_KHONG_CO|' + p;
+    var aIdx = seq.audioTracks.numTracks > 0 ? seq.audioTracks.numTracks - 1 : 0;
+
+    var khoi = String(duLieu).split('\u001E');
+    ac_loiDatCaption = '';
+    var daDat = 0, loiDau = '', msDau = -1;
+    var t0 = new Date().getTime();
+    for (var i = 0; i < khoi.length; i++) {
+      if (!khoi[i]) continue;
+      var f = khoi[i].split('\u001F');
+      if (f.length < 5) { if (!loiDau) loiDau = 'khoi ' + i + ' thieu truong (' + f.length + ')'; continue; }
+      var tu = parseFloat(f[0]), den = parseFloat(f[1]), chu = f[2];
+      var hl = parseInt(f[3], 10); if (isNaN(hl)) hl = 0;
+      var moc = f[4] || '';
+      var co = f.length > 5 ? parseFloat(f[5]) : 100; if (isNaN(co) || co <= 0) co = 100;
+      if (!(den > tu)) continue;
+
+      // ☠️ KARAOKE = CLIP CON THEO TUNG TU. Premiere khong chay expression nhieu
+      // dong trong MOGRT va keyframe tham so qua API khong doi hinh (do 22/08),
+      // nen "tu dang noi sang len" lam bang cach: moi tu mot clip, cung chu cua
+      // khoi, chi khac Highlight Word. Nhieu clip hon (~1 clip/tu) nhung chac.
+      var mocArr = [];
+      if (moc) {
+        var phanMoc = moc.split(',');
+        for (var m = 0; m < phanMoc.length; m++) { var v = parseFloat(phanMoc[m]); if (!isNaN(v)) mocArr.push(v); }
+      }
+      if (mocArr.length > 1) {
+        for (var k2 = 0; k2 < mocArr.length; k2++) {
+          var a2 = tu + mocArr[k2];
+          var b2 = (k2 + 1 < mocArr.length) ? tu + mocArr[k2 + 1] : den;
+          if (b2 > den) b2 = den;
+          if (!(b2 > a2 + 0.02)) continue;   // hai tu cung moc -> bo, tu sau se hien
+          if (ac_datMotCaption(seq, p, vIdx, aIdx, a2, b2, chu, k2 + 1, viTriY, co)) daDat++;
+        }
+      } else {
+        if (ac_datMotCaption(seq, p, vIdx, aIdx, tu, den, chu, hl, viTriY, co)) daDat++;
+      }
+      if (msDau < 0) msDau = new Date().getTime() - t0;
+    }
+    if (!loiDau && ac_loiDatCaption) loiDau = ac_loiDatCaption;
+    return 'OK:daDat=' + daDat + '\nmsDau=' + msDau + '\nmsTong=' + (new Date().getTime() - t0) +
+           (loiDau ? '\nloiDau=' + loiDau : '');
+  } catch (e) {
+    return ac_err('ac_datCaptionMogrt', e);
+  }
+}
+
+/** Dem clip caption AiO dang nam tren sequence dang mo (cho nut go / bien lai). */
+function ac_demCaptionAiO() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var n = 0;
+    for (var t = 0; t < seq.videoTracks.numTracks; t++) {
+      var track = seq.videoTracks[t];
+      for (var i = 0; i < track.clips.numItems; i++) {
+        if (String(track.clips[i].name).indexOf(AC_CAPTION_TIEN_TO) === 0) n++;
+      }
+    }
+    return 'OK:caption=' + n;
+  } catch (e) {
+    return ac_err('ac_demCaptionAiO', e);
   }
 }
 

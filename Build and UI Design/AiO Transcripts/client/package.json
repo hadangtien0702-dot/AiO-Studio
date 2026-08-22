@@ -1,7 +1,7 @@
 {
   "name": "aio-studio-autocut",
   "private": true,
-  "version": "2.4.0",
+  "version": "2.5.0",
   "type": "module",
   "description": "AiO Studio - Transcript: tu cat khoang lang tren timeline Premiere",
   "scripts": {
@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "build:release": "tsc -b && vite build --mode release",
-    "kiem": "tsc src/services/silencelog.ts src/services/plan.ts src/services/srt.ts src/services/amluong.ts --target es2020 --module es2020 --skipLibCheck --outDir ../tests/js && tsc src/lib/cep.ts --target es2020 --module es2020 --lib es2020,dom --skipLibCheck --outDir ../tests/js && node ../tests/kiem-tinh-toan.mjs"
+    "kiem": "tsc src/services/silencelog.ts src/services/plan.ts src/services/srt.ts src/services/amluong.ts --target es2020 --module es2020 --skipLibCheck --outDir ../tests/js && tsc src/lib/cep.ts --target es2020 --module es2020 --lib es2020,dom --skipLibCheck --outDir ../tests/js && node ../tests/kiem-tinh-toan.mjs",
+    "kiem:caption": "tsc src/services/srt.ts src/services/caption-kieu.ts --target es2020 --module es2020 --skipLibCheck --outDir ../tests/js && node ../tests/kiem-caption-kieu.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

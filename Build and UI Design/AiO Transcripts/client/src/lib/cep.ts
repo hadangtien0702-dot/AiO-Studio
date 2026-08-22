@@ -377,6 +377,108 @@ export async function ganPhuDe(srtPath: string): Promise<{ ok: boolean; loi: Hos
 }
 
 /**
+ * Đọc MỖI mốc I–O, không duyệt clip. CHỈ ĐỌC. (2.5.0, chép từ Autocut 19/08)
+ *
+ * Dùng cho vòng thăm dò mỗi giây: người dùng bấm I/O trong Premiere thì panel
+ * không hề hay biết — không có sự kiện nào bắn sang. Hàm này rẻ nên hỏi liên
+ * tục được; `getRangeClips()` duyệt mọi clip trên mọi track nên chỉ gọi khi bấm.
+ */
+export async function getRange(): Promise<{
+  tu: number
+  den: number
+  fps: number
+  seqName: string
+  /** Kích thước khung sequence (px). 0 nếu host không đọc được. */
+  w: number
+  h: number
+} | null> {
+  const res = parseResult(await evalScript('ac_getRange()'))
+  if (!res.ok) return null
+  const kv = parseKV(res.message)
+  const tu = Number(kv.in)
+  const den = Number(kv.out)
+  const fps = Number(kv.fps)
+  if (!Number.isFinite(tu) || !Number.isFinite(den) || den <= tu) return null
+  return {
+    tu,
+    den,
+    fps: Number.isFinite(fps) && fps > 0 ? fps : 30,
+    seqName: kv.seqName ?? '',
+    w: Number(kv.w) || 0,
+    h: Number(kv.h) || 0,
+  }
+}
+
+/* ═══ CAPTION KIỂU HIỆU ỨNG (MOGRT) — 2.5.0 ═══ */
+
+/**
+ * Mã hoá chuỗi cho caption: KHÁC `esc()` ở chỗ GIỮ `\r` (xuống dòng trong chữ)
+ * và hai ký tự ngăn cách U+001E/U+001F — `esc()` đổi xuống dòng thành dấu cách
+ * nên không dùng được ở đây. ExtendScript hiểu `\r` `\n` `\uXXXX` trong chuỗi.
+ */
+function escCaption(s: string): string {
+  return s
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n')
+    .replace(/\u001E/g, '\\u001E')
+    .replace(/\u001F/g, '\\u001F')
+}
+
+/** Gỡ caption AiO đè lên [tu,den] trên sequence đang mở. Trả về số clip đã gỡ. */
+export async function xoaCaptionAiO(tu: number, den: number): Promise<number> {
+  const res = parseResult(await evalScript(`ac_xoaCaptionAiO("${tu}", "${den}")`))
+  if (!res.ok) return 0
+  return parseInt(parseKV(res.message).daXoa ?? '0', 10) || 0
+}
+
+/** Chọn (hoặc thêm) track video trống suốt [tu,den]. */
+export async function chonTrackCaption(
+  tu: number,
+  den: number,
+): Promise<{ vIdx: number; them: boolean; loi: HostLoi | null }> {
+  const res = parseResult(await evalScript(`ac_chonTrackCaption("${tu}", "${den}")`))
+  if (!res.ok) return { vIdx: -1, them: false, loi: dichLoi(res.message) }
+  const kv = parseKV(res.message)
+  return { vIdx: parseInt(kv.vIdx ?? '-1', 10), them: kv.them === '1', loi: null }
+}
+
+/**
+ * Đặt một LÔ caption MOGRT lên track `vIdx`.
+ * @param duLieu chuỗi từ `maHoaKhoi()` (caption-kieu.ts)
+ */
+export async function datCaptionMogrt(
+  mogrtPath: string,
+  vIdx: number,
+  viTriY: number,
+  duLieu: string,
+): Promise<{ daDat: number; msDau: number; msTong: number; loiDau: string; loi: HostLoi | null }> {
+  const p = mogrtPath.replace(/\\/g, '/')
+  const res = parseResult(
+    await evalScript(
+      `ac_datCaptionMogrt("${esc(p)}", "${vIdx}", "${viTriY}", "${escCaption(duLieu)}")`,
+    ),
+  )
+  if (!res.ok) return { daDat: 0, msDau: -1, msTong: 0, loiDau: '', loi: dichLoi(res.message) }
+  const kv = parseKV(res.message)
+  return {
+    daDat: parseInt(kv.daDat ?? '0', 10) || 0,
+    msDau: parseInt(kv.msDau ?? '-1', 10),
+    msTong: parseInt(kv.msTong ?? '0', 10) || 0,
+    loiDau: kv.loiDau ?? '',
+    loi: null,
+  }
+}
+
+/** Đếm clip caption AiO trên sequence đang mở. */
+export async function demCaptionAiO(): Promise<number> {
+  const res = parseResult(await evalScript('ac_demCaptionAiO()'))
+  if (!res.ok) return 0
+  return parseInt(parseKV(res.message).caption ?? '0', 10) || 0
+}
+
+/**
  * Đặt marker tại những chỗ máy nghe không chắc, để soát bằng phím M.
  * @param ds "giây|từ|điểm;giây|từ|điểm;..."
  */

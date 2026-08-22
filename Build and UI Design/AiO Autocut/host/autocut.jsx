@@ -807,6 +807,12 @@ function ac_getRangeClips() {
 
           var p = ac_mediaPath(c);
           if (!p) continue; // title, mau, clip tong hop — khong do tieng duoc
+          // [22/08/2026, host-only] Clip caption MOGRT (panel Transcripts 2.5.0 dat) CO media path
+          // = duong dan file .mogrt nhung khong phai media: in/out template (10 s)
+          // chia do dai clip ra "toc do 2083%" -> panel tu choi chay tren sequence
+          // da co caption AiO. Bo qua nhu title/mau. (Sua cung cho voi Transcripts
+          // 22/08; anh Tien cho phep dung 1 dong nay tren panel dang dong bang.)
+          if (/\.mogrt$/i.test(p) || String(c.name).indexOf('AiO Caption') === 0) continue;
 
           var si = c.inPoint.seconds, sr = c.outPoint.seconds;
           var speed = (e2 - s) > 0 ? ((sr - si) / (e2 - s)) : 1;

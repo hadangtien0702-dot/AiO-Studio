@@ -244,6 +244,24 @@ export interface GioiHanPhuDe {
    * hai phía.
    */
   tuToiDa?: number
+  /**
+   * [2.5.0] LUÔN cắt cho vừa khung, kể cả khi khối con sẽ ngắn hơn `giayToiThieu`.
+   *
+   * Mặc định (caption track .srt) là "thà để nguyên một câu hơi dài" — đúng, vì
+   * Premiere tự xuống dòng caption, dài một chút vẫn đọc được. Nhưng caption kiểu
+   * hiệu ứng (graphic MOGRT, chữ 100-150 px) thì KHÔNG tự co: vượt 2 dòng là
+   * tràn khỏi khung = mất chữ. Bộ kiểm 22/08 trên 803 câu thật đếm được 14 khối
+   * vượt số dòng khi chưa có cờ này.
+   */
+  luonCat?: boolean
+  /**
+   * [2.5.0] KHÔNG bẻ từ Latin theo ký tự khi từ dài hơn dòng — để nguyên từ
+   * (dòng đó tràn một chút, bên gọi tự co cỡ chữ). Chữ CJK (không có dấu cách)
+   * vẫn cắt theo ký tự như cũ. Caption hiệu ứng bật cờ này: bộ kiểm 22/08 trên
+   * 803 câu thật thấy `photolithography` / `INFRASTRUCTURE` bị bẻ đôi giữa từ,
+   * vừa xấu vừa làm lệch số từ (karaoke, tuToiDa). Caption track .srt giữ luật cũ.
+   */
+  giuTuNguyen?: boolean
 }
 
 /**
@@ -405,7 +423,7 @@ function catTheoKyTu(chu: string, rong: number): string[] {
  * được 39 dòng như vậy trên dữ liệu thật.
  * → Sửa: để việc VẼ DÒNG quyết định chỗ cắt, không đoán bằng số ký tự.
  */
-function veDong(chu: string, rong: number): string[] {
+function veDong(chu: string, rong: number, giuTuLatin = false): string[] {
   const dong: string[] = []
   let nay = ''
   for (const tu of chu.split(' ')) {
@@ -415,6 +433,12 @@ function veDong(chu: string, rong: number): string[] {
       continue
     }
     if (nay) dong.push(nay)
+    // [2.5.0] Từ Latin dài hơn dòng mà bên gọi xin GIỮ NGUYÊN: để nó một mình
+    // một dòng (tràn), không bẻ — xem `GioiHanPhuDe.giuTuNguyen`.
+    if (giuTuLatin && doRong(tu) > rong && !FULL_WIDTH.test(tu)) {
+      nay = tu
+      continue
+    }
     // ☠️ MỘT "TỪ" DÀI HƠN CẢ DÒNG THÌ PHẢI CẮT NÓ RA, đừng để tràn.
     //
     // Bản cũ ghi *"đành để nó tràn, còn hơn cắt giữa từ"* — đúng với tiếng Việt,
@@ -438,7 +462,7 @@ function veDong(chu: string, rong: number): string[] {
 
 /** Khối này vẽ ra bao nhiêu dòng. */
 function demDong(chu: string, gh: GioiHanPhuDe): number {
-  return veDong(chu, gh.kyTuMoiDong).length
+  return veDong(chu, gh.kyTuMoiDong, !!gh.giuTuNguyen).length
 }
 
 /**
@@ -494,7 +518,9 @@ export function catCauDai(
   const tranKhoi = gh.kyTuMoiDong * gh.soDongToiDa
   const token: string[] = []
   for (const t of chu.split(' ')) {
-    if (doRong(t) > tranKhoi) token.push(...catTheoKyTu(t, tranKhoi))
+    // [2.5.0] `giuTuNguyen`: từ Latin không bẻ — chỉ còn bẻ CJK (không dấu cách).
+    if (doRong(t) > tranKhoi && !(gh.giuTuNguyen && !FULL_WIDTH.test(t)))
+      token.push(...catTheoKyTu(t, tranKhoi))
     else token.push(t)
   }
 
@@ -521,7 +547,8 @@ export function catCauDai(
   //
   // Bộ đo bắt được đúng chỗ này: chính lệnh `return` bên dưới làm **5 khối 8
   // từ** lọt qua trần 6 từ. Không có phép đo thì nó đi thẳng vào bản người dùng.
-  const buocPhaiCat = !!gh.tuToiDa && chu.split(' ').filter(Boolean).length > gh.tuToiDa
+  const buocPhaiCat =
+    !!gh.luonCat || (!!gh.tuToiDa && chu.split(' ').filter(Boolean).length > gh.tuToiDa)
   if (!buocPhaiCat && tongGiay > 0 && tongGiay / manh.length < gh.giayToiThieu) {
     return [{ ...cau, chu }]
   }
@@ -637,14 +664,23 @@ export function catCauDai(
  */
 export function xuongDong(chu: string, gh: GioiHanPhuDe = GIOI_HAN_MAC_DINH): string[] {
   const s = chu.trim().replace(/\s+/g, ' ')
-  const dong = veDong(s, gh.kyTuMoiDong)
+  const giuTu = !!gh.giuTuNguyen
+  const dong = veDong(s, gh.kyTuMoiDong, giuTu)
 
   // Đúng 2 dòng thì CÂN lại: `41 / 3` đọc khó chịu hơn `22 / 22`.
   // Cân bằng cách vẽ lại với bề rộng hẹp hơn, miễn vẫn ra đúng 2 dòng.
+  //
+  // ☠️ VÀ KHÔNG ĐƯỢC BẺ GIỮA TỪ KHI CÂN — vấp 22/08/2026. Với trần hẹp (caption
+  // kiểu Hormozi: 11 đơn vị), bề rộng thử `rong` có thể NHỎ HƠN một từ, và
+  // `veDong` cắt từ đó theo ký tự (luật cho CJK) → "COMPUTIN" / "G CITY.".
+  // Bộ kiểm trên 803 câu thật bắt được: vừa mất chữ vừa lệch mốc karaoke. Chỉ
+  // nhận kết quả cân nếu ghép lại bằng dấu cách ra ĐÚNG chuỗi gốc (tức mọi chỗ
+  // ngắt đều ở khoảng trắng); chuỗi không có dấu cách (CJK) thì vẫn cân như cũ.
   if (dong.length === 2) {
+    const coDauCach = s.includes(' ')
     for (let rong = Math.ceil(s.length / 2); rong < gh.kyTuMoiDong; rong++) {
-      const thu = veDong(s, rong)
-      if (thu.length === 2) return thu
+      const thu = veDong(s, rong, giuTu)
+      if (thu.length === 2 && (!coDauCach || thu.join(' ') === s)) return thu
     }
   }
   return dong

@@ -35,6 +35,11 @@ import {
   moSequenceTheoId,
   xoaMarker,
   xoaPhuDe,
+  getRange,
+  xoaCaptionAiO,
+  chonTrackCaption,
+  datCaptionMogrt,
+  extensionPath,
 } from './lib/cep'
 import { getFs, getPath, nodeAvailable } from './lib/node'
 import { getFFmpegPath } from './services/ffmpeg'
@@ -62,6 +67,17 @@ import {
   type Moc,
   type ThayTu,
 } from './services/srt'
+import {
+  KIEU_CAPTION,
+  dungKhoiCaption,
+  maHoaKhoi,
+  quetKieuTuyChinh,
+  timKieu,
+  viTriYTheoKhung,
+  type KieuCaption,
+  type MoTaKieuCaption,
+} from './services/caption-kieu'
+import { nodeRequire } from './lib/node'
 import MinhHoa from './MinhHoa'
 import DaiCo, { SO_NGON_NGU } from './Co'
 import { NutDoiNgonNgu, dich } from './ngonngu'
@@ -124,8 +140,81 @@ interface KetPhuDe {
    * nói. Trần là cố ý; GIẤU trần mới là lỗi.
    */
   soat?: { soCho: number; temNhat: number; tongCho: number }
+  /**
+   * [2.5.0] Caption KIỂU HIỆU ỨNG (Hormozi…) đã đặt thành graphic trên timeline.
+   * Có thì `ganDuoc` nói về mấy clip này, không phải caption track.
+   */
+  caption?: { kieu: string; soKhoi: number; soClip: number; track: number }
   buoc?: { ten: string; ket: string; giay: number }[]
   giayTong: number
+}
+
+/** Kiểu caption lưu giữa các phiên — người dựng một kênh thường dùng đúng một kiểu. */
+const KHOA_KIEU_CAPTION = 'aio-transcript-kieu-caption'
+
+function docKieuCaption(): KieuCaption {
+  try {
+    const s = localStorage.getItem(KHOA_KIEU_CAPTION) as KieuCaption | null
+    if (s && KIEU_CAPTION.some((k) => k.ma === s)) return s
+  } catch {
+    /* không đọc được thì mặc định */
+  }
+  return 'mac-dinh'
+}
+
+/** Độ dài vùng đang chọn — "35,2 s" dưới một phút, "1:12" từ một phút trở lên. */
+function daiVung(giay: number): string {
+  if (giay < 60) return `${giay.toFixed(1)} s`
+  return mmss(giay)
+}
+
+/**
+ * Thư mục KIỂU RIÊNG của người dùng: `%APPDATA%\AiOStudio\caption-styles`.
+ * Dùng chung cả bộ AiO (cùng chỗ với `ngonngu.json`). Tạo nếu chưa có.
+ *
+ * ☠️ Lấy APPDATA qua `require('process')['env'][...]` — viết `process.env.APPDATA`
+ * là Vite thay bằng object RỖNG lúc build (vấp 13/08, xem `ngonngu.tsx`).
+ */
+function thuMucKieuRieng(): string {
+  try {
+    const req = nodeRequire()
+    if (!req) return ''
+    const env = req('process')['env'] as Record<string, string | undefined>
+    const appdata = env['APPDATA']
+    if (!appdata) return ''
+    const fs = req('fs')
+    const p = appdata.replace(/\\/g, '/') + '/AiOStudio/caption-styles'
+    if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true })
+    return p
+  } catch {
+    return ''
+  }
+}
+
+/** Bộ 5 kiểu có sẵn + mọi `.mogrt` trong thư mục panel và thư mục kiểu riêng. */
+function quetDsKieu(): MoTaKieuCaption[] {
+  const req = nodeRequire()
+  if (!req) return KIEU_CAPTION
+  try {
+    const fs = req('fs')
+    const path = req('path')
+    const tm = [extensionPath().replace(/\\/g, '/') + '/mogrt', thuMucKieuRieng()].filter(Boolean)
+    return [...KIEU_CAPTION, ...quetKieuTuyChinh(fs, path, tm, KIEU_CAPTION)]
+  } catch {
+    return KIEU_CAPTION
+  }
+}
+
+/** Mở thư mục kiểu riêng trong Explorer để người dùng thả file .mogrt vào. */
+function moThuMucKieuRieng(): void {
+  const req = nodeRequire()
+  const p = thuMucKieuRieng()
+  if (!req || !p) return
+  try {
+    req('child_process').exec(`explorer "${p.replace(/\//g, '\\')}"`)
+  } catch {
+    /* không mở được thì thôi — đường dẫn vẫn hiện trong tooltip */
+  }
 }
 
 /** Bảng sửa từ lưu lại giữa các phiên — càng dùng càng chuẩn. */
@@ -164,6 +253,40 @@ export default function App() {
   const [maMoHinh, setMaMoHinh] = useState<MaMoHinh>("turbo")
   /** Khung hình quyết định luật cắt câu — xem hằng `KHUNG` ở trên. */
   const [khung, setKhung] = useState<KieuKhung>('ngang')
+  /**
+   * [2.5.0] Kiểu caption: Mặc định (caption track) hay một trong 5 kiểu hiệu
+   * ứng (mỗi khối là một graphic MOGRT sửa được). Xem `caption-kieu.ts`.
+   */
+  const [kieuCaption, setKieuCaption] = useState<KieuCaption>(docKieuCaption)
+  /**
+   * Danh sách kiểu = 5 kiểu có sẵn + kiểu người dùng tự làm bên After Effects
+   * (file .mogrt trong thư mục kiểu riêng). Quét lúc mở panel, khi panel được
+   * focus lại (vừa thả file xong quay lại là thấy), và sau mỗi lượt chạy.
+   */
+  const [dsKieu, setDsKieu] = useState<MoTaKieuCaption[]>(KIEU_CAPTION)
+  const kieuDangChon = timKieu(kieuCaption, dsKieu)
+  useEffect(() => {
+    const quet = () => setDsKieu(quetDsKieu())
+    quet()
+    window.addEventListener('focus', quet)
+    return () => window.removeEventListener('focus', quet)
+  }, [])
+  /**
+   * [2.5.0] Vùng I/O đang chọn trên timeline — đọc theo nhịp 1 giây, bám theo
+   * người dùng. Anh Tiến 19/08 (luật cả bộ): *"tool mình build ra nó luôn luôn
+   * theo dõi thao tác của người dùng… đang đồng hành cùng mình"*. Adobe không
+   * bắn sự kiện đổi I/O sang panel; không tự hỏi thì số đứng im và thành nói dối.
+   */
+  const [vungTin, setVungTin] = useState<{
+    tu: number
+    dai: number
+    fps: number
+    w: number
+    h: number
+  } | null>(null)
+  const mocVungRef = useRef('')
+  /** Sequence mà khung đã được tự đặt theo — đổi sequence mới tự đặt lại. */
+  const seqKhungRef = useRef('')
   /**
    * Bảng sửa từ KHÔNG còn giao diện (anh Tiến chốt 29/07: *"editor sẽ sửa
    * trong phần Properties của Pr luôn"*). Giữ biến để `sinhSrt` vẫn nhận đúng
@@ -279,6 +402,24 @@ export default function App() {
         const ds = await danhSachSequence()
         if (dung) return
         setDsSeq(ds)
+        // [2.5.0] Vùng I/O đang chọn — hàm host NHẸ (đọc 4 con số, không duyệt
+        // clip, đo ~1 ms ở Autocut). So mốc rồi mới setState để không vẽ lại
+        // mỗi giây khi người dùng đứng yên. Bỏ khoanh vùng → xoá số cũ.
+        const r = await getRange()
+        if (dung) return
+        const mocMoi = r ? `${r.tu.toFixed(3)}|${r.den.toFixed(3)}` : ''
+        if (mocMoi !== mocVungRef.current) {
+          mocVungRef.current = mocMoi
+          setVungTin(r ? { tu: r.tu, dai: r.den - r.tu, fps: r.fps, w: r.w, h: r.h } : null)
+        }
+        // ☠️ TỰ NHẬN KHUNG theo kích thước sequence — vấp 22/08: reload panel thì
+        // nút Khung về "Ngang" trong khi sequence là 1080×1920 → caption Hormozi
+        // tràn hai mép. Chỉ tự đặt khi ĐỔI SANG SEQUENCE KHÁC (hoặc lần đầu), để
+        // người dùng vẫn ghi đè được bằng tay trong cùng một sequence.
+        if (r && r.w > 0 && r.h > 0 && r.seqName !== seqKhungRef.current) {
+          seqKhungRef.current = r.seqName
+          setKhung(r.h > r.w ? 'doc' : 'ngang')
+        }
         const ten = ds.find((d) => d.dangMo)?.ten ?? ''
         if (!ten) return
         if (tenSeqRef.current && ten !== tenSeqRef.current) {
@@ -543,6 +684,11 @@ export default function App() {
         // 42. Ngôn ngữ do chính Whisper trả về sau khi nghe (`-l auto`).
         gioiHanTheoKhung(khung, nghedDuoc.ngonNgu),
         nghedDuoc.tu,
+        // [2.5.0] Kiểu caption + khung: kiểu hiệu ứng thì đặt MOGRT thay vì
+        // caption track (file .srt vẫn ghi ra làm bản nguồn để sửa/chạy lại).
+        kieuDangChon,
+        khung,
+        vungTin?.w ?? 0,
       )
       let kpd: KetPhuDe = {
         soCau: pd.soCau,
@@ -550,6 +696,7 @@ export default function App() {
         ngonNgu: nghedDuoc.ngonNgu,
         duongDan: pd.duongDan,
         ganDuoc: pd.ganDuoc,
+        caption: pd.caption,
         buoc,
         giayTong: (Date.now() - batDau) / 1000,
       }
@@ -633,7 +780,7 @@ export default function App() {
             Lúc đang chạy thì GIẤU: người dùng không cần xem lời giải thích khi
             máy đã bắt đầu làm. */}
         {!dangChay && !ket && (
-          <section className="khoi">
+          <section className="khoi khoi--gioithieu">
             {/* ☠️ MỘT KHUÔN CHUNG cho cả bốn panel — anh Tiến 30/07: *"2 dòng
                 text này là hướng dẫn, em làm sao cho nó gọn hàng và giống nhau"*.
 
@@ -670,7 +817,32 @@ export default function App() {
         {/* ══════════════════════════════════════════════════════════════════
             KHỐI 2 — CHỌN CÁCH CHÉP RỒI CHẠY
             ══════════════════════════════════════════════════════════════════ */}
-        <section className="khoi">
+        <section className="khoi khoi--dieukhien">
+          {/* ══════════════════════════════════════════════════════════════════
+              [2.5.0] ĐOẠN ĐANG CHỌN — bám theo I/O trên timeline, nhịp 1 giây.
+              Anh Tiến 22/08: *"có thể chọn được vùng và hiển thị lên tool xác
+              định được vùng chọn đó có thời gian bao nhiêu giống như autocut"*.
+              Hiện CẢ LÚC ĐANG CHẠY (số đứng yên lúc đó là đúng — vòng thăm dò
+              ngưng khi chạy, không chen vào ExtendScript một luồng).
+              ══════════════════════════════════════════════════════════════════ */}
+          <div className="selbar" aria-live="polite">
+            <svg className="selbar__ico" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 4H5v16h4M15 4h4v16h-4" />
+            </svg>
+            <span className="selbar__nhan">{dich('Đoạn đang chọn')}</span>
+            <span className={vungTin ? 'selbar__so' : 'selbar__so selbar__so--trong'}>
+              {vungTin ? daiVung(vungTin.dai) : dich('chưa khoanh')}
+            </span>
+            {vungTin && (
+              <span className="selbar__moc">
+                {mmss(vungTin.tu)} → {mmss(vungTin.tu + vungTin.dai)}
+              </span>
+            )}
+            <span className="selbar__phim">
+              {dich('Đổi vùng bằng phím')} <kbd>I</kbd> <kbd>O</kbd>
+            </span>
+          </div>
+
           {!dangChay && (
             <>
               {/* ══════════════════════════════════════════════════════════════
@@ -727,6 +899,57 @@ export default function App() {
               </div>
 
               {/* ══════════════════════════════════════════════════════════════
+                  1b. KIỂU CAPTION — [2.5.0] anh Tiến 22/08: *"thêm option hiệu
+                  ứng captions giống Alex Hormozi… cho anh 5 kiểu"*.
+                  Mặc định = caption track như cũ. 5 kiểu kia = mỗi khối một
+                  graphic MOGRT (bấm vào sửa chữ/màu được trên timeline).
+                  Tên kiểu là TÊN RIÊNG (Hormozi/Beast/…) — không dịch.
+                  ══════════════════════════════════════════════════════════════ */}
+              <div className="chon">
+                <span className="chon__nhan">{dich('Kiểu caption')}</span>
+                <div className="seg seg--luoi">
+                  {dsKieu.map((k) => (
+                    <button
+                      key={k.ma}
+                      className={k.ma === kieuCaption ? 'seg__nut seg__nut--chon' : 'seg__nut'}
+                      title={k.tuyChinh ? k.mogrtPath : dich(k.mo)}
+                      onClick={() => {
+                        setKieuCaption(k.ma)
+                        try {
+                          localStorage.setItem(KHOA_KIEU_CAPTION, k.ma)
+                        } catch {
+                          /* không lưu được thì thôi */
+                        }
+                      }}
+                    >
+                      {k.ma === 'mac-dinh' ? dich(k.ten) : k.ten}
+                    </button>
+                  ))}
+                </div>
+                <p className="chon__mo">
+                  {dich(kieuDangChon.mo)}
+                  {/* Đường VÀO cho kiểu riêng: mở thư mục, thả .mogrt xuất từ AE vào,
+                      quay lại panel là nút mới hiện (quét lại khi panel focus). */}
+                  {trongHost && (
+                    <>
+                      {' · '}
+                      <button
+                        type="button"
+                        className="lien-ket"
+                        title={thuMucKieuRieng()}
+                        onClick={() => {
+                          moThuMucKieuRieng()
+                          window.setTimeout(() => setDsKieu(quetDsKieu()), 2500)
+                        }}
+                      >
+                        {dich('Thêm kiểu từ After Effects…')}
+                      </button>
+                    </>
+                  )}
+                </p>
+              </div>
+
+              {/* ══════════════════════════════════════════════════════════════
                   2. CÁCH CHÉP
                   ══════════════════════════════════════════════════════════════
                   ☠️ Hai nhãn phải nằm trên CÙNG MỘT TRỤC so sánh. Bản trước là
@@ -776,9 +999,19 @@ export default function App() {
 
           {canLam && <p className="canlam">{canLam}</p>}
           {loi && <pre className="loi">{loi}</pre>}
-
-          {ket && <KetQuaPhuDe ket={ket} tenSeqKet={tenSeqKet} tenSeqDangMo={tenSeq} />}
         </section>
+
+        {/* [2.5.0] KẾT QUẢ tách thành khối riêng — để panel RỘNG (≥720px) xếp
+            được HAI CỘT: trái = điều khiển, phải = giới thiệu/kết quả/dọn dẹp.
+            Anh Tiến 22/08: *"màn hình thực tế của editor không được to, họ mở
+            nhiều tab trong Pr cùng lúc… thay đổi lại giao diện cho nó thông
+            minh"*. Panel hẹp thì vẫn một cột như cũ (xem `@media` trong
+            styles.css). */}
+        {ket && (
+          <section className="khoi khoi--ketqua">
+            <KetQuaPhuDe ket={ket} tenSeqKet={tenSeqKet} tenSeqDangMo={tenSeq} />
+          </section>
+        )}
 
         {/* ══════════════════════════════════════════════════════════════════
             ĐƯỜNG RA — xoá thứ panel đã tạo
@@ -1042,7 +1275,25 @@ function KetQuaPhuDe({
       </div>
 
       <p className="ketqua__dong">
-        {ket.ganDuoc
+        {ket.caption && ket.ganDuoc ? (
+          // [2.5.0] Caption kiểu hiệu ứng: nói rõ MẤY graphic, KIỂU gì, TRACK nào —
+          // và nhắc rằng bấm vào là sửa được (đó là lý do chọn MOGRT thay vì overlay).
+          <>
+            {dich('Đã đặt {n} caption kiểu {k} lên V{t} của sequence')
+              .replace('{n}', ket.caption.soKhoi.toLocaleString('vi-VN'))
+              .replace('{k}', () => ket.caption!.kieu)
+              .replace('{t}', String(ket.caption.track))}{' '}
+            {tenSeqKet ? <b>«{tenSeqKet}»</b> : dich('đã chạy')}
+            {ket.caption.soClip > ket.caption.soKhoi &&
+              ' ' +
+                dich('({c} clip — mỗi từ một clip để từ đang nói sáng lên)').replace(
+                  '{c}',
+                  ket.caption.soClip.toLocaleString('vi-VN'),
+                )}
+            .{' '}
+            {dich('Mỗi caption là một graphic — bấm vào là sửa chữ, đổi màu như text thường.')}
+          </>
+        ) : ket.ganDuoc
           ? // Ghi TÊN THẬT, không ghi "sequence đang mở" — câu đó đúng lúc chạy
             // xong nhưng thành nói dối ngay khi người dùng đổi sequence.
             <>
@@ -1198,7 +1449,18 @@ async function ganPhuDeVao(
   /** [2.4.0] Moc tung TU tren FILE GOC — de dat moc cac mau cat ra dung cho
    *  nguoi ta noi that, thay vi chia deu theo so chu. */
   tuTinCay?: { chu: string; giay: number; p: number }[],
-): Promise<{ soCau: number; soBo: number; duongDan: string; ganDuoc: boolean }> {
+  /** [2.5.0] Kiểu caption. Có `mogrt` thì đặt graphic thay vì caption track. */
+  kieu: MoTaKieuCaption = timKieu('mac-dinh'),
+  khung: KieuKhung = 'ngang',
+  /** Bề rộng khung sequence THẬT (px) — để co chữ đúng; 0 = suy từ `khung`. */
+  rongKhungPx = 0,
+): Promise<{
+  soCau: number
+  soBo: number
+  duongDan: string
+  ganDuoc: boolean
+  caption?: { kieu: string; soKhoi: number; soClip: number; track: number }
+}> {
   const fs = getFs()
   const path = getPath()
   if (!fs || !path) throw new Error(dich('Panel không dùng được Node.js'))
@@ -1214,11 +1476,97 @@ async function ganPhuDeVao(
   )
   if (!soCau) throw new Error(dich('Không câu nào rơi vào phần đã giữ lại.'))
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // [2.5.0] KIỂU HIỆU ỨNG → mỗi khối một graphic MOGRT, không tạo caption track.
+  // File .srt bên dưới VẪN ghi (bản nguồn chữ để sửa rồi chạy lại; và là thứ
+  // người dùng mở được bằng mọi trình phát). Chỉ bỏ bước `ganPhuDe`.
+  // ══════════════════════════════════════════════════════════════════════════
+  if (kieu.mogrt) {
+    const khoi = dungKhoiCaption(
+      cau as Cau[],
+      bangSan ?? [],
+      bangSua,
+      kieu,
+      khung,
+      tuTinCay,
+      rongKhungPx,
+    )
+    if (!khoi.length) throw new Error(dich('Không câu nào rơi vào phần đã giữ lại.'))
+    const srtPath = ghiSrt(fs, path, mediaPath, noiDung)
+
+    const tu = khoi[0].tu
+    const den = khoi[khoi.length - 1].den
+    bao(dich('Đang đặt caption lên timeline…'))
+    // Chạy lại thì THAY, không chồng hai lớp (luật "có đường vào phải có đường
+    // ra"; và caption chồng caption là thứ người dùng không bao giờ muốn).
+    await xoaCaptionAiO(tu, den)
+    const tr = await chonTrackCaption(tu, den)
+    if (tr.vIdx < 0) {
+      throw new Error(
+        dich('Không còn track video trống trong vùng — thêm một track video rồi chạy lại.') +
+          (tr.loi ? ` (${tr.loi.message})` : ''),
+      )
+    }
+    const mogrtPath =
+      kieu.mogrtPath ?? extensionPath().replace(/\\/g, '/') + '/mogrt/' + kieu.mogrt + '.mogrt'
+    const viTriY = viTriYTheoKhung(khung)
+
+    // Theo LÔ 25 khối: mỗi lô một lượt evalScript (~100 ms/khối sau lần nạp
+    // template đầu ~2,5 s) → nhãn tiến độ nhảy đều, Premiere không bị giữ lâu.
+    const LO = 25
+    let daDat = 0
+    let loiDau = ''
+    for (let i = 0; i < khoi.length; i += LO) {
+      const lo = khoi.slice(i, i + LO)
+      const r = await datCaptionMogrt(mogrtPath, tr.vIdx, viTriY, maHoaKhoi(lo))
+      if (r.loi) {
+        loiDau = r.loi.message
+        break
+      }
+      daDat += r.daDat
+      if (!loiDau && r.loiDau) loiDau = r.loiDau
+      bao(
+        dich('Đang đặt caption {a}/{b}…')
+          .replace('{a}', String(Math.min(i + LO, khoi.length)))
+          .replace('{b}', String(khoi.length)),
+      )
+    }
+    if (!daDat) {
+      throw new Error(
+        dich('Không đặt được caption lên timeline: {l}').replace('{l}', () => loiDau || '?'),
+      )
+    }
+    return {
+      soCau: khoi.length,
+      soBo,
+      duongDan: srtPath,
+      ganDuoc: true,
+      // Karaoke đặt MỖI TỪ một clip (host chẻ khối) nên `daDat` > số khối: báo số
+      // KHỐI người đọc hiểu, kèm số clip để khỏi ngạc nhiên khi nhìn timeline.
+      caption: { kieu: kieu.ten, soKhoi: khoi.length, soClip: daDat, track: tr.vIdx + 1 },
+    }
+  }
+
   // Tên có GIỜ PHÚT GIÂY, không ghi đè file cũ. Hai lý do:
   //   1. Premiere đọc nội dung .srt vào bộ nhớ lúc import; ghi đè file trên đĩa
   //      thì caption đã nằm trên timeline KHÔNG đổi theo — chạy lại lần hai mà
   //      vẫn ra phụ đề cũ, rất khó hiểu cho người dùng.
   //   2. Anh Tiến có thể đã sửa tay file trước; ghi đè là xoá công của người ta.
+  const srtPath = ghiSrt(fs, path, mediaPath, noiDung)
+
+  bao(dich('Đang gắn phụ đề lên timeline…'))
+  const { ok } = await ganPhuDe(srtPath)
+
+  return { soCau, soBo, duongDan: srtPath, ganDuoc: ok }
+}
+
+/** Ghi file .srt cạnh video gốc, tên có giờ phút giây (xem chú thích trong `ganPhuDeVao`). */
+function ghiSrt(
+  fs: NonNullable<ReturnType<typeof getFs>>,
+  path: NonNullable<ReturnType<typeof getPath>>,
+  mediaPath: string,
+  noiDung: string,
+): string {
   const gio = new Date()
   const p2 = (n: number) => String(n).padStart(2, '0')
   const dau = `${p2(gio.getHours())}${p2(gio.getMinutes())}${p2(gio.getSeconds())}`
@@ -1226,9 +1574,5 @@ async function ganPhuDeVao(
   const ten = path.basename(mediaPath).replace(/\.[^.]+$/, '')
   const srtPath = path.join(thuMuc, `${ten}-autocut-${dau}.srt`)
   fs.writeFileSync(srtPath, noiDung, 'utf8')
-
-  bao(dich('Đang gắn phụ đề lên timeline…'))
-  const { ok } = await ganPhuDe(srtPath)
-
-  return { soCau, soBo, duongDan: srtPath, ganDuoc: ok }
+  return srtPath
 }

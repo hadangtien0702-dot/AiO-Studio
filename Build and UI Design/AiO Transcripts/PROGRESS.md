@@ -1,5 +1,151 @@
 # AiO Transcript - Nhat ky
 
+## [2.5.0-soat] - 2026-08-22 22:54 (UTC+7) - VONG SOAT CODE: 45/51 agent chet vi han muc, 2 loi host da va, 4 loi con lai DA DO co so nhung CHUA sua
+
+### Boi canh
+Chay workflow soat diff 2.5.0 theo 5 goc nhin + xac minh doi khang. Ket qua bao
+`confirmed = 0` -> NGHE nhu sach. Su that: 45/51 agent chet vi het han muc; chi 2 agent
+xac minh chay xong va CA HAI deu ket luan "phat hien DUNG". 21 phat hien con lai bi xep
+vao o "bac bo" chi vi agent kiem chet. Con so 0 la con so cua THUOC HONG (luat 5k/5u).
+-> Tu doc lai ma nguon + do tren 4 bo dem nghe that (VI 1'/60', EN 26'/55').
+
+### Da sua (host/autocut.jsx) - cu phap node --check sach, CHUA chay tren Premiere
+1. `ac_chonTrackCaption`: ban cu lay track trong DAU TIEN tu duoi len -> V1 trong ma
+   hinh o V2 thi caption roi xuong V1, bi hinh che kin, panel van bao "da dat". Nay tim
+   track hinh CAO NHAT de len vung roi chon track trong O TREN no; het thi them track.
+   Tra them `tranHinh=` de kiem.
+2. `ac_datMotCaption`: template thieu tham so "Text" hoac regex textEditValue khong
+   khop -> truoc day im lang, clip hien CHU MAU. Nay ghi vao `ac_loiDatCaption` ->
+   panel thay `loiDau`.
+
+### DA DO co that, CHUA sua (do tren 5.506 khoi / 23.627 clip con karaoke that)
+- Karaoke clip con < 1 khung hinh: 586 (2,5%) @24fps, 127 (0,5%) @30fps; nguong
+  `b2 > a2 + 0.02` nho hon mot khung (41,7 ms @24). Sua: nguong = 1 khung cua sequence.
+- Khoi 1 tu roi nhanh else voi hl=0 -> KHONG BAO GIO SANG: 322/5.506 khoi (5,8%;
+  EN 55' la 7,8%). Do 179/179 deu hl=0. Sua: 1 tu thi hl=1.
+- Khoi > 10 s vuot comp MOGRT (addComp ..., 10, 30): 21 khoi o EN 26' (khoi bia 30 s
+  cua Whisper). MOGRT khong keo dai qua comp -> caption tat giua chung. Sua: chan o
+  panel (cat khoi) hoac build comp dai hon.
+- `dichLoi` thieu 4 ma moi (HET_TRACK/TRACK_SAI/VUNG_SAI/MOGRT_KHONG_CO) -> UI hien ma tho.
+- Kieu rieng (tuy:*): ten clip khong bat dau "AiO Caption" -> xoa/dem bo sot, chay
+  lai chong lop. CHUA do.
+
+### Chot huong cua anh Tien (22/08 toi) - DOI HUONG CAPTION KIEU
+Anh khong muon import MOGRT tu AE nua (nang timeline). Muon: buoc 1 caption track
+(C1 Subtitle) nhu hien tai; buoc 2 bam lam phu de -> "Update caption to graphics"
+ngay trong Premiere va lam hieu ung tai do. MOGRT tu AE chi de danh cho "AiO Text
+Effect" sau nay. Can nghien cuu API truoc khi dong code.
+
+## [2.5.0-goi] - 2026-08-22 16:06 (UTC+7) - DONG GOI: sua huong dan noi SAI + ten goi + bo cai CAI FONT
+
+### Nguyen nhan that
+Chay `scripts/package-release.ps1` lan dau cho 2.5.0 roi MO FILE SINH RA DOC (luat
+3d): `HUONG-DAN-CAI-DAT.txt` van la van ban cua Autocut 0.1.x thang 7 ("Cong cu tu
+cat khoang lang... BAN THAM DO... CHUA cat duoc"), goi ten
+`AiO-Studio-Autocut-<ver>.zxp` va `AiO-Studio-Autocut-<ver>-SETUP.zip` — script chep
+tu Autocut luc tach du an 29/07, chua ai doc lai. Dung cai bay anh Tien bat o Autocut
+19/08, lan nay o panel khac.
+
+### Thay doi (`scripts/package-release.ps1`)
+- Ten goi -> `AiO-Studio-Transcript-<ver>.zxp` / `...-SETUP.zip`.
+- Huong dan viet lai cho Transcripts 2.5.0: lam gi, yeu cau, GIOI HAN DA BIET
+  (karaoke nhieu clip, sequence >1920 px, thu tieng khac moi "chay duoc"), go cai
+  dat, thu muc kieu rieng.
+- `cai-dat.ps1` (bo cai tu chay) them buoc CAI FONT per-user: chep `fonts/*.ttf`
+  vao `%LOCALAPPDATA%\Microsoft\Windows\Fonts` + ghi HKCU Fonts, khong Admin,
+  KHONG broadcast WM_FONTCHANGE (tung treo 2 phut khi co cua so khong tra loi).
+- Script giu ASCII-only: dau gach dai `—` trong chuoi lam PowerShell 5.1 (doc file
+  khong BOM theo ANSI) ngat chuoi giua chung -> ParserError. Da thay bang `-`.
+
+### Kiem chung
+- Chay lai: `build/release/AiO-Studio-Transcript-2.5.0.zxp` 92,4 MB (ky + verify OK),
+  `build/AiO-Studio-Transcript-2.5.0-SETUP.zip` 92,3 MB. Trong .zxp co `mogrt/` 5
+  file, `fonts/` 4 ttf + 2 OFL, host, dist, LICENSE-FFmpeg, THIRD-PARTY-NOTICE.
+- `HUONG-DAN-CAI-DAT.txt` mo ra doc het: dung san pham, dung phien ban.
+- `cai-dat.ps1` co khoi font (dong 33-52). CHUA chay thu bo cai tren may sach.
+- Goi de o `build/` (gitignore), CHUA dua vao ngan `Release/` vi anh chua duyet.
+- Host cai that: `ac_getRange` tra `w=1080 h=1920`; Autocut host (va 1 dong) van
+  tra OK cho `ac_getRangeClips`.
+
+## [2.5.0] - 2026-08-22 12:50 (UTC+7) - CAPTION KIEU HIEU UNG (5 kieu MOGRT sua duoc) + kieu rieng tu AE + doan dang chon bam I/O + responsive
+
+### Boi canh
+Anh Tien 22/08: *"them option hieu ung captions giong Alex Hormozi... cho anh 5
+kieu"*, chot cach gan = **Essential Graphics sua duoc tren timeline** (khong
+overlay render san). Kem: *"chon duoc vung va hien thi len tool... giong autocut"*,
+*"giao dien Responsive"*, *"kieu caption anh thiet ke ben AE thi chon truc dien
+o ben PR"*. Anh cap quyen dieu khien Premiere; em TU TAO sequence test
+`AIO-TEST-*` tu clip co san trong project anh dang mo (khong dat in/out len
+item cua anh — bai hoc 3a-bis), test xong xoa, tra lai sequence anh dang mo.
+
+### Cach lam (3 tang)
+- **Template**: `mogrt-src/build-mogrt.jsx` chay TRONG After Effects (Beta 27) qua
+  **BridgeTalk** gui tu Premiere (`AfterFX.exe -r` KHONG chay script tren AE Beta
+  27; -noui cung khong). Sinh 5 file `mogrt/*.mogrt` (30-46 KB/file). Comp
+  1920x1920 vuong, Premiere dat o tam sequence -> mot file cho ca 16:9 va 9:16.
+- **Tinh toan thuan** `client/src/services/caption-kieu.ts`: cau Whisper -> khoi
+  {tu,den,chu,hl,moc,co}; moi kieu co gioi han rieng (ky tu/dong theo font, 2
+  dong, tu toi da, luonCat, giuTuNguyen); tu noi bat = tu dai nhat; karaoke = moc
+  tung tu; `co` = Text Size % khi tu Latin dai tran khung.
+- **Host** `ac_datCaptionMogrt` (theo lo 25 khoi): `importMGT` -> `ti.end` ->
+  `getMGTComponent().properties` (Text/Position Y/Highlight Word/Text Size).
+  `ac_chonTrackCaption` (track trong suot vung, het thi QE addTracks),
+  `ac_xoaCaptionAiO` (chay lai thi THAY), `ac_getRange` (+w/h), `ac_demCaptionAiO`.
+- **Panel**: hang "Kieu caption" (Mac dinh + 5 + kieu rieng quet tu
+  `<ext>/mogrt` va `%APPDATA%\AiOStudio\caption-styles`, sidecar `.json` ghi de),
+  nut "Them kieu tu After Effects..." mo thu muc; o "Doan dang chon" bam I/O
+  (vong 1 s, host nhe); tu nhan khung Ngang/Doc theo w/h sequence khi doi
+  sequence; responsive (<360 mot cot luoi 2 cot · >=720 HAI COT: trai dieu
+  khien, phai gioi thieu/ket qua/don).
+
+### ☠️ SAU DIEU DO THAT TREN PREMIERE BETA 27 (moi cai la mot vong sua)
+1. **Slider dua len EG bi kep 0..100** (dat 420 doc lai 100) -> Position Y = %.
+2. **Premiere chi chay expression MOT BIEU THUC** — khong var/if/for. Do qua 14
+   template thu A..N: `[50,50]` co dung; `var v=...;[v,v]` khong doi gi; expression
+   selector (`textIndex`) khong to tu nao; range selector + expression nhieu dong
+   -> to CA CAU (loi -> ve 0..100%). Bieu thuc nhieu dong KHONG bao loi, chi im.
+3. **Keyframe tham so MOGRT qua API** (`setTimeVarying/addKey/setValueAtKey`,
+   gio clip) -> `getValueAtTime` doi nhung HINH khong doi -> karaoke lam bang
+   **clip con theo tung tu** (16 khoi -> 83 clip, 9,1 s).
+4. `exportAsMotionGraphicsTemplate` doi project DA LUU va KHONG CO thay doi chua
+   luu -> `app.project.save()` ngay truoc moi export; hop thoai font "not synced"
+   (Bangers, Inter Display, TNR) -> `app.beginSuppressDialogs()`.
+5. AE can pref `Pref_SCRIPTING_FILE_NETWORK_SECURITY = 1` de script ghi file —
+   AE ghi de file prefs luc TAT, sua file khi AE con song la mat (da sua 3 lan).
+6. Clip caption MOGRT co `getMediaPath()` = duong dan .mogrt -> `ac_getRangeClips`
+   dem no nhu clip video, "toc do" = 10s/0,5s = 2083% -> panel TU CHOI chay lai
+   tren vung da co caption. Vá: bo qua `.mogrt` va ten `AiO Caption*`.
+   ⚠️ Autocut cung ham do, CHUA va (dong bang, hoi anh).
+
+### Bo kiem + do
+- `npm run kiem:caption` (`tests/kiem-caption-kieu.mjs`): 5 kieu x 2 khung tren
+  5 bo du lieu THAT (VI 1 phut, VI 60 phut 765 cau/11.723 tu, EN 26/55 phut
+  803 cau/9.565 tu): **tat ca dat** — 0 mat chu, 0 vuot 2 dong, 0 vuot tu, 0 de
+  nhau, ma hoa tron ven. Bo kiem bat duoc 3 loi that truoc khi len Premiere:
+  `xuongDong` can dong BE GIUA TU ("COMPUTIN/G CITY") · bo khoi trung moc = mat
+  chu · tu Latin dai bi be ky tu (luat CJK) -> `giuTuNguyen` + co chu.
+- Tren Premiere (sequence test 1080x1920, vung 0-20 s, Whisper trung dem):
+  Hormozi 23 clip / 2,1-4,4 s · Beast 31 · Karaoke 16 khoi = 83 clip / 9,1 s ·
+  Boxed 16 · Clean 7. Doc lai tung clip: chu dung, `\r` xuong dong, hl dung,
+  y=75, 0 de nhau. ANH THAT: tu noi bat to DUNG MOT TU (PHI / NHUNG / NHAT),
+  pop phong tu nho, Text Size 60% co dung, hop nen Boxed hien, karaoke tu
+  "nhung" -> "nang" chay theo thoi gian.
+- Doan dang chon: doi I/O tren timeline -> panel cap nhat sau **630 ms**.
+- Responsive (dist trong trinh duyet): 280 px khong tran ngang, luoi kieu 2 cot,
+  selbar gap 2 hang; 900 px `.than` grid 2 cot 432/432, luoi 4 cot.
+
+### Con no / chua lam
+- Bo cai phai CAI FONT (`fonts/` OFL: Montserrat x3 + Bangers). Montserrat co
+  tren Adobe Fonts (tu sync), Bangers KHONG.
+- Anh Tien chua dung bai that (thuoc tai nguoi).
+- Sequence > 1920 px: chu khong tu scale theo (comp 1920 co dinh).
+- Karaoke nhieu clip (1 clip/tu); CJK chua co font trong template.
+- Autocut: vá `ac_getRangeClips` bo qua `.mogrt` (hoi anh).
+- Nut go caption AiO (`ac_demCaptionAiO` da co, chua noi UI).
+- Da cai 4 font per-user tren may anh (HKCU, khong admin) de AE/Premiere render.
+  AE Beta dang mo project `mogrt/aio-captions-build.aep`; file
+  `Documents\Untitled Project.aep` do anh bam Save trong hop thoai AE.
+
 ## [song-ngu] - 2026-08-13 17:15 (UTC+7) - DICH NOT 24 CAU CON SOT + CHONG BAY `$` CUA replace()
 
 ### Boi canh
