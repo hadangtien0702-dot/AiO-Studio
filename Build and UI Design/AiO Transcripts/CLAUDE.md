@@ -337,6 +337,15 @@ AE chỉ để dành cho sản phẩm **"AiO Text Effect"** sau này.
 - Các lỗi đã đo của đường AE-MOGRT (karaoke < 1 khung 2,5% @24fps · khối 1 từ hl=0
   5,8% · khối > 10 s vượt comp · kiểu riêng không thay) ghi ở `PROGRESS.md`
   [2.5.0-soat] — **chưa sửa**, vì đường này có thể bị thay.
+- **Đo thêm 22/08 đêm (sequence tự tạo, tự xoá):** template Adobe `Bold Web Caption.mogrt`
+  (làm bằng Premiere) `importMGT` **262 ms/clip**, không phí nạp; `getMGTComponent()` =
+  null nhưng `components → Text → Source Text` **setValue(chuỗi thô) = true, đọc lại đúng**
+  (tiếng Việt, CR/LF); `ti.end`/`ti.name` đặt được; `deleteSequence` dọn được trên 27.0.
+  Style không có tham số → **nướng sẵn trong template** (mỗi kiểu = 1 .mogrt làm tay trong
+  Essential Graphics). ☠️ Chưa nhìn thấy chữ trên hình (ảnh chụp bị che) — phải chứng
+  minh bằng ảnh trước khi nói "được". Anh Tiến chốt thêm 22/08: **editor sửa chữ ngay trên
+  graphic là đủ** → tool KHÔNG cần đọc lại C1; luồng = 2 nút *Làm phụ đề* / *Làm hiệu ứng*.
+  Chi tiết số đo: skill `adobe-cep-panel`, mục "MOGRT LAM TU PREMIERE".
 
 ---
 
