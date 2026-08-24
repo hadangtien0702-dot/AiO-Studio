@@ -147,6 +147,28 @@ interface KetPhuDe {
   giayTong: number
 }
 
+/**
+ * ☠️ CÔNG TẮC KHỐI HIỆU ỨNG — anh Tiến chốt 24/08:
+ * *"vậy mình tạm thời ẩn phần tạo hiệu ứng này nha em"*.
+ *
+ * VÌ SAO TẮT (đo được, không phải cảm tính):
+ *   1. Anh muốn hiệu ứng làm bằng đường NATIVE của Premiere ("update to graphics").
+ *      Đo có đối chứng 24/08: `sequence` 42 method · `app` 34 · `qe.sequence` 63 —
+ *      KHÔNG có hàm nào biến caption thành graphic, và `app` không chạy được lệnh
+ *      menu. Cộng với đo 22/08: graphic do Premiere tạo thì `Source Text.setValue`
+ *      trả `true` nhưng chữ TRỐNG trên hình (Adobe xác nhận API MOGRT chỉ cho AE).
+ *   2. Nên đường duy nhất còn lại là MOGRT xuất từ AE — đúng thứ anh không muốn:
+ *      *"khi mình làm text bên AE thì PR sẽ cho nó là một file import, sẽ rất nặng
+ *      timeline"*.
+ *
+ * ☠️ ẨN, KHÔNG XOÁ. Toàn bộ đường chạy còn nguyên và vẫn được kiểm:
+ * `lamPhuDe('hieuung')` · `ganPhuDeVao` nhánh MOGRT · host `ac_datCaptionMogrt`,
+ * `ac_chonTrackCaption`, `ac_xoaCaptionAiO`, `ac_datCaptionDai` · 5 file `.mogrt`
+ * trong bộ cài · `npm run kiem:caption`.
+ * BẬT LẠI: đổi đúng dòng dưới thành `true`. Không phải dựng lại gì cả.
+ */
+const HIEN_HIEU_UNG: boolean = false
+
 /** Kiểu caption lưu giữa các phiên — người dựng một kênh thường dùng đúng một kiểu. */
 const KHOA_KIEU_CAPTION = 'aio-transcript-kieu-caption'
 
@@ -1010,8 +1032,9 @@ export default function App() {
               xác nhận API chỉ cho MOGRT từ AE) và không có API "Upgrade caption
               to graphic" → hiệu ứng vẫn là MOGRT AE; nói thẳng giá phải trả
               (nặng hơn caption track) ngay dưới nút, không giấu.
+              ☠️ [2.5.4] KHỐI NÀY ĐANG TẮT — xem `HIEN_HIEU_UNG` ở đầu file.
               ══════════════════════════════════════════════════════════════════ */}
-          {!dangChay && (
+          {HIEN_HIEU_UNG && !dangChay && (
             <div className="hieuung">
               <span className="chon__nhan">{dich('Hiệu ứng')}</span>
               <div className="hieuung__hang hieuung__hang--doc">

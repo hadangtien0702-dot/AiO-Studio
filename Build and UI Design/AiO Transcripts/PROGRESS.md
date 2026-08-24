@@ -1,5 +1,17 @@
 # AiO Transcript - Nhat ky
 
+## [2.5.4] - 2026-08-24 23:10 (UTC+7) - AN khoi Hieu ung (anh Tien chot)
+
+Anh Tien: *"vay minh tam thoi an phan tao hieu ung nay nha em"* — sau khi em do chet ca
+hai duong native (khong co API upgrade caption->graphic; graphic Premiere khong nhan chu
+qua API) nen hieu ung bat buoc la MOGRT tu AE, dung thu anh khong muon vi nang timeline.
+
+- Cong tac `HIEN_HIEU_UNG = false` dau App.tsx — AN, KHONG XOA. Toan bo duong chay
+  (lamPhuDe('hieuung'), host ac_datCaptionMogrt/ac_chonTrackCaption/ac_xoaCaptionAiO/
+  ac_datCaptionDai, 5 file .mogrt, kiem:caption) con nguyen. Bat lai = doi 1 dong.
+- Kiem tren panel that v2.5.4: khoi hieu ung 0 nut, 0 o chon, 0 chu lien quan;
+  panel con: Khung hinh · Cach chep · Lam phu de.
+
 ## [2.5.3] - 2026-08-24 23:00 (UTC+7) - Giau quy trinh luc chay, lam sach UI, nut mo thu muc
 
 ### Anh Tien yeu cau trong mot buoi (vua dung vua bao)
