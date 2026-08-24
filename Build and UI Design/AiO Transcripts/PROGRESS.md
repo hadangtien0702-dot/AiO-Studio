@@ -1,5 +1,62 @@
 # AiO Transcript - Nhat ky
 
+## [2.5.3] - 2026-08-24 23:00 (UTC+7) - Giau quy trinh luc chay, lam sach UI, nut mo thu muc
+
+### Anh Tien yeu cau trong mot buoi (vua dung vua bao)
+1. *"cho nay anh can he thong bao la dang loading, khong phai la nap mo hinh hay nap vao he thong"*
+2. *"remove may cau tu vo nghia nay ra luon"* + *"remove lam sach UI"* (kem 2 anh khoanh do)
+3. *"cho link nay okie ne, hay cho anh duong link kem nut mo thang vao folder chua no"*
+4. *"anh chua thay co hieu ung gi het"* -> thuc ra CO, xem muc "Hai phat hien" ben duoi
+
+### Thay doi
+- **Giau quy trinh luc chay** (luat anh chot 13/08, Autocut da theo tu hom do, panel nay sot):
+  `DangChay` bo `nhan` (ten viec) + danh sach 4 buoc; chi con **"Dang xu ly... N%" + dong ho**.
+  Be nguyen khuon tu `AiO Autocut/client/src/App.tsx` cho hai panel noi giong nhau.
+- **Lam sach UI** - go: mo ta duoi Khung hinh · mo ta duoi Cach chep · cau van duoi Hieu ung
+  (GIU nut "Them kieu tu After Effects" - do la duong VAO duy nhat cho kieu tu lam) ·
+  dong "Phu de da gan len sequence X" · khoi "Nghe ra tieng X" · cau "Moi caption la mot
+  graphic - bam vao la sua chu" · dai co ngon ngu (hinh minh hoa, khong bam duoc) ·
+  cau "Chi xoa thu panel tao ra..." · cau bao THANH CONG khi go phu de (chi bao khi that bai).
+  Khoi "Don thu panel da tao" nay **an han khi khong co gi de don** (truoc: hien hai doan van rong).
+- **Nut "Mo thu muc"** canh duong dan .srt: `explorer /select,"<duong dan>"` - mo dung thu muc
+  va boi sang san file.
+- **Nut "Lam hieu ung" rong het hang, vien mau nhan** (truoc: nut nho canh o xo -> anh Tien
+  chon kieu Hormozi roi bam NUT CAM, do tren timeline: 20 clip hinh, 0 clip hieu ung).
+
+### Hai phat hien khi kiem
+1. **"Chua thay hieu ung" - thuc ra CO.** Do tren sequence "1808-S-Phoebe-Kinn Chi phi y te":
+   **4 clip "AiO Caption - Hormozi" tren V2, 115,87s -> 117,13s** - dung khop vung I/O anh khoanh
+   (1:55.9 -> 1:57.4, 1,5 giay). Hinh o V1, caption o V2 = dat DUNG cho. Anh khong thay vi doan
+   do chi dai 1,26 giay o phut thu 115, va luc do anh dang nhin sequence khac.
+2. **☠️ DO CHET duong "update to graphics" trong Premiere** (anh hoi 2 lan). Lan nay thuoc do CO
+   DOI CHUNG (`seq.createCaptionTrack`/`seq.importMGT` deu hien ra = probe dung):
+   | Doi tuong | So method | Co ham nao ve caption->graphic khong |
+   |---|---|---|
+   | sequence | 42 | KHONG. Chi co `createCaptionTrack`. Khong co upgrade/convert/promote |
+   | app | 34 | KHONG co `performMenuCommand` / `executeMenuCommand` -> khong chay duoc lenh menu |
+   | qe.sequence | 63 | KHONG co gi ve caption/graphic |
+   Cong voi do 22/08 (graphic lam tu Premiere: `Source Text.setValue` tra true nhung chu TRONG
+   tren hinh; Adobe xac nhan API MOGRT chi cho AE) => **hieu ung BAT BUOC la MOGRT tu AE**.
+   Khong phai lua chon cua tool.
+
+### Kiem chung
+- Lay mau DOM 60ms/lan trong luc chay: chi ra hai trang thai `"Dang xu ly...
+0:0X"` va
+  `"Dang xu ly...N%
+0:0X"` - khong lo mot ten buoc nao.
+- Quet **text node** (khong loc theo the - bai hoc 3c-bis): 13 cum tu can go -> **con sot 0**.
+- Nut "Mo thu muc" co that trong DOM, title = duong dan day du.
+- Nut "Lam hieu ung" rong 456px = bang nut chinh.
+- E2E tren sequence tu tao: 23 caption Hormozi len V3, khong ro sang sequence nao cua anh Tien.
+- Don: xoa sequence test, project item ve 4, sequence cua anh mo lai dung.
+
+### ☠️ LOI CUA EM TRONG BUOI NAY
+Khi xoa file .srt do test sinh ra, em loc theo GIO (22:4x-23:xx) nen xoa nham **1 file cua anh
+Tien**: `Source Heygen Chi phi y te_1080p-autocut-224212.srt` (ket qua lan anh tu bam luc 22:42).
+File tren timeline da duoc anh "go 8 phu de khoi project" truoc do nen khong gay hong sequence.
+Bai hoc: **loc theo GIO la loc theo mot dau hieu khong phan biet duoc CHU SO HUU.** Lan sau phai
+ghi lai danh sach file TRUOC khi test roi chi xoa dung phan CHENH LECH do minh tao ra.
+
 ## [2.5.2] - 2026-08-24 21:25 (UTC+7) - SUA GOC: caption roi sang SEQUENCE KHAC ma van bao thanh cong
 
 ### Loi bat duoc (khi anh Tien bao "chay lai di em")

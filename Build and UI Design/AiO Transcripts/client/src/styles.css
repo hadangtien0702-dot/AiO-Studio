@@ -956,3 +956,45 @@ body {
   color: var(--accent);
   background: var(--bg-5);
 }
+
+/* [2.5.3] Hàng hiệu ứng xếp DỌC: ô chọn kiểu trên, nút rộng hết hàng bên dưới.
+   Lý do đổi: bản trước để nút nhỏ nằm cạnh ô xổ, anh Tiến chọn kiểu rồi bấm
+   nhầm nút cam — "chưa thấy có hiệu ứng gì hết". Nút phải đủ to để đọc ra là
+   MỘT VIỆC KHÁC, nhưng không tô đặc để không tranh chỗ nút chính. */
+.hieuung__hang--doc {
+  flex-direction: column;
+  align-items: stretch;
+}
+.hieuung__hang--doc select {
+  width: 100%;
+}
+.hieuung__hang--doc .btn--hieuung {
+  width: 100%;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.hieuung__hang--doc .btn--hieuung:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+/* [2.5.3] Đường dẫn file + nút mở thư mục nằm cùng hàng. Tên file co lại được,
+   nút giữ nguyên bề ngang — tên dài không đẩy nút rơi xuống dòng. */
+.ketqua__duong {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.ketqua__ten {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ketqua__mo {
+  flex: 0 0 auto;
+  height: 26px;
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-xs);
+}

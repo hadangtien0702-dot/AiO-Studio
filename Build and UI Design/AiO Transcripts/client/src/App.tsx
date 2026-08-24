@@ -60,7 +60,6 @@ import {
   chonChoSoat,
   dungBangTuClip,
   gioiHanTheoKhung,
-  nhomNgonNgu,
   sinhSrt,
   type Cau,
   type KieuKhung,
@@ -79,7 +78,6 @@ import {
 } from './services/caption-kieu'
 import { nodeRequire } from './lib/node'
 import MinhHoa from './MinhHoa'
-import DaiCo, { SO_NGON_NGU } from './Co'
 import { NutDoiNgonNgu, dich } from './ngonngu'
 
 /**
@@ -216,6 +214,22 @@ function moThuMucKieuRieng(): void {
     req('child_process').exec(`explorer "${p.replace(/\//g, '\\')}"`)
   } catch {
     /* không mở được thì thôi — đường dẫn vẫn hiện trong tooltip */
+  }
+}
+
+/**
+ * Mở Explorer TẠI thư mục chứa một file (chọn sẵn file đó).
+ * Anh Tiến 24/08: *"chỗ link này okie nè, hãy cho anh đường link kèm nút mở
+ * thẳng vào folder chứa nó luôn"*. `/select,` là cờ của Explorer — mở thư mục
+ * và bôi sáng đúng file, đỡ phải dò bằng mắt.
+ */
+function moThuMucChuaFile(duongDan: string): void {
+  const req = nodeRequire()
+  if (!req || !duongDan) return
+  try {
+    req('child_process').exec(`explorer /select,"${duongDan.replace(/\//g, '\\')}"`)
+  } catch {
+    /* không mở được thì thôi — đường dẫn đầy đủ vẫn nằm trong tooltip */
   }
 }
 
@@ -942,7 +956,6 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <p className="chon__mo">{dich(KHUNG.find((k) => k.ma === khung)?.mo ?? '')}</p>
               </div>
 
               {/* ══════════════════════════════════════════════════════════════
@@ -970,11 +983,6 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <p className="chon__mo">
-                  {maMoHinh === 'turbo'
-                    ? dich('Câu ngắn, nhiều khối · chạy nhanh hơn')
-                    : dich('Câu dài, ít khối · nghe kỹ hơn')}
-                </p>
               </div>
             </>
           )}
@@ -1006,7 +1014,7 @@ export default function App() {
           {!dangChay && (
             <div className="hieuung">
               <span className="chon__nhan">{dich('Hiệu ứng')}</span>
-              <div className="hieuung__hang">
+              <div className="hieuung__hang hieuung__hang--doc">
                 <select
                   className="seqpick"
                   value={kieuHieuUng.ma}
@@ -1029,17 +1037,24 @@ export default function App() {
                       </option>
                     ))}
                 </select>
+                {/* ☠️ [2.5.3] NÚT NÀY TỪNG BỊ BỎ SÓT. Anh Tiến 24/08 chọn kiểu Hormozi
+                    rồi bấm NÚT CAM (Làm phụ đề) và báo *"anh chưa thấy có hiệu ứng gì
+                    hết đó em"* — đo trên timeline của anh: 20 clip hình, 0 clip hiệu
+                    ứng, panel báo đúng câu của caption track. Nút cam to và nổi, nút
+                    hiệu ứng thì nhỏ nằm cạnh ô xổ → ai cũng bấm nút cam.
+                    Nay nút hiệu ứng RỘNG HẾT HÀNG, viền đậm màu nhấn. Vẫn KHÔNG tô đặc
+                    màu cam: mỗi màn hình chỉ một nút chính (luật anh Tiến). */}
                 <button className="btn btn--hieuung" onClick={() => void lamPhuDe('hieuung')}>
                   {dich('Làm hiệu ứng')}
                 </button>
               </div>
+              {/* [2.5.3] Anh Tiến 24/08: *"remove mấy câu từ vô nghĩa này ra luôn"*.
+                  Câu văn mô tả kiểu đã gỡ — nhãn nút và tên kiểu đã tự nói đủ.
+                  GIỮ đúng cái NÚT: đó là đường VÀO duy nhất cho kiểu tự làm
+                  (luật "có đường vào thì phải có đường ra" — bỏ là mất tính năng). */}
               <p className="chon__mo">
-                {dich('Mỗi caption là một graphic MOGRT — sửa chữ ngay trên graphic. Nặng hơn caption track, hợp short.')}
-                {/* Đường VÀO cho kiểu riêng: mở thư mục, thả .mogrt xuất từ AE vào,
-                    quay lại panel là mục mới hiện (quét lại khi panel focus). */}
                 {trongHost && (
                   <>
-                    {' · '}
                     <button
                       type="button"
                       className="lien-ket"
@@ -1089,16 +1104,14 @@ export default function App() {
             0 file .srt). Nay: KHỐI luôn hiện, chỉ NÚT là ẩn; không có gì để
             dọn thì nói thẳng bằng một dòng chữ. Tính năng nhìn thấy được,
             mà vẫn không có nút nói dối. */}
-        {!dangChay && daTao && (
+        {/* [2.5.3] Anh Tiến 24/08 khoanh đỏ cả khối này khi nó KHÔNG có nút nào —
+            lúc đó nó chỉ còn là hai đoạn văn giải thích, tức là rác. Nay: có gì để
+            dọn thì hiện (kèm nút), không có thì ẩn hẳn.
+            ☠️ Khác với lần vấp 01/08 (*"nút xoá marker và caption đâu mất rồi em?"*):
+            lần đó ẩn cả khi CÓ thứ để dọn. Nay chỉ ẩn đúng lúc rỗng. */}
+        {!dangChay && daTao && (daTao.marker > 0 || daTao.itemSrt > 0) && (
           <div className="don">
             <span className="don__nhan">{dich('Dọn thứ panel đã tạo')}</span>
-            {daTao.marker === 0 && daTao.itemSrt === 0 && (
-              <p className="don__mo">
-                {dich(
-                  'Sequence này chưa có gì do panel tạo — chạy "Làm phụ đề" xong thì nút xoá phụ đề và marker sẽ hiện ở đây.',
-                )}
-              </p>
-            )}
             <div className="don__nut">
               {daTao.itemSrt > 0 && (
                 <button
@@ -1112,14 +1125,9 @@ export default function App() {
                       try {
                         if (!(await napLaiHost())) throw new Error(dich('Không nạp được host.'))
                         const r = await xoaPhuDe()
+                        // [2.5.3] Chỉ báo khi THẤT BẠI (luật anh Tiến). Gỡ xong thì
+                        // chính cái nút biến mất — người dùng đã thấy, nói thêm là thừa.
                         if (r.loi) setCanLam(r.loi.message)
-                        else
-                          setCanLam(
-                            dich('Đã gỡ {n} phụ đề khỏi project. File trên đĩa vẫn còn — ').replace(
-                              '{n}',
-                              String(r.daXoa),
-                            ) + dich('panel không tự xoá file của anh.'),
-                          )
                       } catch (e: any) {
                         setLoi(String(e?.message ?? e))
                       } finally {
@@ -1172,7 +1180,9 @@ export default function App() {
               )}
             </div>
             <p className="don__mo">
-              {dich('Chỉ xoá thứ panel tạo ra. Phụ đề và marker anh tự làm không bị chạm.')}
+              {/* [2.5.3] Câu "Chỉ xoá thứ panel tạo ra…" đã gỡ (anh Tiến 24/08) —
+                  nhãn nút đã nói rõ xoá cái gì. GIỮ đoạn dưới: nó không phải lời
+                  giải thích mà là VIỆC PHẢI LÀM (Premiere không cho tool xoá track). */}
               {/* ☠️ NÓI THẬT GIỚI HẠN — anh Tiến 31/07: "bấm vào xoá thì nó
                   không có tác dụng". Nút gỡ được FILE trong project; còn TRACK
                   caption trên timeline thì Premiere KHÔNG mở API cho tool nào
@@ -1194,25 +1204,10 @@ export default function App() {
           </div>
         )}
 
-        {/* ══════════════════════════════════════════════════════════════════
-            DẢI CỜ NGÔN NGỮ — anh Tiến 30/07 yêu cầu carousel dạng cờ
-            ══════════════════════════════════════════════════════════════════
-            ☠️ Cờ vẽ SVG, KHÔNG emoji: Windows không có glyph quốc kỳ nên emoji
-            cờ hiện thành hai chữ cái. Đã đo — xem `Co.tsx`. */}
-        {!dangChay && (
-          <div className="mh mh--nho">
-            <DaiCo />
-            <p className="mh__chu">
-              {dich('Tự nhận ngôn ngữ —')}{' '}
-              <b>
-                {SO_NGON_NGU}
-                {dich('+ thứ tiếng')}
-              </b>
-              {dich(', không phải chọn tay.')}
-            </p>
-          </div>
-        )}
-
+        {/* [2.5.3] DẢI CỜ NGÔN NGỮ ĐÃ GỠ — anh Tiến 24/08: *"remove làm sạch UI"*.
+            Nó là hình minh hoạ (12+ thứ tiếng), không phải điều khiển: người dùng
+            không bấm được gì vào đó, mà panel vẫn tự nhận ngôn ngữ như cũ. */
+        }
         {/* ══════════════════════════════════════════════════════════════════
             ☠️ BẢNG "SỬA TỪ NGHE NHẦM" ĐÃ GỠ — anh Tiến chốt 29/07
             ══════════════════════════════════════════════════════════════════
@@ -1256,30 +1251,40 @@ function DangChay({
   cacBuoc: readonly { readonly ten: string; readonly uoc: number }[]
 }) {
   const doDuoc = phanTram >= 0
+
+  // ☠️ GIẤU QUY TRÌNH — [2.5.3] anh Tiến 24/08, nhìn đúng dòng "Đang nạp mô hình
+  // lên GPU": *"chỗ này anh cần hệ thống báo là đang loading nha em, không phải
+  // là nạp mô hình hay nạp vào hệ thống"*. Đây là LUẬT CŨ anh đã chốt 13/08 và
+  // Autocut đã theo từ hôm đó — panel này sót lại, nay bê nguyên khuôn của
+  // `AiO Autocut/client/src/App.tsx` sang cho hai panel nói giống nhau.
+  //
+  // Bỏ HAI thứ:
+  //   1. `nhan` — tên việc đang chạy ("Đang tách tiếng khỏi video",
+  //      "Đang nạp mô hình lên GPU"…)
+  //   2. danh sách 4 bước có dấu ✓ / ● / ○
+  // Đọc hai thứ đó là ra nguyên pipeline (tách tiếng → nghe hiểu bằng mô hình
+  // trên GPU → gắn lên timeline) — phần giá trị nhất của tool, phơi ra cho
+  // người quay màn hình là cho không.
+  //
+  // ☠️ GIỮ đồng hồ và phần trăm, CÓ CHỦ Ý: bỏ nốt thì người dùng không biết máy
+  // còn chạy hay đã treo. Luật của chính anh Tiến — *"nút phải có trạng thái
+  // XONG rõ ràng"*. Giấu VIỆC ĐANG LÀM, không giấu TIẾN ĐỘ.
+  //
+  // `nhan` / `buocIdx` / `cacBuoc` vẫn nhận vào nhưng thôi dùng — bộ đếm bước
+  // bên trong vẫn chạy (nuôi phần trăm), bật lại danh sách chỉ là thêm JSX.
+  void nhan
+  void buocIdx
+  void cacBuoc
+
   return (
     <div className="chay" aria-live="polite">
       <div className={doDuoc ? 'chay__thanh' : 'chay__thanh chay__thanh--troi'}>
         {doDuoc && <div className="chay__day" style={{ width: `${phanTram}%` }} />}
         <span className="chay__chu">
-          {nhan}
-          {doDuoc && <b>{phanTram}%</b>}
+          {dich('Đang xử lý')}…{doDuoc && <b>{phanTram}%</b>}
         </span>
         <span className="chay__gio">{dongHo(giay)}</span>
       </div>
-
-      <ol className="chay__buoc">
-        {cacBuoc.map((b, i) => {
-          const tt = i < buocIdx ? 'xong' : i === buocIdx ? 'dang' : 'cho'
-          return (
-            <li key={b.ten} className={`chay__buoc--${tt}`}>
-              <span className="chay__cham">{tt === 'xong' ? '✓' : tt === 'dang' ? '●' : '○'}</span>
-              {/* Bọc ở chỗ VẼ RA — `CAC_BUOC` là hằng ngoài component, bọc trong
-                  đó là chạy lúc import và khoá cứng vào tiếng Việt. */}
-              {dich(b.ten)}
-            </li>
-          )
-        })}
-      </ol>
     </div>
   )
 }
@@ -1350,45 +1355,41 @@ function KetQuaPhuDe({
                   '{c}',
                   ket.caption.soClip.toLocaleString('vi-VN'),
                 )}
-            .{' '}
-            {dich('Mỗi caption là một graphic — bấm vào là sửa chữ, đổi màu như text thường.')}
+            {/* [2.5.3] Câu "Mỗi caption là một graphic — bấm vào là sửa chữ…" đã gỡ
+                (anh Tiến 24/08). Người dựng bấm thử một cái là biết ngay. */}
+            .
           </>
         ) : ket.ganDuoc
-          ? // Ghi TÊN THẬT, không ghi "sequence đang mở" — câu đó đúng lúc chạy
-            // xong nhưng thành nói dối ngay khi người dùng đổi sequence.
-            <>
-              {dich('Phụ đề đã gắn lên sequence')}{' '}
-              {tenSeqKet ? <b>«{tenSeqKet}»</b> : dich('đã chạy')}.
-            </>
+          ? // [2.5.3] Anh Tiến 24/08 gỡ câu này: ba ô số + đường dẫn đã nói đủ
+            // "xong rồi, nằm đây". Tên sequence vẫn được bảo vệ bằng CẢNH BÁO
+            // `khacSeq` phía trên — nó chỉ hiện khi biên lai thuộc sequence khác,
+            // tức đúng lúc con số có thể bị hiểu nhầm.
+            null
           : dich(
               'Đã tạo file phụ đề nhưng chưa gắn được lên timeline — mở tay từ đường dẫn dưới.',
             )}
-        {/* ☠️ PHẢI NÓI RA ngôn ngữ nó nhận được. Panel dùng `-l auto` nên nếu nó
-            nghe sai thứ tiếng thì cả bản chép là rác — mà không nói ra thì người
-            dùng chỉ biết sau khi đọc hết phụ đề. Đây cũng là chỗ duy nhất báo
-            được rằng luật cắt dòng đang theo nhóm nào. */}
-        {ket.ngonNgu && (
-          <>
-            {' '}
-            {/* ☠️ `'tiếng '` (CÓ dấu cách cuối) dịch sang EN là CHUỖI RỖNG:
-                tiếng Việt phải có chữ "tiếng" đằng trước ("tiếng Việt"), tiếng
-                Anh thì không ("Vietnamese"). Dấu cách nằm TRONG khoá, không nằm
-                ngoài `dich()` — xem ghi chú đầu `chu.ts`. */}
-            {dich('Nghe ra')}{' '}
-            <b>
-              {dich('tiếng ')}
-              {tenNgonNgu(ket.ngonNgu)}
-            </b>
-            {nhomNgonNgu(ket.ngonNgu) === 'cjk' && dich(' — cắt dòng theo chuẩn chữ vuông')}.
-          </>
-        )}
+        {/* [2.5.3] Khối "Nghe ra tiếng ..." ĐÃ GỠ — anh Tiến 24/08 khoanh đỏ.
+            ☠️ Đánh đổi phải biết: panel chạy `-l auto`, nghe nhầm thứ tiếng thì cả
+            bản chép là rác mà nay không còn chỗ nào báo. Ngôn ngữ vẫn nằm trong
+            `ket.ngonNgu` — cần bật lại chỉ là thêm mấy dòng JSX ở đây. */}
       </p>
       {/* ☠️ Chi hien TEN FILE. Anh Tien 30/07: *"ban thuong mai khong de
           nguoi dung biet minh dung gi va lam gi"* — duong dan day du vua dai
           vua bay ra cau truc thu muc. Day du nam trong tooltip, ai can thi re
           chuot. */}
+      {/* [2.5.3] Anh Tiến 24/08: *"chỗ link này okie nè, hãy cho anh đường link
+          kèm nút mở thẳng vào folder chứa nó luôn"*. Bấm là Explorer mở đúng thư
+          mục và bôi sáng sẵn file (`explorer /select,`). */}
       <p className="ketqua__duong" title={ket.duongDan}>
-        {ket.duongDan.split(/[\/]/).pop()}
+        <span className="ketqua__ten">{ket.duongDan.split(/[\/]/).pop()}</span>
+        <button
+          type="button"
+          className="btn btn--phu ketqua__mo"
+          title={ket.duongDan}
+          onClick={() => moThuMucChuaFile(ket.duongDan)}
+        >
+          {dich('Mở thư mục')}
+        </button>
       </p>
 
       {!!ket.soat?.soCho && (

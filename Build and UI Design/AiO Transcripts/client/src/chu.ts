@@ -159,6 +159,9 @@ export const CHU: BangChu = {
     'Thêm kiểu từ After Effects…': 'Add a style from After Effects…',
     // ─── [2.5.1] hai nut: Lam phu de / Lam hieu ung (anh Tien 22/08 dem) ───
     'Hiệu ứng': 'Effects',
+    // [2.5.3] Nhan DUY NHAT luc chay — giau quy trinh (xem `DangChay`).
+    'Đang xử lý': 'Loading',
+    'Mở thư mục': 'Show in folder',
     'Không mở được sequence đang chọn — bấm vào sequence đó trên timeline rồi chạy lại.':
       'Could not open the selected sequence — click that sequence on the timeline and run again.',
     'Làm hiệu ứng': 'Add effects',
