@@ -159,6 +159,8 @@ export const CHU: BangChu = {
     'Thêm kiểu từ After Effects…': 'Add a style from After Effects…',
     // ─── [2.5.1] hai nut: Lam phu de / Lam hieu ung (anh Tien 22/08 dem) ───
     'Hiệu ứng': 'Effects',
+    'Không mở được sequence đang chọn — bấm vào sequence đó trên timeline rồi chạy lại.':
+      'Could not open the selected sequence — click that sequence on the timeline and run again.',
     'Làm hiệu ứng': 'Add effects',
     'Mỗi caption là một graphic MOGRT — sửa chữ ngay trên graphic. Nặng hơn caption track, hợp short.':
       'Each caption becomes a MOGRT graphic — edit the text right on it. Heavier than a caption track; best for shorts.',

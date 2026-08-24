@@ -334,6 +334,20 @@ export default function App() {
   const [dsSeq, setDsSeq] = useState<{ id: string; ten: string; dangMo: boolean }[]>([])
   const idSeqChay = useRef('')
   /**
+   * [2.5.2] Sequence NGƯỜI DÙNG ĐANG THẤY trong ô chọn, cập nhật theo vòng thăm dò.
+   *
+   * ☠️ VẤP THẬT 24/08, đo được vì tình cờ chạy hai lượt liền nhau: panel hiện
+   * «AiO-test-E2E», bấm "Làm hiệu ứng" → **37 clip caption rơi sang sequence
+   * «test - autocut 1103»** của người dùng, mà panel vẫn báo thành công. Nguyên
+   * nhân: lượt chạy tự hỏi lại `app.project.activeSequence` NGAY LÚC BẤM, và
+   * Premiere lúc đó trả về sequence khác cái panel đang hiện (activeSequence bám
+   * theo tab timeline có tiêu điểm — thay đổi được mà panel không hề hay).
+   *
+   * Nay: bấm chạy là **ÉP MỞ đúng sequence trong ô chọn** rồi kiểm lại, xong mới
+   * đọc vùng. Đúng lời hứa ghi ngay trên ô chọn: "cái nhìn thấy = cái sẽ chạy".
+   */
+  const idSeqChonRef = useRef('')
+  /**
    * Biên lai của TỪNG sequence trong phiên panel này. Anh Tiến 30/07, lần hai:
    * *"anh đổi sequence thì thông tin ở panel cũng phải đổi cho giống chứ em"* —
    * cảnh báo "số liệu này của sequence khác" chỉ là nửa đường; đúng nghĩa là
@@ -407,6 +421,9 @@ export default function App() {
         const ds = await danhSachSequence()
         if (dung) return
         setDsSeq(ds)
+        // Người dùng bấm sang tab sequence khác trong Premiere thì ô chọn đi theo —
+        // và lượt chạy kế tiếp cũng đi theo (xem `idSeqChonRef`).
+        idSeqChonRef.current = ds.find((d) => d.dangMo)?.id ?? idSeqChonRef.current
         // [2.5.0] Vùng I/O đang chọn — hàm host NHẸ (đọc 4 con số, không duyệt
         // clip, đo ~1 ms ở Autocut). So mốc rồi mới setState để không vẽ lại
         // mỗi giây khi người dùng đứng yên. Bỏ khoanh vùng → xoá số cũ.
@@ -480,6 +497,21 @@ export default function App() {
         throw new Error(dich('Không nạp được host/index.jsx từ thư mục extension.'))
       }
 
+      // ── 0. ÉP ĐÚNG SEQUENCE ĐANG HIỆN TRONG Ô CHỌN ──
+      // ☠️ Vấp 24/08 (số đo ở `idSeqChonRef`): hỏi Premiere "đang mở cái gì" ngay
+      // lúc bấm là câu hỏi KHÔNG ĐÁNG TIN — nó trả về tab có tiêu điểm, có thể
+      // khác cái panel đang hiện, và caption rơi sang sequence của người dùng mà
+      // không báo gì. Ép mở đúng cái ô chọn đang hiện, rồi ĐỌC LẠI để chắc.
+      const idChon = idSeqChonRef.current
+      if (idChon) {
+        await moSequenceTheoId(idChon)
+        const idThat = (await danhSachSequence()).find((d) => d.dangMo)?.id ?? ''
+        if (idThat !== idChon)
+          throw new Error(
+            dich('Không mở được sequence đang chọn — bấm vào sequence đó trên timeline rồi chạy lại.'),
+          )
+      }
+
       // ── 1. Vùng anh khoanh bằng phím I / O ──
       const { vung, loi: loiVung } = await getRangeClips()
       if (!vung) {
@@ -493,7 +525,7 @@ export default function App() {
       // Và GHIM cả ID: mấy phút nghe hiểu là đủ để người dùng bấm sang
       // sequence khác — trước khi gắn phụ đề/marker sẽ kích hoạt lại đúng nó.
       const tenSeqLanNay = await tenSequenceDangMo()
-      idSeqChay.current = (await danhSachSequence()).find((d) => d.dangMo)?.id ?? ''
+      idSeqChay.current = idChon || ((await danhSachSequence()).find((d) => d.dangMo)?.id ?? '')
       if (tenSeqLanNay) {
         setTenSeqKet(tenSeqLanNay)
         tenSeqRef.current = tenSeqLanNay
@@ -876,6 +908,9 @@ export default function App() {
                     className="seqpick"
                     value={dsSeq.find((d) => d.dangMo)?.id ?? ''}
                     onChange={(e) => {
+                      // Ghi NGAY vào ref: chọn xong bấm chạy trong vòng một giây thì
+                      // vòng thăm dò chưa kịp cập nhật, lượt chạy sẽ lấy nhầm cái cũ.
+                      idSeqChonRef.current = e.target.value
                       void moSequenceTheoId(e.target.value).then((ok) => {
                         if (ok) void demLai()
                       })

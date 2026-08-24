@@ -317,6 +317,18 @@ chạy theo từ) · bộ kiểm **tất cả đạt** trên 5 bộ dữ liệu 
 >1920 px chữ không tự scale · Autocut chưa vá lỗi (6) (đóng băng, hỏi anh) · nút gỡ
 caption chưa nối UI.
 
+**☠️☠️ 2.5.2 (24/08) — `activeSequence` TỰ TRÔI, đọc TRƯỚC khi sửa bất cứ chỗ nào ghi lên timeline:**
+Bấm chạy khi panel đang hiện sequence A → caption rơi sang sequence B của người dùng, panel báo
+**thành công**. Gốc: `app.project.activeSequence` bám theo **tab Timeline có TIÊU ĐIỂM**, không
+theo cái script vừa đặt — đặt xong nó giữ tới khi cửa sổ Premiere lấy lại tiêu điểm rồi **tự quay
+về tab cũ, im lặng**. Đo lại được bằng bẫy: ép trỏ sang B rồi bấm ngay → vẫn ghi vào A (bản đã vá),
+nhưng đọc lại `activeSequence` ra B.
+→ Luật cho panel này (và mọi panel): **KHÔNG hỏi `activeSequence` để biết người dùng định làm ở
+đâu.** Giữ ID của cái đang hiện trong ô chọn (`idSeqChonRef`), trước khi ghi thì **ép mở + đọc lại
+kiểm**, lệch thì DỪNG. Chi tiết + bẫy tái lập: `PROGRESS.md` mục [2.5.2] và skill `adobe-cep-panel`.
+→ Kèm bài học quy trình: 22/08 đã báo "dọn sạch" nhưng chỉ dọn sequence **em tạo**; sequence của
+anh Tiến còn **56 clip caption** sót. **Dọn xong phải SOI CẢ PROJECT**, đừng chỉ soi phần mình tạo.
+
 **☠️ 2.5.1 (22/08 đêm) — HAI NÚT, và ba đường "native" ĐÃ ĐO CHẾT. Đọc trước khi đụng mục 9:**
 Anh Tiến chốt 22/08: *"chia thành 2 nút: Làm phụ đề / Làm hiệu ứng"*, *"editor cần sửa thì sửa
 trên graphic là đủ"* (tool KHÔNG đọc lại C1), và không muốn MOGRT từ AE vì *"nặng timeline"*.

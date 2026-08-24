@@ -1,5 +1,46 @@
 # AiO Transcript - Nhat ky
 
+## [2.5.2] - 2026-08-24 21:25 (UTC+7) - SUA GOC: caption roi sang SEQUENCE KHAC ma van bao thanh cong
+
+### Loi bat duoc (khi anh Tien bao "chay lai di em")
+Chay lai vong E2E thi lo ra: panel dang hien o chon = "AiO-test-E2E", bam "Lam hieu ung"
+-> **37 clip caption roi sang sequence "test - autocut 1103" CUA ANH TIEN**, panel bao
+thanh cong, khong mot dong loi. Soi ca project: sequence cua anh co **93 clip caption AiO**
+(56 sot tu phien 22/08 + 37 vua roi) — tuc 22/08 em da bao "don sach" nhung chi don sequence
+EM TAO, khong soi sequence cua anh.
+
+### Nguyen nhan goc (do duoc, khong doan)
+`app.project.activeSequence` **bam theo TAB TIMELINE DANG CO TIEU DIEM tren giao dien**, khong
+phai theo cai script vua dat. Dat bang `app.project.activeSequence = s` chi giu duoc **cho toi
+khi cua so Premiere lay lai tieu diem** — luc do no TU QUAY VE tab cu, im lang.
+- Bang chung 1: script chup man hinh (`ShowWindow` + `SetForegroundWindow`) chay xen giua hai
+  luot -> luot sau doc ra sequence khac.
+- Bang chung 2 (bay dung lai duoc): ep `activeSequence = AiO-BAY` roi bam ngay -> caption van
+  vao "AiO-MUC-TIEU" (ban da va), nhung **doc lai activeSequence sau do = AiO-BAY**.
+=> Panel cu tu hoi lai `activeSequence` NGAY LUC BAM (`idSeqChay = danhSachSequence().find(dangMo)`),
+nen an ngay cau tra loi sai. O chon sequence hua "cai nhin thay = cai se chay" nhung khong giu duoc.
+
+### Da sua
+- `App.tsx`: them `idSeqChonRef` (sequence NGUOI DUNG DANG THAY, vong tham do cap nhat, o chon
+  ghi ngay khi doi). Vao dau `lamPhuDe`: **EP MO** dung sequence do (`moSequenceTheoId`) roi
+  **DOC LAI kiem** truoc khi doc vung; lech thi bao loi va DUNG, khong ghi bua.
+- `chu.ts`: khoa loi moi (VI/EN).
+
+### Kiem chung (BAY dung lai duoc, hai sequence TU TAO — khong dung sequence cua anh)
+| Buoc | Ket qua |
+|---|---|
+| Tao AiO-BAY + AiO-MUC-TIEU (V1 trong, hinh V2, I/O 0-20) | o chon hien "AiO-MUC-TIEU" |
+| Ep Premiere tro sang AiO-BAY roi bam NGAY (cung mot nhip) | o chon luc bam van "AiO-MUC-TIEU" |
+| Ket qua | **82 clip caption vao AiO-MUC-TIEU**, AiO-BAY = **0 caption** |
+| Doc lai activeSequence sau do | "AiO-BAY" (chung minh no that su tu troi) |
+
+### Da don (so truoc/sau)
+- Sequence cua anh "test - autocut 1103": caption **93 -> 0**; clip hinh **20 -> 20**, clip tieng
+  **20 -> 20** (khong dung vao gi cua anh).
+- Xoa 3 sequence test tu tao (AiO-MUC-TIEU / AiO-BAY / AiO-test-E2E), root item **6 -> 5**.
+- Xoa 3 file .srt do test sinh ra; thu muc Source con 12 file, tat ca deu tu 22/08 (co san).
+- Mo lai dung sequence anh dang lam. KHONG luu project ho anh.
+
 ## [2.5.1] - 2026-08-22 23:47 (UTC+7) - HAI NUT Lam phu de / Lam hieu ung + va 6 loi vong soat + DO CHET 3 duong "native"
 
 ### Anh Tien chot 22/08 dem
