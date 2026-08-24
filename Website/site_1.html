@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AiO Studio — Header</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS — maps 1:1 to DESIGN-SYSTEM.md · §15 tokens.css
+   In production: drop this block and import tokens.css
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --bg-0:#0e0e0e; --bg-1:#141414; --bg-2:#181818; --bg-3:#1f1f1f;
+  --bg-4:#282828; --bg-5:#333333; --bg-6:#161616;
+  --line-1:rgb(255 255 255 /6%); --line-2:rgb(255 255 255 /10%); --line-strong:rgb(255 255 255 /16%);
+  --text-1:#f5f5f7; --text-2:#c3c3c8; --text-3:#8d8d95;
+
+  --accent:#f86820; --accent-hover:#ff7d3c; --accent-pressed:#e0590e;
+  --accent-soft:rgb(248 104 32 /16%); --accent-line:rgb(248 104 32 /40%);
+  --accent-on:#ffffff;
+
+  /* real Premiere colours — DESIGN-SYSTEM §1, used by the editor backdrop */
+  --pr-video:#729ACC; --pr-video-head:#5b7ea8; --pr-audio:#1D7021;
+  --pr-caption:#e8c05a; --pr-playhead:#8fd0ff;
+
+  --font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --shadow-md:0 8px 24px rgb(0 0 0 /45%); --shadow-pop:0 18px 52px rgb(0 0 0 /62%);
+  --dur:150ms; --ease:cubic-bezier(.32,.72,0,1);
+  --h-nav:60px;
+  --z-sticky:200; --z-modal:300;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg-0);color:var(--text-1);
+  font-family:var(--font-ui);-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-sm)}
+
+/* ═══════════════════════════════════════════════════════════════
+   1 · SCROLL PROGRESS — 2px, top edge of the viewport
+   ═══════════════════════════════════════════════════════════════ */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--accent-pressed),var(--accent),var(--accent-hover));
+  z-index:calc(var(--z-sticky) + 10);
+  transition:width 80ms linear;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2 · HEADER
+   ═══════════════════════════════════════════════════════════════ */
+.nav{
+  position:fixed;top:18px;left:50%;
+  width:min(1180px, calc(100% - 28px));
+  transform:translateX(-50%);
+  z-index:var(--z-sticky);
+  display:flex;align-items:center;gap:20px;
+  height:var(--h-nav);
+  padding:0 8px 0 18px;
+  border-radius:var(--r-pill);
+  border:1px solid var(--line-1);
+  background:rgb(20 20 20 /42%);
+  -webkit-backdrop-filter:blur(10px) saturate(150%);
+  backdrop-filter:blur(10px) saturate(150%);
+  transition:
+    width 520ms var(--ease), top 380ms var(--ease), height 380ms var(--ease),
+    background 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
+}
+/* scrolled state: narrower, more opaque, thin orange border */
+.nav.is-stuck{
+  top:10px;
+  width:min(920px, calc(100% - 28px));
+  height:54px;
+  background:rgb(18 18 18 /88%);
+  border-color:var(--line-2);
+  box-shadow:var(--shadow-pop), 0 0 0 1px rgb(248 104 32 /10%);
+}
+/* travelling orange border — only after scroll, kept restrained */
+.nav::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+  background:conic-gradient(from var(--ang), transparent 0deg, var(--accent-line) 40deg, transparent 110deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0;transition:opacity 400ms ease;pointer-events:none;
+}
+.nav.is-stuck::before{opacity:1;animation:spin 6s linear infinite}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin{to{--ang:360deg}}
+
+/* ── brand ── */
+.brand{display:flex;align-items:center;gap:10px;flex:none}
+.brand .mark{
+  width:26px;height:26px;flex:none;
+  filter:drop-shadow(0 0 10px rgb(248 104 32 /35%));
+  transition:transform 420ms var(--ease), filter 320ms ease;
+}
+.brand:hover .mark{transform:scale(1.08) rotate(-4deg);filter:drop-shadow(0 0 16px rgb(248 104 32 /60%))}
+.brand .word{font-size:16px;font-weight:700;letter-spacing:-.015em}
+.brand .word i{font-style:normal;font-weight:400;color:var(--text-2)}
+
+/* ── links + sliding indicator ── */
+.links{position:relative;display:flex;align-items:center;gap:2px;margin-left:auto;margin-right:auto}
+.links a{
+  position:relative;z-index:1;
+  padding:9px 14px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:500;color:var(--text-2);
+  transition:color var(--dur) var(--ease);
+  white-space:nowrap;
+}
+.links a:hover,.links a[aria-current]{color:var(--text-1)}
+.links a[aria-current]{font-weight:600}
+.ink{
+  position:absolute;top:50%;left:0;height:34px;width:0;
+  transform:translateY(-50%);
+  border-radius:var(--r-pill);
+  background:rgb(255 255 255 /7%);
+  border:1px solid var(--line-1);
+  opacity:0;pointer-events:none;
+  transition:left 380ms var(--ease), width 380ms var(--ease), opacity 200ms ease;
+}
+.ink.on{opacity:1}
+
+/* ── actions ── */
+.actions{display:flex;align-items:center;gap:8px;flex:none}
+.lang{
+  position:relative;display:flex;align-items:center;flex:none;
+  height:32px;padding:3px;border-radius:var(--r-pill);
+  background:var(--bg-4);border:1px solid var(--line-1);
+}
+.lang-ink{
+  position:absolute;top:3px;left:3px;height:26px;width:38px;border-radius:var(--r-pill);
+  background:var(--accent);box-shadow:0 2px 8px -3px rgb(248 104 32 /80%);
+  transition:transform 320ms var(--ease);
+}
+.lang-btn{
+  position:relative;z-index:1;width:38px;height:26px;border-radius:var(--r-pill);
+  font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.04em;
+  color:var(--text-3);transition:color 220ms var(--ease);
+}
+.lang-btn:hover{color:var(--text-2)}
+.lang-btn[aria-pressed="true"]{color:var(--accent-on);font-weight:600}
+.lang-btn[aria-pressed="true"]:hover{color:var(--accent-on)}
+
+.ghost{
+  padding:9px 14px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:500;color:var(--text-2);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.ghost:hover{background:rgb(255 255 255 /5%);color:var(--text-1)}
+
+.cta{
+  position:relative;overflow:hidden;
+  display:inline-flex;align-items:center;gap:8px;
+  height:42px;padding:0 20px;border-radius:var(--r-pill);
+  background:var(--accent);color:var(--accent-on);
+  font-size:14px;font-weight:700;letter-spacing:-.005em;
+  box-shadow:0 6px 18px -8px rgb(248 104 32 /70%);
+  transition:background var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.cta:hover{background:var(--accent-hover);box-shadow:0 10px 26px -8px rgb(248 104 32 /85%)}
+.cta:active{background:var(--accent-pressed);transform:translateY(1px)}
+.cta svg{width:15px;height:15px;transition:transform 260ms var(--ease)}
+.cta:hover svg{transform:translateX(3px)}
+/* shine sweeping across the button */
+.cta::after{
+  content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;
+  background:linear-gradient(100deg,transparent,rgb(255 255 255 /38%),transparent);
+  transform:skewX(-18deg);
+}
+.cta:hover::after{animation:sweep 850ms var(--ease)}
+@keyframes sweep{to{left:150%}}
+
+/* ── menu button (mobile) ── */
+.burger{
+  display:none;width:42px;height:42px;border-radius:var(--r-pill);
+  align-items:center;justify-content:center;
+  border:1px solid var(--line-1);
+}
+.burger:hover{background:rgb(255 255 255 /5%)}
+.burger span{display:block;width:16px;height:1.5px;background:var(--text-1);border-radius:2px;transition:transform 300ms var(--ease),opacity 200ms}
+.burger span+span{margin-top:4px}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+/* ── mobile menu sheet ── */
+.sheet{
+  position:fixed;inset:0;z-index:calc(var(--z-sticky) - 1);
+  background:rgb(14 14 14 /92%);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;justify-content:center;gap:6px;
+  padding:0 28px;
+  opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 280ms;
+}
+.sheet.open{opacity:1;visibility:visible}
+.sheet a{
+  font-size:28px;font-weight:700;letter-spacing:-.02em;padding:12px 0;
+  border-bottom:1px solid var(--line-1);
+  opacity:0;transform:translateY(12px);
+}
+.sheet.open a{animation:sheetIn 420ms var(--ease) forwards}
+.sheet.open a:nth-child(2){animation-delay:50ms}
+.sheet.open a:nth-child(3){animation-delay:100ms}
+.sheet.open a:nth-child(4){animation-delay:150ms}
+@keyframes sheetIn{to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════════════════════════
+   3 · HERO + EDITOR BACKDROP
+   ═══════════════════════════════════════════════════════════════ */
+.hero{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center}
+/* wrapper nền — chỉnh vị trí / độ mờ / tắt hẳn nền chỉ cần sửa ở đây */
+.hero-bg{position:absolute;inset:0;pointer-events:none}
+
+/* ── backdrop: mock NLE window ── */
+.editor{
+  position:absolute;left:50%;top:50%;
+  width:min(1560px,100%);aspect-ratio:16/9.1;
+  transform:translate(-50%,-50%) perspective(2200px) rotateX(4deg) scale(1);
+  transform-origin:50% 50%;
+  opacity:.72;filter:saturate(.85);
+  will-change:transform;
+}
+.veil{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg, rgb(14 14 14 /97%) 0%, rgb(14 14 14 /90%) 24%, rgb(14 14 14 /45%) 42%, rgb(14 14 14 /10%) 62%, rgb(14 14 14 /18%) 100%),
+    radial-gradient(52% 48% at 20% 46%, rgb(14 14 14 /92%) 0%, rgb(14 14 14 /50%) 58%, transparent 100%),
+    linear-gradient(180deg, rgb(14 14 14 /92%) 0%, transparent 18%, transparent 66%, rgb(14 14 14 /94%) 100%);
+}
+/* orange glow behind the headline — the ONLY accent moment */
+.glow{
+  position:absolute;left:26%;top:46%;width:820px;height:560px;
+  transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(closest-side, rgb(248 104 32 /15%), transparent 72%);
+  filter:blur(14px);
+}
+
+/* NLE window chrome */
+.nle{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  border:1px solid var(--line-2);border-radius:14px;
+  background:var(--bg-2);overflow:hidden;
+  box-shadow:0 60px 140px -50px #000;
+}
+
+/* --- top bar --- */
+.nle-top{
+  height:38px;flex:none;display:flex;align-items:center;gap:16px;
+  padding:0 14px;background:var(--bg-1);border-bottom:1px solid var(--line-1);
+}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--bg-4)}
+.menus{display:flex;gap:14px;font-size:11px;color:var(--text-3)}
+.wtabs{margin-left:auto;display:flex;gap:4px}
+.wtabs span{
+  font-size:11px;color:var(--text-3);padding:4px 10px;border-radius:var(--r-sm);
+}
+.wtabs .on{background:var(--bg-3);color:var(--text-1)}
+
+/* --- middle row: 3 panels --- */
+.nle-mid{flex:1;display:grid;grid-template-columns:200px 1fr;gap:1px;background:var(--line-1);min-height:0}
+.panel{background:var(--bg-2);display:flex;flex-direction:column;min-height:0}
+.ptitle{
+  height:26px;flex:none;display:flex;align-items:center;gap:6px;
+  padding:0 10px;font-size:10.5px;color:var(--text-3);
+  border-bottom:1px solid var(--line-1);background:var(--bg-1);
+}
+.ptitle b{color:var(--text-2);font-weight:500}
+
+/* Project panel */
+.bins{padding:0}
+.bin-list{padding:8px 8px;display:flex;flex-direction:column;gap:5px;overflow:hidden}
+.bin{
+  display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:var(--r-sm);
+  font-size:10.5px;color:var(--text-3);
+}
+.bin.sel{background:var(--bg-3);color:var(--text-2)}
+.swatch{width:8px;height:8px;border-radius:2px;flex:none}
+.bin .len{margin-left:auto;font-family:var(--font-mono);font-size:9.5px;opacity:.7}
+
+/* Program Monitor panel */
+.monitor{align-items:stretch}
+.screen{
+  flex:1;margin:12px;border-radius:var(--r-md);background:var(--bg-0);
+  position:relative;overflow:hidden;border:1px solid var(--line-1);
+}
+.frame-img{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(62% 72% at 42% 36%, #6d6d76 0%, #3f3f46 46%, #202024 100%);
+}
+.frame-img::after{ /* abstract figure */
+  content:"";position:absolute;left:50%;bottom:-6%;width:34%;height:66%;
+  transform:translateX(-50%);
+  background:radial-gradient(50% 38% at 50% 22%, #6a6a72 0%, #45454b 60%, transparent 62%),
+             radial-gradient(46% 62% at 50% 100%, #53535a 0%, transparent 72%);
+}
+/* 9:16 guide frame — the Auto Re-Frames product */
+.guide916{
+  position:absolute;top:6%;bottom:6%;left:50%;transform:translateX(-50%);
+  aspect-ratio:9/16;border:1.5px solid var(--accent);border-radius:3px;
+  box-shadow:0 0 0 9999px rgb(14 14 14 /34%);
+}
+.guide916::before,.guide916::after{
+  content:"";position:absolute;left:6%;right:6%;height:1px;background:rgb(248 104 32 /35%);
+}
+.guide916::before{top:8%} .guide916::after{bottom:8%}
+/* safe area — the Guide Frame product */
+.safe{position:absolute;inset:7% 9%;border:1px dashed rgb(255 255 255 /13%);border-radius:2px}
+.safe::before{content:"";position:absolute;inset:4% 5%;border:1px dashed rgb(255 255 255 /8%);border-radius:2px}
+/* tay nắm 4 góc + nhãn tỉ lệ trên khung 9:16 */
+.gc{position:absolute;width:11px;height:11px;border:2px solid var(--accent)}
+.gc.tl{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.gc.tr{top:-1px;right:-1px;border-left:0;border-bottom:0}
+.gc.bl{bottom:-1px;left:-1px;border-right:0;border-top:0}
+.gc.br{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.gchip{
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-mono);font-size:8px;line-height:1;font-weight:600;
+  color:var(--accent-on);background:var(--accent);padding:3px 5px;border-radius:3px;
+}
+/* điểm bám chủ thể */
+.trackdot{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.trackdot i{
+  width:9px;height:9px;border-radius:50%;flex:none;
+  border:2px solid var(--accent);box-shadow:0 0 0 4px rgb(248 104 32 /16%);
+  animation:lock 3.4s var(--ease) infinite;
+}
+@keyframes lock{0%,100%{transform:scale(1)}50%{transform:scale(1.28)}}
+.trackdot b{
+  font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--accent);
+  background:rgb(14 14 14 /78%);padding:2px 5px;border-radius:3px;
+}
+/* thanh tua dưới monitor */
+.scrub{position:absolute;left:9px;right:9px;bottom:7px;height:3px;border-radius:2px;background:rgb(255 255 255 /11%)}
+.scrub i{display:block;height:100%;width:36%;border-radius:2px;background:var(--pr-playhead);opacity:.75}
+.scrub b{position:absolute;left:36%;top:-3.5px;width:2px;height:10px;border-radius:1px;background:var(--pr-playhead)}
+
+/* burned-in caption — the Transcripts product */
+.sub{
+  position:absolute;left:50%;bottom:9%;transform:translateX(-50%);
+  font-size:10px;font-weight:600;color:#fff;white-space:nowrap;
+  background:rgb(0 0 0 /55%);padding:3px 8px;border-radius:3px;
+}
+.transport{
+  height:26px;flex:none;display:flex;align-items:center;gap:12px;justify-content:center;
+  border-top:1px solid var(--line-1);background:var(--bg-1);
+  font-family:var(--font-mono);font-size:10px;color:var(--text-3);
+}
+.transport svg{width:11px;height:11px;color:var(--text-2)}
+
+/* Effect Controls panel */
+/* đồ thị sóng + đường ngưỡng — cho thấy "Silence threshold" nghĩa là gì */
+.fx-graph{
+  position:relative;height:44px;margin:10px 10px 0;padding:0 4px;
+  display:flex;align-items:flex-end;gap:1px;overflow:hidden;
+  border-radius:var(--r-sm);background:var(--bg-0);border:1px solid var(--line-1);
+}
+.fx-graph b{flex:1;border-radius:1px 1px 0 0;background:#4e5a49;align-self:flex-end}
+.fx-graph b.low{background:rgb(248 104 32 /45%)}
+.fx-graph .thr{position:absolute;left:0;right:0;bottom:38%;height:1px;background:var(--accent);opacity:.85}
+.fx-graph .thr::after{
+  content:"";position:absolute;right:4px;top:-3px;width:5px;height:5px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 3px rgb(248 104 32 /22%);
+}
+.fx-graph .thr::before{
+  content:"-32 dB";position:absolute;left:5px;top:-11px;
+  font-family:var(--font-mono);font-size:7.5px;color:var(--accent);
+}
+.fx-btn{
+  display:block;width:calc(100% - 20px);margin:11px 10px 0;height:26px;
+  border-radius:var(--r-sm);background:var(--accent);color:var(--accent-on);
+  font-size:10.5px;font-weight:700;letter-spacing:-.005em;
+}
+.fx-note{margin:8px 10px 0;font-family:var(--font-mono);font-size:9px;color:var(--text-3)}
+
+.fx-list{padding:10px;display:flex;flex-direction:column;gap:11px}
+.fx-row{display:flex;flex-direction:column;gap:5px}
+.fx-row span{font-size:10px;color:var(--text-3);display:flex;justify-content:space-between}
+.fx-row span em{font-style:normal;font-family:var(--font-mono);color:var(--text-2)}
+.slider{height:3px;border-radius:2px;background:var(--bg-4);position:relative}
+.slider i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--accent)}
+.slider i::after{
+  content:"";position:absolute;right:-5px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;background:var(--text-2);
+}
+
+/* --- timeline --- */
+.nle-tl{flex:none;height:36%;background:var(--bg-2);border-top:1px solid var(--line-2);position:relative;display:flex;flex-direction:column}
+.ruler{
+  height:22px;flex:none;position:relative;
+  border-bottom:1px solid var(--line-1);background:var(--bg-1);
+  padding-left:52px;
+}
+.ruler .tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line-1)}
+.ruler .tc{
+  position:absolute;top:5px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);
+  transform:translateX(4px);
+}
+.tracks{flex:1;display:flex;flex-direction:column;min-height:0}
+.track{flex:1;display:flex;min-height:0;border-bottom:1px solid var(--line-1)}
+.thead{
+  width:52px;flex:none;display:flex;align-items:center;gap:5px;padding-left:9px;
+  background:var(--bg-1);border-right:1px solid var(--line-1);
+  font-size:9.5px;font-weight:600;color:var(--text-3);
+}
+.thead b{width:5px;height:5px;border-radius:50%;background:var(--bg-5)}
+.lane{flex:1;position:relative;background:
+  repeating-linear-gradient(90deg, transparent 0 39px, rgb(255 255 255 /2%) 39px 40px);}
+
+/* clip */
+.clip{position:absolute;top:3px;bottom:3px;border-radius:3px;overflow:hidden}
+.clip .head{position:absolute;top:0;left:0;right:0;height:5px}
+.clip .name{
+  position:absolute;left:5px;top:7px;font-size:8.5px;font-weight:500;
+  color:rgb(255 255 255 /80%);white-space:nowrap;overflow:hidden;
+}
+.clip.v{background:var(--pr-video)} .clip.v .head{background:var(--pr-video-head)}
+.clip.a{background:var(--pr-audio)}
+.clip.c{background:var(--pr-caption)}
+.clip.c .name{color:rgb(0 0 0 /70%);top:3px;font-weight:600}
+.clip.sel{outline:1.5px solid var(--accent);outline-offset:-1px;box-shadow:0 0 12px rgb(248 104 32 /45%)}
+.wave{position:absolute;left:2px;right:2px;bottom:3px;top:8px;display:flex;align-items:center;gap:1px}
+.wave i{flex:1;background:rgb(255 255 255 /45%);border-radius:1px}
+
+/* removed silence — the Autocut product */
+.gap{
+  position:absolute;top:0;bottom:0;
+  background:repeating-linear-gradient(45deg, rgb(248 104 32 /9%) 0 4px, transparent 4px 8px);
+  border-left:1px dashed rgb(248 104 32 /45%);border-right:1px dashed rgb(248 104 32 /45%);
+}
+
+/* playhead — light blue, as in Premiere */
+.playhead{
+  position:absolute;top:0;bottom:0;width:1.5px;background:var(--pr-playhead);
+  left:8%;z-index:3;box-shadow:0 0 8px rgb(143 208 255 /55%);
+  animation:scrub 30s cubic-bezier(.5,0,.5,1) infinite alternate;
+}
+.playhead::before{
+  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-top:9px solid var(--pr-playhead);
+}
+@keyframes scrub{from{left:9%}to{left:88%}}
+
+/* render bar */
+.renderbar{position:absolute;left:52px;right:0;top:22px;height:2px;background:transparent;z-index:2}
+.renderbar i{display:block;height:100%;width:62%;background:var(--accent);opacity:.55}
+
+
+/* floating AiO panel — the "progress" component from DESIGN-SYSTEM §5 */
+.aio-pop{
+  position:absolute;right:5%;top:50%;transform:translateY(-50%);width:314px;z-index:3;
+  background:var(--bg-3);border:1px solid var(--line-2);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-pop);padding:12px 13px;
+}
+.ap-head{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text-1)}
+.ap-head svg{width:13px;height:13px;fill:var(--accent)}
+.ap-head b{margin-left:auto;font-family:var(--font-mono);font-size:9.5px;font-weight:500;
+  color:var(--accent);background:var(--accent-soft);border-radius:var(--r-pill);padding:2px 6px}
+.ap-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:13px;
+  font-size:11px;color:var(--text-3)}
+.ap-row em{font-style:normal;font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text-1)}
+.ap-bar{height:5px;border-radius:2px;background:var(--bg-0);margin-top:6px;overflow:hidden}
+.ap-bar i{display:block;height:100%;border-radius:2px;background:var(--accent);
+  animation:fill 9s cubic-bezier(.32,.72,0,1) infinite}
+@keyframes fill{0%{width:6%}70%{width:83%}100%{width:96%}}
+.ap-meta{margin-top:9px;font-size:10px;color:var(--text-3);line-height:1.5}
+.ap-meta u{text-decoration:none;color:var(--text-2)}
+@media (max-width:900px){ .aio-pop{position:static;transform:none;width:auto;margin:26px 0 0;max-width:340px} }
+
+/* ── hero content ── */
+.hero-in{position:relative;z-index:2;width:min(1180px,calc(100% - 48px));margin:0 auto;padding-top:60px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:22px;
+}
+h1{
+  font-size:clamp(48px,7.2vw,104px);line-height:.96;font-weight:800;
+  letter-spacing:-.038em;color:var(--text-1);
+}
+h1 em{font-style:normal;color:var(--accent);display:block}
+/* lede: conversational, hard-locked to 2 lines */
+.lede{
+  margin-top:26px;font-size:17px;line-height:1.55;color:var(--text-2);
+  max-width:52ch;height:53px;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.btn-lg{
+  display:inline-flex;align-items:center;gap:9px;height:52px;padding:0 26px;
+  border-radius:var(--r-pill);font-size:15px;font-weight:700;
+}
+.btn-lg.primary{background:var(--accent);color:var(--accent-on);box-shadow:0 10px 30px -10px rgb(248 104 32 /75%)}
+.btn-lg.primary:hover{background:var(--accent-hover)}
+.btn-lg.secondary{border:1px solid var(--line-2);color:var(--text-1)}
+.btn-lg.secondary:hover{background:rgb(255 255 255 /5%);border-color:var(--line-strong)}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   5 · ROTATING HEADLINE — 8 words for 8 plugins, swapped in place
+   ═══════════════════════════════════════════════════════════════ */
+h1{font-size:clamp(44px,6.6vw,96px)}
+.h-line{position:relative;display:flex;align-items:center;gap:24px;min-height:.96em}
+.h-line:last-child{padding-bottom:.14em}
+.h-line .w{display:block;white-space:nowrap}
+.h-line .w.out{position:absolute;left:0;top:0;width:100%;pointer-events:none}
+.h-line .w b{display:inline-block;font-weight:inherit;will-change:transform,opacity,filter}
+.w.in b{animation:wIn 640ms var(--ease) both}
+.w.out b{animation:wOut 460ms var(--ease) both}
+@keyframes wIn{from{opacity:0;transform:translateY(.44em) scale(.965);filter:blur(7px)}
+               to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes wOut{from{opacity:1;transform:none;filter:blur(0)}
+                to{opacity:0;transform:translateY(-.4em) scale(.98);filter:blur(7px)}}
+
+/* plugin label matching the word on that line */
+.h-tag{
+  flex:none;display:flex;align-items:center;gap:12px;white-space:nowrap;
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.03em;color:var(--text-3);
+}
+.h-tag .rule{width:40px;height:1px;flex:none;background:linear-gradient(90deg,transparent,var(--line-strong))}
+.h-tag .tname{transition:opacity 260ms ease,transform 380ms var(--ease)}
+.h-tag.swap .tname{opacity:0;transform:translateY(6px)}
+
+/* "Automated." — shine sweeping through the text + underline drawing in */
+.auto{
+  display:inline-block;position:relative;color:var(--accent);
+  background:linear-gradient(100deg,var(--accent) 0%,var(--accent) 34%,#ffe3ce 46%,var(--accent) 59%,var(--accent) 100%);
+  background-size:280% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:sheen 5.4s ease-in-out infinite;
+}
+@keyframes sheen{0%{background-position:135% 0}58%,100%{background-position:-35% 0}}
+.auto::after{
+  content:"";position:absolute;left:.02em;right:.16em;bottom:-.13em;height:.05em;border-radius:99px;
+  background:var(--accent);opacity:.85;transform:scaleX(0);transform-origin:0 50%;
+  animation:ruleDraw 5.4s var(--ease) infinite;
+}
+@keyframes ruleDraw{0%{transform:scaleX(0);transform-origin:0 50%}
+                    16%,74%{transform:scaleX(1);transform-origin:0 50%}
+                    100%{transform:scaleX(0);transform-origin:100% 50%}}
+
+/* marks showing position in the 8-plugin cycle */
+.steps{display:flex;gap:6px;margin-top:34px}
+.steps i{width:18px;height:2px;border-radius:2px;background:var(--line-2);
+  transition:background 320ms ease,width 320ms var(--ease)}
+.steps i.on{background:var(--accent);width:30px}
+
+@media (max-width:900px){ .h-tag{display:none} }
+@media (prefers-reduced-motion:reduce){ .auto::after{display:none} }
+
+/* ═══════════════════════════════════════════════════════════════
+   6 · MỤC TÍNH NĂNG — 8 plugin, icon 3D lấy từ màn hình Welcome
+   ═══════════════════════════════════════════════════════════════ */
+.features{
+  position:relative;padding:110px 0 120px;scroll-margin-top:90px;
+  background:linear-gradient(180deg,var(--bg-0) 0%,var(--bg-2) 45%,var(--bg-0) 100%);
+}
+.features-in{width:min(1180px,calc(100% - 48px));margin:0 auto}
+.sec-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+.sec-head{position:relative;text-align:center}
+/* quầng cam sau tiêu đề mục, cùng ngôn ngữ với hero nhưng nhạt hơn */
+.sec-head::before{
+  content:"";position:absolute;left:50%;top:52%;width:760px;height:360px;
+  transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(closest-side, rgb(248 104 32 /13%), transparent 74%);
+  filter:blur(12px);
+}
+.sec-head > *{position:relative}
+.sec-title{
+  margin-top:16px;font-size:clamp(38px,4.9vw,64px);line-height:1.03;
+  font-weight:800;letter-spacing:-.035em;color:var(--text-1);
+  text-wrap:balance;
+}
+/* dòng thứ hai nhận màu nhấn — cùng nhịp với "Automated." ở hero */
+.sec-title em{
+  font-style:normal;color:var(--accent);
+  text-shadow:0 0 44px rgb(248 104 32 /30%);
+}
+.sec-lede{margin:14px auto 0;font-size:16px;line-height:1.55;color:var(--text-2);max-width:52ch}
+
+.feat-grid{scroll-margin-top:104px;margin-top:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.feat{
+  position:relative;display:flex;flex-direction:column;min-height:312px;
+  padding:20px 20px 16px;border-radius:var(--r-lg);
+  background:linear-gradient(180deg,var(--bg-3) 0%,var(--bg-2) 100%);
+  border:1px solid var(--line-1);
+  transition:border-color 220ms var(--ease), transform 220ms var(--ease), box-shadow 220ms var(--ease);
+}
+.feat::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 70% at 50% 0%, rgb(248 104 32 /9%) 0%, rgb(248 104 32 /0) 60%);
+  opacity:0;transition:opacity 220ms ease;
+}
+.feat:hover::before{opacity:1}
+
+/* thẻ hiện dần khi cuộn tới, lệch nhau theo thứ tự */
+.feat{opacity:0;transform:translateY(22px)}
+.feat.in{opacity:1;transform:none;transition-delay:calc(var(--i,0) * 55ms)}
+.feat.in:hover{border-color:var(--accent-line);transform:translateY(-4px);box-shadow:var(--shadow-pop);transition-delay:0ms;transition-duration:220ms}
+
+/* quầng cam sau icon — chỉ bật khi rê chuột */
+/* danh sách chi tiết từng tool */
+.feat-list{margin:0 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.feat-list li{
+  position:relative;padding-left:17px;font-size:12.5px;line-height:1.42;
+  color:var(--text-3);transition:color 220ms var(--ease);
+}
+.feat-list li::before{
+  content:"";position:absolute;left:1px;top:.52em;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);opacity:.65;transition:opacity 220ms var(--ease),transform 260ms var(--ease);
+}
+.feat:hover .feat-list li{color:var(--text-2)}
+.feat:hover .feat-list li::before{opacity:1;transform:scale(1.15)}
+
+.feat-art{position:relative}
+.feat-art::before{
+  content:"";position:absolute;left:50%;top:54%;width:200px;height:140px;
+  transform:translate(-50%,-50%) scale(.65);
+  background:radial-gradient(closest-side, rgb(248 104 32 /26%), transparent 72%);
+  filter:blur(8px);opacity:0;pointer-events:none;
+  transition:opacity 340ms ease, transform 480ms var(--ease);
+}
+.feat:hover .feat-art::before{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* icon trôi lơ lửng · rê chuột thì nhấc hẳn lên và nghiêng nhẹ */
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.feat-art svg{
+  position:relative;transform-origin:50% 72%;
+  animation:floaty 7s ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * -.62s);
+  transition:transform 480ms var(--ease), filter 480ms ease;
+}
+.feat:hover .feat-art svg{
+  animation:none;
+  transform:translateY(-4px);
+  filter:drop-shadow(0 16px 22px rgb(0 0 0 /50%));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7 · MỖI TOOL MỘT CHUYỂN ĐỘNG RIÊNG — diễn tả đúng việc nó làm
+   ═══════════════════════════════════════════════════════════════ */
+.feat-art svg [class^="fx-"]{
+  transform-box:fill-box;transform-origin:center;
+  transition:transform 560ms var(--ease), opacity 380ms ease, filter 380ms ease;
+}
+
+/* 1 · Power Bins — nắp bật lên, tia sét sáng bùng */
+.feat[data-fx="bins"] .fx-lid{transform-origin:20% 90%}
+.feat[data-fx="bins"]:hover .fx-lid{transform:translateY(-13px) rotate(-7deg)}
+.feat[data-fx="bins"]:hover .fx-bolt{transform:scale(1.14);filter:drop-shadow(0 0 12px rgb(255 214 170 /70%))}
+
+/* 2 · Asset Manager — ba thư mục xoè ra như bài trên tay */
+.feat[data-fx="assets"]:hover .fx-fa{transform:translate(-11px,-6px) rotate(-6deg)}
+.feat[data-fx="assets"]:hover .fx-fb{transform:translate(-3px,-2px) rotate(-2deg)}
+.feat[data-fx="assets"]:hover .fx-fc{transform:translate(9px,4px) rotate(3deg)}
+
+/* 3 · Auto Silent Cut — hai cụm sóng khép lại đúng chỗ vừa bị cắt, kéo xoay */
+.feat[data-fx="cut"]:hover .fx-left{transform:translateX(13px)}
+.feat[data-fx="cut"]:hover .fx-right{transform:translateX(-13px)}
+.feat[data-fx="cut"]:hover .fx-coin{transform:rotate(-20deg) scale(1.1)}
+
+/* 4 · Sound Design — vặn núm, cột trên màn nhảy theo nhạc */
+.feat[data-fx="sound"]:hover .fx-knob{transform:rotate(42deg)}
+@keyframes eq{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.45)}}
+.feat[data-fx="sound"]:hover .fx-bars rect{
+  transform-box:fill-box;transform-origin:50% 100%;
+  animation:eq 780ms ease-in-out infinite;
+}
+.feat[data-fx="sound"]:hover .fx-bars rect:nth-child(2){animation-delay:.1s}
+.feat[data-fx="sound"]:hover .fx-bars rect:nth-child(3){animation-delay:.22s}
+.feat[data-fx="sound"]:hover .fx-bars rect:nth-child(4){animation-delay:.32s}
+
+/* 5 · Auto Reframes — khung crop bóp vào tỉ lệ dọc, nút play nảy lên */
+.feat[data-fx="reframe"]:hover .fx-crop{transform:scaleX(.72)}
+.feat[data-fx="reframe"]:hover .fx-play{transform:scale(1.14) translateY(-3px)}
+
+/* 6 · Auto Podcast — sóng hai bên nhấp nhô như đồng hồ mức, mic nhích lên */
+@keyframes vu{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.4)}}
+.feat[data-fx="podcast"]:hover .fx-wave rect{
+  transform-box:fill-box;transform-origin:50% 50%;
+  animation:vu 860ms ease-in-out infinite;
+}
+.feat[data-fx="podcast"]:hover .fx-wave rect:nth-child(2n){animation-delay:.14s}
+.feat[data-fx="podcast"]:hover .fx-wave rect:nth-child(3n){animation-delay:.28s}
+.feat[data-fx="podcast"]:hover .fx-wave rect:nth-child(5n){animation-delay:.42s}
+.feat[data-fx="podcast"]:hover .fx-mic{transform:translateY(-5px)}
+
+/* 7 · Auto Short Clip — ô chọn quét sang khung khác, kéo bám theo */
+.feat[data-fx="shorts"] .fx-sel,
+.feat[data-fx="shorts"] .fx-coin{transform-box:view-box}
+.feat[data-fx="shorts"]:hover .fx-sel{transform:translateX(-52px)}
+.feat[data-fx="shorts"]:hover .fx-coin{transform:translateX(-52px) rotate(-16deg)}
+
+/* 8 · Auto Transcripts — chữ chạy ra như đang gõ, bong bóng nảy */
+.feat[data-fx="scripts"] .fx-lines path{stroke-dasharray:200;stroke-dashoffset:0}
+@keyframes typing{from{stroke-dashoffset:200}to{stroke-dashoffset:0}}
+.feat[data-fx="scripts"]:hover .fx-lines path{animation:typing 900ms var(--ease) both}
+.feat[data-fx="scripts"]:hover .fx-bubble{transform:scale(1.07) translate(3px,-3px)}
+
+.feat-head{display:flex;align-items:center;gap:9px}
+.feat-ic{width:18px;height:18px;flex:none;color:var(--accent)}
+.feat-title{font-size:16px;font-weight:600;color:var(--accent);letter-spacing:-.01em}
+.feat-desc{margin-top:8px;font-size:13px;line-height:1.5;color:var(--text-3);
+  height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feat-art{flex:1;display:flex;align-items:center;justify-content:center;padding:6px 0 16px;min-height:132px}
+.feat-art svg{width:100%;max-width:168px;height:auto;display:block}
+.feat-open{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:10px 13px;border-radius:var(--r-md);
+  background:transparent;border:1px solid var(--line-2);
+  color:var(--text-2);font-family:inherit;font-size:14px;font-weight:500;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.feat-open svg{width:14px;height:14px;opacity:.75;transition:transform var(--dur) var(--ease)}
+.feat-open:hover{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-text)}
+.feat-open:hover svg{transform:translate(2px,-2px)}
+
+@media (max-width:1100px){ .feat-grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:620px){ .feat-grid{grid-template-columns:1fr;gap:16px} .features{padding:72px 0 84px} }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   8 · BẢNG GIÁ — 3 gói, gói giữa là gói muốn bán
+   ═══════════════════════════════════════════════════════════════ */
+.pricing{position:relative;padding:110px 0 130px;scroll-margin-top:90px;background:var(--bg-0)}
+.pricing-in{width:min(1180px,calc(100% - 48px));margin:0 auto}
+.plan-grid{margin-top:52px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+.plan{
+  position:relative;display:flex;flex-direction:column;
+  padding:28px 26px 26px;border-radius:var(--r-lg);
+  background:linear-gradient(180deg,var(--bg-3) 0%,var(--bg-2) 100%);
+  border:1px solid var(--line-1);
+  transition:border-color 220ms var(--ease),transform 220ms var(--ease),box-shadow 220ms var(--ease);
+}
+.plan:hover{border-color:var(--line-2);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.plan.is-best{
+  border-color:var(--accent-line);
+  background:linear-gradient(180deg,rgb(40 30 24) 0%,var(--bg-2) 62%);
+  box-shadow:var(--shadow-pop), 0 0 0 1px rgb(248 104 32 /12%);
+}
+.plan.is-best:hover{border-color:var(--accent);transform:translateY(-5px)}
+.plan-badge{
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;white-space:nowrap;
+  color:var(--accent-on);background:var(--accent);padding:5px 11px;border-radius:var(--r-pill);
+  box-shadow:0 6px 16px -6px rgb(248 104 32 /80%);
+}
+.plan-name{font-size:17px;font-weight:700;letter-spacing:-.015em;color:var(--text-1)}
+.plan-for{margin-top:5px;font-size:13px;line-height:1.45;color:var(--text-3);min-height:38px}
+.plan-price{display:flex;align-items:baseline;gap:3px;margin-top:18px}
+.plan-price .cur{font-size:22px;font-weight:600;color:var(--text-2);align-self:flex-start;margin-top:6px}
+.plan-price .num{font-size:52px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--text-1)}
+.plan.is-best .plan-price .num{color:var(--accent)}
+.plan-price .per{margin-left:5px;font-size:13px;color:var(--text-3)}
+.plan-cta{
+  display:flex;align-items:center;justify-content:center;
+  margin-top:22px;height:44px;border-radius:var(--r-pill);
+  font-size:14.5px;font-weight:700;border:1px solid var(--line-2);color:var(--text-1);
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.plan-cta:hover{background:rgb(255 255 255 /6%);border-color:var(--line-strong)}
+.plan.is-best .plan-cta{background:var(--accent);border-color:transparent;color:var(--accent-on);box-shadow:0 8px 22px -8px rgb(248 104 32 /75%)}
+.plan.is-best .plan-cta:hover{background:var(--accent-hover)}
+.plan-sep{margin:24px 0 16px;height:1px;background:var(--line-1)}
+.plan-sub{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px}
+.plan-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.plan-list li{position:relative;padding-left:24px;font-size:13.5px;line-height:1.45;color:var(--text-2)}
+.plan-list li::before{content:"";position:absolute;left:0;top:.18em;width:16px;height:16px;border-radius:50%;background:var(--accent-soft)}
+.plan-list li::after{
+  content:"";position:absolute;left:5px;top:.46em;width:6px;height:3px;
+  border-left:1.6px solid var(--accent);border-bottom:1.6px solid var(--accent);transform:rotate(-45deg);
+}
+.plan-list li.off{color:var(--text-3);opacity:.55}
+.plan-list li.off::before{background:rgb(255 255 255 /5%)}
+.plan-list li.off::after{width:8px;height:0;border-left:0;border-bottom:1.6px solid var(--text-3);transform:none;left:4px;top:.62em}
+.plan-tools{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin-bottom:4px}
+.plan-tools li{position:relative;padding-left:15px;font-size:12.5px;line-height:1.35;color:var(--text-2)}
+.plan-tools li::before{content:"";position:absolute;left:0;top:.46em;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.8}
+.plan-note{margin-top:auto;padding-top:20px;font-size:11.5px;line-height:1.5;color:var(--text-3);border-top:1px solid var(--line-1)}
+@media (max-width:960px){ .plan-grid{grid-template-columns:1fr;gap:26px} .plan.is-best{order:-1} }
+@media (max-width:620px){ .pricing{padding:72px 0 88px} .plan-tools{grid-template-columns:1fr} }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   9 · CHÂN TRANG
+   ═══════════════════════════════════════════════════════════════ */
+.foot{position:relative;background:var(--bg-1);border-top:1px solid var(--line-1);overflow:hidden}
+/* vạch cam mảnh chạy ngang mép trên */
+.foot::before{
+  content:"";position:absolute;top:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent-line) 22%,var(--accent) 50%,var(--accent-line) 78%,transparent);
+  opacity:.55;
+}
+.foot-in{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:72px 0 0}
+
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px}
+
+.foot-brand .fb-top{display:flex;align-items:center;gap:10px}
+.foot-brand .mark{width:26px;height:26px;flex:none;filter:drop-shadow(0 0 10px rgb(248 104 32 /35%))}
+.foot-brand .word{font-size:16px;font-weight:700;letter-spacing:-.015em;color:var(--text-1)}
+.foot-brand .word i{font-style:normal;font-weight:400;color:var(--text-2)}
+.foot-tag{margin-top:14px;font-size:13.5px;line-height:1.6;color:var(--text-3);max-width:34ch}
+
+.compat{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.compat span{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:10.5px;color:var(--text-2);
+  background:var(--bg-3);border:1px solid var(--line-1);
+  padding:6px 10px;border-radius:var(--r-pill);
+}
+.compat span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ok,#4ec98a)}
+
+.foot-col h4{
+  font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:16px;
+}
+.foot-col ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.foot-col a{
+  display:inline-block;font-size:13.5px;color:var(--text-2);
+  transition:color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.foot-col a:hover{color:var(--accent);transform:translateX(3px)}
+
+.foot-bar{
+  margin-top:56px;padding:22px 0 30px;border-top:1px solid var(--line-1);
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.foot-legal{display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--text-3)}
+.foot-legal a{color:var(--text-3);transition:color var(--dur) var(--ease)}
+.foot-legal a:hover{color:var(--text-1)}
+.foot-social{display:flex;gap:8px}
+.foot-social a{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line-1);color:var(--text-3);
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),color var(--dur) var(--ease),transform var(--dur) var(--ease);
+}
+.foot-social a:hover{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);transform:translateY(-2px)}
+.foot-social svg{width:16px;height:16px}
+
+@media (max-width:900px){ .foot-grid{grid-template-columns:1fr 1fr;gap:36px} .foot-brand{grid-column:1 / -1} }
+@media (max-width:560px){ .foot-grid{grid-template-columns:1fr} .foot-in{padding-top:56px} .foot-bar{margin-top:40px} }
+
+/* scroll room so the header state change is visible */
+.after{height:150vh;background:linear-gradient(180deg,var(--bg-0),var(--bg-2));
+  display:flex;align-items:flex-start;justify-content:center;padding-top:90px;
+  color:var(--text-3);font-size:13px}
+
+/* ═══════════════════════════════════════════════════════════════
+   4 · RESPONSIVE — 1024 / 768 / 375 per DESIGN-SYSTEM §14
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width:1024px){
+  .links{display:none}
+  .ghost{display:none}
+  .lang{margin-left:auto}
+  .burger{display:flex}
+  .nav{width:calc(100% - 24px);padding:0 8px 0 16px}
+  .nav.is-stuck{width:calc(100% - 24px)}
+  .editor{width:210%;opacity:.5}
+}
+@media (max-width:768px){
+  .nle-mid{grid-template-columns:1fr}
+  .bins,.fx{display:none}
+  .hero-in{padding-top:40px}
+}
+@media (max-width:420px){
+  .brand .word{font-size:15px}
+  .cta{height:38px;padding:0 15px;font-size:13px}
+  .ver{display:none}
+}
+
+/* respect users who turn motion off */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition-duration:1ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- gradient / filter dùng cho icon 3D ở mục Tính năng -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="dropBig" x="-45%" y="-45%" width="190%" height="190%">
+    <feDropShadow dx="2" dy="8" stdDeviation="7" flood-color="#000" flood-opacity=".65"/>
+  </filter>
+  <filter id="dropMid" x="-45%" y="-45%" width="190%" height="190%">
+    <feDropShadow dx="1" dy="5" stdDeviation="4.5" flood-color="#000" flood-opacity=".6"/>
+  </filter>
+  <filter id="glowOrange" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="3.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+
+  <radialGradient id="ground" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#000" stop-opacity=".6"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="gloss" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".55" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="aoTop" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="aoBottom" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/>
+  </linearGradient>
+  <linearGradient id="edgeLight" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".55" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- orange: 3 faces -->
+  <linearGradient id="oFront" x1="0" y1="0" x2="1" y2=".35">
+    <stop offset="0" stop-color="#FFB570"/><stop offset=".3" stop-color="#F5872C"/><stop offset=".75" stop-color="#DC6318"/><stop offset="1" stop-color="#BE4E11"/>
+  </linearGradient>
+  <linearGradient id="oSide" x1="0" y1="0" x2=".3" y2="1">
+    <stop offset="0" stop-color="#B4480F"/><stop offset="1" stop-color="#7C300A"/>
+  </linearGradient>
+
+  <!-- metal: 3 faces -->
+  <linearGradient id="mTopFace" x1="0" y1="0" x2=".8" y2="1">
+    <stop offset="0" stop-color="#8B857D"/><stop offset=".45" stop-color="#635E58"/><stop offset="1" stop-color="#453F3A"/>
+  </linearGradient>
+  <linearGradient id="mFrontFace" x1="0" y1="0" x2="1" y2=".4">
+    <stop offset="0" stop-color="#5A5550"/><stop offset=".45" stop-color="#43403B"/><stop offset="1" stop-color="#2C2A27"/>
+  </linearGradient>
+  <linearGradient id="mSideFace" x1="0" y1="0" x2=".4" y2="1">
+    <stop offset="0" stop-color="#2E2C29"/><stop offset="1" stop-color="#171615"/>
+  </linearGradient>
+  <linearGradient id="mTopFaceDark" x1="0" y1="0" x2=".8" y2="1">
+    <stop offset="0" stop-color="#5E5952"/><stop offset="1" stop-color="#332F2C"/>
+  </linearGradient>
+
+  <!-- cylinders -->
+  <linearGradient id="cylMetal" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#1C1B19"/><stop offset=".16" stop-color="#5C574F"/><stop offset=".36" stop-color="#7E786F"/>
+    <stop offset=".62" stop-color="#494540"/><stop offset=".85" stop-color="#26241F"/><stop offset="1" stop-color="#141312"/>
+  </linearGradient>
+  <linearGradient id="cylDark" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#141312"/><stop offset=".3" stop-color="#4A4641"/><stop offset=".7" stop-color="#302D2A"/><stop offset="1" stop-color="#121110"/>
+  </linearGradient>
+
+  <!-- bars -->
+  <linearGradient id="barFront" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#F7F2E9"/><stop offset=".55" stop-color="#D6D0C6"/><stop offset="1" stop-color="#98928A"/>
+  </linearGradient>
+  <linearGradient id="barOrangeFront" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#FFB878"/><stop offset=".5" stop-color="#F0741F"/><stop offset="1" stop-color="#B44A10"/>
+  </linearGradient>
+  <linearGradient id="barOrange" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC489"/><stop offset=".25" stop-color="#F58A2E"/><stop offset="1" stop-color="#B84E12"/>
+  </linearGradient>
+
+  <!-- spheres / discs -->
+  <radialGradient id="discOrange" cx="33%" cy="26%" r="82%">
+    <stop offset="0" stop-color="#FFC48C"/><stop offset=".4" stop-color="#F0741F"/><stop offset="1" stop-color="#8A360A"/>
+  </radialGradient>
+  <radialGradient id="knobFace" cx="32%" cy="24%" r="85%">
+    <stop offset="0" stop-color="#8D8780"/><stop offset=".5" stop-color="#544F4A"/><stop offset="1" stop-color="#2A2724"/>
+  </radialGradient>
+
+  <!-- glass / inset -->
+  <linearGradient id="screenGlass" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#1B1A19"/><stop offset=".5" stop-color="#111010"/><stop offset="1" stop-color="#070707"/>
+  </linearGradient>
+  <linearGradient id="panelFace" x1="0" y1="0" x2="1" y2=".4">
+    <stop offset="0" stop-color="#38352F"/><stop offset=".5" stop-color="#282624"/><stop offset="1" stop-color="#191817"/>
+  </linearGradient>
+  <linearGradient id="paperFace" x1="0" y1="0" x2="1" y2=".4">
+    <stop offset="0" stop-color="#464340"/><stop offset=".5" stop-color="#332F2D"/><stop offset="1" stop-color="#1F1E1C"/>
+  </linearGradient>
+</defs></svg>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="AiO Studio" data-i18n-aria="a11y.brand">
+    <svg class="mark" viewBox="0 0 385.89 351.31" fill="var(--accent)" aria-hidden="true">
+      <path d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+      <path d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+    </svg>
+    <span class="word">AiO <i>Studio</i></span>
+  </a>
+
+  <nav class="links" id="links" aria-label="Main navigation" data-i18n-aria="a11y.nav">
+    <span class="ink" id="ink" aria-hidden="true"></span>
+    <a href="#plugins" data-i18n="nav.plugins">Plugins</a>
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+    <a href="#" data-i18n="nav.docs">Docs</a>
+  </nav>
+
+  <div class="actions">
+    <div class="lang" role="group" aria-label="Language">
+      <span class="lang-ink" id="langInk" aria-hidden="true"></span>
+      <button class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
+      <button class="lang-btn" data-lang="vi" aria-pressed="false">VI</button>
+    </div>
+    <a class="ghost" href="#" data-i18n="nav.signin">Sign in</a>
+    <a class="cta" href="#">
+      <span data-i18n="cta.demo">Get the demo</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" data-i18n-aria="a11y.menu" aria-expanded="false" aria-controls="sheet">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="sheet" id="sheet">
+  <a href="#plugins" data-i18n="nav.plugins">Plugins</a><a href="#features" data-i18n="nav.features">Features</a><a href="#pricing" data-i18n="nav.pricing">Pricing</a><a href="#" data-i18n="nav.docs">Docs</a>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="top">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       NỀN HERO — mọi thứ phía sau chữ nằm trong #aio-hero-bg
+       #aio-bg-editor    cửa sổ NLE (xoay/đổi tỉ lệ ở đây)
+       #aio-bg-project · #aio-bg-monitor · #aio-bg-fx · #aio-bg-timeline
+       #aio-bg-veil      lớp phủ tối
+       #aio-bg-glow      quầng cam
+       #aio-bg-panel     panel sản phẩm nổi
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="hero-bg" id="aio-hero-bg" aria-hidden="true">
+  <div class="editor" id="aio-bg-editor">
+    <div class="nle" id="aio-bg-window">
+
+      <div class="nle-top">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <nav class="menus"><span>File</span><span>Edit</span><span>Clip</span><span>Sequence</span><span>Graphics</span><span>Window</span></nav>
+        <div class="wtabs"><span class="on">Edit</span><span>Color</span><span>Audio</span><span>Effects</span></div>
+      </div>
+
+      <div class="nle-mid">
+        <!-- Project -->
+        <div class="panel bins" id="aio-bg-project">
+          <div class="ptitle" data-i18n="ed.project"><b>Project</b> · aio_demo.prproj</div>
+          <div class="bin-list" id="binList"></div>
+        </div>
+
+        <!-- Program Monitor -->
+        <div class="panel monitor" id="aio-bg-monitor">
+          <div class="ptitle" data-i18n="ed.program"><b>Program</b> · Sequence 01</div>
+          <div class="screen">
+            <div class="frame-img"></div>
+            <div class="safe"></div>
+            <div class="guide916">
+              <span class="gc tl"></span><span class="gc tr"></span>
+              <span class="gc bl"></span><span class="gc br"></span>
+              <span class="gchip">9:16</span>
+            </div>
+            <span class="trackdot"><i></i><b data-i18n="ed.face">face · 98%</b></span>
+            <div class="scrub"><i></i><b></b></div>
+            <div class="sub" data-i18n="ed.sub">…one click and it cuts the whole thing.</div>
+          </div>
+          <div class="transport">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h3v14H6zM11 5l9 7-9 7z"/></svg>
+            <span>00:04:18:07</span>
+            <span style="opacity:.5">/ 00:12:40:00</span>
+          </div>
+        </div>
+
+        <!-- Effect Controls -->
+      </div>
+
+
+
+      <!-- Timeline -->
+      <div class="nle-tl" id="aio-bg-timeline">
+        <div class="ruler" id="ruler"></div>
+        <div class="renderbar"><i></i></div>
+        <div class="tracks" id="tracks"></div>
+        <div class="playhead"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="veil" id="aio-bg-veil"></div>
+  <div class="glow" id="aio-bg-glow"></div>
+  </div><!-- /#aio-hero-bg -->
+
+  <!-- floating product panel over the editor -->
+  <div class="aio-pop" id="aio-bg-panel">
+    <div class="ap-head">
+      <svg viewBox="0 0 385.89 351.31"><path d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>
+      <span class="ap-name">AiO Autocut</span> <b data-i18n="panel.badge">running</b>
+    </div>
+    <div class="ap-row"><span>Cutting silences</span><em id="apPct">78%</em></div>
+    <div class="ap-bar"><i></i></div>
+    <div class="ap-meta"><u>214</u> silences · <u>04:12</u> saved · 12 s left</div>
+  </div>
+
+
+  <div class="hero-in">
+    <p class="eyebrow" data-i18n="hero.eyebrow">Plugins for Premiere Pro · DaVinci Resolve</p>
+    <h1>
+      <span class="h-line" id="l0"><span class="h-tag"><i class="rule"></i><span class="tname"></span></span></span>
+      <span class="h-line" id="l1"><span class="h-tag"><i class="rule"></i><span class="tname"></span></span></span>
+      <span class="h-line" id="l2"><span class="h-tag"><i class="rule"></i><span class="tname"></span></span></span>
+      <span class="h-line"><em class="auto" data-i18n="hero.auto">Automated.</em></span>
+    </h1>
+    <div class="steps" id="steps"></div>
+    <p class="lede" data-i18n="hero.lede">I got sick of trimming silence at 2am. So I built eight plugins to do it — right inside Premiere.</p>
+    <div class="hero-cta">
+      <a class="btn-lg primary" href="#"><span data-i18n="hero.primary">Get the free demo</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn-lg secondary" href="#pricing" data-i18n="hero.secondary">See pricing</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ MỤC TÍNH NĂNG ══════════════════ -->
+<section class="features" id="features">
+  <div class="features-in">
+    <div class="sec-head">
+      <p class="sec-eyebrow" data-i18n="feat.eyebrow">Eight plugins</p>
+      <h2 class="sec-title" data-i18n="feat.title">Everything the edit needs.<br><em>None of the clicking.</em></h2>
+      <p class="sec-lede" data-i18n="feat.lede">Each one runs as a panel inside Premiere. Open it, press one button, go back to the story.</p>
+    </div>
+
+    <div class="feat-grid" id="plugins">
+
+    <!-- ============ 1 · Power Bins ============ -->
+    <article class="feat" data-fx="bins">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+        <h2 class="feat-title">AiO Power Bins</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d1">Smart audio file organization</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <!--
+            Geometry note: depth vector d = (+18, -12) for BOTH lid and body,
+            and the side face reuses the front face's exact corner points,
+            so the two faces can never drift apart.
+          -->
+          <ellipse cx="102" cy="128" rx="54" ry="10" fill="url(#ground)" transform="rotate(-5 102 128)"/>
+          <g filter="url(#dropBig)">
+            <!-- BODY: right side face — shares corners (144,58) and (137,122) with the front -->
+            <path d="M144 58 162 46l-7 64-18 12 7-64Z" fill="url(#oSide)"/>
+            <!-- BODY: front face (sharp bottom-right so the side face meets it exactly) -->
+            <path d="M56 58h88l-7 64H67a4 4 0 0 1-4-3.6L56 58Z" fill="url(#oFront)"/>
+            <ellipse cx="84" cy="84" rx="27" ry="26" fill="url(#gloss)"/>
+            <path d="M56 58h88l-1.2 11H57.2L56 58Z" fill="url(#aoTop)"/>
+            <path d="M61 100h78l-2 22H67a4 4 0 0 1-4-3.6L61 100Z" fill="url(#aoBottom)"/>
+            <path d="M144 58l-7 64" stroke="#000" stroke-opacity=".3" stroke-width="1.2"/>
+            <path d="M162 46l-7 64" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
+
+            <!-- embossed bolt --><g class="fx-bolt">
+            <path d="M105 66 82 98h13l-4.5 22 24-32h-14l4.5-22Z" fill="#8A360A" opacity=".55" transform="translate(1.5,2)"/>
+            <path d="M105 66 82 98h13l-4.5 22 24-32h-14l4.5-22Z" fill="#FFF4E6"/>
+            <clipPath id="boltClip"><path d="M105 66 82 98h13l-4.5 22 24-32h-14l4.5-22Z"/></clipPath>
+            <g clip-path="url(#boltClip)">
+              <path d="M70 56h26l-14 74H70V56Z" fill="#fff" opacity=".5"/>
+              <path d="M103 56h32l-16 74h-16V56Z" fill="#C79769" opacity=".4"/>
+            </g></g>
+
+            <g class="fx-lid"><!-- LID -->
+            <path d="M48 42h106l18-12H66L48 42Z" fill="url(#mTopFace)"/>
+            <path d="M154 42l18-12v16l-18 12V42Z" fill="url(#mSideFace)"/>
+            <path d="M48 42h106v16H54a6 6 0 0 1-6-6V42Z" fill="url(#mFrontFace)"/>
+            <path d="M48.5 42.4h105" stroke="#fff" stroke-opacity=".3" stroke-width="1.4"/>
+            <path d="M66.5 30.4h105" stroke="#fff" stroke-opacity=".2" stroke-width="1.2"/>
+            <path d="M48 53h106v5H54a6 6 0 0 1-6-6v1Z" fill="#000" opacity=".35"/>
+
+            <!-- HANDLE: raised slab, footprint stays inside the lid's top face -->
+            <path d="M92 41l15-10h24l-15 10H92Z" fill="#000" opacity=".45"/>
+            <path d="M92 35l15-10h24l-15 10H92Z" fill="url(#mTopFace)"/>
+            <path d="M92 35h24v6H92v-6Z" fill="#35312D"/>
+            <path d="M116 35l15-10v6l-15 10v-6Z" fill="#1D1B19"/>
+            <path d="M92.5 35.3l14.6-9.8" stroke="#fff" stroke-opacity=".34" stroke-width="1.2"/>
+            <path d="M97 35h4v6h-4v-6ZM107 35h4v6h-4v-6Z" fill="#000" opacity=".26"/></g>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f1a">Sorts clips into bins on its own</li><li data-i18n="feat.f1b">Colour labels by camera and mic</li><li data-i18n="feat.f1c">Bulk rename from a pattern</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 2 · Asset Manager ============ -->
+    <article class="feat" data-fx="assets">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+        <h2 class="feat-title">AiO Asset Manager</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d2">Manage and preview assets</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="104" cy="122" rx="66" ry="10" fill="url(#ground)" transform="rotate(-4 104 122)"/>
+
+          <!-- folder A (back) -->
+          <g class="fx-fa" filter="url(#dropMid)">
+            <path d="M24 40V14a4 4 0 0 1 4-4h24a3 3 0 0 1 2.4 1.2L58 15h38a4 4 0 0 1 4 4v21H24Z" fill="#2B2926"/>
+            <path d="M28 10.6h24" stroke="#fff" stroke-opacity=".12" stroke-width="1"/>
+            <path d="M12 46h76l12-8H24l-12 8Z" fill="url(#mTopFaceDark)"/>
+            <path d="M88 46l12-8v34l-12 8V46Z" fill="#161514"/>
+            <path d="M12 46h76v34H17a5 5 0 0 1-5-5V46Z" fill="#2C2A27"/>
+            <path d="M12.5 46.4h75" stroke="#fff" stroke-opacity=".14" stroke-width="1"/>
+          </g>
+
+          <!-- folder B (middle) -->
+          <g class="fx-fb" filter="url(#dropMid)">
+            <path d="M50 53V25a4 4 0 0 1 4-4h27a3 3 0 0 1 2.4 1.2L86 26h46a4 4 0 0 1 4 4v23H50Z" fill="#3A3733"/>
+            <path d="M54 21.6h27" stroke="#fff" stroke-opacity=".14" stroke-width="1"/>
+            <path d="M36 60h86l14-9H50l-14 9Z" fill="url(#mTopFace)"/>
+            <path d="M122 60l14-9v38l-14 9V60Z" fill="#1B1A18"/>
+            <path d="M36 60h86v38H42a6 6 0 0 1-6-6V60Z" fill="#3B3835"/>
+            <path d="M36.5 60.4h85" stroke="#fff" stroke-opacity=".16" stroke-width="1.1"/>
+            <path d="M36 86h86v12H42a6 6 0 0 1-6-6v-6Z" fill="url(#aoBottom)"/>
+          </g>
+
+          <!-- folder C (front, orange) -->
+          <g class="fx-fc" filter="url(#dropBig)">
+            <path d="M80 66V45a5 5 0 0 1 5-5h27a3 3 0 0 1 2.5 1.3L115 45h56a5 5 0 0 1 5 5v16H80Z" fill="#39332F"/>
+            <path d="M80 66V45a5 5 0 0 1 5-5h27a3 3 0 0 1 2.5 1.3L115 45h56a5 5 0 0 1 5 5v16" fill="none" stroke="#F0741F" stroke-width="1.6"/>
+            <path d="M85 40.6h26" stroke="#fff" stroke-opacity=".16" stroke-width="1"/>
+            <path d="M64 74h96l16-10H80l-16 10Z" fill="url(#mTopFace)"/>
+            <path d="M160 74l16-10v42l-16 10V74Z" fill="#141312"/>
+            <path d="M64 74h96v42H70a6 6 0 0 1-6-6V74Z" fill="url(#panelFace)"/>
+            <path d="M160 74v42H70a6 6 0 0 1-6-6V74" fill="none" stroke="#F0741F" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M64 74 80 64M160 74l16-10" stroke="#F0741F" stroke-width="1.6"/>
+            <path d="M64.5 74.4h95" stroke="#FFC48C" stroke-opacity=".55" stroke-width="1.3"/>
+            <g fill="url(#barOrangeFront)" filter="url(#glowOrange)">
+              <rect x="74" y="96" width="5" height="14" rx="2.5"/>
+              <rect x="83" y="88" width="5" height="22" rx="2.5"/>
+              <rect x="92" y="80" width="5" height="30" rx="2.5"/>
+              <rect x="101" y="92" width="5" height="18" rx="2.5"/>
+              <rect x="110" y="84" width="5" height="26" rx="2.5"/>
+              <rect x="119" y="78" width="5" height="32" rx="2.5"/>
+              <rect x="128" y="90" width="5" height="20" rx="2.5"/>
+              <rect x="137" y="86" width="5" height="24" rx="2.5"/>
+              <rect x="146" y="98" width="5" height="12" rx="2.5"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f2a">Indexes every SFX, track and preset</li><li data-i18n="feat.f2b">Preview before you import</li><li data-i18n="feat.f2c">Search by tag, length or colour</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 3 · Auto Silent Cut ============ -->
+    <article class="feat" data-fx="cut">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+        <h2 class="feat-title">AiO Auto Silent Cut</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d3">Remove silences automatically</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="100" cy="112" rx="80" ry="9" fill="url(#ground)"/>
+
+          <rect x="8" y="18" width="76" height="86" rx="5" fill="#fff" fill-opacity=".02" stroke="#8A8580" stroke-width="1.4" stroke-dasharray="7 6"/>
+          <rect x="118" y="18" width="76" height="86" rx="5" fill="#fff" fill-opacity=".02" stroke="#8A8580" stroke-width="1.4" stroke-dasharray="7 6"/>
+
+          <!-- 3D bars (top + front + side face), baseline y=98 -->
+          <g filter="url(#dropMid)">
+            <g class="fx-left">
+              <path d="M16 56h7l6-4h-7Z" fill="#FBF7EF"/><rect x="16" y="56" width="7" height="42" fill="url(#barFront)"/><path d="M23 56l6-4v42l-6 4Z" fill="#6E6961"/>
+              <path d="M27 40h7l6-4h-7Z" fill="#FBF7EF"/><rect x="27" y="40" width="7" height="58" fill="url(#barFront)"/><path d="M34 40l6-4v58l-6 4Z" fill="#6E6961"/>
+              <path d="M38 26h7l6-4h-7Z" fill="#FBF7EF"/><rect x="38" y="26" width="7" height="72" fill="url(#barFront)"/><path d="M45 26l6-4v72l-6 4Z" fill="#6E6961"/>
+              <path d="M49 48h7l6-4h-7Z" fill="#FBF7EF"/><rect x="49" y="48" width="7" height="50" fill="url(#barFront)"/><path d="M56 48l6-4v50l-6 4Z" fill="#6E6961"/>
+              <path d="M60 34h7l6-4h-7Z" fill="#FBF7EF"/><rect x="60" y="34" width="7" height="64" fill="url(#barFront)"/><path d="M67 34l6-4v64l-6 4Z" fill="#6E6961"/>
+            </g>
+            <g class="fx-right">
+              <path d="M126 48h7l6-4h-7Z" fill="#FBF7EF"/><rect x="126" y="48" width="7" height="50" fill="url(#barFront)"/><path d="M133 48l6-4v50l-6 4Z" fill="#6E6961"/>
+              <path d="M137 30h7l6-4h-7Z" fill="#FBF7EF"/><rect x="137" y="30" width="7" height="68" fill="url(#barFront)"/><path d="M144 30l6-4v68l-6 4Z" fill="#6E6961"/>
+              <path d="M148 54h7l6-4h-7Z" fill="#FBF7EF"/><rect x="148" y="54" width="7" height="44" fill="url(#barFront)"/><path d="M155 54l6-4v44l-6 4Z" fill="#6E6961"/>
+              <path d="M159 38h7l6-4h-7Z" fill="#FBF7EF"/><rect x="159" y="38" width="7" height="60" fill="url(#barFront)"/><path d="M166 38l6-4v60l-6 4Z" fill="#6E6961"/>
+              <path d="M170 58h7l6-4h-7Z" fill="#FBF7EF"/><rect x="170" y="58" width="7" height="40" fill="url(#barFront)"/><path d="M177 58l6-4v40l-6 4Z" fill="#6E6961"/>
+            </g>
+          </g>
+
+          <!-- 3D scissors coin -->
+          <g class="fx-coin" filter="url(#dropBig)">
+            <circle cx="101" cy="70" r="24" fill="#6E2A06"/>
+            <circle cx="100" cy="66" r="24" fill="url(#discOrange)"/>
+            <ellipse cx="92" cy="54" rx="12" ry="7" fill="#fff" opacity=".18"/>
+            <circle cx="100" cy="66" r="24" fill="none" stroke="#FFD3AC" stroke-opacity=".4" stroke-width="1.2"/>
+            <g transform="translate(100 66) scale(1.3) translate(-12 -12)"
+               stroke="#3A1B06" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+              <path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f3a">Finds silence by dB threshold</li><li data-i18n="feat.f3b">Keeps breaths, drops dead air</li><li data-i18n="feat.f3c">Ripple deletes in one pass</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 4 · Sound Design ============ -->
+    <article class="feat" data-fx="sound">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>
+        <h2 class="feat-title">AiO Sound Design</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d4">Design and edit unique sounds</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="104" cy="118" rx="72" ry="10" fill="url(#ground)" transform="rotate(-4 104 118)"/>
+          <g filter="url(#dropBig)">
+            <!-- top / side / front -->
+            <path d="M24 52h140l16-11H40L24 52Z" fill="url(#mTopFace)"/>
+            <path d="M164 52l16-11v56l-16 11V52Z" fill="url(#mSideFace)"/>
+            <path d="M24 52h140v56H32a8 8 0 0 1-8-8V52Z" fill="url(#panelFace)"/>
+            <path d="M24.5 52.4h139" stroke="#fff" stroke-opacity=".26" stroke-width="1.3"/>
+            <path d="M40.5 41.4h139" stroke="#fff" stroke-opacity=".16" stroke-width="1.1"/>
+            <path d="M24 52h140v9H24v-9Z" fill="url(#aoTop)" opacity=".55"/>
+
+            <!-- everything below is clipped to the front face so nothing spills out -->
+            <clipPath id="sdFace"><path d="M24 52h140v56H32a8 8 0 0 1-8-8V52Z"/></clipPath>
+            <g clip-path="url(#sdFace)">
+              <!-- big knob -->
+              <g class="fx-knob">
+              <circle cx="53" cy="77" r="14" fill="#0E0D0D" opacity=".75"/>
+              <circle cx="52" cy="74" r="14" fill="url(#knobFace)"/>
+              <circle cx="52" cy="74" r="9.4" fill="#35322E"/>
+              <ellipse cx="47" cy="67" rx="7" ry="3.8" fill="#fff" opacity=".18"/>
+              <path d="M52 74 44.5 66.5" stroke="#F0741F" stroke-width="3" stroke-linecap="round"/>
+              <path d="M40 83.5a14 14 0 0 0 24 0" stroke="#F0741F" stroke-opacity=".5" stroke-width="2" fill="none" stroke-linecap="round"/>
+              </g>
+
+              <!-- small knobs -->
+              <circle cx="88" cy="66" r="8.5" fill="#0E0D0D" opacity=".7"/>
+              <circle cx="87.5" cy="64" r="8.5" fill="url(#knobFace)"/>
+              <path d="M87.5 64 82 58" stroke="#EFE9DF" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="110" cy="66" r="8.5" fill="#0E0D0D" opacity=".7"/>
+              <circle cx="109.5" cy="64" r="8.5" fill="url(#knobFace)"/>
+              <path d="M109.5 64 115 58" stroke="#EFE9DF" stroke-width="2" stroke-linecap="round"/>
+
+              <!-- buttons -->
+              <rect x="78" y="78" width="18" height="10" rx="5" fill="#100F0F"/>
+              <rect x="78" y="76" width="18" height="10" rx="5" fill="#4E4944"/>
+              <rect x="79" y="77" width="16" height="3.2" rx="1.6" fill="#fff" opacity=".14"/>
+              <rect x="102" y="78" width="18" height="10" rx="5" fill="#100F0F"/>
+              <rect x="102" y="76" width="18" height="10" rx="5" fill="#4E4944"/>
+              <rect x="103" y="77" width="16" height="3.2" rx="1.6" fill="#fff" opacity=".14"/>
+
+              <!-- fader (track kept clear of the rounded corners) -->
+              <rect x="42" y="94" width="76" height="6" rx="3" fill="#0B0A0A"/>
+              <rect x="42" y="94" width="76" height="2.2" rx="1.1" fill="#000" opacity=".8"/>
+              <rect x="86" y="91" width="12" height="14" rx="3.5" fill="#0E0D0D"/>
+              <rect x="86" y="89" width="12" height="14" rx="3.5" fill="url(#cylDark)"/>
+              <path d="M86.6 90h10.8" stroke="#fff" stroke-opacity=".25" stroke-width="1"/>
+
+              <!-- screen (inset) -->
+              <rect x="124" y="60" width="34" height="40" rx="6" fill="#000" opacity=".85"/>
+              <rect x="125" y="61" width="32" height="38" rx="5" fill="url(#screenGlass)"/>
+              <path d="M125 61h32v3H125z" fill="#000" opacity=".7"/>
+              <g class="fx-bars" fill="url(#barOrange)" filter="url(#glowOrange)">
+                <rect x="129" y="82" width="4" height="13" rx="2"/>
+                <rect x="135.5" y="74" width="4" height="21" rx="2"/>
+                <rect x="142" y="67" width="4" height="28" rx="2"/>
+                <rect x="148.5" y="77" width="4" height="18" rx="2"/>
+              </g>
+              <path d="M125 61h32l-32 20V61Z" fill="#fff" opacity=".05"/>
+              <rect x="125" y="61" width="32" height="38" rx="5" fill="none" stroke="#6B6660" stroke-width="1"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f4a">Matches SFX to each scene</li><li data-i18n="feat.f4b">Layers and ducks under dialogue</li><li data-i18n="feat.f4c">Exports a stem per layer</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 5 · Auto Reframes ============ -->
+    <article class="feat" data-fx="reframe">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg>
+        <h2 class="feat-title">AiO Auto Reframes</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d5">Automatically reframe video</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="104" cy="116" rx="70" ry="10" fill="url(#ground)" transform="rotate(-4 104 116)"/>
+          <g filter="url(#dropBig)">
+            <path d="M30 42h132l14-10H44L30 42Z" fill="url(#mTopFace)"/>
+            <path d="M162 42l14-10v60l-14 10V42Z" fill="url(#mSideFace)"/>
+            <path d="M30 42h132v60H38a8 8 0 0 1-8-8V42Z" fill="url(#panelFace)"/>
+            <path d="M30.5 42.4h131" stroke="#fff" stroke-opacity=".26" stroke-width="1.3"/>
+            <path d="M44.5 32.4h131" stroke="#fff" stroke-opacity=".16" stroke-width="1.1"/>
+            <!-- screen inset -->
+            <rect x="38" y="50" width="116" height="44" rx="5" fill="#000" opacity=".85"/>
+            <rect x="39" y="51" width="114" height="42" rx="4" fill="url(#screenGlass)"/>
+            <path d="M39 51h114v3H39z" fill="#000" opacity=".65"/>
+            <path d="M39 51h114L39 87V51Z" fill="#fff" opacity=".04"/>
+          </g>
+          <!-- 3D play sphere -->
+          <g class="fx-play" filter="url(#dropBig)">
+            <ellipse cx="100" cy="94" rx="16" ry="4" fill="#000" opacity=".3"/>
+            <circle cx="100" cy="70" r="21" fill="url(#discOrange)"/>
+            <ellipse cx="93" cy="59" rx="12" ry="7" fill="#fff" opacity=".26"/>
+            <circle cx="100" cy="70" r="21" fill="none" stroke="#FFD3AC" stroke-opacity=".35" stroke-width="1.1"/>
+            <path d="M95 61l16 9-16 9V61Z" fill="#3A1B06" opacity=".9"/>
+          </g>
+          <!-- crop brackets -->
+          <g class="fx-crop" stroke="#F0741F" stroke-width="3.4" stroke-linecap="round" fill="none">
+            <path d="M12 46V26a4 4 0 0 1 4-4h20"/>
+            <path d="M164 22h20a4 4 0 0 1 4 4v20"/>
+            <path d="M188 92v20a4 4 0 0 1-4 4h-20"/>
+            <path d="M36 116H16a4 4 0 0 1-4-4V92"/>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f5a">Tracks the subject frame by frame</li><li data-i18n="feat.f5b">Exports 9:16, 1:1 and 4:5</li><li data-i18n="feat.f5c">Leaves keyframes you can edit</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 6 · Auto Podcast ============ -->
+    <article class="feat" data-fx="podcast">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+        <h2 class="feat-title">AiO Auto Podcast</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d6">Enhance podcast audio</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="102" cy="126" rx="60" ry="9" fill="url(#ground)"/>
+          <!-- back panel -->
+          <g filter="url(#dropMid)">
+            <path d="M16 44h164l12-8H28l-12 8Z" fill="url(#mTopFaceDark)"/>
+            <path d="M180 44l12-8v58l-12 8V44Z" fill="#151413"/>
+            <path d="M16 44h164v58H24a8 8 0 0 1-8-8V44Z" fill="url(#panelFace)"/>
+            <path d="M16.5 44.4h163" stroke="#fff" stroke-opacity=".2" stroke-width="1.2"/>
+          </g>
+          <g class="fx-wave" fill="url(#barOrange)" filter="url(#glowOrange)">
+            <rect x="24" y="70" width="4" height="14" rx="2"/>
+            <rect x="32" y="62" width="4" height="30" rx="2"/>
+            <rect x="40" y="54" width="4" height="46" rx="2"/>
+            <rect x="48" y="66" width="4" height="22" rx="2"/>
+            <rect x="56" y="58" width="4" height="38" rx="2"/>
+            <rect x="64" y="70" width="4" height="14" rx="2"/>
+            <rect x="132" y="70" width="4" height="14" rx="2"/>
+            <rect x="140" y="58" width="4" height="38" rx="2"/>
+            <rect x="148" y="66" width="4" height="22" rx="2"/>
+            <rect x="156" y="54" width="4" height="46" rx="2"/>
+            <rect x="164" y="62" width="4" height="30" rx="2"/>
+            <rect x="172" y="70" width="4" height="14" rx="2"/>
+          </g>
+
+          <!-- 3D microphone -->
+          <g class="fx-mic" filter="url(#dropBig)">
+            <!-- base disc -->
+            <path d="M76 112v5a26 8 0 0 0 52 0v-5H76Z" fill="#1A1917"/>
+            <ellipse cx="102" cy="112" rx="26" ry="8" fill="url(#mTopFace)"/>
+            <ellipse cx="102" cy="111" rx="17" ry="5" fill="#000" opacity=".22"/>
+            <!-- stem -->
+            <rect x="97" y="84" width="10" height="30" fill="url(#cylDark)"/>
+            <!-- yoke -->
+            <path d="M78 62a24 24 0 0 0 48 0" stroke="url(#cylDark)" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <path d="M78 62a24 24 0 0 0 48 0" stroke="#847E77" stroke-opacity=".35" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            <!-- capsule -->
+            <rect x="86" y="20" width="32" height="66" rx="16" fill="url(#cylMetal)"/>
+            <ellipse cx="102" cy="25" rx="16" ry="6.5" fill="#7A746B"/>
+            <ellipse cx="98" cy="23.5" rx="8" ry="3" fill="#fff" opacity=".2"/>
+            <g stroke="#A19B93" stroke-opacity=".5" stroke-width="1.1" fill="none">
+              <path d="M87 34q15 7 30 0M87 43q15 7 30 0M87 52q15 7 30 0M87 61q15 7 30 0M87 70q15 7 30 0M88 78q14 6 28 0"/>
+            </g>
+            <rect x="90" y="28" width="5" height="52" rx="2.5" fill="#fff" opacity=".16"/>
+            <rect x="86" y="20" width="32" height="66" rx="16" fill="none" stroke="#6E6960" stroke-opacity=".7" stroke-width="1.1"/>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f6a">Syncs every mic take</li><li data-i18n="feat.f6b">Cuts to whoever is talking</li><li data-i18n="feat.f6c">Cleans noise and evens levels</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 7 · Auto Short Clip ============ -->
+    <article class="feat" data-fx="shorts">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><path d="m3 8 3-5 4 4M11 8l3-5 4 4"/></svg>
+        <h2 class="feat-title">AiO Auto Short Clip</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d7">Extract short clips in seconds</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="102" cy="118" rx="76" ry="10" fill="url(#ground)" transform="rotate(-3 102 118)"/>
+          <g filter="url(#dropBig)">
+            <path d="M14 40h154l14-9H28l-14 9Z" fill="url(#mTopFaceDark)"/>
+            <path d="M168 40l14-9v64l-14 9V40Z" fill="#131212"/>
+            <path d="M14 40h154v64H20a6 6 0 0 1-6-6V40Z" fill="#2A2827"/>
+            <path d="M14.5 40.4h153" stroke="#fff" stroke-opacity=".22" stroke-width="1.2"/>
+            <g fill="#0D0C0C">
+              <rect x="20" y="44" width="10" height="7" rx="2"/><rect x="36" y="44" width="10" height="7" rx="2"/>
+              <rect x="52" y="44" width="10" height="7" rx="2"/><rect x="68" y="44" width="10" height="7" rx="2"/>
+              <rect x="84" y="44" width="10" height="7" rx="2"/><rect x="100" y="44" width="10" height="7" rx="2"/>
+              <rect x="116" y="44" width="10" height="7" rx="2"/><rect x="132" y="44" width="10" height="7" rx="2"/>
+              <rect x="148" y="44" width="10" height="7" rx="2"/>
+              <rect x="20" y="90" width="10" height="7" rx="2"/><rect x="36" y="90" width="10" height="7" rx="2"/>
+              <rect x="52" y="90" width="10" height="7" rx="2"/><rect x="68" y="90" width="10" height="7" rx="2"/>
+              <rect x="84" y="90" width="10" height="7" rx="2"/><rect x="100" y="90" width="10" height="7" rx="2"/>
+              <rect x="116" y="90" width="10" height="7" rx="2"/><rect x="132" y="90" width="10" height="7" rx="2"/>
+              <rect x="148" y="90" width="10" height="7" rx="2"/>
+            </g>
+            <!-- frames (inset) -->
+            <rect x="20" y="56" width="46" height="30" rx="3" fill="#000" opacity=".8"/>
+            <rect x="21" y="57" width="44" height="28" rx="2" fill="url(#screenGlass)"/>
+            <rect x="72" y="56" width="46" height="30" rx="3" fill="#000" opacity=".8"/>
+            <rect x="73" y="57" width="44" height="28" rx="2" fill="#232120"/>
+            <rect x="124" y="56" width="46" height="30" rx="3" fill="#000" opacity=".8"/>
+            <rect x="125" y="57" width="44" height="28" rx="2" fill="url(#screenGlass)"/>
+            <g fill="#4E4A47">
+              <circle cx="43" cy="66" r="5.5"/><path d="M31 85c2-10 22-10 24 0H31Z"/>
+              <circle cx="95" cy="66" r="5.5"/><path d="M83 85c2-10 22-10 24 0H83Z"/>
+              <circle cx="147" cy="66" r="5.5"/><path d="M135 85c2-10 22-10 24 0h-24Z"/>
+            </g>
+          </g>
+          <rect class="fx-sel" x="68" y="52" width="54" height="38" rx="4" fill="none" stroke="#F0741F" stroke-width="2.4"/>
+
+          <!-- scissors coin -->
+          <g class="fx-coin" filter="url(#dropBig)">
+            <circle cx="96" cy="107" r="17" fill="#6E2A06"/>
+            <circle cx="95" cy="104" r="17" fill="url(#discOrange)"/>
+            <ellipse cx="89" cy="96" rx="9" ry="5" fill="#fff" opacity=".18"/>
+            <circle cx="95" cy="104" r="17" fill="none" stroke="#FFD3AC" stroke-opacity=".4" stroke-width="1"/>
+            <g transform="translate(95 104) scale(.92) translate(-12 -12)"
+               stroke="#3A1B06" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+              <path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f7a">Scores highlights from the transcript</li><li data-i18n="feat.f7b">Cuts vertical clips of 30–60 s</li><li data-i18n="feat.f7c">Burns captions on export</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+    <!-- ============ 8 · Auto Transcripts ============ -->
+    <article class="feat" data-fx="scripts">
+      <div class="feat-head">
+        <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+        <h2 class="feat-title">AiO Auto Transcripts</h2>
+      </div>
+      <p class="feat-desc" data-i18n="feat.d8">Generate transcripts instantly</p>
+
+      <div class="feat-art">
+        <svg viewBox="0 0 200 140" fill="none">
+          <ellipse cx="104" cy="124" rx="70" ry="10" fill="url(#ground)" transform="rotate(-4 104 124)"/>
+
+          <!-- document slab -->
+          <g filter="url(#dropBig)">
+            <path d="M18 30h108l14-9H32l-14 9Z" fill="url(#mTopFace)"/>
+            <path d="M126 30l14-9v66l-14 9V30Z" fill="#161514"/>
+            <path d="M18 30h108v66H26a8 8 0 0 1-8-8V30Z" fill="url(#paperFace)"/>
+            <path d="M18.5 30.4h107" stroke="#fff" stroke-opacity=".26" stroke-width="1.3"/>
+            <path d="M32.5 21.4h107" stroke="#fff" stroke-opacity=".16" stroke-width="1.1"/>
+            <clipPath id="docFace"><path d="M18 30h108v66H26a8 8 0 0 1-8-8V30Z"/></clipPath>
+            <g class="fx-lines" clip-path="url(#docFace)" stroke="url(#barOrange)" stroke-width="5" stroke-linecap="round" filter="url(#glowOrange)">
+              <path d="M32 46h64M32 60h76M32 74h50"/>
+            </g>
+          </g>
+
+          <!-- speech bubble slab -->
+          <g class="fx-bubble" filter="url(#dropBig)">
+            <path d="M104 66h68l12-8h-68l-12 8Z" fill="url(#mTopFace)"/>
+            <path d="M172 66l12-8v38l-12 8V66Z" fill="#141312"/>
+            <path d="M104 66h68v38h-48l-14 14v-14h-.6a5.4 5.4 0 0 1-5.4-5.4V66Z" fill="#464340"/>
+            <path d="M104.5 66.4h67" stroke="#fff" stroke-opacity=".26" stroke-width="1.3"/>
+            <path d="M116.5 58.4h67" stroke="#fff" stroke-opacity=".16" stroke-width="1.1"/>
+            <g stroke="#A9A39C" stroke-width="4.4" stroke-linecap="round">
+              <path d="M116 80h46M116 92h28"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <ul class="feat-list"><li data-i18n="feat.f8a">Transcribes with speaker names</li><li data-i18n="feat.f8b">Edit the text, the cut follows</li><li data-i18n="feat.f8c">Exports SRT, VTT or captions</li></ul>
+      <button class="feat-open"><span data-i18n="feat.cta">Learn more</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </article>
+
+  </div>
+  </div>
+</section>
+
+<!-- ══════════════════ BẢNG GIÁ ══════════════════ -->
+<section class="pricing" id="pricing">
+  <div class="pricing-in">
+    <div class="sec-head">
+      <p class="sec-eyebrow" data-i18n="pr.eyebrow">Pricing</p>
+      <h2 class="sec-title" data-i18n="pr.title">Cheaper than one lost evening.<br><em>Pick a plan.</em></h2>
+      <p class="sec-lede" data-i18n="pr.lede">Every plan works in both Premiere Pro and DaVinci Resolve. Cancel whenever you want.</p>
+    </div>
+
+    <div class="plan-grid">
+
+      <article class="plan">
+        <h3 class="plan-name" data-i18n="pr.n1">Free</h3>
+        <p class="plan-for" data-i18n="pr.f1">Your library tool, free forever. No trial clock ticking.</p>
+        <div class="plan-price"><span class="cur">$</span><span class="num">0</span><span class="per" data-i18n="pr.per1">forever</span></div>
+        <a class="plan-cta" href="#" data-i18n="pr.c1">Download free</a>
+        <div class="plan-sep"></div>
+        <p class="plan-sub" data-i18n="pr.s1">What you get</p>
+        <ul class="plan-list">
+          <li data-i18n="pr.a1">AiO Asset Manager, full version</li><li data-i18n="pr.a2">Index every SFX, track and preset</li><li data-i18n="pr.a3">Premiere Pro and DaVinci Resolve</li><li data-i18n="pr.a4">One machine</li><li class="off" data-i18n="pr.a5">The other seven plugins</li>
+        </ul>
+      </article>
+
+      <article class="plan is-best">
+        <span class="plan-badge" data-i18n="pr.badge">Most editors pick this</span>
+        <h3 class="plan-name" data-i18n="pr.n2">Pro</h3>
+        <p class="plan-for" data-i18n="pr.f2">All eight plugins, no limits, for the person doing the edit.</p>
+        <div class="plan-price"><span class="cur">$</span><span class="num">15</span><span class="per" data-i18n="pr.per2">/ month</span></div>
+        <a class="plan-cta" href="#" data-i18n="pr.c2">Start free trial</a>
+        <div class="plan-sep"></div>
+        <p class="plan-sub" data-i18n="pr.s2">All eight plugins</p>
+        <ul class="plan-tools"><li>Auto Silent Cut</li><li>Auto Transcripts</li><li>Auto Podcast</li><li>Auto Reframes</li><li>Auto Short Clip</li><li>Power Bins</li><li>Asset Manager</li><li>Sound Design</li></ul>
+        <div class="plan-sep"></div>
+        <ul class="plan-list">
+          <li data-i18n="pr.b1">No length limit on any sequence</li><li data-i18n="pr.b2">Two machines on one licence</li><li data-i18n="pr.b3">Every update while you subscribe</li><li data-i18n="pr.b4">Email support within one day</li>
+        </ul>
+      </article>
+
+      <article class="plan">
+        <h3 class="plan-name" data-i18n="pr.n3">Studio</h3>
+        <p class="plan-for" data-i18n="pr.f3">For rooms that ship every week and want the newest engine first.</p>
+        <div class="plan-price"><span class="cur">$</span><span class="num">30</span><span class="per" data-i18n="pr.per3">/ month</span></div>
+        <a class="plan-cta" href="#" data-i18n="pr.c3">Start free trial</a>
+        <div class="plan-sep"></div>
+        <p class="plan-sub" data-i18n="pr.s3">Everything in Pro, plus</p>
+        <ul class="plan-list">
+          <li data-i18n="pr.d1">Weekly model upgrades on every plugin</li><li data-i18n="pr.d2">Early access to plugins still in the works</li><li data-i18n="pr.d3">Five machines on one licence</li><li data-i18n="pr.d4">Your silence and reframe presets, synced</li><li data-i18n="pr.d5">Direct line to the person who builds it</li>
+        </ul>
+        <p class="plan-note" data-i18n="pr.note">Every tool gets sharper each week — you keep the newer engine without lifting a finger.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CHÂN TRANG ══════════════════ -->
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-grid">
+
+      <div class="foot-brand">
+        <div class="fb-top">
+          <svg class="mark" viewBox="0 0 385.89 351.31" fill="var(--accent)" aria-hidden="true">
+            <path d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+            <path d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+          </svg>
+          <span class="word">AiO <i>Studio</i></span>
+        </div>
+        <p class="foot-tag" data-i18n="ft.tag">Eight plugins that do the boring half of the edit — without ever leaving your timeline.</p>
+        <div class="compat">
+          <span>Premiere Pro 2023+</span>
+          <span>DaVinci Resolve 18+</span>
+        </div>
+      </div>
+
+      <div class="foot-col">
+        <h4 data-i18n="ft.h1">Plugins</h4>
+        <ul><li><a href="#plugins">AiO Auto Silent Cut</a></li><li><a href="#plugins">AiO Auto Transcripts</a></li><li><a href="#plugins">AiO Auto Podcast</a></li><li><a href="#plugins">AiO Auto Reframes</a></li><li><a href="#plugins">AiO Auto Short Clip</a></li><li><a href="#plugins">AiO Power Bins</a></li><li><a href="#plugins">AiO Asset Manager</a></li><li><a href="#plugins">AiO Sound Design</a></li></ul>
+      </div>
+
+      <div class="foot-col">
+        <h4 data-i18n="ft.h2">Learn</h4>
+        <ul>
+          <li><a href="#" data-i18n="ft.l1">Documentation</a></li>
+          <li><a href="#" data-i18n="ft.l2">Tutorials</a></li>
+          <li><a href="#" data-i18n="ft.l3">Changelog</a></li>
+          <li><a href="#" data-i18n="ft.l4">Roadmap</a></li>
+          <li><a href="#pricing" data-i18n="ft.l5">Pricing</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h4 data-i18n="ft.h3">Company</h4>
+        <ul>
+          <li><a href="#" data-i18n="ft.c1">About</a></li>
+          <li><a href="#" data-i18n="ft.c2">Contact</a></li>
+          <li><a href="#" data-i18n="ft.c3">Become an affiliate</a></li>
+          <li><a href="#" data-i18n="ft.c4">System status</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="foot-bar">
+      <div class="foot-legal">
+        <span data-i18n="ft.copy">&copy; 2026 AiO Studio. Built in Vietnam.</span>
+        <a href="#" data-i18n="ft.terms">Terms</a>
+        <a href="#" data-i18n="ft.privacy">Privacy</a>
+      </div>
+      <div class="foot-social">
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.9-.5-5.8a3 3 0 0 0-2.1-2.1C18.5 3.6 12 3.6 12 3.6s-6.5 0-8.4.5a3 3 0 0 0-2.1 2.1C1 8.1 1 12 1 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 8.4.5 8.4.5s6.5 0 8.4-.5a3 3 0 0 0 2.1-2.1C23 15.9 23 12 23 12ZM9.9 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/></svg></a>
+        <a href="#" aria-label="Discord"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 5.6A16.4 16.4 0 0 0 15.4 4.4l-.2.4a15 15 0 0 0-6.4 0l-.2-.4A16.4 16.4 0 0 0 4.5 5.6C1.9 9.4 1.2 13.2 1.6 16.9a16.6 16.6 0 0 0 5 2.5l1-1.7c-.6-.2-1.1-.5-1.6-.8l.4-.3a11.8 11.8 0 0 0 10.2 0l.4.3c-.5.3-1 .6-1.6.8l1 1.7a16.6 16.6 0 0 0 5-2.5c.5-4.3-.6-8.1-2.9-11.3ZM8.7 14.7c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+
+<script>
+/* ═══════════ editor backdrop data (fixed, not random) ═══════════ */
+const STR = {
+  en:{
+    'a11y.brand':'AiO Studio — back to top', 'a11y.nav':'Main navigation', 'a11y.menu':'Open menu',
+    'a11y.menuClose':'Close menu',
+    'nav.plugins':'Plugins','nav.features':'Features','nav.pricing':'Pricing','nav.docs':'Docs',
+    'nav.signin':'Sign in','cta.demo':'Get the demo',
+    'hero.eyebrow':'Plugins for Premiere Pro · DaVinci Resolve',
+    'hero.auto':'Automated.',
+    'hero.lede':'I got sick of trimming silence at 2am. So I built eight plugins to do it — right inside Premiere.',
+    'hero.primary':'Get the free demo','hero.secondary':'See pricing',
+    'after.note':'Scroll to see the header shrink · orange border switch on · progress bar fill',
+    'ed.project':'<b>Project</b> · aio_demo.prproj',
+    'ed.program':'<b>Program</b> · Sequence 01',
+    'ed.params':'<b>AiO Autocut</b> · parameters',
+    'ed.sub':'…one click and it cuts the whole thing.',
+    'panel.badge':'running','panel.left':'12 s left','clip.caption':'Auto subtitles','clip.broll':'B-roll','clip.lower':'Lower third',
+    'ed.face':'face · 98%','ed.analyse':'Analyse sequence','ed.fxNote':'214 cuts · 04:12 saved',
+    'feat.eyebrow':'Eight plugins',
+    'feat.title':'Everything the edit needs.<br><em>None of the clicking.</em>',
+    'feat.lede':'Each one runs as a panel inside Premiere. Open it, press one button, go back to the story.',
+    'feat.cta':'Learn more',
+    'feat.d1':'Smart audio file organization','feat.d2':'Manage and preview assets',
+    'feat.d3':'Remove silences automatically','feat.d4':'Design and edit unique sounds',
+    'feat.d5':'Automatically reframe video','feat.d6':'Enhance podcast audio',
+    'feat.d7':'Extract short clips in seconds','feat.d8':'Generate transcripts instantly',
+    'feat.f1a':'Sorts clips into bins on its own',
+    'feat.f1b':'Colour labels by camera and mic',
+    'feat.f1c':'Bulk rename from a pattern',
+    'feat.f2a':'Indexes every SFX, track and preset',
+    'feat.f2b':'Preview before you import',
+    'feat.f2c':'Search by tag, length or colour',
+    'feat.f3a':'Finds silence by dB threshold',
+    'feat.f3b':'Keeps breaths, drops dead air',
+    'feat.f3c':'Ripple deletes in one pass',
+    'feat.f4a':'Matches SFX to each scene',
+    'feat.f4b':'Layers and ducks under dialogue',
+    'feat.f4c':'Exports a stem per layer',
+    'feat.f5a':'Tracks the subject frame by frame',
+    'feat.f5b':'Exports 9:16, 1:1 and 4:5',
+    'feat.f5c':'Leaves keyframes you can edit',
+    'feat.f6a':'Syncs every mic take',
+    'feat.f6b':'Cuts to whoever is talking',
+    'feat.f6c':'Cleans noise and evens levels',
+    'feat.f7a':'Scores highlights from the transcript',
+    'feat.f7b':'Cuts vertical clips of 30–60 s',
+    'feat.f7c':'Burns captions on export',
+    'feat.f8a':'Transcribes with speaker names',
+    'feat.f8b':'Edit the text, the cut follows',
+    'feat.f8c':'Exports SRT, VTT or captions',
+    'pr.eyebrow':'Pricing',
+    'pr.title':'Cheaper than one lost evening.<br><em>Pick a plan.</em>',
+    'pr.lede':'Every plan works in both Premiere Pro and DaVinci Resolve. Cancel whenever you want.',
+    'pr.badge':'Most editors pick this',
+    'pr.n1':'Free',
+    'pr.f1':'Your library tool, free forever. No trial clock ticking.',
+    'pr.per1':'forever',
+    'pr.c1':'Download free',
+    'pr.s1':'What you get',
+    'pr.a1':'AiO Asset Manager, full version',
+    'pr.a2':'Index every SFX, track and preset',
+    'pr.a3':'Premiere Pro and DaVinci Resolve',
+    'pr.a4':'One machine',
+    'pr.a5':'The other seven plugins',
+    'pr.n2':'Pro',
+    'pr.f2':'All eight plugins, no limits, for the person doing the edit.',
+    'pr.per2':'/ month',
+    'pr.c2':'Start free trial',
+    'pr.s2':'All eight plugins',
+    'pr.b1':'No length limit on any sequence',
+    'pr.b2':'Two machines on one licence',
+    'pr.b3':'Every update while you subscribe',
+    'pr.b4':'Email support within one day',
+    'pr.n3':'Studio',
+    'pr.f3':'For rooms that ship every week and want the newest engine first.',
+    'pr.per3':'/ month',
+    'pr.c3':'Start free trial',
+    'pr.s3':'Everything in Pro, plus',
+    'pr.d1':'Weekly model upgrades on every plugin',
+    'pr.d2':'Early access to plugins still in the works',
+    'pr.d3':'Five machines on one licence',
+    'pr.d4':'Your silence and reframe presets, synced',
+    'pr.d5':'Direct line to the person who builds it',
+    'pr.note':'Every tool gets sharper each week — you keep the newer engine without lifting a finger.',
+    'ft.tag':'Eight plugins that do the boring half of the edit — without ever leaving your timeline.',
+    'ft.h1':'Plugins',
+    'ft.h2':'Learn',
+    'ft.h3':'Company',
+    'ft.l1':'Documentation',
+    'ft.l2':'Tutorials',
+    'ft.l3':'Changelog',
+    'ft.l4':'Roadmap',
+    'ft.l5':'Pricing',
+    'ft.c1':'About',
+    'ft.c2':'Contact',
+    'ft.c3':'Become an affiliate',
+    'ft.c4':'System status',
+    'ft.copy':'&copy; 2026 AiO Studio. Built in Vietnam.',
+    'ft.terms':'Terms',
+    'ft.privacy':'Privacy',
+  },
+  vi:{
+    'a11y.brand':'AiO Studio — về đầu trang', 'a11y.nav':'Điều hướng chính', 'a11y.menu':'Mở menu',
+    'a11y.menuClose':'Đóng menu',
+    'nav.plugins':'Plugin','nav.features':'Tính năng','nav.pricing':'Bảng giá','nav.docs':'Hướng dẫn',
+    'nav.signin':'Đăng nhập','cta.demo':'Tải Demo',
+    'hero.eyebrow':'Plugin cho Premiere Pro · DaVinci Resolve',
+    'hero.auto':'Tự động.',
+    'hero.lede':'Mình chán cảnh 2 giờ sáng còn ngồi cắt khoảng lặng. Nên mình làm 8 plugin làm hộ, ngay trong Premiere.',
+    'hero.primary':'Tải Demo miễn phí','hero.secondary':'Xem bảng giá',
+    'after.note':'Cuộn xuống để xem header co lại · viền cam bật lên · thanh tiến độ chạy',
+    'ed.project':'<b>Project</b> · aio_demo.prproj',
+    'ed.program':'<b>Program</b> · Sequence 01',
+    'ed.params':'<b>AiO Autocut</b> · thông số',
+    'ed.sub':'…mình bấm một nút là nó tự cắt hết.',
+    'panel.badge':'đang chạy','panel.left':'còn 12 giây','clip.caption':'Phụ đề tự động','clip.broll':'Cảnh phụ','clip.lower':'Chữ dưới màn',
+    'ed.face':'khuôn mặt · 98%','ed.analyse':'Quét chuỗi hình','ed.fxNote':'214 nhát cắt · tiết kiệm 04:12',
+    'feat.eyebrow':'Tám plugin',
+    'feat.title':'Đủ thứ buổi dựng cần.<br><em>Không phải click.</em>',
+    'feat.lede':'Mỗi cái là một panel chạy thẳng trong Premiere. Mở lên, bấm một nút, rồi quay lại với câu chuyện.',
+    'feat.cta':'Xem chi tiết',
+    'feat.d1':'Dọn bin và gán nhãn màu','feat.d2':'Quản lý và xem trước kho FX',
+    'feat.d3':'Cắt khoảng lặng tự động','feat.d4':'Dựng và chỉnh tiếng động',
+    'feat.d5':'Reframe video sang 9:16','feat.d6':'Hậu kỳ podcast đa mic',
+    'feat.d7':'Cắt clip ngắn trong vài giây','feat.d8':'Bóc băng và tạo phụ đề',
+    'feat.f1a':'Tự xếp clip vào đúng bin',
+    'feat.f1b':'Gán nhãn màu theo cam và mic',
+    'feat.f1c':'Đổi tên hàng loạt theo mẫu',
+    'feat.f2a':'Lập chỉ mục mọi SFX, nhạc, preset',
+    'feat.f2b':'Nghe thử trước khi import',
+    'feat.f2c':'Tìm theo thẻ, độ dài hoặc màu',
+    'feat.f3a':'Dò khoảng lặng theo ngưỡng dB',
+    'feat.f3b':'Giữ nhịp thở, bỏ chỗ trống',
+    'feat.f3c':'Xoá dồn chỉ trong một lượt',
+    'feat.f4a':'Ghép SFX theo từng cảnh',
+    'feat.f4b':'Xếp lớp và hạ nền dưới thoại',
+    'feat.f4c':'Xuất stem riêng cho từng lớp',
+    'feat.f5a':'Bám chủ thể từng khung hình',
+    'feat.f5b':'Xuất 9:16, 1:1 và 4:5',
+    'feat.f5c':'Để lại keyframe sửa được',
+    'feat.f6a':'Đồng bộ mọi đường mic',
+    'feat.f6b':'Cắt theo người đang nói',
+    'feat.f6c':'Khử ồn và cân đều âm lượng',
+    'feat.f7a':'Chấm điểm đoạn hay từ bản bóc băng',
+    'feat.f7b':'Cắt clip dọc 30–60 giây',
+    'feat.f7c':'Ghim phụ đề khi xuất',
+    'feat.f8a':'Bóc băng kèm tên người nói',
+    'feat.f8b':'Sửa chữ, bản dựng đổi theo',
+    'feat.f8c':'Xuất SRT, VTT hoặc caption',
+    'pr.eyebrow':'Bảng giá',
+    'pr.title':'Rẻ hơn một buổi tối mất trắng.<br><em>Chọn gói đi anh.</em>',
+    'pr.lede':'Gói nào cũng chạy được cả Premiere Pro lẫn DaVinci Resolve. Ngừng lúc nào cũng được.',
+    'pr.badge':'Đa số chọn gói này',
+    'pr.n1':'Miễn phí',
+    'pr.f1':'Công cụ kho, miễn phí trọn đời. Không đếm ngày dùng thử.',
+    'pr.per1':'trọn đời',
+    'pr.c1':'Tải miễn phí',
+    'pr.s1':'Anh được gì',
+    'pr.a1':'AiO Asset Manager, bản đầy đủ',
+    'pr.a2':'Lập chỉ mục mọi SFX, nhạc và preset',
+    'pr.a3':'Premiere Pro và DaVinci Resolve',
+    'pr.a4':'Một máy',
+    'pr.a5':'Bảy plugin còn lại',
+    'pr.n2':'Pro',
+    'pr.f2':'Đủ tám plugin, không giới hạn, cho người ngồi dựng.',
+    'pr.per2':'/ tháng',
+    'pr.c2':'Dùng thử miễn phí',
+    'pr.s2':'Đủ tám plugin',
+    'pr.b1':'Không giới hạn độ dài chuỗi hình',
+    'pr.b2':'Hai máy trên một giấy phép',
+    'pr.b3':'Mọi bản cập nhật trong lúc còn dùng',
+    'pr.b4':'Hỗ trợ qua email trong một ngày',
+    'pr.n3':'Studio',
+    'pr.f3':'Cho phòng dựng ra bài mỗi tuần, muốn engine mới trước.',
+    'pr.per3':'/ tháng',
+    'pr.c3':'Dùng thử miễn phí',
+    'pr.s3':'Mọi thứ của Pro, thêm',
+    'pr.d1':'Nâng cấp model hằng tuần cho từng plugin',
+    'pr.d2':'Dùng sớm các plugin đang làm dở',
+    'pr.d3':'Năm máy trên một giấy phép',
+    'pr.d4':'Đồng bộ preset khoảng lặng và reframe',
+    'pr.d5':'Nhắn thẳng người viết ra nó',
+    'pr.note':'Mỗi tuần từng tool lại nhạy hơn — anh giữ engine mới mà không phải làm gì.',
+    'ft.tag':'Tám plugin lo phần chán nhất của buổi dựng — mà không phải rời khỏi timeline.',
+    'ft.h1':'Plugin',
+    'ft.h2':'Tìm hiểu',
+    'ft.h3':'Về chúng tôi',
+    'ft.l1':'Tài liệu',
+    'ft.l2':'Hướng dẫn',
+    'ft.l3':'Nhật ký cập nhật',
+    'ft.l4':'Lộ trình',
+    'ft.l5':'Bảng giá',
+    'ft.c1':'Giới thiệu',
+    'ft.c2':'Liên hệ',
+    'ft.c3':'Làm cộng tác viên',
+    'ft.c4':'Tình trạng hệ thống',
+    'ft.copy':'&copy; 2026 AiO Studio. Làm tại Việt Nam.',
+    'ft.terms':'Điều khoản',
+    'ft.privacy':'Bảo mật',
+  }
+};
+
+const FX_STR = {
+  en:[['Silence threshold','-32 dB',68],['Minimum length','0.35 s',34],['Head / tail pad','120 ms',22],['Keep breaths','on',80]],
+  vi:[['Ngưỡng im lặng','-32 dB',68],['Độ dài tối thiểu','0.35 s',34],['Đệm đầu / cuối','120 ms',22],['Giữ nhịp thở','bật',80]],
+};
+
+const BINS_STR = {
+  en:[
+    ['#729ACC','Cam A — master','12:40'],['#729ACC','Cam B — wide','12:40'],
+    ['#1D7021','Mic 1 — host','12:38'],  ['#1D7021','Mic 2 — guest','12:38'],
+    ['#e8c05a','Transcript .srt','—'],   ['#8d8d95','B-roll / pack 01','04:12'],
+  ],
+  vi:[
+    ['#729ACC','Cam A — chính','12:40'], ['#729ACC','Cam B — toàn','12:40'],
+    ['#1D7021','Mic 1 — người dẫn','12:38'],['#1D7021','Mic 2 — khách','12:38'],
+    ['#e8c05a','Phụ đề .srt','—'],       ['#8d8d95','B-roll / gói 01','04:12'],
+  ],
+};
+function buildBins(lang){
+  document.getElementById('binList').innerHTML = BINS_STR[lang].map((b,i)=>
+    `<div class="bin${i===0?' sel':''}"><span class="swatch" style="background:${b[0]}"></span>${b[1]}<span class="len">${b[2]}</span></div>`
+  ).join('');
+}
+
+(function buildGraph(){
+  const g = document.getElementById('fxGraph');
+  if (!g) return;
+  let seed = 4211, html = '';
+  for (let i=0;i<46;i++){
+    seed = (seed*9301 + 49297) % 233280;
+    let h = 12 + (seed/233280)*88;
+    if (i>8 && i<13 || i>25 && i<29 || i>38 && i<41) h = 6 + (seed/233280)*16;  // khoảng lặng
+    html += `<b class="${h < 38 ? 'low' : ''}" style="height:${h}%"></b>`;
+  }
+  g.insertAdjacentHTML('afterbegin', html);
+})();
+
+function buildFx(lang){
+  const el = document.getElementById('fxList');
+  if (!el) return;
+  el.innerHTML = FX_STR[lang].map(f=>
+    `<div class="fx-row"><span>${f[0]}<em>${f[1]}</em></span><div class="slider"><i style="width:${f[2]}%"></i></div></div>`
+  ).join('');
+}
+
+/* time ruler */
+let ruler = '';
+for (let i=0;i<=10;i++){
+  const p = i/10;
+  ruler += `<span class="tick" style="left:calc(52px + (100% - 52px) * ${p})"></span>`;
+  ruler += `<span class="tc" style="left:calc(52px + (100% - 52px) * ${p})">00:0${Math.floor(i*1.2)}:${String((i*17)%60).padStart(2,'0')}</span>`;
+}
+document.getElementById('ruler').innerHTML = ruler;
+
+/* tracks — true Premiere order: captions ON TOP, then V, then A */
+const TRACKS = [
+  {name:'C1', cls:'c', clips:[[6,14,'__CAPTION__'],[23,17,'…'],[45,20,'…'],[70,18,'…']]},
+  {name:'V2', cls:'v', clips:[[10,16,'__BROLL__ 01'],[40,12,'__BROLL__ 02'],[74,14,'__LT__']]},
+  {name:'V1', cls:'v', clips:[[2,20,'Cam A'],[24,16,'Cam B'],[43,22,'Cam A'],[68,26,'Cam B'], ], sel:2},
+  {name:'A1', cls:'a', clips:[[2,20,'Mic 1'],[24,16,'Mic 1'],[43,22,'Mic 1'],[68,26,'Mic 1']]},
+  {name:'A2', cls:'a', clips:[[2,42,'Mic 2'],[46,48,'Mic 2']]},
+];
+const GAPS = [[22.2,1.6],[41.2,1.6],[65.2,2.6]]; /* silences Autocut removed */
+
+function waveBars(n, seed){
+  let s = seed, out = '';
+  for (let i=0;i<n;i++){
+    s = (s*9301 + 49297) % 233280;
+    const h = 22 + (s/233280)*78;
+    out += `<i style="height:${h}%"></i>`;
+  }
+  return out;
+}
+
+function buildTracks(lang){
+document.getElementById('tracks').innerHTML = TRACKS.map((t,ti)=>{
+  const clips = t.clips.map((c,ci)=>{
+    const sel = (t.sel===ci) ? ' sel' : '';
+    const inner = t.cls==='a'
+      ? `<div class="wave">${waveBars(Math.round(c[1]*1.6), 7+ti*31+ci*13)}</div><span class="name">${c[2]}</span>`
+      : (t.cls==='v' ? `<span class="head"></span><span class="name">${c[2]}</span>` : `<span class="name">${c[2]}</span>`);
+    return `<div class="clip ${t.cls}${sel}" style="left:${c[0]}%;width:${c[1]}%">${inner}</div>`;
+  }).join('');
+  const gaps = (t.cls==='v'||t.cls==='a')
+    ? GAPS.map(g=>`<div class="gap" style="left:${g[0]}%;width:${g[1]}%"></div>`).join('') : '';
+  return `<div class="track"><span class="thead"><b></b>${t.name}</span><div class="lane">${clips}${gaps}</div></div>`;
+}).join('')
+   .replace(/__CAPTION__/g, STR[lang]['clip.caption'])
+   .replace(/__BROLL__/g,   STR[lang]['clip.broll'])
+   .replace(/__LT__/g,      STR[lang]['clip.lower']);
+}
+
+/* percentage kept in sync with the progress bar */
+const apPct = document.getElementById('apPct');
+const apBar = document.querySelector('.ap-bar i');
+if (apPct && apBar && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+  setInterval(()=>{ apPct.textContent = Math.round(parseFloat(getComputedStyle(apBar).width)
+    / parseFloat(getComputedStyle(apBar.parentElement).width) * 100) + '%'; }, 120);
+}
+
+
+/* ═══════════ 8 plugins ⇄ 8 headline words ═══════════ */
+const TOOLS_ALL = { en:[
+  ['Cut.',       'Auto Silent Cut',  'Cutting silences',  '<u>214</u> silences · <u>04:12</u> saved'],
+  ['Subtitles.', 'Auto Transcripts', 'Writing subtitles', '<u>1,842</u> words · <u>96%</u> match'],
+  ['Multicam.',  'Auto Podcast',     'Syncing mics',      '<u>3</u> cameras · <u>12:40</u>'],
+  ['Reframe.',   'Auto Reframes',    'Tracking subject',  '<u>128</u> keyframes · <u>4</u> scenes'],
+  ['Shorts.',    'Auto Short Clip',  'Finding highlights','<u>9</u> clips · <u>30–60 s</u>'],
+  ['Organise.',  'Power Bins',       'Sorting bins',      '<u>142</u> clips · <u>6</u> bins'],
+  ['Assets.',    'Asset Manager',    'Scanning library',  '<u>2,410</u> assets · <u>18 GB</u>'],
+  ['Sound.',     'Sound Design',     'Adding sound FX',   '<u>76</u> SFX · <u>5</u> layers'],
+], vi:[
+  ['Cắt.',        'Auto Silent Cut',  'Đang cắt khoảng lặng', '<u>214</u> khoảng lặng · giảm <u>04:12</u>'],
+  ['Phụ đề.',     'Auto Transcripts', 'Đang làm phụ đề',      '<u>1.842</u> từ · khớp <u>96%</u>'],
+  ['Multicam.',   'Auto Podcast',     'Đang đồng bộ mic',     '<u>3</u> camera · <u>12:40</u>'],
+  ['Dọc 9:16.',   'Auto Reframes',    'Đang bám chủ thể',     '<u>128</u> keyframe · <u>4</u> cảnh'],
+  ['Clip ngắn.',  'Auto Short Clip',  'Đang tìm đoạn hay',    '<u>9</u> clip · <u>30–60 giây</u>'],
+  ['Sắp xếp.',    'Power Bins',       'Đang dọn bin',         '<u>142</u> clip · <u>6</u> bin'],
+  ['Kho FX.',     'Asset Manager',    'Đang quét thư viện',   '<u>2.410</u> asset · <u>18 GB</u>'],
+  ['Tiếng động.', 'Sound Design',     'Đang ghép tiếng động', '<u>76</u> SFX · <u>5</u> lớp'],
+]};
+let LANG = 'en';
+let TOOLS = TOOLS_ALL[LANG];
+const SLOTS = [document.getElementById('l0'),document.getElementById('l1'),document.getElementById('l2')];
+const stepsEl = document.getElementById('steps');
+stepsEl.innerHTML = TOOLS.map(()=>'<i></i>').join('');
+const stepDots = [...stepsEl.children];
+const softMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function paint(slot, word, tool, first){
+  const old = slot.querySelector('.w');
+  const w = document.createElement('span');
+  w.className = 'w' + (first || softMotion ? '' : ' in');
+  [...word].forEach((ch,i)=>{
+    const b = document.createElement('b');
+    b.textContent = ch === ' ' ? '\u00A0' : ch;
+    b.style.animationDelay = (i*28) + 'ms';
+    w.appendChild(b);
+  });
+  slot.insertBefore(w, slot.firstChild);
+  if (old){
+    if (softMotion){ old.remove(); }
+    else {
+      old.className = 'w out';
+      [...old.children].forEach((b,i)=>b.style.animationDelay = (i*22)+'ms');
+      setTimeout(()=>old.remove(), 760);
+    }
+  }
+  const tag = slot.querySelector('.h-tag');
+  tag.classList.add('swap');
+  setTimeout(()=>{ tag.querySelector('.tname').textContent = 'AiO ' + tool; tag.classList.remove('swap'); }, 230);
+}
+
+/* the AiO panel follows whichever plugin sits on the first line */
+const apTitle = document.querySelector('.ap-name');
+const apLabel = document.querySelector('.ap-row span');
+const apMeta  = document.querySelector('.ap-meta');
+function syncPanel(t){
+  if (!apTitle) return;
+  document.querySelector('.ap-name').textContent = 'AiO ' + t[1];
+  apLabel.textContent = t[2];
+  apMeta.innerHTML = t[3] + ' · ' + STR[LANG]['panel.left'];
+}
+
+let k = 0;
+let timer = null;
+function cycle(first){
+  for (let n=0;n<3;n++){
+    const t = TOOLS[(k+n) % TOOLS.length];
+    setTimeout(()=>paint(SLOTS[n], t[0], t[1], first), first ? 0 : n*190);
+  }
+  stepDots.forEach((d,i)=>d.classList.toggle('on', [0,1,2].some(n=>(k+n)%TOOLS.length===i)));
+  syncPanel(TOOLS[k % TOOLS.length]);
+  k = (k + 3) % TOOLS.length;
+}
+/* ═══════════ mục Tính năng: hiện dần khi cuộn tới ═══════════ */
+(function revealFeatures(){
+  const cards = [...document.querySelectorAll('.feat')];
+  cards.forEach((c,i)=>c.style.setProperty('--i', i % 4));
+  const showAll = ()=>cards.forEach(c=>c.classList.add('in'));
+  if (softMotion || !('IntersectionObserver' in window)){ showAll(); return; }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {rootMargin:'0px 0px -12% 0px', threshold:.15});
+  cards.forEach(c=>io.observe(c));
+})();
+
+/* ═══════════ language switch — English by default ═══════════ */
+const langInk = document.getElementById('langInk');
+function setLang(lang){
+  LANG = lang;
+  TOOLS = TOOLS_ALL[lang];
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const v = STR[lang][el.dataset.i18n];
+    if (v != null) el.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
+    const v = STR[lang][el.dataset.i18nAria];
+    if (v != null) el.setAttribute('aria-label', v);
+  });
+
+  document.querySelectorAll('.lang-btn').forEach(b=>
+    b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  langInk.style.transform = `translateX(${lang === 'vi' ? 38 : 0}px)`;
+
+  buildBins(lang);
+  buildFx(lang);
+  buildTracks(lang);
+
+  k = 0;
+  cycle(true);
+  if (timer) clearInterval(timer);
+  if (!softMotion) timer = setInterval(()=>cycle(false), 4600);
+}
+document.querySelectorAll('.lang-btn').forEach(b=>
+  b.addEventListener('click', ()=>{ if (b.dataset.lang !== LANG) setLang(b.dataset.lang); }));
+
+setLang('en');   /* mặc định tiếng Anh */
+
+/* ═══════════ header: scroll state + progress bar ═══════════ */
+const nav = document.getElementById('nav');
+const progress = document.getElementById('progress');
+let ticking = false;
+function onScroll(){
+  const y = window.scrollY;
+  nav.classList.toggle('is-stuck', y > 28);
+  const max = document.documentElement.scrollHeight - innerHeight;
+  progress.style.width = (max > 0 ? (y/max)*100 : 0) + '%';
+  ticking = false;
+}
+addEventListener('scroll', ()=>{ if(!ticking){ ticking = true; requestAnimationFrame(onScroll); } }, {passive:true});
+onScroll();
+
+/* ═══════════ sliding indicator under the links ═══════════ */
+const links = document.getElementById('links');
+const ink = document.getElementById('ink');
+function moveInk(el){
+  ink.style.left = el.offsetLeft + 'px';
+  ink.style.width = el.offsetWidth + 'px';
+}
+links.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('mouseenter', ()=>moveInk(a));
+  a.addEventListener('focus', ()=>{ moveInk(a); ink.style.opacity = 1; });
+  a.addEventListener('blur', ()=>{ ink.style.opacity = ''; });
+});
+/* mục đang xem -> tô đậm link tương ứng, con trỏ trượt tới */
+let activeLink = null;
+function setActive(el){
+  if (!el) return;
+  activeLink = el;
+  links.querySelectorAll('a').forEach(a=>a.removeAttribute('aria-current'));
+  el.setAttribute('aria-current','page');
+  if (!links.matches(':hover')) { moveInk(el); ink.classList.add('on'); }
+}
+links.addEventListener('mouseleave', ()=>{ if (activeLink) moveInk(activeLink); });
+
+const SPY = [
+  ['#top',      links.querySelector('[href="#plugins"]')],
+  ['#features', links.querySelector('[href="#features"]')],
+  ['#pricing',  links.querySelector('[href="#pricing"]')],
+];
+const spyMap = new Map();
+SPY.forEach(([sel,link])=>{ const el = document.querySelector(sel); if (el && link) spyMap.set(el, link); });
+
+if ('IntersectionObserver' in window && spyMap.size){
+  const seen = new Map();
+  const spy = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>seen.set(e.target, e.intersectionRatio));
+    let best = null, bestRatio = 0;
+    seen.forEach((ratio, el)=>{ if (ratio > bestRatio){ bestRatio = ratio; best = el; } });
+    if (best && bestRatio > 0.05) setActive(spyMap.get(best));
+  }, {threshold:[0,.05,.2,.4,.6,.8,1], rootMargin:'-72px 0px -35% 0px'});
+  spyMap.forEach((_,el)=>spy.observe(el));
+}
+setActive(links.querySelector('[href="#plugins"]'));
+addEventListener('resize', ()=>{ if (activeLink) moveInk(activeLink); });
+
+/* ═══════════ mobile menu ═══════════ */
+const burger = document.getElementById('burger');
+const sheet = document.getElementById('sheet');
+burger.addEventListener('click', ()=>{
+  const open = burger.getAttribute('aria-expanded') === 'true';
+  burger.setAttribute('aria-expanded', String(!open));
+  burger.setAttribute('aria-label', STR[LANG][open ? 'a11y.menu' : 'a11y.menuClose']);
+  sheet.classList.toggle('open', !open);
+  document.body.style.overflow = !open ? 'hidden' : '';
+});
+addEventListener('keydown', e=>{
+  if (e.key === 'Escape' && sheet.classList.contains('open')) burger.click();
+});
+
+/* ═══════════ backdrop drifts gently with the pointer (parallax) ═══════════ */
+const editor = document.getElementById('aio-bg-editor');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!reduce && matchMedia('(pointer:fine)').matches){
+  let tx = 0, ty = 0, cx = 0, cy = 0, raf;
+  addEventListener('mousemove', e=>{
+    tx = (e.clientX / innerWidth - .5) * 22;
+    ty = (e.clientY / innerHeight - .5) * 14;
+    if (!raf) raf = requestAnimationFrame(loop);
+  }, {passive:true});
+  function loop(){
+    cx += (tx - cx) * .06; cy += (ty - cy) * .06;
+    editor.style.transform =
+      `translate(calc(-50% + ${cx}px), calc(-50% + ${cy}px)) perspective(2200px) rotateX(5deg) scale(1.02)`;
+    raf = (Math.abs(tx-cx) > .1 || Math.abs(ty-cy) > .1) ? requestAnimationFrame(loop) : null;
+  }
+}
+</script>
+</body>
+</html>

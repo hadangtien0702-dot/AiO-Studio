@@ -1,0 +1,58 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100vw; height: 100vh; overflow: hidden;
+  cursor: crosshair;
+  font-family: var(--font-ui);
+  user-select: none;
+}
+
+/* Anh dong bang cua man hinh — nen phia duoi cung. */
+#shot {
+  position: fixed; inset: 0;
+  background-position: center; background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Lop lam mo ca man hinh khi CHUA keo chon. */
+#dim {
+  position: fixed; inset: 0;
+  background: rgb(0 0 0 / 42%);
+}
+
+/* Khung vung chon — box-shadow khong lo lam mo phan ngoai. */
+#sel {
+  position: fixed; left: 0; top: 0; width: 0; height: 0;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
+  pointer-events: none;
+}
+
+/* Nhan kich thuoc WxH. */
+#size {
+  position: absolute; left: 0; top: -24px;
+  height: 20px; padding: 0 var(--sp-2);
+  display: flex; align-items: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+  color: var(--accent-on);
+  background: var(--accent);
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+/* Neu sat mep tren, day nhan xuong trong khung. */
+#size.inside { top: 4px; left: 4px; }
+
+/* Chi dan giua man hinh phia tren. */
+#hint {
+  position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-sm); color: var(--text-1);
+  background: rgb(20 20 20 / 88%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+#hint b { color: var(--accent-text); }
+#hint.hidden { opacity: 0; }

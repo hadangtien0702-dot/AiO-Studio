@@ -1,0 +1,55 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  user-select: none;
+}
+
+/* Khung anh — nam giua, chua bong + goc bo tron trong phan trong suot. */
+#frame {
+  position: absolute;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-pop);
+  cursor: grab;
+  background: var(--bg-2);
+}
+#frame.grabbing { cursor: grabbing; }
+
+#img {
+  display: block;
+  width: 100%; height: 100%;
+  -webkit-user-drag: none;
+}
+
+/* Thanh cong cu — hien khi re chuot. */
+#bar {
+  position: absolute; top: var(--sp-2); right: var(--sp-2);
+  display: flex; gap: var(--sp-1);
+  padding: 3px;
+  background: rgb(20 20 20 / 82%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-md);
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  pointer-events: none;
+}
+#frame:hover #bar { opacity: 1; transform: none; pointer-events: auto; }
+
+#bar button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+#bar button:hover { background: var(--bg-hover); color: var(--text-1); }
+#bar #close:hover { background: var(--danger-strong); color: #fff; }
+#bar button:active { transform: scale(0.94); }
