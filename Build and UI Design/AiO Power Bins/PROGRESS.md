@@ -1,5 +1,14 @@
 # AiO Power Bins - Nhat ky
 
+## 2026-08-24 23:17 - Dong bo token cam #f86820 (lenh anh Tien, ca bo AiO)
+
+- `_tokens.scss` nhan ban moi tu design-system (`dong-bo-tokens.ps1`), chep
+  `Inter.woff2` vao `client/src/fonts/`. Build lai + cai lai.
+- ☠️ `--accent-on` nay TRANG -> nut nho `.btn--sm.btn--primary` 11px tut tuong
+  phan (~2,7:1). Override co pham vi trong `_controls.scss`: giu chu nau #150700
+  nhu ban anh Tien da duyet (do that tren panel 8088 sau khi cai: dat).
+- Panel van DONG BANG tinh nang — day chi la dong bo mau theo lenh 24/08.
+
 ## [song-ngu] - 2026-08-14 13:57 (UTC+7) - SONG NGU VI/EN HOAN CHINH + 4 LOI SUA KEM
 
 ### Trang thai hien tai

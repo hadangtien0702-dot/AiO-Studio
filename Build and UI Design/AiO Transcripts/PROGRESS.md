@@ -1,5 +1,43 @@
 # AiO Transcript - Nhat ky
 
+## [2.5.5] - 2026-08-24 23:17 (UTC+7) - Dong bo nut chinh CA BO AiO Studio (anh Tien khoanh 2 anh)
+
+Anh Tien: *"bo nut nay em phai lam dong bo cho cac tool - mau sac, kich thuoc chu,
+cai thi co icon cai thi khong, mau cam cung khac luon"* + *"soat lai toan bo tool"*.
+
+### Do truoc khi sua (2 panel dang mo)
+| | Autocut | Transcript |
+|---|---|---|
+| Cam nen | #f86820 (DUNG token) | #ff5714 (token CU) |
+| Chu | trang / 700 / 15px | nau den / 600 / 13px |
+| Icon | co | khong |
+Soat ca 7 panel: **6/7 cam token cu #ff5714**, chi Autocut dung. Co che
+`dong-bo-tokens.ps1` co san nhung lau khong chay.
+
+### Da lam
+- Chay `dong-bo-tokens.ps1`: 4 panel build (Asset/PowerBins/Autocut/Transcripts)
+  ve #f86820; chep `Inter.woff2` sang 3 panel (canh bao trong tokens: thieu font
+  la font-weight khong an). Autocut chi them header canh bao, 0 gia tri doi.
+- 3 panel tinh (Re-Frames/GuideFrame/Podcast): thay dung 5 gia tri ho cam trong
+  `dist/tokens.css` (khong chep ca file — tranh bay @font-face). GIU `--accent-on`
+  nau o 3 panel nay: UI cua chung chua ra soat cho chu nho tren cam.
+- Transcript `.btn--primary`: fs-md/semibold -> **fs-lg/bold** + icon phu de
+  (cung hinh icon thanh tren) — dung khuon nut Autocut.
+- Asset Manager + Power Bins: build lai + cai lai de token an vao ban chay.
+  ☠️ Phat hien khi do: nut nho "Them thu muc" 11px thanh TRANG tren cam (~2,7:1,
+  te hon ban cu nau 6,2:1) -> override co pham vi `.btn--sm.btn--primary
+  { color:#150700 }` o ca 2 panel, giu dung dang anh da duyet. Do lai: chu nau OK.
+- `kiem-dong-bo.ps1`: them ngoai le CO GHI CHU cho nut ngon ngu `.aio-ngonngu`
+  (gian chu 0,44px la chu y, VA da deu ca 3 panel — thuoc do su dong bo, khong
+  phai do gu).
+
+### Kiem chung
+- Do DOM 2 panel: nut chinh **giong nhau tung so** — nen rgb(248,104,32), chu
+  trang 15px/700, cao 34, radius 8, co icon.
+- `kiem-dong-bo.ps1`: **"DAT: 3 panel dong bo hoan toan"** (8088/8089/8091;
+  Power Bins dong — kiem bang file, dist da mang #f86820).
+- Asset Manager nut nho: nen #f86820 moi, chu #150700 nhu cu.
+
 ## [2.5.4] - 2026-08-24 23:10 (UTC+7) - AN khoi Hieu ung (anh Tien chot)
 
 Anh Tien: *"vay minh tam thoi an phan tao hieu ung nay nha em"* — sau khi em do chet ca

@@ -1,4 +1,4 @@
-/* =========================================================================
+﻿/* =========================================================================
    AiO STUDIO — TOKENS: NGUỒN CHÂN LÝ DUY NHẤT
    =========================================================================
 
@@ -9,6 +9,15 @@
 
    Nó chép file nguồn sang cả 4 panel. Sửa bản copy thì lần đồng bộ sau bị ghi
    đè, và bạn sẽ mất một buổi để hiểu vì sao thay đổi của mình biến mất.
+
+   ☠️ 2026-08-03 — TRƯỚC KHI CHẠY `dong-bo-tokens.ps1`, ĐỌC DÒNG NÀY.
+   File này nay khai `@font-face` trỏ `./fonts/Inter.woff2`, tính từ chỗ đặt
+   bản copy trong panel (`client/src/`). Đo 03/08: **chỉ Autocut có file đó**,
+   6 panel còn lại chưa. Đồng bộ sang chúng thì `@font-face` trỏ vào hư không —
+   không vỡ layout (rơi về Segoe UI) nhưng mất đúng cái đã sửa: `font-weight`
+   không ăn trên font hệ thống Windows.
+   ⇒ Chép `AiO Design System/fonts/Inter.woff2` vào `client/src/fonts/` của
+   panel nào định đồng bộ, TRƯỚC khi chạy script.
 
    ⚠️ 2026-08-03 — BẢN NÀY ĐI TRƯỚC MỘT BƯỚC.
    Anh Tiến chốt thiết kế mới cho **Auto Cut** (`AiO Design System/Design/

@@ -258,3 +258,11 @@
   font-size: var(--fs-2xs);
   white-space: nowrap;
 }
+
+/* [24/08/2026] Token chung doi `--accent-on` sang TRANG (di voi luat: chu tren cam
+   dac phai bold >= 14px — Autocut/Transcripts theo duoc vi CTA cua chung to).
+   Panel nay co nut cam NHO 11px ("Them thu muc" 114x24) — trang tren cam chi dat
+   ~2,7:1, TE hon ban cu (nau #150700, 6,2:1 — do 24/08 tren panel that).
+   Giu dung dang cu cho nut nho bang override CO PHAM VI, cho toi khi ra soat
+   rieng panel nay. Xoa khoi nay = nho chinh lai co chu/nen cho dat 4,5:1. */
+.btn--sm.btn--primary { color: #150700; }

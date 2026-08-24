@@ -1019,6 +1019,23 @@ export default function App() {
             />
           ) : (
             <button className="btn btn--primary" onClick={() => void lamPhuDe()}>
+              {/* [2.5.5] Icon = việc của panel (phụ đề), cùng khuôn nút Autocut
+                  (icon kéo ✂): stroke currentColor, 15px, nằm trước nhãn. Cùng
+                  hình với icon thanh trên — panel chỉ có MỘT ẩn dụ hình ảnh. */}
+              <svg
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M7 11h3M14 11h3M7 15h6M16 15h1" />
+              </svg>
               {ket ? dich('Chép lại') : dich('Làm phụ đề')}
             </button>
           )}

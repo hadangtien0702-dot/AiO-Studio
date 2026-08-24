@@ -44,7 +44,11 @@ $JS = @'
   const nut = [...document.querySelectorAll('button')]
     .filter(b => b.getBoundingClientRect().height > 0);
   r['@nut-in-hoa'] = String(nut.filter(b => getComputedStyle(b).textTransform === 'uppercase').length);
-  r['@nut-gian-chu'] = String(nut.filter(b => getComputedStyle(b).letterSpacing !== 'normal').length);
+  // NGOAI LE co chu y (24/08/2026): nut doi ngon ngu `.aio-ngonngu` ("VI"/"EN")
+  // gian chu 0,44px — ma 2 ky tu IN HOA gian nhe la typography chuan, va DA
+  // dong deu ca 3 panel (do that: cung 0.44px o 8088/8089/8091). Thuoc nay do
+  // su DONG BO, khong phai do gu — thu gi deu nhau va co chu y thi bo qua.
+  r['@nut-gian-chu'] = String(nut.filter(b => !b.classList.contains('aio-ngonngu') && getComputedStyle(b).letterSpacing !== 'normal').length);
   return JSON.stringify(r);
 })()
 '@

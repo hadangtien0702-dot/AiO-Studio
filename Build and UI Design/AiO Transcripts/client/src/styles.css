@@ -218,12 +218,21 @@ body {
    không phải nút bấm. Bỏ hai thứ sau, giữ lại độ nổi bằng MÀU và bề ngang —
    nó vẫn là CTA duy nhất của màn hình, không cần hét lên mới thấy. */
 .btn--primary {
+  display: inline-flex;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: center;
   height: 34px;
   border-color: var(--accent);
   background: var(--accent);
   color: var(--accent-on);
-  font-size: var(--fs-md);
-  font-weight: var(--fw-semibold);
+  /* [2.5.5] ĐỒNG BỘ VỚI AUTOCUT — anh Tiến 24/08: *"bộ nút này em phải làm đồng
+     bộ cho các tool: màu sắc, kích thước chữ, cái thì có icon cái thì không"*.
+     Đo thật hai panel: Autocut 15px/700/chữ trắng/#f86820, panel này 13px/600/
+     chữ nâu/#ff5714 — vì token cũ + hai dòng dưới đây còn fs-md/semibold.
+     Token mới bắt buộc: chữ trên nền cam đặc = trắng + bold + fs-lg trở lên. */
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
 }
 .btn--primary:hover:not(:disabled) {
   background: var(--accent-hover);
