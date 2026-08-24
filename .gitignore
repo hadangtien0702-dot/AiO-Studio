@@ -13,10 +13,15 @@ dist/
 # Guide Frame MAT SACH dist tren o (chi con trong ban da cai o %APPDATA%),
 # Re-Frames con file nhung nam ngoai git. Doi thu muc thi phai un-ignore
 # CHINH THU MUC, khong un-ignore duoc file ben trong mot thu muc bi ignore.
-!/AiO Auto Podcast/dist/
-!/AiO Auto Re-Frames/dist/
-!/AiO Auto Guiline Frame/dist/
-!/AiO WELCOME/dist/
+# [24/08/2026] SUA DUONG DAN: bon dong duoi day tung ghi la "/AiO Auto Podcast/dist/"
+# — neo vao GOC repo, nhung cac panel nam trong "Build and UI Design/". Nghia la
+# ca bon luat un-ignore DA CHET tu lau ma khong ai thay (do 24/08: khong con
+# thu muc dist nao tren o, git cung khong track file dist nao). Kem theo:
+# "AiO WELCOME" da doi ten thanh "AiO WELCOME Page".
+!/Build and UI Design/AiO Auto Podcast/dist/
+!/Build and UI Design/AiO Auto Re-Frames/dist/
+!/Build and UI Design/AiO Auto Guiline Frame/dist/
+!/Build and UI Design/AiO WELCOME Page/dist/
 build/
 # ☠️ NGOAI LE 2026-08-17: thu muc MA NGUON ten "build" cua website — chua
 # sites-vite-plugin.ts ma vite.config.ts import. Luat "build/" o tren da nuot
