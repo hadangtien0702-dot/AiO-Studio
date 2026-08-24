@@ -1,8 +1,17 @@
 node_modules/
 dist/
 out/
-.selftest/
-*.log
 .DS_Store
 Thumbs.db
+
+# ☠️ ANH CHUP CUA NGUOI DUNG — TUYET DOI KHONG DAY LEN GITHUB.
+# Day la anh chup man hinh THAT (tin nhan, Facebook, du an dang lam). Repo nay
+# co ban public — day len la ro ri doi tu. Thu muc nay do `src/kho.js` sinh ra.
+Anh chup/
+
+# File tam cua bo tu kiem va log chay
+.selftest/
+*.log
 .run-log.txt
+.drag-log.txt
+.selftest-log.txt

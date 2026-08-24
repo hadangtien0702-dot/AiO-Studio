@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO — Khay ảnh</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="shelf.css" />
+</head>
+<body>
+  <div id="shelf">
+    <header id="bar">
+      <span id="logo" title="AiO Shot &amp; Save — kéo để di chuyển khay">
+        <svg viewBox="0 0 385.89 351.31" width="13" height="12" aria-hidden="true">
+          <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+          <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+        </svg>
+      </span>
+      <span id="title">Khay ảnh</span>
+      <span id="count">0</span>
+      <span class="spacer"></span>
+      <button id="folder" title="Mở thư mục lưu ảnh" aria-label="Mở thư mục lưu ảnh">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </button>
+      <button id="clear" title="Dọn khay (ảnh vẫn còn trong thư mục)" aria-label="Dọn khay">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+      </button>
+      <button id="hide" title="Ẩn khay (chụp tấm mới sẽ hiện lại)" aria-label="Ẩn khay">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+      </button>
+    </header>
+
+    <div id="list" role="list"></div>
+
+    <p id="empty">Chưa có ảnh nào — bấm <b>Ctrl&nbsp;+&nbsp;Shift&nbsp;+&nbsp;S</b> để chụp</p>
+  </div>
+  <script src="shelf.js"></script>
+</body>
+</html>

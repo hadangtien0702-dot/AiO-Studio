@@ -15,33 +15,32 @@ window.pin.onData((data) => {
   frame.style.height = data.h + 'px'
 })
 
-/* --- Keo di chuyen cua so (dung toa do man hinh de on dinh) --- */
+/* --- Keo di chuyen cua so ---
+   ☠️ Gui delta TUYET DOI so voi diem bat dau keo. Cong don tung buoc lam cua
+   so PHINH RA tren man hinh DPI khac 100% (vap 24/08, do duoc tren khay). */
 let dragging = false
-let lastX = 0
-let lastY = 0
+let goc = { x: 0, y: 0 }
 
 frame.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return
   if (e.target.closest('#bar')) return // bam nut thi khong keo
   dragging = true
-  lastX = e.screenX
-  lastY = e.screenY
+  goc = { x: e.screenX, y: e.screenY }
+  window.pin.dragStart()
   frame.classList.add('grabbing')
   e.preventDefault()
 })
 
 window.addEventListener('mousemove', (e) => {
   if (!dragging) return
-  const dx = e.screenX - lastX
-  const dy = e.screenY - lastY
-  lastX = e.screenX
-  lastY = e.screenY
-  if (dx || dy) window.pin.move(dx, dy)
+  window.pin.dragTo(e.screenX - goc.x, e.screenY - goc.y)
 })
 
 window.addEventListener('mouseup', () => {
+  if (!dragging) return
   dragging = false
   frame.classList.remove('grabbing')
+  window.pin.dragEnd()
 })
 
 /* --- Nut --- */

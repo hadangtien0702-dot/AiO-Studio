@@ -46,6 +46,7 @@ html, body {
 /* Chi dan giua man hinh phia tren. */
 #hint {
   position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-4);
   font-size: var(--fs-sm); color: var(--text-1);
   background: rgb(20 20 20 / 88%);
@@ -55,4 +56,5 @@ html, body {
   pointer-events: none;
 }
 #hint b { color: var(--accent-text); }
+#hint .logo { color: var(--accent); flex: none; }
 #hint.hidden { opacity: 0; }
