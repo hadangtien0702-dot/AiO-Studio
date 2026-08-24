@@ -1,5 +1,25 @@
 # AiO Transcript - Nhat ky
 
+## TRANG THAI HIEN TAI (cap nhat 2026-08-24 23:25 +0700)
+
+- **Ban dang chay: 2.5.5** — da cai tren may anh Tien, da dong goi
+  `Release/2026-08-24-transcript-2.5.5/` (bo cai 92,5 MB KHONG day len git — luat
+  moi `/Release/**/*.zip` trong `.gitignore`; dung lai bang `package-release.ps1`).
+- Panel con **MOT nut chinh**: *Lam phu de* -> caption track C1. Khoi **Hieu ung DA AN**
+  (`HIEN_HIEU_UNG = false` dau `App.tsx`) — an, khong xoa.
+- Nut chinh da **dong bo ca bo**: cam #f86820, chu trang 15px/700, co icon;
+  `kiem-dong-bo.ps1` bao "DAT: 3 panel dong bo hoan toan".
+
+### Viec ke tiep
+1. **[CHO] Anh Tien dung tren bai that** — thuoc do tu ngoai duy nhat, chua co.
+   Dung stop: khong ai thay duoc buoc nay, phai chinh anh dung.
+2. **[CHO] Thu bo cai tren may sach** — buoc cai font trong `CAI-DAT.bat` chua
+   chay thu lan nao. Dung stop: can mot may Windows chua tung cai panel.
+3. [CHO] Autocut chua va `ac_getRangeClips` (dem clip caption MOGRT nhu clip video
+   -> tu choi chay tren sequence co caption AiO). Dung stop: Autocut DONG BANG,
+   phai hoi anh Tien truoc khi sua.
+
+
 ## [2.5.5] - 2026-08-24 23:17 (UTC+7) - Dong bo nut chinh CA BO AiO Studio (anh Tien khoanh 2 anh)
 
 Anh Tien: *"bo nut nay em phai lam dong bo cho cac tool - mau sac, kich thuoc chu,

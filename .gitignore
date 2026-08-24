@@ -82,6 +82,15 @@ ehthumbs.db
 # luat rong nhu *.sql tung nuot file moi trong im lang).
 /Release/2026-08-14-beta-01/panels/
 /Release/2026-08-14-beta-01/AiO-Studio-Beta-3-panel.zip
+# ☠️ 24/08/2026 — LUAT CHUNG thay cho viec liet ke tung duong dan. Hai lan truoc
+# (beta-01, autocut-1.6.0) deu phai nho tay khong `git add` file .zip; lan nay
+# ghi thanh LUAT de khong con phai nho. Bo cai la SAN PHAM BUILD: dung lai duoc
+# bang `scripts/package-release.ps1`, con day len GitHub thi moi ban ton 46-93 MB
+# vinh vien trong lich su repo.
+# Van GIU trong git: CAI-DAT.bat, cai-dat.ps1, HUONG-DAN-CAI-DAT.txt,
+# GHI-CHU-PHIEN-BAN.md, giay phep — do la thu nguoi khac can DOC.
+/Release/**/*.zip
+/Release/**/*.zxp
 # [19/08/2026] Ban cai thu chi co Autocut 1.6.0 — cung luat: giu ghi chu +
 # script, bo file zip 46 MB (build lai duoc bang scripts\package-release.ps1).
 /Release/2026-08-19-autocut-1.6.0/AiO-Studio-Autocut-1.6.0-SETUP.zip

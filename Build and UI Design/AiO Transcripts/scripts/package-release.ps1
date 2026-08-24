@@ -124,25 +124,25 @@ $guide = Join-Path $outDir 'HUONG-DAN-CAI-DAT.txt'
 # tuong da cap nhat. MO RA DOC HET truoc khi gui.
 $lines = @(
   ("AiO Studio - Transcript  " + $version),
-  "Chep loi tren timeline Premiere thanh PHU DE (caption), gan thang len sequence",
-  "dang mo, cam marker o cho may nghe khong chac. Tu 2.5.0: them 5 KIEU CAPTION",
-  "HIEU UNG (Hormozi / Beast / Karaoke / Boxed / Clean) - moi khoi caption la mot",
-  "graphic tren track video, bam vao sua chu/doi mau nhu text thuong; va tu them",
-  "kieu rieng: xuat .mogrt tu After Effects, tha vao thu muc la hien nut.",
+  # [2.5.5] Doan gioi thieu 5 kieu hieu ung DA GO — anh Tien chot 24/08 AN khoi
+  # hieu ung (HIEN_HIEU_UNG=false trong App.tsx). Huong dan ma quang cao thu
+  # nguoi dung tim khong thay la huong dan noi doi (dung bay 3d da vap 19/08).
+  "Chep loi tren timeline Premiere thanh PHU DE (caption) gan thang len sequence",
+  "dang mo: khoanh vung bang I/O, bam mot nut, phu de nam dung cho nguoi ta noi,",
+  "kem marker o nhung cho may nghe khong chac de soat nhanh.",
   "",
   "YEU CAU",
   "  - Windows 10/11",
   "  - Adobe Premiere Pro 2025 tro len (da kiem tren Beta 26.5 va 27.0 / CEP 12)",
   "  - Khoanh vung bang phim I / O roi bam LAM PHU DE. Panel tu theo vung I/O va",
   "    tu nhan khung Ngang 16:9 / Doc 9:16 theo sequence.",
-  "  - Font cho caption hieu ung (Montserrat, Bangers - giay phep OFL, trong thu muc",
-  "    fonts/) duoc CAI-DAT.bat cai cho tai khoan dang dung (khong can Admin).",
+  "  - CAI-DAT.bat cai kem bo font (Montserrat, Bangers - giay phep OFL, thu muc",
+  "    fonts/) cho tai khoan dang dung, khong can Admin.",
   "",
   "GIOI HAN DA BIET (khong giau)",
-  "  - Kieu Karaoke dat MOI TU mot clip (tu dang noi sang len) -> nhieu clip tren",
-  "    timeline; video dai thi dat lau hon (~0,1 s/clip).",
-  "  - Sequence rong hon 1920 px: chu caption khong tu phong to theo.",
   "  - Tieng Viet va tieng Anh da do tren video that; thu tieng khac moi 'chay duoc'.",
+  "  - Track caption tren timeline Premiere khong cho tool xoa - muon go thi chuot",
+  "    phai vao dau track -> Delete Track.",
   "",
   "CACH CAI (cach 1 - de nhat, khong can cai them gi)",
   "  1. Dong han Premiere Pro.",
@@ -160,10 +160,8 @@ $lines = @(
   "  Dung ZXP Installer, hoac xoa thu muc:",
   "  %APPDATA%\Adobe\CEP\extensions\com.aiostudio.transcript",
   "  Font da cai nam o %LOCALAPPDATA%\Microsoft\Windows\Fonts (xoa tay neu muon).",
-  "",
-  "THU MUC KIEU RIENG",
-  "  %APPDATA%\AiOStudio\caption-styles  - tha file .mogrt (xuat tu After Effects)",
-  "  vao day, quay lai panel la thay nut kieu moi. Template chi can lo tham so 'Text'."
+  ""
+  # [2.5.5] Muc "THU MUC KIEU RIENG" da go cung khoi hieu ung.
 )
 $lines | Out-File -FilePath $guide -Encoding utf8
 
