@@ -8,7 +8,24 @@
 > Luật của bảng: chỉ được ghi ✅ khi có SỐ ĐO thật (ghi trong PROGRESS.md).
 > Cập nhật mỗi phiên làm việc. Chi tiết kỹ thuật: `TINH-NANG.md` + `PROGRESS.md`.
 
-*Cập nhật lần cuối: 06/08/2026 07:47 — panel **v0.6.6**, host **v0.4.8**.
+*Cập nhật lần cuối: 25/08/2026 22:07 — panel **v0.6.6**, host **v0.4.9**.
+✅✅ **"CẮT ĐÚNG NGƯỜI" — MÓN NỢ LỚN NHẤT ĐÃ GIẢI, bằng tai anh Tiến.** Anh tự
+chạy trên liệu thật MỚI `PodTest Nguon` (~40:27, Trọng + Thiện + cam toàn cảnh,
+**KHÔNG mic rời** — tiếng cam làm mic): bản `Podcast Cut (15)`, 411 nhát, cấu
+trúc 411/411 mốc đúng 1 cam · 0 đen hình · 0 chồng cam · ducking 421+747
+keyframe · chia cam Trọng 74,6% / Thiện 11,4% / wide 14,0%. Anh nghe và chốt
+**"không thấy sai"** (mức độ nghe kỹ/lướt không nói rõ). Phạm vi đã chứng minh:
+2 người + wide, tiếng cam làm mic, ~40 phút, giọng Việt. **CHƯA đo:** >2 người,
+mic rời bleed nặng (8 clip stereo `podcast-nghe-kiem-2` vẫn chưa có đáp án),
+tập >1 giờ. **Ngưỡng cắt không đụng** — không có mốc sai để sửa.
+✅ Phát hiện kèm: đường "không mic rời" chạy trọn vẹn end-to-end (tự tách
+`.aio-mono-n.wav` từ tiếng cam → làm mic → duck) — cảnh báo "Cần mic rời" là
+lời khuyên chất lượng, không phải cửa tử. Số đo chi tiết: PROGRESS.md mục
+[test-tieng-cam-lam-mic].
+❌ Còn thiếu để bán (đúng kế hoạch 13/08 — ngưng build, dồn website): FFmpeg
+bundle riêng · cài máy sạch · khoá gói Free/Pro.
+
+*06/08/2026 07:47 — panel **v0.6.6**, host **v0.4.8**.
 ✅ **ĐỒNG HỒ ĐẾM NGƯỢC** khi dựng: *"Đang cắt đoạn 260/299 · còn ~2 phút"*.
 ☠️ Bản đầu tính trung bình từ đầu → **lạc quan 30–40%** (báo ~2 phút lúc thực tế
 còn 3,5 phút) vì tốc độ đặt clip CHẬM DẦN khi timeline đông clip. Sửa bằng **cửa

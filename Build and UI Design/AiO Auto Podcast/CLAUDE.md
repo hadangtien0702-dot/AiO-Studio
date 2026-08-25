@@ -11,13 +11,23 @@
 > **Chạy thật trên liệu 58 phút (2 cam + 2 mic + 1 cam toàn cảnh): 588/588 mốc
 > bật đúng 1 cam, 0 màn hình đen, 0 chồng cam.** Cam chung chiếm 28,7% số nhát.
 >
-> ☠️☠️ **THỨ DUY NHẤT CHƯA CHỨNG MINH ĐƯỢC: "CẮT ĐÚNG NGƯỜI".** Mọi số đo chỉ
-> chứng minh *không mất clip, đúng track, đúng cam, đúng mic, đúng cấu trúc*.
-> Thước ngoài bằng whisper (đã cài ở `C:\AiO-Studio\whisper`) **chỉ phân xử được
-> 16/299 đoạn (5%)** vì bleed làm cả hai mic đều có lời — **đừng trích dẫn con số
-> "50%" trong đó**. Còn 8 clip stereo chờ anh Tiến chấm ở
+> ✅ **"CẮT ĐÚNG NGƯỜI" — ĐÃ GIẢI 25/08/2026, bằng tai anh Tiến, CÓ PHẠM VI.**
+> Anh tự chạy trên liệu thật `PodTest Nguon` (~40:27, Trọng + Thiện + cam toàn
+> cảnh, **KHÔNG mic rời** — tiếng cam làm mic): bản `Podcast Cut (15)`, 411 nhát
+> (Trọng 74,6% / Thiện 11,4% / wide 14,0%), cấu trúc 411/411 sạch, ducking
+> 421+747 keyframe. Anh nghe và chốt **"không thấy sai"** (mức độ kỹ/lướt không
+> nói rõ). Phạm vi đã chứng minh: 2 người + wide · tiếng cam làm mic · ~40 phút
+> · giọng Việt. **CHƯA đo: >2 người, mic rời bleed nặng, tập >1 giờ.**
+> Số đo: `PROGRESS.md` mục [test-tieng-cam-lam-mic].
+>
+> ~~☠️☠️ THỨ DUY NHẤT CHƯA CHỨNG MINH ĐƯỢC: "CẮT ĐÚNG NGƯỜI".~~ (bản gốc 06/08,
+> giữ lại phần còn đúng:) Thước ngoài bằng whisper (đã cài ở
+> `C:\AiO-Studio\whisper`) **chỉ phân xử được 16/299 đoạn (5%)** vì bleed làm
+> cả hai mic đều có lời — **đừng trích dẫn con số "50%" trong đó**. Còn 8 clip
+> stereo bộ Will–Trọng (mic rời, bleed nặng) chờ anh Tiến chấm ở
 > `file pr for test\podcast-nghe-kiem-2\`; cả 8 đoạn sai đều **lệch cùng một
-> chiều** (tool chọn cam Trọng). Có đáp án đó mới được đụng vào ngưỡng cắt.
+> chiều** (tool chọn cam Trọng). **Ngưỡng cắt vẫn CẤM đụng** — 25/08 không có
+> mốc sai nào để sửa, muốn chỉnh phải có đáp án tai người chỉ đúng mốc sai.
 >
 > ☠️ **[CHỜ] Lỗi có sẵn CHƯA sửa, cố ý:** panel lọc `parts.length >= 9` mà
 > `pc_docChiTietClips` trả **8 trường** ⇒ `dsClips` luôn rỗng ⇒ nhánh *"xếp lại

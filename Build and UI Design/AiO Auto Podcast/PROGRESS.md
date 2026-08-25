@@ -1,5 +1,58 @@
 # AiO Auto Podcast - Nhat ky
 
+## [test-tieng-cam-lam-mic] - 2026-08-25 15:10 +0700 - ANH TIEN TU CHAY BAI THAT: KHONG MIC ROI, TIENG CAM LAM MIC — CAU TRUC SACH 411/411
+
+### Boi canh
+
+Anh Tien hoi buoi sang: *"nguoi ta quay phim chi co cai luong audio chinh nhu
+the nay thi minh len xu li nhu the nao em?"* — roi tu mo project
+`Test3_1.prproj`, lieu MOI `PodTest Nguon` (~40:27, Trong + Thien + cam toan
+canh C4025), **khong co mic roi** — panel lay tieng cua tung cam lam mic
+(canh bao vang "Tieng cam (Can mic roi)" hien dung). Anh tu bam chay, em chi
+theo doi qua cong 8094 (chi doc DOM luc dang chay, goi host SAU khi xong).
+
+### Ket qua do (panel v0.6.6, host v0.4.9, cau hinh mac dinh hinh=bat-tat + tieng=duck)
+
+- Thoi gian chay: cat 411 doan xong 15:05, bat/tat cam + thay tieng xong 15:07.
+- `pc_doPhuHinh`: **soMoc=411 | motBat=411 | khongBat=0 | nhieuBat=0** — moi
+  moc dung 1 cam, 0 man hinh den, 0 chong cam.
+- `pc_doKetQua`: V0=V1=V2=411 (1233 clip hinh) · A0=A1=1 clip lien mach ·
+  cuoiHinh 2427,680 ≈ cuoiTieng 2427,640 · **hinhLa=0, tiengLa=0**.
+- Ducking THAT: A0 `Cam2_Thien_C4233.aio-mono-n.wav` isTimeVarying=true,
+  **421 keyframe**; A1 `Cam3_Trong_C4087.aio-mono-n.wav` **747 keyframe**.
+  Tuc duong "khong mic roi" chay TRON VEN: tu tach tieng cam ra
+  `.aio-mono-n.wav` chuan hoa, dat lam mic, ve duck.
+- Chia cam (bat=so nhat, giay=thoi luong bat): Cam Trong **187 nhat / 1806,0s
+  (74,6%)** · Cam Thien 105 nhat / 276,4s (11,4%) · Toan canh 119 nhat /
+  338,0s (14,0%). Timeline bat dau tai 7,2s (giai thich lech 7,28s giua tong
+  thoi luong bat va cuoiHinh).
+
+### Y nghia + gioi han
+
+- Tra loi cau hoi buoi sang: **ca "chi co tieng cam" VAN chay duoc** khi moi
+  nguoi co mot cam dat gan minh — nao van ra 411 nhat can nhac (khong phai
+  1 nhat nhu nao cu), tuc hai tieng cam tach nhau du de so.
+- ☠️ Moi so tren la so CAU TRUC — **"cat dung nguoi" van chua chung minh**
+  (bai hoc 5d). Lech 74,6/11,4 dang de tai kiem: hoac Trong that su noi ap
+  dao, hoac tieng cam Trong thu to hon nen "thang oan" (bai hoc 5s: cap
+  thang thuong la mic cua nguoi noi nhieu / mic to hon). Cho anh Tien nghe
+  va cham — dac biet cac doan cam Thien bat.
+- Khong sua dong code nao trong phien nay — chi do va ghi nhat ky.
+
+### CAP NHAT 22:07 cung ngay — ANH TIEN DA NGHE: "KHONG THAY SAI"
+
+- Anh Tien nghe ban `Podcast Cut (15)` (co ~7 tieng tu luc dung xong 15:07
+  toi luc tra loi) va chot: **"khong thay sai"**, kem "anh da thu tren
+  source thuc". Muc do nghe ky/luot anh khong noi ro — ghi dung muc do.
+- ⇒ **Mon no "cat dung nguoi chua chung minh" DA GIAI — TRONG PHAM VI:**
+  lieu that ~40 phut, 2 nguoi + cam toan canh, KHONG mic roi (tieng cam lam
+  mic), giong Viet. CHUA do: >2 nguoi, mic roi bleed nang (8 clip stereo
+  Will-Trong o `podcast-nghe-kiem-2` van chua co dap an), tap >1 gio.
+- **Nguong cat KHONG dung** — khong co moc sai nao de sua. Luat giu nguyen:
+  muon chinh nguong phai co dap an tai nguoi chi dung moc sai.
+- Da cap nhat: memory `auto-podcast-chot-xong.md` + MEMORY.md, TRANG-THAI.md,
+  va khoi canh bao dau CLAUDE.md du an (chu thich DA GIAI tai cho).
+
 ## [cam-chung-va-trung-ten] - 2026-08-06 09:30 +0700 - CAM THU BA + BIT LO HONG TRUNG TEN FILE
 
 ### Boi canh
