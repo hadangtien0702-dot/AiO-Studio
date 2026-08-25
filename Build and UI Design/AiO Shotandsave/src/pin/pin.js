@@ -7,6 +7,13 @@ const img = document.getElementById('img')
 const btnCopy = document.getElementById('copy')
 const btnClose = document.getElementById('close')
 
+// Dich tooltip theo ngon ngu.
+document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+  const s = window.i18n.t(el.getAttribute('data-i18n-title'))
+  el.title = s
+  el.setAttribute('aria-label', s)
+})
+
 let opacity = 1
 
 window.pin.onData((data) => {
@@ -21,14 +28,23 @@ window.pin.onData((data) => {
 let dragging = false
 let goc = { x: 0, y: 0 }
 
+// DI CHUYEN cua so = keo THANH TREN (khong phai keo anh). Keo anh nay danh cho
+// tha file ra app khac (dragstart ben duoi). Bam NUT thi khong di chuyen.
 frame.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return
-  if (e.target.closest('#bar')) return // bam nut thi khong keo
+  if (!e.target.closest('#bar')) return       // chi keo khi bam vao thanh tren
+  if (e.target.closest('button')) return      // tru cac nut
   dragging = true
   goc = { x: e.screenX, y: e.screenY }
   window.pin.dragStart()
   frame.classList.add('grabbing')
   e.preventDefault()
+})
+
+// KEO ANH RA APP KHAC: tha file .png that vao Premiere / Zalo / Messenger...
+img.addEventListener('dragstart', (e) => {
+  e.preventDefault()          // chan drag mac dinh cua trinh duyet (anh base64)
+  window.pin.startDrag()      // main goi webContents.startDrag voi file that
 })
 
 window.addEventListener('mousemove', (e) => {

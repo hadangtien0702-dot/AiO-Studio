@@ -16,16 +16,20 @@
 
 const {
   app, BrowserWindow, Tray, Menu, globalShortcut,
-  ipcMain, screen, desktopCapturer, nativeImage, clipboard, shell,
+  ipcMain, screen, desktopCapturer, nativeImage, clipboard, shell, dialog,
 } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const kho = require('./kho')
+const i18n = require('./i18n')
 
 const IS_DEV = process.argv.includes('--dev')
 const IS_SELFTEST = process.argv.includes('--selftest')
 const IS_DRAGTEST = process.argv.includes('--selftest-drag')
-const HOTKEY = 'CommandOrControl+Shift+S'
+const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
+let currentHotkey = DEFAULT_HOTKEY // nap tu config khi app ready
+let lang = 'vi' // 'vi' | 'en' — nap tu config
+const T = (key) => i18n.t(lang, key)
 
 /* ☠️ Khi chay dev/selftest, GHI LAI moi loi khong bat duoc ra file.
    Vap 24/08: selftest thoat app ngay sau khi ghim nen hop thoai loi bi nuot —
@@ -44,7 +48,8 @@ if (IS_DEV || IS_SELFTEST) {
 
 /** Con tro app: tray + cac cua so dang song. */
 let tray = null
-let overlayWin = null
+let overlayWins = [] // mot overlay MOI man hinh (moi man mot cua so)
+const overlayShots = new Map() // wcId -> { image (full-res), sf } de cat sau
 let shelfWin = null
 
 /** Khay anh: id -> { id, filePath, image }. Anh THAT nam tren dia (kho.js). */
@@ -71,6 +76,8 @@ app.setName('AiO Shot & Save')
 if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsave')
 
 app.whenReady().then(() => {
+  currentHotkey = kho.docCauHinh().hotkey || DEFAULT_HOTKEY
+  lang = kho.docCauHinh().lang || 'vi'
   createTray()
   registerHotkey()
   // Khong tu mo cua so nao — day la app song o khay he thong.
@@ -115,14 +122,16 @@ function createTray() {
 
 function rebuildTrayMenu() {
   const menu = Menu.buildFromTemplate([
-    { label: 'Chup vung chon', accelerator: HOTKEY, click: () => startCapture() },
+    { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
     { type: 'separator' },
-    { label: 'Hien khay anh', click: () => showShelf() },
-    { label: 'Mo thu muc luu anh', click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
+    { label: T('tray.khay'), click: () => showShelf() },
+    { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
+    { type: 'separator' },
+    { label: T('tray.caiDat'), click: () => openSettings() },
     { type: 'separator' },
     { label: 'AiO Shot & Save  v' + app.getVersion(), enabled: false },
     { type: 'separator' },
-    { label: 'Thoat', click: () => { forceQuit() } },
+    { label: T('tray.thoat'), click: () => { forceQuit() } },
   ])
   tray.setContextMenu(menu)
 }
@@ -147,31 +156,181 @@ async function saveCapture(win, name) {
 }
 
 function registerHotkey() {
-  const ok = globalShortcut.register(HOTKEY, () => startCapture())
-  if (!ok && IS_DEV) console.warn('[shotandsave] khong dang ky duoc phim tat', HOTKEY)
+  let ok = false
+  try { ok = globalShortcut.register(currentHotkey, () => startCapture()) }
+  catch (e) { ok = false }
+  if (!ok && IS_DEV) console.warn('[shotandsave] khong dang ky duoc phim tat', currentHotkey)
+  return ok
 }
+
+/* Doi phim tat: thu dang ky phim moi. That bai (app khac dang giu) thi KHOI
+   PHUC phim cu va bao that bai — khong de nguoi dung mat luon phim tat. */
+function setHotkey(accel) {
+  const old = currentHotkey
+  globalShortcut.unregisterAll()
+  let ok = false
+  try { ok = globalShortcut.register(accel, () => startCapture()) } catch (e) { ok = false }
+  if (!ok) {
+    try { globalShortcut.register(old, () => startCapture()) } catch (e) {}
+    return { ok: false, hotkey: old }
+  }
+  currentHotkey = accel
+  kho.ghiCauHinh({ hotkey: accel })
+  rebuildTrayMenu()
+  return { ok: true, hotkey: accel }
+}
+
+/* --- Cua so Cai dat --- */
+let settingsWin = null
+function openSettings() {
+  if (settingsWin && !settingsWin.isDestroyed()) { settingsWin.show(); settingsWin.focus(); return }
+  settingsWin = new BrowserWindow({
+    width: 440, height: 468, resizable: false, minimizable: false,
+    maximizable: false, fullscreenable: false,
+    frame: false, // header rieng co logo AiO (xem settings/index.html)
+    title: 'AiO Shot & Save - Cai dat', backgroundColor: '#141414', show: false,
+    icon: path.join(__dirname, '..', 'assets', 'app.ico'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload-settings.js'),
+      contextIsolation: true, sandbox: false,
+    },
+  })
+  settingsWin.loadFile(path.join(__dirname, 'settings', 'index.html'))
+  settingsWin.once('ready-to-show', () => settingsWin.show())
+  settingsWin.on('closed', () => { settingsWin = null })
+}
+
+ipcMain.handle('settings:get', () => ({
+  hotkey: currentHotkey, def: DEFAULT_HOTKEY, isMac: process.platform === 'darwin',
+  saveFolder: kho.thuMucAnh(), lang,
+}))
+
+// Preload nap lang DONG BO luc khoi tao renderer.
+ipcMain.on('i18n:lang', (e) => { e.returnValue = lang })
+
+/** Dinh dang phim tat cho de doc: CommandOrControl->Ctrl/⌘, ghep " + ". */
+function formatAccel(accel) {
+  const isMac = process.platform === 'darwin'
+  return (accel || '').split('+').map((x) => {
+    if (x === 'CommandOrControl' || x === 'CmdOrCtrl') return isMac ? '⌘' : 'Ctrl'
+    if (x === 'Cmd' || x === 'Command') return '⌘'
+    if (x === 'Alt' || x === 'Option') return isMac ? '⌥' : 'Alt'
+    if (x === 'Shift') return isMac ? '⇧' : 'Shift'
+    if (x === 'Ctrl' || x === 'Control') return 'Ctrl'
+    return x
+  }).join(' + ')
+}
+ipcMain.on('hotkey:display', (e) => { e.returnValue = formatAccel(currentHotkey) })
+
+// Doi ngon ngu: luu, cap nhat tray, NAP LAI cac cua so dang mo de dich lai.
+ipcMain.handle('settings:set-lang', (_e, l) => {
+  lang = (l === 'en') ? 'en' : 'vi'
+  kho.ghiCauHinh({ lang })
+  rebuildTrayMenu()
+  for (const w of BrowserWindow.getAllWindows()) {
+    if (!w.isDestroyed()) w.webContents.reload()
+  }
+  return { lang }
+})
+
+ipcMain.on('settings:close', (e) => {
+  const w = BrowserWindow.fromWebContents(e.sender)
+  if (w && !w.isDestroyed()) w.close()
+})
+ipcMain.handle('settings:set-hotkey', (_e, accel) => setHotkey(accel))
+
+/* Chon thu muc luu anh. Tra { folder } (thu muc moi) hoac { folder, huy:true }. */
+ipcMain.handle('settings:pick-folder', async (e) => {
+  const parent = BrowserWindow.fromWebContents(e.sender)
+  const res = await dialog.showOpenDialog(parent, {
+    title: 'Chon thu muc luu anh',
+    defaultPath: kho.thuMucAnh(),
+    properties: ['openDirectory', 'createDirectory'],
+  })
+  if (res.canceled || !res.filePaths.length) return { folder: kho.thuMucAnh(), huy: true }
+  const folder = res.filePaths[0]
+  kho.ghiCauHinh({ thuMucAnh: folder })
+  return { folder }
+})
+
+/* Mo thu muc luu anh hien tai trong Explorer. */
+ipcMain.handle('settings:open-folder', () => {
+  shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh()))
+})
+ipcMain.handle('settings:reset', () => setHotkey(DEFAULT_HOTKEY))
 
 /* ---------------------------------------------------------------------- */
 /* Chup: grab man hinh duoi con tro -> overlay chon vung                   */
 /* ---------------------------------------------------------------------- */
 
+let grabPromise = null
+let grabStarted = false
+
 async function startCapture() {
-  if (overlayWin) return // dang chon vung, bo qua
+  if (overlayWins.length) return // dang chon vung, bo qua
 
-  const cursor = screen.getCursorScreenPoint()
-  const display = screen.getDisplayNearestPoint(cursor)
+  const displays = screen.getAllDisplays()
+  if (!displays.length) return
 
-  let image
-  try {
-    image = await grabDisplay(display)
-  } catch (err) {
-    if (IS_DEV) console.error('[shotandsave] grab loi', err)
-    return
+  // Overlay hien NGAY (trong suot, thay man hinh THAT qua no) — tuc thi nhu
+  // Lightshot. Grab bat dau SAU khi overlay da hien (kickGrab, goi tu overlay
+  // dau tien) vi getSources CHAN luong chinh ~0,5s: goi truoc la overlay khong
+  // kip hien.
+  grabStarted = false
+  grabPromise = null
+  openOverlays(displays)
+}
+
+/* Bat dau grab — goi SAU khi overlay dau tien da hien + paint. Chan luong ~0,5s
+   (getSources + toJPEG) nhung overlay da hien roi nen chi "kho" mot chut, khong
+   phai doi moi thay gi. Xong -> gui anh dong bang (freeze) + luu full-res. */
+function kickGrab() {
+  if (grabStarted) return
+  grabStarted = true
+  grabPromise = grabDisplaysList().catch((e) => {
+    if (IS_DEV) console.error('[shotandsave] grab loi', e)
+    return []
+  })
+  grabPromise.then((list) => {
+    for (const win of overlayWins) {
+      if (win.isDestroyed()) continue
+      const item = list.find((x) => x.display.id === win._displayId)
+      if (!item) continue
+      const rec = overlayShots.get(win.webContents.id)
+      if (rec) { rec.image = item.image; rec.sf = item.sf }
+      if (!win.isDestroyed()) win.webContents.send('overlay:frozen', { dataUrl: item.jpeg })
+    }
+  })
+}
+
+/**
+ * Chup TUNG man hinh -> mang { display, dataUrl, sf }. Moi man se co MOT overlay
+ * rieng phu dung man do -> khoanh vung o man nao cung duoc (tu nhien nhu
+ * Lightshot, anh Tien 25/08). Lam RIENG moi man (khong mot cua so khong lo vat
+ * ngang) vi cua so vat qua nhieu man 4K DPI khac nhau khong phu het -> vap
+ * 25/08 tren may 4K + man phu cua anh Tien.
+ */
+async function grabDisplaysList() {
+  const displays = screen.getAllDisplays()
+  // Mot lan getSources cho MOI man (goi 2 lan cham gap doi). Thumbnail = man lon
+  // nhat de man 4K giu net.
+  const maxW = Math.max(...displays.map((d) => Math.round(d.size.width * (d.scaleFactor || 1))))
+  const maxH = Math.max(...displays.map((d) => Math.round(d.size.height * (d.scaleFactor || 1))))
+  const sources = await desktopCapturer.getSources({
+    types: ['screen'], thumbnailSize: { width: maxW, height: maxH }, fetchWindowIcons: false,
+  })
+  const out = []
+  for (const d of displays) {
+    let src = sources.find((s) => String(s.display_id) === String(d.id))
+    if (!src) { const idx = displays.findIndex((x) => x.id === d.id); src = sources[idx] || sources[0] }
+    if (!src || !src.thumbnail || src.thumbnail.isEmpty()) continue
+    // Giu anh GOC (full-res, cat khong mat net). Hien thi thi dung JPEG cho NHANH
+    // — ma hoa PNG 4K ton ~250ms/man, JPEG chi ~50ms va nhe hon nhieu.
+    const img = src.thumbnail
+    const jpeg = 'data:image/jpeg;base64,' + img.toJPEG(90).toString('base64')
+    out.push({ display: d, image: img, jpeg, sf: d.scaleFactor || 1 })
   }
-  if (!image || image.isEmpty()) return
-
-  pending = { image, display, scaleFactor: display.scaleFactor || 1 }
-  openOverlay(display, image)
+  return out
 }
 
 /** Chup 1 man hinh o do phan giai that (device px). Tra ve NativeImage. */
@@ -197,46 +356,51 @@ async function grabDisplay(display) {
   return src.thumbnail
 }
 
-function openOverlay(display, image) {
-  const b = display.bounds
-  overlayWin = new BrowserWindow({
-    x: b.x, y: b.y, width: b.width, height: b.height,
-    frame: false, transparent: false, backgroundColor: '#000000',
-    alwaysOnTop: true, skipTaskbar: true, resizable: false, movable: false,
-    minimizable: false, maximizable: false, fullscreenable: false,
-    hasShadow: false, enableLargerThanScreen: true, show: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload-overlay.js'),
-      contextIsolation: true, sandbox: false,
-    },
-  })
-  overlayWin.setAlwaysOnTop(true, 'screen-saver')
-
-  overlayWin.loadFile(path.join(__dirname, 'overlay', 'index.html'))
-  overlayWin.webContents.once('did-finish-load', () => {
-    overlayWin.webContents.send('overlay:shot', {
-      dataUrl: image.toDataURL(),
-      cssWidth: b.width,
-      cssHeight: b.height,
+function openOverlays(displays) {
+  displays.forEach((disp, idx) => {
+    const b = disp.bounds
+    const win = new BrowserWindow({
+      x: b.x, y: b.y, width: b.width, height: b.height,
+      frame: false, transparent: true, backgroundColor: '#00000000',
+      alwaysOnTop: true, skipTaskbar: true, resizable: false, movable: false,
+      minimizable: false, maximizable: false, fullscreenable: false,
+      hasShadow: false, enableLargerThanScreen: true, show: false,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload-overlay.js'),
+        contextIsolation: true, sandbox: false, backgroundThrottling: false,
+      },
     })
-    overlayWin.show()
-    overlayWin.focus()
+    win._displayId = disp.id
+    win.setAlwaysOnTop(true, 'screen-saver')
+    overlayWins.push(win)
 
-    // Tu kiem: chup lai chinh overlay -> tu xac nhan mot vung o giua man hinh.
-    if (IS_SELFTEST) {
-      const rw = Math.min(640, Math.round(b.width * 0.5))
-      const rh = Math.min(420, Math.round(b.height * 0.5))
-      const rx = Math.round((b.width - rw) / 2)
-      const ry = Math.round((b.height - rh) / 2)
-      setTimeout(() => saveCapture(overlayWin, 'selftest-overlay.png'), 900)
-      setTimeout(() => handleConfirm({ x: rx, y: ry, w: rw, h: rh }), 1600)
-    }
+    // ☠️ Nho wcId NGAY BAY GIO — 'closed' thi webContents da huy (vap 24-25/08).
+    const wcId = win.webContents.id
+    // image = null luc dau; grab xong (song song) moi dien vao de cat.
+    overlayShots.set(wcId, { display: disp, sf: disp.scaleFactor || 1, image: null })
+
+    const laSelftest = IS_SELFTEST && idx === 0
+
+    win.loadFile(path.join(__dirname, 'overlay', 'index.html'))
+    win.webContents.once('did-finish-load', () => {
+      win.webContents.send('overlay:init', { selftest: laSelftest })
+      // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
+      if (!win.isDestroyed() && !win.isVisible()) { win.show(); win.focus() }
+      // Grab bat dau SAU khi overlay dau tien da hien + kip PAINT (~40ms) — de
+      // getSources chan luong thi overlay da hien roi.
+      setTimeout(kickGrab, 40)
+      if (laSelftest) setTimeout(() => saveCapture(win, 'selftest-overlay.png'), 900)
+    })
+    win.on('closed', () => {
+      overlayShots.delete(wcId)
+      overlayWins = overlayWins.filter((w) => w !== win)
+    })
   })
-  overlayWin.on('closed', () => { overlayWin = null })
 }
 
 function closeOverlay() {
-  if (overlayWin) { overlayWin.close(); overlayWin = null }
+  for (const w of overlayWins) { if (!w.isDestroyed()) w.close() }
+  overlayWins = []
   pending = null
 }
 
@@ -244,40 +408,66 @@ function closeOverlay() {
 /* Overlay -> xac nhan vung chon -> tao cua so GHIM                        */
 /* ---------------------------------------------------------------------- */
 
-// rect: { x, y, w, h } theo CSS px, goc = goc man hinh dang chon.
-ipcMain.on('overlay:confirm', (_e, rect) => handleConfirm(rect))
+// Renderer gui { rect } (khong ve shape -> main cat full-res, net) HOAC
+// { dataUrl } (co ve shape -> renderer da ghep san bang canvas).
+ipcMain.on('overlay:confirm', (e, payload) => handleConfirm(e.sender.id, payload))
 
-function handleConfirm(rect) {
-  if (!pending) { closeOverlay(); return }
-  const { image, display, scaleFactor } = pending
-  const b = display.bounds
+async function handleConfirm(wcId, payload) {
+  const shot = overlayShots.get(wcId)
+  const display = shot && shot.display
+  const sf = shot ? shot.sf : 1
+  closeOverlay()
+  if (!display || !payload) return
 
-  // Crop tren anh goc (device px).
-  const cx = Math.max(0, Math.round(rect.x * scaleFactor))
-  const cy = Math.max(0, Math.round(rect.y * scaleFactor))
-  const cw = Math.max(1, Math.round(rect.w * scaleFactor))
-  const ch = Math.max(1, Math.round(rect.h * scaleFactor))
   let cropped
-  try {
-    cropped = image.crop({ x: cx, y: cy, width: cw, height: ch })
-  } catch (err) {
-    if (IS_DEV) console.error('[shotandsave] crop loi', err, { cx, cy, cw, ch })
-    closeOverlay()
-    return
+
+  // Truong hop CO VE SHAPE: renderer da ghep (crop + shape) roi gui dataURL.
+  if (payload.dataUrl) {
+    try { cropped = nativeImage.createFromDataURL(payload.dataUrl) } catch (e) { cropped = null }
+    if (!cropped || cropped.isEmpty()) return
+  } else {
+    // Khong ve shape: cat tu anh GOC full-res (net khong mat).
+    const rect = payload.rect
+    if (!rect) return
+    // Anh dong bang co the CHUA grab xong (chon nhanh hon ~0,5s). Cho.
+    let image = shot.image
+    if (!image) {
+      if (!grabPromise) kickGrab()
+      const list = grabPromise ? await grabPromise : []
+      const item = list.find((x) => x.display.id === display.id)
+      image = item && item.image
+    }
+    if (!image) return
+    const cx = Math.max(0, Math.round(rect.x * sf))
+    const cy = Math.max(0, Math.round(rect.y * sf))
+    const cw = Math.max(1, Math.round(rect.w * sf))
+    const ch = Math.max(1, Math.round(rect.h * sf))
+    try {
+      cropped = image.crop({ x: cx, y: cy, width: cw, height: ch })
+    } catch (err) {
+      if (IS_DEV) console.error('[shotandsave] crop loi', err)
+      return
+    }
+    if (!cropped || cropped.isEmpty()) return
   }
 
-  // Vi tri man hinh (DIP) noi se dat cua so ghim.
-  const screenX = b.x + Math.round(rect.x)
-  const screenY = b.y + Math.round(rect.y)
+  // 0) Ctrl+C: copy vao clipboard luon (them, ngoai Enter/nut check) — anh Tien
+  //    25/08. Van vao khay binh thuong o duoi.
+  if (payload.copy) { try { clipboard.writeImage(cropped) } catch (e) {} }
 
-  closeOverlay()
-
-  // 1) Luu file THAT tren dia truoc — de dong ghim / tat app khong mat anh.
+  // 1) Luu file THAT tren dia truoc — tat app khong mat anh.
   const filePath = kho.luuAnh(cropped)
-  // 2) Vao khay (cho gom moi tam da chup).
+  // 2) Vao khay (cho gom moi tam da chup). Khay tu hien len.
+  //    ☠️ Anh Tien chot 25/08: chup xong CHI vao khay, KHONG bung anh ghim noi.
+  //    Muon ghim len man hinh thi bam thumbnail trong khay (shelf:pin van con).
   shelfAdd(cropped, filePath)
-  // 3) Ghim noi ngay tai cho vua chon.
-  createPinWindow(cropped, screenX, screenY, Math.round(rect.w), Math.round(rect.h))
+
+  // [selftest] Van chay duong GHIM de kiem (that: bam thumbnail se goi ham nay).
+  // Khoi selftest o day cung lo chup selftest-pin/shelf.png + thoat app.
+  if (IS_SELFTEST) {
+    const sz = cropped.getSize()
+    createPinWindow(cropped, 100, 100, sz.width, sz.height, filePath)
+  }
 }
 
 ipcMain.on('overlay:cancel', () => closeOverlay())
@@ -327,7 +517,7 @@ function ketThucKeo(wcId) {
 
 const PIN_PAD = 12 // le trong suot quanh anh de co bong + goc bo tron
 
-function createPinWindow(image, screenX, screenY, dipW, dipH) {
+function createPinWindow(image, screenX, screenY, dipW, dipH, filePath) {
   const win = new BrowserWindow({
     x: screenX - PIN_PAD,
     y: screenY - PIN_PAD,
@@ -349,7 +539,7 @@ function createPinWindow(image, screenX, screenY, dipW, dipH) {
   // ☠️ Nho `id` NGAY BAY GIO. Trong handler 'closed', `win.webContents` da bi
   // huy — doc `.id` tu no nem "Object has been destroyed" (vap 24/08).
   const wcId = win.webContents.id
-  pins.set(wcId, { image })
+  pins.set(wcId, { image, filePath })
 
   win.loadFile(path.join(__dirname, 'pin', 'index.html'))
   win.webContents.once('did-finish-load', () => {
@@ -375,6 +565,17 @@ ipcMain.on('pin:close', (e) => {
 ipcMain.on('pin:copy', (e) => {
   const rec = pins.get(e.sender.id)
   if (rec && rec.image) clipboard.writeImage(rec.image)
+})
+
+/* KEO-THA ra app khac: keo anh ghim -> tha file .png that vao Premiere / Zalo /
+   Messenger... `startDrag` PHAI goi trong nhip dragstart that cua nguoi dung
+   (renderer chan default roi goi sang day), va icon BAT BUOC khong rong. */
+ipcMain.on('pin:start-drag', (e) => {
+  const rec = pins.get(e.sender.id)
+  if (!rec || !rec.filePath) return
+  try {
+    e.sender.startDrag({ file: rec.filePath, icon: rec.image.resize({ height: 96 }) })
+  } catch (err) { if (IS_DEV) console.error('[shotandsave] pin startDrag loi', err) }
 })
 
 ipcMain.on('pin:opacity', (e, value) => {
@@ -480,7 +681,16 @@ ipcMain.on('shelf:pin', (_e, id) => {
   const off = (cascade++ % 6) * 24
   const x = d.workArea.x + Math.round((d.workArea.width - dipW) / 2) + off
   const y = d.workArea.y + Math.round((d.workArea.height - dipH) / 2) + off
-  createPinWindow(it.image, x, y, dipW, dipH)
+  createPinWindow(it.image, x, y, dipW, dipH, it.filePath)
+})
+
+/* KEO-THA tu KHAY ra app khac. Cung `startDrag` nhu pin, nguon la item khay. */
+ipcMain.on('shelf:start-drag', (e, id) => {
+  const it = shelfItems.get(id)
+  if (!it || !it.filePath) return
+  try {
+    e.sender.startDrag({ file: it.filePath, icon: it.image.resize({ height: 96 }) })
+  } catch (err) { if (IS_DEV) console.error('[shotandsave] shelf startDrag loi', err) }
 })
 
 ipcMain.on('shelf:remove', (e, id) => {

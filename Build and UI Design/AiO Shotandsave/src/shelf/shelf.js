@@ -6,24 +6,54 @@ const listEl = document.getElementById('list')
 const countEl = document.getElementById('count')
 const barEl = document.getElementById('bar')
 
+const t = (k) => window.i18n.t(k)
+
+// Dich giao dien tinh: text + tooltip.
+document.querySelectorAll('[data-i18n]').forEach((el) => {
+  el.textContent = t(el.getAttribute('data-i18n'))
+})
+document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+  const s = t(el.getAttribute('data-i18n-title'))
+  el.title = s
+  el.setAttribute('aria-label', s)
+})
+// Dong "chua co anh" — hien PHIM TAT THAT (khong cung Ctrl+Shift+S nua).
+const emptyEl = document.getElementById('empty')
+if (emptyEl) {
+  // Dung textContent cho phan chu (an toan) + chip phim rieng, cach ro rang.
+  const txt1 = document.createElement('span')
+  txt1.textContent = t('khay.trong')
+  const chip = document.createElement('span')
+  chip.className = 'phim-chip'
+  chip.textContent = window.i18n.hotkey || ''
+  const txt2 = document.createElement('span')
+  txt2.textContent = t('khay.trong2')
+  emptyEl.append(txt1, chip, txt2)
+}
+
 /** Ve mot o anh vao dau day (moi nhat ben trai). */
 function themO(item) {
   const el = document.createElement('div')
   el.className = 'item moi'
   el.setAttribute('role', 'listitem')
   el.dataset.id = String(item.id)
-  el.title = 'Bấm để ghim lại lên màn hình'
+  el.title = t('khay.oGhim')
 
   const img = document.createElement('img')
   img.src = item.thumb
   img.alt = ''
-  img.draggable = false
+  // Keo thumbnail ra ngoai = tha file .png that vao Premiere / Zalo / Mess...
+  img.draggable = true
+  img.addEventListener('dragstart', (e) => {
+    e.preventDefault()
+    window.shelf.startDrag(item.id)
+  })
   el.appendChild(img)
 
   const rm = document.createElement('button')
   rm.className = 'rm'
-  rm.title = 'Bỏ khỏi khay (ảnh vẫn còn trong thư mục)'
-  rm.setAttribute('aria-label', 'Bỏ khỏi khay')
+  rm.title = t('khay.oXoa')
+  rm.setAttribute('aria-label', t('khay.oXoa'))
   rm.innerHTML =
     '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor"' +
     ' stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'

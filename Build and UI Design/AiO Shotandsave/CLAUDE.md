@@ -17,7 +17,22 @@ luat tai nguyen) va thuong hieu AiO.
 ## Stack
 
 - Electron (ban moi nhat — hien 43.4.1), JavaScript thuan (CommonJS), khong
-  bundler. Chay: `npm start`.
+  bundler.
+- ☠️ **MAY MOI PHAI `npm install` TRUOC.** `node_modules/` bi gitignore nen
+  `git pull` khong bao gio mang Electron ve — keo code ve bam chay la chet
+  ngay buoc dau, trong nhu tool hong. Da vap that o may cong ty 25/08.
+
+```
+npm install    # chi lan dau tren moi may
+npm start
+```
+
+☠️ **Chay .ps1 phai them `-ExecutionPolicy Bypass`** (Windows mac dinh chan
+chay script, bao "running scripts is disabled"). Vap that o may cong ty 25/08:
+```
+powershell -ExecutionPolicy Bypass -File scripts\cai-loi-tat.ps1        # cai loi tat
+powershell -ExecutionPolicy Bypass -File scripts\cai-loi-tat.ps1 -Go    # go loi tat
+```
 - Giao dien: HTML/CSS/JS thuan + `assets/tokens.css` (copy tu
   `../design-system/tokens.css`). Font Inter tai `assets/fonts/Inter.woff2`.
 
@@ -26,22 +41,38 @@ luat tai nguyen) va thuong hieu AiO.
 ```
 src/
   main.js            App, tray, phim tat, dieu phoi chup, tao cua so, IPC.
-  preload-overlay.js Cau IPC cho overlay (contextBridge -> window.overlay).
-  preload-pin.js     Cau IPC cho cua so ghim (-> window.pin).
-  overlay/           Man chon vung: anh dong bang + keo chon + lam mo.
+  i18n.js            Tu dien VI/EN + t(lang,key). main require; preload nap lang
+                     SYNC (ipcRenderer.sendSync 'i18n:lang') -> window.i18n.t().
+  kho.js             Luu anh (thuMucAnh doc config, DOI DUOC) + cau-hinh.json.
+  preload-overlay.js Cau IPC cho overlay (-> window.overlay) + i18n.
+  preload-pin.js     Cau IPC cho cua so ghim (-> window.pin) + i18n.
+  preload-shelf.js   Cau IPC cho khay (-> window.shelf) + i18n + hotkey display.
+  preload-settings.js Cau IPC cho Cai dat (-> window.settings) + i18n.
+  overlay/           Man chon vung: MOI man mot overlay, anh dong bang + fade.
   pin/               Cua so ghim sticky: anh + thanh cong cu + keo di chuyen.
-assets/              tokens.css, fonts/Inter.woff2, tray.png (AiO logo).
+  shelf/             Khay anh: thumbnail + keo-tha ra app khac.
+  settings/          Man Cai dat (frameless, logo AiO, card): doi phim tat, doi
+                     thu muc luu, toggle ngon ngu VI/EN.
+assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo).
 ```
 
 ## Luong chup (main.js)
 
-1. Phim tat `Ctrl+Shift+S` / bam tray -> `startCapture()`.
-2. `grabDisplay()` chup man hinh DUOI CON TRO qua `desktopCapturer`, do phan
-   giai that = size * scaleFactor (device px). Chup TRUOC khi hien overlay.
-3. `openOverlay()` mo cua so opaque phu dung man hinh do, gui anh dong bang sang.
-4. Renderer overlay: keo chon vung (CSS px). Tha -> `overlay:confirm` voi rect.
-5. `handleConfirm()` crop anh goc (rect * scaleFactor) -> `createPinWindow()`
-   dat tai vi tri man hinh cua vung chon, alwaysOnTop 'screen-saver'.
+1. Phim tat (mac dinh `CommandOrControl+Shift+S` = Ctrl tren Win / ⌘ tren Mac;
+   DOI DUOC qua man Cai dat, luu vao `cau-hinh.json`) / bam tray -> `startCapture()`.
+2. `openOverlays()` mo MOT overlay TRONG SUOT cho MOI man, hien NGAY (~165ms,
+   thay man hinh that qua no) — tuc thi nhu Lightshot. ☠️ KHONG grab TRUOC roi moi
+   hien: `desktopCapturer.getSources` CHAN luong chinh ~0,5s -> overlay hien muon
+   = "pop-up". ☠️ KHONG dung 1 cua so vat ngang ca man hinh ao: may 4K + man phu
+   DPI 150% no khong phu het.
+3. `kickGrab()` (goi SAU khi overlay dau tien hien+paint, setTimeout 40ms) chup
+   TUNG man qua `desktopCapturer` (device px), gui anh dong bang -> renderer dat
+   lam nen (`overlay:frozen`, freeze view) + luu full-res de cat.
+4. Renderer: keo chon vung; chon xong hien THANH CONG CU ve (khung/mui ten). Xong:
+   co shape -> canvas GHEP gui `{dataUrl}`; khong shape -> gui `{rect}`.
+5. `handleConfirm()`: `{dataUrl}` thi dung thang; `{rect}` thi cat anh goc full-res
+   (net). -> luu file -> `shelfAdd()` (khay tu hien). ☠️ 25/08: chup xong CHI vao
+   khay, KHONG bung pin. Ghim chi khi bam thumbnail (`shelf:pin`).
 
 ## Verify — KHONG tin "build sach"
 
@@ -55,7 +86,28 @@ npm start -- --selftest --dev
 
 Roi doc `.selftest/selftest-overlay.png` + `selftest-pin.png` de kiem mat.
 
+## Da lam
+
+KEO-THA ra app khac (`webContents.startDrag`, 25/08): keo anh GHIM hoac
+thumbnail KHAY -> tha file .png that vao Premiere / Zalo / Mess / Explorer...
+Tren cua so ghim: keo ANH = tha ra app, keo THANH TREN (#bar) = di chuyen cua so
+(dragstart chiem cho keo-di-chuyen nen phai tach). Da do that: file roi dung vao
+Explorer, xuyen ca 2 man hinh.
+
+VE SHAPE khi chup (25/08): chon vung xong hien thanh cong cu -> ve KHUNG VUONG /
+MUI TEN (canvas device-res) -> Enter/Xong. Co shape thi renderer ghep gui dataURL;
+khong shape thi main cat full-res. Ctrl+Z hoan tac, Esc huy.
+
+HIEN TUC THI (25/08): overlay cua so TRONG SUOT hien NGAY (~165ms), grab chay NEN
+sau khi overlay hien (getSources CHAN luong chinh nen KHONG duoc grab truoc khi
+hien). Frozen den sau -> freeze view. Selection do renderer nen keo duoc ngay.
+
+MAN CAI DAT PHIM TAT (25/08): mo tu tray -> "Ghi phim moi" -> nhan to hop -> Luu.
+Bo ghi dung `e.code` (vi tri phim), khong dung `e.key` (doi theo Shift). Luu vao
+`cau-hinh.json`, nap luc khoi dong. Doi that bai (app khac giu phim) thi giu phim
+cu. ☠️ Accelerator backtick la `Alt+\`` (literal), KHONG phai 'Alt+Backquote'.
+
 ## Chua lam (xem PROGRESS.md)
 
-Tu luu thu muc · KEO-THA ra app khac (`webContents.startDrag`) · man cai dat ·
-dong goi bo cai · da man hinh day du.
+Dong goi bo cai (.exe) · pre-warm overlay de xuong ~30ms · them cong cu ve khac
+(chu, but ve, che mo) neu anh Tien can.

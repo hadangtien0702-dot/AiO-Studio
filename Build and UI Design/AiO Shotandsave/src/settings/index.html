@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; script-src 'self'" />
+  <title>AiO Shot & Save — Cài đặt</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <!-- Header rieng (frameless): logo AiO + tieu de + doi ngon ngu + dong -->
+  <header id="tieu-de">
+    <div class="hieu">
+      <svg class="logo" viewBox="0 0 385.89 351.31" width="18" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+        <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+      </svg>
+      <span data-i18n="set.tieuDe">Cài đặt</span>
+    </div>
+    <div class="dieu-khien">
+      <div id="lang" class="lang" role="group" aria-label="Language">
+        <button data-lang="vi" class="lang-nut">VI</button>
+        <button data-lang="en" class="lang-nut">EN</button>
+      </div>
+      <button id="close" class="dong" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="the">
+      <h1 data-i18n="set.phim.tieuDe">Phím tắt chụp</h1>
+      <p class="mo-ta" data-i18n="set.phim.moTa"></p>
+      <div class="hang">
+        <div id="disp" class="phim">—</div>
+        <button id="record" class="nut" data-i18n="set.phim.ghi"></button>
+      </div>
+      <div class="hang-nut">
+        <button id="reset" class="nut phu nho" data-i18n="set.phim.macDinh"></button>
+        <button id="save" class="nut chinh nho" data-i18n="set.phim.luu" disabled></button>
+      </div>
+      <p id="msg" class="msg"></p>
+    </section>
+
+    <section class="the">
+      <h1 data-i18n="set.thuMuc.tieuDe">Thư mục lưu ảnh</h1>
+      <p class="mo-ta" data-i18n="set.thuMuc.moTa"></p>
+      <div id="folder" class="duong-dan" title="">—</div>
+      <div class="hang-nut">
+        <button id="open-folder" class="nut phu nho" data-i18n="set.thuMuc.mo"></button>
+        <button id="pick-folder" class="nut nho" data-i18n="set.thuMuc.doi"></button>
+      </div>
+      <p id="msg-folder" class="msg"></p>
+    </section>
+  </main>
+  <script src="settings.js"></script>
+</body>
+</html>

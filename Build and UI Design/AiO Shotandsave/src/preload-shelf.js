@@ -1,5 +1,13 @@
 'use strict'
 const { contextBridge, ipcRenderer } = require('electron')
+const i18n = require('./i18n')
+
+const lang = ipcRenderer.sendSync('i18n:lang') || 'vi'
+contextBridge.exposeInMainWorld('i18n', {
+  lang,
+  t: (key) => i18n.t(lang, key),
+  hotkey: ipcRenderer.sendSync('hotkey:display') || '', // phim tat da dinh dang de hien
+})
 
 contextBridge.exposeInMainWorld('shelf', {
   onAdd: (cb) => ipcRenderer.on('shelf:add', (_e, item) => cb(item)),
@@ -8,6 +16,8 @@ contextBridge.exposeInMainWorld('shelf', {
 
   /** Ghim lai mot anh trong khay len man hinh. */
   pin: (id) => ipcRenderer.send('shelf:pin', id),
+  /** Keo file .png that ra app khac (Premiere/Zalo/Mess). */
+  startDrag: (id) => ipcRenderer.send('shelf:start-drag', id),
   /** Bo khoi khay (file tren dia GIU NGUYEN). */
   remove: (id) => ipcRenderer.send('shelf:remove', id),
   clear: () => ipcRenderer.send('shelf:clear'),

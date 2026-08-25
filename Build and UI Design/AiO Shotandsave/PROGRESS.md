@@ -1,5 +1,463 @@
 # PROGRESS — AiO Shot & Save
 
+
+
+
+
+## 2026-08-25 13:51 — Ctrl+C khi chup: vao khay + COPY clipboard (them, giu Enter/nut check)
+
+Anh Tien: *"bam Ctrl+C cung vao khay duoc khong — them chu ko xoa 2 option dang co"*.
+Them: che do annotate bam **Ctrl+C** -> xong (vao khay) VA copy anh vao clipboard
+(vi Ctrl+C = copy, tien dan ngay). Enter + nut check VAN nguyen (khong copy).
+- overlay.js keydown: Ctrl+C (mode annotate) -> xong(true).
+- xong(copy): them co copy vao payload confirm.
+- main handleConfirm: payload.copy -> clipboard.writeImage(cropped) truoc khi vao khay.
+- Tooltip nut Xong: "Xong (Enter · Ctrl+C = sao chep)".
+Do that: chup -> ve -> Ctrl+C: file VAO KHAY + Clipboard.ContainsImage()=True.
+
+## 2026-08-25 13:48 — BANG CHON MAU cho cong cu ve (mac dinh CAM)
+
+Anh Tien: *"cho anh bang chon mau, mac dinh cam"*. Them dai 7 mau vao thanh cong
+cu ve: cam (accent, MAC DINH) · do · vang · xanh la · xanh duong · trang · den.
+Bam swatch doi mau; moi shape LUU mau rieng (doi mau khong doi shape da ve).
+- overlay/index.html: #mau-nhom 7 nut .mau (data-color + inline bg).
+- overlay.css: .mau (tron 18px, .chon co vien trang).
+- overlay.js: curColor mac dinh '#f86820'; chonMau(); shape luu {color}; veShape
+  dung s.color.
+
+Do that: ve khung -> CAM (mac dinh) dung; bam swatch -> shape doi mau (test hit
+trang -> khung trang). Thanh cong cu render dep: swatch cam co vien trang (dang
+chon).
+
+## 2026-08-25 13:35 — HIEN TUC THI (nhu Lightshot) + VE SHAPE (khung/mui ten) + UI khay
+
+### 1. Overlay hien TUC THI — het "pop-up cho ~0,5s"
+Anh Tien: *"van bi pop-up — Lightshot khong bi"*. Goc: cho grab (~0,5s,
+getSources CHAN luong chinh) xong MOI hien overlay.
+Doi kien truc: overlay cua so TRONG SUOT hien NGAY (thay man hinh that qua no),
+grab chay NEN — kick SAU khi overlay dau tien da hien+paint (setTimeout 40ms),
+xong thi gui anh dong bang (freeze view) + luu full-res de cat. Selection do
+RENDERER xu ly nen keo chon duoc ngay du main dang grab.
+Do that: overlay HIEN o **~165ms** (truoc: 450ms), lop mo fade CSS 150ms.
+handleConfirm: neu chua grab xong (chon nhanh) thi await grabPromise.
+
+### 2. Ve shape khi chup (khung vuong + mui ten) — nhu Lightshot
+Chon vung xong -> hien THANH CONG CU (khung/mui ten/hoan tac/huy/xong). Ve tren
+canvas device-res dat dung vung chon. Xong: co shape thi renderer GHEP (crop
+frozen device-res + canvas shape) -> dataURL; khong shape thi gui rect (main cat
+full-res, net). Enter=xong, Ctrl+Z=hoan tac, Esc=huy. Mau shape = accent cam.
+handleConfirm nhan { rect } HOAC { dataUrl }.
+Do that: ve khung -> anh luu co khung cam dung cho; ve mui ten -> co mui ten +
+dau mui ten dung huong. Thanh cong cu render dep (rect dang chon sang cam, xong
+mau xanh).
+
+### 3. UI khay: chu dinh nhau -> chip phim
+Dong "chua co anh": phim tat truoc day <b> dinh sat chu. Nay tach thanh CHIP
+kieu phim ban phim (.phim-chip: nen accent-soft, vien, bo goc), dung textContent
++ span rieng cho co khoang cach ro.
+
+### File moi/sua
+overlay: index.html (canvas #ve + #toolbar), overlay.css (toolbar/canvas/chip),
+overlay.js (viet lai: may trang thai select->annotate, ve rect/arrow, ghep).
+main.js (startCapture instant + kickGrab + handleConfirm rect|dataUrl),
+preload-overlay (onInit/onFrozen/confirm payload), i18n (5 khoa cong cu ve),
+shelf.js + shelf.css (chip phim).
+
+### Kiem chung bang so
+selftest sach (3 anh, 0 errors). overlay HIEN ~165ms. Ve khung + mui ten:
+2 anh luu deu co shape dung. Don file test.
+
+### Con lai
+- Pre-warm overlay de xuong ~30ms (chua lam; 165ms da du muot).
+- Keo-tha vao Premiere/Zalo: co san, chua tu dong test (chuan Windows).
+- 21+ anh test trong Thung rac; chua commit/push.
+
+## 2026-08-25 13:03 — HIEU UNG FADE muot khi hien overlay (anh Tien: "muot & than thien nhat")
+
+### Thay doi
+Overlay khong "pop" nua — FADE opacity 0->1 (~130ms) qua `fadeInOverlay()` o
+main (setInterval 8 buoc). Ca anh dong bang + lop mo mo dan hien vao. Bo fade rieng
+cua #dim/#hint trong CSS (de ca cua so fade cung nhau, khoi chong nhau).
+Selftest thi hien ngay (khoi cho fade).
+
+### Kiem chung bang so
+Burst chup vung sang tren man chinh sau khi bam Alt+`:
+t=0ms sang=249 -> 188 -> 171 -> 145 (t>=125ms on dinh). Giam DAN trong ~125ms,
+khong sut dot ngot, khong khung den (min 145 = dung 42% dim). selftest sach.
+
+## 2026-08-25 12:59 — SUA GOC "van pop-up khi bam chup" (nen den lo ra)
+
+### Boi canh
+Anh Tien: *"no van bi pop-up man hinh len — luc anh bam chup"*. Ban truoc da thu
+sua "man den nhap len" bang cach doi 'overlay:ready' roi moi show, NHUNG van bi.
+
+### Nguyen nhan GOC (do duoc)
+Overlay tao voi `show: false`. ☠️ Cua so AN thi Chromium TREO
+`requestAnimationFrame` (background throttling). Ma tin hieu 'overlay:ready'
+(bao anh da ve) nam trong double-rAF -> KHONG bay ra khi cua so con an -> cua so
+hien qua TIMER du phong 400ms, luc do anh chua chac ve xong -> lo NEN DEN.
+
+### Sua
+Them `webPreferences.backgroundThrottling: false` cho overlay -> cua so an van
+ve + rAF chay -> 'overlay:ready' bay som. Doi timer du phong 400 -> 1000ms (chi
+con la luoi an toan).
+
+### Kiem chung bang so
+- Log thoi diem show (tam): TRUOC nghi la ~400ms qua timer; SAU khi sua: show qua
+  READY o **~180ms** (sau khi anh da ve). Da go log.
+- Burst chup 10 khung ~40ms sau khi bam: do sang giu 225 roi giam nhe 198 (lop mo
+  vao) — KHONG khung nao den. Het nen den lo ra.
+- selftest sach.
+
+### Con phai hoi anh Tien
+Neu VAN thay "pop-up": co the y anh la (a) man PHU cung hien overlay (do moi man
+mot overlay de khoanh dau cung duoc), hay (b) overlay hien hoi dot ngot. Cho anh
+mo ta them.
+
+
+## 2026-08-25 11:43 — MUOT HON + thu muc luu + logo/layout Cai dat + SONG NGU VI/EN
+
+### Boi canh
+Anh Tien (nhieu yeu cau trong buoi): *"xem phan mem co muot ma khi bam chup"*,
+*"chac chan keo-tha vao bat ki app"*, *"them setup folder luu anh"*, *"thay logo
+va thiet ke lai layout"*, *"ngon ngu app la tieng Anh va tieng Viet"*.
+
+### 1. Muot hon — DO THAT truoc khi sua (luat 5b/5x)
+Bam Alt+` -> doi ~1,2s moi thay overlay = do. Do tach:
+- getSources goi 2 LAN (moi grabDisplay 1 lan) = 1220ms.
+- Sau khi goi getSources 1 LAN: 924ms (getSources 487 + toDataURL PNG 4K 435).
+- Doi hien thi sang JPEG (img.toJPEG 90, ~50ms/man) + GIU anh goc full-res o main
+  de cat (net khong doi): **512ms**. Giam 58%.
+Kem: overlay chi `show()` sau khi anh ve xong + FADE lop mo 140ms + chi dan
+truot vao 180ms -> khoi den dot ngot, muot.
+☠️ Cat chuyen ve MAIN (rect) tu anh goc -> net; renderer chi gui rect.
+☠️ Cache wcId cho 'closed' cua overlay (doc webContents.id sau huy = nem).
+
+### 2. Thu muc luu anh (settings)
+kho.thuMucAnh() da doc config.thuMucAnh san. Them IPC pick-folder (dialog chon
+thu muc) + open-folder, va muc trong man Cai dat. DO THAT: seed config thuMucAnh
+= thu muc temp -> chup -> file VAO dung thu muc moi. Xoa seed, ve mac dinh.
+
+### 3. Logo AiO + thiet ke lai Cai dat
+Cua so Cai dat: FRAMELESS, header rieng co LOGO AiO (SVG inline, mau cam) + tieu
+de + toggle VI/EN + nut dong. Than = 2 CARD (Phim tat / Thu muc). icon cua so =
+app.ico (khoi hien logo Electron mac dinh). Do that: chup VI + EN deu dep.
+Luat 5an-bis: nut cam dac >=13px bold.
+
+### 4. Song ngu VI/EN
+`src/i18n.js` — tu dien VI/EN + t(lang,key). main giu `lang` (config), tray
+dung T(). Moi preload require i18n + nap lang SYNC (ipcRenderer.sendSync
+'i18n:lang') -> window.i18n.t(). Renderer dich [data-i18n] / [data-i18n-title].
+Doi ngon ngu: settings:set-lang -> luu config + rebuild tray + RELOAD moi cua so.
+☠️ Sua luon dong "chua co anh" cua khay: truoc cung `Ctrl+Shift+S`, nay hien
+PHIM TAT THAT qua ipcRenderer.sendSync 'hotkey:display' (formatAccel).
+Do that: settings VI/EN, overlay hint EN "Drag to select · Esc to cancel".
+
+### Kiem chung bang so
+- selftest sach nhieu lan (3 anh, 0 errors.txt) qua tung buoc.
+- grab 1220 -> 924 -> 512 ms (do bang console.time tam, da go).
+- Chup that: overlay khong den nhap; anh cat NET (chu sac); thu muc moi nhan file;
+  settings VI/EN + overlay hint EN chup man hinh xac nhan.
+- Don: file selftest cua em; 21 file test cu nam trong THUNG RAC (khoi phuc duoc).
+
+### Con lai / chua lam
+- Keo-tha: da co (startDrag file), da do vao Explorer + xuyen 2 man. Anh dan
+  "chac chan vao BAT KI app": startDrag file la chuan Windows (CF_HDROP) — moi
+  app nhan file deu duoc. CHUA tu dong test vao Premiere/Zalo (kho automation).
+- 6-21 anh test trong Thung rac: cho anh quyet khoi phuc hay bo.
+- Chua commit/push.
+
+
+## 2026-08-25 11:09 — CHUP DA MAN HINH: khoanh vung o man nao cung duoc (tu nhien nhu Lightshot)
+
+### Boi canh
+Anh Tien: *"nhu vay khong tu nhien lam — Lightshot va cac app khac khong ai lam
+vay"*. Truoc do tool chi chup MAN CO CON TRO, man kia khong chup duoc.
+
+### Nguyen nhan cach cu khong tu nhien
+`startCapture` lay `getDisplayNearestPoint(cursor)` -> chi chup 1 man. Muon
+chup man kia phai di chuot sang roi moi bam.
+
+### Da thu cach A (MOT overlay khong lo vat ngang ca man hinh ao) — HONG
+Ghep tat ca man vao 1 cua so `enableLargerThanScreen`. Do that tren may anh Tien
+(man chinh 4K 3840x2160 + man phu 3072x1728, DPI 150%): cua so KHONG phu het man
+chinh, bang tinh ben phai van sang (khong bi lam mo). Cua so vat qua nhieu man 4K
+DPI khac nhau khong dang tin.
+
+### Cach B (CHOT): moi man MOT overlay rieng
+`grabDisplaysList()` chup tung man -> `openOverlays()` tao MOT cua so overlay
+PHU DUNG tung man (toa do cuc bo 0,0). Khoanh vung o man nao cung duoc. Cat bang
+CANVAS trong renderer (1 layer/overlay) -> giu net dung DPI tung man.
+- `main.js`: `overlayWin` (1) -> `overlayWins` (mang). closeOverlay dong het.
+  Selftest chi chay o overlay dau (idx 0) de khoi confirm N lan.
+- `overlay.js` + overlay.css: da lam theo "layers" tu truoc nen dung lai duoc
+  (moi overlay 1 layer). Cat canvas ghep tung layer, do net theo sf man chua tam
+  vung chon.
+- `handleConfirm(dataUrl)`: nhan anh da cat tu renderer -> luu -> khay.
+
+### Kiem chung bang so — THAT tren 2 man
+- selftest: 3 anh, khong errors.txt.
+- Bam Alt+` -> dem cua so overlay lon: **2** (dung 1/man).
+- Dong "Keo de chon vung" hien tren CA 2 man.
+- Khoanh vung TREN MAN PHU (X am -2600..-1600): ra file that 6.148 byte, noi dung
+  DUNG (panel Graphics cua Premiere tren man phu), NET.
+- Da xoa file test cua em; 9 file con lai la cua anh Tien.
+
+### Gioi han da biet
+Khoanh vung VAT NGANG 2 man (bat dau man nay ket thuc man kia) KHONG duoc — moi
+overlay chi trong man cua no. Hiem gap; Lightshot cung tach theo man. Neu anh can
+thi phai quay lai cach A + xu ly DPI ky hon.
+
+
+## 2026-08-25 10:32 — SUA "man den nhap len" + chup xong CHI vao khay (bo bung pin)
+
+### Boi canh
+Anh Tien: *"khi bam Alt+` thi man hinh co van de — no nhay ra mot man hinh nua
+roi moi chup. Chup xong anh can no tu vao khay luon"*.
+
+### #1 — "man hinh nua" = man DEN nhap len truoc khi hien anh
+Overlay tao voi `backgroundColor: '#000000'` va `show()` goi NGAY sau khi gui
+anh, nhung renderer chua ve anh dong bang xong -> nguoi dung thay MAN DEN full
+man hinh nhap len roi anh moi hien.
+Sua: renderer giai ma anh (`new Image().onload`) + double rAF roi moi bao
+`overlay:ready`; main chi `show()` khi nhan ready (co timer du phong 400ms).
+- `main.js`: bo show() trong did-finish-load, them IPC `overlay:ready` -> show.
+- `preload-overlay.js`: them `ready()`.
+- `overlay.js`: preload anh roi bao ready.
+Do that: selftest-overlay.png hien DUNG anh man hinh (Premiere+trinh duyet),
+KHONG den.
+
+### #2 — chup xong CHI vao khay, KHONG bung pin (anh Tien chot)
+`handleConfirm` truoc: luu -> shelfAdd -> createPinWindow (pin bung noi len).
+Nay: luu -> shelfAdd. BO createPinWindow khoi luong chup.
+Tinh nang ghim VAN CON: bam thumbnail trong khay -> `shelf:pin` -> createPinWindow.
+Selftest van chay duong ghim (nhanh IS_SELFTEST trong handleConfirm) de kiem +
+lo chup selftest-pin/shelf.png + thoat app.
+
+### Kiem chung bang so
+- selftest: 3 anh, khong errors.txt, app thoat sach.
+- Chup THAT bang Alt+` (SendInput) -> liet ke cua so: **Khay hien=True,
+  Pin hien=False** (dung mong doi), file moi `AiO-...103143-850.png` vao khay.
+- Da xoa 1 file test cua em; 7 file con lai la cua anh Tien (test cua anh).
+
+
+## 2026-08-25 10:09 — MAN CAI DAT PHIM TAT + doi duoc phim tat (Win/Mac)
+
+### Boi canh
+Anh Tien hoi: *"neu minh ban cho mac thi phim tat la gi, o win phim tat la gi?
+minh khong co mot cai setup phim tat rieng do em"*. Roi chot phim moi: **Alt + `**.
+
+### Mac/Win — da tu lo tu truoc
+Phim mac dinh viet `CommandOrControl+Shift+S`: Electron tu anh xa **Ctrl** tren
+Win, **Cmd (⌘)** tren Mac. Mot dong code, hai he dung.
+
+### Thay doi
+- `main.js`: HOTKEY co dinh -> `currentHotkey` nap tu config
+  (`kho.docCauHinh().hotkey || DEFAULT`). Them `setHotkey()` (thu dang ky phim
+  moi; that bai thi KHOI PHUC phim cu + bao that bai, khong de mat luon phim),
+  cua so `openSettings()`, 3 IPC `settings:get/set-hotkey/reset`.
+- `preload-settings.js` + `settings/` (index.html, settings.css, settings.js):
+  man Cai dat mo tu tray. Bam "Ghi phim moi" -> nhan to hop -> Luu.
+- Bo ghi phim dung `e.CODE` (vi tri phim vat ly) chu KHONG dung `e.key` —
+  e.key doi theo Shift (Shift+` = ~, Shift+2 = @) lam sai accelerator.
+
+### ☠️ Bay 1: phim backtick khong bat duoc neu chi cho [a-z0-9]
+Anh muon Alt+`. Bo ghi ban dau chi nhan chu/so/F-keys -> backtick tuot.
+Sua: map `e.code` -> ky tu: Backquote->`, Minus->-, ... (CODE_PUNCT).
+Da test truoc: `globalShortcut.register('Alt+`')` = OK (literal backtick);
+'Alt+Backquote'/'Alt+Grave'/'Alt+192' deu FAIL. Nen accelerator dung la `Alt+``.
+
+### ☠️ Bay 2 (thuoc do cua em, KHONG phai app): BOM lam JSON.parse chet
+Seed config bang PowerShell `Set-Content -Encoding utf8` -> them BOM ->
+`JSON.parse` cua Node chet -> `docCauHinh` nuot loi tra {} -> app roi ve mac
+dinh, settings hien "Ctrl+Shift+S" du config ghi Alt+`. Ghi lai bang .NET
+UTF8 KHONG BOM thi settings hien dung "Alt + `". App tu ghi config (ghiCauHinh)
+thi khong BOM nen binh thuong khong dinh.
+
+### ☠️ Bay 3 (thuoc do): SetForegroundWindow tu PowerShell bi Windows chan
+Lai driver man Cai dat bang SendInput -> phim roi vao TRINH DUYET phia sau (chup
+ra trang Google). Doi cach: test phim tat TOAN CUC (khong can focus cua so nao).
+
+### Kiem chung bang so — THAT
+- Man Cai dat mo tu `--open-settings` (co tam, da GO): render dung, hien
+  "Ctrl + Shift + S" (mac dinh), sau khi set config hien dung "Alt + `".
+- Bam Alt+` TOAN CUC (SendInput VK_MENU+VK_OEM_3) -> ra overlay -> keo vung ->
+  sinh file THAT `AiO-...100552-825.png` 19.489 byte. Toan chuoi
+  config->register->capture chay dung voi phim anh chon.
+- `main.js` sach (0 dau vet // TAM / IS_OPENSET / peek).
+
+### ☠️ Chu y du lieu: 6 anh test cua anh Tien (09:23-09:27) o THUNG RAC
+Trong luc lam, 6 anh anh Tien chup thu bi don vao Thung rac (goc: Anh chup).
+`rm` cua em xoa THANG (khong qua thung rac) nen KHONG phai em -- nhieu kha nang
+anh tu Delete trong Explorer. Van con nguyen, khoi phuc duoc. Da HOI anh co muon
+khoi phuc khong. File 100456 (266KB, 10:04) nghi la anh tu bam Alt+` -> GIU LAI.
+
+### Trang thai
+config hien: `hotkey: "Alt+`"`. App dang chay voi phim nay.
+
+
+## 2026-08-25 09:45 — DRAG & DROP: keo anh THA vao app khac (tinh nang loi)
+
+### Boi canh
+Anh Tien: *"em lam drag and drop di em — anh co the xem - keo va tha bat ki
+phan mem va app nao"*. Day la tinh nang CLAUDE.md liet ke la CHUA LAM tu dau.
+
+### Thay doi
+Dung `webContents.startDrag({ file, icon })` — keo tha file .png THAT (khong
+phai anh base64) nen tha duoc vao MOI app nhan file: Premiere, Zalo, Messenger,
+Explorer, trinh duyet...
+- `main.js`: `createPinWindow` nhan them `filePath`, luu vao `pins`.
+  Them 2 handler: `pin:start-drag` va `shelf:start-drag` -> goi startDrag voi
+  file that + icon 96px. Boc try/catch (icon rong la startDrag nem).
+- `preload-pin.js` / `preload-shelf.js`: lo `startDrag`.
+- `pin.js` + pin.css + index.html: KEO ANH GHIM = tha ra app. Vi keo-tha
+  (dragstart) chiem cho keo-di-chuyen cu, DOI: di chuyen cua so = keo THANH TREN
+  (#bar, con=move), keo anh = tha file. `img draggable=true`,
+  `-webkit-user-drag: element`.
+- `shelf.js` + shelf.css: thumbnail `draggable=true`, dragstart -> startDrag.
+  BAM van = ghim lai (click va dragstart khong dam nhau).
+
+### ☠️ Xung dot phai xu ly: keo-tha vs keo-di-chuyen
+Tren cua so ghim, keo anh truoc gio = di chuyen cua so (mousedown+mousemove).
+HTML5 dragstart CHIEM cho mousemove -> khong the vua keo-di-chuyen vua keo-tha
+tren cung mot vung. Tach: anh = tha ra app; thanh tren = di chuyen.
+
+### Kiem chung bang so — THAT, khong chi build sach
+Tu dung moi truong test (luat 3a): tu bam Ctrl+Shift+S qua SendInput, tu keo
+chon vung -> sinh file that `AiO-...094221-464.png` (23.082 byte). Roi:
+- KEO TU KHAY -> tha vao cua so Explorer (thu muc dich rong truoc do):
+  file 23.082 byte ROI DUNG vao thu muc. Explorer o MAN HINH PHU (-2160) ->
+  keo xuyen 2 man hinh van an.
+- Xoa file dich. KEO TU ANH GHIM -> tha vao Explorer: lai ra 23.082 byte.
+- Ca 2 kenh (`pin:start-drag` + `shelf:start-drag`) deu PROVEN drop file that.
+- selftest lai sau khi sua: 3 anh, khong `errors.txt` -> khong lam hong luong cu.
+Da don: 2 file test cua em (KHONG dung 6 file 09:23-09:27 cua anh Tien — luat
+5am-bis: xoa theo GIO se cham file cua nguoi khac), thu muc dich, cua so Explorer.
+
+
+## 2026-08-25 09:33 — SUA "VIEN VO DUYEN" quanh khay anh
+
+### Boi canh
+Anh Tien: *"sao no co cai vien vo duyen vay em?"* (kem anh chup khay tren nen sang).
+
+### Nguyen nhan that — DO DUOC, khong doan
+`#shelf` co `inset: 10px` (le trong suot de chua bong) + `box-shadow: shadow-pop`
+(`0 18px 52px den 62%`). Tren nen TOI (hinh nen desktop) thi tang hinh — nen
+truoc gio khong ai thay. Tren nen SANG (cua so trang / chat phia sau) thi khe
+10px lo nen sang + bong lon xoe ra = mot VIEN xam bo tron bao quanh khay toi.
+Khong phai vien cua Windows — la CSS.
+
+### Cach do (tu dung moi truong test cua minh — luat 3a)
+Them co TAM `--peek-shelf` (hien khay + 1 anh gia, giu mo), tat ban dang chay,
+mo ban peek, chup man hinh THAT co nen trang phia sau:
+- TRUOC: ro vien xam bo tron + khe ho (`vien-nen-sang.png`).
+- SAU:  tam phang sach, chi vien 1px, KHONG khe, KHONG halo (`vien-sau.png`).
+Do tren ca nen toi va nen sang. Da GO co `--peek-shelf`; `main.js` byte giong
+het ban commit (khong con trong `git diff`).
+
+### Thay doi
+`src/shelf/shelf.css` — `#shelf`: `inset: 10px` -> `inset: 0` (khay lap kin
+cua so), bo `box-shadow`. Giu `border: 1px` + `border-radius: 12px`.
+Goc bo tron van sach (window transparent nen ngoai ban kinh la trong suot,
+Windows khong ve them vien).
+
+### Con lai — CHUA sua, cho anh Tien quyet
+Cua so GHIM (`pin.css` + PIN_PAD=12) dinh Y HET mau nay (le trong suot + bong).
+Se hien cung "vien vo duyen" tren nen sang. NHUNG anh ghim la anh chup noi tren
+noi dung bat ky -> bong giup tach khoi nen, co the la CO Y. Chua dong vao vi
+anh Tien chi chi khay; hoi truoc khi sua (doi PIN_PAD con dung toi phep dat vi
+tri cua so ghim).
+
+### Kiem chung bang so
+- Chup man hinh THAT truoc/sau tren nen trang: vien bien mat.
+- `git diff`: chi `shelf.css` (+ CLAUDE.md/PROGRESS.md). `main.js` sach.
+- App chay lai qua LOI TAT: 3 tien trinh electron song.
+
+
+## 2026-08-25 09:14 — CAI LOI TAT tren may cong ty (chay tu ma nguon, KHONG dong goi exe)
+
+### Boi canh
+Anh Tien: *"cai de vua su dung vua test di em, khong dong goi exe nhe"*.
+Ngay sau khi da chay duoc app o muc tren.
+
+### Thay doi
+- `assets/app.ico` (MOI) — icon Windows cho loi tat. Logo goc `tray.png`
+  387x353 KHONG vuong; ep thang vao shortcut la MEO (dung loi da sua cho tray
+  24/08). Ve len khung vuong 256x256, can giua theo chieu cao, boc PNG trong ICO.
+- `scripts/cai-loi-tat.ps1` (MOI, 82 dong) — cai/go loi tat.
+  Loi tat tro THANG `node_modules\electron\dist\electron.exe .` (khong qua
+  npm -> khong hien cua so den). Tao 2 cho: Desktop + Start Menu.
+  Co `-Go` de go (luat: co duong vao phai co duong ra). Go chi xoa 2 .lnk,
+  KHONG dung ma nguon / anh da chup.
+- `CLAUDE.md` — them canh bao "may moi phai npm install truoc".
+
+### Vi sao KHONG dong goi exe / KHONG auto-start
+- exe: anh Tien chot khong lam. Chay tu ma nguon de sua code la app doi ngay,
+  hop cho vua-dung-vua-test.
+- auto-start: anh noi "vua dung vua test" -> bat/tat lien tuc, chua cam auto-run.
+  De anh chu dong bat sau neu can.
+
+### ☠️ Bay: chay .ps1 tay bi Windows chan (bo sung sau khi anh Tien vap)
+Anh Tien chay `powershell -File scripts\cai-loi-tat.ps1` -> bao
+"running scripts is disabled on this system" (ExecutionPolicy = Restricted).
+KHONG phai app hong — loi tat da cai san TU truoc (em cai qua tool noi bo,
+tool do tu vuot chan) va van dung binh thuong. Chay .ps1 TAY thi phai them
+`-ExecutionPolicy Bypass`. Da them vao CLAUDE.md.
+Loi tat khong dinh bay nay vi no tro THANG electron.exe, khong qua .ps1.
+
+### Kiem chung bang so
+- Bam THAT vao loi tat Desktop (khong chi tao file): app len, MAIN PID sau 6s,
+  WorkingSet 65 MB.
+- App DOC LAP: tien trinh cha da thoat -> khong treo vao phien Claude.
+- Icon: `System.Drawing.Icon` doc duoc 256x256.
+- Doi chung script 2 chieu: TRUOC Desktop+Start=True -> `-Go` -> ca hai False
+  -> cai lai -> ca hai True. Ca hai duong deu chay.
+- `git status` sach (2 file .lnk + .ico + .ps1 nam ngoai / da gitignore hoac
+  la file moi trong repo — kiem lai truoc khi commit).
+
+
+## 2026-08-25 08:55 — CHAY DUOC TREN MAY CONG TY (KHONG sua ma nguon)
+
+### Boi canh
+Anh Tien: *"chay shot and save cho anh o may nay di toi qua dang bi loi"*.
+May cong ty (DRT-G21), vua `git pull` ve 2 commit moi nhat (`cff7b2c`).
+
+### Nguyen nhan that — KHONG phai loi code
+`node_modules/` bi `.gitignore` chan (dung chuan). Nen `git pull` **khong bao
+gio** mang Electron ve. Keo code ve xong bam chay la chet ngay buoc dau.
+Day khong phai loi cua tool — day la buoc cai con thieu tren may moi.
+☠️ Bai hoc dung cho MOI may moi / MOI panel Electron trong bo: **keo code ve
+!= chay duoc**. File bi gitignore la file phai TU DUNG LAI tren tung may.
+
+### Thay doi
+KHONG sua mot dong ma nguon nao. `git status` sach truoc va sau.
+Chi chay `npm install` -> 13 goi, 9 giay, Electron **43.4.1** dung ban ghi
+trong CLAUDE.md.
+
+### File anh huong
+`node_modules/` (moi tao, gitignore) · `package-lock.json` (npm tu cham mtime,
+noi dung KHONG doi — da xac nhan bang `git status`).
+
+### Kiem chung bang so
+Chay dung duong kiem cua du an: `npm start -- --selftest --dev`
+
+| Kiem | Ket qua |
+|---|---|
+| `.selftest/errors.txt` | KHONG sinh ra |
+| selftest-overlay.png | 2.078.018 byte, dung do phan giai that |
+| selftest-pin.png | 584.354 byte — net, crop dung vung, bo goc + vien AiO |
+| selftest-shelf.png | 27.841 byte — logo AiO, dem "1", du 3 nut |
+| File that tren dia | `Anh chup/AiO-2026-08-25-085410-087.png` 505.429 byte |
+| App that (`npm start`) | 3 tien trinh electron.exe song, log 0 loi |
+
+Da MO 3 anh ra nhin bang mat, khong chi dem file.
+
+### Don dep
+Xoa 1 tam anh do selftest tu chup (`AiO-2026-08-25-085410-087.png`, 08:54) —
+no chup dung man hinh chat cua anh Tien. Thu muc `Anh chup` trong TRUOC do
+nen khong dung vao tam nao cua anh. Xoa ca `.selftest/`.
+
+
 ## 2026-08-24 23:45 — Logo AiO · doi cho luu anh · SUA LOI KHAY PHINH KHI KEO
 
 ### 1. ☠️ Khay tu phinh to khi keo — anh Tien phat hien, DO DUOC
