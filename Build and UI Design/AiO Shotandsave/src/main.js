@@ -292,16 +292,26 @@ function kickGrab() {
     return []
   })
   grabPromise.then((list) => {
+    // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
+    // de renderer GHEP duoc vung chon VAT NGANG 2 man (anh Tien 25/08: khoanh
+    // ca 2 man ma luu chi co 1 man).
+    const layers = list.map((x) => ({
+      x: x.display.bounds.x, y: x.display.bounds.y,
+      w: x.display.bounds.width, h: x.display.bounds.height,
+      sf: x.sf, dataUrl: x.jpeg,
+    }))
     for (const win of overlayWins) {
       if (win.isDestroyed()) continue
       const item = list.find((x) => x.display.id === win._displayId)
-      if (!item) continue
-      const rec = overlayShots.get(win.webContents.id)
-      if (rec) { rec.image = item.image; rec.sf = item.sf }
-      if (!win.isDestroyed()) win.webContents.send('overlay:frozen', { dataUrl: item.jpeg })
+      if (item) {
+        const rec = overlayShots.get(win.webContents.id)
+        if (rec) { rec.image = item.image; rec.sf = item.sf }
+      }
+      win.webContents.send('overlay:frozen', { layers })
     }
   })
 }
+
 
 /**
  * Chup TUNG man hinh -> mang { display, dataUrl, sf }. Moi man se co MOT overlay
@@ -383,7 +393,8 @@ function openOverlays(displays) {
 
     win.loadFile(path.join(__dirname, 'overlay', 'index.html'))
     win.webContents.once('did-finish-load', () => {
-      win.webContents.send('overlay:init', { selftest: laSelftest })
+      // origin = goc DIP toan cuc cua man nay — renderer quy doi toa do toan cuc.
+      win.webContents.send('overlay:init', { selftest: laSelftest, origin: { x: b.x, y: b.y } })
       // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
       if (!win.isDestroyed() && !win.isVisible()) { win.show(); win.focus() }
       // Grab bat dau SAU khi overlay dau tien da hien + kip PAINT (~40ms) — de

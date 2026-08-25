@@ -4,6 +4,96 @@
 
 
 
+
+
+
+
+## 2026-08-25 15:33 — BO khung "guong" man kia (het vet sang/toi chia doi)
+
+### Boi canh
+Anh Tien: *"bam chup ben man trai thi man ben kia co mot lop sang va toi"*.
+
+### Nguyen nhan
+Khung "guong" (sel-mirror) em them de xem truoc keo xuyen man: khi vung chon nam
+TRON mot man, khung guong o man kia nam ngoai ria viewport — lop toi cua no la
+box-shadow spread 100vmax, chi phu duoc 100vmax tinh tu mep phan tu -> HUT giua
+man -> mot nua toi (co shadow) mot nua sang (het shadow) = vet chia doi.
+
+### Sua
+BO han sel-mirror (renderer + preload + relay o main). Man kia gio chi hien
+dimEl 42% DONG DEU. Keo VAT NGANG 2 man van chup duoc (confirmComposite dua tren
+toa do, khong can guong) — chi khong con xem truoc khung o man thu hai khi keo.
+
+### Kiem chung bang so
+Do TI LE sang (overlay/baseline) tai 8 diem ngang man phu khi dang chon vung o
+man chinh: **0.57-0.63 deu** (~0.58 = dung dim 42%). Truoc do la nua toi nua
+sang. selftest sach.
+
+## 2026-08-25 15:22 — QUET LAI VUNG: bam ra ngoai = bo vung cu, chon lai (nhu Lightshot)
+
+Anh Tien: *"o Lightshot anh chi duoc quet 1 vung"* -> chot y: bam RA NGOAI vung
+da chon la bo vung cu + quet vung moi ngay (truoc day phai Esc roi bam phim tat
+lai). Trong vung van la ve shape nhu cu.
+- overlay.js batDauVe: bam ngoai vung -> chonLaiTuDau(e): ve mode select, xoa
+  shapes + canvas, an toolbar, bat dau keo ngay tu diem bam.
+Do that: chon vung A (700x450 physical) -> bam ngoai quet vung B (600x300) ->
+Enter -> file luu DUNG 600x300 px (vung B). selftest sach.
+
+## 2026-08-25 15:04 — KHOANH VAT NGANG 2 MAN HINH: luu du ca 2 (ghep multi-display)
+
+### Boi canh
+Anh Tien: *"chon vung o ca 2 man thi luu chi co 1 man"*. Truoc day moi overlay
+lam viec doc lap theo toa do cuc bo -> keo sang man kia thi phan do mat.
+
+### Cach lam
+- main gui cho MOI overlay: goc DIP toan cuc cua man no (origin, trong
+  overlay:init) + anh dong bang cua TAT CA man kem toa do (overlay:frozen
+  {layers}).
+- Renderer theo doi vung chon; khi tha chuot:
+  - Vung nam GON trong man nay -> vao che do ve shape nhu cu.
+  - Vung VAT NGANG man khac -> confirmComposite: canvas ghep phan giao tu anh
+    dong bang cua TUNG man (dung sf tung man, thang do ra = sf lon nhat), gui
+    dataUrl. Grab chua xong thi pendingComposite doi.
+- Khung chon HIEN CA O MAN KIA: overlay dang keo phat 'overlay:sel' (DIP toan
+  cuc), main tiep song 'overlay:sel-mirror' cho cac overlay khac ve phan giao
+  (khong hien nhan kich thuoc o man guong).
+
+### Gioi han (chu y)
+- Vung vat ngang 2 man: LUU THANG, khong co buoc ve shape (ve shape chi khi vung
+  nam trong 1 man).
+- 2 man lech doc trong desktop ao -> phan khong man nao phu = MANG DEN trong anh
+  (Snipping Tool cung vay).
+
+### Kiem chung bang so
+Keo that tu man chinh (physical 600,1500) vat sang man phu: file luu
+**1434x516 px** — doi chieu toa do DIP khop cong thuc (556 DIP tu man phu +
+400 DIP tu man chinh, S=1.5). Mo anh: TRAI = noi dung man phu (doan chat),
+PHAI = man chinh (Premiere), dung vi tri va net. selftest sach.
+
+## 2026-08-25 14:55 — BO dan anh dong bang len man hinh (het "duplicate")
+
+### Boi canh
+Anh Tien gui anh: taskbar hien 2 LAN, noi dung in bong nhu nhan doi, va dan
+*"loai bo lop phu overlay"*.
+
+### Nguyen nhan
+Kien truc "hien tuc thi": anh dong bang grab NEN xong duoc DAN len lam nen
+(#shot backgroundImage). Anh dan bi lech/scale khong khop pixel voi man hinh
+that phia sau cua so trong suot -> nhin nhu moi thu duplicate (taskbar 2 lan).
+
+### Sua
+BO han viec dan anh len man hinh (onFrozen chi giu frozenImg NGAM de ghep shape
++ cat luu). Nguoi dung nhin man hinh THAT xuyen qua — khong the lech.
+Danh doi (chap nhan): noi dung DONG (video dang chay) thi anh cat = khoanh khac
+grab (~0,5s sau khi mo overlay), khong phai luc tha chuot. Voi man hinh tinh
+(da so truong hop chup) thi khong khac gi.
+
+### Kiem chung bang so
+- Chup vung taskbar khi overlay dang mo (sau khi frozen ve): taskbar hien
+  DUNG 1 LAN (truoc: 2).
+- Ve khung + Enter: anh luu sang binh thuong, khung cam dung cho, khong dim,
+  khong dinh hint. selftest sach.
+
 ## 2026-08-25 13:51 — Ctrl+C khi chup: vao khay + COPY clipboard (them, giu Enter/nut check)
 
 Anh Tien: *"bam Ctrl+C cung vao khay duoc khong — them chu ko xoa 2 option dang co"*.

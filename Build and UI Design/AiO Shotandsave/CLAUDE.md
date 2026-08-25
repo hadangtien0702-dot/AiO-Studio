@@ -68,7 +68,10 @@ assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo)
 3. `kickGrab()` (goi SAU khi overlay dau tien hien+paint, setTimeout 40ms) chup
    TUNG man qua `desktopCapturer` (device px), gui anh dong bang -> renderer dat
    lam nen (`overlay:frozen`, freeze view) + luu full-res de cat.
-4. Renderer: keo chon vung; chon xong hien THANH CONG CU ve (khung/mui ten). Xong:
+4. Renderer: keo chon vung (toa do toan cuc qua `origin`; khung chon guong sang
+   man kia qua 'overlay:sel'). Vung GON 1 man -> thanh cong cu ve (khung/mui ten,
+   7 mau). Vung VAT NGANG 2 man -> `confirmComposite` ghep tu anh dong bang cac
+   man (dung sf tung man) -> `{dataUrl}` luu thang, KHONG co buoc ve. Xong:
    co shape -> canvas GHEP gui `{dataUrl}`; khong shape -> gui `{rect}`.
 5. `handleConfirm()`: `{dataUrl}` thi dung thang; `{rect}` thi cat anh goc full-res
    (net). -> luu file -> `shelfAdd()` (khay tu hien). ☠️ 25/08: chup xong CHI vao

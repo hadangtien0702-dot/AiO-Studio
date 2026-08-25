@@ -33,17 +33,47 @@ let startX = 0, startY = 0
 let curRect = { x: 0, y: 0, w: 0, h: 0 }
 let shapes = []           // { type, x1, y1, x2, y2 } — toa do CUC BO trong vung chon
 let veCtx = null
-let frozenImg = null
+let frozenImg = null      // anh dong bang cua CHINH man nay (de ghep shape)
+let origin = { x: 0, y: 0 } // goc DIP toan cuc cua man nay
+let layers = []           // anh dong bang MOI man: { img, x, y, w, h, sf } (DIP toan cuc)
+let layersReady = false
+let pendingComposite = null // vung cho ghep neu grab chua xong
 
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
 window.overlay.onInit((data) => {
+  if (data && data.origin) origin = data.origin
   if (data && data.selftest) setTimeout(autoSelftest, 1600)
 })
+// ☠️ KHONG dan anh dong bang len man hinh — dan len la LECH voi man hinh that
+// phia sau (taskbar hien 2 lan; anh Tien bat 25/08). Anh chi dung NGAM de ghep
+// shape + cat luu. Nhan anh cua MOI man de ghep duoc vung VAT NGANG 2 man.
 window.overlay.onFrozen((data) => {
-  shotEl.style.backgroundImage = `url(${data.dataUrl})`
-  frozenImg = new Image()
-  frozenImg.src = data.dataUrl
+  const list = (data && data.layers) || []
+  if (!list.length) return
+  let loaded = 0
+  const news = []
+  const xongTai = () => {
+    loaded++
+    if (loaded < list.length) return
+    layers = news
+    layersReady = true
+    const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+    frozenImg = own ? own.img : null
+    if (pendingComposite) { const g = pendingComposite; pendingComposite = null; confirmComposite(g) }
+  }
+  for (const L of list) {
+    const im = new Image()
+    im.onload = xongTai
+    im.onerror = xongTai
+    im.src = L.dataUrl
+    news.push({ img: im, x: L.x, y: L.y, w: L.w, h: L.h, sf: L.sf })
+  }
 })
+
+/* ☠️ DA BO khung "guong" ben man kia (25/08): khi vung chon nam tron mot man,
+   khung guong o man kia nam ngoai ria — box-shadow cua no chi phu 100vmax nen
+   HUT giua man, tao vet sang/toi chia doi (anh Tien bat). Man kia gio chi toi
+   deu; keo VAT NGANG van chup duoc (confirmComposite khong can guong). */
 
 /* ── Chon vung ────────────────────────────────────────────────────────── */
 function updateSel(x1, y1, x2, y2) {
@@ -79,7 +109,12 @@ window.addEventListener('mouseup', (e) => {
   dragging = false
   const r = curRect
   if (r.w < 8 || r.h < 8) { window.overlay.cancel(); return }
-  vaoCheDoVe() // chon xong -> ve shape (Lightshot)
+  const trongManNay = r.x >= 0 && r.y >= 0 &&
+    r.x + r.w <= window.innerWidth && r.y + r.h <= window.innerHeight
+  if (trongManNay) { vaoCheDoVe(); return } // chon xong -> ve shape (Lightshot)
+  // VAT NGANG man khac: GHEP anh tu cac man roi luu luon (chua ho tro ve shape
+  // cho vung xuyen man — anh Tien 25/08: khoanh ca 2 man phai luu du ca 2).
+  confirmComposite({ x: origin.x + r.x, y: origin.y + r.y, w: r.w, h: r.h })
 })
 
 window.addEventListener('keydown', (e) => {
@@ -140,10 +175,27 @@ function chonCongCu(x) {
 /* ── Ve shape ─────────────────────────────────────────────────────────── */
 let veStart = null
 function batDauVe(e) {
-  // chi ve khi con tro nam TRONG vung chon
   const lx = e.clientX - curRect.x, ly = e.clientY - curRect.y
-  if (lx < 0 || ly < 0 || lx > curRect.w || ly > curRect.h) return
+  if (lx < 0 || ly < 0 || lx > curRect.w || ly > curRect.h) {
+    // Bam RA NGOAI vung = bo vung cu, quet vung MOI ngay (nhu Lightshot —
+    // anh Tien 25/08). Trong vung thi ve shape nhu thuong.
+    chonLaiTuDau(e)
+    return
+  }
   veStart = { x: lx, y: ly }
+}
+
+/* Bo vung chon + shape dang co, quay ve che do quet vung — bat dau keo ngay. */
+function chonLaiTuDau(e) {
+  mode = 'select'
+  shapes = []
+  veStart = null
+  if (veCtx) veCtx.clearRect(0, 0, curRect.w, curRect.h)
+  veEl.hidden = true
+  toolbarEl.hidden = true
+  dragging = true
+  startX = e.clientX; startY = e.clientY
+  updateSel(startX, startY, startX, startY)
 }
 function veDangKeo(e) {
   if (!veStart) return
@@ -237,6 +289,31 @@ function xong(copy) {
   } catch (err) {
     window.overlay.confirm({ rect: curRect, copy: !!copy }) // ghep loi thi cat thuong
   }
+}
+
+/* GHEP vung chon (DIP toan cuc) tu anh dong bang cua CAC man giao voi no.
+   Thang do dau ra = sf LON NHAT trong cac man giao (giu net man 4K). */
+function confirmComposite(g) {
+  if (!layersReady) { pendingComposite = g; return } // grab chua xong thi cho
+  let S = 1
+  for (const L of layers) if (giaoNhau(g, L)) S = Math.max(S, L.sf)
+  const cv = document.createElement('canvas')
+  cv.width = Math.max(1, Math.round(g.w * S))
+  cv.height = Math.max(1, Math.round(g.h * S))
+  const ctx = cv.getContext('2d')
+  for (const L of layers) {
+    const ix = Math.max(g.x, L.x), iy = Math.max(g.y, L.y)
+    const ix2 = Math.min(g.x + g.w, L.x + L.w), iy2 = Math.min(g.y + g.h, L.y + L.h)
+    if (ix2 <= ix || iy2 <= iy) continue // khong giao voi man nay
+    ctx.drawImage(L.img,
+      (ix - L.x) * L.sf, (iy - L.y) * L.sf, (ix2 - ix) * L.sf, (iy2 - iy) * L.sf,
+      (ix - g.x) * S, (iy - g.y) * S, (ix2 - ix) * S, (iy2 - iy) * S)
+  }
+  window.overlay.confirm({ dataUrl: cv.toDataURL('image/png') })
+}
+
+function giaoNhau(a, b) {
+  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
 }
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
