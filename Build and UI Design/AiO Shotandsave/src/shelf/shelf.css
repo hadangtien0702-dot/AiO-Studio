@@ -134,3 +134,28 @@ html, body {
 }
 body.trong #list { display: none; }
 body.trong #empty { display: flex; }
+
+
+/* ── Khay DOC (chon trong Cai dat): anh to chiem be ngang, cuon doc ──── */
+body.doc #list {
+  flex-direction: column;
+  align-items: stretch;
+  overflow-x: hidden; overflow-y: auto;
+}
+body.doc #list::-webkit-scrollbar { width: 6px; height: auto; }
+body.doc .item {
+  height: auto; width: 100%;
+}
+body.doc .item img {
+  width: 100%; height: auto; max-height: 150px;
+  object-fit: cover; object-position: top;
+  display: block;
+}
+
+/* Khay DOC + trong: xep thong diep thanh COT cho khoi gay chu (khay hep). */
+body.doc #empty {
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 var(--sp-3);
+  line-height: 1.5;
+}

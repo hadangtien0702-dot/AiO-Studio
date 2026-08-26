@@ -15,6 +15,52 @@
 
 
 
+
+
+## 2026-08-26 13:19 — CHOT PHIEN (/xong): bump 0.3.4, push khay doc
+
+### Trang thai hien tai (phien sau doc dau tien)
+- **v0.3.4** (package.json khop — 2 dot push truoc dat ten v0.3.2/0.3.3 trong
+  commit ma QUEN bump package.json; da sua ve 0.3.4, dung quen luat 2b nua).
+- App chay tu ma nguon qua loi tat Desktop, phim Alt+\`, config nguoi dung:
+  PNG/Sieu net, khay DOC, lang EN (anh tu chon qua UI — dung reset).
+- Anh Tien da test tay: chup 1 man / vat 2 man / mau / keo vao Premiere — OK.
+
+### [CHO] viec con do + ly do
+- **Dong goi bo cai .exe + ky so** — chua lam (dang chay tu ma nguon; can
+  electron-builder, mo mat tran moi, cho anh Tien uu tien).
+- **Doi chung mixed-scale tren may khac** — thiet ke phys da dung nguyen ly voi
+  moi scale, da chay dung tren 150%+125% cua anh; chua do tren cau hinh thu 3.
+- **Ve shape cho vung VAT NGANG 2 man** — hien luu thang khong co buoc ve
+  (gioi han da bao anh, anh chua yeu cau them).
+- 21+ anh test trong Thung rac (25/08) — anh chua quyet khoi phuc hay bo.
+
+## 2026-08-26 13:09 — KHAY DOC: option kieu khay trong Cai dat (anh to, cuon doc)
+
+Anh Tien: khay ngang anh hoi be — them option trong Cai dat:
+- **Mac dinh (ngang)**: nhu cu, 380x128, cuon ngang.
+- **Doc**: 252x448 DIP, anh chiem CA BE NGANG khay (to gap ~2.3 lan chieu cao
+  64px cu, max 150px/anh), nhieu anh cuon DOC.
+
+### Cach lam
+- config `khayKieu` ('ngang'|'doc', mac dinh ngang). `coKhay()` tra kich thuoc
+  theo kieu; ensureShelf/viTriKhay/trongManHinh dung chung.
+- Renderer: preload sendSync 'khay:kieu' -> body.doc -> CSS #list doi truc
+  (column + overflow-y), .item img width:100% object-fit cover.
+- settings:set-khay: luu config + DUNG cua so khay + dung lai voi co moi +
+  VE LAI toan bo anh tu shelfItems (nguon chan ly o main) -> doi kieu SONG,
+  khong mat anh.
+- Settings card "Khay anh": pill [Mac dinh | Doc]. i18n VI/EN. Cua so 440x700.
+
+### Kiem chung (chup that tung buoc)
+- Bo sung: khay DOC + TRONG — thong diep "chua co anh" xep thanh COT giua khay
+  (truoc bi gay chu vi khay hep; anh Tien: "cho nay xau qua"). Chup kiem: 3 dong
+  can giua sach.
+- Seed doc + 2 anh: khay 383x672 phys (dung 252x448 DIP), 2 anh xep DOC to ro.
+- Bam pill Default trong Settings (dang chay): khay tu dung lai 576x192 phys
+  (dung 380x128 DIP), anh CON NGUYEN trong khay. selftest sach ca 2 kieu.
+- Don file test DICH DANH tung ten; 3 anh anh Tien tu chup 13:07-13:08 giu nguyen.
+
 ## 2026-08-26 12:58 — NANG CHAT LUONG JPEG (basic >=100KB) + bo tron dong bo nut Settings
 
 Anh Tien: *"dung luong dau ra hoi thap, basic nhat cung phai 100KB"* + *"nut lam

@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('settings', {
   openFolder: () => ipcRenderer.invoke('settings:open-folder'),
   /** Doi dinh dang/chat luong anh: { anhLoai, anhChatLuong }. */
   setAnh: (d) => ipcRenderer.invoke('settings:set-anh', d),
+  /** Doi kieu khay: 'ngang' | 'doc'. */
+  setKhay: (kieu) => ipcRenderer.invoke('settings:set-khay', kieu),
   /** Doi ngon ngu 'vi' | 'en' — main nap lai cua so de dich. */
   setLang: (l) => ipcRenderer.invoke('settings:set-lang', l),
   /** Dong cua so cai dat (frameless nen phai tu goi). */

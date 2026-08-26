@@ -207,7 +207,7 @@ let settingsWin = null
 function openSettings() {
   if (settingsWin && !settingsWin.isDestroyed()) { settingsWin.show(); settingsWin.focus(); return }
   settingsWin = new BrowserWindow({
-    width: 440, height: 584, resizable: false, minimizable: false,
+    width: 440, height: 700, resizable: false, minimizable: false,
     maximizable: false, fullscreenable: false,
     frame: false, // header rieng co logo AiO (xem settings/index.html)
     title: 'AiO Shot & Save - Cai dat', backgroundColor: '#141414', show: false,
@@ -229,6 +229,7 @@ ipcMain.handle('settings:get', () => {
     saveFolder: kho.thuMucAnh(), lang, version: app.getVersion(),
     anhLoai: c.anhLoai === 'png' ? 'png' : 'jpeg',
     anhChatLuong: CHAT_LUONG_Q[c.anhChatLuong] ? c.anhChatLuong : 'cao',
+    khayKieu: kieuKhay(),
   }
 })
 
@@ -258,6 +259,32 @@ function formatAccel(accel) {
   }).join(' + ')
 }
 ipcMain.on('hotkey:display', (e) => { e.returnValue = formatAccel(currentHotkey) })
+ipcMain.on('khay:kieu', (e) => { e.returnValue = kieuKhay() })
+
+/* Doi kieu khay: luu config, dung lai cua so khay (dung co + layout moi) va
+   VE LAI cac anh dang co tu shelfItems (nguon chan ly nam o main). */
+ipcMain.handle('settings:set-khay', (_e, kieu) => {
+  kho.ghiCauHinh({ khayKieu: kieu === 'doc' ? 'doc' : 'ngang' })
+  ghiLog('doi kieu khay: ' + kieuKhay())
+  if (shelfWin && !shelfWin.isDestroyed()) {
+    shelfWin.destroy()
+    shelfWin = null
+    if (shelfItems.size) {
+      const w = ensureShelf()
+      w.webContents.once('did-finish-load', () => {
+        for (const it of shelfItems.values()) {
+          const thumb = it.image.resize({ height: 128, quality: 'good' }).toDataURL()
+          const sz = it.image.getSize()
+          let kb = 0
+          try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
+          w.webContents.send('shelf:add', { id: it.id, thumb, filePath: it.filePath, w: sz.width, h: sz.height, kb })
+        }
+        w.showInactive()
+      })
+    }
+  }
+  return { khayKieu: kieuKhay() }
+})
 
 // Doi ngon ngu: luu, cap nhat tray, NAP LAI cac cua so dang mo de dich lai.
 ipcMain.handle('settings:set-lang', (_e, l) => {
@@ -778,6 +805,16 @@ ipcMain.on('pin:drag-end', (e) => ketThucKeo(e.sender.id))
 
 const SHELF_W = 380
 const SHELF_H = 128
+// Khay DOC (anh Tien 26/08): anh to hon (chiem ca be ngang), nhieu anh cuon DOC.
+const SHELF_DOC_W = 252
+const SHELF_DOC_H = 448
+
+function kieuKhay() { return kho.docCauHinh().khayKieu === 'doc' ? 'doc' : 'ngang' }
+function coKhay() {
+  return kieuKhay() === 'doc'
+    ? { w: SHELF_DOC_W, h: SHELF_DOC_H }
+    : { w: SHELF_W, h: SHELF_H }
+}
 const SHELF_MARGIN = 16 // cach mep man hinh khi lan dau
 
 /** Vi tri mo khay: lay tu cau hinh, khong co thi goc phai duoi man hinh chinh. */
@@ -788,8 +825,8 @@ function viTriKhay() {
   }
   const wa = screen.getPrimaryDisplay().workArea
   return {
-    x: wa.x + wa.width - SHELF_W - SHELF_MARGIN,
-    y: wa.y + wa.height - SHELF_H - SHELF_MARGIN,
+    x: wa.x + wa.width - coKhay().w - SHELF_MARGIN,
+    y: wa.y + wa.height - coKhay().h - SHELF_MARGIN,
   }
 }
 
@@ -797,7 +834,7 @@ function viTriKhay() {
 function trongManHinh(p) {
   return screen.getAllDisplays().some((d) => {
     const b = d.workArea
-    return p.x < b.x + b.width && p.x + SHELF_W > b.x &&
+    return p.x < b.x + b.width && p.x + coKhay().w > b.x &&
            p.y < b.y + b.height && p.y + SHELF_H > b.y
   })
 }
@@ -806,8 +843,9 @@ function ensureShelf() {
   if (shelfWin && !shelfWin.isDestroyed()) return shelfWin
 
   const pos = viTriKhay()
+  const co = coKhay()
   shelfWin = new BrowserWindow({
-    x: pos.x, y: pos.y, width: SHELF_W, height: SHELF_H,
+    x: pos.x, y: pos.y, width: co.w, height: co.h,
     frame: false, transparent: true, backgroundColor: '#00000000',
     alwaysOnTop: true, skipTaskbar: true, resizable: false,
     minimizable: false, maximizable: false, fullscreenable: false,

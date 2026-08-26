@@ -8,6 +8,9 @@ const barEl = document.getElementById('bar')
 
 const t = (k) => window.i18n.t(k)
 
+// Kieu khay: 'doc' = anh to, cuon doc (chon trong Cai dat).
+if (window.i18n.khayKieu === 'doc') document.body.classList.add('doc')
+
 // Dich giao dien tinh: text + tooltip.
 document.querySelectorAll('[data-i18n]').forEach((el) => {
   el.textContent = t(el.getAttribute('data-i18n'))

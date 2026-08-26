@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('i18n', {
   lang,
   t: (key) => i18n.t(lang, key),
   hotkey: ipcRenderer.sendSync('hotkey:display') || '', // phim tat da dinh dang de hien
+  khayKieu: ipcRenderer.sendSync('khay:kieu') || 'ngang', // 'ngang' | 'doc'
 })
 
 contextBridge.exposeInMainWorld('shelf', {

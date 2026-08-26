@@ -20,6 +20,7 @@ const btnOpen = document.getElementById('open-folder')
 const msgFolder = document.getElementById('msg-folder')
 const langBox = document.getElementById('lang')
 const btnClose = document.getElementById('close')
+const khayBox = document.getElementById('khay-kieu')
 const loaiBox = document.getElementById('anh-loai')
 const clBox = document.getElementById('anh-chat-luong')
 const hangCL = document.getElementById('hang-chat-luong')
@@ -111,6 +112,7 @@ async function load() {
   hotkey = s.hotkey
   datFolder(s.saveFolder)
   datAnh(s.anhLoai, s.anhChatLuong)
+  chonPill(khayBox, s.khayKieu)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
@@ -140,6 +142,14 @@ clBox.addEventListener('click', async (e) => {
   if (!b || b.classList.contains('chon')) return
   chonPill(clBox, b.dataset.v)
   await window.settings.setAnh({ anhChatLuong: b.dataset.v })
+})
+
+/* ── Kieu khay ────────────────────────────────────────────────────────── */
+khayBox.addEventListener('click', async (e) => {
+  const b = e.target.closest('.chon-nut')
+  if (!b || b.classList.contains('chon')) return
+  chonPill(khayBox, b.dataset.v)
+  await window.settings.setKhay(b.dataset.v)
 })
 
 /* ── Ghi phim ─────────────────────────────────────────────────────────── */
