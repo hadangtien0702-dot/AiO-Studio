@@ -9,6 +9,32 @@
 
 
 
+
+## 2026-08-26 08:56 — THIET KE LAI man Cai dat (than thien hon — anh Tien yeu cau)
+
+Ap bai hoc so thiet ke #5: "mot man mot CTA chinh — nguoi dung that tung che
+4 nut lang nhang". Man cu bay 3 nut cung luc o card phim tat.
+
+### Thiet ke moi
+- Phim tat hien dang KEYCAP that ([Alt] + [`], gradient + vien day 3px duoi).
+- May trang thai mot-CTA: idle [Doi phim…] -> recording (khung cam net dut
+  NHAP NHAY "Nhan to hop moi…" + Huy) -> pending (keycaps MOI + Luu cam + Huy).
+- "Ve mac dinh" thanh link chu nho gach chan (het canh tranh voi CTA).
+- Thu muc: icon chip cam + TEN thu muc dam + duong dan mo cat dau (RTL).
+- Icon chip cam dau moi muc + footer "AiO Shot & Save · v0.3.1" (settings:get
+  tra them version). Cua so 440x442.
+
+### Kiem chung (chup that tung trang thai)
+idle VI dep; bam Doi phim -> recording render dung; nhan Ctrl+Alt+P -> pending
+[Ctrl]+[Alt]+[P] + Luu/Huy; bam Huy -> ve idle GIU Alt+` (khong luu nham);
+EN dich du. selftest sach. Config cuoi: hotkey Alt+`, lang vi.
+
+### ☠️ 2 bay THUOC DO khi tu dong test (khong phai loi app)
+1. keybd_event KHONG kem scan code -> e.code = "Unidentified" -> bo ghi phim
+   (doc e.code) bo qua. Phai gui KEYEVENTF_SCANCODE (sc 0x1D/0x38/0x19).
+2. Moi phien PowerShell moi PHAI goi SetProcessDPIAware truoc SetCursorPos —
+   quen la toa do bi nhan 1.5, click truot het (da vap lai trong chinh buoi nay).
+
 ## 2026-08-26 08:48 — ✅ ANH TIEN DA TEST THAT: "app rat okie roi do em"
 
 Thuoc do ngoai (tay + mat anh Tien tren 2 man hinh that) da qua — theo luat

@@ -185,7 +185,7 @@ let settingsWin = null
 function openSettings() {
   if (settingsWin && !settingsWin.isDestroyed()) { settingsWin.show(); settingsWin.focus(); return }
   settingsWin = new BrowserWindow({
-    width: 440, height: 468, resizable: false, minimizable: false,
+    width: 440, height: 442, resizable: false, minimizable: false,
     maximizable: false, fullscreenable: false,
     frame: false, // header rieng co logo AiO (xem settings/index.html)
     title: 'AiO Shot & Save - Cai dat', backgroundColor: '#141414', show: false,
@@ -202,7 +202,7 @@ function openSettings() {
 
 ipcMain.handle('settings:get', () => ({
   hotkey: currentHotkey, def: DEFAULT_HOTKEY, isMac: process.platform === 'darwin',
-  saveFolder: kho.thuMucAnh(), lang,
+  saveFolder: kho.thuMucAnh(), lang, version: app.getVersion(),
 }))
 
 // Preload nap lang DONG BO luc khoi tao renderer.

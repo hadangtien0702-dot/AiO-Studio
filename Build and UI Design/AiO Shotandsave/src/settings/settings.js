@@ -1,33 +1,41 @@
 'use strict'
 
+/* Man Cai dat — mot CTA chinh moi trang thai (bai hoc "4 nut lang nhang"):
+   idle:      [keycaps hien tai]              [Doi phim…]
+   recording: [Nhan to hop moi… (nhap nhay)]  [Huy]
+   pending:   [keycaps MOI]                   [Luu] [Huy]                     */
+
 const t = (k) => window.i18n.t(k)
 
-const disp = document.getElementById('disp')
-const btnRecord = document.getElementById('record')
+const keysEl = document.getElementById('keys')
+const btnDoi = document.getElementById('doi')
 const btnSave = document.getElementById('save')
+const btnHuyGhi = document.getElementById('huy-ghi')
 const btnReset = document.getElementById('reset')
 const msg = document.getElementById('msg')
-const folderEl = document.getElementById('folder')
+const folderTen = document.getElementById('folder-ten')
+const folderPath = document.getElementById('folder-path')
 const btnPick = document.getElementById('pick-folder')
 const btnOpen = document.getElementById('open-folder')
 const msgFolder = document.getElementById('msg-folder')
 const langBox = document.getElementById('lang')
 const btnClose = document.getElementById('close')
+const verEl = document.getElementById('ver')
 
 let isMac = false
-let pending = null
-let recording = false
+let hotkey = ''      // phim dang dung (accelerator)
+let pending = null   // phim vua ghi, cho Luu
+let state = 'idle'   // 'idle' | 'recording' | 'pending'
 
-/* Dich moi phan tu co data-i18n. */
 function dichGiaoDien() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.getAttribute('data-i18n'))
   })
 }
 
-/* Hien phim tat cho de doc: CommandOrControl -> Ctrl/⌘, ghep bang " + ". */
-function fmt(accel) {
-  if (!accel) return '—'
+/* Tach accelerator thanh mang nhan phim de ve keycap. */
+function tachPhim(accel) {
+  if (!accel) return []
   return accel.split('+').map((x) => {
     if (x === 'CommandOrControl' || x === 'CmdOrCtrl') return isMac ? '⌘' : 'Ctrl'
     if (x === 'Cmd' || x === 'Command') return '⌘'
@@ -35,37 +43,75 @@ function fmt(accel) {
     if (x === 'Shift') return isMac ? '⇧' : 'Shift'
     if (x === 'Ctrl' || x === 'Control') return 'Ctrl'
     return x
-  }).join(' + ')
+  })
+}
+
+/* Ve khu keycaps theo trang thai. */
+function veKeys() {
+  keysEl.classList.toggle('ghi', state === 'recording')
+  keysEl.textContent = ''
+  if (state === 'recording') {
+    keysEl.textContent = t('set.phim.nhanToHop')
+    return
+  }
+  const accel = state === 'pending' ? pending : hotkey
+  const phim = tachPhim(accel)
+  phim.forEach((p, i) => {
+    if (i > 0) {
+      const cong = document.createElement('span')
+      cong.className = 'keycap cong'
+      cong.textContent = '+'
+      keysEl.appendChild(cong)
+    }
+    const k = document.createElement('span')
+    k.className = 'keycap'
+    k.textContent = p
+    keysEl.appendChild(k)
+  })
+}
+
+function veNut() {
+  btnDoi.hidden = state !== 'idle'
+  btnSave.hidden = state !== 'pending'
+  btnHuyGhi.hidden = state === 'idle'
+}
+
+function datTrangThai(s) {
+  state = s
+  veKeys()
+  veNut()
 }
 
 function datFolder(p) {
-  folderEl.textContent = p || '—'
-  folderEl.title = p || ''
+  folderPath.textContent = p || '—'
+  folderPath.title = p || ''
+  const ten = (p || '').split(/[\\/]/).filter(Boolean).pop() || '—'
+  folderTen.textContent = ten
 }
 
 async function load() {
   dichGiaoDien()
   const s = await window.settings.get()
   isMac = s.isMac
-  disp.textContent = fmt(s.hotkey)
+  hotkey = s.hotkey
   datFolder(s.saveFolder)
-  // danh dau nut ngon ngu dang chon
+  if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
   })
+  datTrangThai('idle')
 }
 load()
 
-/* ── Doi ngon ngu ─────────────────────────────────────────────────────── */
+/* ── Ngon ngu + dong ──────────────────────────────────────────────────── */
 langBox.addEventListener('click', async (e) => {
   const b = e.target.closest('.lang-nut')
   if (!b || b.classList.contains('chon')) return
-  await window.settings.setLang(b.dataset.lang) // main nap lai cua so -> load() lai
+  await window.settings.setLang(b.dataset.lang) // main reload cua so -> load() lai
 })
-
 btnClose.addEventListener('click', () => window.settings.close())
 
-/* ── Phim tat ─────────────────────────────────────────────────────────── */
+/* ── Ghi phim ─────────────────────────────────────────────────────────── */
 const CODE_PUNCT = {
   Backquote: '`', Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']',
   Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/',
@@ -83,18 +129,22 @@ function mainKey(e) {
   return null
 }
 
-btnRecord.addEventListener('click', () => {
-  recording = true
+btnDoi.addEventListener('click', () => {
   pending = null
-  disp.textContent = t('set.phim.dangGhi')
-  disp.classList.add('ghi')
   msg.textContent = ''
   msg.className = 'msg'
-  btnSave.disabled = true
+  datTrangThai('recording')
+})
+
+btnHuyGhi.addEventListener('click', () => {
+  pending = null
+  msg.textContent = ''
+  msg.className = 'msg'
+  datTrangThai('idle')
 })
 
 window.addEventListener('keydown', (e) => {
-  if (!recording) return
+  if (state !== 'recording') return
   e.preventDefault()
   const mods = []
   if (e.ctrlKey) mods.push('Ctrl')
@@ -102,54 +152,50 @@ window.addEventListener('keydown', (e) => {
   if (e.altKey) mods.push('Alt')
   if (e.shiftKey) mods.push('Shift')
   const key = mainKey(e)
-  if (!key) return
+  if (!key) return // moi bam modifier — doi phim chinh
   if (mods.length === 0) {
     msg.textContent = isMac ? t('set.phim.canModifierMac') : t('set.phim.canModifier')
     msg.className = 'msg err'
     return
   }
   pending = mods.concat(key).join('+')
-  recording = false
-  disp.classList.remove('ghi')
-  disp.textContent = fmt(pending)
   msg.textContent = ''
   msg.className = 'msg'
-  btnSave.disabled = false
+  datTrangThai('pending')
 })
 
 btnSave.addEventListener('click', async () => {
   if (!pending) return
   const r = await window.settings.setHotkey(pending)
+  hotkey = r.hotkey
   if (r.ok) {
     msg.textContent = t('set.phim.daLuu')
     msg.className = 'msg ok'
   } else {
     msg.textContent = t('set.phim.biGiu')
     msg.className = 'msg err'
-    disp.textContent = fmt(r.hotkey)
   }
   pending = null
-  btnSave.disabled = true
+  datTrangThai('idle')
 })
 
 btnReset.addEventListener('click', async () => {
   const r = await window.settings.reset()
-  disp.textContent = fmt(r.hotkey)
-  disp.classList.remove('ghi')
+  hotkey = r.hotkey
   pending = null
-  btnSave.disabled = true
   msg.textContent = r.ok ? t('set.phim.veMacDinh') : t('set.phim.veMacDinhLoi')
   msg.className = r.ok ? 'msg ok' : 'msg err'
+  datTrangThai('idle')
 })
 
-/* ── Thu muc luu anh ──────────────────────────────────────────────────── */
+/* ── Thu muc ──────────────────────────────────────────────────────────── */
 btnPick.addEventListener('click', async () => {
   const r = await window.settings.pickFolder()
   datFolder(r.folder)
   if (!r.huy) {
     msgFolder.textContent = t('set.thuMuc.daDoi')
     msgFolder.className = 'msg ok'
+    msgFolder.style.textAlign = 'left'
   }
 })
-
 btnOpen.addEventListener('click', () => window.settings.openFolder())
