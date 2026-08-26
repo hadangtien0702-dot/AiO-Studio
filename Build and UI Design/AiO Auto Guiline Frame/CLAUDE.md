@@ -35,7 +35,7 @@
 
 ## Quyết định đã chốt
 
-0. ☠️ **ĐỔI 06/08/2026 — anh Tiến yêu cầu GỠ 5 khối khỏi giao diện.**
+0. ☠️ **ĐỔI 26/08/2026 — anh Tiến yêu cầu GỠ 5 khối khỏi giao diện.**
    Khối hành động nay chỉ còn **DUY NHẤT nút chính**.
    - Gỡ: **"Preset của tôi"** · **nút "Lưu file .guides"** (tức **Tầng B** của
      quyết định số 1 — nay KHÔNG còn trong panel) · **thông báo thành công**
@@ -103,6 +103,17 @@
   `host/guideframe.jsx` · `PHIEN_BAN` trong `dist/index.html`. Lệch = panel báo
   "Premiere đang giữ host CŨ" và chặn mọi lệnh (cố ý).
 
+## Vùng chọn In/Out (v0.3.0 — 2026-08-25, anh Tiến yêu cầu)
+
+- Panel tự nhận vùng In/Out anh khoanh trên timeline (ghép vào chính câu trả lời
+  `gf_thongTinSeq` của vòng thăm dò 1,5s — KHÔNG thêm lượt evalScript nào).
+  Chip "Vùng chọn + thời lượng" trên thanh sequence, CHỈ hiện khi có vùng thật.
+  Bấm nút chính thì guide đặt đúng trong `[in, out]` (`gf_datOverlay` nhận thêm
+  2 tham số, thiếu/vô lý thì rơi về phủ cả sequence như cũ).
+- ☠️ Premiere trả in=0/out=cuối khi CHƯA khoanh — không phân biệt được với
+  "khoanh trọn sequence"; hai ca cho cùng kết quả nên gộp: coi là không có vùng.
+- ☠️ Chip ẩn bằng `style.display`, không dùng `[hidden]` (bẫy `.tt` 06/08).
+
 ## Đã đo / chưa đo (chi tiết: PROGRESS.md mục mới nhất)
 
 - ✅ **Đường đặt/gỡ overlay ĐO THẬT trên Premiere 02/08**: đặt lên track trống
@@ -127,6 +138,10 @@
   tiếp bằng đếm clip; chưa soi file render).
 - ⬜ Số `zalo-916` cạnh phải: JSON ghi **12%**, thiết kế ghi **12,96%** — chờ
   anh Tiến chốt số nào đúng.
+- ✅ **v0.3.0 vùng chọn — phần ĐỌC đo thật trên Premiere 25/08** (logic 15/15 ca
+  biên, chip đo trên DOM, host mới đọc in/out sequence thật). ⬜ Ca CÓ vùng chọn
+  (khoanh I/O → bấm → guide nằm đúng vùng) CHƯA đo trên Premiere — không tự đặt
+  I/O lên sequence của anh được (luật 19/08), chờ anh bấm thử.
 
 ## Nhật ký
 

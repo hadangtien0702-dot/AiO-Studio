@@ -1,8 +1,283 @@
 # PROGRESS — AiO Auto Guiline Frame
 
-## TRANG THAI HIEN TAI (cap nhat 2026-08-06 16:41)
+## TRANG THAI HIEN TAI (cap nhat 2026-08-26 14:40)
 
-- **Phien ban:** v0.2.0 — UI moi cua anh Tien DA GHEP + noi day that vao Premiere.
+- **Phien ban:** v0.3.0 (khop ca 3 noi: manifest · `gf_phienBan()` · `PHIEN_BAN`).
+- Giao dien: ban thiet ke anh Tien chot, DA noi day that vao Premiere va da qua
+  **7 dot sua theo yeu cau truc tiep cua anh** (muc 2026-08-26 ben duoi).
+- Khoi hanh dong chi con **DUY NHAT nut chinh**. Khong con: nut Go guideline ·
+  nut Luu .guides · Preset cua toi · canh bao "con guide tren timeline" ·
+  dong chu nhac nho nung trong anh. Hop trang thai chi hien khi **lech ti le**
+  hoac khi **loi**.
+- Duong RA: xoa clip guide tren track V3 bang tay trong Premiere.
+
+---
+
+## 2026-08-26 14:39 — GHEP THIET KE MOI vao panel v0.3.0 + 6 dot sua theo yeu cau anh Tien
+
+☠️ **SUA NGAY: cac muc duoi day BAN DAU BI GHI NHAM 06/08/2026 va bi chen vao
+muc 2026-08-06.** Dau phien toi chay `date` ra "2026-08-06" roi tin luon, trong
+khi ngay that la **26/08/2026** (lech 20 ngay). Phat hien khi anh Tien gui anh
+chup panel ghi **v0.3.0** — ban ma `CLAUDE.md` da ghi la lam ngay 2026-08-25,
+tuc khong the dang la 06/08. Da doi lai ngay o **13 comment trong ma nguon**
+(`dist/index.html` 10 · `dist/ve-guide.js` 2 · `CLAUDE.md` 1) va dua khoi nay ve
+dung cho. Gio trong tung muc con (17:10, 17:35...) cung la gio BIA ra theo ngay
+sai nen da bo, thay bang so thu tu. Bai hoc 5q: lay ngay bang lenh la chua du —
+phai **doi chieu voi mot moc doc lap** (o day la so phien ban dang chay).
+
+### (1) 3 loi anh Tien bat duoc khi dung that (da sua + do lai)
+
+**1. O chon sequence khong chon duoc.** Anh Tien chup man hinh bao. Do: o xo CO
+mo (`hidden=false`, 2 muc) nhung bi **`.selbar { overflow:hidden }` CAT CUT** —
+danh sach cao 69px bat dau y=68, thanh sequence ket thuc y=110 -> chi lot dong
+dau, "PV sales" bi cat.
+→ Sua GOC: khi mo thi neo o xo bang **`position:fixed`** theo toa do nut (tinh
+trong `comboBox()`), nen khong to tien nao cat duoc, va **khong sua mot dong CSS
+nao cua ban thiet ke**. Kem lat len tren khi tran day panel + bam theo khi cuon.
+→ Do lai: ca 2 muc `elementFromPoint` deu tra ve dung muc do; bam that qua giao
+dien -> `gf_moSequence` chay -> Premiere doi sang "PV sales" -> tra ve duoc.
+
+☠️ **Lan do dau em bao "khong doi duoc" la THUOC SAI**: dat gio cho cung 2,5s,
+trong khi lenh dau sau khi nap lai panel phai `$.evalFile` host truoc nen lau
+hon. Dung bai hoc 5f (lay tin hieu xong cua chinh no) thi ra dung ngay.
+
+**2. Nhan canh bao de len mat nhan vat.** Anh Tien chup anh: khoi chu
+"LOP GUIDE — TAT TRUOC KHI XUAT VIDEO" nam ngay dinh dau nguoi tren sequence 16:9.
+Nguyen nhan: `veTag` cu neo vao **mep vung an toan** (`sUi.y + pad*2 + co`) — tuc
+dat dung vao CHO NGUOI TA CAN NHIN.
+→ Sua: gom tag cua `ve()` va `veLuoi()` thanh MOT ham `veTag()`, dat **sat day
+khung** (luon nam trong dai da bi UI nen tang che) va **co chu con 62%**.
+→ Do lai 3 ca — `yt-169` tren 4K, `tiktok-video` tren 4K (lech ti le), va
+`tiktok-video` dung khung 1080x1920: **0 diem chu trong vung an toan** o ca ba,
+tam khung van alpha 0. Chu chi con o dai duoi cung (y 2100 / 2140 / 1902).
+
+**3. Nut ghi "Thay bang khung an toan moi" nhung KHONG thay.** Phat hien khi do:
+con guide cu tren timeline thi track tren cung khong con trong -> bam vao se
+truot `HET_TRACK`. Nhan noi doi (trai luat "nhan nut la VIEC no lam").
+→ Sua: `hienGuide()` goi `gf_tatOverlay()` truoc khi dat neu `soLopGuide > 0`.
+→ Do: truoc 1 guide -> bam -> **sau van 1 guide** (khong thanh 2, khong loi),
+V3=1 clip, **0,76 giay**.
+
+### (2) Anh Tien yeu cau GO 3 khoi (kem anh chup khoanh do)
+
+| Go gi | Ly do / cach xu |
+|---|---|
+| **"Preset cua toi"** (o ten + nut Luu + danh sach) | Go het markup. Don luon trinh xu ly, bien `presets`, khoa localStorage `aio-gf-presets` va 4 khoa tu dien -> **0 tham chieu chet con lai** |
+| **Nut "Luu file .guides"** + dong ghi chu duoi no | Go markup + `luuGuides()` + `motGuide()` + khoa tu dien. ☠️ Day la **Tang B** cua kien truc lai 2 tang chot 01/08 — nay khong con trong giao dien |
+| **Hop trang thai bao "Da dat len track V3..."** | KHONG go han hop. Theo dung luat anh Tien *"chi bao khi THAT BAI"*: hop **an khi `m === 'ok'`**, van hien khi `warn`/`err`. Go han thi panel se CAM luc "het track trong" / "chua noi Premiere" — nguoi dung khong biet vi sao khong ra guide |
+
+☠️ Bay khi an hop: `.tt{display:flex}` **de len** quy tac `[hidden]{display:none}`
+cua trinh duyet (class co do uu tien cao hon). Phai dung `style.display='none'`.
+
+Do lai sau khi go: `khoi_preset`/`nut_luu_guides`/`dong_ghi_chu` deu **khong con
+trong DOM** · **0 loi JS** · them-xoa duong, doi mau, doi ngon ngu, di het 10 nen
+tang **van chay** · ep trang thai loi thi hop **hien lai** (`display:flex`, muc
+`err`) · dat xong thi hop **`display:none`**.
+
+Kem: bam "Thay bang khung an toan moi" khi timeline dang co **2** guide chong
+nhau -> **con dung 1**, V3=1 clip.
+
+### (3) Anh Tien go tiep 2 khoi: canh bao "con guide" + nut "Go guideline"
+
+Sau khi go, khoi hanh dong chi con **DUY NHAT nut chinh**.
+
+**Duong RA gio la gi:** xoa clip guide tren track V3 bang tay trong Premiere.
+Panel tu nhan ra sau ~1,5 giay (nhip doc `gf_demOverlay`) va doi nhan nut ve
+"Hien khung an toan". Bam nut chinh khi dang co guide thi van **go cu roi dat
+moi** (`hienGuide()` goi `gf_tatOverlay()` truoc). Loi nhac an toan that van
+con: dong "TAT TRUOC KHI XUAT VIDEO" nung trong chinh tam anh.
+**Danh doi da noi ro voi anh Tien:** khong con ai don giup **bin 'AiO Guide
+Frame' + file PNG** trong project — truoc day nut Go don luon.
+
+Da don sach: markup, `tatGuide()`, trinh xu ly, 5 khoa tu dien (`tat` `dangTat`
+`daTat` `tatTrong` `tatThieu`), trang thai `condu` trong `TRANG_THAI`, va dong
+`iTT = 3` trong `demLop()`. **0 tham chieu chet con lai.**
+
+**Do 5 canh (bang bao gio hien hop trang thai):**
+
+| Canh | Hop trang thai | Nhan nut chinh |
+|---|---|---|
+| Khop ti le, chua dat | **an** | Hien khung an toan |
+| Khop ti le, DA co guide tren timeline | **an** | Thay bang khung an toan moi |
+| Vua bam dat xong | **an** | Thay bang khung an toan moi |
+| **Lech ti le** (9:16 tren seq 16:9) | **hien** (warn) | Thay bang khung an toan moi |
+| **Chua noi Premiere** | **hien** (err) | Hien khung an toan |
+
+0 loi JS · them-xoa duong, doi ngon ngu, di het 10 nen tang van chay.
+
+☠️ **Thuoc do sai lan nua:** doc dau tien bao "hop van hien" o canh binh thuong.
+Nguyen nhan: ban thu con nho khung `yt-169` trong localStorage nen dang o canh
+**lech ti le** — tuc hop hien la DUNG. Dung bai hoc 5p (do tren mot trang thai
+khong phai trang thai minh tuong).
+
+### (4) Go han dong chu trong anh + SUA LOI EBUSY anh Tien gap
+
+**A. Go han nhan "LOP GUIDE — TAT TRUOC KHI XUAT VIDEO"** (anh Tien: *"text nay
+anh khong can"*). Xoa han `veTag()` trong `ve-guide.js` + 2 cho goi + `opts.tag`
+/ `tenNenTang` / `phienBanDuLieu` ben panel + hang `PHIEN_BAN_DU_LIEU`.
+Ban xem truoc noi bo von da truyen `tag:false` nen khong anh huong.
+→ **Do co DOI CHUNG**: ve lai voi `uiThat:false` -> **0 diem chu**. Nghia la tag
+bay sach that; **6.188 diem chu con lai la MO PHONG UI NEN TANG** (avatar,
+caption, nhan icon) — tinh nang anh Tien xin 02/08, khong dung toi.
+Muon tat luon thi truyen `{ uiThat:false }` trong `taoPngGuideline()`.
+→ Danh doi da noi ro: anh guide nay KHONG con loi nhac nao. Cong voi viec da go
+nut "Go guideline" va canh bao "dang co N guide", panel khong con nhac gi ve
+"tat truoc khi xuat" — nguoi dung tu nho.
+
+**B. ☠️ `EBUSY: resource busy or locked` khi bam lan thu HAI cho CUNG mot khung.**
+Anh Tien bao loi (anh chup). Nguyen nhan **khong phai** do chon 2 option luoi
+nhu ban dau tuong: ten file PNG dat CO DINH theo `(khung + kich thuoc + ngon
+ngu)`, nen lan hai ghi de len chinh file **Premiere van dang giu** — no khong
+tra lai handle ngay ca khi clip da bi go va bin da bi xoa.
+→ Sua goc: **ten file duy nhat moi lan** (`..._<Date.now()>.png`), kem
+`donFileCu()` xoa cac PNG cu (file nao Premiere con giu thi bo qua, lan sau don
+tiep) — goi sau moi lan ghi va mot lan luc mo panel.
+→ Do: bam **4 lan lien tiep** cung khung `yt-169` tren sequence 4K (lan 2 bat
+them "Tam khung", lan 3 bat "Ti le vang" — dung kieu anh Tien lam):
+**4/4 dat**, 0,62–0,77 giay, **luon chi con dung 1 guide** tren timeline,
+**khong con EBUSY**.
+→ Con lai: PNG cu **chua xoa duoc trong cung phien** (Premiere giu file) — 4 lan
+bam de lai 4 file ~0,4 MB. Chung se bi don o lan mo Premiere sau.
+
+### (5) Dua khung xem truoc len DAU panel (anh Tien: "chi thay doi vi tri")
+
+Anh Tien dung panel o dock **806px** -> `.grid` roi ve 1 cot, khung xem truoc bi
+day xuong duoi cung, phai cuon qua het dieu khien moi thay.
+
+Sua: doi **vi tri trong DOM** — khoi `.col--xem` bay len truoc `.col`. Noi dung
+khoi giu **nguyen si** (`seqbox` / `dich` / `chugiai` khong sua mot ky tu).
+Them dung **3 dong CSS** de dock rong khong bi dao theo:
+`@media (min-width:901px){ .col--xem{order:2} .col:not(.col--xem){order:1} }`.
+
+Do that:
+
+| Kho | Ket qua |
+|---|---|
+| Panel that 806px (1 cot) | thanh sequence y=68 -> **xem truoc y=122** -> chon nen tang y=591 -> nut chinh y=1015 |
+| Ban do 1280px (2 cot) | dieu khien **TRAI** x=61 rong=360 · xem truoc **PHAI** x=433 — **dung y thiet ke goc** |
+
+Moi thu khac khong doi: 10 nut nen tang · 2 chip khung · 4 vung ve · nhan
+"Khung an toan 3456x1836" · chu giai · nhan nut · hop trang thai van an ·
+khong tran ngang · **0 loi JS** · doi ngon ngu va di het 10 nen tang van chay.
+
+### (6) "Vi tri khong deu" o khoi DUONG TU THEM (anh Tien chup anh)
+
+**Do ra nguyen nhan:** nut huong rong theo CHU nen hai hang lech nhau —
+`Doc` **33px** vs `Ngang` **46px** -> thanh keo bat dau lech **12,6px**, con
+truot cung o gia tri 50 lai khong thang hang.
+
+**Sua THEO CAU TAO, khong ghim be rong bang tay:** cho ca `.duongs` thanh mot
+LUOI 4 cot, tung hang `.duong` dung `display:contents` de gop vao cung luoi ->
+moi cot bang nhau o moi hang. Ghim `min-width` bang tay se vo lai khi doi ngon
+ngu ("Horizontal" dai gap doi "Ngang"); cach nay thi khong the lech.
+
+| Ca do | Lech nut | Lech diem bat dau thanh keo | Lech o so | Lech nut xoa |
+|---|---|---|---|---|
+| VI: Doc + Ngang | **0** | **0** | **0** | **0** |
+| EN: Vertical + Horizontal | **0** | **0** | **0** | **0** |
+| VI: 5 duong tron lan | **0** | **0** | **0** | **0** |
+
+Con truot o gia tri 50 cua hai hang: **cung x = 380,8** (truoc do lech 12,6px).
+Nut "+ Them duong" van o hang rieng (`grid-column:1/-1`).
+
+**Kiem `display:contents` co pha gi khong** (no bo hop cua `.duong` di, ma JS
+dung `closest('.duong')` de tim hang): keo thanh truot -> o so dong bo · go so
+-> thanh truot chay theo · doi huong · **xoa dung hang minh bam** (xoa hang 2
+trong 3 hang, con lai dung 2 hang con lai) · duong ve len khung xem truoc ·
+them duong. **6/6 dat, 0 loi JS.**
+
+
+### (7) O nhap "Le %" khac han phan con lai (anh Tien: "sao loi ra cai ong noi 5%")
+
+**Do truoc khi sua** — o "Le" so voi o so trong "Duong tu them":
+
+| | O "Le" | O "Duong tu them" |
+|---|---|---|
+| Cao | 21,3px | 24px |
+| Nen | `rgb(59,59,59)` (mac dinh trinh duyet) | `#0e0e0e` |
+| Vien | `2px inset rgb(133,133,133)` (vien 3D) | `1px solid` mo |
+| Bo goc | **0** | 6px |
+| Font | **Arial** | Inter var |
+
+**Nguyen nhan:** JS phat ra `class="nhaple"` — **0 luat CSS nao khop**. Trong khi
+ban thiet ke CO SAN `.lebox` (2 luat) nhung khong ai dung. Input con mang
+`class="so"`, ma `.so` chi duoc dinh nghia la `.duong .so` (hau due cua `.duong`)
+nen cung khong an. Ket qua: o do roi ve kieu mac dinh cua trinh duyet.
+→ Cung ho voi 14 id JS goi ma HTML khong co: **ve tich cua ban thiet ke doi
+truoc** — CSS giu ten cu, JS giu ten khac.
+
+**Sua:** doi `nhaple` -> `lebox`, bo `class="so"` thua. Khong them mot dong CSS nao.
+
+**Do lai:** cao **28px** dung bang chip "Le" va **thang hang tam** (ca hai y=803,
+lech < 1,5px) · nen `#0e0e0e` · vien 1px solid · bo goc 6px · font Inter var —
+**giong het** o cua "Duong tu them". Go so van an vao khung xem truoc (`le=12`,
+1 duong le duoc ve) · tat Le thi o bien mat · **0 loi JS**.
+
+---
+
+## 2026-08-25 15:27 — v0.3.0: VUNG CHON In/Out — guide dat dung doan anh Tien khoanh
+
+**Boi canh:** anh Tien yeu cau "vung tron o phan tool" — hoi lai bang cau hoi
+lua chon thi ro y: giong o "Doan dang chon" cua Auto Cut. Panel phai tu nhan
+vung In/Out anh khoanh tren timeline, hien thoi luong, va khi bam nut thi
+guideline chi dat DUNG TRONG vung do thay vi phu ca sequence.
+
+**Da lam:**
+- `host/guideframe.jsx` (0.3.0):
+  - Them `gf_inSec_` / `gf_outSec_` — chep dung bai `ac_seqInSec` cua Autocut
+    (getInPointAsTime truoc, getInPoint du phong, -1 khi khong doc duoc).
+  - `gf_thongTinSeq` tra them `|in|out` vao cau tra loi SAN CO — vong tham do
+    1,5s cua panel biet vung chon ma KHONG ton them luot evalScript nao
+    (luat "tool phai dong hanh" 19/08). Kem sua tiem an: ten sequence chua `|`
+    nay duoc thay bang dau cach (truoc gio se lech truong).
+  - `gf_datOverlay(png, batDau, ketThuc)` — them 2 tham so tuy chon. Kep ve
+    [0, daiSeq]; so vo ly thi roi ve ca sequence (an toan hon bao loi).
+    Dat clip bang `overwriteClip(item, giay)` + du phong Time object (bai
+    `ac_datClip` cua Autocut da chay that tren 588 clip).
+- `dist/index.html` (0.3.0):
+  - Chip "Vung chon / In/Out range" tren thanh sequence — CHI hien khi co vung
+    THAT (khac ca sequence), hien thoi luong (vd `12.4s`). Mat vung / mat
+    sequence -> chip an ngay (xoa so cu, khong noi doi).
+  - ☠️ An chip bang `style.display` chu KHONG dung `[hidden]` — `.selbar-chip`
+    co `display:inline-flex` de len `[hidden]{display:none}` (dung bay `.tt`
+    da ghi 06/08).
+  - `tinhVungChon`: Premiere tra in=0/out=cuoi khi CHUA khoanh gi — khong phan
+    biet duoc voi "khoanh tron sequence", va hai truong hop cho cung ket qua
+    nen gop lam mot: coi la khong co vung.
+  - Luc bam nut: doc In/Out TUOI trong chinh lan bam (khong tin cache cua vong
+    tham do), truyen xuong `gf_datOverlay`. Thong bao thanh cong dung cau
+    rieng `daDatVung` (song ngu); canh bao "phu thieu" so voi do dai VUNG chu
+    khong phai do dai sequence nua.
+- Phien ban dong bo 3 noi: manifest 0.3.0 · `gf_phienBan` 0.3.0 · `PHIEN_BAN`
+  0.3.0 (+ nhan v0.3.0 tren topbar).
+
+**Da kiem chung:**
+- Cu phap JS panel: node new Function OK; quet id JS-goi-ma-HTML-thieu: chi con
+  7 id cu (deu boc `if ($())`), 0 id moi thieu.
+- Logic vung chon + kep cua host: **15/15 ca bien DAT** (chua khoanh / khoanh
+  tron seq / vung giua / cham dau / cham cuoi / out vuot seq / out<=in / NaN /
+  thieu tham so / am...).
+- DOM tren trinh duyet: chip an mac dinh -> `datVungChon({a:5,b:17.4})` hien
+  `12.4s` -> doi EN ra "In/Out range" -> `datVungChon(null)` an lai. 0 loi JS moi.
+- **DO THAT tren Premiere 27.0 dang mo** (chi DOC, khong dung timeline cua anh):
+  nap host moi qua cong 8096, `gf_thongTinSeq` tra
+  `OK:1280|720|2433.4|PodTest Nguon|0|2433.4` — chua khoanh I/O nen in=0,
+  out=cuoi, panel hieu dung la "khong co vung". Da cai ban 0.3.0
+  (sign-install, 0 file khoa) + reload panel dang mo: PHIEN_BAN 0.3.0, vong
+  tham do chay, chip an dung.
+
+**CHUA do (noi thang):**
+- ⬜ Ca CO vung chon tren Premiere that (khoanh I/O -> chip hien -> bam nut ->
+  guide nam dung [in, out]). Khong tu dung duoc ma khong dat I/O len sequence
+  cua anh Tien (dung bai 19/08 da cam) — **cho anh khoanh vung roi bam thu**.
+- ⬜ `overwriteClip` tai moc > 0 cho clip GUIDE noi rieng (Autocut da chung
+  minh voi clip video thuong).
+
+**Ghi nhan ngoai le:** console co san 3 loi `<path> attribute d` cua icon
+share trong khung mo phong UI nen tang (co tu ban thiet ke cu, khong lien quan
+ban sua nay).
+
+---
 - **DA DO THAT TREN PREMIERE** (project that cua anh Tien: `PV tuyen dung.prproj`,
   sequence 4K 3840x2160 dai **3.897 giay / 306 clip**):
   - Dat guide **0,74 giay** (chi tieu <=2s) · Go **0,13 giay**.
@@ -154,167 +429,6 @@ Kiem AN TOAN truoc khi bam (bai hoc 3b — chup trang thai goc truoc):
 - Vung lam viec giua: **1004px** (ky vong 1008 tru 2 net vien).
 - **Dong "TAT TRUOC KHI XUAT VIDEO"** nam o **y 194-221 va y 232-253** (2 dong),
   tong ca anh **49.879 diem chu**.
-
-### 17:10 — 3 loi anh Tien bat duoc khi dung that (da sua + do lai)
-
-**1. O chon sequence khong chon duoc.** Anh Tien chup man hinh bao. Do: o xo CO
-mo (`hidden=false`, 2 muc) nhung bi **`.selbar { overflow:hidden }` CAT CUT** —
-danh sach cao 69px bat dau y=68, thanh sequence ket thuc y=110 -> chi lot dong
-dau, "PV sales" bi cat.
-→ Sua GOC: khi mo thi neo o xo bang **`position:fixed`** theo toa do nut (tinh
-trong `comboBox()`), nen khong to tien nao cat duoc, va **khong sua mot dong CSS
-nao cua ban thiet ke**. Kem lat len tren khi tran day panel + bam theo khi cuon.
-→ Do lai: ca 2 muc `elementFromPoint` deu tra ve dung muc do; bam that qua giao
-dien -> `gf_moSequence` chay -> Premiere doi sang "PV sales" -> tra ve duoc.
-
-☠️ **Lan do dau em bao "khong doi duoc" la THUOC SAI**: dat gio cho cung 2,5s,
-trong khi lenh dau sau khi nap lai panel phai `$.evalFile` host truoc nen lau
-hon. Dung bai hoc 5f (lay tin hieu xong cua chinh no) thi ra dung ngay.
-
-**2. Nhan canh bao de len mat nhan vat.** Anh Tien chup anh: khoi chu
-"LOP GUIDE — TAT TRUOC KHI XUAT VIDEO" nam ngay dinh dau nguoi tren sequence 16:9.
-Nguyen nhan: `veTag` cu neo vao **mep vung an toan** (`sUi.y + pad*2 + co`) — tuc
-dat dung vao CHO NGUOI TA CAN NHIN.
-→ Sua: gom tag cua `ve()` va `veLuoi()` thanh MOT ham `veTag()`, dat **sat day
-khung** (luon nam trong dai da bi UI nen tang che) va **co chu con 62%**.
-→ Do lai 3 ca — `yt-169` tren 4K, `tiktok-video` tren 4K (lech ti le), va
-`tiktok-video` dung khung 1080x1920: **0 diem chu trong vung an toan** o ca ba,
-tam khung van alpha 0. Chu chi con o dai duoi cung (y 2100 / 2140 / 1902).
-
-**3. Nut ghi "Thay bang khung an toan moi" nhung KHONG thay.** Phat hien khi do:
-con guide cu tren timeline thi track tren cung khong con trong -> bam vao se
-truot `HET_TRACK`. Nhan noi doi (trai luat "nhan nut la VIEC no lam").
-→ Sua: `hienGuide()` goi `gf_tatOverlay()` truoc khi dat neu `soLopGuide > 0`.
-→ Do: truoc 1 guide -> bam -> **sau van 1 guide** (khong thanh 2, khong loi),
-V3=1 clip, **0,76 giay**.
-
-### 17:35 — Anh Tien yeu cau GO 3 khoi (kem anh chup khoanh do)
-
-| Go gi | Ly do / cach xu |
-|---|---|
-| **"Preset cua toi"** (o ten + nut Luu + danh sach) | Go het markup. Don luon trinh xu ly, bien `presets`, khoa localStorage `aio-gf-presets` va 4 khoa tu dien -> **0 tham chieu chet con lai** |
-| **Nut "Luu file .guides"** + dong ghi chu duoi no | Go markup + `luuGuides()` + `motGuide()` + khoa tu dien. ☠️ Day la **Tang B** cua kien truc lai 2 tang chot 01/08 — nay khong con trong giao dien |
-| **Hop trang thai bao "Da dat len track V3..."** | KHONG go han hop. Theo dung luat anh Tien *"chi bao khi THAT BAI"*: hop **an khi `m === 'ok'`**, van hien khi `warn`/`err`. Go han thi panel se CAM luc "het track trong" / "chua noi Premiere" — nguoi dung khong biet vi sao khong ra guide |
-
-☠️ Bay khi an hop: `.tt{display:flex}` **de len** quy tac `[hidden]{display:none}`
-cua trinh duyet (class co do uu tien cao hon). Phai dung `style.display='none'`.
-
-Do lai sau khi go: `khoi_preset`/`nut_luu_guides`/`dong_ghi_chu` deu **khong con
-trong DOM** · **0 loi JS** · them-xoa duong, doi mau, doi ngon ngu, di het 10 nen
-tang **van chay** · ep trang thai loi thi hop **hien lai** (`display:flex`, muc
-`err`) · dat xong thi hop **`display:none`**.
-
-Kem: bam "Thay bang khung an toan moi" khi timeline dang co **2** guide chong
-nhau -> **con dung 1**, V3=1 clip.
-
-### 17:50 — Anh Tien go tiep 2 khoi: canh bao "con guide" + nut "Go guideline"
-
-Sau khi go, khoi hanh dong chi con **DUY NHAT nut chinh**.
-
-**Duong RA gio la gi:** xoa clip guide tren track V3 bang tay trong Premiere.
-Panel tu nhan ra sau ~1,5 giay (nhip doc `gf_demOverlay`) va doi nhan nut ve
-"Hien khung an toan". Bam nut chinh khi dang co guide thi van **go cu roi dat
-moi** (`hienGuide()` goi `gf_tatOverlay()` truoc). Loi nhac an toan that van
-con: dong "TAT TRUOC KHI XUAT VIDEO" nung trong chinh tam anh.
-**Danh doi da noi ro voi anh Tien:** khong con ai don giup **bin 'AiO Guide
-Frame' + file PNG** trong project — truoc day nut Go don luon.
-
-Da don sach: markup, `tatGuide()`, trinh xu ly, 5 khoa tu dien (`tat` `dangTat`
-`daTat` `tatTrong` `tatThieu`), trang thai `condu` trong `TRANG_THAI`, va dong
-`iTT = 3` trong `demLop()`. **0 tham chieu chet con lai.**
-
-**Do 5 canh (bang bao gio hien hop trang thai):**
-
-| Canh | Hop trang thai | Nhan nut chinh |
-|---|---|---|
-| Khop ti le, chua dat | **an** | Hien khung an toan |
-| Khop ti le, DA co guide tren timeline | **an** | Thay bang khung an toan moi |
-| Vua bam dat xong | **an** | Thay bang khung an toan moi |
-| **Lech ti le** (9:16 tren seq 16:9) | **hien** (warn) | Thay bang khung an toan moi |
-| **Chua noi Premiere** | **hien** (err) | Hien khung an toan |
-
-0 loi JS · them-xoa duong, doi ngon ngu, di het 10 nen tang van chay.
-
-☠️ **Thuoc do sai lan nua:** doc dau tien bao "hop van hien" o canh binh thuong.
-Nguyen nhan: ban thu con nho khung `yt-169` trong localStorage nen dang o canh
-**lech ti le** — tuc hop hien la DUNG. Dung bai hoc 5p (do tren mot trang thai
-khong phai trang thai minh tuong).
-
-### 18:15 — Go han dong chu trong anh + SUA LOI EBUSY anh Tien gap
-
-**A. Go han nhan "LOP GUIDE — TAT TRUOC KHI XUAT VIDEO"** (anh Tien: *"text nay
-anh khong can"*). Xoa han `veTag()` trong `ve-guide.js` + 2 cho goi + `opts.tag`
-/ `tenNenTang` / `phienBanDuLieu` ben panel + hang `PHIEN_BAN_DU_LIEU`.
-Ban xem truoc noi bo von da truyen `tag:false` nen khong anh huong.
-→ **Do co DOI CHUNG**: ve lai voi `uiThat:false` -> **0 diem chu**. Nghia la tag
-bay sach that; **6.188 diem chu con lai la MO PHONG UI NEN TANG** (avatar,
-caption, nhan icon) — tinh nang anh Tien xin 02/08, khong dung toi.
-Muon tat luon thi truyen `{ uiThat:false }` trong `taoPngGuideline()`.
-→ Danh doi da noi ro: anh guide nay KHONG con loi nhac nao. Cong voi viec da go
-nut "Go guideline" va canh bao "dang co N guide", panel khong con nhac gi ve
-"tat truoc khi xuat" — nguoi dung tu nho.
-
-**B. ☠️ `EBUSY: resource busy or locked` khi bam lan thu HAI cho CUNG mot khung.**
-Anh Tien bao loi (anh chup). Nguyen nhan **khong phai** do chon 2 option luoi
-nhu ban dau tuong: ten file PNG dat CO DINH theo `(khung + kich thuoc + ngon
-ngu)`, nen lan hai ghi de len chinh file **Premiere van dang giu** — no khong
-tra lai handle ngay ca khi clip da bi go va bin da bi xoa.
-→ Sua goc: **ten file duy nhat moi lan** (`..._<Date.now()>.png`), kem
-`donFileCu()` xoa cac PNG cu (file nao Premiere con giu thi bo qua, lan sau don
-tiep) — goi sau moi lan ghi va mot lan luc mo panel.
-→ Do: bam **4 lan lien tiep** cung khung `yt-169` tren sequence 4K (lan 2 bat
-them "Tam khung", lan 3 bat "Ti le vang" — dung kieu anh Tien lam):
-**4/4 dat**, 0,62–0,77 giay, **luon chi con dung 1 guide** tren timeline,
-**khong con EBUSY**.
-→ Con lai: PNG cu **chua xoa duoc trong cung phien** (Premiere giu file) — 4 lan
-bam de lai 4 file ~0,4 MB. Chung se bi don o lan mo Premiere sau.
-
-### 18:30 — Dua khung xem truoc len DAU panel (anh Tien: "chi thay doi vi tri")
-
-Anh Tien dung panel o dock **806px** -> `.grid` roi ve 1 cot, khung xem truoc bi
-day xuong duoi cung, phai cuon qua het dieu khien moi thay.
-
-Sua: doi **vi tri trong DOM** — khoi `.col--xem` bay len truoc `.col`. Noi dung
-khoi giu **nguyen si** (`seqbox` / `dich` / `chugiai` khong sua mot ky tu).
-Them dung **3 dong CSS** de dock rong khong bi dao theo:
-`@media (min-width:901px){ .col--xem{order:2} .col:not(.col--xem){order:1} }`.
-
-Do that:
-
-| Kho | Ket qua |
-|---|---|
-| Panel that 806px (1 cot) | thanh sequence y=68 -> **xem truoc y=122** -> chon nen tang y=591 -> nut chinh y=1015 |
-| Ban do 1280px (2 cot) | dieu khien **TRAI** x=61 rong=360 · xem truoc **PHAI** x=433 — **dung y thiet ke goc** |
-
-Moi thu khac khong doi: 10 nut nen tang · 2 chip khung · 4 vung ve · nhan
-"Khung an toan 3456x1836" · chu giai · nhan nut · hop trang thai van an ·
-khong tran ngang · **0 loi JS** · doi ngon ngu va di het 10 nen tang van chay.
-
-### 18:45 — "Vi tri khong deu" o khoi DUONG TU THEM (anh Tien chup anh)
-
-**Do ra nguyen nhan:** nut huong rong theo CHU nen hai hang lech nhau —
-`Doc` **33px** vs `Ngang` **46px** -> thanh keo bat dau lech **12,6px**, con
-truot cung o gia tri 50 lai khong thang hang.
-
-**Sua THEO CAU TAO, khong ghim be rong bang tay:** cho ca `.duongs` thanh mot
-LUOI 4 cot, tung hang `.duong` dung `display:contents` de gop vao cung luoi ->
-moi cot bang nhau o moi hang. Ghim `min-width` bang tay se vo lai khi doi ngon
-ngu ("Horizontal" dai gap doi "Ngang"); cach nay thi khong the lech.
-
-| Ca do | Lech nut | Lech diem bat dau thanh keo | Lech o so | Lech nut xoa |
-|---|---|---|---|---|
-| VI: Doc + Ngang | **0** | **0** | **0** | **0** |
-| EN: Vertical + Horizontal | **0** | **0** | **0** | **0** |
-| VI: 5 duong tron lan | **0** | **0** | **0** | **0** |
-
-Con truot o gia tri 50 cua hai hang: **cung x = 380,8** (truoc do lech 12,6px).
-Nut "+ Them duong" van o hang rieng (`grid-column:1/-1`).
-
-**Kiem `display:contents` co pha gi khong** (no bo hop cua `.duong` di, ma JS
-dung `closest('.duong')` de tim hang): keo thanh truot -> o so dong bo · go so
--> thanh truot chay theo · doi huong · **xoa dung hang minh bam** (xoa hang 2
-trong 3 hang, con lai dung 2 hang con lai) · duong ve len khung xem truoc ·
-them duong. **6/6 dat, 0 loi JS.**
 
 ### CON CHO — chua do duoc
 

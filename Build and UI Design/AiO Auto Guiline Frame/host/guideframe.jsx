@@ -1,5 +1,5 @@
 /**
- * guideframe.jsx — logic host cua AiO Auto Guiline Frame (v0.2.0)
+ * guideframe.jsx — logic host cua AiO Auto Guiline Frame (v0.3.0)
  *
  * Quy uoc tra ve: "OK:..." / "ERR:MA_LOI|chi tiet" — panel dich ra cau chu.
  * ASCII khong dau (ExtendScript ES3). KHONG dung JSON (host khong co).
@@ -24,7 +24,22 @@ function gf_laySeq_() {
   return p.activeSequence || null;
 }
 
-/** Kich thuoc + do dai sequence dang mo: "OK:w|h|daiGiay|ten" */
+/** Diem VAO nguoi dung khoanh (I) tren timeline, tinh bang giay. -1 = khong doc duoc.
+    Cung bai voi ac_seqInSec cua Autocut (da do that 19/08/2026). */
+function gf_inSec_(seq) {
+  try { var t = seq.getInPointAsTime(); if (t && typeof t.seconds === 'number') return t.seconds; } catch (e) {}
+  try { var s = parseFloat(seq.getInPoint()); if (!isNaN(s)) return s; } catch (e2) {}
+  return -1;
+}
+
+/** Diem RA (O), tinh bang giay. -1 = khong doc duoc. */
+function gf_outSec_(seq) {
+  try { var t = seq.getOutPointAsTime(); if (t && typeof t.seconds === 'number') return t.seconds; } catch (e) {}
+  try { var s = parseFloat(seq.getOutPoint()); if (!isNaN(s)) return s; } catch (e2) {}
+  return -1;
+}
+
+/** Kich thuoc + do dai + vung In/Out cua sequence dang mo: "OK:w|h|daiGiay|ten|in|out" */
 function gf_thongTinSeq() {
   var seq = gf_laySeq_();
   if (!seq) return 'ERR:CHUA_MO_SEQ|';
@@ -56,8 +71,11 @@ function gf_thongTinSeq() {
     } catch (e4) {}
   }
   var ten = '';
-  try { ten = seq.name; } catch (e5) {}
-  return 'OK:' + w + '|' + h + '|' + dai + '|' + ten;
+  // '|' la ky tu ngan cach cua giao thuc — ten chua no thi cac truong sau lech het
+  try { ten = String(seq.name).replace(/\|/g, ' '); } catch (e5) {}
+  // Ghep In/Out vao cau tra loi SAN CO: vong tham do 1,5s cua panel biet vung
+  // chon ma khong ton them luot evalScript nao (luat "tool phai dong hanh" 19/08/2026).
+  return 'OK:' + w + '|' + h + '|' + dai + '|' + ten + '|' + gf_inSec_(seq) + '|' + gf_outSec_(seq);
 }
 
 /**
@@ -123,9 +141,11 @@ function gf_binGuide_() {
 /**
  * Dat overlay guide len sequence.
  * duongDanPng: duong dan file PNG (GACH XUOI /), ten file bat dau AIO_GUIDE.
- * Tra: "OK:track=N|batDau=0|daiThuc=X|daiSeq=Y" (daiThuc de panel biet overlay phu duoc bao xa)
+ * batDau/ketThuc (giay, tuy chon): vung In/Out nguoi dung khoanh — guide chi
+ * phu dung vung do. Thieu hoac vo ly (ketThuc <= batDau) thi phu ca sequence.
+ * Tra: "OK:track=N|batDau=X|ketThuc=Y|daiThuc=Z|daiSeq=T"
  */
-function gf_datOverlay(duongDanPng) {
+function gf_datOverlay(duongDanPng, batDau, ketThuc) {
   var seq = gf_laySeq_();
   if (!seq) return 'ERR:CHUA_MO_SEQ|';
 
@@ -136,6 +156,13 @@ function gf_datOverlay(duongDanPng) {
   if (tt.indexOf('OK:') !== 0) return tt;
   var daiSeq = parseFloat(tt.split('|')[2]) || 0;
   if (daiSeq <= 0) return 'ERR:SEQ_TRONG|sequence chua co clip nao';
+
+  // Vung chon: kep ve [0, daiSeq]; so vo ly thi roi ve ca sequence (an toan hon bao loi)
+  var a = parseFloat(batDau), b = parseFloat(ketThuc);
+  if (isNaN(a) || a < 0) a = 0;
+  if (isNaN(b) || b > daiSeq) b = daiSeq;
+  if (b <= a + 0.01 || a >= daiSeq) { a = 0; b = daiSeq; }
+  var daiVung = b - a;
 
   // 1) Tim track TREN CUNG dang trong. Khong tu them track (QE nguy hiem) —
   //    khong co track trong thi tra ma loi de panel huong dan.
@@ -158,33 +185,40 @@ function gf_datOverlay(duongDanPng) {
   if (bin.children.numItems <= truoc) return 'ERR:IMPORT_KHONG_VAO|' + bin.children.numItems;
   var item = bin.children[bin.children.numItems - 1];
 
-  // 3) Keo dai muc tieu: dat out point cua projectItem = dai sequence
+  // 3) Keo dai muc tieu: dat out point cua projectItem = do dai VUNG can phu
   //    (anh tinh mac dinh chi ~5s). Khong duoc thi thoi — se bao daiThuc that.
-  try { item.setOutPoint(daiSeq, 4); } catch (e2) {}
+  try { item.setOutPoint(daiVung, 4); } catch (e2) {}
 
-  // 4) Dat len track
+  // 4) Dat len track tai diem dau vung chon. Thu so giay truoc, khong an thi
+  //    Time object (bai ac_datClip cua Autocut).
   var track = seq.videoTracks[trackDich];
   var demTruoc = track.clips.numItems;
-  try {
-    track.overwriteClip(item, 0);
-  } catch (e3) {
-    return 'ERR:DAT_HONG|' + e3;
+  var datOk = false, loiDat = '';
+  try { track.overwriteClip(item, a); datOk = true; } catch (e3) { loiDat = String(e3); }
+  if (!datOk) {
+    try {
+      var tA = new Time();
+      tA.seconds = a;
+      track.overwriteClip(item, tA);
+      datOk = true;
+    } catch (e3b) { return 'ERR:DAT_HONG|' + loiDat + ' | ' + e3b; }
   }
   if (track.clips.numItems <= demTruoc) return 'ERR:DAT_KHONG_VAO|';
   var clip = track.clips[track.clips.numItems - 1];
 
-  // 5) Thu keo dai clip toi het sequence roi DOC LAI xem co an khong
+  // 5) Thu keo dai clip toi het vung chon roi DOC LAI xem co an khong
   var daiThuc = clip.end.seconds - clip.start.seconds;
-  if (daiThuc < daiSeq - 0.01) {
+  if (daiThuc < daiVung - 0.01) {
     try {
       var tEnd = new Time();
-      tEnd.seconds = daiSeq;
+      tEnd.seconds = b;
       clip.end = tEnd;
     } catch (e4) {}
     try { daiThuc = clip.end.seconds - clip.start.seconds; } catch (e5) {}
   }
 
-  return 'OK:track=' + (trackDich + 1) + '|batDau=0|daiThuc=' + daiThuc.toFixed(2) + '|daiSeq=' + daiSeq.toFixed(2);
+  return 'OK:track=' + (trackDich + 1) + '|batDau=' + a.toFixed(2) + '|ketThuc=' + b.toFixed(2) +
+         '|daiThuc=' + daiThuc.toFixed(2) + '|daiSeq=' + daiSeq.toFixed(2);
 }
 
 /** Xoa moi clip guide (ten bat dau AIO_GUIDE) khoi moi track video. "OK:xoa=N|conLai=M" */
@@ -246,5 +280,5 @@ function gf_demOverlay() {
  * ca file da nap tron ven (bai hoc "evalFile nuot file giua chung" 01/08/2026).
  */
 function gf_phienBan() {
-  return '0.2.0';
+  return '0.3.0';
 }
