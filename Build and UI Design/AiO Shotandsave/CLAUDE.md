@@ -117,7 +117,14 @@ Bo ghi dung `e.code` (vi tri phim), khong dung `e.key` (doi theo Shift). Luu vao
 `cau-hinh.json`, nap luc khoi dong. Doi that bai (app khac giu phim) thi giu phim
 cu. ☠️ Accelerator backtick la `Alt+\`` (literal), KHONG phai 'Alt+Backquote'.
 
+DONG GOI BO CAI (26/08): `npm run dist` -> electron-builder/NSIS mot-cu-bam,
+per-user, ra `dist/AiO-Shot-and-Save-Setup-<ver>.exe` (~99MB, KHONG len git —
+`*.exe` ignored; ban phat hanh nam o `Release/<ngay>-shotandsave-<ver>/`).
+☠️ 2 bay da vap: (1) RUN_LOG trong app.asar CHI DOC -> ban dong goi phai ghi
+vao userData (da lam trong ghiLog); (2) bo cai NSIS TU DE loi tat Desktop cung
+ten -> sau khi cai, loi tat tro BAN CAI chu khong phai ban nguon.
+
 ## Chua lam (xem PROGRESS.md)
 
-Dong goi bo cai (.exe) · pre-warm overlay de xuong ~30ms · them cong cu ve khac
-(chu, but ve, che mo) neu anh Tien can.
+Cai thu MAY SACH (khong Node/nguon) truoc khi phat ra ngoai · ky so (SmartScreen)
+· pre-warm overlay ~30ms · cong cu ve them (chu, but, che mo) neu anh Tien can.
