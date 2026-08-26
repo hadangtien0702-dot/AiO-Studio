@@ -14,4 +14,20 @@ contextBridge.exposeInMainWorld('overlay', {
   confirm: (payload) => ipcRenderer.send('overlay:confirm', payload),
   /** Huy chup. */
   cancel: () => ipcRenderer.send('overlay:cancel'),
+  /** Bat dau keo chon — MAIN theo doi chuot he thong (dung moi scale/DPI). */
+  dragStart: () => ipcRenderer.send('overlay:drag-start'),
+  /** Tha chuot — main chot vung va dieu phoi (annotate / composite / huy). */
+  dragEnd: () => ipcRenderer.send('overlay:drag-end'),
+  /** Vung chon hien tai (DIP toan cuc) tu main; { rect, laChu } hoac null. */
+  onSelRect: (cb) => ipcRenderer.on('overlay:sel-rect', (_e, d) => cb(d)),
+  /** Vung chon nam tron man nay -> vao che do ve. rect CUC BO (DIP man nay). */
+  onAnnotate: (cb) => ipcRenderer.on('overlay:annotate', (_e, rect) => cb(rect)),
+  /** Vung vat ngang nhieu man -> ghep va gui. rect DIP toan cuc. */
+  onComposite: (cb) => ipcRenderer.on('overlay:composite', (_e, rect) => cb(rect)),
+  /** Bao: toi bat dau keo — cac man khac khoa chuot. */
+  lock: () => ipcRenderer.send('overlay:lock'),
+  /** Man khac da bat dau keo — man nay bo qua chuot. */
+  onLocked: (cb) => ipcRenderer.on('overlay:locked', () => cb()),
+  /** Ghi nhat ky chay (qua main). */
+  log: (msg) => ipcRenderer.send('overlay:log', msg),
 })

@@ -89,6 +89,13 @@ npm start -- --selftest --dev
 
 Roi doc `.selftest/selftest-overlay.png` + `selftest-pin.png` de kiem mat.
 
+☠️ **Selftest duong dep 1 man KHONG DU** (anh Tien day 26/08 sau 3 loi lot luoi).
+Truoc khi bao xong PHAI them: (a) do TI LE SANG anh luu vs vung man goc (~1.0;
+0.58 = dinh lop mo); (b) keo vat 2 man tu CA HAI phia, anh phai chua du 2 man;
+(c) moi luot chup ra DUNG 1 file; (d) doc `.run-log.txt` (nhat ky chay luon bat)
+doi chieu tung buoc. Overlay PHAI co `setContentProtection(true)` — khong thi
+grab (chay sau khi overlay hien) nuong lop mo vao anh.
+
 ## Da lam
 
 KEO-THA ra app khac (`webContents.startDrag`, 25/08): keo anh GHIM hoac

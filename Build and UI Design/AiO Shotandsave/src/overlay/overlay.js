@@ -38,6 +38,8 @@ let origin = { x: 0, y: 0 } // goc DIP toan cuc cua man nay
 let layers = []           // anh dong bang MOI man: { img, x, y, w, h, sf } (DIP toan cuc)
 let layersReady = false
 let pendingComposite = null // vung cho ghep neu grab chua xong
+let biKhoa = false          // man KHAC dang keo -> man nay bo qua chuot
+let soLanThuGhep = 0        // dem retry cho ghep xuyen man
 
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
 window.overlay.onInit((data) => {
@@ -66,14 +68,81 @@ window.overlay.onFrozen((data) => {
     im.onload = xongTai
     im.onerror = xongTai
     im.src = L.dataUrl
-    news.push({ img: im, x: L.x, y: L.y, w: L.w, h: L.h, sf: L.sf })
+    news.push({ img: im, x: L.x, y: L.y, w: L.w, h: L.h, sf: L.sf,
+                px: L.px, py: L.py, pw: L.pw, ph: L.ph })
   }
 })
 
-/* ☠️ DA BO khung "guong" ben man kia (25/08): khi vung chon nam tron mot man,
-   khung guong o man kia nam ngoai ria — box-shadow cua no chi phu 100vmax nen
-   HUT giua man, tao vet sang/toi chia doi (anh Tien bat). Man kia gio chi toi
-   deu; keo VAT NGANG van chup duoc (confirmComposite khong can guong). */
+window.overlay.onLocked(() => { biKhoa = true })
+
+/* VE VUNG CHON — thong nhat cho MOI man, du lieu tu MAIN ('overlay:sel-rect',
+   DIP toan cuc, dung moi scale/DPI). Man co phan giao: khung cam + 4 tam mo;
+   khong giao: dim thuong. laChu: hien nhan kich thuoc. ☠️ KHONG dung box-shadow
+   duc lo (100vmax hut giua man -> vet sang/toi, vap 25/08). */
+const guongEl = document.getElementById('guong')
+const gT = document.getElementById('g-t'), gB = document.getElementById('g-b')
+const gL = document.getElementById('g-l'), gR = document.getElementById('g-r')
+const gKhung = document.getElementById('g-khung')
+const gSize = document.getElementById('g-size')
+
+function datPx(el, x, y, w, h) {
+  el.style.left = x + 'px'; el.style.top = y + 'px'
+  el.style.width = Math.max(0, w) + 'px'; el.style.height = Math.max(0, h) + 'px'
+}
+
+function xoaGuong() {
+  guongEl.hidden = true
+  gSize.hidden = true
+  dimEl.style.display = ''
+}
+
+window.overlay.onSelRect((d) => {
+  if (mode === 'annotate') return // dang ve thi giu nguyen khung annotate
+  const W = window.innerWidth, H = window.innerHeight
+  if (!d) { xoaGuong(); hintEl.classList.remove('hidden'); return }
+  hintEl.classList.add('hidden')
+  // d.x/y/w/h da la CUC BO (DIP man nay) do main quy doi tu PIXEL VAT LY.
+  const ix = Math.max(0, d.x), iy = Math.max(0, d.y)
+  const ix2 = Math.min(W, d.x + d.w), iy2 = Math.min(H, d.y + d.h)
+  if (ix2 <= ix || iy2 <= iy) { xoaGuong(); return } // khong giao: dim thuong
+  dimEl.style.display = 'none'
+  guongEl.hidden = false
+  datPx(gT, 0, 0, W, iy)
+  datPx(gB, 0, iy2, W, H - iy2)
+  datPx(gL, 0, iy, ix, iy2 - iy)
+  datPx(gR, ix2, iy, W - ix2, iy2 - iy)
+  datPx(gKhung, ix, iy, Math.max(0, ix2 - ix - 2), Math.max(0, iy2 - iy - 2))
+  if (d.laChu) {
+    gSize.hidden = false
+    // hien kich thuoc theo PIXEL VAT LY — dung voi thu se luu ra file
+    gSize.textContent = Math.round(d.physW) + ' × ' + Math.round(d.physH)
+    gSize.style.left = ix + 'px'
+    gSize.style.top = (iy >= 26 ? iy - 24 : iy + 4) + 'px'
+  } else {
+    gSize.hidden = true
+  }
+})
+
+/* Vung nam tron man nay -> vao che do VE (rect cuc bo tu main). */
+window.overlay.onAnnotate((rect) => {
+  curRect = { x: Math.round(rect.x), y: Math.round(rect.y),
+              w: Math.round(rect.w), h: Math.round(rect.h) }
+  rect = curRect
+  xoaGuong()
+  dimEl.style.display = 'none'
+  selEl.hidden = false
+  selEl.style.left = rect.x + 'px'; selEl.style.top = rect.y + 'px'
+  selEl.style.width = rect.w + 'px'; selEl.style.height = rect.h + 'px'
+  sizeEl.textContent = rect.w + ' × ' + rect.h
+  sizeEl.classList.toggle('inside', rect.y < 28)
+  vaoCheDoVe()
+})
+
+/* Vung vat ngang nhieu man -> ghep (rect DIP toan cuc tu main). */
+window.overlay.onComposite((rect) => {
+  soLanThuGhep = 0
+  confirmComposite(rect)
+})
 
 /* ── Chon vung ────────────────────────────────────────────────────────── */
 function updateSel(x1, y1, x2, y2) {
@@ -88,33 +157,25 @@ function updateSel(x1, y1, x2, y2) {
 
 window.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return
+  if (biKhoa) return // man khac dang giu quyen keo
+  window.overlay.lock()
   if (mode === 'annotate') { batDauVe(e); return }
   dragging = true
-  startX = e.clientX; startY = e.clientY
-  dimEl.style.display = 'none'
-  selEl.hidden = false
   hintEl.classList.add('hidden')
-  updateSel(startX, startY, startX, startY)
+  // MAIN theo doi chuot he thong (dung moi scale) va phat 'sel-rect' ve.
+  window.overlay.dragStart()
 })
 
 window.addEventListener('mousemove', (e) => {
-  if (mode === 'annotate') { veDangKeo(e); return }
-  if (!dragging) return
-  updateSel(startX, startY, e.clientX, e.clientY)
+  if (mode === 'annotate') veDangKeo(e)
+  // select-mode: main tu theo doi chuot, renderer khong can lam gi
 })
 
 window.addEventListener('mouseup', (e) => {
   if (mode === 'annotate') { ketThucVe(e); return }
   if (!dragging) return
   dragging = false
-  const r = curRect
-  if (r.w < 8 || r.h < 8) { window.overlay.cancel(); return }
-  const trongManNay = r.x >= 0 && r.y >= 0 &&
-    r.x + r.w <= window.innerWidth && r.y + r.h <= window.innerHeight
-  if (trongManNay) { vaoCheDoVe(); return } // chon xong -> ve shape (Lightshot)
-  // VAT NGANG man khac: GHEP anh tu cac man roi luu luon (chua ho tro ve shape
-  // cho vung xuyen man — anh Tien 25/08: khoanh ca 2 man phai luu du ca 2).
-  confirmComposite({ x: origin.x + r.x, y: origin.y + r.y, w: r.w, h: r.h })
+  window.overlay.dragEnd() // main chot vung + dieu phoi (annotate/composite/huy)
 })
 
 window.addEventListener('keydown', (e) => {
@@ -193,9 +254,9 @@ function chonLaiTuDau(e) {
   if (veCtx) veCtx.clearRect(0, 0, curRect.w, curRect.h)
   veEl.hidden = true
   toolbarEl.hidden = true
+  selEl.hidden = true
   dragging = true
-  startX = e.clientX; startY = e.clientY
-  updateSel(startX, startY, startX, startY)
+  window.overlay.dragStart() // main theo doi tu vi tri chuot hien tai
 }
 function veDangKeo(e) {
   if (!veStart) return
@@ -294,22 +355,58 @@ function xong(copy) {
 /* GHEP vung chon (DIP toan cuc) tu anh dong bang cua CAC man giao voi no.
    Thang do dau ra = sf LON NHAT trong cac man giao (giu net man 4K). */
 function confirmComposite(g) {
-  if (!layersReady) { pendingComposite = g; return } // grab chua xong thi cho
-  let S = 1
-  for (const L of layers) if (giaoNhau(g, L)) S = Math.max(S, L.sf)
-  const cv = document.createElement('canvas')
-  cv.width = Math.max(1, Math.round(g.w * S))
-  cv.height = Math.max(1, Math.round(g.h * S))
-  const ctx = cv.getContext('2d')
-  for (const L of layers) {
-    const ix = Math.max(g.x, L.x), iy = Math.max(g.y, L.y)
-    const ix2 = Math.min(g.x + g.w, L.x + L.w), iy2 = Math.min(g.y + g.h, L.y + L.h)
-    if (ix2 <= ix || iy2 <= iy) continue // khong giao voi man nay
-    ctx.drawImage(L.img,
-      (ix - L.x) * L.sf, (iy - L.y) * L.sf, (ix2 - ix) * L.sf, (iy2 - iy) * L.sf,
-      (ix - g.x) * S, (iy - g.y) * S, (ix2 - ix) * S, (iy2 - iy) * S)
+  // ☠️ Chi ghep khi anh cua MOI man giao da NAP XONG THAT (complete +
+  // naturalWidth>0). Truoc day chi cho layersReady — anh hong/chua nap van
+  // "xong" (onerror cung dem) -> drawImage im lang khong ve gi -> anh TRANG
+  // TRON 590 byte (anh Tien 26/08). Chua san sang: thu lai 200ms, toi da 15 lan.
+  const giao = layers.filter((L) => giaoNhau(g, { x: L.px, y: L.py, w: L.pw, h: L.ph }))
+  const sanSang = layersReady && giao.length > 0 &&
+    giao.every((L) => L.img && L.img.complete && L.img.naturalWidth > 0)
+  if (!sanSang) {
+    if (!layersReady) { pendingComposite = g; window.overlay.log('composite CHO grab'); return }
+    if (soLanThuGhep < 15) {
+      soLanThuGhep++
+      window.overlay.log('composite thu lai lan ' + soLanThuGhep + ' (ready=' + layersReady + ' giao=' + giao.length + ')')
+      setTimeout(() => confirmComposite(g), 200)
+      return
+    }
+    // Het duong: cat phan nam trong MAN NAY (con hon tra anh trang).
+    // g la PHYS -> quy ve DIP cuc bo bang DPR cua chinh man nay.
+    window.overlay.log('composite FALLBACK ve rect man nay')
+    const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+    const opx = own ? own.px : 0, opy = own ? own.py : 0
+    const lx = Math.max(0, (g.x - opx) / DPR), ly = Math.max(0, (g.y - opy) / DPR)
+    const lw = Math.min(window.innerWidth, (g.x + g.w - opx) / DPR) - lx
+    const lh = Math.min(window.innerHeight, (g.y + g.h - opy) / DPR) - ly
+    window.overlay.confirm({ rect: { x: lx, y: ly, w: Math.max(1, lw), h: Math.max(1, lh) } })
+    return
   }
-  window.overlay.confirm({ dataUrl: cv.toDataURL('image/png') })
+  try {
+    // ☠️ GHEP THEO PIXEL VAT LY, moi man dan 1:1 anh goc (nhu Snipping Tool).
+    // Truoc ghep theo DIP: 2 man khac scale (150%/125%) la mot ben bi phong to
+    // -> "chua dung ti le" (anh Tien 26/08). g o day la rect PHYS tu main.
+    const cv = document.createElement('canvas')
+    cv.width = Math.max(1, Math.round(g.w))
+    cv.height = Math.max(1, Math.round(g.h))
+    const ctx = cv.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+    for (const L of giao) {
+      const ix = Math.max(g.x, L.px), iy = Math.max(g.y, L.py)
+      const ix2 = Math.min(g.x + g.w, L.px + L.pw), iy2 = Math.min(g.y + g.h, L.py + L.ph)
+      if (ix2 <= ix || iy2 <= iy) continue
+      // ☠️ desktopCapturer co the tra anh KHONG dung co native (scale theo
+      // thumbnailSize) — do anh THAT roi quy doi, dung gia dinh.
+      const kx = L.img.naturalWidth / L.pw, ky = L.img.naturalHeight / L.ph
+      ctx.drawImage(L.img,
+        (ix - L.px) * kx, (iy - L.py) * ky, (ix2 - ix) * kx, (iy2 - iy) * ky,
+        ix - g.x, iy - g.y, ix2 - ix, iy2 - iy)
+    }
+    window.overlay.log('composite OK ' + cv.width + 'x' + cv.height + ' (phys 1:1) tu ' + giao.length + ' man')
+    window.overlay.confirm({ dataUrl: cv.toDataURL('image/png') })
+  } catch (err) {
+    window.overlay.log('composite LOI: ' + err.message)
+    window.overlay.cancel()
+  }
 }
 
 function giaoNhau(a, b) {

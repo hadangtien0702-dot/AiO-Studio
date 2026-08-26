@@ -46,6 +46,17 @@ if (IS_DEV || IS_SELFTEST) {
   })
 }
 
+/* Nhat ky chay nhe (LUON bat) — de nguoi dung gap loi la co dau vet ngay.
+   File .run-log.txt canh ma nguon, da gitignore. Tu cat khi qua 300KB. */
+const RUN_LOG = path.join(__dirname, '..', '.run-log.txt')
+function ghiLog(msg) {
+  try {
+    const dong = new Date().toISOString().slice(11, 23) + ' ' + msg + '\n'
+    try { if (fs.statSync(RUN_LOG).size > 300 * 1024) fs.writeFileSync(RUN_LOG, '') } catch (e) {}
+    fs.appendFileSync(RUN_LOG, dong)
+  } catch (e) {}
+}
+
 /** Con tro app: tray + cac cua so dang song. */
 let tray = null
 let overlayWins = [] // mot overlay MOI man hinh (moi man mot cua so)
@@ -278,6 +289,9 @@ async function startCapture() {
   // kip hien.
   grabStarted = false
   grabPromise = null
+  napManCache()
+  ghiLog('capture-start displays=' + displays.length + ' ' +
+    manCache.map((m) => m.px + ',' + m.py + ' ' + m.pw + 'x' + m.ph + '@' + m.sf).join(' | '))
   openOverlays(displays)
 }
 
@@ -295,11 +309,17 @@ function kickGrab() {
     // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
     // de renderer GHEP duoc vung chon VAT NGANG 2 man (anh Tien 25/08: khoanh
     // ca 2 man ma luu chi co 1 man).
-    const layers = list.map((x) => ({
-      x: x.display.bounds.x, y: x.display.bounds.y,
-      w: x.display.bounds.width, h: x.display.bounds.height,
-      sf: x.sf, dataUrl: x.jpeg,
-    }))
+    const layers = list.map((x) => {
+      const m = manCache.find((mm) => mm.id === x.display.id) || {}
+      return {
+        x: x.display.bounds.x, y: x.display.bounds.y,
+        w: x.display.bounds.width, h: x.display.bounds.height,
+        sf: x.sf, dataUrl: x.jpeg,
+        px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
+      }
+    })
+    ghiLog('grab-xong layers=' + layers.length + ' [' +
+      list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph }).join(' | ') + ']')
     for (const win of overlayWins) {
       if (win.isDestroyed()) continue
       const item = list.find((x) => x.display.id === win._displayId)
@@ -312,6 +332,109 @@ function kickGrab() {
   })
 }
 
+/* Khoa mot-nguoi-keo: overlay nao mousedown TRUOC thi giu quyen; cac overlay khac
+   bo qua chuot (het canh 2 man cung chon -> 2 anh). Reset moi lan capture (cua so
+   moi). Renderer cung gui log su kien qua day. */
+ipcMain.on('overlay:lock', (e) => {
+  for (const w of overlayWins) {
+    if (!w.isDestroyed() && w.webContents.id !== e.sender.id) {
+      w.webContents.send('overlay:locked')
+    }
+  }
+})
+ipcMain.on('overlay:log', (_e, msg) => ghiLog('[overlay] ' + msg))
+
+/* ---------------------------------------------------------------------- */
+/* KEO CHON do MAIN theo doi — screen.getCursorScreenPoint() tra DIP toan  */
+/* cuc DUNG theo scale TUNG man (anh Tien 26/08: moi user mot cau hinh     */
+/* man/scale khac nhau; clientX cua renderer chi dung khi 2 man CUNG scale)*/
+/* ---------------------------------------------------------------------- */
+let dragOwnerId = null
+let dragAnchor = null
+let dragTimer = null
+let manCache = [] // {id, dip(bounds), sf, px, py, pw, ph} — phys tinh 1 lan/capture
+
+/** DIP -> pixel VAT LY (Windows). May khac Windows: xap xi qua sf man chua diem. */
+function raPhys(p) {
+  try { return screen.dipToScreenPoint(p) } catch (e) {
+    const d = screen.getDisplayNearestPoint(p)
+    const sf = d.scaleFactor || 1
+    return { x: Math.round(d.bounds.x * sf + (p.x - d.bounds.x) * sf),
+             y: Math.round(d.bounds.y * sf + (p.y - d.bounds.y) * sf) }
+  }
+}
+
+function napManCache() {
+  manCache = screen.getAllDisplays().map((d) => {
+    const goc = raPhys({ x: d.bounds.x, y: d.bounds.y })
+    const sf = d.scaleFactor || 1
+    return { id: d.id, dip: d.bounds, sf, px: goc.x, py: goc.y,
+             pw: Math.round(d.bounds.width * sf), ph: Math.round(d.bounds.height * sf) }
+  })
+}
+
+/* rect PHYS -> rect CUC BO (DIP) cua tung man de renderer ve. */
+function phatSelRect(rect) {
+  for (const w of overlayWins) {
+    if (w.isDestroyed()) continue
+    if (rect === null) { w.webContents.send('overlay:sel-rect', null); continue }
+    const m = manCache.find((x) => x.id === w._displayId)
+    if (!m) continue
+    w.webContents.send('overlay:sel-rect', {
+      x: (rect.x - m.px) / m.sf, y: (rect.y - m.py) / m.sf,
+      w: rect.w / m.sf, h: rect.h / m.sf,
+      physW: rect.w, physH: rect.h,
+      laChu: w.webContents.id === dragOwnerId,
+    })
+  }
+}
+
+function rectHienTai() {
+  const c = raPhys(screen.getCursorScreenPoint())
+  const x = Math.min(dragAnchor.x, c.x), y = Math.min(dragAnchor.y, c.y)
+  return { x, y, w: Math.abs(c.x - dragAnchor.x), h: Math.abs(c.y - dragAnchor.y) }
+}
+
+ipcMain.on('overlay:drag-start', (e) => {
+  dragOwnerId = e.sender.id
+  dragAnchor = raPhys(screen.getCursorScreenPoint())
+  ghiLog('drag-start anchor=' + JSON.stringify(dragAnchor))
+  if (dragTimer) clearInterval(dragTimer)
+  dragTimer = setInterval(() => phatSelRect(rectHienTai()), 16)
+})
+
+ipcMain.on('overlay:drag-end', (e) => {
+  if (dragTimer) { clearInterval(dragTimer); dragTimer = null }
+  if (!dragAnchor) return
+  const rect = rectHienTai()
+  dragAnchor = null
+  ghiLog('drag-end rect=' + JSON.stringify(rect))
+  if (rect.w < 8 || rect.h < 8) { ghiLog('huy (vung qua nho)'); closeOverlay(); return }
+  // Nam TRON mot man? (so bang PIXEL VAT LY — dung moi scale/do phan giai)
+  const chua = manCache.find((m) =>
+    rect.x >= m.px && rect.y >= m.py &&
+    rect.x + rect.w <= m.px + m.pw && rect.y + rect.h <= m.py + m.ph)
+  phatSelRect(rect) // dong bang khung hien tai tren moi man
+  if (chua) {
+    const win = overlayWins.find((w) => !w.isDestroyed() && w._displayId === chua.id)
+    if (win) {
+      ghiLog('vao annotate tren display=' + chua.id)
+      // rect CUC BO theo DIP man do (renderer lam viec bang CSS px)
+      win.webContents.send('overlay:annotate', {
+        x: (rect.x - chua.px) / chua.sf, y: (rect.y - chua.py) / chua.sf,
+        w: rect.w / chua.sf, h: rect.h / chua.sf,
+      })
+      win.focus() // phim Enter/Ctrl+C phai roi vao dung man nay
+      return
+    }
+  }
+  // Vat ngang nhieu man -> chu ghep theo PIXEL VAT LY (1:1 tung man, khong meo)
+  const owner = overlayWins.find((w) => !w.isDestroyed() && w.webContents.id === dragOwnerId)
+  ghiLog('composite (vat ngang, phys)')
+  if (owner) owner.webContents.send('overlay:composite', rect)
+  else closeOverlay()
+})
+
 
 /**
  * Chup TUNG man hinh -> mang { display, dataUrl, sf }. Moi man se co MOT overlay
@@ -322,25 +445,25 @@ function kickGrab() {
  */
 async function grabDisplaysList() {
   const displays = screen.getAllDisplays()
-  // Mot lan getSources cho MOI man (goi 2 lan cham gap doi). Thumbnail = man lon
-  // nhat de man 4K giu net.
-  const maxW = Math.max(...displays.map((d) => Math.round(d.size.width * (d.scaleFactor || 1))))
-  const maxH = Math.max(...displays.map((d) => Math.round(d.size.height * (d.scaleFactor || 1))))
-  const sources = await desktopCapturer.getSources({
-    types: ['screen'], thumbnailSize: { width: maxW, height: maxH }, fetchWindowIcons: false,
-  })
-  const out = []
-  for (const d of displays) {
-    let src = sources.find((s) => String(s.display_id) === String(d.id))
+  // ☠️ MOI man goi getSources RIENG voi thumbnailSize = NATIVE cua man do.
+  // Mot size chung thi man nho bi UPSCALE (do that 26/08: 2560x1441 tra ve
+  // 3840x2160 — mo + sai co luu). Grab chay NEN (overlay da hien) nen cham hon
+  // mot chut khong sao. Promise.all cho chay song song.
+  const boSung = await Promise.all(displays.map(async (d) => {
+    const sf = d.scaleFactor || 1
+    const w = Math.round(d.size.width * sf), h = Math.round(d.size.height * sf)
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'], thumbnailSize: { width: w, height: h }, fetchWindowIcons: false,
+    })
+    let src = sources.find((x) => String(x.display_id) === String(d.id))
     if (!src) { const idx = displays.findIndex((x) => x.id === d.id); src = sources[idx] || sources[0] }
-    if (!src || !src.thumbnail || src.thumbnail.isEmpty()) continue
-    // Giu anh GOC (full-res, cat khong mat net). Hien thi thi dung JPEG cho NHANH
-    // — ma hoa PNG 4K ton ~250ms/man, JPEG chi ~50ms va nhe hon nhieu.
+    if (!src || !src.thumbnail || src.thumbnail.isEmpty()) return null
     const img = src.thumbnail
+    // JPEG cho hien thi/ghep nhanh — PNG 4K ton ~250ms/man, JPEG ~50ms.
     const jpeg = 'data:image/jpeg;base64,' + img.toJPEG(90).toString('base64')
-    out.push({ display: d, image: img, jpeg, sf: d.scaleFactor || 1 })
-  }
-  return out
+    return { display: d, image: img, jpeg, sf }
+  }))
+  return boSung.filter(Boolean)
 }
 
 /** Chup 1 man hinh o do phan giai that (device px). Tra ve NativeImage. */
@@ -382,6 +505,10 @@ function openOverlays(displays) {
     })
     win._displayId = disp.id
     win.setAlwaysOnTop(true, 'screen-saver')
+    // ☠️ LOAI overlay khoi anh chup (WDA_EXCLUDEFROMCAPTURE): grab chay SAU khi
+    // overlay da hien -> khong co dong nay thi LOP MO 42% bi nuong vao anh ->
+    // "ket qua hinh bi toi" (anh Tien 26/08). Co dong nay grab ra man hinh SACH.
+    win.setContentProtection(true)
     overlayWins.push(win)
 
     // ☠️ Nho wcId NGAY BAY GIO — 'closed' thi webContents da huy (vap 24-25/08).
@@ -421,7 +548,13 @@ function closeOverlay() {
 
 // Renderer gui { rect } (khong ve shape -> main cat full-res, net) HOAC
 // { dataUrl } (co ve shape -> renderer da ghep san bang canvas).
-ipcMain.on('overlay:confirm', (e, payload) => handleConfirm(e.sender.id, payload))
+ipcMain.on('overlay:confirm', (e, payload) => {
+  const shot = overlayShots.get(e.sender.id)
+  ghiLog('confirm tu display=' + (shot && shot.display ? shot.display.id : '?') +
+    ' kieu=' + (payload && payload.dataUrl ? 'dataUrl(' + payload.dataUrl.length + ')' : 'rect') +
+    (payload && payload.rect ? ' rect=' + JSON.stringify(payload.rect) : ''))
+  handleConfirm(e.sender.id, payload)
+})
 
 async function handleConfirm(wcId, payload) {
   const shot = overlayShots.get(wcId)
@@ -449,10 +582,15 @@ async function handleConfirm(wcId, payload) {
       image = item && item.image
     }
     if (!image) return
-    const cx = Math.max(0, Math.round(rect.x * sf))
-    const cy = Math.max(0, Math.round(rect.y * sf))
-    const cw = Math.max(1, Math.round(rect.w * sf))
-    const ch = Math.max(1, Math.round(rect.h * sf))
+    // ☠️ Quy doi theo kich thuoc anh THAT (desktopCapturer co the tra anh khong
+    // dung co native) — k = anh-that / (DIP man * sf).
+    const isz = image.getSize()
+    const kx = isz.width / (display.bounds.width * sf)
+    const ky = isz.height / (display.bounds.height * sf)
+    const cx = Math.max(0, Math.round(rect.x * sf * kx))
+    const cy = Math.max(0, Math.round(rect.y * sf * ky))
+    const cw = Math.max(1, Math.round(rect.w * sf * kx))
+    const ch = Math.max(1, Math.round(rect.h * sf * ky))
     try {
       cropped = image.crop({ x: cx, y: cy, width: cw, height: ch })
     } catch (err) {
@@ -468,6 +606,8 @@ async function handleConfirm(wcId, payload) {
 
   // 1) Luu file THAT tren dia truoc — tat app khong mat anh.
   const filePath = kho.luuAnh(cropped)
+  const _sz = cropped.getSize()
+  ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height)
   // 2) Vao khay (cho gom moi tam da chup). Khay tu hien len.
   //    ☠️ Anh Tien chot 25/08: chup xong CHI vao khay, KHONG bung anh ghim noi.
   //    Muon ghim len man hinh thi bam thumbnail trong khay (shelf:pin van con).
@@ -481,7 +621,7 @@ async function handleConfirm(wcId, payload) {
   }
 }
 
-ipcMain.on('overlay:cancel', () => closeOverlay())
+ipcMain.on('overlay:cancel', () => { ghiLog('cancel'); closeOverlay() })
 
 /* ---------------------------------------------------------------------- */
 /* KEO CUA SO — dung chung cho khay va cua so ghim                         */

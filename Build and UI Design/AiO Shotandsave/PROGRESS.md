@@ -10,6 +10,114 @@
 
 
 
+
+
+
+## 2026-08-26 11:31 — GHEP THEO PIXEL VAT LY: dung ti le voi MOI cau hinh man/scale
+
+### Anh Tien: "chua dung ti le vung chup khi 2 man khac do phan giai/kich thuoc"
+DO THAT ra cau hinh that cua may: man 27" = 3840x2160 @150%, man 24" =
+**2560x1441 @125%** — 2 SCALE KHAC NHAU (truoc gio tuong cung 150%).
+
+### 3 loi goc tim ra bang so + log
+1. Ghep theo DIP: 2 man khac scale thi phan man 24" bi PHONG 1.2x so voi man
+   27" -> "chua dung ti le". Sua: ghep theo PIXEL VAT LY (nhu Snipping Tool) —
+   moi man dan 1:1 anh goc, khong scale, khong meo. Theo doi keo cung bang phys
+   (screen.dipToScreenPoint), chua/annotate/composite deu quyet bang phys bounds.
+2. ☠️ desktopCapturer voi MOT thumbnailSize chung UPSCALE man nho (2560x1441 tra
+   ve 3840x2160 — mo + sai co luu). Sua: goi getSources RIENG tung man voi size
+   native (Promise.all; grab chay nen nen khong anh huong do tre overlay).
+   Kem guard: moi duong cat/ghep tu do kich thuoc anh THAT roi quy doi (kx,ky).
+3. ☠️ onFrozen chep layers lam ROI px/py/pw/ph -> composite khong bao gio san
+   sang -> retry 15 lan -> fallback NaN (khong luu gi). Sua: chep du truong.
+
+### Kiem chung bang so (log chuoi day du)
+- frozen OK: px=0,0 3840x2160 | px=-2560,712 2560x1441, anh NATIVE tung man.
+- Keo vat 2 man: drag-end phys {-834,783,1334x516} -> composite 1:1 ->
+  luu **1334x516 KHOP TUNG PIXEL** voi duong chuot that. Mo anh: du 2 man,
+  chu net ca 2 ben, khong con lech ti le. selftest sach.
+- Nhan kich thuoc khi keo (gSize) nay hien theo PIXEL VAT LY = dung voi file luu.
+
+### ☠️ Bay THUOC DO moi (ghi de khoi vap lai)
+SetProcessDPIAware (system-aware) chi dung toa do 1:1 tren MAN CHINH —
+SetCursorPos len man phu khac scale bi Windows quy doi lech (do duoc: dat
+(-1000,940) -> chuot that (-834,783), he so 1.25/1.5). Test chuot xuyen man
+tren may mixed-DPI phai dung Per-Monitor-V2 context, hoac doi chieu vi tri
+THAT qua log cua app (cach da dung). Va: chay SendInput khi ANH TIEN dang cam
+chuot that = hai nguon input danh nhau, ket qua nhiem — phai bao anh dung tay
+hoac nho anh tu keo.
+
+### Cho anh Tien kiem tay
+May em khong the tu dat chuot chinh xac len man 125% (bay tren) — nho anh keo
+vai nhat: 1 man 27", 1 man 24", vat 2 man; doi chieu nhan kich thuoc vs file.
+
+## 2026-08-26 11:22 — KHUNG CAM hien tren man kia (khong vet) + toa do DUNG MOI SCALE
+
+### Anh Tien yeu cau 2 viec (26/08)
+1. Keo tu man 24" sang 27" phai THAY khung cam ben man 27" — nhung khong duoc
+   tai phat vet sang/toi (ly do hom qua go guong).
+2. ☠️ "Moi user mot cau hinh man/scale khac nhau" — toa do phai dung voi moi
+   do phan giai / ti le / scale, khong chi may anh (2 man cung 150%).
+
+### Sua goc — chuyen theo doi keo chon ve MAIN
+Lo hong that: clientX cua renderer quy doi theo scale cua CUA SO DANG KEO —
+2 man khac scale (100%/125%...) la toa do phan ben kia SAI. Nay:
+- mousedown -> 'overlay:drag-start'; MAIN neo diem + interval 16ms doc
+  `screen.getCursorScreenPoint()` (DIP toan cuc, Electron tu quy doi DUNG theo
+  scale TUNG man) -> phat 'overlay:sel-rect' {rect, laChu} cho MOI overlay.
+- Moi man tu ve PHAN GIAO: khung cam + 4 TAM MO quanh no (#guong) — khong
+  box-shadow nen khong the tai phat vet sang/toi. laChu hien nhan kich thuoc.
+- mouseup -> 'overlay:drag-end': MAIN chot vung, so voi bounds DIP tung man:
+  nam tron 1 man -> 'overlay:annotate' (rect cuc bo, focus man do de Enter/Ctrl+C
+  roi dung cho); vat ngang -> 'overlay:composite' cho chu ghep. Duoi 8px -> huy.
+
+### Kiem chung bang so (log dieu phoi + file)
+- 1 man: drag-end rect 400x266 DIP -> "vao annotate" -> ve khung -> Enter ->
+  luu **600x399** (=400x266 x1.5, khop TUNG pixel).
+- Vat 2 man: drag-end {-800,544,1133x322} -> "composite (vat ngang)" -> luu
+  **1700x483** (=1133x322 x1.5) — mo anh: du noi dung CA 2 man, sang dung.
+- Log guong (lan do truoc): 4 tam + khung bam chuot tung nhip 16ms.
+- selftest sach. ☠️ Thuoc CopyFromScreen KHONG THAY overlay (setContentProtection
+  loai no khoi capture) — muon kiem guong phai capturePage hoac mat nguoi.
+
+### Gioi han con lai
+May anh 2 man cung 150% nen chua co doi chung THUC TE cho truong hop 2 scale
+KHAC nhau — thiet ke moi dung getCursorScreenPoint la dung ve nguyen ly voi moi
+scale, nhung chua do tren may that co scale lech. Ghi de test khi co may.
+
+## 2026-08-26 11:11 — SUA 3 LOI 2-MAN (toi/thieu man/2 anh) + NHAT KY CHAY + bai hoc kiem thu
+
+### Anh Tien bao 3 loi (26/08 sang) + phe binh dung: "lam xong khong kiem truoc khi bao"
+1. Anh ket qua BI TOI (thay ro khi keo vao Premiere).
+2. Chup vat 2 man -> ket qua chi co 1 man.
+3. Khay luc nhan 1 anh, luc nhan 2 anh.
+
+### Nguyen nhan + sua
+1. TOI: grab chay SAU khi overlay hien -> lop mo 42% bi NUONG vao anh chup.
+   Truoc gio selftest "sach" la nho RACE hen (grab snapshot truoc khi dim paint).
+   Sua GOC: `win.setContentProtection(true)` cho overlay (WDA_EXCLUDEFROMCAPTURE)
+   -> Windows loai overlay khoi moi anh chup, het hen xui.
+   DO: ti le sang anh-luu / man-goc = **0.98** (dinh mo se ra 0.58).
+2. THIEU MAN + ANH TRANG 590 byte: confirmComposite chi cho layersReady — anh
+   hong/chua nap van "xong" (onerror cung dem) -> drawImage im lang -> trang/thieu.
+   Sua: guard `img.complete && naturalWidth>0` cho MOI man giao; chua san sang
+   thi retry 200ms toi da 15 lan; het duong -> fallback cat phan man minh; try/catch.
+   DO: keo vat 2 man ra **1601x581 va 5072x1239 (chinh anh Tien chup) — du CA 2 man**.
+3. HAI ANH: them KHOA mot-nguoi-keo ('overlay:lock' relay) — man nao mousedown
+   truoc giu quyen, man kia bo qua chuot. DO: moi luot chup ra DUNG 1 file.
+
+### NHAT KY CHAY (.run-log.txt, luon bat, gitignore, tu cat 300KB)
+Ghi: capture-start / grab-xong (layout man) / mousedown-mouseup (origin, rect) /
+composite (OK-cho-retry-fallback) / confirm (kieu, kich thuoc) / luu (ten file).
+La "duong ghi lai cho tool lam sai ngay luc dang dung" theo luat san pham.
+
+### ☠️ BAI HOC KIEM THU (anh Tien day thang)
+Selftest duong dep 1 man KHONG PHAI la kiem. Tu nay truoc khi bao xong cho tool
+chup man hinh: (a) do TI LE SANG anh luu vs man goc; (b) chay ca duong vat 2 man
+tu CA HAI phia; (c) dem so file sinh ra moi luot; (d) doc .run-log.txt doi chieu.
+Cai bay sau: mot phep kiem TUNG XANH nho race (grab nhanh hon dim paint) —
+xanh khong co nghia la dung, phai hieu VI SAO no xanh.
+
 ## 2026-08-26 08:56 — THIET KE LAI man Cai dat (than thien hon — anh Tien yeu cau)
 
 Ap bai hoc so thiet ke #5: "mot man mot CTA chinh — nguoi dung that tung che

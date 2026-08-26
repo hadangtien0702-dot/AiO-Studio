@@ -12,6 +12,14 @@
   <div id="shot"></div>
   <div id="dim"></div>
   <div id="sel" hidden><div id="size"></div></div>
+  <!-- Guong vung chon tu man KHAC: 4 tam mo + khung cam phan giao (KHONG dung
+       box-shadow — cach do gay vet sang/toi khi rect ngoai ria, vap 25/08). -->
+  <div id="guong" hidden>
+    <div class="g-dim" id="g-t"></div><div class="g-dim" id="g-b"></div>
+    <div class="g-dim" id="g-l"></div><div class="g-dim" id="g-r"></div>
+    <div id="g-khung"></div>
+    <div id="g-size" hidden></div>
+  </div>
   <!-- Lop ve shape (khung/mui ten) — nam TREN vung chon khi annotate. -->
   <canvas id="ve" hidden></canvas>
   <!-- Thanh cong cu ve — hien sau khi chon vung xong. -->

@@ -48,6 +48,20 @@ html, body {
 /* Neu sat mep tren, day nhan xuong trong khung. */
 #size.inside { top: 4px; left: 4px; }
 
+/* Guong vung chon tu man khac — phan giao sang, xung quanh mo deu. */
+#guong { pointer-events: none; }
+.g-dim { position: fixed; background: rgb(0 0 0 / 42%); }
+#g-khung { position: fixed; border: 1px solid var(--accent); }
+#g-size {
+  position: fixed;
+  height: 20px; padding: 0 var(--sp-2);
+  display: flex; align-items: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+  color: var(--accent-on); background: var(--accent);
+  border-radius: var(--r-sm); white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
 /* Canvas ve shape — nam TREN vung chon. */
 #ve {
   position: fixed; z-index: 5;
