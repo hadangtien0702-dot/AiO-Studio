@@ -42,7 +42,7 @@ body { display: flex; flex-direction: column; }
 
 .dong {
   display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border: none; border-radius: var(--r-sm);
+  width: 28px; height: 28px; border: none; border-radius: 50%; /* tron dong bo */
   background: transparent; color: var(--icon-dim, var(--text-3)); cursor: pointer;
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
@@ -138,7 +138,7 @@ main {
 /* ── Nut ─────────────────────────────────────────────────────────────── */
 .nut {
   height: 34px; padding: 0 var(--sp-4);
-  border: 1px solid var(--line-2); border-radius: var(--r-md);
+  border: 1px solid var(--line-2); border-radius: var(--r-pill); /* dong bo bo tron (anh Tien 26/08) */
   background: var(--bg-1); color: var(--text-1);
   font-size: 12.5px; font-weight: 600; cursor: pointer;
   white-space: nowrap;
@@ -161,3 +161,26 @@ main {
   padding: 0 0 var(--sp-3);
   font-size: 10.5px; color: var(--text-3); letter-spacing: 0.3px;
 }
+
+/* ── Hang chon (dinh dang / chat luong anh) ──────────────────────────── */
+.hang-chon {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-3); margin-bottom: var(--sp-2);
+}
+.nhan-chon { font-size: 12.5px; color: var(--text-2); font-weight: 600; }
+.chon-nhom {
+  display: flex; padding: 2px;
+  background: var(--bg-0);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+}
+.chon-nut {
+  border: none; background: transparent; cursor: pointer;
+  padding: 5px 14px; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 700; color: var(--text-3);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chon-nut:hover { color: var(--text-1); }
+.chon-nut.chon { background: var(--accent); color: var(--accent-on, #fff); font-size: 13px; }
+/* PNG = lossless, khong can chon chat luong -> lam mo hang nay */
+#hang-chat-luong.mo { opacity: 0.45; pointer-events: none; }

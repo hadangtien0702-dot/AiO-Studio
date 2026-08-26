@@ -191,12 +191,23 @@ function setHotkey(accel) {
   return { ok: true, hotkey: accel }
 }
 
+/* Dinh dang luu anh tu config (anh Tien 26/08): mac dinh JPEG chat luong CAO. */
+// Anh Tien 26/08: "basic nhat cung phai ~100KB" — nang toan bo thang chat luong.
+// Do that vung 1200x700 man 4K: q95~101KB, nen thap=95, cao=98, sieu=100.
+const CHAT_LUONG_Q = { thap: 95, cao: 98, sieu: 100 }
+function layDinhDangAnh() {
+  const c = kho.docCauHinh()
+  const loai = c.anhLoai === 'png' ? 'png' : 'jpeg'
+  const q = CHAT_LUONG_Q[c.anhChatLuong] || CHAT_LUONG_Q.cao
+  return { loai, q }
+}
+
 /* --- Cua so Cai dat --- */
 let settingsWin = null
 function openSettings() {
   if (settingsWin && !settingsWin.isDestroyed()) { settingsWin.show(); settingsWin.focus(); return }
   settingsWin = new BrowserWindow({
-    width: 440, height: 442, resizable: false, minimizable: false,
+    width: 440, height: 584, resizable: false, minimizable: false,
     maximizable: false, fullscreenable: false,
     frame: false, // header rieng co logo AiO (xem settings/index.html)
     title: 'AiO Shot & Save - Cai dat', backgroundColor: '#141414', show: false,
@@ -211,10 +222,25 @@ function openSettings() {
   settingsWin.on('closed', () => { settingsWin = null })
 }
 
-ipcMain.handle('settings:get', () => ({
-  hotkey: currentHotkey, def: DEFAULT_HOTKEY, isMac: process.platform === 'darwin',
-  saveFolder: kho.thuMucAnh(), lang, version: app.getVersion(),
-}))
+ipcMain.handle('settings:get', () => {
+  const c = kho.docCauHinh()
+  return {
+    hotkey: currentHotkey, def: DEFAULT_HOTKEY, isMac: process.platform === 'darwin',
+    saveFolder: kho.thuMucAnh(), lang, version: app.getVersion(),
+    anhLoai: c.anhLoai === 'png' ? 'png' : 'jpeg',
+    anhChatLuong: CHAT_LUONG_Q[c.anhChatLuong] ? c.anhChatLuong : 'cao',
+  }
+})
+
+/* Doi dinh dang / chat luong anh — ap dung ngay tu lan chup sau. */
+ipcMain.handle('settings:set-anh', (_e, d) => {
+  const patch = {}
+  if (d && (d.anhLoai === 'png' || d.anhLoai === 'jpeg')) patch.anhLoai = d.anhLoai
+  if (d && CHAT_LUONG_Q[d.anhChatLuong]) patch.anhChatLuong = d.anhChatLuong
+  kho.ghiCauHinh(patch)
+  ghiLog('doi dinh dang anh: ' + JSON.stringify(patch))
+  return layDinhDangAnh()
+})
 
 // Preload nap lang DONG BO luc khoi tao renderer.
 ipcMain.on('i18n:lang', (e) => { e.returnValue = lang })
@@ -301,6 +327,7 @@ async function startCapture() {
 function kickGrab() {
   if (grabStarted) return
   grabStarted = true
+  const _tg = Date.now() // TAM do gio
   grabPromise = grabDisplaysList().catch((e) => {
     if (IS_DEV) console.error('[shotandsave] grab loi', e)
     return []
@@ -314,11 +341,11 @@ function kickGrab() {
       return {
         x: x.display.bounds.x, y: x.display.bounds.y,
         w: x.display.bounds.width, h: x.display.bounds.height,
-        sf: x.sf, dataUrl: x.jpeg,
+        sf: x.sf, dataUrl: x.dataUrl,
         px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
       }
     })
-    ghiLog('grab-xong layers=' + layers.length + ' [' +
+    ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms layers=' + layers.length + ' [' +
       list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph }).join(' | ') + ']')
     for (const win of overlayWins) {
       if (win.isDestroyed()) continue
@@ -459,9 +486,11 @@ async function grabDisplaysList() {
     if (!src) { const idx = displays.findIndex((x) => x.id === d.id); src = sources[idx] || sources[0] }
     if (!src || !src.thumbnail || src.thumbnail.isEmpty()) return null
     const img = src.thumbnail
-    // JPEG cho hien thi/ghep nhanh — PNG 4K ton ~250ms/man, JPEG ~50ms.
-    const jpeg = 'data:image/jpeg;base64,' + img.toJPEG(90).toString('base64')
-    return { display: d, image: img, jpeg, sf }
+    // ☠️ PNG (lossless) chu KHONG JPEG: anh co shape / vat 2 man ghep tu lop nay
+    // — JPEG 90 la chu nho co vien nhieu khi zoom (khong xung tool cho editor).
+    // PNG 4K ton ~250ms/man nhung grab chay NEN (overlay da hien) nen khong sao.
+    const dataUrl = 'data:image/png;base64,' + img.toPNG().toString('base64')
+    return { display: d, image: img, dataUrl, sf }
   }))
   return boSung.filter(Boolean)
 }
@@ -604,8 +633,9 @@ async function handleConfirm(wcId, payload) {
   //    25/08. Van vao khay binh thuong o duoi.
   if (payload.copy) { try { clipboard.writeImage(cropped) } catch (e) {} }
 
-  // 1) Luu file THAT tren dia truoc — tat app khong mat anh.
-  const filePath = kho.luuAnh(cropped)
+  // 1) Luu file THAT tren dia truoc — tat app khong mat anh. Dinh dang theo
+  //    cai dat nguoi dung (JPEG/PNG + chat luong).
+  const filePath = kho.luuAnh(cropped, layDinhDangAnh())
   const _sz = cropped.getSize()
   ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height)
   // 2) Vao khay (cho gom moi tam da chup). Khay tu hien len.
@@ -810,8 +840,12 @@ function shelfAdd(image, filePath) {
 
   // Thumbnail nho de gui qua IPC cho nhe — anh goc van giu trong shelfItems.
   const thumb = image.resize({ height: 128, quality: 'good' }).toDataURL()
+  // Kem kich thuoc + dung luong de khay hien cho nguoi dung (anh Tien 26/08).
+  const sz = image.getSize()
+  let kb = 0
+  try { kb = Math.round(fs.statSync(filePath).size / 1024) } catch (e) {}
 
-  const send = () => w.webContents.send('shelf:add', { id, thumb, filePath })
+  const send = () => w.webContents.send('shelf:add', { id, thumb, filePath, w: sz.width, h: sz.height, kb })
   if (w.webContents.isLoading()) {
     w.webContents.once('did-finish-load', send)
   } else {

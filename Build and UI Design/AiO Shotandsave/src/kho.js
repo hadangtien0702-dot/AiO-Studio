@@ -42,12 +42,12 @@ function baoDamThuMuc(dir) {
 }
 
 /** Ten file theo thoi diem chup: AiO-2026-08-24-231530.png */
-function tenTheoGio(d) {
+function tenTheoGio(d, duoi) {
   const p = (n, k) => String(n).padStart(k || 2, '0')
   return (
     'AiO-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
     '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) +
-    '-' + p(d.getMilliseconds(), 3) + '.png'
+    '-' + p(d.getMilliseconds(), 3) + '.' + (duoi || 'png')
   )
 }
 
@@ -55,11 +55,18 @@ function tenTheoGio(d) {
  * Ghi mot NativeImage ra file PNG. Tra ve duong dan, hoac null neu that bai
  * (khong nem — mat anh tren dia thi van con anh ghim, dung lam sap app).
  */
-function luuAnh(image) {
+/**
+ * Luu anh theo dinh dang nguoi dung chon (anh Tien 26/08):
+ * dd = { loai: 'jpeg' | 'png', q: 60|85|95 }. Mac dinh jpeg q85 ("cao").
+ * PNG luon lossless (q khong ap dung).
+ */
+function luuAnh(image, dd) {
   try {
+    const loai = (dd && dd.loai) === 'png' ? 'png' : 'jpeg'
+    const q = (dd && dd.q) || 85
     const dir = baoDamThuMuc(thuMucAnh())
-    const file = path.join(dir, tenTheoGio(new Date()))
-    fs.writeFileSync(file, image.toPNG())
+    const file = path.join(dir, tenTheoGio(new Date(), loai === 'png' ? 'png' : 'jpg'))
+    fs.writeFileSync(file, loai === 'png' ? image.toPNG() : image.toJPEG(q))
     return file
   } catch (err) {
     console.error('[kho] khong luu duoc anh:', err)

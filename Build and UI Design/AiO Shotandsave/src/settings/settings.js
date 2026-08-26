@@ -20,6 +20,9 @@ const btnOpen = document.getElementById('open-folder')
 const msgFolder = document.getElementById('msg-folder')
 const langBox = document.getElementById('lang')
 const btnClose = document.getElementById('close')
+const loaiBox = document.getElementById('anh-loai')
+const clBox = document.getElementById('anh-chat-luong')
+const hangCL = document.getElementById('hang-chat-luong')
 const verEl = document.getElementById('ver')
 
 let isMac = false
@@ -89,12 +92,25 @@ function datFolder(p) {
   folderTen.textContent = ten
 }
 
+/* Danh dau nut dang chon trong mot nhom pill. */
+function chonPill(box, v) {
+  box.querySelectorAll('.chon-nut').forEach((b) => b.classList.toggle('chon', b.dataset.v === v))
+}
+
+function datAnh(loai, chatLuong) {
+  chonPill(loaiBox, loai)
+  chonPill(clBox, chatLuong)
+  // PNG luon lossless -> lam mo hang chat luong (khong ap dung)
+  hangCL.classList.toggle('mo', loai === 'png')
+}
+
 async function load() {
   dichGiaoDien()
   const s = await window.settings.get()
   isMac = s.isMac
   hotkey = s.hotkey
   datFolder(s.saveFolder)
+  datAnh(s.anhLoai, s.anhChatLuong)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
@@ -110,6 +126,21 @@ langBox.addEventListener('click', async (e) => {
   await window.settings.setLang(b.dataset.lang) // main reload cua so -> load() lai
 })
 btnClose.addEventListener('click', () => window.settings.close())
+
+/* ── Dinh dang / chat luong anh ───────────────────────────────────────── */
+loaiBox.addEventListener('click', async (e) => {
+  const b = e.target.closest('.chon-nut')
+  if (!b || b.classList.contains('chon')) return
+  const cl = clBox.querySelector('.chon-nut.chon')
+  datAnh(b.dataset.v, cl ? cl.dataset.v : 'cao')
+  await window.settings.setAnh({ anhLoai: b.dataset.v })
+})
+clBox.addEventListener('click', async (e) => {
+  const b = e.target.closest('.chon-nut')
+  if (!b || b.classList.contains('chon')) return
+  chonPill(clBox, b.dataset.v)
+  await window.settings.setAnh({ anhChatLuong: b.dataset.v })
+})
 
 /* ── Ghi phim ─────────────────────────────────────────────────────────── */
 const CODE_PUNCT = {

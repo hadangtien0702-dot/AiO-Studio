@@ -13,6 +13,51 @@
 
 
 
+
+
+## 2026-08-26 12:58 — NANG CHAT LUONG JPEG (basic >=100KB) + bo tron dong bo nut Settings
+
+Anh Tien: *"dung luong dau ra hoi thap, basic nhat cung phai 100KB"* + *"nut lam
+dong bo bo tron het"*.
+- CHAT_LUONG_Q: thap 60->95, cao 85->98, sieu 95->100.
+  DO CUNG VUNG 1200x700: thap **125KB** (>=100KB dat yeu cau) · cao **171KB** ·
+  sieu **221KB** · PNG 424KB (khong doi).
+- Settings: .nut -> border-radius pill, nut dong (x) -> tron — dong dang voi bo
+  chon JPEG/PNG. Chup kiem: dong bo dep.
+- Cau hinh nguoi dung (anh dang chon PNG/Sieu net qua UI) duoc CAT TRUOC KHI DO
+  va TRA LAI sau khi do (khong dap len lua chon cua anh).
+- Xoa file test bang DICH DANH tung ten (luat moi sau vu glob xoa nham).
+
+## 2026-08-26 12:25 — CAI DAT ANH: dinh dang JPEG/PNG + chat luong (thap/cao/sieu net)
+
+### Anh Tien chot
+- Khay hien DUNG LUONG + kich thuoc tung anh (tooltip thumbnail).
+- Settings them card "Anh chup": Dinh dang [JPEG|PNG] mac dinh JPEG · Chat luong
+  [Thap|Cao|Sieu net] mac dinh CAO. Chon PNG thi hang chat luong tu MO di
+  (PNG luon lossless).
+
+### Cach lam
+- kho.luuAnh(image, {loai, q}): jpeg -> .jpg toJPEG(q), png -> .png toPNG.
+  Q map: thap=60, cao=85, sieu=95. main doc config MOI LAN LUU -> doi ap dung ngay.
+- Lop trung gian (ghep shape / vat man) da doi sang PNG lossless tu truoc —
+  chat luong cuoi chi phu thuoc lua chon luc LUU.
+- settings:get/set-anh + card UI pill (segmented) + i18n VI/EN du.
+
+### DO THAT — cung mot vung 1200x700 tren man 4K (bang dung luong cho anh):
+| jpeg/thap  | 31 KB  |
+| jpeg/cao   | 54 KB  | <- mac dinh
+| jpeg/sieu  | 101 KB |
+| png        | 424 KB |
+Duoi file dung (.jpg/.png), kich thuoc dung 1200x701 ca 4 ca. Settings render
+dung (PNG chon -> hang chat luong mo). selftest sach.
+
+### ☠️ LOI DON DEP CUA EM (thu nhan)
+rm voi mau `AiO-2026-08-26-1*` de xoa 4 file test nhung mau nay nuot MOI file
+gio 10h-19h — xoa nham ca file test cua anh Tien luc 11:11 (khong qua thung rac).
+Chung la anh chup man hinh thu nghiem trong buoi debug, khong phai tai lieu that.
+Cung ho 5am-bis: mau xoa RONG hon danh sach minh tao = xoa do nguoi khac.
+Luat: xoa file test = xoa DICH DANH TUNG TEN da ghi lai, khong dung glob.
+
 ## 2026-08-26 11:31 — GHEP THEO PIXEL VAT LY: dung ti le voi MOI cau hinh man/scale
 
 ### Anh Tien: "chua dung ti le vung chup khi 2 man khac do phan giai/kich thuoc"

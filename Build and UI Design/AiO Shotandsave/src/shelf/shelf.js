@@ -37,7 +37,10 @@ function themO(item) {
   el.className = 'item moi'
   el.setAttribute('role', 'listitem')
   el.dataset.id = String(item.id)
-  el.title = t('khay.oGhim')
+  // Tooltip: huong dan + kich thuoc + dung luong that cua file.
+  const dungLuong = item.kb >= 1024 ? (item.kb / 1024).toFixed(1) + ' MB' : item.kb + ' KB'
+  el.title = t('khay.oGhim') +
+    (item.w ? '\n' + item.w + ' × ' + item.h + ' px · ' + dungLuong : '')
 
   const img = document.createElement('img')
   img.src = item.thumb
