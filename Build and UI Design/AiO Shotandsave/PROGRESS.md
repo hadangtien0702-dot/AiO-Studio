@@ -8,6 +8,15 @@
 
 
 
+
+## 2026-08-26 08:48 — ✅ ANH TIEN DA TEST THAT: "app rat okie roi do em"
+
+Thuoc do ngoai (tay + mat anh Tien tren 2 man hinh that) da qua — theo luat
+"dung truoc khi ban". Pham vi da test: chup 1 man, cac sua loi trong ngay.
+Chot so: bump package.json 0.1.0 -> **0.3.1** (khop ten ban trong commit — tranh
+bay version lech kieu Auto Podcast). Them dong 12 vao TOOL_VERSION_TRACKER.
+Con de ban: dong goi bo cai .exe + ky so (chua lam).
+
 ## 2026-08-25 15:33 — BO khung "guong" man kia (het vet sang/toi chia doi)
 
 ### Boi canh

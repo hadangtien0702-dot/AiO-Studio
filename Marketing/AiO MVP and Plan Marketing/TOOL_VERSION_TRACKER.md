@@ -13,7 +13,7 @@
 
 ---
 
-## 1. BẢNG TỔNG — 11 app
+## 1. BẢNG TỔNG — 12 app
 
 | # | App | Bản | ID | Cổng | Trạng thái | Ghi chú thật |
 |:-:|---|:-:|---|:-:|:-:|---|
@@ -28,6 +28,7 @@
 | 9 | AiO Music & SFX | 1.0.0 | `com.aiostudio.music` | 8097 | 🟡 Đang làm | Có UI, chưa nối việc thật |
 | 10 | AiO Auto Cut Short | — | (dành `com.aiostudio.cutshort`) | 8093 | ⬜ **Chưa có code** | Chỉ có `CLAUDE.md` + `PROGRESS.md`. Chờ anh chốt 5 câu hỏi sản phẩm |
 | 11 | AiO Auto Organize Folder | — | — | — | ⬜ **Chưa có code** | Mới có `yêu cầu.txt` |
+| 12 | **AiO Shot & Save** | **0.3.1** | app Electron độc lập (KHÔNG CEP — version từ `package.json`, không có manifest) | — | ✅ **Anh Tiến đã test OK (25/08)** | Chụp vùng (Alt+`, đổi được) + khay ảnh + ghim sticky + vẽ khung/mũi tên 7 màu + Ctrl+C copy + kéo-thả file ra app khác + chụp VẮT NGANG 2 màn + song ngữ VI/EN. Chạy từ mã nguồn qua lối tắt Desktop; CHƯA đóng gói .exe |
 
 **Không phải app:** `AiO Design System` (file thiết kế anh chốt) · `design-system`
 (token dùng chung) · `AiO Git Public` · `Website/AiO WebDessign` (web bán hàng,
