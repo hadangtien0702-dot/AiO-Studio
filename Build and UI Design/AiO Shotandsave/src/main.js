@@ -48,7 +48,10 @@ if (IS_DEV || IS_SELFTEST) {
 
 /* Nhat ky chay nhe (LUON bat) — de nguoi dung gap loi la co dau vet ngay.
    File .run-log.txt canh ma nguon, da gitignore. Tu cat khi qua 300KB. */
-const RUN_LOG = path.join(__dirname, '..', '.run-log.txt')
+// Ban dong goi: __dirname nam trong app.asar (CHI DOC) — ghi log phai ra userData.
+const RUN_LOG = app.isPackaged
+  ? path.join(app.getPath('userData'), 'run-log.txt')
+  : path.join(__dirname, '..', '.run-log.txt')
 function ghiLog(msg) {
   try {
     const dong = new Date().toISOString().slice(11, 23) + ' ' + msg + '\n'

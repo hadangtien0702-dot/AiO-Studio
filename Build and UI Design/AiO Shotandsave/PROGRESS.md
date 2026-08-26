@@ -17,6 +17,37 @@
 
 
 
+
+## 2026-08-26 13:30 — DONG GOI BO CAI .EXE (electron-builder / NSIS) — DA CAI THU CHAY THAT
+
+### Lam gi
+- electron-builder 26.15.3, target NSIS mot-cu-bam, per-user (khong can Admin).
+- package.json: khoi `build` (appId com.aiostudio.shotandsave, icon app.ico,
+  artifact `AiO-Shot-and-Save-Setup-${version}.exe`) + script `npm run dist`.
+- ☠️ Vá truoc khi build: RUN_LOG nam trong app.asar (CHI DOC) o ban dong goi —
+  chuyen sang `userData/run-log.txt` khi `app.isPackaged` (log la duong cuu ho,
+  chet im la mat dau vet).
+- Ra: **AiO-Shot-and-Save-Setup-0.3.4.exe — 99 MB** ->
+  `Release/2026-08-26-shotandsave-0.3.4/` kem HUONG-DAN-CAI-DAT.txt (da MO DOC
+  LAI toan bo truoc khi dong — luat 3d).
+
+### KIEM THAT (khong tin build sach)
+- Cai lang le /S -> `%LOCALAPPDATA%\Programsio-shot-and-save\` du bo.
+- Chay ban CAI: 3 tien trinh; Alt+` (config chung %APPDATA%) -> keo -> Enter ->
+  **luu that** vao `Anh chup` canh exe; **run-log ghi vao userData** (va asar an).
+- File test ban cai da xoa dich danh.
+
+### ⚠️ Trang thai sau dong goi (phien sau + anh Tien can biet)
+- Bo cai NSIS TU DE loi tat Desktop cung ten -> loi tat Desktop + Start Menu
+  gio chay **BAN CAI v0.3.4** (khong con tro ban nguon). Ban nguon van o thu muc
+  du an, dev bang `npm start`.
+- File .exe 99MB KHONG len git (`*.exe` da ignore) — nam local o Release/;
+  gui may khac qua Drive/USB.
+- CHUA ky so: may la se dinh SmartScreen ("More info -> Run anyway") — da ghi
+  trong huong dan; mua chung chi khi ban chinh thuc.
+- CHUA thu tren may sach (khong co Node/nguon) — viec [CHO] ke tiep truoc khi
+  phat cho nguoi ngoai.
+
 ## 2026-08-26 13:19 — CHOT PHIEN (/xong): bump 0.3.4, push khay doc
 
 ### Trang thai hien tai (phien sau doc dau tien)

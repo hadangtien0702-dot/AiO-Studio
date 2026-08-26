@@ -8,9 +8,41 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev"
+    "dev": "electron . --dev",
+    "dist": "electron-builder --win nsis"
   },
   "devDependencies": {
-    "electron": "latest"
+    "electron": "latest",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.aiostudio.shotandsave",
+    "productName": "AiO Shot & Save",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/app.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "AiO-Shot-and-Save-Setup-${version}.exe",
+      "shortcutName": "AiO Shot & Save",
+      "runAfterFinish": true
+    }
   }
 }
