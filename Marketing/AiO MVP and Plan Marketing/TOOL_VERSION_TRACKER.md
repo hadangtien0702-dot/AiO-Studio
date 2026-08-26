@@ -23,8 +23,8 @@
 | 4 | AiO Transcripts | **2.5.5** | `com.aiostudio.transcript` | 8091 | 🟢 Chạy được | **22/08 đêm:** HAI NÚT — *Làm phụ đề* (caption C1) / *Làm hiệu ứng* (graphic MOGRT, chọn kiểu trong ô xổ) theo ý anh 22/08; vá 6 lỗi vòng soát (caption rơi dưới hình, chữ mẫu im lặng, karaoke < 1 khung, khối 1 từ không sáng, khối > 10 s, kiểu riêng không thay); E2E trên sequence tự tạo: 16/23 caption lên V3 trên hình, chạy lại THAY không chồng. ☠️ Đã đo: Premiere 27 KHÔNG cho API đặt chữ vào graphic native / upgrade caption → hiệu ứng vẫn là MOGRT AE (nặng hơn caption track). Chưa qua vòng anh dùng bài thật. **24/08: vá lỗi caption rơi sang sequence KHÁC** (`activeSequence` tự trôi về tab có tiêu điểm) — bẫy tái lập: ép trỏ sai, caption vẫn vào đúng sequence đang hiện |
 | 5 | AiO WELCOME | 1.5.0 | `com.aio.welcome` | 8087 | 🟢 Chạy được | Panel chào mừng |
 | 6 | AiO Auto Re-Frames | 0.5.0 | `com.aiostudio.reframe` | 8092 | 🟡 Đang làm | Dọc 9:16 bám chủ thể |
-| 7 | AiO Auto Guideline Frame | 0.2.0 | `com.aiostudio.guideframe` | 8096 | 🟡 Đang làm | Safe zone 10 nền tảng / 53 vùng |
-| 8 | AiO Auto Podcast | 0.1.0 | `com.aiostudio.podcast` | 8094 | 🟡 Đang làm | ☠️ Chạy đúng 588/588 nhưng **"cắt đúng NGƯỜI" chưa chứng minh được** |
+| 7 | AiO Auto Guideline Frame | 0.3.0 | `com.aiostudio.guideframe` | 8096 | 🟡 Đang làm | Safe zone 10 nền tảng / 53 vùng · **25/08:** vùng chọn In/Out — guide đặt đúng đoạn khoanh (ca có vùng chờ anh bấm thử trên Premiere) |
+| 8 | AiO Auto Podcast | 0.6.6 UI · 0.4.9 host (☠️ manifest CSXS còn 0.1.0, chưa từng bump — [CHỜ] anh gật mới sửa, đang đóng băng build) | `com.aiostudio.podcast` | 8094 | 🟢 Chạy được | ✅ **25\08: "cắt đúng NGƯỜI" ĐÃ GIẢI bằng tai anh Tiến** — liệu thật 40 phút 2 người + wide, KHÔNG mic rời (tiếng cam làm mic), 411 nhát, anh nghe "không thấy sai". Còn để bán: FFmpeg riêng · cài máy sạch · khoá gói |
 | 9 | AiO Music & SFX | 1.0.0 | `com.aiostudio.music` | 8097 | 🟡 Đang làm | Có UI, chưa nối việc thật |
 | 10 | AiO Auto Cut Short | — | (dành `com.aiostudio.cutshort`) | 8093 | ⬜ **Chưa có code** | Chỉ có `CLAUDE.md` + `PROGRESS.md`. Chờ anh chốt 5 câu hỏi sản phẩm |
 | 11 | AiO Auto Organize Folder | — | — | — | ⬜ **Chưa có code** | Mới có `yêu cầu.txt` |
@@ -54,7 +54,7 @@ Không có lifetime, không có gói năm. (Bản 13/08 ghi "3 tool free" đã *
 | Tốc độ: video 1 giờ ~19 phút | Autocut | Bước dựng ăn 83% (`overwriteClip` của Adobe). Cần xuất FCPXML |
 | Ba ca khó chưa đo | Autocut | Nhiều người + xa mic · nhạc nền · video >30 phút |
 | `color-scheme: dark` cho cả bộ | Transcripts + panel khác | Mới sửa riêng Autocut. Đưa lên `design-system/tokens.css` là chạm 4 panel, phải đo lại từng cái |
-| "Cắt đúng người" | Auto Podcast | Thước đo bị mù bởi chính vấn đề nó đo (tiếng lọt mic) |
+| Ca mic rời bleed nặng chưa có đáp án tai | Auto Podcast | 25\08 đã giải "cắt đúng người" cho ca tiếng-cam-làm-mic; riêng bộ Will–Trọng (mic rời, bleed nặng) 8 clip stereo `podcast-nghe-kiem-2` vẫn chờ anh chấm |
 | 5 câu hỏi sản phẩm | Auto Cut Short | Chờ anh Tiến chốt mới viết code |
 | **Bộ cài phải CÀI FONT** (Montserrat ×3 + Bangers, OFL, trong `fonts/`) | Transcripts | Caption MOGRT cần font trên máy khách; Montserrat có trên Adobe Fonts (tự sync) nhưng Bangers thì không. Chưa sửa `package-release.ps1`/bộ cài |
 | **Autocut đếm clip caption MOGRT như clip video** → từ chối chạy ("đổi tốc độ 2083%") trên sequence đã có caption AiO | Autocut | Cùng hàm `ac_getRangeClips`; Transcripts đã vá (bỏ qua `.mogrt`). Autocut ĐÓNG BĂNG → **hỏi anh** trước khi vá 1 dòng |
