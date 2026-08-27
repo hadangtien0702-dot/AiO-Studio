@@ -73,6 +73,8 @@ const DICH = {
     // Ghim
     'ghim.copy': 'Sao chép (Ctrl+C)',
     'ghim.dong': 'Đóng (Esc)',
+    'ghim.ve': 'Vẽ khung / mũi tên',
+    'ghim.veXong': 'Lưu nét vẽ (Enter)',
   },
   en: {
     'tray.chup': 'Capture area',
@@ -134,6 +136,8 @@ const DICH = {
     'khay.oXoa': 'Remove from shelf (file stays in folder)',
     'ghim.copy': 'Copy (Ctrl+C)',
     'ghim.dong': 'Close (Esc)',
+    'ghim.ve': 'Draw box / arrow',
+    'ghim.veXong': 'Save drawing (Enter)',
   },
 }
 

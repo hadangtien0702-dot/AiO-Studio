@@ -1,5 +1,80 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-27 15:58 — 0.3.6: GOI + CAI DE de het canh "sua roi van thay cu"
+
+### Boi canh
+Anh Tien bao "sua xong van bi vien" + gui anh YouTube: bat chup thi vung video
+bi che/mo ("luc bi luc khong"). Do lai: tien trinh dang chay la BAN CAI 0.3.4
+(`AppData\Local\Programs\aio-shot-and-save\`) — phien lam viec hom qua bi ngat
+lam app ban nguon tat, anh mo lai bang loi tat Desktop -> ra ban cu KHONG co
+fix nao. Anh YouTube xac nhan chan doan hom qua: video o lop phan cung, bo chup
+cu khong thay (YouTube lo nen mo ambient, TikTok ra trang — cung mot goc;
+"luc bi luc khong" = Windows luc dung lop phan cung luc khong).
+
+### Thay doi
+- Bump 0.3.6, `npm run dist`, CAI DE truc tiep len may (im lang /S) — tu gio
+  loi tat Desktop mo ra la ban co du: WGC chup video + het vien + VE len anh ghim.
+- `Release/2026-08-27-shotandsave-0.3.6/` (exe + HUONG-DAN da doc lai, muc MOI
+  ghi ca 3 thu).
+
+### Kiem chung
+- Cai de im lang OK; do tien trinh dang chay: `ProductVersion 0.3.6.0` tu
+  `AppData\Local\Programs\aio-shot-and-save\` — loi tat Desktop nay het lech.
+- Bo cai 103,7 MB da cat vao `Release/2026-08-27-shotandsave-0.3.6/`.
+- CHO anh Tien test tren chinh trang YouTube do: bat chup -> vung video phai
+  con nhin thay va anh luu ra phai co hinh video that. + 4 diem tinh nang VE
+  (dung cho / thumbnail doi / keo-tha ra ban da ve / Esc khong dong nham).
+
+
+## 2026-08-26 16:09 — v0.3.5 DONG GOI XONG + TINH NANG MOI: VE LEN ANH GHIM (CHO ANH TEST)
+
+### Boi canh
+1. Anh Tien xac nhan bang mat: "het vien roi" (fix bong do 15:57) + do file: 3/3
+   anh chup sau khi bat WGC deu co noi dung (218/369/616 KB), 0 anh trang
+   (anh trang chi 0-6 KB) -> ca 2 fix DAT -> dong goi 0.3.5.
+2. Anh xin them: bam thumbnail khay ra anh ghim (preview) thi muon VE o /
+   mui ten len anh do — truoc gio chi ve duoc LUC CHUP.
+
+### Thay doi
+**A. Dong goi 0.3.5** (2 fix da kiem: WGC chup video + het dai vien bong do):
+- package.json bump 0.3.4 -> 0.3.5; TOOL_VERSION_TRACKER dong 12 da sua.
+- `npm run dist` -> `Release/2026-08-26-shotandsave-0.3.5/` (.exe 99MB +
+  HUONG-DAN-CAI-DAT.txt da doc lai het, co muc "MOI TRONG BAN 0.3.5").
+  ⚠️ exe nay CHUA co tinh nang ve ben duoi — se dong goi lai khi anh test xong.
+
+**B. VE KHUNG/MUI TEN LEN ANH GHIM** (tai dung logic overlay.js):
+- `pin/index.html`: nut but (edit) tren #bar + canvas #ve + #toolbar (rect/
+  arrow/7 mau/undo/huy/xong — markup giong overlay).
+- `pin/pin.css`: style toolbar (copy tu overlay.css), canvas phu kin anh,
+  `.dang-ve` an #bar. Toolbar day duoi anh, flex-wrap cho anh nho.
+- `pin/pin.js`: viet lai co che do 've': ve toa do DIP tren canvas DPR;
+  Enter/✓ = ghep anh o DO PHAN GIAI THAT (naturalWidth, shape phong he so
+  k = natural/dip, lineWidth 3k) -> hien ngay + gui main. Esc dang ve = bo
+  ve (KHONG dong cua so); Ctrl+Z hoan tac; dang ve khong keo-tha file.
+- `preload-pin.js`: +saveEdit. `preload-shelf.js`: +onUpdate.
+- `main.js`: +ipc 'pin:save-edit' — ghi de DUNG file cu (giu dinh dang theo
+  duoi .png/.jpg, JPEG dung q tu cai dat), cap nhat rec.image (copy/keo-tha
+  dung ban da ve), lam moi thumbnail + dung luong o khay ('shelf:update').
+- `i18n.js`: +ghim.ve, +ghim.veXong (VI/EN).
+
+### File anh huong
+- src/main.js · src/i18n.js · src/pin/index.html · src/pin/pin.css ·
+  src/pin/pin.js (viet lai) · src/preload-pin.js · src/preload-shelf.js ·
+  src/shelf/shelf.js
+
+### Kiem chung
+- node --check 6/6 file OK. App nguon chay lai (3 tien trinh).
+- ☠️ CHUA test tay duong ve (moi truong nay khong bam chuot len pin duoc;
+  selftest hien thoat som khong ra anh — mon no rieng). Logic ve la ban sao
+  overlay.js da chay that nhieu ngay, phan MOI can mat nguoi: (1) ve dung cho,
+  (2) luu xong file + thumbnail khay doi theo, (3) keo-tha ra Premiere ra ban
+  DA VE, (4) Esc dang ve khong dong nham cua so.
+- CHO anh Tien test 4 diem tren -> dat thi dong goi 0.3.6.
+
+### Trang thai hien tai (phien sau doc dau tien)
+- v0.3.5 nguon = 0.3.5 exe + tinh nang ve (chua dong goi).
+- Ban CAI tren may van 0.3.4 (loi tat Desktop tro ban cai) — anh dang chay
+  ban NGUON. Cai 0.3.5.exe de len la het lech.
 
 
 
@@ -17,6 +92,112 @@
 
 
 
+
+
+
+## 2026-08-26 15:57 — TIM RA GOC "KHUNG VIEN XAU": BONG DO BI CHAT CUT, KHONG PHAI BORDER
+
+### Boi canh
+Sau khi doi vien CSS (muc 14:14) va chay ban NGUON, anh Tien ghim thu tren nen
+TOI cua Premiere: "phan vien van con y chang". Tren nen toi lan nen sang deu lo
+cung mot dai xam om quanh anh.
+
+### Nguyen nhan that
+KHONG phai duong border 1px (da doi ma khong doi gi). Thu pham la BONG DO:
+`--shadow-pop: 0 18px 52px` lan toi ~70px, nhung le trong suot quanh anh
+(PIN_PAD trong main.js) chi 12px -> bong bi CHAT NGANG tai mep cua so, thanh
+DAI XAM CO CANH THANG om quanh anh = chinh "cai khung vien xau".
+(Bai hoc: hieu ung CSS lan RONG HON vung cua so trong suot thi bi cat cung —
+nhin nhu mot phan tu co that. Doi mau/vien khong an thi soi KICH THUOC hieu ung
+so voi khoang chua no.)
+
+### Thay doi
+- `src/pin/pin.css` #frame: thay `var(--shadow-pop)` bang `0 2px 8px rgb(0 0 0/45%)`.
+  Giu vong den 1px (0 0 0 1px 32%).
+
+### File anh huong
+- `src/pin/pin.css` (2 dong + comment ☠️ ghi luat "offset+blur <= PIN_PAD").
+
+### Kiem chung bang so
+- Tinh tay: bong lan toi da 2+8 = 10px < 12px (PIN_PAD) -> nam gon trong le
+  trong suot, tu mo dan, khong con canh chat. (Bao dam THEO CAU TAO — rang buoc
+  nam trong con so, khong can do lai tung lan.)
+- Mat nguoi: CHO anh Tien dong ghim cu, bam lai thumbnail (cua so ghim moi moi
+  doc CSS moi) va xac nhan het dai xam.
+- Dau hieu tot kem theo: anh chup Premiere anh gui co DU khung video dang phat
+  (khong con o trang) -> WGC (muc 14:37) co ve DA AN; van cho anh chup them
+  vai phat tren video dang chay de chot.
+- Ca hai OK -> dong goi lai ban cai (npm run dist) de cai de.
+
+## 2026-08-26 14:37 — CHUP VUNG VIDEO RA TRANG -> EP BO CHUP WGC (CHO ANH TEST)
+
+### Boi canh
+Anh Tien chup video/hinh de LAY Y TUONG (reference cho dung phim). Chup vung dang
+co VIDEO PHAT (TikTok) thi anh luu ra TRANG TRON. Anh keu "video phat ma khong lay
+duoc y tuong la chet". Ban dau anh mo ta "khung vien xau" -> em SUA NHAM sang vien
+CSS (muc 14:14), anh bao "y nguyen".
+
+### Nguyen nhan that (da do, chac chan)
+- Mo file .png vua luu: TRANG TRON, chi con 1 cham xam goc tren (nut "IQ" cua
+  video). Nghia la bo chup BAT DUOC giao dien tinh, nhung VUNG VIDEO ra trang.
+- File 942x1386 chi 6KB (anh co noi dung ~300KB). Hom nay 2/nhieu anh trang
+  (0KB luc 09:57, 6KB luc 14:25) -> loi THI THOANG, dung luc video o lop overlay.
+- Goc: video tang toc phan cung nam o lop OVERLAY (multi-plane overlay). Bo chup
+  cu Desktop Duplication API doc bo mat desktop KHONG chua pixel video -> trang.
+  (Tra web xac nhan: "app hands window to GPU, never writes pixels into the
+  desktop surface Desktop Duplication reads".)
+
+### Thay doi
+- `src/main.js` (sau require electron, TRUOC app ready): bat feature WGC
+  `app.commandLine.appendSwitch('enable-features',
+   'AllowWgcScreenCapturer,AllowWgcWindowCapturer,AllowWgcZeroHz')`.
+  WGC (Windows Graphics Capture) = bo chup moi, CO doc lop overlay video.
+  Windows 11 >=22H2 khong con vien vang WGC (may anh Win11 26200 -> OK).
+
+### File anh huong
+- `src/main.js`: +8 dong (khoi appendSwitch).
+- (muc 14:14 truoc: `src/pin/pin.css` doi vien — VO HAI, khong lien quan loi nay;
+  cho anh Tien quyet giu hay tra ve.)
+
+### Kiem chung
+- ☠️ Da xac minh cong tac VAO lenh khoi dong: Win32_Process CommandLine co
+  'AllowWgc' (3 tien trinh electron.exe).
+- ☠️ CHUA co so do ket qua: em KHONG tu dung lai duoc canh video-overlay o day
+  (can video that dang phat). Thuoc do = TAI MAT ANH TIEN chup TikTok that.
+  CHO anh xac nhan: hinh video hien ra? con trang? co vien vang khong?
+- Neu WGC an -> dong goi lai ban cai, cai de. Neu khong -> thu cach khac.
+- ☠️ Ban CAI (%LOCALAPPDATA%\Programs\aio-shot-and-save) doc code trong app.asar,
+  KHONG thay sua nay; anh dang test tren ban NGUON (npm start). Da tat ban cai.
+
+## 2026-08-26 14:14 — SUA VIEN XAU CUA ANH GHIM (pin.css)
+
+### Boi canh
+Anh Tien bam thumbnail trong khay -> anh ghim noi len tren Facebook (nen trang).
+Anh chup man hinh, chi 2 mui ten vao 2 mep anh ghim: "cai khung vien xau qua".
+
+### Nguyen nhan that
+`#frame` trong pin.css dung `border: 1px solid var(--line-strong)` = vien TRANG
+16%. Tren anh chup nen sang thi vien trang chao/nhoe; tren vung toi thi lo khung.
+Vien trang la sai lua chon cho anh ghim noi tren nen bat ky.
+
+### Thay doi
+- Bo `border` trang. Thay bang VONG DEN 1px om ngoai qua box-shadow:
+  `box-shadow: 0 0 0 1px rgb(0 0 0 / 32%), var(--shadow-pop)` — tach anh khoi
+  nen (sang hay toi) ma khong choi, giong Snipaste.
+- Bo goc r-md (8px) -> r-sm (6px): anh chup bot bi cat goc.
+
+### File anh huong
+- `src/pin/pin.css` (#frame): doi 2 dong (border -> ring den, r-md -> r-sm).
+
+### Kiem chung
+- ☠️ CHUA co so do tren nen that. Selftest (`npm start -- --selftest --dev`) o
+  moi truong nay THOAT SOM, `.selftest/` rong (log chi co "khong dang ky duoc
+  phim tat", khong toi buoc chup) — nhieu kha nang desktopCapturer bi chan.
+- Va anh selftest nen XAM cung KHONG lo duoc loi nay (vien trang chi choi tren
+  nen SANG that) -> dung bai hoc "selftest 1 nen khong du".
+- Xac minh dung: anh Tien ghim thu tren Facebook that. CHO anh phan hoi.
+- Fix CSS thuan, KHONG can restart app: createPinWindow loadFile moi lan tao ->
+  bam lai thumbnail la ap CSS moi.
 
 ## 2026-08-26 13:30 — DONG GOI BO CAI .EXE (electron-builder / NSIS) — DA CAI THU CHAY THAT
 

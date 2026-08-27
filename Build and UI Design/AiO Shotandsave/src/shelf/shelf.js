@@ -92,6 +92,17 @@ window.shelf.onAdd((item) => {
   listEl.scrollLeft = 0
 })
 
+/* Anh ghim vua duoc VE them -> thay thumbnail + tooltip cua dung o do. */
+window.shelf.onUpdate((item) => {
+  const el = listEl.querySelector(`.item[data-id="${item.id}"]`)
+  if (!el) return
+  const im = el.querySelector('img')
+  if (im) im.src = item.thumb
+  const dungLuong = item.kb >= 1024 ? (item.kb / 1024).toFixed(1) + ' MB' : item.kb + ' KB'
+  el.title = t('khay.oGhim') +
+    (item.w ? '\n' + item.w + ' × ' + item.h + ' px · ' + dungLuong : '')
+})
+
 window.shelf.onRemove((id) => {
   const el = listEl.querySelector(`.item[data-id="${id}"]`)
   if (el) el.remove()

@@ -1,0 +1,57 @@
+==========================================================
+  AiO Shot & Save v0.3.6 — chup man hinh + khay + ghim
+  Ban dong goi ngay 27/08/2026 (electron-builder, NSIS)
+==========================================================
+
+MOI TRONG BAN 0.3.6
+-------------------
+- Chup duoc VUNG CO VIDEO DANG PHAT (TikTok, YouTube, preview
+  Premiere...). Ban truoc vung video ra khung TRANG / nen mo.
+- Het dai vien xam quanh anh ghim (bong do bi cat cut) — gio
+  anh ghim chi co vien toi 1px + bong mem sat mep.
+- VE LEN ANH DA GHIM: re chuot len anh ghim -> bam nut BUT ->
+  ve khung vuong / mui ten (7 mau), Ctrl+Z hoan tac, Enter luu.
+  Luu xong: file + thumbnail trong khay doi theo ban da ve.
+
+CAI DAT
+-------
+1. Chay file: AiO-Shot-and-Save-Setup-0.3.6.exe
+2. Bo cai MOT CU BAM (khong hoi gi), cai cho rieng nguoi dung
+   (khong can quyen Admin). Cai de len ban cu duoc luon.
+   Cai xong app TU MO va nam o khay he thong (icon AiO mau cam
+   canh dong ho).
+3. Loi tat nam o Start Menu + Desktop: "AiO Shot & Save".
+
+!! CANH BAO WINDOWS SMARTSCREEN !!
+Ban nay CHUA ky so (code-signing) nen lan dau chay Windows co
+the hien "Windows protected your PC":
+  -> bam "More info" -> "Run anyway".
+Day la gioi han da biet, se mua chung chi ky so khi ban chinh thuc.
+
+DUNG NHU THE NAO
+----------------
+- Phim tat chup mac dinh: Ctrl + Shift + S  (doi duoc trong Cai dat)
+- Bam phim tat -> keo chon vung (keo VAT NGANG 2 man hinh cung duoc)
+- Chon vung xong: ve khung / mui ten (7 mau), roi:
+    Enter hoac nut V  = luu vao khay
+    Ctrl + C          = luu vao khay + copy vao clipboard
+    Bam ra ngoai vung = chon lai vung khac
+    Esc               = huy
+- Anh nam trong KHAY (goc man hinh):
+    Bam thumbnail     = ghim anh noi len man hinh
+    KEO thumbnail     = tha file vao Premiere / Zalo / Messenger...
+    Re chuot          = xem kich thuoc + dung luong
+- Cai dat (chuot phai icon khay he thong -> Cai dat):
+    phim tat · dinh dang JPEG/PNG · chat luong · kieu khay
+    (ngang/doc) · thu muc luu · ngon ngu VI/EN
+
+ANH LUU O DAU
+-------------
+Mac dinh: thu muc "Anh chup" ngay canh cho cai app
+(%LOCALAPPDATA%\Programs\aio-shot-and-save\Anh chup).
+Doi duoc trong Cai dat -> Thu muc luu anh.
+
+GO CAI DAT
+----------
+Settings Windows -> Apps -> AiO Shot & Save -> Uninstall.
+(Anh da chup KHONG bi xoa khi go app.)

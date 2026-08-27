@@ -12,10 +12,14 @@ html, body {
 #frame {
   position: absolute;
   left: 50%; top: 50%; transform: translate(-50%, -50%);
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   overflow: hidden;
-  border: 1px solid var(--line-strong);
-  box-shadow: var(--shadow-pop);
+  /* KHONG dung border trang (chao tren anh sang, lo khung tren vung toi).
+     Vong den 1px om ngoai tach anh khoi nen ma khong choi.
+     ☠️ BONG PHAI NAM GON TRONG LE TRONG SUOT 12px (PIN_PAD): bong cu lan 52px
+     bi CHAT NGANG tai mep cua so -> thanh dai xam canh thang om quanh anh =
+     chinh "cai khung vien xau" anh Tien chi (26/08). offset+blur <= 12px. */
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 32%), 0 2px 8px rgb(0 0 0 / 45%);
   cursor: grab;
   background: var(--bg-2);
 }
@@ -55,3 +59,52 @@ html, body {
 #bar button:hover { background: var(--bg-hover); color: var(--text-1); }
 #bar #close:hover { background: var(--danger-strong); color: #fff; }
 #bar button:active { transform: scale(0.94); }
+
+/* ── Che do VE (khung / mui ten len anh ghim) ─────────────────────────── */
+
+/* Canvas ve — phu kin anh, chi hien khi dang ve. */
+#ve {
+  position: absolute; inset: 0;
+  cursor: crosshair;
+}
+/* Dang ve: an thanh tren (khoi vuong tay), khoa keo-di-chuyen tren anh. */
+#frame.dang-ve #bar { display: none; }
+#frame.dang-ve #img { cursor: crosshair; }
+
+/* Thanh cong cu ve — day duoi anh, giua. Tai dung style tu overlay.css. */
+#toolbar {
+  position: absolute; z-index: 10;
+  left: 50%; bottom: var(--sp-2);
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 2px;
+  flex-wrap: wrap; justify-content: center;
+  max-width: calc(100% - 12px);
+  padding: 5px;
+  background: rgb(22 22 22 / 97%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+}
+.cong-cu {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--text-2); cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.cong-cu:hover { background: var(--bg-hover); color: var(--text-1); }
+.cong-cu.chon { background: var(--accent-soft); color: var(--accent-text); }
+.cong-cu.xong { color: var(--ok, #35c46a); }
+.cong-cu.xong:hover { background: var(--ok, #35c46a); color: #fff; }
+.cong-cu.huy:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+.chia { width: 1px; height: 20px; background: var(--line-2); margin: 0 3px; }
+
+#mau-nhom { display: flex; align-items: center; gap: 4px; padding: 0 2px; }
+.mau {
+  width: 18px; height: 18px; padding: 0;
+  border: 2px solid transparent; border-radius: 50%;
+  cursor: pointer; box-shadow: 0 0 0 1px rgb(255 255 255 / 20%) inset;
+  transition: transform var(--dur) var(--ease);
+}
+.mau:hover { transform: scale(1.15); }
+.mau.chon { border-color: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%); }

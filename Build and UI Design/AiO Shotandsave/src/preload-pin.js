@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('pin', {
   close: () => ipcRenderer.send('pin:close'),
   /** Keo file .png that ra app khac (Premiere/Zalo/Mess). */
   startDrag: () => ipcRenderer.send('pin:start-drag'),
+  /** Da ve khung/mui ten -> ghi de file + cap nhat thumbnail khay. */
+  saveEdit: (dataUrl) => ipcRenderer.send('pin:save-edit', dataUrl),
   setOpacity: (v) => ipcRenderer.send('pin:opacity', v),
   /* Keo: neo mot lan roi gui delta TUYET DOI (xem preload-shelf.js). */
   dragStart: () => ipcRenderer.send('pin:drag-start'),

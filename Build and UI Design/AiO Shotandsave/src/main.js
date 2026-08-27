@@ -23,6 +23,17 @@ const fs = require('fs')
 const kho = require('./kho')
 const i18n = require('./i18n')
 
+/* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
+   Video tang toc phan cung nam o lop OVERLAY ma bo chup cu (Desktop Duplication
+   API) doc KHONG THAY -> vung video ra khung TRANG (giao dien tinh van chup duoc,
+   nen loi tuong "thi thoang"). Ep Chromium dung WGC (Windows Graphics Capture) —
+   bo chup moi nay CO doc lop overlay video. Phai goi TRUOC khi app ready.
+   Windows 11 (>=22H2) khong con vien vang WGC. */
+app.commandLine.appendSwitch(
+  'enable-features',
+  'AllowWgcScreenCapturer,AllowWgcWindowCapturer,AllowWgcZeroHz'
+)
+
 const IS_DEV = process.argv.includes('--dev')
 const IS_SELFTEST = process.argv.includes('--selftest')
 const IS_DRAGTEST = process.argv.includes('--selftest-drag')
@@ -787,6 +798,47 @@ ipcMain.on('pin:start-drag', (e) => {
   try {
     e.sender.startDrag({ file: rec.filePath, icon: rec.image.resize({ height: 96 }) })
   } catch (err) { if (IS_DEV) console.error('[shotandsave] pin startDrag loi', err) }
+})
+
+/* VE khung/mui ten len anh ghim (anh Tien 26/08): renderer ghep xong gui dataURL
+   do phan giai THAT -> ghi de file (dung dinh dang cua chinh file do) + cap nhat
+   anh trong bo nho (copy/keo-tha dung ban moi) + lam moi thumbnail khay. */
+ipcMain.on('pin:save-edit', (e, dataUrl) => {
+  const rec = pins.get(e.sender.id)
+  if (!rec || !dataUrl) return
+  let daVe
+  try { daVe = nativeImage.createFromDataURL(dataUrl) } catch (err) { return }
+  if (!daVe || daVe.isEmpty()) return
+
+  rec.image = daVe // copy / keo-tha tu cua so ghim dung ban da ve
+
+  // Ghi de DUNG file cu, giu dinh dang theo duoi file (.png / .jpg).
+  if (rec.filePath) {
+    try {
+      const laPng = /\.png$/i.test(rec.filePath)
+      const dd = layDinhDangAnh()
+      fs.writeFileSync(rec.filePath, laPng ? daVe.toPNG() : daVe.toJPEG((dd && dd.q) || 85))
+      ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath))
+    } catch (err) {
+      ghiLog('pin ve-xong LOI ghi file: ' + err.message)
+    }
+  }
+
+  // Cap nhat o khay dang tro cung file (thumbnail + dung luong).
+  for (const [id, it] of shelfItems) {
+    if (it.filePath !== rec.filePath) continue
+    it.image = daVe
+    let kb = 0
+    try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (err) {}
+    const sz = daVe.getSize()
+    if (shelfWin && !shelfWin.isDestroyed()) {
+      shelfWin.webContents.send('shelf:update', {
+        id,
+        thumb: daVe.resize({ height: 128, quality: 'good' }).toDataURL(),
+        w: sz.width, h: sz.height, kb,
+      })
+    }
+  }
 })
 
 ipcMain.on('pin:opacity', (e, value) => {

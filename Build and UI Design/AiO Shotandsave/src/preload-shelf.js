@@ -14,6 +14,8 @@ contextBridge.exposeInMainWorld('shelf', {
   onAdd: (cb) => ipcRenderer.on('shelf:add', (_e, item) => cb(item)),
   onRemove: (cb) => ipcRenderer.on('shelf:removed', (_e, id) => cb(id)),
   onClear: (cb) => ipcRenderer.on('shelf:cleared', () => cb()),
+  /** Anh ghim vua duoc VE them -> lam moi thumbnail cua dung o do. */
+  onUpdate: (cb) => ipcRenderer.on('shelf:update', (_e, item) => cb(item)),
 
   /** Ghim lai mot anh trong khay len man hinh. */
   pin: (id) => ipcRenderer.send('shelf:pin', id),
