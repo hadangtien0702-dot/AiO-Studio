@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionManifest Version="7.0"
     ExtensionBundleId="com.aiostudio.reframe"
-    ExtensionBundleVersion="0.5.0"
+    ExtensionBundleVersion="0.6.0"
     ExtensionBundleName="AiO Auto Re-Frames"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ExtensionList>
-    <Extension Id="com.aiostudio.reframe.panel" Version="0.5.0" />
+    <Extension Id="com.aiostudio.reframe.panel" Version="0.6.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>

@@ -8,6 +8,7 @@
 |---|---|
 | Extension ID | `com.aiostudio.reframe` |
 | Cổng debug | **8092** (8088 Asset · 8089 Autocut · 8090 PowerBins · 8091 Transcripts) |
+| Đo trên panel đang chạy | `scripts\do-tren-panel.ps1 -Expression "<js>"` (mượn từ Autocut 27/08, đã đổi cổng 8092). ☠️ Chuỗi **có dấu tiếng Việt méo khi qua PowerShell** — thước phải dùng dấu hiệu không dấu. |
 | Build | **KHÔNG có bước build** — `dist/` là file tĩnh viết tay (v0.1) |
 | Cài | `scripts\sign-install.ps1` (mượn ZXPSignCmd của panel anh em) |
 
@@ -93,12 +94,56 @@ nhiều clip / nhiều track / có khoảng trống** — xem CHƯA ĐẠT.
 
 ---
 
+### 2. ĐOẠN ĐANG CHỌN — khoanh I/O rồi bám chủ thể đúng đoạn đó (`rf_catVung`)
+
+> Anh Tiến chốt 27/08: *"khi anh mở sequence a sẽ xác định đoạn cần làm và em
+> phải tracking cho anh đoạn đó — anh xác định bằng I hoặc O cho em luôn"*.
+
+**Người xài thấy gì:** mở sequence ngang → bấm `I` và `O` khoanh đoạn cần làm
+→ panel **tự hiện** khối "Đoạn đang chọn · 1 phút 12 giây" (không phải bấm gì
+để nó biết) → bấm **"Bám chủ thể đoạn này · dọc 9:16"** → vài giây sau timeline
+mở ra sequence `Doan 15s-42s - Doc 9-16`, đúng đoạn đó, khung dọc, chủ thể được
+bám. Bản gốc nguyên vẹn.
+
+*Ví dụ đời thường:* podcast 1 tiếng, chỉ có 40 giây đáng làm short. Trước đây
+bấm nút là tool đổi khung **cả tiếng** rồi Sensei ngồi phân tích cả tiếng. Nay
+khoanh đúng 40 giây đó, Sensei chỉ phải nhìn 40 giây.
+
+**Builder phải biết:**
+- Ba hàm host: `rf_getRange()` (nhẹ, 4 số, gọi mỗi giây) · `rf_getRangeClips()`
+  (nặng, duyệt mọi clip mọi track) · `rf_catVung()` (dựng lại + gắn effect).
+- ☠️ **Chưa khoanh vùng thì `getInPointAsTime().seconds` trả `-400000`**, không
+  phải `-1`, và không ném lỗi. Kiểm `< 0`.
+- ☠️ **Mốc I–O đứng yên KHÔNG có nghĩa là vùng không đổi** — tắt một clip ở
+  track trên là nội dung vùng đổi hẳn mà mốc không nhúc nhích. Vì vậy: mỗi 4
+  nhịp làm mới đầy đủ + `focus` làm mới ngay + **đọc lại vùng ngay trước khi
+  dựng** (chốt chặn thật: hiển thị được phép trễ, dựng thì không).
+- ☠️ **Không dùng razor.** Autocut đã đo 27/07: `remove()` chỉ nhắc đi, dò tham
+  số thì làm SẬP Premiere. Đường chính thức: `createNewSequenceFromClips` cho
+  đoạn đầu + `overwriteClip` cho các đoạn sau, **mốc đọc lại từ clip vừa đặt**
+  chứ không cộng dồn (cộng dồn hở 1 khung sau 32 đoạn).
+- ☠️ `rf_catVung` **cất in/out gốc của MỌI project item nó đụng vào rồi trả lại
+  nguyên văn** (luật 3a-bis). Đặt in/out lên project item là ghi vào dữ liệu
+  của người dùng.
+- Clip đang **tắt** (`clip.disabled`), clip `.mogrt` và caption AiO đều bị bỏ
+  qua — sequence multicam của Auto Podcast tắt cam không dùng chứ không xoá.
+
+**MVP:** ✅ đo thật 27/08 trên Premiere 27.0.0, sequence test tự tạo:
+vùng 4 clip / 2 file cắt ngang biên → **27.00 / 27.00 giây, 0 khe hở, 4/4 clip
+gắn Auto Reframe, 2,19 giây**; in/out gốc trả lại nguyên; panel bắt kịp đổi vùng
+trong **1,1 giây**; đổi vùng ngầm rồi bấm nút thì **không dựng gì**.
+**CHƯA đạt:** vùng có hình chồng lớp (B-roll đè) — panel báo thẳng và khoá nút,
+chưa dựng lại được. Và chưa có mắt anh Tiến duyệt chất lượng tracking.
+
+---
+
 ## ☠️ CHƯA ĐẠT — thật thà, đừng hứa quá
 
 | | Vì sao chưa |
 |---|---|
 | **Mắt người duyệt chất lượng tracking** | Máy chỉ kiểm được "effect ĐÃ GẮN", không kiểm được "Sensei bám ĐÚNG người". Cần anh Tiến mở bản dọc xem. |
-| **Sequence NHIỀU clip / nhiều track** | QE `getItemAt(c)` mới kiểm trên track 1 clip. Track có khoảng trống thì chỉ số QE có thể lệch với `clips[c]` — phải đo trước khi tin. |
+| **Sequence NHIỀU clip / nhiều track** | QE `getItemAt(c)` mới kiểm trên track 1 clip. Track có khoảng trống thì chỉ số QE có thể lệch với `clips[c]` — phải đo trước khi tin. Đường **`rf_catVung`** không dính chuyện này (nó dựng sequence mới nên clip luôn liền, đã đo 4/4 gắn đúng 27/08); chỉ đường `rf_lamDoc` (clone cả sequence) là còn nợ. |
+| **Vùng có hình CHỒNG LỚP** | B-roll ở track trên đè clip track dưới: `rf_getRangeClips` đếm được và panel khoá nút + nói rõ, nhưng chưa dựng lại được. Dựng lại phẳng sẽ sai cả độ dài lẫn nội dung. |
 | **Tham số Motion của Auto Reframe** | Effect có preset (slower/default/faster motion) — chưa đọc/ghi được property của nó, đang để mặc định. |
 | ~~Chọn tỉ lệ khác~~ | ✅ XONG 31/07 — 3 tỉ lệ 9:16 / 1:1 / 4:5, vẽ bằng hình, minh hoạ đổi theo. |
 | **Vào bộ kiểm đồng bộ design-system** | UI v0.4 đã theo tokens + đủ ngôn ngữ bộ (minh hoạ, đèn, song ngữ, onboarding) nhưng `dong-bo-tokens.ps1` / `kiem-dong-bo.ps1` / `so-sanh.html` vẫn danh sách cứng 4 panel. Bàn xem 5 panel tạm thời: `design-system/xem-bo.mjs` cổng 8095. |

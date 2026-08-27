@@ -1,5 +1,93 @@
 # AiO Auto Re-Frames - Nhat ky
 
+## [0.6.0] - 2026-08-27 16:35 (UTC+7) - DOAN DANG CHON: khoanh I/O tren timeline la tracking dung doan do
+
+> ☠️ **SUA NGAY 27/08 16:35:** muc nay ban dau ghi la **26/08** — `Get-Date` luc
+> dau phien tra sai mot ngay va toi tin luon. Bat duoc luc chuan bi commit, nho
+> doi chieu MOC DOC LAP: `PROGRESS.md` cua Shot & Save ghi `2026-08-27 15:58`
+> va co thu muc `Release/2026-08-27-shotandsave-0.3.6`. Dung bai hoc 5q-bis —
+> chay `date` roi van phai doi chieu voi mot moc doc lap trong chinh repo.
+
+Anh Tien yeu cau: *"anh can them viec anh xac dinh duoc doan clip trong timeline
+giong auto cut"*, chot lai cho ro: *"khi anh mo sequence a se xac dinh doan can
+lam va em phai tracking cho anh doan do - anh xac dinh bang I hoac O cho em luon"*.
+
+Truoc dot nay panel co vong tham do 1 giay nhung no CHI doc ten sequence + khung
+hinh. Vung I-O tren timeline thi panel khong he biet — nguoi dung khoanh xong bam
+nut van ra ban DOC CA SEQUENCE.
+
+### Da lam
+
+1. **Host - 3 ham moi** (`host/reframe.jsx`, chep bo da chay that cua Autocut tu 18/08):
+   - `rf_getRange()` — chi doc 4 con so (fps, in, out, khung). Panel goi moi giay.
+   - `rf_getRangeClips()` — duyet moi clip moi track, lay clip GIAO vung; quy doi
+     moc sequence sang moc FILE GOC theo `speed`; bo qua clip dang TAT, clip
+     `.mogrt` va caption AiO; dem so cho CHONG LAN.
+   - `rf_catVung(dsStr, duongStr, rong, cao, ten)` — dung lai dung doan da khoanh
+     thanh sequence khung dich roi gan Auto Reframe len tung clip.
+2. **Panel - khoi "Doan dang chon"** (`dist/index.html`): hien DO DAI doan (anh
+   Tien chon dung muc nay), kem nut *"Bam chu the doan nay · <ti le>"*. Khoi CHI
+   HIEN khi timeline that su co vung khoanh — chua khoanh thi panel giu nguyen
+   hinh dang cu. Song ngu VI/EN day du.
+3. **Vong tham do 1 giay** doc them in/out (them 2 truong vao chuoi inline san
+   co, khong goi them ham host nao). Moc doi -> moi hoi ham nang.
+4. **Doi ti le / doi ngon ngu** cap nhat lai nhan nut vung ngay.
+
+### Vi sao DUNG LAI doan chu khong nhan ban ca sequence roi cat
+
+Sensei phan tich TOAN BO clip no duoc gan len. Gan len clip 1 tieng de lay 2 phut
+la bat nguoi dung ngoi cho phan tich ca tieng. Dung lai dung doan -> Sensei chi
+nhin dung doan do.
+Va **khong dung razor**: Autocut da do 27/07 — qe razor cat duoc nhung `remove()`
+chi NHAC DI (khong don lo), do tham so thi LAM SAP Premiere. Duong chinh thuc la
+`createNewSequenceFromClips` + `overwriteClip`.
+
+### Do that tren Premiere 27.0.0 (panel cong 8092, sequence test TU TAO)
+
+| Phep do | Ket qua |
+|---|---|
+| Ca 1 — vung 20-35 tren 1 clip | dai that **15.00 / can 15.00**, src 20.000-35.000, 1 hinh + 1 tieng, effect gan that |
+| Ca 2 — vung 15-42 cat ngang bien, **4 clip / 2 file** | dai that **27.00 / can 27.00**, **0 khe ho**, **4/4 clip co Auto Reframe**, 2.19 giay |
+| Clip dang TAT tren track tren | bi bo qua dung (`soTat=1`), khong dem vao |
+| Doi chung: BAT clip do len | `chongLan=2`, nut khoa + noi ro ly do — thuoc biet bao do |
+| Panel bat kip khi doi VUNG | **1.1 giay** |
+| Panel bat kip khi BO khoanh vung | **0.9 giay** (khoi an, xoa so cu) |
+| Panel bat kip khi TAT/BAT clip (moc I-O khong doi) | **3.9 giay** |
+| Chot chan: doi vung ngam roi bam nut | **khong dung gi ca** (67 -> 67 sequence), panel tu nhay sang vung moi |
+| in/out goc cua camA/camB sau moi lan chay | **0.000 -> 89.000**, dung nhu truoc |
+| Don moi truong test | 67 -> **62 sequence** = dung so ban dau, khong sot dau vet |
+
+### Hai cai bay da vap ngay trong dot nay
+
+1. ☠️ **Chua khoanh vung thi `getInPointAsTime().seconds` tra `-400000`**, khong
+   phai `-1` va khong nem loi. Kiem `< 0` moi bat duoc. Neu chi kiem `=== -1` thi
+   panel se coi `-400000` la mot vung hop le va hien "-400000 giay".
+2. ☠️ **MOC I-O DUNG YEN KHONG CO NGHIA LA VUNG KHONG DOI.** Ban dau vong tham do
+   chi so moc I-O (giong Autocut). Do that: tat mot clip o track tren thi moc
+   khong nhuc nhich ma noi dung vung doi han (het chong lan) — panel dung im 5
+   giay van bao canh bao cu. Sua: moi 4 nhip lam moi day du + `focus` lam moi
+   ngay + **doc lai vung ngay truoc khi dung**. Cai thu ba moi la chot chan that:
+   hien thi co the tre, nhung DUNG thi khong duoc phep tre mot nhip nao.
+
+### Bay cua CONG CU DO (khong phai cua san pham)
+
+- Thuoc dau tien so sanh bang chuoi `'27 giay'` **co dau** -> meo khi di qua
+  PowerShell nen luon bao "da doi" -> bao DAT cho mot buoc chua he duoc do. Do
+  lai bang dau hieu KHONG DAU (boc so nguyen bang regex `\d+`). Dung bai hoc 5j.
+- `cat > file <<'EOF'` trong phien nay **nuot dau `\`** -> regex `/\\/g` thanh
+  `/\/g` -> "missing ) after argument list". Ghi file do bang duong khac.
+
+### Con thieu
+
+- **Chong lan chua lam duoc**: vung co clip track tren de len clip track duoi thi
+  panel bao thang va khoa nut, chu chua dung lai duoc. Muon lam thi phai giu
+  nhieu lop hinh — chua co duong an toan.
+- **Chua co mat anh Tien duyet**: may chi kiem duoc "effect DA GAN" va "moc DUNG",
+  khong kiem duoc "Sensei bam DUNG nguoi".
+- Ban `0.5.1` (06/08, redesign UI) **chua tung bump manifest** — manifest van nam
+  o `0.5.0` suot 20 ngay. Dot nay dua ca manifest lan topbar len `0.6.0`.
+  Doi manifest thi phai TAT HAN Premiere mo lai moi an.
+
 ## [0.5.1] - 2026-08-06 22:06 (UTC+7) - REDESIGN UI THEO CHUAN STUDIO CONSOLE DESIGN SYSTEM
 
 1. **Redesign UI dist/index.html**: Nang cap toan bo giao dien panel AiO Auto Re-Frames theo chuan Studio Console Design System (topbar brand logo, bar selbar giam sat sequence real-time, live preview dynamic animation bam chu the, aspect ratio selector grid, card Shorts theo noi dung voi list checkbox & badge thoi luong).

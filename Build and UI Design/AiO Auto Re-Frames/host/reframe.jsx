@@ -410,3 +410,339 @@ function rf_lamDoc(rong, cao, nhan) {
     return rf_err('rf_lamDoc', e);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   VUNG I-O — "anh xac dinh doan can lam bang phim I va O, em tracking doan do"
+   (anh Tien chot 2026-08-27)
+   ──────────────────────────────────────────────────────────────────────────
+   Doi tuong lam viec la VUNG KHOANH tren timeline, khong phai clip dang chon.
+   Bo ham duoi day la cung mot bo voi ac_getRange / ac_getRangeClips ben
+   Autocut — bo do da chay that tu 18/08, chep sang de khong phai do lai.
+
+   ☠️ DO THAT 27/08 tren Premiere 27.0.0 (panel 8092):
+      CHUA khoanh vung thi getInPointAsTime().seconds tra **-400000**,
+      KHONG phai -1 va KHONG nem loi. Kiem "< 0" moi bat duoc.
+
+   ☠️ KHONG DUNG RAZOR. Autocut da do 27/07: qe razor cat duoc nhung
+   remove() chi NHAC DI (khong don lo), va do tham so thi LAM SAP Premiere.
+   Kien truc chot: DUNG LAI doan can giu bang overwriteClip — API chinh thuc.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function rf__inSec(seq) {
+  try {
+    var t = seq.getInPointAsTime();
+    if (t && typeof t.seconds === 'number') return t.seconds;
+  } catch (e) {}
+  try {
+    var s = parseFloat(seq.getInPoint());
+    if (!isNaN(s)) return s;
+  } catch (e) {}
+  return -1;
+}
+function rf__outSec(seq) {
+  try {
+    var t = seq.getOutPointAsTime();
+    if (t && typeof t.seconds === 'number') return t.seconds;
+  } catch (e) {}
+  try {
+    var s = parseFloat(seq.getOutPoint());
+    if (!isNaN(s)) return s;
+  } catch (e) {}
+  return -1;
+}
+function rf__mediaPath(clip) {
+  try {
+    var pi = clip.projectItem;
+    if (!pi) return '';
+    var p = pi.getMediaPath();
+    return p ? String(p) : '';
+  } catch (e) { return ''; }
+}
+
+/**
+ * DOC MOC I-O THOI — khong duyet clip. Panel goi ham nay MOI GIAY.
+ * Phai re: chi doc 4 con so. Ham nang (rf_getRangeClips) chi goi khi moc DOI.
+ */
+function rf_getRange() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var a = rf__inSec(seq), b = rf__outSec(seq);
+    if (a < 0 || b < 0 || b <= a) return 'ERR:CHUA_KHOANH_VUNG|';
+    var st = seq.getSettings();
+    var fr = st.videoFrameRate;
+    var fps = (fr && fr.seconds > 0) ? (1 / fr.seconds) : 30;
+    return 'OK:seqName=' + seq.name + '\nfps=' + fps +
+           '\nin=' + a + '\nout=' + b +
+           '\nkhung=' + st.videoFrameWidth + 'x' + st.videoFrameHeight;
+  } catch (e) {
+    return rf_err('rf_getRange', e);
+  }
+}
+
+/**
+ * Duyet MOI clip tren MOI track, lay clip GIAO voi vung I-O.
+ * Nang tren sequence nhieu clip — panel chi goi khi moc I-O da doi.
+ *
+ * ☠️ BO QUA CLIP DANG TAT (`clip.disabled`). Bai hoc 5u cua Auto Podcast:
+ * sequence multicam co MOI cam tren MOI doan, cam khong dung bi TAT chu khong
+ * bi xoa. Dem ca clip tat la dung so gap vai lan va dung nham hinh.
+ *
+ * ☠️ BO QUA .mogrt / "AiO Caption": clip caption cua Transcripts CO media path
+ * nhung khong phai media (in/out template 10s chia do dai ra "toc do 2083%").
+ */
+function rf_getRangeClips() {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    var seq = app.project.activeSequence;
+    if (!seq) return 'ERR:CHUA_MO_SEQUENCE|';
+    var vungA = rf__inSec(seq), vungB = rf__outSec(seq);
+    if (vungA < 0 || vungB < 0 || vungB <= vungA) return 'ERR:CHUA_KHOANH_VUNG|';
+
+    var st = seq.getSettings();
+    var fr = st.videoFrameRate;
+    var fps = (fr && fr.seconds > 0) ? (1 / fr.seconds) : 30;
+    var saiSo = 0.5 / fps;
+
+    var out = [];
+    out.push('seqName=' + seq.name);
+    out.push('fps=' + fps);
+    out.push('in=' + vungA);
+    out.push('out=' + vungB);
+    out.push('khung=' + st.videoFrameWidth + 'x' + st.videoFrameHeight);
+
+    var thay = [];
+    var soTat = 0;
+    function quet(kind, ds, so) {
+      for (var i = 0; i < so; i++) {
+        var tr, n = 0;
+        try { tr = ds[i]; n = tr.clips.numItems; } catch (e) { continue; }
+        for (var j = 0; j < n; j++) {
+          var c;
+          try { c = tr.clips[j]; } catch (e) { continue; }
+          var s, e2;
+          try { s = c.start.seconds; e2 = c.end.seconds; } catch (e) { continue; }
+          if (e2 <= vungA + saiSo || s >= vungB - saiSo) continue;
+          try { if (c.disabled) { soTat++; continue; } } catch (e) {}
+
+          var p = rf__mediaPath(c);
+          if (!p) continue;
+          if (/\.mogrt$/i.test(p) || String(c.name).indexOf('AiO Caption') === 0) continue;
+
+          var si = c.inPoint.seconds, sr = c.outPoint.seconds;
+          var speed = (e2 - s) > 0 ? ((sr - si) / (e2 - s)) : 1;
+          var seqTu = s > vungA ? s : vungA;
+          var seqDen = e2 < vungB ? e2 : vungB;
+          thay.push({
+            kind: kind, tr: i, cl: j,
+            seqTu: seqTu, seqDen: seqDen,
+            srcTu: si + (seqTu - s) * speed,
+            srcDen: si + (seqDen - s) * speed,
+            speed: speed, p: p
+          });
+        }
+      }
+    }
+    quet('V', seq.videoTracks, seq.videoTracks.numTracks);
+    // Chi nhin audio khi vung khong co clip HINH nao — clip A/V lien ket thi
+    // dat phan video se keo audio theo, dem ca hai la dung hai lan.
+    if (!thay.length) quet('A', seq.audioTracks, seq.audioTracks.numTracks);
+    if (!thay.length) return 'ERR:VUNG_KHONG_CO_CLIP|' + soTat;
+
+    // Sap theo moc tren timeline — thu tu dung lai chinh la thu tu nay.
+    thay.sort(function (x, y) { return x.seqTu - y.seqTu; });
+
+    // ☠️ CHONG LAN = KHONG DUNG LAI PHANG DUOC. Hai clip HINH cung bat, cung
+    // luc (B-roll de len) thi xep noi tiep se ra sai ca do dai lan noi dung.
+    // Tha bao thang con hon dung ra mot ban sai ma im.
+    var chongLan = 0;
+    for (var k = 1; k < thay.length; k++) {
+      if (thay[k].seqTu < thay[k - 1].seqDen - saiSo) chongLan++;
+    }
+    out.push('soTat=' + soTat);
+    out.push('chongLan=' + chongLan);
+    for (k = 0; k < thay.length; k++) {
+      var d = thay[k];
+      // Duong dan de o CUOI dong vi no co the chua dau phay.
+      out.push('clip=' + d.kind + ',' + d.tr + ',' + d.cl + ',' +
+               d.seqTu + ',' + d.seqDen + ',' + d.srcTu + ',' + d.srcDen + ',' +
+               d.speed + ',' + d.p);
+    }
+    return 'OK:' + out.join('\n');
+  } catch (e) {
+    return rf_err('rf_getRangeClips', e);
+  }
+}
+
+/* ── Ba tro thu nho, chep tu bo da chay that cua Autocut ── */
+function rf__datInOut(pi, a, b) {
+  try { pi.setInPoint(a, 4); pi.setOutPoint(b, 4); return ''; } catch (e) {}
+  try { pi.setInPoint(a); pi.setOutPoint(b); return ''; } catch (e2) { return e2.toString(); }
+}
+function rf__datClip(track, pi, giay) {
+  var loi1 = '';
+  try { track.overwriteClip(pi, giay); return ''; } catch (e) { loi1 = e.toString(); }
+  try {
+    var t = new Time();
+    t.seconds = giay;
+    track.overwriteClip(pi, t);
+    return '';
+  } catch (e2) { return loi1 + ' | ' + e2.toString(); }
+}
+function rf__mocCuoi(track, duPhong) {
+  try {
+    var n = track.clips.numItems;
+    if (n > 0) return track.clips[n - 1].end.seconds;
+  } catch (e) {}
+  return duPhong;
+}
+function rf__demClip(track) {
+  try { return track ? track.clips.numItems : 0; } catch (e) { return 0; }
+}
+
+/**
+ * VIEC CHINH CUA VUNG I-O: dung lai dung doan anh khoanh thanh mot sequence
+ * khung dich, roi gan Auto Reframe len tung clip cua no.
+ *
+ * Vi sao DUNG LAI chu khong nhan ban ca sequence: Sensei phan tich TOAN BO
+ * clip no duoc gan len. Gan len clip 1 tieng de lay 2 phut la bat nguoi dung
+ * ngoi cho phan tich ca tieng. Dung lai dung doan -> Sensei chi nhin doan do.
+ *
+ * @param dsStr    "srcTu,srcDen,idxDuong;..." — moc giay TREN FILE GOC
+ * @param duongStr "d1|~|d2|~|..." — bang duong dan, tach rieng vi duong co
+ *                 the chua ca dau phay lan cham phay
+ * @param rong/cao khung dich
+ * @param ten      ten sequence (tu chong trung)
+ */
+function rf_catVung(dsStr, duongStr, rong, cao, ten) {
+  try {
+    if (!app.project) return 'ERR:CHUA_MO_PROJECT|';
+    app.enableQE();
+    var fx = null;
+    try { fx = qe.project.getVideoEffectByName('Auto Reframe'); } catch (e) {}
+    if (!fx || fx.name !== 'Auto Reframe') return 'ERR:THIEU_AUTO_REFRAME|';
+
+    // ── Bang duong dan -> project item (tim MOT lan cho moi duong) ──
+    var duong = String(duongStr).split('|~|');
+    var pis = [];
+    var i;
+    for (i = 0; i < duong.length; i++) {
+      var pi = rf__timItemTheoDuong(duong[i]);
+      if (!pi) return 'ERR:KHONG_THAY_ITEM|' + duong[i];
+      pis.push(pi);
+    }
+
+    // ── Danh sach doan ──
+    var muc = [];
+    var manh = String(dsStr).split(';');
+    for (i = 0; i < manh.length; i++) {
+      var ph = manh[i].split(',');
+      if (ph.length !== 3) continue;
+      var idx = parseInt(ph[2], 10);
+      if (isNaN(idx) || idx < 0 || idx >= pis.length) continue;
+      muc.push({ a: parseFloat(ph[0]), b: parseFloat(ph[1]), pi: pis[idx] });
+    }
+    if (!muc.length) return 'ERR:DS_RONG|';
+
+    rf__luuTruoc();
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ☠️ CAT IN/OUT GOC CUA MOI PROJECT ITEM SE BI GHI DE — luat 3a-bis.
+    // Dat in/out len project item la ghi vao DU LIEU CUA NGUOI DUNG. Phai doc
+    // va cat gia tri cu NGAY LAN CHAY NAY roi tra lai nguyen van; tinh lai
+    // bang cong thuc thi cong thuc an chinh cai vua bi lam hong.
+    // ══════════════════════════════════════════════════════════════════════
+    var goc = [];
+    for (i = 0; i < pis.length; i++) {
+      var g = null;
+      try { g = { pi: pis[i], vao: pis[i].getInPoint(), ra: pis[i].getOutPoint() }; } catch (e) {}
+      goc.push(g);
+    }
+    function traLaiInOut() {
+      for (var z = 0; z < goc.length; z++) {
+        if (!goc[z]) continue;
+        try {
+          goc[z].pi.setInPoint(goc[z].vao.seconds, 4);
+          goc[z].pi.setOutPoint(goc[z].ra.seconds, 4);
+        } catch (e) {}
+      }
+    }
+
+    // ── 1. Doan DAU: tao sequence (dat ca hinh lan tieng cung luc) ──
+    var e1 = rf__datInOut(muc[0].pi, muc[0].a, muc[0].b);
+    if (e1) { traLaiInOut(); return 'ERR:INOUT_LOI|' + e1; }
+    var tenSach = rf__tenKhongTrung(String(ten));
+    try { app.project.createNewSequenceFromClips(tenSach, [muc[0].pi], app.project.rootItem); }
+    catch (e2) { traLaiInOut(); return 'ERR:TAO_SEQ_LOI|' + e2.toString(); }
+    var seq = app.project.activeSequence;
+    if (!seq) { traLaiInOut(); return 'ERR:SEQ_KHONG_ACTIVE|'; }
+    var trackV = seq.videoTracks.numTracks ? seq.videoTracks[0] : null;
+    var trackA = seq.audioTracks.numTracks ? seq.audioTracks[0] : null;
+    if (!trackV) { traLaiInOut(); return 'ERR:KHONG_CO_TRACK_V|'; }
+
+    // ── 2. Doi khung dich, DOC LAI kiem ──
+    var st;
+    try {
+      st = seq.getSettings();
+      st.videoFrameWidth = rong;
+      st.videoFrameHeight = cao;
+      seq.setSettings(st);
+    } catch (e3) { traLaiInOut(); return 'ERR:DOI_KHUNG_LOI|' + e3.toString(); }
+    var st2 = seq.getSettings();
+    if (st2.videoFrameWidth !== rong || st2.videoFrameHeight !== cao) {
+      traLaiInOut();
+      return 'ERR:KHUNG_KHONG_DOI|' + st2.videoFrameWidth + 'x' + st2.videoFrameHeight;
+    }
+
+    // ── 3. Cac doan SAU: noi tiep bang overwriteClip ──
+    // Moc DOC LAI tu clip vua dat, KHONG cong don: Premiere lam tron vi tri ve
+    // luoi khung hinh, cong don thi lech dan va de lai khe ho (Autocut do that:
+    // cong don -> ho 1 khung sau 32 doan; doc lai -> 0).
+    var soLoi = 0, loiDau = '';
+    var moc = rf__mocCuoi(trackV, muc[0].b - muc[0].a);
+    for (i = 1; i < muc.length; i++) {
+      var eA = rf__datInOut(muc[i].pi, muc[i].a, muc[i].b);
+      if (eA) { soLoi++; if (!loiDau) loiDau = 'setInPoint: ' + eA; continue; }
+      var eB = rf__datClip(trackV, muc[i].pi, moc);
+      if (eB) { soLoi++; if (!loiDau) loiDau = 'overwriteClip: ' + eB; continue; }
+      moc = rf__mocCuoi(trackV, moc + (muc[i].b - muc[i].a));
+    }
+
+    // ── 4. TIENG phai di theo HINH ──
+    // Doan dau chac chan co tieng. Cac doan sau "thuong" keo audio theo —
+    // "thuong" khong phai "chac", nen DEM lai va bu neu thieu.
+    var soV = rf__demClip(trackV);
+    var soA = rf__demClip(trackA);
+    if (trackA && soA < soV) {
+      var moc2 = 0;
+      for (i = 0; i < muc.length; i++) {
+        rf__datInOut(muc[i].pi, muc[i].a, muc[i].b);
+        rf__datClip(trackA, muc[i].pi, moc2);
+        moc2 = rf__mocCuoi(trackA, moc2 + (muc[i].b - muc[i].a));
+      }
+      soA = rf__demClip(trackA);
+    }
+
+    traLaiInOut();
+
+    // ── 5. Gan Auto Reframe len tung clip cua sequence vua dung ──
+    var kq = rf__ganEffectLenSeq(seq, fx);
+
+    // ── 6. DO LAI ket qua that, khong tin "khong bao loi" ──
+    var mongMuon = 0;
+    for (i = 0; i < muc.length; i++) mongMuon += (muc[i].b - muc[i].a);
+    var daiThat = 0;
+    try { daiThat = trackV.clips[trackV.clips.numItems - 1].end.seconds; } catch (e4) {}
+
+    return 'OK:seqMoi=' + seq.name +
+      '\nkhung=' + st2.videoFrameWidth + 'x' + st2.videoFrameHeight +
+      '\nsoDoanYeuCau=' + muc.length +
+      '\nsoClipHinh=' + soV + '\nsoClipTieng=' + soA +
+      '\ndaiThat=' + daiThat.toFixed(2) + '\ndaiMongMuon=' + mongMuon.toFixed(2) +
+      '\ndaGan=' + kq[0] + '\ndaCoSan=' + kq[1] +
+      '\nsoLoi=' + (soLoi + kq[2]) + '\nloiDau=' + (loiDau || kq[3]);
+  } catch (e) {
+    return rf_err('rf_catVung', e);
+  }
+}
