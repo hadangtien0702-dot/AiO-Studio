@@ -114,6 +114,20 @@ window.shelf.onClear(() => {
   capNhatSoLuong()
 })
 
+/* ── Con lan chuot = cuon day anh ────────────────────────────────────── */
+
+/* Khay NGANG chi co truc ngang de cuon, ma con lan gui deltaY (truc doc) —
+   khong tu doi truc thi lan chuot khong lam gi ca (anh Tien bao 28/08).
+   Khay DOC cuon doc tu nhien nen khong can dung vao. Bat tren window de
+   tro chuot o dau tren khay cung lan duoc, khong phai nham dung day anh. */
+window.addEventListener('wheel', (e) => {
+  if (document.body.classList.contains('doc')) return
+  const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+  if (!delta) return
+  e.preventDefault()
+  listEl.scrollLeft += delta
+}, { passive: false })
+
 /* ── Nut tren thanh ──────────────────────────────────────────────────── */
 
 document.getElementById('folder').addEventListener('click', () => window.shelf.openFolder())

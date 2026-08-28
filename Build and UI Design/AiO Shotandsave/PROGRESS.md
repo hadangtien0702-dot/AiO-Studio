@@ -1,5 +1,43 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-28 16:00 — 0.3.7: con lan chuot cuon duoc day anh trong khay
+
+### Boi canh
+Anh Tien gui anh chup: tro chuot vao khay (24 anh) thi khong dung con lan de
+cuon duoc. Nguyen nhan: day thumbnail la dai cuon NGANG (`overflow-x`), con
+lan chuot ban tin hieu cuon DOC (deltaY) — khay khong co truc doc nen tin hieu
+roi vao khoang khong, khong ai xu ly.
+
+### Thay doi
+- `src/shelf/shelf.js`: them bo chuyen truc — wheel tren khay NGANG thi
+  `preventDefault` + cong deltaY (hoac deltaX neu lon hon, cho trackpad) vao
+  `scrollLeft`. Bat tren `window` de tro dau tren khay cung lan duoc. Khay
+  DOC return som — cuon doc tu nhien giu nguyen.
+- Bump 0.3.7 + TOOL_VERSION_TRACKER dong 12.
+
+### Kiem chung (tu dung moi truong rieng, khong dung app anh dang chay)
+- Script test rieng (scratchpad): nap trang khay THAT + preload THAT
+  (webPreferences chep dung main.js:910), bom 30 anh gia cho tran
+  (scrollWidth 2168 / clientWidth 545), ban con lan qua CDP
+  `Input.synthesizeScrollGesture` — su kien di dung duong ong input Chromium.
+- Khay NGANG: lan xuong scrollLeft 0 -> 602, lan len lui ve 242,7; scrollTop
+  dung im (khong cuon bay truc doc). DAT.
+- Khay DOC (doi chung): scrollTop 0 -> 600 -> 240, scrollLeft dung im —
+  duong cuon doc co san KHONG bi pha. DAT.
+- 3 lan thuoc do sai truoc khi ra so that (ghi de phien sau khoi vap):
+  (1) thieu `sandbox:false` -> preload chet im, 0 anh vao khay;
+  (2) `sendInputEvent('mouseWheel')` KHONG toi trang tren Windows — bo dem
+  wheel trong trang bao 0 su kien, phai chuyen sang CDP;
+  (3) toa do tu tinh y=80 nam ngoai viewport that (chi cao 77px) ->
+  "Position out of bounds" — phai do `getBoundingClientRect` cua chinh day anh.
+
+### Chua lam / cho anh
+- Anh dang chay BAN CAI 0.3.6 — fix chi toi tay anh khi cai 0.3.7.
+  KHONG cai de tu dong lan nay: app dang mo, cai de la khay 24 anh cua anh
+  trong lai (file anh van con trong thu muc luu, chi mat thumbnail tren khay).
+  Bo cai da de o `Release/2026-08-28-shotandsave-0.3.7/`, anh bam cai luc tien.
+
+
 ## 2026-08-27 15:58 — 0.3.6: GOI + CAI DE de het canh "sua roi van thay cu"
 
 ### Boi canh
