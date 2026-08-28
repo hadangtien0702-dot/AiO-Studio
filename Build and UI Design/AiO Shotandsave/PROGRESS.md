@@ -31,11 +31,13 @@ roi vao khoang khong, khong ai xu ly.
   (3) toa do tu tinh y=80 nam ngoai viewport that (chi cao 77px) ->
   "Position out of bounds" — phai do `getBoundingClientRect` cua chinh day anh.
 
-### Chua lam / cho anh
-- Anh dang chay BAN CAI 0.3.6 — fix chi toi tay anh khi cai 0.3.7.
-  KHONG cai de tu dong lan nay: app dang mo, cai de la khay 24 anh cua anh
-  trong lai (file anh van con trong thu muc luu, chi mat thumbnail tren khay).
-  Bo cai da de o `Release/2026-08-28-shotandsave-0.3.7/`, anh bam cai luc tien.
+### Da cai (16:10, anh gat dau moi cai)
+- Ban dau khong tu cai de vi khay anh dang mo 24 anh; anh Tien chot "cai di"
+  -> cai de im lang /S. Do sau cai: file cai `ProductVersion 0.3.7.0`;
+  cai im lang KHONG tu mo app -> tu Start-Process, do tien trinh dang chay:
+  0.3.7.0 tu `AppData\Local\Programs\aio-shot-and-save\`. Khay cua anh
+  trong lai nhu da bao truoc (file anh van trong thu muc luu).
+- CHO anh lan thu con lan tren khay that de xac nhan bang tay.
 
 
 ## 2026-08-27 15:58 — 0.3.6: GOI + CAI DE de het canh "sua roi van thay cu"
