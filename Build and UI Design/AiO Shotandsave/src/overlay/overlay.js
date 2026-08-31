@@ -40,6 +40,7 @@ let layersReady = false
 let pendingComposite = null // vung cho ghep neu grab chua xong
 let biKhoa = false          // man KHAC dang keo -> man nay bo qua chuot
 let soLanThuGhep = 0        // dem retry cho ghep xuyen man
+let lanVeLocal = 0          // moc lan cuoi mousemove LOCAL ve khung (nhuong/gianh voi main)
 
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
 window.overlay.onInit((data) => {
@@ -137,13 +138,16 @@ window.overlay.onSelRect((d) => {
   const W = window.innerWidth, H = window.innerHeight
   if (!d) { xoaGuong(); hintEl.classList.remove('hidden'); return }
   hintEl.classList.add('hidden') // an hint NGAY (dung TRUOC early-return duoi)
-  /* ☠️ RUNG KHI KEO (anh Tien 31/08 "lag vai"): man CHU dang keo thi khung do
-     mousemove LOCAL ve (toa do TUOI). Main ban sel-rect moi 16ms mang toa do
-     chuot CU toi 16ms -> ve de len lam khung giat toi-lui. Bo REDRAW FRAME tu
-     main cho man chu — local lo (frame + nhan). Nhung hint da an o tren roi
-     (31/08 lan 2: de early-return TRUOC dong an hint -> hint khong an -> "te
-     le"). Cac man KHAC (mirror) van dung main vi khong co chuot local. */
-  if (dragging && d.laChu) return
+  /* ☠️ RUNG KHI KEO (31/08 "lag vai"): man CHU dang keo thi khung do mousemove
+     LOCAL ve (toa do TUOI); main ban sel-rect moi 16ms mang toa do CU 16ms —
+     ve de len la khung giat toi-lui. -> local dang HOAT DONG thi bo goi main.
+     ☠️ NHUNG chi "dragging" thoi KHONG du (31/08 lan 3 — anh Tien: "keo mot
+     cho no NHAY mot cho"): chuot keo RA KHOI man nay (vat sang man kia) la
+     mousemove NGUNG BAN (khong co pointer capture), local im — chan main luon
+     thi khung DUNG HINH o vi tri cu roi NHAY khi chuot quay lai. Luat dung:
+     local vua ve trong 50ms thi main nhuong; local im (chuot ngoai man) thi
+     MAIN TIEP QUAN. */
+  if (dragging && d.laChu && performance.now() - lanVeLocal < 50) return
   // d.x/y/w/h da la CUC BO (DIP man nay) do main quy doi tu PIXEL VAT LY.
   const ix = Math.max(0, d.x), iy = Math.max(0, d.y)
   const ix2 = Math.min(W, d.x + d.w), iy2 = Math.min(H, d.y + d.h)
@@ -205,6 +209,7 @@ window.addEventListener('mousemove', (e) => {
      ve de len nhau khong lech; main van lo nhan kich thuoc phys + guong
      sang man kia + CHOT vung luc tha (logic luu anh khong doi). */
   if (dragging) {
+    lanVeLocal = performance.now() // local dang song — main nhuong khung nay
     const x1 = Math.max(0, Math.min(startX, e.clientX))
     const y1 = Math.max(0, Math.min(startY, e.clientY))
     const x2 = Math.min(window.innerWidth, Math.max(startX, e.clientX))

@@ -1,5 +1,35 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 14:35 — 0.3.17: het "keo mot cho NHAY mot cho" (local/main nhuong-gianh dung luat)
+
+### Boi canh
+Anh Tien (sau 0.3.16): "van bi — keo mot cho no nhay mot cho". Trieu chung
+NHAY (khung dung hinh roi bat toi vi tri khac) khac han rung — chi khop mot
+kich ban: chuot keo RA KHOI man chu.
+
+### Goc
+Web KHONG co pointer capture tu dong: mousedown xong keo ra ngoai cua so la
+mousemove NGUNG BAN vao renderer man chu. 0.3.15 chan main ve cho man chu
+VO DIEU KIEN (`if (dragging && laChu) return`) -> chuot sang man kia la khung
+man chu DONG BANG o vi tri cu (local im, main bi chan), chuot quay lai moi
+ve tiep -> "keo mot cho nhay mot cho". Truoc 0.3.15 khong bi vi main luon ve.
+
+### Thay doi (overlay.js — luat nhuong-gianh)
+- `lanVeLocal` = moc moi lan mousemove local ve khung.
+- onSelRect: `if (dragging && laChu && now - lanVeLocal < 50) return` —
+  local VUA ve (chuot dang di tren man nay) thi main nhuong (het rung);
+  local IM >50ms (chuot ra ngoai man) thi MAIN TIEP QUAN (het dung hinh/nhay).
+
+### Kiem chung
+- Harness moi `test-keo-vat-man.js` — 3 giai doan: (1) keo local khung 198px
+  dung; (2) main gui goi LECH 50px trong luc chuot dang di -> khung GIU 200px
+  (khong bi de = khong rung); (3) NGUNG mouse events (gia chuot ra khoi man),
+  main phat vung tien xa -> khung chay theo toi 638px (het dung hinh). DAT.
+- 2 harness cu (drag/freeze) DAT. May that: 0.3.17.0, boot + ham-nong OK.
+- Ghi dong #8 vao SO LOI TAI DIEN: vung ve-khung-khi-keo hoi quy 3 lan/ngay,
+  tu nay dung vao onSelRect/mousemove PHAI chay test-keo-vat-man + drag.
+
+
 ## 2026-08-31 14:05 — 0.3.16: sua "TE LE khi keo" (toolbar+hint hien lac) + ham nong chong giat video
 
 ### Boi canh
