@@ -554,34 +554,58 @@ function napManCache() {
   })
 }
 
-/* rect PHYS -> rect CUC BO (DIP) cua tung man de renderer ve. */
-function phatSelRect(rect) {
+/* rect PHYS -> rect CUC BO (DIP) cua tung man de renderer ve.
+   conTro (phys, tuy chon): con tro DANG NAM TRONG man chu thi BO QUA man chu —
+   local thay chuot va tu ve (nguon duy nhat, het canh 2 nguon nhap nhay
+   "15xx/1405" khi giu yen tay — may nha 31/08). Con tro RA NGOAI man chu
+   (vat man) thi main van ve cho man chu (local mu, 0.3.17). */
+function phatSelRect(rect, conTro) {
   for (const w of overlayWins) {
     if (w.isDestroyed()) continue
     if (rect === null) { w.webContents.send('overlay:sel-rect', null); continue }
     const m = manCache.find((x) => x.id === w._displayId)
     if (!m) continue
+    const laChu = w.webContents.id === dragOwnerId
+    if (laChu && conTro &&
+        conTro.x >= m.px && conTro.x < m.px + m.pw &&
+        conTro.y >= m.py && conTro.y < m.py + m.ph) continue
     w.webContents.send('overlay:sel-rect', {
       x: (rect.x - m.px) / m.sf, y: (rect.y - m.py) / m.sf,
       w: rect.w / m.sf, h: rect.h / m.sf,
       physW: rect.w, physH: rect.h,
-      laChu: w.webContents.id === dragOwnerId,
+      laChu,
     })
   }
 }
 
-function rectHienTai() {
-  const c = raPhys(screen.getCursorScreenPoint())
+function rectTuNeo(c) {
   const x = Math.min(dragAnchor.x, c.x), y = Math.min(dragAnchor.y, c.y)
   return { x, y, w: Math.abs(c.x - dragAnchor.x), h: Math.abs(c.y - dragAnchor.y) }
 }
 
-ipcMain.on('overlay:drag-start', (e) => {
+function rectHienTai() {
+  return rectTuNeo(raPhys(screen.getCursorScreenPoint()))
+}
+
+ipcMain.on('overlay:drag-start', (e, diemNeo) => {
   dragOwnerId = e.sender.id
-  dragAnchor = raPhys(screen.getCursorScreenPoint())
-  ghiLog('drag-start anchor=' + JSON.stringify(dragAnchor))
+  const lucNhan = raPhys(screen.getCursorScreenPoint())
+  /* ☠️ NEO = DIEM MOUSEDOWN renderer gui kem (global DIP -> phys), KHONG hoi
+     con tro luc main nhan tin (may nha 31/08 "keo va giu no giat 15xx/1405"):
+     bam chuot khi grab con chay -> main nghen ~880ms moi nhan drag-start,
+     luc do tay da keo di 100-150px -> neo main LECH neo local tung ay ->
+     giu yen tay la 2 nguon ve nhap nhay 2 kich thuoc khac nhau, va vung
+     ANH LUU (chot bang neo main) cung lech theo. Log ca hai de doi chieu. */
+  dragAnchor = (diemNeo && typeof diemNeo.x === 'number')
+    ? raPhys({ x: diemNeo.x, y: diemNeo.y }) : lucNhan
+  const lech = Math.round(Math.hypot(dragAnchor.x - lucNhan.x, dragAnchor.y - lucNhan.y))
+  ghiLog('drag-start anchor=' + JSON.stringify(dragAnchor) +
+    (lech > 2 ? ' (con tro luc main nhan da troi ' + lech + 'px)' : ''))
   if (dragTimer) clearInterval(dragTimer)
-  dragTimer = setInterval(() => phatSelRect(rectHienTai()), 16)
+  dragTimer = setInterval(() => {
+    const c = raPhys(screen.getCursorScreenPoint())
+    phatSelRect(rectTuNeo(c), c)
+  }, 16)
 })
 
 ipcMain.on('overlay:drag-end', (e) => {

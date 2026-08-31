@@ -1,14 +1,16 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 21:55 +0700
-> - Ban dang chay tren MAY NHA anh Tien: **0.4.1** (cai de 21:52, boot OK,
->   phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.1/`.
-> - 0.4.1 = sua "MAY NHA van giat khi keo" (may cong ty da DAT 0.4.0): anh
->   dong bang di qua protocol `aioshot://` thay vi base64 ~5,7MB qua IPC do
->   xuong renderer dang keo. CHO ANH CHAM tren may nha; run-log nay ghi
->   `keo N khung, gap-max=Xms` moi luot keo — anh con thay giat thi doc so
->   nay truoc, gap-max nho ma van giat = lag o COMPOSITOR (WGC/grab), khong
->   phai renderer.
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 22:22 +0700
+> - Ban dang chay tren MAY NHA anh Tien: **0.4.2** (cai de 22:20, boot OK,
+>   phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.2/`.
+> - 0.4.1+0.4.2 = sua "MAY NHA van giat khi keo" (may cong ty da DAT 0.4.0),
+>   HAI goc cung kich ban bam-chuot-khi-grab-dang-chay: (0.4.1) base64 ~5,7MB
+>   qua IPC -> anh di `aioshot://`; (0.4.2, anh ta "keo va GIU giat
+>   15xx/1405") neo main lech neo local 100-150px vi main nhan drag-start
+>   muon -> neo = diem mousedown renderer gui kem + con tro trong man chu
+>   thi main khong ve man chu. CHO ANH CHAM. Run-log moi luot keo ghi
+>   `keo gap-max` + `con tro luc main nhan da troi Xpx` — con giat thi doc
+>   so nay truoc (gap-max nho + troi 0px ma van giat = lag COMPOSITOR).
 > - ☠️ Truoc khi sua bat cu gi: doc muc **SO LOI TAI DIEN** trong CLAUDE.md
 >   (9 loi + bay thuoc do + checklist kiem hoi quy). Vung ve-khung-khi-keo /
 >   duong frozen dung vao PHAI chay 4 harness scratchpad phien 21:45 31/08
@@ -21,6 +23,52 @@
 >   (xa hon) viet lai Tauri neu can nhe ~5MB nhu Lightshot — cho anh chot.
 > - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
 >   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+
+## 2026-08-31 22:20 — 0.4.2: het "keo va GIU no giat 15xx/1405" — neo main lay tu diem mousedown, thoi hoi con tro muon
+
+### Boi canh
+Anh Tien cai 0.4.1 xong keo thu: "anh keo va giu no giat nha em, vi du kich
+thuoc 15xx con 1405, giat nhanh qua khong doc duoc so chinh xac". Nhan size
+nhay qua lai giua HAI so lech ~100-150px khi GIU YEN tay.
+
+### Goc DA DO (khong doan)
+Hai nguon ve dang cai nhau ve HAI KICH THUOC KHAC NHAU — khac 0.3.15 (rung
+toa do cu 16ms), lan nay lech ca tram px:
+- Renderer neo tai mousedown (clientX). Main thi doi NHAN duoc drag-start moi
+  `getCursorScreenPoint()` lam neo — ma anh bam chuot khi grab dang chan main
+  ~880ms (kich ban co dinh cua may nha, xem 0.4.1), luc main tinh day tay da
+  keo di 100-150px => neo main LECH neo local tung ay.
+- Giu yen tay: tay run nhe -> mousemove le te. Moi cai run local ve so cua no
+  (vd 15xx); im >50ms la main TIEP QUAN (luat 0.3.17) ve so cua NO (1405) ->
+  nhap nhay ~10Hz dung nhu anh ta.
+- ☠️ Nang hon hien thi: mouseup chot vung bang NEO MAIN => vung ANH LUU cung
+  lech 100-150px so voi khung anh nhin thay.
+
+### Thay doi
+1. **overlay.js + preload:** dragStart gui kem DIEM MOUSEDOWN (global DIP =
+   origin + clientX/Y). **main.js:** neo = raPhys(diem do); chi fallback hoi
+   con tro khi khong co diem gui kem. Log `con tro luc main nhan da troi Xpx`
+   khi lech >2px — so do that tren may anh cho lan sau.
+2. **main.js phatSelRect:** con tro dang NAM TRONG man chu -> main BO QUA man
+   chu (local thay chuot, la nguon ve duy nhat — het canh 2 nguon); con tro
+   RA NGOAI man chu (vat man) main moi ve cho man chu (local mu, giu 0.3.17).
+   Luat 50ms renderer giu nguyen lam luoi do phong.
+
+### Kiem chung
+- 4/4 harness DAT lai het: drag cam 6/6 · keo-vat-man 3 giai doan (luat
+  nhuong-gianh renderer khong doi) · frozen-storm (taint sach) · composite
+  vat man dung tung pixel.
+- Selftest DAT; file test xoa dich danh. May that: cai de /S, tien trinh
+  0.4.2.0, boot dang-ky=OK phim Shift+`, 0 CANH BAO.
+- Ghi chu: khong quay video ngoai duoc de "xem anh keo" — overlay bat
+  content-protection nen moi trinh quay ngoai thay vung overlay DEN. Thay
+  bang so trong run-log (gap-max + do troi neo).
+
+### Cho anh
+- Keo + GIU nhu luc nay: nhan size phai DUNG YEN mot so. Chup vai tam roi
+  xem anh luu co khop khung da khoanh khong (truoc 0.4.2 co the lech
+  100-150px ma chua ai de y).
+
 
 ## 2026-08-31 21:52 — 0.4.1: MAY NHA het "van giat y chang" — anh dong bang di aioshot://, thoi base64 qua IPC
 

@@ -229,7 +229,10 @@ window.addEventListener('mousedown', (e) => {
   hintEl.classList.add('hidden')
   batDauDoKeo()
   // MAIN theo doi chuot he thong (dung moi scale) va phat 'sel-rect' ve.
-  window.overlay.dragStart()
+  // ☠️ Gui kem DIEM MOUSEDOWN (global DIP) lam neo: main nhan tin MUON khi
+  // grab dang chan (~880ms) — hoi con tro luc do la neo lech 100-150px so
+  // voi local -> "keo va giu no giat 15xx/1405" + vung LUU lech (31/08).
+  window.overlay.dragStart({ x: origin.x + e.clientX, y: origin.y + e.clientY })
 })
 
 window.addEventListener('mousemove', (e) => {
@@ -346,7 +349,8 @@ function chonLaiTuDau(e) {
   dragging = true
   startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
   batDauDoKeo()
-  window.overlay.dragStart() // main theo doi tu vi tri chuot hien tai
+  // Neo = diem mousedown that (nhu tren) — khong de main tu hoi con tro.
+  window.overlay.dragStart({ x: origin.x + e.clientX, y: origin.y + e.clientY })
 }
 function veDangKeo(e) {
   if (!veStart) return

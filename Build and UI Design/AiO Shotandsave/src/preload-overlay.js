@@ -15,8 +15,9 @@ contextBridge.exposeInMainWorld('overlay', {
   confirm: (payload) => ipcRenderer.send('overlay:confirm', payload),
   /** Huy chup. */
   cancel: () => ipcRenderer.send('overlay:cancel'),
-  /** Bat dau keo chon — MAIN theo doi chuot he thong (dung moi scale/DPI). */
-  dragStart: () => ipcRenderer.send('overlay:drag-start'),
+  /** Bat dau keo chon — MAIN theo doi chuot he thong (dung moi scale/DPI).
+      diemNeo {x,y} = mousedown (global DIP) de main neo DUNG cho du nhan muon. */
+  dragStart: (diemNeo) => ipcRenderer.send('overlay:drag-start', diemNeo),
   /** Tha chuot — main chot vung va dieu phoi (annotate / composite / huy). */
   dragEnd: () => ipcRenderer.send('overlay:drag-end'),
   /** Vung chon hien tai (DIP toan cuc) tu main; { rect, laChu } hoac null. */
