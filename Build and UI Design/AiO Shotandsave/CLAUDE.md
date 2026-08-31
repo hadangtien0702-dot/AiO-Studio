@@ -143,6 +143,16 @@ DUNG go):
   cat locale+WebGPU shader la het phan an toan. Muon nhe nhu Lightshot (~5 MB)
   phai VIET LAI bang Tauri — quyet dinh lon, hoi anh Tien truoc.
 
+**Bay THUOC DO ve GPU/hieu nang** (dinh 31/08 khi tim lag keo — deu la thuoc
+hong, khong phai san pham hong):
+- `getGPUFeatureStatus()` query QUA SOM (ngay app.ready) bao `disabled_software`
+  GIA — GPU process chua init. Phai co CUA SO hien + cho ~3s roi moi query.
+  May nay THAT ra la RTX 4060 Ti, gpu_compositing ENABLED.
+- `requestAnimationFrame` cadence bi VSYNC khoa 60fps -> MU voi lag compositor.
+  Con so 16.7ms phang li = thuoc hong, khong phai muot. Do lag ghep man that
+  bang **CDP Page.screencast** (dem khung day ra man), khong bang rAF.
+- Anh nen test PHANG (mau don) giau chi phi ghep — dung anh chi tiet + full-res.
+
 **Kiem hoi quy truoc khi bao xong** (sau MOI lan sua/them tinh nang):
 1. `npm start -- --selftest --dev` + doc `.selftest/` (muc Verify: 4 diem).
 2. 3 harness scratchpad neu dung vung do: khay (wheel) · settings (hotkey) ·

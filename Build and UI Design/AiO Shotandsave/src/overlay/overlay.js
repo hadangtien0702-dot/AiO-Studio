@@ -134,6 +134,12 @@ function veGuongKhung(ix, iy, ix2, iy2) {
 
 window.overlay.onSelRect((d) => {
   if (mode === 'annotate') return // dang ve thi giu nguyen khung annotate
+  /* ☠️ RUNG KHI KEO (anh Tien 31/08 "lag vai"): man CHU dang keo thi khung do
+     mousemove LOCAL ve (toa do TUOI). Main ban sel-rect moi 16ms mang toa do
+     chuot CU toi 16ms -> ve de len lam khung giat toi-lui. Bo redraw tu main
+     cho man chu khi dang keo — local lo het (frame + nhan kich thuoc). Cac man
+     KHAC (mirror) van dung main vi khong co chuot local. */
+  if (dragging && d && d.laChu) return
   const W = window.innerWidth, H = window.innerHeight
   if (!d) { xoaGuong(); hintEl.classList.remove('hidden'); return }
   hintEl.classList.add('hidden')
@@ -203,6 +209,12 @@ window.addEventListener('mousemove', (e) => {
     const x2 = Math.min(window.innerWidth, Math.max(startX, e.clientX))
     const y2 = Math.min(window.innerHeight, Math.max(startY, e.clientY))
     veGuongKhung(x1, y1, x2, y2)
+    // Nhan kich thuoc LOCAL luon (phys = DIP × DPR) — man chu single-source,
+    // khong doi main gui (het rung). Man chinh sf 1.5 -> DPR 1.5, khop phys main.
+    gSize.hidden = false
+    gSize.textContent = Math.round((x2 - x1) * DPR) + ' × ' + Math.round((y2 - y1) * DPR)
+    gSize.style.left = x1 + 'px'
+    gSize.style.top = (y1 >= 26 ? y1 - 24 : y1 + 4) + 'px'
   }
 })
 

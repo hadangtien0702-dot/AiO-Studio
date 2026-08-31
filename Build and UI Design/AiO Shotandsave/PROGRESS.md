@@ -1,5 +1,49 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 13:30 — 0.3.15: bo NGUON VE THUA khi keo (rung/lag) + 3 bay thuoc do
+
+### Boi canh
+Anh Tien: "drag khung chup lag vai" (sau 0.3.14). GPU tot ma van lag.
+
+### 3 BAY THUOC DO cua em trong buoi (thu nhan — da lam mat thoi gian)
+1. ☠️ **getGPUFeatureStatus() query QUA SOM = bao software GIA.** Query ngay
+   luc app.ready (GPU process chua init) tra "disabled_software" -> em ket
+   luan nham "may software rendering" va di ca huong sai. Do lai SAU khi co
+   cua so hien + cho 3s: **enabled**, ANGLE NVIDIA RTX 4060 Ti. May GPU rat
+   manh. -> Query GPU phai co cua so THAT + cho GPU process len.
+2. ☠️ **rAF cadence VSYNC-CAPPED, mu voi lag compositor.** Do frame-time qua
+   requestAnimationFrame ra 16.7ms PHANG LI (p50=p95=max) o MOI dieu kien —
+   khong phai "muot" ma la rAF bi khoa 60fps theo vsync, khong phan anh chi
+   phi ghep that. Con so qua deu = dau hieu thuoc hong.
+3. ☠️ **Anh nen test PHANG giau chi phi.** Do dau dung anh mau phang (re) ->
+   0 jank; anh chi tiet + full-res moi lo. (Lap lai bai 5aa.)
+   Thuoc do dung cuoi cung: **CDP Page.screencast dem khung compositor THAT**
+   day ra man (nen 4K 35fps vs khong nen 40fps — nen ngon ~13%).
+
+### Nguyen nhan (khong do duoc 100%, nhung chac ve co che)
+Khi keo tren man CHU, khung do HAI nguon ve: (a) mousemove LOCAL toa do tuoi,
+(b) main ban 'sel-rect' moi 16ms mang toa do chuot CU toi 16ms. Hai nguon da
+nhau -> khung giat toi-lui = "lag" du fps cao (rung chu khong cham).
+
+### Thay doi
+- overlay.js onSelRect: `if (dragging && d.laChu) return` — man chu dang keo
+  BO redraw tu main (local lo). Man khac (mirror) van dung main.
+- overlay.js mousemove: nhan kich thuoc tinh LOCAL (phys = DIP × DPR) — man
+  chu single-source, khong cho main gui.
+
+### Kiem chung
+- 2 harness (jitter + drag): khung van bam local 4/4 buoc, 0 dao chieu, syntax OK.
+- ☠️ KHONG tai lap duoc "lag vai" trong harness (harness khong tao duoc do
+  lech pha async that giua 2 nguon). Nen day la ban va theo CO CHE + bot viec
+  (chac chan khong te hon), THUOC DO CUOI la MAT ANH TIEN.
+- May that: cai 0.3.15, tien trinh 0.3.15.0.
+
+### Neu VAN lag (huong tiep, chua lam)
+Screencast do duoc nen 4K ngon ~13%. Neu bo nguon thua chua du, buoc sau la
+giam chi phi ghep nen 4K luc keo (dim bake san / chi repaint vung chon) —
+danh doi voi video, se ban voi anh truoc khi lam.
+
+
 ## 2026-08-31 12:40 — 0.3.14: GIAM DUNG LUONG bo cai 99 -> 84 MB (cat an toan, da verify render)
 
 ### Boi canh
