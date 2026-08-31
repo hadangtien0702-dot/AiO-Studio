@@ -3,13 +3,16 @@
 /* Man Cai dat — mot CTA chinh moi trang thai (bai hoc "4 nut lang nhang"):
    idle:      [keycaps hien tai]              [Doi phim…]
    recording: [Nhan to hop moi… (nhap nhay)]  [Huy]
-   pending:   [keycaps MOI]                   [Luu] [Huy]                     */
+
+   ☠️ 31/08: BO trang thai "pending + nut Luu". Anh Tien nhan to hop moi,
+   man hinh hien keycaps MOI -> tuong xong, dong cua so — nhung phim chi nam
+   trong bien `pending` cua renderer, CHUA he luu. Restart may xong mo ra
+   thay "phim cu" -> anh bao "no tu doi phim". Nay nhan to hop la LUU NGAY. */
 
 const t = (k) => window.i18n.t(k)
 
 const keysEl = document.getElementById('keys')
 const btnDoi = document.getElementById('doi')
-const btnSave = document.getElementById('save')
 const btnHuyGhi = document.getElementById('huy-ghi')
 const btnReset = document.getElementById('reset')
 const msg = document.getElementById('msg')
@@ -28,8 +31,7 @@ const verEl = document.getElementById('ver')
 
 let isMac = false
 let hotkey = ''      // phim dang dung (accelerator)
-let pending = null   // phim vua ghi, cho Luu
-let state = 'idle'   // 'idle' | 'recording' | 'pending'
+let state = 'idle'   // 'idle' | 'recording' | 'saving'
 
 function dichGiaoDien() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -58,8 +60,7 @@ function veKeys() {
     keysEl.textContent = t('set.phim.nhanToHop')
     return
   }
-  const accel = state === 'pending' ? pending : hotkey
-  const phim = tachPhim(accel)
+  const phim = tachPhim(hotkey)
   phim.forEach((p, i) => {
     if (i > 0) {
       const cong = document.createElement('span')
@@ -76,8 +77,7 @@ function veKeys() {
 
 function veNut() {
   btnDoi.hidden = state !== 'idle'
-  btnSave.hidden = state !== 'pending'
-  btnHuyGhi.hidden = state === 'idle'
+  btnHuyGhi.hidden = state !== 'recording'
 }
 
 function datTrangThai(s) {
@@ -171,20 +171,19 @@ function mainKey(e) {
 }
 
 btnDoi.addEventListener('click', () => {
-  pending = null
   msg.textContent = ''
   msg.className = 'msg'
   datTrangThai('recording')
 })
 
 btnHuyGhi.addEventListener('click', () => {
-  pending = null
   msg.textContent = ''
   msg.className = 'msg'
   datTrangThai('idle')
 })
 
-window.addEventListener('keydown', (e) => {
+/* Nhan to hop hop le la LUU NGAY — khong co buoc "Luu" de quen (vap 31/08). */
+window.addEventListener('keydown', async (e) => {
   if (state !== 'recording') return
   e.preventDefault()
   const mods = []
@@ -199,15 +198,8 @@ window.addEventListener('keydown', (e) => {
     msg.className = 'msg err'
     return
   }
-  pending = mods.concat(key).join('+')
-  msg.textContent = ''
-  msg.className = 'msg'
-  datTrangThai('pending')
-})
-
-btnSave.addEventListener('click', async () => {
-  if (!pending) return
-  const r = await window.settings.setHotkey(pending)
+  datTrangThai('saving') // chan keydown tiep theo trong luc cho main tra loi
+  const r = await window.settings.setHotkey(mods.concat(key).join('+'))
   hotkey = r.hotkey
   if (r.ok) {
     msg.textContent = t('set.phim.daLuu')
@@ -216,14 +208,12 @@ btnSave.addEventListener('click', async () => {
     msg.textContent = t('set.phim.biGiu')
     msg.className = 'msg err'
   }
-  pending = null
   datTrangThai('idle')
 })
 
 btnReset.addEventListener('click', async () => {
   const r = await window.settings.reset()
   hotkey = r.hotkey
-  pending = null
   msg.textContent = r.ok ? t('set.phim.veMacDinh') : t('set.phim.veMacDinhLoi')
   msg.className = r.ok ? 'msg ok' : 'msg err'
   datTrangThai('idle')

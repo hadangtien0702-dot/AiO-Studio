@@ -5,6 +5,8 @@
 
 const DICH = {
   vi: {
+    // App
+    'app.phimBiGiu': 'Phím tắt chụp {phim} đang bị ứng dụng khác giữ — bấm sẽ không ăn. Mở Cài đặt để đổi phím.',
     // Tray
     'tray.chup': 'Chụp vùng chọn',
     'tray.khay': 'Hiện khay ảnh',
@@ -77,6 +79,7 @@ const DICH = {
     'ghim.veXong': 'Lưu nét vẽ (Enter)',
   },
   en: {
+    'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
     'tray.chup': 'Capture area',
     'tray.khay': 'Show shelf',
     'tray.moThuMuc': 'Open save folder',

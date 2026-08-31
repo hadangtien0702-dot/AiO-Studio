@@ -95,7 +95,13 @@ function ghiCauHinh(patch) {
     const cur = docCauHinh()
     const next = Object.assign({}, cur, patch)
     fs.mkdirSync(path.dirname(duongDanCauHinh()), { recursive: true })
-    fs.writeFileSync(duongDanCauHinh(), JSON.stringify(next, null, 2))
+    /* Ghi ATOMIC (tmp + rename): file nay duoc ghi RAT thuong xuyen (moi lan
+       keo khay la savePos). May sap/restart giua writeFileSync thang vao file
+       that -> JSON hong -> docCauHinh tra {} -> MOI cai dat ve mac dinh
+       (phim tat, ngon ngu, kieu khay) ma khong ai biet vi sao (31/08). */
+    const tmp = duongDanCauHinh() + '.tmp'
+    fs.writeFileSync(tmp, JSON.stringify(next, null, 2))
+    fs.renameSync(tmp, duongDanCauHinh())
     return next
   } catch (err) {
     console.error('[kho] khong ghi duoc cau hinh:', err)

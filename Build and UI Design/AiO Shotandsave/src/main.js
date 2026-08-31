@@ -17,6 +17,7 @@
 const {
   app, BrowserWindow, Tray, Menu, globalShortcut,
   ipcMain, screen, desktopCapturer, nativeImage, clipboard, shell, dialog,
+  Notification,
 } = require('electron')
 const path = require('path')
 const fs = require('fs')
@@ -101,10 +102,24 @@ app.setName('AiO Shot & Save')
 if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsave')
 
 app.whenReady().then(() => {
-  currentHotkey = kho.docCauHinh().hotkey || DEFAULT_HOTKEY
-  lang = kho.docCauHinh().lang || 'vi'
+  const ch = kho.docCauHinh()
+  currentHotkey = ch.hotkey || DEFAULT_HOTKEY
+  lang = ch.lang || 'vi'
   createTray()
-  registerHotkey()
+  const okPhim = registerHotkey()
+  /* Nhat ky boot: sau nay ai bao "phim tat doi/khong an" la co dau vet ngay
+     (truoc 31/08 log chi ghi thao tac chup — chuyen phim tat MU hoan toan). */
+  ghiLog('boot v' + app.getVersion() + ' hotkey=' + currentHotkey +
+    (ch.hotkey ? '(config)' : '(default)') + ' dang-ky=' + (okPhim ? 'OK' : 'FAIL') +
+    ' lang=' + lang)
+  /* Phim bi app khac giu -> bao HAN ra man hinh, dung chet im lang: nguoi
+     dung bam khong an se tuong "phim tu doi" (chi bao khi THAT BAI). */
+  if (!okPhim && Notification.isSupported()) {
+    new Notification({
+      title: 'AiO Shot & Save',
+      body: T('app.phimBiGiu').replace('{phim}', formatAccel(currentHotkey)),
+    }).show()
+  }
   // Khong tu mo cua so nao — day la app song o khay he thong.
 
   // Che do tu kiem: tu chup -> tu chon vung -> tu ghim (de verify pipeline).
@@ -197,11 +212,13 @@ function setHotkey(accel) {
   try { ok = globalShortcut.register(accel, () => startCapture()) } catch (e) { ok = false }
   if (!ok) {
     try { globalShortcut.register(old, () => startCapture()) } catch (e) {}
+    ghiLog('doi phim ' + old + ' -> ' + accel + ' FAIL (bi giu), giu phim cu')
     return { ok: false, hotkey: old }
   }
   currentHotkey = accel
   kho.ghiCauHinh({ hotkey: accel })
   rebuildTrayMenu()
+  ghiLog('doi phim ' + old + ' -> ' + accel + ' OK, da luu config')
   return { ok: true, hotkey: accel }
 }
 

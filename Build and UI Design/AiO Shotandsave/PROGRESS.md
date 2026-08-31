@@ -1,5 +1,44 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 07:49 — 0.3.8: doi phim tat la LUU NGAY — het canh "restart may no doi phim"
+
+### Boi canh
+Anh Tien bao: doi nut chup xong, khoi dong lai may thi phim "doi sang phim
+khac". Doc code man Cai dat thi ra lo hong quy trinh: nhan to hop moi ->
+man hinh hien KEYCAPS MOI ngay (trang thai pending) -> nguoi dung tuong xong,
+dong cua so — nhung phim chi nam trong bien `pending` cua renderer, phai bam
+nut "Luu" moi thanh that. Dong cua so la mat, restart may mo ra thay phim cu
+-> cam giac "no tu doi". Config tren may anh (userData) dang luu "Shift+`",
+ghi luc 07:39 sang nay — khop kich ban anh vua doi lai.
+
+### Thay doi (4 lop, 1 goc + 3 chong tai dien)
+1. **settings.js — GOC:** nhan to hop hop le la setHotkey NGAY, bo han trang
+   thai pending + nut Luu (HTML bo button#save). Khong con buoc de quen.
+2. **kho.js:** ghiCauHinh ghi ATOMIC (tmp + renameSync). File nay ghi moi lan
+   keo khay (savePos) — may sap giua writeFileSync la JSON hong ->
+   docCauHinh tra {} -> MOI cai dat ve mac dinh im lang (mot duong nua ra
+   dung trieu chung "restart xong phim doi").
+3. **main.js:** run-log gio ghi dong boot (version + phim + config/default +
+   dang-ky OK/FAIL + lang) va ghi moi lan doi phim. Truoc do log chi ghi thao
+   tac chup — chuyen phim tat MU hoan toan, lan nay phai doan tu code.
+4. **main.js:** phim bi app khac giu luc boot -> Notification bao ro (VI/EN,
+   i18n key app.phimBiGiu) — truoc do chet IM LANG, bam khong an cung de
+   tuong "phim tu doi".
+
+### Kiem chung (moi truong test rieng, userData tro scratchpad)
+- Nap man Cai dat THAT + preload THAT, CDP bam nut "Doi phim…" roi nhan
+  Alt+P: main nhan settings:set-hotkey('Alt+P') DUNG 1 LAN, UI bao
+  "✓ Da luu", keycaps Alt+P, ve idle. DAT.
+- kho.ghiCauHinh atomic: ghi -> doc lai dung het, khong sot file .tmp. DAT.
+- node --check 4 file sua: sach.
+- Dong boot trong run-log kiem tren may that sau khi cai 0.3.8 (xem duoi).
+
+### Ghi chu chan doan
+- Truoc ban vá, run-log KHONG co dau vet gi ve hotkey nen khong the khang
+  dinh 100% kich ban (co the con duong config-hong). Ca hai duong deu da
+  chan trong cung lan sua (luat 5aj).
+
+
 ## 2026-08-28 16:00 — 0.3.7: con lan chuot cuon duoc day anh trong khay
 
 ### Boi canh

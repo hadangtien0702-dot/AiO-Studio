@@ -112,7 +112,14 @@ HIEN TUC THI (25/08): overlay cua so TRONG SUOT hien NGAY (~165ms), grab chay NE
 sau khi overlay hien (getSources CHAN luong chinh nen KHONG duoc grab truoc khi
 hien). Frozen den sau -> freeze view. Selection do renderer nen keo duoc ngay.
 
-MAN CAI DAT PHIM TAT (25/08): mo tu tray -> "Ghi phim moi" -> nhan to hop -> Luu.
+MAN CAI DAT PHIM TAT (25/08): mo tu tray -> "Doi phim…" -> nhan to hop -> LUU
+NGAY. ☠️ 31/08 BO nut "Luu": anh Tien nhan to hop, thay keycaps moi hien len
+-> dong cua so tuong xong, nhung phim chi nam trong bien pending cua renderer
+-> restart may thay "phim tu doi" (thuc ra chua tung luu). Nhan to hop hop le
+la setHotkey ngay. Kem 31/08: ghiCauHinh ghi ATOMIC (tmp+rename — file nay ghi
+moi lan keo khay, sap giua chung la JSON hong -> MOI cai dat ve mac dinh);
+run-log ghi dong "boot ... dang-ky=OK/FAIL"; phim bi app khac giu luc boot thi
+bao Notification (truoc do chet im lang).
 Bo ghi dung `e.code` (vi tri phim), khong dung `e.key` (doi theo Shift). Luu vao
 `cau-hinh.json`, nap luc khoi dong. Doi that bai (app khac giu phim) thi giu phim
 cu. ☠️ Accelerator backtick la `Alt+\`` (literal), KHONG phai 'Alt+Backquote'.
