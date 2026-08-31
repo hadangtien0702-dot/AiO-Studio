@@ -14,8 +14,11 @@ Anh Tien lam viec tren 2 may, dong bo qua GitHub `hadangtien0702-dot/AiO-Studio`
 | Nha (user `hadan`) | `D:\Production\AiO Studio` |
 
 **Luat:**
-- Lam xong o may nao → **push** len GitHub ngay.
-- Ngoi vao may kia → **pull TRUOC khi lam**: `git pull` trong thu muc repo.
+- Lam xong o may nao → **push** len GitHub ngay (pull truoc roi moi push).
+- Ngoi vao may kia → chay **`scripts\dong-bo-may.ps1`** TRUOC khi lam — no lam
+  du 3 viec: pull code moi · dem file so voi GitHub · soi node_modules/FFmpeg
+  con thieu gi de chay (them `-CaiThem` la tu npm install cho thieu):
+  `powershell -ExecutionPolicy Bypass -File "<repo>\scripts\dong-bo-may.ps1"`
 - Git KHONG tu dong bo nhu Drive — quen pull la ngoi lam tren ban cu ma khong
   co canh bao gi (da xay ra: may nha dung lai o 24/08, thieu 32 commit).
 - Kiem 2 may khop: `git ls-files | find /c /v ""` o ca 2 dau, so phai bang nhau.
