@@ -74,8 +74,13 @@ soi node_modules/Electron/FFmpeg, thêm `-CaiThem` là tự npm install). Sửa 
    `git -c credential.helper= -c credential.helper=manager push`
 4. Kiểm bằng số: `git status -sb` phải ra `## main...origin/main` không lệch,
    không còn file định đưa lên mà chưa lên.
-5. Trong báo cáo cuối (bước 5) nhắc một dòng: *"đã push commit `<mã>` — máy kia
-   chạy `scripts\dong-bo-may.ps1` là xong (kéo + kiểm + cài thiếu)"*.
+5. **Đẩy brain tổng** (nếu phiên có ghi bài học vào `~/.claude/CLAUDE.md` hay
+   skill): chạy `powershell -ExecutionPolicy Bypass -File
+   "%USERPROFILE%\.claude\brain-repo\dong-bo-brain.ps1" -Day` — nó chép brain
+   vào repo PRIVATE `hadangtien0702-dot/brain` rồi push. ☠️ Brain KHÔNG được
+   nằm trong repo AiO-Studio (repo đó PUBLIC — anh Tiến chốt để public 31/08).
+6. Trong báo cáo cuối (bước 5) nhắc một dòng: *"đã push commit `<mã>` — máy kia
+   chạy `scripts\dong-bo-may.ps1` là xong (kéo code + brain + cài thiếu)"*.
 
 Phiên không sửa mã nguồn → bỏ qua bước này, nói rõ là không có gì để push.
 

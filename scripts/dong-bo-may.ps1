@@ -22,7 +22,7 @@ $repo = Split-Path $PSScriptRoot -Parent
 Write-Host "=== DONG BO MAY - repo: $repo ===" -ForegroundColor Cyan
 
 # ---------- 1. KEO CODE MOI VE ----------
-Write-Host "`n[1/4] git pull..." -ForegroundColor Yellow
+Write-Host "`n[1/5] git pull..." -ForegroundColor Yellow
 Push-Location $repo
 git pull
 if ($LASTEXITCODE -ne 0) {
@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ---------- 2. KIEM THU MUC KHOP GITHUB ----------
-Write-Host "`n[2/4] Doi chieu file voi GitHub..." -ForegroundColor Yellow
+Write-Host "`n[2/5] Doi chieu file voi GitHub..." -ForegroundColor Yellow
 $dsFile = git -c core.quotepath=false ls-files
 $soFile = ($dsFile | Measure-Object).Count
 $thieu = $dsFile | Where-Object { -not (Test-Path -LiteralPath (Join-Path $repo $_)) }
@@ -46,7 +46,7 @@ if ($thieu) {
 }
 
 # ---------- 3. KIEM DO CHAY: node_modules / Electron / FFmpeg ----------
-Write-Host "`n[3/4] Kiem nhung thu can de CHAY (khong nam tren GitHub)..." -ForegroundColor Yellow
+Write-Host "`n[3/5] Kiem nhung thu can de CHAY (khong nam tren GitHub)..." -ForegroundColor Yellow
 
 $npmOk = $null -ne (Get-Command npm -ErrorAction SilentlyContinue)
 if (-not $npmOk) {
@@ -94,7 +94,7 @@ if ($binThieu.Count -gt 0) {
 # ---------- 4. CAI LENH /xong VAO MAY NAY ----------
 # Lenh /xong goc nam trong repo (.claude/commands/) - chep vao ~/.claude/commands
 # de go /xong duoc o MOI du an tren may nay, khong chi khi mo repo AiO Studio.
-Write-Host "`n[4/4] Dong bo lenh /xong ve may nay..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Dong bo lenh /xong ve may nay..." -ForegroundColor Yellow
 $lenhNguon = Join-Path $repo '.claude\commands'
 $lenhDich = Join-Path $env:USERPROFILE '.claude\commands'
 if (Test-Path $lenhNguon) {
@@ -113,6 +113,19 @@ if (Test-Path $lenhNguon) {
             Write-Host "  DAT: /$($_.BaseName) da moi nhat" -ForegroundColor Green
         }
     }
+}
+
+# ---------- 5. NHAN BRAIN TONG ----------
+# Brain tong (~/.claude/CLAUDE.md + skills) dong bo qua repo PRIVATE rieng
+# github.com/hadangtien0702-dot/brain - KHONG nam trong repo nay (repo nay public).
+Write-Host "`n[5/5] Nhan brain tong..." -ForegroundColor Yellow
+$brainScript = Join-Path $env:USERPROFILE '.claude\brain-repo\dong-bo-brain.ps1'
+if (Test-Path $brainScript) {
+    powershell -ExecutionPolicy Bypass -File $brainScript
+} else {
+    Write-Host "  Brain chua thiet lap tren may nay. Chay MOT LAN:" -ForegroundColor Yellow
+    Write-Host '  git clone https://github.com/hadangtien0702-dot/brain.git "%USERPROFILE%\.claude\brain-repo"' -ForegroundColor Yellow
+    Write-Host "  (repo private - GitHub hoi dang nhap tai khoan hadangtien0702-dot mot lan)" -ForegroundColor Yellow
 }
 
 Write-Host "`n=== Nhung thu CO Y khong co (khong phai loi): bo cai .exe/.rar trong Release, Test Media 1,33 GB, .env.local cua Website ===" -ForegroundColor DarkGray
