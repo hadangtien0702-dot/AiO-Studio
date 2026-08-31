@@ -76,11 +76,13 @@ window.overlay.onFrozen((data) => {
         /* Ve anh dung KICH THUOC MAN (anh that / sf), neo goc tren-trai —
            KHONG keo 100% theo cua so: cua so co the du 1-2px (setBounds tren
            man DPI le) ma anh thi phai khop MAN, khong la lech taskbar. Do
-           anh THAT (naturalWidth) roi chia sf, khong tin pw/ph (bay cu). */
-        shotEl.style.backgroundSize =
-          (own.img.naturalWidth / own.sf) + 'px ' + (own.img.naturalHeight / own.sf) + 'px'
-        shotEl.style.backgroundPosition = '0 0'
-        shotEl.style.backgroundImage = "url('" + own.img.src + "')"
+           anh THAT (naturalWidth) roi chia sf, khong tin pw/ph (bay cu).
+           Dan bang CHINH the <img> da decode (khong CSS background): background
+           la request no-CORS — cache key KHAC voi Image crossOrigin -> tai +
+           decode anh 5K2K lan HAI ngay giua luc keo (may nha 31/08). */
+        own.img.style.width = (own.img.naturalWidth / own.sf) + 'px'
+        own.img.style.height = (own.img.naturalHeight / own.sf) + 'px'
+        shotEl.replaceChildren(own.img)
         requestAnimationFrame(() => shotEl.classList.add('co-anh'))
       }
       if (own.img.decode) own.img.decode().then(dan, dan)
@@ -90,9 +92,15 @@ window.overlay.onFrozen((data) => {
   }
   for (const L of list) {
     const im = new Image()
+    /* Anh nap tu aioshot:// (buffer o main) thay vi dataURL base64 ~15-25MB
+       qua IPC — chinh chuoi do lam renderer nghen giua luc keo (may nha 31/08).
+       crossOrigin + ACAO tu protocol de canvas ghep (xong/composite) khong
+       bi taint -> toDataURL van chay. */
+    im.crossOrigin = 'anonymous'
+    im.draggable = false
     im.onload = xongTai
     im.onerror = xongTai
-    im.src = L.dataUrl
+    im.src = L.url
     news.push({ img: im, x: L.x, y: L.y, w: L.w, h: L.h, sf: L.sf,
                 px: L.px, py: L.py, pw: L.pw, ph: L.ph })
   }
@@ -185,6 +193,31 @@ window.overlay.onComposite((rect) => {
   confirmComposite(rect)
 })
 
+/* ── Thuoc do nhip keo (ghi run-log — doi chieu duoc tren may that, so #7).
+   rAF do NGHEN MAIN THREAD renderer (frozen/decode do xuong giua luc keo).
+   ☠️ Bay thuoc do 31/08: rAF vsync-MU voi lag compositor — thuoc nay CHI ket
+   luan duoc ve nghen main thread, khong thay lag ghep man. */
+let doKeo = null
+function batDauDoKeo() {
+  doKeo = { raf: 0, last: performance.now(), max: 0, n: 0 }
+  const tick = () => {
+    if (!doKeo) return
+    const now = performance.now()
+    const gap = now - doKeo.last
+    if (gap > doKeo.max) doKeo.max = gap
+    doKeo.last = now
+    doKeo.n++
+    doKeo.raf = requestAnimationFrame(tick)
+  }
+  doKeo.raf = requestAnimationFrame(tick)
+}
+function ketThucDoKeo() {
+  if (!doKeo) return
+  cancelAnimationFrame(doKeo.raf)
+  window.overlay.log('keo ' + doKeo.n + ' khung, gap-max=' + Math.round(doKeo.max) + 'ms')
+  doKeo = null
+}
+
 /* ── Chon vung ────────────────────────────────────────────────────────── */
 window.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return
@@ -194,6 +227,7 @@ window.addEventListener('mousedown', (e) => {
   dragging = true
   startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
   hintEl.classList.add('hidden')
+  batDauDoKeo()
   // MAIN theo doi chuot he thong (dung moi scale) va phat 'sel-rect' ve.
   window.overlay.dragStart()
 })
@@ -228,6 +262,7 @@ window.addEventListener('mouseup', (e) => {
   if (mode === 'annotate') { ketThucVe(e); return }
   if (!dragging) return
   dragging = false
+  ketThucDoKeo()
   window.overlay.dragEnd() // main chot vung + dieu phoi (annotate/composite/huy)
 })
 
@@ -310,6 +345,7 @@ function chonLaiTuDau(e) {
   selEl.hidden = true
   dragging = true
   startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
+  batDauDoKeo()
   window.overlay.dragStart() // main theo doi tu vi tri chuot hien tai
 }
 function veDangKeo(e) {

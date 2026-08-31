@@ -17,7 +17,7 @@
 const {
   app, BrowserWindow, Tray, Menu, globalShortcut,
   ipcMain, screen, desktopCapturer, nativeImage, clipboard, shell, dialog,
-  Notification,
+  Notification, protocol,
 } = require('electron')
 const path = require('path')
 const fs = require('fs')
@@ -35,9 +35,33 @@ app.commandLine.appendSwitch(
   'AllowWgcScreenCapturer,AllowWgcWindowCapturer,AllowWgcZeroHz'
 )
 
+/* ☠️ ANH DONG BANG DI QUA aioshot:// CHU KHONG QUA IPC (may nha anh Tien 31/08
+   "van giat y chang" du may cong ty da DAT): man 5120x2160 -> PNG base64
+   ~15-25MB, gui 'overlay:frozen' la renderer DANG VE KHUNG THEO CHUOT phai
+   nuot chuoi do tren main thread cua no -> nghen mot nhip = giat. Log that
+   6/6 luot: drag-start roi dung 20-40ms sau grab-xong (bam chuot khi grab con
+   chay, frozen do xuong giua luc keo). Man cong ty nho -> chuoi nho -> "het",
+   ve nha man 5K2K -> y chang. Nay main giu buffer PNG, phuc vu qua protocol;
+   IPC chi mang URL vai chuc byte, nap/decode anh chay o luong rieng cua
+   Chromium. corsEnabled + ACAO de canvas ghep shape/vat-man KHONG bi taint
+   (da do bang harness taint 31/08). Phai goi TRUOC app ready. */
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'aioshot', privileges: { corsEnabled: true, supportFetchAPI: true, stream: true } },
+])
+const frozenStore = new Map() // 'gen/displayId' -> Buffer PNG (xoa moi capture/close)
+let grabGen = 0
+
 const IS_DEV = process.argv.includes('--dev')
 const IS_SELFTEST = process.argv.includes('--selftest')
 const IS_DRAGTEST = process.argv.includes('--selftest-drag')
+
+/* ☠️ Selftest phai CACH LY userData (vap 31/08 may nha): ban cai dang chay
+   giu khoa single-instance (khoa theo userData) -> selftest boot xong TU THOAT
+   (khong capture nao chay ma exit van 0 = XANH GIA, so #6), con ban cai thi
+   nhan 'second-instance' -> BUNG overlay chup ngay tren man nguoi dung. */
+if (IS_SELFTEST || IS_DRAGTEST) {
+  app.setPath('userData', path.join(__dirname, '..', '.selftest', 'userData'))
+}
 const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
 let currentHotkey = DEFAULT_HOTKEY // nap tu config khi app ready
 let lang = 'vi' // 'vi' | 'en' — nap tu config
@@ -66,7 +90,13 @@ const RUN_LOG = app.isPackaged
   : path.join(__dirname, '..', '.run-log.txt')
 function ghiLog(msg) {
   try {
-    const dong = new Date().toISOString().slice(11, 23) + ' ' + msg + '\n'
+    /* ☠️ Gio DIA PHUONG, khong toISOString (UTC): log tung lech -7h so voi
+       ten file anh -> doc log tuong "chup tu trua" trong khi vua chup xong
+       (vap that 31/08 luc truy vet may nha). */
+    const d = new Date()
+    const p2 = (n, k) => String(n).padStart(k || 2, '0')
+    const dong = p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' +
+      p2(d.getSeconds()) + '.' + p2(d.getMilliseconds(), 3) + ' ' + msg + '\n'
     try { if (fs.statSync(RUN_LOG).size > 300 * 1024) fs.writeFileSync(RUN_LOG, '') } catch (e) {}
     fs.appendFileSync(RUN_LOG, dong)
   } catch (e) {}
@@ -102,6 +132,20 @@ app.setName('AiO Shot & Save')
 if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsave')
 
 app.whenReady().then(() => {
+  // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
+  protocol.handle('aioshot', (req) => {
+    const m = /^aioshot:\/\/frozen\/(\d+\/[^/]+)\.png$/.exec(req.url)
+    const buf = m ? frozenStore.get(m[1]) : null
+    if (!buf) return new Response('', { status: 404 })
+    return new Response(buf, {
+      headers: {
+        'Content-Type': 'image/png',
+        'Access-Control-Allow-Origin': '*', // canvas ghep can CORS sach (taint)
+        'Cache-Control': 'max-age=60',      // background + Image cung URL dung chung cache
+      },
+    })
+  })
+
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
   lang = ch.lang || 'vi'
@@ -439,18 +483,24 @@ function kickGrab() {
   grabPromise.then((list) => {
     // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
     // de renderer GHEP duoc vung chon VAT NGANG 2 man (anh Tien 25/08: khoanh
-    // ca 2 man ma luu chi co 1 man).
+    // ca 2 man ma luu chi co 1 man). Anh di qua aioshot:// (buffer o main),
+    // IPC chi mang URL — het nghen renderer giua luc keo (may nha 31/08).
+    if (!overlayWins.length) return // da Esc/dong truoc khi grab xong — khong giu buffer
+    grabGen++
+    frozenStore.clear() // chi giu the he hien tai
     const layers = list.map((x) => {
       const m = manCache.find((mm) => mm.id === x.display.id) || {}
+      const key = grabGen + '/' + x.display.id
+      frozenStore.set(key, x.png)
       return {
         x: x.display.bounds.x, y: x.display.bounds.y,
         w: x.display.bounds.width, h: x.display.bounds.height,
-        sf: x.sf, dataUrl: x.dataUrl,
+        sf: x.sf, url: 'aioshot://frozen/' + key + '.png',
         px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
       }
     })
     ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms layers=' + layers.length + ' [' +
-      list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph }).join(' | ') + ']')
+      list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph + ' / png ' + Math.round(x.png.length / 1024) + 'KB' }).join(' | ') + ']')
     for (const win of overlayWins) {
       if (win.isDestroyed()) continue
       const item = list.find((x) => x.display.id === win._displayId)
@@ -593,8 +643,8 @@ async function grabDisplaysList() {
     // ☠️ PNG (lossless) chu KHONG JPEG: anh co shape / vat 2 man ghep tu lop nay
     // — JPEG 90 la chu nho co vien nhieu khi zoom (khong xung tool cho editor).
     // PNG 4K ton ~250ms/man nhung grab chay NEN (overlay da hien) nen khong sao.
-    const dataUrl = 'data:image/png;base64,' + img.toPNG().toString('base64')
-    return { display: d, image: img, dataUrl, sf }
+    // Buffer PNG giu o main, phuc vu qua aioshot:// — KHONG base64 qua IPC nua.
+    return { display: d, image: img, png: img.toPNG(), sf }
   }))
   return boSung.filter(Boolean)
 }
@@ -692,6 +742,7 @@ function closeOverlay() {
   for (const w of overlayWins) { if (!w.isDestroyed()) w.close() }
   overlayWins = []
   pending = null
+  frozenStore.clear() // buffer PNG 5K2K ~10-25MB/man — khong giu sau khi chup
 }
 
 /* ---------------------------------------------------------------------- */

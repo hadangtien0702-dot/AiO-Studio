@@ -1,13 +1,19 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 14:38 +0700
-> - Ban dang chay tren may anh Tien: **0.4.0** (phat hanh chot, cai de 14:37,
->   boot OK, phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.0/`.
-> - Chuoi keo-chon da qua MAT ANH TIEN: "ngon roi em, het nhay roi".
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 21:55 +0700
+> - Ban dang chay tren MAY NHA anh Tien: **0.4.1** (cai de 21:52, boot OK,
+>   phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.1/`.
+> - 0.4.1 = sua "MAY NHA van giat khi keo" (may cong ty da DAT 0.4.0): anh
+>   dong bang di qua protocol `aioshot://` thay vi base64 ~5,7MB qua IPC do
+>   xuong renderer dang keo. CHO ANH CHAM tren may nha; run-log nay ghi
+>   `keo N khung, gap-max=Xms` moi luot keo — anh con thay giat thi doc so
+>   nay truoc, gap-max nho ma van giat = lag o COMPOSITOR (WGC/grab), khong
+>   phai renderer.
 > - ☠️ Truoc khi sua bat cu gi: doc muc **SO LOI TAI DIEN** trong CLAUDE.md
->   (8 loi + bay thuoc do + checklist kiem hoi quy). Vung ve-khung-khi-keo
->   dung vao PHAI chay test-keo-vat-man.js + test-overlay-drag.js (scratchpad
->   phien 31/08 — neu mat thi dung lai theo mo ta trong PROGRESS).
+>   (9 loi + bay thuoc do + checklist kiem hoi quy). Vung ve-khung-khi-keo /
+>   duong frozen dung vao PHAI chay 4 harness scratchpad phien 21:45 31/08
+>   (test-overlay-drag · test-keo-vat-man · test-frozen-storm · test-composite
+>   — neu mat thi dung lai theo mo ta trong PROGRESS).
 > - [CHO] anh cham: chup video con "giat mot cai" khong sau ham nong (san
 >   ~400ms Electron enumerate; muon nhanh hon ~170ms nua phai doi nen hien
 >   thi sang JPEG — danh doi chat luong, anh quyet).
@@ -15,6 +21,70 @@
 >   (xa hon) viet lai Tauri neu can nhe ~5MB nhu Lightshot — cho anh chot.
 > - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
 >   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+
+## 2026-08-31 21:52 — 0.4.1: MAY NHA het "van giat y chang" — anh dong bang di aioshot://, thoi base64 qua IPC
+
+### Boi canh
+Anh Tien (may NHA, 21:34): "van bi giat khi keo khung chon" + "loi nay fix
+nhieu lan o cong ty roi o nha anh van bi y chang". May nha: man 5120x2160@1.25
++ 2560x1440@1 — khac han 2 man cong ty (150%+125%).
+
+### Goc DA DO (khong doan)
+- Run-log ban cai 0.4.0 (bay #3 loai: tien trinh dung 0.4.0.0): 6/6 luot keo
+  toi 21:30-21:32 deu co `drag-start` roi DUNG 20-40ms sau `grab-xong ~880ms`
+  — deu tam tap khong the la tay nguoi => anh bam chuot TRONG luc grab chay,
+  main nghen nen nhan drag-start muon, roi NGAY lap tuc gui 'overlay:frozen'.
+- Payload do that: man 5K2K ra PNG 1,8-4,3MB (tuy noi dung man) -> base64
+  ~2,4-5,7MB/man x 2 man x 2 cua so overlay — chuoi nay di qua IPC vao DUNG
+  renderer dang ve khung theo chuot -> renderer nghen mot nhip = giat. May
+  cong ty man nho -> chuoi nho -> "het"; ve nha 5K2K -> y chang.
+- ☠️ Bay thuoc do MOI (suyt lac duong 30 phut): run-log ghi gio UTC
+  (toISOString) lech -7h so voi ten file anh — log 14:31 thuc ra la 21:31
+  (vua chup xong). Da sua ghiLog sang gio dia phuong.
+
+### Thay doi
+1. **main.js:** protocol `aioshot://` (registerSchemesAsPrivileged corsEnabled
+   + handle tra buffer PNG tu `frozenStore` Map, header ACAO:* de canvas ghep
+   khong taint). `grabDisplaysList` tra buffer thay dataUrl; `kickGrab` gui
+   layers mang `url` (~100 byte) thay chuoi MB; grab-xong log them `png XKB`;
+   frozenStore.clear() trong closeOverlay + khi Esc truoc grab-xong.
+2. **overlay.js:** Image nap `L.url` voi `crossOrigin=anonymous`; dan nen bang
+   CHINH the <img> da decode (replaceChildren vao #shot) — KHONG CSS
+   background: cache key no-CORS khac voi Image CORS -> tai+decode anh 5K2K
+   lan HAI giua luc keo. Kem thuoc do `keo N khung, gap-max=Xms` (rAF, chi do
+   nghen main-thread renderer — rAF van MU voi lag compositor) ghi run-log
+   moi luot keo -> lan sau anh keo la co so that tu may anh.
+3. **index.html/css:** CSP img-src them `aioshot:`; `#shot img` neo goc
+   tren-trai, -webkit-user-drag none; #shot pointer-events none.
+4. **main.js:** selftest CACH LY userData (.selftest/userData) — ban cai dang
+   chay giu khoa single-instance lam selftest TU THOAT exit 0 (XANH GIA so
+   #6) va con BUNG overlay chup tren man nguoi dung (second-instance ->
+   startCapture). Da xay ra that 21:43, anh Esc.
+5. **main.js ghiLog:** gio dia phuong thay UTC (bay thuoc do o tren).
+
+### Kiem chung (4 harness scratchpad + selftest + may that)
+- test-overlay-drag (dung lai theo PROGRESS 0.3.9): main cam, keo 4 buoc khung
+  bam local tung pixel. 6/6 DAT.
+- test-keo-vat-man (dung lai theo PROGRESS 0.3.17): 3 giai doan nhuong-gianh.
+  3/3 DAT — vung so #8 KHONG hoi quy.
+- test-frozen-storm (MOI): keo 1,6s (mousemove 8ms), frozen do xuong o +400ms,
+  anh MAN THAT 2,7MB. Duong CU (dataURL qua IPC) gap-max=19ms; duong MOI
+  (aioshot) gap-max=12-14ms. Kem kiem TAINT: ve khung + Enter ra dataUrl
+  250x188, nen phu 100% pixel duc, khung cam 1051px — canvas ghep SACH.
+  (Luu y trung thuc: harness 1 layer/cua so nho — delta tren may that 2 layer
+  x 2 cua so se lon hon; so quyet dinh la gap-max trong run-log may anh.)
+- test-composite (MOI, muc b checklist): 2 layer aioshot (man that + anh xanh
+  dac), vung 200x200 vat bien -> ra dung 200x200 phys 1:1, nua phai 20000/
+  20000 px xanh (tu man 2), nua trai 0 px xanh. DAT.
+- Selftest: capture -> grab -> luu OK; 2 file test da xoa DICH DANH (so #4).
+- May that: cai de /S, tien trinh 0.4.1.0, boot `dang-ky=OK` phim Shift+`
+  giu nguyen, 0 dong CANH BAO.
+
+### Cho anh
+- Keo thu vai phat tren may nha. Con giat thi doc run-log dong `keo ... gap-max`
+  gui em: gap-max >30ms = renderer van nghen (em sua tiep huong renderer);
+  gap-max nho ma mat van thay giat = lag COMPOSITOR (WGC dang grab giua luc
+  keo — huong khac: doi lich grab/giam do phan giai grab man phu).
 
 ## 2026-08-31 14:37 — 0.4.0: BAN PHAT HANH CHOT (anh Tien yeu cau "lam lai ban cai")
 

@@ -68,6 +68,12 @@ assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo)
 3. `kickGrab()` (goi SAU khi overlay dau tien hien+paint, setTimeout 40ms) chup
    TUNG man qua `desktopCapturer` (device px), gui anh dong bang -> renderer dat
    lam nen (`overlay:frozen`, freeze view) + luu full-res de cat.
+   ☠️ Anh di qua protocol `aioshot://` (buffer PNG o main, `frozenStore`),
+   IPC CHI mang URL (0.4.1, may nha 31/08): man 5K2K ra base64 ~5,7MB, gui
+   chuoi do qua IPC la renderer DANG KEO nghen mot nhip = giat. Canvas ghep
+   can anh CORS sach -> protocol tra ACAO:* + Image crossOrigin=anonymous;
+   dan nen bang CHINH the <img> da decode, KHONG CSS background (cache key
+   no-CORS khac -> decode lan 2).
    ☠️ PHAI dan frozen lam nen (dao quyet dinh 25/08, chot lai 31/08): video
    phan cung (YouTube) nhin xuyen cua so trong suot ra MANG DEN (lop MPO),
    chi anh WGC moi co hinh — khong dan la nguoi dung khoanh vung tren mang
@@ -118,6 +124,7 @@ grab (chay sau khi overlay hien) nuong lop mo vao anh.
 | 6 | **Selftest/kiem XANH GIA** (24/08 loi bi nuot; 26/08 xanh nho RACE grab-nhanh-hon-dim; 26/08 selftest 1 man khong du — anh Tien day thang) | Selftest thoat som nuot hop thoai loi; phep kiem xanh ma khong hieu vi sao xanh | uncaughtException ghi `.selftest/errors.txt`; checklist 4 diem o muc Verify (ti le sang / vat 2 man 2 phia / dem file / doc run-log); mot phep kiem chua tung DO thi chua tin |
 | 7 | **Dan quyet dinh cu bi dao ma khong do lai nguyen nhan** (31/08 — chinh la #1 quay lai) | So cu chi ghi TRIEU CHUNG ("dan la lech") khong ghi nguyen nhan da do -> phien sau DOAN | Ghi bay = ghi kem NGUYEN NHAN DA DO + con so; dao quyet dinh cu = TAI LAP nguyen nhan bang so do truoc (brain: `bay-dao-quyet-dinh-cu-khong-do-lai.md`) |
 | 8 | **Ve khung khi keo — HOI QUY 3 LAN TRONG 1 NGAY 31/08** (giat drop-fps -> rung 2 nguon -> te le -> nhay khi vat man) | Vung nay co HAI nguon ve (mousemove local + main sel-rect 16ms) tren NHIEU man/DPI — moi lan chinh mot nguon la ho nguon kia. Chuot ra khoi man chu la mousemove NGUNG (khong pointer capture) | Luat hien hanh (0.3.17): local vua ve <50ms thi main NHUONG; local im thi main TIEP QUAN (`lanVeLocal`). ☠️ Dung vao onSelRect/mousemove ma khong chay `test-keo-vat-man.js` (3 giai doan) + `test-overlay-drag.js` la se hoi quy lan 4 |
+| 9 | **"DAT o cong ty, may NHA van y chang"** (31/08 toi — chuoi keo-chon vua cham DAT buoi trua) | Chi phi ti le voi PIXEL man: may nha 5120x2160 -> PNG 1,8-4,3MB -> base64 ~5,7MB qua IPC do vao renderer DANG keo (log: 6/6 luot drag-start dinh 20-40ms sau grab-xong). Man cong ty nho -> cung code ma nhe hon han | 0.4.1: anh di `aioshot://`, IPC chi mang URL. Run-log ghi `keo N khung, gap-max=Xms` moi luot — "muot" phai la SO tu may co man LON nhat, khong phai mat tren may dev. Duong frozen dung vao PHAI chay `test-frozen-storm.js` + `test-composite.js` (taint + vat man) |
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
 DUNG go):
@@ -158,6 +165,13 @@ hong, khong phai san pham hong):
   Con so 16.7ms phang li = thuoc hong, khong phai muot. Do lag ghep man that
   bang **CDP Page.screencast** (dem khung day ra man), khong bang rAF.
 - Anh nen test PHANG (mau don) giau chi phi ghep — dung anh chi tiet + full-res.
+- ☠️ Run-log truoc 0.4.1 ghi gio UTC (toISOString) — lech -7h so voi ten file
+  anh, doc log tuong "chup tu trua" trong khi vua chup xong (suyt lac duong
+  31/08 toi). Da sua sang gio dia phuong; doc log cu thi +7h.
+- ☠️ Selftest khi BAN CAI dang chay: khoa single-instance lam selftest TU THOAT
+  exit 0 (xanh gia) va BUNG overlay chup tren man nguoi dung (second-instance
+  -> startCapture). Da chan: --selftest/--selftest-drag cach ly userData vao
+  `.selftest/userData`.
 
 **Kiem hoi quy truoc khi bao xong** (sau MOI lan sua/them tinh nang):
 1. `npm start -- --selftest --dev` + doc `.selftest/` (muc Verify: 4 diem).
