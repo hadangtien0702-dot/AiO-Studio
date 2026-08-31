@@ -84,6 +84,26 @@ soi node_modules/Electron/FFmpeg, thêm `-CaiThem` là tự npm install). Sửa 
 
 Phiên không sửa mã nguồn → bỏ qua bước này, nói rõ là không có gì để push.
 
+## 2d. ☠️ ĐIỀU KIỆN CHỌN CÔNG NGHỆ — anh Tiến chốt 31/08/2026
+
+Sau vụ Shot & Save: chọn Electron cho app chụp màn hình → cả tuần fix chuỗi
+lỗi giật/rung/nhảy mà gốc là **kiến trúc không hợp thể loại app** (cả thị
+trường chụp hình đều native 1 tiến trình). Anh Tiến: *"đây là một lỗi rất
+nghiêm trọng, em mất thời gian của anh"*. Ba luật, áp cho MỌI dự án:
+
+1. **Trước khi build một tính năng/tool mới: LUÔN tìm xem các app cùng loại
+   trên thị trường đang chạy công nghệ lõi gì, và trình cho anh Tiến** —
+   không được nhảy thẳng vào stack mình sẵn có.
+2. **Luôn ưu tiên công nghệ mới - nhanh - mạnh - nhẹ, nhưng BẮT BUỘC chạy
+   được đa hệ điều hành (Windows + macOS)** — sản phẩm AiO bán cho editor
+   nước ngoài, phần lớn dùng Mac.
+3. **Luôn tham khảo thị trường TRƯỚC khi chốt khuyên anh Tiến dùng công nghệ
+   gì** — khuyến nghị phải kèm bảng "app nào đang dùng lõi nào", không
+   khuyên chay.
+
+Khi `/xong`: nếu trong phiên có khởi đầu tính năng/tool mới, tự kiểm đã làm
+đủ 3 điều trên chưa — thiếu thì ghi rõ vào báo cáo, đừng im.
+
 ## 3. Rút bài học — ghi ĐÚNG TẦNG
 
 Chỉ ghi thứ **không suy ra được từ mã nguồn**. Ghi trùng chỗ khác là lần sau đọc
