@@ -1,4 +1,4 @@
-# dong-bo-may.ps1 — chay tren BAT KY may nao cua anh Tien de dong bo voi GitHub.
+# dong-bo-may.ps1 - chay tren BAT KY may nao cua anh Tien de dong bo voi GitHub.
 # Viet 31/08/2026 theo yeu cau: /xong phai lo cho may kia du 3 viec
 #   1. keo code moi ve (git pull)
 #   2. kiem tra thu muc co khop voi GitHub khong (dem file)
@@ -16,13 +16,13 @@ param([switch]$CaiThem)
 
 $ErrorActionPreference = 'Continue'
 # Ten file co dau tieng Viet: bat git tra ve UTF-8 that (khong escape \341...)
-# va bat PowerShell doc dung UTF-8 — thieu mot trong hai la Test-Path nghen.
+# va bat PowerShell doc dung UTF-8 - thieu mot trong hai la Test-Path nghen.
 [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false
 $repo = Split-Path $PSScriptRoot -Parent
 Write-Host "=== DONG BO MAY - repo: $repo ===" -ForegroundColor Cyan
 
 # ---------- 1. KEO CODE MOI VE ----------
-Write-Host "`n[1/3] git pull..." -ForegroundColor Yellow
+Write-Host "`n[1/4] git pull..." -ForegroundColor Yellow
 Push-Location $repo
 git pull
 if ($LASTEXITCODE -ne 0) {
@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ---------- 2. KIEM THU MUC KHOP GITHUB ----------
-Write-Host "`n[2/3] Doi chieu file voi GitHub..." -ForegroundColor Yellow
+Write-Host "`n[2/4] Doi chieu file voi GitHub..." -ForegroundColor Yellow
 $dsFile = git -c core.quotepath=false ls-files
 $soFile = ($dsFile | Measure-Object).Count
 $thieu = $dsFile | Where-Object { -not (Test-Path -LiteralPath (Join-Path $repo $_)) }
@@ -46,7 +46,7 @@ if ($thieu) {
 }
 
 # ---------- 3. KIEM DO CHAY: node_modules / Electron / FFmpeg ----------
-Write-Host "`n[3/3] Kiem nhung thu can de CHAY (khong nam tren GitHub)..." -ForegroundColor Yellow
+Write-Host "`n[3/4] Kiem nhung thu can de CHAY (khong nam tren GitHub)..." -ForegroundColor Yellow
 
 $npmOk = $null -ne (Get-Command npm -ErrorAction SilentlyContinue)
 if (-not $npmOk) {
@@ -89,6 +89,30 @@ foreach ($p in 'AiO Asset Manager','AiO Autocut','AiO Power Bins','AiO Transcrip
 if ($binThieu.Count -gt 0) {
     Write-Host "`n  THIEU bin\ FFmpeg (~219 MB/panel): $($binThieu -join ', ')" -ForegroundColor Yellow
     Write-Host "  -> Chi can khi CHAY panel that tren Premiere. Chep tay tu may kia (USB/Drive)." -ForegroundColor Yellow
+}
+
+# ---------- 4. CAI LENH /xong VAO MAY NAY ----------
+# Lenh /xong goc nam trong repo (.claude/commands/) - chep vao ~/.claude/commands
+# de go /xong duoc o MOI du an tren may nay, khong chi khi mo repo AiO Studio.
+Write-Host "`n[4/4] Dong bo lenh /xong ve may nay..." -ForegroundColor Yellow
+$lenhNguon = Join-Path $repo '.claude\commands'
+$lenhDich = Join-Path $env:USERPROFILE '.claude\commands'
+if (Test-Path $lenhNguon) {
+    New-Item -ItemType Directory -Force $lenhDich | Out-Null
+    Get-ChildItem $lenhNguon -Filter *.md | ForEach-Object {
+        $dich = Join-Path $lenhDich $_.Name
+        $daCo = Test-Path $dich
+        $khac = $true
+        if ($daCo) {
+            $khac = (Get-FileHash $_.FullName).Hash -ne (Get-FileHash $dich).Hash
+        }
+        if ($khac) {
+            Copy-Item $_.FullName $dich -Force
+            Write-Host "  DA CHEP: /$($_.BaseName) -> $dich" -ForegroundColor Green
+        } else {
+            Write-Host "  DAT: /$($_.BaseName) da moi nhat" -ForegroundColor Green
+        }
+    }
 }
 
 Write-Host "`n=== Nhung thu CO Y khong co (khong phai loi): bo cai .exe/.rar trong Release, Test Media 1,33 GB, .env.local cua Website ===" -ForegroundColor DarkGray

@@ -69,6 +69,12 @@ env/
 .idea/
 .vscode/
 .claude/
+# [31/08/2026] Ngoai le: lenh /xong phai DI THEO REPO de may nha cung go duoc
+# (truoc do no chi nam o ~/.claude/commands cua may cong ty). Cung ho bai hoc
+# dist/: thu muc bi ignore thi phai un-ignore CHINH THU MUC roi moi mo file trong.
+!/.claude/
+/.claude/*
+!/.claude/commands/
 *.suo
 *.ntvs*
 *.njsproj
