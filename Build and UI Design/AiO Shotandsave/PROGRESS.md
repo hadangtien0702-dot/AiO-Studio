@@ -19,8 +19,18 @@
 > - [CHO] anh cham: chup video con "giat mot cai" khong sau ham nong (san
 >   ~400ms Electron enumerate; muon nhanh hon ~170ms nua phai doi nen hien
 >   thi sang JPEG — danh doi chat luong, anh quyet).
-> - [CHO] truoc khi phat ra ngoai: cai may SACH · ky so/SmartScreen ·
->   (xa hon) viet lai Tauri neu can nhe ~5MB nhu Lightshot — cho anh chot.
+> - ☠️ **ANH TIEN CHOT 22:30 31/08: DI THEO TAURI 2 (Rust + webview) cho ca
+>   Win lan Mac** — sau chuoi loi giat keo "fix nhieu lan van gap" anh ket
+>   luan Electron khong hop the loai app nay ("mat thoi gian cua anh qua").
+>   Ban Electron 0.4.2 DONG BANG: anh dung tiep, chi sua loi, KHONG them
+>   tinh nang. Buoc ke: SPIKE Tauri do 4 diem truoc khi cam ket port full:
+>   (1) overlay trong suot hien tuc thi da man khac DPI; (2) toc do WGC tu
+>   Rust (ky vong < sàn 400ms Electron); (3) keo-tha file RA app khac
+>   (tauri-plugin-drag — do that voi Zalo/Premiere/Explorer); (4) phim tat
+>   toan cuc + tray. UI (HTML/CSS/JS + tokens.css) va 3 luat keo-chon +
+>   so 9 loi + 4 harness MANG THEO nguyen.
+> - [CHO] truoc khi phat ra ngoai (ap cho ban Tauri): cai may SACH · ky
+>   so/SmartScreen · notarize Mac.
 > - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
 >   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
 

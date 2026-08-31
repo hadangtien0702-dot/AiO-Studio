@@ -16,6 +16,16 @@ luat tai nguyen) va thuong hieu AiO.
 
 ## Stack
 
+☠️ **ANH TIEN CHOT 31/08 22:30: cong nghe di theo la TAURI 2 (Rust + webview,
+mot ma nguon Win + Mac).** Electron duoi day la ban HIEN HANH, DONG BANG o
+0.4.2 (chi sua loi, khong them tinh nang). Ly do doi: the loai app chup man
+(theo chuot tung ms + capture nang + da man DPI) danh thang vao diem yeu
+2-tien-trinh cua Electron — ca chuoi loi giat/rung/nhay 0.3.9→0.4.2 la mot
+benh kien truc; cac app cung nganh (Lightshot, ShareX, Flameshot, CleanShot)
+deu native 1 tien trinh. Truoc khi port full PHAI SPIKE do 4 diem (xem
+PROGRESS muc TRANG THAI). UI HTML/CSS/tokens + 3 luat keo-chon + so loi +
+harness mang theo nguyen.
+
 - Electron (ban moi nhat — hien 43.4.1), JavaScript thuan (CommonJS), khong
   bundler.
 - ☠️ **MAY MOI PHAI `npm install` TRUOC.** `node_modules/` bi gitignore nen
