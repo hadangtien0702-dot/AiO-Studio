@@ -1,5 +1,34 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 10:50 — LAP SO LOI TAI DIEN trong CLAUDE.md (anh Tien chot quy trinh)
+
+### Boi canh
+Anh Tien: "em phai luu lai cac loi da lam, da bi sua va bi lai de lan sau
+khong bi nua... moi lan anh sua thay them tinh nang khong it thi nhieu no se
+bi cac loi do lai. kiem tra log progress va ghi chu lai."
+
+### Lam gi
+- Doc lai TOAN BO PROGRESS.md (1335 dong, 24/08 -> 31/08), rut ra:
+  - 7 loi TAI DIEN hoac chac chan tai dien: double taskbar (25->31/08) ·
+    vet sang/toi man 2 (25/08 x2) · "sua roi van thay cu" ban cai/nguon
+    (26->27/08) · xoa nham file cua anh khi don test (24->26/08) · version
+    lech (x2) · selftest xanh gia (x3) · dao quyet dinh cu khong do lai.
+  - 9 bay 1-lan se can lai khi them tinh nang (getSources chan main, MPO
+    den, wcId sau closed, asar chi doc, config BOM/atomic, CSS bi chat,
+    delta tuyet doi khi keo, thumbnailSize chung, backtick accelerator).
+- Ghi thanh muc "☠️☠️ SO LOI TAI DIEN — DOC TRUOC KHI SUA" trong CLAUDE.md
+  cua repo (nap tu dong moi phien): bang [loi / goc DA DO / chot chan] +
+  checklist KIEM HOI QUY 4 buoc truoc khi bao xong.
+- Brain: cap nhat bay-dao-quyet-dinh-cu-khong-do-lai.md — anh chot quy trinh
+  nay ap cho MOI du an (du an nao sua UI/tinh nang nhieu vong thi lap so
+  theo mau Shot & Save).
+
+### Vi sao dat o CLAUDE.md ma khong phai file rieng
+CLAUDE.md la file DUY NHAT chac chan duoc nap moi phien lam viec sau —
+PROGRESS.md dai 1335 dong khong ai doc het truoc khi sua mot dong code.
+So loi phai nam tren duong di bat buoc, khong nam trong kho luu tru.
+
+
 ## 2026-08-31 10:25 — 0.3.12/0.3.13: het DOUBLE TASKBAR (bay 25/08 tai dien) + chot chan
 
 ### Boi canh

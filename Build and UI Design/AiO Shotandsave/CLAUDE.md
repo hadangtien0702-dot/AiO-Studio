@@ -100,6 +100,50 @@ Truoc khi bao xong PHAI them: (a) do TI LE SANG anh luu vs vung man goc (~1.0;
 doi chieu tung buoc. Overlay PHAI co `setContentProtection(true)` — khong thi
 grab (chay sau khi overlay hien) nuong lop mo vao anh.
 
+## ☠️☠️ SO LOI TAI DIEN — DOC TRUOC KHI SUA / THEM TINH NANG (anh Tien chot 31/08)
+
+> Anh Tien: *"em phai luu lai cac loi da lam, da bi sua va bi lai de lan sau
+> khong bi nua... moi lan anh sua thay them tinh nang khong it thi nhieu no se
+> bi cac loi do lai"*. Tong hop tu TOAN BO PROGRESS.md (24/08 -> 31/08).
+> **Luat: truoc khi dung vao vung nao, doc dong tuong ung. Sua xong chay muc
+> "Kiem hoi quy" ben duoi roi moi bao xong.**
+
+| # | Loi (da bi may lan) | Goc DA DO (khong phai doan) | Chot chan dang gac |
+|---|---|---|---|
+| 1 | **Double taskbar / anh dan lech** (25/08, TAI DIEN 31/08) | Windows KEP cua so non-resizable vao workArea ngay luc tao: xin 1440 duoc 1392 (hut 48px taskbar) -> anh nen doc | `setBounds(b)` sau khi tao + ve nen theo kich thuoc man that (anh/sf) + app TU DO moi lan mo, hut la ghi `CANH BAO overlay HUT` vao run-log |
+| 2 | **Vet sang/toi chia doi man thu 2** (25/08 x2) | box-shadow spread 100vmax "duc lo" chi phu 100vmax tu mep -> hut giua man 4K | CAM box-shadow duc lo; guong = 4 TAM MO rieng (#guong gT/gB/gL/gR) |
+| 3 | **"Sua roi van thay cu"** (26/08, TAI DIEN 27/08) | Anh Tien chay BAN CAI (loi tat Desktop tro `AppData\Local\Programs\`), sua ma nguon khong toi do | Sua xong = bump version + `npm run dist` + CAI DE + do `ProductVersion` cua TIEN TRINH dang chay + doc dong `boot vX.Y.Z` trong run-log |
+| 4 | **Xoa nham file cua anh khi don test** (24/08 loc theo gio, TAI DIEN 26/08 glob `AiO-...-1*`) | Gio / mau ten / duoi file la thuoc tinh KHONG phan biet chu so huu | Luc TAO file test ghi TEN vao danh sach; don = xoa DICH DANH tung ten trong danh sach do. CAM glob/loc-gio |
+| 5 | **Version lech** (2 dot push ten 0.3.2/0.3.3 ma package.json khong bump) | Quen bump; khong co gi nhac | Bump package.json + sua dong 12 TOOL_VERSION_TRACKER trong CUNG commit |
+| 6 | **Selftest/kiem XANH GIA** (24/08 loi bi nuot; 26/08 xanh nho RACE grab-nhanh-hon-dim; 26/08 selftest 1 man khong du — anh Tien day thang) | Selftest thoat som nuot hop thoai loi; phep kiem xanh ma khong hieu vi sao xanh | uncaughtException ghi `.selftest/errors.txt`; checklist 4 diem o muc Verify (ti le sang / vat 2 man 2 phia / dem file / doc run-log); mot phep kiem chua tung DO thi chua tin |
+| 7 | **Dan quyet dinh cu bi dao ma khong do lai nguyen nhan** (31/08 — chinh la #1 quay lai) | So cu chi ghi TRIEU CHUNG ("dan la lech") khong ghi nguyen nhan da do -> phien sau DOAN | Ghi bay = ghi kem NGUYEN NHAN DA DO + con so; dao quyet dinh cu = TAI LAP nguyen nhan bang so do truoc (brain: `bay-dao-quyet-dinh-cu-khong-do-lai.md`) |
+
+**Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
+DUNG go):
+- `getSources` CHAN main ~0,5-1,5s: khong grab truoc khi overlay hien; UI theo
+  chuot phai ve LOCAL trong renderer, khong cho main phat (0.3.9 "drop fps").
+- Video MPO (YouTube) nhin xuyen cua so trong suot ra DEN -> PHAI dan frozen
+  (0.3.10) + fade 160ms + decode truoc (0.3.11 "giut mot cai").
+- `webContents.id` doc sau 'closed' = crash — cache `wcId` ngay luc tao.
+- app.asar CHI DOC — log/anh cua ban dong goi phai ra userData / canh exe.
+- Config: ghi ATOMIC (tmp+rename, 0.3.8); doc fail tra {} IM LANG — file BOM
+  tung lam JSON.parse chet, moi cai dat ve mac dinh khong ai biet.
+- Hieu ung CSS lan RONG hon le cua so trong suot bi CHAT CANH ("khung vien
+  xau" 26/08): luat `offset+blur <= PIN_PAD`.
+- Keo cua so tren DPI le: gui delta TUYET DOI tu diem neo, cam cong don
+  getPosition/setPosition (khay phinh 24/08).
+- desktopCapturer MOT thumbnailSize chung UPSCALE man nho — goi RIENG tung man
+  voi size native; moi phep cat/ghep do kich thuoc anh THAT roi quy doi.
+- Accelerator backtick la `` Alt+` `` literal; bo ghi phim doc `e.code`.
+
+**Kiem hoi quy truoc khi bao xong** (sau MOI lan sua/them tinh nang):
+1. `npm start -- --selftest --dev` + doc `.selftest/` (muc Verify: 4 diem).
+2. 3 harness scratchpad neu dung vung do: khay (wheel) · settings (hotkey) ·
+   overlay (freeze/drag) — mo ta trong PROGRESS 28-31/08.
+3. Dong goi + cai de + do ProductVersion tien trinh + doc run-log: dong boot
+   OK va KHONG co dong `CANH BAO`.
+4. Ra soat bang tren: thay doi cua minh co dung vao dong nao khong.
+
 ## Da lam
 
 KEO-THA ra app khac (`webContents.startDrag`, 25/08): keo anh GHIM hoac
