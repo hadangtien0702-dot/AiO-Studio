@@ -591,6 +591,14 @@ function openOverlays(displays) {
       },
     })
     win._displayId = disp.id
+    /* ☠️ Windows KEP cua so non-resizable vao workArea (tru taskbar) NGAY tu
+       luc tao: xin 2560x1440 chi duoc 2560x1392 (do that 31/08 tren may 2
+       man). Overlay hut 48px day -> anh dong bang (co taskbar) bi nen doc
+       ~3% -> taskbar trong anh noi ngay TREN taskbar that = "DOUBLE TASKBAR"
+       (anh Tien 31/08 — chinh la bay 25/08 ngay truoc). setBounds lai mot
+       lan la thoat kep: man chinh khop tuyet doi, man phu co the DU 1-2px
+       do lam tron DPI (du = tran ra ngoai mep, vo hai; HUT moi nen anh). */
+    win.setBounds(b)
     win.setAlwaysOnTop(true, 'screen-saver')
     // ☠️ LOAI overlay khoi anh chup (WDA_EXCLUDEFROMCAPTURE): grab chay SAU khi
     // overlay da hien -> khong co dong nay thi LOP MO 42% bi nuong vao anh ->
@@ -614,6 +622,17 @@ function openOverlays(displays) {
       // Grab bat dau SAU khi overlay dau tien da hien + kip PAINT (~40ms) — de
       // getSources chan luong thi overlay da hien roi.
       setTimeout(kickGrab, 40)
+      /* CHOT CHAN (31/08, sau khi bay 25/08 TAI DIEN thanh "double taskbar"):
+         cua so HUT so voi man = anh dong bang bi nen = taskbar doi. Do that
+         MOI lan mo — hut la ghi CANH BAO vao run-log, khoi doan mo lan sau. */
+      setTimeout(() => {
+        if (win.isDestroyed()) return
+        const wb = win.getBounds()
+        if (wb.width < b.width || wb.height < b.height) {
+          ghiLog('CANH BAO overlay HUT man ' + disp.id + ': xin ' +
+            b.width + 'x' + b.height + ' duoc ' + wb.width + 'x' + wb.height)
+        }
+      }, 200)
       if (laSelftest) setTimeout(() => saveCapture(win, 'selftest-overlay.png'), 900)
     })
     win.on('closed', () => {

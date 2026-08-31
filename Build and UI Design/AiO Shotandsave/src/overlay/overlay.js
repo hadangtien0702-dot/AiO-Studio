@@ -72,6 +72,13 @@ window.overlay.onFrozen((data) => {
        la renderer khung mot nhip dung luc chuyen canh, cang them "giut". */
     if (own) {
       const dan = () => {
+        /* Ve anh dung KICH THUOC MAN (anh that / sf), neo goc tren-trai —
+           KHONG keo 100% theo cua so: cua so co the du 1-2px (setBounds tren
+           man DPI le) ma anh thi phai khop MAN, khong la lech taskbar. Do
+           anh THAT (naturalWidth) roi chia sf, khong tin pw/ph (bay cu). */
+        shotEl.style.backgroundSize =
+          (own.img.naturalWidth / own.sf) + 'px ' + (own.img.naturalHeight / own.sf) + 'px'
+        shotEl.style.backgroundPosition = '0 0'
         shotEl.style.backgroundImage = "url('" + own.img.src + "')"
         requestAnimationFrame(() => shotEl.classList.add('co-anh'))
       }

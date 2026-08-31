@@ -1,5 +1,46 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 10:25 — 0.3.12/0.3.13: het DOUBLE TASKBAR (bay 25/08 tai dien) + chot chan
+
+### Boi canh
+Sau 0.3.11 anh Tien bao "double thanh taskbar" — dung bay 25/08 quay lai, va
+anh phe thang: "loi cu lap lai hoai". Nhan loi: khi dan lai frozen (0.3.10)
+toi DOC canh bao 25/08 nhung DOAN nguyen nhan cu (tuong la dan anh khong khop
+man) thay vi DO — sổ cu chi ghi trieu chung, khong ghi nguyen nhan da do.
+
+### Nguyen nhan that (do bang script rieng, may 2 man)
+Windows KEP cua so non-resizable vao workArea NGAY tu luc tao:
+- Man chinh: xin 2560x1440 -> duoc 2560x1392 (hut dung 48px taskbar)
+- Man phu:  xin 2048x1153 -> duoc 2048x1109
+Overlay hut day -> anh dong bang (co taskbar, du chieu cao) keo 100%/100%
+bi NEN DOC ~3% -> taskbar trong anh noi ngay TREN taskbar that = double.
+(Cung la mot phan cam giac "giut" luc dan.)
+
+### Thay doi
+1. **0.3.12 — main.js:** `win.setBounds(b)` lai mot lan sau khi tao overlay
+   — thoat kep. Do 3 phuong an: resizable:true van bi kep; setBounds an
+   (man chinh khop tuyet doi, man phu DU 2px do lam tron DPI — du = tran
+   ra ngoai mep vo hai, HUT moi nen anh).
+2. **0.3.12 — overlay.js:** ve nen theo KICH THUOC MAN THAT (naturalWidth/sf,
+   neo goc tren-trai) thay vi keo 100% theo cua so — cua so co du vai px
+   anh van khong gian.
+3. **0.3.13 — chot chan:** moi lan mo overlay tu do getBounds so voi man,
+   HUT la ghi "CANH BAO overlay HUT man..." vao run-log — bay nay tai dien
+   o may nao (ke ca may khach) la lo ngay, khong phai doan.
+4. Ghi bai hoc vao brain (`bay-dao-quyet-dinh-cu-khong-do-lai.md`): dao
+   quyet dinh cu co canh bao thi phai TAI LAP nguyen nhan bang so do; ghi
+   bay phai kem nguyen nhan da do; sua xong lap chot chan tu dong.
+
+### Kiem chung
+- Script do bounds 3 phuong an x 2 man (so ket qua o tren).
+- Harness freeze: backgroundSize dung cong thuc anh/sf (sf=2, anh 1x1 ->
+  0.5px), neo 0 0, van dan dung anh man minh, fade con nguyen. DAT.
+- May that 0.3.13: 2 luot chup lien (mot luot anh Tien tu keo tren man phu,
+  luu anh 2003x1221 OK) — run-log KHONG co dong CANH BAO nao = cua so phu
+  du man that. Tien trinh 0.3.13.0, boot dang-ky OK.
+- Mat anh Tien cham cuoi: taskbar con double khong.
+
+
 ## 2026-08-31 09:40 — 0.3.11: freeze HIEN DAN (fade 160ms) — het "giut mot cai"
 
 ### Boi canh

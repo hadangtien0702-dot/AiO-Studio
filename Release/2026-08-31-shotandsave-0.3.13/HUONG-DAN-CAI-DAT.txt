@@ -1,0 +1,68 @@
+==========================================================
+  AiO Shot & Save v0.3.13 - chup man hinh + khay + ghim
+  Ban dong goi ngay 31/08/2026 (electron-builder, NSIS)
+==========================================================
+
+MOI TRONG BAN 0.3.13 (gom ca 0.3.12)
+------------------------------------
+- HET "DOUBLE TASKBAR" khi khoanh vung: truoc do Windows lam
+  cua so chon vung ngan hon man hinh dung 1 khoang taskbar,
+  anh dong bang bi nen doc nen taskbar hien 2 lan chong nhau.
+- App tu kiem moi lan mo: neu cua so chon vung khong phu du
+  man hinh la tu ghi canh bao vao nhat ky (de bat loi som
+  tren may co cau hinh la).
+
+CAC BAN TRUOC TRONG NGAY (0.3.8 -> 0.3.11)
+------------------------------------------
+- Vung video YouTube/TikTok het den khi khoanh (hien hinh
+  dung im sau ~nua giay, hien dan em ai khong giut).
+- Keo chon vung muot, het giat kieu drop-fps.
+- Doi phim tat: nhan to hop la LUU NGAY, keycaps nhay xanh.
+- Cau hinh ghi kieu an toan, tat may dot ngot khong mat.
+
+LUU Y KHI CAI DE
+----------------
+App dang mo thi cai de se khoi dong lai app -> KHAY dang co
+anh se trong lai (FILE ANH KHONG MAT - van nam trong thu muc
+luu, bam nut thu muc tren khay la thay).
+
+CAI DAT
+-------
+1. Chay file: AiO-Shot-and-Save-Setup-0.3.13.exe
+2. Bo cai MOT CU BAM (khong hoi gi), cai cho rieng nguoi dung
+   (khong can quyen Admin). Cai de len ban cu duoc luon.
+3. Loi tat nam o Start Menu + Desktop: "AiO Shot & Save".
+
+!! CANH BAO WINDOWS SMARTSCREEN !!
+Ban nay CHUA ky so (code-signing) nen lan dau chay Windows co
+the hien "Windows protected your PC":
+  -> bam "More info" -> "Run anyway".
+
+DUNG NHU THE NAO
+----------------
+- Phim tat chup mac dinh: Ctrl + Shift + S (doi duoc trong Cai dat)
+- Bam phim tat -> keo chon vung (keo VAT NGANG 2 man hinh cung duoc)
+- Chon vung xong: ve khung / mui ten (7 mau), roi:
+    Enter hoac nut V  = luu vao khay
+    Ctrl + C          = luu vao khay + copy vao clipboard
+    Bam ra ngoai vung = chon lai vung khac
+    Esc               = huy
+- Anh nam trong KHAY (goc man hinh):
+    Bam thumbnail     = ghim anh noi len man hinh
+    KEO thumbnail     = tha file vao Premiere / Zalo / Messenger...
+    LAN con lan chuot = cuon day anh
+    Re chuot          = xem kich thuoc + dung luong
+- Cai dat (chuot phai icon khay he thong -> Cai dat):
+    phim tat · dinh dang JPEG/PNG · chat luong · kieu khay
+    (ngang/doc) · thu muc luu · ngon ngu VI/EN
+
+ANH LUU O DAU
+-------------
+Mac dinh: thu muc "Anh chup" ngay canh cho cai app
+(%LOCALAPPDATA%\Programs\aio-shot-and-save\Anh chup).
+Doi duoc trong Cai dat -> Thu muc luu anh.
+
+GO CAI DAT
+----------
+Settings Windows -> Apps -> AiO Shot & Save -> Uninstall.
+(Anh da chup KHONG bi xoa khi go app.)
