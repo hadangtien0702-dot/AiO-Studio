@@ -122,12 +122,50 @@ app.whenReady().then(() => {
   }
   // Khong tu mo cua so nao — day la app song o khay he thong.
 
+  // ☠️ CHAN DOAN GPU (--gpucheck): kiem render con chay sau khi cat shader
+  // WebGPU (dxcompiler/dxil, 0.3.14 giam dung luong). Ghi ket qua ra userData
+  // roi thoat. Dung de VERIFY ban dong goi da cat DLL, khong tin build sach.
+  if (process.argv.includes('--gpucheck')) { setTimeout(gpuCheck, 300); return }
+
   // Che do tu kiem: tu chup -> tu chon vung -> tu ghim (de verify pipeline).
   if (IS_SELFTEST) setTimeout(() => startCapture(), 1200)
 
   // Do that viec KEO KHAY: kich thuoc co phinh ra khong (anh Tien bao loi 24/08).
   if (IS_DRAGTEST) setTimeout(() => doKeoKhay(), 1200)
 })
+
+/* Chan doan GPU/render: dung mot cua so an, VE canvas 2D roi capturePage —
+   neu render chet vi thieu shader thi anh ra rong/den. Kem getGPUFeatureStatus.
+   Ghi JSON ra userData\gpucheck.json va console, roi thoat. */
+async function gpuCheck() {
+  const kq = { boot: 'ok', ffmpeg: fs.existsSync(path.join(process.resourcesPath || '', '..', 'ffmpeg.dll')) }
+  try { kq.gpuFeature = app.getGPUFeatureStatus() } catch (e) { kq.gpuFeature = 'ERR:' + e.message }
+  try {
+    const w = new BrowserWindow({ width: 200, height: 200, show: false,
+      webPreferences: { offscreen: false } })
+    await w.loadURL('data:text/html,' + encodeURIComponent(
+      '<canvas id=c width=200 height=200></canvas><script>' +
+      'var x=document.getElementById("c").getContext("2d");' +
+      'x.fillStyle="#f86820";x.fillRect(0,0,200,200);' +
+      'x.fillStyle="#fff";x.fillRect(50,50,100,100);</script>'))
+    await new Promise((r) => setTimeout(r, 500))
+    const img = await w.webContents.capturePage()
+    const sz = img.getSize()
+    const bmp = img.toBitmap() // BGRA
+    // Do mau tam (100,100) phai TRANG (255,255,255) — chung minh canvas render THAT
+    const i = (100 * sz.width + 100) * 4
+    kq.render = { w: sz.width, h: sz.height, tamB: bmp[i], tamG: bmp[i + 1], tamR: bmp[i + 2],
+      trang: bmp[i] > 240 && bmp[i + 1] > 240 && bmp[i + 2] > 240 }
+    // Do goc (10,10) phai CAM (~248,104,32 R,G,B)
+    const j = (10 * sz.width + 10) * 4
+    kq.render.gocCam = bmp[j + 2] > 200 && bmp[j + 1] > 60 && bmp[j + 1] < 160 && bmp[j] < 90
+    w.destroy()
+  } catch (e) { kq.render = 'ERR:' + e.message }
+  const p = path.join(app.getPath('userData'), 'gpucheck.json')
+  try { fs.writeFileSync(p, JSON.stringify(kq, null, 2)) } catch (e) {}
+  console.log('GPUCHECK=' + JSON.stringify(kq))
+  app.exit(kq.render && kq.render.trang && kq.render.gocCam ? 0 : 1)
+}
 
 // App song o tray: dong het cua so KHONG thoat app.
 app.on('window-all-closed', (e) => {

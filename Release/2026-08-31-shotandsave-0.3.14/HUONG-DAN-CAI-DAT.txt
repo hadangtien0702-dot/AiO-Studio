@@ -1,0 +1,54 @@
+==========================================================
+  AiO Shot & Save v0.3.14 - chup man hinh + khay + ghim
+  Ban dong goi ngay 31/08/2026 (electron-builder, NSIS)
+==========================================================
+
+MOI TRONG BAN 0.3.14
+--------------------
+- NHE HON: bo cai giam tu ~99 MB xuong ~84 MB (bo bot du lieu
+  ngon ngu thua + phan do hoa app khong dung + nen manh hon).
+  Khong bo tinh nang nao.
+
+CAC BAN TRUOC TRONG NGAY
+------------------------
+- Het "double taskbar" khi khoanh vung.
+- Vung video YouTube/TikTok het den khi khoanh (hien dan em ai).
+- Keo chon vung muot, het giat.
+- Doi phim tat: nhan to hop la LUU NGAY.
+
+CAI DAT
+-------
+1. Chay file: AiO-Shot-and-Save-Setup-0.3.14.exe
+2. Bo cai MOT CU BAM (khong hoi gi), cai cho rieng nguoi dung
+   (khong can quyen Admin). Cai de len ban cu duoc luon.
+3. Loi tat nam o Start Menu + Desktop: "AiO Shot & Save".
+
+!! CANH BAO WINDOWS SMARTSCREEN !!
+Ban nay CHUA ky so nen lan dau chay Windows co the hien
+"Windows protected your PC": -> "More info" -> "Run anyway".
+
+DUNG NHU THE NAO
+----------------
+- Phim tat chup mac dinh: Ctrl + Shift + S (doi duoc trong Cai dat)
+- Bam phim tat -> keo chon vung (vat 2 man hinh cung duoc)
+- Chon vung xong: ve khung / mui ten (7 mau), roi:
+    Enter hoac nut V  = luu vao khay
+    Ctrl + C          = luu vao khay + copy clipboard
+    Bam ra ngoai vung = chon lai vung khac
+    Esc               = huy
+- Khay (goc man hinh):
+    Bam thumbnail     = ghim anh len man hinh
+    KEO thumbnail     = tha file vao Premiere / Zalo / Messenger...
+    LAN con lan chuot = cuon day anh
+- Cai dat (chuot phai icon khay he thong -> Cai dat):
+    phim tat · JPEG/PNG · chat luong · kieu khay · thu muc · VI/EN
+
+ANH LUU O DAU
+-------------
+Mac dinh: %LOCALAPPDATA%\Programs\aio-shot-and-save\Anh chup
+(doi duoc trong Cai dat).
+
+GO CAI DAT
+----------
+Settings Windows -> Apps -> AiO Shot & Save -> Uninstall.
+(Anh da chup KHONG bi xoa khi go app.)

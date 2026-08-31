@@ -1,5 +1,53 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 12:40 — 0.3.14: GIAM DUNG LUONG bo cai 99 -> 84 MB (cat an toan, da verify render)
+
+### Boi canh
+Anh Tien: "kiem tra ban cai dung luong bao nhieu, giam xuong muc thap vua phai
+duoc khong — Lightshot rat nhe". Do: bo cai 98,97 MB, unpacked 358 MB.
+
+### Do phan bo (unpacked, tim cho beo)
+- `AiO Shot & Save.exe` 225 MB = Chromium framework (SAN CUNG, khong bo duoc)
+- `locales/` 47 MB = 55 file .pak (app tu dich VI/EN -> chi can en-US)
+- `dxcompiler.dll` 25 MB + `dxil.dll` 1,5 MB = shader WebGPU (app KHONG dung)
+- LICENSES.chromium.html 20 MB (phap ly, nen text ~2 MB, GIU)
+- icudtl.dat 11 MB (du lieu i18n, GIU) · vk_swiftshader 5,3 MB (GIU — xem duoi)
+
+### Thay doi
+- `scripts/afterPack.js` (MOI): sau khi build, TRUOC nen NSIS, xoa 53 locale
+  (giu en-US.pak) + dxcompiler.dll + dxil.dll. Cat **72 MB truoc nen**.
+- package.json build: `"compression": "maximum"` (LZMA manh) + `afterPack`.
+- ☠️ KHONG dung vk_swiftshader.dll: la bo render PHAN MEM du phong cho may
+  YEU/khong GPU (gpucheck cho thay app roi ve software rendering OK nho no) —
+  bo la may khach yeu co the man den. Da ghi vao SO LOI TAI DIEN.
+
+### Ket qua
+- Bo cai **98,97 -> 84,27 MB** (-14,7 MB, -15%). Unpacked 358 -> 286 MB.
+
+### Kiem chung (khong tin build sach — verify render sau khi cat GPU dll)
+- Them che do `--gpucheck` (main.js): mo cua so an, ve canvas 2D (nen cam +
+  o trang), capturePage, do mau tam. Ghi userData\gpucheck.json.
+- Test dieu kien DLL VANG tren ban dev (tam mv dxcompiler/dxil ra .bak, chay,
+  tra lai): tam anh ra TRANG (trang:true) = canvas render THAT khong can 2 dll.
+  gpuFeature: webgpu=disabled_off, skia_graphite=disabled_off (2 thu duy nhat
+  dung dxcompiler von da TAT san trong Electron 43).
+- Chay `--gpucheck` THANG TU BAN CAI 0.3.14 (artifact that, dll da xoa that):
+  boot=ok, render trang=true, ffmpeg con. dxcompiler.dll da vang, locales con 1.
+- ☠️ Thuoc do co 1 loi nho da hieu: gocCam=false vi capturePage tra anh scale
+  1.5x (279px) ma checker do toa do theo 200px — tam trang da du chung minh.
+- WGC chup video: API he dieu hanh, khong dung dxcompiler -> khong anh huong
+  (van cho anh Tien test YouTube nhu cu de chac).
+
+### ☠☠ SU THAT ve dung luong (tra loi cau "nhe nhu Lightshot")
+Lightshot ~5 MB vi viet C++ THUAN. App nay la ELECTRON -> BAT BUOC gánh nguyen
+bo Chromium (cai .exe 225 MB). 84 MB la GAN SAN cua Electron — cat them nua la
+dung vao render/phap ly. **Muon xuong ~5-10 MB that su thi phai VIET LAI bang
+Tauri** (Rust + WebView2 co san trong Win11, tan dung lai HTML/CSS/JS hien co)
+— nhung phai lam lai tu dau: chup man WGC, phim tat toan cuc, keo-tha file deu
+viet lai bang Rust + test lai het. Day la QUYET DINH LON, cho anh Tien chot,
+CHUA lam.
+
+
 ## 2026-08-31 10:50 — LAP SO LOI TAI DIEN trong CLAUDE.md (anh Tien chot quy trinh)
 
 ### Boi canh

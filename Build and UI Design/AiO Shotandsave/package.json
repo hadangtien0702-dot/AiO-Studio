@@ -1,7 +1,7 @@
 {
   "name": "aio-shot-and-save",
   "productName": "AiO Shot & Save",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "description": "AiO Shot & Save — chup vung chon + ghim noi (sticky) len man hinh, cho he thong AiO Studio.",
   "author": "AiO Studio",
   "license": "UNLICENSED",
@@ -18,6 +18,8 @@
   "build": {
     "appId": "com.aiostudio.shotandsave",
     "productName": "AiO Shot & Save",
+    "compression": "maximum",
+    "afterPack": "scripts/afterPack.js",
     "directories": {
       "output": "dist"
     },

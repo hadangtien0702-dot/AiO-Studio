@@ -135,6 +135,13 @@ DUNG go):
 - desktopCapturer MOT thumbnailSize chung UPSCALE man nho — goi RIENG tung man
   voi size native; moi phep cat/ghep do kich thuoc anh THAT roi quy doi.
 - Accelerator backtick la `` Alt+` `` literal; bo ghi phim doc `e.code`.
+- ☠️ **KHONG xoa `vk_swiftshader.dll` / `vulkan-1.dll`** de giam dung luong:
+  la bo render PHAN MEM du phong cho may YEU / khong GPU (gpucheck xac nhan
+  app roi ve software rendering van OK nho no) — bo la may khach man den.
+  `afterPack.js` chi xoa locale thua + dxcompiler/dxil (WebGPU, app khong dung).
+- ☠️ **Dung luong Electron co SAN ~84 MB** (.exe Chromium 225 MB unpacked):
+  cat locale+WebGPU shader la het phan an toan. Muon nhe nhu Lightshot (~5 MB)
+  phai VIET LAI bang Tauri — quyet dinh lon, hoi anh Tien truoc.
 
 **Kiem hoi quy truoc khi bao xong** (sau MOI lan sua/them tinh nang):
 1. `npm start -- --selftest --dev` + doc `.selftest/` (muc Verify: 4 diem).
