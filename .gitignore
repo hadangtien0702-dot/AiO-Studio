@@ -96,6 +96,9 @@ ehthumbs.db
 # GHI-CHU-PHIEN-BAN.md, giay phep — do la thu nguoi khac can DOC.
 /Release/**/*.zip
 /Release/**/*.zxp
+# [31/08/2026] Ban Shot & Save dong goi .rar (84 MB) — cung luat voi zip/zxp:
+# bo cai la san pham build, khong day len GitHub.
+/Release/**/*.rar
 # [19/08/2026] Ban cai thu chi co Autocut 1.6.0 — cung luat: giu ghi chu +
 # script, bo file zip 46 MB (build lai duoc bang scripts\package-release.ps1).
 /Release/2026-08-19-autocut-1.6.0/AiO-Studio-Autocut-1.6.0-SETUP.zip
