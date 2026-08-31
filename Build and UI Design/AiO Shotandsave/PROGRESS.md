@@ -1,5 +1,26 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 09:40 — 0.3.11: freeze HIEN DAN (fade 160ms) — het "giut mot cai"
+
+### Boi canh
+Anh Tien thu 0.3.10: video het den nhung "no giut mot cai roi moi freeze".
+Goc: anh dong bang la khoanh khac ~0,5s TRUOC (grab + nen PNG mat chung do),
+man dang dong (video chay) — dap anh vao mot phat la ca man "khuc" lui nua
+giay. Khong rut ngan duoc do tre (ban chat grab), nhung lam mem duoc cu
+chuyen.
+
+### Thay doi
+- overlay.css: #shot opacity 0 -> transition 160ms -> .co-anh opacity 1.
+- overlay.js: own.img.decode() XONG roi moi dan + rAF add class — tranh
+  khung frame vi giai nen anh 4K dung luc chuyen canh.
+
+### Kiem chung
+- Harness freeze: opacity di 0 -> 0.10 -> 0.71 -> 0.90 -> 1 (co gia tri
+  GIUA that, khong nhay phat mot), van dan dung anh man minh. DAT.
+- May that: cai de, tien trinh 0.3.11.0, boot dang-ky OK.
+- Cam giac "muot" cuoi cung van la mat anh Tien cham.
+
+
 ## 2026-08-31 09:25 — 0.3.10: vung video (YouTube) het DEN trong luc chon vung
 
 ### Boi canh

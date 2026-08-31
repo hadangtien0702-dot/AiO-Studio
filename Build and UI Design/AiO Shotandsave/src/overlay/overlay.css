@@ -14,7 +14,13 @@ html, body {
   background-position: center;
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  /* Anh dong bang HIEN DAN — anh la khoanh khac ~0,5s truoc (grab + nen PNG
+     mat chung do), man dang dong (video chay) ma dap anh vao mot phat la
+     "giut mot cai" (anh Tien 31/08). Fade 160ms cho cu lui thoi gian mem di. */
+  opacity: 0;
+  transition: opacity 160ms ease;
 }
+#shot.co-anh { opacity: 1; }
 
 /* Lop lam mo — FADE vao ~150ms ngay khi overlay hien (cua so hien tuc thi, lop
    mo mo dan toi cho "muot & than thien" — anh Tien 25/08). */

@@ -68,7 +68,16 @@ window.overlay.onFrozen((data) => {
     layersReady = true
     const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
     frozenImg = own ? own.img : null
-    if (own) shotEl.style.backgroundImage = "url('" + own.img.src + "')"
+    /* decode() XONG roi moi dan + fade (.co-anh) — dan anh 4K chua giai nen
+       la renderer khung mot nhip dung luc chuyen canh, cang them "giut". */
+    if (own) {
+      const dan = () => {
+        shotEl.style.backgroundImage = "url('" + own.img.src + "')"
+        requestAnimationFrame(() => shotEl.classList.add('co-anh'))
+      }
+      if (own.img.decode) own.img.decode().then(dan, dan)
+      else dan()
+    }
     if (pendingComposite) { const g = pendingComposite; pendingComposite = null; confirmComposite(g) }
   }
   for (const L of list) {
