@@ -8,9 +8,9 @@
 >   qua IPC -> anh di `aioshot://`; (0.4.2, anh ta "keo va GIU giat
 >   15xx/1405") neo main lech neo local 100-150px vi main nhan drag-start
 >   muon -> neo = diem mousedown renderer gui kem + con tro trong man chu
->   thi main khong ve man chu. CHO ANH CHAM. Run-log moi luot keo ghi
->   `keo gap-max` + `con tro luc main nhan da troi Xpx` — con giat thi doc
->   so nay truoc (gap-max nho + troi 0px ma van giat = lag COMPOSITOR).
+>   thi main khong ve man chu. ✅ ANH CHAM DAT may nha 22:35: "keo lai roi
+>   thi on dinh". Run-log moi luot keo van ghi `keo gap-max` + do troi neo —
+>   sau nay ai bao giat thi doc so nay truoc.
 > - ☠️ Truoc khi sua bat cu gi: doc muc **SO LOI TAI DIEN** trong CLAUDE.md
 >   (9 loi + bay thuoc do + checklist kiem hoi quy). Vung ve-khung-khi-keo /
 >   duong frozen dung vao PHAI chay 4 harness scratchpad phien 21:45 31/08
