@@ -1,5 +1,17 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 14:50 — ✅ ANH TIEN CHAM DAT chuoi keo-chon: "ngon roi em, het nhay roi"
+
+Thuoc do cuoi (mat + tay anh Tien tren 2 man that 150%+125%) da qua cho ca
+chuoi sua keo-chon trong ngay: giat drop-fps (0.3.9) -> rung 2 nguon (0.3.15,
+anh xac nhan "giam giat roi") -> te le toolbar/hint (0.3.16) -> nhay khi vat
+man (0.3.17, anh xac nhan "het nhay roi"). Vung ve-khung-khi-keo dong ho so
+tai dong #8 SO LOI TAI DIEN — dung vao ma khong chay test-keo-vat-man.js +
+test-overlay-drag.js la mo lai ho so.
+Con cho anh cham tiep (chua co phan hoi): chup video con "giat mot cai" khong
+sau ham nong 0.3.16 (san ~400ms Electron khong bo duoc, chi do duoc phan lanh).
+
+
 ## 2026-08-31 14:35 — 0.3.17: het "keo mot cho NHAY mot cho" (local/main nhuong-gianh dung luat)
 
 ### Boi canh
