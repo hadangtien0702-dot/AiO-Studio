@@ -1,6 +1,22 @@
 # PROGRESS — AiO Shot & Save
 
-## 2026-08-31 14:55 — 0.4.0: BAN PHAT HANH CHOT (anh Tien yeu cau "lam lai ban cai")
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 14:38 +0700
+> - Ban dang chay tren may anh Tien: **0.4.0** (phat hanh chot, cai de 14:37,
+>   boot OK, phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.0/`.
+> - Chuoi keo-chon da qua MAT ANH TIEN: "ngon roi em, het nhay roi".
+> - ☠️ Truoc khi sua bat cu gi: doc muc **SO LOI TAI DIEN** trong CLAUDE.md
+>   (8 loi + bay thuoc do + checklist kiem hoi quy). Vung ve-khung-khi-keo
+>   dung vao PHAI chay test-keo-vat-man.js + test-overlay-drag.js (scratchpad
+>   phien 31/08 — neu mat thi dung lai theo mo ta trong PROGRESS).
+> - [CHO] anh cham: chup video con "giat mot cai" khong sau ham nong (san
+>   ~400ms Electron enumerate; muon nhanh hon ~170ms nua phai doi nen hien
+>   thi sang JPEG — danh doi chat luong, anh quyet).
+> - [CHO] truoc khi phat ra ngoai: cai may SACH · ky so/SmartScreen ·
+>   (xa hon) viet lai Tauri neu can nhe ~5MB nhu Lightshot — cho anh chot.
+> - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
+>   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+
+## 2026-08-31 14:37 — 0.4.0: BAN PHAT HANH CHOT (anh Tien yeu cau "lam lai ban cai")
 
 Anh cham DAT chuoi keo-chon xong, xin ban cai moi -> bump 0.4.0 lam moc
 phat hanh sach, gom 10 ban va trong ngay (0.3.8 -> 0.3.17):
@@ -15,7 +31,7 @@ nong getSources.
   0 dong CANH BAO. Phim Shift+` cua anh giu nguyen.
 
 
-## 2026-08-31 14:50 — ✅ ANH TIEN CHAM DAT chuoi keo-chon: "ngon roi em, het nhay roi"
+## 2026-08-31 14:30 — ✅ ANH TIEN CHAM DAT chuoi keo-chon: "ngon roi em, het nhay roi"
 
 Thuoc do cuoi (mat + tay anh Tien tren 2 man that 150%+125%) da qua cho ca
 chuoi sua keo-chon trong ngay: giat drop-fps (0.3.9) -> rung 2 nguon (0.3.15,
