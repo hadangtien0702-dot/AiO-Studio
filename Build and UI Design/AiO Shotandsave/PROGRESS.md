@@ -23,7 +23,11 @@
 >   Win lan Mac** — sau chuoi loi giat keo "fix nhieu lan van gap" anh ket
 >   luan Electron khong hop the loai app nay ("mat thoi gian cua anh qua").
 >   Ban Electron 0.4.2 DONG BANG: anh dung tiep, chi sua loi, KHONG them
->   tinh nang. Buoc ke: SPIKE Tauri do 4 diem truoc khi cam ket port full:
+>   tinh nang. ☠️ Anh noi ro them 22:40: KHONG dap di lam lai bay gio ("build
+>   loi khac lai fix them 1 tuan nua hay sao") — Tauri la huong DAI HAN, CHI
+>   khoi dong khi can BAN MAC hoac PHAT HANH BAN RA NGOAI, va xay SONG SONG
+>   (anh van dung Electron, chi thay khi ban moi qua du harness + anh cham
+>   DAT). Khi khoi dong thi SPIKE do 4 diem truoc khi cam ket port full:
 >   (1) overlay trong suot hien tuc thi da man khac DPI; (2) toc do WGC tu
 >   Rust (ky vong < sàn 400ms Electron); (3) keo-tha file RA app khac
 >   (tauri-plugin-drag — do that voi Zalo/Premiere/Explorer); (4) phim tat
