@@ -1,0 +1,6 @@
+# Rust build (nhieu GB) — khong bao gio len git
+src-tauri/target/
+# Nhat ky do cua may cu the
+spike-ket-qua.txt
+# Schema sinh tu dong
+src-tauri/gen/

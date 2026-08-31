@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 22:22 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 23:02 +0700
+> - ✅ SPIKE TAURI dem 31/08: 3/4 diem DAT voi so dep (chup 5K2K 79ms vs 880ms;
+>   overlay am 13ms vs 165ms; exe 7,9MB vs 84MB) — xem muc 23:00 duoi day va
+>   `../AiO Shotandsave Tauri/CLAUDE.md` (bang ket qua + 5 bay Tauri).
+>   Con thieu: keo-tha file ra app khac. Spike o tray + shortcut Desktop.
 > - Ban dang chay tren MAY NHA anh Tien: **0.4.2** (cai de 22:20, boot OK,
 >   phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.2/`.
 > - 0.4.1+0.4.2 = sua "MAY NHA van giat khi keo" (may cong ty da DAT 0.4.0),
@@ -37,6 +41,42 @@
 >   so/SmartScreen · notarize Mac.
 > - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
 >   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+
+## 2026-08-31 23:00 — SPIKE TAURI dem dau: 3/4 diem DAT, so dep hon Electron nhieu lan
+
+### Boi canh
+Anh Tien chot di Tauri 2 + ra lenh "build cong nghe Rust cua em di" + 3 luat
+chon cong nghe (da vao /xong muc 2d + brain). Dung du an moi
+`AiO Shotandsave Tauri/` (CLAUDE.md rieng trong do co bang ket qua + 5 bay).
+
+### Da lam (1 tieng)
+- Cai bo do nghe may nha: Rustup stable-msvc + VS Build Tools 2022 C++
+  (WebView2 co san). Spike Tauri 2: overlay trong suot da man + xcap chup +
+  tray menu + 2 hotkey, tu ghi so vao `spike-ket-qua.txt`.
+
+### So do (release, may nha 5120x2160@1.25 + 2560x1440@1)
+- Chup man tu Rust: **5K2K=72-79ms, 2K=22-28ms** (Electron ~880ms) — thread
+  rieng, khong cham UI. Giet tan goc kich ban gay ca chuoi loi giat.
+- Overlay: tao lanh 289ms; **an→hien AM = 13ms** (Electron 165ms) — chien
+  luoc port: tao san luc boot, hotkey chi show.
+- exe 7,9MB (vs bo cai 84MB). Tray + menu OK.
+- Kiem THAT khong tin build sach: do do sang man 43→15→43 khi overlay
+  mo/dong (hien that, dong sach); hotkey do bang keybd_event + tay anh Tien.
+- ⏳ Con thieu: keo-tha file ra app khac (can tauri-plugin-drag, vong sau).
+
+### ☠️ Bay dat nhat dem nay (chi tiet + 4 bay nua trong CLAUDE.md ben Tauri)
+Hotkey toan cuc **CAM khi app khong con cua so nao** — dang ky bao OK, tay
+that lan phim gia deu khong an (2 vong doi API vo ich, den khi anh Tien bam
+that moi khoanh vung duoc). Giu 1 cua so song (an) la chay. → overlay HIDE
+chu khong CLOSE.
+
+### Trang bi cho anh
+Spike dang chay o tray + shortcut Desktop "AiO Shot SPIKE (thu nghiem Tauri)".
+Thu: chuot phai icon tray → "Mo / Dong overlay", hoac Ctrl+Shift+F10 /
+Ctrl+Shift+Space. Ban that hang ngay van la Electron 0.4.2.
+Ghi nhan them: log spike 22:47-22:49 co 3 luot bao "1 man 3620x2036" tren
+may 2 man — chua ro vi sao, cho anh xac nhan luc do man hinh co doi gi khong.
+
 
 ## 2026-08-31 22:20 — 0.4.2: het "keo va GIU no giat 15xx/1405" — neo main lay tu diem mousedown, thoi hoi con tro muon
 
