@@ -1,5 +1,20 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 14:55 — 0.4.0: BAN PHAT HANH CHOT (anh Tien yeu cau "lam lai ban cai")
+
+Anh cham DAT chuoi keo-chon xong, xin ban cai moi -> bump 0.4.0 lam moc
+phat hanh sach, gom 10 ban va trong ngay (0.3.8 -> 0.3.17):
+phim tat luu ngay + config atomic + boot log + Notification phim bi giu ·
+keo muot (local ve + luat nhuong-gianh voi main) · video het den (dan frozen
++ fade + decode) · het double taskbar (setBounds + chot chan) · bo cai 84 MB
+(cat locale/WebGPU + LZMA max) · het te le (CSS de [hidden]/opacity) · ham
+nong getSources.
+- `Release/2026-08-31-shotandsave-0.4.0/` (exe 84 MB + HUONG-DAN tong hop
+  viet moi, da doc lai).
+- Cai de may anh: tien trinh 0.4.0.0, boot dang-ky OK, ham-nong xong,
+  0 dong CANH BAO. Phim Shift+` cua anh giu nguyen.
+
+
 ## 2026-08-31 14:50 — ✅ ANH TIEN CHAM DAT chuoi keo-chon: "ngon roi em, het nhay roi"
 
 Thuoc do cuoi (mat + tay anh Tien tren 2 man that 150%+125%) da qua cho ca

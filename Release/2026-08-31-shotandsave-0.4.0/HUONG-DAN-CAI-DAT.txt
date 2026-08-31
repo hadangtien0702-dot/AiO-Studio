@@ -1,0 +1,54 @@
+==========================================================
+  AiO Shot & Save v0.4.0 - chup man hinh + khay + ghim
+  Ban PHAT HANH chot 31/08/2026 (gom 10 ban va trong ngay,
+  chuoi keo-chon da qua tay + mat anh Tien tren 2 man that)
+==========================================================
+
+MOI SO VOI 0.3.7 (ban dau tuan)
+-------------------------------
+- DOI PHIM TAT LA LUU NGAY - het canh restart may bi doi phim.
+  Phim bi app khac chiem -> co thong bao. Cau hinh ghi an
+  toan, tat may dot ngot khong mat.
+- KEO CHON VUNG MUOT: het giat drop-fps, het rung, het "keo
+  mot cho nhay mot cho" (ke ca keo vat 2 man), het toolbar/
+  huong dan hien lac khi keo.
+- VUNG VIDEO (YouTube/TikTok) HET DEN khi khoanh: sau ~nua
+  giay hinh hien dan (dung im) de khoanh. Nua giay dau con
+  den la gioi han doc man hinh cua Windows.
+- HET DOUBLE TASKBAR khi khoanh vung.
+- BO CAI NHE HON: ~99 MB -> ~84 MB, khong bo tinh nang.
+- Con lan chuot cuon duoc day anh trong khay (tu 0.3.7).
+
+CAI DAT
+-------
+1. Chay: AiO-Shot-and-Save-Setup-0.4.0.exe
+2. Bo cai MOT CU BAM, per-user (khong can Admin). Cai de len
+   ban cu duoc luon; phim tat + cai dat cua ban GIU NGUYEN.
+3. Loi tat: Start Menu + Desktop "AiO Shot & Save".
+
+!! SMARTSCREEN: ban chua ky so, lan dau chay Windows co the
+chan -> "More info" -> "Run anyway".
+
+LUU Y KHI CAI DE: app dang mo thi cai de lam khay dang co anh
+trong lai (FILE ANH KHONG MAT - van trong thu muc luu).
+
+DUNG NHU THE NAO
+----------------
+- Phim tat chup mac dinh: Ctrl + Shift + S (doi trong Cai dat)
+- Bam phim tat -> keo chon vung (vat 2 man cung duoc)
+- Chon vung xong: ve khung / mui ten (7 mau), roi:
+    Enter hoac nut V  = luu vao khay
+    Ctrl + C          = luu + copy clipboard
+    Bam ra ngoai vung = chon lai
+    Esc               = huy
+- Khay (goc man hinh):
+    Bam thumbnail     = ghim anh len man hinh (ve tiep duoc)
+    KEO thumbnail     = tha file vao Premiere / Zalo / Mess...
+    LAN con lan chuot = cuon day anh
+- Cai dat (chuot phai icon khay he thong): phim tat ·
+  JPEG/PNG · chat luong · kieu khay ngang/doc · thu muc · VI/EN
+
+ANH LUU O: %LOCALAPPDATA%\Programs\aio-shot-and-save\Anh chup
+(doi duoc trong Cai dat)
+GO: Settings Windows -> Apps -> AiO Shot & Save -> Uninstall
+(anh da chup KHONG bi xoa).
