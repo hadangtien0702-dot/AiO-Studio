@@ -46,9 +46,16 @@ window.overlay.onInit((data) => {
   if (data && data.origin) origin = data.origin
   if (data && data.selftest) setTimeout(autoSelftest, 1600)
 })
-// ☠️ KHONG dan anh dong bang len man hinh — dan len la LECH voi man hinh that
-// phia sau (taskbar hien 2 lan; anh Tien bat 25/08). Anh chi dung NGAM de ghep
-// shape + cat luu. Nhan anh cua MOI man de ghep duoc vung VAT NGANG 2 man.
+// ☠️ DAO QUYET DINH 25/08 ("khong dan anh dong bang" vi lech/taskbar 2 lan):
+// tu 31/08 PHAI DAN LAI anh cua CHINH man nay lam nen (freeze view). Ly do:
+// video tang toc phan cung (YouTube/TikTok) nhin XUYEN cua so trong suot ra
+// MANG DEN — lop video (MPO) khong duoc ve duoi cua so layered; anh Tien bao
+// 31/08 "bam chup thi vung YouTube den, chup xong lai thay hinh". Anh WGC
+// grab CO hinh video -> dan lam nen la vung do hien lai (dong bang tai thoi
+// diem grab — dung nghia chup, nhu Snipping Tool). Bay cu "taskbar 2 lan"
+// la do anh dan KHONG KHOP man; nay chi dan anh own (cung he quy chieu voi
+// chinh cua so nay, phu inset:0, keo 100%/100%) — khong con nguon lech.
+// Van nhan anh cua MOI man de ghep duoc vung VAT NGANG 2 man.
 window.overlay.onFrozen((data) => {
   const list = (data && data.layers) || []
   if (!list.length) return
@@ -61,6 +68,7 @@ window.overlay.onFrozen((data) => {
     layersReady = true
     const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
     frozenImg = own ? own.img : null
+    if (own) shotEl.style.backgroundImage = "url('" + own.img.src + "')"
     if (pendingComposite) { const g = pendingComposite; pendingComposite = null; confirmComposite(g) }
   }
   for (const L of list) {

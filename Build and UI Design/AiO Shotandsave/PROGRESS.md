@@ -1,5 +1,36 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 09:25 — 0.3.10: vung video (YouTube) het DEN trong luc chon vung
+
+### Boi canh
+Anh Tien xac nhan 0.3.9 keo muot roi, nhung bao tiep: dang coi YouTube, bam
+chup thi VUNG VIDEO DEN trong luc khoanh (chup xong anh lai co hinh). Goc:
+video tang toc phan cung nam o lop MPO — nhin XUYEN cua so overlay trong
+suot thi lop do khong duoc ve -> den. Anh WGC grab thi CO hinh (fix 26/08),
+nen file luu van dung.
+
+### Thay doi
+- overlay.js onFrozen: DAN anh WGC cua CHINH man nay lam nen #shot (freeze
+  view) khi grab xong (~0,7s sau khi overlay hien) — vung video hien lai,
+  dong bang tai thoi diem grab (dung nghia chup, nhu Snipping Tool).
+- ☠️ DAO quyet dinh 25/08 "khong dan anh dong bang" (hoi do bi lech/taskbar
+  2 lan). Nay chi dan anh OWN (cung he quy chieu cua so, inset:0 keo 100%)
+  — khong con nguon lech. Ghi ro trong comment.
+
+### Kiem chung
+- Harness (overlay that + preload that, 2 man 2 anh khac nhau): #shot dan
+  DUNG anh man minh (origin 100,200 -> anh do), khong nham anh man kia. DAT.
+- May that sau cai de: tien trinh 0.3.10.0, boot dang-ky OK.
+- CHUA do duoc bang may: canh "video MPO that het den" can YouTube dang phat
+  + overlay that — thuoc cuoi la MAT ANH TIEN (anh dang ngoi dung ca do).
+  Gioi han con lai: ~0,7s DAU (truoc khi grab ve) vung video van den —
+  ban chat grab can thoi gian, chua co cach re hon.
+
+### Cho anh
+- Bam chup tren trang YouTube dang phat: sau ~nua giay vung video phai hien
+  hinh (dung im) de khoanh. Neu van den lau hon 1-2s thi bao em.
+
+
 ## 2026-08-31 09:05 — 0.3.9: keo chon het giat + man Cai dat bot chu
 
 ### Boi canh

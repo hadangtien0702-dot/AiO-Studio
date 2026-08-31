@@ -68,6 +68,10 @@ assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo)
 3. `kickGrab()` (goi SAU khi overlay dau tien hien+paint, setTimeout 40ms) chup
    TUNG man qua `desktopCapturer` (device px), gui anh dong bang -> renderer dat
    lam nen (`overlay:frozen`, freeze view) + luu full-res de cat.
+   ☠️ PHAI dan frozen lam nen (dao quyet dinh 25/08, chot lai 31/08): video
+   phan cung (YouTube) nhin xuyen cua so trong suot ra MANG DEN (lop MPO),
+   chi anh WGC moi co hinh — khong dan la nguoi dung khoanh vung tren mang
+   den. Chi dan anh cua CHINH man do (own) thi khong lech/taskbar-2-lan.
 4. Renderer: keo chon vung (toa do toan cuc qua `origin`; khung chon guong sang
    man kia qua 'overlay:sel'). Vung GON 1 man -> thanh cong cu ve (khung/mui ten,
    7 mau). Vung VAT NGANG 2 man -> `confirmComposite` ghep tu anh dong bang cac
