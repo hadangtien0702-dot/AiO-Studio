@@ -1,0 +1,25 @@
+==========================================================
+  AiO Shot & Save v0.3.16 - chup man hinh + khay + ghim
+  Ban dong goi 31/08/2026 (electron-builder, NSIS)
+==========================================================
+
+MOI TRONG BAN 0.3.16
+--------------------
+- Sua "te le khi keo": thanh cong cu ve + dong huong dan
+  khong con hien lac khi dang keo khung chon.
+- Chup video bot giat lan dau (ham nong san duong chup luc
+  mo app). Luu y: viec chup dung hinh ca man ~0,4-0,7s la
+  gioi han cua Windows/Electron, khong bo han duoc.
+
+TU 0.3.15: keo chon bot rung. TU 0.3.14: bo cai nhe (~84 MB).
+
+CAI DAT
+-------
+1. Chay: AiO-Shot-and-Save-Setup-0.3.16.exe
+2. Bo cai MOT CU BAM, per-user. Cai de duoc.
+3. SmartScreen lan dau -> "More info" -> "Run anyway".
+
+DUNG: Phim tat Ctrl+Shift+S (doi trong Cai dat) -> keo chon
+vung -> ve khung/mui ten -> Enter luu (Ctrl+C copy, Esc huy).
+Khay goc man: bam thumbnail=ghim, KEO=tha file, lan chuot=cuon.
+Go: Settings Windows -> Apps -> AiO Shot & Save -> Uninstall.

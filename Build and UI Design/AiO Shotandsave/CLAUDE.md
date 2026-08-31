@@ -135,6 +135,11 @@ DUNG go):
 - desktopCapturer MOT thumbnailSize chung UPSCALE man nho — goi RIENG tung man
   voi size native; moi phep cat/ghep do kich thuoc anh THAT roi quy doi.
 - Accelerator backtick la `` Alt+` `` literal; bo ghi phim doc `e.code`.
+- ☠️ **CSS de len co che AN phan tu** (bay "te le" 31/08): `#id{display:flex}`
+  DE LEN `[hidden]` (id-specificity > UA) -> `el.hidden=true` vo tac dung;
+  `animation:...both` giu opacity khung cuoi DE LEN `.hidden{opacity:0}`.
+  Toggle .hidden/[hidden] ma khong an -> DO computed display/opacity, dung tin
+  la da an. Sua: `#id[hidden]{display:none!important}` / fill `backwards`.
 - ☠️ **KHONG xoa `vk_swiftshader.dll` / `vulkan-1.dll`** de giam dung luong:
   la bo render PHAN MEM du phong cho may YEU / khong GPU (gpucheck xac nhan
   app roi ve software rendering van OK nho no) — bo la may khach man den.

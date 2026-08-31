@@ -1,5 +1,44 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 14:05 — 0.3.16: sua "TE LE khi keo" (toolbar+hint hien lac) + ham nong chong giat video
+
+### Boi canh
+Anh Tien: (1) "lỗi tè le khi kéo khung chọn" — hoi quy tu 0.3.15; (2) truoc do
+"chup video giat mot cai moi chup duoc".
+
+### "TE LE" — nhin TAN MAT (chup overlay giua luc keo) moi thay
+Luc keo, THANH CONG CU VE (goc trai) + DONG HUONG DAN (giua) hien cung luc,
+dang le ca hai phai an. Hai loi CSS de len co che an:
+1. ☠️ **`#toolbar { display:flex }` (id) DE LEN `[hidden]`** (UA `display:none`
+   specificity thap hon) -> `toolbarEl.hidden=true` VO TAC DUNG, toolbar hien
+   hoai o goc 0,0. Do computed: hidden=true nhung display=flex. AM I tu 0.3.5.
+   Sua: `#toolbar[hidden],#ve[hidden]{display:none!important}`.
+2. ☠️ **`#hint { animation:mo-vao ... both }`** — fill `both` giu khung cuoi
+   (opacity 1) DE LEN `.hidden{opacity:0}` -> hint co class hidden nhung
+   opacity van 1, khong bao gio mo di. Sua: fill `both` -> `backwards` (het
+   animation tra ve CSS thuong -> .hidden an duoc).
+3. Kem: 0.3.15 de early-return TRUOC dong an hint -> gop luon; nay de an hint
+   TRUOC early-return.
+
+### Ham nong chong giat video (do that)
+getSources LANH ~454ms, AM ~390ms; 1x1 (chi enumerate) = 357ms = SAN khong
+tranh duoc (Electron enumerate man). PNG encode 171ms/man. Bat getSources 1x1
+luc mo app (fire-and-forget) -> khoi tao WGC/driver truoc, lan chup dau bot
+cong-tac lanh. ☠️ KHONG doi PNG->JPEG duong LUU: do sai lech pixel JPEG98 max
+~118 o vien chu (giu quyet dinh 25/08). Duong hien co the JPEG (chua lam, cho
+anh chon danh doi).
+
+### Kiem chung
+- Chup overlay giua luc keo: SACH — chi khung + dim + nhan, het toolbar/hint.
+- Luc mo: hint van hien (opacity 1), toolbar an (display none).
+- 3 harness (drag/freeze/jitter) DAT. May that: 0.3.16.0, boot + ham-nong OK.
+
+### ☠️ Thu nhan: buoi nay duoi nhieu huong sai truoc khi trung
+GPU (tuong software - that ra RTX 4060 Ti), rAF vsync-mu, anh test phang. Da
+ghi 3 bay thuoc do vao CLAUDE.md. Lag keo THAT do 2 nguon ve (0.3.15 sua),
+te le do CSS de len hidden (0.3.16 sua).
+
+
 ## 2026-08-31 13:30 — 0.3.15: bo NGUON VE THUA khi keo (rung/lag) + 3 bay thuoc do
 
 ### Boi canh

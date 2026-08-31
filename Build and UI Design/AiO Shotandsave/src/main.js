@@ -122,6 +122,14 @@ app.whenReady().then(() => {
   }
   // Khong tu mo cua so nao — day la app song o khay he thong.
 
+  // ☠️ HAM NONG duong chup (anh Tien 31/08 "chup video giat mot cai moi chup
+  // duoc"): lan getSources DAU tien LANH ~454ms, lan sau AM ~390ms (do that);
+  // va WGC phai khoi tao phien lan dau. Goi mot getSources 1x1 vo hai luc mo
+  // app -> so khoi tao WGC/driver da tra truoc, lan chup THAT dau tien khong
+  // con cong-tac lanh. Fire-and-forget, khong chan gi.
+  desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1, height: 1 }, fetchWindowIcons: false })
+    .then(() => ghiLog('ham-nong xong')).catch(() => {})
+
   // ☠️ CHAN DOAN GPU (--gpucheck): kiem render con chay sau khi cat shader
   // WebGPU (dxcompiler/dxil, 0.3.14 giam dung luong). Ghi ket qua ra userData
   // roi thoat. Dung de VERIFY ban dong goi da cat DLL, khong tin build sach.

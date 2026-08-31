@@ -75,6 +75,11 @@ html, body {
 }
 
 /* Thanh cong cu ve — hien sau khi chon vung xong. */
+/* ☠️ [hidden] bi #toolbar (id) de len -> toolbar hien hoai o goc 0,0 khi
+   dang keo/chua chon ("te le" — anh Tien 31/08). Phai co luat nay de
+   toolbarEl.hidden=true AN THAT. Cung ap cho canvas ve. */
+#toolbar[hidden], #ve[hidden] { display: none !important; }
+
 #toolbar {
   position: fixed; z-index: 10;
   display: flex; align-items: center; gap: 2px;
@@ -122,7 +127,11 @@ html, body {
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-md);
   pointer-events: none;
-  animation: mo-vao 180ms ease both;
+  /* ☠️ fill 'backwards' chu KHONG 'both': 'both' giu khung cuoi (opacity 1)
+     de len .hidden -> hint KHONG BAO GIO an duoc (anh Tien 31/08 "te le" —
+     hint ke o giua man khi keo). backwards: het animation thi tra ve CSS
+     thuong nen .hidden (opacity 0) an duoc. */
+  animation: mo-vao 180ms ease backwards;
   transition: opacity 160ms ease, transform 160ms ease;
 }
 #hint b { color: var(--accent-text); }

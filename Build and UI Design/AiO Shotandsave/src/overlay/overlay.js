@@ -134,15 +134,16 @@ function veGuongKhung(ix, iy, ix2, iy2) {
 
 window.overlay.onSelRect((d) => {
   if (mode === 'annotate') return // dang ve thi giu nguyen khung annotate
-  /* ☠️ RUNG KHI KEO (anh Tien 31/08 "lag vai"): man CHU dang keo thi khung do
-     mousemove LOCAL ve (toa do TUOI). Main ban sel-rect moi 16ms mang toa do
-     chuot CU toi 16ms -> ve de len lam khung giat toi-lui. Bo redraw tu main
-     cho man chu khi dang keo — local lo het (frame + nhan kich thuoc). Cac man
-     KHAC (mirror) van dung main vi khong co chuot local. */
-  if (dragging && d && d.laChu) return
   const W = window.innerWidth, H = window.innerHeight
   if (!d) { xoaGuong(); hintEl.classList.remove('hidden'); return }
-  hintEl.classList.add('hidden')
+  hintEl.classList.add('hidden') // an hint NGAY (dung TRUOC early-return duoi)
+  /* ☠️ RUNG KHI KEO (anh Tien 31/08 "lag vai"): man CHU dang keo thi khung do
+     mousemove LOCAL ve (toa do TUOI). Main ban sel-rect moi 16ms mang toa do
+     chuot CU toi 16ms -> ve de len lam khung giat toi-lui. Bo REDRAW FRAME tu
+     main cho man chu — local lo (frame + nhan). Nhung hint da an o tren roi
+     (31/08 lan 2: de early-return TRUOC dong an hint -> hint khong an -> "te
+     le"). Cac man KHAC (mirror) van dung main vi khong co chuot local. */
+  if (dragging && d.laChu) return
   // d.x/y/w/h da la CUC BO (DIP man nay) do main quy doi tu PIXEL VAT LY.
   const ix = Math.max(0, d.x), iy = Math.max(0, d.y)
   const ix2 = Math.min(W, d.x + d.w), iy2 = Math.min(H, d.y + d.h)
