@@ -201,23 +201,32 @@ window.addEventListener('keydown', async (e) => {
   datTrangThai('saving') // chan keydown tiep theo trong luc cho main tra loi
   const r = await window.settings.setHotkey(mods.concat(key).join('+'))
   hotkey = r.hotkey
-  if (r.ok) {
-    msg.textContent = t('set.phim.daLuu')
-    msg.className = 'msg ok'
-  } else {
-    msg.textContent = t('set.phim.biGiu')
-    msg.className = 'msg err'
-  }
   datTrangThai('idle')
+  baoKetQua(r.ok)
 })
 
 btnReset.addEventListener('click', async () => {
   const r = await window.settings.reset()
   hotkey = r.hotkey
-  msg.textContent = r.ok ? t('set.phim.veMacDinh') : t('set.phim.veMacDinhLoi')
-  msg.className = r.ok ? 'msg ok' : 'msg err'
   datTrangThai('idle')
+  baoKetQua(r.ok)
 })
+
+/* Thanh cong thi IM LANG bang chu — keycaps moi da hien roi, chi nhay XANH
+   mot nhip cho nhin mau la biet (anh Tien 31/08: bo dong "Saved — ready to
+   use"). Chu chi danh cho THAT BAI (phim bi app khac giu). */
+function baoKetQua(ok) {
+  if (ok) {
+    msg.textContent = ''
+    msg.className = 'msg'
+    keysEl.classList.remove('vua-luu')
+    void keysEl.offsetWidth // reset animation neu luu hai lan lien tiep
+    keysEl.classList.add('vua-luu')
+  } else {
+    msg.textContent = t('set.phim.biGiu')
+    msg.className = 'msg err'
+  }
+}
 
 /* ── Thu muc ──────────────────────────────────────────────────────────── */
 btnPick.addEventListener('click', async () => {

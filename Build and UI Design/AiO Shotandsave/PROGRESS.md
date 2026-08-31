@@ -1,5 +1,45 @@
 # PROGRESS — AiO Shot & Save
 
+## 2026-08-31 09:05 — 0.3.9: keo chon het giat + man Cai dat bot chu
+
+### Boi canh
+Anh Tien (sau khi nhan 0.3.8): (1) dong "✓ Saved — ready to use" xau, bo di;
+(2) keo khung chon "giat giat nhu game drop fps", kich hoat chup chua muot.
+
+### Nguyen nhan giat
+Khung chon KHONG do man dang keo tu ve — moi khung hinh di vong: chuot ->
+main (setInterval 16ms getCursorScreenPoint) -> IPC 'sel-rect' -> renderer
+moi ve. Main lai hay BAN: getSources chan ~0,7-1,5s NGAY luc overlay vua
+hien (log that 07:15 va 01:50: drag-start truoc grab-xong) -> interval dung
+-> khung dong bang tung nhip. IPC + timer jitter cong them.
+
+### Thay doi
+1. **overlay.js:** man CHU ve khung NGAY trong mousemove (clientX — DIP man
+   nay, trung so voi main quy doi nen hai nguon ve khong lech). Main van
+   theo doi 16ms: nhan phys + guong man kia + CHOT vung luc tha — logic
+   toa do/luu anh KHONG doi. Xoa ham updateSel chet.
+2. **settings.js/css:** thanh cong IM LANG bang chu — keycaps nhay XANH mot
+   nhip (animation 0.9s) thay cho dong "Saved — ready to use". Chu chi con
+   cho THAT BAI (bi giu phim). Dung luat "chi bao khi that bai" + "nhin mau
+   la biet". Xoa msg thanh cong cua ca nut Reset.
+
+### Kiem chung (2 harness rieng, CDP)
+- Overlay voi main STUB CAM (khong phat sel-rect nao — gia lap main nghet):
+  keo 4 buoc, khung bam DUNG 4/4 buoc tung pixel (78x48 -> 318x218),
+  drag-start/drag-end van gui ve main. DAT.
+- Cai dat: luu Alt+P -> msg RONG + keycaps co class vua-luu + main nhan
+  dung 1 lenh; kho atomic khong sot .tmp. DAT.
+- May that sau cai de: tien trinh 0.3.9.0, boot log "hotkey=Shift+`(config)
+  dang-ky=OK".
+- Do them tu log: 01:51:12 "doi phim Alt+` -> Shift+` OK" — chinh anh doi
+  lai phim sau screenshot; nghi van "Alt+` khong dinh" la KHONG co that.
+  Log doi-phim them o 0.3.8 vua tra cong.
+
+### Cho anh
+- Anh keo thu vai phat xem con "drop fps" khong — con thi bao em, phan
+  con lai la getSources chan main (ban chat API, se can huong khac).
+
+
 ## 2026-08-31 07:49 — 0.3.8: doi phim tat la LUU NGAY — het canh "restart may no doi phim"
 
 ### Boi canh

@@ -110,7 +110,14 @@ khong shape thi main cat full-res. Ctrl+Z hoan tac, Esc huy.
 
 HIEN TUC THI (25/08): overlay cua so TRONG SUOT hien NGAY (~165ms), grab chay NEN
 sau khi overlay hien (getSources CHAN luong chinh nen KHONG duoc grab truoc khi
-hien). Frozen den sau -> freeze view. Selection do renderer nen keo duoc ngay.
+hien). Frozen den sau -> freeze view.
+☠️ KEO CHON PHAI VE LOCAL (31/08): man CHU ve khung NGAY trong mousemove cua
+chinh no (clientX — DIP man do, dung cho diem tren chinh man do); main van
+theo doi chuot 16ms nhung CHI lo nhan phys + guong man kia + chot vung luc
+tha. Truoc do khung CHI ve khi main phat sel-rect -> main ban getSources ~1s
+ngay luc mo overlay (dung luc nguoi dung keo) la khung DUNG HINH — anh Tien
+ta "giat nhu game drop fps". Cau "clientX chi dung khi 2 man cung scale" chi
+ap cho toa do XUYEN man, khong ap cho ve tren chinh man minh.
 
 MAN CAI DAT PHIM TAT (25/08): mo tu tray -> "Doi phim…" -> nhan to hop -> LUU
 NGAY. ☠️ 31/08 BO nut "Luu": anh Tien nhan to hop, thay keycaps moi hien len

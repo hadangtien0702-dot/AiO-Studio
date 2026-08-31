@@ -105,6 +105,19 @@ main {
 }
 @keyframes nhay { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
 
+/* Vua luu xong: keycaps nhay XANH mot nhip roi tu tro lai binh thuong —
+   bao thanh cong bang MAU, khong bang chu (anh Tien 31/08). */
+.keycaps.vua-luu .keycap {
+  animation: vua-luu 0.9s var(--ease);
+}
+@keyframes vua-luu {
+  0%, 45% {
+    border-color: var(--ok, #35c46a);
+    color: var(--ok, #35c46a);
+    box-shadow: 0 0 0 3px rgb(53 196 106 / 22%);
+  }
+}
+
 .nut-phim { display: flex; gap: var(--sp-2); flex: none; }
 
 /* Chan the: link nho ben trai + msg ben phai */

@@ -96,6 +96,18 @@ function xoaGuong() {
   dimEl.style.display = ''
 }
 
+/* Ve khung + 4 tam mo cho vung [ix,iy]..[ix2,iy2] (DIP cuc bo, DA clamp). */
+function veGuongKhung(ix, iy, ix2, iy2) {
+  const W = window.innerWidth, H = window.innerHeight
+  dimEl.style.display = 'none'
+  guongEl.hidden = false
+  datPx(gT, 0, 0, W, iy)
+  datPx(gB, 0, iy2, W, H - iy2)
+  datPx(gL, 0, iy, ix, iy2 - iy)
+  datPx(gR, ix2, iy, W - ix2, iy2 - iy)
+  datPx(gKhung, ix, iy, Math.max(0, ix2 - ix - 2), Math.max(0, iy2 - iy - 2))
+}
+
 window.overlay.onSelRect((d) => {
   if (mode === 'annotate') return // dang ve thi giu nguyen khung annotate
   const W = window.innerWidth, H = window.innerHeight
@@ -105,13 +117,7 @@ window.overlay.onSelRect((d) => {
   const ix = Math.max(0, d.x), iy = Math.max(0, d.y)
   const ix2 = Math.min(W, d.x + d.w), iy2 = Math.min(H, d.y + d.h)
   if (ix2 <= ix || iy2 <= iy) { xoaGuong(); return } // khong giao: dim thuong
-  dimEl.style.display = 'none'
-  guongEl.hidden = false
-  datPx(gT, 0, 0, W, iy)
-  datPx(gB, 0, iy2, W, H - iy2)
-  datPx(gL, 0, iy, ix, iy2 - iy)
-  datPx(gR, ix2, iy, W - ix2, iy2 - iy)
-  datPx(gKhung, ix, iy, Math.max(0, ix2 - ix - 2), Math.max(0, iy2 - iy - 2))
+  veGuongKhung(ix, iy, ix2, iy2)
   if (d.laChu) {
     gSize.hidden = false
     // hien kich thuoc theo PIXEL VAT LY — dung voi thu se luu ra file
@@ -145,30 +151,35 @@ window.overlay.onComposite((rect) => {
 })
 
 /* ── Chon vung ────────────────────────────────────────────────────────── */
-function updateSel(x1, y1, x2, y2) {
-  const x = Math.min(x1, x2), y = Math.min(y1, y2)
-  const w = Math.abs(x2 - x1), h = Math.abs(y2 - y1)
-  curRect = { x, y, w, h }
-  selEl.style.left = x + 'px'; selEl.style.top = y + 'px'
-  selEl.style.width = w + 'px'; selEl.style.height = h + 'px'
-  sizeEl.textContent = `${w} × ${h}`
-  sizeEl.classList.toggle('inside', y < 28)
-}
-
 window.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return
   if (biKhoa) return // man khac dang giu quyen keo
   window.overlay.lock()
   if (mode === 'annotate') { batDauVe(e); return }
   dragging = true
+  startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
   hintEl.classList.add('hidden')
   // MAIN theo doi chuot he thong (dung moi scale) va phat 'sel-rect' ve.
   window.overlay.dragStart()
 })
 
 window.addEventListener('mousemove', (e) => {
-  if (mode === 'annotate') veDangKeo(e)
-  // select-mode: main tu theo doi chuot, renderer khong can lam gi
+  if (mode === 'annotate') { veDangKeo(e); return }
+  /* ☠️ MAN CHU ve khung NGAY tai day, khong doi vong chuot->main->IPC->ve.
+     Truoc 31/08 khung CHI ve khi main phat 'sel-rect' (interval 16ms) — ma
+     main hay ban (getSources chan ~1s ngay luc moi mo overlay, dung luc
+     nguoi dung bat dau keo) nen khung dung hinh tung nhip, anh Tien ta
+     "giat nhu game drop fps". Toa do local (clientX, DIP man nay) voi diem
+     chuot tren CHINH man nay trung khop so cua main quy doi, nen hai nguon
+     ve de len nhau khong lech; main van lo nhan kich thuoc phys + guong
+     sang man kia + CHOT vung luc tha (logic luu anh khong doi). */
+  if (dragging) {
+    const x1 = Math.max(0, Math.min(startX, e.clientX))
+    const y1 = Math.max(0, Math.min(startY, e.clientY))
+    const x2 = Math.min(window.innerWidth, Math.max(startX, e.clientX))
+    const y2 = Math.min(window.innerHeight, Math.max(startY, e.clientY))
+    veGuongKhung(x1, y1, x2, y2)
+  }
 })
 
 window.addEventListener('mouseup', (e) => {
@@ -256,6 +267,7 @@ function chonLaiTuDau(e) {
   toolbarEl.hidden = true
   selEl.hidden = true
   dragging = true
+  startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
   window.overlay.dragStart() // main theo doi tu vi tri chuot hien tai
 }
 function veDangKeo(e) {
