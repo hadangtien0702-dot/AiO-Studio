@@ -1,5 +1,5 @@
-﻿==========================================================
-  AiO Shot & Save v0.3.11 â€” chup man hinh + khay + ghim
+==========================================================
+  AiO Shot & Save v0.3.11 - chup man hinh + khay + ghim
   Ban dong goi ngay 31/08/2026 (electron-builder, NSIS)
 ==========================================================
 
@@ -10,7 +10,7 @@ MOI TRONG BAN 0.3.11
   ma bam chup thi sau ~nua giay vung video hien HINH DUNG IM
   de khoanh (truoc do ca vung den thui, phai doan mo).
   Luu y: nua giay dau tien vung video van den (may can thoi
-  gian doc man hinh) â€” cho hinh hien roi hay keo.
+  gian doc man hinh) - cho hinh hien roi hay keo.
 
 TU CAC BAN 0.3.8 / 0.3.9 (neu cai thang len)
 --------------------------------------------
@@ -22,7 +22,7 @@ TU CAC BAN 0.3.8 / 0.3.9 (neu cai thang len)
 LUU Y KHI CAI DE
 ----------------
 App dang mo thi cai de se khoi dong lai app -> KHAY dang co
-anh se trong lai (FILE ANH KHONG MAT â€” van nam trong thu muc
+anh se trong lai (FILE ANH KHONG MAT - van nam trong thu muc
 luu, bam nut thu muc tren khay la thay).
 
 CAI DAT
@@ -52,8 +52,8 @@ DUNG NHU THE NAO
     LAN con lan chuot = cuon day anh
     Re chuot          = xem kich thuoc + dung luong
 - Cai dat (chuot phai icon khay he thong -> Cai dat):
-    phim tat Â· dinh dang JPEG/PNG Â· chat luong Â· kieu khay
-    (ngang/doc) Â· thu muc luu Â· ngon ngu VI/EN
+    phim tat · dinh dang JPEG/PNG · chat luong · kieu khay
+    (ngang/doc) · thu muc luu · ngon ngu VI/EN
 
 ANH LUU O DAU
 -------------
@@ -65,4 +65,3 @@ GO CAI DAT
 ----------
 Settings Windows -> Apps -> AiO Shot & Save -> Uninstall.
 (Anh da chup KHONG bi xoa khi go app.)
-
