@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>AiO Spike keo-tha</title>
+  <style>
+    html, body { margin: 0; height: 100vh; background: #161616; color: #eee;
+                 font-family: Inter, system-ui, sans-serif; font-size: 13px;
+                 display: flex; align-items: center; justify-content: center; }
+    .khung { text-align: center; padding: 14px; }
+    .chip {
+      display: inline-block; padding: 14px 20px; border-radius: 12px;
+      background: #262626; border: 1px dashed rgb(248 104 32 / 60%);
+      cursor: grab; user-select: none; -webkit-user-select: none;
+    }
+    .chip:active { cursor: grabbing; }
+    b { color: #f86820; }
+    .phu { margin-top: 10px; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="khung">
+    <div class="chip" id="chip"><b>⏳</b> Dang chup man de chuan bi anh keo...</div>
+    <div class="phu">Diem do 3: giu chuot len o tren roi KEO vao Explorer / Premiere / Zalo</div>
+  </div>
+  <script>
+    // Spike diem do 3: keo file PNG THAT ra app khac bang tauri-plugin-drag.
+    // Moi ket qua (goi OK / Dropped / Cancelled) deu ghi ve spike-ket-qua.txt
+    // qua lenh ghi_log — tin SO trong file, khong tin cam giac.
+    const core = window.__TAURI__ && window.__TAURI__.core;
+    const chip = document.getElementById('chip');
+    let duong = null, icon = null;
+
+    function log(msg) { core.invoke('ghi_log', { msg: '  [keo-tha] ' + msg }).catch(() => {}); }
+
+    async function chuanBi() {
+      try {
+        const r = await core.invoke('luu_anh_keo');
+        duong = r.duong; icon = r.icon;
+        chip.innerHTML = '<b>🖼️</b> KEO ANH NAY ra Explorer (chup ' + r.msChup +
+          'ms · ghi PNG ' + r.msGhi + 'ms)';
+      } catch (e) {
+        chip.innerHTML = '<b>✕</b> Chuan bi anh LOI: ' + e;
+        log('chuan bi anh LOI: ' + e);
+      }
+    }
+    chuanBi();
+
+    chip.addEventListener('mousedown', (ev) => {
+      // startDrag PHAI goi trong nhip mousedown that (giong luat startDrag Electron)
+      ev.preventDefault();
+      if (!duong) return;
+      const kenh = new core.Channel();
+      kenh.onmessage = (p) => log('ket qua: ' + p.result +
+        ' tai (' + Math.round(p.cursorPos.x) + ',' + Math.round(p.cursorPos.y) + ')');
+      core.invoke('plugin:drag|start_drag', {
+        item: [duong],
+        image: icon,
+        options: {},
+        onEvent: kenh,
+      }).then(() => log('start_drag goi OK'))
+        .catch((e) => log('start_drag LOI: ' + e));
+    });
+  </script>
+</body>
+</html>

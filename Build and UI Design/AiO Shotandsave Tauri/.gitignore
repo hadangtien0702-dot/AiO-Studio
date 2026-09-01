@@ -2,5 +2,8 @@
 src-tauri/target/
 # Nhat ky do cua may cu the
 spike-ket-qua.txt
+# Anh test keo-tha do spike tu sinh
+spike-keo-tha.png
+spike-keo-tha-icon.png
 # Schema sinh tu dong
 src-tauri/gen/

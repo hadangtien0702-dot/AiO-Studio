@@ -135,9 +135,53 @@ fn chuyen_overlay(app: &tauri::AppHandle, nguon: &str) {
     }
 }
 
+/// Cho UI ghi vao spike-ket-qua.txt (ket qua Dropped/Cancelled cua keo-tha).
+#[tauri::command]
+fn ghi_log(msg: String) {
+    ghi(&msg);
+}
+
+/// Diem do 3 (chuan bi): chup man CHINH -> PNG that tren dia + icon thumbnail
+/// 96px cho preview keo (Electron cung bat buoc icon khong rong). Do RIENG
+/// chup vs encode+ghi — Electron 880ms la tron ca hai, 79ms hom qua chi la chup.
+#[tauri::command]
+fn luu_anh_keo() -> Result<serde_json::Value, String> {
+    let mons = xcap::Monitor::all().map_err(|e| e.to_string())?;
+    let m = mons.first().ok_or("khong co man nao")?;
+    let t0 = Instant::now();
+    let anh = m.capture_image().map_err(|e| e.to_string())?;
+    let ms_chup = t0.elapsed().as_millis();
+
+    let duong = duong_ket_qua().with_file_name("spike-keo-tha.png");
+    let duong_icon = duong_ket_qua().with_file_name("spike-keo-tha-icon.png");
+    let t1 = Instant::now();
+    anh.save(&duong).map_err(|e| e.to_string())?;
+    let ms_ghi = t1.elapsed().as_millis();
+    let rong = (anh.width() * 96 / anh.height().max(1)).max(1);
+    let icon = image::imageops::thumbnail(&anh, rong, 96);
+    icon.save(&duong_icon).map_err(|e| e.to_string())?;
+
+    ghi(&format!(
+        "  [keo-tha] anh {}x{}: chup {}ms + encode/ghi PNG {}ms -> {}",
+        anh.width(),
+        anh.height(),
+        ms_chup,
+        ms_ghi,
+        duong.display()
+    ));
+    Ok(serde_json::json!({
+        "duong": duong.to_string_lossy(),
+        "icon": duong_icon.to_string_lossy(),
+        "msChup": ms_chup,
+        "msGhi": ms_ghi,
+    }))
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_drag::init())
+        .invoke_handler(tauri::generate_handler![ghi_log, luu_anh_keo])
         .setup(|app| {
             ghi("");
             ghi(&format!(
@@ -185,6 +229,23 @@ fn main() {
                     Ok(_) => ghi(&format!("hotkey {}: dang ky OK", phim)),
                     Err(e) => ghi(&format!("hotkey {}: dang ky LOI {}", phim, e)),
                 }
+            }
+
+            // Diem do 3: cua so NHO rieng cho keo-tha (overlay phu kin man thi
+            // khong con cho de tha — san pham that cung keo tu cua so ghim/khay,
+            // khong keo tu overlay). Co vien de anh Tien tu keo di / dong duoc.
+            match WebviewWindowBuilder::new(
+                app,
+                "keospike",
+                WebviewUrl::App("keo.html".into()),
+            )
+            .title("AiO Spike — keo tha (diem do 3)")
+            .inner_size(400.0, 190.0)
+            .always_on_top(true)
+            .build()
+            {
+                Ok(_) => ghi("cua so keo-tha: OK"),
+                Err(e) => ghi(&format!("cua so keo-tha: LOI {}", e)),
             }
 
             // Diem do 1: overlay tuc thi (tu chay 1 lan luc boot)

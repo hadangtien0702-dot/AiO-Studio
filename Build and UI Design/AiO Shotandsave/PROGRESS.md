@@ -1,10 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-08-31 23:02 +0700
-> - ✅ SPIKE TAURI dem 31/08: 3/4 diem DAT voi so dep (chup 5K2K 79ms vs 880ms;
->   overlay am 13ms vs 165ms; exe 7,9MB vs 84MB) — xem muc 23:00 duoi day va
->   `../AiO Shotandsave Tauri/CLAUDE.md` (bang ket qua + 5 bay Tauri).
->   Con thieu: keo-tha file ra app khac. Spike o tray + shortcut Desktop.
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-01 10:00 +0700
+> - ✅✅ **SPIKE TAURI XONG 4/4** (31/08 may nha 3 diem + 01/09 may cong ty
+>   diem keo-tha): chup 5K2K 79ms / 4K 61-70ms + encode PNG 18ms (Electron
+>   ~880ms tron goi); overlay am 13ms; keo PNG that tha vao Explorer THANH
+>   CONG (tauri-plugin-drag 2.1.1, kiem bang file 1,01MB xuat hien o dich).
+>   Exe 12,8MB. Bang ket qua + 8 bay Tauri: `../AiO Shotandsave Tauri/CLAUDE.md`.
+>   **Buoc tiep: PORT that — cho anh Tien chot thu tu uu tien.**
 > - Ban dang chay tren MAY NHA anh Tien: **0.4.2** (cai de 22:20, boot OK,
 >   phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.2/`.
 > - 0.4.1+0.4.2 = sua "MAY NHA van giat khi keo" (may cong ty da DAT 0.4.0),
@@ -41,6 +43,42 @@
 >   so/SmartScreen · notarize Mac.
 > - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
 >   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+
+## 2026-09-01 10:00 — SPIKE TAURI XONG 4/4: keo-tha file ra Explorer DAT (may cong ty)
+
+### Boi canh
+Anh Tien: "tiep tuc build lai loi cong nghe". Diem do con lai: keo-tha file
+RA app khac (tauri-plugin-drag). May cong ty chua co Rust/VS Build Tools.
+
+### Da lam
+- Cai bo do nghe may cong ty (winget VS Build Tools 2022 C++ + rustup
+  stable-msvc, ~15 phut). Build release lan dau 5m14s, exe 12,8MB (tang tu
+  7,9MB vi them plugin drag + crate image).
+- Diem do 3: cua so nho `keospike` rieng (overlay phu kin man thi khong con
+  cho tha — san pham that cung keo tu ghim/khay). Lenh `luu_anh_keo` chup man
+  chinh -> PNG + icon thumbnail 96px; chip keo goi
+  `plugin:drag|start_drag` truc tiep qua `window.__TAURI__` (withGlobalTauri,
+  khong can npm — doi chieu guest-js nhanh v2 cua plugin truoc khi viet).
+- Tu dung moi truong test (luat 3a): mo Explorer tro thu muc scratchpad rieng,
+  gia lap keo bang mouse_event MOVE that (SetCursorPos khong du — khong bom
+  input event), DPI-aware, kiem WindowFromPoint tai diem tha truoc khi keo.
+  Don sach sau test (exe + Explorer + thu muc drop, xoa dich danh).
+
+### So do
+- Chup 4K may cong ty (RTX 4060 Ti, 2 man 4K+2K): 61-70ms / 2K 30-37ms.
+- Encode + ghi PNG 4K: **18ms** -> tron goi chup-toi-file ~90ms (Electron ~880ms).
+- Keo-tha: file `spike-keo-tha.png` **1,01MB xuat hien that** trong thu muc
+  dich. Payload do bang cua so hung WinForms: FileDrop + FileNameW +
+  FileContents + FileGroupDescriptorW + ZoneIdentifier — du bo nhu Explorer keo.
+- Overlay lanh may cong ty: 372ms (may nha 289ms) — van la duong "tao san,
+  hotkey chi show" nen khong sao.
+
+### Bay moi (da ghi vao CLAUDE.md Tauri, muc 6-8)
+- "Dropped" cua plugin = DA NHA TAY, khong phai dich DA NHAN — Explorer tu
+  choi im lang neu tha ngoai vung file (DirectUIHWND). Kiem keo-tha PHAI kiem
+  file that o dich (ho 5k/5l). Lan dau "Dropped" ma 0 file la vi vay.
+- Keo gia lap: SetCursorPos chi doi con tro, OLE khong thay duong di — phai
+  mouse_event MOVE (bom input that) + DPI-aware + tha dung vung file.
 
 ## 2026-08-31 23:00 — SPIKE TAURI dem dau: 3/4 diem DAT, so dep hon Electron nhieu lan
 
