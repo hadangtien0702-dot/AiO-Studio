@@ -1,6 +1,16 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-01 13:30 +0700
+> - ✅ **14:30 01/09: BO CAI TAURI 0.5.0 DA CAI LEN MAY CONG TY, ban Electron
+>   DA GO theo lenh anh** ("xoa cai cu tranh nham"). Bo cai **3,0MB**
+>   (`Release/2026-09-01-shotandsave-tauri-0.5.0/`), cai vao
+>   `%LOCALAPPDATA%\AiO Shot & Save\` + loi tat Desktop. **34 anh that cua anh
+>   (co anh chup sang 01/09) da CHUYEN NGUYEN VEN** tu thu muc cai Electron
+>   sang `Anh chup` cua ban moi TRUOC khi go. Config ke thua dung thoi quen:
+>   Shift+` / EN / PNG sieu net / khay doc — boot log `dang-ky=OK`, E2E bang
+>   phim Shift+` that DAT. Da do ca CAI DE nang cap: 34/34 anh giu nguyen.
+>   2 bay moi trong buoi: BOM cua Out-File lam config chet im (da va code);
+>   hotkey FAIL vi Electron con o tray giu phim (go xong OK ngay).
 > - ✅✅✅ **TAURI 0.5.0: PORT KHUNG DAY DU trong 1 buoi** (anh Tien chot
 >   "giong y chang ban cu tung nut"): chup 1 man + vat 2 man + khay + ghim +
 >   ve + copy + keo-tha Explorer + Settings TUNG NUT + hotkey doi duoc + VI/EN

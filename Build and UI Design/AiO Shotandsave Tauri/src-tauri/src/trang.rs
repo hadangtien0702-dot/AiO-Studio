@@ -21,13 +21,37 @@ pub fn gio_dia_phuong() -> (u16, u16, u16, u16, u16, u16, u16) {
 
 /* ── Nhat ky chay (LUON bat, nhu .run-log.txt ban Electron) ────────────── */
 
+/// Dang chay tu ban DEV (exe nam trong target/) hay ban CAI?
+/// env!(CARGO_MANIFEST_DIR) la duong dan luc BUILD — tren may khach khong
+/// ton tai, phai nhan biet bang vi tri exe (nhu app.isPackaged cua Electron).
+fn la_ban_dev() -> bool {
+    std::env::current_exe()
+        .ok()
+        .map(|p| {
+            let s = p.to_string_lossy().to_lowercase();
+            s.contains("\\target\\release\\") || s.contains("\\target\\debug\\")
+        })
+        .unwrap_or(false)
+}
+
+fn thu_muc_exe() -> PathBuf {
+    std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|x| x.to_path_buf()))
+        .unwrap_or_else(|| PathBuf::from("."))
+}
+
 pub fn duong_run_log() -> PathBuf {
-    // Dev: canh thu muc du an (cha cua src-tauri). Ban dong goi sau nay se
-    // chuyen sang config dir — hien tai chua bundle.
-    let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    p.pop();
-    p.push(".run-log.txt");
-    p
+    if la_ban_dev() {
+        // Dev: canh thu muc du an (cha cua src-tauri), nhu .run-log.txt Electron dev
+        let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        p.pop();
+        p.push(".run-log.txt");
+        p
+    } else {
+        // Ban cai per-user (%LOCALAPPDATA%\...) ghi duoc canh exe
+        thu_muc_exe().join("run-log.txt")
+    }
 }
 
 pub fn ghi_log(msg: &str) {
@@ -78,7 +102,9 @@ pub fn duong_cau_hinh(app: &tauri::AppHandle) -> PathBuf {
 pub fn doc_cau_hinh(app: &tauri::AppHandle) -> CauHinh {
     std::fs::read_to_string(duong_cau_hinh(app))
         .ok()
-        .and_then(|s| serde_json::from_str(&s).ok())
+        // ☠️ BOM lam serde chet im -> MOI cai dat ve mac dinh (bay Electron
+        // 31/08 tai dien 01/09: PowerShell Out-File utf8 ghi BOM). Cat truoc.
+        .and_then(|s| serde_json::from_str(s.trim_start_matches('\u{feff}')).ok())
         .unwrap_or_default()
 }
 
@@ -101,10 +127,15 @@ pub fn ghi_cau_hinh(app: &tauri::AppHandle, sua: impl FnOnce(&mut CauHinh)) -> C
 /* ── Kho anh (thu muc luu + luu file, port kho.js) ─────────────────────── */
 
 /// Thu muc GOC cua tool. ☠️ CAM Pictures mac dinh (OneDrive doi huong — luat 24/08).
+/// Dev: thu muc du an. Ban cai: thu muc chua exe (nhu kho.js Electron).
 pub fn thu_muc_goc() -> PathBuf {
-    let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    p.pop();
-    p
+    if la_ban_dev() {
+        let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        p.pop();
+        p
+    } else {
+        thu_muc_exe()
+    }
 }
 
 pub fn thu_muc_anh(cfg: &CauHinh) -> PathBuf {

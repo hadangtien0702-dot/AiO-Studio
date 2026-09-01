@@ -111,6 +111,21 @@ khong tin cam giac).
    app (app doc DUNG). Man chinh thi 2 he trung nhau nen moi test 1 man deu
    xanh gia. Harness PHAI `SetThreadDpiAwarenessContext(-4)` (PMv2). App
    cung tu ep PMv2 dau main() cho chac. Ho hang 5u/5y: thuoc sai truoc.
+16. **☠️ (01/09) BOM lam config chet im — TAI DIEN bay Electron 31/08**:
+   PowerShell 5.1 `Out-File -Encoding utf8` ghi BOM -> serde_json parse fail
+   -> doc_cau_hinh tra default -> "hotkey=...(default)" du file co config.
+   Da va: doc_cau_hinh trim `\u{feff}` (Notepad cu cung ghi BOM).
+17. **☠️ (01/09) hotkey dang-ky=FAIL: nghi ngay BAN CU DANG CHAY** — Electron
+   0.4.2 nam o tray giu Shift+` -> ban Tauri FAIL. Do bang RegisterHotKey
+   Win32 thuan (fail = phim bi giu that, khong phai loi parse cua minh).
+   Go/tat ban cu xong dang ky OK ngay.
+18. **(01/09) BO CAI NSIS (tauri-cli qua npx, khong can cai gi them)**:
+   `npx @tauri-apps/cli build` -> `src-tauri/target/release/bundle/nsis/`,
+   3,0MB (Electron 84MB). installMode currentUser ->
+   `%LOCALAPPDATA%\AiO Shot & Save\`. **DA DO cai de (nang cap): file la
+   trong thu muc cai (Anh chup 34 anh) GIU NGUYEN 34/34, config giu** —
+   khac noi so tu Electron, NSIS cua tauri chi xoa file no cai.
+   Ban cai luu anh/run-log CANH EXE (la_ban_dev() phan biet target/ vs cai).
 
 ## Mang theo tu ban Electron (KHONG lam lai tu dau)
 
