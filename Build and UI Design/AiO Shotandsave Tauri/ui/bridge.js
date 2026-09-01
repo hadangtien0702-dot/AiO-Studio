@@ -84,17 +84,26 @@
     }
 
     if (APP === 'overlay') {
+      // [dang do giat 01/09] bam gio 2 invoke dau keo — ghi ve run-log
+      const doGio = (ten, p) => {
+        const t0 = performance.now()
+        return p.then((r) => {
+          const ms = Math.round(performance.now() - t0)
+          if (ms > 5) inv('ui_log', { msg: '[do] ' + ten + '=' + ms + 'ms' }).catch(() => {})
+          return r
+        })
+      }
       window.overlay = {
         onInit: (cb) => nghe('overlay:init', cb),
         onFrozen: (cb) => nghe('overlay:frozen', cb),
         confirm: (payload) => inv('overlay_confirm', { payload }),
         cancel: () => inv('overlay_cancel'),
-        dragStart: (diemNeo) => inv('overlay_drag_start', { x: diemNeo.x, y: diemNeo.y }),
+        dragStart: (diemNeo) => doGio('dragStart', inv('overlay_drag_start', { x: diemNeo.x, y: diemNeo.y })),
         dragEnd: () => inv('overlay_drag_end'),
         onSelRect: (cb) => nghe('overlay:sel-rect', cb),
         onAnnotate: (cb) => nghe('overlay:annotate', cb),
         onComposite: (cb) => nghe('overlay:composite', cb),
-        lock: () => inv('overlay_lock'),
+        lock: () => doGio('lock', inv('overlay_lock')),
         onLocked: (cb) => nghe('overlay:locked', cb),
         log: (msg) => inv('overlay_log', { msg }),
       }

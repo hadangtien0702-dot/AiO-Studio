@@ -190,6 +190,25 @@ pub fn bat_dau_chup(app: &AppHandle) {
     // Grab o THREAD RIENG — overlay da hien, khong cham UI (luat spike).
     let app2 = app.clone();
     std::thread::spawn(move || grab(&app2));
+
+    // ☠️ MOI AM DUONG INPUT (01/09, "bi giat"): cu di chuot DAU TIEN sau khi
+    // overlay mo bi nuot ~280ms (do: viTriDut "0+283ms" lap y het moi luot;
+    // chi di khong bam cung dinh; sau do muot 17ms deu — renderer rAF 18ms
+    // suot). Nguoi dung bam phim tat roi keo NGAY nen lan nao cung dinh dung
+    // cu dau = "giat". Nhich con tro 1px qua-lai ngay khi overlay hien de
+    // nuot cai lo truoc khi tay nguoi cham vao. Vo hai (±1px, tra ve cho cu).
+    #[cfg(windows)]
+    std::thread::spawn(|| {
+        use windows::Win32::UI::Input::KeyboardAndMouse::{mouse_event, MOUSEEVENTF_MOVE};
+        for _ in 0..12 {
+            std::thread::sleep(std::time::Duration::from_millis(30));
+            unsafe {
+                mouse_event(MOUSEEVENTF_MOVE, 1, 0, 0, 0);
+                std::thread::sleep(std::time::Duration::from_millis(12));
+                mouse_event(MOUSEEVENTF_MOVE, -1, 0, 0, 0);
+            }
+        }
+    });
 }
 
 /// Chup TUNG man (xcap, native res) -> PNG vao frozen store + full-res de cat.
@@ -266,10 +285,43 @@ pub fn keo_bat_dau(app: &AppHandle, label: &str, x: f64, y: f64) {
     let stop = { app.state::<ArcTrang>().lock().unwrap().keo.as_ref().unwrap().stop.clone() };
     let app2 = app.clone();
     std::thread::spawn(move || {
+        /* ☠️ GIAT (01/09, anh Tien cham tren ban cai): phat sel-rect MU 60/s
+           cho MOI man la moi phat mot cu evaluate_script cua WebView2 (marshal
+           qua main thread) — keo la overlay tut 30fps + khung ~700ms, du
+           cua so tu ve lai 60fps sach (do C: rAF 209 khung gapMax 31ms).
+           Electron gui IPC re nen 16ms khong sao — Tauri thi KHONG.
+           Luat moi: chi phat cho man nao vung chon THAT SU GIAO, va chi khi
+           rect DOI; het giao thi phat dung MOT phat de xoa khung roi im.
+           Keo gon trong mot man (ca thuong gap nhat) = 0 phat/giay. */
+        let mut lan_cuoi: Vec<Option<(i32, i32, i32, i32)>> = vec![None; mans.len()];
+        let mut nhip: u64 = 0;
         while !stop.load(Ordering::SeqCst) {
+            nhip += 1;
             let c = con_tro_phys();
             let rect = rect_tu_neo(anchor, c);
-            phat_sel_rect(&app2, &mans, idx, rect, Some(c));
+            let key = (rect.x, rect.y, rect.w, rect.h);
+            for (i, m) in mans.iter().enumerate() {
+                let la_chu = i == idx;
+                if la_chu && m.chua_phys(c.0, c.1) { continue } // local la nguon duy nhat
+                let giao = rect.x < m.px + m.pw as i32 && rect.x + rect.w > m.px
+                    && rect.y < m.py + m.ph as i32 && rect.y + rect.h > m.py;
+                if giao {
+                    if lan_cuoi[i] == Some(key) { continue } // rect dung yen — khong phat
+                    if nhip % 2 != 0 { continue } // guong 30Hz la du — evaluate_script dat
+                    lan_cuoi[i] = Some(key);
+                } else {
+                    if lan_cuoi[i].is_none() { continue } // chua tung ve — khong co gi de xoa
+                    lan_cuoi[i] = None; // phat mot phat cuoi (khong giao) de overlay tu xoa guong
+                }
+                let _ = app2.emit_to(&format!("overlay{}", i) as &str, "overlay:sel-rect", json!({
+                    "x": (rect.x - m.px) as f64 / m.sf,
+                    "y": (rect.y - m.py) as f64 / m.sf,
+                    "w": rect.w as f64 / m.sf,
+                    "h": rect.h as f64 / m.sf,
+                    "physW": rect.w, "physH": rect.h,
+                    "laChu": la_chu,
+                }));
+            }
             std::thread::sleep(std::time::Duration::from_millis(16));
         }
     });
