@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+
+  <title>AiO Shot — chon vung</title>
+  <link rel="stylesheet" href="../assets/tokens.css" />
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="shot"></div>
+  <div id="dim"></div>
+  <div id="sel" hidden><div id="size"></div></div>
+  <!-- Guong vung chon tu man KHAC: 4 tam mo + khung cam phan giao (KHONG dung
+       box-shadow — cach do gay vet sang/toi khi rect ngoai ria, vap 25/08). -->
+  <div id="guong" hidden>
+    <div class="g-dim" id="g-t"></div><div class="g-dim" id="g-b"></div>
+    <div class="g-dim" id="g-l"></div><div class="g-dim" id="g-r"></div>
+    <div id="g-khung"></div>
+    <div id="g-size" hidden></div>
+  </div>
+  <!-- Lop ve shape (khung/mui ten) — nam TREN vung chon khi annotate. -->
+  <canvas id="ve" hidden></canvas>
+  <!-- Thanh cong cu ve — hien sau khi chon vung xong. -->
+  <div id="toolbar" hidden>
+    <button class="cong-cu" data-tool="rect" data-i18n-title="overlay.rect" aria-label="rect">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>
+    </button>
+    <button class="cong-cu" data-tool="arrow" data-i18n-title="overlay.arrow" aria-label="arrow">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M11 5h8v8"/></svg>
+    </button>
+    <span class="chia"></span>
+    <!-- Bang chon mau — mac dinh cam (accent) -->
+    <div id="mau-nhom" role="group" aria-label="color">
+      <button class="mau" data-color="#f86820" style="background:#f86820" aria-label="cam"></button>
+      <button class="mau" data-color="#ff3b30" style="background:#ff3b30" aria-label="do"></button>
+      <button class="mau" data-color="#ffcc00" style="background:#ffcc00" aria-label="vang"></button>
+      <button class="mau" data-color="#34c759" style="background:#34c759" aria-label="xanh la"></button>
+      <button class="mau" data-color="#0a84ff" style="background:#0a84ff" aria-label="xanh duong"></button>
+      <button class="mau" data-color="#ffffff" style="background:#ffffff" aria-label="trang"></button>
+      <button class="mau" data-color="#111111" style="background:#111111" aria-label="den"></button>
+    </div>
+    <span class="chia"></span>
+    <button id="undo" class="cong-cu" data-i18n-title="overlay.undo" aria-label="undo">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+    </button>
+    <span class="chia"></span>
+    <button id="huy" class="cong-cu huy" data-i18n-title="overlay.cancel" aria-label="cancel">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <button id="xong" class="cong-cu xong" data-i18n-title="overlay.done" aria-label="done">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </button>
+  </div>
+  <div id="hint">
+    <svg class="logo" viewBox="0 0 385.89 351.31" width="13" height="12" aria-hidden="true">
+      <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+      <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+    </svg>
+    <span><span data-i18n="overlay.hint"></span> · <b data-i18n="overlay.esc"></b> <span data-i18n="overlay.huy"></span></span>
+  </div>
+  <script src="../i18n.js"></script>
+  <script src="../bridge.js" data-app="overlay" data-src="overlay.js"></script>
+</body>
+</html>

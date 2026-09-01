@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />  <title>AiO Pin</title>
+  <link rel="stylesheet" href="../assets/tokens.css" />
+  <link rel="stylesheet" href="pin.css" />
+</head>
+<body>
+  <div id="frame">
+    <img id="img" alt="" draggable="true" />
+    <!-- Lop ve khung/mui ten len anh ghim (an; bam nut but de bat). -->
+    <canvas id="ve" hidden></canvas>
+    <div id="bar">
+      <button id="edit" data-i18n-title="ghim.ve">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+      </button>
+      <button id="copy" data-i18n-title="ghim.copy">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+      <button id="close" data-i18n-title="ghim.dong">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <!-- Thanh cong cu ve — hien khi dang o che do ve. Markup tai dung tu overlay. -->
+    <div id="toolbar" hidden>
+      <button class="cong-cu" data-tool="rect" data-i18n-title="overlay.rect" aria-label="rect">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>
+      </button>
+      <button class="cong-cu" data-tool="arrow" data-i18n-title="overlay.arrow" aria-label="arrow">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M11 5h8v8"/></svg>
+      </button>
+      <span class="chia"></span>
+      <div id="mau-nhom" role="group" aria-label="color">
+        <button class="mau" data-color="#f86820" style="background:#f86820" aria-label="cam"></button>
+        <button class="mau" data-color="#ff3b30" style="background:#ff3b30" aria-label="do"></button>
+        <button class="mau" data-color="#ffcc00" style="background:#ffcc00" aria-label="vang"></button>
+        <button class="mau" data-color="#34c759" style="background:#34c759" aria-label="xanh la"></button>
+        <button class="mau" data-color="#0a84ff" style="background:#0a84ff" aria-label="xanh duong"></button>
+        <button class="mau" data-color="#ffffff" style="background:#ffffff" aria-label="trang"></button>
+        <button class="mau" data-color="#111111" style="background:#111111" aria-label="den"></button>
+      </div>
+      <span class="chia"></span>
+      <button id="undo" class="cong-cu" data-i18n-title="overlay.undo" aria-label="undo">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+      </button>
+      <span class="chia"></span>
+      <button id="huy" class="cong-cu huy" data-i18n-title="overlay.cancel" aria-label="cancel">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button id="xong" class="cong-cu xong" data-i18n-title="ghim.veXong" aria-label="done">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+  </div>
+  <script src="../i18n.js"></script>
+  <script src="../bridge.js" data-app="pin" data-src="pin.js"></script>
+</body>
+</html>

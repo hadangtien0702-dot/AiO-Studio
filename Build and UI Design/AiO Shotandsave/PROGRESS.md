@@ -1,6 +1,13 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-01 10:00 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-01 13:30 +0700
+> - ✅✅✅ **TAURI 0.5.0: PORT KHUNG DAY DU trong 1 buoi** (anh Tien chot
+>   "giong y chang ban cu tung nut"): chup 1 man + vat 2 man + khay + ghim +
+>   ve + copy + keo-tha Explorer + Settings TUNG NUT + hotkey doi duoc + VI/EN
+>   — tat ca DA DO bang harness CDP (bang ket qua + 15 bay trong
+>   `../AiO Shotandsave Tauri/CLAUDE.md`). Grab 2 man 141-152ms (Electron
+>   ~880ms), keo gap-max 18ms, exe 11,7MB. Con CHUA do: may sach + vai nut
+>   phu (X khay/don/an, dialog thu muc, notification, keo pin).
 > - ✅✅ **SPIKE TAURI XONG 4/4** (31/08 may nha 3 diem + 01/09 may cong ty
 >   diem keo-tha): chup 5K2K 79ms / 4K 61-70ms + encode PNG 18ms (Electron
 >   ~880ms tron goi); overlay am 13ms; keo PNG that tha vao Explorer THANH
@@ -43,6 +50,47 @@
 >   so/SmartScreen · notarize Mac.
 > - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
 >   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+
+## 2026-09-01 13:30 — TAURI 0.5.0: port khung DAY DU, van hanh y chang Electron, do bang harness CDP
+
+### Boi canh
+Anh Tien: *"lam ban moi phai giong y chang bang cu ve cach van hanh va tung
+nut bam trong seting"*. Chien luoc: KHONG viet lai UI — copy nguyen van
+overlay/pin/shelf/settings/i18n tu ban Electron, viet `ui/bridge.js` gia lap
+dung API 4 preload (co hang doi dem su kien truoc khi listener gan), Rust 3
+file (main/chup/trang) port 1:1 main.js + kho.js. Sua UI sau nay = sua ban
+goc Electron roi copy sang.
+
+### Da lam (1 buoi)
+- Rust: tray + menu dich VI/EN · hotkey doi duoc (accel kieu Electron lam
+  nguon chan ly, doi sang global_hotkey khi dang ky, that bai khoi phuc
+  phim cu) · overlay tao san moi man (show 13ms) · grab xcap thread rieng ·
+  anh di protocol aioshot:// (ACAO, canvas khong taint) · keo chon: main
+  theo doi chuot 16ms + neo tu mousedown (luat 0.4.2) + man chu tu ve ·
+  annotate/composite/confirm · kho anh JPEG q95/98/100 / PNG · khay + ghim
+  + ve-luu-ghi-de + copy clipboard + keo-tha (plugin drag) · config atomic
+  · run-log gio dia phuong · selftest E2E · single-instance (ban 2 = chup).
+- Harness moi: WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port
+  → CDP eval tren DOM tung cua so (harness-tauri.mjs) + gia lap chuot PMv2.
+
+### So do (release, may cong ty 4K@150% + 2K@125%)
+- Grab 2 man 141-152ms (Electron ~880ms) · keo 66 khung gap-max 18ms ·
+  exe 11,7MB (Electron cai 84MB).
+- Vat 2 man: rect (-600,900,900x200) dung TUNG px, mo anh doc thay noi dung
+  ca 2 man. Keo-tha khay→Explorer: file PNG that o dich.
+- Settings tung nut: keycaps/doi phim luu ngay/reset/JPEG-PNG (file sau doi
+  ra .png that)/chat luong/khay doc-ngang/VI-EN/thu muc/version — DOM doc
+  ra dung tung chuoi nhu Electron.
+- Keo khay 40 buoc: 252x448 GIU NGUYEN (loi tai dien #4 khong tai dien).
+
+### Bay moi (ghi day du muc 9-15 CLAUDE.md Tauri) — dang nho nhat:
+- ☠️ THUOC gia lap chuot dung SetProcessDPIAware (API cu, system-aware) dat
+  con tro AO tren man phu (lech x1,2) → vat man ra 800x17, suyt do oan app.
+  Man chinh 2 he trung nhau nen test 1 man xanh gia. Harness phai PMv2.
+- OLE drag Tauri khong nuot mouseup → lot click bung nham ghim (bridge chan).
+- start_drag BAT BUOC key onEvent; frontendDist nuong vao exe (sua UI phai
+  build lai); tao cua so tu command thread ket about:blank (spawn thread);
+  i18n.js phai boc IIFE (dung ten `t`); CDP /json cham cap nhat target.
 
 ## 2026-09-01 10:00 — SPIKE TAURI XONG 4/4: keo-tha file ra Explorer DAT (may cong ty)
 

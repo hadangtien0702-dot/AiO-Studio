@@ -1,0 +1,199 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg-1);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  user-select: none;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+body { display: flex; flex-direction: column; }
+
+/* ── Header (frameless) — keo de di chuyen ────────────────────────────── */
+#tieu-de {
+  -webkit-app-region: drag;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 46px; padding: 0 var(--sp-3) 0 var(--sp-4);
+  border-bottom: 1px solid var(--line-1);
+  flex: none;
+}
+.hieu { display: flex; align-items: center; gap: var(--sp-2); }
+.hieu .logo { color: var(--accent); flex: none; }
+.hieu span { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; }
+
+.dieu-khien { display: flex; align-items: center; gap: var(--sp-2); -webkit-app-region: no-drag; }
+
+.lang {
+  display: flex; padding: 2px;
+  background: var(--bg-0);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+}
+.lang-nut {
+  border: none; background: transparent; cursor: pointer;
+  padding: 3px 10px; border-radius: var(--r-pill);
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.lang-nut:hover { color: var(--text-1); }
+.lang-nut.chon { background: var(--accent); color: var(--accent-on, #fff); }
+
+.dong {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border: none; border-radius: 50%; /* tron dong bo */
+  background: transparent; color: var(--icon-dim, var(--text-3)); cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.dong:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+
+/* ── Than ─────────────────────────────────────────────────────────────── */
+main {
+  padding: var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  flex: 1;
+}
+
+.the {
+  background: var(--bg-2);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+}
+
+/* Dau muc: icon chip cam + tieu de + goi y */
+.dau-muc { display: flex; align-items: flex-start; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.icon-chip {
+  flex: none;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-md);
+}
+.dau-chu h1 { font-size: 13.5px; font-weight: 700; margin-bottom: 2px; }
+.mo-ta { font-size: 11.5px; color: var(--text-3); line-height: 1.45; }
+
+/* ── Phim tat: keycaps ───────────────────────────────────────────────── */
+.hang-phim { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+
+.keycaps { display: flex; align-items: center; gap: 6px; min-height: 40px; flex-wrap: wrap; }
+.keycap {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 34px; padding: 0 10px;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-0));
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 3px;
+  border-radius: 8px;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
+  color: var(--text-1);
+}
+.keycap.cong { /* dau + giua cac phim */
+  min-width: 0; height: auto; padding: 0; border: none; background: none;
+  color: var(--text-3); font-weight: 600; font-size: 12px;
+}
+/* Trang thai dang ghi phim: vien cam nhap nhay */
+.keycaps.ghi {
+  padding: 0 var(--sp-3);
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--r-md);
+  color: var(--accent-text);
+  font-size: 12.5px; font-weight: 600;
+  animation: nhay 1.1s ease-in-out infinite;
+}
+@keyframes nhay { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+/* Vua luu xong: keycaps nhay XANH mot nhip roi tu tro lai binh thuong —
+   bao thanh cong bang MAU, khong bang chu (anh Tien 31/08). */
+.keycaps.vua-luu .keycap {
+  animation: vua-luu 0.9s var(--ease);
+}
+@keyframes vua-luu {
+  0%, 45% {
+    border-color: var(--ok, #35c46a);
+    color: var(--ok, #35c46a);
+    box-shadow: 0 0 0 3px rgb(53 196 106 / 22%);
+  }
+}
+
+.nut-phim { display: flex; gap: var(--sp-2); flex: none; }
+
+/* Chan the: link nho ben trai + msg ben phai */
+.chan-the {
+  margin-top: var(--sp-3);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  min-height: 18px;
+}
+.lien-ket {
+  border: none; background: none; padding: 0;
+  font-size: 11.5px; color: var(--text-3); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.lien-ket:hover { color: var(--text-1); }
+
+.msg { font-size: 11.5px; line-height: 1.4; text-align: right; }
+.msg.ok  { color: var(--ok, #35c46a); }
+.msg.err { color: var(--danger-strong, #ff5a5a); }
+
+/* ── Thu muc ─────────────────────────────────────────────────────────── */
+.thu-muc { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.tm-chu { min-width: 0; flex: 1; }
+.tm-ten { font-size: 14px; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tm-duong {
+  font-size: 11px; color: var(--text-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  direction: rtl; text-align: left; /* cat DAU duong dan, giu phan cuoi */
+}
+#msg-folder { margin-top: var(--sp-2); text-align: left; }
+
+/* ── Nut ─────────────────────────────────────────────────────────────── */
+.nut {
+  height: 34px; padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2); border-radius: var(--r-pill); /* dong bo bo tron (anh Tien 26/08) */
+  background: var(--bg-1); color: var(--text-1);
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.nut:hover { background: var(--bg-hover); }
+.nut.chinh {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--accent-on, #fff);
+  font-size: 13px; font-weight: 700; /* luat: chu tren cam dac >=13px bold */
+}
+.nut.chinh:hover { filter: brightness(1.08); }
+.nut.phu { color: var(--text-3); }
+.nut.phu:hover { color: var(--text-1); }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+#chan {
+  flex: none;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 0 var(--sp-3);
+  font-size: 10.5px; color: var(--text-3); letter-spacing: 0.3px;
+}
+
+/* ── Hang chon (dinh dang / chat luong anh) ──────────────────────────── */
+.hang-chon {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-3); margin-bottom: var(--sp-2);
+}
+.nhan-chon { font-size: 12.5px; color: var(--text-2); font-weight: 600; }
+.chon-nhom {
+  display: flex; padding: 2px;
+  background: var(--bg-0);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+}
+.chon-nut {
+  border: none; background: transparent; cursor: pointer;
+  padding: 5px 14px; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 700; color: var(--text-3);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chon-nut:hover { color: var(--text-1); }
+.chon-nut.chon { background: var(--accent); color: var(--accent-on, #fff); font-size: 13px; }
+/* PNG = lossless, khong can chon chat luong -> lam mo hang nay */
+#hang-chat-luong.mo { opacity: 0.45; pointer-events: none; }

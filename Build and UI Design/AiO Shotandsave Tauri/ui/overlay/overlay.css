@@ -1,0 +1,147 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100vw; height: 100vh; overflow: hidden;
+  cursor: crosshair;
+  font-family: var(--font-ui);
+  user-select: none;
+}
+
+/* Cua so overlay TRONG SUOT -> thay man hinh THAT qua no ngay lap tuc. Anh dong
+   bang (grab song song) den sau ~0,5s moi dat lam nen o day (freeze view). */
+#shot {
+  position: fixed; inset: 0;
+  overflow: hidden;
+  pointer-events: none; /* chuot xuyen xuong — listener nam o window */
+  /* Anh dong bang HIEN DAN — anh la khoanh khac ~0,5s truoc (grab + nen PNG
+     mat chung do), man dang dong (video chay) ma dap anh vao mot phat la
+     "giut mot cai" (anh Tien 31/08). Fade 160ms cho cu lui thoi gian mem di. */
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+#shot.co-anh { opacity: 1; }
+/* Anh dan bang the <img> (nap tu aioshot://, JS dat width/height = anh/sf,
+   neo goc tren-trai — khong keo 100% theo cua so, xem chu thich dan() trong
+   overlay.js). KHONG dung CSS background: cache key no-CORS khac voi Image
+   crossOrigin -> tai + decode anh 5K2K lan hai giua luc keo (may nha 31/08). */
+#shot img {
+  position: absolute; left: 0; top: 0;
+  display: block;
+  -webkit-user-drag: none;
+}
+
+/* Lop lam mo — FADE vao ~150ms ngay khi overlay hien (cua so hien tuc thi, lop
+   mo mo dan toi cho "muot & than thien" — anh Tien 25/08). */
+#dim {
+  position: fixed; inset: 0;
+  background: rgb(0 0 0 / 42%);
+  animation: mo-vao 150ms ease both;
+}
+@keyframes mo-vao { from { opacity: 0; } to { opacity: 1; } }
+
+/* Khung vung chon — box-shadow khong lo lam mo phan ngoai. */
+#sel {
+  position: fixed; left: 0; top: 0; width: 0; height: 0;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
+  pointer-events: none;
+}
+
+/* Nhan kich thuoc WxH. */
+#size {
+  position: absolute; left: 0; top: -24px;
+  height: 20px; padding: 0 var(--sp-2);
+  display: flex; align-items: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+  color: var(--accent-on);
+  background: var(--accent);
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+/* Neu sat mep tren, day nhan xuong trong khung. */
+#size.inside { top: 4px; left: 4px; }
+
+/* Guong vung chon tu man khac — phan giao sang, xung quanh mo deu. */
+#guong { pointer-events: none; }
+.g-dim { position: fixed; background: rgb(0 0 0 / 42%); }
+#g-khung { position: fixed; border: 1px solid var(--accent); }
+#g-size {
+  position: fixed;
+  height: 20px; padding: 0 var(--sp-2);
+  display: flex; align-items: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+  color: var(--accent-on); background: var(--accent);
+  border-radius: var(--r-sm); white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Canvas ve shape — nam TREN vung chon. */
+#ve {
+  position: fixed; z-index: 5;
+  cursor: crosshair;
+}
+
+/* Thanh cong cu ve — hien sau khi chon vung xong. */
+/* ☠️ [hidden] bi #toolbar (id) de len -> toolbar hien hoai o goc 0,0 khi
+   dang keo/chua chon ("te le" — anh Tien 31/08). Phai co luat nay de
+   toolbarEl.hidden=true AN THAT. Cung ap cho canvas ve. */
+#toolbar[hidden], #ve[hidden] { display: none !important; }
+
+#toolbar {
+  position: fixed; z-index: 10;
+  display: flex; align-items: center; gap: 2px;
+  padding: 5px;
+  background: rgb(22 22 22 / 97%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  animation: mo-vao 140ms ease both;
+}
+.cong-cu {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--text-2); cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.cong-cu:hover { background: var(--bg-hover); color: var(--text-1); }
+.cong-cu.chon { background: var(--accent-soft); color: var(--accent-text); }
+.cong-cu.xong { color: var(--ok, #35c46a); }
+.cong-cu.xong:hover { background: var(--ok, #35c46a); color: #fff; }
+.cong-cu.huy:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+.chia { width: 1px; height: 20px; background: var(--line-2); margin: 0 3px; }
+
+/* Bang chon mau */
+#mau-nhom { display: flex; align-items: center; gap: 4px; padding: 0 2px; }
+.mau {
+  width: 18px; height: 18px; padding: 0;
+  border: 2px solid transparent; border-radius: 50%;
+  cursor: pointer; box-shadow: 0 0 0 1px rgb(255 255 255 / 20%) inset;
+  transition: transform var(--dur) var(--ease);
+}
+.mau:hover { transform: scale(1.15); }
+.mau.chon { border-color: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%); }
+
+/* Chi dan giua man hinh phia tren — truot xuong + hien muot khi san sang. */
+#hint {
+  position: fixed; top: 22px; left: 50%;
+  transform: translateX(-50%) translateY(0);
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-sm); color: var(--text-1);
+  background: rgb(20 20 20 / 88%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  /* ☠️ fill 'backwards' chu KHONG 'both': 'both' giu khung cuoi (opacity 1)
+     de len .hidden -> hint KHONG BAO GIO an duoc (anh Tien 31/08 "te le" —
+     hint ke o giua man khi keo). backwards: het animation thi tra ve CSS
+     thuong nen .hidden (opacity 0) an duoc. */
+  animation: mo-vao 180ms ease backwards;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+#hint b { color: var(--accent-text); }
+#hint .logo { color: var(--accent); flex: none; }
+#hint.hidden { opacity: 0; transform: translateX(-50%) translateY(-8px); }

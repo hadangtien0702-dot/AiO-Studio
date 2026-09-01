@@ -2,6 +2,9 @@
 src-tauri/target/
 # Nhat ky do cua may cu the
 spike-ket-qua.txt
+.run-log.txt
+# Anh nguoi dung chup (mac dinh luu canh tool, nhu ban Electron)
+Anh chup/
 # Anh test keo-tha do spike tu sinh
 spike-keo-tha.png
 spike-keo-tha-icon.png

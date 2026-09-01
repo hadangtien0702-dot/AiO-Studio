@@ -1,13 +1,10 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Spike: overlay + hotkey",
+  "description": "AiO Shot & Save: moi cua so goi lenh app + keo-tha file ra ngoai",
   "windows": ["*"],
   "permissions": [
     "core:default",
-    "global-shortcut:allow-register",
-    "global-shortcut:allow-unregister",
-    "global-shortcut:allow-is-registered",
     "drag:default"
   ]
 }

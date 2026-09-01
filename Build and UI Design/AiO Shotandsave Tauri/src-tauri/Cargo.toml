@@ -1,22 +1,37 @@
 [package]
-name = "aio-shot-tauri-spike"
-version = "0.0.1"
-description = "AiO Shot & Save - spike Tauri 2: do overlay/chup/hotkey/tray"
+name = "aio-shot-tauri"
+version = "0.5.0"
+description = "AiO Shot & Save - ban Tauri 2 (Rust + webview), van hanh y chang ban Electron 0.4.2"
 edition = "2021"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
+tauri = { version = "2", features = ["tray-icon", "macos-private-api", "image-png"] }
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-drag = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-single-instance = "2"
 xcap = "0.4"
-# image PHAI cung ban voi image ma xcap 0.4 dung (0.25) — de goi imageops
-# len RgbaImage do xcap tra ve (lam thumbnail cho icon keo-tha)
+# image PHAI cung ban voi image ma xcap 0.4 dung (0.25) — imageops/encoder
+# chay tren RgbaImage do xcap tra ve
 image = "0.25"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+base64 = "0.22"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.58", features = [
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_Graphics_Gdi",
+  "Win32_System_SystemInformation",
+  "Win32_UI_HiDpi",
+] }
 
 [profile.release]
 strip = true
