@@ -112,3 +112,6 @@ ehthumbs.db
 # Temporary measurement / test scripts
 *-tmp.mjs
 
+
+# Ban do brain — log may chu chay tai cho
+scripts/brain-map/server.log
