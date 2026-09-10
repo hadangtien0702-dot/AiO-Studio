@@ -1,0 +1,37 @@
+================================================================================
+ PHAN MEM CUA BEN THU BA DI KEM SAN PHAM NAY
+ THIRD-PARTY SOFTWARE INCLUDED WITH THIS PRODUCT
+================================================================================
+
+--------------------------------------------------------------------------------
+ 1. yt-dlp
+--------------------------------------------------------------------------------
+ Ban dung / Version : 2026.08.19 (win64 standalone, tu cap nhat bang -U)
+ Tap tin / File     : bin/win64/yt-dlp.exe
+ Giay phep / License: The Unlicense (public domain)
+ Trang chu / Home   : https://github.com/yt-dlp/yt-dlp
+ Goi nhu MOT TIEN TRINH RIENG qua dong lenh; khong sua doi ma nguon.
+ Invoked as a SEPARATE PROCESS via command line; source not modified.
+
+--------------------------------------------------------------------------------
+ 2. QuickJS-ng (runtime JavaScript de yt-dlp giai ma link YouTube)
+--------------------------------------------------------------------------------
+ Ban dung / Version : 0.16.2 (qjs-windows-x86_64)
+ Tap tin / File     : bin/win64/qjs.exe
+ Giay phep / License: MIT
+ Trang chu / Home   : https://github.com/quickjs-ng/quickjs
+ Goi boi yt-dlp qua `--js-runtimes quickjs:<path>`; khong sua doi ma nguon.
+
+--------------------------------------------------------------------------------
+ 3. FFmpeg
+--------------------------------------------------------------------------------
+ Ban dung / Version : N-125829-gfe953596e9-20260728  (win64, LGPL build)
+ Tap tin / File     : bin/win64/ffmpeg.exe
+ Giay phep / License: GNU Lesser General Public License, version 3 (LGPL-3.0)
+                      Toan van kem theo trong LICENSE-FFmpeg.txt
+ Trang chu / Home   : https://ffmpeg.org
+ Ma nguon / Source  : https://github.com/FFmpeg/FFmpeg
+ Ban build / Build  : https://github.com/BtbN/FFmpeg-Builds
+ Ban build nay KHONG bat --enable-gpl va KHONG bat --enable-nonfree.
+ Dung de GHEP hinh + tieng (copy stream) va tach MP3. Goi nhu MOT TIEN TRINH
+ RIENG (Windows process) qua dong lenh; khong lien ket tinh hay dong.

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Remote debug cho CEP panel Video Download.
+  Cong 8098 — 8088..8097 da co chu (xem bang cong o AiO Studio\CLAUDE.md muc 2).
+  Mo http://localhost:8098 de xem DevTools cua panel dang chay trong Premiere,
+  hoac chay scripts\do-tren-panel.ps1 de do bang so.
+-->
+<ExtensionList>
+  <Extension Id="com.aiostudio.videodownload.panel">
+    <HostList>
+      <Host Name="PPRO" Port="8098" />
+    </HostList>
+  </Extension>
+</ExtensionList>

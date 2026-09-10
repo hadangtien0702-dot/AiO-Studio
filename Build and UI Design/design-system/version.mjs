@@ -32,7 +32,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 
 const GOC = new URL('../', import.meta.url)
-const PANEL = ['AiO Asset Manager', 'AiO Power Bins', 'AiO Autocut', 'AiO Transcripts']
+const PANEL = ['AiO Asset Manager', 'AiO Power Bins', 'AiO Autocut', 'AiO Transcripts', 'AiO Video Download']
 const SUA = process.argv.includes('--sua')
 
 const duong = (p) => new URL(p, GOC)

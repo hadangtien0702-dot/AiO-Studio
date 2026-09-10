@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0"
+    ExtensionBundleId="com.aiostudio.videodownload"
+    ExtensionBundleVersion="0.1.0"
+    ExtensionBundleName="AiO Studio - Video Download"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <ExtensionList>
+    <Extension Id="com.aiostudio.videodownload.panel" Version="0.1.0" />
+  </ExtensionList>
+
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="PPRO" Version="[15.0,99.9]" />
+    </HostList>
+    <LocaleList>
+      <Locale Code="All" />
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="9.0" />
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+
+  <DispatchInfoList>
+    <Extension Id="com.aiostudio.videodownload.panel">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./dist/index.html</MainPath>
+          <ScriptPath>./host/index.jsx</ScriptPath>
+          <CEFCommandLine>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--mixed-context</Parameter>
+            <Parameter>--allow-file-access</Parameter>
+            <Parameter>--allow-file-access-from-files</Parameter>
+            <!-- Tai video la viec chay NEN dai (vai phut). Neu Premiere dua panel
+                 ra sau, Chromium mac dinh bop timer -> thanh tien do dung hinh
+                 du yt-dlp van chay. Hai co nay giu nhip cap nhat. -->
+            <Parameter>--disable-renderer-backgrounding</Parameter>
+            <Parameter>--disable-background-timer-throttling</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <!-- Dock chung voi cac panel khac (anh Tien chot 13/08 cho ca bo).
+               Doi Type BAT BUOC tat han Premiere roi mo lai. -->
+          <Type>Panel</Type>
+          <Menu>AiO Studio - Video Download</Menu>
+          <!-- Man hinh chi co MOT cot: o dan link -> chon chat luong -> nut tai
+               -> danh sach da tai. 520x680 la kho doc thoai mai; MinSize 300x360
+               la muc dock ben phai van con dung duoc (nut chinh ghim day). -->
+          <Geometry>
+            <Size>
+              <Height>680</Height>
+              <Width>520</Width>
+            </Size>
+            <MinSize>
+              <Height>360</Height>
+              <Width>300</Width>
+            </MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>

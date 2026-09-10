@@ -30,7 +30,8 @@ $dich = @(
   'AiO Asset Manager\client\src\styles\_tokens.scss',
   'AiO Power Bins\client\src\styles\_tokens.scss',
   'AiO Autocut\client\src\tokens.css',
-  'AiO Transcripts\client\src\tokens.css'
+  'AiO Transcripts\client\src\tokens.css',
+  'AiO Video Download\client\src\tokens.css'
 )
 
 $doi = 0; $giong = 0; $thieu = 0
