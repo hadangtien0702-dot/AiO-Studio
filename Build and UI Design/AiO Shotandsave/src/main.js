@@ -54,12 +54,16 @@ let grabGen = 0
 const IS_DEV = process.argv.includes('--dev')
 const IS_SELFTEST = process.argv.includes('--selftest')
 const IS_DRAGTEST = process.argv.includes('--selftest-drag')
+// --selftest-shelf [--khay=doc|ngang]: mo khay voi anh that (chi DOC tu 'Anh chup'),
+// mo cong CDP 9333 de scripts/test/do-cuon-khay.mjs do muot; tu thoat sau 90s.
+const IS_SHELFTEST = process.argv.includes('--selftest-shelf')
+if (IS_SHELFTEST) app.commandLine.appendSwitch('remote-debugging-port', '9333')
 
 /* ☠️ Selftest phai CACH LY userData (vap 31/08 may nha): ban cai dang chay
    giu khoa single-instance (khoa theo userData) -> selftest boot xong TU THOAT
    (khong capture nao chay ma exit van 0 = XANH GIA, so #6), con ban cai thi
    nhan 'second-instance' -> BUNG overlay chup ngay tren man nguoi dung. */
-if (IS_SELFTEST || IS_DRAGTEST) {
+if (IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST) {
   app.setPath('userData', path.join(__dirname, '..', '.selftest', 'userData'))
 }
 const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
@@ -184,7 +188,25 @@ app.whenReady().then(() => {
 
   // Do that viec KEO KHAY: kich thuoc co phinh ra khong (anh Tien bao loi 24/08).
   if (IS_DRAGTEST) setTimeout(() => doKeoKhay(), 1200)
+  if (IS_SHELFTEST) setTimeout(() => moKhayDeDo(), 800)
 })
+
+/* [selftest-shelf] Nap toi da 20 anh that tu 'Anh chup' (CHI DOC) vao khay, kieu khay
+   theo --khay=, roi de nguyen cho script CDP do. Khong ghi file nao. */
+function moKhayDeDo() {
+  const kieu = (process.argv.find((a) => a.startsWith('--khay=')) || '--khay=doc').slice(7)
+  kho.ghiCauHinh({ khayKieu: kieu === 'ngang' ? 'ngang' : 'doc' })
+  const dir = path.join(kho.thuMucGoc(), 'Anh chup')
+  let files = []
+  try { files = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g)$/i.test(f)).sort().slice(0, 20) } catch (e) {}
+  for (const f of files) {
+    const img = nativeImage.createFromPath(path.join(dir, f))
+    if (!img.isEmpty()) shelfAdd(img, path.join(dir, f))
+  }
+  showShelf()
+  ghiLog('[selftest-shelf] kieu=' + kieuKhay() + ' anh=' + files.length + ' cdp=9333')
+  setTimeout(() => forceQuit(), 90 * 1000)
+}
 
 /* Chan doan GPU/render: dung mot cua so an, VE canvas 2D roi capturePage —
    neu render chet vi thieu shader thi anh ra rong/den. Kem getGPUFeatureStatus.
@@ -481,6 +503,15 @@ function kickGrab() {
     return []
   })
   grabPromise.then((list) => {
+    // ☠️ 10/09: khong chup duoc man nao -> bao NGAY + dong overlay. Truoc day
+    //    overlay van mo voi layers=0, nguoi dung khoanh vung xong Enter -> khong
+    //    ra anh, khong bao gi (mat im lang, cung lop loi voi luu-anh 0.4.3).
+    if (!list.length && overlayWins.length) {
+      ghiLog('LOI grab: 0/' + screen.getAllDisplays().length + ' man chup duoc — dong overlay')
+      closeOverlay()
+      if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+      return
+    }
     // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
     // de renderer GHEP duoc vung chon VAT NGANG 2 man (anh Tien 25/08: khoanh
     // ca 2 man ma luu chi co 1 man). Anh di qua aioshot:// (buffer o main),
@@ -654,9 +685,17 @@ async function grabDisplaysList() {
   // Mot size chung thi man nho bi UPSCALE (do that 26/08: 2560x1441 tra ve
   // 3840x2160 — mo + sai co luu). Grab chay NEN (overlay da hien) nen cham hon
   // mot chut khong sao. Promise.all cho chay song song.
-  const boSung = await Promise.all(displays.map(async (d) => {
+  // ☠️ 10/09: allSettled thay Promise.all — mot man getSources NEM loi thi
+  //    truoc day CA hai man ve rong (Promise.all roi -> catch -> []). Nay man
+  //    loi bi loai rieng + ghi run-log, man lanh van chup duoc.
+  //    Test: AIO_TEST_GRAB_LOI=<displayId|all> ep nem loi (chi khi --dev/--selftest).
+  const ketQua = await Promise.allSettled(displays.map(async (d) => {
     const sf = d.scaleFactor || 1
     const w = Math.round(d.size.width * sf), h = Math.round(d.size.height * sf)
+    if ((IS_DEV || IS_SELFTEST) && process.env.AIO_TEST_GRAB_LOI &&
+        (process.env.AIO_TEST_GRAB_LOI === 'all' || process.env.AIO_TEST_GRAB_LOI === String(d.id))) {
+      throw new Error('AIO_TEST_GRAB_LOI ep loi man ' + d.id)
+    }
     const sources = await desktopCapturer.getSources({
       types: ['screen'], thumbnailSize: { width: w, height: h }, fetchWindowIcons: false,
     })
@@ -670,31 +709,14 @@ async function grabDisplaysList() {
     // Buffer PNG giu o main, phuc vu qua aioshot:// — KHONG base64 qua IPC nua.
     return { display: d, image: img, png: img.toPNG(), sf }
   }))
-  return boSung.filter(Boolean)
-}
-
-/** Chup 1 man hinh o do phan giai that (device px). Tra ve NativeImage. */
-async function grabDisplay(display) {
-  const scale = display.scaleFactor || 1
-  const w = Math.round(display.size.width * scale)
-  const h = Math.round(display.size.height * scale)
-
-  const sources = await desktopCapturer.getSources({
-    types: ['screen'],
-    thumbnailSize: { width: w, height: h },
-    fetchWindowIcons: false,
+  const boSung = []
+  ketQua.forEach((r, i) => {
+    if (r.status === 'fulfilled') { if (r.value) boSung.push(r.value); return }
+    ghiLog('LOI grab man ' + displays[i].id + ' (' + displays[i].bounds.width + 'x' + displays[i].bounds.height + '): ' + (r.reason && r.reason.message || r.reason))
   })
-  if (!sources.length) return null
-
-  // Khop nguon voi dung man hinh theo display_id; khong khop thi lay cai dau.
-  let src = sources.find((s) => String(s.display_id) === String(display.id))
-  if (!src) {
-    const all = screen.getAllDisplays()
-    const idx = all.findIndex((d) => d.id === display.id)
-    src = sources[idx] || sources[0]
-  }
-  return src.thumbnail
+  return boSung
 }
+
 
 function openOverlays(displays) {
   displays.forEach((disp, idx) => {
@@ -808,7 +830,12 @@ async function handleConfirm(wcId, payload) {
       const item = list.find((x) => x.display.id === display.id)
       image = item && item.image
     }
-    if (!image) return
+    if (!image) {
+      // ☠️ 10/09: man nay khong co anh (grab man do loi) -> bao, dung return trang.
+      ghiLog('LOI confirm: man ' + display.id + ' khong co anh grab — bo luot chup')
+      if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+      return
+    }
     // ☠️ Quy doi theo kich thuoc anh THAT (desktopCapturer co the tra anh khong
     // dung co native) — k = anh-that / (DIP man * sf).
     const isz = image.getSize()
@@ -835,7 +862,21 @@ async function handleConfirm(wcId, payload) {
   //    cai dat nguoi dung (JPEG/PNG + chat luong).
   const filePath = kho.luuAnh(cropped, layDinhDangAnh())
   const _sz = cropped.getSize()
-  ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height)
+  if (!filePath) {
+    // ☠️ 10/09: luuAnh tra null (o day / mat quyen / thu muc hong). Truoc day
+    //    path.basename(null) nem TypeError trong ham async khong await ->
+    //    unhandled rejection: main KHONG vang (do that Electron 43) nhung anh
+    //    MAT IM LANG: khong vao khay, khong log, khong bao. Nay: bao han +
+    //    giu anh trong clipboard + van vao khay (khay giu anh trong RAM, keo
+    //    ra ngoai tu khoa vi khong co filePath).
+    ghiLog('LOI luu anh: khong ghi duoc vao ' + kho.thuMucAnh() + ' ' + _sz.width + 'x' + _sz.height)
+    try { clipboard.writeImage(cropped) } catch (e) {}
+    if (Notification.isSupported()) {
+      new Notification({ title: 'AiO Shot & Save', body: T('app.khongLuuDuoc').replace('{thuMuc}', kho.thuMucAnh()) }).show()
+    }
+  } else {
+    ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height)
+  }
   // 2) Vao khay (cho gom moi tam da chup). Khay tu hien len.
   //    ☠️ Anh Tien chot 25/08: chup xong CHI vao khay, KHONG bung anh ghim noi.
   //    Muon ghim len man hinh thi bam thumbnail trong khay (shelf:pin van con).

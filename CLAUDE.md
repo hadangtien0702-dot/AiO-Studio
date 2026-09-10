@@ -47,7 +47,8 @@ Repo GitHub: `hadangtien0702-dot/AiO-Studio` — **PUBLIC** (anh chốt 31/08).
 | 9 | Music & SFX (`AiO Mussic`) | 1.0.0 | `com.aiostudio.music` · 8097 | 🟡 | Có UI, chưa nối việc thật |
 | 10 | Auto Cut Short | — | dành `com.aiostudio.cutshort` · 8093 | ⬜ Chưa có code | Chờ anh chốt 5 câu hỏi sản phẩm (trong `CLAUDE.md` của nó) |
 | 11 | Auto Organize Folder | — | — | ⬜ Chưa có code | Mới có `yêu cầu.txt` |
-| 12 | **Shot & Save** | Electron **0.4.2** (đóng băng) · **Tauri 0.5.0** | app độc lập, KHÔNG CEP | ✅ 0.4.2 anh chấm ĐẠT 31/08 · Tauri **chờ anh chấm** | Xem mục 5 |
+| 12 | **Shot & Save** | Electron **0.4.3** | app độc lập, KHÔNG CEP | ✅ Electron là bản dùng thật (0.4.2 anh chấm ĐẠT 31/08; 0.4.3 10/09 sửa mất ảnh im lặng, chờ cài đè). ☠️ **Tauri ĐÃ BỎ 10/09** | Xem mục 5 |
+| 13 | **Video Download** | **0.1.0** | `com.aiostudio.videodownload` · **8098** | 🟡 Mới dựng 08/09 | Dán link → tải (yt-dlp + QuickJS 2 MB + FFmpeg LGPL) → tự vào bin. Đo: YouTube 1080p H.264 255,9 MB/30 s; TikTok chặn ngẫu nhiên → tự thử lại 3 lần. Anh đang bấm thử, chưa qua bài thật. Chi tiết: `CLAUDE.md` + `PROGRESS.md` trong thư mục nó |
 
 Bảng chi tiết hơn (lịch sử từng bản, việc đang chờ): `Marketing/AiO MVP and
 Plan Marketing/TOOL_VERSION_TRACKER.md`. **Bump version panel nào thì sửa luôn
@@ -88,11 +89,12 @@ cùng lúc nên chưa đụng nhau; đổi một bên nếu có lúc cần cả 
 | 19/08 | Repo public dù có `.p12` + mật khẩu chứng chỉ trong 5 `.ps1` | *"cứ push, tính sau"* — chứng chỉ tự tạo, thiệt hại là danh tiếng, không phải chiếm máy | ✅ CHƯA XỬ |
 | 24/08 | Transcripts: **ẨN** khối hiệu ứng (không xoá) | Đo chết 3 đường native, hiệu ứng buộc là MOGRT AE = nặng timeline | ✅ |
 | 25/08 | Podcast: *"không thấy sai"* trên liệu thật 40 phút | Thước tai người đầu tiên | ✅ trong phạm vi đã nghe |
-| 31/08 | Shot & Save: **đi theo TAURI 2** (Win+Mac), Electron đóng băng 0.4.2 | Chuỗi giật/rung/nhảy 0.3.9→0.4.2 là **bệnh kiến trúc 2 tiến trình** của Electron; app cùng ngành đều native; exe 84 MB vs mục tiêu ~5 MB | ✅ |
+| 31/08 | Shot & Save: **đi theo TAURI 2** (Win+Mac), Electron đóng băng 0.4.2 | Chuỗi giật/rung/nhảy 0.3.9→0.4.2 là **bệnh kiến trúc 2 tiến trình** của Electron; app cùng ngành đều native; exe 84 MB vs mục tiêu ~5 MB | ❌ **bị đè 10/09** |
 | 31/08 | **3 luật chọn công nghệ**: khảo sát thị trường trước · ưu tiên nhanh-nhẹ · phải chạy Win + Mac | Rút từ vụ Electron | ✅ (ghi trong `/xong` mục 2d) |
 | 31/08 | Mỗi dự án phải có **SỔ LỖI TÁI DIỄN** trong `CLAUDE.md` repo + checklist hồi quy | *"lỗi cũ lặp lại hoài"* — double taskbar 25/08 tái diễn 31/08 vì cảnh báo cũ không ghi nguyên nhân đã đo | ✅ Shot & Save đã có; panel khác lập theo mẫu |
 | 31/08 | Làm việc **2 máy** đồng bộ qua GitHub; `/xong` = push + lo cho máy kia | Máy nhà từng đứng ở 24/08, thiếu 32 commit không cảnh báo | ✅ (mục 6) |
-| 01/09 | Tauri **phải giống y chang bản cũ từng nút** trong Settings | Người dùng không được thấy khác | ✅ |
+| 01/09 | Tauri **phải giống y chang bản cũ từng nút** trong Settings | Người dùng không được thấy khác | ❌ bị đè 10/09 |
+| **10/09** | **Shot & Save: BỎ bản Tauri, anh tự xoá thư mục; Electron là bản dùng thật, hết đóng băng (sửa lỗi + tính năng đều làm trên Electron)** | Anh: *"anh không dùng bản Tauri"* rồi *"anh sẽ xóa bản Tauri"* (chưa nêu lý do kỹ thuật). ☠️ Lúc chốt, máy công ty đang cài Tauri 0.5.0 với **75 ảnh / 15 MB trong chính thư mục cài** `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — gỡ cài là mất, phải chép ra trước | ✅ **HIỆN HÀNH** |
 
 ---
 
@@ -190,14 +192,13 @@ chụp màn hình và kéo file ra ngoài.
 
 | Bản | Ở đâu | Trạng thái |
 |---|---|---|
-| **Electron 0.4.2** | `Build and UI Design/AiO Shotandsave/` | **ĐÓNG BĂNG** (chỉ sửa lỗi). Anh chấm ĐẠT 31/08 *"kéo lại ổn định"*. Bộ cài 84 MB |
-| **Tauri 0.5.0** | `Build and UI Design/AiO Shotandsave Tauri/` | Port đầy đủ 01/09, UI copy nguyên văn + bridge. Đo máy công ty: grab 2 màn **141–152ms** (Electron ~880ms), gap-max **18ms**, exe **11,7 MB**, bộ cài **3,0 MB**. Đã cài máy công ty 01/09 thay bản Electron. **CHỜ ANH CHẤM**. Chưa đo máy sạch |
+| **Electron 0.4.3** | `Build and UI Design/AiO Shotandsave/` | **BẢN DUY NHẤT từ 10/09** (hết đóng băng). 0.4.2 anh chấm ĐẠT 31/08 *"kéo lại ổn định"*; 0.4.3 sửa mất ảnh im lặng khi không ghi được file, bộ cài 84,3 MB `dist/` chờ cài đè |
+| ~~Tauri 0.5.0~~ | `Build and UI Design/AiO Shotandsave Tauri/` — **anh xoá 10/09** | **ĐÃ BỎ 10/09.** Từng đo máy công ty: grab 2 màn 141–152ms, exe 11,7 MB, bộ cài 3,0 MB — số giữ lại để sau này có cân nhắc lại thì không đo từ đầu. Trước khi xoá còn 32 file chưa commit; lịch sử vẫn trong git (commit `9dcaf5c`, `6e3242b`) |
 
 Chuỗi 10 bản vá kéo-chọn trong ngày 31/08 (0.3.9 → 0.4.2) = một bệnh kiến trúc:
 2 tiến trình Electron + IPC 16ms + grab 880ms chặn main. **Sổ lỗi tái diễn** (9
 lỗi, gốc đã đo, chốt chặn) ở `AiO Shotandsave/CLAUDE.md` — đọc trước khi đụng
-vào kéo-chọn ở bất kỳ bản nào. ☠️ Sửa UI ở bản GỐC Electron rồi copy sang Tauri
-+ build lại (frontendDist nướng vào exe).
+vào kéo-chọn ở bất kỳ bản nào.
 
 ☠️ Máy mới: `npm install` trước (node_modules không qua git); chạy `.ps1` phải
 `-ExecutionPolicy Bypass`.
@@ -245,7 +246,7 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 
 | Việc | App | Vì sao chưa |
 |---|---|---|
-| Anh chấm Tauri 0.5.0 | Shot & Save | Cài 01/09, chưa có phản hồi |
+| Cài đè Electron 0.4.3 + chép 75 ảnh khỏi thư mục cài Tauri rồi mới gỡ Tauri | Shot & Save | Chốt 10/09, anh tự làm |
 | Cài thử **máy sạch** | Autocut, Shot & Save | Chỉ anh làm được |
 | Khoá gói Free/Pro (1/7) | Cả bộ | Chưa làm; ngưng build tool từ 13/08 |
 | `SETUP.exe` gộp + panel chạy thật bằng kho FFmpeg chung | Cả bộ | Chưa làm |
@@ -256,7 +257,7 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 | Tốc độ 19 phút/giờ (mục tiêu <5) | Autocut | 83% ở `overwriteClip` của Adobe; hướng: xuất FCPXML |
 | 5 câu hỏi sản phẩm | Auto Cut Short | Chờ anh chốt |
 | `.p12` + mật khẩu trong repo public | Cả bộ | Anh chốt "tính sau" |
-| `PROGRESS.md` gốc repo + `AiO Shotandsave Tauri/` | — | Chưa có; hook Stop không canh `ui/`, `src-tauri/` |
+| `PROGRESS.md` gốc repo | — | Chưa có |
 
 ---
 
@@ -264,7 +265,7 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 
 ```
 AiO Studio\
-├── Build and UI Design\   11 panel + AiO Shotandsave (+Tauri) + design-system
+├── Build and UI Design\   11 panel + AiO Shotandsave + design-system
 │                          + AiO Design System (file anh chốt) + AiO Git Public
 ├── Website\AiO WebDessign\
 ├── Marketing\AiO MVP and Plan Marketing\   PIPELINE.md (còn thiếu gì để bán)

@@ -89,7 +89,8 @@ function capNhatSoLuong() {
 window.shelf.onAdd((item) => {
   themO(item)
   capNhatSoLuong()
-  listEl.scrollLeft = 0
+  cuonDich = null; cuonDangChay = false
+  listEl.scrollLeft = 0; listEl.scrollTop = 0
 })
 
 /* Anh ghim vua duoc VE them -> thay thumbnail + tooltip cua dung o do. */
@@ -118,14 +119,42 @@ window.shelf.onClear(() => {
 
 /* Khay NGANG chi co truc ngang de cuon, ma con lan gui deltaY (truc doc) —
    khong tu doi truc thi lan chuot khong lam gi ca (anh Tien bao 28/08).
-   Khay DOC cuon doc tu nhien nen khong can dung vao. Bat tren window de
-   tro chuot o dau tren khay cung lan duoc, khong phai nham dung day anh. */
+   Bat tren window de tro chuot o dau tren khay cung lan duoc.
+
+   ☠️ 10/09 anh Tien: "scroll trong khay chua muot". Do CDP (scripts/test/
+   do-cuon-khay.mjs) TRUOC khi sua: moi nac con lan NHAY 100px tuc thi — doc
+   50 buoc nhay, 19 khung/s; ngang 38 buoc nhay, 8 khung/s. Ca khay DOC (cuon
+   native) cung nhay. Nay CA HAI kieu cuon bang mot vong rAF truot dan toi
+   dich (lerp 0.22/khung ~ 120ms toi noi): nac nao cung cong vao DICH, khong
+   dat thang vao scrollTop/Left. */
+let cuonDich = null
+let cuonDangChay = false
+function cuonHienTai() { return document.body.classList.contains('doc') ? listEl.scrollTop : listEl.scrollLeft }
+function cuonToiDa() {
+  return document.body.classList.contains('doc')
+    ? listEl.scrollHeight - listEl.clientHeight
+    : listEl.scrollWidth - listEl.clientWidth
+}
+function datCuon(v) {
+  if (document.body.classList.contains('doc')) listEl.scrollTop = v
+  else listEl.scrollLeft = v
+}
+function buocCuon() {
+  const cur = cuonHienTai()
+  const d = cuonDich - cur
+  if (Math.abs(d) < 0.5) { datCuon(cuonDich); cuonDangChay = false; cuonDich = null; return }
+  datCuon(cur + d * 0.22)
+  requestAnimationFrame(buocCuon)
+}
 window.addEventListener('wheel', (e) => {
-  if (document.body.classList.contains('doc')) return
   const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX
   if (!delta) return
   e.preventDefault()
-  listEl.scrollLeft += delta
+  // deltaMode 1 = theo DONG (mot so chuot/driver) -> quy ra px
+  const px = e.deltaMode === 1 ? delta * 16 : delta
+  if (cuonDich === null) cuonDich = cuonHienTai()
+  cuonDich = Math.max(0, Math.min(cuonToiDa(), cuonDich + px))
+  if (!cuonDangChay) { cuonDangChay = true; requestAnimationFrame(buocCuon) }
 }, { passive: false })
 
 /* ── Nut tren thanh ──────────────────────────────────────────────────── */

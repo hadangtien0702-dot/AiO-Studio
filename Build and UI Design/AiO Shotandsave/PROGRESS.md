@@ -1,65 +1,165 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-01 13:30 +0700
-> - ✅ **14:30 01/09: BO CAI TAURI 0.5.0 DA CAI LEN MAY CONG TY, ban Electron
->   DA GO theo lenh anh** ("xoa cai cu tranh nham"). Bo cai **3,0MB**
->   (`Release/2026-09-01-shotandsave-tauri-0.5.0/`), cai vao
->   `%LOCALAPPDATA%\AiO Shot & Save\` + loi tat Desktop. **34 anh that cua anh
->   (co anh chup sang 01/09) da CHUYEN NGUYEN VEN** tu thu muc cai Electron
->   sang `Anh chup` cua ban moi TRUOC khi go. Config ke thua dung thoi quen:
->   Shift+` / EN / PNG sieu net / khay doc — boot log `dang-ky=OK`, E2E bang
->   phim Shift+` that DAT. Da do ca CAI DE nang cap: 34/34 anh giu nguyen.
->   2 bay moi trong buoi: BOM cua Out-File lam config chet im (da va code);
->   hotkey FAIL vi Electron con o tray giu phim (go xong OK ngay).
-> - ✅✅✅ **TAURI 0.5.0: PORT KHUNG DAY DU trong 1 buoi** (anh Tien chot
->   "giong y chang ban cu tung nut"): chup 1 man + vat 2 man + khay + ghim +
->   ve + copy + keo-tha Explorer + Settings TUNG NUT + hotkey doi duoc + VI/EN
->   — tat ca DA DO bang harness CDP (bang ket qua + 15 bay trong
->   `../AiO Shotandsave Tauri/CLAUDE.md`). Grab 2 man 141-152ms (Electron
->   ~880ms), keo gap-max 18ms, exe 11,7MB. Con CHUA do: may sach + vai nut
->   phu (X khay/don/an, dialog thu muc, notification, keo pin).
-> - ✅✅ **SPIKE TAURI XONG 4/4** (31/08 may nha 3 diem + 01/09 may cong ty
->   diem keo-tha): chup 5K2K 79ms / 4K 61-70ms + encode PNG 18ms (Electron
->   ~880ms tron goi); overlay am 13ms; keo PNG that tha vao Explorer THANH
->   CONG (tauri-plugin-drag 2.1.1, kiem bang file 1,01MB xuat hien o dich).
->   Exe 12,8MB. Bang ket qua + 8 bay Tauri: `../AiO Shotandsave Tauri/CLAUDE.md`.
->   **Buoc tiep: PORT that — cho anh Tien chot thu tu uu tien.**
-> - Ban dang chay tren MAY NHA anh Tien: **0.4.2** (cai de 22:20, boot OK,
->   phim Shift+`). Bo cai: `Release/2026-08-31-shotandsave-0.4.2/`.
-> - 0.4.1+0.4.2 = sua "MAY NHA van giat khi keo" (may cong ty da DAT 0.4.0),
->   HAI goc cung kich ban bam-chuot-khi-grab-dang-chay: (0.4.1) base64 ~5,7MB
->   qua IPC -> anh di `aioshot://`; (0.4.2, anh ta "keo va GIU giat
->   15xx/1405") neo main lech neo local 100-150px vi main nhan drag-start
->   muon -> neo = diem mousedown renderer gui kem + con tro trong man chu
->   thi main khong ve man chu. ✅ ANH CHAM DAT may nha 22:35: "keo lai roi
->   thi on dinh". Run-log moi luot keo van ghi `keo gap-max` + do troi neo —
->   sau nay ai bao giat thi doc so nay truoc.
-> - ☠️ Truoc khi sua bat cu gi: doc muc **SO LOI TAI DIEN** trong CLAUDE.md
->   (9 loi + bay thuoc do + checklist kiem hoi quy). Vung ve-khung-khi-keo /
->   duong frozen dung vao PHAI chay 4 harness scratchpad phien 21:45 31/08
->   (test-overlay-drag · test-keo-vat-man · test-frozen-storm · test-composite
->   — neu mat thi dung lai theo mo ta trong PROGRESS).
-> - [CHO] anh cham: chup video con "giat mot cai" khong sau ham nong (san
->   ~400ms Electron enumerate; muon nhanh hon ~170ms nua phai doi nen hien
->   thi sang JPEG — danh doi chat luong, anh quyet).
-> - ☠️ **ANH TIEN CHOT 22:30 31/08: DI THEO TAURI 2 (Rust + webview) cho ca
->   Win lan Mac** — sau chuoi loi giat keo "fix nhieu lan van gap" anh ket
->   luan Electron khong hop the loai app nay ("mat thoi gian cua anh qua").
->   Ban Electron 0.4.2 DONG BANG: anh dung tiep, chi sua loi, KHONG them
->   tinh nang. ☠️ Anh noi ro them 22:40: KHONG dap di lam lai bay gio ("build
->   loi khac lai fix them 1 tuan nua hay sao") — Tauri la huong DAI HAN, CHI
->   khoi dong khi can BAN MAC hoac PHAT HANH BAN RA NGOAI, va xay SONG SONG
->   (anh van dung Electron, chi thay khi ban moi qua du harness + anh cham
->   DAT). Khi khoi dong thi SPIKE do 4 diem truoc khi cam ket port full:
->   (1) overlay trong suot hien tuc thi da man khac DPI; (2) toc do WGC tu
->   Rust (ky vong < sàn 400ms Electron); (3) keo-tha file RA app khac
->   (tauri-plugin-drag — do that voi Zalo/Premiere/Explorer); (4) phim tat
->   toan cuc + tray. UI (HTML/CSS/JS + tokens.css) va 3 luat keo-chon +
->   so 9 loi + 4 harness MANG THEO nguyen.
-> - [CHO] truoc khi phat ra ngoai (ap cho ban Tauri): cai may SACH · ky
->   so/SmartScreen · notarize Mac.
-> - ☠️ Ghi chu sai gio: 2 muc duoi day tung ghi 14:50/14:55 — SAI (suy tien
->   len thay vi chay lenh date, vap dung luat 5q); gio that ~14:30/14:37.
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-10 10:14 +0700
+> - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
+>   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
+>   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
+>   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
+>   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
+>   khay doc — dat lai tay).
+> - ✅ **0.4.3 (10/09) DA DONG GOI** `dist/AiO-Shot-and-Save-Setup-0.4.3.exe`
+>   84,3 MB — **[CHO] anh cai de + do ProductVersion tien trinh** (so loi #3).
+>   Gom 4 vá: (1) khong luu duoc anh -> bao + clipboard + van vao khay (truoc:
+>   mat im lang, main KHONG vang — do that); (2) grab 1 man loi khong keo mat man
+>   kia (allSettled), 0 man -> bao + dong overlay; (3) **cuon khay muot** (rAF
+>   lerp; do CDP doc 50->0 buoc nhay, p95 46->30ms); (4) ghim Electron 43.4.1.
+> - ✅ **`npm test`** tu cham 5 dieu (6,2s DAT; doi chung ep loi grab TRUOT) —
+>   chay tai MAY THAT, khong CI. **`npm run test:khay [ngang]`** do muot khay.
+>   Cua ep loi: `AIO_TEST_GRAB_LOI=<id|all>`, `--selftest-shelf`.
+> - [CHO] **4 harness keo-chon** (drag / keo-vat-man / frozen-storm / composite)
+>   tung o scratchpad tam DA MAT, chi con mo ta PROGRESS 31/08 (dong ~350). So
+>   loi #8 doi chay chung truoc khi dung keo-chon — dung lai = nua buoi, cho anh
+>   gat. Trong luc do: KHONG dung onSelRect/mousemove/frozen.
+> - [CHO] Notification "khong chup duoc / khong luu duoc" co HIEN tren man khong
+>   — selftest khong chup duoc toast Windows; anh thu bang cach khoa man
+>   Windows roi bam phim tat.
+> - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
+>   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
+>   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-10 09:39 +0700 — 0.4.3 (tiep): cuon khay MUOT + `npm test` tu cham + ghim Electron
+
+**Anh Tien:** "tối ưu đi em sửa những gì cần sửa" (muc 4, 5 bao cao review) +
+"khi ở trong khay anh scroll hình ảnh đã được chụp nó chưa được mượt".
+
+**Cuon khay (shelf.js):** do TRUOC bang CDP `scripts/test/do-cuon-khay.mjs`
+(bao wheel 90 tick x 100px, Page.screencast dem khung THAT, rAF lay mau
+scrollTop) — moi nac con lan NHAY tuc thi, ca khay DOC (native) lan NGANG
+(`scrollLeft += delta`):
+
+| Khay | khung/s | gap p50 | gap p95 | buoc nhay >60px |
+|---|---|---|---|---|
+| doc — TRUOC | 19,3 | 25ms | 46ms | 50 |
+| doc — SAU | **35,4** | **16ms** | **30ms** | **0** |
+| ngang — TRUOC | 7,9 | 48ms | 63ms | 38 |
+| ngang — SAU | **28,4** | **16ms** | **29ms** | **0** |
+
+Sua: ca 2 kieu cuon qua MOT vong rAF lerp 0.22/khung toi DICH (nac con lan
+cong vao dich, khong dat thang). p50 16ms = dung nhip vsync. `fps` la trung
+binh ca 600ms duoi (khong con khung) nen thap hon 60 — so de so sanh
+truoc/sau, khong phai fps luc dang cuon.
+Cua do: `--selftest-shelf [--khay=doc|ngang]` (userData cach ly, nap 20 anh
+CHI DOC tu 'Anh chup', CDP 9333, tu thoat 90s). `npm run test:khay [ngang]`.
+☠️ Thuoc: wheel qua CDP co the khong kich smooth-scroll native cua Chromium
+nhu chuot that -> so TRUOC co the xau hon cam giac that mot chut; nhung
+`scrollLeft +=` (ngang) chac chan nhay, va anh Tien dang dung khay DOC cung
+than. So SAU khong phu thuoc thuoc (JS tu dieu khien).
+
+**`npm test` (scripts/test/selftest.mjs):** chay `--selftest --dev`, cham 5
+dieu (tu thoat <45s · khong errors.txt · run-log co `luu` · khong `CANH
+BAO`/`LOI ` · 3 anh selftest >5KB), don DICH DANH file theo ten trong dong
+`luu` cua run-log ∩ file moi (khong chi chenh lech — nguoi dung chup bang ban
+khac dung luc test la file do cung "moi"). Do: xanh 6,2s DAT 5/5, exit 0;
+doi chung `AIO_TEST_GRAB_LOI=all npm test` -> TRUOT 8 dong, exit 1 (chot chan
+biet do la gi — bai 5aj). KHONG dua len CI: can man that + desktopCapturer.
+
+**Electron:** `"latest"` -> `"43.4.1"` (lockfile da 43.4.1; `npm install`/
+`update` se khong nhay major Chromium nua).
+
+**Ghi nhan:** khay 20 anh nap nhanh -> `MaxListenersExceededWarning`
+did-finish-load (shelfAdd once() moi anh khi khay dang load) — vo hai, chi
+xay ra o cua do; khong sua. 4 harness keo-chon (drag/keo-vat-man/
+frozen-storm/composite) tung o scratchpad tam DA MAT — chi con mo ta trong
+PROGRESS 31/08; dung lai = nua buoi, cho anh gat.
+
+Bo cai `dist/...0.4.3.exe` dong goi lai (gom ca vá luu-anh + grab-loi buoi
+sang). Anh chup: 46 file truoc/sau, khong mat.
+
+## 2026-09-10 09:00 +0700 — 0.4.3 (tiep): grab loi thi BAO + dong overlay, mot man loi khong keo ca hai
+
+**Boi canh:** muc 3 bao cao review: "grab that bai chi console dev + tra [],
+overlay van mo ma khong ra anh; Promise.all lam mot man loi mat ca hai". Do
+bang cach lan theo code: DUNG ca hai (khac muc 1 — muc nay ket luan dung).
+Anh: "sua va toi uu di em".
+
+**Sua (main.js + i18n.js):**
+- `grabDisplaysList`: `Promise.all` -> `Promise.allSettled`; man nao nem loi
+  thi ghi run-log `LOI grab man <id> (WxH): <ly do>` va loai rieng, man lanh
+  van chup. Them cua test `AIO_TEST_GRAB_LOI=<displayId|all>` (chi khi
+  --dev/--selftest) ep nem loi.
+- `kickGrab`: grab ve 0 man -> ghi `LOI grab: 0/N man chup duoc — dong
+  overlay` + `closeOverlay()` + Notification `app.khongChupDuoc` (VI/EN) NGAY,
+  khong de nguoi dung khoanh vung tren thu se khong ra anh.
+- `handleConfirm`: man khong co anh -> ghi `LOI confirm: man <id> khong co anh
+  grab` + Notification, thay cho `return` trang.
+- XOA `grabDisplay()` (21 dong, khong ai goi — dead code de phien sau tuong
+  la duong chup chinh).
+
+**Kiem (selftest, 2 man 1347678434@1.5 + 2778809521@1.25):**
+
+| Kich ban | run-log | anh ra |
+|---|---|---|
+| A: ep loi CA 2 man | 2 dong `LOI grab man`, `LOI grab: 0/2 — dong overlay` | 0 (dung) — selftest treo toi timeout vi khong co loi thoat cho ca overlay dong som, KHONG phai app loi |
+| B: ep loi man phu | `LOI grab man 2778809521`, `grab-xong layers=1` | 1 anh 960x630 tu man chinh (truoc day: 0) |
+| C: binh thuong | `grab-xong layers=2` | 1 anh, khong CANH BAO |
+
+`.selftest/errors.txt` khong sinh o ca 3. 2 file anh test xoa DICH DANH theo
+danh sach chenh lech truoc/sau (39 -> 39). Bo cai `dist/...0.4.3.exe` 84,3 MB
+dong goi lai (bao gom ca vá luu-anh buoi sang).
+
+**Chua do duoc:** Notification co HIEN tren man khong (selftest khong chup
+duoc toast Windows) — chi chac la lenh `.show()` da chay (cung mau voi
+`app.phimBiGiu` da thay hien 31/08). Anh cai 0.4.3 roi ep loi that (khoa man
+Windows luc bam phim tat) la biet.
+
+**Ghi nhan:** luc do co 4 tien trinh electron `npm start` (dev) khoi dong
+08:18 truoc phien — cua ai do dang chay o khay, em khong tat.
+
+## 2026-09-10 08:35 +0700 — 0.4.3: khong luu duoc anh thi BAO, dung mat im lang
+
+**Boi canh:** anh Tien dua mot bao cao review: "luuAnh tra null khi o day/mat
+quyen, main.js chay path.basename(null) ngay -> TypeError, main process vang".
+Hoi "co hay khong?".
+
+**Do that (khong tin bao cao):**
+- `kho.luuAnh` dung la tra `null` (kho.js:63). `path.basename(null)` nem
+  TypeError (Node 24, chay thu).
+- NHUNG `handleConfirm` la ham **async** goi khong `await` (main.js:783) ->
+  loi thanh *unhandled promise rejection*. Dung app Electron 43.4.1 toi gian
+  lap lai dung kich ban: tien trinh **con song sau 3s, exit 0, khong hop
+  thoai**. Bao cao SAI o ket luan "main vang".
+- Hau qua THAT: bam Enter, overlay dong, anh **khong vao khay, khong log,
+  khong bao** — mat trang. Pham luat "chi bao khi THAT BAI".
+
+**Sua (main.js handleConfirm + i18n.js):** `filePath` null -> ghi run-log
+`LOI luu anh: khong ghi duoc vao <thu muc> WxH` + chep anh vao clipboard +
+Notification `app.khongLuuDuoc` (VI/EN, chi thu muc dang hong, nhac mo Cai
+dat doi thu muc) + van `shelfAdd` (khay giu anh trong RAM; keo ra ngoai / ghi
+de tu khoa vi `!filePath` da co san o shelf:drag, pin:drag, pin:ve-xong).
+
+**Kiem:**
+- Ep `cau-hinh.json` (selftest userData) `thuMucAnh = Q:\khong-ton-tai\anh`
+  -> selftest: run-log co `LOI luu anh: khong ghi duoc vao Q:\... 960x630`,
+  KHONG TypeError, `.selftest/errors.txt` khong sinh, van chay tiep buoc
+  ghim + khay (selftest-pin.png 176KB, selftest-shelf.png 11KB).
+- Tra config, selftest duong thuong: `boot v0.4.3 ... dang-ky=OK`, `luu
+  AiO-...jpg 960x630`, khong CANH BAO, khong errors.txt. File anh selftest
+  sinh ra da xoa DICH DANH mot ten (so loi #4).
+- Bump 0.4.2 -> 0.4.3 + tracker dong 12 cung commit (so loi #5).
+
+**Anh chot 10/09: BO BAN TAURI, anh tu xoa thu muc** ("anh không dùng bản
+Tauri" -> "anh sẽ xóa bản Tauri"). Da hoan tac 2 cho vua va ben Tauri. Electron
+(thu muc nay) la ban DUY NHAT, HET DONG BANG. Da sua CLAUDE.md repo (muc 2, 3,
+5, 8, 9) + CLAUDE.md o day (muc Stack) + tracker dong 12 cho khop.
+☠️ Do truoc khi anh go: may cong ty dang cai Tauri 0.5.0 (registry 0.5.0,
+`%LOCALAPPDATA%\AiO Shot & Save\`) va co **75 anh / 15 MB nam TRONG thu muc
+cai** (`Anh chup`, moi nhat 08/09) — go cai la mat. Thu tu dung: cai Electron
+0.4.3 -> chep 75 anh sang `Anh chup` cua ban Electron -> go Tauri. Config
+Tauri (`%APPDATA%\com.aiostudio.shotandsave.tauri\cau-hinh.json`: Shift+`,
+EN, PNG sieu, khay doc) KHONG tu chuyen sang Electron.
+
+**Con cho:** cai de may anh (bo cai `dist/AiO-Shot-and-Save-Setup-0.4.3.exe`)
++ do ProductVersion tien trinh (so loi #3).
 
 ## 2026-09-01 13:30 — TAURI 0.5.0: port khung DAY DU, van hanh y chang Electron, do bang harness CDP
 
@@ -926,7 +1026,7 @@ Vien trang la sai lua chon cho anh ghim noi tren nen bat ky.
   LAI toan bo truoc khi dong — luat 3d).
 
 ### KIEM THAT (khong tin build sach)
-- Cai lang le /S -> `%LOCALAPPDATA%\Programsio-shot-and-save\` du bo.
+- Cai lang le /S -> `%LOCALAPPDATA%\Programs\aio-shot-and-save\` du bo.
 - Chay ban CAI: 3 tien trinh; Alt+` (config chung %APPDATA%) -> keo -> Enter ->
   **luu that** vao `Anh chup` canh exe; **run-log ghi vao userData** (va asar an).
 - File test ban cai da xoa dich danh.

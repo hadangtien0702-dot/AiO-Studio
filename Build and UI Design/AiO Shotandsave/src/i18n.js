@@ -7,6 +7,8 @@ const DICH = {
   vi: {
     // App
     'app.phimBiGiu': 'Phím tắt chụp {phim} đang bị ứng dụng khác giữ — bấm sẽ không ăn. Mở Cài đặt để đổi phím.',
+    'app.khongLuuDuoc': 'Không lưu được ảnh vào {thuMuc} (ổ đầy hoặc mất quyền). Ảnh đã chép vào clipboard — mở Cài đặt để đổi thư mục lưu.',
+    'app.khongChupDuoc': 'Không chụp được màn hình (Windows đang chặn hoặc lỗi hiển thị). Thử lại sau vài giây; nếu vẫn lỗi, khởi động lại AiO Shot & Save.',
     // Tray
     'tray.chup': 'Chụp vùng chọn',
     'tray.khay': 'Hiện khay ảnh',
@@ -80,6 +82,8 @@ const DICH = {
   },
   en: {
     'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
+    'app.khongLuuDuoc': 'Could not save the image to {thuMuc} (disk full or no permission). It was copied to the clipboard — open Settings to change the save folder.',
+    'app.khongChupDuoc': 'Could not capture the screen (blocked by Windows or a display error). Try again in a few seconds; if it persists, restart AiO Shot & Save.',
     'tray.chup': 'Capture area',
     'tray.khay': 'Show shelf',
     'tray.moThuMuc': 'Open save folder',

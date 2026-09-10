@@ -16,9 +16,13 @@ luat tai nguyen) va thuong hieu AiO.
 
 ## Stack
 
-☠️ **ANH TIEN CHOT 31/08 22:30: cong nghe di theo la TAURI 2 (Rust + webview,
-mot ma nguon Win + Mac).** Electron duoi day la ban HIEN HANH, DONG BANG o
-0.4.2 (chi sua loi, khong them tinh nang). Ly do doi: the loai app chup man
+☠️ **10/09 ANH TIEN CHOT LAI: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
+Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG** — sua loi va
+them tinh nang deu lam o day. Doan duoi giu lai de biet VI SAO tung dinh doi:
+
+~~ANH TIEN CHOT 31/08 22:30: cong nghe di theo la TAURI 2 (Rust + webview,
+mot ma nguon Win + Mac).~~ Electron duoi day tung DONG BANG o
+0.4.2 (31/08 -> 10/09). Ly do dinh doi: the loai app chup man
 (theo chuot tung ms + capture nang + da man DPI) danh thang vao diem yeu
 2-tien-trinh cua Electron — ca chuoi loi giat/rung/nhay 0.3.9→0.4.2 la mot
 benh kien truc; cac app cung nganh (Lightshot, ShareX, Flameshot, CleanShot)
@@ -26,8 +30,10 @@ deu native 1 tien trinh. Truoc khi port full PHAI SPIKE do 4 diem (xem
 PROGRESS muc TRANG THAI). UI HTML/CSS/tokens + 3 luat keo-chon + so loi +
 harness mang theo nguyen.
 
-- Electron (ban moi nhat — hien 43.4.1), JavaScript thuan (CommonJS), khong
-  bundler.
+- Electron **43.4.1 ghim cung** trong package.json (10/09 — truoc la `latest`:
+  `npm install` co the nhay major Chromium, app chup man nhay nhat cho do).
+  Nang ban = doi so co y + chay `npm test` + `npm run test:khay`. JavaScript
+  thuan (CommonJS), khong bundler.
 - ☠️ **MAY MOI PHAI `npm install` TRUOC.** `node_modules/` bi gitignore nen
   `git pull` khong bao gio mang Electron ve — keo code ve bam chay la chet
   ngay buoc dau, trong nhu tool hong. Da vap that o may cong ty 25/08.
@@ -109,12 +115,73 @@ npm start -- --selftest --dev
 
 Roi doc `.selftest/selftest-overlay.png` + `selftest-pin.png` de kiem mat.
 
+**`npm test`** (10/09) = chinh selftest tren nhung TU CHAM bang ma thoat (5 dieu
+kien, xem dau `scripts/test/selftest.mjs`), don dich danh file test. Chay tai
+MAY THAT — KHONG dua len CI headless (do gia). Doi chung: `AIO_TEST_GRAB_LOI=all
+npm test` phai TRUOT. **`npm run test:khay [ngang]`** = do MUOT cuon khay bang
+CDP screencast (chuan DAT: gap p95 <= 40ms, 0 buoc nhay >60px; so 10/09: doc
+p95 30ms, ngang 29ms). Dung vao shelf.js cuon/wheel thi chay lai.
+
+Ep duong LOI (10/09): `AIO_TEST_GRAB_LOI=all` (0 man -> phai thay `LOI grab:
+0/N` + overlay dong, 0 anh; selftest se treo toi timeout — binh thuong) hoac
+`AIO_TEST_GRAB_LOI=<displayId>` (man do bi loai, man kia van ra anh,
+`layers=N-1`). Ep loi LUU: sua `.selftest/userData/cau-hinh.json`
+`thuMucAnh` tro o khong ton tai -> phai thay `LOI luu anh` + van qua buoc
+ghim/khay. Xong nho tra config va xoa DICH DANH file anh test sinh ra.
+
 ☠️ **Selftest duong dep 1 man KHONG DU** (anh Tien day 26/08 sau 3 loi lot luoi).
 Truoc khi bao xong PHAI them: (a) do TI LE SANG anh luu vs vung man goc (~1.0;
 0.58 = dinh lop mo); (b) keo vat 2 man tu CA HAI phia, anh phai chua du 2 man;
 (c) moi luot chup ra DUNG 1 file; (d) doc `.run-log.txt` (nhat ky chay luon bat)
 doi chieu tung buoc. Overlay PHAI co `setContentProtection(true)` — khong thi
 grab (chay sau khi overlay hien) nuong lop mo vao anh.
+
+## QUY TAC ANH TIEN CHOT 10/09 — doc truoc khi nhan bao cao review / de xuat refactor
+
+> Rut tu buoi 10/09: mot bao cao review (AI khac) dua 2 muc "uu tien". Do that
+> thi muc 1 SAI o ket luan (nhung lo ra loi that khac), muc 2 dung so nhung
+> khong dang lam. Anh dan: *"nho note vao brain cua du an cac quy tac nay"*.
+
+**1. Bao cao review (nguoi hay AI) la GIA THUYET, khong phai ket luan — DO
+truoc khi tin, DO truoc khi sua.**
+- Ca that: bao cao noi *"luuAnh tra null -> path.basename(null) -> main vang"*.
+  Doc code thi dung tung buoc. Chay thu Electron 43 thi **main KHONG vang**:
+  `handleConfirm` la async goi khong `await` -> TypeError thanh unhandled
+  rejection, Electron chi in canh bao, tien trinh song tiep (do: song sau 3s,
+  exit 0). Nhung hau qua THAT con te hon cai bao cao noi: **anh mat im lang**
+  — khong vao khay, khong log, khong bao.
+- Cach do re nhat: dung app Electron toi gian ~10 dong lap lai dung kich ban,
+  hoac ep config ve trang thai hong (`thuMucAnh = Q:\khong-ton-tai`) roi chay
+  `--selftest` doc run-log. Mat 2 phut, khoi sua nham huong.
+- ☠️ Bay ky thuat di kem: **ham async goi khong `await` thi loi nem ben trong
+  KHONG bao gio len `uncaughtException`** — handler o dau main.js mu voi no,
+  `.selftest/errors.txt` cung khong ghi. Duong nao co the that bai (ghi file,
+  encode, IPC) thi phai tra ket qua ro (null/false) va **ben goi phai kiem**,
+  dung tin "khong thay loi".
+- Luat cu van ap: "chi bao khi THAT BAI" (anh, 25/08) — that bai ma im lang
+  la loi nang hon ca crash, vi nguoi dung tuong da xong.
+
+**2. KHONG tach file / refactor vi "file lon". Chi tach khi (a) co tinh nang
+moi can cho o, hoac (b) do duoc do dinh cheo cao.**
+- Ca that: de xuat tach `main.js` 1.238 dong thanh 4 module. Do: 36 ham,
+  **32/36 chi cham DUNG MOT vung trang thai**, 4 ham cham cheo deu o keo-chon
+  + ghim (ban chat phai cheo). File lon nhung KHONG roi. Tach = doi kien truc
+  tren ban anh da cham DAT 31/08, loi ich nguoi dung = 0, rui ro hoi quy that
+  (so loi #8: 3 lan hoi quy/ngay o keo-chon — do 2 nguon ve da nhau, tach
+  file khong doi duoc).
+- Truoc khi gat mot de xuat refactor, do 3 so: **so ham cham >=2 vung trang
+  thai / tong so ham**, **ham dai nhat**, **so bien trang thai dung chung**.
+  Ti le cheo thap thi tu choi, ghi so vao PROGRESS de lan sau khoi do lai.
+- Neu van muon gon: cat khoi IT DINH NHAT truoc (Settings, Hotkey — moi khoi
+  1 vung, ~150 dong), KHONG dung keo-chon/frozen. Kiem bang selftest + harness
+  settings.
+- Nguyen tac chung cua anh: **"dung truoc khi ban"** — thu anh khong nhin
+  thay tren man hinh thi khong xep truoc thu anh nhin thay.
+
+**3. Sua xong thi hoi "con ai di qua dung cho nay?" — nhung CHI sua noi anh
+dang dung.** 10/09 em va cung loi sang ban Tauri, anh chan ngay: *"anh khong
+dung ban Tauri"* roi *"anh se xoa"*. Ban khong dung = khong sua, va cap nhat
+tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 
 ## ☠️☠️ SO LOI TAI DIEN — DOC TRUOC KHI SUA / THEM TINH NANG (anh Tien chot 31/08)
 
