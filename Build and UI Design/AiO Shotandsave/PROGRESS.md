@@ -27,6 +27,15 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-13 13:31 +0700 — 0.4.3 anh Tien test may nha: "muot roi do em"
+
+- Chay tu ma nguon (`npx electron .`, may nha chua co bo cai 0.4.3 trong dist/).
+- Boot lan 1: hotkey `Shift+`` (config) dang-ky=FAIL — do that: **Lightshot dang giu phim**.
+  Tat Lightshot, boot lai -> dang-ky=OK. Ghi nho: hai app tranh phim, doi phim mot ben neu dung song song.
+- Anh Tien bam thu keo-chon + khay: **"muot roi do em"** — tai/mat nguoi cham DAT tren may nha (Electron 0.4.3).
+- Cung phien: xoa thu muc Tauri da commit `0899867` va push; origin khong con Tauri.
+- Con cho: cai de 0.4.3 bang bo cai tren may cong ty + do ProductVersion (so loi #3).
+
 ## 2026-09-10 09:39 +0700 — 0.4.3 (tiep): cuon khay MUOT + `npm test` tu cham + ghim Electron
 
 **Anh Tien:** "tối ưu đi em sửa những gì cần sửa" (muc 4, 5 bao cao review) +
