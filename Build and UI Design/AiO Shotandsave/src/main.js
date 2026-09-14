@@ -181,6 +181,7 @@ app.whenReady().then(() => {
     return new Response('', { status: 404 })
   })
 
+  kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
   lang = ch.lang || 'vi'
@@ -1069,7 +1070,9 @@ ipcMain.on('pin:start-drag', (e) => {
   const rec = pins.get(e.sender.id)
   if (!rec || !rec.filePath) return
   try {
-    e.sender.startDrag({ file: rec.filePath, icon: rec.image.resize({ height: 96 }) })
+    const duong = kho.duongDanKeoAnToan(rec.filePath)
+    if (duong !== rec.filePath) ghiLog('keo qua lien ket an toan: ' + duong)
+    e.sender.startDrag({ file: duong, icon: rec.image.resize({ height: 96 }) })
   } catch (err) { if (IS_DEV) console.error('[shotandsave] pin startDrag loi', err) }
 })
 
@@ -1271,7 +1274,9 @@ ipcMain.on('shelf:start-drag', (e, id) => {
   const it = shelfItems.get(id)
   if (!it || !it.filePath) return
   try {
-    e.sender.startDrag({ file: it.filePath, icon: it.image.resize({ height: 96 }) })
+    const duong = kho.duongDanKeoAnToan(it.filePath)
+    if (duong !== it.filePath) ghiLog('keo qua lien ket an toan: ' + duong)
+    e.sender.startDrag({ file: duong, icon: it.image.resize({ height: 96 }) })
   } catch (err) { if (IS_DEV) console.error('[shotandsave] shelf startDrag loi', err) }
 })
 

@@ -1,12 +1,26 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 12:47 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 13:12 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - 🟡 **0.4.17 DA CAI MAY CONG TY 14/09 13:10** (0.4.17.0, 124 anh o thu muc moi) — **[CHO]
+>   anh test**: anh "đổi tên folder, file thành shotandsave" + "làm sao để không lỗi ký tự
+>   do anh". (1) Thu muc anh mac dinh `%LOCALAPPDATA%\shotandsave` (khong con AiOShotSave\AnhChup);
+>   (2) ten file `shotandsave-YYYY-MM-DD-HHMMSS-mmm.ext` (truoc `AiO-`); (3) **KEO-THA AN
+>   TOAN**: `kho.duongDanKeoAnToan()` — duong dan co ky tu ngoai [A-Za-z0-9_-.:\/] (ke ca
+>   dau cach, '&', tieng Viet) thi tao HARD LINK (khac o -> copy) vao `%LOCALAPPDATA%\shotandsave\.keo\<ten
+>   da lam sach>` va dua lien ket do cho app dich; anh goc giu nguyen; `.keo` don moi lan
+>   boot. Unit test (Node, electron gia): duong `thu & muc la\con\anh & test.jpg` -> `.keo\anh---test.jpg`
+>   cung size, goi lai tai dung, duong sach giu nguyen, don sach: 4/4. `npm test` 5/5,
+>   `test:raw` DAT, `test:co-khay` 8/8. Config anh dang tro `Downloads` (anh tu dat luc thu)
+>   — em khong doi. ☠️ **Doi ten thu muc ma nguon `AiO Shotandsave` -> `shotandsave` CHUA
+>   LAM DUOC**: `git mv` bao Permission denied (tien trinh khac giu thu muc — IDE dang mo +
+>   phien Claude khoi dong tu trong do). Lam o dau phien sau, tu thu muc goc repo, sau khi
+>   dong IDE; kem sua duong dan trong CLAUDE.md x2, tracker, CHANGELOG, dong-bo-may.ps1.
 > - ✅ **0.4.16 ANH CHAM DAT 14/09 12:4x** ("đường dẫn mới chạy rồi"; 12:44 anh do them:
 >   **Photoshop nhan thanh Smart Object, Premiere nhan len timeline**). Dich keo-tha DA DO
 >   THAT 14/09: Explorer · Premiere · Photoshop · Claude desktop · Messenger · Lark · Teams
@@ -139,6 +153,37 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-14 13:12 — 0.4.17: đổi tên thư mục/file thành `shotandsave` + kéo-thả an toàn với mọi ký tự
+
+**Anh Tiến:** *"em đổi tên folder, file thành shotandsave đi em"* → hỏi A/B/C (bài `5ay`) → *"tất cả —
+do anh không biết `&` là ký tự đặc biệt; em có thể làm sao để không lỗi ký tự do anh là được"*.
+
+**Thay đổi (`src/kho.js`, `src/main.js`):**
+- Mặc định bản đóng gói: `%LOCALAPPDATA%\shotandsave` (ảnh nằm trực tiếp trong đó). Tên file
+  `shotandsave-YYYY-MM-DD-HHMMSS-mmm.{jpg,png}`.
+- `duongDanKeoAnToan(filePath)`: nếu đường dẫn có ký tự ngoài `[A-Za-z0-9_-.:\/]` → tạo hard link
+  (`fs.linkSync`, khác ổ đĩa thì `copyFileSync`) vào `%LOCALAPPDATA%\shotandsave\.keo\` với tên file đã
+  thay ký tự lạ bằng `-`; trả đường dẫn liên kết; đã có và còn mới thì tái dùng; lỗi thì trả đường
+  cũ. `donKeoAnToan()` xoá `.keo` lúc boot. `pin:start-drag` / `shelf:start-drag` gọi hàm này, log
+  `keo qua lien ket an toan`. → Người dùng chọn thư mục tên gì cũng kéo được vào app Chromium.
+- Dữ liệu: MOVE 124 ảnh `AiOShotSave\AnhChup` → `shotandsave`, gỡ thư mục cũ.
+
+**Bẫy trong lúc làm (đều của em):** (a) chèn chú thích `//` cuối dòng biểu thức nhiều dòng → nuốt
+phần sau, `+ +` sinh `NaN` trong tên file; lộ vì `grep -c` trả 0 → exit 1 → chuỗi `&&` dừng trước
+bước kiểm cú pháp — **`grep -c` không phải phép kiểm, nó là phép đếm có mã thoát**; (b) heredoc
+Bash gộp `\\` → script Electron thử treo/hiện hộp lỗi trên màn anh 2 lần (bài `5ax`, lần thứ 4 hôm nay)
+→ script thử ghi bằng Write, chạy Node với `electron` giả thay vì mở Electron thật.
+
+**Kiểm:** unit 4/4 (`.keo\anh---test.jpg` cùng size, tái dùng, đường sạch giữ nguyên, dọn sạch) · `npm test`
+5/5 (`luu shotandsave-2026-09-14-130825-512.jpg`) · `test:raw` ĐẠT · `test:co-khay` 8/8 · `dist` exit 0
+(88.379.489 byte) · cài đè, tiến trình **0.4.17.0**, `app.asar` có chuỗi thư mục mới. **Chưa qua tay
+anh** (kéo từ khay vào Messenger với thư mục lưu có `&` để chứng minh liên kết an toàn).
+
+**Chưa làm:** đổi tên thư mục mã nguồn `Build and UI Design\AiO Shotandsave` → `shotandsave`: `git mv` bị
+Permission denied hai lần (chạy từ trong thư mục và từ `E:\`) → có tiến trình khác giữ (IDE / phiên
+này). Làm đầu phiên sau từ gốc repo sau khi đóng IDE; phải sửa đường dẫn ở CLAUDE.md ×2, tracker,
+CHANGELOG, `scripts/dong-bo-may.ps1`, và ngăn nhớ dự án (đường dẫn slug không đổi vì gắn gốc repo).
 
 ## 2026-09-14 12:55 — Xoá sạch dấu vết Tauri + Spike trên máy công ty (anh: "xóa sạch giúp anh để không lỗi")
 

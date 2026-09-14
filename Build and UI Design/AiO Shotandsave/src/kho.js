@@ -51,9 +51,43 @@ function thuMucAnh() {
        quyen doc file tha theo chuoi duong dan, gap '&' la lech. Thu muc nguoi
        dung tu chon co '&' van se dinh — viec cho. */
     const goc = process.env.LOCALAPPDATA || app.getPath('userData')
-    return path.join(goc, 'AiOShotSave', 'AnhChup')
+    return path.join(goc, 'shotandsave') // 14/09 anh Tien: "doi ten folder, file thanh shotandsave"
   }
   return path.join(thuMucGoc(), 'Anh chup')
+}
+
+/* ── KEO-THA AN TOAN (14/09) ─────────────────────────────────────────────
+   Anh Tien: "anh khong biet '&' la ky tu dac biet — em lam sao de khong loi ky tu
+   do anh la duoc". Do that: duong dan co '&' (thu muc nguoi dung tu chon) -> app
+   Chromium (Chrome/Lark/Teams/Zalo/Messenger) nhan file RONG. Cach: luc keo, neu
+   duong dan co ky tu ngoai [A-Za-z0-9 _ - . : \ /] thi tao HARD LINK (tuc thi,
+   khong ton dung luong; khac o dia thi copy) trong thu muc an toan
+   %LOCALAPPDATA%/shotandsave/.keo/<ten file> va dua LIEN KET do cho app dich.
+   Anh goc nam nguyen cho cu. Thu muc .keo don sach moi lan mo app. */
+const AN_TOAN = /^[A-Za-z0-9_\-.:\\/]+$/
+function thuMucKeo() {
+  const goc = process.env.LOCALAPPDATA || app.getPath('userData')
+  return path.join(goc, 'shotandsave', '.keo')
+}
+function duongDanKeoAnToan(filePath) {
+  if (!filePath) return filePath
+  if (AN_TOAN.test(filePath)) return filePath
+  try {
+    const dir = baoDamThuMuc(thuMucKeo())
+    // Ten file cung phai sach (thu muc nguoi dung co the dat ten anh co '&'/dau cach)
+    const ten = path.basename(filePath).replace(/[^A-Za-z0-9_.-]/g, '-')
+    const dich = path.join(dir, ten)
+    try {
+      const a = fs.statSync(filePath), b = fs.statSync(dich)
+      if (a.size === b.size && a.mtimeMs <= b.mtimeMs) return dich // da co, con moi
+    } catch (e) {}
+    try { fs.unlinkSync(dich) } catch (e) {}
+    try { fs.linkSync(filePath, dich) } catch (e) { fs.copyFileSync(filePath, dich) } // khac o dia -> copy
+    return dich
+  } catch (e) { return filePath } // khong lam duoc thi keo duong cu, con hon khong keo
+}
+function donKeoAnToan() {
+  try { fs.rmSync(thuMucKeo(), { recursive: true, force: true }) } catch (e) {}
 }
 
 function baoDamThuMuc(dir) {
@@ -62,10 +96,11 @@ function baoDamThuMuc(dir) {
 }
 
 /** Ten file theo thoi diem chup: AiO-2026-08-24-231530.png */
+/* Ten file: 'shotandsave-YYYY-MM-DD-HHMMSS-mmm.ext' (14/09, truoc 'AiO-'). */
 function tenTheoGio(d, duoi) {
   const p = (n, k) => String(n).padStart(k || 2, '0')
   return (
-    'AiO-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+    'shotandsave-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
     '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) +
     '-' + p(d.getMilliseconds(), 3) + '.' + (duoi || 'png')
   )
@@ -130,6 +165,6 @@ function ghiCauHinh(patch) {
 }
 
 module.exports = {
-  thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh,
+  thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan,
   docCauHinh, ghiCauHinh,
 }
