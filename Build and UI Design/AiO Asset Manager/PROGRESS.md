@@ -269,7 +269,7 @@ bo cai MOT gia. Luon gia dinh khach co du ca bo.
 - Xoa AiO Editing - giai phong 1.614,5 MB.
 
 ☠️ SUYT MAT DU LIEU: AiO Editing chua 	est 2.prproj DANG MO trong Premiere.
-Do bang pp.project.path truoc khi xoa moi thay. Neu xoa thang la mat project
+Do bang `app.project.path` truoc khi xoa moi thay. Neu xoa thang la mat project
 dang dung cua chu du an cung 36 ban auto-save.
 -> BAI HOC: thu muc sap xoa co the dang chua DU LIEU SONG. Phai do truoc.
 
