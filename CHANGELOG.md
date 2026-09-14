@@ -22,7 +22,7 @@ Ký hiệu: ✅ anh chấm đạt · 🟢 chạy được, chưa qua tay anh · 
 
 ---
 
-## TỔNG QUAN — 13 app, bản hiện hành (13/09/2026)
+## TỔNG QUAN — 13 app, bản hiện hành (14/09/2026)
 
 | # | App | Bản | Trạng thái | Bản đầu | Bản mới nhất |
 |:-:|---|:-:|:-:|:-:|:-:|
@@ -37,7 +37,7 @@ Ký hiệu: ✅ anh chấm đạt · 🟢 chạy được, chưa qua tay anh · 
 | 9 | Music & SFX | 1.0.0 | 🟡 | 14/08 | 14/08 |
 | 10 | Auto Cut Short | — | ⬜ | 30/07 (móng) | — |
 | 11 | Auto Organize Folder | — | ⬜ | 14/08 (yêu cầu) | — |
-| 12 | Shot & Save (Electron) | 0.4.3 | ✅ | 24/08 | 13/09 |
+| 12 | Shot & Save (Electron) | **0.4.16** | ✅ | 24/08 | 14/09 |
 | 13 | Video Download | 0.1.0 | 🟡 | 08/09 | 10/09 |
 
 ---
@@ -137,6 +137,18 @@ Chưa đo: >2 người · mic rời bleed nặng (bộ Will–Trọng) · >1 gi�
 
 | Ngày | Bản | Cập nhật | Chấm |
 |---|:-:|---|:-:|
+| 14/09 | **0.4.16** | Thư mục ảnh mặc định → `%LOCALAPPDATA%\AiOShotSave\AnhChup`: tên cũ có `&` làm kéo-thả vào Chrome/Lark/Teams/Zalo/Messenger ra file RỖNG (đo 3 cửa sổ thả thử); 123 ảnh dời, dọn 133 MB rác Tauri/updater. Đích kéo-thả đo thật: Premiere, Photoshop, Explorer, Claude, Messenger, Lark, Teams, Zalo, Chrome | ✅ anh chấm |
+| 14/09 | 0.4.15 | Chụp TRƯỚC khi phủ overlay (kiểu Lightshot): overlay phủ ≥0,5 s là WGC trả video đen (đo) → YouTube/Facebook hết đen; overlay hiện ~0,6 s kèm hình đứng yên | ✅ anh chấm |
+| 14/09 | 0.4.14 | Fade ảnh đóng băng 160→100 ms. Đo sàn getSources ~370 ms (chụp 1×1 cũng vậy). **Anh chốt KHÔNG làm mô-đun chụp native/Tauri** | ✅ anh chấm |
+| 14/09 | 0.4.13 | Chụp nhanh 2,7× (grab 1.240→465 ms): ảnh đóng băng JPEG chỉ để nhìn (toPNG 4K = 642 ms trên luồng chính), lúc Xong cắt đúng vùng từ ảnh gốc PNG qua `aioshot://raw` → file lưu vẫn lossless. Harness `test:raw` | ✅ anh chấm |
+| 14/09 | 0.4.12 | Kéo to khay = THẤY NHIỀU ẢNH HƠN: lưới ô cố định, ngang thêm hàng / dọc thêm cột (0.4.10–0.4.11 phóng ảnh = sai ý, đã đè). Harness `test:co-khay` 8/8 | ✅ anh chấm |
+| 14/09 | 0.4.10 | Kéo to khay: tay nắm góc trên-trái, sàn = cỡ cũ, trần 60% màn chứa khay, nhớ cỡ riêng dọc/ngang | ❌ đè (phóng ảnh) |
+| 14/09 | 0.4.9 | Màn tối đi mượt sau phím tắt: grab chờ 200 ms cho lớp mờ tối xong (đo screencast 40 ms: 3 khung rồi đứng 1 s). Nhãn khay Ngang/Dọc | ✅ anh chấm |
+| 14/09 | 0.4.8 | Ảnh ghim: rê chuột hiện 3 nút khung/mũi tên/chữ, bấm là vào vẽ (sau khi bỏ bút chì 10/09 chỉ còn phím 1/2/3, cầm chuột không vào được) | ✅ anh chấm |
+| 14/09 | 0.4.7 | Nhãn tray `&&` (hết "AiO Shot  Save") + nhật ký chẩn đoán cửa sổ ghim | 🟢 trung gian |
+| 14/09 | 0.4.6 | Thư mục ảnh mặc định dời RA NGOÀI thư mục cài — cài đè NSIS xoá thư mục cài, mất 2 ảnh anh chụp (sổ lỗi #11) | ✅ anh chấm |
+| 14/09 | 0.4.5 | Chữ có HỘP NỀN tối bo góc, bỏ viền chữ; ô gõ cùng nền (WYSIWYG) | 🟢 |
+| 14/09 | 0.4.4 | Cài đè máy công ty sau khi gỡ Tauri (75 ảnh chép ra trước). Công cụ CHỮ + phím 1/2/3 + sửa khung ghim lệch 1,5× (sổ lỗi #10). Anh: *"ổn định rồi"* | ✅ anh chấm |
 | 13/09 | 0.4.3 | Anh test máy nhà từ mã nguồn: *"mượt rồi"*. Phát hiện Lightshot giữ phím `Shift+``. Thư mục Tauri xoá khỏi repo | ✅ anh chấm |
 | 10/09 | **0.4.3** | Không lưu được ảnh thì báo + clipboard + vẫn vào khay (hết mất im lặng); grab lỗi 1 màn không kéo mất màn kia; cuộn khay mượt (p95 46→30ms); `npm test` tự chấm; ghim Electron 43.4.1. Bộ cài 84,3 MB `dist/`. **Anh chốt bỏ Tauri, Electron là bản duy nhất** | 🟢 chờ cài đè máy công ty |
 | 01/09 | ~~Tauri 0.5.0~~ | Viết lại lõi Tauri 2: grab 2 màn 141–152ms, exe 11,7 MB, bộ cài 3 MB. **Đã bỏ 10/09** (số giữ lại để tham khảo) | ❌ bỏ |
