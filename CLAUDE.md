@@ -36,7 +36,7 @@ Repo GitHub: `hadangtien0702-dot/AiO-Studio` — **PUBLIC** (anh chốt 31/08).
 
 | # | App | Bản | ID · cổng | Trạng thái | Việc gần nhất |
 |:-:|---|:-:|---|:-:|---|
-| 1 | **Autocut** | **1.6.0** | `com.aiostudio.autocut` · 8089 | ✅ **XONG, NGƯNG PHÁT TRIỂN** (anh chốt 19/08) | Anh tự dựng bài thật + nghe lại, không mất lời. Bộ cài `Release/AiO Autocut/2026-08-19-1.6.0/win/` 46 MB. Việc mới phải hỏi anh |
+| 1 | **Autocut** | **1.6.0** | `com.aiostudio.autocut` · 8089 | ✅ **XONG, NGƯNG PHÁT TRIỂN** (anh chốt 19/08) | Anh tự dựng bài thật + nghe lại, không mất lời. Bộ cài `Release/AiO Autocut/win/` 46 MB. Việc mới phải hỏi anh |
 | 2 | Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` · 8088 | 🧊 **Đóng băng** (14/08: *"rất ổn rồi, tạm dừng"*) | Kho ~28.900 asset. Là **gói FREE** |
 | 3 | Power Bins | 2.0.0 | `com.aiostudio.powerbin` · 8090 | 🟢 Chạy được | Brand kit hiện ở mọi project Premiere |
 | 4 | Transcripts | **2.5.5** | `com.aiostudio.transcript` · 8091 | 🟢 Chạy được | 24/08: 2 nút *Làm phụ đề* / *Làm hiệu ứng*; khối hiệu ứng **ẨN** (`HIEN_HIEU_UNG=false`) vì đo chết 3 đường native Premiere 27; vá caption rơi sang sequence khác. Nợ: anh dùng bài thật, bộ cài cài font |
@@ -164,8 +164,8 @@ làm mặc định**); không chạy 2 whisper song song.
   -BinChung`: 3 gói từ 274,7 MB → ~92 MB. ☠️ CHƯA có `SETUP.exe` gộp, CHƯA panel
   nào chạy thật bằng kho chung trên Premiere.
 - Bộ cài `CAI-DAT.bat` tự bật `PlayerDebugMode`, không cần Admin.
-- Mỗi bản phát hành: `Release/<Tên app như Build>/<ngày>-<bản>/win/` + `mac/` (anh chốt
-  14/09; mac chưa có bản nào); `.exe/.zip/.rar` **không lên git**. Xem `Release/README.md`.
+- Bộ cài: `Release/<Tên app như Build>/win/` + `mac/`, CHỈ bản mới nhất (anh chốt 14/09; mac
+  chưa có bản nào); `.exe/.zip/.rar` **không lên git**. Xem `Release/README.md`.
 - ☠️ **BẢO MẬT CHƯA XỬ (19/08):** repo public chứa 3 file `aiostudio-dev.p12` +
   mật khẩu trong 5 `.ps1` → ai cũng ký được `.zxp` mạo danh. Anh chốt "tính sau".
 
@@ -281,7 +281,7 @@ AiO Studio\
 ├── Website\AiO WebDessign\
 ├── Marketing\AiO MVP and Plan Marketing\   PIPELINE.md (còn thiếu gì để bán)
 │                          · TOOL_VERSION_TRACKER.md · MASTER_PLAN · BANG_GIA
-├── Release\               <Tên app>/<ngày>-<bản>/win|mac (README.md trong đó)
+├── Release\               <Tên app>/win|mac — chỉ bản mới nhất (README.md trong đó)
 ├── Test Media\file pr for test\   1,33 GB, dùng chung (project Premiere sẽ hỏi relink)
 ├── Research and Architecture\
 ├── scripts\               dong-bo-may.ps1 · brain-map\ (bản đồ brain, cổng 8097)
