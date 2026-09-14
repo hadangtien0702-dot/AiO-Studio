@@ -6,7 +6,7 @@
 >
 > **Luật ghi:** bump version app nào → thêm dòng ở mục app đó, dòng mới trên
 > cùng. Số bản đọc từ `CSXS/manifest.xml` (panel CEP) hoặc `package.json`
-> (Shot & Save). Bản đã có bộ cài thì ghi thư mục `Release/`. Bản anh Tiến
+> (Shot & Save). Bản đã có bộ cài thì ghi thư mục `Release/<app>/<ngày>-<bản>/`. Bản anh Tiến
 > chấm bằng tay/tai thì ghi rõ chữ **anh chấm**. Bản chỉ chạy xanh trên máy
 > dev thì ghi **chưa qua tay anh**.
 >
@@ -137,7 +137,7 @@ Chưa đo: >2 người · mic rời bleed nặng (bộ Will–Trọng) · >1 gi�
 
 | Ngày | Bản | Cập nhật | Chấm |
 |---|:-:|---|:-:|
-| 14/09 | **0.4.17** | Thư mục mặc định `%LOCALAPPDATA%\shotandsave`, file `shotandsave-…`; **kéo-thả an toàn**: đường dẫn có `&`/dấu cách/ký tự lạ thì kéo qua hard link `.keo` (người dùng chọn thư mục gì cũng kéo được vào Chrome/Lark/Teams/Zalo). Unit 4/4, selftest 5/5. Anh: *"kéo ầm ầm rồi"*. 📦 `2026-09-14-shotandsave-0.4.17` | ✅ anh chấm |
+| 14/09 | **0.4.17** | Thư mục mặc định `%LOCALAPPDATA%\shotandsave`, file `shotandsave-…`; **kéo-thả an toàn**: đường dẫn có `&`/dấu cách/ký tự lạ thì kéo qua hard link `.keo` (người dùng chọn thư mục gì cũng kéo được vào Chrome/Lark/Teams/Zalo). Unit 4/4, selftest 5/5. Anh: *"kéo ầm ầm rồi"*. 📦 `AiO Shotandsave/2026-09-14-0.4.17` | ✅ anh chấm |
 | 14/09 | 0.4.16 | Thư mục ảnh mặc định → `%LOCALAPPDATA%\AiOShotSave\AnhChup`: tên cũ có `&` làm kéo-thả vào Chrome/Lark/Teams/Zalo/Messenger ra file RỖNG (đo 3 cửa sổ thả thử); 123 ảnh dời, dọn 133 MB rác Tauri/updater. Đích kéo-thả đo thật: Premiere, Photoshop, Explorer, Claude, Messenger, Lark, Teams, Zalo, Chrome, FigJam | ✅ anh chấm |
 | 14/09 | 0.4.15 | Chụp TRƯỚC khi phủ overlay (kiểu Lightshot): overlay phủ ≥0,5 s là WGC trả video đen (đo) → YouTube/Facebook hết đen; overlay hiện ~0,6 s kèm hình đứng yên | ✅ anh chấm |
 | 14/09 | 0.4.14 | Fade ảnh đóng băng 160→100 ms. Đo sàn getSources ~370 ms (chụp 1×1 cũng vậy). **Anh chốt KHÔNG làm mô-đun chụp native/Tauri** | ✅ anh chấm |
@@ -153,7 +153,7 @@ Chưa đo: >2 người · mic rời bleed nặng (bộ Will–Trọng) · >1 gi�
 | 13/09 | 0.4.3 | Anh test máy nhà từ mã nguồn: *"mượt rồi"*. Phát hiện Lightshot giữ phím `Shift+``. Thư mục Tauri xoá khỏi repo | ✅ anh chấm |
 | 10/09 | **0.4.3** | Không lưu được ảnh thì báo + clipboard + vẫn vào khay (hết mất im lặng); grab lỗi 1 màn không kéo mất màn kia; cuộn khay mượt (p95 46→30ms); `npm test` tự chấm; ghim Electron 43.4.1. Bộ cài 84,3 MB `dist/`. **Anh chốt bỏ Tauri, Electron là bản duy nhất** | 🟢 chờ cài đè máy công ty |
 | 01/09 | ~~Tauri 0.5.0~~ | Viết lại lõi Tauri 2: grab 2 màn 141–152ms, exe 11,7 MB, bộ cài 3 MB. **Đã bỏ 10/09** (số giữ lại để tham khảo) | ❌ bỏ |
-| 31/08 | 0.4.2 | Kéo-và-giữ hết giật: neo = điểm mousedown renderer gửi kèm. 📦 `2026-08-31-shotandsave-0.4.2`. Anh: *"kéo lại ổn định"* | ✅ anh chấm |
+| 31/08 | 0.4.2 | Kéo-và-giữ hết giật: neo = điểm mousedown renderer gửi kèm. 📦 `AiO Shotandsave/2026-08-31-0.4.2`. Anh: *"kéo lại ổn định"* | ✅ anh chấm |
 | 31/08 | 0.4.1 | Máy nhà 5120×2160 giật: ảnh đóng băng đi protocol `aioshot://` thay base64 5,7 MB qua IPC | 🟢 |
 | 31/08 | **0.4.0** | Bản phát hành gom 10 vá kéo-chọn trong ngày. 📦 84 MB. Anh: *"ngon rồi em, hết nhảy rồi"* | ✅ anh chấm |
 | 31/08 | 0.3.17 | Kéo vắt sang màn kia hết nhảy (local vẽ <50ms thì main nhường) | 🟢 |

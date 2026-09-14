@@ -8,7 +8,7 @@
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
 > - ✅ **0.4.17 ANH CHAM DAT 14/09 13:2x** ("kéo ầm ầm rồi em ơi") — cai 13:10, 0.4.17.0;
->   📦 **BO CAI PHAT HANH** `Release/2026-09-14-shotandsave-0.4.17/` (exe 88.379.489 byte, md5
+>   📦 **BO CAI PHAT HANH** `Release/AiO Shotandsave/2026-09-14-0.4.17/win/` (Release sap xep lai theo app 14/09) (exe 88.379.489 byte, md5
 >   818d9fc2…, + HUONG-DAN-CAI-DAT.txt viet lai cho 0.4.17 — canh bao cai de tu <=0.4.5 mat anh): anh "đổi tên folder, file thành shotandsave" + "làm sao để không lỗi ký tự
 >   do anh". (1) Thu muc anh mac dinh `%LOCALAPPDATA%\shotandsave` (khong con AiOShotSave\AnhChup);
 >   (2) ten file `shotandsave-YYYY-MM-DD-HHMMSS-mmm.ext` (truoc `AiO-`); (3) **KEO-THA AN

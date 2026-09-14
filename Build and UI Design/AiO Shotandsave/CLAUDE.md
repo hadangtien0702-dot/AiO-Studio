@@ -326,7 +326,7 @@ cu. ☠️ Accelerator backtick la `Alt+\`` (literal), KHONG phai 'Alt+Backquote
 
 DONG GOI BO CAI (26/08): `npm run dist` -> electron-builder/NSIS mot-cu-bam,
 per-user, ra `dist/AiO-Shot-and-Save-Setup-<ver>.exe` (~99MB, KHONG len git —
-`*.exe` ignored; ban phat hanh nam o `Release/<ngay>-shotandsave-<ver>/`).
+`*.exe` ignored; ban phat hanh nam o `Release/AiO Shotandsave/<ngay>-<ver>/win/`).
 ☠️ 2 bay da vap: (1) RUN_LOG trong app.asar CHI DOC -> ban dong goi phai ghi
 vao userData (da lam trong ghiLog); (2) bo cai NSIS TU DE loi tat Desktop cung
 ten -> sau khi cai, loi tat tro BAN CAI chu khong phai ban nguon.
