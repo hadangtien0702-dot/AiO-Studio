@@ -155,6 +155,25 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-14 14:20 — Release sắp xếp theo app + sự cố script xoá nhầm thư mục 0.4.17 (đã khôi phục)
+
+**Anh Tiến:** *"Release: folder có tên app như Build, các bản nằm trong folder app riêng, có bản cài win
+và mac… chỉ giữ lại các bản mới nhất"*.
+
+**Đã làm:** `Release/<Tên app như Build>/<ngày>-<bản>/win|mac`, 13 thư mục app (app chưa có bản →
+`CHUA-CO-BAN-PHAT-HANH.txt`; `mac/` → `CHUA-CO-BAN-MAC.txt`), `Release/README.md` ghi cấu trúc. Xoá
+15 bản Shot & Save cũ (0.3.4 → 0.4.0, 84–99 MB mỗi bản) + bundle beta 14/08 (đã bị Autocut 1.6.0 và
+Transcript 2.5.5 thay thế). Giữ: Autocut 1.6.0, Transcripts 2.5.5, Shot & Save 0.4.17. Tài liệu
+trỏ đường dẫn mới: CLAUDE.md gốc, CHANGELOG, tracker, CLAUDE.md panel.
+
+**☠️ Sự cố (của em):** anh có tạo `Release/2026-09-14-shotandsave-0.4.17.rar` (nén tay). Script lọc
+"bản theo app" bằng regex trên `os.listdir` — **file .rar khớp mẫu y như thư mục**, sắp xếp thành
+"mới nhất", nên thư mục 0.4.17 THẬT bị `rmtree` như bản cũ. Khôi phục từ `dist/` (md5
+818d9fc26ad1 khớp) + hướng dẫn từ commit `7c69a59`. Không mất gì, nhưng đây đúng bài `5am-ter`:
+**bước xoá tính từ MẪU TÊN thì phải lọc `isdir` + in danh sách sẽ xoá ra trước, đối chiếu với thứ
+định giữ, rồi mới xoá** — em xoá trong cùng một lượt chạy, không nhìn. File .rar của anh để nguyên
+ở gốc `Release/` (git bỏ qua `*.rar`); muốn thì dời vào `AiO Shotandsave/2026-09-14-0.4.17/win/`.
+
 ## 2026-09-14 13:20 — Anh chấm ĐẠT 0.4.17
 
 Anh: *"kéo ầm ầm rồi em ơi"* — kéo-thả từ khay chạy với thư mục anh đang dùng. Không sửa mã.
