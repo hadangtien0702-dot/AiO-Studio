@@ -1,14 +1,13 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 13:12 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 13:20 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
-> - 🟡 **0.4.17 DA CAI MAY CONG TY 14/09 13:10** (0.4.17.0, 124 anh o thu muc moi) — **[CHO]
->   anh test**: anh "đổi tên folder, file thành shotandsave" + "làm sao để không lỗi ký tự
+> - ✅ **0.4.17 ANH CHAM DAT 14/09 13:2x** ("kéo ầm ầm rồi em ơi") — cai 13:10, 0.4.17.0: anh "đổi tên folder, file thành shotandsave" + "làm sao để không lỗi ký tự
 >   do anh". (1) Thu muc anh mac dinh `%LOCALAPPDATA%\shotandsave` (khong con AiOShotSave\AnhChup);
 >   (2) ten file `shotandsave-YYYY-MM-DD-HHMMSS-mmm.ext` (truoc `AiO-`); (3) **KEO-THA AN
 >   TOAN**: `kho.duongDanKeoAnToan()` — duong dan co ky tu ngoai [A-Za-z0-9_-.:\/] (ke ca
@@ -153,6 +152,11 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-14 13:20 — Anh chấm ĐẠT 0.4.17
+
+Anh: *"kéo ầm ầm rồi em ơi"* — kéo-thả từ khay chạy với thư mục anh đang dùng. Không sửa mã.
+Còn nợ: đổi tên thư mục mã nguồn (đầu phiên sau, từ gốc repo, sau khi đóng IDE).
 
 ## 2026-09-14 13:12 — 0.4.17: đổi tên thư mục/file thành `shotandsave` + kéo-thả an toàn với mọi ký tự
 

@@ -137,7 +137,7 @@ Chưa đo: >2 người · mic rời bleed nặng (bộ Will–Trọng) · >1 gi�
 
 | Ngày | Bản | Cập nhật | Chấm |
 |---|:-:|---|:-:|
-| 14/09 | **0.4.17** | Thư mục mặc định `%LOCALAPPDATA%\shotandsave`, file `shotandsave-…`; **kéo-thả an toàn**: đường dẫn có `&`/dấu cách/ký tự lạ thì kéo qua hard link `.keo` (người dùng chọn thư mục gì cũng kéo được vào Chrome/Lark/Teams/Zalo). Unit 4/4, selftest 5/5 | 🟢 chờ anh test |
+| 14/09 | **0.4.17** | Thư mục mặc định `%LOCALAPPDATA%\shotandsave`, file `shotandsave-…`; **kéo-thả an toàn**: đường dẫn có `&`/dấu cách/ký tự lạ thì kéo qua hard link `.keo` (người dùng chọn thư mục gì cũng kéo được vào Chrome/Lark/Teams/Zalo). Unit 4/4, selftest 5/5. Anh: *"kéo ầm ầm rồi"* | ✅ anh chấm |
 | 14/09 | 0.4.16 | Thư mục ảnh mặc định → `%LOCALAPPDATA%\AiOShotSave\AnhChup`: tên cũ có `&` làm kéo-thả vào Chrome/Lark/Teams/Zalo/Messenger ra file RỖNG (đo 3 cửa sổ thả thử); 123 ảnh dời, dọn 133 MB rác Tauri/updater. Đích kéo-thả đo thật: Premiere, Photoshop, Explorer, Claude, Messenger, Lark, Teams, Zalo, Chrome, FigJam | ✅ anh chấm |
 | 14/09 | 0.4.15 | Chụp TRƯỚC khi phủ overlay (kiểu Lightshot): overlay phủ ≥0,5 s là WGC trả video đen (đo) → YouTube/Facebook hết đen; overlay hiện ~0,6 s kèm hình đứng yên | ✅ anh chấm |
 | 14/09 | 0.4.14 | Fade ảnh đóng băng 160→100 ms. Đo sàn getSources ~370 ms (chụp 1×1 cũng vậy). **Anh chốt KHÔNG làm mô-đun chụp native/Tauri** | ✅ anh chấm |
