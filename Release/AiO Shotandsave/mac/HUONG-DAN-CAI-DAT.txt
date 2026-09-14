@@ -1,0 +1,13 @@
+AiO Shot & Save 0.4.17 cho macOS - 14/09/2026
+
+Chon dung file theo may:
+  - Mac chip M (M1/M2/M3/M4): AiO-Shot-and-Save-0.4.17-mac-arm64.dmg
+  - Mac chip Intel:           AiO-Shot-and-Save-0.4.17-mac-x64.dmg
+  (Khong biet chip gi: bam logo Apple -> About This Mac.)
+
+1. Mo file .dmg, keo "AiO Shot & Save" vao thu muc Applications.
+2. Lan dau mo: macOS bao "khong xac minh duoc nha phat trien" -> bam chuot phai
+   vao app -> Open -> Open. (Neu van bi chan: System Settings -> Privacy &
+   Security -> keo xuong -> Open Anyway.)
+3. macOS hoi quyen Screen Recording -> Allow, roi mo lai app.
+4. Xong. Phim tat chup: Cmd + Shift + S (doi trong Cai dat).

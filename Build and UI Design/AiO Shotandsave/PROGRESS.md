@@ -1,12 +1,24 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 13:20 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 19:40 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - 📦 **BAN MAC 0.4.17 (14/09 19:3x)** — anh: "cai ban cho mac nhe em, mac intel va chip m
+>   luon". Windows KHONG dung duoc ban mac (electron-builder: "Build for macOS is supported
+>   only on macOS") -> dung may mac cua GitHub Actions: `.github/workflows/shotandsave-mac.yml`
+>   (repo public = may mac mien phi), chay khi push sua thu muc app hoac bam "Run workflow".
+>   Lan chay 34843696786: xanh, artifact 439 MB (2 .dmg + 2 .zip, x64 + arm64), tai ve
+>   `Release/AiO Shotandsave/mac/` + HUONG-DAN-CAI-DAT.txt (3 buoc + chon file theo chip).
+>   package.json: `build.mac` (dmg+zip, `identity:null` = KHONG ky, NSScreenCaptureUsageDescription),
+>   script `dist:mac`; `assets/icon.png` 1536px ve tu logo.svg bang Electron. ☠️ CHUA test tren
+>   mac that (khong co may) — chua ky nen macOS se chan lan dau (chuot phai -> Open); quyen
+>   Screen Recording phai cap tay; keo-tha/hard link `.keo`/hotkey Cmd+Shift+S chua do.
+>   `gh` tai khoan Vincentnguyen1809 chi doc repo -> khong bam "Run workflow" bang lenh duoc,
+>   phai push hoac anh bam tren web.
 > - ✅ **0.4.17 ANH CHAM DAT 14/09 13:2x** ("kéo ầm ầm rồi em ơi") — cai 13:10, 0.4.17.0;
 >   📦 **BO CAI PHAT HANH** `Release/AiO Shotandsave/win/` (Release sap xep lai theo app 14/09, bo tang ngay 14:3x) (exe 88.379.489 byte, md5
 >   818d9fc2…, + HUONG-DAN-CAI-DAT.txt viet lai cho 0.4.17 — canh bao cai de tu <=0.4.5 mat anh): anh "đổi tên folder, file thành shotandsave" + "làm sao để không lỗi ký tự

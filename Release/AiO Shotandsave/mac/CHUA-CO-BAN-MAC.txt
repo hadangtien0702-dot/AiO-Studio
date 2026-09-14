@@ -1,2 +1,0 @@
-Chua co ban cai cho macOS.
-Khi build xong thi dat bo cai vao day (cung ten, cung so ban voi thu muc win/).
