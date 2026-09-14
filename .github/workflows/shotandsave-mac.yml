@@ -1,0 +1,38 @@
+# Dung ban mac (Intel x64 + Apple Silicon arm64) cho AiO Shot & Save.
+# Ly do: electron-builder tu choi dung ban mac tren Windows ("supported only on macOS"),
+# nen muon ra .dmg thi phai chay tren may mac — GitHub cho may mac mien phi voi repo public.
+# Chay khi: (a) push len main co sua thu muc app, hoac (b) bam "Run workflow" tren GitHub.
+# Ket qua: tab Actions -> lan chay -> Artifacts -> "shotandsave-mac" (2 .dmg + 2 .zip).
+name: Shot & Save - mac
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'Build and UI Design/AiO Shotandsave/**'
+      - '.github/workflows/shotandsave-mac.yml'
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: Build and UI Design/AiO Shotandsave
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run dist:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - run: ls -la dist | grep -E 'dmg|zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shotandsave-mac
+          path: |
+            Build and UI Design/AiO Shotandsave/dist/*.dmg
+            Build and UI Design/AiO Shotandsave/dist/*.zip
+          if-no-files-found: error

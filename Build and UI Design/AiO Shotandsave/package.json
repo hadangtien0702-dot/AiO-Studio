@@ -16,7 +16,8 @@
     "test:co-khay": "node scripts/test/do-co-khay.mjs",
     "test:mo-dan": "node scripts/test/do-mo-dan.mjs",
     "test:raw": "node scripts/test/do-raw.mjs",
-    "test:khung": "node scripts/test/do-khung-ghim.mjs"
+    "test:khung": "node scripts/test/do-khung-ghim.mjs",
+    "dist:mac": "electron-builder --mac --x64 --arm64 --publish never"
   },
   "devDependencies": {
     "electron": "43.4.1",
@@ -52,6 +53,35 @@
       "artifactName": "AiO-Shot-and-Save-Setup-${version}.exe",
       "shortcutName": "AiO Shot & Save",
       "runAfterFinish": true
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.png",
+      "identity": null,
+      "hardenedRuntime": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "artifactName": "AiO-Shot-and-Save-${version}-mac-${arch}.${ext}",
+      "extendInfo": {
+        "NSScreenCaptureUsageDescription": "AiO Shot & Save can chup man hinh de ban chon vung va ghim anh."
+      }
+    },
+    "dmg": {
+      "artifactName": "AiO-Shot-and-Save-${version}-mac-${arch}.dmg"
     }
   }
 }
