@@ -605,6 +605,15 @@ Pictures máy này KHÔNG bị OneDrive đổi hướng — đã kiểm `GetFold
 - **Chưa tự bấm được tray → Cài đặt** (công cụ điều khiển máy chỉ cho bấm trái
   trên khay hệ thống; bấm trái icon = bắt đầu chụp). Nhờ anh bấm thử.
 
+## 2026-09-13 13:31 +0700 — 0.4.3 anh Tien test may nha: "muot roi do em"
+
+- Chay tu ma nguon (`npx electron .`, may nha chua co bo cai 0.4.3 trong dist/).
+- Boot lan 1: hotkey `Shift+`` (config) dang-ky=FAIL — do that: **Lightshot dang giu phim**.
+  Tat Lightshot, boot lai -> dang-ky=OK. Ghi nho: hai app tranh phim, doi phim mot ben neu dung song song.
+- Anh Tien bam thu keo-chon + khay: **"muot roi do em"** — tai/mat nguoi cham DAT tren may nha (Electron 0.4.3).
+- Cung phien: xoa thu muc Tauri da commit `0899867` va push; origin khong con Tauri.
+- Con cho: cai de 0.4.3 bang bo cai tren may cong ty + do ProductVersion (so loi #3).
+
 ## 2026-09-10 14:03 +0700 — 0.4.4 (tiep): khung ve tren ANH GHIM lech 1,5 lan — canvas khong co kich thuoc CSS
 
 **Anh Tien** (dang chay ban dev tu ma nguon, ve khung tren anh ghim): "lỗi định
