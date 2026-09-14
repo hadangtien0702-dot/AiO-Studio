@@ -10,7 +10,7 @@
 > - ✅ **0.4.16 ANH CHAM DAT 14/09 12:4x** ("đường dẫn mới chạy rồi"; 12:44 anh do them:
 >   **Photoshop nhan thanh Smart Object, Premiere nhan len timeline**). Dich keo-tha DA DO
 >   THAT 14/09: Explorer · Premiere · Photoshop · Claude desktop · Messenger · Lark · Teams
->   (web) · Zalo web · Chrome. — cai 12:37, 0.4.16.0:
+>   (web) · Zalo web · Chrome (mo anh) · **FigJam/Figma** (12:46 anh do them). — cai 12:37, 0.4.16.0:
 >   thu muc anh mac dinh doi `AiO Shot & Save\Anh chup` -> **`%LOCALAPPDATA%\AiOShotSave\AnhChup`**
 >   (KHONG '&', KHONG dau cach). Anh bao keo tu khay vao Lark (-1 byte) / Teams (thieu du
 >   lieu) / Facebook (dinh dang khong hop le) / Zalo web (gui loi) deu HONG, Claude desktop

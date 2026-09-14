@@ -287,7 +287,7 @@ Tren cua so ghim: keo ANH = tha ra app, keo THANH TREN (#bar) = di chuyen cua so
 (dragstart chiem cho keo-di-chuyen nen phai tach). Da do that: file roi dung vao
 Explorer, xuyen ca 2 man hinh. **14/09 (0.4.16, thu muc khong '&'):** Premiere (len
 timeline) · Photoshop (Smart Object) · Claude desktop · Messenger · Lark · Teams web ·
-Zalo web · Chrome — anh Tien tu keo, deu nhan du file.
+Zalo web · Chrome · FigJam/Figma — anh Tien tu keo, deu nhan du file.
 
 VE SHAPE khi chup (25/08): chon vung xong hien thanh cong cu -> ve KHUNG VUONG /
 MUI TEN / CHU (10/09; 0.4.5 14/09 chu co HOP NEN toi bo goc, bo vien chu) (canvas device-res) -> Enter/Xong. **Phim 1/2/3** = khung /
