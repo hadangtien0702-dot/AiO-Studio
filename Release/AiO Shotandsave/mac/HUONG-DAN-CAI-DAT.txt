@@ -6,8 +6,9 @@ Chon dung file theo may:
   (Khong biet chip gi: bam logo Apple -> About This Mac.)
 
 1. Mo file .dmg, keo "AiO Shot & Save" vao thu muc Applications.
-2. Lan dau mo: macOS bao "khong xac minh duoc nha phat trien" -> bam chuot phai
-   vao app -> Open -> Open. (Neu van bi chan: System Settings -> Privacy &
-   Security -> keo xuong -> Open Anyway.)
+2. Lan dau mo, macOS bao "Apple could not verify ... is free of malware"
+   (app chua ky so, binh thuong). Bam Done, roi vao System Settings ->
+   Privacy & Security -> keo xuong cuoi -> "Open Anyway" -> nhap mat khau.
+   (Hoac mo Terminal, dan:  xattr -cr "/Applications/AiO Shot & Save.app" )
 3. macOS hoi quyen Screen Recording -> Allow, roi mo lai app.
 4. Xong. Phim tat chup: Cmd + Shift + S (doi trong Cai dat).
