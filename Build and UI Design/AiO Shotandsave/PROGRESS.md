@@ -140,6 +140,17 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-14 12:55 — Xoá sạch dấu vết Tauri + Spike trên máy công ty (anh: "xóa sạch giúp anh để không lỗi")
+
+Rà: registry Uninstall (chỉ còn Electron 0.4.16 + Lightshot), AppData Local/Roaming, Programs, Start Menu,
+Desktop, Program Files, repo, Release, scratchpad. Đã xoá: `%LOCALAPPDATA%	auri` (cache toolchain),
+`%APPDATA%\com.aiostudio.shotandsave.tauri` (chỉ `cau-hinh.json`), `Release/2026-09-01-shotandsave-tauri-0.5.0`
+(bộ cài 3 MB, không có trong git), scratchpad phiên Tauri, khoá `HKCU\Softwareiostudio\AiO Shot & Save`
+(trỏ thư mục cài Tauri cũ). Trước đó 12:4x đã xoá `com.aiostudio.shotandsave.tauri` + `com.aiostudio.shotspike`
+(WebView2 cache) + `aio-shot-and-save-updater` trong Local. Còn `~/.cargo` + `~/.rustup` (bộ Rust để build
+Tauri, dung lượng lớn, đo bị treo) — **chờ anh gật** vì là công cụ dev, không phải rác app. Mã nguồn spike
+không còn trên đĩa. Không sửa mã.
+
 ## 2026-09-14 12:47 — Anh chấm ĐẠT 0.4.16
 
 Anh: *"anh có thay đổi vào đường dẫn mới chạy rồi em"* — kéo-thả với thư mục không có `&` chạy.
