@@ -23,7 +23,16 @@ function thuMucGoc() {
 }
 
 /**
- * Thu muc luu anh. Mac dinh: <thu muc tool>\Anh chup
+ * Thu muc luu anh. Mac dinh:
+ *   - ban dong goi: %LOCALAPPDATA%/AiO Shot & Save/Anh chup (NGOAI thu muc cai)
+ *   - chay tu nguon: <thu muc du an>/Anh chup
+ *
+ * ☠️ 14/09 MAT ANH THAT: mac dinh cu la <thu muc cai>/Anh chup. Bo cai NSIS
+ * one-click khi CAI DE xoa sach thu muc cai roi moi chep ban moi -> 2 anh anh
+ * Tien chup sang 14/09 bien mat (khong vao thung rac), phai cuu tu ban sao
+ * harness. Moi lan cap nhat = mat het anh nguoi dung de mac dinh. Anh KHONG
+ * duoc nam trong thu muc cai. Dung LOCALAPPDATA (khong roaming, khong OneDrive)
+ * — cung thu muc ban Tauri tung dung, 75 anh cu van o do.
  *
  * ☠️ ANH TIEN NGHIEM CAM luu vao `Pictures` mac dinh cua may (24/08).
  * Ly do do duoc: may nay co `Pictures` bi OneDrive doi huong sang
@@ -33,6 +42,17 @@ function thuMucGoc() {
 function thuMucAnh() {
   const c = docCauHinh()
   if (c.thuMucAnh) return c.thuMucAnh
+  if (app.isPackaged) {
+    /* ☠️ 14/09 (0.4.16): KHONG dau '&', KHONG dau cach trong duong dan mac dinh.
+       Do that: cung file, cung vi tri AppData\Local, cung quyen — thu muc
+       `AiO Shot & Save\Anh chup` keo vao Chrome/Messenger/Lark/Teams/Zalo web
+       la file RONG (Chrome: size=0, lastMod=gio tha; Lark: -1 byte); doi sang
+       `AiOTest` (khong &, khong cach) la nhan du 805.735 byte. Chromium cap
+       quyen doc file tha theo chuoi duong dan, gap '&' la lech. Thu muc nguoi
+       dung tu chon co '&' van se dinh — viec cho. */
+    const goc = process.env.LOCALAPPDATA || app.getPath('userData')
+    return path.join(goc, 'AiOShotSave', 'AnhChup')
+  }
   return path.join(thuMucGoc(), 'Anh chup')
 }
 

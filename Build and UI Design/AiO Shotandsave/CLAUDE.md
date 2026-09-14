@@ -59,14 +59,18 @@ src/
   main.js            App, tray, phim tat, dieu phoi chup, tao cua so, IPC.
   i18n.js            Tu dien VI/EN + t(lang,key). main require; preload nap lang
                      SYNC (ipcRenderer.sendSync 'i18n:lang') -> window.i18n.t().
-  kho.js             Luu anh (thuMucAnh doc config, DOI DUOC) + cau-hinh.json.
+  kho.js             Luu anh (thuMucAnh doc config, DOI DUOC; mac dinh ban cai =
+                     %LOCALAPPDATA%/AiOShotSave/AnhChup — so loi #11, KHONG '&'/dau cach) + cau-hinh.json.
   preload-overlay.js Cau IPC cho overlay (-> window.overlay) + i18n.
   preload-pin.js     Cau IPC cho cua so ghim (-> window.pin) + i18n.
   preload-shelf.js   Cau IPC cho khay (-> window.shelf) + i18n + hotkey display.
   preload-settings.js Cau IPC cho Cai dat (-> window.settings) + i18n.
   overlay/           Man chon vung: MOI man mot overlay, anh dong bang + fade.
   pin/               Cua so ghim sticky: anh + thanh cong cu + keo di chuyen.
-  shelf/             Khay anh: thumbnail + keo-tha ra app khac.
+  shelf/             Khay anh: thumbnail + keo-tha ra app khac + tay nam #grip goc tren-trai
+                     DOI CO (0.4.12: san = co mac dinh, tran 60% man chua khay, luu khayCo.{ngang,doc};
+                     #list la LUOI o co dinh: ngang cao len = them HANG, doc rong ra = them COT —
+                     anh Tien: "xem nhieu anh hon, KHONG phong anh").
   settings/          Man Cai dat (frameless, logo AiO, card): doi phim tat, doi
                      thu muc luu, toggle ngon ngu VI/EN.
 assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo).
@@ -76,16 +80,28 @@ assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo)
 
 1. Phim tat (mac dinh `CommandOrControl+Shift+S` = Ctrl tren Win / ⌘ tren Mac;
    DOI DUOC qua man Cai dat, luu vao `cau-hinh.json`) / bam tray -> `startCapture()`.
-2. `openOverlays()` mo MOT overlay TRONG SUOT cho MOI man, hien NGAY (~165ms,
-   thay man hinh that qua no) — tuc thi nhu Lightshot. ☠️ KHONG grab TRUOC roi moi
-   hien: `desktopCapturer.getSources` CHAN luong chinh ~0,5s -> overlay hien muon
-   = "pop-up". ☠️ KHONG dung 1 cua so vat ngang ca man hinh ao: may 4K + man phu
+2. ☠️ **0.4.15 (14/09) DAO LAI: GRAB TRUOC, overlay SAU** (`GRAB_TRUOC`, mac dinh 1).
+   Do that: cua so trong suot phu len video (YouTube Shorts, lop MPO) **>=0,5s la WGC
+   tra vung video DEN (sang 0)**, <=0,2s con hinh. Che do cu (overlay hien ~165ms ->
+   grab) khoanh khac chup roi ~600ms sau khi phu -> anh chup video den (anh Tien bao
+   14/09). Nay `startCapture` goi `kickGrab()` roi moi `openOverlays()`: chup xong
+   +515ms, overlay hien +594ms KEM frozen san (kieu Lightshot). Doi lai overlay hien
+   muon hon ~0,4s — la gia cua viec video khong den. `AIO_GRAB_TRUOC=0` = che do cu
+   (chi de doi chung, DUNG bat lai cho nguoi dung). ☠️ KHONG dung 1 cua so vat ngang ca man hinh ao: may 4K + man phu
    DPI 150% no khong phu het.
-3. `kickGrab()` (goi SAU khi overlay dau tien hien+paint, setTimeout 40ms) chup
+3. `kickGrab()` (goi SAU khi overlay hien + lop mo toi xong: `GRAB_TRE_MS` = **200ms**
+   tu 0.4.9 — 40ms cu lam fade #dim dung hinh 1s, do `do-mo-dan.mjs` 14/09) chup
    TUNG man qua `desktopCapturer` (device px), gui anh dong bang -> renderer dat
    lam nen (`overlay:frozen`, freeze view) + luu full-res de cat.
-   ☠️ Anh di qua protocol `aioshot://` (buffer PNG o main, `frozenStore`),
-   IPC CHI mang URL (0.4.1, may nha 31/08): man 5K2K ra base64 ~5,7MB, gui
+   ☠️ Anh di qua protocol `aioshot://` (buffer o main, `frozenStore`), IPC CHI
+   mang URL (0.4.1, may nha 31/08). **0.4.13 (14/09): frozen la JPEG q92 CHI DE
+   NHIN** — toPNG 4K = 642ms SYNC tren luong chinh (do that; ghi chu cu "~250ms,
+   chay nen" SAI), grab 1.240 -> 465ms. Anh co shape / vat 2 man: renderer xin
+   cat DUNG VUNG tu NativeImage goc (`rawStore`) qua `aioshot://raw/<key>/x_y_w_h.png`
+   luc Xong (PNG, 960x630 = 36ms) -> file luu van lossless. Harness `npm run
+   test:raw`. DUNG doi lai PNG toan man. ☠️ getSources co SAN ~370ms (chup 1x1 cung
+   vay, 1 hay 2 lenh nhu nhau) + grab-tre 200ms + fade 100ms = den video ~0,75s la
+   GIOI HAN; anh chot 14/09 KHONG lam mo-dun chup native/Tauri — dung de xuat lai. man 5K2K ra base64 ~5,7MB, gui
    chuoi do qua IPC la renderer DANG KEO nghen mot nhip = giat. Canvas ghep
    can anh CORS sach -> protocol tra ACAO:* + Image crossOrigin=anonymous;
    dan nen bang CHINH the <img> da decode, KHONG CSS background (cache key
@@ -118,7 +134,10 @@ Roi doc `.selftest/selftest-overlay.png` + `selftest-pin.png` de kiem mat.
 **`npm test`** (10/09) = chinh selftest tren nhung TU CHAM bang ma thoat (5 dieu
 kien, xem dau `scripts/test/selftest.mjs`), don dich danh file test. Chay tai
 MAY THAT — KHONG dua len CI headless (do gia). Doi chung: `AIO_TEST_GRAB_LOI=all
-npm test` phai TRUOT. **`npm run test:khay [ngang]`** = do MUOT cuon khay bang
+npm test` phai TRUOT. **`npm run test:co-khay [doc|ngang]`** (14/09) = keo to/kep san-tran/luu
+config/them hang-cot/net, 8 phep — dung vao co khay thi chay (dat `AIO_TEST_ANH_DIR`
+tro thu muc BAN SAO anh lon de phep NET co nghia). **`npm run test:mo-dan [ms]`** = quay lop mo
+sau phim tat (grab-tre). **`npm run test:khay [ngang]`** = do MUOT cuon khay bang
 CDP screencast (chuan DAT: gap p95 <= 40ms, 0 buoc nhay >60px; so 10/09: doc
 p95 30ms, ngang 29ms). Dung vao shelf.js cuon/wheel thi chay lai.
 
@@ -201,6 +220,8 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 | 6 | **Selftest/kiem XANH GIA** (24/08 loi bi nuot; 26/08 xanh nho RACE grab-nhanh-hon-dim; 26/08 selftest 1 man khong du — anh Tien day thang) | Selftest thoat som nuot hop thoai loi; phep kiem xanh ma khong hieu vi sao xanh | uncaughtException ghi `.selftest/errors.txt`; checklist 4 diem o muc Verify (ti le sang / vat 2 man 2 phia / dem file / doc run-log); mot phep kiem chua tung DO thi chua tin |
 | 7 | **Dan quyet dinh cu bi dao ma khong do lai nguyen nhan** (31/08 — chinh la #1 quay lai) | So cu chi ghi TRIEU CHUNG ("dan la lech") khong ghi nguyen nhan da do -> phien sau DOAN | Ghi bay = ghi kem NGUYEN NHAN DA DO + con so; dao quyet dinh cu = TAI LAP nguyen nhan bang so do truoc (brain: `bay-dao-quyet-dinh-cu-khong-do-lai.md`) |
 | 8 | **Ve khung khi keo — HOI QUY 3 LAN TRONG 1 NGAY 31/08** (giat drop-fps -> rung 2 nguon -> te le -> nhay khi vat man) | Vung nay co HAI nguon ve (mousemove local + main sel-rect 16ms) tren NHIEU man/DPI — moi lan chinh mot nguon la ho nguon kia. Chuot ra khoi man chu la mousemove NGUNG (khong pointer capture) | Luat hien hanh (0.3.17): local vua ve <50ms thi main NHUONG; local im thi main TIEP QUAN (`lanVeLocal`). ☠️ Dung vao onSelRect/mousemove ma khong chay `test-keo-vat-man.js` (3 giai doan) + `test-overlay-drag.js` la se hoi quy lan 4 |
+| 10 | **Khung/chu ve tren ANH GHIM lech xa chuot** (26/08 co san, anh bao 10/09 khi them cong cu chu) | Canvas `#ve` chi co `position:absolute; inset:0` — canvas la REPLACED element, `inset:0` KHONG keo theo khung, lay kich thuoc THUOC TINH dip*DPR -> man 150% to gap 1,5 lan, do lech 101px | `width:100%;height:100%` CSS + JS dat `style.width/height` = DIP. Harness `npm run test:khung -- <ban sao>` (lech phai <=3px). Luat: canvas do phan giai that PHAI dat CA thuoc tinh (device px) LAN style (DIP) |
+| 11 | **CAI DE = MAT ANH nguoi dung** (14/09: 2 anh anh chup sang do bien mat sau `Setup-0.4.5 /S`, khong vao thung rac) | NSIS one-click xoa sach `$INSTDIR` truoc khi chep ban moi; mac dinh cu `thuMucAnh` = `<thu muc exe>/Anh chup` nam ngay trong do (chon 24/08 vi cam Pictures/OneDrive) | 0.4.6: mac dinh ban dong goi ngoai INSTDIR; **0.4.16: `%LOCALAPPDATA%/AiOShotSave/AnhChup`** — ten cu `AiO Shot & Save` co '&' lam keo-tha vao Chrome/Lark/Teams/Zalo/Messenger ra FILE RONG (Chrome: size=0, lastMod=gio tha; do 14/09 bang 3 cua so tha thu, doi ten thu muc la du byte). Luat: **KHONG BAO GIO ghi du lieu nguoi dung vao thu muc cai; duong dan mac dinh KHONG '&' KHONG dau cach; doi thu muc mac dinh = do lai KEO-THA vao Chrome that**; truoc moi lan cai de PHAI chup danh sach `Anh chup` va so lai sau cai. Harness ghi de anh chi chay tren BAN SAO — va ban sao do KHONG phai ban luu du phong (14/09 mat ban goc anh 2 vi the) |
 | 9 | **"DAT o cong ty, may NHA van y chang"** (31/08 toi — chuoi keo-chon vua cham DAT buoi trua; sau 0.4.1 con "keo va GIU giat 15xx/1405") | HAI goc cung mot kich ban bam-chuot-khi-grab-dang-chay: (a) base64 ~5,7MB qua IPC do vao renderer DANG keo (6/6 luot drag-start dinh 20-40ms sau grab-xong); (b) main nhan drag-start MUON ~880ms moi hoi con tro lay NEO — tay da keo 100-150px -> neo main LECH neo local -> giu yen tay la 2 nguon nhap nhay 2 so khac nhau, vung LUU cung lech | 0.4.1: anh di `aioshot://`, IPC chi mang URL. 0.4.2: neo = DIEM MOUSEDOWN renderer gui kem drag-start; con tro TRONG man chu thi main khong ve man chu (local la nguon duy nhat), ra ngoai (vat man) main moi ve. Run-log ghi `keo gap-max` + `con tro luc main nhan da troi Xpx` — "muot" phai la SO tu may man LON nhat. Duong frozen/neo dung vao PHAI chay du 4 harness (drag · keo-vat-man · frozen-storm · composite) |
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
@@ -264,10 +285,19 @@ KEO-THA ra app khac (`webContents.startDrag`, 25/08): keo anh GHIM hoac
 thumbnail KHAY -> tha file .png that vao Premiere / Zalo / Mess / Explorer...
 Tren cua so ghim: keo ANH = tha ra app, keo THANH TREN (#bar) = di chuyen cua so
 (dragstart chiem cho keo-di-chuyen nen phai tach). Da do that: file roi dung vao
-Explorer, xuyen ca 2 man hinh.
+Explorer, xuyen ca 2 man hinh. **14/09 (0.4.16, thu muc khong '&'):** Premiere (len
+timeline) · Photoshop (Smart Object) · Claude desktop · Messenger · Lark · Teams web ·
+Zalo web · Chrome — anh Tien tu keo, deu nhan du file.
 
 VE SHAPE khi chup (25/08): chon vung xong hien thanh cong cu -> ve KHUNG VUONG /
-MUI TEN (canvas device-res) -> Enter/Xong. Co shape thi renderer ghep gui dataURL;
+MUI TEN / CHU (10/09; 0.4.5 14/09 chu co HOP NEN toi bo goc, bo vien chu) (canvas device-res) -> Enter/Xong. **Phim 1/2/3** = khung /
+mui ten / chu (so nho tren nut). CHU: bam vao anh -> o go -> Enter chot,
+Shift+Enter xuong dong, Esc bo o go. Tren ANH GHIM: KHONG con nut but chi
+(anh bo 10/09) — bam 1/2/3 la vao thang che do ve; **0.4.8 (14/09): RE CHUOT len anh
+-> hien 3 nut khung/mui ten/chu (nhu #bar), bam nut = vao ve** (anh: "bam chuot chon vao
+thi khong duoc" — 4 ngay khong co duong vao bang chuot). Harness: `npm run test:chu
+-- <thu muc BAN SAO anh>` (15 buoc, ghi de file nen PHAI la ban sao) va
+`npm run test:khung -- <ban sao>` (dinh vi khung, lech <=3px — so loi #10). Co shape thi renderer ghep gui dataURL;
 khong shape thi main cat full-res. Ctrl+Z hoan tac, Esc huy.
 
 HIEN TUC THI (25/08): overlay cua so TRONG SUOT hien NGAY (~165ms), grab chay NEN

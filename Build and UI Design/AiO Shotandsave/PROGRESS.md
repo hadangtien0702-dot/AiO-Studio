@@ -1,18 +1,131 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-10 10:14 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 12:47 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
-> - ✅ **0.4.3 (10/09) DA DONG GOI** `dist/AiO-Shot-and-Save-Setup-0.4.3.exe`
->   84,3 MB — **[CHO] anh cai de + do ProductVersion tien trinh** (so loi #3).
->   Gom 4 vá: (1) khong luu duoc anh -> bao + clipboard + van vao khay (truoc:
->   mat im lang, main KHONG vang — do that); (2) grab 1 man loi khong keo mat man
->   kia (allSettled), 0 man -> bao + dong overlay; (3) **cuon khay muot** (rAF
->   lerp; do CDP doc 50->0 buoc nhay, p95 46->30ms); (4) ghim Electron 43.4.1.
+> - ✅ **0.4.16 ANH CHAM DAT 14/09 12:4x** ("đường dẫn mới chạy rồi"; 12:44 anh do them:
+>   **Photoshop nhan thanh Smart Object, Premiere nhan len timeline**). Dich keo-tha DA DO
+>   THAT 14/09: Explorer · Premiere · Photoshop · Claude desktop · Messenger · Lark · Teams
+>   (web) · Zalo web · Chrome. — cai 12:37, 0.4.16.0:
+>   thu muc anh mac dinh doi `AiO Shot & Save\Anh chup` -> **`%LOCALAPPDATA%\AiOShotSave\AnhChup`**
+>   (KHONG '&', KHONG dau cach). Anh bao keo tu khay vao Lark (-1 byte) / Teams (thieu du
+>   lieu) / Facebook (dinh dang khong hop le) / Zalo web (gui loi) deu HONG, Claude desktop
+>   OK. Do bang 3 cua so tha thu: (1) Electron test: file du 686KB; (2) WinForms: goi OLE
+>   chuan FileDrop+FileName, path ton tai; (3) **Chrome that: name dung, size=0, lastMod=gio
+>   tha, 0 byte** = Chrome khong cap duoc quyen doc. Anh doi thu muc sang `E:6\Test` ->
+>   Messenger/Teams nhan; em tao `AppData\Local\AiOTest` (cung vi tri, cung ACL, khong '&')
+>   -> Chrome doc du 805.735 byte, Messenger/Lark/Zalo nhan. => **thu pham: '&' (co the ca
+>   dau cach) trong duong dan**, la loi em gay ra o 0.4.6. Da MOVE 123 anh sang thu muc moi,
+>   tra config `thuMucAnh` ve mac dinh, xoa 5 thu muc rac trong AppData\Local (Tauri
+>   WebView2 cache 33MB, spike 15MB, updater installer.exe 85MB, `AiO Shot & Save` trong,
+>   `AiOTest` trong). ☠️ Thu muc NGUOI DUNG TU CHON co '&' van se dinh — viec cho.
+> - ✅ **0.4.15 ANH CHAM DAT 14/09 12:0x** ("ok rồi em, video hiện hình rồi") — cai 12:00,
+>   0.4.15.0: anh gui anh chup YouTube Shorts **vung video DEN**. Tai lap bang so
+>   (script do-grab, video dang chay tren man LG, do sang vung video): khong overlay
+>   = 70-78 · overlay trong suot phu 0,2s roi chup = 67 · phu **>=0,5s roi chup = 0**
+>   (3/3 moc 0,5/1/2s) · dong overlay = 76. App cu: overlay hien -> cho 200ms -> WGC
+>   mo phien ~370ms -> khoanh khac chup ~600ms sau khi phu = DEN (hoi quy tu 0.4.9 doi
+>   40->200ms; anh chi thay tren YouTube, FB truoc do van ok). **Sua: GRAB TRUOC —
+>   kickGrab ngay luc bam phim, TRUOC khi tao overlay** (`AIO_GRAB_TRUOC`, mac dinh 1;
+>   =0 la che do cu). Do: chup xong +515ms, overlay hien +594ms (cu: overlay +216ms,
+>   chup xong ~+700ms); lop mo 12 khung khong khoang trong; `npm test` 5/5 x4 (ca 2
+>   che do), `test:raw` DAT. Doi lai: overlay hien muon hon ~0,4s, nhung hien la co
+>   hinh dung yen ngay (kieu Lightshot anh khen 11:5x), khong con doan den.
+> - 🟡 **0.4.14 DA CAI MAY CONG TY 14/09 11:42** (0.4.14.0, 108/108 anh giu) — **[CHO] anh
+>   cam nhan**: anh hoi "nhanh hon nua khong" -> do: getSources co SAN ~370ms ke ca
+>   chup 1x1 (chi phi mo phien WGC cua Electron), 1 lenh hay 2 lenh song song deu
+>   ~420; grab-tre 150 lam fade lop mo bi cat 2/3 lan -> GIU 200. Chi rut duoc fade
+>   anh dong bang 160 -> 100ms (~60ms). ☠️ **ANH CHOT 11:4x: KHONG lam mo-dun chup
+>   native / khong dung Tauri** ("đụng đến Tauri là bị lỗi tè le") — day la cach
+>   duy nhat xuong ~0,4s (Tauri tung do 141-152ms). Den video FB ~0,75s la SAN.
+> - 🟡 **0.4.13 DA CAI MAY CONG TY 14/09 11:35** (0.4.13.0, 107/107 anh giu) — **[CHO] anh
+>   cam nhan**: **video Facebook het den lau** (anh: "mat ~2s moi hien hinh, khong phai
+>   loi, hoi cham"). Do: toPNG 4K **642ms** tren luong chinh (getSources chi ~420ms,
+>   toJPEG(92) 37ms). Sua (huong B anh chon): anh dong bang di **JPEG q92 chi de NHIN**;
+>   luc Xong co shape / vat 2 man, renderer xin cat DUNG VUNG tu anh goc qua
+>   `aioshot://raw/<key>/<x>_<y>_<w>_<h>.png` (PNG, vung 960x630 = 36ms) -> file luu
+>   van lossless. grab-xong **1.240 -> 465ms**. Moi setting JPEG/PNG/thap-cao-sieu deu
+>   nhanh nhu nhau luc chup. Harness moi `npm run test:raw` (SHAPE 6/6 · COMPOSITE
+>   5/5, doc pixel file luu roi xoa dich danh), `npm test` 5/5, `test:mo-dan` 8 khung.
+>   ☠️ Dao ghi chu 26/08 "PNG lossless, grab chay nen nen khong sao": toPNG la SYNC
+>   tren main -> chinh no chan fade lop mo (khong chi getSources).
+> - ✅ **0.4.12 ANH CHAM DAT 14/09 11:2x** ("ok rồi em, thấy nhiều ảnh hơn rồi"; mac dinh
+>   = san, anh tu keo — dung nhu code) — cai 11:18, 0.4.12.0: **KEO TO KHAY = THAY NHIEU ANH HON** (anh chinh 11:14: "chu khong phai
+>   em phong anh to"). Tay nam goc TREN-TRAI hien khi re chuot; keo len/trai = to,
+>   goc duoi-phai dung yen; san = co mac dinh cu (ngang 380x128 · doc 252x448),
+>   tran = 60% man DANG CHUA khay; luu rieng `khayCo.{ngang,doc}`. O anh CO DINH
+>   (ngang 64px cao; doc cot >=150px): ngang cao len = them HANG (van cuon ngang),
+>   doc rong ra = them COT (van cuon doc). Thumbnail JPEG 320px (~26KB) — 0.4.11
+>   tung gui 1080px vi hieu nham "phong anh", da bo. Harness `test:co-khay` 8/8
+>   x2 (co them phep NET va phep hang/cot), `test:khay` doc 2469px/ngang 1901px DAT,
+>   `npm test` 5/5. 0.4.10 (11:06, phong anh) va 0.4.11 (11:13, thumb 1080) la ban
+>   trung gian, da bi de.
+> - ☠️ 2 thuoc xanh gia bat duoc 11:1x: (a) `test:khay doc` cuon 0px van DAT — vi
+>   `test:co-khay` de lai `khayCo` 1136px trong userData test -> 7 cot vua khit; da
+>   sua: co-khay don config sau khi chay, cuon-khay TRUOT khi quang duong <100px hoac
+>   <10 khung. (b) phep NET lay anh dau tien (goc 1464px) — phai lay anh LON nhat.
+>   `test:khay ngang` gapMax ~1.6-1.8s CO SAN (CSS cu 1.776ms) — chua tim.
+> - ✅ **0.4.9 ANH CHAM DAT 14/09 10:5x** ("anh thấy mượt lắm rồi") — cai 10:44, 0.4.9.0,
+>   97/97 anh giu: (1) man toi di MUOT hon sau phim tat — grab bat dau sau **200ms**
+>   thay vi 40ms (`GRAB_TRE_MS`, env `AIO_GRAB_TRE`); do screencast CDP
+>   `scripts/test/do-mo-dan.mjs` (moc compositor dong dau): 40ms -> lop mo ve 3
+>   khung roi DUNG ~1.000ms; 200ms -> 8 khung/100ms, 3/3 lan. Doi lai anh dong
+>   bang cu hon ~160ms. (2) Cai dat: nhan kieu khay "Mac dinh/Doc" -> **"Ngang/Doc"**
+>   (EN Horizontal/Vertical). `npm test` 3/4 DAT — lan truot duy nhat grab mat
+>   2.264ms (binh thuong 0,7-1,2s), chua ro vi sao cham dot xuat; theo doi.
+> - ❓ Anh hoi: **keo to khay** — CHUA CO (`resizable:false`, 380x128 co dinh). Anh
+>   muon khoa co nho hien tai lam san, cho keo to. Chua lam, cho anh chot pham vi
+>   (to ra thi thumbnail to len hay them cot?).
+> - ✅ **0.4.8 ANH CHAM DAT 14/09 10:2x** ("ok luôn rồi em" + anh chup: khung + 2 mui ten +
+>   2 khoi chu co nen — *"Click được"*, *"Bấm phím số được luôn không lỗi"*; anh ghi
+>   0.4.7 trong chu nhung tien trinh do luc cai la 0.4.8.0). Ca 3 viec hom nay (nen chu ·
+>   thu muc anh ngoai thu muc cai · vao ve bang chuot) da qua tay anh. CHUA COMMIT. GIAI xong "khong ve duoc tren anh ghim": anh noi ro *"bam phim
+>   1-2-3 thi moi duoc, bam chuot chon vao thi khong"* -> goc: bo nut but chi 10/09
+>   nen **khong con duong vao che do ve bang CHUOT**, khong phai loi ve. Sua: che
+>   do xem re chuot len anh ghim -> hien 3 nut khung/mui ten/chu (nhu #bar), bam
+>   nut = vao ve voi cong cu do; che do ve hien du 13 nut. Harness `test:chu`
+>   **20/20** (them 4 phep: bam chuot nut, xem/none, re->1/auto/3, bam->ve/arrow/13).
+>   0.4.7 (10:12) = ban chan doan trung gian, da bi de. Nhat ky `[pin N]` con 3
+>   dong (data / key / vao ve).
+> - ☠️ Bay do trong buoi: overlay chup co 2 man thi **phim roi vao overlay man
+>   THU HAI** (GetForegroundWindow = cua so man LG) du vua keo chon tren man
+>   chinh -> Enter bi bo qua; `open_application`/second-instance = startCapture
+>   bung overlay tren man anh. Chua xac nhan co xay ra voi chuot that cua anh.
+> - 🟡 **0.4.6 DA CAI MAY CONG TY 14/09 09:22** (do tien trinh 0.4.6.0, run-log
+>   `boot v0.4.6 ... dang-ky=OK lang=en`) — **[CHO] anh test**. Gom 2 viec:
+>   (1) **chu co HOP NEN toi** (0.4.5: anh "cần thêm nền chữ") — `veChu` overlay +
+>   pin ve hop #181818 82% bo goc, bo vien chu, o go cung nen; harness `test:chu`
+>   16/16 (them phep do hop nen), anh nen sang co soc doc duoc. (2) ☠️ **THU MUC
+>   ANH MAC DINH DOI ra `%LOCALAPPDATA%/AiO Shot & Save/Anh chup`** (so loi #11):
+>   cai de 0.4.5 luc 09:19 lam MAT 2 anh anh chup sang nay vi NSIS one-click xoa
+>   sach thu muc cai truoc khi chep, ma mac dinh cu nam trong do. Da cuu tu ban
+>   sao harness: anh 1 nguyen ven, **anh 2 da bi harness ve them chu "AiO test"**
+>   (ban goc 226.819 byte mat han). Thu muc moi da co 77 anh (75 Tauri + 2 cuu).
+> - ✅ **0.4.4 ANH CHAM DAT 14/09 09:04** ("anh mới kiểm tra thử thì thấy ổn
+>   định rồi đó em" — anh ve 3 khung + 4 mui ten tren anh chup, gui lai). Do:
+>   tien trinh dang chay `Programs/aio-shot-and-save/AiO Shot & Save.exe`
+>   ProductVersion **0.4.4.0**; anh luu `Anh chup/AiO-2026-09-14-090423-969.jpg`
+>   3015x1362, 188 KB, 1.824 diem cam (mau 1/16); anh 2 `...-090902-098.jpg`
+>   1464x878 co CHU cam "anh thử lại thấy okie rồi nè" = cong cu chu (phim 3)
+>   chay that tren ban cai. Tauri da GO 08:06 (75 anh da
+>   chep sang Pictures truoc). Gom trong 0.4.4: cong cu CHU (phim 3) + phim
+>   1/2/3 + so nho tren nut + BO but chi tren anh ghim + sua khung ghim lech
+>   1,5 lan (so loi #10) + 4 vá 0.4.3 (khong luu duoc -> bao, grab loi 1 man
+>   khong mat man kia, cuon khay muot, ghim Electron 43.4.1).
+> - ☠️ [CHO DO] **run-log CHET IM LANG o tien trinh 09:03:48 hom 14/09**: app
+>   khoi dong lai (userData = Roaming, xac nhan qua `--user-data-dir`), chup +
+>   luu anh 09:04 OK, nhung `Roaming/AiO Shot & Save/run-log.txt` KHONG co dong
+>   boot/capture nao — mtime dung o 08:06:09 (boot cua lan em mo); luot chup
+>   thu 2 luc 09:09:02 cung khong ghi (2/2 luot mat log). File ghi
+>   duoc (mo append OK, attrib Archive, 58 KB < nguong 300 KB), khong co
+>   run-log nao khac duoc ghi sau 09:00 tren ca may. `ghiLog` nuot loi
+>   (`catch(e){}`) nen khong biet vi sao. CHUA BIET GOC — dung doan. Buoc do
+>   tiep: lan anh khoi dong lai app, xem co dong `boot` moi khong; neu van
+>   khong thi tam bo `catch` rong -> ghi loi ra `errors.txt` canh run-log.
 > - ✅ **`npm test`** tu cham 5 dieu (6,2s DAT; doi chung ep loi grab TRUOT) —
 >   chay tai MAY THAT, khong CI. **`npm run test:khay [ngang]`** do muot khay.
 >   Cua ep loi: `AIO_TEST_GRAB_LOI=<id|all>`, `--selftest-shelf`.
@@ -26,6 +139,533 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-14 12:47 — Anh chấm ĐẠT 0.4.16
+
+Anh: *"anh có thay đổi vào đường dẫn mới chạy rồi em"* — kéo-thả với thư mục không có `&` chạy.
+Không sửa mã. Hôm nay 0.4.4 → 0.4.16, 9 việc qua tay anh. Còn nợ: commit + push (`/xong`).
+
+## 2026-09-14 12:42 — 0.4.16: kéo-thả vào Chrome/Lark/Teams/Zalo/Messenger ra file RỖNG — thủ phạm là dấu `&` trong thư mục mặc định
+
+**Anh Tiến:** *"Claude đã thử được · Lark lỗi · Teams lỗi · Facebook lỗi · Zalo lỗi"* (Lark: `-1 Byte
+Transfer canceled`; Teams: *thiếu dữ liệu cần thiết*; Facebook: *định dạng file không hợp lệ*; Zalo
+web: *Gửi lỗi*). Rồi anh tự đổi thư mục lưu sang `E:6\Test` → Messenger, Teams nhận.
+
+**Đo (không remote máy — dựng cửa sổ thả thử, anh tự kéo):**
+1. Cửa sổ Electron 43 (Chromium nhúng): file đủ `686.052 byte`, `image/jpeg`, `ff d8 ff e0`.
+2. Cửa sổ WinForms liệt kê OLE: `DragContext | DragImageBits | FileDrop | FileNameW | FileName`,
+   `FileDrop` = đường dẫn thật, tồn tại, 449.321 byte → gói kéo chuẩn, không có file ảo.
+3. **Google Chrome thật** (tab `file://…tha-thu-chrome.html`): `name` đúng, **`size=0`, `lastMod =
+   giờ thả`, 0 byte** → Chromium tạo File nhưng từ chối cấp quyền đọc đường dẫn.
+4. Token: app / Explorer / shell đều Medium, không AppContainer. File hợp lệ (`ff d8`). ACL thư mục
+   có thêm ACE capability SID (kế thừa từ `AppData\Local`), là ACE cho phép.
+5. Tách biến: `AppData\Local\AiOTest` (cùng vị trí, cùng ACL, **không `&`, không dấu cách**) →
+   Chrome đọc đủ **805.735 byte**, Messenger/Lark/Zalo nhận. → thủ phạm = ký tự trong tên thư mục
+   (`&` chắc chắn; dấu cách chưa tách riêng — `Programs\aio-shot-and-save\Anh chup` cũ có dấu
+   cách nhưng hồi 25/08 chỉ đo vào Explorer/Premiere, chưa từng đo vào Chrome).
+
+**Vì sao lọt:** 0.4.6 sáng nay em chọn `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` (theo thư mục
+Tauri) chỉ đo "file còn sau cài đè", không đo lại đường kéo-thả — đúng bài `5n`/`5an-bis`: đổi
+một thứ dùng chung thì đo mọi nơi đi qua nó.
+
+**Thay đổi:** `src/kho.js` mặc định bản đóng gói → `%LOCALAPPDATA%\AiOShotSave\AnhChup`, chú thích
+kèm số đo. Không đổi mã kéo-thả (nó đúng). Dữ liệu: MOVE 123 file từ thư mục cũ sang mới (cùng ổ,
+không trùng tên), `AiOTest` trống; config `thuMucAnh: E:6\Test` (anh đặt để thử) → xoá về
+mặc định; xoá 5 thư mục rác `AppData\Local`: `AiO Shot & Save` (trống), `AiOTest` (trống),
+`aio-shot-and-save-updater` (installer.exe 85 MB), `com.aiostudio.shotandsave.tauri` (WebView2
+cache 33 MB), `com.aiostudio.shotspike` (15 MB) — anh: *"remove hoặc đổi tên đi em"*.
+`E:6\Test` của anh không đụng.
+
+**Kiểm:** `npm test` 5/5 · `dist` exit 0 (88.378.890 byte) · cài đè, tiến trình **0.4.16.0**, boot OK,
+`grep` chuỗi thư mục mới trong `app.asar` = 1, thư mục mới 123 ảnh. **Chưa qua tay anh** (anh kéo
+từ khay vào Messenger/Lark/Zalo lần nữa).
+
+**Việc chờ:** người dùng tự chọn thư mục có `&` (hoặc có thể dấu cách) → kéo vào app Chromium vẫn
+rỗng. Hướng: lúc `startDrag` đưa đường dẫn 8.3 (`GetShortPathName`) nếu tên có `&`; hoặc cảnh
+báo trong màn Cài đặt khi chọn thư mục như vậy. Chưa làm.
+
+## 2026-09-14 12:06 — Anh chấm ĐẠT 0.4.15
+
+Anh: *"ok rồi em, video hiện hình rồi"* — YouTube Shorts chụp ra có hình. Không sửa mã.
+Tổng kết ngày: 0.4.4 → 0.4.15, 8 việc qua tay anh (nền chữ · thư mục ảnh ngoài thư mục cài ·
+vào vẽ bằng chuột trên ảnh ghim · màn tối mượt · kéo to khay = nhiều ảnh · chụp nhanh 2,7× ·
+fade ngắn · video không đen). Còn nợ: commit + push (`/xong`).
+
+## 2026-09-14 12:03 — 0.4.15: video YouTube ĐEN trong ảnh chụp → chụp TRƯỚC khi phủ overlay (kiểu Lightshot)
+
+**Anh Tiến:** gửi ảnh chụp YouTube Shorts, khung video đen hoàn toàn; *"anh thấy Lightshot phủ
+overlay cả 2 màn luôn… overlay = hình ảnh trong video đứng yên"*.
+
+**Đo (script Electron `do-grab`, video Shorts đang chạy trên màn LG, độ sáng trung bình vùng
+video 480×880 px thiết bị):**
+
+| Điều kiện | Độ sáng |
+|---|---|
+| Không overlay | 70–78 |
+| Cửa sổ trong suốt luôn-trên-cùng (content-protection) phủ **0,2 s** rồi chụp | 67 |
+| Phủ **0,5 / 1 / 2 s** rồi chụp | **0 / 0 / 0** |
+| Đóng overlay rồi chụp | 76 |
+
+→ Bộ chụp WGC của Electron KHÔNG hỏng (chụp thẳng có hình). Lớp video phần cứng bị DWM/Chrome
+đổi đường trình chiếu sau khi có cửa sổ phủ lên ~0,5 s, từ đó WGC trả vùng video đen. Lần đo
+đầu 4 mốc đều 78 (lúc đó video có thể đang dừng) — lần 2 mới lộ; giữ cả hai số.
+App cũ: overlay hiện (+216 ms) → chờ 200 ms → getSources mở phiên ~370 ms → **khoảnh khắc chụp
+≈ 600 ms sau khi phủ** = đúng vùng đen. Đây là hồi quy từ 0.4.9 (dời mốc 40 → 200 ms để lớp mờ
+mượt): trước đó chụp ở ~450 ms, còn trong vùng an toàn. Facebook anh thử 11:3x không đen có lẽ
+vì player khác đường trình chiếu.
+
+**Thay đổi (`src/main.js`):** `GRAB_TRUOC` (env `AIO_GRAB_TRUOC`, mặc định bật): `startCapture`
+gọi `kickGrab()` NGAY rồi mới `openOverlays()`; `layersSanSang` giữ layers thế hệ hiện tại để
+overlay nào `did-finish-load` sau khi grab xong thì tự nhận `overlay:frozen` + `overlayShots`
+được điền từ `rawStore`; log `overlay hien <displayId>`; chế độ cũ (=0) vẫn `setTimeout(kickGrab,
+GRAB_TRE_MS)`. Thêm `AIO_TEST_SANG=<displayId>:<x>,<y>,<w>,<h>` ghi độ sáng vùng vào run-log
+sau grab (bắt "video đen" bằng số).
+
+**Đo sau:** `npm test` ×2 mỗi chế độ 5/5. Thứ tự thời gian (grab-trước): `capture-start` →
+`grab-xong +515 ms` → `overlay hien +594 ms`; (cũ): `overlay hien +216` → `grab-xong +872`.
+Lớp mờ (`do-mo-dan`, grab-trước): 12 khung/167 ms, gap-max 30 ms. `test:raw` ĐẠT. `dist` exit 0
+(88.378.668 byte); cài đè 109/109 ảnh, **0.4.15.0**, boot OK. Độ sáng vùng video trong 4 lượt
+selftest đều 189 ở cả 2 chế độ (video lúc đó đứng yên) → chưa phân biệt được bằng độ sáng;
+bằng chứng "hết đen" là chụp xảy ra TRƯỚC khi có overlay. **Chờ anh thử YouTube.**
+
+**Đánh đổi nói rõ với anh:** overlay hiện ~0,6 s sau phím (cũ ~0,2 s) vì WGC mở phiên chặn
+luồng chính trước khi cửa sổ kịp hiện; bù lại hiện là có hình đứng yên ngay, không còn 0,75 s
+đen, lớp mờ mượt, và ảnh chụp video không bao giờ đen. Muốn overlay hiện sớm hơn nữa phải
+pre-warm cửa sổ overlay (việc chờ cũ) — được ~0,1 s.
+
+## 2026-09-14 11:45 — 0.4.14: "nhanh hơn nữa không" — đo ra sàn, chỉ rút fade 160→100 ms; anh chốt KHÔNG native
+
+**Đo:** (1) `do-mo-dan` grab-trễ 40/1 ms: lớp mờ vẽ 3 khung rồi đứng ~200 ms (4/4) → WGC mở
+phiên chụp chặn luồng chính, không phải PNG; 150 ms: 2/3 lần fade bị cắt ở ~80 ms rồi đứng
+300 ms → **giữ 200**. (2) `getSources`: 2 lệnh song song 387–438 ms · 1 lệnh 3840×2160 416–449
+· 1 lệnh màn chính 417–440 · **1×1 điểm 357–384** · 1920×1080 372–410 → sàn ~370 ms là chi phí
+mở phiên, không phụ thuộc cỡ ảnh hay số lệnh. (3) Còn lại: JPEG ~40 + giải mã ~50 + fade 160.
+
+**Thay đổi:** `overlay.css` `#shot` transition 160 → **100 ms**. Không đổi gì khác.
+**Kiểm:** `npm test` 5/5 · `test:raw` ĐẠT · `dist` exit 0 · cài đè 108/108 ảnh, **0.4.14.0**, boot OK.
+
+**Anh chốt (11:4x):** đề xuất B (mô-đun chụp native trong Electron, Tauri từng đo 141–152 ms
+cả 2 màn) → *"trời ơi đụng đến Tauri là bị lỗi tè le… không nên"*. → **Không làm native/Tauri.**
+Đen video FB ~0,75 s là sàn của Electron; muốn nhanh hơn phải đổi quyết định này.
+
+## 2026-09-14 11:38 — 0.4.13: ảnh đóng băng đi JPEG (nhìn), cắt ảnh gốc PNG lúc Xong — video Facebook hết đen ~1,6 s
+
+**Anh Tiến:** *"khi anh chụp video trên facebook thì video nó đen — mất khoảng 2s mới hiện lên
+hình… không phải lỗi, hơi chậm thôi"* → hỏi *"với các setting JPEG/PNG, thấp/cao/siêu nét thì
+đều nhanh được không"* → chọn B, *"làm đi em"*. (Cũng chốt: 0.4.12 ĐẠT, khay mặc định = sàn.)
+
+**Đo trước khi sửa** (script Electron tối giản, 3 lần, màn 4K 3840×2160):
+
+| Bước | ms |
+|---|---|
+| `desktopCapturer.getSources` | 405–481 |
+| `toPNG` | **642–673** (3,7 MB) |
+| `toJPEG(92)` | 36–43 (1,0 MB) |
+| `toBitmap` | 4–6 (32 MB) |
+
+Run-log máy anh: `grab-xong 1.239–1.252 ms`. Video đen = trong suốt nhìn xuyên ra lớp MPO đen
+(sổ: phải dán frozen), nên đen kéo dài đúng bằng thời gian chờ frozen: 200 ms trễ + ~1.250 ms
+grab + 160 ms fade ≈ 1,6 s. Hơn nửa là nén PNG. Ghi chú 26/08 trong `grabDisplaysList` nói
+*"PNG 4K ~250 ms nhưng grab chạy nền nên không sao"* — sai hai chỗ: 642 ms, và `toPNG` chạy
+**đồng bộ trên luồng chính** (chính nó đóng băng fade lớp mờ đo lúc 10:3x, không chỉ getSources).
+
+**Thay đổi:**
+- `src/main.js`: `grabDisplaysList` trả `jpg: img.toJPEG(92)` thay `png`; `frozenStore` giữ
+  JPEG, thêm `rawStore` giữ `NativeImage` gốc theo `gen/displayId`; protocol `aioshot://`
+  phục vụ 2 dạng: `frozen/<key>.jpg` (image/jpeg) và **`raw/<key>/<x>_<y>_<w>_<h>.png`** →
+  `img.crop().toPNG()` đúng vùng (run-log `raw crop WxH png KB ms`); layer gửi renderer có
+  thêm `key`; `closeOverlay`/grab mới clear cả hai store. `overlay:init` mang `testShape` /
+  `testComposite` (env `AIO_TEST_SHAPE` / `AIO_TEST_COMPOSITE`, chỉ khi `--selftest`).
+- `src/overlay/overlay.js`: `urlRaw()` + `napAnh()`; `xong()` có shape → nạp crop gốc → vẽ +
+  shape → confirm dataURL (nạp lỗi → rơi về JPEG, log `nen=jpeg-du-phong`); `confirmComposite`
+  tính mảnh giao rồi `Promise.all` nạp crop gốc từng màn, ghép 1:1 phys (lỗi → JPEG). Log
+  `xong shape nen=raw-png` / `composite OK … nen=raw-png`. `autoSelftest` có 2 chế độ test.
+- Harness mới `scripts/test/do-raw.mjs` (`npm run test:raw`): chạy `--selftest --dev` 2 lượt,
+  đọc run-log + đo pixel file lưu bằng System.Drawing, xoá đích danh file test.
+
+**Kiểm:** `test:raw` SHAPE 6/6 (raw crop 960×630 PNG 213 KB **36 ms**; file 960×630 có 3.122
+điểm cam) · COMPOSITE 5/5 (g vắt 2 màn 600×300 phys; 2 raw crop 300×300, 2–3 ms; ghép
+`nen=raw-png`; file 600×300) · `npm test` 5/5 · `test:mo-dan 200` 8 khung/97 ms ·
+run-log dev **`grab-xong 465ms`** (jpg 1.057 KB + 226 KB) so với 1.240 trước · `dist` exit 0
+(88.377.972 byte) · cài đè `/S` 107/107 ảnh giữ, tiến trình **0.4.13.0**, boot OK.
+**Chưa qua tay anh** (anh thử trên video Facebook: đen còn ~0,8 s).
+
+**Không đổi:** thứ tự overlay hiện → fade 150 ms → 200 ms → grab; ảnh cắt KHÔNG shape vẫn
+do main cắt từ NativeImage gốc như trước. Bộ nhớ: JPEG ~1 MB + NativeImage gốc ~32 MB/màn,
+xoá khi đóng overlay (trước: PNG 3,7 MB + NativeImage đã giữ sẵn trong `overlayShots`).
+
+## 2026-09-14 11:20 — 0.4.11 → 0.4.12: sửa lại đúng ý "kéo to khay để THẤY NHIỀU ẢNH HƠN"
+
+**Anh Tiến 11:14:** *"mục tiêu… là vì anh muốn xem được nhiều ảnh hơn (grid trong khay thay
+đổi) chứ không phải là em phóng ảnh to đến mức siêu to theo khay"*. Trước đó 11:11 anh báo
+*"vào khay bị mờ"* — em hiểu nhầm hướng, làm 0.4.11 gửi thumbnail 1080px cho khỏi mờ; thực ra
+gốc là em phóng ô ảnh theo khay (0.4.10), sai đề bài ngay từ lúc chốt phạm vi 10:5x (em
+đề xuất "thumbnail to theo", anh gật "làm đi" mà không đọc kỹ dòng đó — lỗi em đặt câu
+hỏi có sẵn đáp án sai).
+
+**Thay đổi (0.4.12):**
+- `src/shelf/shelf.css`: `#list` thành **lưới**. Ngang: `grid-auto-flow:column`,
+  `grid-template-rows: repeat(auto-fill, 64px)`, cột `max-content` → cao lên = thêm hàng,
+  vẫn cuộn ngang; `.item{height:64px}` cố định như cũ. Dọc: `grid-auto-flow:row`,
+  `grid-template-columns: repeat(auto-fill, minmax(150px,1fr))` → rộng ra = thêm cột, vẫn
+  cuộn dọc; `img max-height:150px` giữ lại.
+- `src/main.js`: `THUMB_H` 1080 → **320**, JPEG q88 qua `thumbKhay()` (~26 KB/ảnh so với PNG
+  128px cũ; đủ nét cho ô 64 DIP ngang và cột dọc tối đa ~324 DIP).
+- Tay nắm / sàn / trần / lưu cỡ giữ nguyên từ 0.4.10.
+- Harness `do-co-khay.mjs`: phép "ô ảnh to theo" → "ô GIỮ cỡ + số hàng (ngang) / số cột
+  (dọc) ≥ 2 sau khi kéo"; phép NÉT: ảnh LỚN NHẤT trong khay, nguồn ≥ min(hiển thị, 300) px;
+  dọn `khayCo` khỏi userData test khi xong. `do-cuon-khay.mjs`: TRƯỢT khi cuộn <100 px hoặc
+  <10 khung (trước: cuộn 0 px vẫn ĐẠT).
+
+**Kiểm:** `test:co-khay` (ảnh 3015×1362 qua `AIO_TEST_ANH_DIR`): ngang 8/8 — kéo +80 cao →
+**2 hàng**, ô 64 px giữ; dọc 8/8 — kéo +120 rộng → **2 cột**; NÉT: nguồn 534×320 vs hiển thị
+157×94 (ngang) / 240×144 (dọc) điểm ảnh thiết bị. `test:khay` dọc 2469 px cuộn, p95 30 ms, 0
+bước nhảy; ngang 1901 px, p95 30 ms. `npm test` 5/5. `dist` exit 0 (88.376.422 byte); cài đè
+`/S` 103/103 ảnh giữ, tiến trình **0.4.12.0**, boot OK. **Chưa qua tay anh.**
+
+**Bài học ghi brain:** chốt phạm vi tính năng thì nêu HAI hướng ngang nhau và hỏi anh chọn,
+đừng đề xuất một hướng rồi hỏi "gật không" — anh gật cả câu, không gật từng dòng.
+
+## 2026-09-14 11:10 — 0.4.10: kéo to khay (tay nắm góc trên-trái, sàn = cỡ cũ, trần = 60% màn chứa khay)
+
+**Anh Tiến:** *"người dùng muốn drag cái khay đó to ra hơn thì mình chưa có tính năng này đúng
+không em"* → *"làm đi em"*. Chốt cùng anh: cỡ nhỏ = cỡ hiện tại khoá làm sàn; to ra thì
+thumbnail to theo (không thêm cột); nhớ cỡ riêng dọc/ngang; không thêm nút/cài đặt.
+
+**Vì sao không dùng resize của Windows:** cửa sổ khay là frameless + transparent, Electron
+không cho kéo mép kiểu OS ổn định; và kéo bằng OS đi qua đúng bẫy "khay phình" 24/08 (DPI
+lẻ). Nên làm tay nắm riêng, cùng luật với kéo di chuyển: neo bounds một lần, renderer gửi
+delta TUYỆT ĐỐI, main tính cỡ mới.
+
+**Thay đổi:**
+- `src/main.js`: `coKhayMin()` (= hằng cũ) · `coKhayMax()` = 60% workArea của màn **đang
+  chứa khay** (lần đầu lấy màn chính → harness dọc trượt vì khay nằm trên LG 2048×1152 nhỏ
+  hơn màn chính; sửa lấy `screen.getDisplayMatching(bounds)`) · `coKhay()` đọc
+  `khayCo[kieu]` kẹp [sàn, trần] · IPC `shelf:resize-start/-to/-end` (giữ góc dưới-phải,
+  thả thì lưu `khayCo` + `viTriKhay`, run-log `khay doi co`) · `THUMB_H` 128→256 ở 3 chỗ ·
+  `trongManHinh` dùng `coKhay().h`.
+- `src/preload-shelf.js`: `resizeStart/To/End`. `src/shelf/index.html`: `#grip`.
+- `src/shelf/shelf.css`: `#grip` 16×16 góc trên-trái, hiện khi rê (0.9), cursor nwse-resize,
+  vạch chéo accent; `#list` `align-items:stretch`, `.item{height:100%}` (trước cứng 64px);
+  dọc bỏ `max-height:150px`.
+- `src/shelf/shelf.js`: kéo tay nắm (mousedown/move/up, delta tuyệt đối). `src/i18n.js`
+  `khay.doiCo`. `package.json`: `test:co-khay`, `test:mo-dan`.
+- Harness mới `scripts/test/do-co-khay.mjs` (7 phép: có grip · cỡ đầu = sàn · kéo −120/−80 →
+  +120/+80 · ô ảnh cao/rộng theo · kéo +500 → kẹp sàn · kéo −9999 → kẹp trần · thả → config).
+  ☠️ Thước: main đặt bounds DIP, renderer đọc innerWidth/Height — trên màn 150% lệch 1–4 px
+  (537 vs 536; tạo 448 → inner 452, có sẵn) → so với dung sai 4 px.
+
+**Kiểm:** `test:co-khay` ngang 7/7 · dọc 7/7 (ngang: 380×128 → 500×208, ô ảnh 151×75 →
+315×155; kẹp sàn 380×128; trần 1536×836 trên màn 2560×1392) · `test:khay` dọc/ngang ĐẠT
+(p95 28–30 ms, 0 bước nhảy) · `npm test` 5/5 (6,5 s) · `dist` exit 0 (88.376.123 byte) · cài đè
+`/S` 100/100 ảnh giữ, tiến trình **0.4.10.0**, boot OK. **Chưa qua tay anh.**
+
+**Có sẵn, chưa sửa:** `test:khay ngang` gapMax 1.600–1.800 ms (một khoảng nghẽn duy nhất,
+p50/p95 bình thường). Đối chứng: CSS cũ 1.776 ms, thumbnail 128 + CSS mới 1.621 ms → không do
+hôm nay. Chưa biết nghẽn ở đầu hay cuối 5 s; harness không in mốc. Việc chờ.
+
+## 2026-09-14 10:52 — Anh chấm ĐẠT 0.4.9
+
+Anh: *"anh thấy mượt lắm rồi nha em"* — cảm nhận tai/mắt người khớp số đo (8 khung/100 ms).
+Không sửa mã. Còn nợ: commit + push; anh chưa chốt phạm vi "kéo to khay".
+
+## 2026-09-14 10:48 — 0.4.9: màn tối đi hết "giật từ từ" (grab chờ lớp mờ tối xong) + nhãn khay Ngang/Dọc
+
+**Anh Tiến:** *"khi anh bấm phím tắt… màn hình sẽ tối đi… nó giật từ từ mới tối (đây không phải
+là lỗi) chỉ là anh thấy chưa được mượt"*.
+
+**Cơ chế đọc từ code:** overlay hiện ngay → `#dim` fade 150 ms → **40 ms** sau đó `kickGrab()`
+(`desktopCapturer.getSources` + nén PNG, chặn ~0,7–1,3 s; hôm nay hình nền nhiều màu nén ra
+3,8–4,1 MB) → ảnh đóng băng về, fade 160 ms nữa.
+
+**Đo (thước mới `scripts/test/do-mo-dan.mjs`):** mở app `--selftest --dev` với `AIO_CDP=1`,
+bám tầng trình duyệt `Target.setAutoAttach` để bật `Page.screencast` NGAY lúc overlay được
+tạo (lần đầu poll `/json` bám muộn 613 ms, lỡ hết fade → số vô nghĩa, bài 5). Đọc **mốc do
+compositor đóng dấu** (metadata.timestamp), không đọc giờ nhận vì đường CDP đi qua chính tiến
+trình bị chặn (bài 5d).
+
+| grab sau | khung trong 600 ms đầu | mốc compositor (ms) |
+|---|---|---|
+| 40 ms (cũ) ×3 | **3** | `0 1 1` rồi trống tới **~1.080** |
+| 200 ms (mới) ×3 | **8** | `0 9 37 49 53 69 83 100` |
+
+→ ở 40 ms lớp mờ vẽ được 3 khung rồi màn đứng ~1 giây, tới khi ảnh đóng băng về mới tối
+hẳn = đúng cảm giác "tối theo nấc". 200 ms = fade 150 ms + 3 khung dư.
+
+**Thay đổi:** `src/main.js` `GRAB_TRE_MS` (env `AIO_GRAB_TRE`, mặc định 200, chú thích kèm số
+đo, KHÔNG hạ dưới 170) + `AIO_CDP=1` mở cổng 9333 khi `--selftest`. `src/i18n.js`
+`set.khay.ngang` "Mặc định"→"Ngang", "Default"→"Horizontal" (anh: đồng bộ Dọc/Ngang).
+Đánh đổi nói rõ với anh: ảnh đóng băng là khoảnh khắc cũ hơn ~160 ms.
+
+**Kiểm:** do-mo-dan 200 ms 3/3 mượt + đối chứng 40 ms vẫn đứng; `npm test` **3/4** (lượt trượt
+có `grab-xong 2264ms`, các lượt đạt 763–1.226 ms — chưa rõ vì sao chậm đột xuất, có thể do
+harness/bản cài chạy chồng; theo dõi). `npm run dist` exit 0 (88.374.944 byte); cài đè `/S`:
+97/97 ảnh giữ, tiến trình **0.4.9.0**, boot OK. ☠️ Lỗi quy trình của em: chuỗi `npm test |
+tail` nuốt mã thoát nên bộ cài vẫn build dù test trượt — lần sau tách lệnh.
+
+**Anh hỏi kéo to khay:** chưa có — `ensureShelf` tạo cửa sổ `resizable:false`, cỡ cố định
+`SHELF_W=380 × SHELF_H=128` (dọc: cỡ khác). Chờ anh chốt: khoá cỡ nhỏ = cỡ hiện tại, kéo góc
+để to ra; to ra thì thumbnail to lên hay giữ cỡ và thêm cột?
+
+## 2026-09-14 10:27 — Anh chấm ĐẠT 0.4.8
+
+Anh: *"ok luôn rồi em"*, kèm ảnh vẽ trên ảnh ghim: 1 khung, 2 mũi tên, 2 khối chữ có nền
+(*"Click được"* / *"Bấm phím số được luôn không lỗi"*). Anh ghi "0.4.7" trong chữ nhưng bản
+đang chạy lúc đó là 0.4.8.0 (đo 10:19). Không sửa mã. Còn nợ: commit + push (`/xong`).
+
+## 2026-09-14 10:22 — 0.4.8: ảnh ghim có đường vào chế độ vẽ bằng CHUỘT (rê lên là hiện 3 nút)
+
+**Anh Tiến (sau khi cài 0.4.7):** *"anh bấm phím 1-2-3 thì mới được — anh bấm chuột chọn vào
+thì không được, lúc nãy anh thử là chỉ có bấm chuột"* rồi *"em chỉnh lại cho anh click bằng
+chuột đi"*.
+
+**Nguyên nhân thật:** không phải lỗi vẽ. 10/09 bỏ nút bút chì trên ảnh ghim theo lệnh anh, thay
+bằng phím 1/2/3 — từ đó **người cầm chuột không có cách nào vào chế độ vẽ**: bấm ảnh = không
+gì, thanh công cụ chỉ hiện sau khi bấm phím. Cả buổi em soi đường mousedown/canvas/tiêu
+điểm (đúng cả, harness + chuột thật đều vẽ được) vì đọc "chọn vẽ ô" thành "kéo vẽ" trong khi
+anh đang nói "bấm chuột để chọn công cụ". Bài học: **mô tả lỗi của anh là THAO TÁC, hỏi lại
+"anh bấm bằng gì" trước khi soi code** (mất ~1 giờ + 1 bản cài trung gian).
+
+**Thay đổi:**
+- `src/pin/index.html`: bỏ attr `hidden` của `#toolbar` (điều khiển bằng class `dang-ve`).
+- `src/pin/pin.css`: chế độ xem `#frame:not(.dang-ve) #toolbar` mờ + `pointer-events:none`,
+  rê chuột lên ảnh → hiện (opacity 1, trượt lên 4px như `#bar`); ẩn nhóm màu / undo / huỷ /
+  xong, chỉ còn 3 nút công cụ. Chế độ vẽ: hiện đủ.
+- `src/pin/pin.js`: bấm nút công cụ khi đang xem → `vaoCheDoVe()` rồi chọn công cụ đó; thoát
+  vẽ đặt lại `rect` để 3 nút không nút nào "đang chọn"; bỏ `toolbarEl.hidden`. Nhật ký chẩn
+  đoán 0.4.7 cắt còn 3 dòng (data / key / vào vẽ) — bỏ mousedown/mouseup/dragstart cho
+  đỡ rác run-log.
+- `scripts/test/do-ve-chu.mjs`: 4 phép mới (bấm chuột nút mũi tên → tool=arrow; chế độ xem
+  chuột ra ngoài → `view/none/0`; rê vào → `1/auto/3`; bấm nút → `ve/arrow/13`). Bẫy thước
+  gặp: đếm nút hiện bằng `getComputedStyle(nút).display` sai (cha `display:none` thì con vẫn
+  trả `block`) → dùng `getClientRects().length`; toạ độ nút phải lấy LẠI sau khi thanh co.
+
+**Kiểm:** `test:chu` bản sao **20/20**; `npm run dist` exit 0 (88.374.636 byte); cài đè `/S`:
+91/91 ảnh giữ, tiến trình **0.4.8.0**, boot OK. **Chưa qua tay anh** (0.4.8 vừa cài 10:19).
+
+## 2026-09-14 10:14 — 0.4.7 (tiếp): nhật ký chẩn đoán "không vẽ được trên ảnh ghim" + cài đè
+
+**Bối cảnh:** anh Tiến: *"cùng tấm ảnh này khi anh đã lưu trong khay và anh bấm vào và muốn
+sửa thêm: chọn vẽ ô — không vẽ được, arrow — không được, text cũng không"*, kèm ảnh: thanh
+công cụ hiện (rect đang chọn) trên ảnh ghim to ~1536×1212 logical. Anh bấm vào ảnh trước
+rồi bấm 1 **vẫn không vẽ được** → loại giả thuyết tiêu điểm.
+
+**Đã đo, chưa ra gốc:**
+- Đọc `pin.js` toàn bộ đường mousedown → veStart → mousemove redraw → mouseup: không thấy
+  chỗ chặn. `dip` nhận từ `pin:data`, canvas đặt cả attr lẫn style (sổ #10).
+- Harness CDP `test:chu` 16/16 và `test:khung` (10/09) ĐẠT — nhưng CDP bơm sự kiện thẳng
+  vào renderer, không qua Windows.
+- Chuột + phím THẬT (công cụ điều khiển máy, 10:00, bản cài 0.4.6): hotkey → kéo chọn
+  1319×792 → Enter → bấm thumbnail → bấm ảnh → phím 1 → kéo: **vẽ được khung cam**.
+  Khác anh: ảnh nhỏ hơn (879×528 DIP so với ~1536×1188). Anh chặn không cho remote tiếp.
+- Bẫy gặp khi đo: 2 màn → sau khi kéo chọn trên màn chính, `GetForegroundWindow` là overlay
+  màn LG → Enter bị bỏ qua (phải AttachThreadInput + SetForegroundWindow đúng overlay).
+  Chưa rõ với chuột thật của anh có vậy không. `open_application` = second-instance =
+  bung overlay chụp trên màn anh (đã ghi trong sổ, em vẫn vấp).
+
+**Thay đổi (không sửa logic vẽ, chỉ đo):**
+- `src/preload-pin.js`: thêm `pin.log(m)` → `src/main.js` `ipcMain.on('pin:log')` →
+  `ghiLog('[pin <wcId>] ...')`.
+- `src/pin/pin.js`: `PLOG` tại: nhận data (dip/DPR/innerSize) · mọi keydown (key/mode/tool)
+  · vào chế độ vẽ (canvas attr, css, display, boundingRect, dip) · mousedown toàn cửa sổ
+  (capture: toạ độ, target, `elementFromPoint`, mode) · canvas mousedown · mouseup
+  (veStart có/không, số shape) · `img dragstart`.
+- `src/main.js` nhãn tray `&&` (mục 09:40).
+
+**Kiểm:** `test:chu` trên bản sao: 16/16; run-log dev ghi đủ chuỗi `[pin 2] key 1 → vao ve:
+canvas 1464x878 css=1171pxx702px display=block rect=14,13 1171x702 → mousedown@… target=ve
+top=ve`. `npm run dist` exit 0 (88.374.596 byte). Cài đè `/S`: 90/90 ảnh giữ, tiến trình
+**0.4.7.0**, `boot v0.4.7 dang-ky=OK`.
+
+**Bước tiếp:** anh thử 1 lần → đọc dòng `[pin` trong run-log Roaming: nếu có `mousedown`
+mà `target≠ve` → lớp nào đè canvas; nếu không có `mousedown` nào → chuột không tới cửa sổ
+(cửa sổ khác đè / Windows); nếu có `canvas mousedown` mà mouseup `veStart=khong` →
+mất veStart giữa chừng. Xong việc thì GỠ PLOG (giữ 1 dòng vào-vẽ là đủ).
+
+## 2026-09-14 09:40 — 0.4.7: menu tray hiện "AiO Shot  Save" (mất dấu &)
+
+**Anh Tiến** gửi ảnh menu tray 0.4.6: dòng phiên bản đọc là *"AiO Shot  Save  v0.4.6"*.
+Gốc: menu Windows coi `&` là dấu gạch chân phím tắt nên nuốt ký tự. Có sẵn từ ngày có
+dòng này, chưa ai nhìn kỹ. Sửa `main.js` nhãn thành `'AiO Shot && Save'`. Hai chuỗi
+`app.khongChupDuoc` trong i18n cũng có `&` nhưng là thân Notification, không qua menu,
+giữ nguyên. Bump 0.4.7 + `npm run dist`; **chưa cài đè** — anh đang test 0.4.6, cài là
+app tắt giữa chừng; gộp cài sau khi anh báo kết quả test.
+
+## 2026-09-14 09:30 — 0.4.6: cài đè 0.4.5 làm MẤT 2 ảnh → dời thư mục ảnh mặc định ra ngoài thư mục cài
+
+**Anh Tiến:** *"em cài cho anh test đi chứ"* (bản 0.4.5 nền chữ).
+
+**Chuyện xảy ra:** chụp danh sách ảnh trước khi cài (2 file), tắt app, chạy
+`Setup-0.4.5.exe /S` exit 0. Đo sau: tiến trình 0.4.5.0, config md5 giữ nguyên, **nhưng
+`Programs/aio-shot-and-save/Anh chup` KHÔNG CÒN** — 2 ảnh anh chụp 09:04 và 09:09 mất,
+thùng rác không có. Gốc: bộ cài NSIS one-click khi cài đè xoá sạch thư mục cài rồi mới
+chép bản mới; `kho.thuMucAnh()` mặc định = `<thư mục exe>/Anh chup` (chọn 24/08 vì anh
+cấm `Pictures` do OneDrive). Nghĩa là **mọi người dùng để mặc định sẽ mất hết ảnh mỗi
+lần cập nhật**. Lỗi có sẵn từ 24/08, hôm nay mới lộ vì đây là lần cài đè đầu tiên có
+ảnh trong thư mục đó (08:06 thư mục còn trống).
+
+**Cứu:** bản sao trong scratchpad harness `anh-ban-sao/` → chép sang
+`%LOCALAPPDATA%/AiO Shot & Save/Anh chup` (thư mục Tauri từng dùng, còn 75 ảnh cũ):
+- `AiO-2026-09-14-090423-969.jpg` 192.033 byte = **nguyên vẹn** (bằng bản gốc).
+- `AiO-2026-09-14-090902-098.jpg` 185.796 byte = **đã bị harness ghi đè** (vẽ thêm chữ
+  "AiO test" ở 30%/40% ảnh, mã hoá lại). Bản gốc 226.819 byte mất hẳn. Phải nói với anh.
+
+**Sửa gốc** (`src/kho.js`): bản đóng gói → mặc định `%LOCALAPPDATA%/AiO Shot & Save/Anh
+chup` (không roaming, không OneDrive, sống qua cài đè lẫn gỡ cài); chạy từ nguồn giữ
+`<dự án>/Anh chup`. `main.js` selftest-shelf đọc `kho.thuMucAnh()` thay vì tự ghép.
+Config có `thuMucAnh` riêng thì không đổi gì.
+
+**Đo:** bump 0.4.6, `npm run dist` exit 0 (88.374.022 byte); tắt 0.4.5, `/S` cài, thư mục
+cài không có `Anh chup`; mở app: tiến trình **0.4.6.0**, run-log `boot v0.4.6 hotkey=Shift+`
+dang-ky=OK lang=en`; `grep` chuỗi thư mục mới trong `resources/app.asar` = 1; thư mục
+ảnh mới 77 file. ☠️ `/S` KHÔNG tự chạy app sau cài (runAfterFinish bị bỏ qua) — phải
+mở tay. **Chưa đo:** một lượt chụp thật trên 0.4.6 rơi vào thư mục mới — chờ anh bấm.
+
+**Kèm:** từ 09:19 run-log ghi lại bình thường (boot 0.4.5, 0.4.6 đều có) — tiến trình
+09:03 mất log là ca riêng, vẫn chưa biết gốc.
+
+## 2026-09-14 09:25 — 0.4.5: chữ có HỘP NỀN (anh Tiến: "phần đánh chữ … cần thêm nền chữ")
+
+**Vì sao:** chữ cam đậm viền tối 0.6 đọc được trên nền tối, nhưng đè lên ảnh sáng /
+nhiều chi tiết là chìm. Anh muốn có nền sau chữ.
+
+**Sửa** (`src/overlay/overlay.js` + `src/pin/pin.js` `veChu`, giống hệt nhau):
+- Đo bề rộng từng dòng bằng `measureText`, vẽ hộp `rgba(24,24,24,0.82)` bo góc 4·k,
+  padding ngang 4·k / dọc 2·k (đúng số lệch cũ nên vị trí chữ không đổi), rồi
+  `fillText` màu đang chọn. **Bỏ `strokeText`** (viền hết cần khi có hộp).
+- `.go-chu` (ô gõ) đổi nền `rgb(24 24 24 / 82%)` + `border-radius:4px`, bỏ
+  `text-shadow` — gõ thấy sao, xuất ra vậy (WYSIWYG).
+- Harness `scripts/test/do-ve-chu.mjs`: thêm phép đo "có hộp nền tối sau chữ" (đếm
+  điểm alpha>150 & RGB<40, phải > 50% số điểm chữ và > 500) + chờ khay nạp ô (tối
+  đa 6 s) thay vì ngủ 800 ms cố định.
+
+**Đo:**
+- `npm run test:chu -- <bản sao 2 ảnh anh chụp sáng nay>`: **16/16 ĐẠT**, chữ 4.696 px
+  có alpha, hộp 3.451 px tối. Ảnh thật trong `Anh chup`: không đụng (2 file, mtime giữ).
+- Ảnh nền sáng kem + sọc cam dựng riêng: 16/16, cắt vùng chữ ra xem: hộp tối bo góc
+  rõ, chữ cam đọc được trên sọc. Trên ảnh nền tối hộp gần như trùng màu nền = đúng ý.
+- Bẫy thước gặp trong buổi: lần chạy đầu báo `khay co anh · 0 anh` trong khi run-log
+  ghi `anh=2` — DOM đọc sau 800 ms, JPEG 3015 px chưa giải mã xong (`5f`). Sửa thước,
+  không sửa app.
+- `npm run dist` exit 0 → `dist/AiO-Shot-and-Save-Setup-0.4.5.exe` 88.373.883 byte.
+
+**Chưa làm:** cài đè máy anh (anh đang dùng 0.4.4, cài là app tắt một nhịp — chờ anh
+gật). Đường overlay chưa tự động hoá (cùng mã `veChu`, harness pin là thước chính).
+
+## 2026-09-14 09:20 — Anh chấm ĐẠT 0.4.4 trên máy công ty (bản cài, sau khi gỡ Tauri)
+
+**Anh Tiến:** *"anh mới kiểm tra thử thì thấy ổn định rồi đó em"* + ảnh chụp có 3 khung
++ 4 mũi tên cam vẽ lúc chụp. Đây là lần đầu anh dùng bản Electron 0.4.4 cài đè (08:06)
+thay bản Tauri — chuỗi vẽ khung/mũi tên trên overlay ổn.
+
+**Đo (không tin lời khen suông, luật 2):**
+- Tiến trình: 5 process `AiO Shot & Save.exe` từ `%LOCALAPPDATA%/Programs/aio-shot-and-save/`,
+  khởi động 09:03:48, ProductVersion **0.4.4.0**, `--user-data-dir` = `Roaming/AiO Shot & Save`.
+- Ảnh: `Anh chup/AiO-2026-09-14-090423-969.jpg` 3015×1362, 192.033 byte; quét mẫu 1/16
+  điểm: **1.824 điểm cam** (R>200, G 70–140, B<80) = khung + mũi tên có thật trong file,
+  không chỉ trên màn. Thư mục ảnh = mặc định cạnh exe (config không có `thuMucAnh`).
+- Config giữ nguyên từ Electron 0.4.2: `Shift+\``, EN, PNG siêu, khay dọc.
+
+**Phát hiện kèm — run-log không ghi gì từ tiến trình 09:03** (chi tiết ở TRẠNG THÁI
+đầu file, mục [CHỜ ĐO]). Không ảnh hưởng người dùng, nhưng là đúng kiểu "chết im
+lặng" — mất nhật ký thì lần sau anh báo lỗi là mù. Chưa sửa vì chưa đo được gốc.
+
+**Không sửa mã nguồn** trong mục này. Đã cập nhật TOOL_VERSION_TRACKER dòng 12 và
+`AiO Studio/CLAUDE.md` (mục 2, 5, 8) sang 0.4.4 đã cài + anh chấm ĐẠT.
+
+## 2026-09-14 07:55 — "Mở Settings không được": máy công ty vẫn chạy TAURI 0.5.0, chưa cài Electron
+
+**Bối cảnh:** anh báo mở Cài đặt không lên. Đo trước khi sửa (luật `5b`):
+- Tiến trình đang chạy: `aio-shot-tauri.exe` **0.5.0**, khởi động 07:50:54, nằm ở
+  `%LOCALAPPDATA%\AiO Shot & Save\`. Lối tắt Desktop trỏ đúng exe đó. Registry
+  Uninstall chỉ có bản 0.5.0 Tauri. **Electron 0.4.4 chưa cài** (không có trong
+  `Programs\`), dù `dist/AiO-Shot-and-Save-Setup-0.4.4.exe` đã build 10/09.
+- Run-log Tauri: `07:51:11 [ui settings] bridge: settings.js nap xong` → trang
+  settings CÓ nạp, nhưng chụp cả 2 màn (ASUS + LG) **không có cửa sổ nào** →
+  cửa sổ tạo ra mà không hiện. Cũng thấy `hotkey=Shift+backtick dang-ky=FAIL`.
+- Mã nguồn Tauri anh đã xoá 10/09 → **không sửa được bản này**, và theo quyết
+  định 10/09 cũng không sửa (Electron là bản duy nhất).
+
+**Nguyên nhân thật:** lỗi nằm ở bản Tauri đã bỏ; máy chưa chuyển sang Electron.
+Không phải lỗi mã Electron (`openSettings` trong `main.js` không đổi từ 0.4.2
+anh chấm ĐẠT 31/08).
+
+**Đã làm:** chép 75 ảnh (15 MB) từ thư mục cài Tauri sang
+`C:\Users\DRT-G21\Pictures\AiO Shot & Save\` (75/75, `cp -n`, KHÔNG xoá gốc;
+Pictures máy này KHÔNG bị OneDrive đổi hướng — đã kiểm `GetFolderPath`).
+
+**08:06 — anh bảo "em cài đi" + "remove bản Tauri":** đã làm, đo xong:
+- Thoát Tauri → `uninstall.exe /S` exit 0 → exe, mục Apps, lối tắt Desktop mất;
+  thư mục `Anh chup` + `run-log.txt` cũ Windows để lại (không mất ảnh gốc).
+- `Setup-0.4.4.exe /S` exit 0 → Apps ghi "AiO Shot & Save 0.4.4", cài ở
+  `%LOCALAPPDATA%\Programs\aio-shot-and-save\`, lối tắt Desktop mới.
+- Mở app: tiến trình ProductVersion **0.4.4.0**; run-log userData
+  `08:06:09 boot v0.4.4 hotkey=Shift+`(config) dang-ky=OK lang=en` — config
+  Electron 0.4.2 cũ vẫn còn nên phím tắt/ngôn ngữ giữ nguyên, KHÔNG về mặc định.
+- **Chưa tự bấm được tray → Cài đặt** (công cụ điều khiển máy chỉ cho bấm trái
+  trên khay hệ thống; bấm trái icon = bắt đầu chụp). Nhờ anh bấm thử.
+
+## 2026-09-10 14:03 +0700 — 0.4.4 (tiep): khung ve tren ANH GHIM lech 1,5 lan — canvas khong co kich thuoc CSS
+
+**Anh Tien** (dang chay ban dev tu ma nguon, ve khung tren anh ghim): "lỗi định
+vị chuột và khung đang sai — chỗ anh cần vẽ thì nó lại nhảy xa ra một chỗ khác".
+
+**Do TRUOC khi sua** (harness moi `npm run test:khung -- <ban sao>`): keo chuot
+(60,50)->(200,150) CSS px, khung ve ra o (87,72)->(301,226) — **lech 101px,
+gap dung 1,50 lan = DPR man**. Hinh hoc: frame 1323x617, canvas CSS
+**1985x926** (= thuoc tinh dip*DPR), ti le CSS/DIP = 1.5.
+**Goc:** `#ve{position:absolute; inset:0}` — canvas la REPLACED element,
+`inset:0` khong keo no theo khung ma lay kich thuoc THUOC TINH. Overlay khong
+dinh vi JS da dat `style.width/height` tuong minh. Loi CO SAN tu 26/08 (ve tren
+anh ghim), tren man 100% khong lo, man anh 150%/125% moi lo — hom nay them
+cong cu chu nen anh dung nhieu moi thay.
+**Sua:** `pin.css #ve{width:100%;height:100%}` + `pin.js vaoCheDoVe` dat
+`style.width/height = dip` px.
+**Do SAU:** canvas CSS 1323x617 = frame, khung ve ra (58,48)->(200.6,150.6),
+**lech max 2px** (= nua net 3px) DAT; `test:chu` van 15/15 (chu cung het lech).
+Bo cai 0.4.4 dong goi lai. So loi tai dien #10.
+☠️ Anh dang chay ban DEV tu ma nguon: dong cua so ghim va ghim lai la nhan ban
+sua (HTML/CSS/JS nap moi moi cua so); overlay chup moi cung vay.
+
+## 2026-09-10 14:00 +0700 — 0.4.4: cong cu CHU + phim 1/2/3 + bo nut but chi tren anh ghim
+
+**Anh Tien:** "them text vao hinh da chup" (ca luc chup lan luc bam preview) +
+"phim 1 = khung, 2 = mui ten, 3 = chu, so nho nho tren nut de nguoi dung biet"
++ (anh ve mui ten chi nut but chi tren thanh anh ghim) "remove cai icon but chi".
+
+**Sua:**
+- `overlay/` + `pin/` (HTML/JS/CSS): cong cu `text` (nut chu T, phim 3). Bam
+  vao anh -> textarea trong suot dung cho do (chu dam 18px DIP, mau dang chon,
+  vien dut) -> Enter chot thanh shape `{type:'text', x, y, text, color, size}`;
+  Shift+Enter xuong dong; Esc bo o go (khong thoat che do); bam cho khac /
+  doi cong cu / Xong = tu chot; Ctrl+Z khi dang go = bo o go. Ve ra canvas:
+  `veChu` font 700, strokeText vien toi 0.6 + fillText mau, nhan he so k khi
+  xuat anh that (pin) — WYSIWYG: chu to dung nhu luc go tren cua so ghim.
+- Phim 1/2/3 doi cong cu (overlay: khi dang annotate; pin: tu che do XEM bam
+  la vao thang che do ve voi cong cu do). O go chu `stopPropagation` keydown
+  nen go so 1/2/3 trong chu khong doi cong cu.
+- So nho `<i class="so">` goc tren phai moi nut (8px, text-3; nut dang chon
+  thi mau accent).
+- Pin: BO nut but chi `#edit` (thay bang phim 1/2/3); tooltip anh ghim
+  `ghim.goiY` noi cach vao ve. i18n VI/EN: `overlay.text`, `ghim.goiY`,
+  rect/arrow ghi kem "(phim 1/2)".
+- `--selftest-shelf` nhan `AIO_TEST_ANH_DIR` (thu muc BAN SAO) de harness ghi
+  de khong dung anh that.
+
+**Kiem (CDP `npm run test:chu -- <thu-muc-ban-sao>`, 5 ban sao trong
+scratchpad): 15/15 DAT** — #edit null · 3 so 1/2/3 8px absolute · phim 3 ->
+ve/text/toolbar hien · bam anh -> textarea focus · insertText -> value · Enter
+-> shapes=[{text:'AiO test'}] van o che do ve · canvas 2.285 px co alpha ·
+Enter -> luu, img.src doi, DUNG 1 file ban sao doi kich thuoc, khong them file
+· phim 1 tu xem -> ve/rect · phim 2 -> arrow · Esc -> view. Mo file ban sao:
+chu "AiO test" cam, dam, vien toi, dung vi tri (pixel cam 900-1002 x 558-578).
+Anh that trong `Anh chup`: 0 khac biet. `npm test` 5/5 (overlay/pin/shelf nap
+sach sau khi sua).
+**CHUA tu dong hoa duong OVERLAY** (can bam hotkey toan cuc, se bung overlay
+len man anh dang lam) — code overlay dung chung `veChu`/o go y het pin, chi
+khac cha (`document.body`, goc `curRect`); anh chup thu + bam 3 la biet.
+
+Bump 0.4.3 -> 0.4.4 (0.4.3 chua cai). Bo cai dong goi lai.
 
 ## 2026-09-10 09:39 +0700 — 0.4.3 (tiep): cuon khay MUOT + `npm test` tu cham + ghim Electron
 

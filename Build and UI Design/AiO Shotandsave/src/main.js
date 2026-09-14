@@ -48,7 +48,13 @@ app.commandLine.appendSwitch(
 protocol.registerSchemesAsPrivileged([
   { scheme: 'aioshot', privileges: { corsEnabled: true, supportFetchAPI: true, stream: true } },
 ])
-const frozenStore = new Map() // 'gen/displayId' -> Buffer PNG (xoa moi capture/close)
+const frozenStore = new Map() // 'gen/displayId' -> Buffer JPEG q92 (nen ANH DONG BANG chi de NHIN)
+/* 'gen/displayId' -> NativeImage GOC (khong nen). 14/09 anh Tien: video Facebook den
+   ~1,6s moi thay hinh. Do: toPNG 4K = 642ms/man tren luong chinh (getSources chi 420ms),
+   toJPEG(92) = 37ms. Nen nen dong bang di JPEG (nhin), con anh co shape / vat 2 man thi
+   luc bam Xong renderer xin cat DUNG VUNG tu anh goc qua aioshot://raw/... (PNG, vung
+   nho -> vai chuc ms) -> file luu van lossless nhu truoc. */
+const rawStore = new Map()
 let grabGen = 0
 
 const IS_DEV = process.argv.includes('--dev')
@@ -58,6 +64,15 @@ const IS_DRAGTEST = process.argv.includes('--selftest-drag')
 // mo cong CDP 9333 de scripts/test/do-cuon-khay.mjs do muot; tu thoat sau 90s.
 const IS_SHELFTEST = process.argv.includes('--selftest-shelf')
 if (IS_SHELFTEST) app.commandLine.appendSwitch('remote-debugging-port', '9333')
+/* [do] AIO_CDP=1: mo cong CDP 9333 ca khi --selftest (harness do-mo-dan.mjs quay overlay). */
+if (process.env.AIO_CDP === '1') app.commandLine.appendSwitch('remote-debugging-port', '9333')
+/* AIO_GRAB_TRE: ms cho tu luc overlay hien toi luc bat dau grab. Mac dinh 200 (0.4.9).
+   ☠️ 14/09 anh Tien: "man toi di giat tu tu". Do bang screencast CDP (do-mo-dan.mjs,
+   moc compositor dong dau): grab bat dau sau 40ms -> lop mo #dim (fade 150ms) chi ve
+   duoc 3 khung roi DUNG 1.080ms (getSources + nen PNG 3,9MB chan) -> toi theo nac.
+   Cho 200ms (fade xong + 3 khung du) -> 8 khung/102ms, muot. Doi lai: anh dong bang
+   cu hon ~160ms. KHONG ha xuong duoi 170ms. */
+const GRAB_TRE_MS = Number(process.env.AIO_GRAB_TRE) > 0 ? Number(process.env.AIO_GRAB_TRE) : 200
 
 /* ☠️ Selftest phai CACH LY userData (vap 31/08 may nha): ban cai dang chay
    giu khoa single-instance (khoa theo userData) -> selftest boot xong TU THOAT
@@ -138,16 +153,32 @@ if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsa
 app.whenReady().then(() => {
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
-    const m = /^aioshot:\/\/frozen\/(\d+\/[^/]+)\.png$/.exec(req.url)
-    const buf = m ? frozenStore.get(m[1]) : null
-    if (!buf) return new Response('', { status: 404 })
-    return new Response(buf, {
-      headers: {
-        'Content-Type': 'image/png',
-        'Access-Control-Allow-Origin': '*', // canvas ghep can CORS sach (taint)
-        'Cache-Control': 'max-age=60',      // background + Image cung URL dung chung cache
-      },
-    })
+    const headers = {
+      'Access-Control-Allow-Origin': '*', // canvas ghep can CORS sach (taint)
+      'Cache-Control': 'max-age=60',      // background + Image cung URL dung chung cache
+    }
+    // aioshot://frozen/<gen>/<displayId>.jpg — anh dong bang (JPEG q92, chi de nhin)
+    let m = /^aioshot:\/\/frozen\/(\d+\/[^/]+)\.jpg$/.exec(req.url)
+    if (m) {
+      const buf = frozenStore.get(m[1])
+      if (!buf) return new Response('', { status: 404 })
+      return new Response(buf, { headers: Object.assign({ 'Content-Type': 'image/jpeg' }, headers) })
+    }
+    // aioshot://raw/<gen>/<displayId>/<x>_<y>_<w>_<h>.png — cat DUNG VUNG (px thiet bi)
+    // tu anh GOC khong nen, PNG. Dung luc bam Xong co shape / ghep vat man (14/09).
+    m = /^aioshot:\/\/raw\/(\d+\/[^/]+)\/(\d+)_(\d+)_(\d+)_(\d+)\.png$/.exec(req.url)
+    if (m) {
+      const img = rawStore.get(m[1])
+      if (!img || img.isEmpty()) return new Response('', { status: 404 })
+      const sz = img.getSize()
+      const x = Math.min(+m[2], sz.width - 1), y = Math.min(+m[3], sz.height - 1)
+      const w = Math.max(1, Math.min(+m[4], sz.width - x)), h = Math.max(1, Math.min(+m[5], sz.height - y))
+      const _t = Date.now()
+      const buf = img.crop({ x, y, width: w, height: h }).toPNG()
+      ghiLog('raw crop ' + w + 'x' + h + ' png ' + Math.round(buf.length / 1024) + 'KB ' + (Date.now() - _t) + 'ms')
+      return new Response(buf, { headers: Object.assign({ 'Content-Type': 'image/png' }, headers) })
+    }
+    return new Response('', { status: 404 })
   })
 
   const ch = kho.docCauHinh()
@@ -196,7 +227,8 @@ app.whenReady().then(() => {
 function moKhayDeDo() {
   const kieu = (process.argv.find((a) => a.startsWith('--khay=')) || '--khay=doc').slice(7)
   kho.ghiCauHinh({ khayKieu: kieu === 'ngang' ? 'ngang' : 'doc' })
-  const dir = path.join(kho.thuMucGoc(), 'Anh chup')
+  // AIO_TEST_ANH_DIR: thu muc BAN SAO de harness ve/ghi de khong dung anh that
+  const dir = process.env.AIO_TEST_ANH_DIR || kho.thuMucAnh()
   let files = []
   try { files = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g)$/i.test(f)).sort().slice(0, 20) } catch (e) {}
   for (const f of files) {
@@ -281,7 +313,9 @@ function rebuildTrayMenu() {
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
     { type: 'separator' },
-    { label: 'AiO Shot & Save  v' + app.getVersion(), enabled: false },
+    /* ☠️ Menu Windows coi '&' la dau gach chan phim tat -> 'AiO Shot  Save' (anh
+       thay 14/09 tren 0.4.6). Viet '&&' de ra dau '&' that. */
+    { label: 'AiO Shot && Save  v' + app.getVersion(), enabled: false },
     { type: 'separator' },
     { label: T('tray.thoat'), click: () => { forceQuit() } },
   ])
@@ -416,7 +450,7 @@ ipcMain.handle('settings:set-khay', (_e, kieu) => {
       const w = ensureShelf()
       w.webContents.once('did-finish-load', () => {
         for (const it of shelfItems.values()) {
-          const thumb = it.image.resize({ height: 128, quality: 'good' }).toDataURL()
+          const thumb = thumbKhay(it.image)
           const sz = it.image.getSize()
           let kb = 0
           try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
@@ -472,6 +506,15 @@ ipcMain.handle('settings:reset', () => setHotkey(DEFAULT_HOTKEY))
 
 let grabPromise = null
 let grabStarted = false
+/* 14/09 GRAB TRUOC (AIO_GRAB_TRUOC, mac dinh 1): goi kickGrab NGAY luc bam phim,
+   TRUOC khi tao overlay (kieu Lightshot). Do that (do-grab, video YouTube Shorts tren
+   man LG): overlay trong suot phu len video >= ~0,5s la WGC tra VUNG VIDEO DEN (sang 0),
+   <= 0,2s van co hinh (67-78). App cu: overlay hien -> cho 200ms -> getSources mo phien
+   ~370ms -> khoanh khac chup roi vao ~600ms sau khi phu = DEN. Grab truoc: khoanh khac
+   chup ~420ms sau phim, overlay hien ~200ms sau phim (sau khi WGC mo phien xong) ->
+   phu moi ~200ms luc chup. Lop mo cung khong bi grab chan nua. */
+const GRAB_TRUOC = process.env.AIO_GRAB_TRUOC !== '0'
+let layersSanSang = null // layers cua the he hien tai — overlay nao nap xong SAU grab thi lay o day
 
 async function startCapture() {
   if (overlayWins.length) return // dang chon vung, bo qua
@@ -485,9 +528,12 @@ async function startCapture() {
   // kip hien.
   grabStarted = false
   grabPromise = null
+  layersSanSang = null
   napManCache()
   ghiLog('capture-start displays=' + displays.length + ' ' +
-    manCache.map((m) => m.px + ',' + m.py + ' ' + m.pw + 'x' + m.ph + '@' + m.sf).join(' | '))
+    manCache.map((m) => m.px + ',' + m.py + ' ' + m.pw + 'x' + m.ph + '@' + m.sf).join(' | ') +
+    (GRAB_TRUOC ? ' grab-truoc' : ''))
+  if (GRAB_TRUOC) kickGrab() // xem chu thich GRAB_TRUOC
   openOverlays(displays)
 }
 
@@ -518,20 +564,36 @@ function kickGrab() {
     // IPC chi mang URL — het nghen renderer giua luc keo (may nha 31/08).
     if (!overlayWins.length) return // da Esc/dong truoc khi grab xong — khong giu buffer
     grabGen++
-    frozenStore.clear() // chi giu the he hien tai
+    /* [do] AIO_TEST_SANG=<displayId>:<x>,<y>,<w>,<h> (px thiet bi): ghi do sang trung binh
+       vung do vao run-log — bat "video den" bang so, khong bang mat (14/09). */
+    if (process.env.AIO_TEST_SANG) {
+      try {
+        const [id, vung] = process.env.AIO_TEST_SANG.split(':')
+        const [x, y, w, h] = vung.split(',').map(Number)
+        const it = list.find((q) => String(q.display.id) === id)
+        if (it) {
+          const c = it.image.crop({ x, y, width: w, height: h }).resize({ width: 48, height: 48 }).toBitmap()
+          let sum = 0, n = 0
+          for (let i = 0; i < c.length; i += 4) { sum += (c[i] + c[i + 1] + c[i + 2]) / 3; n++ }
+          ghiLog('[do] sang vung ' + id + ' ' + x + ',' + y + ' ' + w + 'x' + h + ' = ' + Math.round(sum / n))
+        } else ghiLog('[do] sang: khong co man ' + id)
+      } catch (e) { ghiLog('[do] sang LOI ' + e.message) }
+    }
+    frozenStore.clear(); rawStore.clear() // chi giu the he hien tai
     const layers = list.map((x) => {
       const m = manCache.find((mm) => mm.id === x.display.id) || {}
       const key = grabGen + '/' + x.display.id
-      frozenStore.set(key, x.png)
+      frozenStore.set(key, x.jpg)
+      rawStore.set(key, x.image)
       return {
         x: x.display.bounds.x, y: x.display.bounds.y,
         w: x.display.bounds.width, h: x.display.bounds.height,
-        sf: x.sf, url: 'aioshot://frozen/' + key + '.png',
+        sf: x.sf, key, url: 'aioshot://frozen/' + key + '.jpg',
         px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
       }
     })
     ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms layers=' + layers.length + ' [' +
-      list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph + ' / png ' + Math.round(x.png.length / 1024) + 'KB' }).join(' | ') + ']')
+      list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph + ' / jpg ' + Math.round(x.jpg.length / 1024) + 'KB' }).join(' | ') + ']')
     for (const win of overlayWins) {
       if (win.isDestroyed()) continue
       const item = list.find((x) => x.display.id === win._displayId)
@@ -541,6 +603,7 @@ function kickGrab() {
       }
       win.webContents.send('overlay:frozen', { layers })
     }
+    layersSanSang = layers // overlay nao did-finish-load SAU thoi diem nay thi tu lay
   })
 }
 
@@ -703,11 +766,11 @@ async function grabDisplaysList() {
     if (!src) { const idx = displays.findIndex((x) => x.id === d.id); src = sources[idx] || sources[0] }
     if (!src || !src.thumbnail || src.thumbnail.isEmpty()) return null
     const img = src.thumbnail
-    // ☠️ PNG (lossless) chu KHONG JPEG: anh co shape / vat 2 man ghep tu lop nay
-    // — JPEG 90 la chu nho co vien nhieu khi zoom (khong xung tool cho editor).
-    // PNG 4K ton ~250ms/man nhung grab chay NEN (overlay da hien) nen khong sao.
-    // Buffer PNG giu o main, phuc vu qua aioshot:// — KHONG base64 qua IPC nua.
-    return { display: d, image: img, png: img.toPNG(), sf }
+    // 14/09: nen dong bang JPEG q92 (37ms) thay PNG (642ms 4K — do that, khong phai
+    // ~250ms nhu ghi 26/08; toPNG chay TREN LUONG CHINH nen "grab chay nen" la sai:
+    // no chan ca fade lop mo). Anh co shape / vat man: renderer xin cat vung tu
+    // `image` GOC qua aioshot://raw (PNG) luc bam Xong -> file luu van lossless.
+    return { display: d, image: img, jpg: img.toJPEG(92), sf }
   }))
   const boSung = []
   ketQua.forEach((r, i) => {
@@ -758,12 +821,24 @@ function openOverlays(displays) {
     win.loadFile(path.join(__dirname, 'overlay', 'index.html'))
     win.webContents.once('did-finish-load', () => {
       // origin = goc DIP toan cuc cua man nay — renderer quy doi toa do toan cuc.
-      win.webContents.send('overlay:init', { selftest: laSelftest, origin: { x: b.x, y: b.y } })
+      win.webContents.send('overlay:init', {
+        selftest: laSelftest, origin: { x: b.x, y: b.y },
+        // [do] 14/09: selftest co SHAPE (duong cat anh goc aioshot://raw) / VAT 2 MAN (composite raw)
+        testShape: laSelftest && process.env.AIO_TEST_SHAPE === '1',
+        testComposite: laSelftest && process.env.AIO_TEST_COMPOSITE === '1',
+      })
       // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
       if (!win.isDestroyed() && !win.isVisible()) { win.show(); win.focus() }
-      // Grab bat dau SAU khi overlay dau tien da hien + kip PAINT (~40ms) — de
-      // getSources chan luong thi overlay da hien roi.
-      setTimeout(kickGrab, 40)
+      ghiLog('overlay hien ' + disp.id)
+      // Grab da xong truoc khi overlay nay nap (GRAB_TRUOC) -> gui lai frozen cho no.
+      if (layersSanSang) {
+        const item = layersSanSang.find((L) => L.x === b.x && L.y === b.y)
+        const rec = overlayShots.get(wcId)
+        if (item && rec && !rec.image) { const raw = rawStore.get(item.key); if (raw) { rec.image = raw; rec.sf = item.sf } }
+        win.webContents.send('overlay:frozen', { layers: layersSanSang })
+      }
+      // Che do cu (AIO_GRAB_TRUOC=0): grab SAU khi overlay hien + lop mo toi xong.
+      if (!GRAB_TRUOC) setTimeout(kickGrab, GRAB_TRE_MS)
       /* CHOT CHAN (31/08, sau khi bay 25/08 TAI DIEN thanh "double taskbar"):
          cua so HUT so voi man = anh dong bang bi nen = taskbar doi. Do that
          MOI lan mo — hut la ghi CANH BAO vao run-log, khoi doan mo lan sau. */
@@ -788,7 +863,7 @@ function closeOverlay() {
   for (const w of overlayWins) { if (!w.isDestroyed()) w.close() }
   overlayWins = []
   pending = null
-  frozenStore.clear() // buffer PNG 5K2K ~10-25MB/man — khong giu sau khi chup
+  frozenStore.clear(); rawStore.clear() // JPEG ~1MB + NativeImage goc ~32MB/man 4K — khong giu sau khi chup
 }
 
 /* ---------------------------------------------------------------------- */
@@ -1032,7 +1107,7 @@ ipcMain.on('pin:save-edit', (e, dataUrl) => {
     if (shelfWin && !shelfWin.isDestroyed()) {
       shelfWin.webContents.send('shelf:update', {
         id,
-        thumb: daVe.resize({ height: 128, quality: 'good' }).toDataURL(),
+        thumb: thumbKhay(daVe),
         w: sz.width, h: sz.height, kb,
       })
     }
@@ -1051,22 +1126,53 @@ ipcMain.on('pin:drag-to', (e, tongDx, tongDy) => {
   keoDen(BrowserWindow.fromWebContents(e.sender), e.sender.id, tongDx, tongDy)
 })
 ipcMain.on('pin:drag-end', (e) => ketThucKeo(e.sender.id))
+/* 14/09: chan doan "khong ve duoc tren anh ghim" — renderer pin gui tung buoc
+   (phim / vao che do ve / chuot bam roi vao dau) de doc run-log thay vi doan. */
+ipcMain.on('pin:log', (e, m) => ghiLog('[pin ' + e.sender.id + '] ' + m))
 
 /* ---------------------------------------------------------------------- */
 /* KHAY ANH — cho gom moi tam da chup                                      */
 /* ---------------------------------------------------------------------- */
 
 const SHELF_W = 380
+/* Thumbnail gui sang khay (14/09): o anh CO DINH (khay to = them hang/cot), JPEG q88
+   320px cao (~30-60KB/anh). Truoc 128px PNG: mo khi o dọc rong. Anh nho hon thi giu nguyen. */
+const THUMB_H = 320 /* o co dinh: ngang 64 DIP (96px thiet bi), doc cot toi da ~324 DIP -> 320 cao du net */
+function thumbKhay(img) {
+  const h = Math.min(THUMB_H, img.getSize().height || THUMB_H)
+  return 'data:image/jpeg;base64,' + img.resize({ height: h, quality: 'best' }).toJPEG(88).toString('base64')
+}
 const SHELF_H = 128
 // Khay DOC (anh Tien 26/08): anh to hon (chiem ca be ngang), nhieu anh cuon DOC.
 const SHELF_DOC_W = 252
 const SHELF_DOC_H = 448
 
 function kieuKhay() { return kho.docCauHinh().khayKieu === 'doc' ? 'doc' : 'ngang' }
+/* Co NHO NHAT (san) cua khay = co mac dinh cu — anh Tien 14/09: "mac dinh nho
+   hien tai on roi, khoa lai". */
+function coKhayMin() {
+  return kieuKhay() === 'doc' ? { w: SHELF_DOC_W, h: SHELF_DOC_H } : { w: SHELF_W, h: SHELF_H }
+}
+/* Co LON NHAT (tran) = 60% workArea cua MAN DANG CHUA KHAY (khong phai man chinh:
+   may anh Tien man phu 2048x1152 logical nho hon man chinh 2560x1440, lay theo man
+   chinh la khay tran khoi man phu — harness do-co-khay bat duoc 14/09). */
+function coKhayMax() {
+  const d = (shelfWin && !shelfWin.isDestroyed())
+    ? screen.getDisplayMatching(shelfWin.getBounds())
+    : screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+  const wa = d.workArea
+  return { w: Math.round(wa.width * 0.6), h: Math.round(wa.height * 0.6) }
+}
+/* Co khay dang dung: lay tu config `khayCo[kieu]` (nguoi dung da keo to), kep
+   trong [san, tran]; chua co thi = san. Luu RIENG tung kieu doc/ngang. */
 function coKhay() {
-  return kieuKhay() === 'doc'
-    ? { w: SHELF_DOC_W, h: SHELF_DOC_H }
-    : { w: SHELF_W, h: SHELF_H }
+  const min = coKhayMin(), max = coKhayMax()
+  const luu = (kho.docCauHinh().khayCo || {})[kieuKhay()]
+  const kep = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)))
+  if (luu && Number.isFinite(luu.w) && Number.isFinite(luu.h)) {
+    return { w: kep(luu.w, min.w, max.w), h: kep(luu.h, min.h, max.h) }
+  }
+  return { w: min.w, h: min.h }
 }
 const SHELF_MARGIN = 16 // cach mep man hinh khi lan dau
 
@@ -1088,7 +1194,7 @@ function trongManHinh(p) {
   return screen.getAllDisplays().some((d) => {
     const b = d.workArea
     return p.x < b.x + b.width && p.x + coKhay().w > b.x &&
-           p.y < b.y + b.height && p.y + SHELF_H > b.y
+           p.y < b.y + b.height && p.y + coKhay().h > b.y
   })
 }
 
@@ -1130,7 +1236,7 @@ function shelfAdd(image, filePath) {
   shelfItems.set(id, { id, filePath, image })
 
   // Thumbnail nho de gui qua IPC cho nhe — anh goc van giu trong shelfItems.
-  const thumb = image.resize({ height: 128, quality: 'good' }).toDataURL()
+  const thumb = thumbKhay(image)
   // Kem kich thuoc + dung luong de khay hien cho nguoi dung (anh Tien 26/08).
   const sz = image.getSize()
   let kb = 0
@@ -1200,6 +1306,36 @@ ipcMain.on('shelf:drag-to', (e, tongDx, tongDy) => {
   keoDen(BrowserWindow.fromWebContents(e.sender), e.sender.id, tongDx, tongDy)
 })
 ipcMain.on('shelf:drag-end', (e) => ketThucKeo(e.sender.id))
+
+/* ── DOI CO khay bang tay nam goc TREN-TRAI (anh Tien 14/09 "keo cai khay to ra") ──
+   Cung luat voi keo di chuyen: neo bounds mot lan, renderer gui delta TUYET DOI,
+   main tinh co moi = neo - delta (keo len/trai = to ra), kep [san, tran], GIU
+   NGUYEN goc DUOI-PHAI (khay thuong dat goc phai duoi man hinh -> to ra phia
+   trong man). Tha chuot -> luu `khayCo[kieu]` + vi tri. */
+const resizeAnchors = new Map()
+ipcMain.on('shelf:resize-start', (e) => {
+  const w = BrowserWindow.fromWebContents(e.sender)
+  if (w && !w.isDestroyed()) resizeAnchors.set(e.sender.id, w.getBounds())
+})
+ipcMain.on('shelf:resize-to', (e, tongDx, tongDy) => {
+  const w = BrowserWindow.fromWebContents(e.sender)
+  const neo = resizeAnchors.get(e.sender.id)
+  if (!w || w.isDestroyed() || !neo) return
+  const min = coKhayMin(), max = coKhayMax()
+  const kep = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)))
+  const nw = kep(neo.width - tongDx, min.w, max.w)
+  const nh = kep(neo.height - tongDy, min.h, max.h)
+  w.setBounds({ x: neo.x + neo.width - nw, y: neo.y + neo.height - nh, width: nw, height: nh })
+})
+ipcMain.on('shelf:resize-end', (e) => {
+  resizeAnchors.delete(e.sender.id)
+  const w = BrowserWindow.fromWebContents(e.sender)
+  if (!w || w.isDestroyed()) return
+  const b = w.getBounds()
+  const khayCo = Object.assign({}, kho.docCauHinh().khayCo || {}, { [kieuKhay()]: { w: b.width, h: b.height } })
+  kho.ghiCauHinh({ khayCo, viTriKhay: { x: b.x, y: b.y } })
+  ghiLog('khay doi co ' + kieuKhay() + ' ' + b.width + 'x' + b.height)
+})
 
 /* ── [do that] Keo khay co lam no phinh ra khong? ────────────────────────
    Anh Tien 24/08: *"drag cai khay la cang nay no tu scale to ra"*. Khong doan

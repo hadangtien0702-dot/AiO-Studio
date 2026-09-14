@@ -48,6 +48,21 @@ html, body {
 }
 #frame:hover #bar { opacity: 1; transform: none; pointer-events: auto; }
 
+/* 14/09 anh Tien: "bam chuot chon vao thi khong duoc" — sau khi bo nut but chi
+   (10/09) chi con phim 1/2/3 de vao che do ve, cam chuot thi KHONG co duong vao.
+   Che do XEM: re chuot len anh -> thanh cong cu hien (nhu #bar), CHI 3 nut
+   khung/mui ten/chu; bam nut = vao che do ve voi cong cu do. Che do VE: hien du. */
+#frame:not(.dang-ve) #toolbar {
+  opacity: 0; transform: translateX(-50%) translateY(4px); pointer-events: none;
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+#frame:not(.dang-ve):hover #toolbar { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
+#frame:not(.dang-ve) #toolbar .chia,
+#frame:not(.dang-ve) #toolbar #mau-nhom,
+#frame:not(.dang-ve) #toolbar #undo,
+#frame:not(.dang-ve) #toolbar #huy,
+#frame:not(.dang-ve) #toolbar #xong { display: none; }
+
 #bar button {
   display: inline-flex; align-items: center; justify-content: center;
   width: 24px; height: 24px;
@@ -63,8 +78,12 @@ html, body {
 /* ── Che do VE (khung / mui ten len anh ghim) ─────────────────────────── */
 
 /* Canvas ve — phu kin anh, chi hien khi dang ve. */
+/* ☠️ 10/09: canvas la REPLACED element — `inset:0` KHONG keo no theo khung,
+   no lay kich thuoc THUOC TINH (dip*DPR) -> tren man 150% to gap 1,5 lan,
+   khung ve lech 101px so voi chuot (do harness do-khung-ghim). Phai ep
+   width/height CSS = 100% (JS con dat them px cho chac). */
 #ve {
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; width: 100%; height: 100%;
   cursor: crosshair;
 }
 /* Dang ve: an thanh tren (khoi vuong tay), khoa keo-di-chuyen tren anh. */
@@ -108,3 +127,23 @@ html, body {
 }
 .mau:hover { transform: scale(1.15); }
 .mau.chon { border-color: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%); }
+
+/* So nho goc tren nut = phim tat 1/2/3 (anh Tien 10/09). */
+.cong-cu { position: relative; }
+.cong-cu .so {
+  position: absolute; top: 2px; right: 3px;
+  font: 600 8px/1 Inter, "Segoe UI", sans-serif; font-style: normal;
+  color: var(--text-3); pointer-events: none;
+}
+.cong-cu.chon .so { color: var(--accent-text); }
+/* O go chu (cong cu 3): trong suot, chu dam, co vien dut de biet dang go. */
+.go-chu {
+  position: absolute; z-index: 11;
+  min-width: 40px; max-width: 60vw;
+  margin: 0; padding: 2px 4px;
+  border: 1px dashed rgb(255 255 255 / 70%); border-radius: 3px;
+  background: rgb(24 24 24 / 82%); outline: none; resize: none; overflow: hidden;
+  font: 700 18px/1.25 Inter, "Segoe UI", sans-serif;
+  border-radius: 4px; /* = hop nen khi xuat (veChu), WYSIWYG */
+  white-space: pre; caret-color: #fff;
+}

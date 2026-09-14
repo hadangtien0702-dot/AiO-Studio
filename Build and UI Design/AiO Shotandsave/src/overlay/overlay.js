@@ -26,7 +26,7 @@ const DPR = window.devicePixelRatio || 1
 const MAU = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f86820'
 
 let mode = 'select'       // 'select' | 'annotate'
-let tool = 'rect'         // 'rect' | 'arrow'
+let tool = 'rect'         // 'rect' | 'arrow' | 'text'
 let curColor = '#f86820'  // mac dinh CAM (accent). Doi qua bang mau.
 let dragging = false
 let startX = 0, startY = 0
@@ -43,8 +43,10 @@ let soLanThuGhep = 0        // dem retry cho ghep xuyen man
 let lanVeLocal = 0          // moc lan cuoi mousemove LOCAL ve khung (nhuong/gianh voi main)
 
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
+let cheDoTest = {}
 window.overlay.onInit((data) => {
   if (data && data.origin) origin = data.origin
+  if (data) cheDoTest = data
   if (data && data.selftest) setTimeout(autoSelftest, 1600)
 })
 // ☠️ DAO QUYET DINH 25/08 ("khong dan anh dong bang" vi lech/taskbar 2 lan):
@@ -101,7 +103,7 @@ window.overlay.onFrozen((data) => {
     im.onload = xongTai
     im.onerror = xongTai
     im.src = L.url
-    news.push({ img: im, x: L.x, y: L.y, w: L.w, h: L.h, sf: L.sf,
+    news.push({ img: im, key: L.key, x: L.x, y: L.y, w: L.w, h: L.h, sf: L.sf,
                 px: L.px, py: L.py, pw: L.pw, ph: L.ph })
   }
 })
@@ -276,7 +278,12 @@ window.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && mode === 'annotate') {
     e.preventDefault(); xong(true); return
   }
-  if (e.key === 'Enter' && mode === 'annotate') xong()
+  if (e.key === 'Enter' && mode === 'annotate') { xong(); return }
+  // Phim 1 / 2 / 3 = khung / mui ten / chu (anh Tien 10/09)
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    const t = { '1': 'rect', '2': 'arrow', '3': 'text' }[e.key]
+    if (t) chonCongCu(t)
+  }
 })
 
 /* ── Vao che do VE ────────────────────────────────────────────────────── */
@@ -301,6 +308,7 @@ function vaoCheDoVe() {
 
 function chonMau(mau) {
   curColor = mau
+  if (oGoChu) oGoChu.style.color = mau
   toolbarEl.querySelectorAll('.mau').forEach((b) => {
     b.classList.toggle('chon', b.dataset.color.toLowerCase() === mau.toLowerCase())
   })
@@ -318,6 +326,7 @@ function datViTriThanhCongCu() {
 }
 
 function chonCongCu(x) {
+  if (x !== tool) chotOGoChu()
   tool = x
   toolbarEl.querySelectorAll('.cong-cu[data-tool]').forEach((b) => {
     b.classList.toggle('chon', b.dataset.tool === x)
@@ -334,11 +343,14 @@ function batDauVe(e) {
     chonLaiTuDau(e)
     return
   }
+  if (tool === 'text') { moOGoChu(document.body, lx, ly, curRect.x, curRect.y); return }
+  chotOGoChu() // bam ve khung/mui ten khi dang go chu -> chot chu truoc
   veStart = { x: lx, y: ly }
 }
 
 /* Bo vung chon + shape dang co, quay ve che do quet vung — bat dau keo ngay. */
 function chonLaiTuDau(e) {
+  huyOGoChu()
   mode = 'select'
   shapes = []
   veStart = null
@@ -389,6 +401,8 @@ function veShape(ctx, s) {
     ctx.strokeRect(x, y, Math.abs(s.x2 - s.x1), Math.abs(s.y2 - s.y1))
   } else if (s.type === 'arrow') {
     veMuiTen(ctx, s.x1, s.y1, s.x2, s.y2)
+  } else if (s.type === 'text') {
+    veChu(ctx, s, 1)
   }
 }
 
@@ -408,6 +422,7 @@ function veMuiTen(ctx, x1, y1, x2, y2) {
 
 function hoanTac() {
   if (mode !== 'annotate') return
+  if (oGoChu) { huyOGoChu(); return } // dang go thi Ctrl+Z = bo o go
   shapes.pop()
   redraw()
 }
@@ -425,25 +440,56 @@ toolbarEl.addEventListener('click', (e) => {
   else if (b.id === 'xong') xong()
 })
 
+/* ── Anh GOC khong nen, cat dung vung (14/09) ─────────────────────────────
+   Anh dong bang (layers[].img) tu 14/09 la JPEG chi de NHIN. Luc bam Xong co
+   shape / ghep vat man, xin main cat vung can thiet tu anh goc qua
+   aioshot://raw/<key>/<x>_<y>_<w>_<h>.png (px thiet bi cua man do) -> file luu
+   van lossless. Nap loi -> roi ve JPEG (con hon mat anh). */
+function urlRaw(key, x, y, w, h) {
+  return 'aioshot://raw/' + key + '/' + [x, y, w, h].map((v) => Math.max(0, Math.round(v))).join('_') + '.png'
+}
+function napAnh(url) {
+  return new Promise((res, rej) => {
+    const im = new Image()
+    im.crossOrigin = 'anonymous'
+    im.onload = () => res(im)
+    im.onerror = () => rej(new Error('nap loi ' + url))
+    im.src = url
+  })
+}
+
 /* ── Xong: ghep anh + shape roi gui ───────────────────────────────────── */
 function xong(copy) {
+  chotOGoChu()
   if (!shapes.length) { window.overlay.confirm({ rect: curRect, copy: !!copy }); return }
-  // Co shape: ghep frozen (device res) + shape roi gui dataURL.
-  try {
-    const out = document.createElement('canvas')
-    out.width = Math.max(1, Math.round(curRect.w * DPR))
-    out.height = Math.max(1, Math.round(curRect.h * DPR))
-    const ctx = out.getContext('2d')
-    if (frozenImg && frozenImg.complete && frozenImg.naturalWidth) {
-      ctx.drawImage(frozenImg,
-        curRect.x * DPR, curRect.y * DPR, curRect.w * DPR, curRect.h * DPR,
-        0, 0, out.width, out.height)
-    }
+  // Co shape: ghep anh GOC (cat dung vung, PNG) + shape roi gui dataURL.
+  const out = document.createElement('canvas')
+  out.width = Math.max(1, Math.round(curRect.w * DPR))
+  out.height = Math.max(1, Math.round(curRect.h * DPR))
+  const ctx = out.getContext('2d')
+  const ghepVaGui = (nen, nguon) => {
+    if (nen) ctx.drawImage(nen, 0, 0, out.width, out.height)
     ctx.drawImage(veEl, 0, 0) // shape da o device res
+    window.overlay.log('xong shape nen=' + nguon + ' ' + out.width + 'x' + out.height)
     window.overlay.confirm({ dataUrl: out.toDataURL('image/png'), copy: !!copy })
-  } catch (err) {
-    window.overlay.confirm({ rect: curRect, copy: !!copy }) // ghep loi thi cat thuong
   }
+  const roiVeJpeg = (ly) => {
+    try {
+      if (frozenImg && frozenImg.complete && frozenImg.naturalWidth) {
+        ctx.drawImage(frozenImg,
+          curRect.x * DPR, curRect.y * DPR, curRect.w * DPR, curRect.h * DPR,
+          0, 0, out.width, out.height)
+        ghepVaGui(null, 'jpeg-du-phong(' + ly + ')')
+      } else ghepVaGui(null, 'khong-nen(' + ly + ')')
+    } catch (err) {
+      window.overlay.confirm({ rect: curRect, copy: !!copy }) // ghep loi thi cat thuong
+    }
+  }
+  const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  if (!own || !own.key) { roiVeJpeg('khong co key'); return }
+  napAnh(urlRaw(own.key, curRect.x * DPR, curRect.y * DPR, curRect.w * DPR, curRect.h * DPR))
+    .then((im) => ghepVaGui(im, 'raw-png'))
+    .catch((e) => roiVeJpeg(e.message))
 }
 
 /* GHEP vung chon (DIP toan cuc) tu anh dong bang cua CAC man giao voi no.
@@ -475,32 +521,43 @@ function confirmComposite(g) {
     window.overlay.confirm({ rect: { x: lx, y: ly, w: Math.max(1, lw), h: Math.max(1, lh) } })
     return
   }
-  try {
-    // ☠️ GHEP THEO PIXEL VAT LY, moi man dan 1:1 anh goc (nhu Snipping Tool).
-    // Truoc ghep theo DIP: 2 man khac scale (150%/125%) la mot ben bi phong to
-    // -> "chua dung ti le" (anh Tien 26/08). g o day la rect PHYS tu main.
+  // ☠️ GHEP THEO PIXEL VAT LY, moi man dan 1:1 anh goc (nhu Snipping Tool).
+  // Truoc ghep theo DIP: 2 man khac scale (150%/125%) la mot ben bi phong to
+  // -> "chua dung ti le" (anh Tien 26/08). g o day la rect PHYS tu main.
+  // 14/09: tung manh giao xin cat tu anh GOC (aioshot://raw, PNG); nap loi thi
+  // roi ve lop JPEG (chi de nhin) — con hon tra anh trang.
+  const manh = []
+  for (const L of giao) {
+    const ix = Math.max(g.x, L.px), iy = Math.max(g.y, L.py)
+    const ix2 = Math.min(g.x + g.w, L.px + L.pw), iy2 = Math.min(g.y + g.h, L.py + L.ph)
+    if (ix2 <= ix || iy2 <= iy) continue
+    // ☠️ desktopCapturer co the tra anh KHONG dung co native (scale theo
+    // thumbnailSize) — do anh THAT roi quy doi, dung gia dinh.
+    const kx = L.img.naturalWidth / L.pw, ky = L.img.naturalHeight / L.ph
+    manh.push({ L, sx: (ix - L.px) * kx, sy: (iy - L.py) * ky, sw: (ix2 - ix) * kx, sh: (iy2 - iy) * ky,
+                dx: ix - g.x, dy: iy - g.y, dw: ix2 - ix, dh: iy2 - iy })
+  }
+  const ghep = (nguonRaw) => {
     const cv = document.createElement('canvas')
     cv.width = Math.max(1, Math.round(g.w))
     cv.height = Math.max(1, Math.round(g.h))
     const ctx = cv.getContext('2d')
     ctx.imageSmoothingEnabled = false
-    for (const L of giao) {
-      const ix = Math.max(g.x, L.px), iy = Math.max(g.y, L.py)
-      const ix2 = Math.min(g.x + g.w, L.px + L.pw), iy2 = Math.min(g.y + g.h, L.py + L.ph)
-      if (ix2 <= ix || iy2 <= iy) continue
-      // ☠️ desktopCapturer co the tra anh KHONG dung co native (scale theo
-      // thumbnailSize) — do anh THAT roi quy doi, dung gia dinh.
-      const kx = L.img.naturalWidth / L.pw, ky = L.img.naturalHeight / L.ph
-      ctx.drawImage(L.img,
-        (ix - L.px) * kx, (iy - L.py) * ky, (ix2 - ix) * kx, (iy2 - iy) * ky,
-        ix - g.x, iy - g.y, ix2 - ix, iy2 - iy)
+    for (const m of manh) {
+      if (nguonRaw && m.raw) ctx.drawImage(m.raw, 0, 0, m.raw.naturalWidth, m.raw.naturalHeight, m.dx, m.dy, m.dw, m.dh)
+      else ctx.drawImage(m.L.img, m.sx, m.sy, m.sw, m.sh, m.dx, m.dy, m.dw, m.dh)
     }
-    window.overlay.log('composite OK ' + cv.width + 'x' + cv.height + ' (phys 1:1) tu ' + giao.length + ' man')
+    window.overlay.log('composite OK ' + cv.width + 'x' + cv.height + ' (phys 1:1) tu ' + manh.length + ' man, nen=' + (nguonRaw ? 'raw-png' : 'jpeg-du-phong'))
     window.overlay.confirm({ dataUrl: cv.toDataURL('image/png') })
-  } catch (err) {
-    window.overlay.log('composite LOI: ' + err.message)
-    window.overlay.cancel()
   }
+  Promise.all(manh.map((m) => m.L.key
+    ? napAnh(urlRaw(m.L.key, m.sx, m.sy, m.sw, m.sh)).then((im) => { m.raw = im })
+    : Promise.reject(new Error('khong co key'))))
+    .then(() => { try { ghep(true) } catch (err) { window.overlay.log('composite LOI: ' + err.message); window.overlay.cancel() } })
+    .catch((e) => {
+      window.overlay.log('composite raw loi (' + e.message + ') -> jpeg')
+      try { ghep(false) } catch (err) { window.overlay.log('composite LOI: ' + err.message); window.overlay.cancel() }
+    })
 }
 
 function giaoNhau(a, b) {
@@ -509,11 +566,107 @@ function giaoNhau(a, b) {
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
 
+/* ── Cong cu CHU (phim 3, anh Tien 10/09) ──────────────────────────────
+   Bam vao anh -> hien o go (textarea trong suot) dung cho do; Enter = chot
+   thanh shape {type:'text'}; Shift+Enter xuong dong; Esc = bo o go (KHONG
+   thoat che do). Bam cho khac / doi cong cu / Xong = tu chot o dang go. */
+const CO_CHU = 18 // px DIP, chu dam; xuat ra anh that thi nhan he so k
+let oGoChu = null
+function moOGoChu(parent, lx, ly, ox, oy) {
+  chotOGoChu()
+  const ta = document.createElement('textarea')
+  ta.className = 'go-chu'
+  ta.rows = 1
+  ta.spellcheck = false
+  ta.style.left = (ox + lx) + 'px'
+  ta.style.top = (oy + ly) + 'px'
+  ta.style.color = curColor
+  ta.dataset.lx = lx; ta.dataset.ly = ly
+  ta.addEventListener('mousedown', (e) => e.stopPropagation())
+  ta.addEventListener('keydown', (e) => {
+    e.stopPropagation() // Enter/Esc/1-2-3 cua o go KHONG chay lenh toan cuc
+    if (e.key === 'Escape') { e.preventDefault(); huyOGoChu(); return }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chotOGoChu(); return }
+  })
+  ta.addEventListener('input', () => tuCoOGoChu(ta))
+  parent.appendChild(ta)
+  oGoChu = ta
+  tuCoOGoChu(ta)
+  ta.focus()
+}
+function tuCoOGoChu(ta) {
+  const dong = ta.value.split('\n')
+  ta.rows = Math.max(1, dong.length)
+  ta.style.width = 'auto'
+  ta.style.width = Math.max(40, ta.scrollWidth + 2) + 'px'
+}
+function huyOGoChu() { if (oGoChu) { oGoChu.remove(); oGoChu = null } }
+function chotOGoChu() {
+  if (!oGoChu) return
+  const text = oGoChu.value.replace(/\s+$/, '')
+  const s = { type: 'text', x: +oGoChu.dataset.lx, y: +oGoChu.dataset.ly, text, color: oGoChu.style.color || curColor, size: CO_CHU }
+  huyOGoChu()
+  if (!text) return
+  shapes.push(s)
+  redraw()
+}
+/* Ve chu: dam, tren HOP NEN toi bo goc (anh Tien 14/09: "cần thêm nền chữ" —
+   chu cam de len anh sang la chim; vien chu 0.6 truoc do khong du). Hop = nen
+   #181818 ~82%, padding 4/2 DIP, bo goc 4 DIP; o go (.go-chu) dung cung so
+   de WYSIWYG. k = he so phong. */
+const NEN_CHU = 'rgba(24,24,24,0.82)'
+function veChu(ctx, s, k) {
+  const size = (s.size || CO_CHU) * k
+  const px = 4 * k, py = 2 * k, r = 4 * k, lh = size * 1.25
+  ctx.font = '700 ' + size + 'px Inter, "Segoe UI", sans-serif'
+  ctx.textBaseline = 'top'
+  const dong = String(s.text).split('\n')
+  let w = 0
+  for (const d of dong) w = Math.max(w, ctx.measureText(d).width)
+  const bx = s.x * k, by = s.y * k, bw = w + px * 2, bh = dong.length * lh + py * 2
+  ctx.fillStyle = NEN_CHU
+  ctx.beginPath()
+  if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r); else ctx.rect(bx, by, bw, bh)
+  ctx.fill()
+  ctx.fillStyle = s.color
+  for (let i = 0; i < dong.length; i++) {
+    ctx.fillText(dong[i], bx + px, by + py + i * lh)
+  }
+}
+
 /* [selftest] tu khoanh giua + xong (khong ve shape). */
 function autoSelftest() {
   const W = window.innerWidth, H = window.innerHeight
   const w = Math.min(640, Math.round(W * 0.4)), h = Math.min(420, Math.round(H * 0.4))
   const x = Math.round((W - w) / 2), y = Math.round((H - h) / 2)
   curRect = { x, y, w, h }
+  /* [do] 14/09 AIO_TEST_SHAPE=1: vao che do ve, ve 1 khung cam roi Xong -> di duong
+     aioshot://raw (cat anh goc PNG + shape). File luu phai co diem cam. */
+  if (cheDoTest.testShape) {
+    vaoCheDoVe()
+    shapes.push({ type: 'rect', x1: 20, y1: 20, x2: w - 20, y2: h - 20, color: '#f86820' })
+    redraw()
+    window.overlay.log('[selftest] shape rect ' + w + 'x' + h)
+    setTimeout(() => xong(false), 150)
+    return
+  }
+  /* [do] 14/09 AIO_TEST_COMPOSITE=1: vung VAT NGANG 2 man (phys) -> confirmComposite
+     -> tung manh cat tu anh goc. Can >=2 man; 1 man thi roi ve rect thuong. */
+  if (cheDoTest.testComposite) {
+    const thu = (lan) => {
+      if (!layersReady || layers.length < 2) {
+        if (layers.length < 2 && layersReady) { window.overlay.log('[selftest] composite: chi ' + layers.length + ' man -> rect thuong'); window.overlay.confirm({ rect: curRect }); return }
+        if (lan < 20) { setTimeout(() => thu(lan + 1), 250); return }
+        window.overlay.confirm({ rect: curRect }); return
+      }
+      const sx = [...layers].sort((a, b) => a.px - b.px)
+      const A = sx[0], B = sx[1]
+      const g = { x: A.px + A.pw - 300, y: Math.max(A.py, B.py) + 100, w: 600, h: 300 }
+      window.overlay.log('[selftest] composite g=' + JSON.stringify(g))
+      confirmComposite(g)
+    }
+    thu(0)
+    return
+  }
   window.overlay.confirm({ rect: curRect })
 }

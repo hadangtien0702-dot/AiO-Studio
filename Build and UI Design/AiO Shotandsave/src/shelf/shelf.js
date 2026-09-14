@@ -193,4 +193,31 @@ window.addEventListener('mouseup', () => {
   window.shelf.savePos() // nho cho vua tha
 })
 
+/* ── Tay nam goc tren-trai: DOI CO khay (14/09) ──────────────────────────
+   Cung luat delta TUYET DOI nhu keo di chuyen. Main kep [san, tran] va giu goc
+   duoi-phai. */
+const gripEl = document.getElementById('grip')
+let resizing = false
+let gocCo = { x: 0, y: 0 }
+if (gripEl) {
+  gripEl.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return
+    resizing = true
+    gocCo = { x: e.screenX, y: e.screenY }
+    gripEl.classList.add('dang-keo')
+    window.shelf.resizeStart()
+    e.preventDefault(); e.stopPropagation()
+  })
+  window.addEventListener('mousemove', (e) => {
+    if (!resizing) return
+    window.shelf.resizeTo(e.screenX - gocCo.x, e.screenY - gocCo.y)
+  })
+  window.addEventListener('mouseup', () => {
+    if (!resizing) return
+    resizing = false
+    gripEl.classList.remove('dang-keo')
+    window.shelf.resizeEnd()
+  })
+}
+
 capNhatSoLuong()

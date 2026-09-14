@@ -19,4 +19,6 @@ contextBridge.exposeInMainWorld('pin', {
   dragStart: () => ipcRenderer.send('pin:drag-start'),
   dragTo: (tongDx, tongDy) => ipcRenderer.send('pin:drag-to', tongDx, tongDy),
   dragEnd: () => ipcRenderer.send('pin:drag-end'),
+  /** 14/09: nhat ky chan doan che do ve (anh Tien: khong ve duoc tren anh ghim, chua tai lap). */
+  log: (m) => ipcRenderer.send('pin:log', String(m)),
 })

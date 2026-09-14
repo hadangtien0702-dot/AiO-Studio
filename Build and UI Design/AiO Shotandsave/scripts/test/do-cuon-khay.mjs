@@ -81,7 +81,10 @@ try {
   const dich = Math.max(...mau.map((m) => m[1])) - Math.min(...mau.map((m) => m[1]))
   const kq = { kieu: KIEU, anh: info.n, cuonDuoc: (info.doc ? info.sh - info.ch : info.sw - info.cw) + 'px', khungScreencast: frames.length, ms: tong, fps: +(frames.length / (tong / 1000)).toFixed(1), gapMax: gaps.at(-1), gapP95: p(0.95), gapP50: p(0.5), buocNhayTren60px: nhay, quangDuongCuon: dich + 'px', mauRAF: mau.length }
   console.log(JSON.stringify(kq))
-  const dat = kq.gapP95 <= 40 && nhay === 0
+  /* 14/09: cuon duoc 0px / 0 khung = khong co gi de do -> TRUOT (truoc: xanh gia). */
+  const coGiDeDo = dich > 100 && frames.length > 10
+  const dat = coGiDeDo && kq.gapP95 <= 40 && nhay === 0
+  if (!coGiDeDo) console.log('KHONG CO GI DE DO: quang duong cuon ' + dich + 'px, khung ' + frames.length)
   console.log(dat ? 'DAT' : 'TRUOT (gap-p95 > 40ms hoac co buoc nhay > 60px)')
   process.exitCode = dat ? 0 : 1
 } catch (e) {

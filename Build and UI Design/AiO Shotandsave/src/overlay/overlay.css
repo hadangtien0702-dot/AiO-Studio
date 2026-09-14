@@ -17,7 +17,7 @@ html, body {
      mat chung do), man dang dong (video chay) ma dap anh vao mot phat la
      "giut mot cai" (anh Tien 31/08). Fade 160ms cho cu lui thoi gian mem di. */
   opacity: 0;
-  transition: opacity 160ms ease;
+  transition: opacity 100ms ease; /* 14/09: 160 -> 100, anh Tien "nhanh hon nua"; do mo-dan 150ms grab-tre thi fade lop mo bi cat -> giu 200, chi rut duoc cho nay */
 }
 #shot.co-anh { opacity: 1; }
 /* Anh dan bang the <img> (nap tu aioshot://, JS dat width/height = anh/sf,
@@ -145,3 +145,23 @@ html, body {
 #hint b { color: var(--accent-text); }
 #hint .logo { color: var(--accent); flex: none; }
 #hint.hidden { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+
+/* So nho goc tren nut = phim tat 1/2/3 (anh Tien 10/09). */
+.cong-cu { position: relative; }
+.cong-cu .so {
+  position: absolute; top: 2px; right: 3px;
+  font: 600 8px/1 Inter, "Segoe UI", sans-serif; font-style: normal;
+  color: var(--text-3); pointer-events: none;
+}
+.cong-cu.chon .so { color: var(--accent-text); }
+/* O go chu (cong cu 3): trong suot, chu dam, co vien dut de biet dang go. */
+.go-chu {
+  position: absolute; z-index: 11;
+  min-width: 40px; max-width: 60vw;
+  margin: 0; padding: 2px 4px;
+  border: 1px dashed rgb(255 255 255 / 70%); border-radius: 3px;
+  background: rgb(24 24 24 / 82%); outline: none; resize: none; overflow: hidden;
+  font: 700 18px/1.25 Inter, "Segoe UI", sans-serif;
+  border-radius: 4px; /* = hop nen khi xuat (veChu), WYSIWYG */
+  white-space: pre; caret-color: #fff;
+}

@@ -47,7 +47,7 @@ Repo GitHub: `hadangtien0702-dot/AiO-Studio` — **PUBLIC** (anh chốt 31/08).
 | 9 | Music & SFX (`AiO Mussic`) | 1.0.0 | `com.aiostudio.music` · 8097 | 🟡 | Có UI, chưa nối việc thật |
 | 10 | Auto Cut Short | — | dành `com.aiostudio.cutshort` · 8093 | ⬜ Chưa có code | Chờ anh chốt 5 câu hỏi sản phẩm (trong `CLAUDE.md` của nó) |
 | 11 | Auto Organize Folder | — | — | ⬜ Chưa có code | Mới có `yêu cầu.txt` |
-| 12 | **Shot & Save** | Electron **0.4.3** | app độc lập, KHÔNG CEP | ✅ Electron là bản dùng thật (0.4.2 anh chấm ĐẠT 31/08; 0.4.3 10/09 sửa mất ảnh im lặng, chờ cài đè). ☠️ **Tauri ĐÃ BỎ 10/09** | Xem mục 5 |
+| 12 | **Shot & Save** | Electron **0.4.16** | app độc lập, KHÔNG CEP | ✅ **Anh chấm ĐẠT 14/09** trên bản cài 0.4.4.0 máy công ty (Tauri đã gỡ 14/09 08:06); 0.4.6 nền chữ + dời thư mục ảnh ra ngoài thư mục cài (cài đè từng mất 2 ảnh); 0.4.8 cài 14/09 10:19: ảnh ghim rê chuột hiện 3 nút vẽ (trước chỉ có phím 1/2/3) — anh chấm ĐẠT 14/09; 0.4.9 cài 10:44: màn tối đi mượt (grab chờ 200 ms) — anh chấm ĐẠT 10:52; 0.4.12 kéo to khay = thấy nhiều ảnh hơn (anh ĐẠT 11:2x); 0.4.13–0.4.15 cài 12:00: frozen JPEG + cắt gốc PNG lúc Xong; chụp TRƯỚC khi phủ overlay (overlay phủ ≥0,5 s là video đen — đo), overlay hiện ~0,6 s có hình đứng yên — anh chấm ĐẠT 12:0x; 0.4.16 12:37: thư mục ảnh mặc định đổi `AiOShotSave\AnhChup` vì `&` trong tên làm kéo-thả vào app Chromium ra file rỗng (đo) — anh chấm ĐẠT 12:4x. ☠️ **Tauri ĐÃ BỎ 10/09** | Xem mục 5. [Chờ đo] run-log chết im lặng từ 14/09 09:03 |
 | 13 | **Video Download** | **0.1.0** | `com.aiostudio.videodownload` · **8098** | 🟡 Mới dựng 08/09 | Dán link → tải (yt-dlp + QuickJS 2 MB + FFmpeg LGPL) → tự vào bin. Đo: YouTube 1080p H.264 255,9 MB/30 s; TikTok chặn ngẫu nhiên → tự thử lại 3 lần. Anh đang bấm thử, chưa qua bài thật. Chi tiết: `CLAUDE.md` + `PROGRESS.md` trong thư mục nó |
 
 Bảng chi tiết hơn (lịch sử từng bản, việc đang chờ): `Marketing/AiO MVP and
@@ -95,6 +95,7 @@ cùng lúc nên chưa đụng nhau; đổi một bên nếu có lúc cần cả 
 | 31/08 | Làm việc **2 máy** đồng bộ qua GitHub; `/xong` = push + lo cho máy kia | Máy nhà từng đứng ở 24/08, thiếu 32 commit không cảnh báo | ✅ (mục 6) |
 | 01/09 | Tauri **phải giống y chang bản cũ từng nút** trong Settings | Người dùng không được thấy khác | ❌ bị đè 10/09 |
 | **10/09** | **Shot & Save: BỎ bản Tauri, anh tự xoá thư mục; Electron là bản dùng thật, hết đóng băng (sửa lỗi + tính năng đều làm trên Electron)** | Anh: *"anh không dùng bản Tauri"* rồi *"anh sẽ xóa bản Tauri"* (chưa nêu lý do kỹ thuật). ☠️ Lúc chốt, máy công ty đang cài Tauri 0.5.0 với **75 ảnh / 15 MB trong chính thư mục cài** `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — gỡ cài là mất, phải chép ra trước | ✅ **HIỆN HÀNH** |
+| **14/09** | **Shot & Save: KHÔNG làm mô-đun chụp native (C++/Rust) trong Electron, không quay lại Tauri** | Em đề xuất để hạ đen video FB ~0,75 s → ~0,4 s (getSources Electron có sàn ~370 ms kể cả chụp 1×1; Tauri từng đo 141–152 ms). Anh: *"trời ơi đụng đến Tauri là bị lỗi tè le… không nên"*. Hệ quả: ~0,75 s là sàn, đừng đề xuất lại | ✅ **HIỆN HÀNH** |
 
 ---
 
@@ -151,6 +152,13 @@ làm mặc định**); không chạy 2 whisper song song.
 
 ### 4e. Đóng gói & bán
 - Bảng giá hiện hành (16/08): **Free = Asset Manager · Pro $17/tháng đủ 8 tool**.
+- **Nghiên cứu thị trường số thật 10/09/2026:** `Marketing/AiO MVP and Plan
+  Marketing/NGHIEN_CUU_THI_TRUONG_2026-09-10.md` — 20 đối thủ trong Premiere
+  (giá fetch cùng ngày), Adobe native đã làm gì, kênh bán từ VN, tiếng nói
+  khách hàng. Hai bản tháng 8 (`BAO_CAO_TONG_HOP`, `MASTER_PLAN`) có số sai —
+  mục 10 của file đó liệt kê. ☠️ Phát hiện lớn nhất: **Adobe viết thành văn sẽ
+  gỡ CEP** khỏi Premiere ("a calendar year" sau UXP chính thức; HyperBrew dẫn
+  lời nói miệng "several years") — 11 panel đều CEP, chưa có kế hoạch port UXP.
   Cơ chế khoá gói phải tách **1 free / 7 trả tiền** — CHƯA làm.
 - Kho FFmpeg dùng chung `%APPDATA%\AiOStudio\bin\win64` + `package-release.ps1
   -BinChung`: 3 gói từ 274,7 MB → ~92 MB. ☠️ CHƯA có `SETUP.exe` gộp, CHƯA panel
@@ -192,7 +200,7 @@ chụp màn hình và kéo file ra ngoài.
 
 | Bản | Ở đâu | Trạng thái |
 |---|---|---|
-| **Electron 0.4.3** | `Build and UI Design/AiO Shotandsave/` | **BẢN DUY NHẤT từ 10/09** (hết đóng băng). 0.4.2 anh chấm ĐẠT 31/08 *"kéo lại ổn định"*; 0.4.3 sửa mất ảnh im lặng khi không ghi được file, bộ cài 84,3 MB `dist/` chờ cài đè |
+| **Electron 0.4.4** | `Build and UI Design/AiO Shotandsave/` | **BẢN DUY NHẤT từ 10/09** (hết đóng băng). 0.4.2 anh chấm ĐẠT 31/08 *"kéo lại ổn định"*; 0.4.3 sửa mất ảnh im lặng; 0.4.4 thêm công cụ CHỮ + phím 1/2/3 + sửa khung ghim lệch 1,5×. **Cài đè máy công ty 14/09 08:06 (đo 0.4.4.0), anh chấm ĐẠT 14/09 09:04** *"ổn định rồi"*; 0.4.6 cài 14/09 09:22: chữ có hộp nền + ☠️ thư mục ảnh mặc định dời ra `%LOCALAPPDATA%` (cài đè NSIS xoá thư mục cài = mất ảnh, sổ lỗi #11 panel) — chờ anh test; **0.4.8 (14/09 10:19)** ảnh ghim rê chuột hiện 3 nút vẽ, bấm là vào vẽ (anh: "bấm chuột chọn vào thì không được") |
 | ~~Tauri 0.5.0~~ | `Build and UI Design/AiO Shotandsave Tauri/` — **anh xoá 10/09** | **ĐÃ BỎ 10/09.** Từng đo máy công ty: grab 2 màn 141–152ms, exe 11,7 MB, bộ cài 3,0 MB — số giữ lại để sau này có cân nhắc lại thì không đo từ đầu. Trước khi xoá còn 32 file chưa commit; lịch sử vẫn trong git (commit `9dcaf5c`, `6e3242b`) |
 
 Chuỗi 10 bản vá kéo-chọn trong ngày 31/08 (0.3.9 → 0.4.2) = một bệnh kiến trúc:
@@ -246,7 +254,8 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 
 | Việc | App | Vì sao chưa |
 |---|---|---|
-| Cài đè Electron 0.4.3 + chép 75 ảnh khỏi thư mục cài Tauri rồi mới gỡ Tauri | Shot & Save | Chốt 10/09, anh tự làm |
+| ~~Cài đè Electron + chép 75 ảnh rồi gỡ Tauri~~ **XONG 14/09** (75/75 ảnh sang `Pictures/AiO Shot & Save`, Tauri đã gỡ, 0.4.4.0 chạy, anh chấm ĐẠT) | Shot & Save | — |
+| Run-log không ghi dòng nào từ tiến trình 09:03 ngày 14/09 dù ảnh vẫn lưu (file ghi được, `ghiLog` nuốt lỗi) | Shot & Save | Chưa đo được gốc; xem `[CHỜ ĐO]` đầu PROGRESS.md panel |
 | Cài thử **máy sạch** | Autocut, Shot & Save | Chỉ anh làm được |
 | Khoá gói Free/Pro (1/7) | Cả bộ | Chưa làm; ngưng build tool từ 13/08 |
 | `SETUP.exe` gộp + panel chạy thật bằng kho FFmpeg chung | Cả bộ | Chưa làm |
@@ -257,6 +266,8 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 | Tốc độ 19 phút/giờ (mục tiêu <5) | Autocut | 83% ở `overwriteClip` của Adobe; hướng: xuất FCPXML |
 | 5 câu hỏi sản phẩm | Auto Cut Short | Chờ anh chốt |
 | `.p12` + mật khẩu trong repo public | Cả bộ | Anh chốt "tính sau" |
+| **Quyết CEP → UXP** (spike đo chi phí port 1 panel nhỏ) | Cả bộ | Adobe ghi sẽ gỡ CEP; ngày cắt chưa rõ (xem nghiên cứu 10/09) |
+| 7 câu hỏi giá/định vị từ nghiên cứu thị trường 10/09 (mục 11) | Cả bộ | Chờ anh chốt |
 | `PROGRESS.md` gốc repo | — | Chưa có |
 
 ---
