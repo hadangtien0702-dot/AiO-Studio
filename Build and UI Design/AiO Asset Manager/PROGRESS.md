@@ -1,5 +1,38 @@
 # AiO Asset Manager - Nhat ky
 
+## 2026-09-14 14:40 - BO CAI 2.0.0 KEM FFMPEG (anh: "xai on dinh roi sao khong tao ban cai")
+
+### Boi canh
+Anh Tien 14/09: *"Asset Manager anh thay xai on dinh roi sao em khong tao ban
+cai cho anh"*. Ban trong `build/` la cua 14/08, chi 0,1 MB (dong goi -BinChung,
+may la khong co kho FFmpeg chung thi khong chay) va CU HON lan sua ma 24/08.
+`Release/AiO Asset Manager/win/` chi co file CHUA-CO-BAN-WIN.txt.
+
+### Da lam
+- `scripts\package-release.ps1` (KHONG -BinChung): build:release -> ky ->
+  .zxp 91,5 MB (18 file: ffmpeg + ffprobe LGPL N-125829, manifest, host, dist,
+  LICENSE-FFmpeg, THIRD-PARTY-NOTICE, KHONG co .debug) -> SETUP.exe + SETUP.zip
+  91,4 MB. TSA timestamp khong dung duoc -> ky khong timestamp (nhu moi lan).
+- Rut `HUONG-DAN-CAI-DAT.txt` trong script tu 37 dong -> 7 dong (3 buoc) theo
+  luat anh chot 14/09 o Shot & Save: huong dan cai = dung cac buoc cai, het.
+- Chep vao `Release/AiO Asset Manager/win/`: SETUP.exe (SHA-256 dau
+  `0d059f9ff79e`), SETUP.zip (`2b6d677553eb`), CAI-DAT.bat, cai-dat.ps1,
+  HUONG-DAN, LICENSE-FFmpeg, THIRD-PARTY-NOTICE. .exe/.zip khong len git.
+- Ghi CHANGELOG.md goc, TOOL_VERSION_TRACKER, AiO Studio\CLAUDE.md.
+
+### Kiem chung (may cong ty, Premiere DANG DONG)
+- Ban anh dang cai (24/08 23:14) vs nguon: chi khac dist/index.html (build lai
+  che do release, 276.831 -> 276.471 byte; van co override #150700 va muc
+  "Dung gan day"). host/manifest/ffmpeg md5 giong het.
+- Chay CHINH file SETUP.exe: 4 s, exit 0, thu muc tam %TEMP%\AiOStudioSetup_*
+  da tu don. Sau cai 13 file, diff md5 truoc/sau chi 2 dong: dist/index.html
+  (= md5 nguon ccca31f0) va META-INF/signatures.xml. `.debug` con nguyen (cong
+  8088 van do duoc). PlayerDebugMode=1 o CSXS.9..12.
+- CHUA do: mo Premiere sau khi cai (Premiere dang dong, khong tu mo app cua
+  anh) · cai tren may sach (chi anh lam duoc).
+
+---
+
 ## 2026-08-24 23:17 - Dong bo token cam #f86820 (lenh anh Tien, ca bo AiO)
 
 - `_tokens.scss` nhan ban moi tu design-system (`dong-bo-tokens.ps1`), chep

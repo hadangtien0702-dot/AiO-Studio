@@ -1,0 +1,64 @@
+================================================================================
+ PHAN MEM CUA BEN THU BA DI KEM SAN PHAM NAY
+ THIRD-PARTY SOFTWARE INCLUDED WITH THIS PRODUCT
+================================================================================
+
+--------------------------------------------------------------------------------
+ 1. FFmpeg
+--------------------------------------------------------------------------------
+
+ Ban dung / Version : N-125829-gfe953596e9-20260728  (win64, LGPL build)
+ Tap tin / Files    : bin/win64/ffmpeg.exe
+                      bin/win64/ffprobe.exe
+ Giay phep / License: GNU Lesser General Public License, version 3 (LGPL-3.0)
+                      Toan van kem theo trong LICENSE-FFmpeg.txt
+                      Full text included in LICENSE-FFmpeg.txt
+
+ Trang chu / Homepage    : https://ffmpeg.org
+ Ma nguon / Source code  : https://github.com/FFmpeg/FFmpeg
+ Ban build nay / Build   : https://github.com/BtbN/FFmpeg-Builds
+
+ Ban build nay KHONG bat cau hinh --enable-gpl va KHONG bat --enable-nonfree.
+ This build is configured WITHOUT --enable-gpl and WITHOUT --enable-nonfree.
+
+ San pham nay KHONG sua doi ma nguon FFmpeg. FFmpeg duoc goi nhu mot TIEN TRINH
+ RIENG BIET (Windows process) qua dong lenh, khong lien ket tinh hay dong vao
+ phan mem nay.
+ This product does NOT modify FFmpeg. FFmpeg is invoked as a SEPARATE PROCESS
+ via the command line; it is neither statically nor dynamically linked into
+ this software.
+
+ Ban co quyen thay the hai tap tin ffmpeg.exe / ffprobe.exe trong thu muc
+ bin/win64 bang ban FFmpeg khac tuong thich cua rieng ban.
+ You may replace ffmpeg.exe / ffprobe.exe in bin/win64 with your own compatible
+ build of FFmpeg.
+
+ FFmpeg (C) 2000-2026 the FFmpeg developers
+
+--------------------------------------------------------------------------------
+ 2. OpenH264  (nam ben trong ffmpeg.exe / included inside ffmpeg.exe)
+--------------------------------------------------------------------------------
+
+ Giay phep / License: BSD 2-Clause
+ Ma nguon / Source  : https://github.com/cisco/openh264
+ Copyright (c) 2013, Cisco Systems. All rights reserved.
+
+ Luu y ve bang sang che / Patent notice:
+ OpenH264 hien thuc chuan H.264/AVC. Viec su dung chuan nay o mot so quoc gia
+ co the lien quan toi bang sang che do MPEG LA quan ly. Cisco tra phi ban quyen
+ cho cac tap tin nhi phan do CHINH CISCO phat hanh; ban nhi phan trong san pham
+ nay duoc bien dich lai tu ma nguon nen KHONG thuoc dien do.
+ OpenH264 implements the H.264/AVC standard, which may be subject to patents
+ administered by MPEG LA in some jurisdictions. Cisco covers royalties only for
+ binaries distributed by Cisco itself; the binary included here is rebuilt from
+ source and is therefore NOT covered by that arrangement.
+
+--------------------------------------------------------------------------------
+ 3. whisper.cpp  (khong di kem, nguoi dung tu cai / not bundled)
+--------------------------------------------------------------------------------
+
+ Giay phep / License: MIT
+ Ma nguon / Source  : https://github.com/ggerganov/whisper.cpp
+ Mo hinh / Models   : MIT
+
+================================================================================

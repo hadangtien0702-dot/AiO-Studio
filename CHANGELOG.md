@@ -27,7 +27,7 @@ Ký hiệu: ✅ anh chấm đạt · 🟢 chạy được, chưa qua tay anh · 
 | # | App | Bản | Trạng thái | Bản đầu | Bản mới nhất |
 |:-:|---|:-:|:-:|:-:|:-:|
 | 1 | Autocut | 1.6.0 | ✅ xong, ngưng phát triển | 14/08 beta-01 | 19/08 |
-| 2 | Asset Manager | 2.0.0 | 🧊 đóng băng | 14/08 | 24/08 |
+| 2 | Asset Manager | 2.0.0 | 🧊 đóng băng · 📦 bộ cài 14/09 | 14/08 | 14/09 |
 | 3 | Power Bins | 2.0.0 | 🟢 | 14/08 | 24/08 |
 | 4 | Transcripts | 2.5.5 | 🟢 | 14/08 | 24/08 |
 | 5 | WELCOME | 1.5.0 | 🟢 | 24/08 | 24/08 |
@@ -57,8 +57,9 @@ Nợ còn treo: cài máy sạch · tốc độ 19 phút/giờ (mục tiêu <5) 
 
 | Ngày | Bản | Cập nhật | Chấm |
 |---|:-:|---|:-:|
+| 14/09 | 2.0.0 | Anh: *"xài ổn định rồi"* → đóng bộ cài **KÈM FFmpeg** (máy sạch cài là chạy). 📦 `Release/AiO Asset Manager/win/` SETUP.exe 91,4 MB (SHA-256 đầu `0d059f9ff79e`) + .zip. Cài thử bằng chính .exe trên máy công ty: 4 s, 13 file md5 khớp nguồn. Hướng dẫn cài rút còn 3 bước | ✅ anh chấm ổn định (bản 24/08) · 📦 chưa cài máy sạch |
 | 24/08 | 2.0.0 | Đồng bộ token design-system (sự cố `--accent-on` làm nút cam 11px tụt tương phản 6,2→2,7, đã ghi sổ) | 🟢 |
-| 14/08 | 2.0.0 | **Đóng băng** — anh: *"rất ổn rồi, tạm dừng"*. Là gói FREE | 🧊 |
+| 14/08 | 2.0.0 | **Đóng băng** — anh: *"rất ổn rồi, tạm dừng"*. Là gói FREE. Bộ cài beta-01 đóng kiểu kho FFmpeg chung, 0,1 MB, máy lạ không chạy | 🧊 |
 | 29/07 | — | FFmpeg đổi sang LGPL, proxy 360p dùng `libopenh264` (nhanh gấp đôi, SSIM 0,9655) | 🟢 |
 | 07/2026 | 1.x | Kho ~28.900 asset: quét → xem/nghe → chèn timeline; turbo 8 tiến trình × 2 luồng | 🟢 |
 

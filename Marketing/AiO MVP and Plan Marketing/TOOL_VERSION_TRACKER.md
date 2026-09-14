@@ -18,7 +18,7 @@
 | # | App | Bản | ID | Cổng | Trạng thái | Ghi chú thật |
 |:-:|---|:-:|---|:-:|:-:|---|
 | 1 | **AiO Autocut** | **1.6.0** | `com.aiostudio.autocut` | 8089 | ✅ **XONG** | Anh Tiến tự dùng bài thật + **nghe lại, không mất lời** (19/08). Bộ cài `Release/2026-08-19-autocut-1.6.0/` |
-| 2 | AiO Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` | 8088 | 🧊 Đóng băng | Anh chốt 14/08: *"rất ổn rồi, tạm dừng ở đây"*. Việc mới phải hỏi anh trước |
+| 2 | AiO Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` | 8088 | 🧊 Đóng băng · 📦 bộ cài | Anh chốt 14/08: *"rất ổn rồi, tạm dừng ở đây"*. 14/09 anh: *"xài ổn định rồi"* → bộ cài kèm FFmpeg `Release/AiO Asset Manager/win/` (91,4 MB). Việc mới phải hỏi anh trước |
 | 3 | AiO Power Bins | 2.0.0 | `com.aiostudio.powerbin` | 8090 | 🟢 Chạy được | Brand Kit hiện ở mọi project |
 | 4 | AiO Transcripts | **2.5.5** | `com.aiostudio.transcript` | 8091 | 🟢 Chạy được | **22/08 đêm:** HAI NÚT — *Làm phụ đề* (caption C1) / *Làm hiệu ứng* (graphic MOGRT, chọn kiểu trong ô xổ) theo ý anh 22/08; vá 6 lỗi vòng soát (caption rơi dưới hình, chữ mẫu im lặng, karaoke < 1 khung, khối 1 từ không sáng, khối > 10 s, kiểu riêng không thay); E2E trên sequence tự tạo: 16/23 caption lên V3 trên hình, chạy lại THAY không chồng. ☠️ Đã đo: Premiere 27 KHÔNG cho API đặt chữ vào graphic native / upgrade caption → hiệu ứng vẫn là MOGRT AE (nặng hơn caption track). Chưa qua vòng anh dùng bài thật. **24/08: vá lỗi caption rơi sang sequence KHÁC** (`activeSequence` tự trôi về tab có tiêu điểm) — bẫy tái lập: ép trỏ sai, caption vẫn vào đúng sequence đang hiện |
 | 5 | AiO WELCOME | 1.5.0 | `com.aio.welcome` | 8087 | 🟢 Chạy được | Panel chào mừng |

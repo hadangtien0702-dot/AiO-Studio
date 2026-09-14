@@ -37,7 +37,7 @@ Repo GitHub: `hadangtien0702-dot/AiO-Studio` — **PUBLIC** (anh chốt 31/08).
 | # | App | Bản | ID · cổng | Trạng thái | Việc gần nhất |
 |:-:|---|:-:|---|:-:|---|
 | 1 | **Autocut** | **1.6.0** | `com.aiostudio.autocut` · 8089 | ✅ **XONG, NGƯNG PHÁT TRIỂN** (anh chốt 19/08) | Anh tự dựng bài thật + nghe lại, không mất lời. Bộ cài `Release/AiO Autocut/win/` 46 MB. Việc mới phải hỏi anh |
-| 2 | Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` · 8088 | 🧊 **Đóng băng** (14/08: *"rất ổn rồi, tạm dừng"*) | Kho ~28.900 asset. Là **gói FREE** |
+| 2 | Asset Manager | 2.0.0 | `com.aiostudio.assetmanager` · 8088 | 🧊 **Đóng băng** (14/08: *"rất ổn rồi, tạm dừng"*) | Kho ~28.900 asset. Là **gói FREE**. 14/09 anh *"xài ổn định rồi"* → bộ cài kèm FFmpeg `Release/AiO Asset Manager/win/` SETUP.exe 91,4 MB (cài thử trên máy công ty: 4 s, 13 file md5 khớp; chưa cài máy sạch, chưa mở Premiere sau khi cài) |
 | 3 | Power Bins | 2.0.0 | `com.aiostudio.powerbin` · 8090 | 🟢 Chạy được | Brand kit hiện ở mọi project Premiere |
 | 4 | Transcripts | **2.5.5** | `com.aiostudio.transcript` · 8091 | 🟢 Chạy được | 24/08: 2 nút *Làm phụ đề* / *Làm hiệu ứng*; khối hiệu ứng **ẨN** (`HIEN_HIEU_UNG=false`) vì đo chết 3 đường native Premiere 27; vá caption rơi sang sequence khác. Nợ: anh dùng bài thật, bộ cài cài font |
 | 5 | WELCOME | 1.5.0 | `com.aio.welcome` · 8087 | 🟢 | Panel chào mừng, không build |
@@ -256,7 +256,7 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 |---|---|---|
 | ~~Cài đè Electron + chép 75 ảnh rồi gỡ Tauri~~ **XONG 14/09** (75/75 ảnh sang `Pictures/AiO Shot & Save`, Tauri đã gỡ, 0.4.4.0 chạy, anh chấm ĐẠT) | Shot & Save | — |
 | Run-log không ghi dòng nào từ tiến trình 09:03 ngày 14/09 dù ảnh vẫn lưu (file ghi được, `ghiLog` nuốt lỗi) | Shot & Save | Chưa đo được gốc; xem `[CHỜ ĐO]` đầu PROGRESS.md panel |
-| Cài thử **máy sạch** | Autocut, Shot & Save | Chỉ anh làm được |
+| Cài thử **máy sạch** | Autocut, Shot & Save, Asset Manager (bộ cài 14/09) | Chỉ anh làm được |
 | Khoá gói Free/Pro (1/7) | Cả bộ | Chưa làm; ngưng build tool từ 13/08 |
 | `SETUP.exe` gộp + panel chạy thật bằng kho FFmpeg chung | Cả bộ | Chưa làm |
 | Bộ cài cài font (Montserrat ×3 + Bangers) | Transcripts | Caption MOGRT cần font máy khách |

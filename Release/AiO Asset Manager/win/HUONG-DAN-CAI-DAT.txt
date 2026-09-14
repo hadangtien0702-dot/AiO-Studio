@@ -1,0 +1,7 @@
+﻿AiO Studio - Asset Manager 2.0.0 - 14/09/2026
+
+1. Dong Premiere Pro.
+2. Chay AiO-Studio-Asset-Manager-2.0.0-SETUP.exe (khong can Admin).
+   Windows hoi SmartScreen -> More info -> Run anyway.
+   (Neu nhan ban .zip: giai nen roi bam dup CAI-DAT.bat.)
+3. Mo Premiere -> Window -> Extensions -> AiO Studio - Asset Manager.

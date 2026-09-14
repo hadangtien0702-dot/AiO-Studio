@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 #  AiO Studio - package-release.ps1
 #
 #  Dong goi BAN PHAT HANH cho nguoi dung cuoi. Khac sign-install.ps1 o ba diem:
@@ -124,44 +124,16 @@ Write-Host ("  [OK] Da tao: " + $zxpOut + "  (" + $sizeMb + " MB)") -ForegroundC
 
 # --- 5. Huong dan cai dat di kem ---
 $guide = Join-Path $outDir 'HUONG-DAN-CAI-DAT.txt'
+# [14/09/2026] Anh Tien chot: huong dan cai cho nguoi dung cuoi = DUNG cac buoc
+# cai, het. Khong changelog, khong duong dan, khong cach go (viec cua minh).
 $lines = @(
-  ("AiO Studio - Asset Manager  " + $version),
-  "Panel quan ly asset cho Adobe Premiere Pro (Windows).",
+  ("AiO Studio - Asset Manager " + $version + " - " + (Get-Date -Format "dd/MM/yyyy")),
   "",
-  "YEU CAU",
-  "  - Windows 10/11",
-  "  - Adobe Premiere Pro (da kiem chung tren Beta 26.5 / CEP 12)",
-  "  - KHONG can cai them gi ca: khong can Python, khong can Node.js,",
-  "    khong can FFmpeg (da nam san trong goi), khong can quyen Admin.",
-  "",
-  "TRUOC KHI GIAI NEN - LAM BUOC NAY TRUOC CHO DO VUONG",
-  "  File tai tu mang (Gmail, Drive, Zalo...) bi Windows danh dau la 'tu",
-  "  Internet', nen bam dup CAI-DAT.bat se hien bang xanh chan lai.",
-  "  Cach tranh: chuot phai vao file ZIP -> Properties -> tick o 'Unblock'",
-  "  (Bo chan) o duoi cung -> OK. Xong roi moi giai nen.",
-  "  Neu lo giai nen truoc va bang xanh hien ra: bam 'More info' ->",
-  "  'Run anyway'. Khong sao ca, do chi la canh bao cho file tai tu mang.",
-  "",
-  "CACH CAI (cach 1 - de nhat, khong can cai them gi)",
-  "  1. Dong han Premiere Pro.",
-  "  2. Bam dup vao file CAI-DAT.bat trong thu muc nay.",
-  "  3. Mo Premiere -> Window -> Extensions -> AiO Studio - Asset Manager",
-  "",
-  "CACH CAI (cach 2 - neu quen dung ZXP Installer)",
-  "  1. Tai ZXP Installer (mien phi) tu aescripts.com/learn/zxp-installer",
-  "  2. Dong Premiere Pro lai.",
-  ("  3. Keo tha file " + (Split-Path $zxpOut -Leaf) + " vao cua so ZXP Installer."),
-  "  Ban nay ky bang chung chi TU TAO nen ZXP Installer se hoi xac nhan mot lan;",
-  "  chon 'Yes' / 'Install anyway' de tiep tuc.",
-  "",
-  "GO CAI DAT",
-  "  Dung ZXP Installer, hoac xoa thu muc:",
-  "  %APPDATA%\Adobe\CEP\extensions\com.aiostudio.assetmanager",
-  "",
-  "DU LIEU PANEL LUU O DAU",
-  "  Thu vien:      %APPDATA%\AiOStudio\library.json",
-  "  Bo nho dem:    %APPDATA%\AiOStudio\thumbs va \proxies",
-  "                 (doi cho duoc trong Cai dat > Noi luu bo nho dem)"
+  "1. Dong Premiere Pro.",
+  ("2. Chay AiO-Studio-Asset-Manager-" + $version + "-SETUP.exe (khong can Admin)."),
+  "   Windows hoi SmartScreen -> More info -> Run anyway.",
+  "   (Neu nhan ban .zip: giai nen roi bam dup CAI-DAT.bat.)",
+  "3. Mo Premiere -> Window -> Extensions -> AiO Studio - Asset Manager."
 )
 $lines | Out-File -FilePath $guide -Encoding utf8
 
