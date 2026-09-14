@@ -1,0 +1,68 @@
+==========================================================
+  AiO Shot & Save v0.4.17 - chup man hinh + khay + ghim
+  Ban PHAT HANH chot 14/09/2026 (gom 14 ban trong ngay,
+  0.4.4 -> 0.4.17, tung ban da qua tay anh Tien tren may
+  cong ty; bo cai cai de tu 0.4.0/0.4.2 duoc luon)
+==========================================================
+
+MOI SO VOI 0.4.0 (31/08)
+------------------------
+- VE CHU LEN ANH (phim 3): chu dam, co HOP NEN toi bo goc, doc
+  duoc tren moi anh. Phim 1 = khung, 2 = mui ten, 3 = chu.
+- TREN ANH GHIM: re chuot len anh la hien 3 nut khung / mui
+  ten / chu, bam la ve tiep. Phim 1/2/3 van dung duoc.
+- KEO TO KHAY: re chuot len khay, keo tay nam goc TREN-TRAI.
+  To ra = THAY NHIEU ANH HON (ngang them hang, doc them cot),
+  o anh giu nguyen co. Nho co rieng cho khay ngang / doc.
+- CHUP NHANH GAP 2,7 LAN (1,24s -> 0,47s). Man toi di muot.
+- VIDEO (YouTube / Facebook / TikTok) KHONG CON DEN khi
+  khoanh: app chup TRUOC roi moi phu lop mo, hinh dung yen
+  hien ngay (nhu Lightshot). Overlay hien sau ~0,6s.
+- KEO-THA RA APP KHAC chay voi MOI thu muc luu, ke ca ten co
+  dau '&', dau cach, tieng Viet (truoc: Chrome / Lark / Teams
+  / Zalo / Messenger nhan file rong). Da do that: Premiere,
+  Photoshop, Figma, Explorer, Claude, Messenger, Lark, Teams,
+  Zalo web, Chrome.
+- THU MUC LUU ANH MAC DINH DOI: %LOCALAPPDATA%\shotandsave
+  (nam NGOAI thu muc cai -> cap nhat app KHONG mat anh).
+  Ten file: shotandsave-YYYY-MM-DD-HHMMSS-mmm.jpg
+- Cai dat: kieu khay ghi ro "Ngang / Doc".
+
+CAI DAT
+-------
+1. Chay: AiO-Shot-and-Save-Setup-0.4.17.exe
+2. Bo cai MOT CU BAM, per-user (khong can Admin). Cai de len
+   ban cu duoc luon; phim tat + cai dat cua ban GIU NGUYEN.
+3. Loi tat: Start Menu + Desktop "AiO Shot & Save".
+
+!! SMARTSCREEN: ban chua ky so, lan dau chay Windows co the
+chan -> "More info" -> "Run anyway".
+
+!! CAI DE TU BAN <= 0.4.5: anh cu nam trong thu muc cai
+(%LOCALAPPDATA%\Programs\aio-shot-and-save\Anh chup) SE BI
+XOA khi cai de. Chep thu muc do ra ngoai TRUOC khi cai.
+Tu 0.4.6 tro di anh da nam ngoai thu muc cai, cai de an toan.
+
+DUNG NHU THE NAO
+----------------
+- Phim tat chup mac dinh: Ctrl + Shift + S (doi trong Cai dat)
+- Bam phim tat -> hinh dung yen hien -> keo chon vung (vat 2
+  man cung duoc)
+- Chon vung xong: ve khung (1) / mui ten (2) / chu (3),
+  7 mau, roi:
+    Enter hoac nut V  = luu vao khay
+    Ctrl + C          = luu + copy clipboard
+    Esc               = huy
+- Khay (goc man hinh):
+    Bam thumbnail     = ghim anh len man hinh
+    KEO thumbnail     = tha file vao Premiere / Zalo / Mess...
+    LAN con lan chuot = cuon day anh
+    Keo goc tren-trai = phong to khay (thay nhieu anh hon)
+- Anh ghim: re chuot -> 3 nut ve; keo ANH = tha ra app khac;
+  keo THANH TREN = di chuyen; Ctrl + lan chuot = do mo.
+- Cai dat (chuot phai icon khay he thong): phim tat ·
+  JPEG/PNG · chat luong · kieu khay Ngang/Doc · thu muc · VI/EN
+
+ANH LUU O: %LOCALAPPDATA%\shotandsave (doi duoc trong Cai dat)
+GO: Settings Windows -> Apps -> AiO Shot & Save -> Uninstall
+(anh da chup KHONG bi xoa).
