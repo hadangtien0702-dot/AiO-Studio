@@ -7,6 +7,15 @@
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - 📏 **DO KHUNG OVERLAY TREN WINDOWS 15/09** (run-log 0.4.17, 93 lan chup, 2 man 4K@1.5 + 2K@1.25):
+>   bam phim -> overlay hien **trung vi 581 ms** (min 548, max 1.322 = khoi dong nguoi); grab 505 ms.
+>   Vi mo (scratchpad do-grab.js, 5 lan): getSources ~400 ms trong do **KHOA LUONG CHINH ~285 ms**
+>   (setInterval 5 ms gap-max) -> overlay khong the hien truoc grab-xong; toJPEG q92 ~45 ms;
+>   nap trang overlay + show ~80 ms. => 400 ms la SAN Electron (khong native, anh chot 14/09);
+>   rut duoc toi da ~125 ms (pre-warm overlay + nen JPEG sau khi hien) = 581 -> ~450.
+>   Hai huong da trinh anh: (A) pre-warm, loi 22%, rui ro so loi #8; (B) overlay truoc grab sau —
+>   phu ~430 ms, vung chua do giua 0,2 s (con hinh) va 0,5 s (den). Em de nghi GIU NGUYEN Windows,
+>   cho so mac toi 15/09 roi quyet rieng cho mac. **Chua sua code.**
 > - ✅ **BAN MAC 0.4.17 CHAY DUOC TREN MAC THAT (anh bao 15/09 sang)**: "da chay va cai duoc
 >   roi, chua bi loi khi xai". Cai bang cach chep vao Applications + `xattr -cr` (macOS 15 khong
 >   con chuot phai -> Open). 🟡 **[CHO DO] overlay hien bi KHUNG mot nhip, ro hon Windows** —
