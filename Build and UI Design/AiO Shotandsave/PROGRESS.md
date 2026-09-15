@@ -7,6 +7,14 @@
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - ✅ **BAN MAC 0.4.17 CHAY DUOC TREN MAC THAT (anh bao 15/09 sang)**: "da chay va cai duoc
+>   roi, chua bi loi khi xai". Cai bang cach chep vao Applications + `xattr -cr` (macOS 15 khong
+>   con chuot phai -> Open). 🟡 **[CHO DO] overlay hien bi KHUNG mot nhip, ro hon Windows** —
+>   nghi do GRAB_TRUOC (0.4.15): getSources tren mac (ScreenCaptureKit) cham hon WGC nen overlay
+>   phai doi grab xong. Chua co so: da xin anh `tail -40 ~/Library/Application Support/AiO Shot
+>   & Save/run-log.txt` (dong `grab ... ms`). Hai huong cho anh chon sau khi co so: (A) darwin
+>   dung che do cu overlay-truoc-grab-sau (can test video YouTube co den khong tren mac);
+>   (B) giu grab-truoc nhung ha do phan giai frozen tren mac. KHONG sua truoc khi co so.
 > - 📦 **BAN MAC 0.4.17 (14/09 19:3x)** — anh: "cai ban cho mac nhe em, mac intel va chip m
 >   luon". Windows KHONG dung duoc ban mac (electron-builder: "Build for macOS is supported
 >   only on macOS") -> dung may mac cua GitHub Actions: `.github/workflows/shotandsave-mac.yml`
