@@ -7,6 +7,14 @@
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - ✅ **0.5.0 ANH XAC NHAN 15/09 08:53** bang chinh PowerShell tren may anh: 5 lan chup, phim ->
+>   overlay **7/8/8/11/20 ms, trung vi 8 ms** (ban cu cung bang: 411-474 ms), anh nen 108-159 ms.
+>   ☠️ **Bay moi (15/09): app do em bat tu trong Claude (Start-Process / bash) chay TRONG container
+>   MSIX cua Claude -> %APPDATA% bi chuyen huong vao `AppData\Local\Packages\Claude_*\LocalCache\Roaming`**
+>   -> run-log cua app di lac, lenh PowerShell cua anh (ngoai container) khong thay dong nao sau 08:20;
+>   anh: "anh chụp mà thấy nó có ghi đâu em". Programs/ va %LOCALAPPDATA%\shotandsave KHONG bi chuyen
+>   (kiem: thu muc ao rong). Sua: tat app, mo lai qua `Start-Process explorer.exe "<exe>"` (explorer ngoai
+>   container) -> log ve dung cho. Luat: sau khi cai, mo app qua explorer.exe hoac de anh tu mo.
 > - 🚀 **0.5.0 (15/09 08:xx) — LUONG CHUP CHAY SAN + OVERLAY TAO SAN: bam phim -> overlay hien
 >   12-35 ms (truoc 581 ms trung vi, 93 lan run-log 0.4.17).** Anh: "quá chậm, anh muốn 30ms là
 >   tối đa" sau khi tu chay lenh PowerShell do 486 ms/9 lan. Gốc: getSources sàn ~400 ms, KHÓA
