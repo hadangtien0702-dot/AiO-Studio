@@ -1,12 +1,33 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 09:05 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 09:34 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - 🍎 **MAC CHIP M: "AiO Shot & Save is damaged and can't be opened" (anh cai thu 15/09 09:39, tu zip
+>   arm64).** Goc: `build.mac.identity: null` = electron-builder KHONG ky gi ca; Apple Silicon tu choi
+>   binary khong co chu ky (Intel chi canh bao Gatekeeper). Sua tam cho anh: `xattr -cr` + `codesign --force
+>   --deep --sign -` (ky ad-hoc tai may). Sua goc: bo `identity` khoi package.json de electron-builder tu ky
+>   ad-hoc tren runner mac (push 9478ca6) — KHONG du: log van "skipped macOS application code signing"
+>   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
+>   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
+>   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - 🔴 **[DANG LAM, CHUA DONG GOI] 0.5.2 (15/09 09:34) — anh bao "lỗi chụp youtube": vung video YouTube
+>   Shorts (Chrome) trong overlay ra DEN.** Do bang cua so an (scratchpad `so-den.js`, WGC bat/tat, 2 man,
+>   luoi 64x36 o, 2 lan): **0/2304 o** getSources-sang-ma-luong-toi; anh doi chung `luong-<id>.png` thay ro
+>   video Shorts -> LUONG KHONG DEN khi khong co gi phu. Gia thuyet con lai: 0.5.0 hien overlay o 7 ms nhung
+>   JPEG nen ve sau 120-200 ms -> trong khoang do overlay TRONG SUOT nhin xuyen xuong video that = DEN (benh
+>   MPO 31/08); 0.4.17 khong bi vi doi co anh moi hien. Chua xac nhan voi anh (hoi: den loe hay den mai).
+>   **Da sua trong ma nguon (chua build):** `luong/luong.js` gui them dot 0 = JPEG NHANH nua do phan giai q0.8
+>   truoc JPEG day du; `luong-chup.js` `layKhung(onNhanh, onJpg)` + `item.jpgNhanh`; `main.js`: protocol nhan
+>   `.../nhanh.jpg`, `phatFrozen(list,_tg,nguon,nhanh)` dat key `<gen>/<id>/nhanh`, `capNhatFrozenDayDu()`
+>   thay URL day du cung gen, `doSangTest()` do AIO_TEST_SANG tren JPEG day du. Cu phap 3 file OK.
+>   ☠️ CHUA DO gi tren app (can selftest bung overlay 3 s tren man anh — dang xin phep, bai 3a). Buoc tiep:
+>   selftest `AIO_SELFTEST_TRE=4000 AIO_TEST_SANG=1087326596:2700,400,800,1200` (vung video Shorts man 4K),
+>   doc `nhanh-xong` ms + `[do] sang`, roi bump 0.5.2, dist, cai, mo qua explorer.exe.
 > - 🟡 **0.5.1 (15/09 09:0x) KEO CO KHAY O CA 4 GOC** — anh gui anh mui ten 4 goc: "ở phần UI anh muốn
 >   drag được cả 4 góc". 4 tay nam `.grip-goc` (tl giu id #grip cho harness; tr/bl/br lat bang transform),
 >   renderer gui `resizeStart(goc)`, main tinh: goc dang keo di theo chuot, goc DOI DIEN dung yen, kep
