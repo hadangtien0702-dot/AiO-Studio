@@ -81,6 +81,7 @@
     },
     "dmg": {
       "artifactName": "AiO-Shot-and-Save-${version}-mac-${arch}.dmg"
-    }
+    },
+    "afterSign": "scripts/afterSign.js"
   }
 }
