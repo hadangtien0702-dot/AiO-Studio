@@ -10,5 +10,7 @@ Chon dung file theo may:
    (app chua ky so, binh thuong). Bam Done, roi vao System Settings ->
    Privacy & Security -> keo xuong cuoi -> "Open Anyway" -> nhap mat khau.
    (Hoac mo Terminal, dan:  xattr -cr "/Applications/AiO Shot & Save.app" )
+   Mac chip M bao "damaged and can't be opened" (ban chua ky) -> Terminal:
+     xattr -cr "/Applications/AiO Shot & Save.app" && codesign --force --deep --sign - "/Applications/AiO Shot & Save.app"
 3. macOS hoi quyen Screen Recording -> Allow, roi mo lai app.
 4. Xong. Phim tat chup: Cmd + Shift + S (doi trong Cai dat).
