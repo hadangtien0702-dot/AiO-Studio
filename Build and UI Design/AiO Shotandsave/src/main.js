@@ -1276,7 +1276,10 @@ const SHELF_W = 380
    320px cao (~30-60KB/anh). Truoc 128px PNG: mo khi o dọc rong. Anh nho hon thi giu nguyen. */
 const THUMB_H = 320 /* o co dinh: ngang 64 DIP (96px thiet bi), doc cot toi da ~324 DIP -> 320 cao du net */
 function thumbKhay(img) {
-  const h = Math.min(THUMB_H, img.getSize().height || THUMB_H)
+  const sz = img.getSize()
+  // Anh DOC hien cao toi 340 DIP trong khay doc (15/09) -> thumb cao hon cho net (x1.5 DPR = 510px).
+  const tran = sz.height > sz.width ? THUMB_H * 2 : THUMB_H
+  const h = Math.min(tran, sz.height || tran)
   return 'data:image/jpeg;base64,' + img.resize({ height: h, quality: 'best' }).toJPEG(88).toString('base64')
 }
 const SHELF_H = 128

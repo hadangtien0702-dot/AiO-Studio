@@ -161,6 +161,8 @@ body.doc .item img {
   object-fit: cover; object-position: top;
   display: block;
 }
+/* Anh DOC (cao > rong, 15/09 anh Tien): cho o cao gap doi, khong cat mat phan duoi. */
+body.doc .item.doc-anh img { max-height: 340px; object-fit: contain; object-position: top; }
 
 /* Khay DOC + trong: xep thong diep thanh COT cho khoi gay chu (khay hep). */
 body.doc #empty {

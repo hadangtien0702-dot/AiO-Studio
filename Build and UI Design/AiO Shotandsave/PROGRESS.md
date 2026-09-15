@@ -1,6 +1,6 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 10:12 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 10:20 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
@@ -19,6 +19,13 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - 🟡 **0.5.3 (15/09 10:20) ANH DOC HIEN DOC TRONG KHAY** — anh: "ảnh chụp dọc trong khay ảnh phải hiển thị
+>   dọc chứ em". Goc: khay doc `.item img{max-height:150px; object-fit:cover; object-position:top}` -> anh
+>   cao hon rong bi CAT chi con phan tren (nhin nhu anh ngang). Sua: shelf.js gan class `doc-anh` khi h>w;
+>   CSS `body.doc .item.doc-anh img{max-height:340px; object-fit:contain}`; `thumbKhay` anh doc resize cao
+>   toi 640px (thay 320) cho net o 340 DIP x1.5. Khay ngang khong doi (o cao 64, rong theo ti le — von da
+>   doc). Cai may cong ty 0.5.3.0 (explorer.exe), anh 157/157; chua chay harness khay (bung tren man anh).
+>   ☠️ 0.5.2 vua cai 10:14 da bi de ngay — so PhimDenOverlay cua 0.5.2/0.5.3 chua co, cho anh chay PowerShell.
 > - 🟡 **0.5.2 (15/09 10:12) DANG DONG GOI — anh: "đóng gói bản mới này nhé em; anh đã thử trong Ai và Ae
 >   của Adobe rồi toàn bộ đã chạy"** (keo-tha 0.5.1 vao Illustrator + After Effects OK). Selftest qua luong
 >   (AIO_SELFTEST_TRE=9000): overlay +12/+20 ms, nhanh-xong 556 ms, grab-xong 623 ms, raw 1.291 ms — SO CHAM

@@ -40,6 +40,8 @@ function themO(item) {
   el.className = 'item moi'
   el.setAttribute('role', 'listitem')
   el.dataset.id = String(item.id)
+  // 15/09 anh: "ảnh chụp dọc trong khay phải hiển thị dọc" — anh cao hon rong thi o cao len, khong cat.
+  if (item.h > item.w) el.classList.add('doc-anh')
   // Tooltip: huong dan + kich thuoc + dung luong that cua file.
   const dungLuong = item.kb >= 1024 ? (item.kb / 1024).toFixed(1) + ' MB' : item.kb + ' KB'
   el.title = t('khay.oGhim') +
