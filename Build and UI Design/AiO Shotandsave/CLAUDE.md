@@ -68,8 +68,9 @@ src/
   preload-settings.js Cau IPC cho Cai dat (-> window.settings) + i18n.
   overlay/           Man chon vung: MOI man mot overlay, anh dong bang + fade.
   pin/               Cua so ghim sticky: anh + thanh cong cu + keo di chuyen.
-  shelf/             Khay anh: thumbnail + keo-tha ra app khac + tay nam #grip goc tren-trai
-                     DOI CO (0.4.12: san = co mac dinh, tran 60% man chua khay, luu khayCo.{ngang,doc};
+  shelf/             Khay anh: thumbnail + keo-tha ra app khac + tay nam DOI CO o CA 4 GOC (0.5.1 `.grip-goc`,
+                     goc doi dien dung yen; #grip = goc tren-trai giu id cho harness); anh DOC (h>w) co class
+                     `doc-anh` hien cao toi 340px khong cat (0.5.3) (0.4.12: san = co mac dinh, tran 60% man chua khay, luu khayCo.{ngang,doc};
                      #list la LUOI o co dinh: ngang cao len = them HANG, doc rong ra = them COT —
                      anh Tien: "xem nhieu anh hon, KHONG phong anh").
   settings/          Man Cai dat (frameless, logo AiO, card): doi phim tat, doi
@@ -81,7 +82,8 @@ assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo)
 
 ☠️ **0.5.0 (15/09): LUONG CHUP CHAY SAN + OVERLAY TAO SAN — doc `src/luong-chup.js` truoc.**
 Bam phim -> `startCapture` -> `kickGrab`: neu `luong.sanSang()` thi lay khung tu luong
-(JPEG ve ~150-200 ms -> `phatFrozen`; raw BGRA ve sau ~350 ms -> `rawStore` + `rec.image`),
+(0.5.2: JPEG NHANH nua do phan giai ve truoc ~30-60 ms -> `phatFrozen(...,nhanh)` URL `.../nhanh.jpg`;
+JPEG day du ~120-200 ms -> `capNhatFrozenDayDu`; raw BGRA ve sau ~250-350 ms -> `rawStore` + `rec.image`),
 KHONG thi roi ve `grabDisplaysList()` (getSources, sàn ~400 ms) — log `nguon=luong|grab`.
 `openOverlays` dung `poolWins` (tao + nap san sau boot 1,5 s va sau moi `closeOverlay` 0,4 s)
 -> overlay hien 12-35 ms sau phim (do 15/09). Doi chung: `AIO_LUONG=0` (grab cu),
@@ -344,5 +346,7 @@ ten -> sau khi cai, loi tat tro BAN CAI chu khong phai ban nguon.
 
 ## Chua lam (xem PROGRESS.md)
 
-Cai thu MAY SACH (khong Node/nguon) truoc khi phat ra ngoai · ky so (SmartScreen)
-· pre-warm overlay ~30ms · cong cu ve them (chu, but, che mo) neu anh Tien can.
+Cai thu MAY SACH (khong Node/nguon) truoc khi phat ra ngoai · ky so (SmartScreen Windows; mac = Apple
+Developer 99 USD/nam, hien ky ad-hoc qua `scripts/afterSign.js`) · tat luong chup khi may ranh lau (CPU nam nen
+~10-12 % mot loi) · cong cu ve them (but, che mo) neu anh Tien can. Ban mac dung qua GitHub Actions
+(`.github/workflows/shotandsave-mac.yml`, Windows khong build duoc mac).

@@ -1,6 +1,15 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 10:20 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 14:07 +0700
+> - 📌 **BAN DANG DUNG: 0.5.3** (cai may cong ty 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
+>   `Release/AiO Shotandsave/`). 0.5.0 = luong chup chay san + pool overlay (phim -> overlay 7-20 ms, anh
+>   tu do, 0.4.17 la 411-581 ms); 0.5.1 keo khay 4 goc; 0.5.2 JPEG nhanh truoc; 0.5.3 anh doc hien doc.
+> - **[CHO ANH]** (1) so PhimDenOverlayMs cua 0.5.3 tren may anh; (2) anh doc trong khay da dung chua;
+>   (3) loe den video con khong; (4) mac: A (Apple Developer 99 USD/nam, cai nhu Zalo) hay B (mien phi,
+>   1 lan Open Anyway — hien tai, da ky ad-hoc). (5) CPU nam nen ~10-12 % mot loi (phien WGC, khong doi
+>   theo fps) — anh chua quyet co lam "tat luong khi ranh lau" khong.
+> - ☠️ Luat moi trong ngay: anh dang ngoi may thi KHONG chay selftest/exe thu (so loi #12); sau khi cai
+>   mo app qua explorer.exe (container MSIX cua Claude chuyen huong APPDATA).
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
@@ -19,7 +28,7 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
-> - 🟡 **0.5.3 (15/09 10:20) ANH DOC HIEN DOC TRONG KHAY** — anh: "ảnh chụp dọc trong khay ảnh phải hiển thị
+> - 🟡 **0.5.3 (15/09 10:19) ANH DOC HIEN DOC TRONG KHAY** — anh: "ảnh chụp dọc trong khay ảnh phải hiển thị
 >   dọc chứ em". Goc: khay doc `.item img{max-height:150px; object-fit:cover; object-position:top}` -> anh
 >   cao hon rong bi CAT chi con phan tren (nhin nhu anh ngang). Sua: shelf.js gan class `doc-anh` khi h>w;
 >   CSS `body.doc .item.doc-anh img{max-height:340px; object-fit:contain}`; `thumbKhay` anh doc resize cao
