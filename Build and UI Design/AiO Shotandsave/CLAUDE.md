@@ -79,6 +79,16 @@ assets/              tokens.css, fonts/Inter.woff2, tray.png, app.ico (AiO logo)
 
 ## Luong chup (main.js)
 
+☠️ **0.5.0 (15/09): LUONG CHUP CHAY SAN + OVERLAY TAO SAN — doc `src/luong-chup.js` truoc.**
+Bam phim -> `startCapture` -> `kickGrab`: neu `luong.sanSang()` thi lay khung tu luong
+(JPEG ve ~150-200 ms -> `phatFrozen`; raw BGRA ve sau ~350 ms -> `rawStore` + `rec.image`),
+KHONG thi roi ve `grabDisplaysList()` (getSources, sàn ~400 ms) — log `nguon=luong|grab`.
+`openOverlays` dung `poolWins` (tao + nap san sau boot 1,5 s va sau moi `closeOverlay` 0,4 s)
+-> overlay hien 12-35 ms sau phim (do 15/09). Doi chung: `AIO_LUONG=0` (grab cu),
+`AIO_POOL=0` (tao overlay moi), `AIO_LUONG_FPS=n`, `AIO_USERDATA=<dir>` (chay song song ban
+cai de do), `AIO_SELFTEST_TRE=ms` (selftest doi luong san sang). Cac buoc 1-5 duoi day la
+duong DU PHONG, van dung khi luong chua san sang.
+
 1. Phim tat (mac dinh `CommandOrControl+Shift+S` = Ctrl tren Win / ⌘ tren Mac;
    DOI DUOC qua man Cai dat, luu vao `cau-hinh.json`) / bam tray -> `startCapture()`.
 2. ☠️ **0.4.15 (14/09) DAO LAI: GRAB TRUOC, overlay SAU** (`GRAB_TRUOC`, mac dinh 1).
@@ -223,6 +233,7 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 | 8 | **Ve khung khi keo — HOI QUY 3 LAN TRONG 1 NGAY 31/08** (giat drop-fps -> rung 2 nguon -> te le -> nhay khi vat man) | Vung nay co HAI nguon ve (mousemove local + main sel-rect 16ms) tren NHIEU man/DPI — moi lan chinh mot nguon la ho nguon kia. Chuot ra khoi man chu la mousemove NGUNG (khong pointer capture) | Luat hien hanh (0.3.17): local vua ve <50ms thi main NHUONG; local im thi main TIEP QUAN (`lanVeLocal`). ☠️ Dung vao onSelRect/mousemove ma khong chay `test-keo-vat-man.js` (3 giai doan) + `test-overlay-drag.js` la se hoi quy lan 4 |
 | 10 | **Khung/chu ve tren ANH GHIM lech xa chuot** (26/08 co san, anh bao 10/09 khi them cong cu chu) | Canvas `#ve` chi co `position:absolute; inset:0` — canvas la REPLACED element, `inset:0` KHONG keo theo khung, lay kich thuoc THUOC TINH dip*DPR -> man 150% to gap 1,5 lan, do lech 101px | `width:100%;height:100%` CSS + JS dat `style.width/height` = DIP. Harness `npm run test:khung -- <ban sao>` (lech phai <=3px). Luat: canvas do phan giai that PHAI dat CA thuoc tinh (device px) LAN style (DIP) |
 | 11 | **CAI DE = MAT ANH nguoi dung** (14/09: 2 anh anh chup sang do bien mat sau `Setup-0.4.5 /S`, khong vao thung rac) | NSIS one-click xoa sach `$INSTDIR` truoc khi chep ban moi; mac dinh cu `thuMucAnh` = `<thu muc exe>/Anh chup` nam ngay trong do (chon 24/08 vi cam Pictures/OneDrive) | 0.4.6: mac dinh ban dong goi ngoai INSTDIR; **0.4.16: `%LOCALAPPDATA%/AiOShotSave/AnhChup`** — ten cu `AiO Shot & Save` co '&' lam keo-tha vao Chrome/Lark/Teams/Zalo/Messenger ra FILE RONG (Chrome: size=0, lastMod=gio tha; do 14/09 bang 3 cua so tha thu, doi ten thu muc la du byte). Luat: **KHONG BAO GIO ghi du lieu nguoi dung vao thu muc cai; duong dan mac dinh KHONG '&' KHONG dau cach; doi thu muc mac dinh = do lai KEO-THA vao Chrome that**. 0.4.17: moi duong keo di qua `kho.duongDanKeoAnToan()` — thu muc nguoi dung co ky tu la thi keo qua hard link `.keo`; truoc moi lan cai de PHAI chup danh sach `Anh chup` va so lai sau cai. Harness ghi de anh chi chay tren BAN SAO — va ban sao do KHONG phai ban luu du phong (14/09 mat ban goc anh 2 vi the) |
+| 12 | **Test bung cua so len man anh DANG LAM** (24/08 khay thu 2; 15/09 selftest + video spike + exe dong goi chay lan 2 -> `second-instance` cua ban cai BUNG overlay; anh: "bật overlay xong để đó hả em") | selftest/harness = chup THAT tren man that; exe cung ten chay lan 2 thua lock -> ban cai nhan second-instance = startCapture | Anh dang ngoi may thi KHONG chay selftest/exe thu — xin gio truoc; `AIO_USERDATA` cho ban dong goi; run-log ghi `boot: da co ban khac dang chay` |
 | 9 | **"DAT o cong ty, may NHA van y chang"** (31/08 toi — chuoi keo-chon vua cham DAT buoi trua; sau 0.4.1 con "keo va GIU giat 15xx/1405") | HAI goc cung mot kich ban bam-chuot-khi-grab-dang-chay: (a) base64 ~5,7MB qua IPC do vao renderer DANG keo (6/6 luot drag-start dinh 20-40ms sau grab-xong); (b) main nhan drag-start MUON ~880ms moi hoi con tro lay NEO — tay da keo 100-150px -> neo main LECH neo local -> giu yen tay la 2 nguon nhap nhay 2 so khac nhau, vung LUU cung lech | 0.4.1: anh di `aioshot://`, IPC chi mang URL. 0.4.2: neo = DIEM MOUSEDOWN renderer gui kem drag-start; con tro TRONG man chu thi main khong ve man chu (local la nguon duy nhat), ra ngoai (vat man) main moi ve. Run-log ghi `keo gap-max` + `con tro luc main nhan da troi Xpx` — "muot" phai la SO tu may man LON nhat. Duong frozen/neo dung vao PHAI chay du 4 harness (drag · keo-vat-man · frozen-storm · composite) |
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —

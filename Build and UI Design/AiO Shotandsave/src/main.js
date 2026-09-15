@@ -22,6 +22,7 @@ const {
 const path = require('path')
 const fs = require('fs')
 const kho = require('./kho')
+const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
@@ -81,6 +82,8 @@ const GRAB_TRE_MS = Number(process.env.AIO_GRAB_TRE) > 0 ? Number(process.env.AI
 if (IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST) {
   app.setPath('userData', path.join(__dirname, '..', '.selftest', 'userData'))
 }
+// [do] AIO_USERDATA=<thu muc>: chay ban nguon SONG SONG voi ban cai (khoa single-instance theo userData) de do CPU/GPU nam nen (0.5.0).
+else if (process.env.AIO_USERDATA) app.setPath('userData', process.env.AIO_USERDATA)
 const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
 let currentHotkey = DEFAULT_HOTKEY // nap tu config khi app ready
 let lang = 'vi' // 'vi' | 'en' — nap tu config
@@ -142,6 +145,8 @@ const pins = new Map()
 /* Chi chay mot ban. */
 const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) {
+  // 15/09: ghi lai de khoi doan — ban dong goi chay lan 2 (cung exe) la tu thoat o day, ban dang chay nhan 'second-instance' -> BUNG overlay.
+  try { fs.appendFileSync(RUN_LOG, new Date().toLocaleTimeString('vi-VN', { hour12: false }) + ' boot: da co ban khac dang chay -> thoat (second-instance)\n') } catch (e) {}
   app.quit()
 } else {
   app.on('second-instance', () => startCapture())
@@ -209,6 +214,11 @@ app.whenReady().then(() => {
   // con cong-tac lanh. Fire-and-forget, khong chan gi.
   desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1, height: 1 }, fetchWindowIcons: false })
     .then(() => ghiLog('ham-nong xong')).catch(() => {})
+  // 0.5.0: LUONG CHUP CHAY SAN (xem src/luong-chup.js) — bam phim la co khung ngay.
+  luong.theoDoiMoiTruong()
+  lenLichPool(1500)
+  for (const ev of ['display-added', 'display-removed', 'display-metrics-changed']) screen.on(ev, () => { huyPool(); lenLichPool(1500) })
+  setTimeout(() => luong.khoiDong({ ghiLog }), 800)
 
   // ☠️ CHAN DOAN GPU (--gpucheck): kiem render con chay sau khi cat shader
   // WebGPU (dxcompiler/dxil, 0.3.14 giam dung luong). Ghi ket qua ra userData
@@ -216,7 +226,7 @@ app.whenReady().then(() => {
   if (process.argv.includes('--gpucheck')) { setTimeout(gpuCheck, 300); return }
 
   // Che do tu kiem: tu chup -> tu chon vung -> tu ghim (de verify pipeline).
-  if (IS_SELFTEST) setTimeout(() => startCapture(), 1200)
+  if (IS_SELFTEST) setTimeout(() => startCapture(), Number(process.env.AIO_SELFTEST_TRE) || 1200) // AIO_SELFTEST_TRE: cho luong san sang (0.5.0)
 
   // Do that viec KEO KHAY: kich thuoc co phinh ra khong (anh Tien bao loi 24/08).
   if (IS_DRAGTEST) setTimeout(() => doKeoKhay(), 1200)
@@ -507,6 +517,7 @@ ipcMain.handle('settings:reset', () => setHotkey(DEFAULT_HOTKEY))
 
 let grabPromise = null
 let grabStarted = false
+let nguonGrab = 'grab' // 'luong' (0.5.0) | 'grab' (getSources cu)
 /* 14/09 GRAB TRUOC (AIO_GRAB_TRUOC, mac dinh 1): goi kickGrab NGAY luc bam phim,
    TRUOC khi tao overlay (kieu Lightshot). Do that (do-grab, video YouTube Shorts tren
    man LG): overlay trong suot phu len video >= ~0,5s la WGC tra VUNG VIDEO DEN (sang 0),
@@ -533,7 +544,7 @@ async function startCapture() {
   napManCache()
   ghiLog('capture-start displays=' + displays.length + ' ' +
     manCache.map((m) => m.px + ',' + m.py + ' ' + m.pw + 'x' + m.ph + '@' + m.sf).join(' | ') +
-    (GRAB_TRUOC ? ' grab-truoc' : ''))
+    (GRAB_TRUOC ? ' grab-truoc' : '') + (luong.sanSang() ? ' luong' : ''))
   if (GRAB_TRUOC) kickGrab() // xem chu thich GRAB_TRUOC
   openOverlays(displays)
 }
@@ -545,67 +556,104 @@ function kickGrab() {
   if (grabStarted) return
   grabStarted = true
   const _tg = Date.now() // TAM do gio
+  nguonGrab = luong.sanSang() ? 'luong' : 'grab'
+  if (nguonGrab === 'luong') {
+    /* 0.5.0: khung tu LUONG CHAY SAN — JPEG ve truoc (hien overlay), raw ve sau (cat luc Xong).
+       Truoc khi tin list: rong = luong hong -> roi ve grab cu ngay trong luot nay. */
+    let daPhat = false
+    grabPromise = luong.layKhung((listJpg) => {
+      daPhat = true
+      ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms nguon=luong layers=' + listJpg.length + ' [' +
+        listJpg.map((x) => 'jpg ' + Math.round(x.jpg.length / 1024) + 'KB').join(' | ') + ']')
+      phatFrozen(listJpg)
+    }).then((list) => {
+      if (!list.length) {
+        ghiLog('LUONG: khong ra khung -> roi ve grab cu')
+        return grabDisplaysList().then((l2) => { phatFrozen(l2, _tg, 'grab'); return l2 })
+      }
+      if (!daPhat) { phatFrozen(list, _tg, 'luong'); return list }
+      // Raw da ve: dien image cho overlay + rawStore (frozen key da phat)
+      for (const x of list) {
+        const key = grabGen + '/' + x.display.id
+        if (rawStore.has(key) || frozenStore.has(key)) rawStore.set(key, x.image)
+        for (const win of overlayWins) {
+          if (win.isDestroyed() || win._displayId !== x.display.id) continue
+          const rec = overlayShots.get(win.webContents.id)
+          if (rec) { rec.image = x.image; rec.sf = x.sf }
+        }
+      }
+      ghiLog('raw-xong ' + (Date.now() - _tg) + 'ms nguon=luong [' +
+        list.map((x) => { const sz = x.image.getSize(); return sz.width + 'x' + sz.height }).join(' | ') + ']')
+      return list
+    }).catch((e) => { if (IS_DEV) console.error('[shotandsave] luong loi', e); return [] })
+    return
+  }
   grabPromise = grabDisplaysList().catch((e) => {
     if (IS_DEV) console.error('[shotandsave] grab loi', e)
     return []
   })
-  grabPromise.then((list) => {
-    // ☠️ 10/09: khong chup duoc man nao -> bao NGAY + dong overlay. Truoc day
-    //    overlay van mo voi layers=0, nguoi dung khoanh vung xong Enter -> khong
-    //    ra anh, khong bao gi (mat im lang, cung lop loi voi luu-anh 0.4.3).
-    if (!list.length && overlayWins.length) {
-      ghiLog('LOI grab: 0/' + screen.getAllDisplays().length + ' man chup duoc — dong overlay')
-      closeOverlay()
-      if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
-      return
+  grabPromise.then((list) => phatFrozen(list, _tg, 'grab'))
+}
+
+/* Phat anh dong bang cho moi overlay. list = [{display, image|null, jpg, sf}]. Goi 1 lan
+   cho moi luot chup (grabGen++). image co the null (luong: raw ve sau). */
+function phatFrozen(list, _tg, nguon) {
+  // ☠️ 10/09: khong chup duoc man nao -> bao NGAY + dong overlay. Truoc day
+  //    overlay van mo voi layers=0, nguoi dung khoanh vung xong Enter -> khong
+  //    ra anh, khong bao gi (mat im lang, cung lop loi voi luu-anh 0.4.3).
+  if (!list.length && overlayWins.length) {
+    ghiLog('LOI grab: 0/' + screen.getAllDisplays().length + ' man chup duoc — dong overlay')
+    closeOverlay()
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+    return
+  }
+  // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
+  // de renderer GHEP duoc vung chon VAT NGANG 2 man (anh Tien 25/08: khoanh
+  // ca 2 man ma luu chi co 1 man). Anh di qua aioshot:// (buffer o main),
+  // IPC chi mang URL — het nghen renderer giua luc keo (may nha 31/08).
+  if (!overlayWins.length) return // da Esc/dong truoc khi grab xong — khong giu buffer
+  grabGen++
+  /* [do] AIO_TEST_SANG=<displayId>:<x>,<y>,<w>,<h> (px thiet bi): ghi do sang trung binh
+     vung do vao run-log — bat "video den" bang so, khong bang mat (14/09). */
+  if (process.env.AIO_TEST_SANG) {
+    try {
+      const [id, vung] = process.env.AIO_TEST_SANG.split(':')
+      const [x, y, w, h] = vung.split(',').map(Number)
+      const it = list.find((q) => String(q.display.id) === id)
+      const src = it && (it.image || nativeImage.createFromBuffer(it.jpg))
+      if (src) {
+        const c = src.crop({ x, y, width: w, height: h }).resize({ width: 48, height: 48 }).toBitmap()
+        let sum = 0, n = 0
+        for (let i = 0; i < c.length; i += 4) { sum += (c[i] + c[i + 1] + c[i + 2]) / 3; n++ }
+        ghiLog('[do] sang vung ' + id + ' ' + x + ',' + y + ' ' + w + 'x' + h + ' = ' + Math.round(sum / n))
+      } else ghiLog('[do] sang: khong co man ' + id)
+    } catch (e) { ghiLog('[do] sang LOI ' + e.message) }
+  }
+  frozenStore.clear(); rawStore.clear() // chi giu the he hien tai
+  const layers = list.map((x) => {
+    const m = manCache.find((mm) => mm.id === x.display.id) || {}
+    const key = grabGen + '/' + x.display.id
+    frozenStore.set(key, x.jpg)
+    if (x.image) rawStore.set(key, x.image)
+    return {
+      x: x.display.bounds.x, y: x.display.bounds.y,
+      w: x.display.bounds.width, h: x.display.bounds.height,
+      sf: x.sf, key, url: 'aioshot://frozen/' + key + '.jpg',
+      px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
     }
-    // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
-    // de renderer GHEP duoc vung chon VAT NGANG 2 man (anh Tien 25/08: khoanh
-    // ca 2 man ma luu chi co 1 man). Anh di qua aioshot:// (buffer o main),
-    // IPC chi mang URL — het nghen renderer giua luc keo (may nha 31/08).
-    if (!overlayWins.length) return // da Esc/dong truoc khi grab xong — khong giu buffer
-    grabGen++
-    /* [do] AIO_TEST_SANG=<displayId>:<x>,<y>,<w>,<h> (px thiet bi): ghi do sang trung binh
-       vung do vao run-log — bat "video den" bang so, khong bang mat (14/09). */
-    if (process.env.AIO_TEST_SANG) {
-      try {
-        const [id, vung] = process.env.AIO_TEST_SANG.split(':')
-        const [x, y, w, h] = vung.split(',').map(Number)
-        const it = list.find((q) => String(q.display.id) === id)
-        if (it) {
-          const c = it.image.crop({ x, y, width: w, height: h }).resize({ width: 48, height: 48 }).toBitmap()
-          let sum = 0, n = 0
-          for (let i = 0; i < c.length; i += 4) { sum += (c[i] + c[i + 1] + c[i + 2]) / 3; n++ }
-          ghiLog('[do] sang vung ' + id + ' ' + x + ',' + y + ' ' + w + 'x' + h + ' = ' + Math.round(sum / n))
-        } else ghiLog('[do] sang: khong co man ' + id)
-      } catch (e) { ghiLog('[do] sang LOI ' + e.message) }
-    }
-    frozenStore.clear(); rawStore.clear() // chi giu the he hien tai
-    const layers = list.map((x) => {
-      const m = manCache.find((mm) => mm.id === x.display.id) || {}
-      const key = grabGen + '/' + x.display.id
-      frozenStore.set(key, x.jpg)
-      rawStore.set(key, x.image)
-      return {
-        x: x.display.bounds.x, y: x.display.bounds.y,
-        w: x.display.bounds.width, h: x.display.bounds.height,
-        sf: x.sf, key, url: 'aioshot://frozen/' + key + '.jpg',
-        px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
-      }
-    })
-    ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms layers=' + layers.length + ' [' +
-      list.map((x) => { const sz = x.image.getSize(); const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph + ' / jpg ' + Math.round(x.jpg.length / 1024) + 'KB' }).join(' | ') + ']')
-    for (const win of overlayWins) {
-      if (win.isDestroyed()) continue
-      const item = list.find((x) => x.display.id === win._displayId)
-      if (item) {
-        const rec = overlayShots.get(win.webContents.id)
-        if (rec) { rec.image = item.image; rec.sf = item.sf }
-      }
-      win.webContents.send('overlay:frozen', { layers })
-    }
-    layersSanSang = layers // overlay nao did-finish-load SAU thoi diem nay thi tu lay
   })
+  if (_tg) ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms nguon=' + nguon + ' layers=' + layers.length + ' [' +
+    list.map((x) => { const sz = x.image ? x.image.getSize() : { width: '?', height: '?' }; const m = manCache.find((mm) => mm.id === x.display.id) || {}; return 'anh ' + sz.width + 'x' + sz.height + ' / native ' + m.pw + 'x' + m.ph + ' / jpg ' + Math.round(x.jpg.length / 1024) + 'KB' }).join(' | ') + ']')
+  for (const win of overlayWins) {
+    if (win.isDestroyed()) continue
+    const item = list.find((x) => x.display.id === win._displayId)
+    if (item && item.image) {
+      const rec = overlayShots.get(win.webContents.id)
+      if (rec) { rec.image = item.image; rec.sf = item.sf }
+    }
+    win.webContents.send('overlay:frozen', { layers })
+  }
+  layersSanSang = layers // overlay nao did-finish-load SAU thoi diem nay thi tu lay
 }
 
 /* Khoa mot-nguoi-keo: overlay nao mousedown TRUOC thi giu quyen; cac overlay khac
@@ -782,82 +830,136 @@ async function grabDisplaysList() {
 }
 
 
-function openOverlays(displays) {
-  displays.forEach((disp, idx) => {
-    const b = disp.bounds
-    const win = new BrowserWindow({
-      x: b.x, y: b.y, width: b.width, height: b.height,
-      frame: false, transparent: true, backgroundColor: '#00000000',
-      alwaysOnTop: true, skipTaskbar: true, resizable: false, movable: false,
-      minimizable: false, maximizable: false, fullscreenable: false,
-      hasShadow: false, enableLargerThanScreen: true, show: false,
-      webPreferences: {
-        preload: path.join(__dirname, 'preload-overlay.js'),
-        contextIsolation: true, sandbox: false, backgroundThrottling: false,
-      },
+/* 0.5.0 OVERLAY TAO SAN (pool): tao + nap trang overlay cua MOI man luc app ranh (sau boot,
+   sau moi luot chup, sau khi doi man). Bam phim -> chi show() -> overlay hien ~30 ms thay vi
+   ~80-100 ms tao moi (do 15/09; truoc 0.5.0 con phai doi grab 400 ms). Pool lech cau hinh
+   man (id/bounds/sf) hoac chua nap xong -> roi ve tao moi nhu cu. */
+let poolWins = []
+let poolKey = ''
+let poolTimer = null
+function khoaMan(displays) {
+  return displays.map((d) => d.id + ':' + d.bounds.x + ',' + d.bounds.y + ',' + d.bounds.width + 'x' + d.bounds.height + '@' + (d.scaleFactor || 1)).join('|')
+}
+function huyPool() {
+  for (const w of poolWins) { if (!w.isDestroyed()) w.destroy() }
+  poolWins = []; poolKey = ''
+}
+function lenLichPool(ms) {
+  if (poolTimer) clearTimeout(poolTimer)
+  poolTimer = setTimeout(() => { poolTimer = null; taoPool() }, ms)
+}
+function taoPool() {
+  if (process.env.AIO_POOL === '0') return // [do] doi chung: khong tao san
+  if (overlayWins.length) { lenLichPool(500); return } // dang chup — de sau
+  if (poolWins.length) return
+  const displays = screen.getAllDisplays()
+  if (!displays.length) return
+  poolKey = khoaMan(displays)
+  displays.forEach((disp) => {
+    const win = taoCuaSoOverlay(disp)
+    win._poolReady = false
+    win.webContents.once('did-finish-load', () => {
+      win._poolReady = true
+      // origin gui som de renderer co goc; luc kich hoat gui lai init day du.
+      if (!win.isDestroyed()) win.webContents.send('overlay:init', { origin: { x: disp.bounds.x, y: disp.bounds.y } })
     })
-    win._displayId = disp.id
-    /* ☠️ Windows KEP cua so non-resizable vao workArea (tru taskbar) NGAY tu
-       luc tao: xin 2560x1440 chi duoc 2560x1392 (do that 31/08 tren may 2
-       man). Overlay hut 48px day -> anh dong bang (co taskbar) bi nen doc
-       ~3% -> taskbar trong anh noi ngay TREN taskbar that = "DOUBLE TASKBAR"
-       (anh Tien 31/08 — chinh la bay 25/08 ngay truoc). setBounds lai mot
-       lan la thoat kep: man chinh khop tuyet doi, man phu co the DU 1-2px
-       do lam tron DPI (du = tran ra ngoai mep, vo hai; HUT moi nen anh). */
-    win.setBounds(b)
-    win.setAlwaysOnTop(true, 'screen-saver')
-    // ☠️ LOAI overlay khoi anh chup (WDA_EXCLUDEFROMCAPTURE): grab chay SAU khi
-    // overlay da hien -> khong co dong nay thi LOP MO 42% bi nuong vao anh ->
-    // "ket qua hinh bi toi" (anh Tien 26/08). Co dong nay grab ra man hinh SACH.
-    win.setContentProtection(true)
-    overlayWins.push(win)
+    win.on('closed', () => { poolWins = poolWins.filter((w) => w !== win) })
+    poolWins.push(win)
+  })
+}
 
+/* Tao cua so overlay cho 1 man (chua show, chua init). Dung cho ca pool lan tao moi. */
+function taoCuaSoOverlay(disp) {
+  const b = disp.bounds
+  const win = new BrowserWindow({
+    x: b.x, y: b.y, width: b.width, height: b.height,
+    frame: false, transparent: true, backgroundColor: '#00000000',
+    alwaysOnTop: true, skipTaskbar: true, resizable: false, movable: false,
+    minimizable: false, maximizable: false, fullscreenable: false,
+    hasShadow: false, enableLargerThanScreen: true, show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload-overlay.js'),
+      contextIsolation: true, sandbox: false, backgroundThrottling: false,
+    },
+  })
+  win._displayId = disp.id
+  win._disp = disp
+  /* ☠️ Windows KEP cua so non-resizable vao workArea (tru taskbar) NGAY tu
+     luc tao: xin 2560x1440 chi duoc 2560x1392 (do that 31/08 tren may 2
+     man). Overlay hut 48px day -> anh dong bang (co taskbar) bi nen doc
+     ~3% -> taskbar trong anh noi ngay TREN taskbar that = "DOUBLE TASKBAR"
+     (anh Tien 31/08 — chinh la bay 25/08 ngay truoc). setBounds lai mot
+     lan la thoat kep: man chinh khop tuyet doi, man phu co the DU 1-2px
+     do lam tron DPI (du = tran ra ngoai mep, vo hai; HUT moi nen anh). */
+  win.setBounds(b)
+  win.setAlwaysOnTop(true, 'screen-saver')
+  // ☠️ LOAI overlay khoi anh chup (WDA_EXCLUDEFROMCAPTURE): grab chay SAU khi
+  // overlay da hien -> khong co dong nay thi LOP MO 42% bi nuong vao anh ->
+  // "ket qua hinh bi toi" (anh Tien 26/08). Co dong nay grab ra man hinh SACH.
+  win.setContentProtection(true)
+  win.loadFile(path.join(__dirname, 'overlay', 'index.html'))
+  return win
+}
+
+/* Dua cua so overlay (da nap xong) vao luot chup: init + show + kiem hut + selftest. */
+function kichHoatOverlay(win, disp, idx, sanSang) {
+  if (win.isDestroyed()) return
+  const b = disp.bounds
+  const wcId = win.webContents.id
+  const laSelftest = IS_SELFTEST && idx === 0
+  // origin = goc DIP toan cuc cua man nay — renderer quy doi toa do toan cuc.
+  win.webContents.send('overlay:init', {
+    selftest: laSelftest, origin: { x: b.x, y: b.y },
+    // [do] 14/09: selftest co SHAPE (duong cat anh goc aioshot://raw) / VAT 2 MAN (composite raw)
+    testShape: laSelftest && process.env.AIO_TEST_SHAPE === '1',
+    testComposite: laSelftest && process.env.AIO_TEST_COMPOSITE === '1',
+  })
+  // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
+  if (!win.isVisible()) { win.show(); win.focus() }
+  ghiLog('overlay hien ' + disp.id + (sanSang ? ' (san)' : ''))
+  // Grab da xong truoc khi overlay nay nap (GRAB_TRUOC) -> gui lai frozen cho no.
+  if (layersSanSang) {
+    const item = layersSanSang.find((L) => L.x === b.x && L.y === b.y)
+    const rec = overlayShots.get(wcId)
+    if (item && rec && !rec.image) { const raw = rawStore.get(item.key); if (raw) { rec.image = raw; rec.sf = item.sf } }
+    win.webContents.send('overlay:frozen', { layers: layersSanSang })
+  }
+  // Che do cu (AIO_GRAB_TRUOC=0): grab SAU khi overlay hien + lop mo toi xong.
+  if (!GRAB_TRUOC) setTimeout(kickGrab, GRAB_TRE_MS)
+  /* CHOT CHAN (31/08, sau khi bay 25/08 TAI DIEN thanh "double taskbar"):
+     cua so HUT so voi man = anh dong bang bi nen = taskbar doi. Do that
+     MOI lan mo — hut la ghi CANH BAO vao run-log, khoi doan mo lan sau. */
+  setTimeout(() => {
+    if (win.isDestroyed()) return
+    const wb = win.getBounds()
+    if (wb.width < b.width || wb.height < b.height) {
+      ghiLog('CANH BAO overlay HUT man ' + disp.id + ': xin ' +
+        b.width + 'x' + b.height + ' duoc ' + wb.width + 'x' + wb.height)
+    }
+  }, 200)
+  if (laSelftest) setTimeout(() => saveCapture(win, 'selftest-overlay.png'), 900)
+}
+
+function openOverlays(displays) {
+  const key = khoaMan(displays)
+  const dungPool = poolWins.length === displays.length && poolKey === key &&
+    poolWins.every((w) => !w.isDestroyed() && w._poolReady)
+  if (!dungPool && poolWins.length) { ghiLog('pool overlay lech (' + (poolKey === key ? 'chua nap' : 'doi man') + ') -> tao moi'); huyPool() }
+  displays.forEach((disp, idx) => {
+    const win = dungPool ? poolWins.find((w) => w._displayId === disp.id) : taoCuaSoOverlay(disp)
+    overlayWins.push(win)
     // ☠️ Nho wcId NGAY BAY GIO — 'closed' thi webContents da huy (vap 24-25/08).
     const wcId = win.webContents.id
     // image = null luc dau; grab xong (song song) moi dien vao de cat.
     overlayShots.set(wcId, { display: disp, sf: disp.scaleFactor || 1, image: null })
-
-    const laSelftest = IS_SELFTEST && idx === 0
-
-    win.loadFile(path.join(__dirname, 'overlay', 'index.html'))
-    win.webContents.once('did-finish-load', () => {
-      // origin = goc DIP toan cuc cua man nay — renderer quy doi toa do toan cuc.
-      win.webContents.send('overlay:init', {
-        selftest: laSelftest, origin: { x: b.x, y: b.y },
-        // [do] 14/09: selftest co SHAPE (duong cat anh goc aioshot://raw) / VAT 2 MAN (composite raw)
-        testShape: laSelftest && process.env.AIO_TEST_SHAPE === '1',
-        testComposite: laSelftest && process.env.AIO_TEST_COMPOSITE === '1',
-      })
-      // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
-      if (!win.isDestroyed() && !win.isVisible()) { win.show(); win.focus() }
-      ghiLog('overlay hien ' + disp.id)
-      // Grab da xong truoc khi overlay nay nap (GRAB_TRUOC) -> gui lai frozen cho no.
-      if (layersSanSang) {
-        const item = layersSanSang.find((L) => L.x === b.x && L.y === b.y)
-        const rec = overlayShots.get(wcId)
-        if (item && rec && !rec.image) { const raw = rawStore.get(item.key); if (raw) { rec.image = raw; rec.sf = item.sf } }
-        win.webContents.send('overlay:frozen', { layers: layersSanSang })
-      }
-      // Che do cu (AIO_GRAB_TRUOC=0): grab SAU khi overlay hien + lop mo toi xong.
-      if (!GRAB_TRUOC) setTimeout(kickGrab, GRAB_TRE_MS)
-      /* CHOT CHAN (31/08, sau khi bay 25/08 TAI DIEN thanh "double taskbar"):
-         cua so HUT so voi man = anh dong bang bi nen = taskbar doi. Do that
-         MOI lan mo — hut la ghi CANH BAO vao run-log, khoi doan mo lan sau. */
-      setTimeout(() => {
-        if (win.isDestroyed()) return
-        const wb = win.getBounds()
-        if (wb.width < b.width || wb.height < b.height) {
-          ghiLog('CANH BAO overlay HUT man ' + disp.id + ': xin ' +
-            b.width + 'x' + b.height + ' duoc ' + wb.width + 'x' + wb.height)
-        }
-      }, 200)
-      if (laSelftest) setTimeout(() => saveCapture(win, 'selftest-overlay.png'), 900)
-    })
     win.on('closed', () => {
       overlayShots.delete(wcId)
       overlayWins = overlayWins.filter((w) => w !== win)
     })
+    if (dungPool) kichHoatOverlay(win, disp, idx, true)
+    else win.webContents.once('did-finish-load', () => kichHoatOverlay(win, disp, idx, false))
   })
+  if (dungPool) { poolWins = []; poolKey = '' }
 }
 
 function closeOverlay() {
@@ -865,6 +967,7 @@ function closeOverlay() {
   overlayWins = []
   pending = null
   frozenStore.clear(); rawStore.clear() // JPEG ~1MB + NativeImage goc ~32MB/man 4K — khong giu sau khi chup
+  lenLichPool(400) // 0.5.0: tao san overlay cho luot sau
 }
 
 /* ---------------------------------------------------------------------- */

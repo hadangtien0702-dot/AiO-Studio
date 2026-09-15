@@ -1,12 +1,36 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-14 19:40 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 08:30 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - 🚀 **0.5.0 (15/09 08:xx) — LUONG CHUP CHAY SAN + OVERLAY TAO SAN: bam phim -> overlay hien
+>   12-35 ms (truoc 581 ms trung vi, 93 lan run-log 0.4.17).** Anh: "quá chậm, anh muốn 30ms là
+>   tối đa" sau khi tu chay lenh PowerShell do 486 ms/9 lan. Gốc: getSources sàn ~400 ms, KHÓA
+>   luồng chính ~285 ms (do 5 lan) -> khong overlay nao hien truoc grab duoc; native bi cam 14/09.
+>   Cach moi (`src/luong-chup.js` + `src/luong/` + `preload-luong.js`): cua so AN giu getDisplayMedia
+>   moi man @5fps; bam phim -> ve <video> len canvas = khung co ngay (0,2-1,4 ms). Overlay (pool,
+>   `taoPool`/`kichHoatOverlay` trong main.js) tao + nap san sau boot va sau moi luot -> hotkey chi
+>   show(). Duong cu grabDisplaysList() GIU lam du phong (luong chua san sang / loi 3 lan / doi man).
+>   **Do 15/09 (2 man 4K@1.5 + 2K@1.25):** selftest 3 lan: overlay hien +12/+22, +17/+35 ms; JPEG nen
+>   +152-218 ms; raw +335-579 ms. `npm test` 5/5 x6, `test:raw` 11/11 (SHAPE + COMPOSITE qua nguon=luong).
+>   Pixel luong vs getSources cung canh: lech RGB TB 1,4-2,1/255, lech sang Y TB 1,2-2,0, 1,5-2,8% diem
+>   Y lech >16 (chu dang chay tren man; luong vs luong = 0,0-0,5). **Video phan cung (mp4 xanh phat
+>   trong cua so Electron, vung 950x573 px):** luong = 90 · grab-truoc = 90 · doi chung overlay-truoc
+>   400 ms = **243 (trang, hong)** -> luong KHONG dinh loi video den/trang. CPU nam nen (dev, 1 loi):
+>   luong tat 15,5 % / 2fps 10,3 % / 5fps 11,6 % (so dev nhieu, KHONG dung; do lai tren ban cai).
+>   ☠️ **CHUA DO tren ban cai**: CPU/GPU/RAM nam nen (0.4.17 cai: 4 tien trinh 638 MB, CPU 0,3 %/loi);
+>   pool = +2 renderer overlay thuong truc (uoc +150-250 MB) — doi so sau khi cai. ☠️ Bay dung spike
+>   ghi trong dau `luong-chup.js` (data: URL khong co mediaDevices; can user gesture; thieu
+>   setDisplayMediaRequestHandler thi TREO; RGBA->BGRA). ☠️ **Em VI PHAM bai 3a**: selftest/video spike
+>   bung overlay + khay thu 2 tren man anh dang lam (anh: "bật overlay xong để đó hả em", "đang có 2
+>   cái khay"); them: chay exe dong goi lan 2 -> lock single-instance (cung exe) -> ban cai nhan
+>   second-instance -> BUNG overlay tren man anh (gio da ghi log dong `boot: da co ban khac`).
+>   Luat: **anh dang ngoi may thi KHONG chay selftest / exe thu**; xin gio truoc.
+>   [CHO] anh xin them TAY NAM KEO O 4 GOC khay (anh gui anh 15/09) — lam sau 0.5.0.
 > - 📏 **DO KHUNG OVERLAY TREN WINDOWS 15/09** (run-log 0.4.17, 93 lan chup, 2 man 4K@1.5 + 2K@1.25):
 >   bam phim -> overlay hien **trung vi 581 ms** (min 548, max 1.322 = khoi dong nguoi); grab 505 ms.
 >   Vi mo (scratchpad do-grab.js, 5 lan): getSources ~400 ms trong do **KHOA LUONG CHINH ~285 ms**
