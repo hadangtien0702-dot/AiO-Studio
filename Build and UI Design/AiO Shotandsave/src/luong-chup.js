@@ -129,8 +129,12 @@ ipcMain.on('luong:khung', (e, d) => {
   const display = screen.getAllDisplays().find((x) => String(x.id) === String(d.displayId))
   if (!cfg || !display) return
   let item = c.list.get(d.displayId)
-  if (!item) { item = { display, sf: cfg.sf, image: null, jpg: null }; c.list.set(d.displayId, item) }
-  if (d.loai === 'jpg') {
+  if (!item) { item = { display, sf: cfg.sf, image: null, jpg: null, jpgNhanh: null }; c.list.set(d.displayId, item) }
+  if (d.loai === 'nhanh') {
+    item.jpgNhanh = Buffer.from(d.buf)
+    c.daNhanh++
+    if (c.daNhanh === c.can && c.nhanh) { c.nhanh(Array.from(c.list.values())); c.nhanh = null }
+  } else if (d.loai === 'jpg') {
     item.jpg = Buffer.from(d.buf)
     c.daJpg++
     if (c.daJpg === c.can && c.jpg) { c.jpg(Array.from(c.list.values())); c.jpg = null }
@@ -141,15 +145,16 @@ ipcMain.on('luong:khung', (e, d) => {
   }
 })
 
-/** Lay khung hien tai cua MOI man. onJpg(list) goi som khi JPEG cua moi man da ve
+/** Lay khung hien tai cua MOI man. onNhanh(list) goi khi JPEG NHANH (nua do phan giai) cua moi man
+    da ve (item.jpgNhanh); onJpg(list) goi som khi JPEG cua moi man da ve
     (item.image con null); promise resolve khi ca raw da ve (list day du, cung shape
     voi grabDisplaysList: {display, image, jpg, sf}). */
-function layKhung(onJpg) {
+function layKhung(onNhanh, onJpg) {
   if (!sanSang()) return Promise.resolve([])
   gen++
   const g = gen
   return new Promise((resolve) => {
-    const c = { jpg: onJpg, resolve, list: new Map(), can: cauHinh.length, daJpg: 0, daRaw: 0 }
+    const c = { nhanh: onNhanh, jpg: onJpg, resolve, list: new Map(), can: cauHinh.length, daNhanh: 0, daJpg: 0, daRaw: 0 }
     cho.set(g, c)
     win.webContents.send('luong:lay', { gen: g })
     // Khong ve du trong 3s -> tra cai da co (co the rong) + khoi dong lai luong

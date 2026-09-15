@@ -34,6 +34,16 @@ window.luong.onLay(async ({ gen }) => {
     ctx.drawImage(v, 0, 0, w, h)
     khung.push({ cv, ctx, w, h, c })
   }
+  // Dot 0 (15/09): JPEG NHANH nua do phan giai, q0.8 (~20-40 ms/man) -> overlay co nen ngay,
+  // het khoang trong suot nhin xuyen xuong video (MPO) ra DEN trong luc doi JPEG day du.
+  for (const k of khung) {
+    const nw = Math.max(1, Math.round(k.w / 2)), nh = Math.max(1, Math.round(k.h / 2))
+    const cn = new OffscreenCanvas(nw, nh)
+    cn.getContext('2d').drawImage(k.cv, 0, 0, nw, nh)
+    const blob = await cn.convertToBlob({ type: 'image/jpeg', quality: 0.8 })
+    const buf = await blob.arrayBuffer()
+    window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'nhanh', buf })
+  }
   for (const k of khung) {
     const blob = await k.cv.convertToBlob({ type: 'image/jpeg', quality: 0.92 })
     const buf = await blob.arrayBuffer()

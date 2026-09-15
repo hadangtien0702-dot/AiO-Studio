@@ -1,12 +1,16 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 09:34 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 10:12 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - ✅ **0.5.1 ANH CHAM DAT 15/09 09:56 ("ngon rồi em")** — 3 anh chup YouTube Shorts (Chrome) gui ve deu du
+>   hinh video. => "lỗi chụp youtube" 09:2x la vung den LOE ~0,1-0,2 s luc overlay da hien ma JPEG nen chua
+>   ve (overlay trong suot nhin xuyen video MPO), KHONG phai anh luu den. Ban sua "JPEG nhanh nua do phan
+>   giai" (0.5.2, trong ma nguon, chua build) chi rut khoang loe ~120 -> ~30 ms — chua chac dang lam; hoi anh.
 > - 🍎 **MAC CHIP M: "AiO Shot & Save is damaged and can't be opened" (anh cai thu 15/09 09:39, tu zip
 >   arm64).** Goc: `build.mac.identity: null` = electron-builder KHONG ky gi ca; Apple Silicon tu choi
 >   binary khong co chu ky (Intel chi canh bao Gatekeeper). Sua tam cho anh: `xattr -cr` + `codesign --force
@@ -15,7 +19,13 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
-> - 🔴 **[DANG LAM, CHUA DONG GOI] 0.5.2 (15/09 09:34) — anh bao "lỗi chụp youtube": vung video YouTube
+> - 🟡 **0.5.2 (15/09 10:12) DANG DONG GOI — anh: "đóng gói bản mới này nhé em; anh đã thử trong Ai và Ae
+>   của Adobe rồi toàn bộ đã chạy"** (keo-tha 0.5.1 vao Illustrator + After Effects OK). Selftest qua luong
+>   (AIO_SELFTEST_TRE=9000): overlay +12/+20 ms, nhanh-xong 556 ms, grab-xong 623 ms, raw 1.291 ms — SO CHAM
+>   BAT THUONG vi luc do ban cai 0.5.1 dang chay song song (2 luong WGC x 2 app tren 2 man; lan dau grab cu
+>   2.750 ms). Doi so that sau khi cai (1 app). `npm test` 5/5, `test:raw` 11/11 (SHAPE + COMPOSITE nen=raw-png
+>   qua URL nhanh -> day du).
+> - 🔴 **[LUC 09:34, da xu ly o tren] 0.5.2 — anh bao "lỗi chụp youtube": vung video YouTube
 >   Shorts (Chrome) trong overlay ra DEN.** Do bang cua so an (scratchpad `so-den.js`, WGC bat/tat, 2 man,
 >   luoi 64x36 o, 2 lan): **0/2304 o** getSources-sang-ma-luong-toi; anh doi chung `luong-<id>.png` thay ro
 >   video Shorts -> LUONG KHONG DEN khi khong co gi phu. Gia thuyet con lai: 0.5.0 hien overlay o 7 ms nhung

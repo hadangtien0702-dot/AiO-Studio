@@ -163,7 +163,7 @@ app.whenReady().then(() => {
       'Cache-Control': 'max-age=60',      // background + Image cung URL dung chung cache
     }
     // aioshot://frozen/<gen>/<displayId>.jpg — anh dong bang (JPEG q92, chi de nhin)
-    let m = /^aioshot:\/\/frozen\/(\d+\/[^/]+)\.jpg$/.exec(req.url)
+    let m = /^aioshot:\/\/frozen\/(\d+\/[^/]+(?:\/nhanh)?)\.jpg$/.exec(req.url) // .../nhanh.jpg = ban nua do phan giai (0.5.2)
     if (m) {
       const buf = frozenStore.get(m[1])
       if (!buf) return new Response('', { status: 404 })
@@ -561,11 +561,17 @@ function kickGrab() {
     /* 0.5.0: khung tu LUONG CHAY SAN — JPEG ve truoc (hien overlay), raw ve sau (cat luc Xong).
        Truoc khi tin list: rong = luong hong -> roi ve grab cu ngay trong luot nay. */
     let daPhat = false
-    grabPromise = luong.layKhung((listJpg) => {
+    grabPromise = luong.layKhung((listNhanh) => {
+      // Dot 0 (0.5.2): nen NHANH nua do phan giai -> overlay co nen ngay, khong con nhin xuyen ra video den.
       daPhat = true
+      ghiLog('nhanh-xong ' + (Date.now() - _tg) + 'ms nguon=luong layers=' + listNhanh.length + ' [' +
+        listNhanh.map((x) => 'jpg ' + Math.round(x.jpgNhanh.length / 1024) + 'KB').join(' | ') + ']')
+      phatFrozen(listNhanh, null, 'luong', true)
+    }, (listJpg) => {
       ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms nguon=luong layers=' + listJpg.length + ' [' +
         listJpg.map((x) => 'jpg ' + Math.round(x.jpg.length / 1024) + 'KB').join(' | ') + ']')
-      phatFrozen(listJpg)
+      if (daPhat) capNhatFrozenDayDu(listJpg)
+      else { daPhat = true; phatFrozen(listJpg) }
     }).then((list) => {
       if (!list.length) {
         ghiLog('LUONG: khong ra khung -> roi ve grab cu')
@@ -597,7 +603,32 @@ function kickGrab() {
 
 /* Phat anh dong bang cho moi overlay. list = [{display, image|null, jpg, sf}]. Goi 1 lan
    cho moi luot chup (grabGen++). image co the null (luong: raw ve sau). */
-function phatFrozen(list, _tg, nguon) {
+/* Sau khi da phat ban NHANH: thay bang JPEG day du (cung gen, cung key/raw), overlay nap lai anh net. */
+function capNhatFrozenDayDu(list) {
+  if (!overlayWins.length || !layersSanSang) return
+  for (const x of list) frozenStore.set(grabGen + '/' + x.display.id, x.jpg)
+  doSangTest(list) // [do] AIO_TEST_SANG tren JPEG day du
+  const layers = layersSanSang.map((L) => Object.assign({}, L, { url: 'aioshot://frozen/' + L.key + '.jpg' }))
+  layersSanSang = layers
+  for (const win of overlayWins) { if (!win.isDestroyed()) win.webContents.send('overlay:frozen', { layers }) }
+}
+
+function doSangTest(list) {
+  if (!process.env.AIO_TEST_SANG) return
+  try {
+    const [id, vung] = process.env.AIO_TEST_SANG.split(':')
+    const [x, y, w, h] = vung.split(',').map(Number)
+    const it = list.find((q) => String(q.display.id) === id)
+    const src = it && (it.image || (it.jpg && nativeImage.createFromBuffer(it.jpg)))
+    if (!src) { ghiLog('[do] sang: khong co man ' + id); return }
+    const c = src.crop({ x, y, width: w, height: h }).resize({ width: 48, height: 48 }).toBitmap()
+    let sum = 0, n = 0
+    for (let i = 0; i < c.length; i += 4) { sum += (c[i] + c[i + 1] + c[i + 2]) / 3; n++ }
+    ghiLog('[do] sang vung ' + id + ' ' + x + ',' + y + ' ' + w + 'x' + h + ' = ' + Math.round(sum / n))
+  } catch (e) { ghiLog('[do] sang LOI ' + e.message) }
+}
+
+function phatFrozen(list, _tg, nguon, nhanh) {
   // ☠️ 10/09: khong chup duoc man nao -> bao NGAY + dong overlay. Truoc day
   //    overlay van mo voi layers=0, nguoi dung khoanh vung xong Enter -> khong
   //    ra anh, khong bao gi (mat im lang, cung lop loi voi luu-anh 0.4.3).
@@ -615,12 +646,12 @@ function phatFrozen(list, _tg, nguon) {
   grabGen++
   /* [do] AIO_TEST_SANG=<displayId>:<x>,<y>,<w>,<h> (px thiet bi): ghi do sang trung binh
      vung do vao run-log — bat "video den" bang so, khong bang mat (14/09). */
-  if (process.env.AIO_TEST_SANG) {
+  if (process.env.AIO_TEST_SANG && !nhanh) {
     try {
       const [id, vung] = process.env.AIO_TEST_SANG.split(':')
       const [x, y, w, h] = vung.split(',').map(Number)
       const it = list.find((q) => String(q.display.id) === id)
-      const src = it && (it.image || nativeImage.createFromBuffer(it.jpg))
+      const src = it && (it.image || nativeImage.createFromBuffer(it.jpg || it.jpgNhanh))
       if (src) {
         const c = src.crop({ x, y, width: w, height: h }).resize({ width: 48, height: 48 }).toBitmap()
         let sum = 0, n = 0
@@ -633,12 +664,12 @@ function phatFrozen(list, _tg, nguon) {
   const layers = list.map((x) => {
     const m = manCache.find((mm) => mm.id === x.display.id) || {}
     const key = grabGen + '/' + x.display.id
-    frozenStore.set(key, x.jpg)
+    if (nhanh) frozenStore.set(key + '/nhanh', x.jpgNhanh); else frozenStore.set(key, x.jpg)
     if (x.image) rawStore.set(key, x.image)
     return {
       x: x.display.bounds.x, y: x.display.bounds.y,
       w: x.display.bounds.width, h: x.display.bounds.height,
-      sf: x.sf, key, url: 'aioshot://frozen/' + key + '.jpg',
+      sf: x.sf, key, url: 'aioshot://frozen/' + key + (nhanh ? '/nhanh' : '') + '.jpg',
       px: m.px, py: m.py, pw: m.pw, ph: m.ph, // goc + co PHYS de ghep 1:1
     }
   })
