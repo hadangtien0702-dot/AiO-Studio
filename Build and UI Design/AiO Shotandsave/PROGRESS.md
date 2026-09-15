@@ -1,12 +1,19 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 08:30 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 09:05 +0700
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
 >   Tauri/`. ELECTRON (thu muc nay) LA BAN DUY NHAT, HET DONG BANG.** Truoc khi
 >   anh go Tauri tren may cong ty: **75 anh / 15 MB nam TRONG thu muc cai**
 >   `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — phai cai Electron 0.4.3 -> chep
 >   anh sang -> moi go (config Tauri KHONG tu chuyen: Shift+`, EN, PNG sieu,
 >   khay doc — dat lai tay).
+> - 🟡 **0.5.1 (15/09 09:0x) KEO CO KHAY O CA 4 GOC** — anh gui anh mui ten 4 goc: "ở phần UI anh muốn
+>   drag được cả 4 góc". 4 tay nam `.grip-goc` (tl giu id #grip cho harness; tr/bl/br lat bang transform),
+>   renderer gui `resizeStart(goc)`, main tinh: goc dang keo di theo chuot, goc DOI DIEN dung yen, kep
+>   [san, tran] nhu cu. Unit (node, 6 ca gom kep san/tran): 6/6. ☠️ CHUA chay `test:co-khay` (harness bung
+>   khay tren man anh dang lam — bai 3a); cai may cong ty 0.5.1.0 (mo qua explorer.exe), anh 145/145, cho
+>   anh keo thu. 📦 `Release/AiO Shotandsave/win/` 0.5.1; `mac/` 0.5.0 (dmg x64 + arm64, tu GitHub Actions
+>   run 34917859621 — chua co ban mac 0.5.1, push tiep se tu dung).
 > - ✅ **0.5.0 ANH XAC NHAN 15/09 08:53** bang chinh PowerShell tren may anh: 5 lan chup, phim ->
 >   overlay **7/8/8/11/20 ms, trung vi 8 ms** (ban cu cung bang: 411-474 ms), anh nen 108-159 ms.
 >   ☠️ **Bay moi (15/09): app do em bat tu trong Claude (Start-Process / bash) chay TRONG container

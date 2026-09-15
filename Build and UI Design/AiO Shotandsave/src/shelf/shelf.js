@@ -196,28 +196,30 @@ window.addEventListener('mouseup', () => {
 /* ── Tay nam goc tren-trai: DOI CO khay (14/09) ──────────────────────────
    Cung luat delta TUYET DOI nhu keo di chuyen. Main kep [san, tran] va giu goc
    duoi-phai. */
-const gripEl = document.getElementById('grip')
 let resizing = false
 let gocCo = { x: 0, y: 0 }
-if (gripEl) {
-  gripEl.addEventListener('mousedown', (e) => {
+let gripDangKeo = null
+for (const g of document.querySelectorAll('.grip-goc')) {
+  g.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return
     resizing = true
+    gripDangKeo = g
     gocCo = { x: e.screenX, y: e.screenY }
-    gripEl.classList.add('dang-keo')
-    window.shelf.resizeStart()
+    g.classList.add('dang-keo')
+    window.shelf.resizeStart(g.dataset.goc || 'tl') // goc dang keo: tl | tr | bl | br (15/09)
     e.preventDefault(); e.stopPropagation()
   })
-  window.addEventListener('mousemove', (e) => {
-    if (!resizing) return
-    window.shelf.resizeTo(e.screenX - gocCo.x, e.screenY - gocCo.y)
-  })
-  window.addEventListener('mouseup', () => {
-    if (!resizing) return
-    resizing = false
-    gripEl.classList.remove('dang-keo')
-    window.shelf.resizeEnd()
-  })
 }
+window.addEventListener('mousemove', (e) => {
+  if (!resizing) return
+  window.shelf.resizeTo(e.screenX - gocCo.x, e.screenY - gocCo.y)
+})
+window.addEventListener('mouseup', () => {
+  if (!resizing) return
+  resizing = false
+  if (gripDangKeo) gripDangKeo.classList.remove('dang-keo')
+  gripDangKeo = null
+  window.shelf.resizeEnd()
+})
 
 capNhatSoLuong()

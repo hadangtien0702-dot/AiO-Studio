@@ -36,7 +36,7 @@ contextBridge.exposeInMainWorld('shelf', {
   savePos: () => ipcRenderer.send('shelf:save-pos'),
 
   /* Doi co bang tay nam goc tren-trai (14/09): cung luat delta TUYET DOI. */
-  resizeStart: () => ipcRenderer.send('shelf:resize-start'),
+  resizeStart: (goc) => ipcRenderer.send('shelf:resize-start', goc || 'tl'),
   resizeTo: (tongDx, tongDy) => ipcRenderer.send('shelf:resize-to', tongDx, tongDy),
   resizeEnd: () => ipcRenderer.send('shelf:resize-end'),
 })

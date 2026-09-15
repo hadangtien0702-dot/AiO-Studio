@@ -1421,9 +1421,9 @@ ipcMain.on('shelf:drag-end', (e) => ketThucKeo(e.sender.id))
    NGUYEN goc DUOI-PHAI (khay thuong dat goc phai duoi man hinh -> to ra phia
    trong man). Tha chuot -> luu `khayCo[kieu]` + vi tri. */
 const resizeAnchors = new Map()
-ipcMain.on('shelf:resize-start', (e) => {
+ipcMain.on('shelf:resize-start', (e, goc) => {
   const w = BrowserWindow.fromWebContents(e.sender)
-  if (w && !w.isDestroyed()) resizeAnchors.set(e.sender.id, w.getBounds())
+  if (w && !w.isDestroyed()) resizeAnchors.set(e.sender.id, Object.assign(w.getBounds(), { goc: goc || 'tl' }))
 })
 ipcMain.on('shelf:resize-to', (e, tongDx, tongDy) => {
   const w = BrowserWindow.fromWebContents(e.sender)
@@ -1431,9 +1431,14 @@ ipcMain.on('shelf:resize-to', (e, tongDx, tongDy) => {
   if (!w || w.isDestroyed() || !neo) return
   const min = coKhayMin(), max = coKhayMax()
   const kep = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)))
-  const nw = kep(neo.width - tongDx, min.w, max.w)
-  const nh = kep(neo.height - tongDy, min.h, max.h)
-  w.setBounds({ x: neo.x + neo.width - nw, y: neo.y + neo.height - nh, width: nw, height: nh })
+  /* 15/09 anh xin keo CA 4 GOC: goc dang keo di theo chuot, goc DOI DIEN dung yen.
+     trai (tl/bl): keo trai = to ra, x doi; phai (tr/br): keo phai = to ra, x giu.
+     tren (tl/tr): keo len = to ra, y doi; duoi (bl/br): keo xuong = to ra, y giu. */
+  const goc = neo.goc || 'tl'
+  const trai = goc === 'tl' || goc === 'bl', tren = goc === 'tl' || goc === 'tr'
+  const nw = kep(neo.width + (trai ? -tongDx : tongDx), min.w, max.w)
+  const nh = kep(neo.height + (tren ? -tongDy : tongDy), min.h, max.h)
+  w.setBounds({ x: trai ? neo.x + neo.width - nw : neo.x, y: tren ? neo.y + neo.height - nh : neo.y, width: nw, height: nh })
 })
 ipcMain.on('shelf:resize-end', (e) => {
   resizeAnchors.delete(e.sender.id)

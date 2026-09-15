@@ -173,15 +173,16 @@ body.doc #empty {
 /* ── Tay nam DOI CO (14/09 anh Tien "keo cai khay to ra") ────────────────
    Goc tren-trai, 16x16, hien khi re chuot len khay. Keo len/trai = to ra, goc
    duoi-phai dung yen (main giu). San = co mac dinh, tran = 60% man hinh. */
-#grip {
-  position: absolute; left: 0; top: 0; z-index: 5;
+.grip-goc {
+  position: absolute; z-index: 5;
   width: 16px; height: 16px;
-  cursor: nwse-resize;
   opacity: 0;
   transition: opacity var(--dur) var(--ease);
-  background:
-    linear-gradient(135deg, var(--accent) 0 3px, transparent 3px 5px, var(--accent) 5px 7px, transparent 7px) no-repeat 0 0 / 11px 11px;
-  border-top-left-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--accent) 0 3px, transparent 3px 5px, var(--accent) 5px 7px, transparent 7px) no-repeat 0 0 / 11px 11px;
 }
-#shelf:hover #grip { opacity: 0.9; }
-#grip:hover, #grip.dang-keo { opacity: 1; }
+#grip    { left: 0;  top: 0;    cursor: nwse-resize; border-top-left-radius: var(--r-lg); }
+#grip-tr { right: 0; top: 0;    cursor: nesw-resize; border-top-right-radius: var(--r-lg);    transform: scaleX(-1); }
+#grip-bl { left: 0;  bottom: 0; cursor: nesw-resize; border-bottom-left-radius: var(--r-lg);  transform: scaleY(-1); }
+#grip-br { right: 0; bottom: 0; cursor: nwse-resize; border-bottom-right-radius: var(--r-lg); transform: scale(-1); }
+#shelf:hover .grip-goc { opacity: 0.9; }
+.grip-goc:hover, .grip-goc.dang-keo { opacity: 1; }
