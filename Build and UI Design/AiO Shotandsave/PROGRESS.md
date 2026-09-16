@@ -28,6 +28,11 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - ✅ **0.5.4 mac: LUOI KHAY NGANG ANH CHAM DAT 16/09 11:0x** ("như này cũng okie rồi đó em" — anh khay 3 hang
+>   x 3 cot, o rong bang anh, khong con nen den thua). CHO: chop 2 man con khong (JPEG nhanh da tat), chon
+>   A/B/C CPU nam nen (do 16/09 tren ban cai 0.5.4, 1 ban: fps 1 = 5,1 %, fps 5 = 25,5 %, tat luong = 4,8 %
+>   -> CPU ti le theo fps, ket luan 15/09 "khong doi theo fps" SAI vi ban 0.5.0 chay ngam; applyConstraints
+>   1->30 fps + khung moi = ~210 ms), mac A/B ky so.
 > - 🟡 **0.5.4 (16/09 10:15) LOI LUOI KHAY NGANG** — anh gui anh khay ngang keo to tren mac: cot 2 rong
 >   nguyen chieu ngang khay, anh dat trai, nen den thua. Goc: `#list` ngang = grid `auto-flow: column`,
 >   `grid-auto-columns: max-content` -> cot rong bang anh RONG NHAT trong cot (anh chup text dai), cac o
