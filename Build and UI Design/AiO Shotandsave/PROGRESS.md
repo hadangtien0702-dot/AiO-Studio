@@ -28,6 +28,19 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - 🍎 **TEST TREN CHIP M — 16/09 08:5x, anh: "em test trên môi trường mac chip M thử".** Khong co may mac ->
+>   dung runner GitHub `macos-latest` (arm64, macOS 26.6.2) trong `.github/workflows/shotandsave-mac.yml`:
+>   (1) `codesign --verify --deep --strict` OK, Signature=adhoc, TeamIdentifier=not set; `spctl` REJECTED
+>   (khong notarize -> nguoi dung phai Open Anyway, du kien). (2) Cap quyen Screen Recording bang cach ghi
+>   thang TCC.db (runner cho phep sudo sqlite3). (3) Selftest dev 2 luot: luot 1 duong grab (398 ms) -> luu
+>   410x307 + ghim OK; luot 2 doi luong (AIO_SELFTEST_TRE=6000): `capture-start ... luong`, **overlay hien
+>   +32 ms (san)**, nhanh 627 / jpg 681 / raw 687 ms (VM khong GPU, 1024x768), luu + ghim OK, 0 loi. Anh
+>   `.selftest/selftest-overlay.png`: overlay mac ve dung (menu bar, dock, hint, tray icon AiO), khay ve dung.
+>   => getDisplayMedia + pool + hotkey deu chay tren Apple Silicon. Nghi van nho: run-log luot 2 co 2 dong
+>   `LUONG: san sang` cach 0,6 s (khoiDong chay 2 lan — chac `display-metrics-changed` ban luc boot tren VM),
+>   vo hai (cua so cu bi destroy). Chua do: DPI Retina 2x, 2 man, video den, quyen TCC doi theo ban (ad-hoc).
+>   Quyen Screen Recording tren may anh: ad-hoc = moi build la "app khac" voi TCC -> phai cap lai; da huong
+>   dan `tccutil reset ScreenCapture com.aiostudio.shotandsave` + thoat/mo lai.
 > - 🟡 **0.5.3 (15/09 10:19) ANH DOC HIEN DOC TRONG KHAY** — anh: "ảnh chụp dọc trong khay ảnh phải hiển thị
 >   dọc chứ em". Goc: khay doc `.item img{max-height:150px; object-fit:cover; object-position:top}` -> anh
 >   cao hon rong bi CAT chi con phan tren (nhin nhu anh ngang). Sua: shelf.js gan class `doc-anh` khi h>w;
