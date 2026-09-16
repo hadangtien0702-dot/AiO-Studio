@@ -1,8 +1,8 @@
-AiO Shot & Save 0.5.3 cho macOS - 15/09/2026
+AiO Shot & Save 0.5.4 cho macOS - 16/09/2026
 
 Chon dung file theo may:
-  - Mac chip M (M1/M2/M3/M4): AiO-Shot-and-Save-0.5.3-mac-arm64.dmg
-  - Mac chip Intel:           AiO-Shot-and-Save-0.5.3-mac-x64.dmg
+  - Mac chip M (M1/M2/M3/M4): AiO-Shot-and-Save-0.5.4-mac-arm64.dmg
+  - Mac chip Intel:           AiO-Shot-and-Save-0.5.4-mac-x64.dmg
   (Khong biet chip gi: bam logo Apple -> About This Mac.)
 
 1. Mo file .dmg, keo "AiO Shot & Save" vao thu muc Applications.
