@@ -28,6 +28,10 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - ✅ **CHOP 2 MAN HET — anh xac nhan 16/09 11:1x** ("không [chớp] gì hết rồi em") tren mac 0.5.4 (JPEG nhanh
+>   tat). => Thu pham DA XAC NHAN: cu doi anh nen mo (nua do phan giai) -> net cua 0.5.2. Giu `AIO_NHANH`
+>   mac dinh TAT; khong bat lai cho nguoi dung. Bai hoc: "lap khoang trong" bang anh mo la doi mot cai
+>   trong suot 100 ms lay mot cu doi net 100 ms — mat nguoi dung bat cu doi ro hon khoang trong.
 > - ✅ **0.5.4 mac: LUOI KHAY NGANG ANH CHAM DAT 16/09 11:0x** ("như này cũng okie rồi đó em" — anh khay 3 hang
 >   x 3 cot, o rong bang anh, khong con nen den thua). CHO: chop 2 man con khong (JPEG nhanh da tat), chon
 >   A/B/C CPU nam nen (do 16/09 tren ban cai 0.5.4, 1 ban: fps 1 = 5,1 %, fps 5 = 25,5 %, tat luong = 4,8 %
