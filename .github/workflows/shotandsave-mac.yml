@@ -50,10 +50,17 @@ jobs:
         continue-on-error: true
         run: |
           rm -f .run-log.txt
-          (npx electron . --selftest --dev > selftest-mac.out 2>&1 &) ; PID=$!
+          (npx electron . --selftest --dev > selftest-mac.out 2>&1 &)
           sleep 25
           pkill -f "electron . --selftest" || true
-          echo "===== run-log:"; cat .run-log.txt || echo "(khong co run-log)"
+          echo "===== run-log (luot 1, duong grab):"; cat .run-log.txt || echo "(khong co run-log)"
+          cp .run-log.txt run-log-mac-1.txt 2>/dev/null || true
+          rm -f .run-log.txt
+          (AIO_SELFTEST_TRE=6000 npx electron . --selftest --dev > selftest-mac-2.out 2>&1 &)
+          sleep 30
+          pkill -f "electron . --selftest" || true
+          echo "===== run-log (luot 2, doi luong san sang):"; cat .run-log.txt || echo "(khong co run-log)"
+          cp .run-log.txt run-log-mac-2.txt 2>/dev/null || true
           echo "===== errors:"; cat .selftest/errors.txt 2>/dev/null || echo "(khong co errors.txt)"
           echo "===== stdout/stderr (40 dong cuoi):"; tail -40 selftest-mac.out || true
           ls -la .selftest 2>/dev/null || true
@@ -61,10 +68,11 @@ jobs:
         with:
           name: shotandsave-mac-test-log
           path: |
-            Build and UI Design/AiO Shotandsave/.run-log.txt
-            Build and UI Design/AiO Shotandsave/selftest-mac.out
+            Build and UI Design/AiO Shotandsave/run-log-mac-*.txt
+            Build and UI Design/AiO Shotandsave/selftest-mac*.out
             Build and UI Design/AiO Shotandsave/.selftest/*.png
           if-no-files-found: ignore
+          include-hidden-files: true
       - uses: actions/upload-artifact@v4
         with:
           name: shotandsave-mac
