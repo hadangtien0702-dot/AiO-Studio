@@ -1448,6 +1448,10 @@ ipcMain.on('shelf:drag-to', (e, tongDx, tongDy) => {
   keoDen(BrowserWindow.fromWebContents(e.sender), e.sender.id, tongDx, tongDy)
 })
 ipcMain.on('shelf:drag-end', (e) => ketThucKeo(e.sender.id))
+// Cai dat: keo qua IPC (16/09 — app-region drag native bi nhay tren Windows, anh bao)
+ipcMain.on('settings:drag-start', (e) => batDauKeo(BrowserWindow.fromWebContents(e.sender), e.sender.id))
+ipcMain.on('settings:drag-to', (e, tongDx, tongDy) => keoDen(BrowserWindow.fromWebContents(e.sender), e.sender.id, tongDx, tongDy))
+ipcMain.on('settings:drag-end', (e) => ketThucKeo(e.sender.id))
 
 /* ── DOI CO khay bang tay nam goc TREN-TRAI (anh Tien 14/09 "keo cai khay to ra") ──
    Cung luat voi keo di chuyen: neo bounds mot lan, renderer gui delta TUYET DOI,

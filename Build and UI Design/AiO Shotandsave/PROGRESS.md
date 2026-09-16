@@ -1,7 +1,7 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-16 10:31 +0700
-> - 📌 **BAN DANG DUNG: 0.5.4** (Windows cai 16/09 10:29; 0.5.3 cai 15/09 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
+> - 📌 **BAN DANG DUNG: 0.5.5** (Windows cai 16/09 11:33; 0.5.4 cai 10:29; 0.5.3 cai 15/09 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
 >   `Release/AiO Shotandsave/`). 0.5.0 = luong chup chay san + pool overlay (phim -> overlay 7-20 ms, anh
 >   tu do, 0.4.17 la 411-581 ms); 0.5.1 keo khay 4 goc; 0.5.2 JPEG nhanh truoc; 0.5.3 anh doc hien doc.
 > - **[CHO ANH]** (1) so PhimDenOverlayMs cua 0.5.3 tren may anh; (2) anh doc trong khay da dung chua;
@@ -28,6 +28,13 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - 🟡 **0.5.5 (16/09 11:21) KEO CUA SO CAI DAT BI NHAY** — anh (Windows): "drag setting nó bị lag... giống như
+>   là nhảy chỗ chứ không phải là di chuyển". Cai dat la cua so DUY NHAT con dung `-webkit-app-region: drag`
+>   (native Windows; frameless + resizable:false + DPI 150%/125%) — khay va ghim da doi sang keo qua IPC
+>   (delta TUYET DOI tu neo, `batDauKeo/keoDen`) tu 24/08 vi cung benh. Sua: settings.css bo app-region,
+>   settings.js mousedown #tieu-de (tru .dieu-khien) -> `settings:drag-start/to/end` -> main dung chung
+>   batDauKeo/keoDen/ketThucKeo. Chua do bang harness (khong co harness cho Cai dat; anh dang ngoi may
+>   Windows — khong bung cua so). Cho anh keo thu sau khi cai.
 > - ✅ **CHOP 2 MAN HET — anh xac nhan 16/09 11:1x** ("không [chớp] gì hết rồi em") tren mac 0.5.4 (JPEG nhanh
 >   tat). => Thu pham DA XAC NHAN: cu doi anh nen mo (nua do phan giai) -> net cua 0.5.2. Giu `AIO_NHANH`
 >   mac dinh TAT; khong bat lai cho nguoi dung. Bai hoc: "lap khoang trong" bang anh mo la doi mot cai

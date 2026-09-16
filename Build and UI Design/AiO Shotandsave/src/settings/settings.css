@@ -13,7 +13,10 @@ body { display: flex; flex-direction: column; }
 
 /* ── Header (frameless) — keo de di chuyen ────────────────────────────── */
 #tieu-de {
-  -webkit-app-region: drag;
+  /* 16/09 anh: "drag setting no bi lag... nhay cho" — `-webkit-app-region: drag` native tren Windows
+     (frameless + resizable:false, DPI 150%) keo bi nhay. Doi sang keo qua IPC nhu khay/ghim (delta
+     TUYET DOI tu neo, xem batDauKeo/keoDen trong main.js). */
+  cursor: grab; user-select: none;
   display: flex; align-items: center; justify-content: space-between;
   height: 46px; padding: 0 var(--sp-3) 0 var(--sp-4);
   border-bottom: 1px solid var(--line-1);

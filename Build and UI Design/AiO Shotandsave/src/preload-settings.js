@@ -28,4 +28,8 @@ contextBridge.exposeInMainWorld('settings', {
   setLang: (l) => ipcRenderer.invoke('settings:set-lang', l),
   /** Dong cua so cai dat (frameless nen phai tu goi). */
   close: () => ipcRenderer.send('settings:close'),
+  /** Keo di chuyen cua so bang thanh tieu de (16/09, thay app-region drag bi nhay). */
+  dragStart: () => ipcRenderer.send('settings:drag-start'),
+  dragTo: (tongDx, tongDy) => ipcRenderer.send('settings:drag-to', tongDx, tongDy),
+  dragEnd: () => ipcRenderer.send('settings:drag-end'),
 })

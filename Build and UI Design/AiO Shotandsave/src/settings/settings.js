@@ -11,6 +11,23 @@
 
 const t = (k) => window.i18n.t(k)
 
+/* Keo cua so bang thanh tieu de (16/09): mousedown tren #tieu-de (tru vung nut .dieu-khien)
+   -> gui delta TUYET DOI tu diem nhan (screenX/Y) -> main setBounds tu neo. */
+;(() => {
+  const bar = document.getElementById('tieu-de')
+  if (!bar) return
+  let keo = false, goc = { x: 0, y: 0 }
+  bar.addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || e.target.closest('.dieu-khien')) return
+    keo = true; goc = { x: e.screenX, y: e.screenY }
+    bar.style.cursor = 'grabbing'
+    window.settings.dragStart()
+    e.preventDefault()
+  })
+  window.addEventListener('mousemove', (e) => { if (keo) window.settings.dragTo(e.screenX - goc.x, e.screenY - goc.y) })
+  window.addEventListener('mouseup', () => { if (!keo) return; keo = false; bar.style.cursor = ''; window.settings.dragEnd() })
+})()
+
 const keysEl = document.getElementById('keys')
 const btnDoi = document.getElementById('doi')
 const btnHuyGhi = document.getElementById('huy-ghi')
