@@ -29,6 +29,42 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - run: ls -la dist | grep -E 'dmg|zip'
+      # ---- TEST TREN CHIP M (runner macos-latest = Apple Silicon), 15/09 anh: "em test tren moi truong mac chip M thu"
+      - name: Kiem chu ky + Gatekeeper (arm64)
+        run: |
+          uname -m; sw_vers
+          APP="dist/mac-arm64/AiO Shot & Save.app"
+          codesign --verify --deep --strict --verbose=2 "$APP" && echo "CODESIGN OK"
+          codesign -dv --verbose=2 "$APP" 2>&1 | grep -E 'Identifier|Signature|TeamIdentifier|flags'
+          spctl --assess --type exec -vv "$APP" 2>&1 || echo "SPCTL: bi tu choi (khong notarize — du kien, nguoi dung phai Open Anyway)"
+      - name: Cap quyen Screen Recording cho electron (thu)
+        run: |
+          TCC="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
+          ls -la "$TCC" || true
+          EL="$(pwd)/node_modules/electron/dist/Electron.app"
+          for CLIENT in "com.github.Electron" "$EL"; do
+            sudo sqlite3 "$TCC" "INSERT OR REPLACE INTO access (service,client,client_type,auth_value,auth_reason,auth_version,indirect_object_identifier_type,indirect_object_identifier,flags,last_modified) VALUES ('kTCCServiceScreenCapture','$CLIENT',0,2,2,1,0,'UNUSED',0,$(date +%s));" 2>&1 || echo "TCC ghi that bai cho $CLIENT"
+          done
+          sudo sqlite3 "$TCC" "SELECT service,client,auth_value FROM access WHERE service='kTCCServiceScreenCapture';" 2>&1 || true
+      - name: Chay selftest tren chip M (dev, 90s)
+        continue-on-error: true
+        run: |
+          rm -f .run-log.txt
+          (npx electron . --selftest --dev > selftest-mac.out 2>&1 &) ; PID=$!
+          sleep 25
+          pkill -f "electron . --selftest" || true
+          echo "===== run-log:"; cat .run-log.txt || echo "(khong co run-log)"
+          echo "===== errors:"; cat .selftest/errors.txt 2>/dev/null || echo "(khong co errors.txt)"
+          echo "===== stdout/stderr (40 dong cuoi):"; tail -40 selftest-mac.out || true
+          ls -la .selftest 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shotandsave-mac-test-log
+          path: |
+            Build and UI Design/AiO Shotandsave/.run-log.txt
+            Build and UI Design/AiO Shotandsave/selftest-mac.out
+            Build and UI Design/AiO Shotandsave/.selftest/*.png
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         with:
           name: shotandsave-mac
