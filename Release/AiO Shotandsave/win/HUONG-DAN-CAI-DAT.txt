@@ -1,5 +1,5 @@
-AiO Shot & Save 0.5.3 - 15/09/2026
+AiO Shot & Save 0.5.4 - 16/09/2026
 
-1. Chay AiO-Shot-and-Save-Setup-0.5.3.exe (mot cu bam, khong can Admin).
+1. Chay AiO-Shot-and-Save-Setup-0.5.4.exe (mot cu bam, khong can Admin).
 2. Windows hoi SmartScreen -> "More info" -> "Run anyway".
 3. Xong. Phim tat chup: Ctrl + Shift + S (doi trong Cai dat).

@@ -26,6 +26,9 @@ const path = require('path')
 
 const LUONG_FPS = Number(process.env.AIO_LUONG_FPS) > 0 ? Number(process.env.AIO_LUONG_FPS) : 5
 const TAT = process.env.AIO_LUONG === '0' // doi chung: ep di duong grab cu
+/* 16/09: JPEG NHANH (0.5.2) TAT mac dinh — anh: "co mot cai gi no chop len rat nhanh... rat kho chiu";
+   doi mo -> net sau ~100 ms chinh la cu chop. AIO_NHANH=1 de bat lai khi can doi chung. */
+const NHANH = process.env.AIO_NHANH === '1'
 
 let win = null
 let ghiLog = () => {}
@@ -154,9 +157,9 @@ function layKhung(onNhanh, onJpg) {
   gen++
   const g = gen
   return new Promise((resolve) => {
-    const c = { nhanh: onNhanh, jpg: onJpg, resolve, list: new Map(), can: cauHinh.length, daNhanh: 0, daJpg: 0, daRaw: 0 }
+    const c = { nhanh: NHANH ? onNhanh : null, jpg: onJpg, resolve, list: new Map(), can: cauHinh.length, daNhanh: 0, daJpg: 0, daRaw: 0 }
     cho.set(g, c)
-    win.webContents.send('luong:lay', { gen: g })
+    win.webContents.send('luong:lay', { gen: g, nhanh: NHANH })
     // Khong ve du trong 3s -> tra cai da co (co the rong) + khoi dong lai luong
     setTimeout(() => {
       if (!cho.has(g)) return
@@ -181,4 +184,4 @@ function theoDoiMoiTruong() {
   } catch (e) {}
 }
 
-module.exports = { khoiDong, sanSang, layKhung, theoDoiMoiTruong, LUONG_FPS, TAT }
+module.exports = { khoiDong, sanSang, layKhung, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH }

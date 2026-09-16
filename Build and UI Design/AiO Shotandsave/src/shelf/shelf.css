@@ -78,6 +78,9 @@ html, body {
   grid-template-rows: repeat(auto-fill, 64px);
   grid-auto-columns: max-content;
   align-content: start; justify-content: start;
+  /* 16/09 anh: "lỗi grid trong khay" — cot rong = anh RONG NHAT trong cot, cac o khac bi keo gian theo
+     (justify-self mac dinh stretch) -> nen den thua ben phai anh. O chi rong bang anh cua no. */
+  justify-items: start;
   gap: var(--sp-3);
   padding: var(--sp-3);
   overflow-x: auto; overflow-y: hidden;

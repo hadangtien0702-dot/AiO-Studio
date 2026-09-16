@@ -1,7 +1,7 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-15 14:07 +0700
-> - 📌 **BAN DANG DUNG: 0.5.3** (cai may cong ty 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-16 10:31 +0700
+> - 📌 **BAN DANG DUNG: 0.5.4** (Windows cai 16/09 10:29; 0.5.3 cai 15/09 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
 >   `Release/AiO Shotandsave/`). 0.5.0 = luong chup chay san + pool overlay (phim -> overlay 7-20 ms, anh
 >   tu do, 0.4.17 la 411-581 ms); 0.5.1 keo khay 4 goc; 0.5.2 JPEG nhanh truoc; 0.5.3 anh doc hien doc.
 > - **[CHO ANH]** (1) so PhimDenOverlayMs cua 0.5.3 tren may anh; (2) anh doc trong khay da dung chua;
@@ -28,6 +28,23 @@
 >   (CSC_IDENTITY_AUTO_DISCOVERY=false). Sua that: `scripts/afterSign.js` goi `codesign --force --deep
 >   --sign -` tren .app (b532df7); run 34922265671 log "[afterSign] da ky ad-hoc" cho CA x64 lan arm64,
 >   artifact = ban 0.5.1 mac. CHUA co anh test lai tren chip M. Huong dan mac da them dong codesign.
+> - 🟡 **0.5.4 (16/09 10:15) LOI LUOI KHAY NGANG** — anh gui anh khay ngang keo to tren mac: cot 2 rong
+>   nguyen chieu ngang khay, anh dat trai, nen den thua. Goc: `#list` ngang = grid `auto-flow: column`,
+>   `grid-auto-columns: max-content` -> cot rong bang anh RONG NHAT trong cot (anh chup text dai), cac o
+>   khac trong cot bi `justify-self: stretch` mac dinh keo theo (nen `.item` bg-0 = mang den). Sua 1 dong:
+>   `#list { justify-items: start }`. Harness `test:co-khay ngang`: lan 1 co 1 phep TRUOT ("o giu 64px" do
+>   61->63, tam thoi), lan 2 DAT o 129x64 -> 129x64 hang=2; cac phep khac DAT.
+>   **Kem trong 0.5.4: TAT JPEG NHANH (0.5.2) mac dinh** — anh 10:2x: "khi anh bấm chụp ở 2 màn có một cái gì
+>   nó chớp lên rất nhanh... rất khó chịu", "giống như nó chụp lại màn trước xong mới có lớp overlay". Gia
+>   thuyet: cu doi anh nen MO (nua do phan giai) -> NET sau ~100 ms = cai chop (0.5.1 khong co buoc nay, anh
+>   chấm "ngon"). `AIO_NHANH=1` bat lai de doi chung; renderer bo qua dot nhanh khi flag tat. CHUA xac nhan
+>   voi anh (anh dang o mac, can ban mac 0.5.4 tu GitHub).
+>   ☠️ **Bay thuoc 15/09 lo ra**: ban dong goi 0.5.0 chay tu `dist/win-unpacked` (AIO_USERDATA) KHONG chet nhu
+>   em ket luan — con 7 tien trinh song ngam toi 16/09 10:2x (build 0.5.4 lan 1 EBUSY rmdir win-unpacked).
+>   Thuoc sai: `Get-Process | Where Path -like "*win-unpacked*"` tra 0 (Path doc loi/null) -> "0 tien trinh".
+>   Hau qua: cac so CPU/RAM nam nen 15/09 loc theo TEN co the gom ca ban ngam. Do lai 16/09 10:29 ngay sau boot
+>   0.5.4 (1 ban): CPU 21,0 % mot loi / 30 s, RAM 762 MB / 6 tien trinh — van cao; do lai sau 5 phut.
+>   Cai may cong ty 0.5.4.0 (explorer.exe), anh 208/208.
 > - 🍎 **TEST TREN CHIP M — 16/09 08:5x, anh: "em test trên môi trường mac chip M thử".** Khong co may mac ->
 >   dung runner GitHub `macos-latest` (arm64, macOS 26.6.2) trong `.github/workflows/shotandsave-mac.yml`:
 >   (1) `codesign --verify --deep --strict` OK, Signature=adhoc, TeamIdentifier=not set; `spctl` REJECTED
