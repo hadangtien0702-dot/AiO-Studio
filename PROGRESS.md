@@ -5,6 +5,35 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [hub-va-mac] - 2026-09-21 17:4x (UTC+7) - Panel tổng: chốt kiểu BỆ PHÓNG + 3 bản vẽ chờ chọn · Mac: KHÔNG mua Apple Developer
+
+### Trạng thái hiện tại (phiên sau đọc đầu tiên)
+- [CHỜ ANH] Chọn giao diện panel tổng A / B / C: https://claude.ai/artifact/GmdDjRe5oRJuNBr3uAbubN — chọn xong mới code.
+- [CHỜ ANH] Đổi Music → "Keynote": Keynote làm việc gì (xem mục [ba-may-mac]).
+- Tối 21/09 anh làm trên Mac: lần đầu chạy `bash scripts/dong-bo-mac.sh --cai-them` (chưa từng chạy trên Mac thật).
+
+### Bối cảnh
+Anh gửi ảnh MFinder (app Mac có hộp "A new version… Install Update" của Sparkle) — *"trên mac anh muốn app mình được cài như thế này"* —
+và *"làm ra một panel tổng để dễ dàng mở tool… quản lí toàn bộ tool qua panel tổng… nhìn cho đẹp và chuyên nghiệp"*.
+
+### Đo trước khi đề xuất
+- **Đã có sẵn** "AiO Welcome Hub" (`com.aio.welcome` 1.5.0, 03/08) — nhưng: CHƯA cài (`CEP/extensions` không có), liệt kê **7/12** tool,
+  **7/7 nút gọi sai ID** (`com.aio.autocut` ≠ ID thật `com.aiostudio.autocut`) → bấm không mở được gì; cửa sổ Modeless 1020×720.
+- Mở panel khác từ panel: `requestOpenExtension` — skill adobe-cep-panel đã ghi chạy được (panel đích lên sau ~1 s).
+- Thị trường: AutoCut = MỘT panel có menu 10 tool (autocut.com). Mac tự cập nhật (Squirrel.Mac/Sparkle) **bắt buộc** ký Developer ID +
+  notarize (tài liệu Electron + electron-builder) → 99 USD/năm. Shot & Save hiện KHÔNG có dòng code cập nhật nào, `hardenedRuntime: false`.
+
+### Anh chốt (bảng hỏi 3 câu)
+1. Panel tổng = **A. Bệ phóng** (không gộp 11 panel thành 1). 2. Mac = **Không mua** 99 USD/năm. 3. Giao diện = **em vẽ nháp để anh chọn**.
+Ghi vào bảng quyết định mục 3 `CLAUDE.md` kèm lý do.
+
+### Bản vẽ
+6 artboard (A 380/300 · B 380/300 · C 72/300), dữ liệu thật: phiên bản đọc từ manifest 21/09, trạng thái cài đọc từ `CEP/extensions`
+máy công ty (10 panel + Shot & Save app + Organize "Sắp có"). Logo thật `AiO Logo Mark.png` của website. Icon Lucide nét 1.9 (luật icon AiO),
+0 emoji, thẻ mở/đóng khớp 6/6 file. **Đã tự nhìn**: chụp headless Chrome cả 6 bản cạnh nhau — 12 tool hiện đủ, không tràn ở 300px.
+Bộ sinh: `scratchpad/hub/taoban.mjs` (ngoài repo).
+
+
 ## [ba-may-mac] - 2026-09-21 16:21 (UTC+7) - THÊM MÁY MAC: script dong-bo-mac.sh + /xong push cho 3 máy
 
 ### Trạng thái hiện tại (phiên sau đọc đầu tiên)
