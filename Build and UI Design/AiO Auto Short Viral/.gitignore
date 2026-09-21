@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+certs/
+bin/
+tests/js/
+client/vite.config.js
+client/vite.config.d.ts
+client/tsconfig.tsbuildinfo

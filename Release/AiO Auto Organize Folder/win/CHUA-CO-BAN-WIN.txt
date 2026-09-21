@@ -1,1 +1,1 @@
-Chua co ban phat hanh cho Windows. Khi co: tao thu muc <yyyy-mm-dd>-<so ban>/win va dat bo cai vao.
+Chua co ban phat hanh cho Windows. Khi co: dat bo cai MOI NHAT thang vao thu muc nay (khong tao thu muc con theo ngay), so ban nam trong ten file, roi xoa file nay. Luat: Release/README.md.

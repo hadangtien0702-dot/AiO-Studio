@@ -1,0 +1,28 @@
+{
+  "name": "aio-studio-shortviral",
+  "private": true,
+  "version": "0.1.2",
+  "type": "module",
+  "description": "AiO Studio - Auto Short Viral: doc noi dung clip, chia khoi hoi-dap, dat marker hoac tao sequence moi",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node ../tests/kiem-byte.mjs",
+    "preview": "vite preview",
+    "build:release": "tsc -b && vite build --mode release && node ../tests/kiem-byte.mjs",
+    "kiem": "tsc src/services/kieu.ts src/services/moc.ts src/services/hoidap.ts src/services/xuat.ts --target es2020 --module es2020 --skipLibCheck --outDir ../tests/js && node ../tests/kiem-hoidap.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-singlefile": "^2.3.3",
+    "zxp-sign-cmd": "^2.0.0"
+  }
+}

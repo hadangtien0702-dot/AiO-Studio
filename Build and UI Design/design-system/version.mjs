@@ -1,5 +1,6 @@
 /**
- * version.mjs — MỘT CHỖ DUY NHẤT quản version của cả 4 panel.
+ * version.mjs — MỘT CHỖ DUY NHẤT quản version của các panel có build (mảng
+ * PANEL bên dưới — lúc lập 30/07 là 4 panel, 19/09 là 6).
  *
  * ══════════════════════════════════════════════════════════════════════════
  * VÌ SAO PHẢI CÓ — anh Tiến 30/07
@@ -32,7 +33,14 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 
 const GOC = new URL('../', import.meta.url)
-const PANEL = ['AiO Asset Manager', 'AiO Power Bins', 'AiO Autocut', 'AiO Transcripts', 'AiO Video Download']
+const PANEL = [
+  'AiO Asset Manager',
+  'AiO Power Bins',
+  'AiO Autocut',
+  'AiO Transcripts',
+  'AiO Video Download',
+  'AiO Auto Short Viral',
+]
 const SUA = process.argv.includes('--sua')
 
 const duong = (p) => new URL(p, GOC)
@@ -74,16 +82,19 @@ function doc(ten) {
 const bang = PANEL.map(doc)
 let lech = 0
 
+// Cột tên rộng theo tên DÀI NHẤT + 2 — cứng 20 thì "AiO Auto Short Viral" (đúng
+// 20 ký tự) dính liền cột nhật ký thành "Viral0.0.0" (đo 19/09).
+const RONG_TEN = Math.max(...PANEL.map((t) => t.length)) + 2
 console.log(
-  `\n${'Panel'.padEnd(20)}${'Nhat ky'.padEnd(16)}${'manifest bundle'.padEnd(17)}${'manifest ext'.padEnd(15)}package.json`,
+  `\n${'Panel'.padEnd(RONG_TEN)}${'Nhat ky'.padEnd(16)}${'manifest bundle'.padEnd(17)}${'manifest ext'.padEnd(15)}package.json`,
 )
-console.log('-'.repeat(84))
+console.log('-'.repeat(RONG_TEN + 64))
 for (const r of bang) {
   const mongManifest = choManifest(r.nhatKy)
   const ok = r.bundle === mongManifest && r.ext === mongManifest && r.pkg === r.nhatKy
   if (!ok) lech++
   console.log(
-    r.ten.padEnd(20) +
+    r.ten.padEnd(RONG_TEN) +
       (r.nhatKy || '-').padEnd(16) +
       (r.bundle || '-').padEnd(17) +
       (r.ext || '-').padEnd(15) +
@@ -95,8 +106,8 @@ for (const r of bang) {
 if (!SUA) {
   console.log(
     lech
-      ? `\n${lech}/4 panel LECH version. Chay lai voi --sua de dong bo theo nhat ky.`
-      : '\n4/4 panel KHOP version.',
+      ? `\n${lech}/${PANEL.length} panel LECH version. Chay lai voi --sua de dong bo theo nhat ky.`
+      : `\n${PANEL.length}/${PANEL.length} panel KHOP version.`,
   )
   process.exit(lech ? 1 : 0)
 }

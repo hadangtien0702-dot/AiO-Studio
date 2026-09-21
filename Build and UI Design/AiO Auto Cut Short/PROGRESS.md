@@ -1,5 +1,34 @@
 # AiO Auto Cut Short - Nhat ky
 
+## [0.0.4] - 2026-09-18 19:18 (UTC+7) - ANH HOI: GOP VAO AUTOCUT HAY TACH PANEL? + do lai dau "?"
+
+Anh Tien de xuat mo rong: (1) biet doan nao dang noi gi ngay trong panel,
+(2) kiem soat noi dung video, (3) tu de xuat doan cung y / tu tach HOI-DAP
+thanh doan trong sequence hoac sequence moi, (4) thao tac muot trong panel.
+Hoi: gop vao Autocut hay lam panel moi. Chua viet code — CHO ANH CHOT.
+
+**ANH CHOT 18/09 (sau muc nay):** tinh nang do la panel MOI `AiO Auto Short Viral`
+(cong 8100) — KHONG lam o day. Anh chon **giu Auto Cut Short la san pham RIENG**
+(van giu cong 8093 + 4 quyet dinh 30/07). Ranh gioi hai tool CHUA vach — hoi anh
+truoc khi ai do viet nao chia hoi-dap. De xuat "lam o CHO NAY" ben duoi da BI BAC.
+
+Em de xuat: KHONG gop vao Autocut (dong bang 19/08, da qua tai anh; dock 360px
+khong chua noi danh sach noi dung; nghien cuu thi truong 10/09 de xuat dua
+Autocut vao Free). Lam o CHO NAY (Auto Cut Short) vi y (3) chinh la quyet dinh
+30/07 "chia theo cau hoi" — mo rong thanh "ban do noi dung", short la mot dau ra.
+
+Do lai tren 4 ban chep that co san (doc thang .autocut-nghe.json):
+- Heygen tieng Viet 1,4 phut: 16 cau, 2 cau "?" (Whisper co cham "?" tieng Viet)
+- Conspiracy 26 phut: 363 cau, 3 dau "?" (ca 3 cuoi cau)
+- Gnostic 39 phut: 455 cau, **21 dau "?" nhung chi 9 o cuoi cau — 12 nam GIUA cau**
+- Machine 55 phut: 803 cau, **28 dau "?", 21 cuoi cau, 7 giua cau**; 35 cau mo
+  dau "- " (luot thoai)
+-> Khop so 31/07 (3/9/21 cau ket thuc bang "?"), nhung phep dem 31/07 chi bat
+   "?" o CUOI cau Whisper -> sot 57% (Gnostic) / 25% (Machine). Nao hoi-dap
+   phai tach o muc TU. Ca 4 file la phim tai lieu/thuyet minh, KHONG co file
+   phong van host-khach tieng Viet nao da chep — lieu Podcast 40 phut 2 nguoi
+   (25/08) la ung vien do dung nhat.
+
 ## [0.0.3] - 2026-07-31 15:08 (UTC+7) - DUONG ONG CHAY THONG LAN DAU, co "ngat cau dung"
 
 Anh Tien them yeu cau: *"dac biet la phai ngat cau dung nha em"*. Da chay thong

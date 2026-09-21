@@ -72,6 +72,14 @@ v0 phải đưa **danh sách ứng viên kèm lý do bằng số**, không tự 
 
 ### Việc phải SPIKE trước khi xây (thứ tự)
 
+> ☠️ **Cập nhật 18/09/2026 — danh sách dưới đây ĐÃ CŨ, đọc `PROGRESS.md` trước.**
+> Spike 1 + 3 ĐẠT ngày 31/07 (tiếng Anh). **Spike 2 làm SẬP Premiere 31/07** —
+> `exportAsMediaDirect` và cả `app.encoder.*` nay là **CẤM** (skill `adobe-cep-panel`
+> mục 6e-bis). Bản nháp 480p đi đường **FFmpeg cắt thẳng từ file gốc**, không đụng
+> Premiere. Đo thêm 18/09: bộ đếm cũ chỉ bắt `?` ở CUỐI câu Whisper — sót **12/21**
+> dấu `?` (video Gnostic) và **7/28** (video Machine) nằm GIỮA câu → phải tách ở
+> mức TỪ, không ở mức câu.
+
 1. **Whisper có chấm dấu `?` tin được không** — đo trên 3 video Test có sẵn
    (đếm câu `?` thật vs nghe tai vài đoạn).
 2. **Xuất 480p bằng script**: `seq.exportAsMediaDirect(outPath, eprPath,

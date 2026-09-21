@@ -1,0 +1,1591 @@
+/* =========================================================================
+   AiO Studio — Auto Short Viral · dáng riêng của panel này
+
+   Token (màu, thang chữ, khoảng cách, chiều cao control) KHÔNG nằm ở đây.
+   Nguồn chân lý: `design-system/tokens.css`. File `tokens.css` cạnh bên là
+   BẢN COPY do `dong-bo-tokens.ps1` sinh ra — đừng sửa nó.
+
+   ☠️ KHÔNG MÃ MÀU CỨNG trong file này (grep `#[0-9a-f]{3,6}` / `rgb(` phải ra
+   0 ngoài chú thích). Cần màu mới thì thêm token ở design-system trước.
+
+   Bốn chỗ khuôn (panel tải video của bộ, 08/09) LỆCH LUẬT — cố ý KHÔNG chép:
+     1. nút cam chữ trắng 13px/600 → ở đây 15px (--fs-lg) / 700: trắng trên
+        cam chỉ 3,0:1, WCAG chỉ cho qua khi chữ ≥14px + đậm (tokens.css);
+     2. `.than` không giới hạn bề ngang → ở đây max 680 (MASTER "Bố cục");
+     3. icon viewBox 16 tô đặc → ở đây viewBox 24, nét 1.9 (luật icon 07/08);
+     4. `letter-spacing` ở nút ngôn ngữ → bỏ (MASTER luật nút #2).
+   ========================================================================= */
+@import './tokens.css';
+
+/* Danh sách xổ của <select>, thanh cuộn, ô tích do HỆ ĐIỀU HÀNH vẽ — CSS
+   thường không với tới; chỉ `color-scheme` đổi được. Thiếu dòng này là ô chọn
+   sequence xổ ra nền TRẮNG giữa panel tối (Autocut 19/08, anh Tiến chụp). */
+:root {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* <button> <input> <select> KHÔNG kế thừa font từ body (bài 02/09 Dashboard). */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg-2);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.ic {
+  display: block;
+  flex: none;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1.3;
+}
+
+/* ── Khung tổng ──────────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topbar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap; /* khổ hẹp không được bẻ thanh trên thành cột dọc (bài 06/09) */
+  gap: var(--sp-3);
+  align-items: center;
+  height: var(--h-topbar);
+  padding: 0 var(--sp-4);
+  border-bottom: 1px solid var(--line-1);
+  background: var(--bg-1);
+}
+/* Icon đổi màu theo trạng thái thay cho một chấm đèn riêng (MASTER lỗi #9). */
+.topbar__icon {
+  display: flex;
+  flex: none;
+  color: var(--accent);
+}
+.topbar__icon--tat {
+  color: var(--text-3);
+}
+.topbar__ten {
+  flex: none;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+.chon-seq {
+  flex: 0 1 280px;
+  min-width: 0;
+  height: var(--h-ctrl);
+  margin-left: auto;
+  padding: 0 var(--sp-2);
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.chon-seq:hover:not(:disabled) {
+  border-color: var(--line-strong);
+}
+.chon-seq:disabled {
+  color: var(--text-3);
+  cursor: default;
+}
+
+/* Dock hẹp (< 360px): nhường chỗ cho ô chọn sequence. Tên panel vẫn nằm trên
+   tab panel của Premiere ("AiO Studio - Auto Short Viral"), icon vẫn còn. */
+@media (max-width: 359px) {
+  .topbar__ten {
+    display: none;
+  }
+}
+
+/* ☠️ GIỚI HẠN BỀ NGANG 680 — panel CEP kéo được tới hết màn hình; không giới
+   hạn thì nút chính dài 1.500px, đọc rất mệt (MASTER "Bố cục", Transcripts). */
+.than {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: 680px;
+  min-height: 0;
+  margin: 0 auto;
+  padding: var(--sp-4);
+  overflow-y: auto;
+  /* Chừa chỗ thanh cuộn KỂ CẢ khi chưa cuộn (Chromium 94+; CEP cũ bỏ qua dòng
+     này, không hại gì) — danh sách dài ra không làm cả khối xê dịch ngang, và
+     bề rộng thanh cuộn đo được cố định để thanh đáy thẳng hàng (App.tsx
+     `--rong-thanh-cuon`). */
+  scrollbar-gutter: stable;
+}
+
+/* ── Dòng nguồn (khuôn `.selbar` Autocut/Transcripts) ────────────────── */
+
+.nguon {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: var(--sp-1) var(--sp-2);
+  align-items: center;
+  min-height: 34px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+}
+.nguon__ic {
+  color: var(--icon-dim);
+}
+.nguon__nhan {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.nguon--trong .nguon__nhan {
+  color: var(--text-2);
+}
+.nguon__so {
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+.nguon__dai {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+.nguon__phim {
+  white-space: nowrap;
+}
+
+/* Vùng đổi sau khi đọc: MỘT phần tử vừa báo vừa là việc cần làm. Vàng = còn
+   việc phải làm (không phải hỏng) — nghĩa của --warn trong MASTER. */
+.nut-canh {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--sp-2);
+  align-items: center;
+  width: 100%;
+  min-height: var(--h-ctrl);
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--warn);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--warn);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+.nut-canh:hover {
+  background: var(--bg-hover);
+}
+
+/* ── Nút ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: center;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--bg-5);
+}
+.btn:active:not(:disabled) {
+  background: var(--bg-active);
+}
+.btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.btn--nho {
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+/* NÚT CHÍNH cam. ☠️ `--accent-on` là TRẮNG: trắng trên cam = 3,0:1 → CHỈ hợp
+   lệ khi chữ ≥14px VÀ đậm. Nên cỡ --fs-lg (15px) + 700, không bớt được.
+   Không in hoa, không giãn chữ (MASTER luật nút #1, #2). */
+.btn--chinh {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+}
+.btn--chinh:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--accent-hover);
+}
+.btn--chinh:active:not(:disabled) {
+  background: var(--accent-pressed);
+}
+/* Chưa bấm được: XÁM hẳn, không phải cam mờ — "chưa có vùng" khác "đang khoá". */
+.btn--chinh:disabled {
+  border-color: var(--line-2);
+  background: var(--bg-4);
+  color: var(--text-3);
+  opacity: 1;
+}
+.btn--lon {
+  width: 100%;
+  height: var(--h-ctrl-lg);
+}
+/* Đèn XONG: xanh, chữ tối (luật anh Tiến "nhìn màu là biết"). */
+.btn--xong,
+.btn--xong:disabled {
+  border-color: transparent;
+  background: var(--ok);
+  color: var(--bg-0);
+  opacity: 1;
+}
+/* Nửa mũi tên của nút tách đôi vẫn BẤM ĐƯỢC khi đã xong (đổi cách tạo) — rê
+   chuột vào thì `.btn--chinh:hover:not(:disabled)` (0,3,0) thắng `.btn--xong`
+   (0,1,0) và nút xanh lộ một mảng CAM (soát 19/09). Cùng độ ưu tiên, đặt SAU. */
+.btn--xong:hover:not(:disabled),
+.btn--xong:active:not(:disabled) {
+  border-color: transparent;
+  background: var(--ok);
+  color: var(--bg-0);
+}
+/* Nút PHỤ đã làm xong: viền + chữ xanh, vẫn bấm lại được. */
+.btn--da-xong {
+  border-color: var(--ok);
+  background: transparent;
+  color: var(--ok);
+}
+.btn--nguy {
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+.btn--nguy:hover:not(:disabled) {
+  border-color: var(--danger-strong);
+  background: var(--bg-hover);
+}
+
+/* Nút chỉ có icon. Icon mờ = --icon-dim (MASTER luật icon 03). */
+.nut-ic {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--h-ctrl);
+  height: var(--h-ctrl);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--icon-dim);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.nut-ic:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+.nut-ic:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.nut-ic--nho {
+  width: var(--h-ctrl-sm);
+  height: var(--h-ctrl-sm);
+}
+
+/* Nút dạng chữ (Chọn hết / Bỏ chọn) — không phải CTA. */
+.nut-chu {
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-1);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--accent-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.nut-chu:hover:not(:disabled) {
+  color: var(--text-1);
+}
+.nut-chu:disabled {
+  color: var(--text-3);
+  cursor: default;
+}
+
+/* Việc phá (xoá marker): viền đỏ, nhỏ, đặt XA nút hay bấm (cuối danh sách). */
+.nut-nguy {
+  align-self: center;
+  flex-shrink: 0;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--danger);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--danger);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  cursor: pointer;
+}
+.nut-nguy:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+.nut-nguy:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Màn trước khi đọc ───────────────────────────────────────────────── */
+
+.bat-dau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.gioi-thieu {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.ghi-chu {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+.ghi-chu--thu {
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+}
+.ghi-chu-khoi {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.ghi-chu--canh {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--text-2);
+}
+.ghi-chu--canh > span {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Thiếu whisper/ffmpeg: nói thiếu gì + tải ở đâu (câu của kiemBoMay).
+   Gạch VÀNG (--warn), không đỏ: đây là VIỆC CẦN LÀM (cài thêm), và cùng tình
+   huống đi qua dòng thông báo (THIEU_BO_MAY) cũng tô vàng — một nghĩa một màu
+   (soát 19/09: bản đầu hai chỗ hai màu). */
+.thieu-may {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+}
+.thieu-may__chu {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+/* Dòng thông báo: CHỈ khi hỏng / dừng giữa chừng / có con số cần soát.
+   Nền trung tính + gạch màu bên trái (không có token nền đỏ/vàng nhạt — đừng
+   đẻ màu cứng). Chữ --text-1 để đọc rõ; màu nằm ở gạch. */
+.thong-bao {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-left: 3px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+}
+.thong-bao--loi {
+  border-left-color: var(--danger);
+}
+.thong-bao--canh {
+  border-left-color: var(--warn);
+}
+.thong-bao--ok {
+  border-left-color: var(--ok);
+}
+.thong-bao__chu {
+  flex: 1;
+  min-width: 0;
+  margin: 3px 0 0;
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+  word-break: break-word;
+}
+
+/* ── Đang chạy — khuôn Transcripts (thanh không bao giờ đứng im) ─────── */
+
+.chay {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+.chay__thanh {
+  position: relative;
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  min-height: var(--h-ctrl-lg);
+  padding: 0 var(--sp-3);
+  overflow: hidden;
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+}
+.chay__day {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent-soft);
+  transition: width 0.3s ease;
+}
+/* Chưa đo được % thì cho vệt sáng trôi — đứng ở 0% nhìn y như treo. */
+.chay__thanh--troi::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+  animation: chay-troi 1.5s ease-in-out infinite;
+}
+@keyframes chay-troi {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+.chay__chu {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chay__chu b {
+  margin-left: var(--sp-2);
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.chay__gio {
+  position: relative;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+.chay__dung {
+  position: relative;
+}
+/* Có nút Dừng thì lề phải hẹp lại cho nút sát mép. KHÔNG dùng `:has()` — CEF
+   của Premiere (Chromium < 105) không hiểu, bỏ cả luật. */
+.chay__thanh--co-dung {
+  padding-right: var(--sp-1);
+}
+
+/* ── Thanh công cụ dính trên: tìm + thẻ ──────────────────────────────── */
+
+/* ☠️ MỘT tầng sticky duy nhất (bài 47: >2 tầng thì mọi lệnh cuộn phải bù trừ).
+   `top: 0` = dính sát mép khung cuộn; lề âm để phủ kín hai rãnh padding của
+   `.than`, không thì chữ danh sách lộ ra hai bên khi cuộn qua. Chiều cao của
+   khối này được App đo (`congCuRef`) để tự cuộn không nhét dòng xuống dưới nó. */
+.cong-cu {
+  position: sticky;
+  top: calc(-1 * var(--sp-4));
+  z-index: var(--z-sticky);
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: calc(-1 * var(--sp-2)) calc(-1 * var(--sp-4)) 0;
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--bg-2);
+  box-shadow: 0 1px 0 var(--line-1);
+}
+
+.tim {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-1) 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-0);
+  transition: border-color var(--dur) var(--ease);
+}
+.tim:hover {
+  border-color: var(--line-strong);
+}
+.tim:focus-within {
+  border-color: var(--accent);
+}
+.tim__ic {
+  color: var(--icon-dim);
+}
+.tim__o {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+}
+.tim__o::placeholder {
+  color: var(--text-3);
+}
+.tim__dem {
+  flex: none;
+  color: var(--accent-text);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.the-hang {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+/* Số thẻ nằm trong DỮ LIỆU (grid-auto-flow), không chôn `repeat(2,…)` vào CSS
+   (MASTER lỗi #3). */
+.the {
+  display: grid;
+  flex: 1;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 2px;
+  min-width: 0;
+  height: var(--h-ctrl);
+  padding: 2px;
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-sm);
+  background: var(--bg-1);
+}
+.the__nut {
+  display: inline-flex;
+  gap: var(--sp-1);
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 var(--sp-2);
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.the__nut:hover {
+  color: var(--text-1);
+}
+.the__nut--dang {
+  background: var(--bg-4);
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
+}
+.the__so {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Pill chọn / bỏ chọn tất cả (đầu danh sách khối) ─────────────────── */
+
+/* Hàng riêng để pill không bị `.cong-cu` (flex column) kéo giãn hết bề ngang —
+   nó phải đúng bề rộng của chữ, đọc ra là một cái chip bấm được. */
+.pill-hang {
+  display: flex;
+  align-items: center;
+}
+.pill-chon {
+  display: inline-flex;
+  gap: var(--sp-2);
+  align-items: center;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-3) 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  background: var(--bg-4);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.pill-chon:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--bg-5);
+  color: var(--text-1);
+}
+.pill-chon:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.pill-chon:disabled {
+  color: var(--text-3);
+  cursor: default;
+}
+/* Ô tích vẽ bằng CSS (không dùng `<input>`): pill là MỘT nút, có hai vùng bấm là
+   người dùng phải đoán bấm chỗ nào. Cỡ 14px = y như `.khoi__chon` trên thẻ, để
+   mắt nhận ra "cái này bật/tắt đúng những ô kia". */
+.pill-chon__o {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  background: var(--bg-0);
+  color: var(--accent-on);
+}
+/* NỬA VỜI: gạch ngang — trạng thái này phải nhìn ra được, không chỉ đoán qua số. */
+.pill-chon--nua .pill-chon__o {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.pill-chon--nua {
+  border-color: var(--accent-line);
+  color: var(--text-1);
+}
+/* CHỌN HẾT: ô tích cam đặc + tick trắng (chữ trên cam đặc = --accent-on). */
+.pill-chon--het .pill-chon__o {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.pill-chon--het {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--text-1);
+}
+.pill-chon--het:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* ── Danh sách khối ──────────────────────────────────────────────────── */
+
+.ds-khoi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ☠️ `content-visibility: auto` = thẻ ngoài màn hình không dàn trang/vẽ.
+   Kèm paint containment → mọi thứ absolute/fixed BÊN TRONG bị cắt theo mép thẻ
+   → menu "⋯" phải vẽ ở tầng ngoài (MenuKhoi.tsx). `contain-intrinsic-size`:
+   dòng 1 cho Chromium < 95 (không hiểu `auto`), dòng 2 nhớ cỡ thật đã vẽ. */
+.khoi {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 112px;
+  contain-intrinsic-size: auto 112px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+  transition: border-color var(--dur) var(--ease);
+}
+.khoi:hover {
+  border-color: var(--line-2);
+}
+.khoi--chon {
+  border-color: var(--accent-line);
+}
+/* Khối đang trỏ bằng phím (J/K) — viền cam trong, không đẩy bố cục. */
+.khoi--tro {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+/* ĐẦU ĐỌC đang ở khối này. Lấy màu XANH của clip Premiere (--pr-video), KHÔNG
+   dùng cam: cam đã mang nghĩa "đang chọn" — hai nghĩa một màu là đọc nhầm
+   (MASTER "Màu — ngữ nghĩa"; lỗi #7: vẽ thứ của Premiere lấy màu Premiere). */
+.khoi[data-phat] {
+  box-shadow: inset 3px 0 0 var(--pr-video);
+}
+/* KHỐI ĐANG ĐƯỢC ĐƯA VÀO SEQUENCE (lúc bấm "Tạo sequence"). Viền cam ĐẶC + nền
+   cam nhạt = "máy đang làm đúng khối này" — phải mạnh hơn hẳn viền cam 40% của
+   khối đang chọn, vì MỌI khối trong lượt đều đang chọn; bằng nhau là không nhìn
+   ra cái nào.
+   ☠️ KHÔNG đụng `box-shadow`: `[data-phat]` (đầu đọc) vẽ vạch xanh bằng
+   `box-shadow: inset` — đặt box-shadow ở đây là xoá vạch đó khi hai trạng thái
+   trùng lên một thẻ. Cũng KHÔNG dùng `outline` (của `.khoi--tro`, phím J/K).
+   ☠️ Thuộc tính này do App đặt THẲNG lên DOM (`veDangDua`), không qua props —
+   đổi prop là vẽ lại cả danh sách cho từng khối. */
+.khoi[data-dang-dua] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.khoi--bo {
+  border-style: dashed;
+  background: var(--bg-2);
+}
+.khoi--bo .khoi__ten {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.khoi__dau {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  min-width: 0;
+  min-height: var(--h-ctrl-sm);
+}
+.khoi__chon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.khoi__chon:disabled {
+  cursor: default;
+}
+.khoi__so {
+  flex: none;
+  min-width: 22px;
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+.khoi__moc {
+  flex: none;
+  height: 20px;
+  padding: 0 var(--sp-1);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.khoi__moc:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+.khoi__dai {
+  flex: none;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.khoi__menu {
+  margin-left: auto;
+}
+
+.khoi__ten-hang {
+  display: flex;
+  gap: var(--sp-1);
+  align-items: flex-start;
+  min-width: 0;
+}
+.khoi__ten {
+  display: -webkit-box;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  text-align: left;
+  word-break: break-word;
+  cursor: pointer;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.khoi__ten:hover {
+  color: var(--accent-text);
+}
+/* Nút bút chỉ hiện khi rê chuột / đang có tiêu điểm trong thẻ — dùng opacity
+   (KHÔNG visibility/display) để vẫn Tab tới được bằng bàn phím. */
+.khoi__but {
+  margin-top: -3px;
+  opacity: 0;
+}
+.khoi:hover .khoi__but,
+.khoi:focus-within .khoi__but {
+  opacity: 1;
+}
+.khoi__o-ten {
+  flex: 1;
+  min-width: 0;
+  height: var(--h-ctrl);
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-sm);
+  outline: none;
+  background: var(--bg-0);
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.khoi__tra {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh);
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.khoi__chan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-2);
+  align-items: center;
+  min-width: 0;
+}
+.khoi__mo {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-1) 0 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: 1;
+  cursor: pointer;
+}
+.khoi__mo:hover {
+  color: var(--text-1);
+}
+
+/* Cờ có CHỮ (không chỉ chấm màu). Viền = currentColor: vừa tách khối vừa nhắc
+   lại màu nghĩa (bài 40 — chip nền nhạt trên nền nhạt thì chìm). */
+.the-co {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--sp-2);
+  border: 1px solid;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+.the-co--canh {
+  border-color: currentColor;
+  color: var(--warn);
+}
+.the-co--thuong {
+  border-color: var(--line-2);
+  color: var(--text-3);
+}
+.the-co--bo {
+  border-color: var(--line-strong);
+  color: var(--text-2);
+}
+.the-co--khop {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+/* ── Dòng câu ────────────────────────────────────────────────────────── */
+
+.ds-cau {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ds-cau--khoi {
+  margin-top: var(--sp-1);
+  padding-top: var(--sp-1);
+  border-top: 1px solid var(--line-1);
+}
+
+/* ── Đầu tab "Toàn bộ lời": số liệu + chép / xuất ─────────────────────── */
+
+.loi-dau {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+}
+.so-lieu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-2);
+  align-items: center;
+  min-width: 0;
+}
+/* Ô số liệu: chữ nhỏ, viền mảnh — đọc như một dãy con số, không như dãy nút. */
+.so-lieu__o {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  color: var(--text-2);
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+.so-lieu__o--canh {
+  border-color: currentColor;
+  color: var(--warn);
+}
+.loi-nut {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.loi-nut .btn {
+  gap: var(--sp-1);
+}
+
+.cau {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 28px;
+  contain-intrinsic-size: auto 28px;
+  border-radius: var(--r-sm);
+}
+/* Câu nằm trong vùng đang chọn. Tô trên THẺ `.cau` (không trên `.cau__nut`) để
+   không tranh với nền của câu đang phát `[data-phat]` — hai thứ khác nghĩa.
+   ☠️ `data-chon` do App đặt THẲNG lên DOM (`veVungChon`), không qua React: đo
+   21/09 bản cũ (vùng chọn là prop) mất 43,2 ms cho 501 câu, 57,2 ms khi bỏ chọn
+   794 câu. Đổi tên thuộc tính này thì phải sửa App. */
+.cau[data-chon] {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+/* Chevron bung từng từ — hiện SẴN (không đợi rê chuột) vì đó là đường duy nhất
+   thấy được để xem mốc từng từ. */
+.cau__mo {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  min-height: 22px;
+  margin-top: var(--sp-1);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--icon-dim);
+  cursor: pointer;
+}
+.cau__mo:hover {
+  color: var(--text-1);
+}
+.cau__nut {
+  flex: 1 1 auto;
+  display: flex;
+  gap: var(--sp-2);
+  align-items: baseline;
+  min-width: 0;
+  padding: var(--sp-1) var(--sp-2);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh);
+  text-align: left;
+  cursor: pointer;
+}
+.cau__nut:hover {
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+.cau[data-phat] .cau__nut {
+  background: var(--bg-hover);
+  color: var(--text-1);
+  box-shadow: inset 2px 0 0 var(--pr-video);
+}
+.cau__moc {
+  flex: none;
+  min-width: 46px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+/* "Q3" — câu này mở đầu một khối. Nhãn sống cả khi đang lọc (vạch khối thì không). */
+.cau__khoi {
+  flex: none;
+  padding: 0 var(--sp-1);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-pill);
+  color: var(--accent-text);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1.5;
+}
+.cau__chu {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+}
+/* Độ dài câu — sát mép phải, nhạt, chữ số cùng bề rộng để dóng thành cột. */
+.cau__dai {
+  flex: none;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+.cau__chu--bia {
+  color: var(--text-3);
+}
+.cau__chu--nghi {
+  text-decoration: underline dotted var(--warn);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+/* Nhóm nút của dòng (chép câu · "Tách tại đây") hiện khi rê chuột / Tab tới
+   dòng. Nằm GỌN trong dòng (content-visibility của dòng cắt mọi thứ tràn ra).
+   ☠️ Ẩn bằng `opacity` + `pointer-events`, KHÔNG bằng `display:none`: dòng ẩn
+   theo kiểu display thì không Tab tới được, mà `:focus-within` lại cần có cái
+   gì đang được focus mới bật — tự khoá nhau, bàn phím không bao giờ vào được. */
+/* ☠️ Neo theo DÒNG CHỮ (`top` cố định), KHÔNG theo `top:50%` của thẻ `.cau`:
+   bung một câu ra thì `<ol class="ds-tu">` nằm TRONG cùng thẻ `.cau` nên thẻ cao
+   lên gấp mấy lần, 50% đẩy nút chép xuống GIỮA vùng chip từ và nó ĐÈ lên chip ở
+   mép phải — bấm vào từ đó là bấm vào nút chép, đầu đọc không nhảy (sửa 21/09).
+   `.cau` đã `align-items: flex-start` nên dòng chữ luôn ở trên cùng. */
+.cau__do {
+  position: absolute;
+  top: var(--sp-1);
+  right: 2px;
+  display: inline-flex;
+  gap: var(--sp-1);
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+}
+.cau:hover .cau__do,
+.cau:focus-within .cau__do,
+.cau[data-vua-chep] .cau__do {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Đèn "vừa chép xong" ngay trên nút vừa bấm — chép vào bộ nhớ tạm là việc VÔ
+   HÌNH, mà nút "Đã chép" ở đầu tab thì không dính nên bấm ở câu thứ 700 không
+   thấy gì. `data-vua-chep` do App đặt thẳng lên DOM (`veVuaChep`), 1,5 giây. */
+.cau[data-vua-chep] .cau__ic {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+/* Chừa chỗ cho nút chép ở tab "Toàn bộ lời" — để nó đừng đè lên độ dài câu. */
+.ds-cau--loi .cau__nut {
+  padding-right: 24px;
+}
+.cau__ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  cursor: pointer;
+}
+.cau__ic:hover {
+  border-color: var(--accent-line);
+  color: var(--accent-text);
+}
+.cau__tach {
+  display: inline-flex;
+  gap: var(--sp-1);
+  align-items: center;
+  height: var(--h-ctrl-sm);
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.cau__tach:hover {
+  border-color: var(--accent-line);
+  color: var(--accent-text);
+}
+
+/* ── Từng TỪ của một câu (bung ra) ────────────────────────────────────── */
+
+.ds-tu {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin: 0 0 var(--sp-2);
+  /* Thụt vào cho thẳng cột chữ của câu (16px chevron + 46px mốc + khoảng cách). */
+  padding: 0 var(--sp-2) 0 68px;
+  list-style: none;
+}
+.tu {
+  display: flex;
+}
+.tu__nut {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px var(--sp-1);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--text-2);
+  text-align: left;
+  cursor: pointer;
+}
+.tu__nut:hover {
+  border-color: var(--accent-line);
+  background: var(--bg-4);
+  color: var(--text-1);
+}
+.tu__chu {
+  font-size: var(--fs-sm);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.tu__so {
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+/* Từ máy chấm tin cậy dưới 0,5 — cùng ngưỡng với câu "không chắc". */
+.tu--yeu .tu__nut {
+  border-color: var(--warn);
+}
+.tu--yeu .tu__chu {
+  color: var(--warn);
+}
+.ds-tu__trong {
+  flex: 1 1 100%;
+  margin: 0 0 var(--sp-2);
+  padding-left: 68px;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+mark {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+/* Vạch mảnh báo chỗ một khối bắt đầu (tab Toàn bộ lời, khi không tìm). */
+.vach-khoi {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  margin: var(--sp-3) 0 var(--sp-1);
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+}
+.vach-khoi:first-child {
+  margin-top: 0;
+}
+.vach-khoi span {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vach-khoi::after {
+  content: '';
+  flex: 1 0 24px;
+  height: 1px;
+  background: var(--line-1);
+}
+
+.trong {
+  margin: var(--sp-5) 0;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+.phim-tat {
+  margin: var(--sp-1) 0 0;
+  color: var(--text-3);
+  font-size: var(--fs-2xs);
+  line-height: 2;
+  text-align: center;
+}
+
+.xac-nhan {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--danger);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+}
+.xac-nhan__chu {
+  margin: 0;
+  color: var(--text-1);
+  font-size: var(--fs-sm);
+}
+.xac-nhan__nut {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+}
+
+/* ── Thanh hành động ghim đáy ────────────────────────────────────────── */
+
+.thanh-hd {
+  flex-shrink: 0;
+  padding: var(--sp-2) var(--sp-4);
+  border-top: 1px solid var(--line-1);
+  background: var(--bg-1);
+}
+.thanh-hd__ruot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-width: calc(680px - 2 * var(--sp-4));
+  margin: 0 auto;
+  /* Thanh cuộn nằm TRONG .than → thẻ khối hụt đúng bề rộng thanh cuộn ở mép phải
+     (đo 19/09 khổ 1280: .khoi phải 953, ruột thanh đáy phải 968). App.tsx đo bề
+     rộng thật đưa vào biến; chừa đúng chừng đó để hai mép thẳng hàng. */
+  padding-right: var(--rong-thanh-cuon, 0px);
+}
+/* Hai hàng, đo 19/09 trên bản EN (nhãn dài hơn VI): hàng 1 = "Đã chọn N khối ·
+   Chọn hết" + nút phụ Đặt marker; hàng 2 = nút CHÍNH trải hết bề ngang (cùng
+   dáng nút "Đọc nội dung" trước khi đọc — một màn một CTA, CTA luôn ở một chỗ).
+   Bản đầu để hai nút cùng hàng: đo trong trình duyệt ở 400px, EN "Place
+   markers (20)" 145px + "Create sequences (20)" 194px + mũi tên 34px + khe 8px
+   = 381px > 376px chỗ có → vỡ thành BA hàng, nút chính lệch phải. Dock 300px
+   thì nút phụ rớt xuống hàng riêng — vẫn sống, chấp nhận. */
+.thanh-hd__hang {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  align-items: center;
+}
+.thanh-hd__dem {
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--sp-1);
+  align-items: center;
+  min-width: 0;
+}
+.thanh-hd__so {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.thanh-hd__phu {
+  margin-left: auto;
+}
+.thanh-hd .btn--chinh {
+  height: var(--h-ctrl-lg);
+}
+
+/* Nút tách đôi: phần chính = việc làm, mũi tên = chọn cách làm. `flex-basis
+   100%` = luôn một hàng riêng, phần chính giãn hết chỗ còn lại. */
+.tach-nut {
+  position: relative;
+  display: flex;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.tach-nut__chinh {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+/* Chưa chọn khối: phần chính xám (disabled) — mũi tên cũng về xám cho cả nút
+   đọc là MỘT trạng thái, nhưng vẫn bấm được để chọn trước cách tạo. */
+.tach-nut--tat .tach-nut__mui {
+  border-color: var(--line-2);
+  background: var(--bg-4);
+  color: var(--text-2);
+}
+.tach-nut--tat .tach-nut__mui:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--bg-5);
+  color: var(--text-1);
+}
+/* Nguồn chọn là VÙNG CÂU: không có nút mũi tên (luôn ra một sequence) nên nút
+   chính phải tròn cả hai mép phải. */
+.tach-nut--mot .tach-nut__chinh {
+  border-radius: var(--r-sm);
+}
+.tach-nut__mui {
+  width: var(--h-ctrl-lg);
+  padding: 0;
+  border-left: 1px solid var(--accent-pressed);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.tach-nut__mui:disabled {
+  border-left-color: var(--line-2);
+}
+/* Đã xong: vạch ngăn hai nửa là vạch TỐI trên nền xanh, không phải vạch cam. */
+.tach-nut__mui.btn--xong {
+  border-left-color: var(--bg-0);
+}
+
+/* ── Menu nổi ────────────────────────────────────────────────────────── */
+
+.menu {
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-width: calc(100vw - 16px);
+  padding: var(--sp-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+  box-shadow: var(--shadow-md);
+}
+.menu--noi {
+  position: fixed;
+}
+.menu--tren {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--sp-1));
+  width: 260px;
+}
+.menu__muc {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  width: 100%;
+  min-height: var(--h-ctrl);
+  padding: var(--sp-1) var(--sp-3);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+  line-height: var(--lh-tight);
+  text-align: left;
+  cursor: pointer;
+}
+.menu__muc:hover:not(:disabled),
+.menu__muc:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+.menu__muc:disabled {
+  color: var(--text-3);
+  cursor: default;
+}
+.menu__muc kbd {
+  margin-left: auto;
+}
+.menu__vach {
+  height: 1px;
+  margin: var(--sp-1) 0;
+  background: var(--line-1);
+}
+.menu__muc--chon {
+  align-items: flex-start;
+  padding-top: var(--sp-2);
+  padding-bottom: var(--sp-2);
+}
+.menu__dau {
+  flex: none;
+  width: 14px;
+  padding-top: 1px;
+  color: var(--accent);
+}
+.menu__chu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.menu__chu small {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-tight);
+}
+
+/* ── Nút đổi ngôn ngữ (dùng chung cả bộ) ─────────────────────────────── */
+/* Khuôn panel tải video của bộ, BỎ `letter-spacing: 0.04em` (MASTER luật nút #2). */
+.aio-ngonngu {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: var(--h-ctrl-sm);
+  min-width: 34px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--bg-4);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.aio-ngonngu:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-5);
+  color: var(--accent);
+}
+.aio-ngonngu:active {
+  background: var(--bg-active);
+}

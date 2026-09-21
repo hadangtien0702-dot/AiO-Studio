@@ -23,7 +23,8 @@ $panels = @(
   'AiO Asset Manager',
   'AiO Power Bins',
   'AiO Transcripts',
-  'AiO Video Download'
+  'AiO Video Download',
+  'AiO Auto Short Viral'
 )
 
 if (-not (Test-Path $nguon)) { Write-Host "  [LOI] Khong thay nguon: $nguon" -ForegroundColor Red; exit 1 }

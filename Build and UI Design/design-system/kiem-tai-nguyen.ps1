@@ -52,6 +52,7 @@ function Soi([string]$ten, [string]$duong, [string]$mau, [string]$mongDoi) {
 Write-Output '--- 1. Panel CO BUILD (TypeScript): hang so TRAN_TAI_NGUYEN = 0.70 ---'
 Soi 'Autocut' 'AiO Autocut\client\src\services\ffmpeg.ts' 'TRAN_TAI_NGUYEN = 0\.70' 'TRAN_TAI_NGUYEN = 0.70'
 Soi 'Transcripts' 'AiO Transcripts\client\src\services\ffmpeg.ts' 'TRAN_TAI_NGUYEN = 0\.70' 'TRAN_TAI_NGUYEN = 0.70'
+Soi 'Auto Short Viral' 'AiO Auto Short Viral\client\src\services\ffmpeg.ts' 'TRAN_TAI_NGUYEN = 0\.70' 'TRAN_TAI_NGUYEN = 0.70'
 Soi 'Asset Manager' 'AiO Asset Manager\client\src\services\jobQueue.ts' 'TRAN_TAI_NGUYEN = 0\.70' 'TRAN_TAI_NGUYEN = 0.70'
 Soi 'Power Bins' 'AiO Power Bins\client\src\services\jobQueue.ts' 'TRAN_TAI_NGUYEN = 0\.70' 'TRAN_TAI_NGUYEN = 0.70'
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Remote debug cho CEP panel Auto Short Viral.
+  Cong 8100 - moi cong tu 8088 toi 8099 deu da co chu (8099 la xem-rieng.mjs
+  cua Re-Frames); bang cong day du o AiO Studio\CLAUDE.md muc 2.
+  Mo http://localhost:8100 de xem DevTools cua panel dang chay trong Premiere,
+  hoac chay scripts\do-tren-panel.ps1 de do bang so.
+  File nay CHI di vao ban DEV (sign-install.ps1); package-release.ps1 bo no ra.
+-->
+<ExtensionList>
+  <Extension Id="com.aiostudio.shortviral.panel">
+    <HostList>
+      <Host Name="PPRO" Port="8100" />
+    </HostList>
+  </Extension>
+</ExtensionList>

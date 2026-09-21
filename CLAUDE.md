@@ -45,10 +45,11 @@ Repo GitHub: `hadangtien0702-dot/AiO-Studio` — **PUBLIC** (anh chốt 31/08).
 | 7 | Auto Guideline Frame | 0.3.0 | `com.aiostudio.guideframe` · 8096 | 🟡 Đang làm | Safe zone 10 nền tảng / 53 vùng; đặt 0,74s / gỡ 0,13s trên sequence 4K 306 clip. Không build |
 | 8 | Auto Podcast | UI 0.6.6 · host 0.4.9 (☠️ manifest **0.1.0** chưa bump — chờ anh gật) | `com.aiostudio.podcast` · 8094 | 🟢 Chạy được | 25/08 *"cắt đúng người"* ĐÃ GIẢI bằng tai anh: liệu 40 phút 2 người + wide, tiếng cam làm mic, 411 nhát. **Chưa đo**: >2 người, mic rời bleed nặng, >1 giờ. Ngưỡng cắt KHÔNG đụng |
 | 9 | Music & SFX (`AiO Mussic`) | 1.0.0 | `com.aiostudio.music` · 8097 | 🟡 | Có UI, chưa nối việc thật |
-| 10 | Auto Cut Short | — | dành `com.aiostudio.cutshort` · 8093 | ⬜ Chưa có code | Chờ anh chốt 5 câu hỏi sản phẩm (trong `CLAUDE.md` của nó) |
+| 10 | Auto Cut Short | — | dành `com.aiostudio.short` (bản cũ file này ghi `cutshort` — panel ghi `short`) · 8093 | 🟡 Chưa có panel riêng. ☠️ **Não hỏi–đáp đã CHUYỂN vào panel Re-Frames 0.6.0** theo lời anh 31/07 (`chiaDoan`/`timDoan`/`taoShorts` + host `rf_catShort`/`rf_ghepDoan`; ranh giới ghi ở Re-Frames/CLAUDE.md dòng 37) — sửa 18/09, lần sửa trước chỉ ghi "chạy bằng script" là THIẾU. 18/09 anh chốt **giữ Cut Short là sản phẩm RIÊNG**, không gộp vào Auto Short Viral (dòng 14) — ranh giới giữa hai tool CHƯA vạch | *(sửa 18/09 — dòng cũ ghi "chờ chốt 5 câu hỏi" là SAI)* Anh chốt 4 quyết định 30/07 (chia theo HỎI–ĐÁP · mỗi đoạn một sequence mới · 30–90s · phụ đề dọc của Transcripts). 31/07 chạy thông bằng script trên video 55 phút: 803 câu → 21 câu hỏi → 8 đoạn, ngắt câu lệch 0,000s. Xuất 480p bằng API Premiere **làm sập Premiere** (CẤM). Chưa đo trên podcast tiếng Việt. Ý "bản đồ nội dung" anh đưa ra 18/09 thuộc về **Auto Short Viral** (dòng 14), không làm ở đây |
 | 11 | Auto Organize Folder | — | — | ⬜ Chưa có code | Mới có `yêu cầu.txt` |
 | 12 | **Shot & Save** | Electron **0.4.17** | app độc lập, KHÔNG CEP | ✅ **Anh chấm ĐẠT 14/09** trên bản cài 0.4.4.0 máy công ty (Tauri đã gỡ 14/09 08:06); 0.4.6 nền chữ + dời thư mục ảnh ra ngoài thư mục cài (cài đè từng mất 2 ảnh); 0.4.8 cài 14/09 10:19: ảnh ghim rê chuột hiện 3 nút vẽ (trước chỉ có phím 1/2/3) — anh chấm ĐẠT 14/09; 0.4.9 cài 10:44: màn tối đi mượt (grab chờ 200 ms) — anh chấm ĐẠT 10:52; 0.4.12 kéo to khay = thấy nhiều ảnh hơn (anh ĐẠT 11:2x); 0.4.13–0.4.15 cài 12:00: frozen JPEG + cắt gốc PNG lúc Xong; chụp TRƯỚC khi phủ overlay (overlay phủ ≥0,5 s là video đen — đo), overlay hiện ~0,6 s có hình đứng yên — anh chấm ĐẠT 12:0x; 0.4.16 12:37: thư mục ảnh mặc định đổi `AiOShotSave\AnhChup` vì `&` trong tên làm kéo-thả vào app Chromium ra file rỗng (đo) — anh chấm ĐẠT 12:4x; 0.4.17 13:10: thư mục `shotandsave`, file `shotandsave-…`, kéo-thả an toàn qua hard link với mọi ký tự — anh chấm ĐẠT 13:2x. ☠️ **Tauri ĐÃ BỎ 10/09** | Xem mục 5. [Chờ đo] run-log chết im lặng từ 14/09 09:03 |
 | 13 | **Video Download** | **0.1.0** | `com.aiostudio.videodownload` · **8098** | 🟡 Mới dựng 08/09 | Dán link → tải (yt-dlp + QuickJS 2 MB + FFmpeg LGPL) → tự vào bin. Đo: YouTube 1080p H.264 255,9 MB/30 s; TikTok chặn ngẫu nhiên → tự thử lại 3 lần. Anh đang bấm thử, chưa qua bài thật. Chi tiết: `CLAUDE.md` + `PROGRESS.md` trong thư mục nó |
+| 14 | **Auto Short Viral** | **0.1.2** | `com.aiostudio.shortviral` · **8100** | 🟢 **Đã cài, chạy thật trong Premiere 19–21/09** | Đọc nội dung → chia khối HỎI–ĐÁP (thẻ) · bấm câu nhảy đầu đọc · đặt marker · tạo sequence (mỗi khối một cái, hoặc gộp một cái, có tiến độ từng khối) · tab *Toàn bộ lời* xem từng chữ + điểm tin cậy, chọn nhiều câu, chép/xuất `.txt`/`.srt`. Đo thật: bộ 40 phút → 61 khối; sequence 20 phút → 37 khối trong **253 ms**; in/out clip gốc không đổi; `npm run kiem` **222/0**. Chi tiết + việc chờ: `CLAUDE.md` + `PROGRESS.md` trong thư mục nó. ☠️ Chưa làm: AI offline, ranh giới với Cut Short, bản Mac. 8099 bị `xem-rieng.mjs` (Re-Frames) dùng nên lấy 8100 |
 
 Bảng chi tiết hơn (lịch sử từng bản, việc đang chờ): `Marketing/AiO MVP and
 Plan Marketing/TOOL_VERSION_TRACKER.md`. **Bump version panel nào thì sửa luôn
@@ -96,6 +97,12 @@ cùng lúc nên chưa đụng nhau; đổi một bên nếu có lúc cần cả 
 | 01/09 | Tauri **phải giống y chang bản cũ từng nút** trong Settings | Người dùng không được thấy khác | ❌ bị đè 10/09 |
 | **10/09** | **Shot & Save: BỎ bản Tauri, anh tự xoá thư mục; Electron là bản dùng thật, hết đóng băng (sửa lỗi + tính năng đều làm trên Electron)** | Anh: *"anh không dùng bản Tauri"* rồi *"anh sẽ xóa bản Tauri"* (chưa nêu lý do kỹ thuật). ☠️ Lúc chốt, máy công ty đang cài Tauri 0.5.0 với **75 ảnh / 15 MB trong chính thư mục cài** `%LOCALAPPDATA%\AiO Shot & Save\Anh chup` — gỡ cài là mất, phải chép ra trước | ✅ **HIỆN HÀNH** |
 | **14/09** | **Shot & Save: KHÔNG làm mô-đun chụp native (C++/Rust) trong Electron, không quay lại Tauri** | Em đề xuất để hạ đen video FB ~0,75 s → ~0,4 s (getSources Electron có sàn ~370 ms kể cả chụp 1×1; Tauri từng đo 141–152 ms). Anh: *"trời ơi đụng đến Tauri là bị lỗi tè le… không nên"*. Hệ quả: ~0,75 s là sàn, đừng đề xuất lại | ✅ **HIỆN HÀNH** |
+| **18/09** | **Tính năng "bản đồ nội dung + tách hỏi–đáp" = panel MỚI `AiO Auto Short Viral`, KHÔNG gộp vào Autocut** | Em đề xuất (Autocut xong + đóng băng 19/08; việc khác bản chất; dock 360px chật; nghiên cứu 10/09 đề xuất Autocut vào Free), anh đặt tên: *"tách ra làm phần mới mang tên là Auto Short Viral"* | ✅ |
+| **18/09** | **Giữ Auto Cut Short là sản phẩm riêng** · **Short Viral không liên quan Re-Frames** · chỉ chuẩn hoá folder Short Viral (không đụng app cũ) · web chưa đổi | Anh chọn trong bảng hỏi; nguyên văn về Re-Frames: *"Re-frames đâu có liên quan gì tới short viral đâu em?"* | ✅ |
+| **18/09** | **Tool mới = tạo đủ folder ở mọi ngăn trước khi code** (mục 4h) | *"khi có yêu cầu tạo Tool mới thì em hãy tạo cho anh các thư mục trong từng folder tương ứng"* | ✅ luật |
+| **19/09** | **Short Viral làm bằng CEP**, không UXP | Em trình bảng 12 đối thủ (luật 2d): 8/8 app cùng loại xác minh được đều CEP, chưa ai lên UXP; Premiere 27 vẫn chạy CEP; UXP **không chạy được whisper** bằng JS thuần (phải viết addon C++) và bản Mac đòi chứng chỉ Apple 99 USD/năm — trái quyết định 14/08. Kèm điều kiện: tách riêng lớp gọi Premiere và lớp chạy tiến trình để sau đổi UXP chỉ thay 2 file | ✅ |
+| **20/09** | **AI của Short Viral chạy OFFLINE, KHÔNG dùng Ollama** | Anh: *"có thể offline luôn nha em, ko dùng ollama"*. Hệ quả: bước 1 không cần model (chia theo chủ đề bằng độ dính từ vựng, tiêu đề lấy cụm từ khoá); bước 2 nếu cần thì nhúng model nhỏ chạy bằng llama.cpp — cùng họ whisper.cpp, vẫn offline, không token | ✅ |
+| **21/09** | **Giao diện Short Viral: giữ kiểu THẺ** cho khối hỏi–đáp; tab *Toàn bộ lời* phải đọc được chi tiết | Anh xem artifact 4 bản vẽ rồi chốt: *"anh chốt thẻ C"*, kèm *"khi full scripts em phải đọc và show ra details chi tiết"* | ✅ |
 
 ---
 
@@ -189,6 +196,47 @@ anh** trước khi vá 1 dòng.
    caption rơi sang sequence của anh mà panel báo thành công. Giữ ID cái đang
    hiện, ép mở + đọc lại rồi mới ghi. **Dọn xong soi CẢ project.**
 
+### 4h. ☠️ TOOL MỚI = TẠO ĐỦ FOLDER Ở MỌI NGĂN, TRƯỚC KHI VIẾT CODE (anh chốt 18/09)
+Nguyên văn: *"khi có yêu cầu tạo Tool mới thì em hãy tạo cho anh các thư mục trong
+từng folder tương ứng đang có trong folder Production"* — lúc tách **Auto Short
+Viral**, kèm *"chuẩn hóa Folder trước khi chúng ta bắt đầu làm cái gì đó"*.
+Vì sao: trước đó mỗi app có mặt ở ngăn này mà thiếu ở ngăn kia (18/09: Video
+Download có Release nhưng không có folder trong Design System) → tìm đồ phải đoán.
+
+1. **DÒ, đừng nhớ danh sách.** Ngăn nào đang có folder riêng `AiO <Tên>` cho từ
+   2 app trở lên thì tool mới cũng phải có folder ở đó. Đo 18/09 ra **3 ngăn**:
+
+   | Ngăn | Để làm gì | Ai bỏ đồ vào |
+   |---|---|---|
+   | `Build and UI Design/AiO <Tên>/` | mã nguồn + `CLAUDE.md` + `PROGRESS.md` ngay từ ngày đầu | Claude |
+   | `Build and UI Design/AiO Design System/AiO <Tên>/` | file thiết kế anh chốt | **Anh** — Claude chỉ tạo thư mục, KHÔNG tạo/sửa file thiết kế |
+   | `Release/AiO <Tên>/win/` + `mac/` | bộ cài mới nhất (luật trong `Release/README.md`) | Claude, lúc đóng gói |
+
+   `Marketing/`, `Test Media/`, `Website/`, `Research and Architecture/` là ngăn
+   **dùng chung**, không có folder từng app → đừng tạo.
+2. **Cùng MỘT tên y hệt ở mọi ngăn** (`AiO <Tên>`) — để NGƯỜI đi tìm thấy ngay.
+   Không script nào đọc tên thư mục `Release/` (đo 18/09): bộ cài sinh ra trong
+   `<panel>/build/release`, chép TAY sang `Release/AiO <Tên>/win/`.
+3. ☠️ **Git không theo dõi thư mục rỗng** → folder rỗng thì máy kia pull về
+   **không có**. Mỗi thư mục mới phải có một file giữ chỗ (`README.md` 2–3 dòng
+   nói thư mục để làm gì; `mac/` dùng `CHUA-CO-BAN-MAC.txt` như các app khác).
+4. **KHÔNG tạo tay** `dist/` · `build/` · `bin/` · `node_modules/` — do build/cài
+   sinh ra, bị gitignore hoặc bị script ghi đè.
+5. **Đăng ký tên** ngay: bảng mục 2 file này (extension ID + cổng, **không trùng**),
+   `Marketing/AiO MVP and Plan Marketing/TOOL_VERSION_TRACKER.md`.
+6. Tool **kế thừa / đổi tên** dự án cũ → **hỏi anh** giữ song song hay gộp. Gộp
+   thì `git mv` ở cả mọi ngăn để giữ lịch sử (thư mục rỗng thì đổi tên thường,
+   `git mv` báo lỗi). *(Dòng này là đề xuất của Claude 18/09, CHƯA phải lời anh —
+   đừng trình cho anh như "luật cấm".)* Ca đầu tiên 18/09: Short Viral kế thừa ý
+   của Cut Short → anh chọn **GIỮ RIÊNG hai sản phẩm** — tức là không mặc định gộp.
+6b. Panel mới chép khuôn từ panel cũ: **tạo `.gitignore` riêng ĐẦU TIÊN**, trước
+   lần chạy `sign-install.ps1` đầu tiên — `.gitignore` gốc KHÔNG chặn `certs/`,
+   repo PUBLIC; 3 panel thiếu nó (Podcast, Re-Frames, Guide Frame) đã đưa `.p12`
+   lên GitHub. Và `git grep` tên/ID/cổng của panel khuôn phải ra **0 dòng** trước
+   lần cài đầu — sót một chỗ `$extId` là cài đè lên panel khuôn (sự cố 29/07).
+7. Kiểm bằng số trước khi báo xong: `ls` từng ngăn thấy đủ folder, `git ls-files`
+   thấy file giữ chỗ trong từng folder. `/xong` có bước kiểm này (mục 2e).
+
 ---
 
 ## 5. Shot & Save — app ngoài Premiere
@@ -264,11 +312,21 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 | Bump manifest Podcast 0.1.0 → 0.6.6 | Podcast | Chờ anh gật (đóng băng build) |
 | Mic rời bleed nặng (bộ Will–Trọng, 8 clip stereo `podcast-nghe-kiem-2`) | Podcast | Chờ tai anh |
 | Tốc độ 19 phút/giờ (mục tiêu <5) | Autocut | 83% ở `overwriteClip` của Adobe; hướng: xuất FCPXML |
-| 5 câu hỏi sản phẩm | Auto Cut Short | Chờ anh chốt |
+| Dựng panel + đo não hỏi–đáp trên podcast tiếng Việt thật | Auto Cut Short | 4 quyết định đã chốt 30/07; 18/09 anh chốt giữ riêng — ranh giới với Short Viral chưa vạch |
+| **AI offline bước 1** (chia theo chủ đề bằng độ dính từ vựng · tiêu đề cụm từ khoá · chấm đoạn đáng làm short) | Auto Short Viral | Anh chốt 20/09 chạy offline không Ollama; chờ anh gật mới viết |
+| Ranh giới Cut Short ↔ Short Viral | Auto Short Viral · Auto Cut Short | Cả hai đều chia hỏi–đáp; anh chưa vạch — hỏi trước khi ai đó sửa não chia đoạn |
+| Dọn 3 sequence thử trong `Test3_1`: `PodTest Nguon – Q1…`, `– Q2…`, `PodTest 20 phut… – Q5+Q6+Q7` (giữ `PodTest 20 phut - thu Short Viral`) | Auto Short Viral | Chờ anh gật |
+| **Bản Mac** cho Short Viral: panel CEP chạy được trên Mac nhưng whisper/FFmpeg và 3 script `.ps1` mới chỉ có bản Windows | Auto Short Viral | Luật 31/08 "phải chạy Win + Mac" CHƯA đạt — nói rõ để không tưởng đã xong |
+| Độ chính xác nghe lời: **chưa có con số WER cho bất kỳ thứ tiếng nào** (thiếu bản chuẩn do tai anh duyệt); tên riêng tiếng Việt bị chép sai | Cả bộ (whisper) | Cần anh duyệt 10 phút làm bản chuẩn; hướng rẻ nhất là bảng sửa tên riêng sau khi nghe (mồi từ vựng đã đo 2 lần: vô tác dụng) |
+| Folder app cũ lệch chuẩn 4h: Design System thiếu Video Download / Shotandsave / Auto Organize Folder · `AiO Power Bins` + `AiO Transcripts` trong Design System rỗng (0 file, máy nhà không có) · tên lệch `AiO Mussic`↔`AiO Music`, `AiO WELCOME Page`↔`AiO WELCOME` · bảng mục 2 ghi WELCOME 8087 nhưng `.debug` là **8095** (trùng `xem-bo.mjs`) | Cả bộ | 18/09 anh chọn "chỉ Short Viral lúc này" — đo xong, chưa sửa |
 | `.p12` + mật khẩu trong repo public | Cả bộ | Anh chốt "tính sau" |
 | **Quyết CEP → UXP** (spike đo chi phí port 1 panel nhỏ) | Cả bộ | Adobe ghi sẽ gỡ CEP; ngày cắt chưa rõ (xem nghiên cứu 10/09) |
 | 7 câu hỏi giá/định vị từ nghiên cứu thị trường 10/09 (mục 11) | Cả bộ | Chờ anh chốt |
-| `PROGRESS.md` gốc repo | — | Chưa có |
+| ~~`PROGRESS.md` gốc repo~~ **XONG 21/09** (lập cùng lúc lắp cửa vào brain) | — | — |
+| Lắp hook `SessionStart` ở **máy nhà** (script chép được qua git, hook thì không) | Cả bộ | Chỉ anh làm được — xem `scripts/batdau/README.md` |
+| Giai đoạn B: cắt `~/.claude/CLAUDE.md` 1.145 → ~150 dòng, 62 bài học thành skill | Cả bộ | Anh chốt 21/09, chờ đo giai đoạn A có ăn không |
+| `worktrees/` 652 file/36,8 MB từ 01/09 nhân đôi 13 `CLAUDE.md` · 2 slug lạc của Autocut · hook `Stop` không canh `public/` nên Thinksmart không bị chặn | Cả bộ | Đo 21/09, chưa dọn |
+| ☠️ `~/.claude/settings.json` có token n8n JWT + Google `client_secret` trong `permissions.allow` | Cả bộ | Chờ anh quyết |
 
 ---
 

@@ -104,6 +104,29 @@ nghiêm trọng, em mất thời gian của anh"*. Ba luật, áp cho MỌI dự
 Khi `/xong`: nếu trong phiên có khởi đầu tính năng/tool mới, tự kiểm đã làm
 đủ 3 điều trên chưa — thiếu thì ghi rõ vào báo cáo, đừng im.
 
+## 2e. ☠️ TOOL MỚI = ĐỦ FOLDER Ở MỌI NGĂN — anh Tiến chốt 18/09/2026
+
+Nguyên văn: *"khi có yêu cầu tạo Tool mới thì em hãy tạo cho anh các thư mục trong
+từng folder tương ứng đang có trong folder Production"*. Luật đầy đủ (ngăn nào,
+file giữ chỗ, thứ không tạo tay): **`AiO Studio/CLAUDE.md` mục 4h** — đọc ở đó,
+file này chỉ giữ bước kiểm.
+
+Khi `/xong`: nếu phiên có **tạo tool mới hoặc đổi tên tool**, kiểm bằng lệnh,
+đừng kiểm bằng trí nhớ:
+
+1. **Dò lại danh sách ngăn** — ngăn nào đang có folder `AiO <Tên>` cho từ 2 app
+   trở lên (đo 18/09: `Build and UI Design/` · `Build and UI Design/AiO Design
+   System/` · `Release/<app>/win|mac`). Ngăn mới xuất hiện sau ngày đó thì cũng tính.
+2. `ls` từng ngăn → tool mới có folder **cùng một tên** ở **mọi** ngăn đó.
+3. `git ls-files` từng folder → có ít nhất một file giữ chỗ (thư mục rỗng không lên
+   git, máy kia pull về sẽ không có).
+4. Tên đã vào bảng app trong `AiO Studio/CLAUDE.md` mục 2 (ID + cổng không trùng)
+   và `TOOL_VERSION_TRACKER.md`.
+
+Thiếu mục nào → làm cho đủ, hoặc ghi rõ vào báo cáo bước 5 là còn thiếu gì.
+Tool nằm **ngoài** AiO Studio (dự án khác trong `E:\2026\Production`) → hỏi anh
+Tiến cấu trúc ngăn của dự án đó, đừng áp khuôn AiO.
+
 ## 3. Rút bài học — ghi ĐÚNG TẦNG
 
 Chỉ ghi thứ **không suy ra được từ mã nguồn**. Ghi trùng chỗ khác là lần sau đọc

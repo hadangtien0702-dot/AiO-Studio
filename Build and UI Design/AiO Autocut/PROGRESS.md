@@ -1,5 +1,35 @@
 # AiO Autocut - Nhat ky
 
+## [ghi-bu-tokens] - 2026-09-18 19:20 (UTC+7) - GHI BU: tokens.css bi lan dong bo 24/08 cham vao, KHONG doi gia tri
+
+### Trang thai hien tai
+Khong doi: **v1.6.0 dong bang** (anh chot 19/08). Bo cai 1.6.0 khong doi.
+18/09 anh hoi co gop tinh nang "ban do noi dung / tach hoi-dap" vao Autocut khong
+-> em de xuat KHONG gop, lam o Auto Cut Short (xem PROGRESS.md ben do, muc 0.0.4).
+**Anh chot 18/09: tach thanh panel MOI `AiO Auto Short Viral`** (khong gop Autocut,
+giu Auto Cut Short rieng) — xem `../AiO Auto Short Viral/PROGRESS.md`.
+Phien nay KHONG sua dong ma nao cua Autocut.
+
+### Boi canh
+Hook Stop bao `client/src/tokens.css` (24/08 23:08) moi hon PROGRESS.md (22/08 16:06).
+
+### Nguyen nhan that
+Commit `1a4da6c` (24/08 23:17, "dong bo nut chinh + token cam #f86820 ca bo") chay
+`dong-bo-tokens.ps1` chep nguon token sang cac panel, trong do co Autocut. Luc do
+ghi PROGRESS cho Transcripts / Asset Manager / Power Bins nhung QUEN ghi cho Autocut.
+
+### Thay doi (cua commit 24/08, khong phai phien nay)
+`git show 1a4da6c -- client/src/tokens.css`: 11 dong = 1 dong them BOM UTF-8 dau
+file + 9 dong CHU THICH (canh bao chep Inter.woff2 truoc khi dong bo). **0 gia tri
+token doi** — Autocut von la ban nguon cua mau cam #F86820 tu 03/08.
+
+### File anh huong
+`client/src/tokens.css` (da commit tu 24/08, `git diff` hien tai rong).
+
+### Kiem chung bang so
+`git diff --stat -- client/src/tokens.css` = rong (khong co thay doi chua commit).
+Chua build lai -> ban dang cai va bo cai 1.6.0 van la ban 19/08.
+
 ## [va-1-dong] - 2026-08-22 16:06 (UTC+7) - BO QUA CLIP CAPTION MOGRT TRONG ac_getRangeClips
 
 (Gio tren la gio ghi lai bang lenh `date`; ban dau ghi "13:05" la suy tu muc truoc,

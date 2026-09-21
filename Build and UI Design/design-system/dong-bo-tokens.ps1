@@ -1,5 +1,6 @@
 # =============================================================================
-#  dong-bo-tokens.ps1 - Chep NGUON CHAN LY (tokens.css) sang ca 4 panel.
+#  dong-bo-tokens.ps1 - Chep NGUON CHAN LY (tokens.css) sang moi panel co build
+#  (danh sach $dich ben duoi; luc lap 29/07 la 4 panel).
 # =============================================================================
 #  Anh Tien 2026-07-29: *"anh thay ca 4 phan UI chua dong bo do em. Em nen dua
 #  ra mot UI Design System cho thong nhat... anh thay moi lan em thiet ke lai
@@ -24,14 +25,15 @@ if (-not (Test-Path $nguon)) { throw "Khong thay $nguon" }
 $noiDung = Get-Content $nguon -Raw -Encoding UTF8
 $studio = Split-Path -Parent $goc
 
-# Bon dich den. Asset Manager / Power Bins dung SCSS - nhung SCSS la superset
+# Cac dich den. Asset Manager / Power Bins dung SCSS - nhung SCSS la superset
 # cua CSS nen file .css hop le cung la .scss hop le, chep thang duoc.
 $dich = @(
   'AiO Asset Manager\client\src\styles\_tokens.scss',
   'AiO Power Bins\client\src\styles\_tokens.scss',
   'AiO Autocut\client\src\tokens.css',
   'AiO Transcripts\client\src\tokens.css',
-  'AiO Video Download\client\src\tokens.css'
+  'AiO Video Download\client\src\tokens.css',
+  'AiO Auto Short Viral\client\src\tokens.css'
 )
 
 $doi = 0; $giong = 0; $thieu = 0

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AiO Studio - Auto Short Viral. Chep khuon panel moi nhat cua bo (19/09/2026).
+  File nay GIU ASCII: scripts\package-release.ps1 doc no bang [xml](Get-Content)
+  cua PowerShell 5.1 (mac dinh ANSI) - chu co dau trong chu thich co the lam
+  hong buoc doc so phien ban.
+  Version o 3 cho (bundle, extension, client/package.json) - kiem bang
+  node design-system/version.mjs, dung go tay lech nhau.
+-->
+<ExtensionManifest Version="7.0"
+    ExtensionBundleId="com.aiostudio.shortviral"
+    ExtensionBundleVersion="0.1.2"
+    ExtensionBundleName="AiO Studio - Auto Short Viral"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <ExtensionList>
+    <Extension Id="com.aiostudio.shortviral.panel" Version="0.1.2" />
+  </ExtensionList>
+
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="PPRO" Version="[15.0,99.9]" />
+    </HostList>
+    <LocaleList>
+      <Locale Code="All" />
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="9.0" />
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+
+  <DispatchInfoList>
+    <Extension Id="com.aiostudio.shortviral.panel">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./dist/index.html</MainPath>
+          <ScriptPath>./host/index.jsx</ScriptPath>
+          <CEFCommandLine>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--mixed-context</Parameter>
+            <Parameter>--allow-file-access</Parameter>
+            <Parameter>--allow-file-access-from-files</Parameter>
+            <!-- Nghe loi (whisper) mot video dai la viec chay NEN nhieu phut. Neu
+                 Premiere dua panel ra sau, Chromium mac dinh bop timer -> thanh
+                 tien do va dong ho dung hinh du whisper van chay, nguoi dung
+                 tuong panel treo. Hai co nay giu nhip cap nhat. -->
+            <Parameter>--disable-renderer-backgrounding</Parameter>
+            <Parameter>--disable-background-timer-throttling</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <!-- Dock chung voi cac panel khac (anh Tien chot 13/08 cho ca bo).
+               Doi Type BAT BUOC tat han Premiere roi mo lai. -->
+          <Type>Panel</Type>
+          <Menu>AiO Studio - Auto Short Viral</Menu>
+          <!-- Man hinh doc: danh sach cau + danh sach khoi hoi-dap xep chong theo
+               chieu doc -> can cao hon panel tai video. 420x760 la kho doc thoai
+               mai; MinSize 300x420 la muc dock ben phai van con dung duoc.
+               CHUA DO tren Premiere that (may anh devicePixelRatio 1.5 -> kho
+               CSS px that nho hon so o day, xem Autocut/CLAUDE.md). -->
+          <Geometry>
+            <Size>
+              <Height>760</Height>
+              <Width>420</Width>
+            </Size>
+            <MinSize>
+              <Height>420</Height>
+              <Width>300</Width>
+            </MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>
