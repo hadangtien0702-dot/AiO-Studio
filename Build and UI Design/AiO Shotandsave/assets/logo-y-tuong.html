@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Shot & Save — icon 3D</title>
+<style>
+body{margin:0;background:#ececef;color:#1a1a1a;font:14px/1.5 Inter,"Segoe UI",sans-serif;padding:32px}
+h1{font-size:20px;margin:0 0 6px}p.mo{color:#666;margin:0 0 24px}
+.hang{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.the{background:#fff;border:1px solid #e3e3e6;border-radius:14px;padding:24px}
+.chu{display:inline-flex;align-items:center;gap:14px;border:2px solid #1a1a1a;border-radius:8px;padding:8px 16px 8px 8px;background:#fff;margin-bottom:18px}
+.chu b{font:800 28px/1 Inter,"Segoe UI",sans-serif;letter-spacing:-.5px}
+.co{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.o{display:flex;flex-direction:column;align-items:center;gap:6px;color:#888;font-size:11px}
+.toi{background:#181818;border-radius:10px;padding:10px}
+.khay{background:#0d0d0d;border-radius:6px;padding:6px;display:flex;gap:8px;align-items:center}
+</style></head><body>
+<h1>Shot &amp; Save — icon 3D (đợt 2: dày hơn)</h1>
+<p class="mo">Ô cam là nút bấm có mép dày (sáng trên-trái, tối dưới-phải, lõm trong). Hình trắng và vòng tròn được ép nổi có cạnh dày, bóng đổ dài. Chấm đỏ viên bi kính.</p>
+
+<svg width="0" height="0" style="position:absolute">
+<defs>
+  <linearGradient id="nen" x1="0" y1="0" x2="0.35" y2="1">
+    <stop offset="0" stop-color="#FF9F4C"/><stop offset=".5" stop-color="#F86820"/><stop offset="1" stop-color="#A32805"/>
+  </linearGradient>
+  <linearGradient id="mepSang" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD9B8"/><stop offset=".5" stop-color="#FF8A3D"/><stop offset="1" stop-color="#7A1C02"/></linearGradient>
+  <radialGradient id="den" cx="0.25" cy="0.08" r="0.95"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".4" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="toiGoc" cx="0.9" cy="1" r="0.9"><stop offset="0" stop-color="#2a0900" stop-opacity=".55"/><stop offset=".65" stop-color="#2a0900" stop-opacity="0"/></radialGradient>
+  <clipPath id="clip"><rect x="8" y="8" width="240" height="240" rx="52"/></clipPath>
+  <!-- long trong: khoi cong nhe -->
+  <filter id="cong" x="-10%" y="-10%" width="120%" height="120%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="14" result="b"/>
+    <feDiffuseLighting in="b" surfaceScale="10" diffuseConstant="1" lighting-color="#fff" result="dif"><fePointLight x="40" y="-60" z="320"/></feDiffuseLighting>
+    <feComposite in="dif" in2="SourceAlpha" operator="in" result="difIn"/>
+    <feComposite in="SourceGraphic" in2="difIn" operator="arithmetic" k1=".9" k2=".35" k3="0" k4="0"/>
+  </filter>
+  <!-- su trang: khoi + specular -->
+  <linearGradient id="su" x1="0" y1="0" x2="0.15" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#FFF6EE"/><stop offset="1" stop-color="#EAD5C4"/></linearGradient>
+  <linearGradient id="canh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9BBA4"/><stop offset="1" stop-color="#9C6A4E"/></linearGradient>
+  <filter id="specSu" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="b"/>
+    <feSpecularLighting in="b" surfaceScale="9" specularConstant="1.3" specularExponent="26" lighting-color="#fff" result="spec"><fePointLight x="60" y="0" z="240"/></feSpecularLighting>
+    <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn"/>
+    <feComposite in="SourceGraphic" in2="specIn" operator="arithmetic" k1="0" k2="1" k3=".8" k4="0"/>
+  </filter>
+  <filter id="bongDai" x="-30%" y="-30%" width="160%" height="180%">
+    <feDropShadow dx="0" dy="14" stdDeviation="9" flood-color="#4A1000" flood-opacity=".55"/>
+  </filter>
+  <filter id="bongNgan" x="-50%" y="-50%" width="200%" height="220%"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#3a0d00" flood-opacity=".6"/></filter>
+  <radialGradient id="bi" cx="0.35" cy="0.28" r="0.85"><stop offset="0" stop-color="#FF9A7E"/><stop offset=".4" stop-color="#EA3D10"/><stop offset="1" stop-color="#6E1502"/></radialGradient>
+</defs>
+
+<symbol id="icon" viewBox="0 0 256 256">
+  <!-- bong ca icon xuong nen -->
+  <rect x="14" y="26" width="228" height="228" rx="52" fill="#000" opacity=".22" filter="url(#bongDai)"/>
+  <!-- MEP NGOAI day (nut bam): lop duoi toi, lop tren sang -->
+  <rect width="256" height="256" rx="58" fill="url(#mepSang)"/>
+  <rect x="3" y="3" width="250" height="250" rx="55" fill="#7E1D03"/>
+  <rect x="3" y="3" width="250" height="248" rx="55" fill="url(#mepSang)" opacity=".9"/>
+  <!-- LONG TRONG lom nhe -->
+  <g filter="url(#cong)">
+    <rect x="8" y="8" width="240" height="240" rx="52" fill="url(#nen)"/>
+  </g>
+  <g clip-path="url(#clip)">
+    <rect width="256" height="256" fill="url(#den)"/>
+    <rect width="256" height="256" fill="url(#toiGoc)"/>
+    <!-- bong trong mep tren (lom) -->
+    <rect x="8" y="8" width="240" height="18" fill="#3a0d00" opacity=".18"/>
+    <rect x="8" y="8" width="16" height="240" fill="#3a0d00" opacity=".10"/>
+    <!-- gloss -->
+    <path d="M8 8 H248 V66 C200 100 70 104 8 76 Z" fill="#fff" opacity=".09"/>
+  </g>
+
+  <!-- HINH ANH: ep noi day 10px (cac lop canh) -->
+  <g filter="url(#bongDai)">
+    <g fill="url(#canh)">
+      <path d="M44 198 L102 118 L142 168 L166 144 L212 198 Z"/>
+      <path d="M44 195 L102 115 L142 165 L166 141 L212 195 Z"/>
+      <path d="M44 192 L102 112 L142 162 L166 138 L212 192 Z"/>
+    </g>
+  </g>
+  <g filter="url(#specSu)">
+    <path d="M44 188 L102 108 L142 158 L166 134 L212 188 Z" fill="url(#su)"/>
+  </g>
+  <path d="M102 108 L142 158" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".95"/>
+  <path d="M166 134 L212 188" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+  <path d="M44 188 L102 108" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+
+  <!-- VONG TRON: ep noi -->
+  <g filter="url(#bongDai)"><circle cx="178" cy="88" r="26" fill="url(#canh)"/><circle cx="178" cy="85" r="26" fill="url(#canh)"/></g>
+  <g filter="url(#specSu)"><circle cx="178" cy="80" r="26" fill="url(#su)"/></g>
+  <circle cx="178" cy="80" r="15" fill="#5a1a06" opacity=".35"/>
+  <g filter="url(#bongNgan)"><circle cx="178" cy="80" r="14" fill="url(#bi)"/></g>
+  <ellipse cx="172" cy="72.5" rx="5.5" ry="3.6" fill="#fff" opacity=".9"/>
+  <ellipse cx="181" cy="91" rx="7" ry="2.4" fill="#fff" opacity=".22"/>
+</symbol>
+
+<symbol id="khay" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="currentColor"/><path d="M12 47 L26 27 L36 39.5 L42 33.5 L52 47 Z" fill="#000" opacity=".85"/><circle cx="44.5" cy="20.5" r="5.5" fill="#000" opacity=".85"/></symbol>
+</svg>
+
+<div class="hang">
+<div class="the">
+  <div class="chu"><svg width="48" height="48"><use href="#icon"/></svg><b>Shot &amp; Save</b></div>
+  <div class="co">
+    <div class="o"><svg width="256" height="256"><use href="#icon"/></svg>256</div>
+    <div class="o"><svg width="128" height="128"><use href="#icon"/></svg>128</div>
+    <div class="o"><svg width="64" height="64"><use href="#icon"/></svg>64</div>
+    <div class="o"><svg width="32" height="32"><use href="#icon"/></svg>32</div>
+  </div>
+</div>
+<div class="the toi" style="border:none">
+  <div class="co">
+    <div class="o" style="color:#aaa"><svg width="160" height="160"><use href="#icon"/></svg>nền tối 160</div>
+    <div class="o" style="color:#aaa"><svg width="48" height="48"><use href="#icon"/></svg>48</div>
+    <div class="o" style="color:#aaa"><div class="khay"><svg width="16" height="16" style="color:#F86820"><use href="#khay"/></svg><svg width="16" height="16" style="color:#fff"><use href="#khay"/></svg></div>khay 16</div>
+  </div>
+</div>
+</div>
+</body></html>

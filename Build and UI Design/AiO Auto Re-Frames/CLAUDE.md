@@ -34,7 +34,7 @@ Hai tầng tính năng:
 thoại, tìm từng câu hỏi–trả lời trọn vẹn, và trên timeline mọc ra các short
 dọc sẵn — editor chỉ tỉa lại thay vì ngồi tua cả tiếng tìm đoạn.
 
-⚠️ Ranh giới với thư mục `AiO Auto Cut Short`: não "chọn đoạn theo hỏi–đáp"
+⚠️ (21/09: Auto Cut Short đã GỘP vào `AiO Auto Short Viral`, thư mục cũ đã bỏ — ghi chép cũ ở `AiO Auto Short Viral/tai-lieu/`.) Ranh giới với thư mục `AiO Auto Cut Short`: não "chọn đoạn theo hỏi–đáp"
 anh chốt đặt VÀO Re-Frames (lời anh 31/07 ở trên). Thư mục Short giữ các phần
 chưa làm: phụ đề gắn lên short, xuất nháp 480p, karaoke — chốt số phận sau.
 

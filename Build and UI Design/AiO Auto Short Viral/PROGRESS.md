@@ -1,5 +1,32 @@
 # AiO Auto Short Viral - Nhat ky
 
+## [0.1.2-vaphienban] - 2026-09-21 11:22 (UTC+7) - SUA: panel CHAN "Doc noi dung" vi lech phien ban host. DA CAI + DA DO
+
+### Boi canh
+Anh Tien bam "Doc noi dung" luc 11:20 (anh chup man hinh): panel bao *"Phan chay trong
+Premiere dang la ban 0.1.2, khong khop giao dien..."* va khong chay.
+
+### Nguyen nhan that
+Muc 11:05 bump 0.1.2 o 3 cho (manifest, package.json, host `sv_phienBan`) nhung SOT cho
+thu 4: `client/src/lib/cep.ts` `PHIEN_BAN_HOST = '0.1.0'`. Host tra 0.1.2 != 0.1.0 ->
+`HOST_CU` -> chan. Phep do 11:05 "sv_phienBan() tra 0.1.2" goi THANG host qua CDP nen
+khong di qua buoc kiem phien ban cua giao dien -> khong lo (brain 5p: do tren duong
+khong phai duong nguoi dung di). Kiem `design-system/version.mjs` chi so 3 cho, mu voi 2
+cho con lai.
+
+### Da sua
+- `cep.ts` `PHIEN_BAN_HOST` -> '0.1.2'.
+- Chot chan moi `tests/kiem-phien-ban.mjs`: 5 cho (2 dong manifest, package.json, host,
+  cep.ts) phai bang nhau; chay DAU TIEN trong `npm run build` va `build:release`.
+  Doi chung `--doi-chung` (gia lap cep.ts lech) -> in HONG, exit 1. Ban that -> 5/5, exit 0.
+
+### Kiem chung
+- `npm run build` sach, dist 567,77 kB, kiem-byte sach · `npm run kiem` 222 DAT / 0 HONG.
+- Chep `dist/index.html` vao extension, md5 khop (`0a309f7f...`). Host KHONG doi -> khong
+  can tat Premiere; nap lai trang panel qua cong 8100.
+- Tren Premiere that, bam "Doc noi dung" qua CDP tren `PodTest 20 phut - thu Short Viral`:
+  **khong con bao lech**, ra **37 khoi / 295 cau** (khop 37 khoi do 11:05).
+
 ## [0.1.2] - 2026-09-21 11:05 (UTC+7) - DA CAI + DO TREN PREMIERE THAT (pill, tien do gop, tab loi). CHOT SO CUOI PHIEN
 
 ### Trang thai hien tai

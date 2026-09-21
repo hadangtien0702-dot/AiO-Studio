@@ -1,0 +1,98 @@
+[
+  {
+    "id": "int-001",
+    "state_code": "CA",
+    "client_name": "David Miller",
+    "role": "VP of Production",
+    "company": "Silicon Media Labs",
+    "city": "Los Angeles",
+    "date": "2026-08-14",
+    "status": "completed",
+    "video_link": "PR-SEQ-LA01",
+    "notes": "Interview about AI post-production workflows, Premiere timeline automation, and color finishing."
+  },
+  {
+    "id": "int-002",
+    "state_code": "CA",
+    "client_name": "Elena Rostova",
+    "role": "Head of Post-Production",
+    "company": "Pacific Coast Films",
+    "city": "San Francisco",
+    "date": "2026-08-18",
+    "status": "completed",
+    "video_link": "PR-SEQ-SF02",
+    "notes": "In-depth case study on multi-cam editing and auto-captioning integrations."
+  },
+  {
+    "id": "int-003",
+    "state_code": "TX",
+    "client_name": "Marcus Sterling",
+    "role": "Creative Director",
+    "company": "Austin Hub Studios",
+    "city": "Austin",
+    "date": "2026-08-26",
+    "status": "completed",
+    "video_link": "PR-SEQ-ATX01",
+    "notes": "Discussed short-form video explosion and high-velocity daily reels editing."
+  },
+  {
+    "id": "int-004",
+    "state_code": "TX",
+    "client_name": "Samantha Hayes",
+    "role": "Lead Podcast Producer",
+    "company": "Lone Star Media",
+    "city": "Dallas",
+    "date": "2026-09-02",
+    "status": "completed",
+    "video_link": "PR-SEQ-DFW02",
+    "notes": "Multi-camera podcast workflow with auto-cut switching and transcript sync."
+  },
+  {
+    "id": "int-005",
+    "state_code": "NY",
+    "client_name": "Jonathan Chen",
+    "role": "Executive Producer",
+    "company": "Manhattan Broadcast Group",
+    "city": "New York City",
+    "date": "2026-09-08",
+    "status": "completed",
+    "video_link": "PR-SEQ-NYC01",
+    "notes": "Broadcast delivery standards, HDR mastering, and multi-user asset bin management."
+  },
+  {
+    "id": "int-006",
+    "state_code": "NY",
+    "client_name": "Chloe Dupont",
+    "role": "Documentary Filmmaker",
+    "company": "Brooklyn Independent Docs",
+    "city": "Brooklyn",
+    "date": "2026-09-28",
+    "status": "planned",
+    "video_link": "PR-PLAN-BK01",
+    "notes": "Upcoming shoot: Archival footage restoration and documentary pacing."
+  },
+  {
+    "id": "int-007",
+    "state_code": "FL",
+    "client_name": "Carlos Rodriguez",
+    "role": "Content Director",
+    "company": "Miami Sun Media",
+    "city": "Miami",
+    "date": "2026-09-12",
+    "status": "completed",
+    "video_link": "PR-SEQ-MIA01",
+    "notes": "Commercial ad editing, fast turnarounds for social campaigns."
+  },
+  {
+    "id": "int-008",
+    "state_code": "WA",
+    "client_name": "Rachel Adams",
+    "role": "Lead Video Editor",
+    "company": "Puget Sound Digital",
+    "city": "Seattle",
+    "date": "2026-09-17",
+    "status": "completed",
+    "video_link": "PR-SEQ-SEA01",
+    "notes": "Color grading and LUT management in Premiere Pro for commercial travel docs."
+  }
+]

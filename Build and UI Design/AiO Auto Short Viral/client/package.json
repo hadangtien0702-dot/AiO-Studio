@@ -6,9 +6,9 @@
   "description": "AiO Studio - Auto Short Viral: doc noi dung clip, chia khoi hoi-dap, dat marker hoac tao sequence moi",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node ../tests/kiem-byte.mjs",
+    "build": "node ../tests/kiem-phien-ban.mjs && tsc -b && vite build && node ../tests/kiem-byte.mjs",
     "preview": "vite preview",
-    "build:release": "tsc -b && vite build --mode release && node ../tests/kiem-byte.mjs",
+    "build:release": "node ../tests/kiem-phien-ban.mjs && tsc -b && vite build --mode release && node ../tests/kiem-byte.mjs",
     "kiem": "tsc src/services/kieu.ts src/services/moc.ts src/services/hoidap.ts src/services/xuat.ts --target es2020 --module es2020 --skipLibCheck --outDir ../tests/js && node ../tests/kiem-hoidap.mjs"
   },
   "dependencies": {

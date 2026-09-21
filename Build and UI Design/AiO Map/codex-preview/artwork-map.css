@@ -1,0 +1,100 @@
+/* This stylesheet belongs to the isolated Codex preview on port 8090. */
+:root { --map-paper: #e5edef; --map-ink: #203d43; --map-teal: #087c80; }
+body.map-artwork { --bg-canvas: var(--map-paper); --acc: var(--map-teal); }
+body.map-artwork #app-container { background: var(--map-paper); }
+.artwork-stage[hidden] { display: none; }
+.artwork-stage { position: absolute; inset: 110px 32px 80px; z-index: 2; display: flex; flex-direction: column; justify-content: center; color: var(--map-ink); }
+.map-has-selection .artwork-stage { right: 374px; }
+.artwork-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 24px; flex: 0 0 auto; }
+.artwork-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #4c686e; }
+.artwork-heading h1 { font-family: 'Segoe UI', sans-serif; font-size: clamp(23px, 2.2vw, 34px); font-weight: 400; letter-spacing: -1px; line-height: 1.25; margin: 8px 0; }
+.artwork-heading p { color: #536b71; font-size: 12px; }
+.artwork-chooser { display: grid; gap: 7px; font-size: 11px; color: #4c686e; }
+.artwork-chooser select { width: 172px; min-height: 40px; border: 1px solid #b9cdcf; border-radius: 8px; background: #ffffffb3; color: var(--map-ink); padding: 8px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.artwork-board { width: min(100%, calc((100dvh - 290px) * 1.25)); aspect-ratio: 1.25; flex: 0 1 auto; align-self: center; overflow: hidden; margin: 16px 0 0; }
+.artwork-canvas { position: relative; width: 100%; aspect-ratio: 1; transform: translateY(-12%); }
+.artwork-image { display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); }
+.artwork-markers { position: absolute; inset: 0; }
+.artwork-pin { position: absolute; transform: translate(-50%, -100%); min-width: 44px; height: 60px; padding: 0 4px 28px; background: none; border: 0; cursor: pointer; color: var(--map-teal); z-index: 1; }
+.artwork-pin::after { content: ''; position: absolute; bottom: 2px; left: calc(50% - 1px); width: 2px; height: 30px; background: currentColor; box-shadow: 2px 2px 4px #294f4f26; }
+.artwork-pin::before { content: ''; position: absolute; bottom: 0; left: calc(50% - 4px); width: 8px; height: 6px; border-radius: 50%; background: white; border: 2px solid currentColor; }
+.artwork-pin-label { display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; z-index: 1; padding: 6px 8px; border-radius: 5px; background: #fffffff5; color: inherit; box-shadow: 0 3px 12px #254e4e1f; white-space: nowrap; font-size: 11px; letter-spacing: 1px; font-weight: 700; transition: transform .18s ease; }
+.artwork-pin-label b { padding-left: 7px; border-left: 1px solid #c8dddd; font-size: 10px; }
+.artwork-pin.is-planned { color: #805319; }
+.artwork-pin.is-selected:not(.has-painted-label) .artwork-pin-label { background: var(--map-teal); color: white; }
+.artwork-pin.has-painted-label { height: 44px; padding: 0; transform: translate(-50%, -50%); }
+.artwork-pin.has-painted-label::before, .artwork-pin.has-painted-label::after, .artwork-pin.has-painted-label .artwork-pin-label { visibility: hidden; }
+.artwork-pin.has-painted-label:focus-visible .artwork-pin-label { visibility: visible; }
+.artwork-pin:hover .artwork-pin-label { transform: translateY(-3px); }
+.artwork-footer { display: flex; justify-content: space-between; align-items: center; padding: 0 24px; gap: 16px; }
+.artwork-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 11px; color: #4c686e; }
+.artwork-legend span { display: flex; align-items: center; gap: 6px; }
+.artwork-legend i { width: 7px; height: 7px; display: block; border-radius: 50%; }
+.legend-filmed { background: var(--map-teal); }
+.legend-planned { background: #9c681e; }
+.artwork-reset { min-height: 40px; padding: 8px 12px; color: var(--map-teal); border: 1px solid #b9cdcf; border-radius: 7px; background: transparent; cursor: pointer; font-size: 12px; white-space: nowrap; }
+.artwork-status { text-align: center; font-size: 12px; color: #8b401d; }
+.artwork-status:empty { display: none; }
+body.map-artwork [data-preset="topdown"], body.map-artwork [data-preset="cinematic"], body.map-artwork .controls-bottom-bar, body.map-artwork #export-transparent { display: none; }
+.topbar { gap: 10px; }
+.topbar-left { flex: 1; min-width: 0; }
+.app-brand { flex-shrink: 0; }
+.brand-title, .btn-icon-label, .btn-add-interview { white-space: nowrap; }
+.search-wrapper { min-width: 120px; max-width: 250px; flex: 1; }
+.search-input-box { width: 100%; }
+.topbar-center, .topbar-right { flex-shrink: 0; }
+.bottom-hints { bottom: 70px; background: transparent; border: none; box-shadow: none; font-size: 10px; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid #087c80; outline-offset: 3px; }
+.theme-console.map-artwork .topbar { --acc: #55d2d3; }
+.theme-console.map-artwork .bottom-hints { color: #4c686e; }
+@media (max-width: 1150px) {
+  .topbar { flex-wrap: wrap; height: auto; align-content: start; }
+  .topbar-left { flex-basis: calc(100% - 240px); }
+  .topbar-center { order: 3; }
+  .artwork-stage { top: 145px; left: 12px; right: 12px; }
+  .map-has-selection .artwork-stage { right: 362px; }
+  .artwork-heading { padding: 0 12px; gap: 12px; flex-wrap: wrap; }
+  .artwork-heading h1 { font-size: 25px; }
+  .artwork-heading p { display: none; }
+  .artwork-board { width: min(100%, calc((100dvh - 335px) * 1.25)); }
+  .state-info-panel { top: 128px; }
+  .artwork-footer { padding: 0 12px; }
+  .artwork-legend { gap: 10px; }
+}
+@media (max-width: 760px) {
+  html, body { overflow-y: auto; }
+  #app-container { min-height: 100dvh; height: auto; padding-top: 188px; padding-bottom: 84px; overflow: hidden; }
+  .topbar { top: 10px; left: 12px; right: 12px; gap: 8px; }
+  .topbar-left { flex-basis: 100%; gap: 8px; }
+  .app-brand { padding: 8px; }
+  .brand-title { font-size: 11px; }
+  .brand-subtitle { font-size: 9px; }
+  .production-stats-badge { display: none; }
+  .search-wrapper { min-width: 90px; }
+  .search-input { font-size: 12px; width: 100%; }
+  .topbar-center { order: 2; max-width: 100%; overflow-x: auto; }
+  .topbar-right { order: 3; }
+  .btn-icon-label, .btn-icon-only, .btn-add-interview { min-height: 40px; }
+  .artwork-stage, .map-has-selection .artwork-stage { position: relative; inset: auto; margin: 12px 0 24px; }
+  .artwork-heading { padding: 0 20px; }
+  .artwork-heading h1 { font-size: 24px; }
+  .artwork-chooser { width: 100%; }
+  .artwork-chooser select { width: 100%; min-height: 44px; font-size: 16px; }
+  .artwork-board { width: 100%; margin-top: 32px; overflow: visible; }
+  .artwork-footer { padding: 0 20px; }
+  .artwork-legend { max-width: 200px; font-size: 10px; }
+  .artwork-pin { min-width: 44px; height: 44px; padding-bottom: 20px; }
+  .artwork-pin-label { font-size: 9px; gap: 4px; padding: 5px; }
+  .artwork-pin-label b { padding-left: 4px; }
+  .artwork-pin::after { height: 22px; }
+  .map-artwork .state-info-panel { display: none; }
+  .map-artwork .state-info-panel.visible { position: relative; display: flex; inset: auto; transform: none; width: auto; margin: 0 12px 16px; max-height: 560px; }
+  .bottom-hints { display: none; }
+  .bottom-region-bar { position: fixed; bottom: 12px; max-width: calc(100vw - 16px); overflow-x: auto; gap: 0; }
+  .region-pill { white-space: nowrap; min-height: 40px; padding: 6px 10px; }
+  .all-interviews-drawer { top: 150px; max-width: calc(100vw - 24px); }
+  .form-input, .form-select, .form-textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+}

@@ -36,19 +36,20 @@ thấy từng câu hỏi là một khối, kéo gộp/tách/bỏ rồi mới đ�
 | Ngày | Quyết định | Vì sao |
 |---|---|---|
 | 18/09 | **Panel riêng, KHÔNG gộp vào Auto Cut** | Em đề xuất, anh đồng ý và đặt tên: Auto Cut đã xong + đóng băng 19/08 (qua tai anh); việc khác bản chất (1 nút ↔ thao tác liên tục); dock 360px không đủ chỗ; nghiên cứu 10/09 đề xuất đưa Auto Cut vào gói Free |
-| 18/09 | **Giữ `AiO Auto Cut Short` là sản phẩm RIÊNG**, không gộp vào đây | Anh chọn "Giữ riêng 2 sản phẩm". Cut Short giữ cổng 8093 |
+| 18/09 | ~~**Giữ `AiO Auto Cut Short` là sản phẩm RIÊNG**, không gộp vào đây~~ | ❌ **Bị đè 21/09** |
+| **21/09** | **GỘP Auto Cut Short vào đây, giữ tên "Auto Short Viral"** | Anh: *"2 cái này là một và giữ cái tên Auto Short Viral là chính"*. Ghi chép cũ của Cut Short: `tai-lieu/cut-short-CLAUDE-cu.md` + `tai-lieu/cut-short-PROGRESS-cu.md`. Cổng 8093 trả lại |
 | 18/09 | **Không liên quan tới Re-Frames** | Anh: *"Re-frames đâu có liên quan gì tới short viral đâu em?"* |
 | 18/09 | Web bán hàng **chưa** thêm tên này | Anh chọn "để khi có bản chạy" |
 
-☠️ **Ranh giới với Auto Cut Short CHƯA vạch.** Cut Short đã chốt 30/07 "chia đoạn
-theo HỎI–ĐÁP, mỗi đoạn một sequence mới" — trùng ý (3) ở trên. Phải hỏi anh hai
-tool khác nhau ở đâu **trước khi** viết não chia đoạn, đừng tự vạch.
+✅ **Hết chuyện ranh giới (21/09): Cut Short đã gộp vào đây.** Các quyết định Cut Short chốt 30/07 (chia HỎI–ĐÁP · mỗi đoạn một sequence mới · 30–90s · phụ đề dọc) nay là đầu vào của panel này — đọc `tai-lieu/cut-short-CLAUDE-cu.md`.
+
+
 
 ---
 
 ## Việc CHỜ trước khi viết code
 
-1. **Ranh giới với Auto Cut Short** (xem trên).
+1. ~~Ranh giới với Auto Cut Short~~ — hết, đã gộp 21/09.
 2. **"Các đoạn cùng ý nghĩa"** cần mô hình hiểu nghĩa: chạy trên máy (offline,
    không hạn mức, kém hơn, ăn tài nguyên máy đang mở Premiere) hay gọi AI qua
    mạng (hiểu tốt hơn, tốn tiền theo giờ video → phải có hạn mức, gửi nội dung
@@ -71,7 +72,7 @@ tool khác nhau ở đâu **trước khi** viết não chia đoạn, đừng t�
 - **Mã tham khảo chia hỏi–đáp**: `chiaDoan()` trong `AiO Auto Re-Frames/dist/index.html`
   (anh chốt 18/09 hai sản phẩm KHÔNG liên quan — chỉ đọc để học, không nối panel).
 - **Cắt vùng thành sequence mới**: `setInPoint/OutPoint` + `createNewSequenceFromClips`
-  (chạy được 31/07, xem `AiO Auto Cut Short/PROGRESS.md` [0.0.2]). Bản của panel này:
+  (chạy được 31/07, xem `tai-lieu/cut-short-PROGRESS-cu.md` [0.0.2]). Bản của panel này:
   `sv__dung` trong `host/shortviral.jsx` — cất in/out gốc TRƯỚC, trả lại sau (bài 3a-bis).
 
 ### Số đo đã có về dấu `?` (18/09, đọc thẳng 4 bản chép lời trên ổ)
@@ -115,6 +116,7 @@ số đó đếm cả dấu `?` đứng cuối câu mà sau nó chỉ còn dấu
 | 9 | ☠️ **Một byte ĐIỀU KHIỂN nằm trần trong mã nguồn ⇒ bản đã đóng gói mở ra TRẮNG TRƠN**, mà `tsc` sạch · `vite build` sạch · `npm run kiem` xanh hết | Đo 21/09: `xuat.ts` dòng 199 có 1 byte NUL + 1 byte 0x1F thật (viết `\x00-\x1f` trong regex, vỏ lệnh gộp mất một tầng thoát — brain 5ax). Vite gói cả mã vào MỘT khối `<script>` nội tuyến; bộ đọc HTML đổi U+0000 thành U+FFFD ở "script data" nên lớp ký tự thành khoảng NGƯỢC → Chrome trên `dist` đã build: *"Invalid regular expression … Range out of order in character class"*, `<div id="root">` **RỖNG**. `vite dev` không lộ (file phục vụ dạng `.js`, không qua bộ đọc HTML). Kèm: NUL trong 8.000 byte đầu làm **git coi file là NHỊ PHÂN** (`git diff` in "Binary files differ", `git blame` mất từng dòng) và **ripgrep BỎ QUA file** → hai phép kiểm bắt buộc của dự án (`git grep` ID/cổng panel khuôn, grep mã màu cứng) cho ÂM TÍNH GIẢ | `npm run build` chạy `node ../tests/kiem-byte.mjs` — mã nguồn: cấm mọi byte < 0x20 ngoài TAB/CR/LF; `dist/index.html`: cấm **NUL** (chỉ NUL mới chết — bản đang chạy thật 19/09 có 2 byte 0x1E/0x1F của chính React, bắt cả hai loại là báo đỏ một bản chạy tốt). `npm run kiem` mục (7i) có **đối chứng hai chiều**. Cần dải ký tự điều khiển thì viết 4 ký tự ASCII `\x00` hoặc `String.fromCharCode(...)` như `ui/chung.tsx:102`, và **ghi file bằng Write/Edit, không heredoc** |
 | 10 | Phím tắt một chữ của panel **trùng phím mặc định Premiere** → có thể sửa timeline của người dùng | CHƯA ĐO (21/09 không được mở/chạy Premiere). `preventDefault()` chỉ chặn trình duyệt nhúng, không chứng minh host không nhận cùng cú phím; grep skill `adobe-cep-panel` ra **0 dòng** về phím bị host ăn | Đã **bỏ `E`** (Extend Selected Edit to Playhead — phá timeline) khỏi đường bung câu, giữ `←`/`→` (xấu nhất là đầu đọc nhích 1 khung). Lần cài đầu phải đo: bấm `→` 10 lần, ghi 3 số TRƯỚC/SAU — vị trí đầu đọc, số clip trên track, mốc đầu/cuối clip đang chọn. Cả ba không đổi thì phím sạch; đổi thì bỏ luôn `←`/`→`. Tab khối đang dùng J/K/M/X/Enter — cũng **chưa đo** |
 | 11 | Một nhãn **đổi bề rộng lúc đang chạy** làm CẮT ĐUÔI con số bên cạnh nó — mất đúng thứ vừa làm ra để hiện | Đo 21/09 (36 cảnh, DOM thật + CSS của `dist` đã build, khổ 300 px): nút Dừng đổi chữ `Dừng`→`Đang dừng…` phình **48,9 → 92 px**, chỗ cho dòng đếm tụt còn 97–127 px trong khi `Đang đưa khối 12/12…` cần **145,1 px** → cắt 18–48 px. Thanh đó có **BA biến** cùng ăn bề rộng: nhãn nút · đồng hồ (`dongHo` là m:ss, phút KHÔNG chặn trên → "100:05") · `--rong-thanh-cuon` (11–15 px khi danh sách dài) | Nhãn nút trong thanh tiến độ **giữ nguyên chữ**, trạng thái nói bằng `disabled` + opacity. Thêm gì vào `.chay__thanh` thì phải đo lại với đủ BA biến trên, ở **cả hai** bản VI/EN. ☠️ **Thước phải là bề rộng DÀN TRANG** (span thử cùng font trong DOM thật, đối chứng bằng `scrollWidth` ở ca tràn) — canvas `measureText` báo **thiếu ~7 px (~5%)** và chính nó làm vòng soát trước tưởng còn thừa 20 px |
+| 12 | Bump phiên bản xong, panel **CHẶN nút Đọc nội dung**: *"Phần chạy trong Premiere đang là bản 0.1.2, không khớp giao diện"* | 21/09 11:05 bump 0.1.2 ở 3 chỗ, sót `PHIEN_BAN_HOST` trong `client/src/lib/cep.ts` (vẫn 0.1.0). Phép đo lúc cài gọi `sv_phienBan()` THẲNG qua CDP nên không đi qua bước kiểm của giao diện → không lộ; anh bấm nút mới lộ | Số phiên bản nằm ở **5 chỗ**: 2 dòng manifest · `client/package.json` · `sv_phienBan()` cuối host · `PHIEN_BAN_HOST`. `npm run build` chạy `tests/kiem-phien-ban.mjs` ĐẦU TIÊN, lệch là đỏ (có `--doi-chung`). Sau khi cài: đo bằng cách **bấm Đọc nội dung**, không gọi host thẳng |
 
 ---
 
@@ -134,7 +136,7 @@ nguyên hai thư mục đó). **Không bao giờ tạo tay:** `dist/` · `build/
 
 ## Quy ước
 
-- Cổng **8100**. 8093 là của Auto Cut Short; 8099 đang bị `xem-rieng.mjs` của
+- Cổng **8100**. 8093 từng dành cho Auto Cut Short (đã gộp vào đây 21/09, cổng bỏ trống); 8099 đang bị `xem-rieng.mjs` của
   Re-Frames dùng. Bảng cổng đầy đủ: `AiO Studio/CLAUDE.md` mục 2.
 - `cd client && npm run build` = `tsc -b` + `vite build` + **chốt chặn byte điều khiển**
   (`node ../tests/kiem-byte.mjs`, sổ lỗi #9). Build đỏ ở bước đó thì ĐỪNG cài.

@@ -1,3 +1,5 @@
+> ☠️ **LƯU TRỮ — 21/09/2026 anh Tiến gộp Auto Cut Short vào Auto Short Viral** (*"2 cái này là một và giữ cái tên Auto Short Viral là chính"*). File này là ghi chép CŨ của Cut Short (30/07–18/09), chép nguyên văn để giữ các quyết định + số đo. Nguồn chân lý hiện hành: `../CLAUDE.md`. Cổng 8093 + ID `com.aiostudio.short` đã trả lại.
+
 # AiO Auto Cut Short — đọc cái này trước
 
 > Dự án thứ 6 của bộ AiO Studio. Anh Tiến giao 2026-07-30:

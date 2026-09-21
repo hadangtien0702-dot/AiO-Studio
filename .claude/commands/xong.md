@@ -76,7 +76,7 @@ soi node_modules/Electron/FFmpeg, thêm `-CaiThem` là tự npm install). Sửa 
    không còn file định đưa lên mà chưa lên.
 5. **Đẩy brain tổng** (nếu phiên có ghi bài học vào `~/.claude/CLAUDE.md` hay
    skill): chạy `powershell -ExecutionPolicy Bypass -File
-   "%USERPROFILE%\.claude\brain-repo\dong-bo-brain.ps1" -Day` — nó chép brain
+   "%USERPROFILE%\.claude\brain-repo\dong-bo-brain.ps1" -Day` (☠️ **trên Mac** không có PowerShell: chạy `bash "<repo>/scripts/dong-bo-mac.sh" --day-brain`) — nó chép brain
    vào repo PRIVATE `hadangtien0702-dot/brain` rồi push. ☠️ Brain KHÔNG được
    nằm trong repo AiO-Studio (repo đó PUBLIC — anh Tiến chốt để public 31/08).
 6. Trong báo cáo cuối (bước 5) nhắc một dòng: *"đã push commit `<mã>` — máy kia

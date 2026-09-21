@@ -1,5 +1,9 @@
 # PROGRESS — AiO Auto Guiline Frame
 
+## 2026-09-21 15:37 — ANH TEST ĐẠT
+Anh Tiến: *"Auto Guideline Frame - anh test thấy okie rồi đó em"* (bản 0.3.0). Chưa có bộ cài trong `Release/`;
+đóng gói là bước tiếp theo nếu anh muốn đưa ra ngoài.
+
 ## TRANG THAI HIEN TAI (cap nhat 2026-08-26 14:40)
 
 - **Phien ban:** v0.3.0 (khop ca 3 noi: manifest · `gf_phienBan()` · `PHIEN_BAN`).

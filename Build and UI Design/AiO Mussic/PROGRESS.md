@@ -1,5 +1,12 @@
 # PROGRESS — AiO Music (BGM & Sound Effects Manager)
 
+## 2026-09-21 15:37 — cài lại vào Premiere MÁY CÔNG TY
+Anh nhờ "mở lại trong extension PR". Đo: `%APPDATA%\Adobe\CEP\extensions` có 9 panel AiO nhưng KHÔNG có
+`com.aiostudio.music` (bản ghi 08/08 chỉ cài ở máy nhà). Tạo junction
+`com.aiostudio.music` → `E:\2026\Production\AiO Studio\Build and UI Design\AiO Mussic` (cùng kiểu Re-Frames);
+`manifest.xml` đọc được qua junction. Cổng 8097 trống (brain-map không chạy). ☠️ SỬA 15:4x: em ghi "Premiere đang TẮT" là SAI — `Get-Process -Name "Adobe Premiere Pro"` khớp tên CHÍNH XÁC nên mù với "Adobe Premiere Pro (Beta)" (PID 29100, mở 15:32, TRƯỚC khi tạo junction) → Premiere chưa quét thấy panel, phải tắt mở lại. Dò tiến trình Premiere bằng `-like "*Premiere*"`.
+CHƯA đo panel mở trong Premiere — chờ anh mở Window > Extensions (AiO) > Music.
+
 ## TRANG THAI HIEN TAI (cap nhat 2026-08-08 19:58)
 
 - **Phien ban:** v2.0 UI + da thanh EXTENSION CEP THAT (truoc do chi la file

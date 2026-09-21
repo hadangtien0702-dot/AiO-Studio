@@ -91,10 +91,10 @@ if ($binThieu.Count -gt 0) {
     Write-Host "  -> Chi can khi CHAY panel that tren Premiere. Chep tay tu may kia (USB/Drive)." -ForegroundColor Yellow
 }
 
-# ---------- 4. CAI LENH /xong VAO MAY NAY ----------
-# Lenh /xong goc nam trong repo (.claude/commands/) - chep vao ~/.claude/commands
-# de go /xong duoc o MOI du an tren may nay, khong chi khi mo repo AiO Studio.
-Write-Host "`n[4/5] Dong bo lenh /xong ve may nay..." -ForegroundColor Yellow
+# ---------- 4. CAI LENH /xong /batdau + SCRIPT batdau VAO MAY NAY ----------
+# Lenh goc nam trong repo (.claude/commands/) - chep vao ~/.claude/commands
+# de go duoc o MOI du an tren may nay, khong chi khi mo repo AiO Studio.
+Write-Host "`n[4/5] Dong bo lenh /xong, /batdau ve may nay..." -ForegroundColor Yellow
 $lenhNguon = Join-Path $repo '.claude\commands'
 $lenhDich = Join-Path $env:USERPROFILE '.claude\commands'
 if (Test-Path $lenhNguon) {
@@ -111,6 +111,31 @@ if (Test-Path $lenhNguon) {
             Write-Host "  DA CHEP: /$($_.BaseName) -> $dich" -ForegroundColor Green
         } else {
             Write-Host "  DAT: /$($_.BaseName) da moi nhat" -ForegroundColor Green
+        }
+    }
+}
+
+# Script batdau.mjs - CUA VAO cua brain (hook SessionStart goi no moi dau phien).
+# Ban goc trong repo scripts\batdau\; ban ~/.claude/scripts la ban CHEP.
+# Khong co no thi hook im lang thoat 0 -> phien nao cung mo ra voi tri nho trang.
+$sNguon = Join-Path $repo 'scripts\batdau\batdau.mjs'
+$sDich = Join-Path $env:USERPROFILE '.claude\scripts\batdau.mjs'
+if (Test-Path $sNguon) {
+    New-Item -ItemType Directory -Force (Split-Path $sDich) | Out-Null
+    $khacS = $true
+    if (Test-Path $sDich) { $khacS = (Get-FileHash $sNguon).Hash -ne (Get-FileHash $sDich).Hash }
+    if ($khacS) {
+        Copy-Item $sNguon $sDich -Force
+        Write-Host "  DA CHEP: batdau.mjs -> $sDich" -ForegroundColor Green
+    } else {
+        Write-Host "  DAT: batdau.mjs da moi nhat" -ForegroundColor Green
+    }
+    # Canh bao neu may nay chua lap hook SessionStart (chep script thoi chua du)
+    $sj = Join-Path $env:USERPROFILE '.claude\settings.json'
+    if (Test-Path $sj) {
+        if ((Get-Content $sj -Raw) -notmatch 'SessionStart') {
+            Write-Host "  THIEU hook SessionStart trong ~/.claude/settings.json" -ForegroundColor Yellow
+            Write-Host "  -> Chua co no thi dau phien KHONG tu doc PROGRESS.md. Xem scripts\batdau\README.md" -ForegroundColor Yellow
         }
     }
 }

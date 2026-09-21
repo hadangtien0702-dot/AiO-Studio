@@ -52,7 +52,7 @@ interface CSInterfaceLike {
 }
 
 /** Phiên bản host mà giao diện này cần — phải khớp `sv_phienBan()` ở CUỐI host/shortviral.jsx. */
-export const PHIEN_BAN_HOST = '0.1.0'
+export const PHIEN_BAN_HOST = '0.1.2'
 
 /** Chờ tối đa cho hàm nhẹ (skill 6f: ~8 s — quá thì gần như chắc có hộp thoại modal chặn engine). */
 const CHO_NHE = 8000

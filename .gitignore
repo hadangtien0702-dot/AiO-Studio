@@ -116,3 +116,7 @@ ehthumbs.db
 # Ban do brain — log may chu chay tai cho
 scripts/brain-map/server.log
 *.dmg
+
+# 21/09/2026: thu muc tai ve cua panel Video Download khi test (video bi chan boi *.mp4, con lai la .autocut-nghe.json vo dung khi thieu video)
+/Test Media/file pr for test/AiO Studio Download/
+/Test Media/file pr for test/Video Download/

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AiO Studio - 3D Isometric USA Map & Client Interview Tracker</title>
+  <link rel="stylesheet" href="styles.css?v=203">
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      console.error('Window Error:', msg, url, line, col, error);
+      fetch('/api/log-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'window.onerror', msg: msg, url: url, line: line, col: col, stack: error ? error.stack : '' })
+      }).catch(function(){});
+    };
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled Rejection:', e.reason);
+      fetch('/api/log-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'unhandledrejection', reason: String(e.reason), stack: e.reason ? e.reason.stack : '' })
+      }).catch(function(){});
+    });
+  </script>
+</head>
+<body>
+  <div id="app-container">
+    <!-- 3D WebGL Canvas Viewport -->
+    <div id="viewport-3d"></div>
+
+    <!-- Topbar: 44px Studio Console Standard -->
+    <header class="topbar">
+      <!-- Left: Official Brand & Live Coverage Stats -->
+      <div class="topbar-left">
+        <div class="app-brand">
+          <div class="brand-icon-box" title="AiO Studio">
+            <!-- Official AiO Studio Logo from Asset 9.svg -->
+            <svg class="ic-brand" viewBox="0 0 355.74 357.22" style="width:16px;height:16px;">
+              <path fill="#ffffff" d="M98.67,175.64h39.87v30.14c0,25.83-20.97,46.8-46.8,46.8h-39.87v-30.14c0-25.83,20.97-46.8,46.8-46.8Z"/>
+              <path fill="#ffffff" d="M303.87,253.2h-34.63c-63.04-1.4-65.42,3.33-89.41-26.51l-76.01-94.57c-23.99-29.85-18.59-71.89,10.61-97.47l13.51-10.86,175.94,229.41Z"/>
+            </svg>
+          </div>
+          <div class="brand-text-col">
+            <span class="brand-title">AiO Studio</span>
+            <span class="brand-subtitle">US Client Map</span>
+          </div>
+        </div>
+
+        <div class="stats-coverage-pill" title="Live Video Production Coverage">
+          <div class="stats-dot-live"></div>
+          <div><span id="top-filmed-count" class="stats-val">0</span> Filmed</div>
+          <div class="stats-divider"></div>
+          <div><span id="top-states-count" class="stats-val">0</span> States</div>
+        </div>
+      </div>
+
+      <!-- Center: Fast Search & Camera Angles -->
+      <div class="topbar-center">
+        <div class="search-wrapper">
+          <div class="search-input-box">
+            <svg class="ic search-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="state-search" class="search-input" placeholder="Search state or client... (Ctrl+K)" autocomplete="off" spellcheck="false">
+            <button id="search-clear" class="search-clear-btn" aria-label="Clear search">
+              <svg class="ic ic-sm" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div id="search-dropdown" class="search-dropdown"></div>
+        </div>
+
+        <div class="seg-view-group">
+          <button class="seg-btn active" data-preset="isometric" title="Isometric 3D Perspective">
+            <svg class="ic ic-sm" viewBox="0 0 24 24">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span>3D Iso</span>
+          </button>
+          <button class="seg-btn" data-preset="topdown" title="Top-Down Orthographic View">
+            <svg class="ic ic-sm" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="12" y1="3" x2="12" y2="21"/>
+            </svg>
+            <span>Top</span>
+          </button>
+          <button id="btn-reset-view" class="seg-btn" title="Reset View Angle">
+            <svg class="ic ic-sm" viewBox="0 0 24 24">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Pins Toggle, + Add Shoot CTA, Log, Theme, Export -->
+      <div class="topbar-right">
+        <button id="btn-toggle-all-pins" class="btn-clean active" title="Toggle 3D Pins on Filmed States">
+          <svg class="ic" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Pins</span>
+        </button>
+
+        <button id="btn-drawer-toggle" class="btn-clean" title="Open Full Client Interview Log">
+          <svg class="ic" viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          <span>Interviews</span>
+        </button>
+
+        <button id="btn-top-add-interview" class="btn-primary-add" title="Record New Client Interview Shoot">
+          <svg class="ic" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>+ Add Shoot</span>
+        </button>
+
+        <button id="theme-toggle-btn" class="btn-icon-sq" title="Toggle Studio Dark / Clay Studio Theme">
+          <svg id="icon-theme-sun" class="ic" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg id="icon-theme-moon" class="ic" style="display:none;" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <div class="export-wrapper">
+          <button id="export-btn" class="btn-icon-sq" title="Export Map Snapshot / Data">
+            <svg class="ic" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </button>
+          <div id="export-dropdown" class="export-dropdown-menu">
+            <div id="export-png" class="export-menu-item">
+              <svg class="ic" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <span>Export 3D Render (Solid)</span>
+            </div>
+            <div id="export-transparent" class="export-menu-item">
+              <svg class="ic" viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span>Export PNG (Transparent)</span>
+            </div>
+            <div id="export-data-json" class="export-menu-item">
+              <svg class="ic" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <span>Export Shoots Log (JSON)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- State Inspector Panel (Floating on the Right) -->
+    <aside id="state-info-panel" class="state-inspector-panel">
+      <div class="inspector-header">
+        <div class="inspector-badge-row">
+          <div id="card-fips-badge" class="state-code-badge">CA</div>
+          <div class="state-name-col">
+            <h2 id="card-state-name" class="state-title-text">California</h2>
+            <span id="card-state-sub" class="state-meta-text">Sacramento · West</span>
+          </div>
+        </div>
+        <button id="card-close" class="btn-close-clean" aria-label="Close card">
+          <svg class="ic ic-sm" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="inspector-action-row">
+        <div class="interviews-counter-tag">
+          <span>Client Shoots</span>
+          <span id="state-interviews-count" class="count-pill">0</span>
+        </div>
+        <button id="btn-add-in-state" class="btn-add-in-state-cta">
+          <svg class="ic ic-sm" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>Add Client</span>
+        </button>
+      </div>
+
+      <div id="state-interviews-list" class="inspector-scroll-list">
+        <!-- Dynamic Interview Cards rendered by JS -->
+      </div>
+
+      <div class="inspector-footer-slider">
+        <div class="slider-label-row">
+          <span>3D Elevation Lift</span>
+          <span id="elevation-val" class="slider-val-tag">14px</span>
+        </div>
+        <input type="range" id="elevation-slider" class="custom-range-slider" min="4" max="28" value="14" step="1">
+      </div>
+    </aside>
+
+    <!-- Production Log Drawer (Left Slide-out) -->
+    <aside id="all-interviews-drawer" class="all-interviews-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title-row">
+          <svg class="ic" viewBox="0 0 24 24">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <span>Production Interview Log</span>
+        </div>
+        <button id="btn-close-drawer" class="btn-close-clean" aria-label="Close drawer">
+          <svg class="ic ic-sm" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <input type="text" id="drawer-search-input" class="drawer-search-input" placeholder="Search client name, city or state...">
+
+      <div class="drawer-filters-row">
+        <button class="drawer-filter-pill active" data-filter="all">All (<span id="drawer-count-all">0</span>)</button>
+        <button class="drawer-filter-pill" data-filter="completed">Completed (<span id="drawer-count-completed">0</span>)</button>
+        <button class="drawer-filter-pill" data-filter="planned">Planned (<span id="drawer-count-planned">0</span>)</button>
+      </div>
+
+      <div id="drawer-interviews-list" class="drawer-scroll-list">
+        <!-- Dynamic full interview list rendered by JS -->
+      </div>
+    </aside>
+
+    <!-- Modal Form: Add / Edit Client Interview -->
+    <div id="modal-interview" class="modal-overlay">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 id="modal-title" class="modal-title">Record Client Shoot</h3>
+          <button id="modal-btn-close" class="btn-close-clean" aria-label="Close modal">
+            <svg class="ic ic-sm" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="form-interview" class="modal-body">
+          <input type="hidden" id="form-interview-id" value="">
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label">State / Region *</label>
+              <select id="form-state" class="form-select" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">City / Location *</label>
+              <input type="text" id="form-city" class="form-input" placeholder="e.g. San Francisco, Austin" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Client / Interviewee Name *</label>
+            <input type="text" id="form-client-name" class="form-input" placeholder="e.g. David Miller" required>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label">Role / Title</label>
+              <input type="text" id="form-role" class="form-input" placeholder="e.g. Creative Director">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Studio / Company</label>
+              <input type="text" id="form-company" class="form-input" placeholder="e.g. Pixar Animation Studios">
+            </div>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label">Date of Filming</label>
+              <input type="date" id="form-date" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <div class="status-toggle-group">
+                <button type="button" class="status-toggle-btn active completed" data-status="completed">Completed</button>
+                <button type="button" class="status-toggle-btn planned" data-status="planned">Planned</button>
+              </div>
+              <input type="hidden" id="form-status" value="completed">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Premiere Project / Sequence Tag</label>
+            <input type="text" id="form-video-link" class="form-input" placeholder="e.g. PR-SEQ-SF01 / Episode 04">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Interview Notes & Topics</label>
+            <textarea id="form-notes" class="form-textarea" rows="3" placeholder="Key topics covered, camera setup, editing instructions..."></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" id="modal-btn-cancel" class="btn-modal-cancel">Cancel</button>
+            <button type="submit" class="btn-modal-save">Save Interview</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bottom Region Bar -->
+    <nav class="bottom-region-bar" aria-label="Region filters">
+      <button class="region-pill active" data-region="ALL">All States (51)</button>
+      <button class="region-pill" data-region="West">West</button>
+      <button class="region-pill" data-region="Midwest">Midwest</button>
+      <button class="region-pill" data-region="South">South</button>
+      <button class="region-pill" data-region="Northeast">Northeast</button>
+    </nav>
+
+    <!-- Bottom Left Interaction Hints -->
+    <div class="bottom-hints">
+      <div class="hint-dot"></div>
+      <span>Click state to inspect shoots / Right drag to orbit 3D / Scroll to zoom</span>
+    </div>
+
+    <!-- Hover Tooltip -->
+    <div id="hover-tooltip" class="hover-tooltip"></div>
+  </div>
+
+  <!-- Vendor & Core Scripts -->
+  <script src="vendor/three.min.js?v=203"></script>
+  <script src="vendor/OrbitControls.js?v=203"></script>
+  <script src="data/us-states.js?v=203"></script>
+  <script src="interview-manager.js?v=203"></script>
+  <script src="map-3d.js?v=203"></script>
+  <script src="app.js?v=203"></script>
+</body>
+</html>
