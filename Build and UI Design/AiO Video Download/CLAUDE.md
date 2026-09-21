@@ -35,7 +35,7 @@ tự rút link), vài giây sau clip đã nằm trong bin, đúng H.264 Premiere
 | Ghép hình+tiếng / MP3 | `bin/win64/ffmpeg.exe` (LGPL, bản của Autocut) | copy stream, không encode — không đụng luật tài nguyên 50–70% |
 | Lõi gọi engine | `client/src/services/ytdlp.ts` | đọc thông tin (`--flat-playlist -J`), tải (tiến độ cộng dồn theo `format_id`), dịch lỗi, mở thư mục |
 | Đồng hành | `client/src/services/dongHanh.ts` | `useHost` (project theo ĐƯỜNG DẪN, bỏ lượt khi Premiere kẹt) · `useTinhTrang` (file còn trên đĩa + có trong project đang mở) |
-| Engine cập nhật | `%APPDATA%\AiOStudio\videodownload\engine\` | `-U` chạy trên BẢN SAO ở đây, không ghi đè exe trong thư mục extension đã ký |
+| Engine cập nhật | `%APPDATA%\AiOStudio\videodownload\engine\` | `-U` chạy trên BẢN SAO ở đây, không ghi đè exe trong thư mục extension đã ký. **TỰ chạy ngầm, KHÔNG có nút** (anh chốt 21/09): mở panel ≤1 lần/24 giờ (`lan-kiem.json`) + khi gặp lỗi lạ thì ép cập nhật rồi tự thử lại 1 lần |
 | Cài đặt / lịch sử | `%APPDATA%\AiOStudio\videodownload.json` · `videodownload-lichsu.json` | lịch sử KHÔNG lưu trạng thái "đã vào project" (bài 21/09) |
 | Việc cần Premiere | `host/videodownload.jsx` | `vd_trangThai` · `vd_dauHieu` · `vd_nhap(path, projectKyVong)` · `vd_phienBan()` ở CUỐI file |
 | Giao diện | `client/src/App.tsx` + `ui/Ic.tsx` + `styles.css` | Hướng A anh chốt 21/09; 1 file `dist/index.html` (viteSingleFile) |
@@ -81,6 +81,7 @@ anh vẫn mở bên cạnh), test, rồi `closeDocument(0, 0)` trên ĐÚNG proj
 | 08/09 | Một link một lần, không hàng đợi | v0.1 tối giản; hàng đợi làm khi anh cần thật |
 | **21/09** | **Giao diện = HƯỚNG A** ("một cột + thanh đáy", khuôn Short Viral) | Anh xem canvas 3 hướng A/B/C (https://claude.ai/artifact/6BmtRecyvqDUczVpVovQEg) và chọn *"A1 sẵn sàng và A1 đang tải"* |
 | **21/09** | **Thư mục lưu mặc định = cạnh file project Premiere, thư mục con `AiO Studio Download`**; bấm "Đổi" thì dùng đúng chỗ người dùng chọn (có nút về mặc định) | Anh: *"mặc định … tạo cùng Project đang lưu File Adobe PR hiện tại (sẽ tạo folder AiO Studio Download) … còn chọn đổi sẽ tùy theo người dùng chọn"*. Chưa lưu project → `Downloads\AiO Studio Download` |
+| **21/09** | **Engine tự cài bản mới nhất, KHÔNG hiện cho người dùng** (bỏ mục "Engine tải" trong Cài đặt) | Anh: *"cái này mình ko show cho người dùng — có engine mới nhất tự động cài và cập nhật luôn"* |
 | 21/09 | Codec lạ (VP9/AV1) **không tự nhập**, chờ người dùng bấm | importFiles có thể bung hộp "File Import Failure" — hộp modal chặn MỌI panel (đề xuất của Claude, chưa hỏi anh) |
 
 ## Sổ lỗi tái diễn (mẫu theo luật 31/08)

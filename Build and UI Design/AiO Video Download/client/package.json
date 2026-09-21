@@ -1,7 +1,7 @@
 {
   "name": "aio-studio-videodownload",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "AiO Studio - Video Download: dan link, tai video ve, nhap thang vao bin Premiere",
   "scripts": {

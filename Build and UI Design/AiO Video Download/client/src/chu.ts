@@ -26,8 +26,8 @@ export const CHU: BangChu = {
       'Premiere is busy or has a dialog open — the panel is waiting for Premiere.',
 
     // Thanh trên + Cài đặt
+    'Cài đặt: cookie trình duyệt': 'Settings: browser cookies',
     'Cài đặt': 'Settings',
-    'Cài đặt: cookie trình duyệt, engine tải': 'Settings: browser cookies, download engine',
     'Cookie trình duyệt': 'Browser cookies',
     'Chỉ cần khi trang đòi đăng nhập (Vimeo, video riêng tư). Trình duyệt đó phải đang đăng nhập sẵn.':
       'Only needed when a site requires sign-in (Vimeo, private videos). You must already be signed in on that browser.',
@@ -35,12 +35,6 @@ export const CHU: BangChu = {
     'Edge': 'Edge',
     'Chrome': 'Chrome',
     'Firefox': 'Firefox',
-    'Engine tải': 'Download engine',
-    'Cập nhật': 'Update',
-    'Đang cập nhật…': 'Updating…',
-    'Đã cập nhật lên {v}': 'Updated to {v}',
-    'Engine đã là bản mới nhất': 'Engine is already up to date',
-    'Cập nhật không thành công. Kiểm tra mạng rồi thử lại.': 'Update failed. Check your network and retry.',
 
     // Ô link
     'Link video': 'Video link',
@@ -113,8 +107,6 @@ export const CHU: BangChu = {
     'Link này là danh sách nhiều video. Bản này tải từng video — dán link của đúng video cần tải.':
       'This link is a list of videos. This version downloads one video at a time — paste the link of the video you need.',
     'Tải không thành công.': 'Download failed.',
-    'Nếu link này từng tải được: mở Cài đặt → Cập nhật engine, rồi thử lại.':
-      'If this link used to work: open Settings → Update engine, then retry.',
 
     // Danh sách
     'Đã tải': 'Downloaded',

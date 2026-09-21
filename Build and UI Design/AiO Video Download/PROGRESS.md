@@ -2,13 +2,52 @@
 
 > Mục mới trên cùng. Giờ lấy bằng lệnh `date`, không suy từ mục trước.
 
-## Trạng thái hiện tại (21/09/2026 14:43)
+## Trạng thái hiện tại (21/09/2026 15:05)
 
-- **0.2.0 ĐÃ CÀI máy công ty**, anh Tiến đang tự test (anh bảo dừng lúc 14:4x).
+- **0.2.1 ĐÃ CÀI máy công ty (14:5x): engine TỰ cập nhật, bỏ mục "Engine tải" khỏi Cài đặt.**
+  15:0x anh dùng 0.2.1: *"tạm thời anh chưa thấy lỗi — okie rồi đó em"*. Đã commit + push.
+- **Việc kế tiếp (chờ anh chọn):** đóng gói bộ cài vào `Release/AiO Video Download/win/`.
+- **[CHO]** nhánh "lỗi lạ → tự cập nhật → tự thử lại" chưa đo (không tạo được lỗi
+  `khac` khi engine đã mới nhất) — gặp lỗi lạ thật thì soi `lan-kiem.json`.
+
+- **21/09 14:51 anh Tiến tự test 0.2.0 trên máy công ty: *"anh test thấy ổn mà em"*.**
+  Đây là lượt anh TỰ THỬ panel, chưa phải dùng trên bài dựng thật (mốc MVP cuối
+  vẫn ⏳). Anh không báo lỗi nào.
+- **0.2.0 ĐÃ CÀI máy công ty**.
   Giao diện hướng A (anh chọn) + responsive 3 mức (<560 dọc · 560–879 thẻ ngang ·
   ≥880 hai cột). Đã commit + push 21/09; chưa đóng gói bộ cài.
 - **[CHO] Chờ đo:** lượt thử Shorts 1080p TRÊN PANEL không ra kết quả trong 40 s (lý do
   chưa đo; cùng tham số chạy ngoài panel thì đọc được 3,5 s, 46 định dạng).
+
+---
+
+## [0.2.1] 2026-09-21 14:52–14:59 — engine tự cập nhật, không còn nút
+
+**Anh Tiến (ảnh chụp menu Cài đặt):** *"cái này mình ko show cho người dùng — có
+engine mới nhất tự động cài và cập nhật luôn đi e"*.
+
+**Đã sửa:**
+- Bỏ khối "Engine tải · phiên bản · nút Cập nhật" khỏi menu Cài đặt, bỏ câu gợi ý
+  "mở Cài đặt → Cập nhật engine" ở lỗi lạ, bỏ 8 chuỗi song ngữ không còn dùng.
+- `tuCapNhatEngine()` (ytdlp.ts) chạy ngầm ở 2 lúc: (1) mở panel + 5 s, tối đa
+  1 lần/24 giờ (mốc `lan-kiem.json`, ghi cả khi thất bại để mất mạng không thử lại
+  mỗi lần mở); bỏ qua nếu đang tải. (2) Đọc/tải gặp lỗi `khac` → ép cập nhật; có
+  bản mới và người dùng vẫn ở đúng link đó → tự thử lại 1 lần/link.
+- Trong lúc `-U` đang thay exe bản sao, `duongYtDlp()` dùng bản đóng gói
+  (cờ `_dangCapNhat`) — tránh bắt đầu tải bằng một exe đang bị ghi dở.
+
+**Kiểm chứng trên panel thật (cổng 8098):**
+| Phép thử | Kết quả |
+|---|---|
+| Menu Cài đặt | chỉ còn Cookie; nhãn nút "Cài đặt: cookie trình duyệt"; `v0.2.1` |
+| Mở panel lần đầu | `lan-kiem.json` ghi lúc 14:56:50, ok, 2026.08.19 (đã mới nhất) |
+| Mở lại trong 24 giờ | 20 s sau: 3 file trong thư mục engine không đổi giờ sửa → bỏ qua đúng |
+| Engine cũ | hạ bản sao về 2026.07.04, xoá mốc, mở lại panel → 15 s sau bản sao = **2026.08.19**, không hiện gì trên giao diện |
+| `kiem-chu.mjs` · `tsc -b` | 89 khoá, thiếu 0 · sạch |
+
+**CHƯA đo:** nhánh (2) "lỗi lạ → cập nhật → tự thử lại" — không tạo được lỗi
+`khac` thật khi engine đã là bản mới nhất. Chưa tải lại một video sau khi sửa
+(luồng đọc/tải không bị đổi, chỉ thêm một lời gọi ở nhánh lỗi).
 
 ---
 

@@ -129,7 +129,7 @@ function timBinary(tenFile: string): string {
 }
 
 // ── Bản engine CẬP NHẬT ───────────────────────────────────────────────────
-// Nút "Cập nhật engine" KHÔNG ghi đè yt-dlp.exe trong thư mục extension đã ký
+// Việc cập nhật engine (tự chạy, xem tuCapNhatEngine) KHÔNG ghi đè yt-dlp.exe trong thư mục extension đã ký
 // (cài bản panel sau sẽ chép đè bản cũ lên → lùi phiên bản im lặng). Nó chép
 // ra %APPDATA%\AiOStudio\videodownload\engine\ rồi `-U` ở đó; ghi phiên bản
 // vào engine.json. Dùng bản sao khi nó MỚI HƠN bản đóng gói (so chuỗi ngày
@@ -142,12 +142,14 @@ function thuMucBanSao(): string {
 }
 
 let _phienBanGoi = ''
+/** Đang `-U` bản sao → exe bản sao có thể đang bị thay giữa chừng; dùng bản đóng gói. */
+let _dangCapNhat = false
 
 function banSaoMoiHon(): string {
   const fs = getFs()
   const path = getPath()
   const tm = thuMucBanSao()
-  if (!fs || !path || !tm) return ''
+  if (!fs || !path || !tm || _dangCapNhat) return ''
   try {
     const exe = path.join(tm, 'yt-dlp.exe')
     const js = path.join(tm, 'engine.json')
@@ -764,16 +766,58 @@ export async function capNhatEngine(): Promise<{ ok: boolean; phienBan: string; 
   } catch (e) {
     return { ok: false, phienBan: '', moi: false, chiTiet: String(e) }
   }
-  const truoc = (await chayLay(exe, ['--version'])).out
-  const r = await chayLay(exe, ['-U'])
-  const sau = (await chayLay(exe, ['--version'])).out
-  const ok = r.code === 0 && /^\d{4}\.\d{2}\.\d{2}/.test(sau)
-  if (ok) {
+  _dangCapNhat = true
+  try {
+    const truoc = (await chayLay(exe, ['--version'])).out
+    const r = await chayLay(exe, ['-U'])
+    const sau = (await chayLay(exe, ['--version'])).out
+    const ok = r.code === 0 && /^\d{4}\.\d{2}\.\d{2}/.test(sau)
+    if (ok) {
+      try {
+        fs.writeFileSync(path.join(tm, 'engine.json'), JSON.stringify({ phienBan: sau, luc: new Date().toISOString() }), 'utf8')
+      } catch {}
+    }
+    return { ok, phienBan: sau, moi: ok && sau !== truoc, chiTiet: r.out.split(/\r?\n/).pop() || '' }
+  } finally {
+    _dangCapNhat = false
+  }
+}
+
+// ── TỰ cập nhật (anh Tiến 21/09: "mình ko show cho người dùng — engine mới
+// nhất tự động cài và cập nhật luôn") ─────────────────────────────────────
+// Không còn nút. Hai lúc tự chạy, đều ngầm:
+//   1. Mở panel: tối đa MỘT lần / 24 giờ (mốc ghi ở lan-kiem.json, ghi cả khi
+//      thất bại — mất mạng thì không thử lại mỗi lần mở panel).
+//   2. Đọc/tải gặp lỗi lạ ('khac' — thường là YouTube vừa đổi cơ chế): ép
+//      cập nhật, có bản mới thì panel tự thử lại MỘT lần.
+const MOT_NGAY = 24 * 3600 * 1000
+let _dangTu: Promise<{ ok: boolean; moi: boolean }> | null = null
+
+export function tuCapNhatEngine(ep = false): Promise<{ ok: boolean; moi: boolean }> {
+  if (_dangTu) return _dangTu
+  const fs = getFs()
+  const path = getPath()
+  const tm = thuMucBanSao()
+  if (!fs || !path || !tm) return Promise.resolve({ ok: false, moi: false })
+  const moc = path.join(tm, 'lan-kiem.json')
+  if (!ep) {
     try {
-      fs.writeFileSync(path.join(tm, 'engine.json'), JSON.stringify({ phienBan: sau, luc: new Date().toISOString() }), 'utf8')
+      const luc = Number(JSON.parse(fs.readFileSync(moc, 'utf8')).luc) || 0
+      if (Date.now() - luc < MOT_NGAY) return Promise.resolve({ ok: true, moi: false })
     } catch {}
   }
-  return { ok, phienBan: sau, moi: ok && sau !== truoc, chiTiet: r.out.split(/\r?\n/).pop() || '' }
+  _dangTu = capNhatEngine()
+    .then((r) => {
+      try {
+        if (!fs.existsSync(tm)) fs.mkdirSync(tm, { recursive: true })
+        fs.writeFileSync(moc, JSON.stringify({ luc: Date.now(), ok: r.ok, phienBan: r.phienBan }), 'utf8')
+      } catch {}
+      return { ok: r.ok, moi: r.moi }
+    })
+    .finally(() => {
+      _dangTu = null
+    })
+  return _dangTu
 }
 
 /** Phiên bản engine ĐANG DÙNG. Lần đầu gọi cũng ghi nhớ phiên bản bản đóng gói (để so bản sao). */

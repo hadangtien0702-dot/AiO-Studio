@@ -18,7 +18,7 @@ import { useNgonNgu, NutDoiNgonNgu, dich } from './ngonngu'
 import { isInHost, chonThuMuc, nhapVaoProject } from './lib/cep'
 import { getFs, getPath, nodeAvailable } from './lib/node'
 import {
-  rutLink, docThongTin, taiVideo, kiemEngine, capNhatEngine, phienBanEngine, moThuMuc,
+  rutLink, docThongTin, taiVideo, kiemEngine, tuCapNhatEngine, phienBanEngine, moThuMuc,
   dinhDangThoiLuong, dinhDangMB, taoThumb, duongThumb, fileUrl,
 } from './services/ytdlp'
 import type { ThongTinVideo, TienDo, GiaiDoan, KetQuaTai, LoiTai, ChatLuong, CookieTrinhDuyet } from './services/ytdlp'
@@ -81,12 +81,13 @@ export default function App() {
   const theoDoiRef = useRef<string[]>([])
   const { host, ban, dauHieu, nhip } = useHost(() => theoDoiRef.current)
   const [engine, setEngine] = useState(() => kiemEngine())
-  const [phienBan, setPhienBan] = useState('')
 
   const [url, setUrl] = useState('')
   const link = rutLink(url)
   const [lanDoc, setLanDoc] = useState(0)
   const [trangThai, setTrangThai] = useState<TrangThai>('nghi')
+  const trangThaiRef = useRef(trangThai)
+  trangThaiRef.current = trangThai
   const [thongTin, setThongTin] = useState<ThongTinVideo | null>(null)
   const [tienDo, setTienDo] = useState<TienDo | null>(null)
   const [giaiDoan, setGiaiDoan] = useState<GiaiDoan>('lay-thong-tin')
@@ -114,8 +115,6 @@ export default function App() {
    */
   const [daCoTay, setDaCoTay] = useState<Record<string, string>>({})
   const [moCaiDat, setMoCaiDat] = useState(false)
-  const [dangCapNhat, setDangCapNhat] = useState(false)
-  const [thongBaoEngine, setThongBaoEngine] = useState<{ ok: boolean; chu: string; chiTiet?: string } | null>(null)
   const [dangChon, setDangChon] = useState(false)
 
   const dsDuong = daTai.map((m) => m.ketQua.duongDan)
@@ -147,9 +146,33 @@ export default function App() {
   const moiNhat = useRef({ caiDat, thuMucLuu, host, link, hoiLai })
   moiNhat.current = { caiDat, thuMucLuu, host, link, hoiLai }
 
+  // Engine TỰ cập nhật ngầm (anh Tiến 21/09 — không còn nút). Chờ 5 s cho panel
+  // mở xong; đang tải thì để lần mở sau. phienBanEngine() trước để ghi nhớ bản
+  // đóng gói (so với bản sao).
   useEffect(() => {
-    phienBanEngine().then(setPhienBan)
+    const id = window.setTimeout(() => {
+      phienBanEngine().then(() => {
+        if (trangThaiRef.current !== 'dang-tai') tuCapNhatEngine()
+      })
+    }, 5000)
+    return () => window.clearTimeout(id)
   }, [])
+
+  /**
+   * Lỗi lạ ('khac') thường là YouTube vừa đổi cơ chế → ép cập nhật engine; có
+   * bản mới và người dùng vẫn đang ở ĐÚNG link đó thì tự thử lại, MỘT lần/link.
+   */
+  const daCuu = useRef('')
+  const cuuBangCapNhat = (e: LoiTai, l: string, thu: () => void) => {
+    if (e.ma !== 'khac' || !l || daCuu.current === l) return
+    daCuu.current = l
+    tuCapNhatEngine(true).then((r) => {
+      if (r.moi && moiNhat.current.link === l) {
+        setEngine(kiemEngine())
+        thu()
+      }
+    })
+  }
 
   // Mục chưa có ảnh bìa (và file còn) thì tách nền, từng cái một.
   useEffect(() => {
@@ -224,6 +247,7 @@ export default function App() {
           taiKhiDocXong.current = ''
           setLoi(e)
           setTrangThai('loi')
+          cuuBangCapNhat(e, link, () => setLanDoc((n) => n + 1))
         })
     }, 400)
     return () => window.clearTimeout(id)
@@ -296,6 +320,7 @@ export default function App() {
         }
         setLoi(e)
         setTrangThai('loi')
+        cuuBangCapNhat(e, l, () => batDauTai(tt))
       })
   }
 
@@ -336,17 +361,6 @@ export default function App() {
     } finally {
       setDangChon(false)
     }
-  }
-
-  const capNhat = async () => {
-    setDangCapNhat(true)
-    setThongBaoEngine(null)
-    const r = await capNhatEngine()
-    setDangCapNhat(false)
-    if (r.ok) setThongBaoEngine({ ok: true, chu: r.moi ? tp('Đã cập nhật lên {v}', { v: r.phienBan }) : t('Engine đã là bản mới nhất') })
-    else setThongBaoEngine({ ok: false, chu: t('Cập nhật không thành công. Kiểm tra mạng rồi thử lại.'), chiTiet: r.chiTiet })
-    setEngine(kiemEngine())
-    phienBanEngine().then(setPhienBan)
   }
 
   const thuLai = () => {
@@ -431,7 +445,7 @@ export default function App() {
             className={'nut-ic' + (moCaiDat ? ' nut-ic--dang' : '')}
             aria-label={t('Cài đặt')}
             aria-expanded={moCaiDat}
-            title={t('Cài đặt: cookie trình duyệt, engine tải')}
+            title={t('Cài đặt: cookie trình duyệt')}
             onClick={() => setMoCaiDat((v) => !v)}
           >
             <Ic ten="caiDat" />
@@ -443,10 +457,6 @@ export default function App() {
               cookies={caiDat.cookies}
               doiCookie={(c) => luuCaiDat({ cookies: c })}
               khoa={dangChay}
-              phienBan={phienBan}
-              dangCapNhat={dangCapNhat}
-              capNhat={capNhat}
-              thongBao={thongBaoEngine}
             />
           )}
         </div>
@@ -548,7 +558,7 @@ export default function App() {
           </article>
         )}
         {loi && (
-          <ThongBao loai="loi" chu={nhanLoi(loi)} title={loi.chiTiet} phu={loi.ma === 'khac' ? t('Nếu link này từng tải được: mở Cài đặt → Cập nhật engine, rồi thử lại.') : ''} />
+          <ThongBao loai="loi" chu={nhanLoi(loi)} title={loi.chiTiet} />
         )}
 
         {/* ── Chất lượng ── */}
@@ -836,10 +846,6 @@ function MenuCaiDat(p: {
   cookies: CookieTrinhDuyet
   doiCookie: (c: CookieTrinhDuyet) => void
   khoa: boolean
-  phienBan: string
-  dangCapNhat: boolean
-  capNhat: () => void
-  thongBao: { ok: boolean; chu: string; chiTiet?: string } | null
 }) {
   const { t } = useNgonNgu()
   const ref = useRef<HTMLDivElement>(null)
@@ -880,20 +886,6 @@ function MenuCaiDat(p: {
           </button>
         ))}
       </div>
-      <div className="menu__vach" aria-hidden="true" />
-      <p className="menu__nhan">{t('Engine tải')}</p>
-      <div className="menu__hang">
-        <span className="menu__so">{p.phienBan || '—'}</span>
-        <button type="button" className="btn btn--nho" disabled={p.dangCapNhat || p.khoa} onClick={p.capNhat}>
-          <Ic ten="lamMoi" co={12} net={2.2} className={p.dangCapNhat ? 'ic--xoay' : ''} />
-          {p.dangCapNhat ? t('Đang cập nhật…') : t('Cập nhật')}
-        </button>
-      </div>
-      {p.thongBao && (
-        <p className={'menu__kq' + (p.thongBao.ok ? ' menu__kq--ok' : ' menu__kq--loi')} title={p.thongBao.chiTiet || undefined}>
-          {p.thongBao.chu}
-        </p>
-      )}
     </div>
   )
 }
