@@ -279,5 +279,5 @@ function vd_probe() {
  * do dang (bay skill adobe-cep-panel 02/08). Doi so nay CUNG LUC voi package.json.
  */
 function vd_phienBan() {
-  return '0.2.1';
+  return '0.2.2';
 }

@@ -2,10 +2,14 @@
 
 > Mục mới trên cùng. Giờ lấy bằng lệnh `date`, không suy từ mục trước.
 
-## Trạng thái hiện tại (21/09/2026 15:05)
+## Trạng thái hiện tại (21/09/2026 18:48)
 
-- **0.2.1 ĐÃ CÀI máy công ty (14:5x): engine TỰ cập nhật, bỏ mục "Engine tải" khỏi Cài đặt.**
-  15:0x anh dùng 0.2.1: *"tạm thời anh chưa thấy lỗi — okie rồi đó em"*. Đã commit + push.
+- **0.2.2 ĐÃ CÀI máy công ty (18:4x)**: sửa 3 lỗi của 0.2.1 + 1 lỗi do chính bản vá
+  sinh ra, tất cả do **Codex (OpenAI) soát chéo** bắt được — lượt thử đầu của "QA khác
+  hãng" (AI Company OS, xem `AiO Studio/CLAUDE.md` mục 3 ngày 21/09).
+- Cài đặt đang để cookie **Chrome** (file đổi 14:54, không phải Claude) → đọc link báo
+  "Không đọc được cookie của Chrome" (đo 18:4x). Chưa đổi — cài đặt của anh.
+- 0.2.1: 15:0x anh dùng: *"tạm thời anh chưa thấy lỗi — okie rồi đó em"*.
 - **Việc kế tiếp (chờ anh chọn):** đóng gói bộ cài vào `Release/AiO Video Download/win/`.
 - **[CHO]** nhánh "lỗi lạ → tự cập nhật → tự thử lại" chưa đo (không tạo được lỗi
   `khac` khi engine đã mới nhất) — gặp lỗi lạ thật thì soi `lan-kiem.json`.
@@ -18,6 +22,45 @@
   ≥880 hai cột). Đã commit + push 21/09; chưa đóng gói bộ cài.
 - **[CHO] Chờ đo:** lượt thử Shorts 1080p TRÊN PANEL không ra kết quả trong 40 s (lý do
   chưa đo; cùng tham số chạy ngoài panel thì đọc được 3,5 s, 46 định dạng).
+
+---
+
+## [0.2.2] 2026-09-21 18:40–18:48 — Codex soát chéo bản 0.2.1: 3 lỗi thật + 1 lỗi do bản vá
+
+**Bối cảnh:** anh muốn áp "AI Company OS" (artifact LYDRzb8efWYwHKf2AN3hZJ) vào AiO
+Studio, chọn *"ghép vào để anh biết thật sự ra sao"*. Ghế QA khác hãng: **Codex CLI**
+(`codex exec --sandbox read-only`, đã đăng nhập sẵn). Gemini CLI **chết**:
+`IneligibleTierError … migrate to Antigravity` (đo 18:3x).
+
+**Lượt 1 (0.2.1, 81 s, 55.064 token Codex) — 3 lỗi, Claude đọc lại code: cả 3 THẬT:**
+1. (cao) Tự thử lại không kiểm lượt tải đang chạy → người dùng đã bấm "Thử lại" thì
+   thành HAI lượt cùng ghi một file, nút Dừng chỉ giữ một.
+2. (vừa) Lượt lỗi chạy lúc đang `-U` (dùng bản đóng gói cũ) → `moi=false` → không thử lại
+   dù bản sao tốt đang có.
+3. (vừa) `_phienBanGoi` rỗng 5 s đầu → nhận bản sao AppData CŨ HƠN bản vừa cài kèm panel.
+
+**Lượt 2 (soát bản vá, 78 s, 43.267 token):** lỗi 1 hết; 2 và 3 **một phần** (lấy exe lúc
+NHẬN lỗi chứ không phải lúc CHẠY; đọc link không chờ `--version`); và **lỗi MỚI do Claude**:
+`useRef(phienBanEngine())` đánh giá đối số MỖI lần render → khi bản sao mới hơn, mỗi
+render (nhịp hỏi host 2 s) sinh một tiến trình `yt-dlp --version`.
+
+**Sửa gốc:** `docBanGoi()` chạy `--version` đúng 1 lần/phiên, đọc và tải đều `await` nó;
+`_exeLanCuoi` ghi lúc SPAWN; thử lại chỉ khi `trangThai === 'loi'` và (có bản mới hoặc
+exe giờ khác exe đã lỗi); bỏ lời gọi trong render. ☠️ Lúc sửa dính lại bẫy `5ax`:
+regex viết qua heredoc mất `\` thành `/^d{4}.d{2}.d{2}/` (không bao giờ khớp) — sửa
+bằng công cụ Edit.
+
+**Đo trên panel thật (8098):**
+| Phép thử | Kết quả |
+|---|---|
+| Bản sao ghi 2026.07.04 (cũ hơn gói 08.19), dán link 3 s sau khi mở | 3/3 mẫu tiến trình = **bản đóng gói** |
+| Đối chứng: bản sao ghi 2026.09.99 | 3/3 mẫu = **bản sao AppData** (+2 mẫu `--version` bản gói) |
+| Panel nằm yên 12 s | **0** tiến trình yt-dlp ở cả 8 lần đếm |
+| Mở lại trong 24 giờ | `lan-kiem.json` không đổi (14:58:00) |
+| `tsc -b` · `kiem-chu.mjs` | sạch · 89/0 |
+`engine.json` đã trả về nguyên bản sau khi thử.
+
+**[CHO]** chưa đo: nhánh lỗi lạ → thử lại (vẫn không tạo được lỗi `khac` thật).
 
 ---
 

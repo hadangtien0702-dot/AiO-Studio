@@ -144,6 +144,29 @@ function thuMucBanSao(): string {
 let _phienBanGoi = ''
 /** Đang `-U` bản sao → exe bản sao có thể đang bị thay giữa chừng; dùng bản đóng gói. */
 let _dangCapNhat = false
+/** exe yt-dlp mà lượt đọc/tải GẦN NHẤT thật sự chạy — để biết lượt lỗi đã dùng engine nào. */
+let _exeLanCuoi = ''
+export function exeLanCuoi(): string {
+  return _exeLanCuoi
+}
+
+/**
+ * Biết phiên bản bản ĐÓNG GÓI trước khi chọn exe (Codex soát 21/09): chưa biết
+ * thì banSaoMoiHon() nhận bản sao AppData dù nó CŨ HƠN bản vừa cài kèm panel.
+ * Chạy `--version` đúng MỘT lần cho cả phiên panel; đọc/tải đều chờ nó.
+ */
+let _choBanGoi: Promise<void> | null = null
+export function docBanGoi(): Promise<void> {
+  if (!_choBanGoi) {
+    const goc = timBinary('yt-dlp.exe')
+    _choBanGoi = goc
+      ? chayLay(goc, ['--version']).then((r) => {
+          if (/^\d{4}\.\d{2}\.\d{2}/.test(r.out)) _phienBanGoi = r.out
+        })
+      : Promise.resolve()
+  }
+  return _choBanGoi
+}
 
 function banSaoMoiHon(): string {
   const fs = getFs()
@@ -220,6 +243,7 @@ export function docThongTin(url: string, cookies: CookieTrinhDuyet): { huy: () =
   let daHuy = false
   const xong = (async () => {
     let loiCuoi: LoiTai = { ma: 'khac', chiTiet: '' }
+    await docBanGoi()
     for (let lan = 1; lan <= SO_LAN_THU; lan++) {
       if (daHuy) throw <LoiTai>{ ma: 'huy', chiTiet: '' }
       const p = docThongTinMotLan(url, cookies)
@@ -250,6 +274,7 @@ export function docThongTin(url: string, cookies: CookieTrinhDuyet): { huy: () =
 function docThongTinMotLan(url: string, cookies: CookieTrinhDuyet): { huy: () => void; xong: Promise<ThongTinVideo> } {
   const cp = getChildProcess()
   const exe = duongYtDlp()
+  _exeLanCuoi = exe
   let proc: any = null
   const xong = new Promise<ThongTinVideo>((resolve, reject) => {
     const eng = kiemEngine()
@@ -385,6 +410,7 @@ export function taiVideo(
   let dangNghi = false
   const xong = (async () => {
     let loiCuoi: LoiTai = { ma: 'khac', chiTiet: '' }
+    await docBanGoi()
     for (let lan = 1; lan <= SO_LAN_THU; lan++) {
       if (daHuy) throw <LoiTai>{ ma: 'huy', chiTiet: '' }
       const p = taiVideoMotLan(url, tc, truoc, tienDoMotChieu, onGiaiDoan)
@@ -426,6 +452,7 @@ function taiVideoMotLan(
   const fs = getFs()
   const path = getPath()
   const exe = duongYtDlp()
+  _exeLanCuoi = exe
   let proc: any = null
   let daHuy = false
   let daDong = false
@@ -823,7 +850,7 @@ export function tuCapNhatEngine(ep = false): Promise<{ ok: boolean; moi: boolean
 /** Phiên bản engine ĐANG DÙNG. Lần đầu gọi cũng ghi nhớ phiên bản bản đóng gói (để so bản sao). */
 export async function phienBanEngine(): Promise<string> {
   const goc = timBinary('yt-dlp.exe')
-  if (goc && !_phienBanGoi) _phienBanGoi = (await chayLay(goc, ['--version'])).out
+  await docBanGoi()
   const dung = duongYtDlp()
   if (dung === goc) return _phienBanGoi
   return (await chayLay(dung, ['--version'])).out

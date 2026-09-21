@@ -18,7 +18,7 @@ import { useNgonNgu, NutDoiNgonNgu, dich } from './ngonngu'
 import { isInHost, chonThuMuc, nhapVaoProject } from './lib/cep'
 import { getFs, getPath, nodeAvailable } from './lib/node'
 import {
-  rutLink, docThongTin, taiVideo, kiemEngine, tuCapNhatEngine, phienBanEngine, moThuMuc,
+  rutLink, docThongTin, taiVideo, kiemEngine, tuCapNhatEngine, docBanGoi, exeLanCuoi, duongYtDlp, moThuMuc,
   dinhDangThoiLuong, dinhDangMB, taoThumb, duongThumb, fileUrl,
 } from './services/ytdlp'
 import type { ThongTinVideo, TienDo, GiaiDoan, KetQuaTai, LoiTai, ChatLuong, CookieTrinhDuyet } from './services/ytdlp'
@@ -147,11 +147,10 @@ export default function App() {
   moiNhat.current = { caiDat, thuMucLuu, host, link, hoiLai }
 
   // Engine TỰ cập nhật ngầm (anh Tiến 21/09 — không còn nút). Chờ 5 s cho panel
-  // mở xong; đang tải thì để lần mở sau. phienBanEngine() trước để ghi nhớ bản
-  // đóng gói (so với bản sao).
+  // mở xong; đang tải thì để lần mở sau. (Đọc/tải tự chờ docBanGoi() — xem ytdlp.ts.)
   useEffect(() => {
     const id = window.setTimeout(() => {
-      phienBanEngine().then(() => {
+      docBanGoi().then(() => {
         if (trangThaiRef.current !== 'dang-tai') tuCapNhatEngine()
       })
     }, 5000)
@@ -166,8 +165,17 @@ export default function App() {
   const cuuBangCapNhat = (e: LoiTai, l: string, thu: () => void) => {
     if (e.ma !== 'khac' || !l || daCuu.current === l) return
     daCuu.current = l
+    // Engine THẬT SỰ đã chạy lượt lỗi (ghi lúc spawn, không đoán lúc nhận lỗi).
+    // Lượt đó chạy lúc đang `-U` thì là bản đóng gói (có thể cũ hơn bản sao tốt)
+    // → engine giờ KHÁC cái đã lỗi thì cũng đáng thử lại, dù không có bản mới
+    // (Codex soát 21/09, 2 lượt).
+    const exeLoi = exeLanCuoi()
     tuCapNhatEngine(true).then((r) => {
-      if (r.moi && moiNhat.current.link === l) {
+      // ☠️ Chỉ thử lại khi panel VẪN đang đứng ở lỗi: người dùng đã tự bấm "Thử
+      // lại" thì gọi thêm = HAI lượt tải cùng ghi một file, nút Dừng chỉ giữ được
+      // một (Codex soát 21/09).
+      const doiEngine = r.moi || (exeLoi !== '' && exeLoi !== duongYtDlp())
+      if (doiEngine && moiNhat.current.link === l && trangThaiRef.current === 'loi') {
         setEngine(kiemEngine())
         thu()
       }
