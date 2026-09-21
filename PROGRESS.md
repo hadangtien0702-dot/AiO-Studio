@@ -8,7 +8,9 @@
 ## [hub-va-mac] - 2026-09-21 17:4x (UTC+7) - Panel tổng: chốt kiểu BỆ PHÓNG + 3 bản vẽ chờ chọn · Mac: KHÔNG mua Apple Developer
 
 ### Trạng thái hiện tại (phiên sau đọc đầu tiên)
-- [CHỜ ANH] Chọn giao diện panel tổng A / B / C: https://claude.ai/artifact/GmdDjRe5oRJuNBr3uAbubN — chọn xong mới code.
+- ✅ 21/09 18:0x anh CHỐT giao diện panel tổng: **2 dạng** — thu hẹp = thanh icon (dọc / ngang), mở rộng = lưới thẻ A
+  (380px 2 cột · 1280px 4 cột); bỏ B. Bản vẽ trang "Bản 2 · hai dạng" (Bản 1 giữ ở trang riêng): https://claude.ai/artifact/GmdDjRe5oRJuNBr3uAbubN
+- [CHỜ ANH] Duyệt ngưỡng đổi dạng (em đề xuất: hẹp < ~340px hoặc thấp < ~260px → thanh icon) rồi bấm "làm" mới code.
 - [CHỜ ANH] Đổi Music → "Keynote": Keynote làm việc gì (xem mục [ba-may-mac]).
 - Tối 21/09 anh làm trên Mac: lần đầu chạy `bash scripts/dong-bo-mac.sh --cai-them` (chưa từng chạy trên Mac thật).
 
