@@ -2,13 +2,116 @@
 
 > Mục mới trên cùng. Giờ lấy bằng lệnh `date`, không suy từ mục trước.
 
-## Trạng thái hiện tại (08/09/2026 16:00)
+## Trạng thái hiện tại (21/09/2026 14:43)
 
-- **0.1.0** — dựng từ trắng trong một buổi, đã cài máy công ty, anh Tiến
-  đang bấm thử trực tiếp. Chưa qua vòng "dùng trên bài thật" (project thật
-  của anh — em test trên project copy trong Temp).
-- Chưa đóng gói bộ cài phát hành (`package-release.ps1` đã viết, chưa chạy).
-- Chưa commit.
+- **0.2.0 ĐÃ CÀI máy công ty**, anh Tiến đang tự test (anh bảo dừng lúc 14:4x).
+  Giao diện hướng A (anh chọn) + responsive 3 mức (<560 dọc · 560–879 thẻ ngang ·
+  ≥880 hai cột). Đã commit + push 21/09; chưa đóng gói bộ cài.
+- **[CHO] Chờ đo:** lượt thử Shorts 1080p TRÊN PANEL không ra kết quả trong 40 s (lý do
+  chưa đo; cùng tham số chạy ngoài panel thì đọc được 3,5 s, 46 định dạng).
+
+---
+
+## [0.2.0] 2026-09-21 14:10–14:43 — soi lại code mới (8 agent), responsive, 2 lỗi dùng chung
+
+**Anh Tiến giữa buổi:** *"phần này em để trống làm gì … thiết kế responsive"* —
+khung ảnh 16:9 có `max-height:260px` → Chromium chuyển thành max-width → chừa
+khoảng trống bên phải khi panel rộng. Sửa: bỏ max-height, 3 mức responsive.
+Đo 300/420/666/1000 px: tràn ngang 0 px ở cả 4, ảnh lấp kín thẻ.
+
+**Lỗi lớn do soi code bắt (đã đo trên Premiere thật):**
+1. ☠️ `getHostInfo` là hàm TOÀN CỤC 8 panel cùng định nghĩa trong MỘT engine
+   ExtendScript; 0.2.0 đổi nó thành 3 trường → panel khác đọc nhầm. Đã trả về
+   2 trường như cũ; Video Download dùng `vd_thongTinHost()` riêng. Đo:
+   `getHostInfo()` = `27.0.0|Test3_1.prproj`.
+2. ☠️ ExtendScript `new File()` VÀ `importFiles` GIẢI MÃ `%XX` trong đường dẫn:
+   `100%Beef` → `100?ef`, nhập thì bật hộp modal "File Import Failure" (đã bật thật
+   trong project thử, em bấm OK). Sửa: tải đổi `%`→`％` trong tên
+   (`--replace-in-metadata`), host không gọi importFiles khi còn `%`.
+3. Video dọc: `[height<=1080]` ra 480×854 → đổi `-S res:N` (đo: 1080×1920).
+4. Dừng để lại `_MEI` 22,7 MB/lần trong %TEMP% → giết tiến trình CON trước
+   (đo 0/3 sót, bản cũ 1/1). Link kênh lớn 75 s → `-I :2` (1,6 s).
+5. Thêm: vòng hỏi gộp một lệnh, dấu hiệu theo file "Trong project", % tiến độ
+   không bị cắt ở 300px, vòng focus đặc, radio đi bằng phím mũi tên, dichLoi bỏ
+   tiền tố `[extractor] id:` (9/9 câu lỗi đúng).
+
+**Vòng cuối trên panel thật (project thử riêng):** Dừng ở 3% → 0 file mới còn
+lại, 2,1 s; `_MEI` trong %TEMP% 2 → 2 (không thêm). Shorts: xem "Chờ đo" ở trên.
+
+---
+
+## [0.2.0 — dở] 2026-09-21 13:55 — "Mở thư mục không được", "Đã vào project là ảo", làm lại UI
+
+**Bối cảnh.** Anh Tiến gửi ảnh panel 0.1.0: *"làm lại UI … chưa đẹp"*,
+*"bấm mở thư mục không được"*, *"nút Đã vào project là Ảo"*, *"kiểm tra lại
+toàn bộ"*. Soi toàn bộ mã bằng 4 agent + 4 agent phản biện: 46 phát hiện, 33
+chắc chắn đúng, 13 có thể, 0 bị bác (bảng đầy đủ trong scratchpad phiên).
+
+**Nguyên nhân thật (đã đo):**
+
+1. **"Mở thư mục" — gốc là `windowsHide: true` trên explorer.exe.** Explorer
+   TẠO CỬA SỔ ẨN. Máy anh có **9 cửa sổ Explorer vô hình** (9 tiến trình
+   ~185 MB, tổng **1.666 MB** cạnh Premiere) từ 9 lần bấm 13:11–13:16. Đã
+   `Quit()` đúng 9 cửa sổ ẩn → 0, không đụng cửa sổ hiện / shell chính.
+   ☠️ Đoạn PowerShell "kéo lên trước" của 0.1.0 **chưa từng chạy**:
+   JSON.stringify nhân đôi `\`, PowerShell không giải mã → so
+   `file:///e://2026//…` với `file:///E:/2026/…` → 0/9 khớp. Tức số đo 08/09
+   "foreground = File Explorer" ghi ở mục 0.1.0 bên dưới **không thể** đến từ
+   đoạn code đó — ghi đính chính ở đây.
+   Cộng thêm: 5/6 mục lịch sử trỏ file test trong Temp phiên 08/09 **đã mất**.
+2. **"Đã vào project" — cờ `daNhap:'roi'` LƯU CỨNG ra file lịch sử**, không
+   gắn project nào, không hỏi lại Premiere, và khoá luôn nút. 5/6 mục mang
+   cờ từ project test `AiO-VD-test_1` trong khi anh mở `Test3_1`.
+3. **Nút "Đổi" mở `Folder.selectDialog` trong ExtendScript** = hộp modal chặn
+   MỌI evalScript của mọi panel AiO. Đo: hộp mở từ 13:16 tới 13:45, `1+1` hết
+   giờ 8 s; panel vẫn đẩy thêm lệnh hỏi project mỗi 2 s. Em bấm Cancel hộp
+   (không chọn gì) để đo tiếp.
+
+**Đo engine trước khi sửa (tải thử video 1 giây vào scratchpad):**
+
+| Đo | Kết quả |
+|---|---|
+| Tiến độ 1080p/720p | chạy 0→100% cho luồng `135`, rồi LẠI 0→100% cho `140` |
+| Dòng `postprocess:` khi có `--print` | ra **stderr** (stdout bị quiet) |
+| Tải lại cùng link 480→360 | trả FILE CŨ 470p, in `height=352` → nhãn sai |
+| Link kênh `@YouTube/videos` + `--flat-playlist -J` | `playlist`, 194 mục, 3,5 s (0.1.0 sẽ tải CẢ 194) |
+| `findItemsMatchingMediaPath` (Test3_1, 99 item) | 1 ms, tìm cả bin con; `e:` thay `E:` → 0, gạch xuôi → 0 |
+| Đi cây project + getMediaPath | 39 ms / 99 item |
+
+**Đã sửa (lõi, chưa build):**
+- `host/videodownload.jsx`: `vd_trangThai([đường dẫn])` (0/1/2 = không có /
+  có / offline, dùng findItemsMatchingMediaPath rồi SO LẠI getMediaPath),
+  `vd_dauHieu()` (dấu hiệu nhẹ cho vòng thăm dò), `vd_nhap(path, projectKyVong)`
+  (tìm trùng cả project + đi cây, đổi project thì không nhập bừa, bằng chứng
+  = tìm thấy item sau khi nhập), `vd_moThuMuc` (Folder.execute, dự phòng),
+  `vd_chonThuMuc` dùng `selectDlg` (dự phòng), `vd_phienBan()` ở CUỐI file.
+- `host/index.jsx`: `getHostInfo` trả `version|đường dẫn|tên`.
+- `lib/cep.ts`: đếm lệnh treo (`hostDangCho`, `hostBan`), `goiHost` gộp
+  nạp-lại + kiểm phiên bản host + gọi thành MỘT lệnh, `parseResult` tách mã,
+  `chuoiJsx` thoát U+2028/2029, chọn thư mục bằng `cep.fs.showOpenDialogEx`.
+- `services/ytdlp.ts`: explorer KHÔNG `windowsHide`; mở thư mục kiểm tồn tại
+  trước; PowerShell kéo lên trước nhận đường dẫn qua biến môi trường, chỉ xét
+  cửa sổ hiện, `AttachThreadInput`, in kết quả; chặn playlist; tên file kèm
+  `%(height)sp`; `-I 1`; `--no-post-overwrites`; tiến độ cộng dồn các luồng
+  (chỉ đi lên); bắt pha xử lý từ stderr; Dừng → chờ taskkill xong rồi xoá
+  đúng file MỚI mang [id] (chụp danh sách trước); mã lỗi mới (cookie, không
+  ghi được, Windows chặn exe, playlist); huỷ đọc link luôn trả 'huy';
+  cập nhật engine vào bản sao `%APPDATA%\AiOStudio\videodownload\engine`.
+- `services/caidat.ts`: lịch sử hỏng → đổi tên .bak (không ghi [] đè); ghi
+  file tạm rồi đổi tên.
+- `services/dongHanh.ts` (mới): `useHost` (bỏ lượt khi còn lệnh treo, chỉ đổi
+  state khi đổi thật), `useTinhTrang` (file còn không — fs.stat bất đồng bộ;
+  có trong project đang mở không — hỏi khi dấu hiệu đổi / focus / danh sách đổi).
+- Phiên bản 0.2.0 ở package.json + manifest + host.
+
+**Kiểm chứng bằng số:** tải thật với bộ tham số mới (`scratchpad/thu-engine2.mjs`):
+tiến độ 1% → 76% → 80% → 100% (không tụt), dòng `Merger started/finished`
+bắt được, file ra `… [tPEE9ZwTmy0] 470p.mp4`, MP3 chạy. **CHƯA** đo trên
+panel: chưa build/cài.
+
+**Còn phải làm:** anh chọn hướng UI → dựng App.tsx + styles.css + chu.ts →
+build → cài → đo bằng cú bấm thật trong Premiere (Mở thư mục lên trước
+Premiere? trạng thái "Trong project" đổi khi xoá clip / đổi project?).
 
 ---
 

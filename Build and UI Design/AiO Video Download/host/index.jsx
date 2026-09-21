@@ -15,7 +15,15 @@ function ping() {
   return 'pong';
 }
 
-/** Thong tin host, tra ve chuoi "appVersion|project". */
+/**
+ * Thong tin host, tra ve chuoi "appVersion|project".
+ *
+ * ☠️☠️ HOP DONG DUNG CHUNG — KHONG DUOC DOI DINH DANG. Moi panel AiO chay chung
+ * MOT engine ExtendScript trong Premiere; 8 panel cung dinh nghia ham toan cuc
+ * ten `getHostInfo`, panel nao nap host SAU thi ban cua no thang. 21/09 ban
+ * 0.2.0 doi ham nay thanh 3 truong -> panel khac doc nham (soi code bat duoc).
+ * Video Download doc thong tin cua MINH qua `vd_thongTinHost()` (videodownload.jsx).
+ */
 function getHostInfo() {
   var appVersion = 'unknown';
   var project = '(chua mo project)';

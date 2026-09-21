@@ -79,18 +79,30 @@ function duongLichSu(): string {
   return path.join(appData, 'AiOStudio', 'videodownload-lichsu.json')
 }
 
+/**
+ * Đọc lịch sử. ☠️ File HỎNG (JSON dở, bị khoá) KHÁC file CHƯA CÓ: trước đây cả
+ * hai cùng ra [] rồi panel ghi [] đè lên ngay lúc mở → mất cả 30 mục. Giờ file
+ * hỏng được đổi tên sang .bak (giữ lại để cứu) rồi mới bắt đầu danh sách mới.
+ */
 export function docLichSu<T>(): T[] {
   const fs = getFs()
   const f = duongLichSu()
+  if (!fs || !f) return []
+  let raw = ''
   try {
-    if (fs && f && fs.existsSync(f)) {
-      const d = JSON.parse(fs.readFileSync(f, 'utf8'))
-      return Array.isArray(d) ? d : []
-    }
-  } catch {}
-  return []
+    if (!fs.existsSync(f)) return []
+    raw = fs.readFileSync(f, 'utf8')
+    const d = JSON.parse(raw.replace(/^﻿/, ''))
+    return Array.isArray(d) ? d : []
+  } catch {
+    try {
+      if (raw) fs.renameSync(f, f + '.' + Date.now() + '.bak')
+    } catch {}
+    return []
+  }
 }
 
+/** Ghi ra file tạm rồi đổi tên — tắt Premiere giữa chừng không để lại JSON dở. */
 export function ghiLichSu<T>(ds: T[]): void {
   const fs = getFs()
   const path = getPath()
@@ -99,7 +111,8 @@ export function ghiLichSu<T>(ds: T[]): void {
     if (fs && path && f) {
       const tm = path.dirname(f)
       if (!fs.existsSync(tm)) fs.mkdirSync(tm, { recursive: true })
-      fs.writeFileSync(f, JSON.stringify(ds.slice(0, TOI_DA_LICH_SU), null, 2), 'utf8')
+      fs.writeFileSync(f + '.tmp', JSON.stringify(ds.slice(0, TOI_DA_LICH_SU), null, 2), 'utf8')
+      fs.renameSync(f + '.tmp', f)
     }
   } catch {}
 }
