@@ -8,6 +8,12 @@
 >   (3) loe den video con khong; (4) mac: A (Apple Developer 99 USD/nam, cai nhu Zalo) hay B (mien phi,
 >   1 lan Open Anyway — hien tai, da ky ad-hoc). (5) CPU nam nen ~10-12 % mot loi (phien WGC, khong doi
 >   theo fps) — anh chua quyet co lam "tat luong khi ranh lau" khong.
+> - 🌐 **WEB BAN (22/09):** `Website/AiO ShotSave Web/index.html` — 1 file tinh, EN/VI, sang/toi, gia $9.99 mot lan +
+>   $3/nam tuy chon (anh chot), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app; khay co gian qua Cai dat; dau trang
+>   khung chon "chup"). Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
+>   (nut Mua dang bao "Sap mo ban", `CHECKOUT_URL` rong); (2) chinh sach hoan tien + Dieu khoan/Lien he o chan trang;
+>   (3) anh/clip app that + anh chia se link (og:image); (4) xac nhan "khong gia han van chay"; (5) thu tren DIEN THOAI THAT:
+>   cham de dung phim tu chay (chua do duoc — su kien gia lap khong qua `isTrusted`). "Windows 10" + "macOS" tren trang CHUA do.
 > - ☠️ Luat moi trong ngay: anh dang ngoi may thi KHONG chay selftest/exe thu (so loi #12); sau khi cai
 >   mo app qua explorer.exe (container MSIX cua Claude chuyen huong APPDATA).
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
@@ -315,6 +321,337 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-22 16:03 — Website: nhãn "Đang tự chạy" không còn đè số đo W × H khi demo khoanh vùng
+
+⚠️ Giờ lấy bằng `date` = 16:03. Các mục bên dưới ghi 16:20–17:50 cùng ngày là **giờ sai** (file sửa lần cuối 14:55 theo
+hook đầu phiên) — chưa sửa lại từng mục, đọc thứ tự trên-dưới chứ đừng tin giờ.
+
+**Gốc:** nhãn `.dauto` nằm cố định góc trên-phải khung demo (z 7). Trên iPhone nhãn rộng gần hết khung nên mỗi lần demo
+khoanh vùng gần mép trên, số đo `#dsize` nằm ngay dưới nhãn. Phát hiện khi thử Playwright WebKit (vừa cài).
+**Sửa:** đang khoanh (`.stage.auto.cap`) thì nhãn ẩn NGAY (opacity 0, không transition), hết khoanh thì hiện dần lại 0,2 s.
+Bản đầu có mờ dần 0,2 s lúc ẩn → vẫn đè 12/274 mẫu, nên bỏ transition lúc ẩn.
+**Đo** (Playwright, 1 vòng demo 32 s, lấy mẫu mỗi 50 ms, đếm mẫu có số đo hiện mà nhãn còn thấy và hai hộp cắt nhau):
+WebKit iPhone 13 **0/275** · WebKit 1280 0/275 · Chromium iPhone 0/347 · Chromium 1280 0/345; 0 lỗi demo.
+Đối chứng (ép nhãn hiện lúc khoanh): iPhone **276/276 và 346/346 đè**, 1280 = 0 → lỗi chỉ có ở khổ điện thoại, thước bắt được.
+Script: scratchpad `pw/de.mjs` (không lưu vào repo).
+
+## 2026-09-22 16:51 +0700 — Website: khay kéo vào từ MÉP TRÁI màn hình (vòng đầu) + chốt sổ
+
+☠️ **Sửa giờ:** các mục web hôm nay ghi 14:30 → 20:55 là giờ EM ƯỚC, không lấy bằng lệnh (sai bài 5aw). `date` lúc chốt sổ ra
+**16:51 +0700** — tức toàn bộ loạt việc web nằm trong khoảng 14:10 → 16:51. Thứ tự các mục vẫn đúng, chỉ con số giờ sai.
+
+**Anh:** vẽ mũi tên từ mép trái section tới khay: *"chỗ này kéo từ trái qua được không"*.
+**Đã làm:** vòng đầu, khay ló ra ở mép trái MÀN HÌNH (62% nằm ngoài, `#shelf{overflow:hidden}` cắt gọn), con trỏ hiện ngay trên
+phần ló ra, kéo 1,7 s vào sát cửa sổ app; vòng sau (chữ đã hiện) chỉ kéo đoạn ngắn để khay không lướt đè lên chữ.
+**Đo 1280:** khay từ -100 → 620 px (so mép section), khe cuối 16 px, chữ hiện 0,25 s sau khi thả, tràn ngang 0; ảnh headless giữa
+lúc kéo đúng hướng mũi tên anh vẽ.
+
+## 2026-09-22 20:55 — Website: màn mở đầu section khay
+
+**Anh:** chụp cảnh đầu (cửa sổ app là khung rỗng, dãy icon chưa chọn gì): *"chỗ này xấu"* + *"setup khi mới bắt đầu animation đẹp tí"*.
+**Gốc:** cửa sổ app chỉ được vẽ khi cảnh 1 bắt đầu, mà bước kéo khay (thêm 20:40) chen trước → suốt ~3 s cửa sổ rỗng.
+**Sửa:** vẽ SẴN cảnh Lark + chọn icon Lark ngay khi tải; màn mở đầu dàn cảnh: cửa sổ app trồi lên (0,25 s) → dãy icon bật vào (0,6 s)
+→ con trỏ + khay hiện, kéo khay vào (1,1 s) → chữ trồi lên (~3,9 s). Vòng sau: mờ về Lark TRƯỚC khi kéo khay lại; cảnh đang hiện
+thì không vẽ lại (`veCanh` bỏ qua), khỏi chớp. Trạng thái chờ `.cho-*` do JS gắn (không JS / giảm chuyển động → hiện đủ).
+**Đo:** trước khi chạy: cửa sổ có nội dung "Lark", icon Lark chọn sẵn; nhật ký 4,3 s đúng thứ tự; ảnh headless 1,3 / 3,0 / 5,2 s đúng cảnh.
+
+## 2026-09-22 20:40 — Website: loạt animation (Cài đặt, thẻ tính năng, thẻ giá, đầu trang, khay kéo vào)
+
+**Anh (nhiều tin liên tiếp):** pill "Ngang | Dọc" *"thêm setting"* → *"thêm animation của setting đang có"*; *"chỗ này thêm animation"*
+(6 thẻ tính năng) · *"chỗ này nữa"* (thẻ giá) · *"animation chỗ này luôn"* (đầu trang); section khay: *"animation chuột kéo khay lại gần
+khung phần mềm từ trái qua"* + *"chữ One drag away… mới xuất hiện theo sau khi khay vào đúng vị trí"*.
+- **Cài đặt:** pill = "⚙ Cài đặt | Ngang | Dọc"; cửa sổ Cài đặt thu nhỏ chép từ `src/settings` (header logo + VI/EN + ✕, thẻ Phím tắt
+  Ctrl+Shift+S, thẻ Khay ảnh "Kiểu khay Ngang|Dọc", màu app). Đổi kiểu khay đi QUA cửa sổ: bấm bánh răng → mở → bấm Dọc/Ngang → ✕ →
+  khay đổi. Đo: 6,2 s mở · 7,7 s chọn Dọc · 9,0 s đóng · 9,8 s khay dọc; quay về tương tự; cửa sổ 346×260 trong khung. Điện thoại: pill
+  đè khay dọc 17px → ẩn chữ "Cài đặt" (giữ bánh răng), khe ≥55px. Khay dọc 1 cột cắt tiêu đề "Khay ản…" → bắt đầu 2 cột, kéo ra 4.
+- **Thẻ tính năng:** trồi lên lần lượt (trễ 70 ms/thẻ) khi cuộn tới; icon diễn đúng việc (sét loé, con trỏ kéo, ghim cắm, bút
+  nguệch, 2 màn dãn, lưới bật), rê chuột diễn lại. **Thẻ giá:** trồi lên, giá đếm $0.00 → $9.99, 3 ✓ vẽ dần, dòng tiền trượt vào,
+  vệt sáng lướt nút Mua (1 lần + khi rê). Ẩn ban đầu CHỈ khi JS đã chạy (`.hien-js`); "giảm chuyển động" → hiện ngay.
+- **Đầu trang:** 6 lớp trồi lên lần lượt (0 → 0,56 s); rồi khung chọn vùng cam kéo ra bao "Kéo thả đi bất cứ đâu." + nhãn kích thước
+  thật ("647 × 75"), loé trắng như vừa chụp, tắt. Một lần. Kiểm bằng TUA hiệu ứng (`getAnimations` pause + currentTime) rồi chụp:
+  0,3 s đang kéo · 0,9 s bao trọn · 1,42 s loé.
+- **Khay kéo vào:** đầu mỗi vòng khay hiện ở mép trái (-5% khung desktop, 0 trên điện thoại), con trỏ nắm thanh tiêu đề kéo tới cách
+  cửa sổ app 16px; lần đầu, chữ section trồi lên SAU khi khay vào chỗ. Đo: -30px → 60px, khe 108 → 16; chữ hiện 0,25 s sau khi thả;
+  điện thoại 0 tràn ngang, khe 16.
+☠️ **Thước sai 3 lần buổi này (không phải lỗi trang):** pane ẩn → transition treo (đọc opacity 1 khi phải 0), IntersectionObserver
+không báo, animationend không tới. Cách đo đúng: tắt transition TRƯỚC khi đổi class; ép hiện bằng hook; tua animation rồi chụp headless.
+Thêm bảo hiểm gỡ khung chọn sau 2,3 s (tab ẩn thì animationend không tới).
+
+## 2026-09-22 19:50 — Website: section "Kéo to, thấy nhiều" (khay co giãn) + ảnh khay không lặp
+
+**Anh:** *"thêm 1 section nói về sự responsive của phần khay"*; rồi *"ảnh bị lặp lại"*.
+- Hiểu "responsive" = tính năng kéo to khay (0.4.12/0.5.1): kéo góc → thêm hàng / cột, ẢNH GIỮ CỠ; khay ngang ↔ dọc. Section `#resize`
+  dưới section khay, đảo chiều (cảnh trái, chữ phải). Phim ~10 s/vòng: khay ngang 1×4 → kéo lên 3×4 → kéo phải 3×6 (18 ảnh) →
+  nhãn "Ngang | Dọc" chuyển Dọc → khay dựng phải 5×1 → kéo trái 5×3. Đo 1280: ô ảnh 64×48 KHÔNG ĐỔI suốt phim; 375: 37×27 không đổi,
+  0 tràn ngang, 0 mồ côi. Bắt lỗi chớp lúc tải (khay cỡ mặc định 24 ảnh một hàng hiện 0,3 s trước khi mờ) → khay ẩn sẵn trong HTML.
+- Ảnh lặp: bản đầu xoay vòng 6 mẫu cố định. Nay sinh 24 ảnh từ 6 kiểu (cột, đường, tài liệu, tròn, phong cảnh, giao diện) × màu /
+  số liệu / nhãn ngẫu nhiên (hạt giống cố định), xếp để 2 ảnh cùng kiểu không bao giờ liền nhau, 4 ảnh phong cảnh 4 tông trời riêng.
+  Đo: 24 ảnh, 0 trùng, 0 cặp cùng kiểu liền nhau.
+☠️ **Tự gây lỗi:** chèn chú thích `// …` vào một hàm viết trên MỘT dòng → nửa sau dòng thành chú thích → lỗi cú pháp, khay 0 ảnh.
+Bắt được vì thước đếm ra rỗng. Sửa sang `/* */`; từ nay sau mỗi lần sửa script bằng lệnh chèn chuỗi: `new Function(script)` kiểm cú pháp.
+
+## 2026-09-22 19:20 — Website: thêm 4 nền tảng vào section khay + sửa xuống hàng sớm
+
+**Anh:** khoanh dãy icon L/T/Pr: *"thêm mấy cái nền tảng vào đi em"*; rồi khoanh khoảng trống bên phải thẻ "Drag and drop" và
+chữ "seamless" rớt dòng: *"khoảng giống chỗ này nhiều quá… xuống hàng chữ chưa đúng"*.
+- **Nền tảng:** thêm 4 app anh đã tự kéo-thả thử ĐẠT 14/09: Zalo (chat, #0068ff), Messenger (chat, #6e44ff), Photoshop (canvas +
+  bảng Layers: thả → ảnh lên canvas + lớp "anh-chup" mới), Figma (Frame "Thumbnail" + danh sách lớp, ảnh có viền chọn xanh).
+  Dãy icon 7 ô lưới 4 cột × 2 hàng (30px). Câu mô tả: "Kéo thẳng vào Zalo, Teams, Premiere hay Figma."
+  Đo: dãy rộng 162px, cách app 60px, cách khay 91px; nhật ký 54 s: 7 cảnh đúng thứ tự Lark → Teams → Zalo → Messenger → Premiere
+  → Photoshop → Figma → lặp (~51 s/vòng), 3 cảnh thiết kế đích sáng viền trước khi thả, 0 lỗi. (Công cụ đo giới hạn 45 s/lệnh →
+  ghi nhật ký ngầm trong trang, đọc ở lệnh sau.)
+- **Xuống hàng sớm:** gốc là `text-wrap:pretty` em thêm lúc chống mồ côi (18:10) — nó cân đoạn bằng cách xuống hàng sớm. Bỏ khỏi
+  đoạn văn (tiêu đề giữ `balance`); chống mồ côi chỉ còn JS dính 2 chữ cuối. Thước mới "xuống hàng sớm" (chữ đầu dòng sau có vừa
+  khoảng trống dòng trên?): 0 lỗi thật (2 chỗ báo là `<br>` cố ý + 1 chỗ thước không trừ mũi tên trong câu hỏi FAQ).
+  Bắt thêm 1 mồ côi thật ở 1024: "3 | chữ." — NBSP sau `<kbd>` không giữ dòng → bọc mỗi cặp phím + chữ trong `.nw{white-space:nowrap}`.
+  Quét 375/768/1024/1280/1440 × VI/EN: 0 mồ côi. Sửa luôn bài học sai trong `design-lessons/LESSONS.md` (trước khuyên dùng pretty).
+
+## 2026-09-22 18:55 — Website: nền cam phủ hết section khay + nút mua đúng màu logo
+
+**Anh:** *"cái nền cam bao hết section luôn"*; rồi khoanh nút mua: *"màu cam này đổi lại màu cho giống logo"*.
+- **Section khay:** dải nền phủ hết bề ngang (`#shelf`), nhạt bên trái (dưới chữ) → cam đậm bên phải; khung cảnh bỏ nền,
+  bóng, viền riêng. Tương phản chữ phụ chỗ nền đậm nhất sau chữ ~7:1 (sáng) / ~8,5:1 (tối).
+  Soi ảnh bắt vệt KHUNG MỜ quanh khung cảnh: gốc là `overflow:hidden` còn lại cắt đứt bóng đổ của cửa sổ app + khay ở mép
+  khung → đổi `overflow:visible`, hết vệt.
+- **Nút mua:** nền sáng dùng `#C2410C` (em chọn vì chữ trắng trên cam logo chỉ 3,0:1). Nay = đúng cam logo `#F86820`,
+  chữ TỐI `#1a0e06`: đo 4 nút × 2 nền = 6,30:1, trùng màu logo rgb(248,104,32). Đúng luật dự án "nút nhỏ phải chữ tối".
+
+## 2026-09-22 18:35 — Website: bỏ hàng tên app trong thẻ "Kéo và Thả"
+
+Anh khoanh 7 chip (Premiere Pro · Photoshop · Figma · Messenger · Zalo · Teams · Lark): *"bỏ chỗ này đi em"* — section khay
+đã diễn kéo-thả vào nhiều app. Xoá thẻ + CSS `.apps` (chỉ dùng ở đó). Đo 1280: 0 chip, 6 thẻ cao đều 214px (trước thẻ 2 cao hơn).
+
+## 2026-09-22 18:30 — Website: sửa lỗi điện thoại kẹt chế độ chụp + "$3/year"
+
+**Anh:** *"sửa lỗi kẹt chế độ chụp trên điện thoại luôn em"* (lỗi em tái hiện lúc soát 15:20); và *"$3 / year thành $3/year"*.
+**Gốc đã đo:** chạm vào demo lúc đang cuộn → pointerdown gọi `batDau()` ngay (màn tối, `touch-action:none`) → trình duyệt
+giành cuộn → pointercancel đi qua `tha()` như thả tay, vùng quá nhỏ bị bỏ nhưng VẪN ở chế độ chụp; không có nút thoát
+(thanh công cụ chỉ hiện khi có vùng), điện thoại không có Esc.
+**Sửa:** (1) cảm ứng/bút ở trạng thái chờ KHÔNG vào chế độ chụp, chỉ vào bằng nút "Thử ngay" (chuột giữ nguyên);
+(2) pointercancel khi CHƯA có vùng → `ketThuc()`; đã có vùng → giữ nguyên vùng; (3) nút ✕ 44×44 góc trên-phải hiện suốt
+chế độ chụp (ẩn khi phim tự chạy); (4) phim tự chạy: chuột nhấn là dừng, cảm ứng chỉ dừng khi CHẠM HẲN (click), vuốt qua
+không dừng.
+**Đo (375px, PointerEvent giả lập `pointerType:touch`):** vuốt qua → không vào chế độ chụp, touch-action auto; vào bằng
+nút rồi bị giành cuộn → thoát, khay hiện lại; có vùng rồi lỡ vuốt → giữ vùng; nút ✕ 44×44 → thoát; chuột kéo + Esc như cũ;
+0 lỗi, 0 tràn ngang. ⚠️ CHƯA đo được: dừng phim bằng chạm thật (listener đòi `isTrusted`, sự kiện giả lập không qua) —
+cần anh thử trên điện thoại thật.
+**Giá:** "$3 / year" → "$3/year", "$3 / năm" → "$3/năm".
+
+## 2026-09-22 18:15 — Website: 3 ô thanh trên cùng cao 48px
+
+Anh: *"sao có cái ô mặt trăng này nó nhỏ hơn 2 ô kia"*. Đo: ô sáng/tối 44 · nhóm EN/VI **50** (nút 44 + đệm 3×2) · Mua 44
+— lệch vì nhóm có đệm, 2 ô kia không. Sửa: ô sáng/tối 48×48, nút Mua 48, đệm nhóm 3 → 2 (nút EN/VI giữ 44 cho ngón tay).
+Đo 1280 + 375: cả 3 cao 48, đỉnh/đáy trùng nhau (8/56), thanh trên vẫn 64; 375 không tràn (Mua mép phải 359).
+
+## 2026-09-22 18:10 — Website: chống chữ mồ côi toàn trang + khay cách cửa sổ app
+
+**Anh:** khoanh "việc." (section khay) và "tuần." (Đủ thứ cần): *"kiểm tra không để chữ lỗi mồ côi"*; rồi khay ảnh
+*"bị sát với khung phần mềm, dời ra xíu"*.
+- **Mồ côi:** CSS `text-wrap:pretty` cho đoạn văn, `balance` cho tiêu đề + JS `chongMoCoi` dính 2 chữ cuối bằng dấu cách
+  không ngắt (dự phòng trình duyệt cũ; chạy mỗi lần đổi ngôn ngữ). Thước: đo toạ độ chữ cuối so với chữ kế cuối.
+  **Đối chứng:** tắt cả 2 lớp → thước bắt 3 chỗ ("tuần.", "việc." + "cửa sổ." anh chưa thấy); bật → 0.
+  Quét 375/768/1024/1280/1440 × VI/EN: 0 chữ mồ côi.
+- **Khay sát app:** đo khe khay↔cửa sổ app: 1280 = 0px, 1024 = −22 (đè), 768 = 67, 375 = −39. Gốc: ô ảnh khay tính theo
+  `vw` (cửa sổ trình duyệt), cửa sổ app tính theo % khung cảnh → hai thước khác nhau, tỉ lệ trôi theo khổ. Đổi ô ảnh sang
+  `12cqw` (container query theo khung cảnh), cửa sổ app 57% → 53%; điện thoại ẩn chữ "Khay ảnh" (giữ logo + số đếm), thu đệm.
+  Đo lại: 1440 = 48 · 1280 = 48 · 1024 = 39 · 768 = 60 · 375 = 29px; 0 tràn ngang.
+
+## 2026-09-22 17:50 — Website: nhãn app thành dãy icon trong khung + chữ phụ các section bằng nhau
+
+**Anh:** khoanh hàng nhãn Lark/Teams/Premiere dưới khung + góc trống trên-trái khung: *"làm dạng icon cho chuyên nghiệp
+đi em và đem nó lên trên này"*; rồi *"hình như text phụ này nó không bằng nhau"*.
+- Dãy icon góc trên-trái khung: ô L (xanh) · T (tím) · Pr (tím than), app đang thả phóng 1,08× + viền cam, tên app bên
+  dưới. Chữ cái đầu trên màu gợi nhắc, KHÔNG logo gốc. Bỏ hàng nhãn dưới khung.
+  Đo: bản đầu để tên cạnh icon → đè cửa sổ app 46–60px ở cả 3 cảnh; đưa tên xuống dòng → cách app 60px, cách khay 94px,
+  tên 1 dòng không tràn (kể cả "Microsoft Teams").
+- Chữ phụ: khay `clamp(17px,2vw,19px)` = 19px ở 1280 vs "Đủ thứ cần"/"Một giá" 18px → gốc là mỗi section tự đặt cỡ.
+  Gom về một biến `--fs-sub:18px`. Đo 1280 + 375: cả 3 đều 18px/28,8px. Chữ dưới tiêu đề đầu trang giữ 19px (cỡ hero, cố ý).
+
+## 2026-09-22 17:35 — Website: section khay kéo vào NHIỀU app (Lark → Teams → Premiere Pro)
+
+Anh: *"làm thêm như lark - teams - adobe pr… show cho họ thấy mình drag and drop được nhiều nền tảng"*.
+**Đã làm:** khung đích đổi sau mỗi lần kéo: Lark (chat, xanh #245bdb) → Microsoft Teams (chat + thanh bên, tím #5b5fc7)
+→ Premiere Pro (màn Program + timeline V2/V1/A1, thả vào V2 thành clip "anh-chup.png" + hiện trên Program). Hàng nhãn
+"Lark · Teams · Premiere Pro" dưới khung, sáng app đang thả. Chỉ ghi TÊN app trên thanh tiêu đề, giao diện gợi tả,
+KHÔNG logo / không chép giao diện (thương hiệu của họ). Câu mô tả đổi: "Kéo thẳng vào Lark, Teams hay Premiere Pro."
+Chat chữ trắng trên màu app: Lark ~5,9:1, Teams ~5,4:1.
+**Đo:** nhật ký 24 s: Lark thả 3,5 s trả lời 5,3 s · Teams 10,9 / 12,7 s · Premiere: V2 sáng 17,5 s, clip + Program 18,3 s ·
+lặp 22 s; ảnh kéo giữ cột [24,49,32,38] cả 3 cảnh; 0 lỗi. Soi ảnh bắt 2 lỗi: nhãn đổi sớm 0,3 s trước cửa sổ → dời
+vào cùng lúc vẽ cảnh (đo 436 mẫu: 0 lệch); tên clip nghiêng do thẻ `<i>` → `font-style:normal`.
+
+## 2026-09-22 17:05 — Website: section KHAY "Chỉ một cú kéo" (cảnh kéo ảnh từ khay vào chat, tự chạy)
+
+Anh gửi ảnh section "Always one drag away" của CleanShot: *"làm thêm một section nữa dành cho phần khay"*.
+**Đã làm:** section `#shelf` giữa Tính năng và Giá. Trái: "Chỉ một cú kéo" + 3 dòng. Phải: nền cam, cửa sổ chat chung chung
+(không mang thương hiệu app nào) + khay đúng giao diện khay thật; con trỏ nắm ảnh "+18%" → ô gốc mờ, bản sao bay theo →
+khung chat sáng viền cam → thả thành tin nhắn ảnh → "đang gõ…" → "Nhận rồi, cảm ơn em!" → lặp (~8 s/vòng). Chữ EN/VI,
+sáng/tối, chỉ chạy khi trong màn hình, "giảm chuyển động" thì hiện sẵn cảnh cuối. Câu EN tự viết, KHÔNG chép câu CleanShot.
+**Đo:** nhật ký từng bước (1,6 s nắm · 2,3 s chat sáng · 3,3 s thành tin · 5,3 s trả lời · 8,1 s lặp), 0 lỗi.
+**2 lỗi bắt được khi soi ảnh:** (1) nền tối có vệt sáng trắng loang → đổi thành ánh cam 18%; (2) ảnh đang kéo MẤT cột
+biểu đồ: đệm ô ảnh khai `10%`, mà % tính theo bề rộng KHUNG CHỨA → trong khay ~8px, bản sao bay ra khung 600px thì đệm
+60px > ô 84px → cột cao 0. Đổi đệm sang px: cột khi kéo [24,49,32,38] = y hệt trong khay.
+☠️ Bẫy đo lặp lại (đã có trong memory `bay-do-web-tinh`): Chrome ngầm ép khung ≥500px → ảnh 390px trông như tràn ngang;
+đo thật trên trang 390px: scrollWidth 390/390. Và mở thẳng `#shelf` bằng headless → ảnh trắng trơn (cách chụp, không phải trang).
+File thử tạm `_test-khay.html` đã xoá đích danh.
+
+## 2026-09-22 16:40 — Website: nút Mua không ghi giá, bấm là cuộn thẳng tới thẻ thanh toán
+
+Anh: *"bỏ giá khi khách bấm vào thì đưa xuống phần thanh toán"*. Bỏ giá ở nút thanh trên ("Mua") và nút cuối trang
+("Mua Shot & Save"); giá chỉ còn ở thẻ giá + nút "Mua ngay $9.99" trong thẻ. Xoá CSS `.price-mini` không còn dùng.
+Đích cuộn đổi từ `#pricing` (tiêu đề phần giá) sang `#checkout` (thẻ thanh toán, scroll-margin 80px).
+**Đo:** trước, 1280×900: bấm → nút "Mua ngay" ở 1096px, NGOÀI màn hình. Sau: cả 3 nút → thẻ ở 80px, nút "Mua ngay" 836px,
+thấy trọn. Điện thoại 375×812: thẻ ở 80px, nút "Mua ngay" 979px (thẻ cao hơn màn hình, phải cuộn thêm một đoạn).
+
+## 2026-09-22 16:30 — Website: bỏ giá khỏi nút mua đầu trang
+
+Anh: *"chỗ này mình không nên để giá ở đây"*. Nút đầu trang: "Mua Shot & Save" / "Get Shot & Save". Giá vẫn còn ở nút
+thanh trên, nút trong thẻ giá, nút cuối trang — chờ anh nói có bỏ luôn không.
+
+## 2026-09-22 16:25 — Anh chấm ĐẠT demo tự chạy
+
+Anh gửi ảnh phim đang chạy (bản EN): *"animation okie rồi đó em"*.
+
+## 2026-09-22 16:20 — Website: demo TỰ CHẠY + mô tả thẻ tính năng ≤2 dòng
+
+**Anh:** *"anh muốn là tự động là animation… chụp nhiều tấm ảnh chạy vào khay"*; và 6 câu mô tả *"tối đa 2 dòng"*.
+**Tự chạy:** con trỏ giả khoanh vùng → chọn công cụ + màu → vẽ khung / mũi tên / chữ "+18%" → ✓ → ảnh BAY vào khay; 4 tấm,
+rồi bấm 1 ảnh cho ghim, dọn khay, lặp (~30 s/vòng). Nhãn "Đang tự chạy · Bấm để tự thử" góc trên. Khách chạm chuột
+vào demo / bấm phím trong demo / Ctrl+Shift+S → dừng hẳn, giữ ảnh đã có trong khay, hiện lại nút "Thử ngay".
+Ngoài màn hình hoặc tab ẩn → phim đứng thời gian. Máy bật "giảm chuyển động" → không tự chạy.
+**Đo:** nhật ký từng bước 30 s (bật `ssDemo.epChay()` vì pane ẩn): khay 1→4 lúc 5,3 / 11,7 / 18 / 24,5 s, mỗi lần có
+ảnh bay; ghim 26,8 s; dọn 29,4 s; 0 lỗi. Dừng giữa lúc khoanh: hết lớp mờ, con trỏ ẩn, 0 ảnh kẹt, khay giữ 2 ảnh.
+Ảnh chụp headless 28,5 s: khay 4 ảnh + ghim biểu đồ "+18%".
+☠️ **Bẫy đo:** bản đầu dùng `requestAnimationFrame` làm đồng hồ → trong Chrome chạy ngầm phim ĐỨNG sau bước đầu
+(0 lỗi, promise treo). Đổi sang `setTimeout` 16 ms: chạy đều cả khi đo. Lỗi thật (không phải "dừng") nay ghi vào
+`<html data-loi-demo>` thay vì bị `.catch` nuốt im lặng.
+**Mô tả ≤2 dòng:** rút 5 câu còn 39–56 ký tự; thẻ 1 giữ "Một nút bấm - Một tấm ảnh", dòng 2 của anh ("Không để bạn
+vụt mất ý tưởng đang bị lướt qua") đo ra 3 dòng ở mọi khổ → đổi "Không bỏ lỡ ý tưởng đang lướt qua" (thử 4 câu, câu này
+vừa ở 375px). Đo 1280/768/375 × VI/EN: mọi thẻ 1–2 dòng.
+⚠️ Lỗi điện thoại "chạm khi cuộn là kẹt chế độ chụp" (soát 15:20) VẪN CÒN — chờ anh gật.
+
+## 2026-09-22 15:45 — Website: 6 tiêu đề thẻ tính năng rút còn 3–4 tiếng
+
+Anh: *"các tiêu đề này tối đa từ 3 đến 4 từ thôi"*. Mới: Chụp tức thì · Kéo và Thả · Ghim trên cùng · Chú thích một
+phím · Chụp hai màn hình · Khay lưu ảnh (EN: Instant capture · Drag and drop · Pin on top · One-key markup · Two-screen
+capture · Shot shelf). Đo: 3–4 tiếng, cả 6 nằm 1 dòng ở 1280px và 375px (cao 30px mỗi tiêu đề).
+
+## 2026-09-22 15:40 — Website: sửa icon + lời 2 thẻ tính năng (kéo-thả, hai màn hình)
+
+**Anh:** thẻ hai màn hình *"icon đang bị lỗi… tiêu đề và nội dung cũng đang có vấn đề"*; thẻ kéo-thả *"phải icon là
+Drag hoặc con chuột"* + tiêu đề *"Kéo và Thả"*.
+- Icon hai màn hình: gốc là 2 khung vẽ CHỒNG lên nhau (x 2–13 và 11–22) → ở 24px thành một cục. Nay 2 màn cạnh nhau
+  có chân đế. Lần sửa đầu em xoá hụt một vạch thừa (sed có dấu cách thừa; `grep -c` báo 1 mà em không đọc) — soi ảnh
+  phóng to mới thấy, đã xoá.
+- Lời thẻ hai màn hình: bỏ chữ kỹ thuật ("điểm ảnh", "150% và 125%") → "Chụp vắt qua hai màn hình / Khoanh một vùng
+  ngang qua cả hai màn hình, ảnh vẫn liền mạch, rõ nét, không lệch. Kể cả khi hai màn khác cỡ, khác độ phân giải."
+- Icon kéo-thả: bàn tay vẫy → khung ảnh + con trỏ chuột (thử nét đứt trước, ở 24px lấm tấm → bỏ).
+- Tiêu đề: "Kéo và Thả" / EN "Drag and drop".
+**Đo:** vẽ riêng 2 icon cỡ 140px và 24px trên nền tối soi bằng mắt; grep: 0 vạch thừa, 0 nét đứt, tiêu đề đúng VI/EN.
+
+## 2026-09-22 15:30 — Website: đổi lời thẻ tính năng 1 theo chữ anh
+
+Anh viết lại: *"Một nút bấm - Một tấm ảnh / Không để bạn vụt mất ý tưởng đang bị lướt qua"* (thay câu "Bấm Ctrl Shift S…
+20 ms…"). Giữ nguyên văn, 2 dòng. Bản EN em dịch: "One press, one shot. / Never lose an idea that is scrolling past."
+Tiêu đề thẻ giữ nguyên. Đo: đổi VI/EN hiện đúng cả hai.
+
+## 2026-09-22 15:25 — Website: bỏ dòng "Trả một lần · Windows 10/11 · macOS (bản thử)" dưới nút đầu trang
+
+Anh khoanh dòng đó: *"remove cái này nha em"*. Xoá thẻ `<p class="fine">` + chuỗi VI + CSS `.fine` (chỉ dùng ở đó).
+Đo: phần đầu trang không còn dòng này (EN/VI), nút cách khung demo 48px. Dòng hệ điều hành trong THẺ GIÁ vẫn giữ.
+
+## 2026-09-22 15:20 — Website: soát toàn trang theo ui-ux-pro-max (CHỈ soát, chưa sửa — chờ anh chọn)
+
+Đo trên trang đang chạy: 375 / 768 / 1024 / 1440px, sáng + tối, EN + VI, 82 đoạn chữ.
+**Đạt:** tương phản mọi chữ (sáng thấp nhất 3,00 = tiêu đề cam cỡ lớn, vừa chạm chuẩn 3:1; tối thấp nhất 5,39) ·
+0 tràn ngang ở 4 khổ · tiêu đề H1→H2→H3 đúng thứ tự · mọi nút có tên đọc được · thứ tự Tab đúng thứ tự nhìn ·
+có link "bỏ qua tới nội dung" · nút mua nằm trên màn hình đầu (đáy 497/900px) · trang 60 KB.
+**CHƯA đạt (xếp theo mức):**
+1. ☠️ ĐO RA LỖI THẬT: điện thoại vuốt cuộn đi qua khung demo → PointerEvent pointerdown + pointercancel → trang
+   KẸT ở chế độ chụp (mờ tối, khay ẩn, `touch-action:none` chặn luôn cuộn trang), không có nút thoát vì thanh công
+   cụ chỉ hiện sau khi có vùng, điện thoại không có Esc.
+2. Nút Mua trỏ `href="#"` (chưa có cổng thanh toán) · chân trang thiếu Điều khoản / Chính sách hoàn tiền / Liên hệ
+   (cổng thanh toán như Paddle, Lemon Squeezy đòi có trước khi duyệt shop).
+3. Thiếu thẻ chia sẻ `og:title` / `og:image` / `canonical` / `theme-color` → dán link vào Zalo/Facebook không có ảnh xem trước.
+4. Chưa có ảnh/clip app THẬT, chưa có số phiên bản / dung lượng / yêu cầu máy; "Windows 10" và "macOS" chưa đo.
+5. Nhỏ: câu trả lời Hỏi đáp ~93 ký tự/dòng (chuẩn 65–75) · nút "Thử ngay" trên điện thoại vẫn hiện phím Ctrl Shift S ·
+   dấu ✓ trong câu hướng dẫn là ký tự chứ không phải icon · chữ 10–11px trong khay demo (cố ý giống app).
+☠️ **2 lần thước sai trong buổi soát (đã loại, không phải lỗi trang):** (a) nền thanh trên có `color-mix` →
+`getComputedStyle` trả `color(srgb 1 1 1 / 0.82)` (thang 0–1), regex đọc thành rgb(1,1,1) = đen → báo 1,39:1;
+(b) pane ẩn → transition màu nút không chạy → nút tối đo bằng màu nền CŨ → 3,66:1; tắt transition đo lại 5,39.
+
+## 2026-09-22 15:05 — Website: bỏ gạch ngang dài "—" khỏi chữ khách nhìn thấy
+
+**Anh Tiến** khoanh nút "Mua Shot & Save — $9.99": *"sao em hay sử dụng dấu '--' đôi trong các dự án của anh vậy em"*.
+Gốc: tật chấm câu kiểu tiếng Anh/văn AI của em. Trang có 31 "—": 23 chỗ chữ hiển thị (19 mẫu) → thay bằng phẩy /
+chấm / "là" / "nên" / bỏ ("Mua Shot & Save $9.99"); còn lại nằm trong chú thích code, để nguyên.
+**Đo:** quét text node + aria-label/title/placeholder trên trang đang chạy, EN và VI: 0; chuỗi trong script: 0.
+Luật ghi vào brain tổng (mục Góc nhìn sản phẩm).
+
+## 2026-09-22 14:55 — Website: nút chuyển sáng/tối + anh chốt giá $3/năm
+
+**Anh Tiến:** *"$3/năm nha em"* · *"trắng và đen đều okie rồi"* · *"cho anh cả 2 option chuyển đổi"*.
+**Đã làm:** nút mặt trăng/mặt trời 44×44 trên thanh đầu (cạnh EN/VI). Mặc định theo máy khách; bấm thì ghi nhớ
+(`localStorage ss-theme`), đổi `data-theme` trên `<html>` (token 2 chế độ đã có sẵn). Nhãn đọc màn hình đổi theo
+EN/VI. Giá trên trang vốn đã $3 — không đổi. Quyết định giá ghi vào `AiO Studio/CLAUDE.md` mục 3.
+**Đo (375px):** sáng → bấm → tối (nền rgb 20,18,16, lưu "dark") → bấm → sáng (255,255,255); aria "Chuyển sang nền
+sáng" / "Switch to light mode" đúng; thanh đầu vừa 375 (nút Mua mép phải 359), 0 lỗi.
+
+## 2026-09-22 14:45 — Website: soát theo skill ui-ux-pro-max (bản anthropic-skills, anh gọi `/ui-ux-pro-max`)
+
+**Skill đề xuất:** kiểu "Interactive Product Demo" (khớp hướng đang làm). **KHÔNG lấy** bảng màu navy/vàng +
+font Amatic SC của nó — trái thương hiệu AiO đã chốt (cam #F86820 + Inter). CTA 7:1 của mẫu "hero-centric"
+cũng không theo (phải đổi nút sang nâu sẫm #9A3412); giữ chuẩn AA 4,5:1 (đang 5,18:1).
+
+**Đo trước → sau (điện thoại 375px, pointer:coarse):**
+- Nút <44px lúc chưa bấm: 6 (EN/VI 38, Mua 42, logo 27, dọn khay 21) → **1** (dọn khay 36px hình, vùng bấm 44 nhờ ::after).
+- Thanh công cụ vẽ: rộng **379px trong khung 323px** (lòi 56px) → **311px**, cách mép 6/6px, xuống 2 hàng.
+  Chấm màu 14 → 24px + vùng bấm 44 (chạm cách tâm 20px về 4 phía đều trúng). Ảnh ghim: nút Sao chép/Đóng hiện
+  sẵn (không phụ thuộc rê chuột), 40×40.
+- **Bàn phím** (trước: không dùng được demo): Enter trên "Thử ngay" / Ctrl+Shift+S → vùng dựng sẵn giữa cảnh,
+  tiêu điểm vào ✓ → Enter → khay → Tab tới ảnh → Enter → ghim. Đo: đi hết chuỗi, 0 lỗi.
+- aria-label demo trước chỉ tiếng Anh → dịch theo VI/EN (`data-i-aria`), đo ra "Khung (1)", "Dọn khay".
+- Máy tính 1280: nút giữ 32px đúng app, thanh 1 hàng 40px, 0 lỗi.
+☠️ Bẫy thước: pane trình duyệt ẩn ở preset desktop → bề rộng trang 0 → "NaN × NaN" — không phải lỗi trang; đo
+phải đặt viewport cố định.
+
+## 2026-09-22 14:30 — Website: demo đầu trang TƯƠNG TÁC được + khay/ghim/thanh vẽ đúng giao diện app
+
+**Anh Tiến:** chụp khung minh hoạ: *"chỗ này anh cần tương tác được"*; rồi *"phần khay của mình thiết kế cũng
+đẹp sao em không đưa vào?"* — bản 1 vẽ khay bằng 3 ô màu chung chung, không phải khay thật.
+
+**Đã làm:** cảnh desktop vẽ bằng canvas; kéo khoanh vùng (nhãn kích thước quy ra màn 2560px) → thanh công cụ
+chép từ `src/pin` (phím 1/2/3, 7 màu, hoàn tác, huỷ, ✓) → vẽ khung / mũi tên / chữ có hộp nền → ✓ thì CẮT ảnh
+PNG thật (vùng + nét vẽ) vào KHAY chép từ `src/shelf` (thanh logo + "Khay ảnh" + số đếm + nút dọn, ô ảnh cao
+64px, nút x khi rê) → bấm ảnh thì GHIM (kéo đi được, rê chuột hiện Sao chép = chép PNG thật vào clipboard / Đóng).
+Giữ đúng luồng app: chụp xong CHỈ vào khay, ghim khi bấm ảnh. Ctrl+Shift+S / Esc / Enter / Ctrl+Z như app.
+
+**Đo (bấm giả bằng PointerEvent):** vùng 360×270 → ảnh PNG 360×270, alpha lớp mờ trong vùng 0 / ngoài 128;
+khay 1 ảnh, số đếm "1"; ghim 360×270, kéo +100/+50 px đúng bằng tay kéo; Esc về trạng thái chờ, ảnh ghim hiện lại;
+0 lỗi JS. Chụp headless 2 bước (đang vẽ / sau khi ghim) soi bằng mắt: nét vẽ nằm đúng chỗ trong ảnh cắt.
+375px: thanh công cụ nằm trọn trong khung, không tràn ngang (375/375); khay rỗng 72/190 px. **Lỗi bắt được khi đo:**
+W=0 lúc ResizeObserver chưa chạy → nhãn "NaN × NaN" → đo lại cỡ ngay lúc bắt đầu chụp. File thử tạm
+`_test-demo.html` đã xoá đích danh.
+
+## 2026-09-22 14:16 — Website bán Shot & Save (bản nháp 1, trang tĩnh)
+
+**Anh Tiến:** web bán đơn giản, tham khảo cleanshot.com, dùng skill UI/UX Pro Max; một gói **$9.99 trả một
+lần** + phí năm để đội ngũ tiếp tục làm tính năng. ☠️ Lời anh có **hai con số phí năm: "$2/năm" và "$3"** —
+trang đang dùng **$3** (câu "ghi chú rõ"), CHỜ anh chốt.
+
+**Đã làm:** `Website/AiO ShotSave Web/index.html` — một file HTML/CSS/JS, không build. Khối: thanh trên ·
+hero + mô phỏng app bằng CSS (khung chọn, thanh vẽ, ảnh ghim, khay) · 6 tính năng (số lấy từ đo thật: overlay
+~20 ms, kéo-thả vào 7 app anh đã thử 14/09, 2 màn 150%+125%) · thẻ giá có **bảng tiền hiện thẳng** (Hôm nay
+$9.99 / Mỗi năm sau $3 tuỳ chọn) · 4 câu hỏi · song ngữ EN/VI · sáng/tối. Nút mua: hằng `CHECKOUT_URL` rỗng →
+báo "Sắp mở bán" (chưa có cổng thanh toán).
+
+**Giả định CHƯA được anh duyệt:** phí năm là TUỲ CHỌN, không gia hạn app vẫn chạy (theo mẫu CleanShot) · ghi
+"Windows 10/11 · macOS (beta)" — Win 10 và Mac thật đều CHƯA đo · màu cam AiO thay xanh CleanShot.
+
+**Đo:** Chrome headless 1366px sáng + 500px tối, soi ảnh bằng mắt; bắt được khung chọn trong mô phỏng bị
+co về 0 (animate width/height, ảnh chụp lúc animation chưa chạy) → đổi sang transform/opacity, trạng thái
+nghỉ là khung đầy đủ, chụp lại đúng. 375px: scrollWidth 375/375, 0 phần tử tràn; bấm VI đổi đủ ("$3 / năm");
+bấm Mua hiện toast. Nút chính chữ trắng trên #C2410C = 5,18:1.
 
 ## 2026-09-14 14:20 — Release sắp xếp theo app + sự cố script xoá nhầm thư mục 0.4.17 (đã khôi phục)
 
