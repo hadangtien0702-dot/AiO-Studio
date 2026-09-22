@@ -9,8 +9,8 @@
 >   1 lan Open Anyway — hien tai, da ky ad-hoc). (5) CPU nam nen ~10-12 % mot loi (phien WGC, khong doi
 >   theo fps) — anh chua quyet co lam "tat luong khi ranh lau" khong.
 > - 🌐 **WEB BAN (22/09):** `Website/AiO ShotSave Web/index.html` — 1 file tinh, EN/VI, sang/toi, gia $9.99 mot lan +
->   $3/nam tuy chon (anh chot), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app; khay co gian qua Cai dat; dau trang
->   khung chon "chup"). Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
+>   $3/nam tuy chon (anh chot), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app — section khay dung thanh MAN HINH THAT
+>   co taskbar, khong chan de, anh duyet 22/09; khay co gian qua Cai dat; dau trang khung chon "chup"). Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
 >   (nut Mua dang bao "Sap mo ban", `CHECKOUT_URL` rong); (2) chinh sach hoan tien + Dieu khoan/Lien he o chan trang;
 >   (3) anh/clip app that + anh chia se link (og:image); (4) xac nhan "khong gia han van chay"; (5) thu tren DIEN THOAI THAT:
 >   cham de dung phim tu chay (chua do duoc — su kien gia lap khong qua `isTrusted`). "Windows 10" + "macOS" tren trang CHUA do.
@@ -335,6 +335,18 @@ Bản đầu có mờ dần 0,2 s lúc ẩn → vẫn đè 12/274 mẫu, nên b�
 WebKit iPhone 13 **0/275** · WebKit 1280 0/275 · Chromium iPhone 0/347 · Chromium 1280 0/345; 0 lỗi demo.
 Đối chứng (ép nhãn hiện lúc khoanh): iPhone **276/276 và 346/346 đè**, 1280 = 0 → lỗi chỉ có ở khổ điện thoại, thước bắt được.
 Script: scratchpad `pw/de.mjs` (không lưu vào repo).
+
+## 2026-09-22 17:03 +0700 — Website: section khay = MÀN HÌNH THẬT (hướng A, không chân đế)
+
+**Anh:** *"animation okie rồi"* nhưng *"UI tổng thể chưa được đã lắm"*. Hỏi 2 câu (bảng chọn): phạm vi = **riêng section khay**; hướng =
+**A · Màn hình thật** (so với B phóng to/gom cụm, C nền tối kiểu editor). Làm nháp file riêng `_nhap-khay-A.html` trước; anh xem ảnh:
+*"bỏ cái chân chỉ để màn hình là đẹp lắm"* → áp vào `index.html`, xoá file nháp.
+**Đã làm:** khung cảnh bọc trong viền màn hình tối (`.kh-mon`, camera nhỏ, không chân đế), hình nền cam ấm pha tím; dãy icon lơ lửng
+→ **taskbar** đáy màn hình (icon Shot & Save + 7 app + đồng hồ; app đang thả sáng, nhô, vạch cam dưới); cửa sổ app 56% × 75%; khay
+trên taskbar; khay kéo vào từ mép trái MÀN HÌNH (`overflow:hidden` của màn hình cắt); cột hình rộng hơn (.72fr / 1.28fr).
+**Đo:** 1280: màn hình 621×388, viền 12px, taskbar 33px, khe khay↔app cuối 16px, taskbar đổi đúng app (Lark → Teams), khay + app luôn
+nằm trên taskbar, 0 lỗi. 375: 0 tràn ngang, khe 16, taskbar vừa màn hình (icon 13px — nhỏ, chỉ để trang trí).
+Lần áp bị sót 2 thẻ chân đế trong HTML (lệnh sửa script không khớp chuỗi, CSS đã bỏ nên không hiện) → xoá tay, grep `kh-chan|kh-de` = 0.
 
 ## 2026-09-22 16:51 +0700 — Website: khay kéo vào từ MÉP TRÁI màn hình (vòng đầu) + chốt sổ
 

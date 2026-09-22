@@ -543,6 +543,34 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
   .hien-js #shelf .kh-text.hien p{transition-delay:.15s}
 }
 
+/* ===== Section khay = MÀN HÌNH THẬT (anh chọn hướng A 22/09, BỎ chân đế: "chỉ để màn hình là đẹp lắm") — viền, hình nền, taskbar ===== */
+.kh-mon{position:relative;padding:12px 12px 14px;border-radius:22px;background:linear-gradient(180deg,#2c2723,#16120f);
+  box-shadow:0 50px 90px -40px rgb(70 25 0/60%),0 0 0 1px rgb(255 255 255/6%) inset}
+.kh-mon::before{content:"";position:absolute;left:50%;top:5px;width:5px;height:5px;border-radius:50%;background:#3d3631;transform:translateX(-50%)}
+#shelf .kh-visual{aspect-ratio:16/10;border-radius:9px;overflow:hidden;box-shadow:none;
+  background:radial-gradient(70% 80% at 18% 18%,rgb(255 240 228/.55) 0,transparent 60%),radial-gradient(60% 70% at 88% 95%,rgb(124 77 255/.35) 0,transparent 65%),linear-gradient(135deg,#ffd2b3,#f59a62 55%,#c4622f)}
+:root[data-theme="dark"] #shelf .kh-visual{background:radial-gradient(70% 80% at 18% 18%,rgb(248 104 32/.35) 0,transparent 60%),radial-gradient(60% 70% at 88% 95%,rgb(124 77 255/.3) 0,transparent 65%),linear-gradient(135deg,#3a2518,#7a3813 55%,#2a1a10)}
+#shelf .kh-app{top:6%;right:5%;width:56%;height:75%}
+#shelf .kh-shelf{bottom:13%}
+/* taskbar: thay dãy icon lơ lửng — app đang thả sáng + vạch cam bên dưới như app đang mở */
+#shelf .kh-task{position:absolute;inset:auto 0 0 0;top:auto;left:0;height:9.5%;display:flex;align-items:center;justify-content:center;gap:1.1cqw;
+  padding:0 2cqw;border-radius:0;background:rgb(255 250 246/.62);backdrop-filter:blur(14px);box-shadow:0 -1px 0 rgb(255 255 255/.55);grid-template-columns:none}
+:root[data-theme="dark"] #shelf .kh-task{background:rgb(24 20 17/.7);box-shadow:0 -1px 0 rgb(255 255 255/.08)}
+#shelf .kh-task .ic{position:relative;width:4.4cqw;height:4.4cqw;border-radius:1.1cqw;font-size:1.7cqw;opacity:.9;transform:none}
+#shelf .kh-task .ic::after{content:"";position:absolute;left:50%;bottom:-.95cqw;width:.8cqw;height:.35cqw;border-radius:9px;background:#8d8d95;transform:translateX(-50%);transition:width .25s,background-color .25s}
+#shelf .kh-task .ic.on{opacity:1;transform:translateY(-.3cqw);box-shadow:0 .6cqw 1.4cqw -.4cqw rgb(0 0 0/.45)}
+#shelf .kh-task .pr.on,#shelf .kh-task .ps.on{box-shadow:inset 0 0 0 1.5px currentColor,0 .6cqw 1.4cqw -.4cqw rgb(0 0 0/.45)}
+#shelf .kh-task .ic.on::after{width:2cqw;background:#f86820}
+#shelf .kh-me{display:grid;place-items:center;width:4.4cqw;height:4.4cqw;border-radius:1.1cqw;background:#181818;color:#f86820}
+#shelf .kh-me svg{width:55%;height:55%}
+#shelf .kh-sep{width:1px;height:45%;background:rgb(0 0 0/.15);margin:0 .4cqw}
+:root[data-theme="dark"] #shelf .kh-sep{background:rgb(255 255 255/.15)}
+#shelf .kh-task .kh-dock-ten{display:none}
+#shelf .kh-gio{position:absolute;right:2cqw;font:600 1.5cqw/1 Inter,sans-serif;color:#4f4740}
+:root[data-theme="dark"] #shelf .kh-gio{color:#cfc6bd}
+@media (min-width:900px){#shelf .kh-grid{grid-template-columns:.72fr 1.28fr;gap:48px}}   /* màn hình to hơn */
+@media (max-width:520px){#shelf .kh-task{gap:.9cqw}#shelf .kh-gio{display:none}}
+
 /* ===== FAQ ===== */
 .faq{max-width:720px;margin:0 auto;display:grid;gap:10px}
 details{border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
@@ -697,8 +725,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         <p data-i="khSub">Every shot waits on your shelf. Drag it straight into Zalo, Teams, Premiere or Figma. No hunting through folders, no lost focus.</p>
       </div>
       <div class="kh-right">
-        <div class="kh-visual" id="khVisual" aria-hidden="true">
-          <div class="kh-dock" id="khApps"><span class="ic lark" data-ten="Lark">L</span><span class="ic teams" data-ten="Microsoft Teams">T</span><span class="ic zalo" data-ten="Zalo">Z</span><span class="ic mess" data-ten="Messenger">M</span><span class="ic pr" data-ten="Premiere Pro">Pr</span><span class="ic ps" data-ten="Photoshop">Ps</span><span class="ic fig" data-ten="Figma">F</span><b class="kh-dock-ten" id="khDockTen"></b></div>
+        <div class="kh-mon"><div class="kh-visual" id="khVisual" aria-hidden="true">
+          <div class="kh-dock kh-task" id="khApps"><span class="kh-me"><svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span><i class="kh-sep"></i><span class="ic lark" data-ten="Lark">L</span><span class="ic teams" data-ten="Microsoft Teams">T</span><span class="ic zalo" data-ten="Zalo">Z</span><span class="ic mess" data-ten="Messenger">M</span><span class="ic pr" data-ten="Premiere Pro">Pr</span><span class="ic ps" data-ten="Photoshop">Ps</span><span class="ic fig" data-ten="Figma">F</span><b class="kh-dock-ten" id="khDockTen"></b><span class="kh-gio">16:51</span></div>
           <div class="kh-app" id="khApp"></div>
           <div class="kh-shelf" id="khShelf">
             <div class="sbar">
@@ -714,6 +742,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           </div>
           <div class="kh-cursor" id="khCursor"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
         </div>
+      </div>
       </div>
     </div>
   </section>
@@ -1495,7 +1524,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const V = vis.getBoundingClientRect(), A = rel(app), sec = document.getElementById("shelf").getBoundingClientRect();
     khayEl.style.opacity = "0"; await ngu(300);
     const w = khayEl.getBoundingClientRect().width;
-    const dau = xa ? (sec.left - V.left) - w * .62 : (innerWidth >= 900 ? -.05 * V.width : 0);
+    const dau = xa ? -w * .62 : (innerWidth >= 900 ? -.05 * V.width : 0);
     khayEl.style.left = dau + "px"; khayEl.style.opacity = "1"; vis.classList.remove("cho-khay");
     await ngu(xa ? 200 : 350);
     const S = rel(khayEl), dich = Math.max(8, A.x - S.w - 16), bar = rel(khayEl.querySelector(".sbar"));
