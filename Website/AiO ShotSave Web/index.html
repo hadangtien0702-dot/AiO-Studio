@@ -259,6 +259,17 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .bill-row .num{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .bill-note{margin:0;padding:12px 18px 14px;border-top:1px solid var(--line);color:var(--ink-2);font-size:14px}
 .price .btn{width:100%;min-height:56px;font-size:17px;border-radius:16px}
+/* Thẻ giá: khối tên + giá (23/09, hướng A) */
+.ph-logo{flex:none;display:grid;place-items:center;width:48px;height:48px;color:#f86820}   /* anh 23/09: logo trơn, không ô nền đen */
+.ph-logo svg{width:44px;height:40px}
+.ph-ten .price-name{font-size:22px;line-height:1.2}
+.ph-ten small{display:block;margin-top:3px;color:var(--ink-3);font-size:15px}
+.ph .amount{margin:0}
+/* anh 23/09: bỏ chữ "once" dưới giá (nhãn trên thẻ đã nói "Trả một lần") */
+.ph{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin:0 0 28px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+.ph .amount{flex-direction:column;align-items:flex-end;gap:6px}
+.ph .amount strong{font-size:54px}
+@media (max-width:480px){.ph{grid-template-columns:auto 1fr}.ph .amount{grid-column:1 / -1;flex-direction:row;align-items:center;gap:10px}}
 .price-foot{margin:14px 0 0;text-align:center;color:var(--ink-3);font-size:14px}
 @media (max-width:420px){.price{padding:28px 20px 24px}.amount strong{font-size:54px}}
 
@@ -408,6 +419,8 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .rs-grip{position:absolute;z-index:2;width:16px;height:16px;top:0;right:0;opacity:.95;
   background:linear-gradient(135deg,#f86820 0 3px,transparent 3px 5px,#f86820 5px 7px,transparent 7px) no-repeat 0 0/11px 11px;transform:scaleX(-1)}
 .rs-shelf.doc .rs-grip{right:auto;left:0;transform:none}
+.rs-shelf.goc-duoi .rs-grip{top:auto;left:auto;right:0;bottom:0;transform:rotate(180deg)}   /* 23/09: kéo góc dưới-phải */
+#rsCur,#rsShelf{will-change:transform}
 #rsCur{display:block}
 @media (max-width:520px){.rs-mode{font-size:11px;padding:2px}.rs-mode > span{padding:5px 8px}}   /* điện thoại: pill nhỏ lại (22/09 pill đè khay dọc 17px; 23/09 bỏ bánh răng Cài đặt, pill còn Ngang/Dọc) */
 .rs-list .kh-thumb.tx{padding:0;display:block;position:relative}
@@ -909,13 +922,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
       <div class="price-shell" id="checkout" data-hien>
         <div class="price-tag" data-i="priceTag">One-time payment</div>
         <div class="price">
-          <h3 class="price-name">Shot &amp; Save</h3>
-          <div class="amount"><strong>$7.99</strong><span data-i="once">once</span></div>
-          <p class="price-sub" data-i="priceLine">Pay once, use it forever.</p>
+          <div class="ph">
+            <span class="ph-logo"><svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+            <div class="ph-ten"><h3 class="price-name">Shot &amp; Save</h3><small data-i="priceWhat">Capture, mark up, pin, drag</small></div>
+            <div class="amount"><strong>$7.99</strong></div>
+          </div>
 
           <ul class="list">
             <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li1">Every feature, no limits</span></li>
-            <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><span data-i="li2">First year of new features included</span><small data-i="li2s">Everything we ship in your first 12 months</small></span></li>
+            <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li2">First year of new features included</span></li>
             <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li3">Windows 10/11 · macOS (beta)</span></li>
           </ul>
 
@@ -983,9 +998,7 @@ const T = {
     f5t:"Chụp hai màn hình", f5p:"Một vùng chụp qua hai màn hình, liền mạch và rõ nét.",
     f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm để ghim lại.",
     priceTitle:"Một giá. Trả một lần.", priceSub:"Không cần đăng ký thuê bao. Muốn có tính năng mới thì mỗi năm vài đô, không muốn thì thôi.",
-    priceTag:"Trả một lần", once:"một lần", priceLine:"Trả một lần, dùng mãi mãi.",
-    li1:"Đủ mọi tính năng, không giới hạn", li2:"Năm đầu có sẵn mọi tính năng mới", li2s:"Mọi thứ ra mắt trong 12 tháng đầu của bạn",
-    li3:"Windows 10/11 · macOS (bản thử)",
+    priceTag:"Trả một lần", once:"một lần", li1:"Đủ mọi tính năng, không giới hạn", li2:"Năm đầu có sẵn mọi tính năng mới", li3:"Windows 10/11 · macOS (bản thử)",
     b1:"Hôm nay", b1s:"Lần trừ tiền đầu tiên", b2:"Mỗi năm sau đó", b2s:"Tuỳ chọn, để tiếp tục nhận tính năng mới", b2n:"$2/năm",
     bNote:"$2 này trả cho đội ngũ tiếp tục làm thêm tính năng và sửa lỗi cho Shot & Save. Không gia hạn thì app vẫn chạy bình thường, chỉ không nhận tính năng mới.",
     buyBtn:"Mua ngay $7.99", priceFoot:"Giá tính bằng USD. Có thể cộng thuế lúc thanh toán.",
@@ -1023,6 +1036,8 @@ Object.assign(T.vi, { stTitle:"Chỉnh một lần, dùng mãi", stSub:"Mọi tu
 Object.assign(T.en, { stTitle:"Set it once, forget it", stSub:"Every option lives in one small window. No nested menus, no manual to read.",
   stP1:"Your own shortcut", stP1m:"Pick the key combo your hands already know.", stP2:"JPEG or PNG", stP2m:"Light files to send fast, or lossless PNG.",
   stP3:"Save where you want", stP3m:"Pick the folder, open it in one click.", stP4:"Vietnamese or English", stP4m:"Switch the language in one click." });
+Object.assign(T.vi, { priceWhat:"Chụp, vẽ, ghim, kéo thả" });
+Object.assign(T.en, { priceWhat:"Capture, mark up, pin, drag" });
 let lang = "en";
 // Chống "chữ mồ côi" (anh 22/09): dính 2 chữ cuối bằng dấu cách không ngắt, để dòng cuối không bao giờ còn trơ 1 chữ.
 // Lớp dự phòng cho trình duyệt chưa hỗ trợ `text-wrap: pretty` (CSS bên trên lo phần chính).
@@ -1734,15 +1749,29 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     d.className = "kh-thumb " + lop; d.innerHTML = html; list.append(d);
   }
   let thay = false, epChay = false;
-  new IntersectionObserver(es => { thay = es[0].isIntersecting; }, { threshold: .3 }).observe(vis);
+  new IntersectionObserver(es => { thay = es[0].isIntersecting; capNhatTween(); }, { threshold: .3 }).observe(vis);
   const ngu = ms => new Promise(res => {
     let con = ms, truoc = performance.now();
     const tick = () => { const now = performance.now(); if ((thay && !document.hidden) || epChay) con -= now - truoc; truoc = now; con <= 0 ? res() : setTimeout(tick, 16); };
     setTimeout(tick, 16);
   });
   let cx = 0, cy = 0;
-  const dat = (x, y) => { cx = x; cy = y; cur.style.transform = `translate(${x}px,${y}px)`; };
-  async function di(x, y, ms, moiBuoc) {
+  const dat = (x, y) => { cx = x; cy = y; cur.style.transform = `translate3d(${x}px,${y}px,0)`; };
+  // 23/09: chuyển động theo nhịp màn hình bằng GSAP (đường cong giữ nguyên = power1.inOut); ngoài màn hình tạm dừng
+  const dangTween = new Set(), chay = () => (thay && !document.hidden) || epChay;
+  const capNhatTween = () => dangTween.forEach(tw => chay() ? tw.resume() : tw.pause());
+  document.addEventListener("visibilitychange", capNhatTween);
+  function di(x, y, ms, moiBuoc) {
+    if (!window.gsap) return diCu(x, y, ms, moiBuoc);
+    const o = { x: cx, y: cy };
+    return new Promise(res => {
+      const tw = gsap.to(o, { x, y, duration: ms / 1000, ease: "power1.inOut",
+        onUpdate() { dat(o.x, o.y); if (moiBuoc) moiBuoc(cx, cy); },
+        onComplete() { dangTween.delete(tw); res(); } });
+      dangTween.add(tw); if (!chay()) tw.pause();
+    });
+  }
+  async function diCu(x, y, ms, moiBuoc) {          // dự phòng khi không tải được GSAP
     const x0 = cx, y0 = cy, t0 = performance.now();
     for (;;) {
       await ngu(16);
@@ -1758,7 +1787,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const rong = n => VIEN + 2 * g + n * tw + (n - 1) * g;
   const cao = n => BAR + VIEN + 2 * g + n * t + (n - 1) * g;
   const soCotVua = w => Math.max(1, Math.floor((w - VIEN - 2 * g + g) / (tw + g)));
-  const ngang = (w, h) => Object.assign(shelf.style, { left: .05 * W + "px", bottom: .08 * H + "px", right: "auto", top: "auto", width: w + "px", height: h + "px" });
+  const ngang = (w, h, day = H - .08 * H) => Object.assign(shelf.style, { left: .05 * W + "px", top: day - h + "px", right: "auto", bottom: "auto", width: w + "px", height: h + "px" });
   const doc = (w, h) => Object.assign(shelf.style, { right: .05 * W + "px", top: .06 * H + "px", left: "auto", bottom: "auto", width: w + "px", height: h + "px" });
   const bam = async () => { cur.classList.add("bam"); await ngu(150); cur.classList.remove("bam"); };
   const tamO = el => { const r = el.getBoundingClientRect(), v = vis.getBoundingClientRect(); return [r.left - v.left + r.width / 2, r.top - v.top + r.height / 2]; };
@@ -1770,30 +1799,45 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     doCo();
     // ---- 1. KHAY NGANG: nắm góc trên-phải, kéo LÊN (thêm hàng) rồi kéo SANG PHẢI (thêm cột) ----
     shelf.classList.add("an"); await ngu(300);
-    cheDo(0);
-    let w = rong(4), h = cao(1); ngang(w, h);
+    cheDo(0); shelf.classList.remove("goc-duoi");
+    const trai = .05 * W; let day = H - .2 * H;            /* chừa đáy 20% để lát nữa kéo góc dưới xuống */
+    let w = rong(4), h = cao(1); ngang(w, h, day);
     shelf.classList.remove("an");
-    const trai = .05 * W, day = H - .08 * H;
     await ngu(400);   /* không nhảy con trỏ: đi tiếp từ chỗ vừa bấm "Ngang" */
     await di(trai + w, day - h, 800);
     cur.classList.add("bam"); await ngu(150);
-    await di(trai + w, day - cao(3), 900, (x, y) => { h = day - y; ngang(w, h); });
+    await di(trai + w, day - cao(3), 900, (x, y) => { h = day - y; ngang(w, h, day); });
     await ngu(250);
     const wMax = rong(soCotVua(W * .9 - trai));
-    await di(trai + wMax, cy, 1000, x => { w = x - trai; ngang(w, h); });
+    await di(trai + wMax, cy, 1000, x => { w = x - trai; ngang(w, h, day); });
+    cur.classList.remove("bam");
+    await ngu(600);
+    // ---- 1b. góc DƯỚI-phải: kéo XUỐNG thêm một hàng ("kéo góc nào cũng được") ----
+    const dinhNgang = day - h;
+    shelf.classList.add("goc-duoi");
+    await di(trai + w, day, 600);
+    cur.classList.add("bam"); await ngu(150);
+    await di(trai + w, H * .95, 900, (x, y) => { day = y; h = day - dinhNgang; ngang(w, h, day); });
     cur.classList.remove("bam");
     await ngu(1500);
     // ---- 2. KHAY DỌC: dựng bên phải, nắm góc trên-trái, kéo SANG TRÁI (thêm cột) ----
     await doiKieu(1);
     shelf.classList.add("an"); await ngu(300);
-    cheDo(1);
-    const phai = W - .05 * W, dinh = .06 * H, hDoc = .88 * H;
+    cheDo(1); shelf.classList.remove("goc-duoi");
+    const phai = W - .05 * W, dinh = .06 * H; let hDoc = .6 * H;   /* bắt đầu thấp 60% để lát nữa kéo góc dưới xuống */
     w = rong(2); doc(w, hDoc);   /* 1 cột thì tiêu đề "Khay ảnh" bị cắt (soi ảnh 22/09) → bắt đầu 2 cột */
     shelf.classList.remove("an");
     await ngu(300);
     await di(phai - w, dinh, 700);
     cur.classList.add("bam"); await ngu(150);
     await di(phai - rong(4), dinh, 1000, x => { w = phai - x; doc(w, hDoc); });
+    cur.classList.remove("bam");
+    await ngu(600);
+    // ---- 2b. góc DƯỚI-phải: kéo XUỐNG, thêm hàng ----
+    shelf.classList.add("goc-duoi");
+    await di(phai, dinh + hDoc, 700);
+    cur.classList.add("bam"); await ngu(150);
+    await di(phai, H * .94, 900, (x, y) => { hDoc = y - dinh; doc(w, hDoc); });
     cur.classList.remove("bam");
     await ngu(1200);
     await doiKieu(0);

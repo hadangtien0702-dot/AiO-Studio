@@ -324,6 +324,14 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-23 10:10 +0700 — Website: áp thẻ giá hướng A + kéo thêm góc vào trang thật
+
+Anh xem nháp hướng A: *"anh thấy cũng được rồi mà"* + 2 chỉnh: logo bỏ ô nền đen (chỉ logo cam 44px như thanh menu), bỏ chữ
+"once" dưới giá. Áp vào `index.html` cùng bản "kéo thêm góc" section Kéo to (có sẵn trong nháp anh xem). Xoá 4 file nháp.
+**Đo trang thật:** thẻ giá 1280 VI · 390 VI · 1280 EN tối: 0 tràn, giá $7.99, dòng "Everything we ship…" đã mất; toàn trang 5 khổ
+× 2 ngôn ngữ: 0px tràn, 0 "—", GSAP nạp; phim Kéo to 1280/1024/390: khay lọt khung 0, pill đè 0, giật thật 0/989 · 0/987 · 1/944.
+☠️ Vấp thước: `node kiem-rs.mjs | head` → EPIPE giết script giữa chừng (bẫy `| head` đã có trong brain) — phần pill đo lại bằng kiem-keo.
+
 ## 2026-09-23 09:51 +0700 — Website: ĐỔI GIÁ $7.99 + $2/năm (anh chốt) · nháp kéo thêm góc + 3 hướng thẻ giá
 
 **Giá:** anh *"giá anh muốn thay đổi thành $7.99 và $2/year updated"* → sửa thẳng trang thật (quyết định kinh doanh, không cần nháp):
