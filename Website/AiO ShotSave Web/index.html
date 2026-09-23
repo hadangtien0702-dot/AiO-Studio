@@ -664,6 +664,7 @@ details p{margin:0;padding:0 20px 18px;color:var(--ink-2)}
 .end{padding:96px 0;text-align:center}
 .end h2{margin-bottom:24px}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--ink-3);font-size:14px}
+.foot-links{display:flex;gap:16px}.foot-links a{color:var(--ink-2);text-decoration:none}.foot-links a:hover{color:var(--ink);text-decoration:underline}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:12px 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;transition:opacity .2s ease,transform .2s ease;z-index:90;max-width:calc(100% - 32px);text-align:center}
@@ -971,6 +972,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 <footer>
   <div class="wrap">
     <span>© 2026 AiO Studio · Shot &amp; Save</span>
+    <nav class="foot-links" aria-label="Legal"><a href="legal.html#refund" data-i="fRefund">Refund policy</a><a href="legal.html#terms" data-i="fTerms">Terms</a><a href="legal.html#privacy" data-i="fPrivacy">Privacy</a></nav>
     <span data-i="footRight">Made for editors, designers and anyone who screenshots a lot.</span>
   </div>
 </footer>
@@ -979,7 +981,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" defer></script>
 <script>
-/* Link thanh toán — dán link Lemon Squeezy / Paddle / Gumroad vào đây. Rỗng = báo "sắp mở bán". */
+/* Link thanh toán POLAR (anh chốt 23/09) — dán link Checkout của sản phẩm Shot & Save vào đây. Rỗng = báo "sắp mở bán". */
 const CHECKOUT_URL = "";
 
 const T = {
@@ -1008,7 +1010,7 @@ const T = {
     q3:"$2 mỗi năm dùng vào việc gì?", a3:"Trả cho đội ngũ thật đang làm thêm tính năng và sửa lỗi. Đó là chi phí để app tiếp tục lớn lên, không phải tiền thuê để được dùng.",
     q4:"Có chạy trên Mac không?", a4:"Có, dạng bản thử cho Mac chip Apple và Intel. Lần đầu mở, macOS có thể bắt xác nhận ở Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở.",
     endTitle:"Lần chụp màn hình tới<br>có thể là lần nhanh nhất.", endBtn:"Mua Shot & Save",
-    footRight:"Làm cho editor, designer và bất kỳ ai chụp màn hình nhiều.",
+    footRight:"Làm cho editor, designer và bất kỳ ai chụp màn hình nhiều.", fRefund:"Hoàn tiền", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư",
     toast:"Sắp mở bán. Cổng thanh toán đang được gắn.",
     demoTry:"Thử ngay tại đây", demoChart:"Doanh thu theo tuần", demoShelf:"Khay ảnh", demoEmpty:"Ảnh chụp sẽ nằm ở đây",
     demoCap:"Thử đi: kéo khoanh một vùng, bấm <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> để vẽ, rồi bấm ✓. Bấm ảnh trong khay để ghim.",

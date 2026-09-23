@@ -328,6 +328,21 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-23 10:26 +0700 — Bán hàng: chọn POLAR, hoàn tiền 14 ngày, trang pháp lý legal.html
+
+Anh: *"setup thủ tục mua bán đi em"*. Em tra 4 cổng (Merchant of Record) ngày 23/09: Polar · Lemon Squeezy · Paddle · Gumroad
+(bảng + lý do bỏ trong `AiO Studio/CLAUDE.md` mục 3). Anh chọn **Polar** + **hoàn tiền 14 ngày**. Polar: 5% + $0,50, trang
+supported-countries CÓ Việt Nam, khoá bản quyền có sẵn (hết hạn N năm, giới hạn số máy), app kiểm mã qua 2 endpoint công khai
+`/v1/customer-portal/license-keys/activate|validate` (cần `organization_id`, không cần token).
+**Làm:** `Website/AiO ShotSave Web/legal.html` (mới) — EN + VI, 4 mục Hoàn tiền · Điều khoản · Quyền riêng tư · Liên hệ; chân trang
+index thêm 3 link. Quyền riêng tư viết theo SỐ ĐO: grep `src/` app không có `fetch`/`http`/updater/analytics nào → "ảnh không rời
+máy" là thật. Link Polar privacy/terms curl 200. **Đo:** legal 1280/390 × EN/VI: 0 tràn, 0 "—", neo mục 4/4; link chân trang
+`#privacy` sang bản VI nhảy đúng `#rieng-tu` (16px dưới đỉnh), bản EN đúng `#privacy`.
+**[CHO ANH]** (1) email liên hệ công khai — 2 chỗ `[CONTACT_EMAIL]` trong legal.html; (2) có thêm gói $14.99 cập nhật trọn đời
+không; (3) tạo tài khoản Polar + KYC + ngân hàng + sản phẩm (Claude CẤM nhập thông tin này) rồi gửi link Checkout → dán vào
+`CHECKOUT_URL`. **[CHO]** trang Quyền riêng tư nói "app gửi mã + tên máy tới Polar khi nhập mã" — app CHƯA có ô nhập mã: phải làm
+kích hoạt bản quyền trong app TRƯỚC khi mở bán, không thì câu đó sai và khách mua xong không có chỗ dùng mã.
+
 ## 2026-09-23 10:20 +0700 — Website: viết gọn ghi chú $2 để dòng cuối không lửng
 
 Anh khoanh "new features" rơi xuống dòng riêng (ảnh anh là bản CŨ trong bộ đệm trình duyệt — nhắc Ctrl+F5, lỗi vẫn có ở bản mới).
