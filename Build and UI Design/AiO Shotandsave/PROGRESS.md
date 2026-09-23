@@ -13,13 +13,19 @@
 >   co taskbar, khong chan de, anh duyet 22/09; khay co gian bam thang Ngang/Doc tren pill; dau trang khung chon "chup").
 >   23/09 (commit cd7475a): GSAP 3.13.0 (cdnjs) chay khay + phim Keo to (giat that 29/413 -> 0/416); section CAI DAT moi (cua so
 >   Cai dat that, phim 4 buoc); Keo to keo them goc duoi (ngang 4 hang, doc 6 hang), bo banh rang; the gia huong A (logo tron +
->   ten trai, gia phai, bo "once"/"Pay once"). **[CHO]** demo dau trang van nhich setTimeout — cho anh gat chuyen GSAP.
->   **[CHO ANH] gia:** phi cong thanh toan ~5%+$0,50 an ~30% khoan $2/nam — em de xuat them goi "$14.99 cap nhat tron doi" (B),
->   anh chua quyet. **Chan ban lon nhat: CHUA co he thong khoa ban quyen** (mo hinh 1 lan + nam can biet ai mua, han cap nhat).
->   **LIVE: https://aio-shotsave.vercel.app** (Vercel `aio-shotsave`, NOI GitHub 23/09: push main co doi thu muc web = tu deploy). Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
->   (nut Mua dang bao "Sap mo ban", `CHECKOUT_URL` rong); (2) chinh sach hoan tien + Dieu khoan/Lien he o chan trang;
->   (3) anh/clip app that + anh chia se link (og:image); (4) xac nhan "khong gia han van chay"; (5) thu tren DIEN THOAI THAT:
->   cham de dung phim tu chay (chua do duoc — su kien gia lap khong qua `isTrusted`). "Windows 10" + "macOS" tren trang CHUA do.
+>   ten trai, gia phai, bo "once"/"Pay once").
+>   **LIVE: https://aio-shotsave.vercel.app** (Vercel `aio-shotsave`, NOI GitHub 23/09: push main co doi thu muc web = tu deploy,
+>   doi cho khac = tu bo qua). Trang phap ly `legal.html` (hoan tien 14 ngay · dieu khoan · rieng tu · lien he, EN/VI).
+>   **BAN HANG = POLAR** (anh chot 23/09, `AiO Studio/CLAUDE.md` muc 3). **[CHO ANH]** (1) dang ky Polar + KYC + ngan hang +
+>   tao SP "Shot & Save" $7.99 mot lan, License key het han 1 nam (de xuat 3 may) → gui link Checkout + Organization ID
+>   (Claude CAM nhap tai khoan/giay to/ngan hang); (2) email lien he cong khai — 2 cho `[CONTACT_EMAIL]` trong legal.html;
+>   (3) them goi "$14.99 cap nhat tron doi" khong (phi ~5%+$0,50 an ~30% khoan $2); (4) tang Shot & Save trong goi Pro AiO khong
+>   + ten mien that (em de xuat ban RIENG 2 web, chung thuong hieu, dan qua lai — anh chua gat); (5) connector Vercel trong Claude
+>   van o tai khoan Vincent (403) — anh can `/mcp` hoac phien moi; (6) web ai-o-studio tu build lai MOI lan push (ke ca khong doi web
+>   do) — de xuat them luat bo qua, chua lam; (7) thu DIEN THOAI THAT: cham dung phim tu chay; og:image; anh/clip app that.
+>   **[CHO] CHAN MO BAN:** app CHUA co o nhap/kich hoat ma ban quyen (Polar `/v1/customer-portal/license-keys/activate|validate`) —
+>   lam khi co Organization ID; legal.html da hua "app gui ma + ten may toi Polar" nen PHAI lam truoc khi ban.
+>   **[CHO]** demo dau trang van nhich setTimeout — cho anh gat chuyen GSAP. "Windows 10" + "macOS" tren trang CHUA do.
 > - ☠️ Luat moi trong ngay: anh dang ngoi may thi KHONG chay selftest/exe thu (so loi #12); sau khi cai
 >   mo app qua explorer.exe (container MSIX cua Claude chuyen huong APPDATA).
 > - ☠️ **10/09 ANH TIEN CHOT: BO BAN TAURI, anh tu xoa thu muc `AiO Shotandsave
@@ -327,6 +333,16 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-23 13:10 +0700 — Chốt sổ: connector Vercel, tư vấn bán riêng/chung
+
+Không sửa mã nguồn sau 11:28. (1) Anh đăng nhập lại connector Vercel của Claude → kiểm 2 lần: `list_teams` vẫn chỉ
+"Vincent's projects", `get_project aio-shotsave` vẫn 403 — phiên đang giữ kết nối cũ (status "connected" nên không tự nối lại).
+Không chặn gì: mọi việc Vercel làm qua CLI (đúng tài khoản `hadangtien0702-8981`). Kiểm lại: git local = GitHub `0f2e1ff`, commit
+status success cả `ai-o-studio` + `aio-shotsave`, live md5 = local, `.env.local` 404. (2) Anh hỏi bán Shot & Save riêng hay chung
+web với bộ AiO → em đề xuất RIÊNG 2 trang, chung thương hiệu, dẫn qua lại, tặng Shot & Save trong gói Pro, dùng chung 1 tổ chức
+Polar (lý do: khách khác nhau — mọi người chụp màn hình vs chỉ editor Premiere; $7.99 một lần cạnh $17/tháng làm khó nhau; 2 bộ từ
+khoá tìm kiếm khác nhau). Anh CHƯA gật. Máy chủ thử `http.server 8123` đã tắt (exit 4) — web đã có bản live, không cần.
 
 ## 2026-09-23 11:28 +0700 — Nối GitHub ↔ Vercel: push main có đổi thư mục web = tự lên
 
