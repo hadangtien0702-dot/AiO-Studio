@@ -10,7 +10,9 @@
 >   theo fps) — anh chua quyet co lam "tat luong khi ranh lau" khong.
 > - 🌐 **WEB BAN (22/09):** `Website/AiO ShotSave Web/index.html` — 1 file tinh, EN/VI, sang/toi, gia $9.99 mot lan +
 >   $3/nam tuy chon (anh chot), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app — section khay dung thanh MAN HINH THAT
->   co taskbar, khong chan de, anh duyet 22/09; khay co gian qua Cai dat; dau trang khung chon "chup"). Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
+>   co taskbar, khong chan de, anh duyet 22/09; khay co gian bam thang Ngang/Doc tren pill; dau trang khung chon "chup").
+>   23/09: GSAP 3.13.0 (cdnjs) cho khay + section CAI DAT moi (cua so Cai dat that, phim 4 buoc). Demo dau trang + phim Keo to
+>   van nhich bang setTimeout (cung goc giat, CHUA do rieng) — cho anh gat de chuyen GSAP. Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
 >   (nut Mua dang bao "Sap mo ban", `CHECKOUT_URL` rong); (2) chinh sach hoan tien + Dieu khoan/Lien he o chan trang;
 >   (3) anh/clip app that + anh chia se link (og:image); (4) xac nhan "khong gia han van chay"; (5) thu tren DIEN THOAI THAT:
 >   cham de dung phim tu chay (chua do duoc — su kien gia lap khong qua `isTrusted`). "Windows 10" + "macOS" tren trang CHUA do.
@@ -321,6 +323,39 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-23 09:33 +0700 — Website: khay mượt bằng GSAP · section CÀI ĐẶT mới · bỏ bánh răng ở section Kéo to
+
+**Bối cảnh:** anh cài skill `gsap-skills` chính hãng (brain `72570ea`), giao "dùng skill gsap làm lại animation", chọn
+*"kiểm tra chuyển động hiện tại và làm cho nó mượt mà hơn"* + *làm một section trước*. Sau đó anh xem ảnh cửa sổ Cài đặt thật,
+muốn *"làm thêm animation và thông tin cho phần setting"* → em đề xuất tách section riêng (nhét vào section Kéo to thì cửa
+sổ cao gấp đôi, che kín khay), anh *"okie làm section mới"*. Duyệt 2 bản nháp xong: *"áp vào trang thật … bỏ phần settings ở đây"*.
+
+**1. Khay mượt (section #shelf).** Gốc đo được: con trỏ/khay nhích bằng `setTimeout(16)` — không khớp nhịp màn hình — và khay
+dời bằng `left` (tính lại bố cục mỗi khung). Sửa: `di()` chạy bằng tween GSAP (`power1.inOut` = đúng đường cong cũ), khay +
+ảnh kéo dời bằng `translate3d`, kéo xong mới chốt `left` một lần; ngoài màn hình pause tween; không tải được GSAP (cdnjs
+3.13.0, 72 KB, `defer`) → `diCu()` như cũ. **Đo** (Playwright Chromium 1280, 22 s, ghi vị trí MỖI khung rAF):
+khung giật thật (đứng kẹp giữa 2 bước đang chạy + nhảy cóc) **29/413 → 0/416**; khay lúc kéo 11/95 → 0/94. Ca cũ điển hình
+`2,2 → 0 → 4,5 → 0 → 2,4` px. 14 khung "đứng" còn lại của bản mới đều là dốc tăng/giảm tốc đầu–cuối (in ra đọc từng ca).
+Khe khay↔cửa sổ app 16px ở 1280 và 390 (như cũ) · cuộn đi: đứng; quay lại: 22 vị trí khác nhau/10 s (bản cũ 21) · chặn CDN:
+chạy cách cũ, 0 lỗi. Chưa đo màn 120/144 Hz (máy đo 60 Hz).
+
+**2. Section CÀI ĐẶT mới (#settings, sau Kéo to, trước Giá).** Trái: "Chỉnh một lần, dùng mãi" + 4 dòng (phím tắt · JPEG/PNG ·
+thư mục · VI/EN), dòng đang diễn sáng + vạch tiến độ. Phải: cửa sổ Cài đặt CHÉP ĐÚNG `src/settings` (4 thẻ, px + token thật,
+chữ từ `src/i18n.js` bỏ "—"), phim GSAP ~19 s/vòng đúng hành vi app: Đổi phím… → viền cam đứt nét "Nhấn tổ hợp mới…" + nút
+Huỷ → phím mới loé XANH (không chữ); PNG làm mờ hàng Chất lượng + dòng lưu ý; Mở thư mục → thư mục ảnh tên đúng mẫu `kho.js`;
+EN rồi trả về ngôn ngữ trang. Đổi ngôn ngữ trang → cửa sổ đổi theo (`ssStRelang` trong `setLang`). **Đo:** 5 khổ × 2 ngôn ngữ:
+0px tràn trang, 0 phần tử tràn cửa sổ, 0 chữ bị cắt, 0 "—"; phim đủ 4 bước + lặp, 0 lỗi. Soi ảnh bắt 3 lỗi tự gây, đã sửa:
+`<header>/<footer>` trong cửa sổ ăn luật chung của web (nền xám sáng + sticky, vạch trắng) → đổi `div`; `.st-nut{display:
+inline-flex}` đè `hidden` → nút Huỷ hiện sẵn; thư mục bật lên che đúng thẻ đang sáng → dời lên nửa trên. Điện thoại: phím tắt
++ tên thư mục một hàng riêng.
+
+**3. Section Kéo to: bỏ "⚙ Cài đặt" ở pill** (anh khoanh ảnh). Bánh răng là cửa mở cửa sổ Cài đặt thu nhỏ → bỏ luôn `#rsWin`
++ CSS `.rs-win/.rw-*` + 5 chữ `rsSet/rsW*`; `quaCaiDat()` → `doiKieu()`: con trỏ bấm thẳng Ngang/Dọc trên pill. **Đo** 26 s:
+pill Ngang › Dọc › Ngang › Dọc › Ngang; pill đè khay **0/236** mẫu ở 390 và 1280. Toàn trang 5 khổ × 2 ngôn ngữ: 0px tràn, 0 "—", 0 lỗi JS.
+Film Kéo to + demo đầu trang VẪN chạy bằng `setTimeout` (cùng lỗi giật) — chưa làm, chờ anh.
+
+**Sổ bài học:** `design-lessons` dòng "dùng setTimeout, không dùng rAF" (22/09) là SAI → đã sửa tại chỗ kèm số đo.
 
 ## 2026-09-22 16:03 — Website: nhãn "Đang tự chạy" không còn đè số đo W × H khi demo khoanh vùng
 
