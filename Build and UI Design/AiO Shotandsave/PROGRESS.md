@@ -328,6 +328,14 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-23 10:20 +0700 — Website: viết gọn ghi chú $2 để dòng cuối không lửng
+
+Anh khoanh "new features" rơi xuống dòng riêng (ảnh anh là bản CŨ trong bộ đệm trình duyệt — nhắc Ctrl+F5, lỗi vẫn có ở bản mới).
+Gốc: không phải luật xuống dòng (không có `text-wrap:pretty`), câu EN dài vừa đủ để cụm cuối hụt vài px. Đo 3 phương án chữ bằng
+`dong-cuoi.mjs` (5 khổ × 2 ngôn ngữ, % độ đầy dòng cuối): câu cũ **4/10** chỗ dòng cuối < 35% (EN 20%) → câu mới **0/10**, máy tính
+2 dòng, dòng cuối 59–83%. EN "The $2 keeps Shot & Save improving. Skip it and your app still works, you just won't get new features."
+· VI "$2 này giúp Shot & Save tiếp tục ra tính năng mới. Không gia hạn thì app vẫn chạy, chỉ không có tính năng mới."
+
 ## 2026-09-23 10:10 +0700 — Website: áp thẻ giá hướng A + kéo thêm góc vào trang thật
 
 Anh xem nháp hướng A: *"anh thấy cũng được rồi mà"* + 2 chỉnh: logo bỏ ô nền đen (chỉ logo cam 44px như thanh menu), bỏ chữ
