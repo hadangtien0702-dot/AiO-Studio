@@ -8,8 +8,8 @@
 >   (3) loe den video con khong; (4) mac: A (Apple Developer 99 USD/nam, cai nhu Zalo) hay B (mien phi,
 >   1 lan Open Anyway — hien tai, da ky ad-hoc). (5) CPU nam nen ~10-12 % mot loi (phien WGC, khong doi
 >   theo fps) — anh chua quyet co lam "tat luong khi ranh lau" khong.
-> - 🌐 **WEB BAN (22/09):** `Website/AiO ShotSave Web/index.html` — 1 file tinh, EN/VI, sang/toi, gia $9.99 mot lan +
->   $3/nam tuy chon (anh chot), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app — section khay dung thanh MAN HINH THAT
+> - 🌐 **WEB BAN (22/09):** `Website/AiO ShotSave Web/index.html` — 1 file tinh, EN/VI, sang/toi, gia $7.99 mot lan + $2/nam tuy chon (anh doi 23/09, truoc $9.99 +
+>   $3/nam), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app — section khay dung thanh MAN HINH THAT
 >   co taskbar, khong chan de, anh duyet 22/09; khay co gian bam thang Ngang/Doc tren pill; dau trang khung chon "chup").
 >   23/09: GSAP 3.13.0 (cdnjs) cho khay + section CAI DAT moi (cua so Cai dat that, phim 4 buoc). Demo dau trang + phim Keo to
 >   van nhich bang setTimeout (cung goc giat, CHUA do rieng) — cho anh gat de chuyen GSAP. Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
@@ -323,6 +323,17 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-23 09:51 +0700 — Website: ĐỔI GIÁ $7.99 + $2/năm (anh chốt) · nháp kéo thêm góc + 3 hướng thẻ giá
+
+**Giá:** anh *"giá anh muốn thay đổi thành $7.99 và $2/year updated"* → sửa thẳng trang thật (quyết định kinh doanh, không cần nháp):
+18 chỗ, in từng chỗ kèm ngữ cảnh ra đọc — 7 × `$9.99`, 1 × số đếm lên `const dich = 9.99`, 10 × `$3` (thẻ, nút Mua, ghi chú tiền,
+q1–q3/a1, meta description). Còn sót `9.99`: 0, `$3`: 0. Ghi quyết định vào `AiO Studio/CLAUDE.md` mục 3 (dòng 22/09 đánh dấu bị đè).
+**Nháp chờ anh chọn (chưa vào trang thật):** `_nhap-keo-them.html` — section Kéo to thêm góc DƯỚI-phải (ngang 3→4 hàng × 6 cột,
+dọc 4→6 hàng), `di()` chạy GSAP; đo 1280/1024/390: khay lọt khung 0, pill đè 0, con trỏ giật thật 0/992.
+`_nhap-gia-A/B/C.html` — bỏ dòng "Everything we ship…" (anh bảo) + làm lại khối tên–giá: bỏ câu "Pay once, use it forever"
+(ý "một lần" đang nói 3 lần), thêm logo + "Chụp, vẽ, ghim, kéo thả". A = một hàng (tên trái, giá phải) · B = căn giữa · C = dải cam
+đầu thẻ. 3 hướng × (1280 VI, 390 VI, 1280 EN tối): 0 tràn.
 
 ## 2026-09-23 09:33 +0700 — Website: khay mượt bằng GSAP · section CÀI ĐẶT mới · bỏ bánh răng ở section Kéo to
 

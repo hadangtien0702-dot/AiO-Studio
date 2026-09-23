@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AiO Shot & Save</title>
-<meta name="description" content="Capture any part of your screen, pin it, mark it up and drag it straight into your app. One payment of $9.99.">
+<meta name="description" content="Capture any part of your screen, pin it, mark it up and drag it straight into your app. One payment of $7.99.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 386 352'%3E%3Cpath fill='%23F86820' d='M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z'/%3E%3Cpath fill='%23F86820' d='M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -910,7 +910,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         <div class="price-tag" data-i="priceTag">One-time payment</div>
         <div class="price">
           <h3 class="price-name">Shot &amp; Save</h3>
-          <div class="amount"><strong>$9.99</strong><span data-i="once">once</span></div>
+          <div class="amount"><strong>$7.99</strong><span data-i="once">once</span></div>
           <p class="price-sub" data-i="priceLine">Pay once, use it forever.</p>
 
           <ul class="list">
@@ -921,12 +921,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 
           <!-- Ghi chú tiền: hiện thẳng ra, không giấu trong tooltip -->
           <div class="bill" aria-label="What you pay">
-            <div class="bill-row"><span><b data-i="b1">Today</b><small data-i="b1s">First charge</small></span><span class="num">$9.99</span></div>
-            <div class="bill-row"><span><b data-i="b2">Each year after</b><small data-i="b2s">Optional, keeps new features coming</small></span><span class="num" data-i="b2n">$3/year</span></div>
-            <p class="bill-note" data-i="bNote">The $3 pays the people who keep building and fixing Shot &amp; Save. Skip it and your app keeps working. You just won't get new features.</p>
+            <div class="bill-row"><span><b data-i="b1">Today</b><small data-i="b1s">First charge</small></span><span class="num">$7.99</span></div>
+            <div class="bill-row"><span><b data-i="b2">Each year after</b><small data-i="b2s">Optional, keeps new features coming</small></span><span class="num" data-i="b2n">$2/year</span></div>
+            <p class="bill-note" data-i="bNote">The $2 pays the people who keep building and fixing Shot &amp; Save. Skip it and your app keeps working. You just won't get new features.</p>
           </div>
 
-          <a class="btn btn-main" href="#" id="buy" data-i="buyBtn">Buy now $9.99</a>
+          <a class="btn btn-main" href="#" id="buy" data-i="buyBtn">Buy now $7.99</a>
           <p class="price-foot" data-i="priceFoot">Prices in USD. Taxes may apply at checkout.</p>
         </div>
       </div>
@@ -937,9 +937,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
     <div class="wrap">
       <div class="sec-head"><h2 data-i="faqTitle">Questions</h2></div>
       <div class="faq">
-        <details><summary data-i="q1">What exactly do I pay?</summary><p data-i="a1">$9.99 the first time. That's it for year one. From the second year, $3 a year if you want to keep receiving new features.</p></details>
-        <details><summary data-i="q2">What happens if I don't pay the $3?</summary><p data-i="a2">Nothing breaks. The version you have keeps working forever. You can pay later whenever you want the newest features.</p></details>
-        <details><summary data-i="q3">What does the $3 a year pay for?</summary><p data-i="a3">A real team that keeps adding features and fixing issues. It's the cost of keeping the app growing, not a subscription to use it.</p></details>
+        <details><summary data-i="q1">What exactly do I pay?</summary><p data-i="a1">$7.99 the first time. That's it for year one. From the second year, $2 a year if you want to keep receiving new features.</p></details>
+        <details><summary data-i="q2">What happens if I don't pay the $2?</summary><p data-i="a2">Nothing breaks. The version you have keeps working forever. You can pay later whenever you want the newest features.</p></details>
+        <details><summary data-i="q3">What does the $2 a year pay for?</summary><p data-i="a3">A real team that keeps adding features and fixing issues. It's the cost of keeping the app growing, not a subscription to use it.</p></details>
         <details><summary data-i="q4">Does it work on Mac?</summary><p data-i="a4">Yes, as a beta for Apple Silicon and Intel Macs. The first time you open it, macOS may ask you to confirm in System Settings → Privacy &amp; Security → Open Anyway.</p></details>
       </div>
     </div>
@@ -986,13 +986,13 @@ const T = {
     priceTag:"Trả một lần", once:"một lần", priceLine:"Trả một lần, dùng mãi mãi.",
     li1:"Đủ mọi tính năng, không giới hạn", li2:"Năm đầu có sẵn mọi tính năng mới", li2s:"Mọi thứ ra mắt trong 12 tháng đầu của bạn",
     li3:"Windows 10/11 · macOS (bản thử)",
-    b1:"Hôm nay", b1s:"Lần trừ tiền đầu tiên", b2:"Mỗi năm sau đó", b2s:"Tuỳ chọn, để tiếp tục nhận tính năng mới", b2n:"$3/năm",
-    bNote:"$3 này trả cho đội ngũ tiếp tục làm thêm tính năng và sửa lỗi cho Shot & Save. Không gia hạn thì app vẫn chạy bình thường, chỉ không nhận tính năng mới.",
-    buyBtn:"Mua ngay $9.99", priceFoot:"Giá tính bằng USD. Có thể cộng thuế lúc thanh toán.",
+    b1:"Hôm nay", b1s:"Lần trừ tiền đầu tiên", b2:"Mỗi năm sau đó", b2s:"Tuỳ chọn, để tiếp tục nhận tính năng mới", b2n:"$2/năm",
+    bNote:"$2 này trả cho đội ngũ tiếp tục làm thêm tính năng và sửa lỗi cho Shot & Save. Không gia hạn thì app vẫn chạy bình thường, chỉ không nhận tính năng mới.",
+    buyBtn:"Mua ngay $7.99", priceFoot:"Giá tính bằng USD. Có thể cộng thuế lúc thanh toán.",
     faqTitle:"Hỏi đáp",
-    q1:"Chính xác thì tôi trả bao nhiêu?", a1:"Lần đầu $9.99. Năm đầu chỉ vậy. Từ năm thứ hai, $3 mỗi năm nếu bạn muốn tiếp tục nhận tính năng mới.",
-    q2:"Không trả $3 thì sao?", a2:"Không có gì hỏng cả. Bản bạn đang có chạy mãi mãi. Khi nào muốn tính năng mới nhất thì trả sau cũng được.",
-    q3:"$3 mỗi năm dùng vào việc gì?", a3:"Trả cho đội ngũ thật đang làm thêm tính năng và sửa lỗi. Đó là chi phí để app tiếp tục lớn lên, không phải tiền thuê để được dùng.",
+    q1:"Chính xác thì tôi trả bao nhiêu?", a1:"Lần đầu $7.99. Năm đầu chỉ vậy. Từ năm thứ hai, $2 mỗi năm nếu bạn muốn tiếp tục nhận tính năng mới.",
+    q2:"Không trả $2 thì sao?", a2:"Không có gì hỏng cả. Bản bạn đang có chạy mãi mãi. Khi nào muốn tính năng mới nhất thì trả sau cũng được.",
+    q3:"$2 mỗi năm dùng vào việc gì?", a3:"Trả cho đội ngũ thật đang làm thêm tính năng và sửa lỗi. Đó là chi phí để app tiếp tục lớn lên, không phải tiền thuê để được dùng.",
     q4:"Có chạy trên Mac không?", a4:"Có, dạng bản thử cho Mac chip Apple và Intel. Lần đầu mở, macOS có thể bắt xác nhận ở Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở.",
     endTitle:"Lần chụp màn hình tới<br>có thể là lần nhanh nhất.", endBtn:"Mua Shot & Save",
     footRight:"Làm cho editor, designer và bất kỳ ai chụp màn hình nhiều.",
@@ -1818,7 +1818,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const gia = document.querySelector(".price .amount strong");
   function demGia() {
     if (giam || !gia) return;
-    const dich = 9.99, t0 = performance.now(), ms = 800;
+    const dich = 7.99, t0 = performance.now(), ms = 800;
     const buoc = () => { const k = Math.min(1, (performance.now() - t0) / ms), e = 1 - (1 - k) ** 3; gia.textContent = "$" + (dich * e).toFixed(2); if (k < 1) setTimeout(buoc, 16); };
     gia.textContent = "$0.00"; setTimeout(buoc, 250);
   }
