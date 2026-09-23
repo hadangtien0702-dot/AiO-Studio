@@ -212,8 +212,6 @@ h1 em{font-style:normal;color:var(--brand)}
 .stage.auto.cap .dauto{opacity:0;pointer-events:none;transition:none}  /* đang khoanh: nhãn nhường chỗ cho số đo "W × H" (đè nhau trên iPhone, đo 22/09) */
 .stage.auto .try{display:none}
 @media (pointer:coarse){.dauto{min-height:44px}}
-.demo-cap{margin:14px 0 0;color:var(--ink-3);font-size:14px}
-.demo-cap kbd{font-size:12px}
 
 /* ===== Tính năng ===== */
 section{scroll-margin-top:80px}
@@ -751,7 +749,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
             <div class="slist" id="dlist"><span class="dempty" data-i="demoEmpty">Your captures land here</span></div>
           </div>
         </div>
-        <p class="demo-cap" data-i-html="demoCap">Try it: drag a box, press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to mark it up, then ✓. Click a shot on the shelf to pin it.</p>
       </div>
     </div>
   </section>
@@ -1013,7 +1010,6 @@ const T = {
     footRight:"Làm cho editor, designer và bất kỳ ai chụp màn hình nhiều.", fRefund:"Hoàn tiền", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư",
     toast:"Sắp mở bán. Cổng thanh toán đang được gắn.",
     demoTry:"Thử ngay tại đây", demoChart:"Doanh thu theo tuần", demoShelf:"Khay ảnh", demoEmpty:"Ảnh chụp sẽ nằm ở đây",
-    demoCap:"Thử đi: kéo khoanh một vùng, bấm <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> để vẽ, rồi bấm ✓. Bấm ảnh trong khay để ghim.",
     demoSaved:"Đã vào khay. Bấm ảnh để ghim lên màn hình.", demoPinIt:"Ghim ảnh này", demoPinned:"Ảnh đã ghim",
     demoCopy:"Sao chép", demoClose:"Đóng", demoCopied:"Đã sao chép. Dán vào đâu cũng được.", demoCopyNo:"Trình duyệt này không cho sao chép ảnh."
   },

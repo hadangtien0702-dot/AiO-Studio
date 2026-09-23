@@ -283,6 +283,12 @@ chưa thì chưa đo** — kiểm bằng cách mở trang thật trước khi n�
 trong thư mục đó. Bẫy đo web tĩnh: Chrome headless ép viewport ≥500px; `npx
 serve out` giữ thư mục làm `next build` in "✓" mà không ghi được bản mới.
 
+**Web bán Shot & Save** — `Website/AiO ShotSave Web/` (index.html + legal.html, tĩnh, không build) → Vercel dự án **`aio-shotsave`**
+(tài khoản `hadangtien0702-8981`), **https://aio-shotsave.vercel.app**, lên lần đầu 23/09 bằng CLI (`vercel deploy --prod --yes`
+trong thư mục đó). ☠️ **KHÔNG nối git** → push GitHub KHÔNG tự lên web, phải chạy lại lệnh deploy. ☠️ `vercel link` tự tạo
+`.env.local` chứa token OIDC, mà danh sách bỏ qua mặc định của Vercel KHÔNG có `.env*` → đã chặn bằng `.vercelignore`
+(`.env*`, `.vercel`, 2 file ignore); đo live: `/.env.local` 404. Sau mỗi deploy: curl md5 live = file local.
+
 ---
 
 ## 7. Làm việc 3 máy — chốt 31/08, thêm Mac 21/09

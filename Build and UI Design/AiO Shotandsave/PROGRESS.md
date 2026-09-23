@@ -16,7 +16,7 @@
 >   ten trai, gia phai, bo "once"/"Pay once"). **[CHO]** demo dau trang van nhich setTimeout — cho anh gat chuyen GSAP.
 >   **[CHO ANH] gia:** phi cong thanh toan ~5%+$0,50 an ~30% khoan $2/nam — em de xuat them goi "$14.99 cap nhat tron doi" (B),
 >   anh chua quyet. **Chan ban lon nhat: CHUA co he thong khoa ban quyen** (mo hinh 1 lan + nam can biet ai mua, han cap nhat).
->   Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
+>   **LIVE: https://aio-shotsave.vercel.app** (Vercel `aio-shotsave`, deploy CLI, KHONG noi git: push xong phai `vercel deploy --prod --yes` trong thu muc web). Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
 >   (nut Mua dang bao "Sap mo ban", `CHECKOUT_URL` rong); (2) chinh sach hoan tien + Dieu khoan/Lien he o chan trang;
 >   (3) anh/clip app that + anh chia se link (og:image); (4) xac nhan "khong gia han van chay"; (5) thu tren DIEN THOAI THAT:
 >   cham de dung phim tu chay (chua do duoc — su kien gia lap khong qua `isTrusted`). "Windows 10" + "macOS" tren trang CHUA do.
@@ -327,6 +327,17 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-23 10:54 +0700 — Web lên Vercel: https://aio-shotsave.vercel.app · bỏ dòng hướng dẫn dưới demo
+
+Anh: *"push code lên git và vercel deploy trước thử"*. Vercel CLI 56.2.1 đã đăng nhập `hadangtien0702-8981` → dự án MỚI
+`aio-shotsave` (tách khỏi `ai-o-studio` của web AiO Studio), deploy bằng CLI, KHÔNG nối git. ☠️ Bẫy bắt kịp trước khi đẩy:
+`vercel link` tạo `.env.local` (token OIDC); danh sách bỏ qua mặc định của Vercel không có `.env*` → thêm `.vercelignore`.
+Thêm `.gitignore` trong thư mục (`.vercel`, `.env*`). **Đo live:** `/` + `/legal.html` 200, md5 = file local; `/.env.local`,
+`/.gitignore`, `/.vercelignore`, `/.vercel/project.json` đều 404; Playwright 1280 + 390: GSAP nạp, phim Cài đặt chạy,
+0 lỗi JS, 0 request hỏng, 0 tràn.
+Anh chỉ dòng "Try it: drag a box, press 1 2 3…" dưới demo: *"bỏ cái này đi em"* → bỏ thẻ `.demo-cap` + CSS + chữ VI
+(403 ký tự, sót 0); demo cách section sau 16px + đệm 96px, 0 lỗi, 0 tràn.
 
 ## 2026-09-23 10:26 +0700 — Bán hàng: chọn POLAR, hoàn tiền 14 ngày, trang pháp lý legal.html
 
