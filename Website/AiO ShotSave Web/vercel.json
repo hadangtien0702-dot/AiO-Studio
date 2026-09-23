@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "echo trang-tinh-khong-cai",
+  "buildCommand": "echo trang-tinh-khong-dung",
+  "outputDirectory": ".",
+  "framework": null
+}
