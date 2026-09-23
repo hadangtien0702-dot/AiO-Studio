@@ -74,15 +74,18 @@ soi node_modules/Electron/FFmpeg, thêm `-CaiThem` là tự npm install). Sửa 
    `git -c credential.helper= -c credential.helper=manager push`
 4. Kiểm bằng số: `git status -sb` phải ra `## main...origin/main` không lệch,
    không còn file định đưa lên mà chưa lên.
-5. **Đẩy brain tổng** (nếu phiên có ghi bài học vào `~/.claude/CLAUDE.md` hay
-   skill): chạy `powershell -ExecutionPolicy Bypass -File
+5. **Đẩy brain tổng — LUÔN LUÔN, mỗi lần `/xong`** (anh chốt 23/09: *"mỗi lần anh
+   bấm /xong thì cập nhật brain và map công ty luôn 1 lần"*), kể cả phiên không
+   sửa mã nguồn và không có bài học mới. Chạy **SAU bước 2f** (2f chụp sổ công ty
+   vào repo brain trước, lệnh này đẩy cả hai lên một lượt): chạy `powershell -ExecutionPolicy Bypass -File
    "%USERPROFILE%\.claude\brain-repo\dong-bo-brain.ps1" -Day` (☠️ **trên Mac** không có PowerShell: chạy `bash "<repo>/scripts/dong-bo-mac.sh" --day-brain`) — nó chép brain
    vào repo PRIVATE `hadangtien0702-dot/brain` rồi push. ☠️ Brain KHÔNG được
    nằm trong repo AiO-Studio (repo đó PUBLIC — anh Tiến chốt để public 31/08).
 6. Trong báo cáo cuối (bước 5) nhắc một dòng: *"đã push commit `<mã>` — máy kia
    chạy `scripts\dong-bo-may.ps1` là xong (kéo code + brain + cài thiếu)"*.
 
-Phiên không sửa mã nguồn → bỏ qua bước này, nói rõ là không có gì để push.
+Phiên không sửa mã nguồn → bỏ qua mục 0–4 và 6 (không có code để push), nói rõ
+là không có gì để push. **Mục 5 (brain + sổ công ty) vẫn chạy.**
 
 ## 2d. ☠️ ĐIỀU KIỆN CHỌN CÔNG NGHỆ — anh Tiến chốt 31/08/2026
 
@@ -148,6 +151,18 @@ qua, nói rõ là bỏ qua.
    sang `'moi'` (luật **mỗi phòng một việc**).
 4. Việc CÒN DỞ của app → **không tự đẩy lên trang**; liệt kê trong báo cáo bước 5
    và hỏi anh có muốn giao cho phòng nào không.
+5. **CHỤP SỔ LÊN GIT — LUÔN LUÔN, mỗi lần `/xong`** (anh chốt 23/09, chọn repo
+   PRIVATE `brain`, không phải AiO-Studio vì repo đó public). Làm cả khi mục 1–4
+   bỏ qua:
+   - `Artifact` read `path:"index.html"`, `out_dir` = `~/.claude/brain-repo/trung-tam-dieu-hanh`.
+   - `ArtifactData` list (`query.limit:1000`) 5 collection `phongban` · `app` ·
+     `viec` · `hoatdong` · `meta`, `out_dir` = **thư mục nháp** (☠️ ghi thẳng vào
+     `~/.claude` bị chặn bởi luật an toàn), rồi **xoá sạch** `trung-tam-dieu-hanh/du-lieu/`
+     và chép bản mới vào (việc đã xong bị gỡ trên trang thì file cũ phải mất theo).
+   - `node tao-readme.mjs` trong thư mục đó → `README.md` (bảng đọc được trên GitHub).
+   - Soát: `grep -ri "eyJ\|sk-\|ghp_\|password\s*[:=]"` trong `du-lieu/` phải ra 0.
+   - Rồi chạy bước 2c mục 5 (đẩy brain) — nó commit cả thư mục này.
+   - Link cho anh xem: https://github.com/hadangtien0702-dot/brain/tree/main/trung-tam-dieu-hanh
 
 Luật chi tiết (mã phòng, giá trị trạng thái, những thứ cấm đưa lên trang như
 token / mật khẩu / đường dẫn ổ đĩa): đọc `congty.md` cùng thư mục với file này.
