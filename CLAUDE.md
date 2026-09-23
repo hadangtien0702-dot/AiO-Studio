@@ -285,7 +285,10 @@ serve out` giữ thư mục làm `next build` in "✓" mà không ghi được b
 
 **Web bán Shot & Save** — `Website/AiO ShotSave Web/` (index.html + legal.html, tĩnh, không build) → Vercel dự án **`aio-shotsave`**
 (tài khoản `hadangtien0702-8981`), **https://aio-shotsave.vercel.app**, lên lần đầu 23/09 bằng CLI (`vercel deploy --prod --yes`
-trong thư mục đó). ☠️ **KHÔNG nối git** → push GitHub KHÔNG tự lên web, phải chạy lại lệnh deploy. ☠️ `vercel link` tự tạo
+trong thư mục đó). **Nối GitHub 23/09 11:2x** (anh: *"nối GitHub với Vercel luôn"*): push `main` → tự deploy; Root Directory
+`Website/AiO ShotSave Web`; bỏ qua build khi thư mục web không đổi (`git diff --quiet HEAD^ HEAD -- .`). Cài bằng `vercel git
+connect <url repo>` (CLI không tự thấy .git ở thư mục con) + `vercel api PATCH /v9/projects/...` — ☠️ connector Vercel MCP trong
+Claude đăng nhập TÀI KHOẢN KHÁC (403 scope), đừng dùng nó cho dự án này. ☠️ `vercel link` tự tạo
 `.env.local` chứa token OIDC, mà danh sách bỏ qua mặc định của Vercel KHÔNG có `.env*` → đã chặn bằng `.vercelignore`
 (`.env*`, `.vercel`, 2 file ignore); đo live: `/.env.local` 404. Sau mỗi deploy: curl md5 live = file local.
 
