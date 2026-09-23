@@ -94,7 +94,7 @@ if ($binThieu.Count -gt 0) {
 # ---------- 4. CAI LENH /xong /batdau + SCRIPT batdau VAO MAY NAY ----------
 # Lenh goc nam trong repo (.claude/commands/) - chep vao ~/.claude/commands
 # de go duoc o MOI du an tren may nay, khong chi khi mo repo AiO Studio.
-Write-Host "`n[4/5] Dong bo lenh /xong, /batdau ve may nay..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Dong bo lenh /xong, /batdau, /congty ve may nay..." -ForegroundColor Yellow
 $lenhNguon = Join-Path $repo '.claude\commands'
 $lenhDich = Join-Path $env:USERPROFILE '.claude\commands'
 if (Test-Path $lenhNguon) {

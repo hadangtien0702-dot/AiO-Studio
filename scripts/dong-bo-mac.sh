@@ -92,7 +92,7 @@ vang "  Autocut, Transcripts, Asset Manager, Power Bins, Podcast, Short Viral, V
 vang "  CHUA chay duoc tren Mac cho toi khi co ban Mac cua cac binary do."
 
 # ---------- 4. LENH /xong /batdau + SCRIPT batdau ----------
-vang "[4/5] Dong bo lenh /xong, /batdau ve may nay..."
+vang "[4/5] Dong bo lenh /xong, /batdau, /congty ve may nay..."
 mkdir -p "$CL/commands" "$CL/scripts"
 for f in "$REPO/.claude/commands/"*.md; do
   [ -f "$f" ] || continue

@@ -5,6 +5,19 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [congty] - 2026-09-23 10:12 (UTC+7) - Lệnh /congty, gộp vào /xong bước 2f
+
+- **Bối cảnh:** anh cần một lệnh để gắn sản phẩm vào Trung tâm Điều hành (artifact
+  `MwhxaNXJNGMrUwKtUDW9Wn`, sổ công ty dựng 21/09). Viết `/congty` xong thì anh bảo
+  *"gộp /congty vào /xong luôn đi em"*.
+- **Đã làm:** `.claude/commands/congty.md` (sổ luật: đọc phiên bản từ repo, ghi
+  `app` + `hoatdong loai:'app'` + `meta`, mã 9 phòng, luật mỗi phòng một việc, cấm
+  đưa bí mật lên trang) · `xong.md` thêm **bước 2f** gọi theo sổ luật đó ·
+  `dong-bo-may.ps1` / `dong-bo-mac.sh` đổi nhãn (vốn đã chép mọi `*.md`).
+- **Kiểm:** bản repo = bản `~/.claude/commands` (cmp 2/2). Thử bước 2f đọc thật:
+  Video Download repo 0.2.2 = sổ 0.2.2 → không cần ghi. **[CHO]** chưa có lần 2f
+  ghi THẬT (dữ liệu khác nhau) — lần `/xong` đầu có bản mới thì mở trang kiểm.
+
 ## [hub-va-mac] - 2026-09-21 17:4x (UTC+7) - Panel tổng: chốt kiểu BỆ PHÓNG + 3 bản vẽ chờ chọn · Mac: KHÔNG mua Apple Developer
 
 ### Trạng thái hiện tại (phiên sau đọc đầu tiên)

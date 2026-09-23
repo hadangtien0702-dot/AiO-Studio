@@ -11,8 +11,12 @@
 > - 🌐 **WEB BAN (22/09):** `Website/AiO ShotSave Web/index.html` — 1 file tinh, EN/VI, sang/toi, gia $7.99 mot lan + $2/nam tuy chon (anh doi 23/09, truoc $9.99 +
 >   $3/nam), 4 demo tu chay (chup-ve-khay-ghim; keo khay vao 7 app — section khay dung thanh MAN HINH THAT
 >   co taskbar, khong chan de, anh duyet 22/09; khay co gian bam thang Ngang/Doc tren pill; dau trang khung chon "chup").
->   23/09: GSAP 3.13.0 (cdnjs) cho khay + section CAI DAT moi (cua so Cai dat that, phim 4 buoc). Demo dau trang + phim Keo to
->   van nhich bang setTimeout (cung goc giat, CHUA do rieng) — cho anh gat de chuyen GSAP. Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
+>   23/09 (commit cd7475a): GSAP 3.13.0 (cdnjs) chay khay + phim Keo to (giat that 29/413 -> 0/416); section CAI DAT moi (cua so
+>   Cai dat that, phim 4 buoc); Keo to keo them goc duoi (ngang 4 hang, doc 6 hang), bo banh rang; the gia huong A (logo tron +
+>   ten trai, gia phai, bo "once"/"Pay once"). **[CHO]** demo dau trang van nhich setTimeout — cho anh gat chuyen GSAP.
+>   **[CHO ANH] gia:** phi cong thanh toan ~5%+$0,50 an ~30% khoan $2/nam — em de xuat them goi "$14.99 cap nhat tron doi" (B),
+>   anh chua quyet. **Chan ban lon nhat: CHUA co he thong khoa ban quyen** (mo hinh 1 lan + nam can biet ai mua, han cap nhat).
+>   Chay thu: `python -m http.server 8123` trong thu muc do. **[CHO ANH]** (1) cong thanh toan
 >   (nut Mua dang bao "Sap mo ban", `CHECKOUT_URL` rong); (2) chinh sach hoan tien + Dieu khoan/Lien he o chan trang;
 >   (3) anh/clip app that + anh chia se link (og:image); (4) xac nhan "khong gia han van chay"; (5) thu tren DIEN THOAI THAT:
 >   cham de dung phim tu chay (chua do duoc — su kien gia lap khong qua `isTrusted`). "Windows 10" + "macOS" tren trang CHUA do.

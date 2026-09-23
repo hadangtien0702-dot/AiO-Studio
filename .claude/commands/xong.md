@@ -127,6 +127,31 @@ Thiếu mục nào → làm cho đủ, hoặc ghi rõ vào báo cáo bước 5 l
 Tool nằm **ngoài** AiO Studio (dự án khác trong `E:\2026\Production`) → hỏi anh
 Tiến cấu trúc ngăn của dự án đó, đừng áp khuôn AiO.
 
+## 2f. Cập nhật Trung tâm Điều hành (sổ công ty) — anh Tiến chốt 23/09/2026
+
+Anh chốt gộp `/congty` vào đây: *"gộp /congty vào /xong luôn đi em"*. Mỗi lần chốt
+phiên, sổ công ty (artifact `https://claude.ai/artifact/MwhxaNXJNGMrUwKtUDW9Wn`)
+phải nói đúng như repo.
+
+**Làm khi phiên có đụng tới một app của AiO Studio** (sửa code, ra bản mới, anh
+nghiệm thu, đổi trạng thái). Phiên chỉ tra cứu, hoặc dự án ngoài AiO Studio → bỏ
+qua, nói rõ là bỏ qua.
+
+1. Với **từng app đã đụng trong phiên**: đọc số phiên bản + trạng thái từ repo
+   (manifest / `package.json` / `PROGRESS.md`), đọc dòng `app/<mã>` trong sổ
+   bằng `ArtifactData`, so hai bên.
+2. Khác nhau → một lệnh `batch` (kèm `if_version`): cập nhật `app/<mã>` · thêm
+   **một** dòng `hoatdong` với `loai:'app'`, `app:'<tên>'` (vào khung **Lịch sử
+   app**) · đổi `meta/tong.capNhat`. Giờ lấy bằng `Date.now()` chạy thật.
+3. Việc anh đã giao trên trang mà phiên này làm xong → gỡ thẻ `viec/<mã>` đó, ghi
+   `hoatdong` `loai:'phong'`, và việc `'cho'` kế tiếp của đúng phòng đó chuyển
+   sang `'moi'` (luật **mỗi phòng một việc**).
+4. Việc CÒN DỞ của app → **không tự đẩy lên trang**; liệt kê trong báo cáo bước 5
+   và hỏi anh có muốn giao cho phòng nào không.
+
+Luật chi tiết (mã phòng, giá trị trạng thái, những thứ cấm đưa lên trang như
+token / mật khẩu / đường dẫn ổ đĩa): đọc `congty.md` cùng thư mục với file này.
+
 ## 3. Rút bài học — ghi ĐÚNG TẦNG
 
 Chỉ ghi thứ **không suy ra được từ mã nguồn**. Ghi trùng chỗ khác là lần sau đọc
