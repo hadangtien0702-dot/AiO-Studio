@@ -1,6 +1,6 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-16 10:31 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-23 14:46 +0700
 > - 📌 **BAN DANG DUNG: 0.5.5** (Windows cai 16/09 11:33; 0.5.4 cai 10:29; 0.5.3 cai 15/09 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
 >   `Release/AiO Shotandsave/`). 0.5.0 = luong chup chay san + pool overlay (phim -> overlay 7-20 ms, anh
 >   tu do, 0.4.17 la 411-581 ms); 0.5.1 keo khay 4 goc; 0.5.2 JPEG nhanh truoc; 0.5.3 anh doc hien doc.
@@ -16,15 +16,15 @@
 >   ten trai, gia phai, bo "once"/"Pay once").
 >   **LIVE: https://aio-shotsave.vercel.app** (Vercel `aio-shotsave`, NOI GitHub 23/09: push main co doi thu muc web = tu deploy,
 >   doi cho khac = tu bo qua). Trang phap ly `legal.html` (hoan tien 14 ngay · dieu khoan · rieng tu · lien he, EN/VI).
->   **BAN HANG = POLAR** (anh chot 23/09, `AiO Studio/CLAUDE.md` muc 3). **[CHO ANH]** (1) dang ky Polar + KYC + ngan hang +
->   tao SP "Shot & Save" $7.99 mot lan, License key het han 1 nam (de xuat 3 may) → gui link Checkout + Organization ID
->   (Claude CAM nhap tai khoan/giay to/ngan hang); (2) email lien he cong khai — 2 cho `[CONTACT_EMAIL]` trong legal.html;
->   (3) them goi "$14.99 cap nhat tron doi" khong (phi ~5%+$0,50 an ~30% khoan $2); (4) tang Shot & Save trong goi Pro AiO khong
->   + ten mien that (em de xuat ban RIENG 2 web, chung thuong hieu, dan qua lai — anh chua gat); (5) connector Vercel trong Claude
->   van o tai khoan Vincent (403) — anh can `/mcp` hoac phien moi; (6) web ai-o-studio tu build lai MOI lan push (ke ca khong doi web
->   do) — de xuat them luat bo qua, chua lam; (7) thu DIEN THOAI THAT: cham dung phim tu chay; og:image; anh/clip app that.
->   **[CHO] CHAN MO BAN:** app CHUA co o nhap/kich hoat ma ban quyen (Polar `/v1/customer-portal/license-keys/activate|validate`) —
->   lam khi co Organization ID; legal.html da hua "app gui ma + ten may toi Polar" nen PHAI lam truoc khi ban.
+>   **BAN HANG = POLAR — DUNG XONG PHIA ANH 23/09 14:4x:** org `aiostudio` (Org ID `05f1edf9-2456-4d3f-8ff1-a824e433673e`), SP
+>   "AiO Shot & Save" $7.99 mot lan + License Keys `AIOSS-` het han 1 nam, **2 may**, gan dung SP; Checkout link "Web chinh" da tao.
+>   Anh CHOT: thu 14 ngay khi chua nhap ma · tai bo cai phai de lai EMAIL (Google Sheet, BO so dien thoai, quoc gia tu lay).
+>   **[CHO ANH]** (1) dan link Checkout dang CHU -> `CHECKOUT_URL` index.html dong 983; (2) email ho tro cong khai -> 2 cho
+>   `[CONTACT_EMAIL]` legal.html; (3) gat dua bo cai len GitHub Releases (web CHUA co nut Tai, bo cai CHUA o dau cong khai);
+>   (4) Polar Payouts: KYC + ngan hang (anh tu lam); (5) goi $14.99 tron doi? (6) tang trong goi Pro AiO + ten mien? (7) web
+>   ai-o-studio build lai moi lan push; (8) thu dien thoai that, og:image.
+>   **[CHO] CHAN MO BAN — viec em, thu tu:** app (thu 14 ngay + o nhap ma + nut HUY kich hoat + Polar activate/validate/deactivate +
+>   chay khi mat mang) -> web (nut Tai + form email + ghi Sheet) -> bo cai len Releases -> anh tao Sheet/Apps Script -> gan Checkout.
 >   **[CHO]** demo dau trang van nhich setTimeout — cho anh gat chuyen GSAP. "Windows 10" + "macOS" tren trang CHUA do.
 > - ☠️ Luat moi trong ngay: anh dang ngoi may thi KHONG chay selftest/exe thu (so loi #12); sau khi cai
 >   mo app qua explorer.exe (container MSIX cua Claude chuyen huong APPDATA).
@@ -334,6 +334,14 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-23 14:46 +0700 — Polar dựng xong phía anh; chốt 2 máy · thử 14 ngày · tải qua email (Google Sheet)
+
+Anh tự làm trên Polar (em chỉ từng ô qua ảnh chụp): tổ chức `aiostudio` (Individual, USD, Org ID `05f1edf9-2456-4d3f-8ff1-a824e433673e`) · sản phẩm **AiO Shot & Save $7.99 một lần** · benefit License Keys *"Shot & Save license key + 1 year updates"* (prefix `AIOSS-XXXX-XXXX-XXXX`, hết hạn 1 năm sau khi mua, **2 máy**, khách tự quản lý máy = Yes, không giới hạn lượt) đã gắn vào sản phẩm (đối chiếu ảnh chụp trang benefit) · Checkout link "Web chinh" (Success URL để trống vì web chưa có trang cảm ơn → Polar tự hiện mã; Return URL về web; cho mã giảm giá; không bắt địa chỉ).
+**Anh chốt:** (1) 1 mã = 1 máy → đổi ngay sang **2 máy** (máy công ty + máy nhà); (2) chưa nhập mã = **dùng thử 14 ngày** đủ tính năng; (3) tải bộ cài phải **để lại email**, lưu **Google Sheet**, **bỏ số điện thoại** (quốc gia tự lấy từ `x-vercel-ip-country` + múi giờ; SMS quảng cáo khách nước ngoài phạm luật TCPA/GDPR) + ô tích đồng ý nhận tin.
+**Sửa:** `Website/AiO ShotSave Web/legal.html` EN+VI mục Dùng bản quyền: "tối đa hai máy (công ty + nhà)" + "đổi máy thì huỷ kích hoạt trong app hoặc liên hệ". Kiểm: grep ra đúng 2 dòng mới, 0 dấu "—" mới.
+**Phát hiện:** web **chưa có nút Tải về nào**, bộ cài 99 MB **chưa nằm ở đâu công khai**.
+**[CHO ANH]** (1) dán link Checkout dạng CHỮ (đọc từ ảnh dễ nhầm l/I, 0/O) → `CHECKOUT_URL` dòng 983 index.html; (2) email hỗ trợ công khai (em khuyên Gmail riêng) → 2 chỗ `[CONTACT_EMAIL]`; (3) gật đưa bộ cài lên GitHub Releases (repo public); (4) Polar Finance → Payouts: KYC + ngân hàng (anh tự làm).
+**[CHO] việc em, thứ tự đề xuất:** 5 app: dùng thử 14 ngày + ô nhập mã + nút huỷ kích hoạt + gọi Polar `/v1/customer-portal/license-keys/activate|validate|deactivate` + chạy được khi mất mạng → 3 web: nút Tải + form email + quốc gia + ghi Sheet → 2 bộ cài lên Releases → 1 anh tạo Sheet + Apps Script (em viết sẵn) → 4 gắn Checkout + câu thu email vào Quyền riêng tư. Dừng vì anh gõ /xong.
 ## 2026-09-23 13:10 +0700 — Chốt sổ: connector Vercel, tư vấn bán riêng/chung
 
 Không sửa mã nguồn sau 11:28. (1) Anh đăng nhập lại connector Vercel của Claude → kiểm 2 lần: `list_teams` vẫn chỉ
