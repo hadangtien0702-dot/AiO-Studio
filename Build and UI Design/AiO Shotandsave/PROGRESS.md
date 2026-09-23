@@ -328,6 +328,16 @@
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
 
+## 2026-09-23 11:28 +0700 — Nối GitHub ↔ Vercel: push main có đổi thư mục web = tự lên
+
+Anh: *"nối GitHub với Vercel luôn đi em"*. `vercel git connect https://github.com/hadangtien0702-dot/AiO-Studio` (CLI không tự thấy
+.git ở thư mục con) + `vercel api PATCH /v9/projects/…`: Root Directory `Website/AiO ShotSave Web`, bỏ qua build khi thư mục không
+đổi `git diff --quiet HEAD^ HEAD -- .`; đọc lại bằng GET riêng: đúng. Connector Vercel MCP của Claude = tài khoản khác (403) → không dùng.
+**Thử bằng push thật:** `40eba75` (chỉ sổ, ngoài thư mục web) → CANCELED ✓ · `66bda60` (đổi index) → **ERROR**: Vercel lấy
+`vercel.json` GỐC repo (của web AiO Studio) → `cd "Website/AiO WebDessign"` không tồn tại. Sửa: `vercel.json` riêng trong thư mục
+web (echo, output `.`), không đụng file gốc → `89856f7` READY; md5 live = local cả index + legal; `/.env.local` `.gitignore`
+`.vercelignore` `.vercel/project.json` 404 (`/vercel.json` 200, không có gì bí mật).
+
 ## 2026-09-23 10:54 +0700 — Web lên Vercel: https://aio-shotsave.vercel.app · bỏ dòng hướng dẫn dưới demo
 
 Anh: *"push code lên git và vercel deploy trước thử"*. Vercel CLI 56.2.1 đã đăng nhập `hadangtien0702-8981` → dự án MỚI

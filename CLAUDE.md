@@ -288,7 +288,10 @@ serve out` giữ thư mục làm `next build` in "✓" mà không ghi được b
 trong thư mục đó). **Nối GitHub 23/09 11:2x** (anh: *"nối GitHub với Vercel luôn"*): push `main` → tự deploy; Root Directory
 `Website/AiO ShotSave Web`; bỏ qua build khi thư mục web không đổi (`git diff --quiet HEAD^ HEAD -- .`). Cài bằng `vercel git
 connect <url repo>` (CLI không tự thấy .git ở thư mục con) + `vercel api PATCH /v9/projects/...` — ☠️ connector Vercel MCP trong
-Claude đăng nhập TÀI KHOẢN KHÁC (403 scope), đừng dùng nó cho dự án này. ☠️ `vercel link` tự tạo
+Claude đăng nhập TÀI KHOẢN KHÁC (403 scope), đừng dùng nó cho dự án này. ☠️ **`vercel.json` ở GỐC repo là của web AiO Studio**
+(build Next.js `Website/AiO WebDessign`) và Vercel đem nó áp cho dự án có Root Directory con → lần push đầu ERROR `cd: Website/AiO
+WebDessign: No such file`. Sửa: `vercel.json` RIÊNG trong thư mục web (install/build = echo, output = `.`). Đừng sửa file gốc.
+Thử thật 23/09: push ngoài thư mục web → CANCELED (đúng); push có đổi web → READY, md5 live = local. ☠️ `vercel link` tự tạo
 `.env.local` chứa token OIDC, mà danh sách bỏ qua mặc định của Vercel KHÔNG có `.env*` → đã chặn bằng `.vercelignore`
 (`.env*`, `.vercel`, 2 file ignore); đo live: `/.env.local` 404. Sau mỗi deploy: curl md5 live = file local.
 
