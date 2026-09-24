@@ -39,7 +39,7 @@ const SO_NGAY_THU = 14
 const KIEM_MOI = 3 * NGAY // hoi lai Polar toi da 3 ngay/lan (ma bi hoan tien se khoa trong <= 3 ngay)
 const HET_GIO_MS = 15000
 
-/* ☠️ CHO ANH CHOT: Polar TU CHOI kich hoat ma da qua 1 nam (403 "expired") —
+/* ANH CHOT A 24/09 ("Van cho dung"). Polar TU CHOI kich hoat ma da qua 1 nam (403 "expired") —
    tuc khach mua nam truoc, nam nay cai lai may / doi may thi KHONG kich hoat
    duoc, trai luat "het han van chay". true = nhan ma het han (Polar da xac nhan
    ma ton tai va tung hop le) thanh "dung vinh vien, khong co ban cap nhat" ma
