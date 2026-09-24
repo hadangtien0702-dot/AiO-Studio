@@ -476,6 +476,11 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
   .price-shell.hien #buy::after{animation:loe 1.1s ease 1.3s}
   #buy:hover::after{animation:loe .9s ease}
 }
+/* 24/09 anh: animation bảng giá bằng GSAP (JS gắn .gs khi có GSAP) — tắt transition CSS để không giành nhau với tween */
+.hien-js .price-shell.gs[data-hien],.hien-js .price-shell.gs .list li,.hien-js .price-shell.gs .bill-row,.hien-js .price-shell.gs .list .ok path{transition:none!important}
+.hien-js .price-shell.gs[data-hien]{opacity:1;transform:none}
+.price-shell.gs.hien #buy::after{animation:loe 1s ease .15s}
+.price-shell.gs{will-change:transform}
 @keyframes ico-nen{30%{transform:scale(1.08)}}
 @keyframes ico-set{0%{transform:none}30%{transform:scale(1.3) rotate(-10deg);filter:drop-shadow(0 0 5px #f86820)}60%{transform:scale(.95)}100%{transform:none}}
 @keyframes ico-keo{0%{transform:none}45%{transform:translate(5px,5px)}75%{transform:translate(-1px,-1px)}100%{transform:none}}
@@ -2067,12 +2072,65 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   }
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
-    const el = e.target; el.classList.add("hien"); io.unobserve(el);
+    const el = e.target;
+    if (el.id === "checkout" && window.ssGiaGs) { io.unobserve(el); window.ssGiaGs(); return; }   // có GSAP: bảng giá diễn bằng timeline riêng
+    el.classList.add("hien"); io.unobserve(el);
     if (el.classList.contains("card") && !giam) setTimeout(() => choi(el), parseInt(el.style.getPropertyValue("--tre")) + 300);
     if (el.id === "checkout") demGia();
   }), { threshold: .2 });
   document.querySelectorAll("[data-hien]").forEach(el => io.observe(el));
   window.ssHien = { epHien: () => document.querySelectorAll("[data-hien]").forEach(el => { if (!el.classList.contains("hien")) { el.classList.add("hien"); if (el.id === "checkout") demGia(); } }) };   // chỉ để đo
+})();
+
+// ===== Bảng giá bằng GSAP (24/09 anh: "animation phần bảng giá cũng làm luôn"): nhịp nhanh chậm =====
+// Thẻ bật lên → logo xoay vào → giá VỤT lên rồi chậm dần về $7.99, nảy + quầng cam → ✓ vẽ lần lượt → dòng tiền → nút Mua bật + vệt sáng.
+// Rê chuột (máy tính): thẻ nghiêng 3D theo chuột. Không GSAP / giảm chuyển động: giữ bản CSS cũ.
+(() => {
+  const shell = document.getElementById("checkout"); if (!shell) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const chuanBi = () => {
+    if (!window.gsap || shell.classList.contains("hien")) return;   // đã hiện bằng CSS rồi thì thôi
+    const q = s => shell.querySelector(s), qa = s => [...shell.querySelectorAll(s)];
+    const tag = q(".price-tag"), logo = q(".ph-logo"), ten = q(".ph-ten"), gia = q(".amount strong");
+    const li = qa(".list li"), ok = qa(".list .ok"), vet = qa(".list .ok path"), dong = qa(".bill-row"), note = q(".bill-note"), nut = q("#buy"), chan = q(".price-foot");
+    shell.classList.add("gs");
+    gsap.set(shell, { autoAlpha: 0, y: 48, scale: .94 });
+    gsap.set([tag, ten, note, chan], { autoAlpha: 0 });
+    gsap.set(logo, { scale: 0, rotate: -40 });
+    gsap.set(li, { autoAlpha: 0, x: -18 }); gsap.set(ok, { scale: .4 }); gsap.set(vet, { strokeDasharray: 22, strokeDashoffset: 22 });
+    gsap.set(dong, { autoAlpha: 0, y: 14 }); gsap.set(nut, { autoAlpha: 0, y: 18, scale: .94 });
+    gia.textContent = "$0.00";
+    window.ssGiaGs = () => {
+      const so = { v: 0 };
+      const tl = gsap.timeline({ onComplete() {
+        gsap.set([shell, tag, logo, ten, gia, ...li, ...ok, ...vet, ...dong, note, nut, chan], { clearProps: "all" });
+        shell.classList.add("hien"); nghieng();
+      } });
+      tl.to(shell, { autoAlpha: 1, y: 0, scale: 1, duration: .8, ease: "expo.out" })
+        .fromTo(tag, { y: -10 }, { autoAlpha: 1, y: 0, duration: .4, ease: "power3.out" }, .1)
+        .to(logo, { scale: 1, rotate: 0, duration: .6, ease: "back.out(3)" }, .25)
+        .fromTo(ten, { x: -14 }, { autoAlpha: 1, x: 0, duration: .45, ease: "power3.out" }, .3)
+        .to(so, { v: 7.99, duration: 1.2, ease: "expo.out", onUpdate() { gia.textContent = "$" + so.v.toFixed(2); } }, .3)   // vụt lên rồi chậm dần
+        .fromTo(gia, { scale: 1 }, { keyframes: [{ scale: 1.14, textShadow: "0 0 28px rgba(248,104,32,.55)", duration: .14, ease: "power2.out" },
+                                                  { scale: 1, textShadow: "0 0 0 rgba(248,104,32,0)", duration: .6, ease: "elastic.out(1,.45)" }], transformOrigin: "100% 50%" }, 1.15)
+        .to(li, { autoAlpha: 1, x: 0, duration: .4, ease: "power3.out", stagger: .09 }, .55)
+        .to(ok, { scale: 1, duration: .45, ease: "back.out(3)", stagger: .09 }, .6)
+        .to(vet, { strokeDashoffset: 0, duration: .3, ease: "power2.out", stagger: .09 }, .7)
+        .to(dong, { autoAlpha: 1, y: 0, duration: .45, ease: "power3.out", stagger: .12 }, .95)
+        .to(note, { autoAlpha: 1, duration: .4 }, 1.2)
+        .to(nut, { autoAlpha: 1, y: 0, scale: 1, duration: .6, ease: "back.out(2.2)" }, 1.3)
+        .to(chan, { autoAlpha: 1, duration: .4 }, 1.5);
+    };
+  };
+  // Thẻ nghiêng 3D theo chuột (chỉ chuột thật, không cảm ứng)
+  function nghieng() {
+    if (!matchMedia("(pointer: fine)").matches) return;
+    const rx = gsap.quickTo(shell, "rotationX", { duration: .5, ease: "power3.out" }), ry = gsap.quickTo(shell, "rotationY", { duration: .5, ease: "power3.out" });
+    gsap.set(shell, { transformPerspective: 1000 });
+    shell.addEventListener("pointermove", e => { const r = shell.getBoundingClientRect(); ry(((e.clientX - r.left) / r.width - .5) * 7); rx(-((e.clientY - r.top) / r.height - .5) * 7); });
+    shell.addEventListener("pointerleave", () => { rx(0); ry(0); });
+  }
+  if (document.readyState === "complete") chuanBi(); else addEventListener("load", chuanBi);   // GSAP nạp kiểu defer → chờ load
 })();
 
 // ===== Đầu trang: khung chọn vùng "chụp" dòng cam, một lần khi mở trang =====
