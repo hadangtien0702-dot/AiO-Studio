@@ -1485,33 +1485,39 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     { v: [.34, .12, .46, .24], tool: "box",   ve: [[.36, .16], [.60, .30]], mau: "#0a84ff" },
   ];
 
+  // 24/09 anh: "có nhanh có nhậm, hiện tại đều đều nên chán". Nhịp như tay người: LAO nhanh tới chỗ (expo),
+  // khựng một nhịp, rồi mới KÉO chậm có chủ đích; mỗi tấm lệch thời gian một chút để không lặp như máy.
+  const nhip = ms => ms * (.85 + Math.random() * .3);
+  const LAO = "expo.inOut", KEO = "power3.out";
   async function motTam(kb) {
     const [fx, fy, fw, fh] = kb.v, x = fx * W, y = fy * H, w = fw * W, h = fh * H;
-    await diToi(x, y, 650);
+    await diToi(x, y, nhip(420), null, LAO);
+    await ngu(nhip(160));                                // khựng: ngắm điểm bắt đầu
     await bam(); batDau();
     sel = { x, y, w: 0, h: 0, ox: x, oy: y }; chon = false;
-    await diToi(x + w, y + h, 750, (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); }, "power2.inOut");
+    await diToi(x + w, y + h, nhip(950), (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); }, "expo.out");   // bung nhanh rồi chỉnh chậm cho khít
     chon = true; datNhan(); datTools(); drawOv();
     if (window.gsap) {                                   // thanh công cụ bật lên từ dưới vùng chọn
       gsap.fromTo(tools, { opacity: 0, y: 8, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: .35, ease: "back.out(2)", clearProps: "opacity,transform" });
     }
-    await ngu(250);
+    await ngu(nhip(120));
     const nutTool = tools.querySelector(`[data-tool="${kb.tool}"]`), nutMau = tools.querySelector(`[data-color="${kb.mau}"]`);
-    await diToi(...tamCua(nutTool), 450); await bam(); chonTool(kb.tool);
-    if (nutMau && nutMau.offsetWidth) { await diToi(...tamCua(nutMau), 300); await bam(); nutMau.click(); }
+    await diToi(...tamCua(nutTool), nhip(300), null, LAO); await bam(); chonTool(kb.tool);
+    if (nutMau && nutMau.offsetWidth) { await diToi(...tamCua(nutMau), nhip(180), null, LAO); await bam(); nutMau.click(); }
     const [a, b] = kb.ve;
-    await diToi(a[0] * W, a[1] * H, 450); await bam();
+    await diToi(a[0] * W, a[1] * H, nhip(340), null, LAO);
+    await ngu(nhip(220)); await bam();                   // dừng lại trước khi vẽ
     if (kb.tool === "text") {
       const s = { type: "text", x: a[0] * W, y: a[1] * H, text: "", color };
       shapes.push(s);
-      for (const ch of kb.chu) { s.text += ch; drawOv(); await ngu(110); }
+      for (const ch of kb.chu) { s.text += ch; drawOv(); await ngu(50 + Math.random() * 130); }   // gõ nhanh chậm như người
     } else {
       tam = { type: kb.tool, x1: a[0] * W, y1: a[1] * H, x2: a[0] * W, y2: a[1] * H, color };
-      await diToi(b[0] * W, b[1] * H, 550, (px, py) => { tam.x2 = px; tam.y2 = py; drawOv(); });
+      await diToi(b[0] * W, b[1] * H, nhip(520), (px, py) => { tam.x2 = px; tam.y2 = py; drawOv(); }, KEO);
       shapes.push(tam); tam = null; drawOv();
     }
-    await ngu(300);
-    await diToi(...tamCua(tools.querySelector(".xong")), 450); await bam();
+    await ngu(nhip(450));                                // ngắm lại tác phẩm một nhịp dài…
+    await diToi(...tamCua(tools.querySelector(".xong")), nhip(260), null, LAO); await bam();   // …rồi chốt thật nhanh
     const vung = { ...sel };
     if (window.gsap) {                                   // loé sáng như vừa bấm chụp
       const f = document.createElement("i"); f.className = "dflash";
@@ -1535,7 +1541,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     if (window.gsap) {
       const dx = dich.left - s.left - vung.x, dy = dich.top - s.top - vung.y, t = { p: 0 }, vong = Math.min(120, Math.abs(dy) * .45 + 40);
       try {
-        await chayTw(t, { p: 1, duration: .75, ease: "power2.inOut", onUpdate() {
+        await chayTw(t, { p: 1, duration: .55, ease: "power3.in", onUpdate() {   // lấy đà chậm rồi bị HÚT nhanh vào khay
           const q = t.p, sc = 1 + (k - 1) * q, rot = Math.sin(Math.PI * q) * -8;
           fly.style.transform = `translate(${dx * q}px,${dy * q - vong * Math.sin(Math.PI * q)}px) rotate(${rot}deg) scale(${sc})`;
           fly.style.opacity = String(1 - .05 * q);
@@ -1557,7 +1563,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   async function vongLap() {
     datCur(W * .5, H * .85);
     for (;;) {
-      for (const kb of KICH_BAN) { await motTam(kb); await ngu(700); }
+      for (const kb of KICH_BAN) { await motTam(kb); await ngu(nhip(450)); }
       const o = listEl.querySelectorAll(".ditem")[1];
       if (o) { await diToi(...tamCua(o), 700); await bam(); o.click(); }
       await ngu(2600);
@@ -1659,6 +1665,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (k >= 1) return;
     }
   }
+  const nhip = ms => ms * (.85 + Math.random() * .3);   // lệch nhịp mỗi lần cho khỏi đều đều như máy (24/09)
   const banSao = () => { const a = pick.cloneNode(true); a.removeAttribute("id"); a.classList.remove("cam", "di"); return a; };
 
   // ---- 3 cảnh ----
@@ -1759,10 +1766,10 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   async function motCanh(i) {
     const c = CANH[i];
     await veCanh(i); pick.classList.remove("cam", "di");
-    await ngu(700);
+    await ngu(nhip(500));
     const p = rel(pick);
-    await di(p.x + p.w * .55, p.y + p.h * .5, 750);
-    pick.classList.add("cam"); await ngu(180);
+    await di(p.x + p.w * .55, p.y + p.h * .5, nhip(480), null, 0, "expo.inOut");   // 24/09: lao nhanh tới ảnh…
+    pick.classList.add("cam"); await ngu(nhip(220));                              // …khựng một nhịp rồi mới nhấc
     cur.classList.add("bam"); await ngu(140);
     const g = banSao(); g.classList.add("kh-ghost");
     Object.assign(g.style, { left: p.x + "px", top: p.y + "px", width: p.w + "px", height: p.h + "px" });
@@ -1775,12 +1782,12 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const dich = c.dich(), d = rel(dich), a = rel(app);
     const sang = c.nhanLop ? dich : app;                 // Premiere: sáng TRACK; chat: sáng cả cửa sổ
     let xTruoc = cx;
-    await di(d.x + d.w * .55, d.y + d.h * .5, 1050, (x, y) => {
+    await di(d.x + d.w * .55, d.y + d.h * .5, nhip(900), (x, y) => {
       gs.tx = x - lx - p.x; gs.ty = y - ly - p.y;
       const nghieng = Math.max(-14, Math.min(14, (x - xTruoc) * 1.6)); xTruoc = x;
       gs.rot += (nghieng - gs.rot) * .18; veG();
       sang.classList.toggle("nhan", c.nhanLop ? (x > d.x && y > d.y && y < d.y + d.h) : (x > a.x && y > a.y));
-    }, window.gsap ? vis.clientHeight * .12 : 0, "power2.inOut");
+    }, window.gsap ? vis.clientHeight * .12 : 0, "expo.inOut");                   // nhấc lên chậm, vút qua, đáp chậm
     await ngu(160);
     cur.classList.remove("bam"); pick.classList.remove("cam", "di");
     // Thả: ảnh bay đúng vào chỗ của nó trong app (bong chat / canvas / clip), vòng sóng lan ra
@@ -1794,7 +1801,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       an.style.visibility = ""; g.remove(); song(r.x + r.w / 2, r.y + r.h / 2);
     };
     await c.tha(bay);
-    await ngu(2200);
+    await ngu(nhip(1700));
   }
   // Con trỏ nắm thanh tiêu đề khay, kéo TỪ TRÁI vào sát cửa sổ app (cách 16px)
   const khayEl = document.getElementById("khShelf");
