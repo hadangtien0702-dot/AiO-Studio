@@ -206,6 +206,9 @@ h1 em{font-style:normal;color:var(--brand)}
 .dcursor svg{transition:transform .12s ease}
 .dcursor.bam svg{transform:scale(.82)}
 .dfly{position:absolute;z-index:6;transform-origin:0 0;border-radius:4px;pointer-events:none;box-shadow:0 12px 30px rgb(0 0 0/45%)}
+/* 24/09 anh: "peak hơn, cháy hơn, mượt hơn": loé sáng lúc chụp + vòng sóng lúc bấm chuột */
+.dflash{position:absolute;z-index:6;pointer-events:none;background:#fff;border-radius:2px;opacity:0;box-shadow:0 0 40px 10px rgb(248 104 32/55%)}
+.dsong{position:absolute;z-index:6;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 12px rgb(248 104 32/60%)}
 .dauto{position:absolute;top:10px;right:10px;z-index:7;display:none;align-items:center;gap:8px;min-height:36px;padding:0 12px;border:0;border-radius:999px;
   background:rgb(20 20 20/82%);color:#fff;font:600 13px/1 Inter,sans-serif;cursor:pointer;backdrop-filter:blur(6px);box-shadow:0 0 0 1px rgb(255 255 255/12%)}
 .dauto::before{content:"";width:8px;height:8px;border-radius:50%;background:#4ec98a;animation:puls 1.8s ease-in-out infinite}
@@ -392,7 +395,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .kh-thumb.t3 em{height:10%;border-radius:2px;background:#e9e1d8}.kh-thumb.t3 em:first-child{width:60%;background:#16110d}
 .kh-thumb.cam{border-color:#f86820;transform:translateY(-2px)}
 .kh-thumb.di{opacity:.35}
-.kh-ghost{position:absolute;z-index:4;margin:0;pointer-events:none;box-shadow:0 16px 30px rgb(0 0 0/40%)}
+.kh-ghost{position:absolute;z-index:4;margin:0;pointer-events:none;box-shadow:0 22px 40px -8px rgb(0 0 0/45%),0 0 0 2px #f86820;transition:none}
+/* 24/09 anh: "animation peak hơn": vòng sóng cam lan ra chỗ ảnh đáp xuống */
+.kh-song{position:absolute;z-index:3;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 18px rgb(248 104 32/55%)}
 .kh-cursor{position:absolute;left:0;top:0;z-index:5;margin:-2px 0 0 -4px;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(0 0 0/45%))}
 .kh-cursor svg{transition:transform .12s ease}.kh-cursor.bam svg{transform:scale(.82)}
 @media (max-width:520px){.kh-shelf{left:4%}.kh-shelf .stitle{display:none}.kh-list{padding:6px;gap:5px}.kh-b{font-size:11px}.kh-chat-top{padding:6px 8px}.kh-msgs{padding:6px 8px}.kh-rail{display:none}}
@@ -420,6 +425,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .rs-shelf.doc .rs-grip{right:auto;left:0;transform:none}
 .rs-shelf.goc-duoi .rs-grip{top:auto;left:auto;right:0;bottom:0;transform:rotate(180deg)}   /* 23/09: kéo góc dưới-phải */
 #rsCur,#rsShelf{will-change:transform}
+/* 24/09 anh: animation co giãn "có nhanh có nhậm": nắm góc = khay nổi lên, viền cam */
+.rs-shelf{transition:opacity .3s ease,box-shadow .25s ease}
+.rs-shelf.keo{box-shadow:0 0 0 2px #f86820,0 28px 56px -14px rgb(0 0 0/55%)}
 #rsCur{display:block}
 @media (max-width:520px){.rs-mode{font-size:11px;padding:2px}.rs-mode > span{padding:5px 8px}}   /* điện thoại: pill nhỏ lại (22/09 pill đè khay dọc 17px; 23/09 bỏ bánh răng Cài đặt, pill còn Ngang/Dọc) */
 .rs-list .kh-thumb.tx{padding:0;display:block;position:relative}
@@ -468,6 +476,11 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
   .price-shell.hien #buy::after{animation:loe 1.1s ease 1.3s}
   #buy:hover::after{animation:loe .9s ease}
 }
+/* 24/09 anh: animation bảng giá bằng GSAP (JS gắn .gs khi có GSAP) — tắt transition CSS để không giành nhau với tween */
+.hien-js .price-shell.gs[data-hien],.hien-js .price-shell.gs .list li,.hien-js .price-shell.gs .bill-row,.hien-js .price-shell.gs .list .ok path{transition:none!important}
+.hien-js .price-shell.gs[data-hien]{opacity:1;transform:none}
+.price-shell.gs.hien #buy::after{animation:loe 1s ease .15s}
+.price-shell.gs{will-change:transform}
 @keyframes ico-nen{30%{transform:scale(1.08)}}
 @keyframes ico-set{0%{transform:none}30%{transform:scale(1.3) rotate(-10deg);filter:drop-shadow(0 0 5px #f86820)}60%{transform:scale(.95)}100%{transform:none}}
 @keyframes ico-keo{0%{transform:none}45%{transform:translate(5px,5px)}75%{transform:translate(-1px,-1px)}100%{transform:none}}
@@ -494,6 +507,10 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
   animation:chon-hero 2s cubic-bezier(.3,.7,.3,1) both}
 .hero-sel b{position:absolute;left:-2px;top:-28px;padding:3px 8px;border-radius:6px;background:#141414;color:#fff;
   font:600 12px/1.4 Inter,sans-serif;letter-spacing:0;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* 24/09 anh: "đẹp rồi nhưng chưa mượt" — clip-path làm lộ từng đoạn viền trên/trái. Bản GSAP: khung giãn thật từ góc như rê chuột */
+.hero-sel.gs{animation:none;opacity:1}
+.hero-sel .loe{position:absolute;inset:0;border-radius:2px;background:#fff;opacity:0}
+.hero-sel .goc{position:absolute;width:6px;height:6px;background:#fff;border:1.5px solid var(--brand);border-radius:1px;opacity:0}
 @keyframes chon-hero{
   0%{opacity:1;clip-path:inset(-32px 100% 100% -4px);background:transparent}
   34%{clip-path:inset(-32px -4px -4px -4px);background:transparent}
@@ -985,34 +1002,34 @@ const CHECKOUT_URL = "";
 const T = {
   vi: {
     skip:"Bỏ qua tới nội dung", navFeatures:"Tính năng", navPricing:"Giá", navFaq:"Hỏi đáp", navBuy:"Mua",
-    eyebrow:"Chụp màn hình cho người làm nghề",
+    eyebrow:"Công cụ chụp màn hình cho người làm sáng tạo",
     h1:"<span class=\"h1a\">Chụp. Ghim.</span><br><em>Kéo thả đi bất cứ đâu.</em>",
-    lede:"Bấm một phím tắt, khoanh một vùng là ảnh sẵn sàng để ghim nổi trên màn hình, vẽ chú thích, hoặc kéo thẳng vào Premiere, Figma hay khung chat.",
-    heroBuy:"Mua Shot & Save", heroSee:"Xem nó làm được gì",
-    featTitle:"Đủ thứ cần. Không thừa thứ gì.", featSub:"Do một editor dựng phim làm ra, người chụp màn hình hàng trăm lần mỗi tuần.",
+    lede:"Nhấn phím tắt, chọn vùng cần chụp. Ảnh có thể ghim nổi trên màn hình, thêm chú thích, hoặc kéo thẳng vào Premiere, Figma hay khung chat.",
+    heroBuy:"Mua Shot & Save", heroSee:"Xem cách hoạt động",
+    featTitle:"Gọn nhẹ, đủ những gì bạn cần", featSub:"Được làm bởi một editor dựng phim, người chụp màn hình hàng trăm lần mỗi tuần.",
     f1t:"Chụp tức thì",
-    f1p:"Một nút bấm - Một tấm ảnh<br>Không bỏ lỡ ý tưởng đang lướt qua",
-    f2t:"Kéo và Thả", f2p:"Nắm ảnh và thả thẳng vào app bạn đang dùng.",
-    f3t:"Ghim trên cùng", f3p:"Giữ ảnh tham chiếu nổi trên mọi cửa sổ.",
-    f4t:"Chú thích một phím", f4p:"Bấm <span class=\"nw\"><kbd>1</kbd> khung,</span> <span class=\"nw\"><kbd>2</kbd> mũi tên,</span> <span class=\"nw\"><kbd>3</kbd> chữ.</span>",
-    f5t:"Chụp hai màn hình", f5p:"Một vùng chụp qua hai màn hình, liền mạch và rõ nét.",
-    f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm để ghim lại.",
-    priceTitle:"Một giá. Trả một lần.", priceSub:"Không cần đăng ký thuê bao. Muốn có tính năng mới thì mỗi năm vài đô, không muốn thì thôi.",
-    priceTag:"Trả một lần", once:"một lần", li1:"Đủ mọi tính năng, không giới hạn", li2:"Năm đầu có sẵn mọi tính năng mới", li3:"Windows 10/11 · macOS (bản thử)",
-    b1:"Hôm nay", b1s:"Lần trừ tiền đầu tiên", b2:"Mỗi năm sau đó", b2s:"Tuỳ chọn, để tiếp tục nhận tính năng mới", b2n:"$2/năm",
-    bNote:"$2 này giúp Shot & Save tiếp tục ra tính năng mới. Không gia hạn thì app vẫn chạy, chỉ không có tính năng mới.",
-    buyBtn:"Mua ngay $7.99", priceFoot:"Giá tính bằng USD. Có thể cộng thuế lúc thanh toán.",
+    f1p:"Một phím tắt là có ảnh.<br>Kịp lưu lại mọi ý tưởng.",
+    f2t:"Kéo và thả", f2p:"Kéo ảnh thả thẳng vào ứng dụng bạn đang dùng.",
+    f3t:"Ghim trên cùng", f3p:"Giữ ảnh tham khảo luôn nổi trên mọi cửa sổ.",
+    f4t:"Chú thích bằng một phím", f4p:"Bấm <span class=\"nw\"><kbd>1</kbd> khung,</span> <span class=\"nw\"><kbd>2</kbd> mũi tên,</span> <span class=\"nw\"><kbd>3</kbd> chữ.</span>",
+    f5t:"Chụp hai màn hình", f5p:"Chụp một vùng trải qua hai màn hình, liền mạch và sắc nét.",
+    f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm vào là ghim lên màn hình.",
+    priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao hằng tháng. Nếu muốn tiếp tục nhận tính năng mới, bạn có thể gia hạn $2 mỗi năm.",
+    priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật trong năm đầu", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
+    b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Từ năm thứ hai", b2s:"Không bắt buộc, để tiếp tục nhận bản cập nhật", b2n:"$2/năm",
+    bNote:"Khoản $2 giúp Shot & Save tiếp tục được cải tiến. Nếu không gia hạn, ứng dụng vẫn hoạt động bình thường, chỉ không nhận thêm tính năng mới.",
+    buyBtn:"Mua ngay $7.99", priceFoot:"Giá tính bằng USD, có thể cộng thêm thuế tuỳ quốc gia khi thanh toán.",
     faqTitle:"Hỏi đáp",
-    q1:"Chính xác thì tôi trả bao nhiêu?", a1:"Lần đầu $7.99. Năm đầu chỉ vậy. Từ năm thứ hai, $2 mỗi năm nếu bạn muốn tiếp tục nhận tính năng mới.",
-    q2:"Không trả $2 thì sao?", a2:"Không có gì hỏng cả. Bản bạn đang có chạy mãi mãi. Khi nào muốn tính năng mới nhất thì trả sau cũng được.",
-    q3:"$2 mỗi năm dùng vào việc gì?", a3:"Trả cho đội ngũ thật đang làm thêm tính năng và sửa lỗi. Đó là chi phí để app tiếp tục lớn lên, không phải tiền thuê để được dùng.",
-    q4:"Có chạy trên Mac không?", a4:"Có, dạng bản thử cho Mac chip Apple và Intel. Lần đầu mở, macOS có thể bắt xác nhận ở Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở.",
-    endTitle:"Lần chụp màn hình tới<br>có thể là lần nhanh nhất.", endBtn:"Mua Shot & Save",
-    footRight:"Làm cho editor, designer và bất kỳ ai chụp màn hình nhiều.", fRefund:"Hoàn tiền", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư",
-    toast:"Sắp mở bán. Cổng thanh toán đang được gắn.",
+    q1:"Tôi cần trả bao nhiêu?", a1:"Bạn trả $7.99 một lần, đã gồm mọi bản cập nhật trong năm đầu. Từ năm thứ hai, nếu muốn tiếp tục nhận tính năng mới, bạn gia hạn $2 mỗi năm.",
+    q2:"Nếu tôi không gia hạn thì sao?", a2:"Ứng dụng vẫn hoạt động bình thường với phiên bản bạn đang có, không giới hạn thời gian. Khi cần tính năng mới, bạn có thể gia hạn bất cứ lúc nào.",
+    q3:"Khoản $2 mỗi năm dùng để làm gì?", a3:"Để duy trì đội ngũ phát triển tính năng mới và sửa lỗi. Đây là phí nhận bản cập nhật, không phải phí để được tiếp tục sử dụng.",
+    q4:"Có chạy trên Mac không?", a4:"Có. Bản thử nghiệm chạy trên Mac chip Apple và Intel. Lần đầu mở, macOS có thể yêu cầu bạn xác nhận tại Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở.",
+    endTitle:"Chụp màn hình nhanh hơn,<br>bắt đầu từ hôm nay.", endBtn:"Mua Shot & Save",
+    footRight:"Dành cho editor, designer và bất kỳ ai thường xuyên chụp màn hình.", fRefund:"Hoàn tiền", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư",
+    toast:"Sắp mở bán. Chúng tôi đang hoàn tất cổng thanh toán.",
     demoTry:"Thử ngay tại đây", demoChart:"Doanh thu theo tuần", demoShelf:"Khay ảnh", demoEmpty:"Ảnh chụp sẽ nằm ở đây",
-    demoSaved:"Đã vào khay. Bấm ảnh để ghim lên màn hình.", demoPinIt:"Ghim ảnh này", demoPinned:"Ảnh đã ghim",
-    demoCopy:"Sao chép", demoClose:"Đóng", demoCopied:"Đã sao chép. Dán vào đâu cũng được.", demoCopyNo:"Trình duyệt này không cho sao chép ảnh."
+    demoSaved:"Ảnh đã vào khay. Bấm vào ảnh để ghim lên màn hình.", demoPinIt:"Ghim ảnh này", demoPinned:"Ảnh đã ghim",
+    demoCopy:"Sao chép", demoClose:"Đóng", demoCopied:"Đã sao chép, bạn có thể dán vào bất cứ đâu.", demoCopyNo:"Trình duyệt này chưa hỗ trợ sao chép ảnh."
   },
   en: {}
 };
@@ -1022,16 +1039,16 @@ document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] 
 document.querySelectorAll("[data-i-aria]").forEach(el => T.en[el.dataset.iAria] = el.getAttribute("aria-label"));
 Object.assign(T.vi, { demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)",
   aUndo:"Hoàn tác (Ctrl+Z)", aCancel:"Huỷ (Esc)", aExit:"Thoát (Esc)", aDone:"Xong (Enter)", aClear:"Dọn khay",
-  themeToDark:"Chuyển sang nền tối", khTitle:"Chỉ một cú kéo", khSub:"Chụp xong, ảnh nằm sẵn trong khay. Kéo thẳng vào Zalo, Teams, Premiere hay Figma. Không phải lục thư mục, không đứt mạch làm việc.", khTeam:"Nhóm hậu kỳ", khT1:"Gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Kéo to, thấy nhiều", rsSub:"Kéo góc nào của khay cũng được. To ra là thêm hàng, thêm cột, ảnh không bị phóng mờ. Để ngang dưới màn hình hay dựng dọc bên cạnh tuỳ bạn.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
+  themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
 T.en.themeToLight = "Switch to light mode";
 T.en.toast = "Coming soon. Checkout is being set up.";
 Object.assign(T.en, { khReply:"Got it, thanks!", khName:"Edit team", khOnline:"Online", khM1:"Can you send this week's chart?", khM2:"One sec", khType:"Message", khTeam:"Post team", khT1:"Can you show me the color issue?", khT2:"Here you go", khTReply:"Got it, fixing now", khClip:"shot.png", khZName:"Client", khZ1:"Can you send the thumbnail draft?", khZ2:"Sending now", khZReply:"Looks good, approved!", khMName:"Linh", khMs1:"Where does the error show up?", khMs2:"Right here", khMsReply:"Ah, I see it. Thanks!", khLayer:"shot", khPsL1:"Title", khPsL2:"Background", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Title", demoAuto:"Auto demo · Click to try it yourself", demoChart:"Revenue by week", demoSaved:"Saved to the shelf. Click it to pin it on screen.", demoPinIt:"Pin this shot", demoPinned:"Pinned shot",
   demoCopy:"Copy", demoClose:"Close", demoCopied:"Copied. Paste it anywhere.", demoCopyNo:"This browser can't copy images." });
 window.ssT = k => (T[lang] && T[lang][k]) || T.en[k] || "";
 
-Object.assign(T.vi, { stTitle:"Chỉnh một lần, dùng mãi", stSub:"Mọi tuỳ chọn nằm gọn trong một cửa sổ nhỏ. Không menu lồng nhau, không cần đọc hướng dẫn.",
-  stP1:"Phím tắt của bạn", stP1m:"Chọn tổ hợp phím bạn đã quen tay.", stP2:"JPEG hoặc PNG", stP2m:"Ảnh nhẹ để gửi nhanh, hoặc PNG nguyên gốc.",
-  stP3:"Lưu đúng chỗ", stP3m:"Chọn thư mục lưu, mở ra bằng một cú bấm.", stP4:"Tiếng Việt, tiếng Anh", stP4m:"Đổi ngôn ngữ bằng một cú bấm." });
+Object.assign(T.vi, { stTitle:"Cài đặt một lần, dùng lâu dài", stSub:"Mọi tuỳ chọn nằm gọn trong một cửa sổ nhỏ, dễ hiểu, không cần đọc hướng dẫn.",
+  stP1:"Phím tắt của bạn", stP1m:"Chọn tổ hợp phím quen tay của bạn.", stP2:"JPEG hoặc PNG", stP2m:"JPEG nhẹ để gửi nhanh, hoặc PNG giữ nguyên chất lượng.",
+  stP3:"Lưu đúng nơi bạn muốn", stP3m:"Chọn thư mục lưu, mở ra chỉ với một cú bấm.", stP4:"Tiếng Việt, tiếng Anh", stP4m:"Chuyển ngôn ngữ chỉ với một cú bấm." });
 Object.assign(T.en, { stTitle:"Set it once, forget it", stSub:"Every option lives in one small window. No nested menus, no manual to read.",
   stP1:"Your own shortcut", stP1m:"Pick the key combo your hands already know.", stP2:"JPEG or PNG", stP2m:"Light files to send fast, or lossless PNG.",
   stP3:"Save where you want", stP3m:"Pick the folder, open it in one click.", stP4:"Vietnamese or English", stP4m:"Switch the language in one click." });
@@ -1120,6 +1137,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   let tool = "box", color = "#ff3b30";
   const shots = [];
 
+  const mo = { a: .5 };               // độ tối của màn phủ (24/09: tối dần vào thay vì bật phắt)
   const rr = (c, x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
 
   // Cảnh desktop giả: một cửa sổ app có thanh bên + biểu đồ cột
@@ -1167,13 +1185,21 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   function drawOv() {
     const c = ocx; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
     if (mode !== "cap") return;
-    c.fillStyle = "rgba(10,8,6,.5)"; c.fillRect(0, 0, W, H);
+    c.fillStyle = `rgba(10,8,6,${mo.a})`; c.fillRect(0, 0, W, H);
     if (!sel) return;
     c.clearRect(sel.x, sel.y, sel.w, sel.h);
     c.save(); c.beginPath(); c.rect(sel.x, sel.y, sel.w, sel.h); c.clip();
     shapes.forEach(s => drawShape(c, s)); if (tam) drawShape(c, tam);
     c.restore();
-    c.strokeStyle = "#F86820"; c.lineWidth = 2; c.strokeRect(sel.x - 1, sel.y - 1, sel.w + 2, sel.h + 2);
+    // viền cam phát sáng (24/09) + 4 chấm góc khi đã khoanh xong
+    c.save(); c.shadowColor = "rgba(248,104,32,.85)"; c.shadowBlur = 14;
+    c.strokeStyle = "#F86820"; c.lineWidth = 2; c.strokeRect(sel.x - 1, sel.y - 1, sel.w + 2, sel.h + 2); c.restore();
+    if (chon || keo === "chon" || stage.classList.contains("auto")) {
+      const g = 7; c.fillStyle = "#fff"; c.strokeStyle = "#F86820"; c.lineWidth = 1.5;
+      for (const [gx, gy] of [[sel.x, sel.y], [sel.x + sel.w, sel.y], [sel.x, sel.y + sel.h], [sel.x + sel.w, sel.y + sel.h]]) {
+        c.fillRect(gx - g / 2, gy - g / 2, g, g); c.strokeRect(gx - g / 2, gy - g / 2, g, g);
+      }
+    }
   }
 
   function size() {
@@ -1195,6 +1221,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     size();                            // đo lại cỡ ngay lúc bắt đầu (ResizeObserver có thể chưa kịp chạy)
     mode = "cap"; sel = null; chon = false; shapes = []; tam = null;
     stage.classList.add("cap");
+    if (window.gsap) { gsap.killTweensOf(mo); mo.a = 0; gsap.to(mo, { a: .55, duration: .28, ease: "power2.out", onUpdate: drawOv }); }
     stage.querySelectorAll(".dpin,.dshelf").forEach(el => el.style.visibility = "hidden");
     drawOv();
   }
@@ -1412,7 +1439,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   chip.type = "button"; chip.className = "dauto"; chip.dataset.i = "demoAuto"; chip.textContent = window.ssT("demoAuto");
   stage.append(chip);
   let thay = false, epChay = false;
-  new IntersectionObserver(es => { thay = es[0].isIntersecting; }, { threshold: .35 }).observe(stage);
+  new IntersectionObserver(es => { thay = es[0].isIntersecting; if (typeof capNhatTw === "function") capNhatTw(); }, { threshold: .35 }).observe(stage);
   const ngu = ms => new Promise((res, rej) => {
     const luot = veVuot; let con = ms, truoc = performance.now();
     const tick = now => {
@@ -1425,7 +1452,28 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   });
   let cx = 0, cy = 0;
   const datCur = (x, y) => { cx = x; cy = y; cur.style.transform = `translate(${x}px,${y}px)`; };
-  async function diToi(x, y, ms = 600, moiBuoc) {
+  // 24/09 "mượt hơn": di chuyển bằng GSAP theo nhịp màn hình (trước: setTimeout 16 ms, lệch nhịp = giật).
+  // Ngoài màn hình thì tạm dừng; khách chạm vào demo thì huỷ hết.
+  const dangTw = new Set(), chayDuoc = () => (thay && !document.hidden) || epChay;
+  const capNhatTw = () => dangTw.forEach(o => chayDuoc() ? o.tw.resume() : o.tw.pause());
+  document.addEventListener("visibilitychange", capNhatTw);
+  const chayTw = (target, vars) => new Promise((res, rej) => {
+    if (!tuChay) return rej("dung");
+    const o = { rej };
+    o.tw = gsap.to(target, Object.assign({}, vars, { onComplete() { dangTw.delete(o); if (vars.onComplete) vars.onComplete(); res(); } }));
+    dangTw.add(o); if (!chayDuoc()) o.tw.pause();
+  });
+  const huyTw = () => { dangTw.forEach(o => { o.tw.kill(); o.rej("dung"); }); dangTw.clear(); };
+  function song(x, y) {
+    if (!window.gsap) return;
+    const r = document.createElement("i"); r.className = "dsong"; r.style.left = x + "px"; r.style.top = y + "px"; stage.append(r);
+    gsap.fromTo(r, { scale: .3, opacity: 1 }, { scale: 1.9, opacity: 0, duration: .5, ease: "power2.out", onComplete: () => r.remove() });
+  }
+  async function diToi(x, y, ms = 600, moiBuoc, ease = "power3.inOut") {
+    if (window.gsap) {
+      const o = { x: cx, y: cy };
+      return chayTw(o, { x, y, duration: ms / 1000, ease, onUpdate() { datCur(o.x, o.y); if (moiBuoc) moiBuoc(cx, cy); } });
+    }
     const x0 = cx, y0 = cy, t0 = performance.now();
     for (;;) {
       await ngu(16);
@@ -1435,7 +1483,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (k >= 1) return;
     }
   }
-  const bam = async () => { cur.classList.add("bam"); await ngu(140); cur.classList.remove("bam"); };
+  const bam = async () => { cur.classList.add("bam"); song(cx + 2, cy + 2); await ngu(140); cur.classList.remove("bam"); };
   const tamCua = el => { const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(); return [r.left - s.left + r.width / 2, r.top - s.top + r.height / 2]; };
 
   const KICH_BAN = [
@@ -1445,31 +1493,46 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     { v: [.34, .12, .46, .24], tool: "box",   ve: [[.36, .16], [.60, .30]], mau: "#0a84ff" },
   ];
 
+  // 24/09 anh: "có nhanh có nhậm, hiện tại đều đều nên chán". Nhịp như tay người: LAO nhanh tới chỗ (expo),
+  // khựng một nhịp, rồi mới KÉO chậm có chủ đích; mỗi tấm lệch thời gian một chút để không lặp như máy.
+  const nhip = ms => ms * (.85 + Math.random() * .3);
+  const LAO = "expo.inOut", KEO = "power3.out";
   async function motTam(kb) {
     const [fx, fy, fw, fh] = kb.v, x = fx * W, y = fy * H, w = fw * W, h = fh * H;
-    await diToi(x, y, 650);
+    await diToi(x, y, nhip(420), null, LAO);
+    await ngu(nhip(160));                                // khựng: ngắm điểm bắt đầu
     await bam(); batDau();
     sel = { x, y, w: 0, h: 0, ox: x, oy: y }; chon = false;
-    await diToi(x + w, y + h, 750, (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); });
+    await diToi(x + w, y + h, nhip(950), (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); }, "expo.out");   // bung nhanh rồi chỉnh chậm cho khít
     chon = true; datNhan(); datTools(); drawOv();
-    await ngu(250);
+    if (window.gsap) {                                   // thanh công cụ bật lên từ dưới vùng chọn
+      gsap.fromTo(tools, { opacity: 0, y: 8, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: .35, ease: "back.out(2)", clearProps: "opacity,transform" });
+    }
+    await ngu(nhip(120));
     const nutTool = tools.querySelector(`[data-tool="${kb.tool}"]`), nutMau = tools.querySelector(`[data-color="${kb.mau}"]`);
-    await diToi(...tamCua(nutTool), 450); await bam(); chonTool(kb.tool);
-    if (nutMau && nutMau.offsetWidth) { await diToi(...tamCua(nutMau), 300); await bam(); nutMau.click(); }
+    await diToi(...tamCua(nutTool), nhip(300), null, LAO); await bam(); chonTool(kb.tool);
+    if (nutMau && nutMau.offsetWidth) { await diToi(...tamCua(nutMau), nhip(180), null, LAO); await bam(); nutMau.click(); }
     const [a, b] = kb.ve;
-    await diToi(a[0] * W, a[1] * H, 450); await bam();
+    await diToi(a[0] * W, a[1] * H, nhip(340), null, LAO);
+    await ngu(nhip(220)); await bam();                   // dừng lại trước khi vẽ
     if (kb.tool === "text") {
       const s = { type: "text", x: a[0] * W, y: a[1] * H, text: "", color };
       shapes.push(s);
-      for (const ch of kb.chu) { s.text += ch; drawOv(); await ngu(110); }
+      for (const ch of kb.chu) { s.text += ch; drawOv(); await ngu(50 + Math.random() * 130); }   // gõ nhanh chậm như người
     } else {
       tam = { type: kb.tool, x1: a[0] * W, y1: a[1] * H, x2: a[0] * W, y2: a[1] * H, color };
-      await diToi(b[0] * W, b[1] * H, 550, (px, py) => { tam.x2 = px; tam.y2 = py; drawOv(); });
+      await diToi(b[0] * W, b[1] * H, nhip(520), (px, py) => { tam.x2 = px; tam.y2 = py; drawOv(); }, KEO);
       shapes.push(tam); tam = null; drawOv();
     }
-    await ngu(300);
-    await diToi(...tamCua(tools.querySelector(".xong")), 450); await bam();
+    await ngu(nhip(450));                                // ngắm lại tác phẩm một nhịp dài…
+    await diToi(...tamCua(tools.querySelector(".xong")), nhip(260), null, LAO); await bam();   // …rồi chốt thật nhanh
     const vung = { ...sel };
+    if (window.gsap) {                                   // loé sáng như vừa bấm chụp
+      const f = document.createElement("i"); f.className = "dflash";
+      Object.assign(f.style, { left: vung.x + "px", top: vung.y + "px", width: vung.w + "px", height: vung.h + "px" }); stage.append(f);
+      gsap.timeline({ onComplete: () => f.remove() }).to(f, { opacity: .9, duration: .07, ease: "power1.out" }).to(f, { opacity: 0, duration: .45, ease: "power2.out" });
+      await ngu(90);
+    }
     xong();
     await bayVaoKhay(vung);
   }
@@ -1483,6 +1546,21 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     Object.assign(fly.style, { left: vung.x + "px", top: vung.y + "px", width: vung.w + "px", height: vung.h + "px" });
     stage.append(fly);
     const k = dich.height / vung.h;
+    if (window.gsap) {
+      const dx = dich.left - s.left - vung.x, dy = dich.top - s.top - vung.y, t = { p: 0 }, vong = Math.min(120, Math.abs(dy) * .45 + 40);
+      try {
+        await chayTw(t, { p: 1, duration: .55, ease: "power3.in", onUpdate() {   // lấy đà chậm rồi bị HÚT nhanh vào khay
+          const q = t.p, sc = 1 + (k - 1) * q, rot = Math.sin(Math.PI * q) * -8;
+          fly.style.transform = `translate(${dx * q}px,${dy * q - vong * Math.sin(Math.PI * q)}px) rotate(${rot}deg) scale(${sc})`;
+          fly.style.opacity = String(1 - .05 * q);
+        } });
+      } finally { fly.remove(); o.style.opacity = ""; }
+      const [ox, oy] = tamCua(o); song(ox, oy);
+      o.style.transition = "none";
+      gsap.fromTo(o, { scale: .7 }, { scale: 1, duration: .6, ease: "elastic.out(1,.45)", clearProps: "transform", onComplete: () => { o.style.transition = ""; } });
+      gsap.fromTo(countEl, { scale: 1.6 }, { scale: 1, duration: .5, ease: "back.out(3)", clearProps: "transform" });
+      return;
+    }
     const an = fly.animate([
       { transform: "translate(0,0) scale(1)", opacity: 1 },
       { transform: `translate(${dich.left - s.left - vung.x}px,${dich.top - s.top - vung.y}px) scale(${k})`, opacity: .95 }
@@ -1493,7 +1571,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   async function vongLap() {
     datCur(W * .5, H * .85);
     for (;;) {
-      for (const kb of KICH_BAN) { await motTam(kb); await ngu(700); }
+      for (const kb of KICH_BAN) { await motTam(kb); await ngu(nhip(450)); }
       const o = listEl.querySelectorAll(".ditem")[1];
       if (o) { await diToi(...tamCua(o), 700); await bam(); o.click(); }
       await ngu(2600);
@@ -1511,6 +1589,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   function dungTuChay() {
     if (!tuChay) return;
     tuChay = false; veVuot++;
+    if (window.gsap) huyTw();
     stage.classList.remove("auto");
     stage.querySelectorAll(".dfly").forEach(f => f.remove());
     listEl.querySelectorAll(".ditem").forEach(o => o.style.opacity = "");
@@ -1552,15 +1631,38 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const dangTween = new Set(), chay = () => (thay && !document.hidden) || epChay;
   const capNhatTween = () => dangTween.forEach(tw => chay() ? tw.resume() : tw.pause());
   document.addEventListener("visibilitychange", capNhatTween);
-  function di(x, y, ms, moiBuoc) {
+  // cong = độ vồng (px) của đường đi: kéo ảnh bay theo đường cong tự nhiên như tay người, không đi thẳng tắp (24/09)
+  function di(x, y, ms, moiBuoc, cong = 0, ease = "power1.inOut") {
     if (!window.gsap) return diCu(x, y, ms, moiBuoc);
-    const o = { x: cx, y: cy };
+    const x0 = cx, y0 = cy, o = { k: 0 };
     return new Promise(res => {
-      const tw = gsap.to(o, { x, y, duration: ms / 1000, ease: "power1.inOut",
-        onUpdate() { dat(o.x, o.y); if (moiBuoc) moiBuoc(cx, cy); },
+      const tw = gsap.to(o, { k: 1, duration: ms / 1000, ease,
+        onUpdate() { dat(x0 + (x - x0) * o.k, y0 + (y - y0) * o.k - cong * Math.sin(Math.PI * o.k)); if (moiBuoc) moiBuoc(cx, cy); },
         onComplete() { dangTween.delete(tw); res(); } });
       dangTween.add(tw); if (!chay()) tw.pause();
     });
+  }
+  // Tween GSAP bất kỳ, cũng tạm dừng khi section ra khỏi màn hình
+  const hop = (t, vars) => new Promise(res => {
+    if (!window.gsap) { res(); return; }
+    const tw = gsap.to(t, Object.assign({}, vars, { onComplete() { dangTween.delete(tw); if (vars.onComplete) vars.onComplete(); res(); } }));
+    dangTween.add(tw); if (!chay()) tw.pause();
+  });
+  // Vòng sóng cam tại điểm ảnh đáp xuống
+  function song(x, y) {
+    if (!window.gsap) return;
+    for (let k = 0; k < 2; k++) {
+      const r = document.createElement("i"); r.className = "kh-song"; r.style.left = x + "px"; r.style.top = y + "px"; vis.append(r);
+      gsap.set(r, { scale: .3, opacity: .95 });
+      hop(r, { scale: 2.6 + k, opacity: 0, duration: .7 + k * .15, ease: "power2.out", delay: k * .1, onComplete: () => r.remove() });
+    }
+  }
+  // Nảy nhẹ khi phần tử mới hiện ra
+  function nay(el, to = 1.08) {
+    if (!window.gsap || !el) return;
+    el.style.transition = "none"; gsap.set(el, { scale: .82 });
+    hop(el, { keyframes: [{ scale: to, duration: .16, ease: "power2.out" }, { scale: 1, duration: .45, ease: "elastic.out(1,.45)" }],
+      onComplete: () => { gsap.set(el, { clearProps: "transform" }); el.style.transition = ""; } });
   }
   async function diCu(x, y, ms, moiBuoc) {          // dự phòng khi không tải được GSAP
     const x0 = cx, y0 = cy, t0 = performance.now();
@@ -1571,6 +1673,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (k >= 1) return;
     }
   }
+  const nhip = ms => ms * (.85 + Math.random() * .3);   // lệch nhịp mỗi lần cho khỏi đều đều như máy (24/09)
   const banSao = () => { const a = pick.cloneNode(true); a.removeAttribute("id"); a.classList.remove("cam", "di"); return a; };
 
   // ---- 3 cảnh ----
@@ -1583,10 +1686,11 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         <div class="kh-input"><span>${T("khType")}</span><i></i></div></div></div>`;
     },
     dich: () => app.querySelector(".kh-msgs"),
-    async tha() {
+    async tha(bay) {
       const msgs = app.querySelector(".kh-msgs");
       const bong = lop => { const b = document.createElement("div"); b.className = "kh-b kh-moi " + lop; msgs.append(b); return b; };
-      bong("anh").append(banSao());
+      const ba = bong("anh"); ba.classList.remove("kh-moi"); const a = banSao(); ba.append(a);
+      await bay(a, ba); nay(ba, 1.05);
       await ngu(800);
       const go = bong("trai go"); go.innerHTML = "<i></i><i></i><i></i>";
       await ngu(1000);
@@ -1602,8 +1706,9 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         <div class="kh-2c"><div class="kh-can"><div class="kh-board" data-ten="${o.frame ? T(o.frame) : ""}"></div></div><div class="kh-lay">${lop}</div></div>`;
     },
     dich: () => app.querySelector(".kh-board"),
-    async tha() {
-      const b = app.querySelector(".kh-board"), a = banSao(); a.classList.add("kh-moi"); b.append(a);
+    async tha(bay) {
+      const b = app.querySelector(".kh-board"), a = banSao(); b.append(a);
+      await bay(a); nay(a, 1.06);
       const dong = document.createElement("div"); dong.className = "moi kh-moi"; dong.innerHTML = "<i></i>" + T("khLayer");
       app.querySelector(".kh-lay").prepend(dong);
       await ngu(1200);
@@ -1627,10 +1732,11 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           </div>`;
       },
       dich: () => app.querySelector("#khV2"),
-      async tha() {
+      async tha(bay) {
         const lan = app.querySelector("#khV2");
-        const clip = document.createElement("i"); clip.className = "kh-clip g kh-moi"; clip.style.cssText = "left:45%;width:30%";
+        const clip = document.createElement("i"); clip.className = "kh-clip g"; clip.style.cssText = "left:45%;width:30%";
         clip.textContent = T("khClip"); lan.append(clip);
+        await bay(clip);                                   // ảnh "nén" lại thành clip trên track V2
         const mon = app.querySelector(".kh-pr-mon"); mon.innerHTML = ""; const a = banSao(); a.classList.add("kh-moi"); mon.append(a);
         await ngu(1200);
       },
@@ -1642,34 +1748,68 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const CANH_PR = 4;
 
   // Vẽ cảnh i (mờ đi → vẽ → hiện lại); đang là cảnh i rồi thì không vẽ lại (khỏi chớp)
+  // Icon taskbar của app mới nảy lên như vừa được bấm mở
+  function nayIcon(i) {
+    const c = chips[i]; if (!window.gsap || !c) return;
+    c.style.transition = "opacity .25s ease,box-shadow .25s ease";
+    hop(c, { keyframes: [{ y: -9, scale: 1.12, duration: .18, ease: "power2.out" }, { y: 0, scale: 1, duration: .5, ease: "bounce.out" }],
+      onComplete: () => { gsap.set(c, { clearProps: "transform" }); c.style.transition = ""; } });
+  }
   async function veCanh(i) {
     if (app.dataset.canh === String(i)) { chonIcon(i); return; }
-    app.classList.add("an"); await ngu(300);
-    CANH[i].ve(); app.dataset.canh = i; chonIcon(i);   // nhãn app đổi CÙNG lúc với cửa sổ
-    await ngu(30); app.classList.remove("an");
+    if (!window.gsap) {
+      app.classList.add("an"); await ngu(300);
+      CANH[i].ve(); app.dataset.canh = i; chonIcon(i);   // nhãn app đổi CÙNG lúc với cửa sổ
+      await ngu(30); app.classList.remove("an"); return;
+    }
+    // 24/09: cửa sổ cũ thu nhỏ + nhoè đi, cửa sổ mới bật lên, nội dung hiện lần lượt
+    app.style.transition = "box-shadow .2s ease";
+    await hop(app, { opacity: 0, scale: .94, y: 14, filter: "blur(6px)", duration: .28, ease: "power2.in" });
+    CANH[i].ve(); app.dataset.canh = i; chonIcon(i); nayIcon(i);
+    const con = app.querySelectorAll(".kh-chat-top, .kh-b, .kh-input, .kh-tr, .kh-pr-mon, .kh-lay div, .kh-board");
+    gsap.fromTo(con, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .4, ease: "power2.out", stagger: .06, delay: .12, clearProps: "opacity,transform" });
+    await hop(app, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: .55, ease: "back.out(1.6)" });
+    gsap.set(app, { clearProps: "opacity,transform,filter" }); app.style.transition = "";
   }
   async function motCanh(i) {
     const c = CANH[i];
     await veCanh(i); pick.classList.remove("cam", "di");
-    await ngu(700);
+    await ngu(nhip(500));
     const p = rel(pick);
-    await di(p.x + p.w * .55, p.y + p.h * .5, 750);
-    pick.classList.add("cam"); await ngu(180);
+    await di(p.x + p.w * .55, p.y + p.h * .5, nhip(480), null, 0, "expo.inOut");   // 24/09: lao nhanh tới ảnh…
+    pick.classList.add("cam"); await ngu(nhip(220));                              // …khựng một nhịp rồi mới nhấc
     cur.classList.add("bam"); await ngu(140);
     const g = banSao(); g.classList.add("kh-ghost");
     Object.assign(g.style, { left: p.x + "px", top: p.y + "px", width: p.w + "px", height: p.h + "px" });
     vis.append(g); pick.classList.add("di");
     const lx = cx - p.x, ly = cy - p.y;
+    // 24/09: ảnh được NHẤC lên (phóng to + bóng đổ dày), nghiêng theo hướng kéo, bay theo đường cong
+    const gs = { tx: 0, ty: 0, sx: 1, sy: 1, rot: 0 };
+    const veG = () => { g.style.transform = `translate3d(${gs.tx}px,${gs.ty}px,0) rotate(${gs.rot}deg) scale(${gs.sx},${gs.sy})`; };
+    hop(gs, { sx: 1.16, sy: 1.16, duration: .3, ease: "back.out(2.6)", onUpdate: veG });
     const dich = c.dich(), d = rel(dich), a = rel(app);
     const sang = c.nhanLop ? dich : app;                 // Premiere: sáng TRACK; chat: sáng cả cửa sổ
-    await di(d.x + d.w * .55, d.y + d.h * .5, 1050, (x, y) => {
-      g.style.transform = `translate3d(${x - lx - p.x}px,${y - ly - p.y}px,0)`;
+    let xTruoc = cx;
+    await di(d.x + d.w * .55, d.y + d.h * .5, nhip(900), (x, y) => {
+      gs.tx = x - lx - p.x; gs.ty = y - ly - p.y;
+      const nghieng = Math.max(-14, Math.min(14, (x - xTruoc) * 1.6)); xTruoc = x;
+      gs.rot += (nghieng - gs.rot) * .18; veG();
       sang.classList.toggle("nhan", c.nhanLop ? (x > d.x && y > d.y && y < d.y + d.h) : (x > a.x && y > a.y));
-    });
-    await ngu(220);
-    cur.classList.remove("bam"); g.remove(); pick.classList.remove("cam", "di"); sang.classList.remove("nhan");
-    await c.tha();
-    await ngu(2200);
+    }, window.gsap ? vis.clientHeight * .12 : 0, "expo.inOut");                   // nhấc lên chậm, vút qua, đáp chậm
+    await ngu(160);
+    cur.classList.remove("bam"); pick.classList.remove("cam", "di");
+    // Thả: ảnh bay đúng vào chỗ của nó trong app (bong chat / canvas / clip), vòng sóng lan ra
+    const bay = async (el, an = el) => {                 // an = phần tử giấu trong lúc bay (bong chat: giấu cả bong, không chỉ ảnh)
+      sang.classList.remove("nhan");
+      if (!window.gsap) { g.remove(); return; }
+      an.style.visibility = "hidden";
+      const r = rel(el);
+      await hop(gs, { tx: r.x + r.w / 2 - (p.x + p.w / 2), ty: r.y + r.h / 2 - (p.y + p.h / 2), sx: r.w / p.w, sy: r.h / p.h, rot: 0,
+        duration: .45, ease: "power3.inOut", onUpdate: veG });
+      an.style.visibility = ""; g.remove(); song(r.x + r.w / 2, r.y + r.h / 2);
+    };
+    await c.tha(bay);
+    await ngu(nhip(1700));
   }
   // Con trỏ nắm thanh tiêu đề khay, kéo TỪ TRÁI vào sát cửa sổ app (cách 16px)
   const khayEl = document.getElementById("khShelf");
@@ -1681,6 +1821,12 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const w = khayEl.getBoundingClientRect().width;
     const dau = xa ? -w * .62 : (innerWidth >= 900 ? -.05 * V.width : 0);
     khayEl.style.transform = ""; khayEl.style.left = dau + "px"; khayEl.style.opacity = "1"; vis.classList.remove("cho-khay");
+    if (xa && window.gsap) {                             // 24/09: 4 ảnh trong khay bật vào lần lượt
+      const th = [...khayEl.querySelectorAll(".kh-thumb")];
+      th.forEach(e => e.style.transition = "none");
+      gsap.fromTo(th, { scale: .4, opacity: 0, rotate: -8 }, { scale: 1, opacity: 1, rotate: 0, duration: .5, ease: "back.out(2.2)", stagger: .09, delay: .15,
+        onComplete: () => { gsap.set(th, { clearProps: "transform,opacity" }); th.forEach(e => e.style.transition = ""); } });
+    }
     await ngu(xa ? 200 : 350);
     const S = rel(khayEl), dich = Math.max(8, A.x - S.w - 16), bar = rel(khayEl.querySelector(".sbar"));
     const gx = bar.x + bar.w * (xa ? .8 : .4), gy = bar.y + bar.h / 2;
@@ -1688,9 +1834,14 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     else await di(gx, gy, 700);
     cur.classList.add("bam"); await ngu(140);
     const lech = cx - S.x;
-    await di(dich + lech, cy, xa ? 1700 : 950, x => { khayEl.style.transform = `translate3d(${x - lech - dau}px,0,0)`; });
+    await di(dich + lech, cy, xa ? 1500 : 900, x => { khayEl.style.transform = `translate3d(${x - lech - dau}px,0,0)`; }, 0, "power3.out");
     khayEl.style.left = (cx - lech) + "px"; khayEl.style.transform = "";
-    cur.classList.remove("bam"); await ngu(250);
+    cur.classList.remove("bam");
+    if (window.gsap) {                                   // thả tay: khay trôi thêm chút rồi đàn hồi về chỗ
+      await hop(khayEl, { keyframes: [{ x: 10, duration: .14, ease: "power2.out" }, { x: 0, duration: .6, ease: "elastic.out(1,.4)" }] });
+      gsap.set(khayEl, { clearProps: "transform" });
+    }
+    await ngu(250);
   }
   async function vongLap() {
     const V = vis.getBoundingClientRect(); dat(V.width * .5, V.height * .95);
@@ -1760,11 +1911,18 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const dangTween = new Set(), chay = () => (thay && !document.hidden) || epChay;
   const capNhatTween = () => dangTween.forEach(tw => chay() ? tw.resume() : tw.pause());
   document.addEventListener("visibilitychange", capNhatTween);
-  function di(x, y, ms, moiBuoc) {
+  // 24/09: nhịp nhanh chậm — LAO tới góc (expo), khựng, rồi KÉO chậm có chủ đích; mỗi vòng lệch ±15%
+  const nhip = ms => ms * (.85 + Math.random() * .3), LAO = "expo.inOut", KEO = "power2.inOut";
+  const hop = (t, vars) => new Promise(res => {
+    if (!window.gsap) { res(); return; }
+    const tw = gsap.to(t, Object.assign({}, vars, { onComplete() { dangTween.delete(tw); if (vars.onComplete) vars.onComplete(); res(); } }));
+    dangTween.add(tw); if (!chay()) tw.pause();
+  });
+  function di(x, y, ms, moiBuoc, ease = "power1.inOut") {
     if (!window.gsap) return diCu(x, y, ms, moiBuoc);
     const o = { x: cx, y: cy };
     return new Promise(res => {
-      const tw = gsap.to(o, { x, y, duration: ms / 1000, ease: "power1.inOut",
+      const tw = gsap.to(o, { x, y, duration: ms / 1000, ease,
         onUpdate() { dat(o.x, o.y); if (moiBuoc) moiBuoc(cx, cy); },
         onComplete() { dangTween.delete(tw); res(); } });
       dangTween.add(tw); if (!chay()) tw.pause();
@@ -1788,57 +1946,104 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const soCotVua = w => Math.max(1, Math.floor((w - VIEN - 2 * g + g) / (tw + g)));
   const ngang = (w, h, day = H - .08 * H) => Object.assign(shelf.style, { left: .05 * W + "px", top: day - h + "px", right: "auto", bottom: "auto", width: w + "px", height: h + "px" });
   const doc = (w, h) => Object.assign(shelf.style, { right: .05 * W + "px", top: .06 * H + "px", left: "auto", bottom: "auto", width: w + "px", height: h + "px" });
-  const bam = async () => { cur.classList.add("bam"); await ngu(150); cur.classList.remove("bam"); };
+  function song(x, y) {                            // vòng sóng cam khi bấm
+    if (!window.gsap) return;
+    const r = document.createElement("i"); r.className = "kh-song"; r.style.left = x + "px"; r.style.top = y + "px"; vis.append(r);
+    gsap.fromTo(r, { scale: .3, opacity: .95 }, { scale: 1.8, opacity: 0, duration: .55, ease: "power2.out", onComplete: () => r.remove() });
+  }
+  const bam = async () => { cur.classList.add("bam"); song(cx + 2, cy + 2); await ngu(150); cur.classList.remove("bam"); };
+  // Nắm / thả góc khay: nắm = khay nổi lên; thả = khay hít khít vào lưới (nảy đàn hồi)
+  const nam = async () => { cur.classList.add("bam"); song(cx + 2, cy + 2); shelf.classList.add("keo"); await ngu(nhip(170)); };
+  const tha = () => { cur.classList.remove("bam"); shelf.classList.remove("keo"); };
+  // Ô ảnh vừa lộ ra (thêm hàng / cột) thì BẬT vào; ô bị che thì đánh dấu để lần sau lộ ra lại bật
+  const thumbs = [...list.children];
+  function soiHien(bat = true) {
+    const L = list.getBoundingClientRect();
+    for (const th of thumbs) {
+      const r = th.getBoundingClientRect(), hien = r.width > 0 && r.right <= L.right + 1 && r.bottom <= L.bottom + 1;
+      if (hien && !th._hien && bat && window.gsap) {
+        th.style.transition = "none";
+        gsap.fromTo(th, { scale: .35, opacity: 0, rotate: -6 }, { scale: 1, opacity: 1, rotate: 0, duration: .45, ease: "back.out(2.4)",
+          onComplete: () => { gsap.set(th, { clearProps: "transform,opacity" }); th.style.transition = ""; } });
+      }
+      th._hien = hien;
+    }
+  }
+  async function hit(tu, den, apDung) {             // co/giãn tới kích thước khít lưới, nảy nhẹ
+    if (!window.gsap || Math.abs(tu - den) < .5) { apDung(den); return; }
+    const o = { v: tu };
+    await hop(o, { v: den, duration: .55, ease: "elastic.out(1,.55)", onUpdate() { apDung(o.v); } });
+  }
   const tamO = el => { const r = el.getBoundingClientRect(), v = vis.getBoundingClientRect(); return [r.left - v.left + r.width / 2, r.top - v.top + r.height / 2]; };
   // Đổi kiểu khay: bấm thẳng Ngang/Dọc trên pill (23/09 anh bỏ bánh răng "Cài đặt" ở đây, cài đặt đã có section riêng)
-  async function doiKieu(i) { await di(...tamO(modes[i]), 800); await bam(); modes.forEach((m, k) => m.classList.toggle("on", k === i)); await ngu(350); }
+  async function doiKieu(i) {
+    await di(...tamO(modes[i]), nhip(520), null, LAO); await ngu(nhip(140)); await bam();
+    modes.forEach((m, k) => m.classList.toggle("on", k === i));
+    if (window.gsap) gsap.fromTo(modes[i], { scale: .85 }, { scale: 1, duration: .45, ease: "back.out(3)", clearProps: "transform" });
+    await ngu(nhip(250));
+  }
+  // Khay biến mất / hiện lại khi đổi kiểu: thu nhỏ + mờ, rồi bật lên
+  async function anKhay() {
+    if (!window.gsap) { shelf.classList.add("an"); await ngu(300); return; }
+    await hop(shelf, { scale: .88, opacity: 0, duration: .25, ease: "power2.in" });
+  }
+  async function hienKhay() {
+    shelf.classList.remove("an"); thumbs.forEach(th => th._hien = false);
+    if (!window.gsap) { soiHien(false); return; }
+    soiHien(true);
+    gsap.set(shelf, { scale: .88, opacity: 0 });
+    await hop(shelf, { scale: 1, opacity: 1, duration: .5, ease: "back.out(1.8)", onComplete: () => gsap.set(shelf, { clearProps: "transform,opacity" }) });
+  }
   const cheDo = i => { modes.forEach((m, k) => m.classList.toggle("on", k === i)); shelf.classList.toggle("doc", i === 1); };
 
   async function motVong() {
     doCo();
     // ---- 1. KHAY NGANG: nắm góc trên-phải, kéo LÊN (thêm hàng) rồi kéo SANG PHẢI (thêm cột) ----
-    shelf.classList.add("an"); await ngu(300);
+    await anKhay();
     cheDo(0); shelf.classList.remove("goc-duoi");
     const trai = .05 * W; let day = H - .2 * H;            /* chừa đáy 20% để lát nữa kéo góc dưới xuống */
     let w = rong(4), h = cao(1); ngang(w, h, day);
-    shelf.classList.remove("an");
-    await ngu(400);   /* không nhảy con trỏ: đi tiếp từ chỗ vừa bấm "Ngang" */
-    await di(trai + w, day - h, 800);
-    cur.classList.add("bam"); await ngu(150);
-    await di(trai + w, day - cao(3), 900, (x, y) => { h = day - y; ngang(w, h, day); });
-    await ngu(250);
+    await hienKhay();
+    await ngu(nhip(300));   /* không nhảy con trỏ: đi tiếp từ chỗ vừa bấm "Ngang" */
+    await di(trai + w, day - h, nhip(480), null, LAO);
+    await ngu(nhip(160)); await nam();
+    await di(trai + w, day - cao(3) - g * 1.5, nhip(950), (x, y) => { h = day - y; ngang(w, h, day); soiHien(); }, KEO);
+    await hit(h, cao(3), v => { h = v; ngang(w, h, day); cur.style.transform = `translate3d(${trai + w}px,${day - h}px,0)`; cy = day - h; });
+    await ngu(nhip(200));
     const wMax = rong(soCotVua(W * .9 - trai));
-    await di(trai + wMax, cy, 1000, x => { w = x - trai; ngang(w, h, day); });
-    cur.classList.remove("bam");
-    await ngu(600);
+    await di(trai + wMax + tw * .35, cy, nhip(1100), x => { w = x - trai; ngang(w, h, day); soiHien(); }, "power3.inOut");
+    await hit(w, wMax, v => { w = v; ngang(w, h, day); cx = trai + w; cur.style.transform = `translate3d(${cx}px,${cy}px,0)`; });
+    tha();
+    await ngu(nhip(450));
     // ---- 1b. góc DƯỚI-phải: kéo XUỐNG thêm một hàng ("kéo góc nào cũng được") ----
     const dinhNgang = day - h;
     shelf.classList.add("goc-duoi");
-    await di(trai + w, day, 600);
-    cur.classList.add("bam"); await ngu(150);
-    await di(trai + w, H * .95, 900, (x, y) => { day = y; h = day - dinhNgang; ngang(w, h, day); });
-    cur.classList.remove("bam");
-    await ngu(1500);
+    await di(trai + w, day, nhip(380), null, LAO);
+    await ngu(nhip(140)); await nam();
+    await di(trai + w, H * .95, nhip(800), (x, y) => { day = y; h = day - dinhNgang; ngang(w, h, day); soiHien(); }, KEO);
+    tha();
+    await ngu(nhip(1300));
     // ---- 2. KHAY DỌC: dựng bên phải, nắm góc trên-trái, kéo SANG TRÁI (thêm cột) ----
     await doiKieu(1);
-    shelf.classList.add("an"); await ngu(300);
+    await anKhay();
     cheDo(1); shelf.classList.remove("goc-duoi");
     const phai = W - .05 * W, dinh = .06 * H; let hDoc = .6 * H;   /* bắt đầu thấp 60% để lát nữa kéo góc dưới xuống */
     w = rong(2); doc(w, hDoc);   /* 1 cột thì tiêu đề "Khay ảnh" bị cắt (soi ảnh 22/09) → bắt đầu 2 cột */
-    shelf.classList.remove("an");
-    await ngu(300);
-    await di(phai - w, dinh, 700);
-    cur.classList.add("bam"); await ngu(150);
-    await di(phai - rong(4), dinh, 1000, x => { w = phai - x; doc(w, hDoc); });
-    cur.classList.remove("bam");
-    await ngu(600);
+    await hienKhay();
+    await ngu(nhip(250));
+    await di(phai - w, dinh, nhip(450), null, LAO);
+    await ngu(nhip(150)); await nam();
+    await di(phai - rong(4) - tw * .35, dinh, nhip(1000), x => { w = phai - x; doc(w, hDoc); soiHien(); }, "power3.inOut");
+    await hit(w, rong(4), v => { w = v; doc(w, hDoc); cx = phai - w; cur.style.transform = `translate3d(${cx}px,${cy}px,0)`; });
+    tha();
+    await ngu(nhip(450));
     // ---- 2b. góc DƯỚI-phải: kéo XUỐNG, thêm hàng ----
     shelf.classList.add("goc-duoi");
-    await di(phai, dinh + hDoc, 700);
-    cur.classList.add("bam"); await ngu(150);
-    await di(phai, H * .94, 900, (x, y) => { hDoc = y - dinh; doc(w, hDoc); });
-    cur.classList.remove("bam");
-    await ngu(1200);
+    await di(phai, dinh + hDoc, nhip(420), null, LAO);
+    await ngu(nhip(140)); await nam();
+    await di(phai, H * .94, nhip(800), (x, y) => { hDoc = y - dinh; doc(w, hDoc); soiHien(); }, KEO);
+    tha();
+    await ngu(nhip(1100));
     await doiKieu(0);
   }
   async function vongLap() { for (;;) await motVong(); }
@@ -1867,12 +2072,65 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   }
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
-    const el = e.target; el.classList.add("hien"); io.unobserve(el);
+    const el = e.target;
+    if (el.id === "checkout" && window.ssGiaGs) { io.unobserve(el); window.ssGiaGs(); return; }   // có GSAP: bảng giá diễn bằng timeline riêng
+    el.classList.add("hien"); io.unobserve(el);
     if (el.classList.contains("card") && !giam) setTimeout(() => choi(el), parseInt(el.style.getPropertyValue("--tre")) + 300);
     if (el.id === "checkout") demGia();
   }), { threshold: .2 });
   document.querySelectorAll("[data-hien]").forEach(el => io.observe(el));
   window.ssHien = { epHien: () => document.querySelectorAll("[data-hien]").forEach(el => { if (!el.classList.contains("hien")) { el.classList.add("hien"); if (el.id === "checkout") demGia(); } }) };   // chỉ để đo
+})();
+
+// ===== Bảng giá bằng GSAP (24/09 anh: "animation phần bảng giá cũng làm luôn"): nhịp nhanh chậm =====
+// Thẻ bật lên → logo xoay vào → giá VỤT lên rồi chậm dần về $7.99, nảy + quầng cam → ✓ vẽ lần lượt → dòng tiền → nút Mua bật + vệt sáng.
+// Rê chuột (máy tính): thẻ nghiêng 3D theo chuột. Không GSAP / giảm chuyển động: giữ bản CSS cũ.
+(() => {
+  const shell = document.getElementById("checkout"); if (!shell) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const chuanBi = () => {
+    if (!window.gsap || shell.classList.contains("hien")) return;   // đã hiện bằng CSS rồi thì thôi
+    const q = s => shell.querySelector(s), qa = s => [...shell.querySelectorAll(s)];
+    const tag = q(".price-tag"), logo = q(".ph-logo"), ten = q(".ph-ten"), gia = q(".amount strong");
+    const li = qa(".list li"), ok = qa(".list .ok"), vet = qa(".list .ok path"), dong = qa(".bill-row"), note = q(".bill-note"), nut = q("#buy"), chan = q(".price-foot");
+    shell.classList.add("gs");
+    gsap.set(shell, { autoAlpha: 0, y: 48, scale: .94 });
+    gsap.set([tag, ten, note, chan], { autoAlpha: 0 });
+    gsap.set(logo, { scale: 0, rotate: -40 });
+    gsap.set(li, { autoAlpha: 0, x: -18 }); gsap.set(ok, { scale: .4 }); gsap.set(vet, { strokeDasharray: 22, strokeDashoffset: 22 });
+    gsap.set(dong, { autoAlpha: 0, y: 14 }); gsap.set(nut, { autoAlpha: 0, y: 18, scale: .94 });
+    gia.textContent = "$0.00";
+    window.ssGiaGs = () => {
+      const so = { v: 0 };
+      const tl = gsap.timeline({ onComplete() {
+        gsap.set([shell, tag, logo, ten, gia, ...li, ...ok, ...vet, ...dong, note, nut, chan], { clearProps: "all" });
+        shell.classList.add("hien"); nghieng();
+      } });
+      tl.to(shell, { autoAlpha: 1, y: 0, scale: 1, duration: .8, ease: "expo.out" })
+        .fromTo(tag, { y: -10 }, { autoAlpha: 1, y: 0, duration: .4, ease: "power3.out" }, .1)
+        .to(logo, { scale: 1, rotate: 0, duration: .6, ease: "back.out(3)" }, .25)
+        .fromTo(ten, { x: -14 }, { autoAlpha: 1, x: 0, duration: .45, ease: "power3.out" }, .3)
+        .to(so, { v: 7.99, duration: 1.2, ease: "expo.out", onUpdate() { gia.textContent = "$" + so.v.toFixed(2); } }, .3)   // vụt lên rồi chậm dần
+        .fromTo(gia, { scale: 1 }, { keyframes: [{ scale: 1.14, textShadow: "0 0 28px rgba(248,104,32,.55)", duration: .14, ease: "power2.out" },
+                                                  { scale: 1, textShadow: "0 0 0 rgba(248,104,32,0)", duration: .6, ease: "elastic.out(1,.45)" }], transformOrigin: "100% 50%" }, 1.15)
+        .to(li, { autoAlpha: 1, x: 0, duration: .4, ease: "power3.out", stagger: .09 }, .55)
+        .to(ok, { scale: 1, duration: .45, ease: "back.out(3)", stagger: .09 }, .6)
+        .to(vet, { strokeDashoffset: 0, duration: .3, ease: "power2.out", stagger: .09 }, .7)
+        .to(dong, { autoAlpha: 1, y: 0, duration: .45, ease: "power3.out", stagger: .12 }, .95)
+        .to(note, { autoAlpha: 1, duration: .4 }, 1.2)
+        .to(nut, { autoAlpha: 1, y: 0, scale: 1, duration: .6, ease: "back.out(2.2)" }, 1.3)
+        .to(chan, { autoAlpha: 1, duration: .4 }, 1.5);
+    };
+  };
+  // Thẻ nghiêng 3D theo chuột (chỉ chuột thật, không cảm ứng)
+  function nghieng() {
+    if (!matchMedia("(pointer: fine)").matches) return;
+    const rx = gsap.quickTo(shell, "rotationX", { duration: .5, ease: "power3.out" }), ry = gsap.quickTo(shell, "rotationY", { duration: .5, ease: "power3.out" });
+    gsap.set(shell, { transformPerspective: 1000 });
+    shell.addEventListener("pointermove", e => { const r = shell.getBoundingClientRect(); ry(((e.clientX - r.left) / r.width - .5) * 7); rx(-((e.clientY - r.top) / r.height - .5) * 7); });
+    shell.addEventListener("pointerleave", () => { rx(0); ry(0); });
+  }
+  if (document.readyState === "complete") chuanBi(); else addEventListener("load", chuanBi);   // GSAP nạp kiểu defer → chờ load
 })();
 
 // ===== Đầu trang: khung chọn vùng "chụp" dòng cam, một lần khi mở trang =====
@@ -1885,6 +2143,24 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const k = document.createElement("div"); k.className = "hero-sel"; k.setAttribute("aria-hidden", "true");
     Object.assign(k.style, { left: (b.left - a.left - p) + "px", top: (b.top - a.top - p / 2) + "px", width: (b.width + p * 2) + "px", height: (b.height + p) + "px" });
     const nhan = document.createElement("b"); nhan.textContent = Math.round(b.width + p * 2) + " × " + Math.round(b.height + p); k.append(nhan);
+    if (window.gsap) {
+      const W = b.width + p * 2, H = b.height + p, o = { w: 0, h: 0 };
+      k.classList.add("gs"); k.style.width = "0px"; k.style.height = "0px"; nhan.textContent = "0 × 0";
+      const loe = document.createElement("i"); loe.className = "loe"; k.append(loe);
+      const goc = ["-4px auto auto -4px", "-4px -4px auto auto", "auto auto -4px -4px", "auto -4px -4px auto"].map(v => {
+        const g = document.createElement("i"); g.className = "goc"; const [t, r, bo, l] = v.split(" ");
+        Object.assign(g.style, { top: t, right: r, bottom: bo, left: l }); k.append(g); return g; });
+      h1.append(k);
+      gsap.timeline({ onComplete: () => k.remove() })
+        .fromTo(nhan, { opacity: 0, y: 4 }, { opacity: 1, y: 0, duration: .25, ease: "power2.out" }, 0)
+        .to(o, { w: W, h: H, duration: 1, ease: "power3.inOut",
+          onUpdate() { k.style.width = o.w + "px"; k.style.height = o.h + "px"; nhan.textContent = Math.round(o.w) + " × " + Math.round(o.h); } }, 0)
+        .to(goc, { opacity: 1, scale: 1, duration: .3, ease: "back.out(3)", stagger: .04, startAt: { scale: 0 } }, .85)
+        .to(loe, { opacity: .7, duration: .08, ease: "power1.out" }, "+=.3")
+        .to(loe, { opacity: 0, duration: .4, ease: "power2.out" })
+        .to(k, { opacity: 0, duration: .5, ease: "power1.inOut" }, "+=.35");
+      return;
+    }
     k.addEventListener("animationend", () => k.remove());
     setTimeout(() => k.remove(), 2300);   /* bảo hiểm: tab ẩn thì animationend không tới */
     h1.append(k);
@@ -1947,26 +2223,34 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     let cx = 0, cy = 0;
     const dat = (x, y) => { cx = x; cy = y; cur.style.transform = `translate3d(${x}px,${y}px,0)`; };
     const tam = el => { const r = el.getBoundingClientRect(), v = vis.getBoundingClientRect(); return [r.left - v.left + r.width * .55, r.top - v.top + r.height * .6]; };
-    function toi(x, y, ms = 650) {
+    // 24/09 anh: "có nhanh có nhậm". LAO tới nút (expo), khựng một nhịp rồi mới bấm; mỗi vòng lệch ±15%
+    const nhip = ms => ms * (.85 + Math.random() * .3);
+    function toi(x, y, ms = 650, ease = "expo.inOut") {
       const o = { x: cx, y: cy };
-      return giu(gsap.to(o, { x, y, duration: ms / 1000, ease: "power2.inOut", onUpdate() { dat(o.x, o.y); } }));
+      return giu(gsap.to(o, { x, y, duration: nhip(ms) / 1000, ease, onUpdate() { dat(o.x, o.y); } }));
     }
-    const di = (el, ms) => toi(...tam(el), ms);
-    async function bam(el) { cur.classList.add("bam"); el.classList.add("bam"); await cho(150); cur.classList.remove("bam"); el.classList.remove("bam"); }
+    const di = async (el, ms = 480) => { await toi(...tam(el), ms); await cho(nhip(150)); };
+    function vongSong(x, y) {
+      const r = document.createElement("i"); r.className = "kh-song"; r.style.left = x + "px"; r.style.top = y + "px"; vis.append(r);
+      gsap.fromTo(r, { scale: .3, opacity: .95 }, { scale: 1.8, opacity: 0, duration: .55, ease: "power2.out", onComplete: () => r.remove() });
+    }
+    const nay = (el, tu = .88) => gsap.fromTo(el, { scale: tu }, { scale: 1, duration: .5, ease: "back.out(3)", clearProps: "transform" });
+    async function bam(el) { cur.classList.add("bam"); el.classList.add("bam"); vongSong(cx + 2, cy + 2); await cho(150); cur.classList.remove("bam"); el.classList.remove("bam"); }
     // bước i: sáng dòng i bên trái + thẻ tương ứng trong cửa sổ, vạch tiến độ chạy đúng ms
     const THE_CUA = [0, 1, 3, -1];                                  // dòng 4 (ngôn ngữ) = nút VI/EN trên thanh tiêu đề
     function buoc(i, ms, viec) {
       ds.forEach((li, k) => li.classList.toggle("on", k === i));
       the.forEach((t, k) => t.classList.toggle("on", k === THE_CUA[i]));
+      if (the[THE_CUA[i]]) gsap.fromTo(the[THE_CUA[i]], { scale: .98 }, { scale: 1, duration: .6, ease: "elastic.out(1,.5)", clearProps: "transform" });
       langEl.classList.toggle("on", THE_CUA[i] === -1);
       const vach = ds[i].querySelector(".st-tien");
       return Promise.all([giu(gsap.fromTo(vach, { scaleX: 0 }, { scaleX: 1, duration: ms / 1000, ease: "none" })), viec()]);
     }
     async function doiNgonNgu(l) {
       const chu = win.querySelectorAll("[data-w]");
-      await giu(gsap.to(chu, { opacity: 0, duration: .12, ease: "power1.in" }));
+      await giu(gsap.to(chu, { opacity: 0, y: -6, duration: .14, ease: "power2.in" }));   // chữ cũ trượt lên biến mất…
       veChu(l);
-      await giu(gsap.to(chu, { opacity: 1, duration: .22, ease: "power1.out", stagger: .008 }));
+      await giu(gsap.fromTo(chu, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .35, ease: "power3.out", stagger: .012, clearProps: "transform" }));   // …chữ mới trồi lên lần lượt
     }
     async function vongLap() {
       const V = vis.getBoundingClientRect(); dat(V.width * .9, V.height * .96);
@@ -1977,36 +2261,40 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           await di(nutDoi); await bam(nutDoi);
           nutDoi.hidden = true; nutHuy.hidden = false;
           keysEl.classList.add("ghi"); keysEl.textContent = ST_W[wl].nhanToHop;
-          await cho(1200);
+          await cho(nhip(1000));
           phimI ^= 1; keysEl.classList.remove("ghi", "vua-luu"); veKeys(PHIM[phimI]);
+          const kb = [...keysEl.children];                              // phím mới hiện TỪNG PHÍM như đang gõ tổ hợp
+          await giu(gsap.fromTo(kb, { opacity: 0, y: 10, scale: .6 }, { opacity: 1, y: 0, scale: 1, duration: .38, ease: "back.out(2.8)", stagger: .11, clearProps: "opacity,transform" }));
           nutDoi.hidden = false; nutHuy.hidden = true;
           void keysEl.offsetWidth; keysEl.classList.add("vua-luu");
         });
         await buoc(1, 5200, async () => {                            // PNG làm mờ hàng Chất lượng; về JPEG chọn Siêu nét
           const png = loai.querySelector('[data-v="png"]'), jpg = loai.querySelector('[data-v="jpeg"]');
-          await di(png); await bam(png); datLoai("png");
-          await cho(1300);
-          await di(jpg, 450); await bam(jpg); datLoai("jpeg");
-          await cho(250);
+          await di(png); await bam(png); datLoai("png"); nay(png);
+          await cho(nhip(1300));
+          await di(jpg, 300); await bam(jpg); datLoai("jpeg"); nay(jpg);
+          await cho(nhip(200));
           const sieu = chat.querySelector('[data-v="sieu"]'), cao = chat.querySelector('[data-v="cao"]');
           const dich = chat.querySelector(".on") === sieu ? cao : sieu;
-          await di(dich, 450); await bam(dich); chonSeg(chat, dich.dataset.v);
+          await di(dich, 300); await bam(dich); chonSeg(chat, dich.dataset.v); nay(dich);
         });
         await buoc(2, 4200, async () => {                            // Mở thư mục → thư mục ảnh vừa chụp bật lên
           await di(nutMo); await bam(nutMo);
-          await giu(gsap.fromTo(folder, { autoAlpha: 0, y: 18, scale: .96 }, { autoAlpha: 1, y: 0, scale: 1, duration: .38, ease: "back.out(1.6)" }));
-          await cho(1900);
+          const hinh = folder.querySelectorAll("figure");
+          gsap.fromTo(hinh, { opacity: 0, y: 14, scale: .7 }, { opacity: 1, y: 0, scale: 1, duration: .45, ease: "back.out(2.2)", stagger: .09, delay: .12, clearProps: "opacity,transform" });
+          await giu(gsap.fromTo(folder, { autoAlpha: 0, y: 24, scale: .9 }, { autoAlpha: 1, y: 0, scale: 1, duration: .5, ease: "back.out(1.8)" }));
+          await cho(nhip(1700));
           await giu(gsap.to(folder, { autoAlpha: 0, y: 10, duration: .2, ease: "power1.in" }));
         });
         await buoc(3, 3800, async () => {                            // đổi ngôn ngữ cửa sổ rồi trả về ngôn ngữ của trang
           const khac = wl === "vi" ? "en" : "vi";
-          const n1 = langEl.querySelector(`[data-l="${khac}"]`); await di(n1); await bam(n1); await doiNgonNgu(khac);
-          await cho(1500);
-          const n2 = langEl.querySelector(`[data-l="${langTrang()}"]`); await di(n2, 400); await bam(n2); await doiNgonNgu(langTrang());
+          const n1 = langEl.querySelector(`[data-l="${khac}"]`); await di(n1); await bam(n1); nay(n1); await doiNgonNgu(khac);
+          await cho(nhip(1400));
+          const n2 = langEl.querySelector(`[data-l="${langTrang()}"]`); await di(n2, 260); await bam(n2); nay(n2); await doiNgonNgu(langTrang());
         });
         dangChay = false;
         ds.forEach(li => li.classList.remove("on")); the.forEach(t => t.classList.remove("on")); langEl.classList.remove("on");
-        const W = vis.getBoundingClientRect(); await toi(W.width * .9, W.height * .96, 700);
+        const W = vis.getBoundingClientRect(); await toi(W.width * .9, W.height * .96, 700, "power2.inOut");
         await cho(900);
       }
     }

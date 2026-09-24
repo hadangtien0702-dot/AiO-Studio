@@ -3,5 +3,6 @@
   "installCommand": "echo trang-tinh-khong-cai",
   "buildCommand": "echo trang-tinh-khong-dung",
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "ignoreCommand": "if git diff --quiet \"${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}\" HEAD -- . 2>/dev/null; then exit 0; else exit 1; fi"
 }
