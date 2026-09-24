@@ -33,3 +33,11 @@ contextBridge.exposeInMainWorld('settings', {
   dragTo: (tongDx, tongDy) => ipcRenderer.send('settings:drag-to', tongDx, tongDy),
   dragEnd: () => ipcRenderer.send('settings:drag-end'),
 })
+
+/* Ban quyen (24/09): dung thu 14 ngay + ma Polar */
+contextBridge.exposeInMainWorld('banQuyen', {
+  get: () => ipcRenderer.invoke('bq:get'),
+  kichHoat: (ma) => ipcRenderer.invoke('bq:kich-hoat', ma),
+  huy: () => ipcRenderer.invoke('bq:huy'),
+  mua: () => ipcRenderer.invoke('bq:mua'),
+})

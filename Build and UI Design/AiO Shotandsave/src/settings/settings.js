@@ -256,3 +256,75 @@ btnPick.addEventListener('click', async () => {
   }
 })
 btnOpen.addEventListener('click', () => window.settings.openFolder())
+
+/* ── Ban quyen (24/09) ────────────────────────────────────────────────────
+   Chua kich hoat: o nhap ma + Kich hoat + Mua. Da kich hoat: ma da che + han cap nhat + Huy (bam 2 lan).
+   Het dung thu: the vien cam, mo Cai dat la thay ngay (main mo cua so khi bam chup bi khoa). */
+;(() => {
+  const the = document.getElementById('the-bq')
+  const moTa = document.getElementById('bq-mo-ta'), tieuDe = document.getElementById('bq-tieu-de')
+  const khoiNhap = document.getElementById('bq-nhap'), khoiCo = document.getElementById('bq-co')
+  const o = document.getElementById('bq-ma'), nutKH = document.getElementById('bq-kich-hoat')
+  const nutMua = document.getElementById('bq-mua'), nutHuy = document.getElementById('bq-huy'), msg = document.getElementById('bq-msg')
+  if (!the || !window.banQuyen) return
+  o.placeholder = t(o.dataset.i18nPh)
+  const ngay = (iso) => new Date(iso).toLocaleDateString(window.i18n.lang === 'en' ? 'en-US' : 'vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
+  const bao = (chu, kieu) => { msg.textContent = chu || ''; msg.className = 'msg' + (kieu ? ' ' + kieu : '') }
+
+  function ve(s) {
+    if (!s) { the.hidden = true; return }
+    const co = s.loai === 'da-kich-hoat'
+    khoiNhap.hidden = co; khoiCo.hidden = !co
+    the.classList.toggle('het', s.loai === 'het-han-thu')
+    if (co) {
+      tieuDe.textContent = t('bq.daKichHoat') + ' · ' + s.maHienThi
+      moTa.textContent = s.hetQuyenCapNhat || s.khongGiuMay || !s.hetHan ? t('bq.hetCapNhat') : t('bq.capNhatDen').replace('{ngay}', ngay(s.hetHan))
+      nutHuy.hidden = !!s.khongGiuMay            // ma het han khong giu cho may nao -> khong co gi de huy
+    } else if (s.biThuHoi) {
+      tieuDe.textContent = t('bq.thuHoi'); moTa.textContent = t('bq.thuHoiMoTa')
+    } else if (s.lyDoMatMa === 'may-bi-go') {
+      tieuDe.textContent = t('bq.biGo'); moTa.textContent = t('bq.biGoMoTa')
+    } else if (s.loai === 'dung-thu') {
+      tieuDe.textContent = t('bq.dungThu').replace('{n}', s.ngayConLai); moTa.textContent = t('bq.dungThuMoTa')
+    } else {
+      tieuDe.textContent = t('bq.hetThu'); moTa.textContent = t('bq.hetThuMoTa')
+    }
+  }
+
+  async function kichHoat() {
+    nutKH.disabled = true; nutKH.textContent = t('bq.dangKichHoat'); bao('')
+    try {
+      const r = await window.banQuyen.kichHoat(o.value)
+      ve(r.trangThai)
+      if (r.ok) { o.value = ''; bao(r.canhBao === 'ma-het-han' ? t('bq.okHetHan') : t('bq.ok'), 'ok') }
+      else bao(t('bq.loi.' + r.loi), 'err')
+    } catch (e) { bao(t('bq.loi.mat-mang'), 'err') }
+    nutKH.disabled = false; nutKH.textContent = t('bq.kichHoat')
+  }
+  nutKH.addEventListener('click', kichHoat)
+  o.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); kichHoat() } })
+  nutMua.addEventListener('click', () => window.banQuyen.mua())
+
+  // Huy: bam lan 1 doi chu "Bam lan nua de huy" 3 giay (khong hop thoai), bam lan 2 moi huy that
+  let choXacNhan = null
+  nutHuy.addEventListener('click', async () => {
+    if (!choXacNhan) {
+      nutHuy.textContent = t('bq.huyXacNhan'); nutHuy.classList.remove('phu')
+      choXacNhan = setTimeout(() => { choXacNhan = null; nutHuy.textContent = t('bq.huy'); nutHuy.classList.add('phu') }, 3000)
+      return
+    }
+    clearTimeout(choXacNhan); choXacNhan = null
+    nutHuy.disabled = true; nutHuy.textContent = t('bq.dangHuy'); bao('')
+    try {
+      const r = await window.banQuyen.huy()
+      ve(r.trangThai)
+      bao(r.ok ? t('bq.daHuy') : t('bq.loi.' + r.loi), r.ok ? 'ok' : 'err')
+    } catch (e) { bao(t('bq.loi.mat-mang'), 'err') }
+    nutHuy.disabled = false; nutHuy.textContent = t('bq.huy'); nutHuy.classList.add('phu')
+  })
+
+  window.banQuyen.get().then((s) => {
+    ve(s)
+    if (s && s.loai === 'het-han-thu') o.focus()   // vua bi khoa chup -> dat con tro san vao o nhap ma
+  })
+})()

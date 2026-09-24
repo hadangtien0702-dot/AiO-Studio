@@ -200,3 +200,20 @@ main {
 .chon-nut.chon { background: var(--accent); color: var(--accent-on, #fff); font-size: 13px; }
 /* PNG = lossless, khong can chon chat luong -> lam mo hang nay */
 #hang-chat-luong.mo { opacity: 0.45; pointer-events: none; }
+
+/* ── Ban quyen (24/09) ────────────────────────────────────────────────── */
+main { overflow-y: auto; min-height: 0; }   /* them the Ban quyen: cua so 700px khong du cao -> cuon */
+#the-bq.het { border-color: var(--accent); }
+#the-bq.het #bq-tieu-de { color: var(--accent); }
+#bq-nhap[hidden], #bq-co[hidden] { display: none !important; }
+.bq-hang { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-2); }
+.bq-o {
+  flex: 1; min-width: 0; height: 34px; padding: 0 var(--sp-3);
+  border: 1px solid var(--line-2); border-radius: var(--r-pill);
+  background: var(--bg-0); color: var(--text-1);
+  font: 600 12.5px/1 var(--font-ui); letter-spacing: .3px; user-select: text;
+}
+.bq-o:focus { outline: none; border-color: var(--accent); }
+.bq-o::placeholder { color: var(--text-3); font-weight: 500; }
+.nut:disabled { opacity: .6; cursor: default; }
+#bq-msg { margin-top: var(--sp-2); }

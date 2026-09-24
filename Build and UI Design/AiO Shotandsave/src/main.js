@@ -17,13 +17,15 @@
 const {
   app, BrowserWindow, Tray, Menu, globalShortcut,
   ipcMain, screen, desktopCapturer, nativeImage, clipboard, shell, dialog,
-  Notification, protocol,
+  Notification, protocol, net,
 } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const kho = require('./kho')
 const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
+const os = require('os')
+const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
    Video tang toc phan cung nam o lop OVERLAY ma bo chup cu (Desktop Duplication
@@ -88,6 +90,37 @@ const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
 let currentHotkey = DEFAULT_HOTKEY // nap tu config khi app ready
 let lang = 'vi' // 'vi' | 'en' — nap tu config
 const T = (key) => i18n.t(lang, key)
+
+/* ── Ban quyen (24/09, anh chot 23/09 + A 24/09) ──────────────────────────
+   File RIENG `ban-quyen.json` trong userData (khong chung cau-hinh.json: ghi atomic rieng,
+   reset cai dat khong dung toi ban quyen). Selftest/harness bo qua kiem (khong khoa chup). */
+const WEB_MUA = 'https://aio-shotsave.vercel.app/#checkout'
+let bq = null
+function khoiTaoBanQuyen() {
+  const file = path.join(app.getPath('userData'), 'ban-quyen.json')
+  bq = taoBanQuyen({
+    doc: () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { return null } },
+    ghi: (s) => {
+      fs.mkdirSync(path.dirname(file), { recursive: true })
+      fs.writeFileSync(file + '.tmp', JSON.stringify(s, null, 2)); fs.renameSync(file + '.tmp', file)
+    },
+    fetch: (url, opt) => net.fetch(url, opt), // net.fetch = mang Chromium, theo proxy he thong (may cong ty)
+    tenMay: os.hostname(),
+    meta: { nen_tang: process.platform, ban: app.getVersion() },
+  })
+  const s = bq.trangThai()
+  ghiLog('ban-quyen: ' + s.loai + (s.loai === 'da-kich-hoat' ? ' ' + s.maHienThi + (s.hetQuyenCapNhat ? ' het-cap-nhat' : '') : ' con ' + s.ngayConLai + ' ngay'))
+}
+const BO_QUA_BAN_QUYEN = IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST
+async function kiemBanQuyenNen() {
+  if (!bq) return
+  try {
+    const r = await bq.kiemTra()
+    if (r.daHoi) ghiLog('ban-quyen kiem lai: ' + r.trangThai.loai + (r.trangThai.lyDoMatMa ? ' (' + r.trangThai.lyDoMatMa + ')' : ''))
+    else if (r.loi) ghiLog('ban-quyen kiem lai: bo qua (' + r.loi + ')')
+  } catch (e) { ghiLog('ban-quyen kiem lai LOI: ' + e.message) }
+  rebuildTrayMenu()
+}
 
 /* ☠️ Khi chay dev/selftest, GHI LAI moi loi khong bat duoc ra file.
    Vap 24/08: selftest thoat app ngay sau khi ghim nen hop thoai loi bi nuot —
@@ -190,7 +223,10 @@ app.whenReady().then(() => {
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
   lang = ch.lang || 'vi'
+  khoiTaoBanQuyen()
   createTray()
+  setTimeout(kiemBanQuyenNen, 15000)                    // hoi lai Polar sau khi boot yen (toi da 3 ngay/lan, xem banquyen.js)
+  setInterval(kiemBanQuyenNen, 6 * 60 * 60 * 1000)
   const okPhim = registerHotkey()
   /* Nhat ky boot: sau nay ai bao "phim tat doi/khong an" la co dau vet ngay
      (truoc 31/08 log chi ghi thao tac chup — chuyen phim tat MU hoan toan). */
@@ -315,8 +351,18 @@ function createTray() {
   tray.on('click', () => startCapture())
 }
 
+function dongBanQuyenTray() {
+  if (!bq) return []
+  const s = bq.trangThai()
+  if (s.loai === 'da-kich-hoat') return []
+  const nhan = s.loai === 'dung-thu' ? T('bq.trayConNgay').replace('{n}', s.ngayConLai) : T('bq.trayHetHan')
+  return [{ label: nhan, click: () => openSettings() }, { type: 'separator' }]
+}
+
 function rebuildTrayMenu() {
+  if (!tray) return
   const menu = Menu.buildFromTemplate([
+    ...dongBanQuyenTray(),
     { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
@@ -511,6 +557,22 @@ ipcMain.handle('settings:open-folder', () => {
 })
 ipcMain.handle('settings:reset', () => setHotkey(DEFAULT_HOTKEY))
 
+/* Ban quyen: trang thai / nhap ma / huy kich hoat / mo trang mua */
+ipcMain.handle('bq:get', () => (bq ? bq.trangThai() : null))
+ipcMain.handle('bq:kich-hoat', async (_e, ma) => {
+  const r = await bq.kichHoat(ma)
+  ghiLog('ban-quyen kich hoat: ' + (r.ok ? 'OK ' + r.trangThai.maHienThi + (r.canhBao ? ' (' + r.canhBao + ')' : '') : 'LOI ' + r.loi))
+  rebuildTrayMenu()
+  return r
+})
+ipcMain.handle('bq:huy', async () => {
+  const r = await bq.huyKichHoat()
+  ghiLog('ban-quyen huy kich hoat: ' + (r.ok ? 'OK' : 'LOI ' + r.loi))
+  rebuildTrayMenu()
+  return r
+})
+ipcMain.handle('bq:mua', () => shell.openExternal(WEB_MUA))
+
 /* ---------------------------------------------------------------------- */
 /* Chup: grab man hinh duoi con tro -> overlay chon vung                   */
 /* ---------------------------------------------------------------------- */
@@ -530,6 +592,13 @@ let layersSanSang = null // layers cua the he hien tai — overlay nao nap xong 
 
 async function startCapture() {
   if (overlayWins.length) return // dang chon vung, bo qua
+  // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
+  if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
+    ghiLog('capture: KHOA — het dung thu, chua co ma')
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('bq.baoKhoa') }).show()
+    openSettings()
+    return
+  }
 
   const displays = screen.getAllDisplays()
   if (!displays.length) return

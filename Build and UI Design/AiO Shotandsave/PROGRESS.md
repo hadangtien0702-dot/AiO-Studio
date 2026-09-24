@@ -1,6 +1,16 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-23 14:46 +0700
+> - 🔑 **0.5.6 (24/09, CHUA BUILD / CHUA CAI) — BAN QUYEN:** `src/banquyen.js` (khong require electron, tiem doc/ghi/fetch/gio)
+>   + noi vao `main.js` (`khoiTaoBanQuyen` luc boot, file RIENG `userData/ban-quyen.json` ghi atomic; `startCapture` KHOA khi
+>   het dung thu -> Notification + mo Cai dat; tray co dong "Dung thu: con N ngay"; kiem lai Polar 15 s sau boot roi 6 h/lan,
+>   toi da 3 ngay/lan hoi that; `net.fetch` = mang Chromium theo proxy he thong) + the **Ban quyen** dau man Cai dat (o dan ma,
+>   Kich hoat, Mua -> aio-shotsave.vercel.app/#checkout, Huy kich hoat bam 2 lan; main cuon duoc). Selftest/harness BO QUA khoa.
+>   `npm run test:banquyen` **27/27** voi Polar GIA (cau tra loi doc tu ma nguon polarsource/polar `license_key/service.py`;
+>   doi chung: tat luat A -> 1 TRUOT dung cho). Giao dien chup bang Chrome that 4 trang thai x VI/EN (preload gia).
+>   ☠️ **CHUA do:** goi Polar THAT (polar.sh bi chan tu may dam may — lan dau tren may anh: nhap ma that, xem run-log dong
+>   `ban-quyen kich hoat: OK`), chay Electron that (`npm test` selftest phai van 5/5 — BO_QUA_BAN_QUYEN), build + cai de.
+>   Nguoi dang dung 0.5.5 cai 0.5.6 = bat dau 14 ngay dung thu tu luc mo ban moi.
 > - 📌 **BAN DANG DUNG: 0.5.5** (Windows cai 16/09 11:33; 0.5.4 cai 10:29; 0.5.3 cai 15/09 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
 >   `Release/AiO Shotandsave/`). 0.5.0 = luong chup chay san + pool overlay (phim -> overlay 7-20 ms, anh
 >   tu do, 0.4.17 la 411-581 ms); 0.5.1 keo khay 4 goc; 0.5.2 JPEG nhanh truoc; 0.5.3 anh doc hien doc.
