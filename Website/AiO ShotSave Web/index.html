@@ -206,6 +206,9 @@ h1 em{font-style:normal;color:var(--brand)}
 .dcursor svg{transition:transform .12s ease}
 .dcursor.bam svg{transform:scale(.82)}
 .dfly{position:absolute;z-index:6;transform-origin:0 0;border-radius:4px;pointer-events:none;box-shadow:0 12px 30px rgb(0 0 0/45%)}
+/* 24/09 anh: "peak hơn, cháy hơn, mượt hơn": loé sáng lúc chụp + vòng sóng lúc bấm chuột */
+.dflash{position:absolute;z-index:6;pointer-events:none;background:#fff;border-radius:2px;opacity:0;box-shadow:0 0 40px 10px rgb(248 104 32/55%)}
+.dsong{position:absolute;z-index:6;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 12px rgb(248 104 32/60%)}
 .dauto{position:absolute;top:10px;right:10px;z-index:7;display:none;align-items:center;gap:8px;min-height:36px;padding:0 12px;border:0;border-radius:999px;
   background:rgb(20 20 20/82%);color:#fff;font:600 13px/1 Inter,sans-serif;cursor:pointer;backdrop-filter:blur(6px);box-shadow:0 0 0 1px rgb(255 255 255/12%)}
 .dauto::before{content:"";width:8px;height:8px;border-radius:50%;background:#4ec98a;animation:puls 1.8s ease-in-out infinite}
@@ -1126,6 +1129,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   let tool = "box", color = "#ff3b30";
   const shots = [];
 
+  const mo = { a: .5 };               // độ tối của màn phủ (24/09: tối dần vào thay vì bật phắt)
   const rr = (c, x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
 
   // Cảnh desktop giả: một cửa sổ app có thanh bên + biểu đồ cột
@@ -1173,13 +1177,21 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   function drawOv() {
     const c = ocx; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
     if (mode !== "cap") return;
-    c.fillStyle = "rgba(10,8,6,.5)"; c.fillRect(0, 0, W, H);
+    c.fillStyle = `rgba(10,8,6,${mo.a})`; c.fillRect(0, 0, W, H);
     if (!sel) return;
     c.clearRect(sel.x, sel.y, sel.w, sel.h);
     c.save(); c.beginPath(); c.rect(sel.x, sel.y, sel.w, sel.h); c.clip();
     shapes.forEach(s => drawShape(c, s)); if (tam) drawShape(c, tam);
     c.restore();
-    c.strokeStyle = "#F86820"; c.lineWidth = 2; c.strokeRect(sel.x - 1, sel.y - 1, sel.w + 2, sel.h + 2);
+    // viền cam phát sáng (24/09) + 4 chấm góc khi đã khoanh xong
+    c.save(); c.shadowColor = "rgba(248,104,32,.85)"; c.shadowBlur = 14;
+    c.strokeStyle = "#F86820"; c.lineWidth = 2; c.strokeRect(sel.x - 1, sel.y - 1, sel.w + 2, sel.h + 2); c.restore();
+    if (chon || keo === "chon" || stage.classList.contains("auto")) {
+      const g = 7; c.fillStyle = "#fff"; c.strokeStyle = "#F86820"; c.lineWidth = 1.5;
+      for (const [gx, gy] of [[sel.x, sel.y], [sel.x + sel.w, sel.y], [sel.x, sel.y + sel.h], [sel.x + sel.w, sel.y + sel.h]]) {
+        c.fillRect(gx - g / 2, gy - g / 2, g, g); c.strokeRect(gx - g / 2, gy - g / 2, g, g);
+      }
+    }
   }
 
   function size() {
@@ -1201,6 +1213,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     size();                            // đo lại cỡ ngay lúc bắt đầu (ResizeObserver có thể chưa kịp chạy)
     mode = "cap"; sel = null; chon = false; shapes = []; tam = null;
     stage.classList.add("cap");
+    if (window.gsap) { gsap.killTweensOf(mo); mo.a = 0; gsap.to(mo, { a: .55, duration: .28, ease: "power2.out", onUpdate: drawOv }); }
     stage.querySelectorAll(".dpin,.dshelf").forEach(el => el.style.visibility = "hidden");
     drawOv();
   }
@@ -1418,7 +1431,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   chip.type = "button"; chip.className = "dauto"; chip.dataset.i = "demoAuto"; chip.textContent = window.ssT("demoAuto");
   stage.append(chip);
   let thay = false, epChay = false;
-  new IntersectionObserver(es => { thay = es[0].isIntersecting; }, { threshold: .35 }).observe(stage);
+  new IntersectionObserver(es => { thay = es[0].isIntersecting; if (typeof capNhatTw === "function") capNhatTw(); }, { threshold: .35 }).observe(stage);
   const ngu = ms => new Promise((res, rej) => {
     const luot = veVuot; let con = ms, truoc = performance.now();
     const tick = now => {
@@ -1431,7 +1444,28 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   });
   let cx = 0, cy = 0;
   const datCur = (x, y) => { cx = x; cy = y; cur.style.transform = `translate(${x}px,${y}px)`; };
-  async function diToi(x, y, ms = 600, moiBuoc) {
+  // 24/09 "mượt hơn": di chuyển bằng GSAP theo nhịp màn hình (trước: setTimeout 16 ms, lệch nhịp = giật).
+  // Ngoài màn hình thì tạm dừng; khách chạm vào demo thì huỷ hết.
+  const dangTw = new Set(), chayDuoc = () => (thay && !document.hidden) || epChay;
+  const capNhatTw = () => dangTw.forEach(o => chayDuoc() ? o.tw.resume() : o.tw.pause());
+  document.addEventListener("visibilitychange", capNhatTw);
+  const chayTw = (target, vars) => new Promise((res, rej) => {
+    if (!tuChay) return rej("dung");
+    const o = { rej };
+    o.tw = gsap.to(target, Object.assign({}, vars, { onComplete() { dangTw.delete(o); if (vars.onComplete) vars.onComplete(); res(); } }));
+    dangTw.add(o); if (!chayDuoc()) o.tw.pause();
+  });
+  const huyTw = () => { dangTw.forEach(o => { o.tw.kill(); o.rej("dung"); }); dangTw.clear(); };
+  function song(x, y) {
+    if (!window.gsap) return;
+    const r = document.createElement("i"); r.className = "dsong"; r.style.left = x + "px"; r.style.top = y + "px"; stage.append(r);
+    gsap.fromTo(r, { scale: .3, opacity: 1 }, { scale: 1.9, opacity: 0, duration: .5, ease: "power2.out", onComplete: () => r.remove() });
+  }
+  async function diToi(x, y, ms = 600, moiBuoc, ease = "power3.inOut") {
+    if (window.gsap) {
+      const o = { x: cx, y: cy };
+      return chayTw(o, { x, y, duration: ms / 1000, ease, onUpdate() { datCur(o.x, o.y); if (moiBuoc) moiBuoc(cx, cy); } });
+    }
     const x0 = cx, y0 = cy, t0 = performance.now();
     for (;;) {
       await ngu(16);
@@ -1441,7 +1475,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (k >= 1) return;
     }
   }
-  const bam = async () => { cur.classList.add("bam"); await ngu(140); cur.classList.remove("bam"); };
+  const bam = async () => { cur.classList.add("bam"); song(cx + 2, cy + 2); await ngu(140); cur.classList.remove("bam"); };
   const tamCua = el => { const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(); return [r.left - s.left + r.width / 2, r.top - s.top + r.height / 2]; };
 
   const KICH_BAN = [
@@ -1456,8 +1490,11 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     await diToi(x, y, 650);
     await bam(); batDau();
     sel = { x, y, w: 0, h: 0, ox: x, oy: y }; chon = false;
-    await diToi(x + w, y + h, 750, (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); });
+    await diToi(x + w, y + h, 750, (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); }, "power2.inOut");
     chon = true; datNhan(); datTools(); drawOv();
+    if (window.gsap) {                                   // thanh công cụ bật lên từ dưới vùng chọn
+      gsap.fromTo(tools, { opacity: 0, y: 8, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: .35, ease: "back.out(2)", clearProps: "opacity,transform" });
+    }
     await ngu(250);
     const nutTool = tools.querySelector(`[data-tool="${kb.tool}"]`), nutMau = tools.querySelector(`[data-color="${kb.mau}"]`);
     await diToi(...tamCua(nutTool), 450); await bam(); chonTool(kb.tool);
@@ -1476,6 +1513,12 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     await ngu(300);
     await diToi(...tamCua(tools.querySelector(".xong")), 450); await bam();
     const vung = { ...sel };
+    if (window.gsap) {                                   // loé sáng như vừa bấm chụp
+      const f = document.createElement("i"); f.className = "dflash";
+      Object.assign(f.style, { left: vung.x + "px", top: vung.y + "px", width: vung.w + "px", height: vung.h + "px" }); stage.append(f);
+      gsap.timeline({ onComplete: () => f.remove() }).to(f, { opacity: .9, duration: .07, ease: "power1.out" }).to(f, { opacity: 0, duration: .45, ease: "power2.out" });
+      await ngu(90);
+    }
     xong();
     await bayVaoKhay(vung);
   }
@@ -1489,6 +1532,21 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     Object.assign(fly.style, { left: vung.x + "px", top: vung.y + "px", width: vung.w + "px", height: vung.h + "px" });
     stage.append(fly);
     const k = dich.height / vung.h;
+    if (window.gsap) {
+      const dx = dich.left - s.left - vung.x, dy = dich.top - s.top - vung.y, t = { p: 0 }, vong = Math.min(120, Math.abs(dy) * .45 + 40);
+      try {
+        await chayTw(t, { p: 1, duration: .75, ease: "power2.inOut", onUpdate() {
+          const q = t.p, sc = 1 + (k - 1) * q, rot = Math.sin(Math.PI * q) * -8;
+          fly.style.transform = `translate(${dx * q}px,${dy * q - vong * Math.sin(Math.PI * q)}px) rotate(${rot}deg) scale(${sc})`;
+          fly.style.opacity = String(1 - .05 * q);
+        } });
+      } finally { fly.remove(); o.style.opacity = ""; }
+      const [ox, oy] = tamCua(o); song(ox, oy);
+      o.style.transition = "none";
+      gsap.fromTo(o, { scale: .7 }, { scale: 1, duration: .6, ease: "elastic.out(1,.45)", clearProps: "transform", onComplete: () => { o.style.transition = ""; } });
+      gsap.fromTo(countEl, { scale: 1.6 }, { scale: 1, duration: .5, ease: "back.out(3)", clearProps: "transform" });
+      return;
+    }
     const an = fly.animate([
       { transform: "translate(0,0) scale(1)", opacity: 1 },
       { transform: `translate(${dich.left - s.left - vung.x}px,${dich.top - s.top - vung.y}px) scale(${k})`, opacity: .95 }
@@ -1517,6 +1575,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   function dungTuChay() {
     if (!tuChay) return;
     tuChay = false; veVuot++;
+    if (window.gsap) huyTw();
     stage.classList.remove("auto");
     stage.querySelectorAll(".dfly").forEach(f => f.remove());
     listEl.querySelectorAll(".ditem").forEach(o => o.style.opacity = "");
