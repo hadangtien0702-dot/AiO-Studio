@@ -1092,8 +1092,8 @@ window.ssToast = key => {
 };
 document.getElementById("buy").addEventListener("click", e => {
   if (CHECKOUT_URL) { e.currentTarget.href = CHECKOUT_URL; return; }
-  e.preventDefault();
-  window.ssToast("toast");
+  // 24/09 anh: chưa có link Polar thì bấm Mua mở trang XEM THỬ luồng mua (ghi rõ DEMO, không thu thông tin thanh toán)
+  e.currentTarget.href = "checkout-demo.html";
 });
 
 // ---- Sáng / tối: mặc định theo máy khách, bấm nút thì ghi nhớ lựa chọn ----
