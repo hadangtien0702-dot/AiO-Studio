@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--
+  AiO Shot & Save — THƯ CẢM ƠN / MÃ BẢN QUYỀN (tiếng Việt). Anh Tiến chốt 25/09: kiểu thẻ như Apple
+  (nền xám nhạt #f5f5f7, thẻ trắng bo tròn 24px, chữ canh giữa, tiêu đề to đậm, link "… ›").
+  An toàn cho hộp thư: bảng + style inline; <style> chỉ để xếp 2 cột thành 1 cột trên điện thoại.
+  Không SVG (Gmail bỏ) -> icon/ảnh là PNG @2x ở img/email/ trên web.
+  Ô trống do bên gửi thư điền:
+    {{asset_base}} (vd https://aio-shotsave.vercel.app/img/email)
+    {{customer_email}} {{license_key}} {{order_id}} {{order_date}} {{price}} {{update_until}}
+    {{download_win}} {{download_mac}}
+  Nút cam #F86820 chữ trắng đậm 17px (3,0:1 chỉ đạt cho chữ đậm to). Link cam đậm #b8501a (5:1).
+-->
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Mã bản quyền Shot &amp; Save của bạn</title>
+<style>
+  @media (max-width:560px){
+    .cot{display:block!important;width:100%!important;box-sizing:border-box}
+    .buoc .cot{padding:0 0 14px 0!important}
+    .khe{display:block!important;width:100%!important;height:14px!important}
+    .the{padding-left:24px!important;padding-right:24px!important}
+    .to{font-size:34px!important}
+    .ma{font-size:16px!important;padding:14px 16px!important}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f7;-webkit-text-size-adjust:100%;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f5f5f7;font-size:1px;line-height:1px;">Cảm ơn bạn đã mua Shot &amp; Save. Mã bản quyền nằm ngay trong thư, chỉ cần dán vào là dùng.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f5f7;">
+<tr><td align="center" style="padding:28px 12px 36px 12px;">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
+
+  <!-- đầu thư -->
+  <tr><td align="center" style="padding:0 0 22px 0;">
+    <img src="{{asset_base}}/logo.png" width="26" height="24" alt="" style="display:inline-block;vertical-align:middle;border:0;">
+    <span style="display:inline-block;vertical-align:middle;padding-left:8px;font-size:17px;font-weight:600;color:#1d1d1f;">Shot &amp; Save</span>
+  </td></tr>
+
+  <!-- thẻ chính -->
+  <tr><td class="the" align="center" style="background:#ffffff;border-radius:24px;padding:44px 40px 0 40px;">
+    <p style="margin:0 0 10px 0;font-size:14px;font-weight:600;color:#b8501a;">Đơn hàng đã hoàn tất</p>
+    <h1 class="to" style="margin:0 0 12px 0;font-size:40px;line-height:1.1;font-weight:700;letter-spacing:-.02em;color:#1d1d1f;">Cảm ơn bạn.</h1>
+    <p style="margin:0 auto 24px auto;max-width:420px;font-size:17px;line-height:1.5;color:#424245;">Shot &amp; Save đã sẵn sàng. Chụp màn hình, ghim lên trên mọi cửa sổ, kéo thả đi đâu cũng được.</p>
+    <a href="{{download_win}}" style="display:inline-block;background:#F86820;border-radius:980px;padding:12px 26px;font-size:17px;font-weight:700;color:#ffffff;text-decoration:none;">Tải cho Windows</a>
+    <p style="margin:14px 0 30px 0;font-size:17px;"><a href="{{download_mac}}" style="color:#b8501a;text-decoration:none;">Tải cho macOS&nbsp;›</a></p>
+    <img src="{{asset_base}}/hero.png" width="528" alt="Chọn vùng, ghim ảnh và khay ảnh của Shot &amp; Save" style="display:block;width:100%;max-width:528px;height:auto;border:0;margin:0 auto;">
+  </td></tr>
+
+  <tr><td style="height:14px;line-height:14px;font-size:0;">&nbsp;</td></tr>
+
+  <!-- mã bản quyền -->
+  <tr><td class="the" align="center" style="background:#ffffff;border-radius:24px;padding:40px 40px 38px 40px;">
+    <h2 style="margin:0 0 8px 0;font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-.01em;color:#1d1d1f;">Mã bản quyền của bạn.</h2>
+    <p style="margin:0 0 22px 0;font-size:17px;line-height:1.5;color:#424245;">Giữ lại thư này, khi cài lại máy bạn sẽ cần đến mã.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr>
+      <td class="ma" style="background:#f5f5f7;border-radius:14px;padding:16px 22px;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:19px;font-weight:600;letter-spacing:.03em;color:#1d1d1f;overflow-wrap:break-word;">{{license_key}}</td>
+    </tr></table>
+    <p style="margin:18px 0 0 0;font-size:14px;line-height:1.6;color:#6e6e73;">Dùng trên 2 máy · Cập nhật miễn phí đến {{update_until}}</p>
+  </td></tr>
+
+  <tr><td style="height:14px;line-height:14px;font-size:0;">&nbsp;</td></tr>
+
+  <!-- kích hoạt 3 bước -->
+  <tr><td class="the" align="center" style="background:#ffffff;border-radius:24px;padding:40px 40px 34px 40px;">
+    <h2 style="margin:0 0 24px 0;font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-.01em;color:#1d1d1f;">Kích hoạt trong 3 bước.</h2>
+    <table class="buoc" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td class="cot" align="center" valign="top" width="33%" style="padding:0 6px;">
+        <p style="margin:0 0 6px 0;font-size:30px;font-weight:700;color:#F86820;">1</p>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#424245;">Cài app và mở từ biểu tượng ở khay hệ thống.</p>
+      </td>
+      <td class="cot" align="center" valign="top" width="33%" style="padding:0 6px;">
+        <p style="margin:0 0 6px 0;font-size:30px;font-weight:700;color:#F86820;">2</p>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#424245;">Mở <b style="color:#1d1d1f;">Cài đặt</b>, thẻ <b style="color:#1d1d1f;">Bản quyền</b> ở trên cùng.</p>
+      </td>
+      <td class="cot" align="center" valign="top" width="33%" style="padding:0 6px;">
+        <p style="margin:0 0 6px 0;font-size:30px;font-weight:700;color:#F86820;">3</p>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#424245;">Dán mã rồi bấm <b style="color:#1d1d1f;">Kích hoạt</b>. Vậy là xong.</p>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="height:14px;line-height:14px;font-size:0;">&nbsp;</td></tr>
+
+  <!-- 2 thẻ nhỏ -->
+  <tr><td>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td class="cot" width="48%" align="center" valign="top" style="background:#ffffff;border-radius:24px;padding:34px 24px 32px 24px;">
+            <img src="{{asset_base}}/doi-may.png" width="48" height="48" alt="" style="display:block;margin:0 auto 14px auto;border:0;">
+            <h3 style="margin:0 0 8px 0;font-size:21px;line-height:1.2;font-weight:700;color:#1d1d1f;">Đổi máy dễ dàng.</h3>
+            <p style="margin:0;font-size:15px;line-height:1.5;color:#424245;">Trên máy cũ, mở Cài đặt và bấm <i>Huỷ kích hoạt trên máy này</i>, rồi nhập mã ở máy mới.</p>
+          </td>
+      <td class="khe" width="14" style="width:14px;font-size:0;line-height:0;">&nbsp;</td>
+      <td class="cot" width="48%" align="center" valign="top" style="background:#ffffff;border-radius:24px;padding:34px 24px 32px 24px;">
+            <img src="{{asset_base}}/hoan-tien.png" width="48" height="48" alt="" style="display:block;margin:0 auto 14px auto;border:0;">
+            <h3 style="margin:0 0 8px 0;font-size:21px;line-height:1.2;font-weight:700;color:#1d1d1f;">Hoàn tiền 14 ngày.</h3>
+            <p style="margin:0;font-size:15px;line-height:1.5;color:#424245;">Chưa hài lòng? Bạn được hoàn đủ tiền trong 14 ngày kể từ lúc mua.</p>
+          </td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="height:14px;line-height:14px;font-size:0;">&nbsp;</td></tr>
+
+  <!-- hỗ trợ -->
+  <tr><td class="the" align="center" style="background:#ffffff;border-radius:24px;padding:34px 40px 32px 40px;">
+    <img src="{{asset_base}}/ho-tro.png" width="48" height="48" alt="" style="display:block;margin:0 auto 14px auto;border:0;">
+    <h3 style="margin:0 0 8px 0;font-size:21px;line-height:1.2;font-weight:700;color:#1d1d1f;">Cần hỗ trợ?</h3>
+    <p style="margin:0;font-size:15px;line-height:1.5;color:#424245;">Bạn cứ trả lời thư này, sẽ có người thật đọc và phản hồi.</p>
+  </td></tr>
+
+  <!-- chi tiết đơn -->
+  <tr><td style="padding:26px 24px 0 24px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #d2d2d7;">
+      <tr>
+        <td style="padding:16px 0 4px 0;font-size:14px;color:#1d1d1f;font-weight:600;">Shot &amp; Save, trả một lần</td>
+        <td align="right" style="padding:16px 0 4px 0;font-size:14px;color:#1d1d1f;font-weight:600;">{{price}}</td>
+      </tr>
+      <tr><td colspan="2" style="padding:0 0 14px 0;font-size:12px;line-height:1.7;color:#6e6e73;">Kèm 1 năm cập nhật · Mã đơn {{order_id}} · {{order_date}}<br>Gửi tới {{customer_email}}</td></tr>
+    </table>
+  </td></tr>
+
+  <!-- chân thư -->
+  <tr><td align="center" style="padding:10px 24px 0 24px;border-top:1px solid #d2d2d7;font-size:12px;line-height:1.8;color:#6e6e73;">
+    Bạn nhận được thư này vì đã mua Shot &amp; Save.<br>
+    <a href="https://aio-shotsave.vercel.app/" style="color:#424245;text-decoration:none;">aio-shotsave.vercel.app</a> &nbsp;|&nbsp; <a href="https://aio-shotsave.vercel.app/legal.html" style="color:#424245;text-decoration:none;">Điều khoản &amp; Quyền riêng tư</a><br>
+    © AiO Studio
+  </td></tr>
+
+</table>
+
+</td></tr>
+</table>
+</body>
+</html>
