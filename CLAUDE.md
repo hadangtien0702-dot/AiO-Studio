@@ -298,6 +298,12 @@ Thử thật 23/09: push ngoài thư mục web → CANCELED (đúng); push có �
 `.env.local` chứa token OIDC, mà danh sách bỏ qua mặc định của Vercel KHÔNG có `.env*` → đã chặn bằng `.vercelignore`
 (`.env*`, `.vercel`, 2 file ignore); đo live: `/.env.local` 404. Sau mỗi deploy: curl md5 live = file local.
 
+**Thư cảm ơn khách mua Shot & Save** (25/09, anh chốt kiểu thẻ Apple): `Website/AiO ShotSave Web/email/cam-on-mua.{vi,en}.html`
+(ô trống `{{license_key}}`…`{{asset_base}}`), ảnh PNG @2x `img/email/` (Gmail bỏ SVG); `email/` nằm trong `.vercelignore`.
+☠️ Polar tự gửi thư mã bằng mẫu CỦA POLAR — mẫu này chỉ tới tay khách khi có webhook Polar → dịch vụ gửi thư (chưa làm, chưa
+gật). ☠️ Phiên Claude trên ĐÁM MÂY chỉ nhận connector (Gmail…) lúc MỞ phiên: anh đăng nhập giữa chừng vẫn báo "sign in again" →
+mở phiên mới. Gmail connector chỉ tạo THƯ NHÁP, không tự gửi.
+
 ---
 
 ## 7. Làm việc 3 máy — chốt 31/08, thêm Mac 21/09
