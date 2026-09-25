@@ -1,6 +1,6 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-23 14:46 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-25 08:40 +0700
 > - 🔑 **0.5.6 (24/09, CHUA BUILD / CHUA CAI) — BAN QUYEN:** `src/banquyen.js` (khong require electron, tiem doc/ghi/fetch/gio)
 >   + noi vao `main.js` (`khoiTaoBanQuyen` luc boot, file RIENG `userData/ban-quyen.json` ghi atomic; `startCapture` KHOA khi
 >   het dung thu -> Notification + mo Cai dat; tray co dong "Dung thu: con N ngay"; kiem lai Polar 15 s sau boot roi 6 h/lan,
@@ -11,6 +11,8 @@
 >   ☠️ **CHUA do:** goi Polar THAT (polar.sh bi chan tu may dam may — lan dau tren may anh: nhap ma that, xem run-log dong
 >   `ban-quyen kich hoat: OK`), chay Electron that (`npm test` selftest phai van 5/5 — BO_QUA_BAN_QUYEN), build + cai de.
 >   Nguoi dang dung 0.5.5 cai 0.5.6 = bat dau 14 ngay dung thu tu luc mo ban moi.
+> - 🌐 **25/09 08:40:** web + trang demo mua (email bắt buộc, mã gửi qua email) + thư cảm ơn kiểu Apple ĐÃ MERGE (PR #2–#4,
+>   main `7d308e0`). Việc chờ: xem mục 2026-09-25 bên dưới.
 > - 📌 **BAN DANG DUNG: 0.5.5** (Windows cai 16/09 11:33; 0.5.4 cai 10:29; 0.5.3 cai 15/09 10:19, mo qua explorer.exe; win + mac x64/arm64 trong
 >   `Release/AiO Shotandsave/`). 0.5.0 = luong chup chay san + pool overlay (phim -> overlay 7-20 ms, anh
 >   tu do, 0.4.17 la 411-581 ms); 0.5.1 keo khay 4 goc; 0.5.2 JPEG nhanh truoc; 0.5.3 anh doc hien doc.
@@ -343,6 +345,39 @@
 > - Quy tac anh chot 10/09 (bao cao review = gia thuyet, phai DO; khong tach
 >   file vi "lon"; khong sua ban anh khong dung): `CLAUDE.md` muc "QUY TAC ANH
 >   TIEN CHOT 10/09". Lich su chi tiet cac ban truoc: xem cac muc ben duoi.
+
+## 2026-09-25 08:40 +0700 — Bản quyền 0.5.6 · web mượt + chữ VI + trang demo mua · thư cảm ơn kiểu Apple (PR #1–#4 đã merge)
+
+**Bối cảnh:** chặn mở bán còn 2 mảng: app chưa có bản quyền, web chưa có đường mua/nhận mã. Làm trên máy đám mây (polar.sh,
+cdnjs, Gmail bị chặn/đăng xuất ở đó), đẩy qua PR rồi anh bảo "merge code lên git anh kiểm tra" mới squash-merge.
+
+**Đã làm (theo PR):**
+- **#1 `1c47754` — app 0.5.6 bản quyền:** `src/banquyen.js` + nối `main.js`, thẻ Bản quyền trong Cài đặt, 31 khoá `bq.*` VI/EN,
+  `npm run test:banquyen` 27/27 (Polar giả, câu trả lời đọc từ mã nguồn polarsource/polar). Luật A anh chốt 24/09: mã quá
+  1 năm vẫn kích hoạt được (`NHAN_MA_HET_HAN = true`, đổi false thì đúng 1 phép trượt). Ghi ở CLAUDE.md gốc mục 3.
+- **#2 `6ec5910` — web:** GSAP mạnh hơn ở hero (khung chọn to dần theo W×H, góc + loé), demo chụp, khay (bay FLIP, sóng, nảy
+  icon), Kéo to (nảy elastic), Cài đặt, bảng giá (tilt 3D); nhịp ±15 % cho "có nhanh có nhậm". Viết lại chữ VI (thân thiện,
+  vào thẳng việc; legal.html 4 dòng). MỌI nút cam chữ trắng (`--on-btn:#fff`, hover `#e0560f`). `checkout-demo.html` (3 bước,
+  noindex, EN/VI) — nút Mua dẫn tới đó khi `CHECKOUT_URL` rỗng; 2 nút tải Win/Mac. `vercel.json` thêm `ignoreCommand` (diff theo
+  `VERCEL_GIT_PREVIOUS_SHA`, trước chỉ diff HEAD^ nên bỏ sót preview).
+- **#3 `238a627` — demo mua:** bắt buộc email (rỗng/sai định dạng bị chặn), bước 3 KHÔNG hiện mã nữa, báo "đã gửi tới <email>"
+  + "Gửi lại email". Là demo: không lưu, không gửi.
+- **#4 `7d308e0` — thư cảm ơn:** `Website/AiO ShotSave Web/email/cam-on-mua.{vi,en}.html` kiểu thẻ Apple (anh gửi ảnh Apple
+  Trade In: *"phải làm mẫu thư cảm ơn giống như apple mới đẹp"*). Bảng + style inline, 600px, ô trống `{{license_key}}`
+  `{{update_until}}` `{{order_id}}` `{{order_date}}` `{{price}}` `{{customer_email}}` `{{download_win}}` `{{download_mac}}`
+  `{{asset_base}}`. Ảnh PNG @2x ở `img/email/` (Gmail bỏ SVG). `email/` nằm trong `.vercelignore`.
+
+**Kiểm chứng:** Chrome không giao diện 1280/390 px (web) và 700/390 px (thư): 0 tràn ngang, 0 lỗi JS; khựng con trỏ demo
+11/834 khung → 0–2; 4 PR đều Vercel Ready trước khi merge.
+
+**Bẫy đã vấp:** (1) tên `song` trùng `const song = new Set()` trong IIFE Cài đặt → SyntaxError làm chết cả script trang — đổi
+`vongSong`; (2) phiên đám mây chỉ nhận connector lúc MỞ phiên: anh đăng nhập Gmail giữa chừng vẫn báo "sign in again" → phải mở
+phiên mới; (3) Gmail của Claude chỉ tạo THƯ NHÁP, không tự gửi.
+
+**[CHO]** (1) gửi thư thử vào hadangtien0702@gmail.com — cần phiên mới có Gmail; (2) Polar tự gửi thư mã của Polar, KHÔNG phải
+mẫu này — muốn khách nhận đúng mẫu phải có webhook Polar → dịch vụ gửi thư (Resend…), anh chưa gật; (3) link Checkout dạng chữ
+→ `CHECKOUT_URL`; (4) mua thử Polar thật xem mã có trong thư; (5) anh thử 0.5.6 trên Windows (build + cài đè); (6) bộ cài lên
+GitHub Releases (nút tải trong web + thư đang trỏ trang chủ).
 
 ## 2026-09-23 14:46 +0700 — Polar dựng xong phía anh; chốt 2 máy · thử 14 ngày · tải qua email (Google Sheet)
 
