@@ -2,7 +2,10 @@
 <!-- 24/09 anh: "set cho anh trang bấm buy now demo". Trang XEM THỬ luồng mua khi CHƯA gắn link Checkout Polar:
      tóm tắt đơn → Thanh toán thử → màn cảm ơn (mã MẪU + tải + 3 bước kích hoạt đúng như app 0.5.6).
      KHÔNG có ô nhập thẻ / email, KHÔNG gửi dữ liệu đi đâu, ghi rõ DEMO ở mọi màn. Khi có CHECKOUT_URL thật,
-     nút Mua ở index.html đi thẳng Polar, trang này không còn ai tới. -->
+     nút Mua ở index.html đi thẳng Polar, trang này không còn ai tới.
+     25/09 anh: "không nhận được email cảm ơn… tạm thời phát triển trên localhost". Mở qua `dev/server.mjs`
+     (http://localhost:3000) thì trang GỬI THƯ THẬT: POST /api/gui-thu -> mẫu email/cam-on-mua.<lang>.html qua Gmail.
+     Trên Vercel (không phải localhost) vẫn là demo, không gửi gì. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -104,6 +107,9 @@ kbd{padding:1px 6px;border-radius:5px;background:var(--bg-soft);box-shadow:inset
 .o-email input[aria-invalid="true"]{border-color:#d93025}
 .o-email small{display:block;margin-top:6px;font-size:13px;color:var(--ink-3)}
 .o-email .loi{color:#d93025;font-weight:600}
+.tt-gui{margin:-4px 0 18px;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5;background:var(--bg-soft);border:1px solid var(--line);color:var(--ink-2)}
+.tt-gui.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.tt-gui.loi{background:var(--brand-soft);border-color:transparent;color:var(--brand-ink)}
 .thu{display:flex;gap:14px;align-items:flex-start;margin:6px 0 4px;padding:16px;border-radius:14px;background:var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line-strong)}
 .thu svg{flex:none;width:28px;height:28px;color:var(--brand)}
 .thu b{display:block;font-size:15px}
@@ -177,6 +183,7 @@ footer{max-width:960px;margin:0 auto;padding:0 16px 40px;text-align:center;color
           <small data-i="kiemThu">It usually arrives within a few minutes. Check your Spam or Promotions folder if you don't see it.</small></div>
       </div>
       <button type="button" class="gui-lai" id="gui-lai" data-i="guiLai">Didn't get it? Resend the email</button>
+      <p class="tt-gui" id="tt-gui" role="status" hidden></p>
       <ol class="cac-buoc">
         <li><span data-i-html="c1"><b>Install</b> Shot &amp; Save and open it from the tray icon.</span></li>
         <li><span data-i-html="c2">Open <b>Settings</b>. The <b>License</b> card is at the top.</span></li>
@@ -213,14 +220,26 @@ const T = {
     c3:"Chép mã trong email, dán vào rồi bấm <b>Kích hoạt</b>. Dùng được trên tối đa 2 máy.",
     taiWin:"Tải cho Windows", taiMac:"Tải cho macOS", taiGhi:"macOS: bản thử nghiệm, chạy trên chip Apple và Intel.", taiChua:"Bộ cài sẽ có khi mở bán.", veTrang:"Về trang chủ",
     ghi3:"Đổi máy? Bấm “Huỷ kích hoạt trên máy này” ở máy cũ trước. Hoàn tiền trong 14 ngày.",
-    chan:"Trang này là bản demo. Không gửi email nào, không thu thập thông tin thanh toán." },
+    chan:"Trang này là bản demo. Không gửi email nào, không thu thập thông tin thanh toán.",
+    chanLocal:"Đang chạy thử trên máy: thư cảm ơn được gửi THẬT tới email bạn nhập (mã trong thư là mã thử). Không thu tiền.",
+    dangGui:"Đang gửi thư…", guiOk:"Đã gửi thư. Bạn mở hộp thư (cả mục Spam/Quảng cáo) để xem nhé.",
+    luuFile:"Chưa cài Gmail gửi thư nên thư được lưu vào thư mục dev/hop-thu. Xem dev/README.md để gửi thật.",
+    loiMatKhau:"Gmail từ chối đăng nhập: kiểm tra GMAIL_USER và mật khẩu ứng dụng trong dev/.env.",
+    loiGui:"Gửi thư không được. Xem dòng lỗi trong cửa sổ đang chạy máy chủ.", guiNhanh:"Vừa gửi xong, bạn đợi vài giây rồi bấm lại nhé.",
+    khongMay:"Không gọi được máy chủ chạy thử. Bạn mở trang qua http://localhost:3000 nhé." },
   en: {}
 };
 document.querySelectorAll("[data-i]").forEach(el => T.en[el.dataset.i] = el.textContent);
 document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] = el.innerHTML);
 Object.assign(T.en, { dangTra:"Processing…", taiChua:"The installer will be available at launch.",
   emTrong:"Please enter your email to receive your license key.", emSai:"That email doesn't look right. Please check it.",
-  daGuiLai:"Resent (demo: no email is actually sent)." });
+  daGuiLai:"Resent (demo: no email is actually sent).",
+  chanLocal:"Local test mode: the thank-you email is REALLY sent to the address you enter (the key inside is a test key). No payment is taken.",
+  dangGui:"Sending the email…", guiOk:"Email sent. Check your inbox (and the Spam/Promotions folder).",
+  luuFile:"Gmail sending isn't set up yet, so the email was saved to dev/hop-thu. See dev/README.md to send for real.",
+  loiMatKhau:"Gmail refused to sign in: check GMAIL_USER and the app password in dev/.env.",
+  loiGui:"Couldn't send the email. See the error line in the server window.", guiNhanh:"Just sent. Please wait a few seconds and try again.",
+  khongMay:"Can't reach the local test server. Please open the page through http://localhost:3000." });
 let lang = "en";
 const t = k => (T[lang] && T[lang][k]) || T.en[k] || "";
 function setLang(l) {
@@ -236,8 +255,25 @@ setLang(daLuu || ((navigator.language || "").toLowerCase().startsWith("vi") ? "v
 // Sáng/tối: theo lựa chọn đã lưu ở trang chính
 try { const th = localStorage.getItem("ss-theme"); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
 
+// Chạy thử trên máy (dev/server.mjs): gửi thư THẬT. Trên Vercel: demo, không gửi gì.
+const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const ttGui = document.getElementById("tt-gui");
+if (LOCAL) { const c = document.querySelector("footer [data-i]"); c.dataset.i = "chanLocal"; c.textContent = t("chanLocal"); }
+function baoGui(khoa, kieu) {
+  ttGui.hidden = false; ttGui.dataset.i = khoa; ttGui.textContent = t(khoa);
+  ttGui.className = "tt-gui" + (kieu ? " " + kieu : "");
+}
+async function guiThu(email) {
+  baoGui("dangGui");
+  try {
+    const r = await fetch("/api/gui-thu", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, lang }) });
+    const d = await r.json().catch(() => ({}));
+    if (d.ok) return baoGui(d.cheDo === "luu-file" ? "luuFile" : "guiOk", d.cheDo === "luu-file" ? "" : "ok");
+    baoGui(d.loi === "sai-mat-khau-ung-dung" ? "loiMatKhau" : d.loi === "gui-qua-nhanh" ? "guiNhanh" : "loiGui", "loi");
+  } catch (e) { baoGui("khongMay", "loi"); }
+}
 const nutTra = document.getElementById("tra"), oEmail = document.getElementById("email"), goiEmail = document.getElementById("email-goi");
-// Bản demo: email CHỈ để hiện lại ở bước 3, không lưu, không gửi đi đâu
+// Trên Vercel: email CHỈ để hiện lại ở bước 3, không lưu, không gửi đi đâu. Trên localhost: gửi thư thật (guiThu)
 function kiemEmail() {
   const v = oEmail.value.trim(), dung = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
   oEmail.setAttribute("aria-invalid", String(!dung));
@@ -251,6 +287,7 @@ nutTra.addEventListener("click", () => {
   const email = kiemEmail();
   if (!email) { oEmail.focus(); return; }
   document.getElementById("dc-email").textContent = email;
+  if (LOCAL) guiThu(email);
   oEmail.disabled = true;
   nutTra.disabled = true;
   nutTra.innerHTML = '<span class="xoay" aria-hidden="true"></span><span>' + t("dangTra") + '</span>';
@@ -263,7 +300,9 @@ nutTra.addEventListener("click", () => {
   }, 1400);
 });
 document.getElementById("gui-lai").addEventListener("click", e => {
-  const nut = e.currentTarget; nut.textContent = t("daGuiLai"); nut.disabled = true;
+  const nut = e.currentTarget;
+  if (LOCAL) { nut.disabled = true; guiThu(oEmail.value.trim()).finally(() => setTimeout(() => { nut.disabled = false; }, 3000)); return; }
+  nut.textContent = t("daGuiLai"); nut.disabled = true;
   setTimeout(() => { nut.textContent = t("guiLai"); nut.disabled = false; }, 3000);
 });
 // 2 nút tải: nút của HỆ ĐIỀU HÀNH đang dùng là nút cam chính, đứng trước; nút kia viền
