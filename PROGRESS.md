@@ -18,6 +18,16 @@
   Video Download repo 0.2.2 = sổ 0.2.2 → không cần ghi. **[CHO]** chưa có lần 2f
   ghi THẬT (dữ liệu khác nhau) — lần `/xong` đầu có bản mới thì mở trang kiểm.
 
+## [panel-tong-2.0.0] - 2026-09-22 14:17 (UTC+7) - Panel tổng AiO Studio 2.0.0 viết xong, nối vào Premiere · sửa .gitignore
+
+### Trạng thái hiện tại (phiên sau đọc đầu tiên)
+- [CHỜ ANH] tắt/mở Premiere → Window → Extensions → **AiO Studio**; rồi đo thật qua cổng 8101. Chi tiết + số đo: `Build and UI Design/AiO WELCOME/PROGRESS.md`.
+- Chưa push (chờ anh bảo / `/xong`).
+
+### Gốc repo đổi gì
+- `.gitignore`: thêm `!/Build and UI Design/AiO WELCOME/dist/` — dòng cũ trỏ `AiO WELCOME Page/dist/` (không tồn tại) nên Welcome Hub 1.5.0 (44 KB) **chưa từng lên git**; kiểm `git check-ignore` → hub.js không còn bị chặn.
+- `CLAUDE.md` bảng app dòng 5 (WELCOME → panel tổng `com.aiostudio.hub` · 8101) + việc chờ; `TOOL_VERSION_TRACKER.md` dòng 5.
+
 ## [hub-va-mac] - 2026-09-21 17:4x (UTC+7) - Panel tổng: chốt kiểu BỆ PHÓNG + 3 bản vẽ chờ chọn · Mac: KHÔNG mua Apple Developer
 
 ### Trạng thái hiện tại (phiên sau đọc đầu tiên)

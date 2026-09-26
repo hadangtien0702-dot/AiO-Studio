@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AiO Studio — PANEL TỔNG ("bệ phóng"): mở mọi tool AiO từ một chỗ.
+  2.0.0 (22/09/2026) viết lại toàn bộ Welcome Hub 1.5.0 theo thiết kế anh Tiến chốt
+  ("Option 2": nền tối, banner cam, mỗi tool một màu). ID cũ `com.aio.welcome` bỏ —
+  đổi về chuẩn `com.aiostudio.*` như 11 panel kia. Cổng debug 8101 (xem .debug).
+-->
 <ExtensionManifest Version="7.0"
-    ExtensionBundleId="com.aiostudio.guideframe"
-    ExtensionBundleVersion="0.3.1"
-    ExtensionBundleName="AiO Auto Guiline Frame"
+    ExtensionBundleId="com.aiostudio.hub"
+    ExtensionBundleVersion="2.1.0"
+    ExtensionBundleName="AiO Studio"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ExtensionList>
-    <Extension Id="com.aiostudio.guideframe.panel" Version="0.3.1" />
+    <Extension Id="com.aiostudio.hub.panel" Version="2.1.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -19,11 +25,10 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.aiostudio.guideframe.panel">
+    <Extension Id="com.aiostudio.hub.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./dist/index.html</MainPath>
-          <ScriptPath>./host/index.jsx</ScriptPath>
           <CEFCommandLine>
             <Parameter>--enable-nodejs</Parameter>
             <Parameter>--mixed-context</Parameter>
@@ -34,12 +39,16 @@
         </Lifecycle>
         <UI>
           <Type>Panel</Type>
-          <Menu>AiO Studio - Guide Frame</Menu>
+          <Menu>AiO Studio</Menu>
           <Geometry>
             <Size>
-              <Height>480</Height>
-              <Width>340</Width>
+              <Height>640</Height>
+              <Width>960</Width>
             </Size>
+            <MinSize>
+              <Height>56</Height>
+              <Width>56</Width>
+            </MinSize>
           </Geometry>
         </UI>
       </DispatchInfo>

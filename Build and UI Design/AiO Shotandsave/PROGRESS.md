@@ -379,6 +379,10 @@ mẫu này — muốn khách nhận đúng mẫu phải có webhook Polar → d�
 → `CHECKOUT_URL`; (4) mua thử Polar thật xem mã có trong thư; (5) anh thử 0.5.6 trên Windows (build + cài đè); (6) bộ cài lên
 GitHub Releases (nút tải trong web + thư đang trỏ trang chủ).
 
+## 2026-09-23 15:17 +0700 — Web: gắn link Checkout Polar (CHƯA đẩy lên live)
+
+Anh dán link `https://buy.polar.sh/polar_cl_VlltCyEnXds2Q0ObLuepAblYHBlDuxHGvlMBW2LKVIL` → `CHECKOUT_URL` trong `Website/AiO ShotSave Web/index.html`. **Đo:** curl 200, chuyển tới trang checkout có "AiO Shot & Save" + 7.99; bản chạy tại máy (http.server 8123, đã tắt): nút #buy href = đúng link, toast "sắp mở bán" KHÔNG hiện. ☠️ Trang Polar báo **"AiOStudio is in test mode — test checkout with free products or 100% discount orders"** → chưa nhận tiền thật được tới khi anh xong KYC/Payouts. **CHƯA push** (push main = tự lên live) vì app chưa có ô nhập mã; anh chưa chọn A (thử trên máy) / B (đẩy live). **[CHO ANH]** tạo mã giảm 100% giới hạn vài lượt để mua thử → lấy mã AIOSS thật cho em làm phần kích hoạt trong app.
+
 ## 2026-09-23 14:46 +0700 — Polar dựng xong phía anh; chốt 2 máy · thử 14 ngày · tải qua email (Google Sheet)
 
 Anh tự làm trên Polar (em chỉ từng ô qua ảnh chụp): tổ chức `aiostudio` (Individual, USD, Org ID `05f1edf9-2456-4d3f-8ff1-a824e433673e`) · sản phẩm **AiO Shot & Save $7.99 một lần** · benefit License Keys *"Shot & Save license key + 1 year updates"* (prefix `AIOSS-XXXX-XXXX-XXXX`, hết hạn 1 năm sau khi mua, **2 máy**, khách tự quản lý máy = Yes, không giới hạn lượt) đã gắn vào sản phẩm (đối chiếu ảnh chụp trang benefit) · Checkout link "Web chinh" (Success URL để trống vì web chưa có trang cảm ơn → Polar tự hiện mã; Return URL về web; cho mã giảm giá; không bắt địa chỉ).

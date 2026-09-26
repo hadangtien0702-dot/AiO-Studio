@@ -22,6 +22,9 @@ dist/
 !/Build and UI Design/AiO Auto Re-Frames/dist/
 !/Build and UI Design/AiO Auto Guiline Frame/dist/
 !/Build and UI Design/AiO WELCOME Page/dist/
+# [22/09/2026] Dong tren tro vao thu muc KHONG TON TAI (dist that nam o "AiO WELCOME/dist/") -> Welcome Hub 1.5.0
+# (44 KB) CHUA TUNG len git. Panel tong 2.0.0 viet tay nen dist/ phai nam trong git:
+!/Build and UI Design/AiO WELCOME/dist/
 build/
 # ☠️ NGOAI LE 2026-08-17: thu muc MA NGUON ten "build" cua website — chua
 # sites-vite-plugin.ts ma vite.config.ts import. Luat "build/" o tren da nuot
@@ -45,6 +48,8 @@ out/
 *.wav
 *.mp3
 *.prin
+*.prmf
+* Masks/
 file pr for test/Adobe Premiere Pro (Beta) Audio Previews/
 file pr for test/**/Audio Previews/
 file pr for test/**/Peak Files/

@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ve guide yt-shorts 1080x1920</title>
+<script src="/dist/safe-zones.js"></script>
+<script src="/dist/ve-guide.js"></script>
+<style>body{margin:0;background:#222}canvas{width:270px;height:480px;display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+function veLai(id) {
+  const fmt = (window.SAFE_ZONES.nenTang.flatMap(n => n.dinhDang)).find(f => f.id === (id || 'yt-shorts'));
+  const c = document.getElementById('c'); const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, 1080, 1920);
+  window.VeGuide.ve(ctx, 1080, 1920, fmt, 'vi', { uiThat: true });
+  window.PNG = c.toDataURL('image/png');
+  window.FMT = fmt;
+  return { id: fmt.id, vung: fmt.vung.map(v => v.canh + '=' + v.pt), dai: window.PNG.length };
+}
+window.KQ = veLai('yt-shorts');
+</script>
+</body></html>

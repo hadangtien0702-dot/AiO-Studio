@@ -69,6 +69,33 @@ Bên thứ ba đo organic (❗ mâu thuẫn — ghi nguyên trạng):
 Mốc chính thức Google (192/480/108) **bao trùm** mọi số đo → an toàn nhất để nhúng.
 - Progress bar sát mép dưới ~10–20 px ⚠️. Subscribe 2026 to hơn ~180×80 góc dưới ⚠️ đơn nguồn.
 
+### 2a. ☠️ ĐO THẬT 25/09/2026 trên ảnh chụp điện thoại anh Tiến — KHUNG CŨ SAI Ở CỘT PHẢI + HÀNG TRÊN
+
+Anh gửi ảnh chụp màn hình chính video của anh trên YouTube Shorts (iPhone, **1290×2796**, góc
+CHỦ KÊNH: có pill "Số liệu phân tích", badge AI, "Bị chặn", nút "Chia sẻ video của bạn") và nói
+*"khung guideline frame YouTube Short chưa đúng"*. Đo pixel bằng Python/PIL (`scripts/do-anh-that/`):
+
+| Thứ | Toạ độ màn hình (px) | Quy về 1080×1920 | Khung CŨ | Khung MỚI |
+|---|---|---|---|---|
+| Thanh điều hướng dưới (đen phẳng) | từ y **2553** (seek bar 2544–2552, vạch xám 2550–2552, nền #0f0f0f từ 2553) | video = vùng 0..2553 | — | — |
+| Cách iPhone hiện video 9:16 | hình còn dưới mốc 9:16 vừa-bề-rộng (2293); không có đường nối sắc→mờ tại 2293 (loại letterbox+blur); hàng 0–60 có 460–520 màu (video sau status bar); fit-width cho navTop → 2240 > 1920 vô lý → **phủ kín chiều cao, cắt 2 mép** | k = 2553/1920 = 1,3297; cắt **55 px nguồn mỗi mép (5,1%)** | không có vùng cắt | left **7%** loại crop (iPhone 5,1%; Android 20:9 ~6,2% hình học; 21:9 ~9% chưa phủ) |
+| Hàng trên: back / search / 3 chấm | y 219–278 (status bar 64–108) | hết ở **208 px = 10,8%** trên Pro Max; UI neo pt → iPhone 15/16 ~**12,0%** | top 10% (192) cắt ngang icon | **top 13%** (250) |
+| Cột icon phải: tim, bình luận, lưu, chia sẻ, phối lại (mờ), ô nhạc | x **1131–1255**, y 1493–2489; 6 phần tử cùng tâm x 1193,5 ± 0,5, bước 178 px | nhãn "Chia sẻ" mép trái **905 px** → lấn **16,2%** (Android 20:9 ~17,3%); tâm x 952,5 (88,2%W); tim 59,6%H, bước 7,0%H; ô nhạc 95,6%H | right 10% (108): icon nằm NGOÀI vùng đỏ, mock vẽ tâm ~94%W (bị cắt khỏi màn) và bắt đầu 46%H, có avatar trong cột | **right 18%** (194); mock tâm 88,2%W từ 59,6%H, ô nhạc vuông 72 px |
+| Khối chữ dưới-trái (**góc chủ kênh**) | y 1974 (avatar) … 2489 (nút), x từ 48 | bắt đầu **1485 px = 77,3%** (cần 22,7%); chữ từ 91 px = 8,4%W | bottom 25% (480) đã phủ; mock chữ từ 4,5%W (bị cắt) | bottom 25% giữ. Mock vẽ góc **NGƯỜI XEM neo đáy** (ước, phản biện #3): nhạc 95,6%H · tiêu đề 91,5%H · avatar + tên + Subscribe 87,6%H; ngang: chữ từ 8,4%W, avatar 72 px, tên từ 183 px |
+
+- Phép kiểm: vẽ guide 1080×1920 bằng chính `ve-guide.js` (harness `ve-shorts.html` + máy chủ tĩnh
+  8125), phóng lên 1432×2545, dịch −71 px, đặt chồng lên ảnh chụp → bản cũ: mock icon lệch hẳn cột
+  thật; bản mới: icon giả trùng icon thật, hàng trên trùng, hàng kênh trùng. Ảnh `shorts-truoc-sau.jpg`
+  đã gửi anh 21:27.
+- 2 agent đo lại độc lập (21:3x): navTop **2553** (2545 là vạch seek bar), k = 1,3297, cắt **55 px
+  nguồn/mép**, top 208–209, right 175 (16,2%), bottom 435 (chủ kênh), left 91, tâm cột 952,5 px, 6 phần
+  tử cột cùng tâm x 1193,5 ± 0,5, bước 178 px màn. Mock sau tinh chỉnh: tâm icon giả lệch icon thật
+  ≤ 12 px màn hình (≤ 9 px nguồn), tâm cột lệch 1 px.
+- Góc NGƯỜI XEM khác góc chủ kênh (không có pill Số liệu / AI / Bị chặn / nút Chia sẻ), khối chữ
+  ngắn hơn nên nằm THẤP hơn → vùng 25% đo từ góc chủ kênh vẫn phủ. Chưa có ảnh góc người xem + Android.
+- Bài học: số ads chính thức (10/25/10) là biên cho ADS; UI organic trên máy thật lấn khác — **ảnh chụp
+  thật của người dùng là thước tốt nhất**, mock UI phải đo từ ảnh, không vẽ theo cảm tính.
+
 ## 3. YouTube 16:9 player (1920×1080)
 
 | Thứ | Số liệu | Trạng thái |
@@ -403,5 +430,43 @@ Guides.guides` lúc Premiere đang chạy vs khởi động lại — xem lúc n
 (b) soi `qe.reflect.methods` tìm hàm guide ẩn (project trắng).
 
 ---
+
+## 17. RÀ SOÁT LẦN 2 — 25/09/2026 (anh Tiến yêu cầu: *"truy quét lại các frame trên các nền tảng"*)
+
+Cách làm: đọc lại **trực tiếp** các trang chính thức trong `nguonRaSoat` (fetch 25/09/2026,
+16:0x), tìm thêm nguồn 2026 cho nền tảng không có trang chính thức, so từng con số với
+JSON bản 01/08/2026. **Kết quả: 17/17 định dạng, 53 vùng — KHÔNG con số nào đổi.**
+Chỉ đổi ngày phiên bản dữ liệu (`2026-09-25`), kỳ rà tiếp (`2026-12-25`) và ghi chú nguồn.
+
+| Nền tảng / định dạng | Đọc được gì hôm nay | So với JSON | Trạng thái |
+|---|---|---|---|
+| **IG Reels ads** (ads-guide instagram-reels, bản tiếng Việt) | *"Tránh … trong khoảng 14% không gian trên cùng, 35% không gian dưới cùng và 6% không gian ở mỗi cạnh bên"*; độ phân giải khuyến nghị **1440×2560** | 14/35/6 | ✅ không đổi |
+| **FB Reels ads** (ads-guide facebook-facebook-reels) | Câu y hệt 14/35/6; 1440×2560; text 40/55 ký tự | 14/35/6 | ✅ không đổi |
+| **FB Stories ads** (ads-guide facebook-story) | *"top 14% (250 pixel) and 20% bottom (340 pixel)"* | 14/20 | ✅ không đổi — ❗ vẫn mâu thuẫn với Reels sau 2 tháng, Meta chưa sửa |
+| Meta Help 980593475366490 | Trang chỉ trả tiêu đề (body render JS) cả bản VI lẫn `?locale=en_US` | — | ⚠️ không đọc lại được; hai trang ads-guide ở trên xác nhận thay |
+| **TikTok** (ads.tiktok.com video-ads-specifications) | Trang ghi cập nhật **06/2026** (cùng bản đã đọc 01/08). Vẫn *"safe zone size is determined by the dimension, ad caption length, and any additional formats"*; HTML có **5 link .zip template** chính thức trên `lf-tt4b.tiktokcdn.com` (chưa tải — cần anh gật vì là tải file). 4 nguồn 2026 (renderforest, creamate, ezugc, adaptlypost) tái bản **130/484/44/140** | 130/484/44/140 | ✅ không đổi (vẫn là số tái bản, chưa đo file gốc) |
+| **YouTube Shorts** (business.google.com shorts-ads) | *"Avoid placing critical elements in the top 10%, the bottom 25%, and the right-hand 10% of the frame"*; 1080×1920; tối đa 3 phút | 10/25/10 | ✅ không đổi. Bên thứ ba 2026 vẫn tản mát (120–380 top, 300–420 bottom, 96–140 right) — mốc % Google bao trùm |
+| **Snapchat** (businesshelp safe-zones) | Trang không tải (JS, chỉ ra "loading"); 6 nguồn 2026 (adnabu, zeely, adkit, recruitmentads, spilno, auditsocials) tái bản **150 top / 330 bottom** cho Single Image/Video. Mới ghi nhận: **Story Ad TILE 175/269**, **Collection 150/450** — format khác | 150/330 | ✅ không đổi; ghi chú thêm 2 format khác vào JSON |
+| **Pinterest** (help.pinterest.com product-specs) | *"Top: 270 px Left: 65 px Right: 195 px Bottom: 440 px"* cho Idea Ads 9:16; 1080×1920 | 270/440/65/195 | ✅ không đổi |
+| **IG lưới profile** | 2026: tile **3:4 = 1080×1440** đã ổn định; Reel 9:16 hiện khúc giữa, mất trên/dưới (Oktopost, Buffer, YourSocialTeam) | 240/240 | ✅ không đổi |
+| LinkedIn dọc | Vẫn không công bố; nguồn 2026 chỉ nói "giữ caption trong vùng giữa có đệm" | ước lượng 108/320/60/120 | ⚠️ giữ nguyên, vẫn UNVERIFIED |
+| X immersive | Vẫn không công bố; socialk.it 2026: *"clear the bottom ~400 px and right ~140 px"* | 400/140 | ⚠️ giữ nguyên |
+| Zalo | ads.zalo.me (quy định video, tạo quảng cáo video): vẫn *"nội dung chính trong vùng an toàn"*, không số; 16:9/9:16/1:1, MP4 H.264, ≤150 MB, ≤60 s | ước lượng | ⚠️ giữ nguyên. ⬜ `zalo-916` phải 12% vs thiết kế 12,96% — vẫn chờ anh chốt |
+| Broadcast / YT 16:9 | EBU R95 v1.1 + SMPTE ST 2046-1 là chuẩn cố định, không cần đọc lại | 5% / 3,5% | ✅ |
+
+**Việc còn mở sau lần rà này (cần anh gật vì là TẢI FILE về máy):**
+- Tải 1 file zip template In-Feed của TikTok (~84 KB, `lf-tt4b.tiktokcdn.com`) và ảnh "red
+  safe area" 1080×1920 của Google (answer/9128498) để **đo pixel trực tiếp trên file gốc**
+  — nâng TikTok từ "tái bản bên thứ ba" lên "đo từ file chính thức". Meta có PSD/PPTX
+  safe-zone-checker 2023-08-24 (vẫn khớp 14/35/6) — đo thêm nếu anh muốn.
+
+Nguồn đọc 25/09/2026: facebook.com/business/ads-guide/update/video/instagram-reels ·
+…/facebook-facebook-reels · …/facebook-story · ads.tiktok.com/help/article/video-ads-specifications ·
+business.google.com/us/ad-solutions/youtube-ads/shorts-ads · help.pinterest.com/en/business/article/pinterest-product-specs ·
+blog.adnabu.com/snapchat/snapchat-ad-specs · zeely.ai/blog/snapchat-safe-zones-explained-for-ads ·
+adkit.so/tools/safe-zones/snapchat · renderforest.com/blog/tiktok-video-specs-dimensions ·
+creamate.ai/en/blog/tiktok-safe-zone-guide · oktopost.com/blog/instagram-grid-size-guide ·
+buffer.com/resources/instagram-image-size · socialk.it/en/sizes/x-video-size ·
+ads.zalo.me/business/quy-dinh-ve-su-dung-quang-cao-video.
 
 *(Mục biến thiên thiết bị: đang chờ research, sẽ bổ sung bên dưới.)*

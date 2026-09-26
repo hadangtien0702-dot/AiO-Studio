@@ -1,0 +1,245 @@
+/* =========================================================================
+   AiO Studio — PANEL TỔNG 2.1.0 (25/09/2026)
+   2.0.0 (22/09): thiết kế "Option 2" anh chốt — nền tối · banner cam · MỖI TOOL MỘT MÀU ·
+   thẻ nằm ngang · hàng lọc nhóm. Bản vẽ: https://claude.ai/artifact/GmdDjRe5oRJuNBr3uAbubN
+   2.1.0 (25/09): anh: "đồng bộ UI với website https://aio-shotsave.vercel.app/ … anh thích
+   animation của trang web này" + "Panel UI khi mở lên cũng có animation tương tự".
+     · Token màu / chữ / bo góc / bóng / nút = ĐÚNG token của web (bản tối + bản sáng),
+       đọc từ HTML live 25/09. Giữ "mỗi tool một màu" (anh chốt 22/09) cho ô icon.
+     · Animation "vào" lúc mở panel = keyframes vao-hero / vao / ico-nen của web, cùng
+       đường cong cubic-bezier(.2,.8,.2,1) và nhịp trễ 80 → 560 ms. Chỉ chạy khi #hub có
+       lớp .khoi-dong (lần vẽ ĐẦU của mỗi dạng), vẽ lại vì focus/đổi ngôn ngữ thì không.
+     · Lọc/tìm: thẻ mới hiện bằng `vao` 220 ms như .ditem.moi của web.
+   ☠️ Panel tổng CỐ Ý đè 2 luật "Studio Console" của design-system/MASTER.md
+   ("không hero/gradient", "accent tiết chế") — anh chốt 22/09, CHỈ cho panel này.
+   Hai dạng tự đổi theo KÍCH THƯỚC panel (Premiere không cho panel tự kéo rộng/hẹp):
+     luoi  — lưới thẻ (rộng ≥720px: thẻ nằm ngang + banner; hẹp hơn: thẻ đứng)
+     doc   — thanh icon dọc  (panel hẹp <340px)
+     ngang — dải icon ngang  (panel thấp <260px và rộng hơn cao)
+   CEF của CEP 12 ≈ Chromium 99: KHÔNG dùng color-mix() / :has() / container query.
+   ========================================================================= */
+@font-face {
+  font-family: 'Inter var';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/Inter.woff2') format('woff2');
+}
+
+/* ── Token = web Shot & Save, bản TỐI (mặc định trong Premiere) ─────────── */
+:root {
+  --bg: #141210;
+  --bg-soft: #1a1714;
+  --surface: #1f1b18;
+  --surface-hv: #26211d;
+  --line: #2e2925;
+  --line-strong: #3b352f;
+  --ink: #f6f1ec;
+  --ink-2: #cfc6bd;
+  --ink-3: #a89e94;
+  --brand: #F86820;
+  --btn: #F86820;
+  --btn-hover: #e0560f;
+  --on-btn: #ffffff;
+  --brand-soft: #2d1d12;
+  --brand-ink: #ffb58a;
+  --glow: rgba(248, 104, 32, .22);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 16px 40px -16px rgba(0, 0, 0, .6);
+  --warn: #e8c05a;
+  --warn-soft: rgba(232, 192, 90, .14);
+  --radius: 20px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --font: 'Inter var', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+/* Bản SÁNG = token sáng của web (nút mặt trời/mặt trăng trên thanh trên) */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-soft: #fbf8f5;
+  --surface: #ffffff;
+  --surface-hv: #fbf8f5;
+  --line: #ece6e0;
+  --line-strong: #ddd4cb;
+  --ink: #16110d;
+  --ink-2: #4f4740;
+  --ink-3: #6f665e;
+  --brand-soft: #fff1e8;
+  --brand-ink: #9A3412;
+  --glow: rgba(248, 104, 32, .16);
+  --shadow: 0 1px 2px rgba(22, 17, 13, .05), 0 12px 32px -12px rgba(22, 17, 13, .16);
+  --warn: #8a5a00;
+  --warn-soft: rgba(154, 100, 0, .12);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.45 var(--font); overflow: hidden; -webkit-font-smoothing: antialiased; }
+html { transition: background-color .25s ease; }
+button { font: inherit; color: inherit; }
+button:focus-visible, .the:focus-visible, .o-rail:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(248, 104, 32, .35); }
+#hub { height: 100%; display: flex; flex-direction: column; }
+
+/* ── Keyframes chép từ web (tên giữ nguyên để đối chiếu) ────────────────── */
+/* Chỉ khai `from`, KHÔNG khai `to`: đích = giá trị gốc của phần tử. Thẻ "Sắp có" (opacity .65)
+   và thanh icon mờ (.5) nhờ vậy kết thúc đúng độ mờ của nó — đo 16:42 trên panel thật: khai
+   `to{opacity:1}` làm ô Organize sáng 1 rồi tụt về .5 khi gỡ lớp khoi-dong ở 2,2 s (nháy). */
+@keyframes vao-hero { from { opacity: 0; transform: translateY(18px); } }
+@keyframes vao { from { opacity: 0; transform: translateY(6px) scale(.96); } }
+@keyframes ico-nen { 30% { transform: scale(1.08); } }
+@keyframes ico-vao { 0% { opacity: 0; transform: scale(.6); } 60% { transform: scale(1.1); } 100% { transform: none; } }
+@keyframes hien { from { opacity: 0; } }
+
+/* ── Thanh trên ─────────────────────────────────────────────────────────── */
+.dau { flex: none; position: relative; z-index: 5; display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 20px; border-bottom: 1px solid transparent; transition: border-color .2s; }
+#hub:not(.rong) .dau { gap: 4px; padding: 0 10px; }
+#hub.cuon .dau { border-bottom-color: var(--line); }
+.logo { flex: none; width: 22px; height: 20px; object-fit: contain; }
+.ten-app { flex: none; margin: 0 0 0 4px; font-size: 16px; font-weight: 700; line-height: 1.25; white-space: nowrap; letter-spacing: -.01em; }
+.gian { flex: 1 1 auto; }
+.tim { flex: 1 1 auto; max-width: 420px; display: flex; align-items: center; gap: 10px; height: 36px; margin-left: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-3); transition: box-shadow .18s ease; }
+.tim:focus-within { box-shadow: inset 0 0 0 1px rgba(248, 104, 32, .55), 0 0 0 4px rgba(248, 104, 32, .12); }
+.tim input { flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: 400 13px/1 var(--font); }
+.tim input::placeholder { color: var(--ink-3); }
+.hang-tim { flex: none; padding: 0 12px 10px; }
+.hang-tim .tim { max-width: none; margin: 0; }
+.nut-ic { flex: none; position: relative; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 0; border-radius: 10px; background: transparent; color: var(--ink-2); cursor: pointer; transition: background-color .18s ease, color .18s ease, box-shadow .18s ease; }
+.nut-ic:hover { background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+.nut-ic[aria-pressed="true"] { background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); }
+.cham { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; border-radius: 999px; background: var(--brand); box-shadow: 0 0 0 2px var(--bg); }
+.nut-lang { flex: none; height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); font: 700 12px/1 var(--font); cursor: pointer; transition: background-color .18s ease; }
+.nut-lang:hover { background: var(--bg-soft); }
+.avatar { flex: none; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-left: 2px; border: 0; border-radius: 999px; background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); cursor: pointer; transition: color .18s, box-shadow .18s; }
+.avatar:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* ── Thân cuộn ─────────────────────────────────────────────────────────── */
+.than { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px 20px 20px; }
+#hub:not(.rong) .than { padding: 2px 12px 12px; }
+.than::-webkit-scrollbar { width: 10px; }
+.than::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 10px; border: 3px solid var(--bg); }
+.than::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Banner — chỉ hiện khi panel đủ rộng VÀ đủ cao ──────────────────────── */
+.banner { position: relative; display: flex; align-items: center; min-height: 132px; margin: 8px 0 18px; padding: 20px 28px; border-radius: var(--radius); overflow: hidden; background: radial-gradient(380px 220px at 70% 55%, var(--glow), rgba(248, 104, 32, 0) 70%), radial-gradient(520px 260px at 0% 0%, rgba(248, 104, 32, .10), rgba(248, 104, 32, 0) 60%), var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+#hub:not(.rong) .banner, #hub:not(.cao) .banner { display: none; }
+.banner-chu { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+/* Nhãn nhỏ = kiểu .eyebrow của web: viên thuốc cam nhạt, chữ cam đậm */
+.banner-nho { display: inline-flex; align-items: center; gap: 8px; padding: 5px 11px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-ink); font-size: 12px; font-weight: 600; line-height: 1.25; }
+.banner-lon { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.015em; color: var(--ink); }
+.banner-lon em { font-style: normal; color: var(--brand); }
+.banner-phu { font-size: 12px; line-height: 1.3; color: var(--ink-2); }
+/* Hình khối cam dựng bằng CSS (chưa có ảnh 3D) — chỉ bày khi banner đủ chỗ, không đè chữ */
+.khoi { position: absolute; display: none; align-items: center; justify-content: center; border-radius: 22px; background: linear-gradient(150deg, #ffb07a 0%, #f86820 42%, #b8420c 100%); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .45), inset 0 -8px 16px rgba(120, 40, 0, .45), 0 16px 36px rgba(248, 104, 32, .35); color: rgba(255, 255, 255, .92); }
+#hub.rat-rong .khoi { display: flex; }
+.khoi-1 { left: 49%; top: 34px; width: 104px; height: 80px; transform: rotate(-14deg); opacity: .55; }
+.khoi-2 { left: 55%; top: 18px; width: 92px; height: 92px; border-radius: 24px; transform: rotate(10deg); }
+.khoi-3 { left: 62%; top: 36px; width: 88px; height: 88px; border-radius: 999px; opacity: .9; }
+.chu-tay { position: absolute; right: 36px; top: 50%; display: none; transform: translateY(-50%) rotate(-12deg); font: 500 30px/0.95 'Caveat', 'Segoe Script', 'Ink Free', 'Bradley Hand', cursive; color: var(--ink-2); opacity: .75; text-align: center; white-space: pre-line; }
+#hub.rat-rong .chu-tay { display: block; }
+
+/* ── Hàng lọc nhóm — chip = nút của web (.btn-main khi chọn) ───────────── */
+.loc { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none; }
+#hub:not(.rong) .loc { margin-bottom: 12px; }
+.loc::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 14px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font: 500 13px/1 var(--font); white-space: nowrap; cursor: pointer; transition: box-shadow .18s ease, color .18s ease, background-color .18s ease, transform .18s ease; }
+.chip:hover { box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); }
+.chip:active { transform: scale(.97); }
+.chip .so { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Nút đang chọn: cam ĐẶC + chữ trắng ĐẬM 14px — luật AiO: trắng trên cam (3,0:1) chỉ hợp lệ khi bold ≥14px; hover ĐẬM hơn như web */
+.chip[aria-pressed="true"] { padding: 0 14px; background: var(--btn); color: var(--on-btn); font: 700 14px/1 var(--font); box-shadow: 0 8px 24px -8px var(--glow), inset 0 2px 0 rgba(0, 0, 0, .08); }
+.chip[aria-pressed="true"]:hover { background: var(--btn-hover); }
+.chip[aria-pressed="true"] .so { min-width: 0; height: auto; padding: 0; background: none; box-shadow: none; color: var(--on-btn); font-size: 14px; font-weight: 700; }
+
+/* ── Lưới thẻ — thẻ = .card của web (bo góc, viền inset, bóng khi rê) ───── */
+.luoi { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+#hub:not(.rong) .luoi { gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(170px, calc(50% - 5px)), 1fr)); }
+/* Khổ hẹp: tên dài xuống 2 dòng thay vì bị cắt (đo 22/09: 340px ra 2 cột, mỗi thẻ ~153px) */
+#hub:not(.rong) .the-dong { white-space: normal; align-items: flex-start; }
+#hub:not(.rong) .the-ten { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; }
+.the { position: relative; display: flex; align-items: center; gap: 14px; min-width: 0; height: 84px; padding: 0 12px 0 16px; border: 0; border-radius: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); text-align: left; cursor: pointer; font-family: var(--font); transition: box-shadow .2s ease, transform .2s ease, background-color .2s ease; }
+#hub:not(.rong) .the { flex-direction: column; align-items: flex-start; gap: 0; height: auto; padding: 12px; }
+.the:hover { background: var(--surface-hv); box-shadow: inset 0 0 0 1px var(--line-strong), var(--shadow); }
+.the:active { transform: scale(.985); }
+.the:hover .o-icon { animation: ico-nen .8s ease; }
+.the.sap-co, .the.chua-cai { cursor: default; }
+.the.sap-co { opacity: .65; }
+.the.chua-cai { opacity: .6; }
+.the.sap-co:hover, .the.chua-cai:hover { box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); }
+.the.sap-co:hover .o-icon, .the.chua-cai:hover .o-icon { animation: none; }
+.the.sap-co:active, .the.chua-cai:active { transform: none; }
+.o-icon { flex: none; display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 14px; color: #ffffff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
+#hub:not(.rong) .o-icon { width: 34px; height: 34px; border-radius: 10px; }
+#hub:not(.rong) .o-icon svg { width: 17px; height: 17px; }
+.the-chu { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+#hub:not(.rong) .the-chu { width: 100%; gap: 2px; margin-top: 10px; }
+.the-dong { display: flex; align-items: center; min-width: 0; white-space: nowrap; }
+.the-ten { font-size: 14px; font-weight: 700; line-height: 1.25; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+#hub:not(.rong) .the-ten { font-size: 13px; }
+.the-viec { font-size: 12px; line-height: 1.3; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#hub:not(.rong) .the-viec { min-height: 30px; font-size: 11px; line-height: 1.35; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.nhan { flex: none; display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; color: var(--ink-3); font-size: 11px; font-weight: 500; }
+.nhan.vien { height: 18px; padding: 0 7px; border-radius: 999px; background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); font-size: 10px; font-weight: 600; }
+.nhan.canh { color: var(--warn); background: var(--warn-soft); box-shadow: none; }
+#hub:not(.rong) .the .nhan { position: absolute; top: 12px; right: 12px; margin: 0; }
+.chev { flex: none; display: flex; color: var(--brand); opacity: 0; transform: translateX(-3px); transition: opacity 150ms, transform 150ms var(--ease); }
+.the:hover .chev, .the:focus-visible .chev { opacity: 1; transform: none; }
+#hub:not(.rong) .chev { display: none; }
+.rong-khong { padding: 32px 8px; color: var(--ink-3); text-align: center; }
+
+/* ── Thanh icon (dọc / ngang) ──────────────────────────────────────────── */
+.rail { height: 100%; display: flex; }
+#hub[data-dang="doc"] .rail { flex-direction: column; align-items: center; }
+#hub[data-dang="ngang"] .rail { flex-direction: row; align-items: center; }
+.rail-dau { flex: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+#hub[data-dang="doc"] .rail-dau { height: 52px; }
+#hub[data-dang="ngang"] .rail-dau { padding: 0 14px 0 16px; }
+#hub[data-dang="doc"] .rail-dau .ten-app { display: none; }
+.rail-vach-dau { flex: none; background: var(--line); }
+#hub[data-dang="doc"] .rail-vach-dau { display: none; }
+#hub[data-dang="ngang"] .rail-vach-dau { width: 1px; height: 28px; }
+.rail-ds { flex: 1 1 auto; display: flex; align-items: center; gap: 2px; scrollbar-width: none; }
+.rail-ds::-webkit-scrollbar { display: none; }
+#hub[data-dang="doc"] .rail-ds { min-height: 0; flex-direction: column; overflow-y: auto; padding: 4px 0; width: 100%; }
+#hub[data-dang="ngang"] .rail-ds { min-width: 0; flex-direction: row; overflow-x: auto; padding: 0 8px; }
+.o-rail { flex: none; position: relative; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 0; border-radius: 12px; background: transparent; cursor: pointer; transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.o-rail:hover { background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); }
+.o-rail:hover .o-icon { animation: ico-nen .8s ease; }
+.o-rail:active { transform: scale(.94); }
+.o-rail .o-icon { width: 36px; height: 36px; border-radius: 10px; }
+.o-rail .o-icon svg { width: 18px; height: 18px; }
+.o-rail.sap-co, .o-rail.chua-cai { opacity: .5; cursor: default; }
+.o-rail.sap-co:hover .o-icon, .o-rail.chua-cai:hover .o-icon { animation: none; }
+.o-rail .phu { position: absolute; right: 3px; bottom: 3px; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 999px; background: var(--bg); color: var(--ink-2); }
+.rail-vach { flex: none; background: var(--line); }
+#hub[data-dang="doc"] .rail-vach { width: 28px; height: 1px; margin: 4px 0; }
+#hub[data-dang="ngang"] .rail-vach { width: 1px; height: 28px; margin: 0 6px; }
+.rail-cuoi { flex: none; display: flex; align-items: center; gap: 4px; }
+#hub[data-dang="doc"] .rail-cuoi { flex-direction: column; padding: 8px 0 12px; }
+#hub[data-dang="ngang"] .rail-cuoi { padding: 0 14px; }
+
+/* ── Thông báo ngắn ────────────────────────────────────────────────────── */
+#thong-bao { position: fixed; left: 50%; bottom: 16px; z-index: 50; max-width: calc(100% - 24px); padding: 9px 14px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong), var(--shadow); color: var(--ink); font-size: 12px; line-height: 1.35; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; transition: opacity 150ms, transform 150ms var(--ease); }
+#thong-bao.hien { opacity: 1; transform: translate(-50%, 0); }
+
+/* ── ANIMATION "VÀO" lúc mở panel — chỉ khi #hub.khoi-dong (lần vẽ đầu của mỗi dạng) ─
+   Nhịp chép từ hero của web: eyebrow .08s → tiêu đề .2s → chữ phụ .32s → nút .44s → demo .56s.
+   Thẻ nối tiếp sau đó, mỗi thẻ cách 55 ms (web: mỗi thẻ 70 ms), icon "nảy" 120 ms sau thẻ. */
+#hub.khoi-dong .dau > * { animation: vao-hero .6s var(--ease) both; animation-delay: calc(var(--n, 0) * 45ms); }
+.dau > :nth-child(1) { --n: 0; } .dau > :nth-child(2) { --n: 1; } .dau > :nth-child(3) { --n: 2; } .dau > :nth-child(4) { --n: 3; }
+.dau > :nth-child(5) { --n: 4; } .dau > :nth-child(6) { --n: 5; } .dau > :nth-child(7) { --n: 6; } .dau > :nth-child(8) { --n: 7; }
+#hub.khoi-dong .hang-tim { animation: vao-hero .5s var(--ease) both; animation-delay: .12s; }
+#hub.khoi-dong .banner-nho { animation: vao-hero .7s var(--ease) both; animation-delay: .08s; }
+#hub.khoi-dong .banner-lon { animation: vao-hero .7s var(--ease) both; animation-delay: .2s; }
+#hub.khoi-dong .banner-phu { animation: vao-hero .7s var(--ease) both; animation-delay: .32s; }
+/* khối 3D + chữ tay có transform riêng (xoay) → chỉ mờ dần, không đụng transform */
+#hub.khoi-dong .khoi { animation: hien .8s ease both; animation-delay: .44s; }
+#hub.khoi-dong .chu-tay { animation: hien .8s ease both; animation-delay: .56s; }
+#hub.khoi-dong .chip { animation: vao-hero .5s var(--ease) both; animation-delay: calc(.3s + var(--n, 0) * 30ms); }
+#hub.khoi-dong .the { animation: vao .42s var(--ease) both; animation-delay: var(--tre, 0ms); }
+#hub.khoi-dong .the .o-icon { animation: ico-vao .5s var(--ease) both; animation-delay: calc(var(--tre, 0ms) + 120ms); }
+#hub.khoi-dong .rail-dau, #hub.khoi-dong .rail-cuoi > * { animation: vao-hero .5s var(--ease) both; }
+#hub.khoi-dong .rail-cuoi > :nth-child(2) { animation-delay: .06s; }
+#hub.khoi-dong .o-rail { animation: vao .4s var(--ease) both; animation-delay: var(--tre, 0ms); }
+/* Lọc / tìm: thẻ mới hiện nhẹ như .ditem.moi của web (220 ms) */
+.the.moi { animation: vao .22s var(--ease) both; animation-delay: var(--tre, 0ms); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

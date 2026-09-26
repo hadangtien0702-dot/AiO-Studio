@@ -355,24 +355,69 @@
       ctx.restore();
     },
     shorts: function (ctx, W, H, s) {
+      /* ☠️ VI TRI DO TU ANH CHUP THAT 25/09/2026 (anh Tien: "khung guideline frame YouTube Short
+         chua dung"): iPhone 1290x2796, video 9:16 PHU KIN chieu cao vung tren thanh dieu huong
+         (0..2545 px) va bi CAT ~5% moi mep. Quy ve 1080x1920:
+           hang tren: back/search/3 cham tam y = 9,7%H (ban cu 4,5%H — qua cao, bo qua status bar)
+           cot phai: tam x = 88,3%W (ban cu ~94%W — ra ngoai man hinh sau khi cat mep), tim 59,8%H
+                     roi moi icon cach 7,1%H: binh luan, luu, chia se, remix; dia nhac 95,9%H
+                     (ban cu bat dau 46%H va co avatar trong cot — Shorts KHONG co avatar o cot)
+           duoi-trai: chu bat dau 8,5%W (ban cu 4,5%W — bi cat mat), avatar + ten + Subscribe
+                     tam y 79,4%H, tieu de 83,4%H, dong nhac 86,5%H.
+         Anh chup la goc CHU KENH (co pill So lieu, AI, Bi chan, nut Chia se video cua ban) —
+         mock ve goc NGUOI XEM (avatar + ten + Subscribe, tieu de, dong nhac) cung toa do. */
+      var xT = W * 0.084; // 2 agent do lai 25/09 21:3x: chu/avatar tu x=48 man hinh -> 91 px nguon (8,4%W)
+      // Dai bi CAT ben phai (5,1% tren iPhone) nam trong vung UI 18% — ve gach cheo mo de phan biet "bi cat" voi "bi UI che"
+      veHatch(ctx, { x: W * 0.949, y: 0, w: W * 0.051, h: H }, 'rgba(255,255,255,0.10)', s * 0.9);
       ctx.save(); bongDo(ctx, s * 0.1);
-      veKinhLup(ctx, W * 0.86, H * 0.045, s * 0.85);
-      veBaCham(ctx, W * 0.94, H * 0.042, s * 0.8, true);
+      ctx.strokeStyle = TRANG; ctx.lineWidth = s * 0.16; // mui ten back, tam 10,6%W (do 115 px)
+      ctx.beginPath(); ctx.moveTo(W * 0.106 + s * 0.2, H * 0.097 - s * 0.38); ctx.lineTo(W * 0.106 - s * 0.2, H * 0.097); ctx.lineTo(W * 0.106 + s * 0.2, H * 0.097 + s * 0.38); ctx.stroke();
+      veKinhLup(ctx, W * 0.786, H * 0.097, s * 0.85);
+      veBaCham(ctx, W * 0.886, H * 0.097, s * 0.8, true);
       ctx.restore();
-      veCotPhai(ctx, W, H, s, W - (108 / 1080) * W / 2 - s * 0.2, [
-        ['tim', '305K'], ['binhluan', '1.4K'], ['chiase', 'Share'], ['lap', 'Remix'], ['avatar']
-      ]);
-      // duoi: kenh + Subscribe + tieu de + nhac
-      var yK = H * 0.815;
+      // cot phai: 5 icon tu 59,6%H, buoc 7,0%H, tam x 88,2%W; o nhac vuong bo goc 72 px tam 95,6%H
+      var tamX = W * 0.882, yI = H * 0.596, buoc = H * 0.070; // tim cy 1522 -> 1145 px (59,6%H), buoc 178 px man = 134 px nguon (7,0%H)
+      var ds = [['tim', '305K'], ['binhluan', '1.4K'], ['luudau', 'Save'], ['chiase', 'Share'], ['lap', 'Remix']];
+      for (var i = 0; i < ds.length; i++) {
+        var y = yI + i * buoc;
+        ctx.save(); bongDo(ctx, s * 0.1);
+        if (ds[i][0] === 'lap') ctx.globalAlpha = 0.6; // Phoi lai hien MO tren app that
+        if (ds[i][0] === 'tim') veTim(ctx, tamX, y - s * 0.45, s);
+        if (ds[i][0] === 'binhluan') veBinhLuan(ctx, tamX, y - s * 0.55, s);
+        if (ds[i][0] === 'luudau') veLuuDau(ctx, tamX, y - s * 0.45, s);
+        if (ds[i][0] === 'chiase') veChiaSe(ctx, tamX, y - s * 0.35, s);
+        if (ds[i][0] === 'lap') { ctx.strokeStyle = TRANG; ctx.lineWidth = s * 0.14; ctx.strokeRect(tamX - s * 0.4, y - s * 0.4, s * 0.8, s * 0.8); }
+        ctx.restore();
+        ctx.save(); if (ds[i][0] === 'lap') ctx.globalAlpha = 0.6;
+        nhanDuoiIcon(ctx, ds[i][1], tamX, y + s * 0.95, s);
+        ctx.restore();
+      }
+      ctx.save(); bongDo(ctx, s * 0.1); // o nhac: vuong bo goc 72 px vien trang (do 96 px man), tam 95,6%H
+      ctx.strokeStyle = TRANG; ctx.lineWidth = s * 0.12; ctx.fillStyle = 'rgba(30,30,30,0.85)';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(tamX - s * 0.82, H * 0.956 - s * 0.82, s * 1.64, s * 1.64, s * 0.3); else ctx.rect(tamX - s * 0.82, H * 0.956 - s * 0.82, s * 1.64, s * 1.64);
+      ctx.fill(); ctx.stroke();
+      veTron(ctx, tamX, H * 0.956, s * 0.22, TRANG);
+      ctx.restore();
+      /* Khoi duoi-trai theo goc NGUOI XEM — ☠️ UOC (phan bien #3, 25/09): anh chup la goc CHU KENH, khoi
+         bat dau 77,3%H vi bi 3 hang rieng cua chu kenh (AI / Bi chan / nut Chia se video cua ban, ~300 px)
+         day len. Nguoi xem chi co 3 hang, neo DAY (day = 97,5%H nhu nut cua chu kenh): dong nhac tam
+         95,6%H (ngang o nhac cot phai), tieu de 91,5%H, avatar + ten + Subscribe 87,6%H. Chieu ngang giu so
+         do: mep trai 8,4%W, avatar 72 px, ten tu 183 px, pill Subscribe cao 72 px (rong 151 px la UOC).
+         Vung bottom 25% phu ca hai goc. Co anh goc nguoi xem thi do lai roi thay cac so nay. */
+      var yK = H * 0.876;
       ctx.save(); bongDo(ctx, s * 0.08);
-      veAvatar(ctx, W * 0.07, yK, s * 0.55, false);
-      chuUi(ctx, '@channel', W * 0.07 + s * 0.85, yK + s * 0.18, s * 0.5, true);
-      vePill(ctx, W * 0.07 + s * 4.6, yK - s * 0.5, s * 3.4, s * 1.0, TRANG);
-      chuUi(ctx, 'Subscribe', W * 0.07 + s * 6.3, yK + s * 0.16, s * 0.48, true, 'center', 'rgba(15,15,15,0.95)');
+      veAvatar(ctx, xT + s * 0.82, yK, s * 0.82, false);
+      chuUi(ctx, '@channel', xT + s * 2.1, yK + s * 0.18, s * 0.5, true);
+      vePill(ctx, xT + s * 6.3, yK - s * 0.82, s * 3.4, s * 1.64, TRANG);
+      chuUi(ctx, 'Subscribe', xT + s * 8.0, yK + s * 0.18, s * 0.48, true, 'center', 'rgba(15,15,15,0.95)');
       ctx.restore();
-      veDongMo(ctx, W * 0.045, yK + s * 1.05, W * 0.55, s * 0.34);
-      veDongMo(ctx, W * 0.045, yK + s * 1.65, W * 0.4, s * 0.3);
-      // progress bar sat day
+      veDongMo(ctx, xT, H * 0.915 - s * 0.17, W * 0.71, s * 0.34);
+      ctx.save(); bongDo(ctx, s * 0.08);
+      veNotNhac(ctx, xT + s * 0.15, H * 0.956 + s * 0.12, s * 0.75);
+      veDongMo(ctx, xT + s * 0.95, H * 0.956 - s * 0.15, W * 0.4, s * 0.3);
+      ctx.restore();
+      // progress bar sat day (tren iPhone trung mep tren thanh dieu huong)
       ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fillRect(0, H - s * 0.16, W, s * 0.16);
       ctx.fillStyle = '#f03'; ctx.fillRect(0, H - s * 0.16, W * 0.4, s * 0.16);
     },
@@ -472,10 +517,85 @@
     'fb-feed-45': 'fbfeed'
   };
 
+  /* ── MOCK UI THEO SO DO THAT (tu 26/09/2026) ─────────────────────────────
+     Anh Tien: "em không đo hình ảnh thực tế từ sản phẩm mà em đã lấy thông số ảo để áp vào".
+     Tu day, mock cua app nao DA DO tu anh chup that thi nam trong MOCK_DO[id] duoi dang
+     BANG PHAN TU — moi dong mot phan tu, toa do % cua 1080x1920 doc thang tu anh:
+       t   = loai: tim | binhluan | luudau | chiase | lap | bacham | kinhlup | back | x | avatar |
+                   dia | oNhac | not | chu | pill | dongMo | progress | hatch | tienTrinh
+       x,y = TAM phan tu (% W, % H) — rieng pill / dongMo / hatch: GOC TREN-TRAI; chu: goc trai + baseline
+       w,h = % W / % H (pill, dongMo, hatch, tienTrinh)   s = he so co (x 44 px tren 1080)
+       nhan = chu duoi icon / trong pill / noi dung chu   mo = do mo (0..1)   mau = mau chu
+     Co so do moi (anh chup moi) thi SUA BANG NAY, khong sua code ve. App chua do van dung
+     UI_THAT[...] cu (ve theo tai lieu — ghi ro trong PROGRESS la CHUA KIEM). */
+  var MOCK_DO = {
+    // YouTube Shorts — do tren anh chup iPhone Pro Max 1290x2796 cua anh Tien 25/09/2026 (goc chu kenh),
+    // phu kin chieu cao 0..2553, cat 55 px/mep; 2 agent do lai khop; khoi duoi-trai theo goc NGUOI XEM neo day (UOC).
+    'yt-shorts': [
+      { t: 'hatch', x: 94.9, y: 0, w: 5.1, h: 100 },                       // dai bi cat ben phai (iPhone)
+      { t: 'back', x: 10.6, y: 9.7 }, { t: 'kinhlup', x: 78.6, y: 9.7 }, { t: 'bacham', x: 88.6, y: 9.7, doc: true },
+      { t: 'tim', x: 88.2, y: 59.6, nhan: '305K' }, { t: 'binhluan', x: 88.2, y: 66.6, nhan: '1.4K' },
+      { t: 'luudau', x: 88.2, y: 73.6, nhan: 'Save' }, { t: 'chiase', x: 88.2, y: 80.6, nhan: 'Share' },
+      { t: 'lap', x: 88.2, y: 87.6, nhan: 'Remix', mo: 0.6 }, { t: 'oNhac', x: 88.2, y: 95.6 },
+      { t: 'avatar', x: 11.7, y: 87.6, s: 0.82 },
+      { t: 'chu', x: 16.9, y: 88.0, nhan: '@channel', s: 0.5, dam: true },
+      { t: 'pill', x: 34.1, y: 85.7, w: 13.9, h: 3.75, nhan: 'Subscribe' },
+      { t: 'dongMo', x: 8.4, y: 91.1, w: 71, h: 0.78 },
+      { t: 'not', x: 9.0, y: 95.8 }, { t: 'dongMo', x: 12.3, y: 95.2, w: 40, h: 0.69 },
+      { t: 'progress', y: 99.6 }
+    ]
+  };
+  // ==== BAT DAU MOCK_DO SINH TU KET QUA DO (scripts/do-anh-that/ap-ket-qua.mjs ghi de doan nay) ====
+  // ==== KET THUC MOCK_DO SINH TU KET QUA DO ====
+  function veMockData(ctx, W, H, s, ds) {
+    for (var i = 0; i < ds.length; i++) {
+      var e = ds[i], x = W * (e.x || 0) / 100, y = H * (e.y || 0) / 100, k = s * (e.s || 1);
+      var w = W * (e.w || 0) / 100, h = H * (e.h || 0) / 100;
+      ctx.save();
+      if (e.mo) ctx.globalAlpha = e.mo;
+      var laIcon = false;
+      switch (e.t) {
+        case 'hatch': veHatch(ctx, { x: x, y: y, w: w, h: h }, 'rgba(255,255,255,0.10)', k * 0.9); break;
+        case 'back': bongDo(ctx, k * 0.1); ctx.strokeStyle = TRANG; ctx.lineWidth = k * 0.16;
+          ctx.beginPath(); ctx.moveTo(x + k * 0.2, y - k * 0.38); ctx.lineTo(x - k * 0.2, y); ctx.lineTo(x + k * 0.2, y + k * 0.38); ctx.stroke(); break;
+        case 'x': bongDo(ctx, k * 0.1); ctx.strokeStyle = TRANG; ctx.lineWidth = k * 0.14;
+          ctx.beginPath(); ctx.moveTo(x - k * 0.35, y - k * 0.35); ctx.lineTo(x + k * 0.35, y + k * 0.35); ctx.moveTo(x + k * 0.35, y - k * 0.35); ctx.lineTo(x - k * 0.35, y + k * 0.35); ctx.stroke(); break;
+        case 'kinhlup': bongDo(ctx, k * 0.1); veKinhLup(ctx, x, y, k * 0.85); break;
+        case 'bacham': bongDo(ctx, k * 0.1); veBaCham(ctx, x, y, k * 0.8, e.doc !== false); break;
+        case 'tim': bongDo(ctx, k * 0.1); veTim(ctx, x, y - k * 0.45, k); laIcon = true; break;
+        case 'binhluan': bongDo(ctx, k * 0.1); veBinhLuan(ctx, x, y - k * 0.55, k); laIcon = true; break;
+        case 'luudau': bongDo(ctx, k * 0.1); veLuuDau(ctx, x, y - k * 0.45, k); laIcon = true; break;
+        case 'chiase': bongDo(ctx, k * 0.1); veChiaSe(ctx, x, y - k * 0.35, k); laIcon = true; break;
+        case 'lap': bongDo(ctx, k * 0.1); ctx.strokeStyle = TRANG; ctx.lineWidth = k * 0.14; ctx.strokeRect(x - k * 0.4, y - k * 0.4, k * 0.8, k * 0.8); laIcon = true; break;
+        case 'avatar': bongDo(ctx, k * 0.08); veAvatar(ctx, x, y, k, !!e.cong); break;
+        case 'dia': bongDo(ctx, k * 0.1); veDiaNhac(ctx, x, y, k); break;
+        case 'oNhac': bongDo(ctx, k * 0.1); ctx.strokeStyle = TRANG; ctx.lineWidth = k * 0.12; ctx.fillStyle = 'rgba(30,30,30,0.85)';
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(x - k * 0.82, y - k * 0.82, k * 1.64, k * 1.64, k * 0.3); else ctx.rect(x - k * 0.82, y - k * 0.82, k * 1.64, k * 1.64);
+          ctx.fill(); ctx.stroke(); veTron(ctx, x, y, k * 0.22, TRANG); break;
+        case 'not': bongDo(ctx, k * 0.08); veNotNhac(ctx, x, y, k * 0.75); break;
+        case 'chu': chuUi(ctx, e.nhan || '', x, y, k, e.dam !== false, e.can || 'left', e.mau); break;
+        case 'pill': bongDo(ctx, k * 0.08); vePill(ctx, x, y, w, h, e.mau || TRANG, e.vien);
+          if (e.nhan) chuUi(ctx, e.nhan, x + w / 2, y + h * 0.66, Math.min(h * 0.52, s * 0.5), true, 'center', e.mauChu || 'rgba(15,15,15,0.95)'); break;
+        case 'dongMo': veDongMo(ctx, x, y, w, h); break;
+        case 'progress': ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fillRect(0, y - s * 0.08, W, s * 0.16);
+          ctx.fillStyle = e.mau || '#f03'; ctx.fillRect(0, y - s * 0.08, W * ((e.pt || 40) / 100), s * 0.16); break;
+        case 'tienTrinh': { // cac doan progress cua Story: n doan, doan dau sang
+          var n = e.n || 4, khe = s * 0.2, wD = (w - khe * (n - 1)) / n;
+          for (var j = 0; j < n; j++) { ctx.fillStyle = j === 0 ? TRANG : 'rgba(255,255,255,0.35)'; ctx.fillRect(x + j * (wD + khe), y, wD, h || s * 0.14); }
+          break;
+        }
+      }
+      ctx.restore();
+      if (laIcon && e.nhan) { ctx.save(); if (e.mo) ctx.globalAlpha = e.mo; nhanDuoiIcon(ctx, e.nhan, x, y + k * 0.95, k); ctx.restore(); }
+    }
+  }
+
   function veUiThat(ctx, W, H, fmt) {
+    var s = W / 1080 * 44; // don vi icon co ban ~44px tren khung 1080
+    if (MOCK_DO[fmt.id]) { veMockData(ctx, W, H, s, MOCK_DO[fmt.id]); return true; }
     var kieu = UI_THAT_MAP[fmt.id];
     if (!kieu || !UI_THAT[kieu]) return false;
-    var s = W / 1080 * 44; // don vi icon co ban ~44px tren khung 1080
     UI_THAT[kieu](ctx, W, H, s);
     return true;
   }

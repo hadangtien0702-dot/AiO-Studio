@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Remote debug cho panel tổng AiO Studio. Cổng 8101 — không trùng 8087–8100
+  (8095 = xem-bo.mjs, 8099 = xem-rieng.mjs, 8100 = Short Viral).
+  Mở http://localhost:8101 khi panel đang mở trong Premiere.
+-->
+<ExtensionList>
+  <Extension Id="com.aiostudio.hub.panel">
+    <HostList>
+      <Host Name="PPRO" Port="8101" />
+    </HostList>
+  </Extension>
+</ExtensionList>

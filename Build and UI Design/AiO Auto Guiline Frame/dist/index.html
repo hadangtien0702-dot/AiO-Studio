@@ -417,7 +417,7 @@ svg{display:block}
   <svg class="ico brand-ico" id="denHost" viewBox="0 0 24 24" aria-hidden="true">
     <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>
   <h1 class="brand">Guide Frame</h1>
-  <span class="ver">v0.3.0</span>
+  <span class="ver">v0.3.1</span>
   <span class="host" id="host"></span>
   <span class="spacer"></span>
   <button class="btn btn--sm" id="lang" title="Chuyển sang tiếng Anh" aria-label="Chuyển sang tiếng Anh">EN</button>
@@ -605,13 +605,15 @@ const DICT = {
     vungLbl: 'Vùng chọn',
     daDat: 'Đã đặt lên <b>track V{track}</b>, phủ <b>{dai}s</b> trên tổng <b>{seq}s</b>.',
     daDatVung: 'Đã đặt lên <b>track V{track}</b>, phủ vùng chọn <b>{dai}s</b> ({a}s → {b}s).',
-    phuThieu: ' Ảnh chỉ phủ được {dai}s — kéo dài clip guide trong timeline nếu cần.',
-    luoiTrong: 'Chưa chọn nền tảng và cũng chưa bật lưới nào — panel không biết phải vẽ gì.',
+    daThemTrack: 'Đã thêm <b>track V{track}</b> mới. ',
+    phuThieu: ' Ảnh chỉ phủ được {dai}s, kéo dài clip guide trong timeline nếu cần.',
+    luoiTrong: 'Chưa chọn nền tảng và cũng chưa bật lưới nào, panel không biết phải vẽ gì.',
     l_CHUA_MO_SEQ: 'Chưa mở sequence nào. Mở một sequence trong Premiere rồi bấm lại.',
     l_CHUA_MO_DU_AN: 'Chưa mở project nào trong Premiere.',
     l_KHONG_DOC_DUOC_KHUNG: 'Không đọc được kích thước khung của sequence.',
-    l_SEQ_TRONG: 'Sequence chưa có clip nào — panel không biết guide phải dài bao nhiêu.',
-    l_HET_TRACK: 'Không còn track video trống. Thêm một track video trong Premiere rồi bấm lại (panel không tự thêm track — làm vậy dễ làm sập Premiere).',
+    l_SEQ_TRONG: 'Sequence chưa có clip nào, panel không biết guide phải dài bao nhiêu.',
+    l_HET_TRACK: 'Không thêm được track video mới nên chưa đặt được guide. Thêm một track video trong Premiere rồi bấm lại.',
+    l_TRACK_MOI_KHONG_TREN_CUNG: 'Đã thêm track mới nhưng track trên cùng vẫn có clip nên chưa đặt guide (không đè lên clip của anh). Xem lại timeline rồi bấm lại.',
     l_KHONG_THAY_FILE: 'Premiere không thấy file ảnh guide vừa ghi ra.',
     l_IMPORT_HONG: 'Không nhập được ảnh guide vào project.',
     l_IMPORT_KHONG_VAO: 'Ảnh guide không vào được bin.',
@@ -662,13 +664,15 @@ const DICT = {
     vungLbl: 'In/Out range',
     daDat: 'Applied to <b>track V{track}</b>, covering <b>{dai}s</b> of <b>{seq}s</b>.',
     daDatVung: 'Applied to <b>track V{track}</b>, covering the selected range <b>{dai}s</b> ({a}s → {b}s).',
-    phuThieu: ' The image only covers {dai}s — stretch the guide clip in the timeline if needed.',
-    luoiTrong: 'No platform selected and no grid enabled — nothing for the panel to draw.',
+    daThemTrack: 'Added a new <b>track V{track}</b>. ',
+    phuThieu: ' The image only covers {dai}s, stretch the guide clip in the timeline if needed.',
+    luoiTrong: 'No platform selected and no grid enabled, nothing for the panel to draw.',
     l_CHUA_MO_SEQ: 'No sequence open. Open one in Premiere and try again.',
     l_CHUA_MO_DU_AN: 'No project open in Premiere.',
     l_KHONG_DOC_DUOC_KHUNG: 'Could not read the sequence frame size.',
-    l_SEQ_TRONG: 'The sequence has no clips — the panel cannot tell how long the guide should be.',
-    l_HET_TRACK: 'No empty video track left. Add a video track in Premiere and try again (the panel will not add one — doing so can crash Premiere).',
+    l_SEQ_TRONG: 'The sequence has no clips, so the panel cannot tell how long the guide should be.',
+    l_HET_TRACK: 'Could not add a new video track, so the guide was not placed. Add a video track in Premiere and try again.',
+    l_TRACK_MOI_KHONG_TREN_CUNG: 'A track was added, but the top track still holds clips, so the guide was not placed (it never covers your clips). Check the timeline and try again.',
     l_KHONG_THAY_FILE: 'Premiere cannot see the guide image that was just written.',
     l_IMPORT_HONG: 'Could not import the guide image into the project.',
     l_IMPORT_KHONG_VAO: 'The guide image did not land in the bin.',
@@ -726,7 +730,10 @@ $('lang').addEventListener('click', () => {
 });
 
 /* ============ NỐI HOST PREMIERE ============ */
-const PHIEN_BAN = '0.3.0';
+const PHIEN_BAN = '0.3.1';
+// Huy hiệu "vX.Y.Z" trên thanh tiêu đề đọc từ PHIEN_BAN, khỏi thành nơi thứ 4 phải
+// sửa tay (25/09/2026: bump 0.3.1 ở 3 nơi mà huy hiệu vẫn ghi 0.3.0).
+document.querySelectorAll('.ver').forEach(e => { e.textContent = 'v' + PHIEN_BAN; });
 let cs = null, extPath = '';
 try {
   if (typeof CSInterface !== 'undefined') {
@@ -778,19 +785,10 @@ function ghiFile(duongDan, duLieu, encoding){
    (khung + kich thuoc + ngon ngu) nen bam lan hai cho CUNG mot khung la dinh
    `EBUSY: resource busy or locked` — Premiere van giu file cu du clip da bi go
    (no khong tra lai handle ngay). Do that 26/08/2026, anh Tien bao loi.
-   Doi lai: file cu dong lai trong thu muc -> don ngay sau khi ghi thanh cong,
-   file nao Premiere con giu thi bo qua, lan sau don tiep. */
-function donFileCu(giuLai){
-  const fs = nodeFs(); if (!fs) return 0;
-  let don = 0;
-  try {
-    for (const f of fs.readdirSync(THU_MUC)) {
-      if (f.indexOf('AIO_GUIDE_') !== 0 || !/\.png$/i.test(f) || f === giuLai) continue;
-      try { fs.unlinkSync(THU_MUC + '/' + f); don++; } catch(e) {}   // dang bi giu thi de lai
-    }
-  } catch(e) {}
-  return don;
-}
+   Tu 26/08 -> 25/09 panel co ham donFileCu() quet xoa moi PNG guide cu tren dia.
+   ☠️ BO 25/09/2026: file cua guide dang nam o sequence/project KHAC chi duoc OS
+   "giu" tam; het giu la bi quet -> clip offline (xay ra that tren "Tap 2" cua anh
+   Tien). Nay host xoa file theo tung item het nguoi dung (gf_donBinGuide_). */
 
 /* ============ SEQUENCE ĐANG MỞ ============
    Bản thiết kế bày 4 sequence mẫu để duyệt hình. Bản thật đọc danh sách
@@ -1451,14 +1449,14 @@ function veHanhDong(){
   if (t.id === 'chua'){
     m = 'err'; p = P.tat; khoa = true;
     html = lang === 'en'
-      ? `<b>Not connected to Premiere.</b> Open a sequence and try again — the panel needs the real frame size.`
-      : `<b>Chưa nối được với Premiere.</b> Mở một sequence rồi bấm lại — panel cần biết khung hình thật để tính.`;
+      ? `<b>Not connected to Premiere.</b> Open a sequence and try again. The panel needs the real frame size.`
+      : `<b>Chưa nối được với Premiere.</b> Mở một sequence rồi bấm lại. Panel cần biết khung hình thật để tính.`;
   } else if (t.id === 'hettrack'){
     m = 'err'; p = P.canh; khoa = true;
     html = lang === 'en'
-      ? `<b>No empty video track.</b> The guide needs an empty track on top so it never covers your clips — add one in Premiere and try again.`
-      : `<b>Không còn track video trống.</b> Guide cần một track trống trên cùng để không đè lên clip của anh —
-            thêm một track video trong Premiere rồi bấm lại.`;
+      ? `<b>Could not add a video track.</b> The guide needs an empty track on top so it never covers your clips. Add one in Premiere and try again.`
+      : `<b>Không thêm được track video.</b> Guide cần một track trống trên cùng để không đè lên clip của anh.
+            Thêm một track video trong Premiere rồi bấm lại.`;
   } else if (!d){
     m = 'warn'; p = P.canh; khoa = true;
     html = `<b>Chưa chọn nơi đăng nào.</b> Tick ít nhất một nơi để panel biết phải chừa những đâu.`;
@@ -1910,7 +1908,9 @@ function hienGuide(){
       const tenFile = 'AIO_GUIDE_' + (d ? d.id : 'luoi') + '_' + s.w + 'x' + s.h + '_' + Date.now() + '.png';
       const duongDan = THU_MUC + '/' + tenFile;
       ghiFile(duongDan, b64, 'base64');
-      donFileCu(tenFile);
+      // Không quét xoá PNG cũ ở đây nữa (25/09): file của guide đang nằm ở sequence
+      // KHÁC (hoặc project khác) cũng bị quét mất → clip offline. Host tự xoá file
+      // đúng lúc gỡ item không còn ai dùng (gf_donBinGuide_).
       const a = vX ? vX.a : 0, b = vX ? vX.b : s.dai;
       return evalP('gf_datOverlay("' + duongDan + '",' + a + ',' + b + ')', 20000);
     })
@@ -1923,6 +1923,9 @@ function hienGuide(){
       let chu = coVungThuc
         ? tm('daDatVung', { track:p.track, dai:p.daiThuc, a:p.batDau, b:p.ketThuc })
         : tm('daDat', { track:p.track, dai:p.daiThuc, seq:p.daiSeq });
+      // Host vừa phải THÊM track mới (timeline đầy): nói ra cho người dùng biết
+      // vì sao timeline có thêm một track (25/09/2026).
+      if (p.themTrack === '1') chu = tm('daThemTrack', { track:p.track }) + chu;
       const kyVong = parseFloat(p.ketThuc) - parseFloat(p.batDau);
       if (parseFloat(p.daiThuc) < kyVong - 0.5) chu += tm('phuThieu', { dai:p.daiThuc });
       nut.dataset.state = 'done';
@@ -1963,9 +1966,9 @@ napCaiDat();
 capNhatNgonNgu();          // đặt nhãn theo ngôn ngữ đã nhớ, rồi ve()
 
 function khoiDong(){
-  // Don PNG cu ngay khi mo panel: luc nay Premiere thuong da tha file cua phien
-  // truoc, con trong phien dang chay thi no giu -> unlink truot, bo qua.
-  donFileCu('');
+  // ☠️ Trước 25/09 chỗ này quét xoá MỌI PNG guide trên đĩa lúc mở panel. Sai: file
+  // của guide đang dùng ở sequence/project khác chỉ được OS "giữ" tạm, hết giữ là
+  // bị xoá → clip offline. Nay dọn file là việc của host, theo từng item hết dùng.
   if (!cs){
     iTT = 1;
     if ($('host')) $('host').textContent = 'browser';

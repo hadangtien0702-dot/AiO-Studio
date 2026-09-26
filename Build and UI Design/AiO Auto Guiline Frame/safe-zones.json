@@ -1,14 +1,17 @@
 {
-  "phienBanDuLieu": "2026-08-01",
-  "ghiChu": "NGUON CHAN LY safe zone. Moi so phai chi ve duoc mot dong trong nghien-cuu-safe-zone.md. Don vi chinh la PHAN TRAM (pt) cua chieu tuong ung — panel quy doi theo canvas sequence. px1080 chi la tham chieu tren canvas goc. trangThai: chinh_thuc | ben_thu_3 | uoc_luong. loai: ui (bi che) | crop (bi cat khi hien o ngu canh khac) | khuyen_nghi (khong bat buoc).",
-  "raSoatTiepTheo": "2026-11-01",
+  "phienBanDuLieu": "2026-09-25",
+  "ghiChu": "NGUON CHAN LY safe zone. Moi so phai chi ve duoc mot dong trong nghien-cuu-safe-zone.md. Don vi chinh la PHAN TRAM (pt) cua chieu tuong ung — panel quy doi theo canvas sequence. px1080 chi la tham chieu tren canvas goc. trangThai: chinh_thuc | ben_thu_3 | uoc_luong. loai: ui (bi che) | crop (bi cat khi hien o ngu canh khac) | khuyen_nghi (khong bat buoc). Ra soat lan 2 ngay 25/09/2026: doc lai 6 trang chinh thuc + 5 nhom nguon ben thu 3, 17/17 dinh dang KHONG doi so (chi tiet: nghien-cuu-safe-zone.md muc 17).",
+  "raSoatTiepTheo": "2026-12-25",
   "nguonRaSoat": [
     "https://www.facebook.com/business/help/980593475366490",
     "https://www.facebook.com/business/ads-guide/update/video/instagram-reels",
     "https://ads.tiktok.com/help/article/video-ads-specifications",
     "https://business.google.com/us/ad-solutions/youtube-ads/shorts-ads/",
     "https://businesshelp.snapchat.com/s/article/safe-zones",
-    "https://help.pinterest.com/en/business/article/pinterest-product-specs"
+    "https://help.pinterest.com/en/business/article/pinterest-product-specs",
+    "https://www.facebook.com/business/ads-guide/update/video/facebook-facebook-reels",
+    "https://www.facebook.com/business/ads-guide/update/video/facebook-story",
+    "https://businesshelp.snapchat.com/s/article/snap-ads-practices"
   ],
   "nenTang": [
     {
@@ -26,7 +29,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "ads.tiktok.com video-ads-specifications (06/2026)",
+          "nguon": "ads.tiktok.com video-ads-specifications (06/2026) | ra lai 25/09/2026: trang van ban 06/2026, co 5 file zip template chinh thuc (chua do truc tiep), 4 nguon 2026 tai ban 130/484/44/140 -> KHONG doi",
           "vung": [
             {
               "canh": "top",
@@ -89,7 +92,7 @@
             "h": 1920
           },
           "trangThai": "ben_thu_3",
-          "nguon": "socialrails/pixpipe/nemovideo 2026 — suy tu ti le, chua co doc chinh thuc",
+          "nguon": "socialrails/pixpipe/nemovideo 2026 — suy tu ti le, chua co doc chinh thuc | ra lai 25/09/2026: khong doi",
           "vung": [
             {
               "canh": "top",
@@ -136,7 +139,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Meta Ads Guide instagram-reels (doc 01/08/2026): top 14% / bottom 35% / 6% moi ben",
+          "nguon": "Meta Ads Guide instagram-reels (doc 01/08/2026): top 14% / bottom 35% / 6% moi ben | ra lai 25/09/2026 (doc truc tiep, ban tieng Viet): van 14/35/6, do phan giai khuyen nghi 1440x2560",
           "vung": [
             {
               "canh": "top",
@@ -199,7 +202,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Quy tac 250px legacy cua Meta + Buffer 03/2026; ads da chuyen sang chuan gop 14/35/6",
+          "nguon": "Quy tac 250px legacy cua Meta + Buffer 03/2026; ads da chuyen sang chuan gop 14/35/6 | ra lai 25/09/2026: khong doi",
           "vung": [
             {
               "canh": "top",
@@ -240,7 +243,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Luoi 3:4 tu 01/2025 (Mosseri) — hinh hoc 9:16 tren tile 3:4, Buffer/Kapwing 2025-2026",
+          "nguon": "Luoi 3:4 tu 01/2025 (Mosseri) — hinh hoc 9:16 tren tile 3:4, Buffer/Kapwing 2025-2026 | ra lai 25/09/2026: luoi 3:4 (tile 1080x1440) van hien hanh (Oktopost, Buffer 2026)",
           "vung": [
             {
               "canh": "top",
@@ -287,7 +290,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Meta Ads Guide facebook-facebook-reels (doc 01/08/2026): 14% / 35% / 6%",
+          "nguon": "Meta Ads Guide facebook-facebook-reels (doc 01/08/2026): 14% / 35% / 6% | ra lai 25/09/2026 (doc truc tiep, ban tieng Viet): van 14/35/6",
           "vung": [
             {
               "canh": "top",
@@ -350,7 +353,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Meta Ads Guide facebook-story (doc 01/08/2026) van ghi 14% top / 20% bottom — MAU THUAN voi trang IG da gop 14/35/6",
+          "nguon": "Meta Ads Guide facebook-story (doc 01/08/2026) van ghi 14% top / 20% bottom — MAU THUAN voi trang IG da gop 14/35/6 | ra lai 25/09/2026 (doc truc tiep): van \"14% (250 px) / 20% (340 px)\" - VAN MAU THUAN voi Reels",
           "vung": [
             {
               "canh": "top",
@@ -391,7 +394,7 @@
             "h": 1350
           },
           "trangThai": "chinh_thuc",
-          "nguon": "AdNabu 06/2026 + LucidMedia 05/2026: avatar/caption nam NGOAI khung, khong de len video",
+          "nguon": "AdNabu 06/2026 + LucidMedia 05/2026: avatar/caption nam NGOAI khung, khong de len video | ra lai 25/09/2026: khong doi",
           "vung": [
             {
               "canh": "top",
@@ -454,7 +457,7 @@
             "h": 1920
           },
           "trangThai": "ben_thu_3",
-          "nguon": "bestever.ai / quickframe 2025-2026: feed co dien mask 9:16 ve ~4:5",
+          "nguon": "bestever.ai / quickframe 2025-2026: feed co dien mask 9:16 ve ~4:5 | ra lai 25/09/2026: khong doi",
           "vung": [
             {
               "canh": "top",
@@ -501,17 +504,17 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "business.google.com shorts-ads (doc 01/08/2026): top 10% / bottom 25% / right 10%",
+          "nguon": "business.google.com shorts-ads (doc 01/08/2026): top 10% / bottom 25% / right 10% | ra lai 25/09/2026 (doc truc tiep): van 10/25/10 | DO THAT 25/09/2026 tren anh chup iPhone Pro Max 1290x2796 cua anh Tien, goc CHU KENH (2 agent do lai doc lap khop): video 9:16 PHU KIN chieu cao 0..2553 px (thanh dieu huong tu 2553), cat 55 px nguon = 5,1% moi mep; hang icon tren ket thuc 208 px (10,8%) nhung UI neo theo pt nen iPhone 15/16 (852 pt) len ~12,0% -> top 13%; nhan 'Chia se' cot phai mep trai 905 px = 16,2%, Android 20:9 cat them ~12 px -> 17,3% -> right 18% (= 192 px PNG chinh thuc Google); khoi chu chu kenh bat dau 1485 px (22,7%), nguoi xem it hang hon nen thap hon -> bottom 25% giu; mep bi cat 5,1% (Android 20:9 ~6,2% tinh hinh hoc) -> left 7% loai crop | Google PNG 'Vertical Video Ads Safe Zone' (do PIL 25/09): 288/672/48/192 la so ADS moi vi tri, khong dung cho organic",
           "vung": [
             {
               "canh": "top",
-              "pt": 10,
-              "px1080": 192,
+              "pt": 13,
+              "px1080": 250,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
-                "vi": "Search + camera + 3 chấm",
-                "en": "Search + camera + overflow"
+                "vi": "Thanh trạng thái + Back, Search, 3 chấm (đo: hết 10,8% trên Pro Max, ~12,0% trên iPhone 15/16)",
+                "en": "Status bar + Back, Search, overflow (measured: ends 10.8% on Pro Max, ~12.0% on iPhone 15/16)"
               }
             },
             {
@@ -521,25 +524,36 @@
               "loai": "ui",
               "trangThai": "chinh_thuc",
               "ui": {
-                "vi": "Kênh + Subscribe + tiêu đề + nhạc",
-                "en": "Channel + Subscribe + title + sound"
+                "vi": "Kênh + Subscribe + tiêu đề + nhạc (đo: khối chữ bắt đầu 78,8%)",
+                "en": "Channel + Subscribe + title + sound (measured: text block starts at 78.8%)"
               }
             },
             {
               "canh": "right",
-              "pt": 10,
-              "px1080": 108,
+              "pt": 18,
+              "px1080": 194,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
-                "vi": "Tim, Bình luận, Chia sẻ, Remix",
-                "en": "Like, Comments, Share, Remix"
+                "vi": "Tim, Bình luận, Lưu, Chia sẻ, Phối lại, ô nhạc (đo: nhãn cột lấn tới 16,2% trên iPhone, ~17,3% Android 20:9)",
+                "en": "Like, Comments, Save, Share, Remix, sound tile (measured: rail labels reach 16.2% on iPhone, ~17.3% on 20:9 Android)"
+              }
+            },
+            {
+              "canh": "left",
+              "pt": 7,
+              "px1080": 76,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
+              "ui": {
+                "vi": "Bị cắt trên điện thoại màn dài (iPhone đo 5,1%, Android 20:9 ~6,2%, 21:9 ~9% chưa phủ)",
+                "en": "Cropped on tall phones (iPhone measured 5.1%, 20:9 Android ~6.2%, 21:9 ~9% not covered)"
               }
             }
           ],
           "ghiChu": {
-            "vi": "% chính thức của Google — bao trùm mọi số đo bên thứ ba (đáy đo thật 330–400px). Player đổi 03/07/2026: bỏ dislike, thêm tim.",
-            "en": "Google's official % — covers all third-party measurements (real bottom 330–400px). Player changed 03/07/2026: dislike removed, heart added."
+            "vi": "Số Google (10/25/10) là số ADS. Đo thật trên iPhone anh Tiến 25/09/2026 (góc chủ kênh): cột icon phải lấn 16,2%, hàng trên 10,8% (iPhone nhỏ hơn ~12,0%) → top 13 / phải 18. Video 9:16 bị cắt 5,1% mỗi mép (mép phải nằm trong dải 18%). Khối tên kênh của NGƯỜI XEM thấp hơn góc chủ kênh ~160 px (ít hàng hơn, neo đáy) — chưa có ảnh người xem/Android; giả định cắt đối xứng và không bật 'Zoom to fill' của iOS. Giao diện Shorts đổi giữa 2026 (thêm Lưu, Phối lại, ô nhạc; bỏ dislike).",
+            "en": "Google's 10/25/10 are AD numbers. Measured on Tien's iPhone 25/09/2026 (creator view): rail reaches 16.2% in, top row 10.8% (~12.0% on smaller iPhones) → top 13 / right 18. A 9:16 video loses 5.1% per side (right crop sits inside the 18% band). The VIEWER's channel block sits ~160 px lower than the creator view (fewer rows, bottom-anchored); no viewer/Android screenshot yet; assumes symmetric crop and iOS 'Zoom to fill' off. Shorts UI changed mid-2026 (Save, Remix, sound tile added; dislike removed)."
           }
         },
         {
@@ -553,7 +567,7 @@
             "h": 1080
           },
           "trangThai": "chinh_thuc",
-          "nguon": "EBU R95 v1.1 + SMPTE ST 2046-1 (khop nhau tung pixel): action 3.5% / title 5% moi canh",
+          "nguon": "EBU R95 v1.1 + SMPTE ST 2046-1 (khop nhau tung pixel): action 3.5% / title 5% moi canh | ra lai 25/09/2026: chuan khong doi",
           "vung": [
             {
               "canh": "top",
@@ -622,7 +636,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "businesshelp.snapchat.com safe-zones + snap-ads-practices (doc 01/08/2026): top 150 / bottom 330, MOT vung cho moi format",
+          "nguon": "businesshelp.snapchat.com safe-zones + snap-ads-practices (doc 01/08/2026): top 150 / bottom 330, MOT vung cho moi format | ra lai 25/09/2026: trang Snap khong tai duoc (JS), 6 nguon 2026 tai ban 150/330 -> khong doi. Story Ad TILE 175/269 va Collection 150/450 la format khac, khong ap cho video 9:16",
           "vung": [
             {
               "canh": "top",
@@ -648,8 +662,8 @@
             }
           ],
           "ghiChu": {
-            "vi": "Số '460px đáy' lan truyền là spec Spotlight CŨ 2021–2023 — hiện hành là 150/330.",
-            "en": "The circulating '460px bottom' is stale 2021–2023 Spotlight guidance — current is 150/330."
+            "vi": "Số '460px đáy' lan truyền là spec Spotlight CŨ 2021–2023 — hiện hành là 150/330. Story Ad (tile trong Discover) là 175/269 và Collection 150/450 — format khác, preset này chỉ cho video 9:16 toàn màn.",
+            "en": "The circulating '460px bottom' is stale 2021–2023 Spotlight guidance — current is 150/330. Story Ad tiles (Discover) use 175/269 and Collection 150/450 — different formats; this preset is for full-screen 9:16 video only."
           }
         }
       ]
@@ -669,7 +683,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "help.pinterest.com product-specs (doc 01/08/2026): 270 / 440 / 65 / 195",
+          "nguon": "help.pinterest.com product-specs (doc 01/08/2026): 270 / 440 / 65 / 195 | ra lai 25/09/2026 (doc truc tiep): van 270/440/65/195",
           "vung": [
             {
               "canh": "top",
@@ -738,7 +752,7 @@
             "h": 1920
           },
           "trangThai": "uoc_luong",
-          "nguon": "aicarousels.com 2025 — DUY NHAT mot nguon co so, LinkedIn khong cong bo",
+          "nguon": "aicarousels.com 2025 — DUY NHAT mot nguon co so, LinkedIn khong cong bo | ra lai 25/09/2026: LinkedIn van khong cong bo, uoc luong khong doi",
           "vung": [
             {
               "canh": "top",
@@ -807,7 +821,7 @@
             "h": 1920
           },
           "trangThai": "uoc_luong",
-          "nguon": "socialk.it 2026 — X khong cong bo safe zone cho immersive viewer",
+          "nguon": "socialk.it 2026 — X khong cong bo safe zone cho immersive viewer | ra lai 25/09/2026: X van khong cong bo, socialk.it 2026 van ~400/~140",
           "vung": [
             {
               "canh": "bottom",
@@ -854,7 +868,7 @@
             "h": 1920
           },
           "trangThai": "uoc_luong",
-          "nguon": "Zalo BAT BUOC 'noi dung chinh trong vung an toan' nhung khong cong bo so — uoc theo mat bang nganh",
+          "nguon": "Zalo BAT BUOC 'noi dung chinh trong vung an toan' nhung khong cong bo so — uoc theo mat bang nganh | ra lai 25/09/2026: ads.zalo.me van chi ghi \"vung an toan\" khong so",
           "vung": [
             {
               "canh": "top",
@@ -923,7 +937,7 @@
             "h": 1080
           },
           "trangThai": "chinh_thuc",
-          "nguon": "EBU R95 v1.1 (2017) + SMPTE ST 2046-1:2009 — khop nhau: action le 3.5%, title/graphics le 5%",
+          "nguon": "EBU R95 v1.1 (2017) + SMPTE ST 2046-1:2009 — khop nhau: action le 3.5%, title/graphics le 5% | ra lai 25/09/2026: EBU R95 / SMPTE ST 2046-1 khong doi",
           "vung": [
             {
               "canh": "top",

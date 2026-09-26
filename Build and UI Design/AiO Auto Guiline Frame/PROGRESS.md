@@ -1,12 +1,323 @@
 # PROGRESS — AiO Auto Guiline Frame
 
+## 2026-09-26 16:35 — VÒNG ĐO 10 APP LẦN 1 CHẾT VÌ HẾT HẠN MỨC; LẬP BỘ TÍCH HỢP TỰ ĐỘNG, CHẠY LẠI LẦN 2
+
+**Bối cảnh.** Workflow 10 agent đo (đường B, ảnh app thật) chạy ~10:0x, **cả 10 agent chết cùng lúc vì hết hạn mức
+phiên** ("session limit, resets 1pm") sau khi đã tải 137 ảnh (172 MB) nhưng chưa trả kết quả; 2,5 triệu token mất
+trắng. Anh: *"Try again"*. Hạn mức reset 13:00, chạy lại lúc 16:33.
+
+**Nguyên nhân thật.** Agent làm cả 3 việc (tìm + tải + đo) trong một lượt dài, không ghi kết quả trung gian ra
+đĩa → chết là mất hết. Ảnh tải về thì còn (trên đĩa), nên vòng 2 chỉ cần đo.
+
+**Thay đổi.**
+- Vòng 2 (`wf_7b732065-42c`, 10 agent, 1 pha): dùng ảnh CÓ SẴN trong `scratchpad/anh-app/<id>/`, không tải thêm,
+  **ghi `ket-qua.json` ngay sau khi đo xong** (trước khi soạn đề xuất) để chết giữa chừng vẫn còn số; bỏ 10 agent
+  phản biện (tiết kiệm hạn mức) — thay bằng ghép chồng kiểm của em. Đầu ra bắt buộc theo đúng định dạng `MOCK_DO`.
+- `dist/ve-guide.js`: thêm 2 dòng đánh dấu `BAT DAU/KET THUC MOCK_DO SINH TU KET QUA DO` để script ghi đè bảng.
+- `scripts/do-anh-that/ap-ket-qua.mjs` (mới): đọc kết quả agent → in bảng duyệt (đo thật % / hiện tại / đề xuất,
+  cảnh báo `!!` nếu đề xuất nhỏ hơn đo thật) → `--ap` ghi `MOCK_DO[id]` vào ve-guide.js + vùng vào safe-zones.json
+  (pt/px1080 tính lại, `trangThai` ben_thu_3, `nguon` nối cách đo; **không bao giờ ghi số nhỏ hơn số đo**) → `manifest.json`.
+- `scripts/do-anh-that/ghep-tat-ca.py` (mới): theo manifest, ghép `guide-<id>.png` lên ảnh app thật (gọi
+  `ghep-app.py`) + montage 5 ảnh/hàng. Harness `ve-shorts.html` thêm `veTatCa()` vẽ 17 định dạng gửi lên `/luu`.
+
+**File ảnh hưởng:** `dist/ve-guide.js` (chỉ 2 dòng đánh dấu), `scripts/do-anh-that/ap-ket-qua.mjs`, `ghep-tat-ca.py`.
+
+**Kiểm chứng bằng số.** `node --check` ve-guide.js + ap-ket-qua.mjs sạch, `ast.parse` ghep-tat-ca.py sạch. Kho ảnh
+đã kiểm kê: 10/10 app có ≥ 1 ảnh khung thiết bị thật (1242×2688 / 1284×2778 / 1290×2796 / 1080×1920…), 3 app có
+sẵn script đo dở của agent. Chưa có số đo nào được áp — chờ vòng 2.
+
+## TRẠNG THÁI HIỆN TẠI (cập nhật 2026-09-26 16:35)
+
+- **Phiên bản:** v0.3.1 (manifest · `gf_phienBan()` · `PHIEN_BAN`; huy hiệu đọc từ `PHIEN_BAN`). Đã cài máy công ty.
+- **Dữ liệu safe zone:** chỉ **YouTube Shorts** đã đo từ ảnh app thật (25/09, iPhone của anh). **12 định dạng có mock
+  còn lại đang dùng số từ tài liệu = CHƯA KIỂM** (anh 26/09: *"em đã lấy thông số ảo để áp vào"*, bài brain `5bf`).
+- **Đang chạy (26/09 16:33, vòng 2):** workflow 10 agent đo trên 137 ảnh app thật đã tải (vòng 1 chết vì hạn mức).
+  Kết quả về → `ap-ket-qua.mjs` duyệt + ghi `MOCK_DO` + `safe-zones.json` → `veTatCa()` + `ghep-tat-ca.py` ghép
+  chồng kiểm 10 app → cài → ghi sổ. Ảnh tạm 172 MB trong scratchpad, xong sẽ xoá, giữ ảnh đã dùng.
+- Việc chờ anh: 3 ảnh YouTube (góc người xem · iPhone 15/16 hoặc Android · máy anh sau khi tắt Zoom to fill).
+
+## 2026-09-26 11:47 — MOCK UI CHUYỂN SANG BẢNG TOẠ ĐỘ ĐO ĐƯỢC (`MOCK_DO`) + bộ ghép chồng dùng chung cho mọi app
+
+**Bối cảnh.** Anh: *"Vậy tính ra các nền tảng khác cũng bị sai luôn chứ đâu phải mỗi mình YouTube"* rồi *"Sửa lại
+toàn bộ chưa?"* và chọn đường **B** (em tự lấy ảnh giao diện app thật từ App Store / Google Play / trang chính
+thức, đo, sửa; anh đối chiếu bằng máy mình sau). Để 10 kết quả đo đổ thẳng vào panel mà không viết lại 10 hàm vẽ,
+cần đổi cách vẽ mock.
+
+**Nguyên nhân thật.** `UI_THAT.<app>` là 13 hàm vẽ tay, toạ độ nằm rải trong code theo cảm tính (`W*0.07`,
+`H*0.815`…), không có chỗ nào để "đổ số đo vào" — nên mỗi lần có ảnh thật lại phải sửa code, và không ai đối chiếu
+được số trong code với số đo. Chính vì vậy YouTube sai suốt từ 02/08.
+
+**Thay đổi.**
+- `dist/ve-guide.js`: thêm bảng **`MOCK_DO[id]`** = danh sách phần tử `{t, x, y, w, h, s, nhan, mo}` (toạ độ % của
+  1080×1920, đọc thẳng từ ảnh) + bộ vẽ chung **`veMockData()`** (19 loại: tim, binhluan, luudau, chiase, lap,
+  bacham, kinhlup, back, x, avatar, dia, oNhac, not, chu, pill, dongMo, progress, hatch, tienTrinh). `veUiThat()`:
+  app có trong `MOCK_DO` thì vẽ từ bảng, chưa có thì rơi về hàm cũ. YouTube Shorts đã chuyển sang bảng (16 dòng).
+- `scripts/do-anh-that/ghep-app.py`: ghép guide lên ảnh chụp của **bất kỳ app** theo hình chữ nhật vùng video +
+  mapping (`fill` phủ kín chiều cao / `fit` vừa bề rộng / `khit`), thay cho `ghep-shorts.py` chỉ dành cho YouTube.
+
+**File ảnh hưởng:** `dist/ve-guide.js`, `scripts/do-anh-that/ghep-app.py` (mới). Chưa cài đè (chờ gom cùng 10 app).
+
+**Kiểm chứng bằng số.** `node --check` sạch. Vẽ yt-shorts bằng bảng vs bằng hàm cũ trên cùng khung 1080×1920: **0,97%
+điểm ảnh khác (5.028/518.400)**, tập trung ở hàng dưới cùng (nét chữ Subscribe / vạch tiêu đề do làm tròn %),
+cột icon và hàng trên không khác. Ghép bản bảng lên ảnh anh bằng `ghep-app.py` (vùng 0,0–1290,2553, fill): trùng icon
+như bản 21:54. Workflow lúc 11:46: 10/10 agent đo đã tải **137 ảnh (172 MB)** cho 10 app — nhiều hơn 10–20 ảnh đã
+xin anh vì agent lấy cả bộ ảnh App Store để chọn; xong sẽ xoá, chỉ giữ ảnh đã dùng.
+
+## 2026-09-25 21:28 — YOUTUBE SHORTS: KHUNG SAI, SỬA THEO ẢNH CHỤP THẬT CỦA ANH (anh: "Khung guideline frames youtube short chưa đúng")
+
+**Bối cảnh.** Anh gửi ảnh chụp màn hình video của anh trên YouTube Shorts (iPhone 1290×2796, góc chủ
+kênh). Em đo pixel (Python/PIL) rồi vẽ guide của panel chồng lên ảnh theo đúng cách iPhone hiện video
+(phủ kín chiều cao 0..2545, cắt 53 px nguồn mỗi mép) → thấy ngay: cột icon phải thật nằm NGOÀI vùng đỏ
+10% và mock icon của panel vẽ tâm ~94%W nên bị cắt khỏi màn, bắt đầu 46%H trong khi thật 59,8%H; hàng
+trên panel vẽ 4,5%H trong khi thật 9,7%H; chữ dưới-trái panel vẽ từ 4,5%W (bị cắt) trong khi thật 8,5%W.
+Bảng đo đầy đủ: `nghien-cuu-safe-zone.md` mục 2a.
+
+**Đã sửa.**
+- `safe-zones.json` yt-shorts: top 10 → **12%** (230 px), right 10 → **17%** (184 px), bottom giữ 25%,
+  thêm **left 6% loại crop** (mép bị điện thoại cắt); `trangThai` các cạnh đo = `ben_thu_3`, `nguon` ghi
+  cách đo. 53 → **54 vùng**, `sinh-du-lieu` ĐẠT, panel đã cài (`sign-install`) + reload: panel đọc
+  `top=12,bottom=25,right=17,left=6`.
+- `dist/ve-guide.js` `UI_THAT.shorts`: vẽ lại theo toạ độ đo (back/search/3 chấm 9,7%H; cột phải tâm
+  88,3%W, 5 icon từ 59,8%H bước 7,1%H + đĩa 95,9%H, bỏ avatar trong cột; avatar + tên + Subscribe
+  79,4%H, tiêu đề 83,4%H, dòng nhạc 86,5%H, chữ từ 8,5%W). Góc NGƯỜI XEM, cùng toạ độ góc chủ kênh.
+- Bộ đo giữ lại trong `scripts/do-anh-that/` (đo ảnh, harness vẽ guide, máy chủ tĩnh, ghép chồng) để
+  lần sau anh gửi ảnh app khác là đo được ngay. Ảnh gốc của anh chép vào `Test Media/` (ngoài git).
+
+**Kiểm chứng.** Ghép chồng bản mới lên ảnh thật (`shorts-truoc-sau.jpg` gửi anh 21:27): tim/bình
+luận/lưu/chia sẻ/remix/đĩa giả trùng icon thật; hàng trên trùng; avatar + tên + Subscribe trùng hàng kênh;
+vùng đỏ phải phủ trọn cột icon; dải gạch chéo trái đúng phần bị cắt. `node --check ve-guide.js` sạch.
+**21:32 — 2 agent đo lại ĐỘC LẬP (phương pháp khác: mode màu nền nav, texture theo hàng, bbox theo
+ngưỡng sáng) khớp số của em:** navTop **2553** (em lấy 2545 = vạch sáng seek bar, lệch 0,3%), phủ kín
+chiều cao xác nhận bằng 3 bằng chứng (257/260 hàng vùng 2293–2553 còn texture; mép cột x 1250–1290 có
+hình; fit-width thì navTop quy về 2137 > 1920 vô lý), cắt **55 px nguồn mỗi mép**; top 208–209 px,
+right 175 px (16,2%), bottom 435 px (chủ kênh), left 91 px; tâm cột 952,5 px; 6 phần tử cột cùng tâm x
+1193,5 ± 0,5, bước 178 px màn. Em tinh chỉnh mock (xT 8,4%W · tim 59,6%H · bước 7,0%H · đĩa 95,6%H),
+cài lại + reload panel, đo lại bằng số: **tâm 6 icon giả lệch tâm icon thật −1…−12 px màn hình (≤ 9 px
+nguồn, icon cao 58 px), tâm cột lệch 1 px.** Vùng: right 17% = 184 px > 175 px đo (biên 9 px).
+**21:5x — nhóm agent xong (9 agent, 2,1 triệu token, 30 phút): 3 nghiên cứu + 1 tổng hợp + 3 phản biện
+(2/3 bác bỏ có lý). Em sửa theo, cài đè lần cuối 21:54, panel đọc `top=13,bottom=25,right=18,left=7`:**
+- **Phản biện 1 (đúng):** UI YouTube neo theo pt, ảnh anh là Pro Max (máy CAO nhất = ca dễ nhất); iPhone
+  15/16 (852 pt) hàng icon trên chiếm ~12,0%H → 12% hết dư → **top 13%** (250 px). Phải: iPhone 15/16 dư
+  12 px, 13 mini 3 px, Android 20:9 (tính hình học) 5–7 px → **18%** (194 px, trùng 192 px của PNG Google);
+  nhãn cột theo ngôn ngữ app (Share / Compartir…) chưa đo.
+- **Phản biện 2 (không bác được mapping):** 4 bằng chứng phủ-kín: không có đường nối sắc→mờ tại y 2293
+  (loại letterbox + blur), ảnh gamma thấy vải liền tới 2543, hàng 0–60 có 460–520 màu (video sau status
+  bar), fit-width cho navTop → 2240 > 1920 vô lý. Sửa số trong sổ: navTop **2553**, cắt **55 px = 5,1%**.
+  Cảnh báo giữ lại: giả định cắt ĐỐI XỨNG + iOS "Zoom to fill screen" tắt — chưa kiểm.
+- **Phản biện 3 (đúng, quan trọng nhất):** khối dưới-trái trong ảnh là góc CHỦ KÊNH, bắt đầu cao (77,3%H)
+  vì bị 3 hàng riêng (AI / Bị chặn / nút Chia sẻ video của bạn ~300 px) đẩy lên; NGƯỜI XEM chỉ có 3 hàng,
+  neo đáy → khối bắt đầu ~85,8%H. Mock vẽ theo góc chủ kênh sẽ lệch 80–160 px so với màn người xem. Sửa:
+  mock khối dưới vẽ theo góc NGƯỜI XEM neo đáy (nhạc 95,6%H ngang ô nhạc cột phải · tiêu đề 91,5%H · avatar
+  + tên + Subscribe 87,6%H), ghi rõ ƯỚC trong mã; vùng bottom 25% phủ cả hai góc.
+- Nghiên cứu: không nguồn web 2026 nào cho toạ độ từng phần tử (chỉ dải mép, lệch nhau 120–380 / 300–672 /
+  96–200); **PNG chính thức Google tải + đo PIL = 288/672/48/192 nhưng file in chữ "Vertical Video ADS Safe
+  Zone"** — 5 site chép nhầm thành số organic, không dùng; Google 13547298 còn nói "without cutting off your
+  content" trái với 5,1% đo được. Left **7%** crop (Android 20:9 ~6,2% hình học; 21:9 ~9% chưa phủ).
+- Mock thêm: mũi tên Back tâm 10,6%W, ô nhạc vuông bo góc 72 px (thay đĩa 88 px), avatar 72 px, tên từ
+  183 px, pill Subscribe cao 72 px, tiêu đề rộng 71%W, Phối lại mờ 60%, gạch chéo mờ dải cắt phải 5,1%.
+- Đo lại lần cuối: tâm 6 icon cột phải giả vs thật lệch ≤ 12 px màn; khối dưới CỐ Ý thấp hơn ảnh chủ kênh
+  (góc người xem). Ảnh so sánh `shorts-truoc-sau.jpg` cập nhật.
+- **Xin anh 3 ảnh để khoá số:** (1) Shorts góc NGƯỜI XEM (tài khoản khác / máy khác), (2) iPhone 15/16 hoặc
+  Android, (3) máy anh sau khi tắt Settings → General → Display Zoom / "Zoom to fill" nếu có bật.
+
+**Chưa:** ảnh góc NGƯỜI XEM và ảnh Android (cắt mép nhiều hơn) chưa có; TikTok / Reels mock vẫn là
+"minh hoạ" chưa đo từ ảnh thật — anh gửi ảnh chụp là em đo y hệt.
+
+## 2026-09-25 16:1x — RÀ SOÁT SAFE ZONE LẦN 2 (anh: "truy quét lại các frame trên các nền tảng… đúng vị trí, kích thước, an toàn")
+
+> ☠️ **GHI THÊM 26/09 09:5x — lần rà này SAI PHƯƠNG PHÁP.** Nó chỉ đọc lại tài liệu (6 trang chính thức
+> + nguồn 2026) và kết luận "17/17 không đổi số"; **5 giờ sau ảnh chụp thật của anh cho thấy YouTube Shorts
+> sai** (cột phải 10% vs 16% thật, icon giả ngoài màn). Anh: *"Em không đo hình ảnh thực tế từ sản phẩm mà
+> em đã lấy thông số ảo để áp vào."* Kết luận "không đổi" bên dưới chỉ có nghĩa **"spec không đổi"**, KHÔNG
+> có nghĩa khung đúng. Bài học brain `5bf`. Trạng thái thật của 17 định dạng: chỉ YouTube Shorts đã đo từ
+> ảnh sản phẩm; 12 định dạng có mock còn lại **chưa kiểm được** tới khi có ảnh chụp app thật.
+
+Anh xác nhận trước đó: *"anh bấm và thấy nó lên rồi đó em"* (0.3.1 chạy trên bài thật).
+
+**Cách rà:** đọc lại TRỰC TIẾP 6 trang chính thức trong `nguonRaSoat` (Meta IG Reels, FB
+Reels, FB Stories, TikTok ads specs, Google Shorts ads, Pinterest specs) + tìm nguồn 2026 cho
+Snapchat (trang Snap render JS không đọc được), LinkedIn, X, Zalo, lưới IG. So từng số với
+JSON bản 01/08/2026. Bảng đầy đủ + nguồn: `nghien-cuu-safe-zone.md` mục 17.
+
+**Kết quả: 17/17 định dạng, 53 vùng — KHÔNG con số nào đổi.** Đáng chú ý: Meta vẫn 14/35/6
+cho Reels (độ phân giải khuyến nghị nay 1440×2560); FB Stories vẫn "14% (250 px) / 20% (340
+px)", mâu thuẫn với Reels chưa được Meta sửa sau 2 tháng; TikTok trang vẫn bản 06/2026, HTML lộ
+5 link .zip template chính thức (chưa tải, cần anh gật); Snapchat ngoài 150/330 còn Story Ad
+tile 175/269 và Collection 150/450 (format khác, ghi chú, không áp).
+
+**Đã sửa:** `safe-zones.json` — `phienBanDuLieu` 2026-08-01 → **2026-09-25**, `raSoatTiepTheo`
+→ **2026-12-25**, thêm 3 URL vào `nguonRaSoat`, 17 dòng `nguon` nối "ra lai 25/09/2026: …",
+ghi chú Snapchat. Script vá tự đối chứng: **53/53 pt/px1080 trước = sau**. `sinh-du-lieu`:
+ĐẠT 10/17/53, `dist/safe-zones.js` 19.050 byte. Cài đè + reload panel 16:08, đọc
+`window.SAFE_ZONES` của panel đang chạy trong Premiere qua cổng 8096 rồi so với JSON nguồn:
+**53/53 vùng khớp (pt, px1080, loại, trạng thái), 0 lệch, phiên bản panel = 2026-09-25.**
+
+**Còn mở:** (1) đo pixel trực tiếp file template chính thức TikTok (.zip ~84 KB) + ảnh vùng đỏ
+của Google — là TẢI FILE, chờ anh gật; (2) `zalo-916` phải 12% vs thiết kế 12,96% — vẫn chờ
+anh chốt; (3) kỳ rà tiếp 25/12/2026.
+
+## 2026-09-25 13:48 — v0.3.1: HẾT TRACK TRỐNG THÌ TỰ THÊM TRACK (anh: "add không được em à")
+
+**Bối cảnh.** Anh dựng bài thật (`Tap_1_Hay_Yeu_Thuong_Nhau`, sequence 11 track video,
+V1–V11 đều có clip trong vùng In/Out 0–1:36), bấm *Show safe zone* → hộp đỏ "No empty
+video track left. Add a video track in Premiere and try again…". Anh chụp màn hình:
+*"add không được em à"*.
+
+**Nguyên nhân thật (đọc `gf_datOverlay`).** (1) Host chỉ nhận track trống LIÊN TIẾP trên
+cùng; V11 có clip → dừng ngay → `ERR:HET_TRACK`, đúng như thiết kế v0.1 "không dùng QE,
+bắt người dùng thêm track tay" (quyết định 4 trong CLAUDE.md, nay đã đè). (2) Bẫy thứ
+hai nằm sẵn: `gf_trackTrong_` hỏi "trống suốt cả sequence [0, daiSeq)" kể cả khi đã
+khoanh In/Out — track chỉ bận NGOÀI vùng khoanh vẫn bị coi là bận (skill 6b đã ghi luật
+"hỏi đúng khoảng", panel này chưa theo).
+
+**Đã sửa.**
+- `host/guideframe.jsx`: `gf_trackTrong_(track, tu, den)` hỏi đúng vùng [a,b); thêm
+  `gf_themTrackVideo_` = đúng MỘT lệnh QE `addTracks(1, soTrack, 0, 0)` (chữ ký Asset
+  Manager / Power Bins / Transcripts đang dùng; 2 thread Adobe Community cùng mô tả tham
+  số: số track video, chỗ chèn, số track tiếng, loại tiếng), gọi xong ĐỌC LẠI số track,
+  có chốt tên sequence QE = sequence đang đặt. Trả thêm `themTrack=0/1|themAudio=N`.
+  Hết đường mới trả `HET_TRACK`.
+- `dist/index.html`: câu lỗi HET_TRACK mới ("Không thêm được track video mới nên chưa
+  đặt được guide…"); đặt xong mà có thêm track thì mở đầu bằng "Đã thêm track V{n}
+  mới."; huy hiệu `v…` trên thanh tiêu đề đọc từ `PHIEN_BAN` (nơi thứ 4 bị quên khi
+  bump); bỏ gạch dài "—" trong 8 chuỗi người dùng thấy đã đụng tới (luật 22/09). Trong
+  khu DICT + hộp trạng thái còn **8 dòng** có "—" chưa đụng (đếm dòng, chưa phân loại
+  chữ hay ghi chú) — chờ anh gật rồi dọn một lượt.
+- Phiên bản 0.3.1 ở manifest ×2 · `gf_phienBan()` · `PHIEN_BAN`. Đã ký + cài đè
+  (`sign-install.ps1` 2 lần, lần 2 vì huy hiệu), reload panel qua cổng 8096:
+  panel = host = huy hiệu = 0.3.1.
+
+**Kiểm chứng — ĐO THẬT trên Premiere 27 (Beta), bài test tự dựng môi trường (luật 3a,
+script `thu-them-track.js` chạy trong panel qua CDP):** bin riêng `AiO GF THU <ts>` +
+2 PNG riêng + sequence riêng tạo bằng `createNewSequenceFromClips` ở gốc project
+(3V/3A, 4,97 s), lấp đầy V1–V3 bằng clip nền.
+
+| Ca | Host trả | Đọc lại timeline |
+|---|---|---|
+| 3 track đầy, bấm đặt | `OK:track=4\|themTrack=1\|themAudio=0`, **298 ms** | nV 3→4, nA 3=3, V4 = guide [0,00..4,97], 3 clip dưới nguyên |
+| gỡ rồi bấm lại (V4 trống) | `track=4\|themTrack=0` | nV vẫn 4 |
+| V4 bận [0..1,97) · vùng chọn [3..4,97) | `track=4\|batDau=3,00\|themTrack=0` | V4 có 2 clip: nền [0..1,97] + guide [3,00..4,97] |
+
+Dọn: `deleteSequence=true`, bin thử xoá, bin "AiO Guide Frame" không còn; sequence
+"Tập 2" của anh mở lại đúng ID, **12V/3A/9 clip/2 item gốc/2 sequence trước = sau**.
+2 PNG thử trong `C:/AiOStudio/GuideFrame/` Premiere còn giữ (EBUSY quen thuộc, xem mục
+0 CLAUDE.md) — `donFileCu()` dọn ở lần bấm sau. Cú pháp: `node --check` host (chép
+sang .js) + script inline của index.html sạch.
+
+**Soát lại lần 2 (anh: *"kiểm tra kĩ lại"*, 13:48→15:15 theo `date`; bản nháp đầu của mục này
+ghi "14:0x" là giờ ĐOÁN, đã sửa — bài 5aw) — đọc lại diff bằng mắt, tìm được 2 chỗ còn tin lời
+hơn tin số đo, sửa cả hai, cài đè lần 3:**
+1. **Sau khi thêm track, code cũ tin "track mới nằm trên cùng" (`sau - 1`) rồi
+   `overwriteClip` lên đó.** Nếu QE có lúc chèn ở đầu/giữa thì track trên cùng vẫn là
+   track có clip của người dùng → ĐÈ MẤT clip. Lần đo 13:43 chèn đúng trên cùng
+   (clipDuoi=3 nguyên), nhưng đó là 1 mẫu. Nay: thêm xong TÌM LẠI track trống từ
+   trên xuống bằng đúng vòng lặp cũ; không có thì trả `ERR:TRACK_MOI_KHONG_TREN_CUNG`
+   (chuỗi VI/EN mới), tuyệt đối không đè. Hệ quả chấp nhận được: lỡ thêm track rồi mà
+   import PNG lỗi thì thừa một track trống, không hại gì.
+2. **Chốt "tên sequence QE = tên sequence DOM" có thể ÂM TÍNH GIẢ với tên tiếng
+   Việt** ("Tập 2" của anh) nếu hai đường mã hoá dấu khác nhau → panel báo "không thêm
+   được track" oan. Chưa đo được (Premiere đã đóng lúc soát) nên đổi sang so bản
+   "xương ASCII" (bỏ ký tự ngoài 0x20–0x7E): "Tập 2" hai bên đều thành "Tp 2" → khớp;
+   tên khác hẳn vẫn bắt được. ⬜ Khi anh mở lại Premiere: chạy `soat-doc.js` đo
+   `qe.name === seq.name` trên "Tập 2" để đóng câu hỏi này.
+3. Cú pháp: `node --check` host (chép .js) + script inline sạch; quét host không có
+   `let/const/=>/forEach/map`, 3 `indexOf` đều trên CHUỖI (ES3 có). Bản cài trong
+   `%APPDATA%` có đủ mã lỗi mới + regex ASCII (đo grep bản đã cài).
+4. Gạch dài "—" còn trong chữ người dùng thấy: **7 chuỗi** (đọc từng dòng, không đếm
+   mò): `lblTtDemoSub` VI/EN · `l_HOST_CU` VI/EN · 2 dòng cảnh báo ở khung xem trước
+   ("Khung hẹp hơn sequence — …", "Chưa bật lưới nào — …") · trạng thái "Lệch tỉ lệ —
+   guide chỉ vẽ…". 2 dòng còn lại là ghi chú code. Chưa sửa, chờ anh gật.
+5. Cho **Codex CLI** (QA khác hãng, ghế đã chốt 21/09) soát diff + đọc cả file, đề bài
+   chỉ tìm lỗi thật kèm file:dòng. **Vòng 1 (47.727 token, ~10 phút): 5 phát hiện**, em
+   đọc lại code từng cái (lời QA vẫn là lời khai, bài 5d-ter):
+
+   | # | Codex nói | Đối chiếu code | Xử lý (cài đè lần 4) |
+   |---|---|---|---|
+   | 1 | Thêm track rồi bước sau lỗi → thừa track trống | Đúng | Đảo thứ tự: **import PNG TRƯỚC**, thêm track sau → import hỏng thì không đụng timeline. Đặt clip hỏng sau khi đã thêm thì vẫn thừa 1 track trống (không có API gỡ, QE không dò) — chấp nhận, ghi rõ |
+   | 2 | Hai sequence trùng tên → QE thêm nhầm | Đúng một phần (QE không lộ ID) | So thêm `qs.numVideoTracks` với số track DOM (chỉ ĐỌC thuộc tính) — trùng tên mà khác số track thì bắt được |
+   | 3 | **`setOutPoint` không ăn → guide dài hơn vùng → `overwriteClip` ĐÈ clip người dùng ngay sau Out** | **Đúng, nặng nhất**: bước tìm track chỉ kiểm [a,b) | Đọc lại `getOutPoint(4)−getInPoint(4)` của item; dài hơn vùng thì bắt track trống tới `a+daiItem`, không thì KHÔNG đặt (`DAT_HONG` kèm số). Không đọc được → coi dài bằng cả sequence. Sau khi đặt: dài hơn vùng thì cắt `clip.end = b` (trước chỉ kéo dài) |
+   | 4 | Đặt hỏng để rác item PNG trong bin | Đúng | `gf_xoaItemMoi_`: bin chỉ còn item đó → `deleteBin`; còn item khác → bin tạm + `moveBin` + `deleteBin` (đường đã đo Transcripts 30/07). Gọi ở **6** đường lỗi sau import |
+   | 5 | `addTracks` thêm xong mới ném lỗi → báo HET_TRACK oan | Có thể | Bọc riêng lệnh gọi, đọc lại số track bất kể lỗi (2 đường đọc) |
+
+   Chuỗi trả về thêm `daiItem=` để bài test đọc được.
+   **Vòng 2 trên bản vá (60.859 token): 3 phát hiện, đều về DỌN RÁC, không còn điểm nào
+   về đè clip / sai track / sai sequence.** Đã vá cả 3 (cài đè lần 5): `importFiles` ném
+   lỗi sau khi đã đưa item vào → đếm lại bin, dọn item lọt vào, bin rỗng vừa tạo thì xoá ·
+   dọn rác thất bại thì nối câu "(không dọn được ảnh guide trong bin…)" vào chi tiết lỗi
+   thay vì nuốt (`gf_xoaItemMoi_` trả true/false + `gf_ghiDon_`) · đọc lại độ dài clip
+   ĐÃ đặt mà hỏng thì không xoá item (clip đang tham chiếu), coi như dài bằng vùng, vẫn
+   trả OK. **Dừng ở vòng 2** — cả 3 điểm đều nhẹ, vòng 3 tốn ~60k token nữa của gói
+   ChatGPT anh (bài 5bc).
+6. ☠️ Bản cuối (guard + ASCII) **CHƯA đo lại trên Premiere** — lúc soát thì cổng 8096 tắt
+   và `tasklist` không còn Premiere (anh đã đóng, giờ chính xác không biết). Việc đầu
+   tiên khi mở lại: chạy lại `thu-them-track.js` (3 ca phải đạt như 13:43) rồi anh bấm
+   trên bài thật.
+
+**15:49 — chạy lại 4 ca trên bản cuối theo lời anh (*"mở panel rồi đó, chạy test đi em"*):
+4/4 ĐẠT** (thêm V4 226 ms · không thêm lại · vùng [3,5) lên V4 tại 3,00 · vùng ngắn [0,2)
+cạnh clip [3,5): guide 1,97 s, clip của anh nguyên; `daiItem` đọc lại 4,94/1,97 đúng).
+Đo thêm chỉ-đọc: `qe.name === seq.name` trên "Tập 2" = **true**, `typeof` string,
+`qs.numVideoTracks` = 15 = DOM → chốt ASCII không cần nhưng vô hại.
+
+☠️☠️ **NHƯNG dòng dọn lộ ra bài test đã XOÁ MẤT GUIDE ANH VỪA ĐẶT trên "Tập 2":** trước
+test 15V/3A/**11 clip**/**13** item gốc, bin guide **CÓ 1 item**; sau test 15V/3A/**10
+clip**/**12** item, bin **không còn**. Gốc là **HAI LỖI CÓ SẴN từ 06/08**, chỉ lộ khi
+project có nhiều sequence (bài test gỡ guide trên sequence RIÊNG của em đúng như người
+dùng gỡ ở sequence B trong khi A đang có guide):
+1. `gf_tatOverlay` đếm guide chỉ trên sequence ĐANG MỞ; = 0 là **xoá cả bin "AiO Guide
+   Frame"** → item PNG của guide ở sequence khác mất → Premiere xoá luôn clip đó.
+2. Panel `donFileCu()` quét xoá MỌI `AIO_GUIDE_*.png` trên đĩa lúc mở panel và mỗi lần
+   bấm; file của guide đang dùng chỉ được OS "giữ" tạm, hết giữ là mất → clip offline.
+   (Chính nó xoá file của anh sau khi item mất: 15:49 trên đĩa không còn file của anh.)
+Em đã **ghi rủi ro số 1 ra giấy lúc 12:3x** ("bin guide có sẵn thì tránh gf_tatOverlay")
+rồi **không đưa vào script test** — lần 1 (13:43) thoát vì bin trống, lần 2 dính. Bài
+học vào brain tổng (`5be`). Guide của anh lấy lại bằng cách bấm nút lần nữa (0,3 s), em
+không tự đặt lại vì không biết track/vùng anh đã chọn.
+
+**Sửa gốc (cài đè lần 6, 15:57):**
+- Host: `gf_tenGuideDangDung_()` gom tên clip guide trên **MỌI sequence**;
+  `gf_donBinGuide_()` chỉ xoá item **không còn sequence nào dùng** (bin tạm → `moveBin`
+  → `deleteBin`, rồi mới xoá file trên đĩa — xoá file TRƯỚC khi xoá bin tạm thì Premiere
+  còn giữ, đo `xoaFile=0`), bin rỗng mới xoá bin; file Premiere còn giữ thì xếp vào
+  `GF_FILE_CHO` thử lại lần dọn sau. Gọi ở `gf_tatOverlay` và đầu `gf_datOverlay`.
+- Panel: **bỏ hẳn `donFileCu()`** (hàm + 2 chỗ gọi), giữ ghi chú vì sao.
+- Bài test v3: chụp toàn project (mỗi sequence: track/clip/guide; tên item bin) trước và
+  sau, phải giống hệt; hai sequence riêng A + B, gỡ ở B thì A phải còn.
+- Đo được trước khi anh đóng panel (15:5x): **gỡ ở B → `xoaItem=1|giuItem=1`, guide A còn
+  nguyên** = sửa gốc ĂN. Bài test v3 lần đầu vỡ giữa chừng vì lỗi THƯỚC (`fs` không phải
+  biến toàn cục trong panel, phải `nodeFs()`) — chính lỗi này làm mọi dòng "fileGiu" ở
+  các lần trước là **giả** (chưa bao giờ xoá được file, không phải Premiere giữ). Đã sửa
+  thước; 5 file PNG test xoá tay theo tên.
+
+**16:00 — bài test v3 chạy TRỌN trên bản cài 15:57, ngay trong project mới anh đang
+mở (`Friend_comforting_young_man_…`, 7V/11 clip/**1 guide thật của anh**, bin có PNG của
+anh):**
+
+| Ca | Kết quả |
+|---|---|
+| A: sequence riêng, V2/V3 trống → đặt | `track=2`, không thêm track |
+| B: 3 track đầy → đặt | thêm V4, **189 ms**, `themAudio=0`, 3 clip dưới nguyên |
+| **Gỡ ở B** | `xoaItem=1` (item B) · **`giuItem=2`** (item của A + của anh giữ nguyên) · A vẫn `guide=1` |
+| B: bấm lại khi V4 trống · vùng [3,5) · vùng ngắn [0,2) cạnh clip [3,5) | 3/3 như 15:49, `daiItem` 4,94 / 1,97 đúng |
+| Gỡ ở A | item A xoá, bin còn đúng 1 item của anh |
+| **Chụp project trước/sau** | `PROJECT_CUA_ANH_KHOP_TRUOC_SAU=DUNG` — sequence của anh vẫn 7V/11 clip/1 guide, bin vẫn 1 PNG của anh |
+
+Phát hiện kèm: **xoá file PNG trên đĩa từ host cũng KHÔNG ăn trong phiên** (`xoaFile=0`,
+`fileCho` 1→5): Premiere giữ handle cả sau khi item đã xoá, `File.remove()` trả false —
+cùng cơ chế EBUSY 26/08. Quyết định: **chấp nhận rác nhỏ** (~50 KB/lần bấm) thay vì quét
+đĩa (quét là cắn nhầm guide của project khác). `GF_FILE_CHO` thử lại trong phiên, vô hại.
+
+**Chưa đo:** anh bấm lại trên "Tập 2" để lấy lại guide đã mất (anh đã đặt được guide ở
+project mới, ca thật đã chạy) + trên bài 11 track; chưa đóng gói `Release/`; skill
+`adobe-cep-panel` + bảng app + tracker đã cập nhật.
+
 ## 2026-09-21 15:37 — ANH TEST ĐẠT
 Anh Tiến: *"Auto Guideline Frame - anh test thấy okie rồi đó em"* (bản 0.3.0). Chưa có bộ cài trong `Release/`;
 đóng gói là bước tiếp theo nếu anh muốn đưa ra ngoài.
 
-## TRANG THAI HIEN TAI (cap nhat 2026-08-26 14:40)
+## (CŨ) TRANG THAI 2026-08-26 14:40 — giữ để tham khảo, trạng thái hiện hành ở ĐẦU FILE
 
-- **Phien ban:** v0.3.0 (khop ca 3 noi: manifest · `gf_phienBan()` · `PHIEN_BAN`).
+- **Phien ban:** v0.3.1 tu 25/09/2026 (khop ca 3 noi: manifest · `gf_phienBan()` · `PHIEN_BAN`; huy hieu doc tu `PHIEN_BAN`).
 - Giao dien: ban thiet ke anh Tien chot, DA noi day that vao Premiere va da qua
   **7 dot sua theo yeu cau truc tiep cua anh** (muc 2026-08-26 ben duoi).
 - Khoi hanh dong chi con **DUY NHAT nut chinh**. Khong con: nut Go guideline ·
