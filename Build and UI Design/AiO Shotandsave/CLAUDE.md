@@ -355,6 +355,7 @@ Developer 99 USD/nam, hien ky ad-hoc qua `scripts/afterSign.js`) · tat luong ch
 
 ## Ke hoach tinh nang: Multi-Shot Storyboard Strip (Dai phan canh dien anh)
 
+> Xem chi tiet toan bo roadmap tinh nang sang tao tai file [ROADMAP.md](ROADMAP.md).
 Chot voi anh Tien toi 27/09: phat trien tinh nang ghep nhieu anh chup thanh dai phan canh / contact sheet cho editor.
 
 ### 1. Nhu cau
