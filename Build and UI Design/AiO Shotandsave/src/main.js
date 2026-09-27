@@ -466,7 +466,15 @@ ipcMain.handle('settings:get', () => {
     anhLoai: c.anhLoai === 'png' ? 'png' : 'jpeg',
     anhChatLuong: CHAT_LUONG_Q[c.anhChatLuong] ? c.anhChatLuong : 'cao',
     khayKieu: kieuKhay(),
+    khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
   }
+})
+
+ipcMain.handle('settings:set-khay-so-anh', (_e, n) => {
+  const so = Math.max(0, Math.min(100, Math.round(Number(n) || 0)))
+  kho.ghiCauHinh({ khaySoAnh: so })
+  ghiLog('doi so anh tu dong vao khay: ' + so)
+  return { khaySoAnh: so }
 })
 
 /* Doi dinh dang / chat luong anh — ap dung ngay tu lan chup sau. */
@@ -1409,7 +1417,54 @@ function trongManHinh(p) {
   })
 }
 
+let daNapAnhGanNhat = false
+
+function layDanhSachAnhGanNhat(soLuong) {
+  if (!soLuong || soLuong <= 0) return []
+  try {
+    const dir = kho.thuMucAnh()
+    if (!fs.existsSync(dir)) return []
+    const files = fs.readdirSync(dir)
+      .filter((f) => /\.(png|jpe?g)$/i.test(f) && !f.startsWith('.'))
+      .map((f) => {
+        const full = path.join(dir, f)
+        let mtime = 0
+        try { mtime = fs.statSync(full).mtimeMs } catch (e) {}
+        return { name: f, path: full, mtime }
+      })
+      .sort((a, b) => b.mtime - a.mtime)
+      .slice(0, soLuong)
+    return files
+  } catch (err) {
+    ghiLog('layDanhSachAnhGanNhat loi: ' + err.message)
+    return []
+  }
+}
+
+function napAnhGanNhatVaoKhay() {
+  if (daNapAnhGanNhat) return
+  daNapAnhGanNhat = true
+  const c = kho.docCauHinh()
+  const soLuong = typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5
+  if (soLuong <= 0) return
+
+  const files = layDanhSachAnhGanNhat(soLuong)
+  if (!files.length) return
+
+  // Xep theo thu tu thoi gian cu truoc -> moi sau de gan so thu tu #1, #2...
+  const filesChrono = files.reverse()
+  for (const f of filesChrono) {
+    let img
+    try { img = nativeImage.createFromPath(f.path) } catch (e) {}
+    if (!img || img.isEmpty()) continue
+    const id = ++shelfSeq
+    shelfItems.set(id, { id, filePath: f.path, image: img, seq: id })
+  }
+  ghiLog('tu dong nap ' + shelfItems.size + ' anh gan nhat vao khay')
+}
+
 function ensureShelf() {
+  napAnhGanNhatVaoKhay()
   if (shelfWin && !shelfWin.isDestroyed()) return shelfWin
 
   const pos = viTriKhay()
@@ -1427,6 +1482,20 @@ function ensureShelf() {
   })
   shelfWin.setAlwaysOnTop(true, 'screen-saver')
   shelfWin.loadFile(path.join(__dirname, 'shelf', 'index.html'))
+  shelfWin.webContents.once('did-finish-load', () => {
+    if (shelfItems.size && shelfWin && !shelfWin.isDestroyed()) {
+      for (const it of shelfItems.values()) {
+        const thumb = thumbKhay(it.image)
+        const sz = it.image.getSize()
+        let kb = 0
+        try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
+        shelfWin.webContents.send('shelf:add', {
+          id: it.id, seq: it.seq || it.id, thumb, filePath: it.filePath,
+          w: sz.width, h: sz.height, kb,
+        })
+      }
+    }
+  })
   shelfWin.on('closed', () => { shelfWin = null })
   return shelfWin
 }

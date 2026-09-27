@@ -1,7 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:20 +0700
-> - 📌 **BAN DANG DUNG: 0.6.2** (Windows cai 27/09 20:18, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.2.exe`).
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:30 +0700
+> - 📌 **BAN DANG DUNG: 0.6.3** (Windows cai 27/09 20:28, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.3.exe`).
+> - 🖼️ **0.6.3 (27/09) — TU DONG LOAD ANH GAN NHAT VAO KHAY + TUY CHON TRONG CAI DAT (anh yeu cau 27/09):**
+>   Khi mở khay ảnh lên (hoặc khởi động lại app / reset máy), khay sẽ tự động quét thư mục lưu và nạp **05 tấm ảnh chụp gần nhất**
+>   (sắp xếp theo thứ tự chụp `#1` đến `#5`, ảnh mới nhất `#5` nằm ngoài cùng bên trái). Đầy đủ mọi tính năng: bấm ghim ảnh,
+>   kéo thả vào Premiere / Zalo / Mess, xóa khỏi khay, chụp thêm ảnh mới sẽ tiếp nối `#6`... Bổ sung tùy chọn trong
+>   **Cài đặt -> Khay ảnh -> Số ảnh gần nhất** cho phép chọn: **Tắt (0)**, **5 (mặc định)**, **10**, hoặc **20** ảnh.
 > - 🔢 **0.6.2 (27/09) — SO THU TU ANH TRONG KHAY (#1, #2... — anh yeu cau 27/09):**
 >   Thêm con số thứ tự bé bé (`#1`, `#2`, `#3`...) ở góc dưới bên trái của mỗi ô thumbnail ảnh trong khay.
 >   Đánh số theo đúng thứ tự chụp: ảnh đầu tiên mang số `#1`, các ảnh sau tăng dần `#2`, `#3`... Số được giữ cố định

@@ -41,6 +41,7 @@ const msgFolder = document.getElementById('msg-folder')
 const langBox = document.getElementById('lang')
 const btnClose = document.getElementById('close')
 const khayBox = document.getElementById('khay-kieu')
+const khaySoAnhBox = document.getElementById('khay-so-anh')
 const loaiBox = document.getElementById('anh-loai')
 const clBox = document.getElementById('anh-chat-luong')
 const hangCL = document.getElementById('hang-chat-luong')
@@ -130,6 +131,7 @@ async function load() {
   datFolder(s.saveFolder)
   datAnh(s.anhLoai, s.anhChatLuong)
   chonPill(khayBox, s.khayKieu)
+  chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
@@ -161,12 +163,18 @@ clBox.addEventListener('click', async (e) => {
   await window.settings.setAnh({ anhChatLuong: b.dataset.v })
 })
 
-/* ── Kieu khay ────────────────────────────────────────────────────────── */
+/* ── Kieu khay + So anh nap vao khay ─────────────────────────────────── */
 khayBox.addEventListener('click', async (e) => {
   const b = e.target.closest('.chon-nut')
   if (!b || b.classList.contains('chon')) return
   chonPill(khayBox, b.dataset.v)
   await window.settings.setKhay(b.dataset.v)
+})
+khaySoAnhBox.addEventListener('click', async (e) => {
+  const b = e.target.closest('.chon-nut')
+  if (!b || b.classList.contains('chon')) return
+  chonPill(khaySoAnhBox, b.dataset.v)
+  await window.settings.setKhaySoAnh(Number(b.dataset.v) || 0)
 })
 
 /* ── Ghi phim ─────────────────────────────────────────────────────────── */

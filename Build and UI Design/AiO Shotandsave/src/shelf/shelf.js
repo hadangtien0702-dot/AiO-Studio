@@ -36,6 +36,7 @@ if (emptyEl) {
 
 /** Ve mot o anh vao dau day (moi nhat ben trai). */
 function themO(item) {
+  if (listEl.querySelector(`.item[data-id="${item.id}"]`)) return
   const el = document.createElement('div')
   el.className = 'item moi'
   el.setAttribute('role', 'listitem')
