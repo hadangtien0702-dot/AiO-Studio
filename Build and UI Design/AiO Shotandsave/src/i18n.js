@@ -84,7 +84,7 @@ const DICH = {
     'ghim.keoFile': 'Kéo để thả file vào Premiere / Photoshop / Zalo',
     'ghim.copy': 'Sao chép (Ctrl+C)',
     'ghim.dong': 'Đóng (Esc)',
-    'ghim.goiY': 'Kéo để di chuyển · Bấm 1 / 2 / 3 để vẽ · Lăn chuột = độ mờ',
+    'ghim.goiY': 'Kéo để di chuyển · 1 / 2 / 3 để vẽ · 4 làm mờ · V chọn nét vẽ · Ctrl + lăn chuột = độ mờ',
     'ghim.veXong': 'Lưu nét vẽ (Enter)',
     // Ban quyen (24/09)
     'bq.tieuDe': 'Bản quyền',
@@ -189,7 +189,7 @@ const DICH = {
     'ghim.keoFile': 'Drag to drop file into Premiere / Photoshop / other apps',
     'ghim.copy': 'Copy (Ctrl+C)',
     'ghim.dong': 'Close (Esc)',
-    'ghim.goiY': 'Drag to move · Press 1 / 2 / 3 to draw · Scroll = opacity',
+    'ghim.goiY': 'Drag to move · 1 / 2 / 3 to draw · 4 blur · V select · Ctrl + scroll = opacity',
     'ghim.veXong': 'Save drawing (Enter)',
     'bq.tieuDe': 'License',
     'bq.dungThu': 'Trial: {n} days left',

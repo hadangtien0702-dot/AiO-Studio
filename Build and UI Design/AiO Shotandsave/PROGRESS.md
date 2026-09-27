@@ -1,7 +1,22 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:38 +0700
-> - 📌 **BAN DANG DUNG: 0.6.4** (Windows cai 27/09 20:37, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.4.exe`).
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:45 +0700
+> - **BAN DANG DUNG: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+> - **0.5.7 -> 0.6.4 do GEMINI lam cung ngay 27/09** (anh dung Gemini). Claude ra soat 20:4x, ket qua + luat lam chung
+>   repo ghi o `GEMINI.md` goc repo. 0.6.5 sua 2 loi tu ra soat (muc 0.6.5 ngay duoi). [CHO] chua ai chay harness
+>   keo-chon (so loi #8) cho 0.5.7 (8 tay nam co gian khung) — can gio cua anh (luat #12); anh bam chup 1 tam
+>   sau khi mo app de xac nhan loi "anh hien 2 lan" het tren may that.
+> - **0.6.5 (27/09 20:45, Claude) — SUA 2 LOI TU RA SOAT BAN GEMINI:**
+>   (1) Lan chup DAU sau khi mo app, anh vua chup hien **2 lan** trong khay: `shelfAdd` -> `ensureShelf` ->
+>   `napAnhGanNhatVaoKhay` (0.6.3) quet thu muc SAU khi file moi da luu nen nap luon no, roi `shelfAdd` them lan nua.
+>   Sua: `shelfAdd` goi `napAnhGanNhatVaoKhay(filePath)` TRUOC, bo qua file vua luu (so theo duong dan chuan hoa).
+>   Kiem: chay NGUYEN VAN 2 ham tu main.js tren thu muc 7 anh gia (scratchpad `thu-khay/thu-nap-anh.cjs`) — doi
+>   chung cach goi cu: anh moi CO trong 5 anh nap (tai hien loi); ban sua: 5 anh cu, KHONG co anh moi. Kem: harness
+>   `moKhayDeDo` tat tu nap (truoc bi chen 5 anh that vao bo 20 anh do).
+>   (2) Goi y anh ghim ghi "Lan chuot = do mo" nhung `pin.js` BAT BUOC giu Ctrl/⌘ -> sua chu VI+EN, them phim 4 va V.
+>   Kem: sua cau nhat ky 0.6.1 "khong the dao nguoc bang AI" (sai, kham 8-15 px); CLAUDE.md muc keo-tha anh ghim cho
+>   khop 0.5.8; bang phien ban CLAUDE.md goc (ket o 0.5.5) + TOOL_VERSION_TRACKER (0.5.6) -> 0.6.5.
+>   Cai de: anh "Anh chup" 17 truoc = 17 sau. Release/win con 7 bo cai cu 0.5.8-0.6.4 (~620 MB) — CHO anh gat xoa.
 > - 📐 **0.6.4 (27/09) — DOI THIET KE TAY NAM CO GIAN 4 GOC KHAY (CORNER L-BRACKET — anh yeu cau 27/09):**
 >   Thay thế hoàn toàn 4 góc sọc chéo màu cam cũ (gây thô và che logo/nút thu nhỏ) bằng thiết kế **Thước góc bo viền (Corner L-Bracket)**
 >   tối giản theo phong cách Studio Console. Đường viền mảnh 2px bo góc cong mượt mà theo đúng bán kính cong của khay (radius 8px).
@@ -21,8 +36,9 @@
 >   bộ đếm thứ tự tự động reset về #1 cho lượt chụp tiếp theo.
 > - 📌 **0.6.1 (27/09) — BLUR & PIXELATE TOOL (LAM MO / KHAM DIEM ANH CHE THONG TIN NHAY CAM — anh yeu cau 27/09):**
 >   Thêm công cụ làm mờ / khảm điểm ảnh (Mosaic) với phím tắt **`4`** hoặc **`B`**. Kéo quét qua bất kỳ vùng nào (mật khẩu, số tài khoản,
->   khuôn mặt, link nhạy cảm) sẽ tạo hiệu ứng khảm khối pixel tức thời (real-time preview), độ an toàn tuyệt đối không thể đảo ngược
->   bằng AI; viền bo mờ tinh tế và góc vuông vắn chuyên nghiệp. Tích hợp đầy đủ với công cụ chọn **`V`** (bấm chọn vùng khảm để di chuyển,
+>   khuôn mặt, link nhạy cảm) sẽ tạo hiệu ứng khảm khối pixel tức thời (real-time preview) [SUA 27/09 Claude: cau goc ghi "an toan tuyet doi, khong the dao
+>   nguoc bang AI" la SAI — khoi chi 8-15 px (`max(8, round(10*DPR))`), chu nho kham co do con khoi phuc duoc (kieu
+>   Depix); CHUA DO. Che thong tin chac chan: khoi >= 20 px hoac to kin]; viền bo mờ tinh tế và góc vuông vắn chuyên nghiệp. Tích hợp đầy đủ với công cụ chọn **`V`** (bấm chọn vùng khảm để di chuyển,
 >   nudge bằng phím mũi tên, xóa bằng `Delete`/`Backspace`). Đồng bộ trên cả màn hình chụp (Overlay) và cửa sổ ghim (Sticky Pin).
 > - 🎯 **0.6.0 (27/09) — SELECTION TOOL (PHIM TAT V — CHON & DI CHUYEN NET VE CHUAN PREMIERE PRO — anh yeu cau 27/09):**
 >   Thêm công cụ chọn nét vẽ với phím tắt **`V`**, nút mũi tên con trỏ chuột đầu thanh công cụ. Nhấn `V` chuyển sang chế độ chọn:

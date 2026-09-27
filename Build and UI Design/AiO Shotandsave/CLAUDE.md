@@ -297,7 +297,9 @@ hong, khong phai san pham hong):
 
 KEO-THA ra app khac (`webContents.startDrag`, 25/08): keo anh GHIM hoac
 thumbnail KHAY -> tha file .png that vao Premiere / Zalo / Mess / Explorer...
-Tren cua so ghim: keo ANH = tha ra app, keo THANH TREN (#bar) = di chuyen cua so
+~~Tren cua so ghim: keo ANH = tha ra app, keo THANH TREN (#bar) = di chuyen cua so~~
+**DOI 0.5.8 (27/09, Gemini lam, anh yeu cau):** keo ANH ghim = DI CHUYEN cua so; tha file ra app = keo nut
+`#drag-file` tren thanh cong cu, hoac GIU Alt + keo anh. Khay anh van keo thumbnail = tha ra app nhu cu.
 (dragstart chiem cho keo-di-chuyen nen phai tach). Da do that: file roi dung vao
 Explorer, xuyen ca 2 man hinh. **14/09 (0.4.16, thu muc khong '&'):** Premiere (len
 timeline) · Photoshop (Smart Object) · Claude desktop · Messenger · Lark · Teams web ·

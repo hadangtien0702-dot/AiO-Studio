@@ -277,6 +277,7 @@ function moKhayDeDo() {
   // AIO_TEST_ANH_DIR: thu muc BAN SAO de harness ve/ghi de khong dung anh that
   const dir = process.env.AIO_TEST_ANH_DIR || kho.thuMucAnh()
   let files = []
+  daNapAnhGanNhat = true   // harness tu nap dung bo anh cua no — khong cho "anh gan nhat" (0.6.3) chen them (0.6.5)
   try { files = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g)$/i.test(f)).sort().slice(0, 20) } catch (e) {}
   for (const f of files) {
     const img = nativeImage.createFromPath(path.join(dir, f))
@@ -1441,14 +1442,25 @@ function layDanhSachAnhGanNhat(soLuong) {
   }
 }
 
-function napAnhGanNhatVaoKhay() {
+/* ☠️ 27/09 (0.6.5, Claude ra soat ban Gemini): lan chup DAU sau khi mo app, shelfAdd() goi
+   ensureShelf() -> ham nay quet thu muc SAU khi anh moi da luu -> nap luon anh do, roi shelfAdd
+   them no lan nua = anh vua chup hien 2 lan trong khay. Nay shelfAdd goi truoc voi `boQua` =
+   file vua luu; so khop theo duong dan chuan hoa (Windows khong phan biet hoa thuong). */
+const khoaDuongDan = (p) => {
+  const r = path.resolve(String(p || ''))
+  return process.platform === 'win32' ? r.toLowerCase() : r
+}
+function napAnhGanNhatVaoKhay(boQua) {
   if (daNapAnhGanNhat) return
   daNapAnhGanNhat = true
   const c = kho.docCauHinh()
   const soLuong = typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5
   if (soLuong <= 0) return
 
-  const files = layDanhSachAnhGanNhat(soLuong)
+  const khoaBoQua = boQua ? khoaDuongDan(boQua) : ''
+  const files = layDanhSachAnhGanNhat(soLuong + (khoaBoQua ? 1 : 0))
+    .filter((f) => !khoaBoQua || khoaDuongDan(f.path) !== khoaBoQua)
+    .slice(0, soLuong)
   if (!files.length) return
 
   // Xep theo thu tu thoi gian cu truoc -> moi sau de gan so thu tu #1, #2...
@@ -1511,6 +1523,7 @@ function showShelf() {
 
 /** Them mot anh vao khay (goi sau khi da luu file). */
 function shelfAdd(image, filePath) {
+  napAnhGanNhatVaoKhay(filePath)   // truoc ensureShelf: nap anh cu, TRU anh vua chup (0.6.5)
   const w = ensureShelf()
   const id = ++shelfSeq
   shelfItems.set(id, { id, filePath, image, seq: id })
