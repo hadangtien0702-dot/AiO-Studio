@@ -1,5 +1,10 @@
 # AiO Studio — TOÀN BỘ kiến thức về dự án, một chỗ duy nhất
 
+> ☠️ **LUẬT LÀM CHUNG VỚI GEMINI (27/09/2026) nằm ở `AGENTS.md` — Claude và Gemini cùng đọc MỘT file đó.**
+> Dòng dưới nạp nó tự động; sửa luật làm chung thì sửa trong `AGENTS.md`, không chép sang đây.
+
+@AGENTS.md
+
 > **File này nằm TRONG repo** → máy nào pull về cũng đọc được, khác ngăn nhớ tự
 > động của Claude (gắn theo đường dẫn từng máy, dời thư mục là mất).
 >
