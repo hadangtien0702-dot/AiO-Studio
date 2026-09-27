@@ -371,6 +371,15 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 | Giai đoạn B: cắt `~/.claude/CLAUDE.md` 1.145 → ~150 dòng, 62 bài học thành skill | Cả bộ | Anh chốt 21/09, chờ đo giai đoạn A có ăn không |
 | `worktrees/` 652 file/36,8 MB từ 01/09 nhân đôi 13 `CLAUDE.md` · 2 slug lạc của Autocut · hook `Stop` không canh `public/` nên Thinksmart không bị chặn | Cả bộ | Đo 21/09, chưa dọn |
 | ☠️ `~/.claude/settings.json` có token n8n JWT + Google `client_secret` trong `permissions.allow` | Cả bộ | Chờ anh quyết |
+| Harness kéo-chọn (sổ lỗi #8) cho 0.5.7 — 8 tay nắm co giãn khung Gemini thêm, CHƯA ai chạy | Shot & Save | Harness bật cửa sổ chụp lên màn anh (luật #12) — cần anh cho giờ |
+| Anh chụp 1 tấm sau khi mở app 0.6.5 → khay đúng 1 ô (xác nhận hết lỗi "ảnh hiện 2 lần") · anh dùng thử làm mờ / V / chỉnh khung trên máy thật | Shot & Save | Tính năng đã lên web (27/09) nhưng anh chưa dùng — luật "dùng trước khi bán" |
+| Kích thước khối làm mờ 8–15 px (chữ nhỏ có thể khôi phục) — giữ hay tăng ≥ 20 px / tô kín | Shot & Save | Chờ anh quyết |
+| Xoá 7 bộ cài cũ 0.5.8→0.6.4 (~620 MB) trong `Release/AiO Shotandsave/win/`, giữ 0.6.5 | Shot & Save | Chờ anh gật (xoá = không đảo ngược) |
+| Thư mục làm việc của Gemini (git worktree nhánh `gemini`) mới có ở **máy nhà** — máy công ty chưa tạo | Shot & Save | Tạo khi ngồi máy công ty: `git worktree add "E:\2026\Production\AiO Studio - Gemini" gemini` |
+| Luật `AGENTS.md` chưa thử lần nào — lượt Gemini bàn giao đầu tiên phải soát xem có theo đúng không | Cả bộ | Chờ lượt Gemini làm đầu tiên |
+| Máy nhà thiếu `bin/` FFmpeg/whisper/yt-dlp: Video Download chưa cài, tool xử lý âm thanh/video lỗi khi chạy việc thật; Music đang dùng tạm ffmpeg-static **GPL** (không đóng gói) | Cả bộ | Chép `bin/` từ máy công ty hoặc anh gật tải (~2 GB) |
+| Music: anh thử kéo file / kéo clip từ timeline vào ô (đọc `%APPDATA%\AiOMusic\tha-vao.log`), bấm clip, nghe kiểm key; panel có mở vào màn Key không | Music | Chờ anh thử |
+| 3 script cài (Re-Frames, Guide Frame, Podcast) không gỡ junction chết trước khi chép | 3 panel | Chưa sửa (anh chưa gật) |
 
 ---
 
