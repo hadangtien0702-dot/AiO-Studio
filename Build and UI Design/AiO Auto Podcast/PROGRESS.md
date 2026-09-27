@@ -1,5 +1,16 @@
 # AiO Auto Podcast - Nhat ky
 
+## [ngon-ngu-chung] - 2026-09-27 18:08 +0700 - Theo ngon ngu CHUNG ca bo (truoc day localStorage rieng, mac dinh vi)
+
+- **Boi canh:** anh nho kiem panel tong (27/09) -> em thay Podcast, Re-Frames, Guide Frame KHONG doc file ngon ngu
+  chung `%APPDATA%\AiOStudio\ngonngu.json` (grep 'ngonngu' = 0): doi ngon ngu o panel tong / Autocut thi 3 panel nay
+  dung yen, va mac dinh 'vi' trong khi ca bo mac dinh 'en' (design-system/ngonngu.tsx MAC_DINH, anh chot ban nuoc ngoai).
+- **Da sua:** nguon chan ly moi `design-system/ngonngu-chung.js` (doc/ghi/theoDoi 2 s, mac dinh 'en'), chep sang dist
+  bang `dong-bo-tai-nguyen.ps1` (script nay nay chep ca 2 file). Panel nap bang <script src="./ngonngu-chung.js">.
+- **Do tren Premiere that (may nha, cong debug):** file 'vi' -> 3 panel VI; bam nut o PANEL TONG -> file 'en', ca 5
+  panel dang mo (tong, Autocut, Podcast, Re-Frames, Guide Frame) doi trong <= 3,5 s; bam nut o GUIDE FRAME -> file 'vi',
+  ca 5 doi ve VI. Podcast: bo kiem 4 lop DAT truoc khi cai.
+
 ## [test-tieng-cam-lam-mic] - 2026-08-25 15:10 +0700 - ANH TIEN TU CHAY BAI THAT: KHONG MIC ROI, TIENG CAM LAM MIC — CAU TRUC SACH 411/411
 
 ### Boi canh

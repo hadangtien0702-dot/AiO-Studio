@@ -20,20 +20,22 @@ param([switch]$KiemThoi)
 $ErrorActionPreference = 'Stop'
 $goc = Split-Path -Parent $MyInvocation.MyCommand.Path
 $studio = Split-Path -Parent $goc
-$nguon = Join-Path $goc 'tai-nguyen.js'
-if (-not (Test-Path $nguon)) { throw "Khong thay $nguon" }
-
-# Panel KHONG build — nap tai-nguyen.js bang <script src="./tai-nguyen.js">
-$dich = @(
-  'AiO Auto Podcast\dist\tai-nguyen.js',
-  'AiO Auto Re-Frames\dist\tai-nguyen.js'
+# Panel KHONG build — nap bang <script src="./ten-file.js">
+#   tai-nguyen.js    : luat tai nguyen 50-70%
+#   ngonngu-chung.js : ngon ngu chung ca bo %APPDATA%\AiOStudio\ngonngu.json (them 27/09/2026)
+$bang = @(
+  @{ file = 'tai-nguyen.js';    panel = @('AiO Auto Podcast', 'AiO Auto Re-Frames') },
+  @{ file = 'ngonngu-chung.js'; panel = @('AiO Auto Podcast', 'AiO Auto Re-Frames', 'AiO Auto Guiline Frame') }
 )
 
-$bamNguon = (Get-FileHash $nguon -Algorithm MD5).Hash
 $doi = 0
 $giong = 0
 
-foreach ($d in $dich) {
+foreach ($muc in $bang) {
+ $nguon = Join-Path $goc $muc.file
+ if (-not (Test-Path $nguon)) { throw "Khong thay $nguon" }
+ $bamNguon = (Get-FileHash $nguon -Algorithm MD5).Hash
+ foreach ($d in ($muc.panel | ForEach-Object { "$_\dist\" + $muc.file })) {
   $day = Join-Path $studio $d
   $thuMuc = Split-Path -Parent $day
   if (-not (Test-Path $thuMuc)) {
@@ -53,10 +55,11 @@ foreach ($d in $dich) {
     Write-Output "  DA CHEP  $d"
     $doi++
   }
+ }
 }
 
 Write-Output ''
-Write-Output "Nguon: $nguon"
+Write-Output "Nguon: $goc (tai-nguyen.js, ngonngu-chung.js)"
 Write-Output ("Giong san: $giong | " + $(if ($KiemThoi) { "Lech: $doi" } else { "Da chep: $doi" }))
 Write-Output ''
 Write-Output '--- NHAC: 4 panel CO BUILD giu hang so rieng, kiem bang: ---'

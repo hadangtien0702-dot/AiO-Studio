@@ -37,7 +37,6 @@ html, body {
   position: absolute; top: var(--sp-2); right: var(--sp-2);
   display: flex; gap: var(--sp-1);
   padding: 3px;
-  cursor: move; /* keo thanh nay = di chuyen cua so ghim */
   background: rgb(20 20 20 / 82%);
   border: 1px solid var(--line-2);
   border-radius: var(--r-sm);
@@ -45,8 +44,21 @@ html, body {
   opacity: 0; transform: translateY(-4px);
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
   pointer-events: none;
+  z-index: 10;
 }
 #frame:hover #bar { opacity: 1; transform: none; pointer-events: auto; }
+
+#bar button, #bar #drag-file {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: var(--r-xs);
+  background: transparent; color: var(--text-2); cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+#bar #drag-file { cursor: grab; }
+#bar #drag-file:active { cursor: grabbing; }
+#bar button:hover, #bar #drag-file:hover { background: var(--bg-hover); color: var(--text-1); }
+#bar #close:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
 
 /* 14/09 anh Tien: "bam chuot chon vao thi khong duoc" — sau khi bo nut but chi
    (10/09) chi con phim 1/2/3 de vao che do ve, cam chuot thi KHONG co duong vao.

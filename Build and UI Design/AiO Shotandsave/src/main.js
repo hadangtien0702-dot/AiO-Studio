@@ -339,7 +339,9 @@ function trayIcon() {
   if (img.isEmpty()) return undefined
   // Logo AiO la 386x351 (KHONG vuong). Ep vao o vuong 18x18 la bop meo chu A —
   // chi ghim CHIEU CAO, de chieu rong tu theo ti le.
-  return img.resize({ height: 16, quality: 'best' })
+  const resized = img.resize({ height: 16, quality: 'best' })
+  if (process.platform === 'darwin') resized.setTemplateImage(true)
+  return resized
 }
 
 function createTray() {

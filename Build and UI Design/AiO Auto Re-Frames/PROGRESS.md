@@ -1,5 +1,16 @@
 # AiO Auto Re-Frames - Nhat ky
 
+## [0.6.0+] - 2026-09-27 18:08 (UTC+7) - Theo ngon ngu CHUNG ca bo (truoc day localStorage rieng, mac dinh vi)
+
+- **Boi canh:** anh nho kiem panel tong (27/09) -> em thay Podcast, Re-Frames, Guide Frame KHONG doc file ngon ngu
+  chung `%APPDATA%\AiOStudio\ngonngu.json` (grep 'ngonngu' = 0): doi ngon ngu o panel tong / Autocut thi 3 panel nay
+  dung yen, va mac dinh 'vi' trong khi ca bo mac dinh 'en' (design-system/ngonngu.tsx MAC_DINH, anh chot ban nuoc ngoai).
+- **Da sua:** nguon chan ly moi `design-system/ngonngu-chung.js` (doc/ghi/theoDoi 2 s, mac dinh 'en'), chep sang dist
+  bang `dong-bo-tai-nguyen.ps1` (script nay nay chep ca 2 file). Panel nap bang <script src="./ngonngu-chung.js">.
+- **Do tren Premiere that (may nha, cong debug):** file 'vi' -> 3 panel VI; bam nut o PANEL TONG -> file 'en', ca 5
+  panel dang mo (tong, Autocut, Podcast, Re-Frames, Guide Frame) doi trong <= 3,5 s; bam nut o GUIDE FRAME -> file 'vi',
+  ca 5 doi ve VI. Podcast: bo kiem 4 lop DAT truoc khi cai.
+
 ## [0.6.0] - 2026-08-27 16:35 (UTC+7) - DOAN DANG CHON: khoanh I/O tren timeline la tracking dung doan do
 
 > ☠️ **SUA NGAY 27/08 16:35:** muc nay ban dau ghi la **26/08** — `Get-Date` luc

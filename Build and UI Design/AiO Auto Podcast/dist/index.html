@@ -497,6 +497,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
 <script src="./sync.js"></script>
 <script src="./khop.js"></script>
 <script src="./tai-nguyen.js"></script>
+<script src="./ngonngu-chung.js"></script>
 <script>
   var cs = new CSInterface()
 
@@ -737,9 +738,8 @@ select option{background:var(--bg-2);color:var(--text-1)}
       tomtat_auto: 'auto',
     },
   }
-  var L = 'vi'
-  try { L = localStorage.getItem('aio-lang') || 'vi' } catch (e) {}
-  if (!NGON_NGU[L]) L = 'vi'
+  var L = window.AiONgonNgu ? window.AiONgonNgu.doc() : 'en'  // file chung ca bo, mac dinh 'en' (27/09)
+  if (!NGON_NGU[L]) L = 'en'
   function t(k) {
     var b = NGON_NGU[L][k]
     if (b === undefined) b = NGON_NGU.vi[k]
@@ -2775,7 +2775,7 @@ select option{background:var(--bg-2);color:var(--text-1)}
   }
   document.getElementById('lang').addEventListener('click', function () {
     L = L === 'vi' ? 'en' : 'vi'
-    try { localStorage.setItem('aio-lang', L) } catch (e) {}
+    if (window.AiONgonNgu) window.AiONgonNgu.ghi(L); else try { localStorage.setItem('aio-lang', L) } catch (e) {}
     apNgonNgu()
   })
 
@@ -2807,6 +2807,8 @@ select option{background:var(--bg-2);color:var(--text-1)}
     dsPick[iP].addEventListener('change', apCaiDat)
   }
 
+  // Dong hanh: doi ngon ngu o panel khac (panel tong, Autocut...) thi panel nay doi theo
+  if (window.AiONgonNgu) window.AiONgonNgu.theoDoi(function (l) { if (l !== L && NGON_NGU[l]) { L = l; apNgonNgu() } })
   apNgonNgu()
   ve()
 </script>

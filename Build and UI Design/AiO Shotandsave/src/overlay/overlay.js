@@ -178,14 +178,10 @@ window.overlay.onSelRect((d) => {
 window.overlay.onAnnotate((rect) => {
   curRect = { x: Math.round(rect.x), y: Math.round(rect.y),
               w: Math.round(rect.w), h: Math.round(rect.h) }
-  rect = curRect
   xoaGuong()
   dimEl.style.display = 'none'
   selEl.hidden = false
-  selEl.style.left = rect.x + 'px'; selEl.style.top = rect.y + 'px'
-  selEl.style.width = rect.w + 'px'; selEl.style.height = rect.h + 'px'
-  sizeEl.textContent = rect.w + ' × ' + rect.h
-  sizeEl.classList.toggle('inside', rect.y < 28)
+  capNhatGiaoDienKhung()
   vaoCheDoVe()
 })
 
@@ -194,6 +190,113 @@ window.overlay.onComposite((rect) => {
   soLanThuGhep = 0
   confirmComposite(rect)
 })
+
+/* ── Chinh sua co va vi tri khung da chon (8 tay nam + keo vien) ──────── */
+let isAdjusting = false
+let adjustType = null // 'nw' | 'ne' | 'se' | 'sw' | 'n' | 's' | 'e' | 'w' | 'move'
+let adjustStartMouse = { x: 0, y: 0 }
+let adjustStartRect = { x: 0, y: 0, w: 0, h: 0 }
+
+selEl.addEventListener('mousedown', (e) => {
+  if (mode !== 'annotate') return
+  if (e.button !== 0) return
+  const handle = e.target.closest('.sel-handle')
+  const edge = e.target.closest('.sel-edge')
+  const size = e.target.closest('#size')
+  if (!handle && !edge && !size) return
+  e.stopPropagation()
+  e.preventDefault()
+  chotOGoChu()
+  isAdjusting = true
+  if (handle) {
+    adjustType = handle.dataset.handle
+  } else if (edge) {
+    adjustType = edge.dataset.edge
+  } else {
+    adjustType = 'move'
+  }
+  adjustStartMouse = { x: e.clientX, y: e.clientY }
+  adjustStartRect = { ...curRect }
+  toolbarEl.style.opacity = '0.3'
+  toolbarEl.style.pointerEvents = 'none'
+})
+
+function capNhatGiaoDienKhung() {
+  selEl.style.left = curRect.x + 'px'
+  selEl.style.top = curRect.y + 'px'
+  selEl.style.width = curRect.w + 'px'
+  selEl.style.height = curRect.h + 'px'
+  sizeEl.textContent = Math.round(curRect.w * DPR) + ' × ' + Math.round(curRect.h * DPR)
+  sizeEl.classList.toggle('inside', curRect.y < 28)
+
+  veEl.style.left = curRect.x + 'px'
+  veEl.style.top = curRect.y + 'px'
+  veEl.style.width = curRect.w + 'px'
+  veEl.style.height = curRect.h + 'px'
+  veEl.width = Math.max(1, Math.round(curRect.w * DPR))
+  veEl.height = Math.max(1, Math.round(curRect.h * DPR))
+  veCtx = veEl.getContext('2d')
+  if (veCtx) {
+    veCtx.setTransform(DPR, 0, 0, DPR, 0, 0)
+    redraw()
+  }
+  datViTriThanhCongCu()
+}
+
+function xuLyChinhKhung(e) {
+  if (!isAdjusting) return
+  e.preventDefault()
+  const dx = e.clientX - adjustStartMouse.x
+  const dy = e.clientY - adjustStartMouse.y
+  const minW = 20, minH = 20
+  const W = window.innerWidth, H = window.innerHeight
+
+  let nx = adjustStartRect.x
+  let ny = adjustStartRect.y
+  let nw = adjustStartRect.w
+  let nh = adjustStartRect.h
+
+  if (adjustType === 'move') {
+    nx = clamp(adjustStartRect.x + dx, 0, W - adjustStartRect.w)
+    ny = clamp(adjustStartRect.y + dy, 0, H - adjustStartRect.h)
+  } else {
+    if (adjustType.includes('e')) {
+      nw = Math.max(minW, Math.min(W - adjustStartRect.x, adjustStartRect.w + dx))
+    }
+    if (adjustType.includes('s')) {
+      nh = Math.max(minH, Math.min(H - adjustStartRect.y, adjustStartRect.h + dy))
+    }
+    if (adjustType.includes('w')) {
+      const right = adjustStartRect.x + adjustStartRect.w
+      nx = Math.max(0, Math.min(right - minW, adjustStartRect.x + dx))
+      nw = right - nx
+    }
+    if (adjustType.includes('n')) {
+      const bottom = adjustStartRect.y + adjustStartRect.h
+      ny = Math.max(0, Math.min(bottom - minH, adjustStartRect.y + dy))
+      nh = bottom - ny
+    }
+  }
+
+  nx = Math.round(nx); ny = Math.round(ny); nw = Math.round(nw); nh = Math.round(nh)
+
+  if (shapes.length > 0 && (nx !== curRect.x || ny !== curRect.y)) {
+    const shiftX = nx - curRect.x
+    const shiftY = ny - curRect.y
+    for (const s of shapes) {
+      if (s.type === 'text') {
+        s.x -= shiftX
+        s.y -= shiftY
+      } else {
+        s.x1 -= shiftX; s.x2 -= shiftX
+        s.y1 -= shiftY; s.y2 -= shiftY
+      }
+    }
+  }
+
+  curRect = { x: nx, y: ny, w: nw, h: nh }
+  capNhatGiaoDienKhung()
+}
 
 /* ── Thuoc do nhip keo (ghi run-log — doi chieu duoc tren may that, so #7).
    rAF do NGHEN MAIN THREAD renderer (frozen/decode do xuong giua luc keo).
@@ -238,6 +341,7 @@ window.addEventListener('mousedown', (e) => {
 })
 
 window.addEventListener('mousemove', (e) => {
+  if (isAdjusting) { xuLyChinhKhung(e); return }
   if (mode === 'annotate') { veDangKeo(e); return }
   /* ☠️ MAN CHU ve khung NGAY tai day, khong doi vong chuot->main->IPC->ve.
      Truoc 31/08 khung CHI ve khi main phat 'sel-rect' (interval 16ms) — ma
@@ -264,6 +368,14 @@ window.addEventListener('mousemove', (e) => {
 })
 
 window.addEventListener('mouseup', (e) => {
+  if (isAdjusting) {
+    isAdjusting = false
+    adjustType = null
+    toolbarEl.style.opacity = '1'
+    toolbarEl.style.pointerEvents = 'auto'
+    datViTriThanhCongCu()
+    return
+  }
   if (mode === 'annotate') { ketThucVe(e); return }
   if (!dragging) return
   dragging = false
@@ -274,14 +386,43 @@ window.addEventListener('mouseup', (e) => {
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { window.overlay.cancel(); return }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { hoanTac(); return }
+  // Xoa shape dang chon (Delete / Backspace)
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShape && !oGoChu && mode === 'annotate') {
+    const idx = shapes.indexOf(selectedShape)
+    if (idx >= 0) shapes.splice(idx, 1)
+    selectedShape = null
+    redraw()
+    return
+  }
+  // Di chuyen shape bang phim mui ten (nudge nhu PR / AI)
+  if (selectedShape && !oGoChu && mode === 'annotate' && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+    e.preventDefault()
+    const step = e.shiftKey ? 10 : 1
+    const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
+    const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
+    if (selectedShape.type === 'text') {
+      selectedShape.x += dx; selectedShape.y += dy
+    } else {
+      selectedShape.x1 += dx; selectedShape.x2 += dx
+      selectedShape.y1 += dy; selectedShape.y2 += dy
+    }
+    redraw()
+    return
+  }
   // Ctrl+C: xong + COPY vao clipboard (them, khong bo Enter / nut check).
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && mode === 'annotate') {
     e.preventDefault(); xong(true); return
   }
-  if (e.key === 'Enter' && mode === 'annotate') { xong(); return }
-  // Phim 1 / 2 / 3 = khung / mui ten / chu (anh Tien 10/09)
+  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09)
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
-    const t = { '1': 'rect', '2': 'arrow', '3': 'text' }[e.key]
+    const keyMap = {
+      'v': 'select', 'V': 'select', 'KeyV': 'select',
+      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur',
+      'b': 'blur', 'B': 'blur', 'KeyB': 'blur',
+      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur',
+      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur'
+    }
+    const t = keyMap[e.key] || keyMap[e.code]
     if (t) chonCongCu(t)
   }
 })
@@ -289,16 +430,8 @@ window.addEventListener('keydown', (e) => {
 /* ── Vao che do VE ────────────────────────────────────────────────────── */
 function vaoCheDoVe() {
   mode = 'annotate'
-  // Canvas ve dat DUNG len vung chon, do phan giai THAT (device px) cho net.
   veEl.hidden = false
-  veEl.style.left = curRect.x + 'px'
-  veEl.style.top = curRect.y + 'px'
-  veEl.style.width = curRect.w + 'px'
-  veEl.style.height = curRect.h + 'px'
-  veEl.width = Math.max(1, Math.round(curRect.w * DPR))
-  veEl.height = Math.max(1, Math.round(curRect.h * DPR))
-  veCtx = veEl.getContext('2d')
-  veCtx.setTransform(DPR, 0, 0, DPR, 0, 0)
+  capNhatGiaoDienKhung()
   // Thanh cong cu: duoi vung chon, hoac tren neu khong du cho.
   toolbarEl.hidden = false
   datViTriThanhCongCu()
@@ -309,6 +442,10 @@ function vaoCheDoVe() {
 function chonMau(mau) {
   curColor = mau
   if (oGoChu) oGoChu.style.color = mau
+  if (selectedShape && tool === 'select') {
+    selectedShape.color = mau
+    redraw()
+  }
   toolbarEl.querySelectorAll('.mau').forEach((b) => {
     b.classList.toggle('chon', b.dataset.color.toLowerCase() === mau.toLowerCase())
   })
@@ -328,19 +465,144 @@ function datViTriThanhCongCu() {
 function chonCongCu(x) {
   if (x !== tool) chotOGoChu()
   tool = x
+  if (tool !== 'select') {
+    selectedShape = null
+    veEl.style.cursor = 'crosshair'
+  } else {
+    veEl.style.cursor = 'default'
+  }
   toolbarEl.querySelectorAll('.cong-cu[data-tool]').forEach((b) => {
     b.classList.toggle('chon', b.dataset.tool === x)
   })
+  redraw()
 }
 
-/* ── Ve shape ─────────────────────────────────────────────────────────── */
+/* ── Ve shape & Select tool (phim V) ─────────────────────────────────── */
 let veStart = null
+let selectedShape = null
+let dangKeoShape = false
+let keoShapeStart = { x: 0, y: 0 }
+let shapeBanDau = null
+
+function khoangCachDiemDoanThang(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1
+  const l2 = dx * dx + dy * dy
+  if (l2 === 0) return Math.hypot(px - x1, py - y1)
+  let t = ((px - x1) * dx + (py - y1) * dy) / l2
+  t = Math.max(0, Math.min(1, t))
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
+}
+
+function tinhHopBaoChu(s) {
+  const size = s.size || CO_CHU
+  const px = 4, py = 2, lh = size * 1.25
+  let w = 0
+  const dong = String(s.text).split('\n')
+  if (veCtx) {
+    veCtx.save()
+    veCtx.font = '700 ' + size + 'px Inter, "Segoe UI", sans-serif'
+    for (const d of dong) w = Math.max(w, veCtx.measureText(d).width)
+    veCtx.restore()
+  } else {
+    w = (s.text.length || 1) * size * 0.6
+  }
+  return {
+    x: s.x,
+    y: s.y,
+    w: w + px * 2,
+    h: dong.length * lh + py * 2
+  }
+}
+
+function layHopBaoShape(s) {
+  if (s.type === 'rect' || s.type === 'blur') {
+    const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
+    const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
+    return { x: x - 4, y: y - 4, w: w + 8, h: h + 8 }
+  }
+  if (s.type === 'arrow') {
+    const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
+    const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2)
+    return { x: minX - 6, y: minY - 6, w: (maxX - minX) + 12, h: (maxY - minY) + 12 }
+  }
+  if (s.type === 'text') {
+    const b = tinhHopBaoChu(s)
+    return { x: b.x - 2, y: b.y - 2, w: b.w + 4, h: b.h + 4 }
+  }
+  return null
+}
+
+function timShapeTaiDiem(lx, ly) {
+  for (let i = shapes.length - 1; i >= 0; i--) {
+    const s = shapes[i]
+    if (s.type === 'rect' || s.type === 'blur') {
+      const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
+      const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2)
+      const pad = 6
+      if (lx >= minX - pad && lx <= maxX + pad && ly >= minY - pad && ly <= maxY + pad) {
+        return { shape: s, index: i }
+      }
+    } else if (s.type === 'arrow') {
+      const pad = 9
+      if (khoangCachDiemDoanThang(lx, ly, s.x1, s.y1, s.x2, s.y2) <= pad) {
+        return { shape: s, index: i }
+      }
+    } else if (s.type === 'text') {
+      const hop = tinhHopBaoChu(s)
+      if (lx >= hop.x && lx <= hop.x + hop.w && ly >= hop.y && ly <= hop.y + hop.h) {
+        return { shape: s, index: i }
+      }
+    }
+  }
+  return null
+}
+
+function veKhungChonShape(ctx, s) {
+  const b = layHopBaoShape(s)
+  if (!b) return
+  ctx.save()
+  ctx.strokeStyle = '#00e5ff'
+  ctx.lineWidth = 1.5
+  ctx.setLineDash([4, 3])
+  ctx.strokeRect(b.x, b.y, b.w, b.h)
+  ctx.setLineDash([])
+  ctx.fillStyle = '#ffffff'
+  ctx.strokeStyle = '#00e5ff'
+  ctx.lineWidth = 1.5
+  const r = 3
+  const corners = [
+    [b.x, b.y],
+    [b.x + b.w, b.y],
+    [b.x + b.w, b.y + b.h],
+    [b.x, b.y + b.h]
+  ]
+  for (const [cx, cy] of corners) {
+    ctx.fillRect(cx - r, cy - r, r * 2, r * 2)
+    ctx.strokeRect(cx - r, cy - r, r * 2, r * 2)
+  }
+  ctx.restore()
+}
+
 function batDauVe(e) {
   const lx = e.clientX - curRect.x, ly = e.clientY - curRect.y
   if (lx < 0 || ly < 0 || lx > curRect.w || ly > curRect.h) {
     // Bam RA NGOAI vung = bo vung cu, quet vung MOI ngay (nhu Lightshot —
     // anh Tien 25/08). Trong vung thi ve shape nhu thuong.
     chonLaiTuDau(e)
+    return
+  }
+  if (tool === 'select') {
+    chotOGoChu()
+    const hit = timShapeTaiDiem(lx, ly)
+    if (hit) {
+      selectedShape = hit.shape
+      dangKeoShape = true
+      keoShapeStart = { x: lx, y: ly }
+      shapeBanDau = { ...hit.shape }
+    } else {
+      selectedShape = null
+    }
+    redraw()
     return
   }
   if (tool === 'text') { moOGoChu(document.body, lx, ly, curRect.x, curRect.y); return }
@@ -351,9 +613,15 @@ function batDauVe(e) {
 /* Bo vung chon + shape dang co, quay ve che do quet vung — bat dau keo ngay. */
 function chonLaiTuDau(e) {
   huyOGoChu()
+  selectedShape = null
+  dangKeoShape = false
   mode = 'select'
   shapes = []
   veStart = null
+  isAdjusting = false
+  adjustType = null
+  toolbarEl.style.opacity = '1'
+  toolbarEl.style.pointerEvents = 'auto'
   if (veCtx) veCtx.clearRect(0, 0, curRect.w, curRect.h)
   veEl.hidden = true
   toolbarEl.hidden = true
@@ -364,13 +632,44 @@ function chonLaiTuDau(e) {
   // Neo = diem mousedown that (nhu tren) — khong de main tu hoi con tro.
   window.overlay.dragStart({ x: origin.x + e.clientX, y: origin.y + e.clientY })
 }
+
 function veDangKeo(e) {
+  if (tool === 'select') {
+    const lx = e.clientX - curRect.x, ly = e.clientY - curRect.y
+    if (dangKeoShape && selectedShape && shapeBanDau) {
+      const dx = Math.round(lx - keoShapeStart.x)
+      const dy = Math.round(ly - keoShapeStart.y)
+      if (selectedShape.type === 'rect' || selectedShape.type === 'arrow') {
+        selectedShape.x1 = shapeBanDau.x1 + dx
+        selectedShape.y1 = shapeBanDau.y1 + dy
+        selectedShape.x2 = shapeBanDau.x2 + dx
+        selectedShape.y2 = shapeBanDau.y2 + dy
+      } else if (selectedShape.type === 'text') {
+        selectedShape.x = shapeBanDau.x + dx
+        selectedShape.y = shapeBanDau.y + dy
+      }
+      redraw()
+    } else if (lx >= 0 && ly >= 0 && lx <= curRect.w && ly <= curRect.h) {
+      const hit = timShapeTaiDiem(lx, ly)
+      veEl.style.cursor = hit ? 'move' : 'default'
+    }
+    return
+  }
   if (!veStart) return
   const lx = clamp(e.clientX - curRect.x, 0, curRect.w)
   const ly = clamp(e.clientY - curRect.y, 0, curRect.h)
   redraw({ type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor }) // xem truoc
 }
+
 function ketThucVe(e) {
+  if (tool === 'select') {
+    if (dangKeoShape) {
+      dangKeoShape = false
+      shapeBanDau = null
+      redraw()
+    }
+    return
+  }
   if (!veStart) return
   const lx = clamp(e.clientX - curRect.x, 0, curRect.w)
   const ly = clamp(e.clientY - curRect.y, 0, curRect.h)
@@ -387,6 +686,48 @@ function redraw(preview) {
   veCtx.clearRect(0, 0, curRect.w, curRect.h)
   const ds = preview ? shapes.concat(preview) : shapes
   for (const s of ds) veShape(veCtx, s)
+  if (selectedShape && tool === 'select') {
+    veKhungChonShape(veCtx, selectedShape)
+  }
+}
+
+let offscreenBlurCanvas = null
+function veBlurPixelate(ctx, x, y, w, h) {
+  if (w <= 0 || h <= 0) return
+  const sx = (curRect.x + x) * DPR
+  const sy = (curRect.y + y) * DPR
+  const sw = w * DPR
+  const sh = h * DPR
+
+  if (frozenImg && frozenImg.naturalWidth > 0) {
+    const blockSize = Math.max(8, Math.round(10 * DPR))
+    const bw = Math.max(1, Math.round(sw / blockSize))
+    const bh = Math.max(1, Math.round(sh / blockSize))
+
+    if (!offscreenBlurCanvas) offscreenBlurCanvas = document.createElement('canvas')
+    offscreenBlurCanvas.width = bw
+    offscreenBlurCanvas.height = bh
+    const offCtx = offscreenBlurCanvas.getContext('2d')
+    offCtx.imageSmoothingEnabled = true
+    offCtx.clearRect(0, 0, bw, bh)
+    offCtx.drawImage(frozenImg, sx, sy, sw, sh, 0, 0, bw, bh)
+
+    ctx.save()
+    ctx.imageSmoothingEnabled = false
+    ctx.drawImage(offscreenBlurCanvas, 0, 0, bw, bh, x, y, w, h)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(x, y, w, h)
+    ctx.restore()
+  } else {
+    ctx.save()
+    ctx.fillStyle = 'rgba(25, 25, 25, 0.92)'
+    ctx.fillRect(x, y, w, h)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(x, y, w, h)
+    ctx.restore()
+  }
 }
 
 function veShape(ctx, s) {
@@ -403,6 +744,9 @@ function veShape(ctx, s) {
     veMuiTen(ctx, s.x1, s.y1, s.x2, s.y2)
   } else if (s.type === 'text') {
     veChu(ctx, s, 1)
+  } else if (s.type === 'blur') {
+    const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
+    veBlurPixelate(ctx, x, y, Math.abs(s.x2 - s.x1), Math.abs(s.y2 - s.y1))
   }
 }
 
@@ -461,6 +805,8 @@ function napAnh(url) {
 /* ── Xong: ghep anh + shape roi gui ───────────────────────────────────── */
 function xong(copy) {
   chotOGoChu()
+  selectedShape = null
+  redraw()
   if (!shapes.length) { window.overlay.confirm({ rect: curRect, copy: !!copy }); return }
   // Co shape: ghep anh GOC (cat dung vung, PNG) + shape roi gui dataURL.
   const out = document.createElement('canvas')

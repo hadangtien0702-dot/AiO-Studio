@@ -11,7 +11,23 @@
 <body>
   <div id="shot"></div>
   <div id="dim"></div>
-  <div id="sel" hidden><div id="size"></div></div>
+  <div id="sel" hidden>
+    <div id="size" title="Kéo để di chuyển khung"></div>
+    <!-- 8 tay nắm chỉnh cỡ khung -->
+    <div class="sel-handle handle-nw" data-handle="nw" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-n" data-handle="n" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-ne" data-handle="ne" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-e" data-handle="e" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-se" data-handle="se" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-s" data-handle="s" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-sw" data-handle="sw" title="Kéo để đổi cỡ"></div>
+    <div class="sel-handle handle-w" data-handle="w" title="Kéo để đổi cỡ"></div>
+    <!-- 4 viền để kéo đổi cỡ các cạnh khung -->
+    <div class="sel-edge edge-t" data-edge="n" title="Kéo để đổi cỡ"></div>
+    <div class="sel-edge edge-b" data-edge="s" title="Kéo để đổi cỡ"></div>
+    <div class="sel-edge edge-l" data-edge="w" title="Kéo để đổi cỡ"></div>
+    <div class="sel-edge edge-r" data-edge="e" title="Kéo để đổi cỡ"></div>
+  </div>
   <!-- Guong vung chon tu man KHAC: 4 tam mo + khung cam phan giao (KHONG dung
        box-shadow — cach do gay vet sang/toi khi rect ngoai ria, vap 25/08). -->
   <div id="guong" hidden>
@@ -24,6 +40,9 @@
   <canvas id="ve" hidden></canvas>
   <!-- Thanh cong cu ve — hien sau khi chon vung xong. -->
   <div id="toolbar" hidden>
+    <button class="cong-cu" data-tool="select" data-i18n-title="overlay.select" aria-label="select">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7 18 3-7 7-3L3 3z"/></svg><i class="so">V</i>
+    </button>
     <button class="cong-cu" data-tool="rect" data-i18n-title="overlay.rect" aria-label="rect">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg><i class="so">1</i>
     </button>
@@ -32,6 +51,14 @@
     </button>
     <button class="cong-cu" data-tool="text" data-i18n-title="overlay.text" aria-label="text">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg><i class="so">3</i>
+    </button>
+    <button class="cong-cu" data-tool="blur" data-i18n-title="overlay.blur" aria-label="blur">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="8" height="8" rx="1.5"/>
+        <rect x="13" y="3" width="8" height="8" rx="1.5" fill="currentColor" fill-opacity="0.3"/>
+        <rect x="3" y="13" width="8" height="8" rx="1.5" fill="currentColor" fill-opacity="0.3"/>
+        <rect x="13" y="13" width="8" height="8" rx="1.5"/>
+      </svg><i class="so">4</i>
     </button>
     <span class="chia"></span>
     <!-- Bang chon mau — mac dinh cam (accent) -->

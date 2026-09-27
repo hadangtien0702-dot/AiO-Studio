@@ -581,6 +581,7 @@
 
 <script src="./CSInterface.js"></script>
 <script src="./tai-nguyen.js"></script>
+<script src="./ngonngu-chung.js"></script>
 <script>
   var cs = new CSInterface()
 
@@ -741,9 +742,8 @@
       hd_ok: 'Got it',
     },
   }
-  var L = 'vi'
-  try { L = localStorage.getItem('aio-lang') || 'vi' } catch (e) {}
-  if (!NGON_NGU[L]) L = 'vi'
+  var L = window.AiONgonNgu ? window.AiONgonNgu.doc() : 'en'  // file chung ca bo, mac dinh 'en' (27/09)
+  if (!NGON_NGU[L]) L = 'en'
 
   var doNhanXuat = '720'
 
@@ -819,7 +819,7 @@
 
   function doiNgonNgu() {
     L = L === 'vi' ? 'en' : 'vi'
-    try { localStorage.setItem('aio-lang', L) } catch (e) {}
+    if (window.AiONgonNgu) window.AiONgonNgu.ghi(L); else try { localStorage.setItem('aio-lang', L) } catch (e) {}
     apNgonNgu()
   }
 
@@ -1565,6 +1565,8 @@
     batDauAnimLoop()
   })
 
+  // Dong hanh: doi ngon ngu o panel khac (panel tong, Autocut...) thi panel nay doi theo
+  if (window.AiONgonNgu) window.AiONgonNgu.theoDoi(function (l) { if (l !== L && NGON_NGU[l]) { L = l; apNgonNgu() } })
   apNgonNgu()
   veSeg()
   batDauAnimLoop()

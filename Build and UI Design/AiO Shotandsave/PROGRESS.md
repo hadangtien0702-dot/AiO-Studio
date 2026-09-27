@@ -1,6 +1,29 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-25 08:40 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:05 +0700
+> - 📌 **BAN DANG DUNG: 0.6.1** (Windows cai 27/09 18:30, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.1.exe`).
+> - 🫥 **0.6.1 (27/09) — BLUR & PIXELATE TOOL (LAM MO / KHAM DIEM ANH CHE THONG TIN NHAY CAM — anh yeu cau 27/09):**
+>   Thêm công cụ làm mờ / khảm điểm ảnh (Mosaic) với phím tắt **`4`** hoặc **`B`**. Kéo quét qua bất kỳ vùng nào (mật khẩu, số tài khoản,
+>   khuôn mặt, link nhạy cảm) sẽ tạo hiệu ứng khảm khối pixel tức thời (real-time preview), độ an toàn tuyệt đối không thể đảo ngược
+>   bằng AI; viền bo mờ tinh tế và góc vuông vắn chuyên nghiệp. Tích hợp đầy đủ với công cụ chọn **`V`** (bấm chọn vùng khảm để di chuyển,
+>   nudge bằng phím mũi tên, xóa bằng `Delete`/`Backspace`). Đồng bộ trên cả màn hình chụp (Overlay) và cửa sổ ghim (Sticky Pin).
+> - 🎯 **0.6.0 (27/09) — SELECTION TOOL (PHIM TAT V — CHON & DI CHUYEN NET VE CHUAN PREMIERE PRO — anh yeu cau 27/09):**
+>   Thêm công cụ chọn nét vẽ với phím tắt **`V`**, nút mũi tên con trỏ chuột đầu thanh công cụ. Nhấn `V` chuyển sang chế độ chọn:
+>   hover qua nét vẽ đổi trỏ chuột thành `move`, click vào nét vẽ (khung, mũi tên, chữ, blur) hiển thị bounding box viền xanh neon
+>   nét đứt kèm 4 điểm neo góc; kéo chuột để di chuyển nét vẽ tự do; tinh chỉnh tọa độ bằng 4 phím mũi tên (1px, giữ Shift 10px);
+>   nhấn `Delete` hoặc `Backspace` để xóa nét đã chọn; bấm bảng màu đổi màu nét ngay lập tức. Khung chọn tự ẩn khi xuất ảnh (`Enter`/`Ctrl+C`).
+>   Đồng bộ trên cả Overlay và Sticky Pin.
+> - 🛠️ **0.5.9 (27/09) — SUA LOI TINH NANG VE 1-2-3 (anh bao 27/09):**
+>   Khắc phục lỗi mất Canvas Context: gán lại `veCtx = veEl.getContext('2d')` kèm `setTransform(DPR)` mỗi khi kích thước khung thay đổi,
+>   giúp hàm `redraw()` hiển thị đầy đủ hình chữ nhật (`1`), mũi tên (`2`), và chữ (`3`). Tinh chỉnh 4 viền co giãn khung (`.sel-edge`)
+>   chỉ nhận co giãn biên (`ns-resize` / `ew-resize`) thay vì cướp quyền kéo chuột của cọ vẽ. Hỗ trợ thêm cả cụm phím số bên phải (Numpad 1, 2, 3).
+> - 🖱️ **0.5.8 (27/09) — KEO DI CHUYEN ANH GHIM (anh yeu cau 27/09):** Bấm giữ kéo trực tiếp bất kỳ đâu trên ảnh ghim
+>   là di chuyển cửa sổ mượt mà ngay (trước bị chặn do chỉ cho kéo trên thanh bar); bổ sung nút riêng `#drag-file` trên
+>   thanh công cụ góc trên để kéo thả file vào Premiere / Photoshop / Zalo (hoặc giữ phím Alt khi kéo ảnh).
+> - 📐 **0.5.7 (27/09) — CHINH SUA KHUNG CHUP SAU KHI KEO (anh yeu cau 27/09):** Sau khi quet chon vung, khung xuat hien
+>   **8 tay nam** (4 goc `nw, ne, se, sw` + 4 canh `n, s, e, w`) cho phep keo co dan khung chup tu moi huong; **4 mep vien**
+>   va the **#size** cho phep bam keo de di chuyen toan bo khung den vi tri moi. Lop lam mo, canvas ve va toa do anh cat
+>   tu dong dong bo theo thoi gian thuc; cac net ve truoc do (neu co) tu dong dich theo de giu nguyen vi tri tren anh.
 > - 🔑 **0.5.6 (24/09, CHUA BUILD / CHUA CAI) — BAN QUYEN:** `src/banquyen.js` (khong require electron, tiem doc/ghi/fetch/gio)
 >   + noi vao `main.js` (`khoiTaoBanQuyen` luc boot, file RIENG `userData/ban-quyen.json` ghi atomic; `startCapture` KHOA khi
 >   het dung thu -> Notification + mo Cai dat; tray co dong "Dung thu: con N ngay"; kiem lai Polar 15 s sau boot roi 6 h/lan,

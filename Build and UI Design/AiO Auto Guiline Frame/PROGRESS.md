@@ -1,5 +1,38 @@
 # PROGRESS — AiO Auto Guiline Frame
 
+## 2026-09-27 18:18 — Dịch hết chế độ EN (anh: *"dịch luôn Guide Frame đi em"*)
+
+- **Sửa lại chỗ mục 18:08 ghi SAI:** "trước đây `lang` luôn 'vi', KHÔNG nhớ gì" — sai. Panel CÓ nhớ, qua
+  `localStorage 'aio-gf-lang'` trong `napCaiDat()`. Chính kho nhớ riêng này ĐÈ lên file chung: đo thật, file
+  `{"lang":"en"}`, `AiONgonNgu.doc()` trả 'en', panel mở ra vẫn 'vi'. Đã bỏ đọc/ghi `aio-gf-lang`.
+- **Gốc "dịch thiếu":** dữ liệu `safe-zones.json` CÓ đủ tiếng Anh (`ten.en`, `ui.en` cả 17 khung) nhưng chỗ vẽ
+  lấy bản `.vi`; ~25 chuỗi viết cứng tiếng Việt trong JS. Số "60 chỗ `m:`" ở mục 18:08 là mảng dự phòng
+  `NEN_GOC` (chỉ dùng khi thiếu `safe-zones.js`), không phải thứ người dùng thấy.
+- **Đã sửa:** hàm `tr(vi, en)`; `TEN_CANH`/`TEN_LOAI` theo ngôn ngữ; tooltip vùng dùng `mEn`/`tenEn`; chú giải,
+  hộp trạng thái (chưa chọn nền tảng / lệch tỉ lệ / khớp tỉ lệ), lưới "N đường · khung", nút "Share" của mockup,
+  5 aria-label, nhãn nút chính + nhãn trạng thái đổi theo khi đổi ngôn ngữ; số thập phân EN dùng dấu chấm
+  (`vn()` chỉ hiển thị, không gửi host); 3 tên sequence mẫu sang tiếng Anh.
+- **Đo trên Premiere (máy nhà, cổng 8096):** chế độ EN chạy 40 bước (17 khung × 1/nhiều nền tảng, không chọn,
+  3 trạng thái, lưới tắt/đầy + số đo, 2 tab), quét text node + title/aria-label/placeholder: **0 chuỗi tiếng Việt**.
+  (Không có số "trước" ở EN: lượt quét đầu panel bị kho nhớ riêng ép VI, ra 188 chuỗi — đó là số ở VI, không dùng
+  làm mốc so. Mốc trước sửa ở EN là lượt quét 18:0x: 6 dòng chữ + 9 nhãn ẩn trên 1 khung.) Chiều ngược ở VI: danh sách trạng thái mở ra đúng tiếng Việt. Không đụng host.
+
+## 2026-09-27 18:08 — Theo ngôn ngữ CHUNG cả bộ + lộ ra EN dịch chưa hết
+
+- **Boi canh:** anh nho kiem panel tong (27/09) -> em thay Podcast, Re-Frames, Guide Frame KHONG doc file ngon ngu
+  chung `%APPDATA%\AiOStudio\ngonngu.json` (grep 'ngonngu' = 0): doi ngon ngu o panel tong / Autocut thi 3 panel nay
+  dung yen, va mac dinh 'vi' trong khi ca bo mac dinh 'en' (design-system/ngonngu.tsx MAC_DINH, anh chot ban nuoc ngoai).
+- **Da sua:** nguon chan ly moi `design-system/ngonngu-chung.js` (doc/ghi/theoDoi 2 s, mac dinh 'en'), chep sang dist
+  bang `dong-bo-tai-nguyen.ps1` (script nay nay chep ca 2 file). Panel nap bang <script src="./ngonngu-chung.js">.
+- **Do tren Premiere that (may nha, cong debug):** file 'vi' -> 3 panel VI; bam nut o PANEL TONG -> file 'en', ca 5
+  panel dang mo (tong, Autocut, Podcast, Re-Frames, Guide Frame) doi trong <= 3,5 s; bam nut o GUIDE FRAME -> file 'vi',
+  ca 5 doi ve VI. Podcast: bo kiem 4 lop DAT truoc khi cai.
+- Kem: `NHAN_NGAN.broadcast` doi thanh getter (truoc dong bang ngon ngu luc nap trang). Truoc day `lang` luon 'vi',
+  KHONG nho gi (comment "ngon ngu da nho" o khoi KHOI DONG la sai).
+- **[XONG 18:18, xem mục trên] EN dich CHUA HET** (co san tu truoc, nay lo ra vi mac dinh la EN): quet text node o che do EN con "Chia se",
+  "Bi UI che", "Vung an toan", "Khung dich hep hon sequence…", "Lech ti le…", 5 aria-label, tooltip vung. Dem: 181 dong ma
+  co chu Viet ngoai DICT; mo ta vung `m:` 60 cho, chi 1 co `mEn`. Cho anh gat moi dich.
+
 ## 2026-09-26 16:35 — VÒNG ĐO 10 APP LẦN 1 CHẾT VÌ HẾT HẠN MỨC; LẬP BỘ TÍCH HỢP TỰ ĐỘNG, CHẠY LẠI LẦN 2
 
 **Bối cảnh.** Workflow 10 agent đo (đường B, ảnh app thật) chạy ~10:0x, **cả 10 agent chết cùng lúc vì hết hạn mức

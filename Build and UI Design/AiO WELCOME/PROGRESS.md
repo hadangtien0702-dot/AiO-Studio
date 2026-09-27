@@ -1,5 +1,21 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [2.1.0+] - 2026-09-27 18:03 (UTC+7) - Kiểm trên Premiere MÁY NHÀ + sửa mặc định ngôn ngữ
+
+- **Bối cảnh:** anh nhờ kiểm panel tổng trên máy nhà (vừa cài lại cả bộ 27/09 17:4x — 8 junction cũ
+  trỏ đường dẫn trước lần sắp xếp 14/08, chết im lặng; Video Download chưa cài vì thiếu yt-dlp/FFmpeg).
+- **Đo qua cổng 8101 (Premiere 27.0.0, project Tập2.prproj):** 12 thẻ, trạng thái khớp máy (10 có,
+  Video Download "Chưa cài", Organize "Sắp có"), 0 phần tử tràn ở 1867×794. Bấm 9 thẻ → 9/9 panel mở,
+  161–323 ms, cả 9 lên giao diện thật (đọc đúng project). Lần bấm đầu Power Bins mở chậm > 8 s.
+  Video Download / Organize bấm ra đúng câu báo. Chữ cắt đuôi: 1 thẻ ("Nhạc nền và hiệu ứng âm thanh",
+  thiếu 2 px ở khổ 6 cột).
+- **Lỗi thật đã sửa:** `hub.js` mặc định `'vi'` trong khi cả bộ mặc định `'en'` (`design-system/ngonngu.tsx`
+  MAC_DINH, anh chốt bán ra nước ngoài). Máy chưa có `ngonngu.json` (máy khách mới cài, máy nhà) →
+  panel tổng tiếng Việt, 9 tool tiếng Anh. Đổi thành `'en'`. Đo sau khi nạp lại: nút EN, thẻ "Cut silences";
+  bấm VI → ghi `{"lang":"vi"}` → Autocut/Transcripts/Asset/Power Bins đổi VI trong ≤ 3 s.
+- **[CHO] Chưa sửa (ngoài panel tổng):** Podcast, Re-Frames, Guide Frame có nút EN riêng nhưng KHÔNG đọc
+  `ngonngu.json` (grep 0) → không theo cả bộ; Music chỉ có tiếng Việt.
+
 ## [2.1.0] - 2026-09-25 16:45 (UTC+7) - ĐO THẬT trên Premiere: 10/10 tool mở được · đồng bộ UI với web Shot & Save · animation "vào" lúc mở panel
 
 ### Trạng thái hiện tại (phiên sau đọc đầu tiên)

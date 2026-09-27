@@ -7,6 +7,7 @@
 <script src="./CSInterface.js"></script>
 <script src="./safe-zones.js"></script>
 <script src="./ve-guide.js"></script>
+<script src="./ngonngu-chung.js"></script>
 <!--
   AiO Guide Frame — thiết kế mới, dựng theo design system "Studio Console".
   Số liệu safe zone lấy nguyên từ safe-zones.json (phiên bản 2026-08-01).
@@ -565,7 +566,8 @@ svg{display:block}
 const $ = id => document.getElementById(id);
 
 /* ============ NGÔN NGỮ (I18N) ============ */
-let lang = 'vi';
+// File chung cả bộ %APPDATA%\AiOStudio\ngonngu.json, mặc định 'en' (27/09 — trước đây luôn 'vi', không nhớ gì)
+let lang = window.AiONgonNgu ? window.AiONgonNgu.doc() : 'en';
 
 const DICT = {
   vi: {
@@ -721,13 +723,22 @@ function capNhatNgonNgu(){
   if ($('lblHienSo') && $('lblHienSo').childNodes[0]) $('lblHienSo').childNodes[0].textContent = d.lblHienSo + ' ';
   if ($('lblHienSoSub')) $('lblHienSoSub').textContent = d.lblHienSoSub;
   if ($('dong')) $('dong').textContent = d.dong;
+  // Nhãn ẩn cho trình đọc màn hình (27/09: trước đây chỉ có tiếng Việt)
+  const ARIA = { nentang:['Nền tảng','Platform'], dinhds:['Khung hình','Frame'], swatches:['Màu lưới','Grid color'],
+                 ttBtn:['Xem thử trạng thái','Preview status'], ttList:['Trạng thái','Status'] };
+  for (const id in ARIA) if ($(id)) $(id).setAttribute('aria-label', tr(ARIA[id][0], ARIA[id][1]));
+  if ($('goLabel') && !dangChay) $('goLabel').textContent = d.goSafe;
+  if ($('ttBtnLabel')) $('ttBtnLabel').textContent = tr(tt().ten, tt().tenEn || tt().ten);
   ve();
 }
 
 $('lang').addEventListener('click', () => {
   lang = lang === 'vi' ? 'en' : 'vi';
+  if (window.AiONgonNgu) window.AiONgonNgu.ghi(lang);
   capNhatNgonNgu();
 });
+// Đồng hành: đổi ngôn ngữ ở panel khác (panel tổng, Autocut...) thì panel này đổi theo
+if (window.AiONgonNgu) window.AiONgonNgu.theoDoi(l => { if (l !== lang && DICT[l]) { lang = l; capNhatNgonNgu(); } });
 
 /* ============ NỐI HOST PREMIERE ============ */
 const PHIEN_BAN = '0.3.1';
@@ -795,9 +806,9 @@ function ghiFile(duongDan, duLieu, encoding){
    sequence CÓ THẬT trong project — chọn một cái là Premiere mở đúng cái đó. */
 const SEQS_DEMO = [
   { ten:'Reel 60s — Cut 02',        w:1080, h:1920 },
-  { ten:'Podcast Ep12 — Bản đầy đủ', w:1920, h:1080 },
-  { ten:'Feed vuông — Teaser',      w:1080, h:1080 },
-  { ten:'Ep12 — Bản 4:5 cho Feed',  w:1080, h:1350 },
+  { ten:'Podcast Ep12 — Full cut',  w:1920, h:1080 },
+  { ten:'Square feed — Teaser',     w:1080, h:1080 },
+  { ten:'Ep12 — 4:5 for Feed',      w:1080, h:1350 },
 ];
 let SEQS = SEQS_DEMO.slice();
 let iSeq = 0;
@@ -1072,7 +1083,8 @@ const ICON = {
   zalo:     '<path d="M12 2C6.48 2 2 5.92 2 10.75c0 2.87 1.6 5.42 4.12 7.08l-.87 3.17c-.1.38.27.7.63.53l3.66-1.74c.8.2 1.62.31 2.46.31 5.52 0 10-3.92 10-8.75S17.52 2 12 2zm-2.5 13H6.25v-1.75l3.25-4.25H6.25V7.5h5.5v1.75l-3.25 4.25h3.5V15z"/>',
   broadcast:'<path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .89-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm0 14H3V8h18v12z"/>',
 };
-const NHAN_NGAN = { x:'X', broadcast: lang === 'en' ? 'Broadcast' : 'Truyền hình', instagram:'Instagram' };
+// getter: đọc lang lúc vẽ, không đóng băng lúc nạp trang (đổi ngôn ngữ giữa chừng vẫn đúng)
+const NHAN_NGAN = { x:'X', get broadcast(){ return lang === 'en' ? 'Broadcast' : 'Truyền hình'; }, instagram:'Instagram' };
 
 let iDinh = Math.max(0, MOI_DINH.findIndex(d => d.id === 'tiktok-video'));
 if (iDinh < 0) iDinh = 0;
@@ -1106,15 +1118,21 @@ let iTT = 0;
 const tt = () => TRANG_THAI[iTT];
 
 /* ============ TIỆN ============ */
+// Chọn chữ theo ngôn ngữ ĐANG dùng — gọi lúc vẽ, không lúc nạp trang (27/09: EN từng dịch thiếu ~25 chỗ).
+const tr = (vi, en) => lang === 'en' ? en : vi;
 const vn = (n, d = 2) => {
   const s = Math.abs(n - Math.round(n)) < 0.005 ? String(Math.round(n)) : n.toFixed(d);
-  return s.replace('.', ',');
+  return lang === 'en' ? s : s.replace('.', ',');
 };
 const ucln = (a, b) => b ? ucln(b, a % b) : a;
 const tiLe = (w, h) => { const g = ucln(w, h) || 1; return (w / g) + ':' + (h / g); };
-const TEN_CANH = { top:'Trên', bottom:'Dưới', left:'Trái', right:'Phải' };
-const TEN_LOAI = { ui:'Bị UI che', crop:'Bị cắt', khuyen_nghi:'Khuyến nghị' };
-const TEN_TIN  = { chinh_thuc:"Số chính thức", ben_thu_3:"Nguồn bên thứ ba", uoc_luong:"Số ước lượng" };
+const TEN_CANH_2 = { vi:{ top:'Trên', bottom:'Dưới', left:'Trái', right:'Phải' },
+                     en:{ top:'Top', bottom:'Bottom', left:'Left', right:'Right' } };
+const TEN_LOAI_2 = { vi:{ ui:'Bị UI che', crop:'Bị cắt', khuyen_nghi:'Khuyến nghị' },
+                     en:{ ui:'Covered by UI', crop:'Cropped', khuyen_nghi:'Recommended' } };
+const TEN_CANH = new Proxy({}, { get:(o, k) => TEN_CANH_2[lang][k] });
+const TEN_LOAI = new Proxy({}, { get:(o, k) => TEN_LOAI_2[lang][k] });
+const TEN_TIN  = { chinh_thuc:"Số chính thức", ben_thu_3:"Nguồn bên thứ ba", uoc_luong:"Số ước lượng" };  // chưa dùng ở đâu
 
 function khungDich(s, d){
   if (!s || !d || !s.w || !s.h || !d.w || !d.h) return { w:1080, h:1920, x:0, y:0, khop:true };
@@ -1130,7 +1148,7 @@ function gopVung(ds){
     if (!d || !d.vung) continue;
     for (const v of d.vung){
       const cu = ra[v.c];
-      if (!cu || v.pt > cu.pt) ra[v.c] = { ...v, tu:d.nenTen + ' · ' + d.ten };
+      if (!cu || v.pt > cu.pt) ra[v.c] = { ...v, tu:d.nenTen + ' · ' + tr(d.ten, d.tenEn || d.ten) };
       else if (cu && v.pt === cu.pt && !cu.tu.includes(d.nenTen)) cu.tu += ', ' + d.nenTen;
     }
   }
@@ -1291,7 +1309,7 @@ function taoUIMockup(nenId){
         </div>
         <div class="ui-mockup-act">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c0 .79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-          <span>Chia sẻ</span>
+          <span>${isVi ? 'Chia sẻ' : 'Share'}</span>
         </div>
         <div class="ui-mockup-disc"><div class="ui-mockup-disc-inner"></div></div>
       </div>
@@ -1339,8 +1357,8 @@ function veXem(){
              : c === 'left'   ? `left:0;top:0;height:100%;width:${dp * 100}%`
              :                  `right:0;top:0;height:100%;width:${dp * 100}%`;
     const canh = (c === 'top' || c === 'bottom') ? k.h : k.w;
-    const tip = `${TEN_CANH[c]} · ${TEN_LOAI[v.l]} — ${v.m} · chừa ${Math.round(v.pt / 100 * canh)}px (${vn(v.pt)}%)`
-              + (cheDo === 'nhieu' && v.tu ? ` · chặt nhất: ${v.tu}` : '');
+    const tip = `${TEN_CANH[c]} · ${TEN_LOAI[v.l]} — ${tr(v.m, v.mEn || v.m)} · ${tr('chừa', 'keep clear')} ${Math.round(v.pt / 100 * canh)}px (${vn(v.pt)}%)`
+              + (cheDo === 'nhieu' && v.tu ? ` · ${tr('chặt nhất', 'strictest')}: ${v.tu}` : '');
     html += `<i class="vung" data-loai="${v.l}" style="${st}" title="${tip}"></i>`;
   }
 
@@ -1389,8 +1407,8 @@ function veXem(){
     const co = new Set(Object.values(V).map(v => v.l));
     $('chugiai').innerHTML =
       [...co].map(l => `<span><i class="ck" data-loai="${l}"></i>${TEN_LOAI[l]}</span>`).join('')
-      + `<span><i class="ck" data-loai="an"></i>Vùng an toàn</span>`
-      + (k.khop ? '' : `<span style="color:var(--warn)">Khung đích hẹp hơn sequence — phần gạch chéo nằm ngoài</span>`);
+      + `<span><i class="ck" data-loai="an"></i>${tr('Vùng an toàn', 'Safe area')}</span>`
+      + (k.khop ? '' : `<span style="color:var(--warn)">${tr('Khung đích hẹp hơn sequence — phần gạch chéo nằm ngoài', 'Target frame is narrower than the sequence — hatched area is outside')}</span>`);
   }
 }
 
@@ -1428,9 +1446,9 @@ function veLuoi(s, bw, bh){
             + (luoiCfg.le > 0 ? 4 : 0) + luoiCfg.tuyChinh.length;
   if ($('chugiai')) {
     $('chugiai').innerHTML = dem
-      ? `<span>${dem} đường · khung ${Math.round(k.w)}×${Math.round(k.h)}</span>`
-        + (k.khop ? '' : `<span style="color:var(--warn)">Khung hẹp hơn sequence — phần gạch chéo nằm ngoài</span>`)
-      : `<span style="color:var(--warn)">Chưa bật lưới nào — chọn một kiểu lưới hoặc thêm một đường</span>`;
+      ? `<span>${dem} ${tr('đường · khung', dem === 1 ? 'line · frame' : 'lines · frame')} ${Math.round(k.w)}×${Math.round(k.h)}</span>`
+        + (k.khop ? '' : `<span style="color:var(--warn)">${tr('Khung hẹp hơn sequence — phần gạch chéo nằm ngoài', 'Frame is narrower than the sequence — hatched area is outside')}</span>`)
+      : `<span style="color:var(--warn)">${tr('Chưa bật lưới nào — chọn một kiểu lưới hoặc thêm một đường', 'No grid on — pick a grid type or add a line')}</span>`;
   }
 }
 
@@ -1459,12 +1477,14 @@ function veHanhDong(){
             Thêm một track video trong Premiere rồi bấm lại.`;
   } else if (!d){
     m = 'warn'; p = P.canh; khoa = true;
-    html = `<b>Chưa chọn nơi đăng nào.</b> Tick ít nhất một nơi để panel biết phải chừa những đâu.`;
+    html = tr(`<b>Chưa chọn nơi đăng nào.</b> Tick ít nhất một nơi để panel biết phải chừa những đâu.`,
+              `<b>No platform selected.</b> Tick at least one so the panel knows what to keep clear.`);
   } else if (k && !k.khop){
     m = 'warn'; p = P.canh;
-    html = `<b>Lệch tỉ lệ</b> — guide chỉ vẽ vùng giữa <b>${Math.round(k.w)}×${Math.round(k.h)}</b>.`;
+    html = tr(`<b>Lệch tỉ lệ</b> — guide chỉ vẽ vùng giữa <b>${Math.round(k.w)}×${Math.round(k.h)}</b>.`,
+              `<b>Aspect ratio mismatch</b> — the guide only covers the center <b>${Math.round(k.w)}×${Math.round(k.h)}</b>.`);
   } else {
-    html = `<b>Khớp tỉ lệ</b>`;
+    html = tr(`<b>Khớp tỉ lệ</b>`, `<b>Aspect ratio matches</b>`);
   }
 
   // Còn guide cũ trên timeline: nút đổi nhãn thành "Thay bằng…" và bấm vào thì
@@ -1513,8 +1533,8 @@ function napCaiDat(){
       Object.assign(luoiCfg, a);
       if (!Array.isArray(luoiCfg.tuyChinh)) luoiCfg.tuyChinh = [];
     }
-    const l = localStorage.getItem('aio-gf-lang');
-    if (l === 'vi' || l === 'en') lang = l;
+    // Ngôn ngữ KHÔNG nhớ riêng ở đây nữa (27/09): 'aio-gf-lang' đè lên file chung cả bộ,
+    // đo thật: file 'en' mà panel mở ra vẫn 'vi'. Nguồn duy nhất là ngonngu-chung.js.
     hienSo = localStorage.getItem('aio-gf-hienso') === '1';
     if ($('hienSo')) $('hienSo').checked = hienSo;
     const id = localStorage.getItem('aio-gf-dinh');
@@ -1524,7 +1544,6 @@ function napCaiDat(){
 function luuCaiDat(){
   try {
     localStorage.setItem('aio-gf-luoi', JSON.stringify(luoiCfg));
-    localStorage.setItem('aio-gf-lang', lang);
     localStorage.setItem('aio-gf-hienso', hienSo ? '1' : '0');
     const d = dinh(); if (d) localStorage.setItem('aio-gf-dinh', d.id);
   } catch(e) {}

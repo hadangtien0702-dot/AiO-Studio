@@ -142,7 +142,9 @@
       } catch (e) { canhBao('doc ngonngu.json hong', e); }
     }
     try { var l = localStorage.getItem('aio-lang'); if (l === 'vi' || l === 'en') return l; } catch (e) { /* bỏ qua */ }
-    return 'vi';
+    // Mặc định PHẢI trùng MAC_DINH của design-system/ngonngu.tsx ('en', anh chốt bán ra nước ngoài).
+    // 27/09: dòng này từng là 'vi' → máy chưa có ngonngu.json thì panel tổng tiếng Việt, 9 tool tiếng Anh.
+    return 'en';
   }
   function ghiNgonNgu(lang) {
     try { localStorage.setItem('aio-lang', lang); } catch (e) { /* bỏ qua */ }
