@@ -67,6 +67,12 @@ function themO(item) {
     ' stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
   el.appendChild(rm)
 
+  // So thu tu be be o duoi anh (#1, #2...)
+  const stt = document.createElement('span')
+  stt.className = 'stt'
+  stt.textContent = '#' + (item.seq || item.id || 1)
+  el.appendChild(stt)
+
   // Bam vao anh = ghim lai. Bam vao X = bo khoi khay.
   el.addEventListener('click', (e) => {
     if (e.target.closest('.rm')) {

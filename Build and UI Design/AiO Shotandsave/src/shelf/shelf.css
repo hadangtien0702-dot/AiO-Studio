@@ -127,6 +127,23 @@ html, body {
 .item:hover .rm { opacity: 1; }
 .item .rm:hover { background: var(--danger-strong); color: #fff; }
 
+/* So thu tu o anh — goc duoi trai moi o */
+.item .stt {
+  position: absolute; bottom: 3px; left: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 14px; min-width: 14px; padding: 0 4px;
+  font-family: var(--font-ui); font-size: 9px; font-weight: 700; line-height: 1;
+  color: var(--text-2); background: rgba(9, 10, 13, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  pointer-events: none; z-index: 2; white-space: nowrap; letter-spacing: 0.2px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.item:hover .stt {
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+
 /* ── Trang khi chua co anh ───────────────────────────────────────────── */
 #empty {
   flex: 1; display: none;

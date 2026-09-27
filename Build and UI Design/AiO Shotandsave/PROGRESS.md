@@ -1,8 +1,14 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:05 +0700
-> - 📌 **BAN DANG DUNG: 0.6.1** (Windows cai 27/09 18:30, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.1.exe`).
-> - 🫥 **0.6.1 (27/09) — BLUR & PIXELATE TOOL (LAM MO / KHAM DIEM ANH CHE THONG TIN NHAY CAM — anh yeu cau 27/09):**
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:20 +0700
+> - 📌 **BAN DANG DUNG: 0.6.2** (Windows cai 27/09 20:18, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.2.exe`).
+> - 🔢 **0.6.2 (27/09) — SO THU TU ANH TRONG KHAY (#1, #2... — anh yeu cau 27/09):**
+>   Thêm con số thứ tự bé bé (`#1`, `#2`, `#3`...) ở góc dưới bên trái của mỗi ô thumbnail ảnh trong khay.
+>   Đánh số theo đúng thứ tự chụp: ảnh đầu tiên mang số `#1`, các ảnh sau tăng dần `#2`, `#3`... Số được giữ cố định
+>   không bị nhảy số khi chụp thêm ảnh mới. Thiết kế badge siêu nhỏ gọn theo phong cách Studio Console (nền tối mờ, viền 1px,
+>   chữ số sắc nét, đổi viền cam neon khi hover, không chặn thao tác kéo thả ảnh vào Premiere/Zalo). Khi dọn sạch khay,
+>   bộ đếm thứ tự tự động reset về #1 cho lượt chụp tiếp theo.
+> - 📌 **0.6.1 (27/09) — BLUR & PIXELATE TOOL (LAM MO / KHAM DIEM ANH CHE THONG TIN NHAY CAM — anh yeu cau 27/09):**
 >   Thêm công cụ làm mờ / khảm điểm ảnh (Mosaic) với phím tắt **`4`** hoặc **`B`**. Kéo quét qua bất kỳ vùng nào (mật khẩu, số tài khoản,
 >   khuôn mặt, link nhạy cảm) sẽ tạo hiệu ứng khảm khối pixel tức thời (real-time preview), độ an toàn tuyệt đối không thể đảo ngược
 >   bằng AI; viền bo mờ tinh tế và góc vuông vắn chuyên nghiệp. Tích hợp đầy đủ với công cụ chọn **`V`** (bấm chọn vùng khảm để di chuyển,

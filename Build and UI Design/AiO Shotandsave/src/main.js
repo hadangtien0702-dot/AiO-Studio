@@ -513,7 +513,7 @@ ipcMain.handle('settings:set-khay', (_e, kieu) => {
           const sz = it.image.getSize()
           let kb = 0
           try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
-          w.webContents.send('shelf:add', { id: it.id, thumb, filePath: it.filePath, w: sz.width, h: sz.height, kb })
+          w.webContents.send('shelf:add', { id: it.id, seq: it.seq || it.id, thumb, filePath: it.filePath, w: sz.width, h: sz.height, kb })
         }
         w.showInactive()
       })
@@ -1444,7 +1444,7 @@ function showShelf() {
 function shelfAdd(image, filePath) {
   const w = ensureShelf()
   const id = ++shelfSeq
-  shelfItems.set(id, { id, filePath, image })
+  shelfItems.set(id, { id, filePath, image, seq: id })
 
   // Thumbnail nho de gui qua IPC cho nhe — anh goc van giu trong shelfItems.
   const thumb = thumbKhay(image)
@@ -1453,7 +1453,7 @@ function shelfAdd(image, filePath) {
   let kb = 0
   try { kb = Math.round(fs.statSync(filePath).size / 1024) } catch (e) {}
 
-  const send = () => w.webContents.send('shelf:add', { id, thumb, filePath, w: sz.width, h: sz.height, kb })
+  const send = () => w.webContents.send('shelf:add', { id, seq: id, thumb, filePath, w: sz.width, h: sz.height, kb })
   if (w.webContents.isLoading()) {
     w.webContents.once('did-finish-load', send)
   } else {
@@ -1492,11 +1492,13 @@ ipcMain.on('shelf:remove', (e, id) => {
   // CHI bo khoi khay — file tren dia GIU NGUYEN (xoa file cua nguoi dung phai
   // do chinh ho quyet dinh, khong phai mot cu bam nham trong khay).
   shelfItems.delete(id)
+  if (shelfItems.size === 0) shelfSeq = 0
   e.sender.send('shelf:removed', id)
 })
 
 ipcMain.on('shelf:clear', (e) => {
   shelfItems.clear()
+  shelfSeq = 0
   e.sender.send('shelf:cleared')
 })
 
