@@ -352,3 +352,29 @@ Cai thu MAY SACH (khong Node/nguon) truoc khi phat ra ngoai · ky so (SmartScree
 Developer 99 USD/nam, hien ky ad-hoc qua `scripts/afterSign.js`) · tat luong chup khi may ranh lau (CPU nam nen
 ~10-12 % mot loi) · cong cu ve them (but, che mo) neu anh Tien can. Ban mac dung qua GitHub Actions
 (`.github/workflows/shotandsave-mac.yml`, Windows khong build duoc mac).
+
+## Ke hoach tinh nang: Multi-Shot Storyboard Strip (Dai phan canh dien anh)
+
+Chot voi anh Tien toi 27/09: phat trien tinh nang ghep nhieu anh chup thanh dai phan canh / contact sheet cho editor.
+
+### 1. Nhu cau
+- Editor dung Premiere/AE/DaVinci chup 3-10 khung hinh tren timeline de gui dao dien, khach hang hoac team duyet.
+- Thay vi gui 10 file le hoac mo Photoshop cat dan 15 phut, tool cho phep 1-click ghep thanh 1 tam anh storyboard dien anh duy nhat.
+
+### 2. Giao dien & Luong thao tac
+- Nut `#storyboard` tren thanh tieu de khay anh (`#bar`, canh nut mo thu muc `#folder`), phom icon Lucide film/layout inline SVG.
+- Phim tat: `S` khi dang mo cua so khay.
+- Dau vao: Lay toan bo anh dang mo trong khay (theo thu tu `#1`, `#2`... da danh so o 0.6.2) hoac cho phep multi-select.
+- 3 Che do bo cuc (Layout Templates):
+  (1) Cinema Filmstrip: Xep ngang cac khung hinh tren dai nen toi `#090a0d`, ngan cach boi vach 1px, nhan `SHOT 01`, `SHOT 02`...
+  (2) Storyboard Grid: Tu dong tinh cot/hang (2x2, 3x2, 4x2) tuy theo so luong shot, bo goc radius 8px theo style Studio Console.
+  (3) Director Contact Sheet: Header banner co Logo AiO, ten phan canh, ngay gio; duoi moi o anh co vung ghi chu revision note.
+- Xuat: `Ctrl+C` copy clipboard, `Ctrl+S` luu file vao thu muc anh (tu dong nap lai vao khay), hoac keo tha file vao Premiere Pro.
+
+### 3. Kien truc & File can thiep (28/09)
+- `src/shelf/index.html` & `shelf.css`: Nut `#storyboard`, style tooltip, hieu ung hover theo token `--acc` / `#f86820`.
+- `src/shelf/shelf.js`: Bat su kien click / phim `S`, thu thap danh sach anh.
+- Module ghep anh `src/storyboard/`: Dung HTML5 Canvas 2D (khong can thu vien ngoai nang ne), render tai ty le goc 1:1.
+- `src/i18n.js`: Bo tu dien VI/EN cho tieu de va cac nut thao tac storyboard.
+- `src/main.js`: IPC handler mo modal/cua so xem truoc hoac luu file anh ghep.
+

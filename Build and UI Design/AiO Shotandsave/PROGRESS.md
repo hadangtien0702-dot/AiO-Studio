@@ -1,11 +1,37 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:45 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 21:05 +0700
 > - **BAN DANG DUNG: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+> - **TIEP THEO (phien ngay mai 28/09): TRIEN KHAI TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
+>   Thiet ke chi tiet da ghi o muc 2026-09-27 21:05 ngay ben duoi va CLAUDE.md. 1-click ghep cac anh trong khay
+>   thanh dai phim / luoi phan canh de editor gui duyet dao dien / khach hang hoac keo vao Premiere lam reference.
 > - **0.5.7 -> 0.6.4 do GEMINI lam cung ngay 27/09** (anh dung Gemini). Claude ra soat 20:4x, ket qua + luat lam chung
 >   repo ghi o `GEMINI.md` goc repo. 0.6.5 sua 2 loi tu ra soat (muc 0.6.5 ngay duoi). [CHO] chua ai chay harness
 >   keo-chon (so loi #8) cho 0.5.7 (8 tay nam co gian khung) — can gio cua anh (luat #12); anh bam chup 1 tam
 >   sau khi mo app de xac nhan loi "anh hien 2 lan" het tren may that.
+> - **2026-09-27 21:05 — THIET KE CHI TIET TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
+>   Loi anh Tien toi 27/09: "3. Chup dai Storyboard / Phan canh (Multi-Shot Storyboard Strip) chi tiet hon cho anh ve tinh nang nay di em",
+>   "ghi lai chi tiet tinh nang nay va ngay mai phat trien tiep em nhe, push code len git cho anh luon nha".
+>   Viec: ghi thiet ke chi tiet vao PROGRESS.md va CLAUDE.md de phien 28/09 bat dau lap trinh ngay, chua sua ma nguon app.
+>   1. Vande thuc te cua editor: Khi dung phim/video can chup mot loat cac shot tren Timeline Premiere/AE/DaVinci
+>   de gui dao dien hoac khach hang duyet (goc quay, mau sac, nhip cat). Hien tai phai chup tung tam rieng le roi gui
+>   mot mo file lon xon, hoac mat 10-15 phut mo Photoshop/Canva xep cat dan thu cong thanh contact sheet.
+>   2. Giai phap thiet ke:
+>   - Diem bat tren khay: Nut moi #storyboard tren thanh tieu de khay (#bar, canh nut #folder) + phim tat S khi mo khay.
+>   Icon SVG inline (khong emoji, chuan Studio Console). Che do mac dinh lay toan bo anh dang co trong khay theo thu tu
+>   chup (#1, #2... da co tu 0.6.2), hoac ho tro chon 2-8 anh tuy y.
+>   - 3 Bo cuc (Layout):
+>     (A) Dai ngang dien anh (Cinema Filmstrip): Xep cac frame thanh 1 hang ngang tren nen toi (#090a0d), vach ngan 1px,
+>     nhan SHOT 01, SHOT 02... kem gio/thu tu. Thich hop nhat de nhin nhip cat phan canh (action continuity).
+>     (B) Luoi phan canh (Storyboard Grid 2x2, 3x2, 4x2): Tu dong can doi ti le khi nhieu anh, vien bo goc Studio Console.
+>     (C) Ban duyet dao dien (Director Contact Sheet): Co Header banner sang trong tren cung (Logo AiO, ten phan canh,
+>     ngay gio, tong so shot) va duoi moi frame co dong ghi chu hanh dong / revision note ngan.
+>   - Xuat ket qua (1-Click):
+>     Ctrl+C copy vao Clipboard de paste ngay vao Zalo/Mess/Slack; Ctrl+S luu thanh 1 file anh duy nhat vao thu muc anh
+>     (tu dong nap vao khay); hoac keo tha truc tiep vao Premiere Pro lam visual reference sequence tren timeline.
+>   3. File se can thiep 28/09: `src/shelf/index.html`, `src/shelf/shelf.css`, `src/shelf/shelf.js`,
+>   module ghep anh `src/storyboard/` (HTML5 Canvas 2D khong dung thu vien ngoai), `src/i18n.js`, `src/main.js`.
+>   Kiem chung: chua sua code, chua kiem.
 > - **0.6.5 (27/09 20:45, Claude) — SUA 2 LOI TU RA SOAT BAN GEMINI:**
 >   (1) Lan chup DAU sau khi mo app, anh vua chup hien **2 lan** trong khay: `shelfAdd` -> `ensureShelf` ->
 >   `napAnhGanNhatVaoKhay` (0.6.3) quet thu muc SAU khi file moi da luu nen nap luon no, roi `shelfAdd` them lan nua.
