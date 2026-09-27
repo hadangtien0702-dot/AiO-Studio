@@ -1,7 +1,13 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:30 +0700
-> - 📌 **BAN DANG DUNG: 0.6.3** (Windows cai 27/09 20:28, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.3.exe`).
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 20:38 +0700
+> - 📌 **BAN DANG DUNG: 0.6.4** (Windows cai 27/09 20:37, mo tu dong; file cai nam o `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.4.exe`).
+> - 📐 **0.6.4 (27/09) — DOI THIET KE TAY NAM CO GIAN 4 GOC KHAY (CORNER L-BRACKET — anh yeu cau 27/09):**
+>   Thay thế hoàn toàn 4 góc sọc chéo màu cam cũ (gây thô và che logo/nút thu nhỏ) bằng thiết kế **Thước góc bo viền (Corner L-Bracket)**
+>   tối giản theo phong cách Studio Console. Đường viền mảnh 2px bo góc cong mượt mà theo đúng bán kính cong của khay (radius 8px).
+>   Bình thường khi rê chuột xem ảnh trên khay, 4 góc chỉ mờ nhẹ tinh tế (opacity 0.35 màu xám dịu, không tranh chấp thị giác).
+>   Chỉ khi người dùng rê chuột trực tiếp vào đúng góc co giãn thì thước góc mới sáng bừng màu cam neon (`--accent` / `#f86820`) kèm hiệu ứng
+>   glow tỏa sáng, vùng bấm co giãn 20x20px cực kỳ thoải mái và đầm tay.
 > - 🖼️ **0.6.3 (27/09) — TU DONG LOAD ANH GAN NHAT VAO KHAY + TUY CHON TRONG CAI DAT (anh yeu cau 27/09):**
 >   Khi mở khay ảnh lên (hoặc khởi động lại app / reset máy), khay sẽ tự động quét thư mục lưu và nạp **05 tấm ảnh chụp gần nhất**
 >   (sắp xếp theo thứ tự chụp `#1` đến `#5`, ảnh mới nhất `#5` nằm ngoài cùng bên trái). Đầy đủ mọi tính năng: bấm ghim ảnh,

@@ -192,19 +192,74 @@ body.doc #empty {
   line-height: 1.5;
 }
 
-/* ── Tay nam DOI CO (14/09 anh Tien "keo cai khay to ra") ────────────────
-   Goc tren-trai, 16x16, hien khi re chuot len khay. Keo len/trai = to ra, goc
-   duoi-phai dung yen (main giu). San = co mac dinh, tran = 60% man hinh. */
+/* ── Tay nam DOI CO (Corner L-Bracket tối giản, bo cong theo viền khay) ── */
 .grip-goc {
-  position: absolute; z-index: 5;
-  width: 16px; height: 16px;
-  opacity: 0;
-  transition: opacity var(--dur) var(--ease);
-  background: linear-gradient(135deg, var(--accent) 0 3px, transparent 3px 5px, var(--accent) 5px 7px, transparent 7px) no-repeat 0 0 / 11px 11px;
+  position: absolute; z-index: 10;
+  width: 20px; height: 20px;
+  pointer-events: auto;
 }
-#grip    { left: 0;  top: 0;    cursor: nwse-resize; border-top-left-radius: var(--r-lg); }
-#grip-tr { right: 0; top: 0;    cursor: nesw-resize; border-top-right-radius: var(--r-lg);    transform: scaleX(-1); }
-#grip-bl { left: 0;  bottom: 0; cursor: nesw-resize; border-bottom-left-radius: var(--r-lg);  transform: scaleY(-1); }
-#grip-br { right: 0; bottom: 0; cursor: nwse-resize; border-bottom-right-radius: var(--r-lg); transform: scale(-1); }
-#shelf:hover .grip-goc { opacity: 0.9; }
-.grip-goc:hover, .grip-goc.dang-keo { opacity: 1; }
+
+.grip-goc::before {
+  content: '';
+  position: absolute;
+  width: 10px; height: 10px;
+  border-color: var(--text-3);
+  border-style: solid;
+  border-width: 0;
+  opacity: 0;
+  box-sizing: border-box;
+  transition: opacity var(--dur) var(--ease), border-color var(--dur) var(--ease), filter var(--dur) var(--ease);
+}
+
+#grip {
+  left: 0; top: 0; cursor: nwse-resize;
+}
+#grip::before {
+  left: 3px; top: 3px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+  border-top-left-radius: 8px;
+}
+
+#grip-tr {
+  right: 0; top: 0; cursor: nesw-resize;
+}
+#grip-tr::before {
+  right: 3px; top: 3px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+  border-top-right-radius: 8px;
+}
+
+#grip-bl {
+  left: 0; bottom: 0; cursor: nesw-resize;
+}
+#grip-bl::before {
+  left: 3px; bottom: 3px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+  border-bottom-left-radius: 8px;
+}
+
+#grip-br {
+  right: 0; bottom: 0; cursor: nwse-resize;
+}
+#grip-br::before {
+  right: 3px; bottom: 3px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Hover khay: hien mo nhe tinh te */
+#shelf:hover .grip-goc::before {
+  opacity: 0.35;
+}
+
+/* Re chuot dung vao goc hoac dang keo: sang cam neon dac trung */
+.grip-goc:hover::before,
+.grip-goc.dang-keo::before {
+  opacity: 1 !important;
+  border-color: var(--accent) !important;
+  filter: drop-shadow(0 0 3px rgba(248, 104, 32, 0.6));
+}
