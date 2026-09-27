@@ -33,7 +33,7 @@ không mất, nhưng lịch sử ghi sai chủ và các panel đó lên GitHub m
 - Shot & Save: `Build and UI Design/AiO Shotandsave/package.json` → `"version"`.
 - **Và** sửa dòng của app trong 2 bảng: `CLAUDE.md` gốc (mục 2, dòng `| 12 | **Shot & Save**`) và
   `Marketing/AiO MVP and Plan Marketing/TOOL_VERSION_TRACKER.md` (dòng 12).
-  ☠️ Hiện đang LỆCH: 2 bảng ghi 0.5.5 / 0.5.6 trong khi `package.json` đã 0.6.3–0.6.4 (sổ lỗi #5 của Shot & Save).
+  (27/09 đã lệch: 2 bảng kẹt 0.5.5 / 0.5.6 trong khi app đã 0.6.4 — Claude sửa về 0.6.5. Đừng để lệch lại.)
 
 ## 3. Nhật ký `PROGRESS.md` của app
 
@@ -59,26 +59,29 @@ lỗi có nguyên nhân đã đo + chốt chặn). Những vùng Gemini vừa s�
 `ProductVersion` của tiến trình đang chạy + đọc run-log. Chữ người dùng nhìn thấy: **không dùng gạch ngang dài "—"**
 (anh cấm 22/09), luôn đủ **VI + EN** trong `src/i18n.js`.
 
-## 5. Kết quả Claude rà Shot & Save 0.5.7 → 0.6.3 (27/09/2026 20:4x) — việc cần sửa
+## 5. Kết quả Claude rà Shot & Save 0.5.7 → 0.6.3 (27/09/2026 20:4x)
+
+> **Cập nhật 20:45:** Claude đã sửa mục 1, 2, 4 (câu nhật ký) và 5 trong bản **0.6.5** (commit sau ).
+> Còn mở: mục 3 (chạy harness kéo-chọn) và mục 6. Đừng sửa lại các mục đã xong.
 
 Rà bằng đọc mã + đo, CHƯA chạy app (luật #12). Đã kiểm: cú pháp mọi file JS **sạch** · i18n đủ cặp VI/EN cho mọi
 chuỗi mới · thư mục ảnh bị `.gitignore` chặn (0 ảnh lên git) · quét thư mục 5.000 ảnh mất ~45 ms (chấp nhận được).
 
-1. **[LỖI — nên sửa trước] Ảnh vừa chụp hiện 2 lần trong khay** ở lần chụp đầu tiên sau khi mở app.
+1. **[ĐÃ SỬA 0.6.5] Ảnh vừa chụp hiện 2 lần trong khay** ở lần chụp đầu tiên sau khi mở app.
    `handleConfirm` lưu file xong mới gọi `shelfAdd()` → `ensureShelf()` → `napAnhGanNhatVaoKhay()` quét thư mục
    **thấy luôn file vừa lưu** (mới nhất) và nạp nó; rồi `shelfAdd` thêm chính file đó lần nữa với số khác.
    (`src/main.js`: `shelfAdd` ~dòng 1513, `ensureShelf` ~1466, `napAnhGanNhatVaoKhay` ~1446.)
    Hướng sửa: nạp ảnh gần nhất lúc app khởi động (trước lần chụp đầu), hoặc bỏ qua `filePath` đang thêm,
    hoặc lọc trùng theo `filePath` chứ không theo `id`. Kiểm: mở app → chụp 1 tấm → khay có đúng 1 ô ảnh đó.
-2. **[SAI CHỮ] Gợi ý ảnh ghim ghi "Lăn chuột = độ mờ"** (`ghim.goiY` trong `src/i18n.js`) nhưng `src/pin/pin.js`
+2. **[ĐÃ SỬA 0.6.5] Gợi ý ảnh ghim ghi "Lăn chuột = độ mờ"** (`ghim.goiY` trong `src/i18n.js`) nhưng `src/pin/pin.js`
    dòng ~136 vẫn **bắt buộc giữ Ctrl** mới đổi độ mờ. Sửa chữ cho đúng (hoặc đổi hành vi nếu anh muốn), cả VI lẫn EN.
    Gợi ý cũng chưa nhắc phím **4 / B (làm mờ)** và **V (chọn)**.
 3. **[CHƯA KIỂM] 7 bản 0.5.7 → 0.6.3 không có dòng kiểm thử nào trong PROGRESS**, trong khi 0.5.7 thêm 8 tay nắm
    co giãn khung ngay vùng kéo-chọn (sổ lỗi #8). Cần chạy harness mục 4 và ghi số vào nhật ký.
-4. **[NÓI QUÁ] Làm mờ = khảm khối 8–15 px** (`veBlurPixelate`, `blockSize = max(8, round(10*DPR))`). Với chữ nhỏ,
+4. **[ĐÃ SỬA câu nhật ký 0.6.5; kích thước khối CHƯA đổi — chờ anh] Làm mờ = khảm khối 8–15 px** (`veBlurPixelate`, `blockSize = max(8, round(10*DPR))`). Với chữ nhỏ,
    khảm khối nhỏ **có thể bị khôi phục** (công cụ kiểu Depix). Nhật ký ghi "không thể đảo ngược bằng AI" là sai —
    sửa câu đó; nếu muốn che thông tin nhạy cảm chắc chắn: khối to hơn (≥ 20 px) hoặc tô kín.
-5. **[TÀI LIỆU LỖI THỜI]** `AiO Shotandsave/CLAUDE.md` mục "Da lam" vẫn ghi *"Tren cua so ghim: keo ANH = tha ra app,
+5. **[ĐÃ SỬA 0.6.5]** `AiO Shotandsave/CLAUDE.md` mục "Da lam" vẫn ghi *"Tren cua so ghim: keo ANH = tha ra app,
    keo THANH TREN = di chuyen"*, nhưng 0.5.8 đã đổi: kéo ảnh = di chuyển cửa sổ, kéo ra app = nút `#drag-file` hoặc giữ Alt.
    Sửa tài liệu cho khớp. Sổ công ty (Trung tâm Điều hành) cũng đang ghi Shot & Save **0.5.6**.
 6. **[NHỎ]** `veBlurPixelate` lấy mẫu từ `frozenImg` theo `toạ độ × DPR`; ~0,1–0,2 s đầu `frozenImg` là bản
