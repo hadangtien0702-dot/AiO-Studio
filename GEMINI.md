@@ -61,7 +61,7 @@ lỗi có nguyên nhân đã đo + chốt chặn). Những vùng Gemini vừa s�
 
 ## 5. Kết quả Claude rà Shot & Save 0.5.7 → 0.6.3 (27/09/2026 20:4x)
 
-> **Cập nhật 20:45:** Claude đã sửa mục 1, 2, 4 (câu nhật ký) và 5 trong bản **0.6.5** (commit sau ).
+> **Cập nhật 20:45:** Claude đã sửa mục 1, 2, 4 (câu nhật ký) và 5 trong bản **0.6.5** (commit `7623e83`).
 > Còn mở: mục 3 (chạy harness kéo-chọn) và mục 6. Đừng sửa lại các mục đã xong.
 
 Rà bằng đọc mã + đo, CHƯA chạy app (luật #12). Đã kiểm: cú pháp mọi file JS **sạch** · i18n đủ cặp VI/EN cho mọi
