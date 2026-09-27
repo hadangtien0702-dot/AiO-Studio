@@ -1,5 +1,5 @@
 /**
- * guideframe.jsx — logic host cua AiO Auto Guiline Frame (v0.3.1)
+ * guideframe.jsx — logic host cua AiO Auto Guiline Frame (v0.3.2)
  *
  * Quy uoc tra ve: "OK:..." / "ERR:MA_LOI|chi tiet" — panel dich ra cau chu.
  * ASCII khong dau (ExtendScript ES3). KHONG dung JSON (host khong co).
@@ -476,5 +476,5 @@ function gf_demOverlay() {
  * ca file da nap tron ven (bai hoc "evalFile nuot file giua chung" 01/08/2026).
  */
 function gf_phienBan() {
-  return '0.3.1';
+  return '0.3.2';
 }

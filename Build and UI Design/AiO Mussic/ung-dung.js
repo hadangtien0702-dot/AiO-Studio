@@ -1077,7 +1077,10 @@ function analyzeKey() {
     var pct = Math.round((kq.tinCayKey || 0) * 100);
     keyDangCo = kq.key;
     if (elKey) { elKey.innerText = kq.key; elKey.classList.remove('trong'); }
-    if (elVi) elVi.innerText = keyVi(kq.key);
+    // Kem key SONG SONG: bo do con hay lan truong <-> thu song song (do 27/09),
+    // ma hai key nay cung bo not nen ghep nhac/SFX van hop.
+    var ss = keySongSong(kq.key);
+    if (elVi) elVi.innerText = keyVi(kq.key) + (ss ? ' · cùng bộ nốt với ' + ss : '');
     if (elPct) elPct.innerText = pct + '%';
     if (elFill) elFill.style.width = pct + '%';
     if (elCanh) {
@@ -1113,7 +1116,7 @@ function veNhacHop(key) {
 
   if (!key) {
     if (tieu) tieu.innerText = 'Nhạc hợp trong kho';
-    list.innerHTML = '<div class="hop-trong">Bấm <b>Đo Key</b> ở trên để tìm nhạc hợp với bài này.</div>';
+    list.innerHTML = '<div class="hop-trong">Thả một bài nhạc vào ô ở trên, hoặc bấm chọn clip nhạc trên timeline, để tìm nhạc hợp key.</div>';
     return;
   }
 
@@ -1410,7 +1413,8 @@ function switchMode(m) {
   if (tb) tb.style.display = (m === 'lib') ? '' : 'none';
 
   if (m === 'bpm') capNhatNguonDo();
-  if (m === 'key') { capNhatNguonDoKey(); veNhacHop(keyDangCo); }
+  // 27/09: man Key tu theo clip dang chon + o tha (thay cho 2 nut chon nguon)
+  if (m === 'key') { batTheoClip(); veNhacHop(keyDangCo); }
 }
 
 /** Bai qua ngan thi bao truoc, dung de nguoi dung bam roi nhan con so vo nghia. */
@@ -1440,3 +1444,125 @@ function khoiDongThat() {
 }
 
 window.addEventListener('DOMContentLoaded', khoiDongThat);
+
+/* ══════════════════════════════════════════
+   KEO THA + THEO CLIP DANG CHON — 27/09/2026
+   Anh Tien: *"editor se download nhac bang video download cua minh xong se tim
+   bai do la dang o key nao trong time-line"* + *"cam nhac tu time-line va keo
+   vao tool se ra key"*.
+   Truoc: 5 buoc (bam icon chia khoa khong chu -> doi nguon -> chon clip ->
+   quay lai panel -> bam "Do Key"). Nay: THA file vao o, hoac BAM clip tren
+   timeline -> tu do, khong nut nao.
+   ☠️ CHUA BIET Premiere co dua gi sang khi keo thang tu TIMELINE vao panel
+   (ghi chu cu o Asset Manager Grid.tsx noi "khong", khong ro da do chua). Moi
+   lan tha deu ghi lai kieu du lieu nhan duoc vao %APPDATA%\AiOMusic\tha-vao.log
+   de do bang lan keo that dau tien. Keo file tu Explorer thi chac chan an.
+══════════════════════════════════════════ */
+function ghiNhatKyTha(dong) {
+  try {
+    var fs = nodeRequire('fs'), path = nodeRequire('path'), os = nodeRequire('os');
+    var p = path.join(os.homedir(), 'AppData', 'Roaming', 'AiOMusic', 'tha-vao.log');
+    fs.appendFileSync(p, new Date().toISOString() + ' ' + dong + '\n');
+  } catch (e) {}
+}
+
+/** Lay duong dan file tu mot lan tha — thu moi kieu du lieu co the co. */
+function duongDanTuLanTha(dt) {
+  var ghi = [];
+  try {
+    var types = Array.prototype.slice.call(dt.types || []);
+    ghi.push('types=' + JSON.stringify(types));
+    for (var i = 0; i < types.length; i++) {
+      var v = '';
+      try { v = dt.getData(types[i]) || ''; } catch (e) { v = '(loi ' + e + ')'; }
+      ghi.push(types[i] + '=' + JSON.stringify(String(v).slice(0, 300)));
+    }
+    var files = dt.files || [];
+    for (var j = 0; j < files.length; j++) ghi.push('file[' + j + ']=' + JSON.stringify(files[j].path || files[j].name));
+  } catch (e) { ghi.push('loi-doc=' + e); }
+  ghiNhatKyTha(ghi.join(' | '));
+
+  // 1) File tu Explorer: CEP co Node nen File co .path that
+  if (dt.files && dt.files.length && dt.files[0].path) return dt.files[0].path;
+  // 2) Kieu du lieu Adobe dung khi keo ra ngoai (xem skill adobe-cep-panel), hoac uri/text
+  var thu = ['com.adobe.cep.dnd.file.0', 'text/uri-list', 'text/plain'];
+  for (var k = 0; k < thu.length; k++) {
+    var s = '';
+    try { s = dt.getData(thu[k]) || ''; } catch (e) {}
+    s = String(s).split(/\r?\n/)[0].trim();
+    if (!s) continue;
+    if (/^file:\/\//i.test(s)) { try { s = decodeURIComponent(s.replace(/^file:\/\/\/?/i, '')); } catch (e) {} }
+    if (/^[a-zA-Z]:[\\/]/.test(s) || /^\//.test(s)) return s;
+  }
+  return '';
+}
+
+/** Dat mot bai lam doi tuong do key roi do ngay. */
+function doKeyChoFile(duongDan, ten, giay, nguonChu) {
+  nguonDoKey = 'tha';
+  baiDoKey = { duongDan: duongDan, name: ten || duongDan.split(/[\\/]/).pop(), giay: giay || 0 };
+  var elTen = document.getElementById('dnk-ten'), elPhu = document.getElementById('dnk-phu');
+  if (elTen) elTen.innerText = baiDoKey.name;
+  if (elPhu) elPhu.innerText = (giay ? dinhDangPhut(giay) + ' · ' : '') + nguonChu;
+  analyzeKey();
+}
+
+function ganOTha() {
+  var o = document.getElementById('o-tha');
+  if (!o || o._daGan) return;
+  o._daGan = true;
+  var dem = 0;
+  o.addEventListener('dragenter', function (e) { e.preventDefault(); dem++; o.classList.add('dang-keo'); });
+  o.addEventListener('dragover', function (e) { e.preventDefault(); try { e.dataTransfer.dropEffect = 'copy'; } catch (x) {} });
+  o.addEventListener('dragleave', function () { if (--dem <= 0) { dem = 0; o.classList.remove('dang-keo'); } });
+  o.addEventListener('drop', function (e) {
+    e.preventDefault(); dem = 0; o.classList.remove('dang-keo');
+    var p = duongDanTuLanTha(e.dataTransfer);
+    if (!p) { toast2('Chưa đọc được file vừa thả. Thử kéo file từ thư mục, hoặc bấm chọn clip trên timeline.'); return; }
+    doKeyChoFile(p, '', 0, 'vừa thả vào');
+  });
+}
+
+/* Theo clip dang chon: hoi Premiere ~1,5 giay/lan, CHI khi dang o man Key va
+   panel dang hien; dang do thi ngung hoi (ExtendScript mot luong). */
+var theoClip = { hen: null, cuoi: null, dangHoi: false };
+function hoiClipDangChon(chiGhiMoc) {
+  if (theoClip.dangHoi) return;
+  var nut = document.getElementById('nut-do-key');
+  if (nut && nut.disabled) return;                 // dang do -> nhip sau
+  theoClip.dangHoi = true;
+  goiHost('mus_selectedClipPath()').then(function (kq) {
+    theoClip.dangHoi = false;
+    var r = tach(kq);
+    var moc = r.ok ? r.dulieu : '';
+    if (moc === theoClip.cuoi) return;
+    theoClip.cuoi = moc;
+    if (!r.ok || chiGhiMoc) return;
+    var p = r.dulieu.split('|');
+    doKeyChoFile(p[0], p[2] || '', parseFloat(p[1]) || 0, 'clip đang chọn trên timeline');
+  }, function () { theoClip.dangHoi = false; });
+}
+function batTheoClip() {
+  if (!coNode()) return;
+  // Lan dau: neu da co bai (vd vua bam key trong Thu Vien) thi chi ghi moc, khong de len
+  hoiClipDangChon(!!baiDoKey);
+  if (theoClip.hen) return;
+  (function vong() {
+    var pane = document.getElementById('mode-key');
+    if (!pane || !pane.classList.contains('active')) { theoClip.hen = null; return; }
+    if (!document.hidden) hoiClipDangChon(false);
+    theoClip.hen = setTimeout(vong, 1500);
+  })();
+}
+
+/** Key song song (cung bo not): Em <-> G, Am <-> C. */
+function keySongSong(k) {
+  var m = /^([A-G]#?)(m?)$/.exec(k || '');
+  if (!m) return '';
+  var i = NOT_KEY_SS.indexOf(m[1]);
+  if (i < 0) return '';
+  return m[2] ? NOT_KEY_SS[(i + 3) % 12] : NOT_KEY_SS[(i + 9) % 12] + 'm';
+}
+var NOT_KEY_SS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+window.addEventListener('DOMContentLoaded', ganOTha);

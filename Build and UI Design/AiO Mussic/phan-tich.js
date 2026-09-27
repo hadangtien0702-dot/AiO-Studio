@@ -15,7 +15,7 @@
  *
  * Cach lam:
  *   BPM — nang luong pho (spectral flux) -> tuong quan tu than (autocorrelation)
- *   KEY — vector chroma 12 cung -> doi chieu bang mau Krumhansl-Kessler
+ *   KEY — chroma phan giai cao (cua so 8192) -> doi chieu bang mau Temperley (doi 27/09, xem khoi KEY)
  */
 
 /* ══════════════════════════════════════════
@@ -193,12 +193,33 @@ function doBPM(pho) {
 }
 
 /* ══════════════════════════════════════════
-   KEY — chroma + bang mau Krumhansl-Kessler
+   KEY — chroma do phan giai cao + bang mau Temperley
+   ☠️ VIET LAI 27/09/2026. Ban cu (cua so 2048 = 10,8 Hz/o) SAI HE THONG:
+   duoi ~180 Hz hai not lien nhau cach nhau it hon mot o FFT, nen vung BASS —
+   cho mang nhieu thong tin ve key nhat — bi dem theo kieu "trung o nao thi
+   tinh o do". Do that bang phep NANG CAO DO (bai that nang k nua cung, key
+   dung phai dich dung k): ban cu chi dich dung 22,4% (32/143), 54,5% ket qua
+   ra F/C, va KHONG BAO GIO ra B. Hop am tong hop (110-330 Hz) van qua — nen
+   bo kiem 09/08 khong bat duoc.
+   Ban nay (do cung phep tren 12 bai that + 1 doi chung): dich dung 79,0%
+   (113/143), F/C 19,9% (gan muc tu nhien ~16,7%), doi chung 11/11.
+   Cach lam:
+     - cua so RIENG cho key 8192 mau (2,7 Hz/o) -> tach not tu ~55 Hz
+     - moi o FFT gan vao not gan nhat, trong so tam giac theo do lech
+     - chia moi lop not cho TONG TRONG SO cua chinh no (not nhieu o khong thang)
+     - bien do TUYEN TINH (nen log day nen tap am len -> lech ve G#m, da do)
+     - chuan hoa tung khung, tru nen (min) roi so bang mau Temperley
+   Lech con lai chu yeu la TRUONG <-> THU SONG SONG (Em <-> G): cung bo not,
+   ghep voi nhau van hop — giao dien phai noi ro dieu nay.
 ══════════════════════════════════════════ */
 var NOT = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-// Bang mau cam nhan cung dieu (Krumhansl & Kessler 1982)
-var MAU_TRUONG = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
-var MAU_THU    = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
+// Bang mau Temperley (Kostka-Payne): do that 27/09 on dinh hon Krumhansl 1982
+// (79,0% vs 73,4%) va Albrecht-Shanahan (74,8%) tren cung bo 12 bai.
+var MAU_TRUONG = [5, 2, 3.5, 2, 4.5, 4, 2, 4.5, 2, 3.5, 1.5, 4];
+var MAU_THU    = [5, 2, 3.5, 4.5, 2, 4, 2, 4.5, 3.5, 2, 1.5, 4];
+
+var CUA_SO_KEY = 8192, BUOC_KEY = 4096;
+var TAN_DUOI = 55, TAN_TREN = 2000;
 
 function tuongQuan(a, b) {
   var n = a.length, sa = 0, sb = 0, i;
@@ -212,119 +233,71 @@ function tuongQuan(a, b) {
   return mau === 0 ? 0 : tu / mau;
 }
 
-/* ══════════════════════════════════════════
-   ☠️ VAN TAY CUA MAY DO — phai tru di, khong la sai het.
-   Bin FFT cach deu theo TAN SO, con cung nhac chia theo hàm LOG. Nen so bin
-   roi vao moi cung KHONG bang nhau. Do that (SR 22050, cua so 2048, dai
-   65-2100 Hz): C va A moi cung hung **21 bin**, con C# chi **9 bin** —
-   lech **2,33 lan**.
-   Hau qua tren kho that cua anh Tien: **4.114/5.025 bai ra "Am" (82%)**.
-   Tieng xe co, song bien, tieng gio... deu ra Am, vi pho bang rong thi cung
-   nao hung nhieu bin hon se thang, ma A va C dung dau bang.
-   Chua: chia moi cung cho SO BIN cua chinh no -> pho phang cho ra chroma phang
-   -> khong khop bang mau nao -> tin cay thap -> bi loai dung.
-══════════════════════════════════════════ */
-/* Dai bin cua tung NOT ban cung — dung mot lan roi dung lai. */
-var MIDI_DAU = 36, MIDI_CUOI = 96;    // C2 (65 Hz) .. C7 (2093 Hz)
-var _daiNot = null;
-
-function daiNot(soBin) {
-  if (_daiNot) return _daiNot;
-  var ds = [];
-  for (var m = MIDI_DAU; m <= MIDI_CUOI; m++) {
-    // Bien duoi/tren cua not: nua cung moi ben
-    var fd = 440 * Math.pow(2, (m - 0.5 - 69) / 12);
-    var fc = 440 * Math.pow(2, (m + 0.5 - 69) / 12);
-    var kd = Math.max(1, Math.ceil(fd * CUA_SO / SR));
-    var kc = Math.min(soBin - 1, Math.floor(fc * CUA_SO / SR));
-    if (kc < kd) continue;             // not qua thap, chua du mot bin
-    ds.push({ pc: ((m % 12) + 12) % 12, kd: kd, kc: kc, so: kc - kd + 1 });
+/* O FFT -> (lop not, trong so) — dung mot lan roi dung lai. */
+var _bangKey = null;
+function bangKey() {
+  if (_bangKey) return _bangKey;
+  var ds = [], tongW = new Float64Array(12);
+  for (var k = 1; k < CUA_SO_KEY / 2; k++) {
+    var f = k * SR / CUA_SO_KEY;
+    if (f < TAN_DUOI || f > TAN_TREN) continue;
+    var midi = 69 + 12 * Math.log(f / 440) / Math.LN2;
+    var gan = Math.round(midi);
+    var w = 1 - Math.abs(midi - gan) / 0.5;      // dung tam not = 1, giua hai not = 0
+    if (w <= 0) continue;
+    var pc = ((gan % 12) + 12) % 12;
+    ds.push({ k: k, pc: pc, w: w });
+    tongW[pc] += w;
   }
-  _daiNot = ds;
-  return ds;
+  _bangKey = { ds: ds, tongW: tongW };
+  return _bangKey;
 }
 
-function doKey(pho) {
-  if (!pho || pho.length < 8) return { key: '', tinCay: 0 };
-  var soBin = pho[0].length;
-  var chroma = new Float64Array(12);
-  var ds = daiNot(soBin);
-  if (!ds.length) return { key: '', tinCay: 0 };
+function doKey(x) {
+  if (!x || x.length < CUA_SO_KEY * 2) return { key: '', tinCay: 0 };
+  var B = bangKey(), i, j;
+  var hann = new Float64Array(CUA_SO_KEY);
+  for (i = 0; i < CUA_SO_KEY; i++) hann[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (CUA_SO_KEY - 1)));
+  var re = new Float64Array(CUA_SO_KEY), im = new Float64Array(CUA_SO_KEY);
+  var chroma = new Float64Array(12), c = new Float64Array(12);
 
-  /* ☠️ LAY TRUNG BINH THEO TUNG NOT, KHONG CONG DON THEO BIN.
-     Ban dau em cong thang bien do cua moi bin vao cung tuong ung. Sai, vi bin
-     FFT cach deu theo TAN SO con not nhac chia theo LOG: not cao trum nhieu bin
-     hon not thap. Do that: cung C va A moi cung hung 21 bin, C# chi 9 — lech
-     2,33 lan. Ket qua tren kho that: **4.114/5.025 bai ra "Am" (82%)**, ke ca
-     tieng xe co va song bien.
-     Thu chia cho so bin CUA CA CUNG cung khong xong: lam vay lai phat oan tin
-     hieu CO TONG (hop am C bi doan thanh Em).
-     Cach dung: moi NOT BAN CUNG lay TRUNG BINH bien do trong dai cua no, roi
-     moi cong vao cung. Nho vay:
-       - pho phang (tap am) -> moi not trung binh nhu nhau -> chroma PHANG
-       - co not that       -> not do troi han -> chroma NHON dung cho */
-  for (var f = 0; f < pho.length; f++) {
-    var mag = pho[f];
-    for (var i = 0; i < ds.length; i++) {
-      var n = ds[i], s = 0;
-      for (var k = n.kd; k <= n.kc; k++) s += mag[k];
-      chroma[n.pc] += s / n.so;        // TRUNG BINH, khong phai tong
+  for (var o = 0; o + CUA_SO_KEY <= x.length; o += BUOC_KEY) {
+    for (i = 0; i < CUA_SO_KEY; i++) { re[i] = x[o + i] * hann[i]; im[i] = 0; }
+    fft(re, im);
+    for (i = 0; i < 12; i++) c[i] = 0;
+    for (j = 0; j < B.ds.length; j++) {
+      var b = B.ds[j];
+      c[b.pc] += b.w * Math.sqrt(re[b.k] * re[b.k] + im[b.k] * im[b.k]);
     }
+    var mx = 0;
+    for (i = 0; i < 12; i++) { c[i] /= B.tongW[i]; if (c[i] > mx) mx = c[i]; }
+    if (mx > 0) for (i = 0; i < 12; i++) chroma[i] += c[i] / mx;
   }
-
+  var mn = Infinity;
+  for (i = 0; i < 12; i++) if (chroma[i] < mn) mn = chroma[i];
   var tong = 0;
-  for (i = 0; i < 12; i++) tong += chroma[i];
+  for (i = 0; i < 12; i++) { chroma[i] -= mn; tong += chroma[i]; }
   if (tong <= 0) return { key: '', tinCay: 0 };
   for (i = 0; i < 12; i++) chroma[i] /= tong;
 
-  // Thu ca 12 cung x 2 dieu, lay cai khop nhat
-  var tot = -2, gocTot = 0, thuTot = false, nhi = -2;
+  var tot = -2, gocTot = 0, thuTot = false;
   for (var g = 0; g < 12; g++) {
     var xoay = new Float64Array(12);
     for (i = 0; i < 12; i++) xoay[i] = chroma[(g + i) % 12];
-    var rT = tuongQuan(xoay, MAU_TRUONG);
-    var rt = tuongQuan(xoay, MAU_THU);
-    if (rT > tot) { nhi = tot; tot = rT; gocTot = g; thuTot = false; }
-    else if (rT > nhi) nhi = rT;
-    if (rt > tot) { nhi = tot; tot = rt; gocTot = g; thuTot = true; }
-    else if (rt > nhi) nhi = rt;
+    var rT = tuongQuan(xoay, MAU_TRUONG), rt = tuongQuan(xoay, MAU_THU);
+    if (rT > tot) { tot = rT; gocTot = g; thuTot = false; }
+    if (rt > tot) { tot = rt; gocTot = g; thuTot = true; }
   }
 
-  var ten = NOT[gocTot] + (thuTot ? 'm' : '');
-
-  /* ══════════════════════════════════════════
-     ☠️ TIN CAY — VIET LAI HOAN TOAN 09/08.
-     Cong thuc cu: `tot*0.6 + (tot-nhi)*2` — BI NGUOC.
-     No do KHOANG CACH giua hang nhat va hang nhi, chu khong do CO TONG HAY
-     KHONG. Hai bang mau Krumhansl co trong so chu am gan y het nhau (truong
-     6,35 · thu 6,33), nen tieng cang THUAN MOT CAO DO thi truong va thu cang
-     cham diem bang nhau -> (tot-nhi) sup ve 0 -> tin cay TUT.
-     Bang chung do that:
-       - chuong `bell_notification_3` (ro cao do nhat, nhon 0,091) -> chi 41%
-       - tieng `power down` pho phang                              -> 81%
-       - nhieu trang/xanh/hong/nau deu ra "Am" 51-78%, chroma trung nhau tung so
-     Tren ca kho anh Tien: **4.114/5.025 bai ra "Am" (82%)**.
-
-     Cong thuc moi dua vao **DO NHON cua chroma** (1 - entropy chuan hoa).
-     Do that de hieu chinh (nhom mau tach bach):
-       tap am  : nhon 0,006-0,022   tuong quan 0,78-0,80
-       nhac    : nhon 0,022-0,108   tuong quan 0,39-0,88
-       hop am  : nhon 0,249-0,452   tuong quan 0,82-0,92
-     => TUONG QUAN KHONG TACH DUOC (tap am con cao hon nhac). Chi DO NHON tach
-     duoc. Nen do nhon lam CONG CHINH, tuong quan chi lam he so phu.
-  ══════════════════════════════════════════ */
-  var H = 0;
-  for (i = 0; i < 12; i++) if (chroma[i] > 0) H -= chroma[i] * Math.log(chroma[i]);
-  var nhon = 1 - H / Math.log(12);            // 0 = phang tit, 1 = don mot cung
-
-  // Nguong lay tu so do o tren: 0,018 = tran cua tap am, 0,063 = nhac ro tong
-  var cong = Math.max(0, Math.min(1, (nhon - 0.018) / 0.045));
-  // Bang mau co that su khop khong — chi lam he so phu, khong quyet dinh
-  var khop = Math.max(0, Math.min(1, (tot - 0.5) / 0.35));
-  var tinCay = cong * (0.55 + 0.45 * khop);
+  /* TIN CAY = do khop bang mau. Do that 27/09 (60 giay dau moi file):
+       tap am (gio, xe co, song, tau dien)  khop 0,32-0,41 (rieng 1 tieng gio vu 0,61)
+       nhac that                            khop 0,41-0,93, phan lon >= 0,53
+     "Do nhon" dung cho ban cu KHONG con tach duoc (tap am 0,06-0,24 · nhac 0,07-0,32).
+     Nguong 0,42 dat ngay tren tran cum tap am; 0,72 tro len coi la chac. */
+  var tinCay = Math.max(0, Math.min(1, (tot - 0.42) / 0.30));
 
   return {
-    key: ten, tinCay: tinCay, nhon: nhon, khop: tot,
+    key: NOT[gocTot] + (thuTot ? 'm' : ''), tinCay: tinCay, khop: tot,
     chroma: Array.prototype.slice.call(chroma)
   };
 }
@@ -338,7 +311,7 @@ function phanTichNhac(duongDan, tongGiay) {
     var pho = tinhPho(x);
     if (!pho) return { bpm: 0, key: '', tinCayBpm: 0, tinCayKey: 0, loi: 'File qua ngan de do' };
     var b = doBPM(pho);
-    var k = doKey(pho);
+    var k = doKey(x);          // 27/09: key dung cua so rieng 8192, can mau goc
     return {
       bpm: b.bpm, tinCayBpm: b.tinCay,
       key: k.key, tinCayKey: k.tinCay,

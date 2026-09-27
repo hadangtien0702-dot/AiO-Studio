@@ -1,5 +1,9 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [2.1.1] - 2026-09-27 20:34 (UTC+7) - Tang so phien ban
+
+- manifest 2.1.0 -> 2.1.1 (mac dinh ngon ngu 'en' cua hub.js). Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.
+
 ## [2.1.0+] - 2026-09-27 18:03 (UTC+7) - Kiểm trên Premiere MÁY NHÀ + sửa mặc định ngôn ngữ
 
 - **Bối cảnh:** anh nhờ kiểm panel tổng trên máy nhà (vừa cài lại cả bộ 27/09 17:4x — 8 junction cũ

@@ -1,5 +1,11 @@
 # PROGRESS — AiO Auto Guiline Frame
 
+## [0.3.2] - 2026-09-27 20:34 (UTC+7) — Tăng số phiên bản
+
+- 0.3.1 -> 0.3.2 ở cả 3 nơi (manifest · `PHIEN_BAN` dist/index.html · `gf_phienBan()` host) + dòng đầu host.
+  Nội dung: ngôn ngữ chung + dịch EN. Host chỉ đổi chuỗi phiên bản → không chạy `thu-them-track.js`.
+  Cài lại bản ký 0.3.2 trên máy nhà; CHƯA kiểm trong Premiere (panel đang đóng). Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.
+
 ## 2026-09-27 18:18 — Dịch hết chế độ EN (anh: *"dịch luôn Guide Frame đi em"*)
 
 - **Sửa lại chỗ mục 18:08 ghi SAI:** "trước đây `lang` luôn 'vi', KHÔNG nhớ gì" — sai. Panel CÓ nhớ, qua

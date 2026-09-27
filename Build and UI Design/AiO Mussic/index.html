@@ -352,6 +352,16 @@ svg.ic.dim{stroke:var(--t3);}svg.ic.wh{stroke:#fff;}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dn-phu{font-size:var(--fs-2xs);color:var(--t4);margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* O tha nhac (27/09) — vien net dut, sang len khi dang keo qua */
+.o-tha{border:1.5px dashed var(--ln-2);border-radius:var(--r-lg);background:var(--bg-1);
+  padding:16px 12px 4px;text-align:center;transition:border-color var(--dur),background var(--dur);}
+.o-tha.dang-keo{border-color:var(--acc);background:var(--bg-3);}
+.o-tha-ic{width:22px;height:22px;stroke:var(--t3);}
+.o-tha.dang-keo .o-tha-ic{stroke:var(--acc);}
+.o-tha-chu{font-size:var(--fs-sm);font-weight:700;color:var(--t1);margin-top:6px;}
+.o-tha-phu{font-size:var(--fs-2xs);color:var(--t3);margin-top:2px;}
+.o-tha .dn-chon{border-top:1px solid var(--ln-1);margin-top:12px;text-align:left;}
+.o-tha *{pointer-events:none;}
 
 .do-ketqua{background:linear-gradient(180deg,var(--bg-3),var(--bg-1));
   border:1px solid var(--ln-1);border-radius:var(--r-xl);padding:18px;
@@ -688,7 +698,7 @@ svg.ic.dim{stroke:var(--t3);}svg.ic.wh{stroke:#fff;}
       </svg>
     </div>
     <span class="tb-name">AiO Music</span>
-    <span class="tb-ver">v2.0</span>
+    <span class="tb-ver">v2.1</span>
   </div>
 
   <div class="tb-tabs">
@@ -847,24 +857,22 @@ svg.ic.dim{stroke:var(--t3);}svg.ic.wh{stroke:#fff;}
 
         <!-- 1. Chon nguon — CUNG KHUON voi tab Tim BPM (anh Tien 08/08:
              *"phan tim key cung co the chon tu folder hoac tool giong tim bpm"*) -->
-        <div class="do-nguon">
-          <div class="do-nguon-tab">
-            <button class="dn-tab active" id="dn-tab-kho-k" onclick="doiNguonDoKey('kho')">
-              <svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-              Bài trong thư viện
-            </button>
-            <button class="dn-tab" id="dn-tab-seq-k" onclick="doiNguonDoKey('seq')">
-              <svg class="ic" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-              Clip trên timeline
-            </button>
-          </div>
+        <!-- 27/09/2026 anh Tien: *"cam nhac tu time-line va keo vao tool se ra key"*.
+             Thay 2 nut chon nguon bang MOT o tha + tu theo clip dang chon (ung-dung.js
+             muc KEO THA). Nut "Do Key" an di: tha / chon clip la tu do. -->
+        <div class="o-tha" id="o-tha">
+          <svg class="ic o-tha-ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <div class="o-tha-chu">Kéo nhạc thả vào đây</div>
+          <div class="o-tha-phu">hoặc bấm chọn clip nhạc trên timeline</div>
           <div class="dn-chon">
-            <div class="dn-ten" id="dnk-ten">Chưa chọn bài nào</div>
-            <div class="dn-phu" id="dnk-phu">Bấm ▶ một bài ở tab Thư Viện để chọn</div>
+            <div class="dn-ten" id="dnk-ten">Chưa có bài nào</div>
+            <div class="dn-phu" id="dnk-phu"></div>
           </div>
         </div>
+        <!-- Giu 2 nut cu (an) vi code cu con goi toi id cua chung -->
+        <div hidden><button id="dn-tab-kho-k"></button><button id="dn-tab-seq-k"></button></div>
 
-        <button class="analyze-bpm-btn" id="nut-do-key" onclick="analyzeKey()">
+        <button class="analyze-bpm-btn" id="nut-do-key" onclick="analyzeKey()" style="display:none">
           <svg class="ic" style="width:12px;height:12px" viewBox="0 0 24 24"><circle cx="7.86" cy="12" r="3"/><path d="M10.13 12H22M22 9v6"/></svg>
           Đo Key
         </button>

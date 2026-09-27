@@ -1,5 +1,46 @@
 # PROGRESS — AiO Music (BGM & Sound Effects Manager)
 
+## [1.0.1 · UI v2.1] - 2026-09-27 20:34 (UTC+7) — Tăng số phiên bản
+
+- manifest 1.0.0 -> 1.0.1, nhãn topbar v2.0 -> v2.1 (bộ đo key mới + ô thả, mục ngay dưới). Luật /xong 2b.
+
+## 2026-09-27 20:32 — BỘ ĐO KEY SAI HỆ THỐNG → viết lại · ô thả nhạc + tự theo clip đang chọn
+
+- **Bối cảnh:** anh: *"tool này nó khá là chưa ổn"* → *"editor sẽ download nhạc bằng video download của mình xong
+  sẽ tìm bài đó là đang ở key nào trong time-line"* → *"cầm nhạc từ time-line và kéo vào tool sẽ ra key"*.
+  Anh chọn "đo độ chính xác trước rồi làm".
+- **Đo (máy nhà, kho 10.673 file):** 96% (10.283) file < 30 s = SFX. Ground truth rẻ KHÔNG có: 376 bài ≥ 30 s chỉ
+  5 bài có TKEY, 2 trong đó là "A" bắt nhầm từ tên. Key trên web (Tunebat, SongBPM) cũng là máy đo và cãi nhau
+  (After Dark: Gm vs Ab) → chỉ tham khảo.
+- **Phép đo KHÔNG cần đáp án** (scratchpad `do-key/do-dich-cao-do.cjs`): bài thật nâng k nửa cung (asetrate +
+  atempo, giữ tốc độ), bộ đo đúng phải ra key + k. 12 bài thật × 12 mức + 1 ĐỐI CHỨNG (hợp âm Am tổng hợp).
+  | Bộ đo | Dịch đúng | Ra F/C | Đối chứng |
+  |---|---|---|---|
+  | **Cũ** (cửa sổ 2048) | **32/143 = 22,4%** | 54,5% (tự nhiên ~16,7%) | 10/11 |
+  | Mới + Krumhansl | 73,4% | 21,8% | 11/11 |
+  | Mới + Albrecht–Shanahan | 74,8% | 20,5% | 11/11 |
+  | **Mới + Temperley (đã dùng)** | **113/143 = 79,0%** | 19,9% | 11/11 |
+  Cũ không bao giờ ra B/Bm (156 lần đo, 0 lần).
+- **Gốc:** 2048 mẫu ở 22.050 Hz = 10,8 Hz/ô FFT; dưới ~180 Hz hai nốt liền nhau cách < 1 ô → vùng BASS (nhiều
+  thông tin key nhất) bị đếm theo kiểu "trúng ô nào tính ô đó". Hợp âm test tháng 8 nằm 110–330 Hz nên qua.
+  Hai bẫy đã vấp khi viết bản mới: nén log đẩy nền tạp âm → lệch G#m (25,9%); tổng trọng số ô không chia
+  theo nốt → lệch lại.
+- **Đã sửa:** `phan-tich.js` khối KEY viết lại (cửa sổ riêng 8192 = 2,7 Hz/ô, gán ô → nốt gần nhất, chia tổng
+  trọng số từng nốt, biên độ tuyến tính, Temperley). BPM giữ nguyên. Độ tin cậy = độ khớp bảng mẫu (tạp âm
+  0,32–0,41, nhạc phần lớn ≥ 0,53; "độ nhọn" cũ không còn tách được). `nen.js`: `PHIEN_BAN_DO = 2`, kết quả lưu
+  không có `v` = coi như chưa đo → đo ngầm tự đo lại cả kho (đo: 18 file/s, ~5 phút). Kiểm file của tool bằng
+  cùng bàn đo: 113/143 (khớp bản thử).
+- **Giao diện màn Key:** 2 nút chọn nguồn + nút "Đo Key" → MỘT ô "Kéo nhạc thả vào đây / hoặc bấm chọn clip nhạc
+  trên timeline", thả là đo; panel hỏi clip đang chọn mỗi 1,5 s CHỈ khi đang ở màn Key (hàm host 2–29 ms trên
+  sequence "Tap 2"); kết quả kèm key song song ("Sol trưởng · cùng bộ nốt với Em"). Đo trong Premiere: Another
+  Love → G · cùng bộ nốt với Em, 0,93 s. Mỗi lần thả ghi kiểu dữ liệu vào `%APPDATA%\AiOMusic\tha-vao.log`.
+- ☠️ **TẠM:** `bin/win64/ffmpeg.exe` = ffmpeg-static (GPL) chép từ node_modules để đo trên máy nhà (máy nhà
+  không có LGPL). bin/ bị gitignore. KHÔNG đóng gói — thay bản LGPL N-125829 trước khi làm bộ cài.
+- **[CHỜ ANH] chưa đo được:** (1) kéo file từ Explorer vào ô · (2) kéo THẲNG clip từ timeline vào ô — Premiere có
+  đưa đường dẫn sang không (ghi chú cũ Asset Manager nói "không", không rõ đã đo) — đọc `tha-vao.log` sau lần kéo
+  đầu · (3) bấm clip nhạc trên timeline → tự ra key · (4) tai anh nghe thử vài bài xem key có đúng không.
+  Panel vẫn mở vào tab Thư viện, tab Key là icon chìa khoá không chữ — chưa đổi, hỏi anh.
+
 ## 2026-09-21 15:37 — cài lại vào Premiere MÁY CÔNG TY
 Anh nhờ "mở lại trong extension PR". Đo: `%APPDATA%\Adobe\CEP\extensions` có 9 panel AiO nhưng KHÔNG có
 `com.aiostudio.music` (bản ghi 08/08 chỉ cài ở máy nhà). Tạo junction
@@ -7,14 +48,17 @@ Anh nhờ "mở lại trong extension PR". Đo: `%APPDATA%\Adobe\CEP\extensions`
 `manifest.xml` đọc được qua junction. Cổng 8097 trống (brain-map không chạy). ☠️ SỬA 15:4x: em ghi "Premiere đang TẮT" là SAI — `Get-Process -Name "Adobe Premiere Pro"` khớp tên CHÍNH XÁC nên mù với "Adobe Premiere Pro (Beta)" (PID 29100, mở 15:32, TRƯỚC khi tạo junction) → Premiere chưa quét thấy panel, phải tắt mở lại. Dò tiến trình Premiere bằng `-like "*Premiere*"`.
 CHƯA đo panel mở trong Premiere — chờ anh mở Window > Extensions (AiO) > Music.
 
-## TRANG THAI HIEN TAI (cap nhat 2026-08-08 19:58)
+## TRANG THAI HIEN TAI (cap nhat 2026-09-27 20:35)
 
-- **Phien ban:** v2.0 UI + da thanh EXTENSION CEP THAT (truoc do chi la file
-  index.html roi, Premiere khong nhan).
+- **Phien ban:** manifest 1.0.1 · nhan UI v2.1. Viec chinh anh can (27/09): **tim KEY cua bai nhac dang dung tren
+  timeline** (nhac tai bang Video Download). Bo do key VIET LAI 27/09 (22,4% -> 79,0%), man Key = o tha + tu theo
+  clip dang chon. [CHO ANH] thu keo tha tu Explorer / tu timeline, bam clip, nghe kiem key (xem muc 27/09 20:32).
 - **Extension ID:** `com.aiostudio.music` - cong debug `8097`.
-- **Da cai vao Premiere may nha** bang junction:
-  `%APPDATA%\Adobe\CEP\extensions\com.aiostudio.music` -> `D:\Production\AiO Studio\AiO Mussic`.
-  Ca 8 panel deu cai kieu nay, build lai la tu cap nhat.
+- **Cai vao Premiere bang junction** `%APPDATA%\Adobe\CEP\extensions\com.aiostudio.music` -> thu muc NAY
+  (`...\Build and UI Design\AiO Mussic`). ☠️ Junction cu tro `D:\Production\AiO Studio\AiO Mussic` (truoc lan to chuc
+  lai 14/08) da CHET im lang tren may nha tu 14/08 toi 27/09 — dung duong dan moi.
+- ☠️ Dang dung ffmpeg-static (GPL) TAM trong `bin/win64` tren may nha — khong dong goi.
+- Viec cho cu o CLAUDE.md goc: "doi AiO Music thanh Keynote" (anh giao 21/09) — chua lam, anh chua noi Keynote lam gi.
 - **UI da RESPONSIVE** - do that o 320 / 420 / 560 / 900 px, khong tran ngang.
 
 ### ☠️ CO THAT CUA USER LA 300-450px, KHONG PHAI MAN RONG

@@ -1,5 +1,9 @@
 # AiO Auto Podcast - Nhat ky
 
+## [ui-0.6.7] - 2026-09-27 20:34 (UTC+7) - Tang so phien ban giao dien
+
+- Nhan giao dien v0.6.6 -> v0.6.7 (ngon ngu chung). Manifest VAN 0.1.0 (cho anh gat, viec cho o CLAUDE.md goc). Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.
+
 ## [ngon-ngu-chung] - 2026-09-27 18:08 +0700 - Theo ngon ngu CHUNG ca bo (truoc day localStorage rieng, mac dinh vi)
 
 - **Boi canh:** anh nho kiem panel tong (27/09) -> em thay Podcast, Re-Frames, Guide Frame KHONG doc file ngon ngu

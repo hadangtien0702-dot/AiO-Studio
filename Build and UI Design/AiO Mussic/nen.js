@@ -313,11 +313,18 @@ function docSongAmCoDem(duongDan, soVach) {
  * hang chuc phut. Giu chroma (12 so) thi tinh lai tin cay chi mat vai giay.
  * Tra gia: file dem to them ~1 MB cho ca kho. Rat dang.
  */
+/* ☠️ PHIEN BAN BO DO — tang so nay moi khi doi cach do BPM/Key.
+   27/09/2026: len 2 vi bo do key cu SAI HE THONG (dich dung cao do 22,4%,
+   54,5% ket qua ra F/C — xem phan-tich.js khoi KEY). Ket qua luu tu ban cu
+   (khong co truong v) bi coi nhu CHUA DO -> do ngam tu dong do lai. */
+var PHIEN_BAN_DO = 2;
+
 function luuPhanTich(duongDan, kq) {
   var vt = vanTay(duongDan);
   if (!DEM.du[duongDan]) DEM.du[duongDan] = { vt: vt, m: {} };
   DEM.du[duongDan].vt = vt;
   DEM.du[duongDan].pt = {
+    v: PHIEN_BAN_DO,
     bpm: kq.bpm, key: kq.key,
     tinCayBpm: kq.tinCayBpm, tinCayKey: kq.tinCayKey,
     loi: kq.loi || '',
@@ -328,7 +335,7 @@ function luuPhanTich(duongDan, kq) {
 }
 function layPhanTich(duongDan) {
   var cu = DEM.du[duongDan];
-  if (cu && cu.vt === vanTay(duongDan) && cu.pt) return cu.pt;
+  if (cu && cu.vt === vanTay(duongDan) && cu.pt && cu.pt.v === PHIEN_BAN_DO) return cu.pt;
   return null;
 }
 

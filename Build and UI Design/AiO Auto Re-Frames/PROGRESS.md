@@ -1,5 +1,9 @@
 # AiO Auto Re-Frames - Nhat ky
 
+## [0.6.1] - 2026-09-27 20:34 (UTC+7) - Tang so phien ban
+
+- manifest + nhan topbar 0.6.0 -> 0.6.1 (ngon ngu chung). Cai lai ban ky tren may nha. Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.
+
 ## [0.6.0+] - 2026-09-27 18:08 (UTC+7) - Theo ngon ngu CHUNG ca bo (truoc day localStorage rieng, mac dinh vi)
 
 - **Boi canh:** anh nho kiem panel tong (27/09) -> em thay Podcast, Re-Frames, Guide Frame KHONG doc file ngon ngu
