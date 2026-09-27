@@ -304,7 +304,7 @@ Claude đăng nhập TÀI KHOẢN KHÁC (403 scope), đừng dùng nó cho dự 
 WebDessign: No such file`. Sửa: `vercel.json` RIÊNG trong thư mục web (install/build = echo, output = `.`). Đừng sửa file gốc.
 Thử thật 23/09: push ngoài thư mục web → CANCELED (đúng); push có đổi web → READY, md5 live = local. ☠️ `vercel link` tự tạo
 `.env.local` chứa token OIDC, mà danh sách bỏ qua mặc định của Vercel KHÔNG có `.env*` → đã chặn bằng `.vercelignore`
-(`.env*`, `.vercel`, 2 file ignore); đo live: `/.env.local` 404. Sau mỗi deploy: curl md5 live = file local.
+(`.env*`, `.vercel`, 2 file ignore); đo live: `/.env.local` 404. Sau mỗi deploy: curl md5 live = **`git show HEAD:"Website/AiO ShotSave Web/index.html" | md5sum`** — ☠️ KHÔNG so với file trong máy: trên Windows file máy là CRLF, git/Vercel là LF → md5 luôn lệch dù web đúng (vấp 27/09: tưởng deploy hỏng, thật ra khớp từng byte với git).
 
 **Thư cảm ơn khách mua Shot & Save** (25/09, anh chốt kiểu thẻ Apple): `Website/AiO ShotSave Web/email/cam-on-mua.{vi,en}.html`
 (ô trống `{{license_key}}`…`{{asset_base}}`), ảnh PNG @2x `img/email/` (Gmail bỏ SVG); `email/` nằm trong `.vercelignore`.

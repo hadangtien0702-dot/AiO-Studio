@@ -34,6 +34,9 @@ phiên bản kẹt ở 0.5.5 trong khi app đã 0.6.4.
 ### Luật 2 — Một người dựng, người kia soát; mỗi app một người cầm bút tại một thời điểm
 - **Gemini dựng** (tính năng / sửa lỗi) trên nhánh `gemini` → **BÀN GIAO** → dừng sửa app đó.
 - **Claude soát**: đọc mã, chạy bài kiểm, đo; sửa nếu cần; **gộp vào `main`**; đóng gói + cài cho anh; báo anh.
+- **Web bán hàng Shot & Save (`Website/AiO ShotSave Web/`) = việc của Claude** (anh chốt 27/09: *"Gemini phát
+  triển tính năng, em đem lên web"*). Gemini không sửa thư mục web; tính năng mới xong + đã gộp `main` thì Claude đưa
+  lên web, **chỉ quảng cáo thứ có thật trong mã app** và đã soát.
 - Anh có thể đổi vai (Claude dựng, Gemini soát) — khi đó đổi chữ trong luật này cho khớp, đừng làm ngầm.
 - **Anh là người báo "tới lượt ai"**. Chưa tới lượt thì chỉ ĐỌC app đó, không sửa.
 
