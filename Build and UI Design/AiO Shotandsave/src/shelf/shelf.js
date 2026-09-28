@@ -168,9 +168,22 @@ window.addEventListener('wheel', (e) => {
 
 /* ── Nut tren thanh ──────────────────────────────────────────────────── */
 
+document.getElementById('storyboard')?.addEventListener('click', () => {
+  if (listEl.children.length === 0) return
+  window.shelf.openStoryboard()
+})
 document.getElementById('folder').addEventListener('click', () => window.shelf.openFolder())
 document.getElementById('clear').addEventListener('click', () => window.shelf.clear())
 document.getElementById('hide').addEventListener('click', () => window.shelf.hide())
+
+window.addEventListener('keydown', (e) => {
+  if (e.target.matches('input, textarea, [contenteditable="true"]')) return
+  if ((e.key === 's' || e.key === 'S') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (listEl.children.length === 0) return
+    e.preventDefault()
+    window.shelf.openStoryboard()
+  }
+})
 
 /* ── Keo thanh tren de doi cho khay ──────────────────────────────────── */
 

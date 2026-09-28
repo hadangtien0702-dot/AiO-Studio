@@ -369,6 +369,7 @@ function rebuildTrayMenu() {
     { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
+    { label: T('khay.storyboard'), click: () => openStoryboardWindow() },
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
@@ -457,6 +458,42 @@ function openSettings() {
   settingsWin.loadFile(path.join(__dirname, 'settings', 'index.html'))
   settingsWin.once('ready-to-show', () => settingsWin.show())
   settingsWin.on('closed', () => { settingsWin = null })
+}
+
+/* --- Cua so Multi-Shot Storyboard Strip --- */
+let storyboardWin = null
+function openStoryboardWindow() {
+  if (storyboardWin && !storyboardWin.isDestroyed()) {
+    storyboardWin.show()
+    storyboardWin.focus()
+    return
+  }
+
+  const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+  const wa = d.workArea
+  const w = Math.min(1080, Math.round(wa.width * 0.88))
+  const h = Math.min(700, Math.round(wa.height * 0.8))
+  const x = wa.x + Math.round((wa.width - w) / 2)
+  const y = wa.y + Math.round((wa.height - h) / 2)
+
+  storyboardWin = new BrowserWindow({
+    x, y, width: w, height: h,
+    minWidth: 640, minHeight: 460,
+    frame: false,
+    title: 'AiO Shot & Save - Storyboard Strip',
+    backgroundColor: '#090a0d',
+    show: false,
+    alwaysOnTop: true,
+    icon: path.join(__dirname, '..', 'assets', 'app.ico'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload-storyboard.js'),
+      contextIsolation: true, sandbox: false,
+    },
+  })
+
+  storyboardWin.loadFile(path.join(__dirname, 'storyboard', 'index.html'))
+  storyboardWin.once('ready-to-show', () => storyboardWin.show())
+  storyboardWin.on('closed', () => { storyboardWin = null })
 }
 
 ipcMain.handle('settings:get', () => {
@@ -1624,6 +1661,84 @@ ipcMain.on('shelf:drag-end', (e) => ketThucKeo(e.sender.id))
 ipcMain.on('settings:drag-start', (e) => batDauKeo(BrowserWindow.fromWebContents(e.sender), e.sender.id))
 ipcMain.on('settings:drag-to', (e, tongDx, tongDy) => keoDen(BrowserWindow.fromWebContents(e.sender), e.sender.id, tongDx, tongDy))
 ipcMain.on('settings:drag-end', (e) => ketThucKeo(e.sender.id))
+
+/* ── Storyboard Strip IPC ────────────────────────────────────────────── */
+ipcMain.on('shelf:open-storyboard', () => openStoryboardWindow())
+
+ipcMain.handle('storyboard:get-data', () => {
+  const items = []
+  for (const it of shelfItems.values()) {
+    const sz = it.image.getSize()
+    let kb = 0
+    try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
+    const maxH = 1080
+    const imgResized = (sz.height && sz.height > maxH) ? it.image.resize({ height: maxH, quality: 'best' }) : it.image
+    const dataUrl = 'data:image/jpeg;base64,' + imgResized.toJPEG(92).toString('base64')
+    items.push({
+      id: it.id,
+      seq: it.seq || it.id,
+      filePath: it.filePath,
+      w: sz.width,
+      h: sz.height,
+      kb,
+      dataUrl,
+    })
+  }
+  return { items, lang }
+})
+
+ipcMain.handle('storyboard:copy', (_e, dataUrl) => {
+  if (!dataUrl) return { ok: false }
+  try {
+    const img = nativeImage.createFromDataURL(dataUrl)
+    clipboard.writeImage(img)
+    ghiLog('storyboard chep vao clipboard: OK')
+    return { ok: true }
+  } catch (err) {
+    ghiLog('storyboard copy LOI: ' + err.message)
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.handle('storyboard:save', (_e, dataUrl) => {
+  if (!dataUrl) return { ok: false }
+  try {
+    const img = nativeImage.createFromDataURL(dataUrl)
+    const dir = kho.baoDamThuMuc(kho.thuMucAnh())
+    const d = new Date()
+    const p = (v, k) => String(v).padStart(k || 2, '0')
+    const tenFile = 'shotandsave-storyboard-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+      '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '.png'
+    const filePath = path.join(dir, tenFile)
+    fs.writeFileSync(filePath, img.toPNG())
+    ghiLog('storyboard luu file: ' + filePath)
+    shelfAdd(img, filePath)
+    return { ok: true, filePath }
+  } catch (err) {
+    ghiLog('storyboard save LOI: ' + err.message)
+    return { ok: false, error: err.message }
+  }
+})
+
+ipcMain.on('storyboard:start-drag', (e, dataUrl) => {
+  if (!dataUrl) return
+  try {
+    const img = nativeImage.createFromDataURL(dataUrl)
+    const dir = kho.baoDamThuMuc(kho.thuMucKeo())
+    const filePath = path.join(dir, 'storyboard-strip.png')
+    fs.writeFileSync(filePath, img.toPNG())
+    const duong = kho.duongDanKeoAnToan(filePath)
+    e.sender.startDrag({ file: duong, icon: img.resize({ height: 80, quality: 'best' }) })
+    ghiLog('storyboard startDrag: ' + duong)
+  } catch (err) {
+    ghiLog('storyboard startDrag LOI: ' + err.message)
+  }
+})
+
+ipcMain.on('storyboard:close', (e) => {
+  const w = BrowserWindow.fromWebContents(e.sender)
+  if (w && !w.isDestroyed()) w.close()
+})
 
 /* ── DOI CO khay bang tay nam goc TREN-TRAI (anh Tien 14/09 "keo cai khay to ra") ──
    Cung luat voi keo di chuyen: neo bounds mot lan, renderer gui delta TUYET DOI,

@@ -25,6 +25,7 @@ contextBridge.exposeInMainWorld('shelf', {
   remove: (id) => ipcRenderer.send('shelf:remove', id),
   clear: () => ipcRenderer.send('shelf:clear'),
   openFolder: () => ipcRenderer.send('shelf:open-folder'),
+  openStoryboard: () => ipcRenderer.send('shelf:open-storyboard'),
   hide: () => ipcRenderer.send('shelf:hide'),
 
   /* Keo: neo mot lan roi gui delta TUYET DOI tu luc bat dau — khong gui delta

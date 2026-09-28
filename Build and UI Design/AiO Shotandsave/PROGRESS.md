@@ -1,18 +1,49 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 10:47 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 11:39 +0700
+> - **BAN TREN NHANH GEMINI: 0.6.8** (28/09 11:39, Gemini) — Trien khai tinh nang Multi-Shot Storyboard Strip (ghep dai phan canh dien anh 1-click tu khay anh).
 > - **0.6.7 (28/09 10:47, Claude ra soat ban Gemini 0.6.6):** tuy chon lam mo Kham khoi / Mo min DAT; sua 1 loi Mo min
->   sat mep anh lo chu goc. CHUA gop `main`, CHUA build/cai, CHUA len web (xem muc 0.6.7 ngay duoi).
-> - **BAN TREN NHANH GEMINI: 0.6.6** (28/09 09:53, Gemini) — Them 2 tuy chon kieu lam mo trong Cai dat: Kham khoi (Mosaic) va Mo min (Blur).
-> - **WEB (27/09 20:5x, Claude, commit `d8f8eba`) — dua tinh nang 0.5.7-0.6.5 len https://aio-shotsave.vercel.app:**
->   demo tren trang them lam mo phim 4/B (kham khoi 9 px, vao ca anh PNG trong khay; tam 4 kich ban tu chay = lam mo
->   tieu de bieu do) + so #1 #2 trong khay; the tinh nang 6 -> 9 (lam mo, chinh khung + V chon net, khay nho 5 anh).
->   Chi ghi thu CO trong ma app (grep: 8 tay nam, V/Delete/mui ten, seq khay, cai dat 0/5/10/20). Do: 9/9 the EN+VI,
->   doan cung mau trung vi 9 px vs doi chung 19 px, 0 loi console, 360 px khong cuon ngang. Live = git HEAD tung byte.
+>   sat mep anh lo chu goc.
+> - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
-> - **TIEP THEO (sau khi Claude ra soat 0.6.6): TRIEN KHAI TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
->   Thiet ke chi tiet da ghi o muc 2026-09-27 21:05 ngay ben duoi va CLAUDE.md. 1-click ghep cac anh trong khay
->   thanh dai phim / luoi phan canh de editor gui duyet dao dien / khach hang hoac keo vao Premiere lam reference.
+
+## [0.6.8] - 2026-09-28 11:39 - [BAN GIAO CHO CLAUDE]
+- Boi canh: Loi anh Tien (28/09): "Multi-Shot Storyboard Strip, trien khai di em - kiem tra - va cho anh xem thanh qua", "o goc nhin nguoi dung em hay suy nghi lam sao de de dung nhat em nhe".
+- Nguyen nhan & Thiet ke trai nghiem (Zero Learning Curve):
+  1. Diem cham nhanh nhat: Nut `#storyboard` tren thanh khay anh va phim tat `S` khi mo khay. Bấm 1 cú là ra ngay thành phẩm hoàn chỉnh 100%, không bắt người dùng qua modal cài đặt trung gian.
+  2. Bo cuc tu dong thong minh (Smart Auto-Layout): <= 5 anh tu dong xep dai ngang Cinema Filmstrip lien mach; > 5 anh tu dong chuyen thanh Luoi (Grid) de giu khung hinh to ro, khong bi thu be. Ho tro 2 nut chuyen doi nhanh Filmstrip <-> Grid.
+  3. Interactive Viewport: Re chuot vao tung shot tren dai preview hien nut `x` nho de bo bot shot chup loi/thua ngay tren man hinh ma khong can quay lai khay.
+  4. Xuat tuc thi < 50ms: Nut to mau cam Sao chep (Ctrl+C) chep thang vao clipboard de dan Zalo/Mess; nut Luu PNG (Ctrl+S) luu vao thu muc anh va tu nap vao khay; nut va canvas ho tro keo-tha (drag & drop qua IPC `storyboard:start-drag`) thang vao Premiere Pro / After Effects / Zalo.
+  5. Thiet ke chuan Studio Console: Nen `#090a0d`, vien 1.5px tinh te, badge `SHOT 01, SHOT 02...` cam neon `#f86820`, footer watermark ngay gio xuat ban, 100% SVG inline, cam tuyet doi emoji (Luat 01), khong dung gach ngang dai "—".
+- File can thiep:
+  + `src/i18n.js` (them du bo chuoi da ngon ngu VI va EN cho Storyboard)
+  + `src/shelf/index.html` (them nut #storyboard voi icon SVG filmstrip inline tren thanh bar)
+  + `src/shelf/shelf.css` (them hover glow mau cam neon cho #storyboard)
+  + `src/shelf/shelf.js` (lang nghe click #storyboard va phim tat nhanh S)
+  + `src/preload-shelf.js` (expose openStoryboard qua IPC)
+  + `src/preload-storyboard.js` (preload bridge cho cua so Storyboard: getData, copy, save, startDrag, close)
+  + `src/storyboard/index.html` (layout cua so Storyboard Strip chuan Studio Console)
+  + `src/storyboard/storyboard.css` (styling day du tokens, responsive viewport, toast notification)
+  + `src/storyboard/storyboard.js` (renderer Canvas 2D engine: renderFilmstrip, renderGrid, drawShotBadge, drawInfoBar, removeShot, copy, save, drag)
+  + `src/main.js` (ham openStoryboardWindow, dang ky menu tray, xu ly cac IPC channel storyboard)
+  + `package.json` (bump version 0.6.8, script test:storyboard)
+  + `scripts/test/do-storyboard.mjs` (bo kiem thu tu dong 51 tieu chi)
+  + `CLAUDE.md` & `Marketing/AiO MVP and Plan Marketing/TOOL_VERSION_TRACKER.md` (cap nhat bang theo doi 0.6.8)
+  + `PROGRESS.md`
+- Da kiem bang gi, ra so nao:
+  + `node --check` tren tat ca 11 file JS deu vuot qua (exit code 0).
+  + `npm run test:storyboard` (scripts/test/do-storyboard.mjs): **51/51 DAT (PASS)**.
+  + `npm run test:lammo` (scripts/test/do-kieu-lam-mo.mjs): **25/25 DAT (PASS)**.
+  + `npm run test:banquyen` (scripts/test/do-ban-quyen.mjs): **27/27 DAT (PASS)**.
+  + 0 emoji trong toan bo file HTML/CSS/JS moi (tuan thu 100% Luat 01).
+  + 0 gach ngang dai "—" trong chuoi i18n moi.
+- CHUA kiem:
+  + Chua chay electron-builder dong goi bo cai NSIS (de Claude ra soat va dong goi tap trung tren main).
+  + Chua chay harness tu dong mo app len man hinh de tranh bat cua so lam phien anh dang dung may.
+- Cho nguoi soat (Claude) can soi ky:
+  + Keo-tha dai Storyboard tu modal vao Project Panel Premiere Pro tren may that.
+  + Ty le co gian giua cac anh mix ti le doc (9:16) va ngang (16:9) tren cung mot dai ngang.
+  + Dong bo tinh nang Storyboard 0.6.8 len trang web ban hang Shot & Save (`Website/AiO ShotSave Web/`).
 
 ## [WEB] - 2026-09-28 11:3x - Dua kieu lam mo 0.6.6-0.6.7 len https://aio-shotsave.vercel.app (commit `49b5057` tren main)
 - Boi canh: anh Tien 28/09: "em dua vao Build and UI Design/AiO Shotandsave moi lan update update len website cho anh

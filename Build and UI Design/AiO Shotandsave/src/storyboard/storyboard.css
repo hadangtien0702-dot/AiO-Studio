@@ -1,0 +1,386 @@
+/* Studio Console — Multi-Shot Storyboard Strip */
+:root {
+  --acc: #f86820;
+  --acc-soft: rgba(248, 104, 32, 0.15);
+  --acc-glow: rgba(248, 104, 32, 0.35);
+  --bg-0: #090a0d;
+  --bg-1: #0d0e12;
+  --bg-2: #161820;
+  --bg-hover: rgba(255, 255, 255, 0.07);
+  --t1: #eeeef2;
+  --t2: #a1a3b5;
+  --t3: #6f7185;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.15);
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-pill: 9999px;
+  --header-h: 46px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-0);
+  color: var(--t1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Header Studio Console ───────────────────────────────────────────── */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding: 0 14px;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--line);
+  -webkit-app-region: drag;
+}
+
+#header-left,
+#header-center,
+#header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  -webkit-app-region: no-drag;
+}
+
+#logo {
+  display: inline-flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+#title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  letter-spacing: -0.2px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--acc);
+  background: var(--acc-soft);
+  border: 1px solid rgba(248, 104, 32, 0.3);
+  border-radius: var(--r-pill);
+}
+
+/* Segmented Layout Group */
+.layout-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-2);
+  padding: 2px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+}
+
+.btn-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--t3);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tool:hover {
+  color: var(--t1);
+  background: var(--bg-hover);
+}
+
+.btn-tool.active {
+  background: var(--acc);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.opt-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--line);
+}
+
+/* Checkbox Toggle */
+.opt-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--t2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.opt-label input[type="checkbox"] {
+  display: none;
+}
+
+.custom-chk {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.opt-label input:checked + .custom-chk {
+  background: var(--acc);
+  border-color: var(--acc);
+}
+
+.opt-label input:checked + .custom-chk::after {
+  content: '';
+  width: 4px;
+  height: 7px;
+  border: solid #ffffff;
+  border-width: 0 1.8px 1.8px 0;
+  transform: rotate(45deg);
+  margin-top: -1px;
+}
+
+/* Action Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  background: var(--acc);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px var(--acc-glow);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+}
+
+.btn-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  background: var(--bg-2);
+  color: var(--t1);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-sub:hover {
+  background: var(--bg-hover);
+  border-color: var(--line-strong);
+  color: #ffffff;
+}
+
+.btn-sub:active {
+  transform: scale(0.96);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  color: var(--t3);
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-icon:hover {
+  background: var(--bg-hover);
+  color: var(--t1);
+}
+
+#btn-close:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+#btn-drag {
+  cursor: grab;
+}
+
+#btn-drag:active {
+  cursor: grabbing;
+}
+
+/* ── Viewport Area ───────────────────────────────────────────────────── */
+#viewport {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at center, #11131a 0%, #08090c 100%);
+  position: relative;
+}
+
+#canvas-wrapper {
+  position: relative;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-lg);
+  overflow: visible;
+  line-height: 0;
+  cursor: grab;
+}
+
+#canvas-wrapper:active {
+  cursor: grabbing;
+}
+
+#main-canvas {
+  display: block;
+  border-radius: var(--r-lg);
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+}
+
+/* Interactive Shot Overlay for Quick Removal */
+#shot-overlays {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.shot-target-box {
+  position: absolute;
+  pointer-events: auto;
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s ease;
+  border-radius: var(--r-sm);
+}
+
+.shot-target-box:hover {
+  border-color: rgba(248, 104, 32, 0.6);
+}
+
+.shot-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-pill);
+  background: rgba(9, 10, 13, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--t2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all 0.15s ease;
+}
+
+.shot-target-box:hover .shot-remove-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.shot-remove-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+}
+
+/* ── SVG Icons ───────────────────────────────────────────────────────── */
+svg.ic {
+  display: inline-block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+svg.ic-sm { width: 13px; height: 13px; }
+svg.ic-md { width: 15px; height: 15px; }
+
+/* ── Toast Notification ──────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg-1);
+  color: var(--t1);
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--acc);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px var(--acc-soft);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

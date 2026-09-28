@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data: blob: file:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO — Storyboard Strip</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="storyboard.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Thanh tieu de & dieu khien Studio Console -->
+    <header id="header">
+      <div id="header-left">
+        <span id="logo" aria-hidden="true">
+          <svg viewBox="0 0 385.89 351.31" width="14" height="13">
+            <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+            <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+          </svg>
+        </span>
+        <span id="title" data-i18n="sb.tieuDe">Dải phân cảnh Storyboard</span>
+        <span id="shot-badge" class="badge">0 SHOTS</span>
+      </div>
+
+      <div id="header-center">
+        <!-- Chuyen doi bo cuc nhanh -->
+        <div class="layout-group" role="radiogroup" aria-label="Bố cục">
+          <button id="btn-filmstrip" class="btn-tool active" data-layout="filmstrip" data-i18n-title="sb.ngang">
+            <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <path d="M7 5v14M17 5v14M2 9h20M2 15h20"/>
+            </svg>
+            <span data-i18n="sb.ngang">Dải cuộn phim</span>
+          </button>
+          <button id="btn-grid" class="btn-tool" data-layout="grid" data-i18n-title="sb.luoi">
+            <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="14" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span data-i18n="sb.luoi">Lưới</span>
+          </button>
+        </div>
+
+        <div class="opt-separator"></div>
+
+        <!-- Tuy chon nhanh -->
+        <label class="opt-label" data-i18n-title="sb.nhanShot">
+          <input type="checkbox" id="chk-shot-badge" checked />
+          <span class="custom-chk"></span>
+          <span data-i18n="sb.nhanShot">Nhãn SHOT</span>
+        </label>
+        <label class="opt-label" data-i18n-title="sb.thongTin">
+          <input type="checkbox" id="chk-info-bar" checked />
+          <span class="custom-chk"></span>
+          <span data-i18n="sb.thongTin">Ngày giờ</span>
+        </label>
+      </div>
+
+      <div id="header-right">
+        <!-- Nut Copy Primary CTA -->
+        <button id="btn-copy" class="btn-primary" data-i18n-title="sb.copy">
+          <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span data-i18n="sb.copy">Sao chép (Ctrl+C)</span>
+        </button>
+
+        <!-- Nut Luu PNG -->
+        <button id="btn-save" class="btn-sub" data-i18n-title="sb.luu">
+          <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          <span data-i18n="sb.luu">Lưu PNG</span>
+        </button>
+
+        <!-- Nut Keo-tha -->
+        <button id="btn-drag" class="btn-icon" draggable="true" data-i18n-title="sb.keo">
+          <svg class="ic ic-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="5 9 2 12 5 15"/>
+            <polyline points="9 5 12 2 15 5"/>
+            <polyline points="15 19 12 22 9 19"/>
+            <polyline points="19 9 22 12 19 15"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
+          </svg>
+        </button>
+
+        <!-- Nut Dong -->
+        <button id="btn-close" class="btn-icon" data-i18n-title="sb.dong">
+          <svg class="ic ic-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Khung xem truoc dải anh -->
+    <main id="viewport">
+      <div id="canvas-wrapper">
+        <canvas id="main-canvas"></canvas>
+        <div id="shot-overlays"></div>
+      </div>
+    </main>
+
+    <!-- Thong bao Toast nhanh -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="storyboard.js"></script>
+</body>
+</html>

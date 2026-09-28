@@ -65,6 +65,7 @@ html, body {
 }
 #bar button:hover { background: var(--bg-hover); color: var(--text-1); }
 #bar button:active { transform: scale(0.92); }
+#bar #storyboard:hover { background: var(--bg-hover); color: var(--accent); }
 #bar #clear:hover { background: var(--danger-strong); color: #fff; }
 
 /* ── Day anh ─────────────────────────────────────────────────────────── */
