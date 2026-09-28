@@ -1,6 +1,8 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 09:53 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 10:47 +0700
+> - **0.6.7 (28/09 10:47, Claude ra soat ban Gemini 0.6.6):** tuy chon lam mo Kham khoi / Mo min DAT; sua 1 loi Mo min
+>   sat mep anh lo chu goc. CHUA gop `main`, CHUA build/cai, CHUA len web (xem muc 0.6.7 ngay duoi).
 > - **BAN TREN NHANH GEMINI: 0.6.6** (28/09 09:53, Gemini) — Them 2 tuy chon kieu lam mo trong Cai dat: Kham khoi (Mosaic) va Mo min (Blur).
 > - **WEB (27/09 20:5x, Claude, commit `d8f8eba`) — dua tinh nang 0.5.7-0.6.5 len https://aio-shotsave.vercel.app:**
 >   demo tren trang them lam mo phim 4/B (kham khoi 9 px, vao ca anh PNG trong khay; tam 4 kich ban tu chay = lam mo
@@ -11,6 +13,36 @@
 > - **TIEP THEO (sau khi Claude ra soat 0.6.6): TRIEN KHAI TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
 >   Thiet ke chi tiet da ghi o muc 2026-09-27 21:05 ngay ben duoi va CLAUDE.md. 1-click ghep cac anh trong khay
 >   thanh dai phim / luoi phan canh de editor gui duyet dao dien / khach hang hoac keo vao Premiere lam reference.
+
+## [WEB] - 2026-09-28 11:3x - Dua kieu lam mo 0.6.6-0.6.7 len https://aio-shotsave.vercel.app (commit `49b5057` tren main)
+- Boi canh: anh Tien 28/09: "em dua vao Build and UI Design/AiO Shotandsave moi lan update update len website cho anh
+  di em" -> LUAT MOI: moi ban Shot & Save moi thi Claude doi chieu ma app roi cap nhat web (chi ghi thu CO trong ma).
+- Da sua `Website/AiO ShotSave Web/index.html`: the tinh nang Lam mo ghi du 2 kieu (EN+VI); khung Cai dat mo phong
+  them the "Hieu ung lam mo" (chu nguyen van `src/i18n.js` set.lamMo.*, dat giua Khay va Thu muc nhu app); dong thu 5
+  ben trai + buoc phim thu 5 (con tro bam Mo min roi tra ve Kham khoi, mac dinh app); man < 520 px hang nay xuong dong.
+- Do (Chromium, may chu tam): 5 the / 5 dong; phim sang du 5 buoc trong 17 s, buoc 3 sang dung the Lam mo, nut Mo min
+  duoc chon; EN + VI dung chu app; 360 px: khong cuon ngang, chu trong nut 1 dong; 0 loi console. Live md5 = git HEAD
+  (`92e7cf88...`) sau ~75 s.
+- Chua kiem: tren iPhone/Safari that. Demo chup tren trang van chi co Kham khoi (dung mac dinh app), chua co Mo min.
+
+## [0.6.7] - 2026-09-28 10:47 - [KET QUA RA SOAT CUA CLAUDE — Gemini doc lai buoi sau]
+- Boi canh: anh chuyen loi ban giao 0.6.6 cua Gemini: "Xong tinh nang tuy chon lam mo Mosaic / Mo min Blur, da push
+  nhanh gemini, anh bao Claude ra nhe". Ra theo AGENTS.md luat 2, may cong ty, nhanh rieng `claude/ra-066`.
+- Doc diff 17 file: noi day dung (IPC `settings:set-lam-mo` -> overlay + pin dang mo; `overlayWins` co that; the Cai
+  dat dung class nhu 5 the khac; `blurType` luu tren tung net ve nen doi cai dat khong doi net cu). ROADMAP.md van con
+  2 vien dan sai da ghi 27/09 (luat 01 cam emoji UI khong ton tai; 4/5 ma mau khong co trong tokens.css) — chua sua.
+- **LOI THAT (da sua):** `veBlurSmooth` lay mau them 20 px quanh vung, nhung `blur(10px)` loang ~30 px, va SAT MEP
+  anh (mep man hinh luc chup, mep anh ghim) thi phan lay them = 0 -> blur lay "ngoai anh" = TRONG SUOT -> ghep ra file
+  thi LO CHU GOC. Do tren trang do chep NGUYEN VAN ham cua Gemini (Chromium, chu den 12 px, 4 ti le 100/125/150/200%):
+  lop mo duc nhat chi **77-93/255**; dai 14 DIP sat mep con **23-32%** tuong phan chu (giua anh chi 2-6%); nhin anh:
+  doc duoc "0912 345 678 VCB 1234567890 matk". Ton tai ca overlay lan pin. Kham khoi (Mosaic) khong dinh.
+- Sua (`src/overlay/overlay.js`, `src/pin/pin.js`): truoc khi ve blur, lot 1 lop DUC = vung thu nho ~40 DIP/diem roi
+  phong to muot (khong con net chu). Do lai cung bai: 24/24 ca lop mo **255/255**, dai sat mep con **3-9%** (ngang
+  giua anh), vung giua KHONG doi (2-6%); nhin anh 3 vung (goc tren-trai, giua, goc duoi-phai) khong doc ra chu.
+- Kiem them: `test:lammo` 25/25, `test:banquyen` 27/27, `node --check` moi file src 0 loi. Luu y: `test:lammo` cua
+  Gemini chi GREP chuoi (co ham, co khoa i18n), khong ve thu lan nao -> 25/25 khong bat duoc loi tren.
+- CHUA kiem: chay app that (chua build/cai 0.6.7); toc do ve lai khi keo vung Mo min lon tren man 4K (moi lan re chuot
+  ve lai blur moi net); bo cai; web chua dua tinh nang nay (cho anh dung that truoc — luat "dung truoc khi ban").
 
 ## [0.6.6] - 2026-09-28 09:53 - [BAN GIAO CHO CLAUDE]
 - Boi canh: Loi anh Tien (28/09): "cai hieu ung so 4 ma lam mo em co the nao cho nguoi dung 2 option lam mo trong setting duoc khong em, kieu dang co dang mosaic va them 1 kieu lam mo dang blur".
