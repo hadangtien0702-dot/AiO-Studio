@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-27 21:05 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 +0700
+> - **WEB (27/09 20:5x, Claude, commit `d8f8eba`) — dua tinh nang 0.5.7-0.6.5 len https://aio-shotsave.vercel.app:**
+>   demo tren trang them lam mo phim 4/B (kham khoi 9 px, vao ca anh PNG trong khay; tam 4 kich ban tu chay = lam mo
+>   tieu de bieu do) + so #1 #2 trong khay; the tinh nang 6 -> 9 (lam mo, chinh khung + V chon net, khay nho 5 anh).
+>   Chi ghi thu CO trong ma app (grep: 8 tay nam, V/Delete/mui ten, seq khay, cai dat 0/5/10/20). Do: 9/9 the EN+VI,
+>   doan cung mau trung vi 9 px vs doi chung 19 px, 0 loi console, 360 px khong cuon ngang. Live = git HEAD tung byte.
 > - **BAN DANG DUNG: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
 > - **TIEP THEO (phien ngay mai 28/09): TRIEN KHAI TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
 >   Thiet ke chi tiet da ghi o muc 2026-09-27 21:05 ngay ben duoi va CLAUDE.md. 1-click ghep cac anh trong khay

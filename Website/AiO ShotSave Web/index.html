@@ -166,6 +166,8 @@ h1 em{font-style:normal;color:var(--brand)}
 .ditem .rm{position:absolute;top:3px;right:3px;width:16px;height:16px;display:grid;place-items:center;border-radius:999px;background:rgb(10 10 10/74%);color:var(--d-t2);opacity:0;transition:opacity .15s}
 .ditem:hover .rm{opacity:1}
 .ditem .rm:hover{background:#ff4757;color:#fff}
+.ditem .dso{position:absolute;left:3px;bottom:3px;padding:1px 5px;border-radius:4px;background:rgb(10 10 10/72%);border:1px solid rgb(255 255 255/14%);color:#fff;font:700 9px/1.3 Inter,sans-serif;letter-spacing:.02em;pointer-events:none}
+.ditem:hover .dso{border-color:#F86820}
 .dempty{padding:14px 16px;font-size:11px;color:var(--d-t3);white-space:nowrap}
 /* Ảnh ghim — giống src/pin */
 .dpin{position:absolute;z-index:5;border-radius:8px;overflow:hidden;background:var(--d-bg2);cursor:grab;touch-action:none;
@@ -739,6 +741,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
             <button type="button" class="cc" data-tool="box" aria-pressed="true" aria-label="Box (1)" data-i-aria="aBox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg><i class="so">1</i></button>
             <button type="button" class="cc" data-tool="arrow" aria-pressed="false" aria-label="Arrow (2)" data-i-aria="aArrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M11 5h8v8"/></svg><i class="so">2</i></button>
             <button type="button" class="cc" data-tool="text" aria-pressed="false" aria-label="Text (3)" data-i-aria="aText"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg><i class="so">3</i></button>
+            <button type="button" class="cc" data-tool="blur" aria-pressed="false" aria-label="Blur (4)" data-i-aria="aBlur"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="5" height="5" rx="1"/><rect x="9.5" y="4" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="4" width="5" height="5" rx="1"/><rect x="4" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="15" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="4" y="15" width="5" height="5" rx="1"/><rect x="9.5" y="15" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="15" width="5" height="5" rx="1"/></svg><i class="so">4</i></button>
             <span class="chia"></span>
             <div class="mau-nhom" role="group" aria-label="Color">
               <button type="button" class="mau" data-color="#f86820" style="background:#f86820" aria-label="Orange" aria-pressed="false"></button>
@@ -796,7 +799,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         <article class="card" data-hien>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
           <h3 data-i="f4t">One-key markup</h3>
-          <p data-i-html="f4p">Press <span class="nw"><kbd>1</kbd> box,</span> <span class="nw"><kbd>2</kbd> arrow,</span> <span class="nw"><kbd>3</kbd> text.</span></p>
+          <p data-i-html="f4p">Press <span class="nw"><kbd>1</kbd> box,</span> <span class="nw"><kbd>2</kbd> arrow,</span> <span class="nw"><kbd>3</kbd> text,</span> <span class="nw"><kbd>4</kbd> blur.</span></p>
         </article>
         <article class="card" data-hien>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4" width="9.5" height="7.5" rx="1.5"/><rect x="13" y="4" width="9.5" height="7.5" rx="1.5"/><path d="M6.25 11.5v3.5M4 15h4.5M17.75 11.5v3.5M15.5 15h4.5"/></svg></div>
@@ -807,6 +810,22 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
           <h3 data-i="f6t">Shot shelf</h3>
           <p data-i="f6p">Recent shots wait in a tray. Click one to pin it.</p>
+        </article>
+        <!-- 27/09: 3 the cho tinh nang moi 0.5.7-0.6.5 (Gemini lam, Claude ra + dua len web). Chi ghi thu CO trong ma app. -->
+        <article class="card" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><rect x="3" y="3" width="5.5" height="5.5" rx="1"/><rect x="9.25" y="3" width="5.5" height="5.5" rx="1" opacity=".4"/><rect x="15.5" y="3" width="5.5" height="5.5" rx="1"/><rect x="3" y="9.25" width="5.5" height="5.5" rx="1" opacity=".4"/><rect x="9.25" y="9.25" width="5.5" height="5.5" rx="1"/><rect x="15.5" y="9.25" width="5.5" height="5.5" rx="1" opacity=".4"/><rect x="3" y="15.5" width="5.5" height="5.5" rx="1"/><rect x="9.25" y="15.5" width="5.5" height="5.5" rx="1" opacity=".4"/><rect x="15.5" y="15.5" width="5.5" height="5.5" rx="1"/></svg></div>
+          <h3 data-i="f7t">Blur private info</h3>
+          <p data-i-html="f7p">Press <kbd>4</kbd> and drag over names, emails or numbers to pixelate them before you share.</p>
+        </article>
+        <article class="card" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><rect x="8" y="8" width="8" height="8" rx="1" stroke-dasharray="2 2.2"/></svg></div>
+          <h3 data-i="f8t">Adjust before you save</h3>
+          <p data-i-html="f8p">Resize or move the frame after you drag. Press <kbd>V</kbd> to pick a mark, then move or delete it.</p>
+        </article>
+        <article class="card" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 8 21M16 3l-2 18M4 8.5h16M3.5 15.5h16"/></svg></div>
+          <h3 data-i="f9t">A shelf that remembers</h3>
+          <p data-i="f9p">Shots are numbered #1, #2 and so on. Restart the app and your 5 latest shots are still in the shelf.</p>
         </article>
       </div>
     </div>
@@ -1011,9 +1030,12 @@ const T = {
     f1p:"Một phím tắt là có ảnh.<br>Kịp lưu lại mọi ý tưởng.",
     f2t:"Kéo và thả", f2p:"Kéo ảnh thả thẳng vào ứng dụng bạn đang dùng.",
     f3t:"Ghim trên cùng", f3p:"Giữ ảnh tham khảo luôn nổi trên mọi cửa sổ.",
-    f4t:"Chú thích bằng một phím", f4p:"Bấm <span class=\"nw\"><kbd>1</kbd> khung,</span> <span class=\"nw\"><kbd>2</kbd> mũi tên,</span> <span class=\"nw\"><kbd>3</kbd> chữ.</span>",
+    f4t:"Chú thích bằng một phím", f4p:"Bấm <span class=\"nw\"><kbd>1</kbd> khung,</span> <span class=\"nw\"><kbd>2</kbd> mũi tên,</span> <span class=\"nw\"><kbd>3</kbd> chữ,</span> <span class=\"nw\"><kbd>4</kbd> làm mờ.</span>",
     f5t:"Chụp hai màn hình", f5p:"Chụp một vùng trải qua hai màn hình, liền mạch và sắc nét.",
     f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm vào là ghim lên màn hình.",
+    f7t:"Làm mờ thông tin riêng", f7p:"Bấm <kbd>4</kbd> rồi kéo qua tên, email hay số tài khoản để làm mờ trước khi gửi đi.",
+    f8t:"Chỉnh lại trước khi lưu", f8p:"Kéo xong vẫn co giãn, dời được khung chụp. Bấm <kbd>V</kbd> để chọn nét vẽ rồi di chuyển hoặc xoá.",
+    f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao hằng tháng. Nếu muốn tiếp tục nhận tính năng mới, bạn có thể gia hạn $2 mỗi năm.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật trong năm đầu", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
     b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Từ năm thứ hai", b2s:"Không bắt buộc, để tiếp tục nhận bản cập nhật", b2n:"$2/năm",
@@ -1037,7 +1059,7 @@ const T = {
 document.querySelectorAll("[data-i]").forEach(el => T.en[el.dataset.i] = el.textContent);
 document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] = el.innerHTML);
 document.querySelectorAll("[data-i-aria]").forEach(el => T.en[el.dataset.iAria] = el.getAttribute("aria-label"));
-Object.assign(T.vi, { demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)",
+Object.assign(T.vi, { demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)", aBlur:"Làm mờ (4)",
   aUndo:"Hoàn tác (Ctrl+Z)", aCancel:"Huỷ (Esc)", aExit:"Thoát (Esc)", aDone:"Xong (Enter)", aClear:"Dọn khay",
   themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
 T.en.themeToLight = "Switch to light mode";
@@ -1136,6 +1158,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   let shapes = [], tam = null, keo = null;
   let tool = "box", color = "#ff3b30";
   const shots = [];
+  let soAnh = 0;                       // số thứ tự ảnh trong khay #1, #2… (app 0.6.2)
 
   const mo = { a: .5 };               // độ tối của màn phủ (24/09: tối dần vào thay vì bật phắt)
   const rr = (c, x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
@@ -1178,6 +1201,19 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       const w = c.measureText(s.text).width;
       c.fillStyle = "rgba(0,0,0,.72)"; rr(c, s.x - 7, s.y - 4, w + 14, 28, 6); c.fill();   // hộp nền tối bo góc như app 0.4.5
       c.fillStyle = s.color; c.fillText(s.text, s.x, s.y + 1);
+    } else if (s.type === "blur") {
+      // Làm mờ kiểu KHẢM KHỐI như app 0.6.1 (phím 4): lấy mẫu từ cảnh gốc (canvas sc, px thật = toạ độ × dpr),
+      // thu nhỏ còn 1 điểm / khối rồi phóng to không làm mịn. Toạ độ s.* là toạ độ khung demo, c đã dịch (ox, oy).
+      const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2), w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1);
+      if (w >= 2 && h >= 2) {
+        const KHOI = 9, bw = Math.max(1, Math.round(w / KHOI)), bh = Math.max(1, Math.round(h / KHOI));
+        const t = drawShape.tam || (drawShape.tam = document.createElement("canvas"));
+        t.width = bw; t.height = bh;
+        const tc = t.getContext("2d"); tc.imageSmoothingEnabled = true;
+        tc.drawImage(sc, x * dpr, y * dpr, w * dpr, h * dpr, 0, 0, bw, bh);
+        c.imageSmoothingEnabled = false; c.drawImage(t, 0, 0, bw, bh, x, y, w, h);
+        c.lineWidth = 1; c.strokeStyle = "rgba(255,255,255,.35)"; c.strokeRect(x + .5, y + .5, w - 1, h - 1);
+      }
     }
     c.restore();
   }
@@ -1338,7 +1374,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     x.drawImage(sc, Math.round(sel.x * dpr), Math.round(sel.y * dpr), c.width, c.height, 0, 0, c.width, c.height);
     x.setTransform(dpr, 0, 0, dpr, 0, 0);
     shapes.forEach(s => drawShape(x, s, -sel.x, -sel.y));
-    const shot = { url: c.toDataURL("image/png"), w: sel.w, h: sel.h, canvas: c };
+    if (!shots.length) soAnh = 0;           // khay trống thì đếm lại từ #1 (như app 0.6.2)
+    const shot = { url: c.toDataURL("image/png"), w: sel.w, h: sel.h, canvas: c, so: ++soAnh };
     ketThuc();
     shots.unshift(shot); veKhay(true); stage.classList.add("used");
     if (!tuChay) window.ssToast && window.ssToast("demoSaved");   // phim tự chạy thì không bật thông báo mỗi tấm
@@ -1355,7 +1392,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       const rm = document.createElement("span"); rm.className = "rm"; rm.setAttribute("aria-hidden", "true");
       rm.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
       rm.addEventListener("click", e => { e.stopPropagation(); shots.splice(shots.indexOf(s), 1); veKhay(); });
-      b.append(img, rm);
+      const so = document.createElement("b"); so.className = "dso"; so.setAttribute("aria-hidden", "true"); so.textContent = "#" + s.so;
+      b.append(img, rm, so);
       b.addEventListener("click", () => ghim(s));
       listEl.append(b);
     });
@@ -1422,7 +1460,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     if (e.key === "Escape") { e.preventDefault(); huy(); }
     else if (e.key === "Enter") { e.preventDefault(); xong(); }
     else if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") { e.preventDefault(); shapes.pop(); drawOv(); }
-    else if (chon && ["1", "2", "3"].includes(e.key)) chonTool({ 1: "box", 2: "arrow", 3: "text" }[e.key]);
+    else if (chon && ["1", "2", "3", "4"].includes(e.key)) chonTool({ 1: "box", 2: "arrow", 3: "text", 4: "blur" }[e.key]);
+    else if (chon && (e.key === "b" || e.key === "B")) chonTool("blur");   // app: B cũng là làm mờ
   });
 
   // ===== TỰ CHẠY (22/09 anh: "anh muốn là tự động là animation… chụp nhiều tấm ảnh chạy vào khay") =====
@@ -1490,7 +1529,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     { v: [.40, .30, .30, .40], tool: "box",   ve: [[.44, .40], [.56, .62]], mau: "#ff3b30" },
     { v: [.60, .26, .30, .52], tool: "arrow", ve: [[.84, .72], [.72, .40]], mau: "#ffcc00" },
     { v: [.60, .30, .27, .50], tool: "text",  ve: [[.66, .36]], chu: "+18%", mau: "#34c759" },
-    { v: [.34, .12, .46, .24], tool: "box",   ve: [[.36, .16], [.60, .30]], mau: "#0a84ff" },
+    { v: [.29, .12, .51, .24], tool: "blur",  ve: [[.30, .165], [.57, .255]], mau: null },   // 27/09: tấm 4 = làm mờ tiêu đề (tính năng 0.6.1)
   ];
 
   // 24/09 anh: "có nhanh có nhậm, hiện tại đều đều nên chán". Nhịp như tay người: LAO nhanh tới chỗ (expo),
