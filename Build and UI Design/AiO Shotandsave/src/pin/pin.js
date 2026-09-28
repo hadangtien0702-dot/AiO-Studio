@@ -21,14 +21,24 @@ document.querySelectorAll('[data-i18n-title]').forEach((el) => {
 let opacity = 1
 const PLOG = (m) => { try { window.pin.log(m) } catch (e) {} }
 let dip = { w: 0, h: 0 } // kich thuoc hien thi (DIP) tu main
+let curBlurType = 'mosaic' // 'mosaic' | 'blur'
 
 window.pin.onData((data) => {
   img.src = data.dataUrl
   frame.style.width = data.w + 'px'
   frame.style.height = data.h + 'px'
   dip = { w: data.w, h: data.h }
-  PLOG('data dip=' + data.w + 'x' + data.h + ' DPR=' + DPR + ' win=' + window.innerWidth + 'x' + window.innerHeight)
+  if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
+  PLOG('data dip=' + data.w + 'x' + data.h + ' DPR=' + DPR + ' win=' + window.innerWidth + 'x' + window.innerHeight + ' blur=' + curBlurType)
 })
+if (window.pin.onUpdateConfig) {
+  window.pin.onUpdateConfig((data) => {
+    if (data && data.lamMoKieu) {
+      curBlurType = data.lamMoKieu
+      redraw()
+    }
+  })
+}
 
 const btnDragFile = document.getElementById('drag-file')
 
@@ -366,7 +376,7 @@ window.addEventListener('mousemove', (e) => {
     return
   }
   if (!veStart) return
-  redraw({ type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor })
+  redraw({ type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor, blurType: curBlurType })
 })
 
 window.addEventListener('mouseup', (e) => {
@@ -383,7 +393,7 @@ window.addEventListener('mouseup', (e) => {
   const r = veEl.getBoundingClientRect()
   const lx = clamp(e.clientX - r.left, 0, dip.w)
   const ly = clamp(e.clientY - r.top, 0, dip.h)
-  const s = { type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor }
+  const s = { type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor, blurType: curBlurType }
   veStart = null
   if (Math.abs(s.x2 - s.x1) < 3 && Math.abs(s.y2 - s.y1) < 3) { redraw(); return }
   shapes.push(s)
@@ -439,6 +449,43 @@ function veBlurPixelate(ctx, x, y, w, h, k) {
   ctx.restore()
 }
 
+function veBlurSmooth(ctx, x, y, w, h, k) {
+  if (w <= 0 || h <= 0) return
+  if (!img || !img.naturalWidth) return
+  const kScale = img.naturalWidth / dip.w
+  const sx = x * kScale
+  const sy = y * kScale
+  const sw = w * kScale
+  const sh = h * kScale
+
+  const pad = Math.round(20 * kScale)
+  const sxPad = Math.max(0, sx - pad)
+  const syPad = Math.max(0, sy - pad)
+  const swPad = Math.min(img.naturalWidth - sxPad, sw + (sx - sxPad) + pad)
+  const shPad = Math.min(img.naturalHeight - syPad, sh + (sy - syPad) + pad)
+
+  const dx = (x * k) - ((sx - sxPad) / kScale) * k
+  const dy = (y * k) - ((sy - syPad) / kScale) * k
+  const dw = (swPad / kScale) * k
+  const dh = (shPad / kScale) * k
+
+  const blurRadius = Math.max(4, Math.round(10 * k))
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(x * k, y * k, w * k, h * k)
+  ctx.clip()
+  ctx.filter = 'blur(' + blurRadius + 'px)'
+  ctx.drawImage(img, sxPad, syPad, swPad, shPad, dx, dy, dw, dh)
+  ctx.restore()
+
+  ctx.save()
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+  ctx.lineWidth = 1 * k
+  ctx.strokeRect(x * k, y * k, w * k, h * k)
+  ctx.restore()
+}
+
 /* k = he so phong (1 khi xem truoc; naturalW/dipW khi xuat ra anh that). */
 function veShape(ctx, s, k) {
   ctx.strokeStyle = s.color
@@ -455,7 +502,13 @@ function veShape(ctx, s, k) {
     veChu(ctx, s, k)
   } else if (s.type === 'blur') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
-    veBlurPixelate(ctx, x, y, Math.abs(s.x2 - s.x1), Math.abs(s.y2 - s.y1), k)
+    const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
+    const bType = s.blurType || curBlurType
+    if (bType === 'blur') {
+      veBlurSmooth(ctx, x, y, w, h, k)
+    } else {
+      veBlurPixelate(ctx, x, y, w, h, k)
+    }
   }
 }
 

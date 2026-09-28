@@ -42,6 +42,7 @@ const langBox = document.getElementById('lang')
 const btnClose = document.getElementById('close')
 const khayBox = document.getElementById('khay-kieu')
 const khaySoAnhBox = document.getElementById('khay-so-anh')
+const lamMoBox = document.getElementById('lam-mo-kieu')
 const loaiBox = document.getElementById('anh-loai')
 const clBox = document.getElementById('anh-chat-luong')
 const hangCL = document.getElementById('hang-chat-luong')
@@ -132,6 +133,7 @@ async function load() {
   datAnh(s.anhLoai, s.anhChatLuong)
   chonPill(khayBox, s.khayKieu)
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
+  if (lamMoBox) chonPill(lamMoBox, s.lamMoKieu || 'mosaic')
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
@@ -176,6 +178,16 @@ khaySoAnhBox.addEventListener('click', async (e) => {
   chonPill(khaySoAnhBox, b.dataset.v)
   await window.settings.setKhaySoAnh(Number(b.dataset.v) || 0)
 })
+
+/* ── Kieu lam mo ──────────────────────────────────────────────────────── */
+if (lamMoBox) {
+  lamMoBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    chonPill(lamMoBox, b.dataset.v)
+    await window.settings.setLamMo(b.dataset.v)
+  })
+}
 
 /* ── Ghi phim ─────────────────────────────────────────────────────────── */
 const CODE_PUNCT = {

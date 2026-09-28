@@ -468,7 +468,23 @@ ipcMain.handle('settings:get', () => {
     anhChatLuong: CHAT_LUONG_Q[c.anhChatLuong] ? c.anhChatLuong : 'cao',
     khayKieu: kieuKhay(),
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
+    lamMoKieu: c.lamMoKieu === 'blur' ? 'blur' : 'mosaic',
   }
+})
+
+ipcMain.handle('settings:set-lam-mo', (_e, kieu) => {
+  const val = kieu === 'blur' ? 'blur' : 'mosaic'
+  kho.ghiCauHinh({ lamMoKieu: val })
+  ghiLog('doi kieu lam mo: ' + val)
+  for (const w of overlayWins) {
+    if (!w.isDestroyed()) w.webContents.send('overlay:update-config', { lamMoKieu: val })
+  }
+  for (const [, rec] of pins) {
+    if (rec.win && !rec.win.isDestroyed()) {
+      rec.win.webContents.send('pin:update-config', { lamMoKieu: val })
+    }
+  }
+  return { lamMoKieu: val }
 })
 
 ipcMain.handle('settings:set-khay-so-anh', (_e, n) => {
@@ -972,7 +988,7 @@ function taoPool() {
     win.webContents.once('did-finish-load', () => {
       win._poolReady = true
       // origin gui som de renderer co goc; luc kich hoat gui lai init day du.
-      if (!win.isDestroyed()) win.webContents.send('overlay:init', { origin: { x: disp.bounds.x, y: disp.bounds.y } })
+      if (!win.isDestroyed()) win.webContents.send('overlay:init', { origin: { x: disp.bounds.x, y: disp.bounds.y }, lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic' })
     })
     win.on('closed', () => { poolWins = poolWins.filter((w) => w !== win) })
     poolWins.push(win)
@@ -1024,6 +1040,7 @@ function kichHoatOverlay(win, disp, idx, sanSang) {
     // [do] 14/09: selftest co SHAPE (duong cat anh goc aioshot://raw) / VAT 2 MAN (composite raw)
     testShape: laSelftest && process.env.AIO_TEST_SHAPE === '1',
     testComposite: laSelftest && process.env.AIO_TEST_COMPOSITE === '1',
+    lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic',
   })
   // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
   if (!win.isVisible()) { win.show(); win.focus() }
@@ -1249,11 +1266,11 @@ function createPinWindow(image, screenX, screenY, dipW, dipH, filePath) {
   // ☠️ Nho `id` NGAY BAY GIO. Trong handler 'closed', `win.webContents` da bi
   // huy — doc `.id` tu no nem "Object has been destroyed" (vap 24/08).
   const wcId = win.webContents.id
-  pins.set(wcId, { image, filePath })
+  pins.set(wcId, { image, filePath, win })
 
   win.loadFile(path.join(__dirname, 'pin', 'index.html'))
   win.webContents.once('did-finish-load', () => {
-    win.webContents.send('pin:data', { dataUrl, pad: PIN_PAD, w: dipW, h: dipH })
+    win.webContents.send('pin:data', { dataUrl, pad: PIN_PAD, w: dipW, h: dipH, lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic' })
     win.show()
 
     // Tu kiem: chup ghim + KHAY -> dong ghim (duong da lam sap app) -> thoat.

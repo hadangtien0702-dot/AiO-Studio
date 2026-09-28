@@ -1,15 +1,49 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 09:53 +0700
+> - **BAN TREN NHANH GEMINI: 0.6.6** (28/09 09:53, Gemini) — Them 2 tuy chon kieu lam mo trong Cai dat: Kham khoi (Mosaic) va Mo min (Blur).
 > - **WEB (27/09 20:5x, Claude, commit `d8f8eba`) — dua tinh nang 0.5.7-0.6.5 len https://aio-shotsave.vercel.app:**
 >   demo tren trang them lam mo phim 4/B (kham khoi 9 px, vao ca anh PNG trong khay; tam 4 kich ban tu chay = lam mo
 >   tieu de bieu do) + so #1 #2 trong khay; the tinh nang 6 -> 9 (lam mo, chinh khung + V chon net, khay nho 5 anh).
 >   Chi ghi thu CO trong ma app (grep: 8 tay nam, V/Delete/mui ten, seq khay, cai dat 0/5/10/20). Do: 9/9 the EN+VI,
 >   doan cung mau trung vi 9 px vs doi chung 19 px, 0 loi console, 360 px khong cuon ngang. Live = git HEAD tung byte.
-> - **BAN DANG DUNG: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
-> - **TIEP THEO (phien ngay mai 28/09): TRIEN KHAI TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
+> - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+> - **TIEP THEO (sau khi Claude ra soat 0.6.6): TRIEN KHAI TINH NANG MULTI-SHOT STORYBOARD STRIP (DAI PHAN CANH DIEN ANH):**
 >   Thiet ke chi tiet da ghi o muc 2026-09-27 21:05 ngay ben duoi va CLAUDE.md. 1-click ghep cac anh trong khay
 >   thanh dai phim / luoi phan canh de editor gui duyet dao dien / khach hang hoac keo vao Premiere lam reference.
+
+## [0.6.6] - 2026-09-28 09:53 - [BAN GIAO CHO CLAUDE]
+- Boi canh: Loi anh Tien (28/09): "cai hieu ung so 4 ma lam mo em co the nao cho nguoi dung 2 option lam mo trong setting duoc khong em, kieu dang co dang mosaic va them 1 kieu lam mo dang blur".
+- Nguyen nhan & Thiet ke ky thuat:
+  1. Cau hinh `lamMoKieu`: gia tri 'mosaic' (mac dinh) hoac 'blur', luu atomic trong `cau-hinh.json` qua `kho.ghiCauHinh`.
+  2. Giao dien Cai dat: Them the "Hieu ung lam mo", 2 nut chuyen doi Mosaic / Blur co nho trang thai. SVG inline, khong dung emoji, da ngon ngu VI/EN trong `i18n.js` (tuan thu luat 01, 02 va luat khong dung gach ngang dai "—").
+  3. Preload & IPC: `settings:set-lam-mo` phat su kien `overlay:update-config` va `pin:update-config` de cap nhat ngay lap tuc cho cac cua so dang mo ma khong can khoi dong lai.
+  4. Ve hieu ung (overlay.js & pin.js):
+     - Luu thuoc tinh `blurType` tren tung shape preview va shape chot (dam bao khi doi setting thi shape cu da ve khong bi thay doi kieu dot ngot).
+     - Bo sung ham `veBlurSmooth(ctx, x, y, w, h, [k])`: dung Canvas 2D filter `blur(10px)` (hoac 10*k tren file that cua pin), lay mau mo rong `pad = 20 * scale` tu anh chup goc roi clip dung hinh chu nhat de triet tieu hoan toan hien tuong lem vien trong suot (edge transparency bleed).
+     - Ham `veShape` re nhanh: goi `veBlurSmooth` neu kieu la 'blur', nguoc lai goi `veBlurPixelate` (mosaic).
+- File can thiep:
+  + `src/i18n.js` (khoa `set.lamMo.*` cho ca VI va EN)
+  + `src/settings/index.html` (the cai dat hieu ung lam mo)
+  + `src/settings/settings.js` (bind UI chon kieu lam mo)
+  + `src/preload-settings.js` (expose `setLamMo`)
+  + `src/preload-overlay.js` & `src/preload-pin.js` (expose `onUpdateConfig`)
+  + `src/main.js` (IPC handler `settings:set-lam-mo`, truyen `lamMoKieu` trong init va broadcast update)
+  + `src/overlay/overlay.js` & `src/pin/pin.js` (ho tro ve mo min veBlurSmooth, re nhanh theo kieu)
+  + `package.json` (bump version 0.6.6, script test:lammo)
+  + `scripts/test/do-kieu-lam-mo.mjs` (bo kiem thu tu dong 25 tieu chi)
+  + `CLAUDE.md` & `Marketing/AiO MVP and Plan Marketing/TOOL_VERSION_TRACKER.md` (cap nhat bang theo doi 0.6.6)
+  + `PROGRESS.md`
+- Da kiem bang gi, ra so nao:
+  + `node --check` 8 file JS deu vuot qua khong co loi cu phap (exit code 0).
+  + `npm run test:lammo` (scripts/test/do-kieu-lam-mo.mjs): 25/25 DAT (i18n, UI, bridge, IPC, renderer).
+  + `npm run test:banquyen`: 27/27 DAT.
+- CHUA kiem:
+  + Chua chay electron-builder dong goi bo cai NSIS (de Claude ra soat va dong goi tap trung tren main).
+  + Chua chay harness tu dong bung overlay len man hinh de tranh gay giand doan anh Tien dang lam viec tren may.
+- Cho nguoi soat (Claude) can soi ky:
+  + Ty le mo min `veBlurSmooth` tren man hinh ti le le (DPR 125%/150%).
+  + Dong bo tinh nang 0.6.6 len trang web ban hang Shot & Save (`Website/AiO ShotSave Web/`).
 > - **0.5.7 -> 0.6.4 do GEMINI lam cung ngay 27/09** (anh dung Gemini). Claude ra soat 20:4x, ket qua + luat lam chung
 >   repo ghi o `GEMINI.md` goc repo. 0.6.5 sua 2 loi tu ra soat (muc 0.6.5 ngay duoi). [CHO] chua ai chay harness
 >   keo-chon (so loi #8) cho 0.5.7 (8 tay nam co gian khung) — can gio cua anh (luat #12); anh bam chup 1 tam

@@ -32,4 +32,6 @@ contextBridge.exposeInMainWorld('overlay', {
   onLocked: (cb) => ipcRenderer.on('overlay:locked', () => cb()),
   /** Ghi nhat ky chay (qua main). */
   log: (msg) => ipcRenderer.send('overlay:log', msg),
+  /** Cap nhat cau hinh khi dang mo: { lamMoKieu }. */
+  onUpdateConfig: (cb) => ipcRenderer.on('overlay:update-config', (_e, d) => cb(d)),
 })

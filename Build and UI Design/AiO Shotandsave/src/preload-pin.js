@@ -21,4 +21,6 @@ contextBridge.exposeInMainWorld('pin', {
   dragEnd: () => ipcRenderer.send('pin:drag-end'),
   /** 14/09: nhat ky chan doan che do ve (anh Tien: khong ve duoc tren anh ghim, chua tai lap). */
   log: (m) => ipcRenderer.send('pin:log', String(m)),
+  /** Cap nhat cau hinh khi dang mo: { lamMoKieu }. */
+  onUpdateConfig: (cb) => ipcRenderer.on('pin:update-config', (_e, d) => cb(d)),
 })

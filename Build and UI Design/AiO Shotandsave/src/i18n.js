@@ -65,6 +65,12 @@ const DICH = {
     'set.khay.soAnh': 'Số ảnh gần nhất',
     'set.khay.tat': 'Tắt',
     'khay.doiCo': 'Kéo để phóng to / thu nhỏ khay',
+    // Settings — lam mo
+    'set.lamMo.tieuDe': 'Hiệu ứng làm mờ',
+    'set.lamMo.moTa': 'Kiểu che thông tin nhạy cảm cho công cụ Làm mờ (phím 4 / B).',
+    'set.lamMo.kieu': 'Kiểu làm mờ',
+    'set.lamMo.mosaic': 'Khảm khối (Mosaic)',
+    'set.lamMo.blur': 'Mờ mịn (Blur)',
     // Settings — thu muc
     'set.thuMuc.tieuDe': 'Thư mục lưu ảnh',
     'set.thuMuc.moTa': 'Nơi mọi ảnh chụp được lưu.',
@@ -173,6 +179,12 @@ const DICH = {
     'set.khay.soAnh': 'Recent shots to load',
     'set.khay.tat': 'Off',
     'khay.doiCo': 'Drag to resize the shelf',
+    // Settings — blur
+    'set.lamMo.tieuDe': 'Blur & Obfuscate',
+    'set.lamMo.moTa': 'Obfuscation style for the Blur tool (key 4 / B).',
+    'set.lamMo.kieu': 'Blur style',
+    'set.lamMo.mosaic': 'Mosaic (Pixelate)',
+    'set.lamMo.blur': 'Smooth Blur',
     'set.thuMuc.tieuDe': 'Save folder',
     'set.thuMuc.moTa': 'Where every screenshot is saved.',
     'set.thuMuc.mo': 'Open folder',

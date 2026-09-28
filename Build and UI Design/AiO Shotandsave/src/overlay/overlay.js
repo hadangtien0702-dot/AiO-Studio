@@ -28,6 +28,7 @@ const MAU = getComputedStyle(document.documentElement).getPropertyValue('--accen
 let mode = 'select'       // 'select' | 'annotate'
 let tool = 'rect'         // 'rect' | 'arrow' | 'text'
 let curColor = '#f86820'  // mac dinh CAM (accent). Doi qua bang mau.
+let curBlurType = 'mosaic' // 'mosaic' | 'blur'
 let dragging = false
 let startX = 0, startY = 0
 let curRect = { x: 0, y: 0, w: 0, h: 0 }
@@ -46,9 +47,18 @@ let lanVeLocal = 0          // moc lan cuoi mousemove LOCAL ve khung (nhuong/gia
 let cheDoTest = {}
 window.overlay.onInit((data) => {
   if (data && data.origin) origin = data.origin
+  if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
   if (data) cheDoTest = data
   if (data && data.selftest) setTimeout(autoSelftest, 1600)
 })
+if (window.overlay.onUpdateConfig) {
+  window.overlay.onUpdateConfig((data) => {
+    if (data && data.lamMoKieu) {
+      curBlurType = data.lamMoKieu
+      redraw()
+    }
+  })
+}
 // ☠️ DAO QUYET DINH 25/08 ("khong dan anh dong bang" vi lech/taskbar 2 lan):
 // tu 31/08 PHAI DAN LAI anh cua CHINH man nay lam nen (freeze view). Ly do:
 // video tang toc phan cung (YouTube/TikTok) nhin XUYEN cua so trong suot ra
@@ -658,7 +668,7 @@ function veDangKeo(e) {
   if (!veStart) return
   const lx = clamp(e.clientX - curRect.x, 0, curRect.w)
   const ly = clamp(e.clientY - curRect.y, 0, curRect.h)
-  redraw({ type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor }) // xem truoc
+  redraw({ type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor, blurType: curBlurType }) // xem truoc
 }
 
 function ketThucVe(e) {
@@ -673,7 +683,7 @@ function ketThucVe(e) {
   if (!veStart) return
   const lx = clamp(e.clientX - curRect.x, 0, curRect.w)
   const ly = clamp(e.clientY - curRect.y, 0, curRect.h)
-  const s = { type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor }
+  const s = { type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor, blurType: curBlurType }
   veStart = null
   // bo qua neu qua nho (bam nham)
   if (Math.abs(s.x2 - s.x1) < 3 && Math.abs(s.y2 - s.y1) < 3) { redraw(); return }
@@ -730,6 +740,49 @@ function veBlurPixelate(ctx, x, y, w, h) {
   }
 }
 
+function veBlurSmooth(ctx, x, y, w, h) {
+  if (w <= 0 || h <= 0) return
+  if (frozenImg && frozenImg.naturalWidth > 0) {
+    const sx = (curRect.x + x) * DPR
+    const sy = (curRect.y + y) * DPR
+    const sw = w * DPR
+    const sh = h * DPR
+
+    const pad = Math.round(20 * DPR)
+    const sxPad = Math.max(0, sx - pad)
+    const syPad = Math.max(0, sy - pad)
+    const swPad = Math.min(frozenImg.naturalWidth - sxPad, sw + (sx - sxPad) + pad)
+    const shPad = Math.min(frozenImg.naturalHeight - syPad, sh + (sy - syPad) + pad)
+
+    const dx = x - (sx - sxPad) / DPR
+    const dy = y - (sy - syPad) / DPR
+    const dw = swPad / DPR
+    const dh = shPad / DPR
+
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(x, y, w, h)
+    ctx.clip()
+    ctx.filter = 'blur(10px)'
+    ctx.drawImage(frozenImg, sxPad, syPad, swPad, shPad, dx, dy, dw, dh)
+    ctx.restore()
+
+    ctx.save()
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(x, y, w, h)
+    ctx.restore()
+  } else {
+    ctx.save()
+    ctx.fillStyle = 'rgba(25, 25, 25, 0.92)'
+    ctx.fillRect(x, y, w, h)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
+    ctx.lineWidth = 1
+    ctx.strokeRect(x, y, w, h)
+    ctx.restore()
+  }
+}
+
 function veShape(ctx, s) {
   const mau = s.color || MAU
   ctx.strokeStyle = mau
@@ -746,7 +799,13 @@ function veShape(ctx, s) {
     veChu(ctx, s, 1)
   } else if (s.type === 'blur') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
-    veBlurPixelate(ctx, x, y, Math.abs(s.x2 - s.x1), Math.abs(s.y2 - s.y1))
+    const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
+    const bType = s.blurType || curBlurType
+    if (bType === 'blur') {
+      veBlurSmooth(ctx, x, y, w, h)
+    } else {
+      veBlurPixelate(ctx, x, y, w, h)
+    }
   }
 }
 
