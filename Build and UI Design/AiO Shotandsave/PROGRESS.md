@@ -1,7 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 15:35 +0700
-> - **0.7.3 (28/09 15:35, Claude):** khay Storyboard theo dung khuon MAN CAI DAT (font, pill, sap xep) — muc 0.7.3 duoi. [CHO ANH] cai + mo khay.
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 15:54 +0700
+> - **0.7.4 (28/09 15:54, Claude):** bat Storyboard + khoanh vung + Xong = QUAY 3 GIAY (6 khung, vien cam + dem 3-2-1)
+>   -> cua so dai tu luu. NUT STORYBOARD 0.7.0 NAY DA CHAY THAT. [CHO ANH] thu tren may that (chua ai chay app that).
+>   Chua dua len web (cho anh thu).
+> - **0.7.3 (28/09 15:35, Claude):** khay Storyboard theo dung khuon MAN CAI DAT (font, pill, sap xep).
 > - **0.7.2 (28/09 14:19, Claude):** khay Storyboard lan 1 (khuon thanh tren khay anh) — anh: "chua chuan nhu UI dang co".
 > - **0.7.1 (28/09 14:03, Claude ra 0.7.0 cua Gemini + gop `main`):** nut Storyboard tren khung chon + toolbar + phim S.
 >   ☠️ NUT CHUA LAM GI: `isStoryboardMode` khong duoc doc o dau ca, bat len van luu 1 anh nhu cu. Chi de anh xem giao dien.
@@ -14,6 +17,36 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+
+## [0.7.4] - 2026-09-28 15:54 - Quay 3 giay thanh dai + bo cum Hien thi
+- Boi canh: anh gui anh khay 0.7.3: "Thu 1 anh muon bo 2 cai pill nay tu dong hien shot la duoc em / thu 2 la khi chon
+  Multi-Shot Storyboard Strip minh khoanh vung thi app se tu dong luu lai hinh anh voi 3s va chuyen thanh dai hinh
+  anh". Hoi 2 bang: anh chot "khoanh 1 lan chup 1 lan 3s", "cu du 3s la tao thanh 1 strips", 6 khung (0,5 s/khung),
+  vien cam + dem 3-2-1, BO dai ngay gio.
+- Da lam:
+  + Khay Storyboard: bo cum "Hien thi" (Nhan SHOT luon hien; dai ngay gio tat han `showInfoBar = false`).
+  + overlay.js xong(): dang bat Storyboard -> gui `{ rect, storyboard: true }` (bo qua net ve).
+  + main.js handleConfirm -> quay3Giay(): cho 350 ms (overlay anh dong bang vua dong, luong 5 fps ve man that) roi
+    6 lan x 0,5 s goi layKhungVung (luong.catVung; luong chua san sang -> grabDisplaysList + crop). Xong -> daiQuay
+    {items, tuLuu} -> openStoryboardWindow. get-data tra daiQuay (boCuc filmstrip, tuLuu CHI lan dau). Mo tu khay
+    (`shelf:open-storyboard`) -> daiQuay = null -> dung anh khay nhu cu. 6 khung KHONG vao khay; dai tu luu thi vao khay.
+  + luong-chup.js catVung() + luong.js onCat: renderer cat DUNG vung tu <video> (quy doi DIP -> co video that), JPEG q0.95.
+    Truoc: chi co 'luong:lay' gui CA man raw BGRA (~33 MB/man 4K) -> 6 lan/3 s qua nang.
+  + Vien: ☠️ KHONG dung 1 cua so trong suot phu vung (so loi: cua so trong suot phu video tang toc phan cung -> video DEN
+    trong anh). Nay 4 cua so thanh DAC #f86820 day 3px, cach vung 3px, nam NGOAI vung + dong ho (src/dem/) vien thuoc
+    64x26 tren vung (het cho thi duoi; het ca hai thi khong hien + ghi log). Tat ca focusable:false + bo qua chuot.
+- Kiem:
+  + luong.js catVung tren trinh duyet (man gia 1920x1080 = DIP 1280x720 sf 1.5, video 5 fps co o doi mau moi khung):
+    vung DIP 200x200 -> 300x300 px dung; tam ra o cam dung; 6 lan cach 0,5 s ra 6 mau khac nhau (60/120/160/220/4/64)
+    = 6 khung KHAC nhau; nhip 0/513/1013/1512/2011/2510 ms; moi lan cat 16-31 ms. Doi chung vung nen xanh -> ra xanh.
+  + Khay Storyboard mo tu quay: bo cuc dai, goi save dung 1 lan, dem 6, khong con cum Hien thi, 0 loi. Mo tu khay: KHONG tu luu.
+    (Lan "reload van save" la do stub trang thu chay lai tu dau — thuoc sai, khong tinh.)
+  + Dong ho 3-2-1 doi dung. `npm run test:storyboard` TAT CA DAT; node --check 7 file OK.
+- CHUA kiem (can app that, bung cua so len man anh — luat #12): 4 thanh vien + dong ho hien dung cho quanh vung tren man
+  150%/125%; luong that tra khung trong 350 ms dau (co the khung 1 con la anh dong bang?); video YouTube/Premiere co bi
+  den khong; duong du phong grab khi luong chua san sang; vung vat 2 man (khong ho tro — di duong ghep thuong).
+- File: src/overlay/overlay.js, src/main.js, src/luong-chup.js, src/luong/luong.js, src/preload-luong.js, src/dem/*,
+  src/storyboard/{index.html,storyboard.css,storyboard.js}.
 
 ## [0.7.3] - 2026-09-28 15:35 - Khay Storyboard theo khuon man Cai dat
 - Boi canh: anh xem 0.7.2: "chua chuan nhu UI dang co em" roi "font chu - pill - cach em sap xep", gui anh Cai dat

@@ -60,3 +60,25 @@ window.luong.onLay(async ({ gen, nhanh }) => {
     window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'raw', w: k.w, h: k.h, buf: id.data.buffer })
   }
 })
+
+/* 28/09 QUAY 3 GIAY (Multi-Shot Storyboard): cat DUNG vung khoanh tu video dang chay, tra JPEG q0.95.
+   rect la DIP cuc bo cua man; dipW/dipH = kich thuoc DIP cua man -> quy doi theo co video THAT
+   (video co the khong dung co native). Khong gui ca man raw nhu 'luong:lay' (4K ~33MB x 6 lan). */
+window.luong.onCat(async ({ id, displayId, rect, dipW, dipH }) => {
+  try {
+    const x = vids.find((o) => String(o.c.displayId) === String(displayId)) || vids[0]
+    if (!x) { window.luong.guiCat({ id, loi: 'khong co luong' }); return }
+    const v = x.v
+    const vw = v.videoWidth || x.c.w, vh = v.videoHeight || x.c.h
+    const kx = vw / dipW, ky = vh / dipH
+    const sx = Math.max(0, Math.round(rect.x * kx)), sy = Math.max(0, Math.round(rect.y * ky))
+    const sw = Math.max(1, Math.min(vw - sx, Math.round(rect.w * kx)))
+    const sh = Math.max(1, Math.min(vh - sy, Math.round(rect.h * ky)))
+    const cv = new OffscreenCanvas(sw, sh)
+    cv.getContext('2d').drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh)
+    const blob = await cv.convertToBlob({ type: 'image/jpeg', quality: 0.95 })
+    window.luong.guiCat({ id, buf: await blob.arrayBuffer(), w: sw, h: sh })
+  } catch (e) {
+    window.luong.guiCat({ id, loi: (e && e.message) || String(e) })
+  }
+})

@@ -15,8 +15,6 @@ const toastEl = document.getElementById('toast')
 
 const btnFilmstrip = document.getElementById('btn-filmstrip')
 const btnGrid = document.getElementById('btn-grid')
-const chkShotBadge = document.getElementById('chk-shot-badge')
-const chkInfoBar = document.getElementById('chk-info-bar')
 
 const btnCopy = document.getElementById('btn-copy')
 const btnSave = document.getElementById('btn-save')
@@ -27,8 +25,9 @@ const canvasWrapper = document.getElementById('canvas-wrapper')
 let rawItems = []
 let activeItems = []
 let currentLayout = 'filmstrip' // 'filmstrip' | 'grid'
-let showShotBadge = true
-let showInfoBar = true
+// [28/09] anh bo nut bat/tat: "tu dong hien shot la duoc" -> nhan SHOT luon hien. Dai ngay gio: anh chon "Bo".
+const showShotBadge = true
+const showInfoBar = false
 let toastTimer = null
 /* [ra 28/09] ti le chu/nhan theo co khung: 720px (dai) -> x2.4, 460px (luoi) -> x1.53.
    Truoc: badge 13px co dinh, dai 6.512px gui Zalo thu con ~1.000px -> nhan ~2px khong doc duoc. */
@@ -66,8 +65,10 @@ async function init() {
     rawItems = data.items
     activeItems = [...rawItems]
 
-    // Tu dong chon bo cuc thong minh: <= 5 anh: Filmstrip, > 5 anh: Grid
-    if (activeItems.length > 5) {
+    // Tu dong chon bo cuc thong minh: <= 5 anh: Filmstrip, > 5 anh: Grid.
+    // 28/09: mo tu QUAY 3 GIAY (data.boCuc) -> dai cuon phim (anh: "chuyen thanh dai hinh anh").
+    const boCuc = data.boCuc || (activeItems.length > 5 ? 'grid' : 'filmstrip')
+    if (boCuc === 'grid') {
       currentLayout = 'grid'
       btnFilmstrip.classList.remove('active')
       btnGrid.classList.add('active')
@@ -76,6 +77,8 @@ async function init() {
     updateShotBadgeCount()
     await loadAllImages()
     render()
+    // 28/09: QUAY 3 GIAY "tu dong luu" -> luu dai PNG vao thu muc anh (main them dai vao khay) dung MOT lan.
+    if (data.tuLuu) await doSave()
   } catch (err) {
     console.error('Loi khoi tao Storyboard:', err)
   }
@@ -488,19 +491,6 @@ btnGrid.addEventListener('click', () => {
   render()
 })
 
-// Toggles
-// [28/09] O tick -> pill bat/tat (cung kieu cum pill cua Cai dat): cam dac = dang bat.
-function batTat(nut, dat) {
-  nut.addEventListener('click', () => {
-    const bat = !nut.classList.contains('active')
-    nut.classList.toggle('active', bat)
-    nut.setAttribute('aria-pressed', String(bat))
-    dat(bat)
-    render()
-  })
-}
-batTat(chkShotBadge, (v) => { showShotBadge = v })
-batTat(chkInfoBar, (v) => { showInfoBar = v })
 
 // Phim tat
 window.addEventListener('keydown', (e) => {

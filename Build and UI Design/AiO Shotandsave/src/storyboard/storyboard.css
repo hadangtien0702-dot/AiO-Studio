@@ -176,5 +176,3 @@ img, canvas { -webkit-user-drag: none; }
 #toolbar .nut { flex: none; }
 /* Cua so hep (<= 720px): thu dem pill, khong thu chu */
 @media (max-width: 720px) { #toolbar .chon-nut { padding: 5px 10px; } #toolbar { padding: var(--sp-3); } }
-/* Cum "Hien thi" bat DUOC CA HAI (Cai dat moi cum chi 1 lua chon): 2 pill cam dac dung sat nhau thanh mot khoi -> chen khe */
-#toolbar .chon-nhom.nhieu { gap: 3px; }

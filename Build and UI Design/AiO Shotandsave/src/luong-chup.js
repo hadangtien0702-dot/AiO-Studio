@@ -171,6 +171,31 @@ function layKhung(onNhanh, onJpg) {
   })
 }
 
+/* 28/09 QUAY 3 GIAY: cat DUNG vung khoanh tu video dang chay (renderer luong.js onCat) -> Buffer JPEG.
+   Tra null neu luong chua san sang / loi / qua 1,5 s (nguoi goi tu roi ve duong grab). */
+let soCat = 0
+const choCat = new Map() // id -> resolve
+ipcMain.on('luong:cat-xong', (e, d) => {
+  if (!win || e.sender.id !== win.webContents.id) return
+  const r = choCat.get(d.id)
+  if (!r) return
+  choCat.delete(d.id)
+  if (d.loi || !d.buf) { ghiLog('LUONG cat loi: ' + d.loi); r(null); return }
+  r({ buf: Buffer.from(d.buf), w: d.w, h: d.h })
+})
+function catVung(display, rect) {
+  if (!sanSang()) return Promise.resolve(null)
+  const id = ++soCat
+  return new Promise((resolve) => {
+    choCat.set(id, resolve)
+    win.webContents.send('luong:cat', {
+      id, displayId: String(display.id), rect,
+      dipW: display.bounds.width, dipH: display.bounds.height,
+    })
+    setTimeout(() => { if (choCat.has(id)) { choCat.delete(id); ghiLog('LUONG cat het gio id ' + id); resolve(null) } }, 1500)
+  })
+}
+
 /* Man hinh doi / may ngu day -> nguon doi -> khoi dong lai (debounce). */
 function theoDoiMoiTruong() {
   if (TAT) return
@@ -184,4 +209,4 @@ function theoDoiMoiTruong() {
   } catch (e) {}
 }
 
-module.exports = { khoiDong, sanSang, layKhung, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH }
+module.exports = { khoiDong, sanSang, layKhung, catVung, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH }

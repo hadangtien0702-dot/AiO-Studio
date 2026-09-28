@@ -930,6 +930,13 @@ function napAnh(url) {
 /* ── Xong: ghep anh + shape roi gui ───────────────────────────────────── */
 function xong(copy) {
   chotOGoChu()
+  // 28/09: dang bat Multi-Shot Storyboard -> main QUAY 3 GIAY dung vung nay (6 khung) roi ghep dai.
+  // Net ve (neu co) khong ap len khung video dang chay -> chi gui vung.
+  if (isStoryboardMode) {
+    window.overlay.log('xong storyboard: quay 3s ' + curRect.w + 'x' + curRect.h)
+    window.overlay.confirm({ rect: curRect, storyboard: true })
+    return
+  }
   selectedShape = null
   redraw()
   if (!shapes.length) { window.overlay.confirm({ rect: curRect, copy: !!copy }); return }

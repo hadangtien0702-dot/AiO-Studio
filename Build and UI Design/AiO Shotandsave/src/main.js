@@ -1158,6 +1158,9 @@ async function handleConfirm(wcId, payload) {
   closeOverlay()
   if (!display || !payload) return
 
+  // 28/09: dang bat Multi-Shot Storyboard (nut/phim S tren khung chon) -> QUAY 3 GIAY vung nay thay vi chup 1 tam.
+  if (payload.storyboard && payload.rect) { quay3Giay(display, sf, payload.rect); return }
+
   let cropped
 
   // Truong hop CO VE SHAPE: renderer da ghep (crop + shape) roi gui dataURL.
@@ -1664,10 +1667,141 @@ ipcMain.on('settings:drag-start', (e) => batDauKeo(BrowserWindow.fromWebContents
 ipcMain.on('settings:drag-to', (e, tongDx, tongDy) => keoDen(BrowserWindow.fromWebContents(e.sender), e.sender.id, tongDx, tongDy))
 ipcMain.on('settings:drag-end', (e) => ketThucKeo(e.sender.id))
 
+/* ── QUAY 3 GIAY -> dai phan canh (28/09) ─────────────────────────────
+   Anh Tien: "khi chon Multi-Shot Storyboard Strip minh khoanh vung thi app se tu dong luu lai hinh anh voi 3s
+   va chuyen thanh dai hinh anh". Chot trong bang hoi 28/09: khoanh 1 lan -> quay 3 giay -> 6 khung (0,5 s/khung)
+   -> 1 dai; trong luc quay: vien cam + dem 3-2-1; bo dai ngay gio.
+   - Khung lay tu LUONG CHUP CHAY SAN (luong.catVung: renderer cat DUNG vung, JPEG) — 5 fps nen 0,5 s luon la
+     khung moi. Luong chua san sang -> grabDisplaysList (~0,4 s/lan, van kip 0,5 s).
+   - ☠️ KHONG cua so trong suot nao phu len vung: vien = 4 thanh DAC nam ngoai vung, dong ho nam tren/duoi vung.
+     (So loi: cua so trong suot phu len video tang toc phan cung -> video DEN trong anh chup.)
+   - 6 khung KHONG vao khay (tranh ngap khay); cua so Storyboard mo voi 6 khung va TU LUU dai (dai vao khay). */
+const QUAY_SO_KHUNG = 6
+const QUAY_BUOC_MS = 500
+const QUAY_CHO_MS = 350 // overlay (anh dong bang) vua dong -> doi luong 5 fps ve lai man that
+let dangQuay = false
+let daiQuay = null // { items: [{ id, seq, image }], tuLuu } -> storyboard:get-data doc thay khay
+
+const cho = (ms) => new Promise((r) => setTimeout(r, ms))
+
+function moVienQuay(display, rect) {
+  const b = display.bounds
+  const G = 3, T = 3, DH_W = 64, DH_H = 26 // khe, do day thanh, co dong ho
+  const gx = Math.round(b.x + rect.x), gy = Math.round(b.y + rect.y)
+  const rw = Math.round(rect.w), rh = Math.round(rect.h)
+  const ngoai = G + T
+  const thanh = [
+    { x: gx - ngoai, y: gy - ngoai, w: rw + 2 * ngoai, h: T },        // tren
+    { x: gx - ngoai, y: gy + rh + G, w: rw + 2 * ngoai, h: T },       // duoi
+    { x: gx - ngoai, y: gy - G, w: T, h: rh + 2 * G },                // trai
+    { x: gx + rw + G, y: gy - G, w: T, h: rh + 2 * G },               // phai
+  ]
+  const wins = []
+  for (const t of thanh) {
+    const w = new BrowserWindow({
+      x: t.x, y: t.y, width: Math.max(1, t.w), height: Math.max(1, t.h),
+      frame: false, resizable: false, movable: false, focusable: false, skipTaskbar: true,
+      hasShadow: false, show: false, backgroundColor: '#f86820', enableLargerThanScreen: true,
+      webPreferences: { sandbox: true, contextIsolation: true },
+    })
+    w.setBounds({ x: t.x, y: t.y, width: Math.max(1, t.w), height: Math.max(1, t.h) }) // Windows kep co toi thieu luc tao
+    w.setAlwaysOnTop(true, 'screen-saver')
+    w.setIgnoreMouseEvents(true)
+    w.showInactive()
+    wins.push(w)
+  }
+  // Dong ho: tren vung neu con cho, khong thi duoi; het cho ca hai -> khong hien (de khong lot vao anh).
+  let dhY = null
+  if (gy - ngoai - 4 - DH_H >= b.y) dhY = gy - ngoai - 4 - DH_H
+  else if (gy + rh + ngoai + 4 + DH_H <= b.y + b.height) dhY = gy + rh + ngoai + 4
+  let dongHo = null
+  if (dhY != null) {
+    dongHo = new BrowserWindow({
+      x: gx - ngoai, y: dhY, width: DH_W, height: DH_H,
+      frame: false, transparent: true, backgroundColor: '#00000000', resizable: false, movable: false,
+      focusable: false, skipTaskbar: true, hasShadow: false, show: false,
+      webPreferences: { sandbox: true, contextIsolation: true },
+    })
+    dongHo.setAlwaysOnTop(true, 'screen-saver')
+    dongHo.setIgnoreMouseEvents(true)
+    dongHo.loadFile(path.join(__dirname, 'dem', 'index.html'))
+    dongHo.once('ready-to-show', () => { if (!dongHo.isDestroyed()) dongHo.showInactive() })
+    wins.push(dongHo)
+  } else ghiLog('quay3s: khong co cho dat dong ho (vung sat ca mep tren lan duoi)')
+  return {
+    datSo: (n) => { if (dongHo && !dongHo.isDestroyed()) dongHo.webContents.executeJavaScript('window.datSo && window.datSo(' + n + ')').catch(() => {}) },
+    dong: () => { for (const w of wins) if (!w.isDestroyed()) w.destroy() },
+  }
+}
+
+async function layKhungVung(display, sf, rect) {
+  const r = await luong.catVung(display, rect)
+  if (r) return { image: nativeImage.createFromBuffer(r.buf), nguon: 'luong' }
+  const list = await grabDisplaysList()
+  const item = list.find((x) => x.display.id === display.id)
+  if (!item || !item.image) return null
+  const isz = item.image.getSize()
+  const kx = isz.width / (display.bounds.width * sf), ky = isz.height / (display.bounds.height * sf)
+  try {
+    return { image: item.image.crop({
+      x: Math.max(0, Math.round(rect.x * sf * kx)), y: Math.max(0, Math.round(rect.y * sf * ky)),
+      width: Math.max(1, Math.round(rect.w * sf * kx)), height: Math.max(1, Math.round(rect.h * sf * ky)),
+    }), nguon: 'grab' }
+  } catch (e) { return null }
+}
+
+async function quay3Giay(display, sf, rect) {
+  if (dangQuay) return
+  dangQuay = true
+  const vien = moVienQuay(display, rect)
+  const khung = []
+  const nhatKy = []
+  try {
+    await cho(QUAY_CHO_MS)
+    const batDau = Date.now()
+    for (let i = 0; i < QUAY_SO_KHUNG; i++) {
+      const tre = batDau + i * QUAY_BUOC_MS - Date.now()
+      if (tre > 0) await cho(tre)
+      vien.datSo(Math.max(1, 3 - Math.floor((Date.now() - batDau) / 1000)))
+      const t = Date.now() - batDau
+      const k = await layKhungVung(display, sf, rect)
+      if (k && k.image && !k.image.isEmpty()) {
+        khung.push({ id: i + 1, seq: i + 1, image: k.image })
+        nhatKy.push(t + 'ms/' + k.nguon + '/' + (Date.now() - batDau - t) + 'ms')
+      } else nhatKy.push(t + 'ms/LOI')
+    }
+    const conLai = batDau + QUAY_SO_KHUNG * QUAY_BUOC_MS - Date.now()
+    if (conLai > 0) await cho(conLai)
+  } catch (e) {
+    ghiLog('quay3s LOI: ' + (e && e.message || e))
+  } finally {
+    vien.dong()
+    dangQuay = false
+  }
+  ghiLog('quay3s ' + khung.length + '/' + QUAY_SO_KHUNG + ' khung [' + nhatKy.join(' ') + ']')
+  if (!khung.length) {
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+    return
+  }
+  daiQuay = { items: khung, tuLuu: true }
+  openStoryboardWindow()
+}
+
 /* ── Storyboard Strip IPC ────────────────────────────────────────────── */
-ipcMain.on('shelf:open-storyboard', () => openStoryboardWindow())
+ipcMain.on('shelf:open-storyboard', () => { daiQuay = null; openStoryboardWindow() })
 
 ipcMain.handle('storyboard:get-data', () => {
+  // Mo tu QUAY 3 GIAY: 6 khung vua quay (khong phai khay). Tu luu dung MOT lan (mo lai / reload khong luu nua).
+  if (daiQuay) {
+    const tuLuu = daiQuay.tuLuu
+    daiQuay.tuLuu = false
+    const items = daiQuay.items.map((it) => {
+      const sz = it.image.getSize()
+      const img = sz.height > 1080 ? it.image.resize({ height: 1080, quality: 'best' }) : it.image
+      return { id: it.id, seq: it.seq, w: sz.width, h: sz.height, kb: 0, dataUrl: 'data:image/jpeg;base64,' + img.toJPEG(92).toString('base64') }
+    })
+    return { items, lang, nguon: 'quay', tuLuu, boCuc: 'filmstrip' }
+  }
   const items = []
   for (const it of shelfItems.values()) {
     const sz = it.image.getSize()
