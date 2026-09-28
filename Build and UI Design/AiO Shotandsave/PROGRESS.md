@@ -14,6 +14,17 @@
 >   Thiet ke chi tiet da ghi o muc 2026-09-27 21:05 ngay ben duoi va CLAUDE.md. 1-click ghep cac anh trong khay
 >   thanh dai phim / luoi phan canh de editor gui duyet dao dien / khach hang hoac keo vao Premiere lam reference.
 
+## [WEB] - 2026-09-28 11:3x - Dua kieu lam mo 0.6.6-0.6.7 len https://aio-shotsave.vercel.app (commit `49b5057` tren main)
+- Boi canh: anh Tien 28/09: "em dua vao Build and UI Design/AiO Shotandsave moi lan update update len website cho anh
+  di em" -> LUAT MOI: moi ban Shot & Save moi thi Claude doi chieu ma app roi cap nhat web (chi ghi thu CO trong ma).
+- Da sua `Website/AiO ShotSave Web/index.html`: the tinh nang Lam mo ghi du 2 kieu (EN+VI); khung Cai dat mo phong
+  them the "Hieu ung lam mo" (chu nguyen van `src/i18n.js` set.lamMo.*, dat giua Khay va Thu muc nhu app); dong thu 5
+  ben trai + buoc phim thu 5 (con tro bam Mo min roi tra ve Kham khoi, mac dinh app); man < 520 px hang nay xuong dong.
+- Do (Chromium, may chu tam): 5 the / 5 dong; phim sang du 5 buoc trong 17 s, buoc 3 sang dung the Lam mo, nut Mo min
+  duoc chon; EN + VI dung chu app; 360 px: khong cuon ngang, chu trong nut 1 dong; 0 loi console. Live md5 = git HEAD
+  (`92e7cf88...`) sau ~75 s.
+- Chua kiem: tren iPhone/Safari that. Demo chup tren trang van chi co Kham khoi (dung mac dinh app), chua co Mo min.
+
 ## [0.6.7] - 2026-09-28 10:47 - [KET QUA RA SOAT CUA CLAUDE — Gemini doc lai buoi sau]
 - Boi canh: anh chuyen loi ban giao 0.6.6 cua Gemini: "Xong tinh nang tuy chon lam mo Mosaic / Mo min Blur, da push
   nhanh gemini, anh bao Claude ra nhe". Ra theo AGENTS.md luat 2, may cong ty, nhanh rieng `claude/ra-066`.
