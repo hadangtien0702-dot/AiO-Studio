@@ -35,6 +35,9 @@ const keys = [
   'sb.thongTin',
   'sb.chuaCoAnh',
   'sb.boShot',
+  'overlay.storyboard',
+  'overlay.storyboard_btn',
+  'overlay.storyboard_chip',
 ]
 for (const k of keys) {
   const count = (i18nContent.match(new RegExp("'" + k + "':", 'g')) || []).length
@@ -120,6 +123,19 @@ const khoExp = new Set(((khoSrc.match(/module\.exports\s*=\s*\{([\s\S]*?)\}/) ||
 const khoGoi = [...new Set([...mainJs.matchAll(/\bkho\.([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]))]
 const khoThieu = khoGoi.filter((f) => !khoExp.has(f))
 kiem('main.js goi ' + khoGoi.length + ' ham kho.* - tat ca deu duoc export', khoGoi.length > 0 && khoThieu.length === 0, khoThieu.length ? 'THIEU: ' + khoThieu.join(', ') : '')
+
+console.log('\n[7] Kiem tra Storyboard tren Overlay (Selection Box & Toolbar)')
+const overlayHtml = fs.readFileSync(path.join(ROOT, 'src', 'overlay', 'index.html'), 'utf8')
+const overlayCss = fs.readFileSync(path.join(ROOT, 'src', 'overlay', 'overlay.css'), 'utf8')
+const overlayJs = fs.readFileSync(path.join(ROOT, 'src', 'overlay', 'overlay.js'), 'utf8')
+
+kiem('Overlay HTML co nut #sel-storyboard-btn tren khung chon', overlayHtml.includes('id="sel-storyboard-btn"'))
+kiem('Overlay HTML co nut data-tool="storyboard" tren toolbar', overlayHtml.includes('data-tool="storyboard"'))
+kiem('Nut Storyboard tren Overlay dung icon SVG inline (viewBox 24 24)', overlayHtml.includes('viewBox="0 0 24 24"'))
+kiem('Overlay CSS co style cho .sel-opt-chip', overlayCss.includes('.sel-opt-chip'))
+kiem('Overlay CSS co style .sel-opt-chip.active voi accent cam', overlayCss.includes('.sel-opt-chip.active') && overlayCss.includes('var(--accent)'))
+kiem('Overlay JS co toggleStoryboardMode', overlayJs.includes('toggleStoryboardMode'))
+kiem('Overlay JS ho tro phim tat S', overlayJs.includes("'KeyS'") || overlayJs.includes("'s'"))
 
 console.log('\n' + '='.repeat(60))
 console.log(kq.join('\n'))

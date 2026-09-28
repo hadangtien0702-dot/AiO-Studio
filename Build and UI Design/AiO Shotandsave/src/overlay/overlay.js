@@ -10,9 +10,32 @@ const shotEl = document.getElementById('shot')
 const dimEl = document.getElementById('dim')
 const selEl = document.getElementById('sel')
 const sizeEl = document.getElementById('size')
+const selStoryboardBtn = document.getElementById('sel-storyboard-btn')
 const hintEl = document.getElementById('hint')
 const veEl = document.getElementById('ve')
 const toolbarEl = document.getElementById('toolbar')
+
+let isStoryboardMode = false
+
+function toggleStoryboardMode(force) {
+  isStoryboardMode = typeof force === 'boolean' ? force : !isStoryboardMode
+  if (selStoryboardBtn) {
+    selStoryboardBtn.classList.toggle('active', isStoryboardMode)
+  }
+  const sbBtn = toolbarEl.querySelector('.cong-cu[data-tool="storyboard"]')
+  if (sbBtn) {
+    sbBtn.classList.toggle('chon', isStoryboardMode)
+  }
+}
+
+if (selStoryboardBtn) {
+  selStoryboardBtn.addEventListener('mousedown', (e) => e.stopPropagation())
+  selStoryboardBtn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    toggleStoryboardMode()
+  })
+}
 
 const t = (k) => window.i18n.t(k)
 
@@ -210,6 +233,7 @@ let adjustStartRect = { x: 0, y: 0, w: 0, h: 0 }
 selEl.addEventListener('mousedown', (e) => {
   if (mode !== 'annotate') return
   if (e.button !== 0) return
+  if (e.target.closest('#sel-storyboard-btn')) return
   const handle = e.target.closest('.sel-handle')
   const edge = e.target.closest('.sel-edge')
   const size = e.target.closest('#size')
@@ -238,6 +262,7 @@ function capNhatGiaoDienKhung() {
   selEl.style.height = curRect.h + 'px'
   sizeEl.textContent = Math.round(curRect.w * DPR) + ' × ' + Math.round(curRect.h * DPR)
   sizeEl.classList.toggle('inside', curRect.y < 28)
+  if (selStoryboardBtn) selStoryboardBtn.classList.toggle('inside', curRect.y < 28)
 
   veEl.style.left = curRect.x + 'px'
   veEl.style.top = curRect.y + 'px'
@@ -422,6 +447,13 @@ window.addEventListener('keydown', (e) => {
   // Ctrl+C: xong + COPY vao clipboard (them, khong bo Enter / nut check).
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && mode === 'annotate') {
     e.preventDefault(); xong(true); return
+  }
+  // Phim S = bat/tat Storyboard Strip
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu) {
+    if (e.key === 's' || e.key === 'S' || e.code === 'KeyS') {
+      toggleStoryboardMode()
+      return
+    }
   }
   // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09)
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -636,6 +668,7 @@ function chonLaiTuDau(e) {
   veEl.hidden = true
   toolbarEl.hidden = true
   selEl.hidden = true
+  toggleStoryboardMode(false)
   dragging = true
   startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
   batDauDoKeo()
@@ -852,7 +885,13 @@ toolbarEl.addEventListener('click', (e) => {
   if (mau) { chonMau(mau.dataset.color); return }
   const b = e.target.closest('button')
   if (!b) return
-  if (b.dataset.tool) chonCongCu(b.dataset.tool)
+  if (b.dataset.tool) {
+    if (b.dataset.tool === 'storyboard') {
+      toggleStoryboardMode()
+      return
+    }
+    chonCongCu(b.dataset.tool)
+  }
   else if (b.id === 'undo') hoanTac()
   else if (b.id === 'huy') window.overlay.cancel()
   else if (b.id === 'xong') xong()
