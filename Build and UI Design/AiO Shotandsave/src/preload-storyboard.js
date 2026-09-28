@@ -19,9 +19,9 @@ contextBridge.exposeInMainWorld('i18n', {
 
 contextBridge.exposeInMainWorld('storyboard', {
   getData: () => ipcRenderer.invoke('storyboard:get-data'),
-  copy: (dataUrl) => ipcRenderer.invoke('storyboard:copy', dataUrl),
-  save: (dataUrl) => ipcRenderer.invoke('storyboard:save', dataUrl),
-  startDrag: (dataUrl) => ipcRenderer.send('storyboard:start-drag', dataUrl),
+  /* [ra 28/09] nhan byte PNG (Uint8Array) thay cho dataURL base64 */
+  copy: (u8) => ipcRenderer.invoke('storyboard:copy', u8),
+  save: (u8) => ipcRenderer.invoke('storyboard:save', u8),
+  startDrag: (u8, iconDataUrl) => ipcRenderer.send('storyboard:start-drag', u8, iconDataUrl),
   close: () => ipcRenderer.send('storyboard:close'),
-  dragWindow: (dx, dy) => ipcRenderer.send('storyboard:drag-window', dx, dy),
 })

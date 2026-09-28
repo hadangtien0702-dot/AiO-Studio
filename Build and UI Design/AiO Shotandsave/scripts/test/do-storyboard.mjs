@@ -111,6 +111,16 @@ for (const f of filesToCheck) {
   kiem('Khong co emoji trong ' + path.basename(f), !emojiRegex.test(content))
 }
 
+/* [ra 28/09 Claude] Grep "co ham" khong bat duoc goi ham KHONG TON TAI: ban 0.6.8 goi kho.thuMucKeo()
+   ma kho.js khong export -> keo dai Storyboard chet im lang, 51/51 van DAT. Kiem that: moi kho.X ma
+   main.js goi phai co trong module.exports cua kho.js. */
+console.log('\n[6] Kiem tra ham kho.* ma main.js goi deu ton tai')
+const khoSrc = fs.readFileSync(path.join(ROOT, 'src', 'kho.js'), 'utf8')
+const khoExp = new Set(((khoSrc.match(/module\.exports\s*=\s*\{([\s\S]*?)\}/) || [])[1] || '').split(/[\s,]+/).filter(Boolean))
+const khoGoi = [...new Set([...mainJs.matchAll(/\bkho\.([A-Za-z_]\w*)\s*\(/g)].map((m) => m[1]))]
+const khoThieu = khoGoi.filter((f) => !khoExp.has(f))
+kiem('main.js goi ' + khoGoi.length + ' ham kho.* - tat ca deu duoc export', khoGoi.length > 0 && khoThieu.length === 0, khoThieu.length ? 'THIEU: ' + khoThieu.join(', ') : '')
+
 console.log('\n' + '='.repeat(60))
 console.log(kq.join('\n'))
 console.log('='.repeat(60))

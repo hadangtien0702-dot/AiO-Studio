@@ -464,6 +464,8 @@ function openSettings() {
 let storyboardWin = null
 function openStoryboardWindow() {
   if (storyboardWin && !storyboardWin.isDestroyed()) {
+    // [ra 28/09] mo lai = nap lai khay (truoc: hien dai CU, thieu anh vua chup them)
+    storyboardWin.webContents.reload()
     storyboardWin.show()
     storyboardWin.focus()
     return
@@ -1687,12 +1689,33 @@ ipcMain.handle('storyboard:get-data', () => {
   return { items, lang }
 })
 
-ipcMain.handle('storyboard:copy', (_e, dataUrl) => {
-  if (!dataUrl) return { ok: false }
+/* [ra 28/09 Claude] Renderer gui THANG byte PNG (Uint8Array), khong qua base64 dataURL (+33%) va main
+   KHONG giai ma roi nen PNG lai lan nua (ban dau: createFromDataURL -> toPNG). Do ban dau (anh nhieu chu):
+   3 anh 10,2 MB / 5 anh 15,1 MB / 20 anh 25,8 MB chuoi base64 qua IPC.
+   Dai KEO ra ngoai = FILE THAT trong thu muc anh, ten duy nhat. Ban dau ghi .keo/storyboard-strip.png:
+   (1) kho.thuMucKeo KHONG duoc export -> TypeError -> keo khong bao gio chay; (2) .keo bi xoa moi lan mo
+   app -> Premiere mat media; (3) cung mot ten -> lan keo sau ghi de dai Premiere da nhan. */
+let sbDemTen = 0
+function luuFileStoryboard(buf) {
+  const dir = kho.baoDamThuMuc(kho.thuMucAnh())
+  const d = new Date()
+  const p = (v, k) => String(v).padStart(k || 2, '0')
+  const tenFile = 'shotandsave-storyboard-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+    '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '-' + p(d.getMilliseconds(), 3) + '-' + (++sbDemTen) + '.png'
+  const filePath = path.join(dir, tenFile)
+  fs.writeFileSync(filePath, buf)
+  return filePath
+}
+const layBuf = (u8) => (u8 && u8.byteLength ? Buffer.from(u8.buffer ? u8.buffer.slice(u8.byteOffset, u8.byteOffset + u8.byteLength) : u8) : null)
+
+ipcMain.handle('storyboard:copy', (_e, u8) => {
+  const buf = layBuf(u8)
+  if (!buf) return { ok: false }
   try {
-    const img = nativeImage.createFromDataURL(dataUrl)
+    const img = nativeImage.createFromBuffer(buf)
+    if (img.isEmpty()) throw new Error('anh rong')
     clipboard.writeImage(img)
-    ghiLog('storyboard chep vao clipboard: OK')
+    ghiLog('storyboard chep vao clipboard: OK ' + Math.round(buf.length / 1024) + ' KB')
     return { ok: true }
   } catch (err) {
     ghiLog('storyboard copy LOI: ' + err.message)
@@ -1700,19 +1723,13 @@ ipcMain.handle('storyboard:copy', (_e, dataUrl) => {
   }
 })
 
-ipcMain.handle('storyboard:save', (_e, dataUrl) => {
-  if (!dataUrl) return { ok: false }
+ipcMain.handle('storyboard:save', (_e, u8) => {
+  const buf = layBuf(u8)
+  if (!buf) return { ok: false }
   try {
-    const img = nativeImage.createFromDataURL(dataUrl)
-    const dir = kho.baoDamThuMuc(kho.thuMucAnh())
-    const d = new Date()
-    const p = (v, k) => String(v).padStart(k || 2, '0')
-    const tenFile = 'shotandsave-storyboard-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
-      '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '.png'
-    const filePath = path.join(dir, tenFile)
-    fs.writeFileSync(filePath, img.toPNG())
+    const filePath = luuFileStoryboard(buf)
     ghiLog('storyboard luu file: ' + filePath)
-    shelfAdd(img, filePath)
+    shelfAdd(nativeImage.createFromBuffer(buf), filePath)
     return { ok: true, filePath }
   } catch (err) {
     ghiLog('storyboard save LOI: ' + err.message)
@@ -1720,15 +1737,15 @@ ipcMain.handle('storyboard:save', (_e, dataUrl) => {
   }
 })
 
-ipcMain.on('storyboard:start-drag', (e, dataUrl) => {
-  if (!dataUrl) return
+ipcMain.on('storyboard:start-drag', (e, u8, iconDataUrl) => {
+  const buf = layBuf(u8)
+  if (!buf) return
   try {
-    const img = nativeImage.createFromDataURL(dataUrl)
-    const dir = kho.baoDamThuMuc(kho.thuMucKeo())
-    const filePath = path.join(dir, 'storyboard-strip.png')
-    fs.writeFileSync(filePath, img.toPNG())
+    const filePath = luuFileStoryboard(buf)
     const duong = kho.duongDanKeoAnToan(filePath)
-    e.sender.startDrag({ file: duong, icon: img.resize({ height: 80, quality: 'best' }) })
+    let icon = iconDataUrl ? nativeImage.createFromDataURL(iconDataUrl) : null
+    if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'icon.png')).resize({ height: 64 })
+    e.sender.startDrag({ file: duong, icon })
     ghiLog('storyboard startDrag: ' + duong)
   } catch (err) {
     ghiLog('storyboard startDrag LOI: ' + err.message)

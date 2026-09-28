@@ -30,6 +30,9 @@ let currentLayout = 'filmstrip' // 'filmstrip' | 'grid'
 let showShotBadge = true
 let showInfoBar = true
 let toastTimer = null
+/* [ra 28/09] ti le chu/nhan theo co khung: 720px (dai) -> x2.4, 460px (luoi) -> x1.53.
+   Truoc: badge 13px co dinh, dai 6.512px gui Zalo thu con ~1.000px -> nhan ~2px khong doc duoc. */
+let tl = 1
 
 // Chuyen doi chuoi i18n
 document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -134,14 +137,32 @@ function render() {
   } else {
     renderGrid()
   }
+  nenSan()
 }
+
+/* [ra 28/09] toBlob chay nen (khong chan giao dien nhu toDataURL), gui BYTE thang sang main. */
+let banNen = null   // Promise<{ u8, icon }> cua lan ve moi nhat
+function nenSan() {
+  const ve = document.createElement('canvas')
+  const hIcon = 80, wIcon = Math.max(1, Math.round(canvas.width * hIcon / canvas.height))
+  ve.width = Math.min(wIcon, 480); ve.height = Math.round(ve.width * canvas.height / canvas.width)
+  ve.getContext('2d').drawImage(canvas, 0, 0, ve.width, ve.height)
+  const icon = ve.toDataURL('image/png')
+  banNen = new Promise((res, rej) => canvas.toBlob((b) => b ? b.arrayBuffer().then((ab) => res({ u8: new Uint8Array(ab), icon }), rej) : rej(new Error('toBlob rong')), 'image/png'))
+}
+const layBanNen = () => banNen || (nenSan(), banNen)
 
 /** 1. Bo cuc Cinema Filmstrip (Dai ngang lien mach) */
 function renderFilmstrip() {
-  const frameH = 720
   const gap = 16
   const pad = 24
-  const infoH = showInfoBar ? 46 : 0
+  /* [ra 28/09] tran be ngang 16.000 px: do 40 anh 16:9 o dang dai = 51.872 px, PNG 88 MB (khong gui/mo noi).
+     Vuot tran thi khung thap xuong (toi thieu 160 px), chu/nhan thu theo (tl). */
+  const TRAN_W = 16000
+  const tongTiLe = activeItems.reduce((a, it) => a + ((it.imgEl && it.imgEl.naturalWidth) || it.w || 16) / ((it.imgEl && it.imgEl.naturalHeight) || it.h || 9), 0)
+  const frameH = Math.max(160, Math.min(720, Math.floor((TRAN_W - pad * 2 - gap * (activeItems.length - 1)) / (tongTiLe || 1))))
+  tl = frameH / 300
+  const infoH = showInfoBar ? Math.round(46 * tl) : 0
   const extraBottom = showInfoBar ? 12 : 0
 
   // Tinh toan be rong moi shot theo ty le thuc te
@@ -192,7 +213,7 @@ function renderFilmstrip() {
 
     // Nhãn SHOT 01, SHOT 02...
     if (showShotBadge) {
-      drawShotBadge(curX + 14, curY + 14, idx + 1)
+      drawShotBadge(curX + Math.round(14 * tl), curY + Math.round(14 * tl), idx + 1)
     }
 
     // Luu toa do de tao overlay xoa shot
@@ -203,7 +224,7 @@ function renderFilmstrip() {
 
   // Dòng ngày giờ & Watermark
   if (showInfoBar) {
-    drawInfoBar(pad, totalH - pad - infoH + 8, totalW - pad * 2, infoH)
+    drawInfoBar(pad, totalH - pad - infoH + 8, totalW - pad * 2, infoH - 8)
   }
 
   // Tao overlay tuong tac cho DOM
@@ -219,9 +240,10 @@ function renderGrid() {
 
   const rows = Math.ceil(n / cols)
   const cellH = 460
+  tl = cellH / 300
   const gap = 16
   const pad = 24
-  const infoH = showInfoBar ? 46 : 0
+  const infoH = showInfoBar ? Math.round(46 * tl) : 0
   const extraBottom = showInfoBar ? 12 : 0
 
   // Tinh be rong chuan theo 16:9 trung binh
@@ -285,7 +307,7 @@ function renderGrid() {
 
     // Badge
     if (showShotBadge) {
-      drawShotBadge(curX + 14, curY + 14, idx + 1)
+      drawShotBadge(curX + Math.round(14 * tl), curY + Math.round(14 * tl), idx + 1)
     }
 
     boxes.push({ id: item.id, x: curX, y: curY, w: cellW, h: cellH })
@@ -293,7 +315,7 @@ function renderGrid() {
 
   // Dòng thông tin footer
   if (showInfoBar) {
-    drawInfoBar(pad, totalH - pad - infoH + 8, totalW - pad * 2, infoH)
+    drawInfoBar(pad, totalH - pad - infoH + 8, totalW - pad * 2, infoH - 8)
   }
 
   setupOverlays(boxes, totalW, totalH)
@@ -301,23 +323,22 @@ function renderGrid() {
 
 /** Ve badge SHOT 01, SHOT 02... */
 function drawShotBadge(x, y, num) {
-  const padH = 10
-  const padV = 5
+  const padH = 10 * tl
   const txt = 'SHOT ' + String(num).padStart(2, '0')
 
   ctx.save()
-  ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.font = 'bold ' + Math.round(13 * tl) + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   const tw = ctx.measureText(txt).width
   const bw = tw + padH * 2
-  const bh = 24
+  const bh = Math.round(24 * tl)
 
   ctx.fillStyle = 'rgba(9, 10, 13, 0.88)'
-  roundRect(ctx, x, y, bw, bh, 5)
+  roundRect(ctx, x, y, bw, bh, 5 * tl)
   ctx.fill()
 
   ctx.strokeStyle = 'rgba(248, 104, 32, 0.5)'
-  ctx.lineWidth = 1.2
-  roundRect(ctx, x, y, bw, bh, 5)
+  ctx.lineWidth = 1.2 * tl
+  roundRect(ctx, x, y, bw, bh, 5 * tl)
   ctx.stroke()
 
   ctx.fillStyle = '#f86820'
@@ -341,7 +362,7 @@ function drawInfoBar(x, y, w, h) {
   ctx.stroke()
 
   ctx.fillStyle = '#8b8e9f'
-  ctx.font = '500 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.font = '500 ' + Math.round(12 * tl) + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.textBaseline = 'middle'
 
   // Ben trai: AiO Studio Storyboard
@@ -397,9 +418,9 @@ function removeShot(id) {
 async function doCopy() {
   if (activeItems.length === 0) return
   try {
-    const dataUrl = canvas.toDataURL('image/png')
-    await window.storyboard.copy(dataUrl)
-    showToast(t('sb.copyThanhCong'))
+    const { u8 } = await layBanNen()
+    const res = await window.storyboard.copy(u8)
+    if (res && res.ok) showToast(t('sb.copyThanhCong'))
   } catch (err) {
     console.error('Loi copy:', err)
   }
@@ -408,8 +429,8 @@ async function doCopy() {
 async function doSave() {
   if (activeItems.length === 0) return
   try {
-    const dataUrl = canvas.toDataURL('image/png')
-    const res = await window.storyboard.save(dataUrl)
+    const { u8 } = await layBanNen()
+    const res = await window.storyboard.save(u8)
     if (res && res.ok) {
       showToast(t('sb.luuThanhCong'))
     }
@@ -418,11 +439,11 @@ async function doSave() {
   }
 }
 
-function doStartDrag() {
+async function doStartDrag() {
   if (activeItems.length === 0) return
   try {
-    const dataUrl = canvas.toDataURL('image/png')
-    window.storyboard.startDrag(dataUrl)
+    const { u8, icon } = await layBanNen()
+    window.storyboard.startDrag(u8, icon)
   } catch (err) {
     console.error('Loi drag:', err)
   }
@@ -440,13 +461,10 @@ btnDrag.addEventListener('dragstart', (e) => {
   doStartDrag()
 })
 
-canvasWrapper.addEventListener('mousedown', (e) => {
-  if (e.target.closest('.shot-remove-btn')) return
-  // Neu bam giu va keo tren canvas -> goi startDrag
-})
-
+canvasWrapper.draggable = true
 canvasWrapper.addEventListener('dragstart', (e) => {
   e.preventDefault()
+  if (e.target.closest && e.target.closest('.shot-remove-btn')) return
   doStartDrag()
 })
 

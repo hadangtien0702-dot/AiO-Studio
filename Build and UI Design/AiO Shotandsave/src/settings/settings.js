@@ -298,7 +298,8 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
     the.classList.toggle('het', s.loai === 'het-han-thu')
     if (co) {
       tieuDe.textContent = t('bq.daKichHoat') + ' · ' + s.maHienThi
-      moTa.textContent = s.hetQuyenCapNhat || s.khongGiuMay || !s.hetHan ? t('bq.hetCapNhat') : t('bq.capNhatDen').replace('{ngay}', ngay(s.hetHan))
+      // [28/09] gia $14.99 cap nhat TRON DOI: ma KHONG co ngay het han = tron doi (truoc: bao nham 'da het han')
+      moTa.textContent = s.hetQuyenCapNhat || s.khongGiuMay ? t('bq.hetCapNhat') : !s.hetHan ? t('bq.tronDoi') : t('bq.capNhatDen').replace('{ngay}', ngay(s.hetHan))
       nutHuy.hidden = !!s.khongGiuMay            // ma het han khong giu cho may nao -> khong co gi de huy
     } else if (s.biThuHoi) {
       tieuDe.textContent = t('bq.thuHoi'); moTa.textContent = t('bq.thuHoiMoTa')

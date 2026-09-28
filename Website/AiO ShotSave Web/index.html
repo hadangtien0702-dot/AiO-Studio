@@ -230,7 +230,7 @@ h1,h2,h3{text-wrap:balance}
 .sec-head p{margin:0;color:var(--ink-2);font-size:var(--fs-sub)}
 .grid{display:grid;gap:16px;grid-template-columns:1fr}
 @media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
-@media (min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}.grid .card.rong{grid-column:1 / -1}}   /* 28/09: the thu 10 trai het hang, khong le 1 the */
 .card{padding:28px;border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .2s ease,transform .2s ease}
 .card:hover{box-shadow:inset 0 0 0 1px var(--line-strong),var(--shadow)}
 .ico{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--brand-soft);color:var(--brand-ink);margin-bottom:20px}
@@ -831,6 +831,13 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f9t">A shelf that remembers</h3>
           <p data-i="f9p">Shots are numbered #1, #2 and so on. Restart the app and your 5 latest shots are still in the shelf.</p>
         </article>
+        <!-- 28/09: Storyboard Strip (app 0.6.9, Gemini dung + Claude ra). Chi ghi thu da do: phim S trong khay, dai / luoi,
+             nhan SHOT, bo shot, chep, luu PNG. CHUA ghi "keo vao Premiere" vi chua thu tren may that. -->
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 8h20M2 16h20"/></svg></div>
+          <h3 data-i="f10t">A storyboard in one key</h3>
+          <p data-i-html="f10p">Press <kbd>S</kbd> in the shelf and your shots line up as a numbered strip, or a grid when there are more than five. Remove any shot, then copy it or save it as one PNG to send for review.</p>
+        </article>
       </div>
     </div>
   </section>
@@ -1044,6 +1051,7 @@ const T = {
     f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm vào là ghim lên màn hình.",
     f7t:"Làm mờ thông tin riêng", f7p:"Bấm <kbd>4</kbd> rồi kéo qua tên, email hay số tài khoản để che trước khi gửi đi. Chọn kiểu khảm khối hoặc mờ mịn trong Cài đặt.",
     f8t:"Chỉnh lại trước khi lưu", f8p:"Kéo xong vẫn co giãn, dời được khung chụp. Bấm <kbd>V</kbd> để chọn nét vẽ rồi di chuyển hoặc xoá.",
+    f10t:"Dải phân cảnh bằng một phím", f10p:"Bấm <kbd>S</kbd> trong khay, các ảnh xếp thành dải có đánh số SHOT, hoặc thành lưới khi nhiều hơn năm ảnh. Bỏ bớt ảnh thừa, rồi chép hoặc lưu thành một file PNG để gửi duyệt.",
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
@@ -1552,7 +1560,9 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     await ngu(nhip(160));                                // khựng: ngắm điểm bắt đầu
     await bam(); batDau();
     sel = { x, y, w: 0, h: 0, ox: x, oy: y }; chon = false;
-    await diToi(x + w, y + h, nhip(950), (px, py) => { sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); }, "expo.out");   // bung nhanh rồi chỉnh chậm cho khít
+    // 28/09: khung đổi cỡ giữa lượt → size() gọi huy() → sel = null, tween vẫn chạy → "Cannot set properties of null (setting 'w')" mỗi giây (đo)
+    await diToi(x + w, y + h, nhip(950), (px, py) => { if (!sel) return; sel.w = px - x; sel.h = py - y; datNhan(); drawOv(); }, "expo.out");   // bung nhanh rồi chỉnh chậm cho khít
+    if (!sel) return;                                    // lượt này đã bị huỷ (đổi cỡ), bỏ phần còn lại
     chon = true; datNhan(); datTools(); drawOv();
     if (window.gsap) {                                   // thanh công cụ bật lên từ dưới vùng chọn
       gsap.fromTo(tools, { opacity: 0, y: 8, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: .35, ease: "back.out(2)", clearProps: "opacity,transform" });

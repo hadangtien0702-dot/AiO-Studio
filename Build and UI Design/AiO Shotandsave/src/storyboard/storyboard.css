@@ -384,3 +384,12 @@ svg.ic-md { width: 15px; height: 15px; }
   transform: translateX(-50%) translateY(0);
   opacity: 1;
 }
+
+/* [ra 28/09 Claude] Khung mac dinh 1080px: 6 nhan gay 2 dong ("3 KHUNG / HINH", "Sao chep / (Ctrl+C)").
+   Giu 1 dong; khung hep thi bo phim tat trong ngoac va chu nut che do (icon + title van con). */
+#title, .badge, .btn-tool, .opt-label, .btn-primary, .btn-sub { white-space: nowrap; }
+@media (max-width: 1180px) { .btn-tool span, .btn-tool [data-i18n] { display: none; } }
+/* Hep hon nua (cua so toi thieu 640px): do 28/09 thanh cong cu dai 904px, nut Dong bi day ra ngoai man hinh.
+   Bo chu, giu icon + title (re chuot van thay ten nut). */
+@media (max-width: 1000px) { #title, .opt-label span[data-i18n] { display: none; } }
+@media (max-width: 860px) { .btn-primary span[data-i18n], .btn-sub span[data-i18n] { display: none; } }

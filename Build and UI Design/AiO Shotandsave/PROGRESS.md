@@ -1,11 +1,51 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 11:39 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 12:51 +0700
+> - **0.6.9 (28/09 12:51, Claude ra + gop `main`):** Storyboard 0.6.8 cua Gemini + sua 6 loi (muc 0.6.9 ngay duoi).
+>   Bo cai `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.9.exe` (84,3 MB) — ANH TU CAI (luat 28/09).
+>   Web da co the Storyboard. [CHO ANH] keo dai Storyboard vao Premiere tren may that; chua ai chay app that 0.6.9.
 > - **BAN TREN NHANH GEMINI: 0.6.8** (28/09 11:39, Gemini) — Trien khai tinh nang Multi-Shot Storyboard Strip (ghep dai phan canh dien anh 1-click tu khay anh).
 > - **0.6.7 (28/09 10:47, Claude ra soat ban Gemini 0.6.6):** tuy chon lam mo Kham khoi / Mo min DAT; sua 1 loi Mo min
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+
+## [0.6.9] - 2026-09-28 12:51 - [KET QUA RA SOAT BAN GEMINI 0.6.8 — Gemini doc lai buoi sau]
+- Boi canh: anh gui anh chup loi bao cua Gemini (0.6.8 Storyboard xong, 51/51 DAT, cho Claude ra -> gop main -> bo
+  cai -> web). Ra o thu muc rieng (nhanh `claude/ra-066`) vi thu muc chinh co file sua do cua phien Guide Frame.
+- Cach do: ban do chay NGUYEN VAN src/storyboard (html/css/js + i18n that) trong Chromium 1080x700 (dung co cua so
+  app), gia preload; anh thu NHIEU CHU nhu anh chup man hinh (anh mau phang giau chi phi nen PNG - vap lan dau, so
+  do lan dau cua 5/20 anh la thuoc mu vi khong ve lai, da bo).
+- **6 LOI THAT (da sua):**
+  1. **Keo dai ra ngoai KHONG BAO GIO chay:** main goi `kho.thuMucKeo()` ma kho.js khong export -> TypeError bi
+     nuot vao run-log. Them phep kiem vao `test:storyboard` [6]: moi `kho.X` main goi phai duoc export — doi chung:
+     ban 949f1cf TRUOT "THIEU: thuMucKeo", ban sua DAT.
+  2. **Dai keo nam trong `.keo` bi XOA moi lan mo app** (kho.js:66) + cung ten `storyboard-strip.png` -> Premiere
+     mat media / lan keo sau ghi de dai truoc. Sua: `luuFileStoryboard` ghi FILE THAT trong thu muc anh, ten duy
+     nhat `shotandsave-storyboard-<ngay-gio-ms>-<n>.png`.
+  3. **Mo lai Storyboard hien dai CU** (thieu anh chup them): mo lai = `webContents.reload()`.
+  4. **"Xuat < 50 ms" chua tung do va sai:** toDataURL chan giao dien 134-377 ms, base64 10,2-25,8 MB qua IPC, main
+     giai ma roi nen PNG LAI. Sua: `toBlob` nen san sau moi lan ve, gui Uint8Array, main ghi thang byte. Do: bam
+     Chep 8 ms, Luu 5 ms, Keo 3 ms toi IPC; du lieu 15,1 -> 10,2 MB (5 anh).
+  5. **Nhan SHOT / dong ngay gio 13 px co dinh** tren dai 4.000-6.500 px -> thu nho gui Zalo con ~2 px. Sua: ti le
+     theo co khung (x2,4 dai, x1,53 luoi); do chu cam cao 22 px.
+  6. **Thanh cong cu:** 1080 px gay 6 nhan thanh 2 dong; 640 px (min) dai 904 px, nut Dong bi day ra NGOAI man.
+     Sua: nowrap + kho hep bo chu giu icon/title. Do 640/900/1080: 0 tran, 0 gay dong, nut Dong trong man.
+  + Kem (gia moi anh chot 28/09): ma KHONG co ngay het han hien "Da het han cap nhat" -> nay "Nhan moi ban cap nhat,
+    tron doi" (`bq.tronDoi`, settings.js:301).
+  + Keo tren CA dai anh (truoc chi nut nho ✥ keo duoc vi canvas khong draggable).
+  + Dai qua dai: 40 anh 16:9 o dang dai = 51.872 px, PNG 88 MB. Tran be ngang 16.000 px (khung thap xuong, toi
+    thieu 160 px): do 40 anh -> 15.952x308, 7,8 MB; 5 anh giu nguyen 6512x890.
+- WEB (cung commit): them the "Dai phan canh bang mot phim" (EN+VI; CHUA ghi "keo vao Premiere" vi chua thu may
+  that); sua loi CO SAN cua demo tu chay: khung doi co giua luot -> "Cannot set properties of null (setting 'w')"
+  moi giay (tai hien tren web live; ban va 0 loi / 14 s doi co lien tuc, demo van chay tiep).
+- DAT, khong sua: thu tu SHOT dung thu tu chup (nap anh cu truoc, seq tang); nut x khop tung khung (lop nut = khung
+  canvas tung px); luoi 20 anh khong meo.
+- Kiem: test:storyboard DAT (them muc [6]), test:lammo 25/25, test:banquyen 27/27, node --check moi file 0 loi.
+  `npm run dist` 36 s -> Setup-0.6.9.exe 84,3 MB; app.asar trong bo cai co luuFileStoryboard/nenSan/bq.tronDoi,
+  exe ProductVersion 0.6.9.0; chep vao Release khop tung byte.
+- CHUA kiem: chay app that 0.6.9 (anh tu cai); keo dai vao Premiere/Zalo that; toBlob nen nen ~200 ms sau khi ve
+  (bam Chep ngay trong 200 ms dau van phai cho).
 
 ## [0.6.8] - 2026-09-28 11:39 - [BAN GIAO CHO CLAUDE]
 - Boi canh: Loi anh Tien (28/09): "Multi-Shot Storyboard Strip, trien khai di em - kiem tra - va cho anh xem thanh qua", "o goc nhin nguoi dung em hay suy nghi lam sao de de dung nhat em nhe".
