@@ -84,7 +84,7 @@ File này là luật chung. Cả hai cùng theo **sổ lỗi tái diễn** của
 | Thư mục ảnh, khay (`kho.js`, shelf) | #4 #11 xoá/mất ảnh của anh | không xoá/ghi đè ảnh thật; test trên BẢN SAO; cài đè xong đếm ảnh trước = sau |
 | Khay: nạp ảnh gần nhất | 27/09 ảnh vừa chụp hiện 2 lần | `shelfAdd` gọi `napAnhGanNhatVaoKhay(filePath)` TRƯỚC `ensureShelf` — đừng gỡ |
 | Bài test bật cửa sổ chụp | #12 bung overlay lên màn anh đang làm | anh đang ngồi máy thì **không chạy selftest** — hỏi trước |
-| Cài bản mới | #3 "sửa rồi vẫn thấy cũ" | `npm run dist` + cài đè + ProductVersion tiến trình đang chạy + dòng `boot vX.Y.Z` run-log |
+| Bản mới / Release | anh Tiến chốt 28/09: "mỗi lần làm xong cứ thêm vào bản release anh tự cài" | `npm run dist` -> chép bộ cài `.exe` vào `Release/<app>/win/` + cập nhật `HUONG-DAN-CAI-DAT.txt` (để anh tự cài) |
 
 Chữ người dùng thấy: đủ **VI + EN** (`src/i18n.js`), **không dùng gạch ngang dài "—"**, câu hướng dẫn nói **đúng
 hành vi thật**. Máy/thư mục mới: `npm install` trong thư mục app trước khi chạy.
