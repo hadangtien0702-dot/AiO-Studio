@@ -1,240 +1,166 @@
-/* Storyboard Strip — cung ngon ngu voi khay anh (src/shelf/shelf.css).
-   [28/09 Claude] Viet lai theo loi anh Tien "dong bo va dep voi khay anh thuong":
-   ban truoc TU KHAI lai :root (--bg-0 #090a0d, --r-sm 4px...) de len tokens.css, dung font he thong,
-   thanh tren 46px, nen loang tron -> nhin nhu app khac. Nay KHONG khai token rieng: moi mau/co/bo goc
-   lay tu assets/tokens.css. Mau VE TRONG ANH XUAT (canvas) giu nguyen — do la san pham, khong phai khung. */
+/* Storyboard Strip — CUNG ngon ngu voi man Cai dat (src/settings/settings.css).
+   [28/09 Claude] Lan 1 (0.7.2) em chep khuon thanh tren cua KHAY ANH (30px, chu xam 11px) + nut vuong cam nhat.
+   Anh Tien: "chua chuan nhu UI dang co · font chu - pill - cach em sap xep". Chuan dung la man Cai dat:
+   header 46px chu trang 13px/700 · pill bo tron nen --bg-0, lua chon cam DAC chu trang dam · nhan chu ben trai,
+   cum pill ben phai · nut vien thuoc 34px. Moi so duoi day CHEP tu settings.css, khong tu nghi.
+   KHONG khai token rieng (bai kiem do-storyboard.mjs chan). Mau VE TRONG ANH XUAT (canvas) giu nguyen. */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
   width: 100%; height: 100%;
   overflow: hidden;
-  background: var(--bg-2);
-  font-family: var(--font-ui);
-  font-size: var(--fs-md);
+  background: var(--bg-1);
   color: var(--text-1);
+  font-family: var(--font-ui);
   user-select: none;
 }
-button, input { font-family: inherit; }
+body { display: flex; flex-direction: column; border: 1px solid var(--line-strong); }
+/* KHONG dat button{font-family:inherit}: nut ben Cai dat hien bang font mac dinh cua nut (Arial, do 28/09) —
+   day la thu anh Tien dang nhin va coi la chuan. Doi ca bo sang Inter thi doi O CA HAI man cung luc. */
 img, canvas { -webkit-user-drag: none; }
 
-#app {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  background: var(--bg-2);
-  border: 1px solid var(--line-strong);
-  overflow: hidden;
-}
-
-/* ── Thanh tren: y het #bar cua khay anh ─────────────────────────────── */
-#bar {
-  display: flex; align-items: center; gap: var(--sp-2);
-  height: 30px; padding: 0 var(--sp-2) 0 var(--sp-1);
-  background: var(--bg-1);
+/* ── Header: y het #tieu-de cua Cai dat ──────────────────────────────── */
+#tieu-de {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 46px; padding: 0 var(--sp-3) 0 var(--sp-4);
   border-bottom: 1px solid var(--line-1);
   flex: none;
-  -webkit-app-region: drag; /* cua so khong vien: keo thanh tren de di chuyen */
+  -webkit-app-region: drag;
 }
-#bar button { -webkit-app-region: no-drag; }
+.hieu { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; }
+.hieu .logo { color: var(--accent); flex: none; }
+#title { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-#logo {
-  display: flex; align-items: center;
-  color: var(--accent);
-  padding: 0 var(--sp-1) 0 var(--sp-2);
-}
-
-#title {
-  font-size: var(--fs-xs); font-weight: var(--fw-semibold);
-  color: var(--text-2); letter-spacing: var(--ls-display);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* So shot dang ghep — cung vien thuoc voi #count cua khay */
+/* So shot dang ghep: vien thuoc nho canh ten (cung kieu so dem cua khay anh) */
 #shot-badge {
-  min-width: 17px; height: 15px; padding: 0 5px; flex: none;
+  min-width: 20px; height: 18px; padding: 0 6px; flex: none;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  font-size: 11px; font-weight: 700;
   color: var(--accent-text); background: var(--accent-soft);
   border: 1px solid var(--accent-line);
   border-radius: var(--r-pill);
 }
 
-.spacer { flex: 1; }
-
-#bar button {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 21px; height: 21px; flex: none;
-  border: none; border-radius: var(--r-sm);
-  background: transparent; color: var(--icon-dim);
-  cursor: pointer;
+.dieu-khien { display: flex; align-items: center; gap: var(--sp-1); -webkit-app-region: no-drag; }
+.dong {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border: none; border-radius: 50%;
+  background: transparent; color: var(--icon-dim, var(--text-3)); cursor: pointer;
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-#bar button:hover { background: var(--bg-hover); color: var(--text-1); }
-#bar button:active { transform: scale(0.92); }
-#bar #btn-drag { cursor: grab; }
-#bar #btn-drag:hover { color: var(--accent); }
-#bar #btn-close:hover { background: var(--danger-strong); color: #fff; }
+.dong:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+.dong.keo { cursor: grab; }
+.dong.keo:hover { background: var(--bg-hover); color: var(--accent); }
 
-/* ── Hang cong cu: bo cuc · tuy chon · Luu · Sao chep ───────────────── */
+/* ── Hang dieu khien: [nhan + cum pill] [nhan + cum pill] ... [Luu] [Sao chep] ── */
 #toolbar {
-  display: flex; align-items: center; gap: var(--sp-3);
-  height: 40px; padding: 0 var(--sp-3);
-  background: var(--bg-2);
+  display: flex; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--line-1);
   flex: none;
 }
+.spacer { flex: 1; }
 
-svg.ic {
-  display: block; flex: none;
-  fill: none; stroke: currentColor; stroke-width: 2;
-  stroke-linecap: round; stroke-linejoin: round;
-}
-
-/* Nut chon bo cuc: cum 2 nut dinh nhau, nut dang chon = nen cam nhat (khong cam dac —
-   dac danh cho nut chinh duy nhat Sao chep). */
-.layout-group {
-  display: inline-flex; align-items: center; gap: 2px;
-  padding: 2px;
+.hang-chon { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
+.nhan-chon { font-size: 12.5px; color: var(--text-2); font-weight: 600; }
+.chon-nhom {
+  display: flex; padding: 2px;
   background: var(--bg-0);
   border: 1px solid var(--line-2);
-  border-radius: var(--r-sm);
-  flex: none;
+  border-radius: var(--r-pill);
 }
-.btn-tool {
-  display: inline-flex; align-items: center; gap: var(--sp-2);
-  height: var(--h-ctrl-sm); padding: 0 var(--sp-3);
-  border: 1px solid transparent; border-radius: 4px;
-  background: transparent; color: var(--text-3);
-  font-size: var(--fs-xs); font-weight: var(--fw-medium);
-  white-space: nowrap; cursor: pointer;
-  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+.chon-nut {
+  border: none; background: transparent; cursor: pointer;
+  padding: 5px 14px; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 700; color: var(--text-3);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.btn-tool:hover { background: var(--bg-hover); color: var(--text-1); }
-.btn-tool.active {
-  background: var(--accent-soft); color: var(--accent-text);
-  border-color: var(--accent-line);
-  font-weight: var(--fw-semibold);
-}
+.chon-nut:hover { color: var(--text-1); }
+.chon-nut.active { background: var(--accent); color: var(--accent-on, #fff); font-size: 13px; }
 
-.chia { width: 1px; height: 18px; background: var(--line-2); flex: none; }
-
-/* O tick */
-.opt-label {
-  display: inline-flex; align-items: center; gap: var(--sp-2);
-  font-size: var(--fs-xs); color: var(--text-2);
-  white-space: nowrap; cursor: pointer;
-  transition: color var(--dur) var(--ease);
-}
-.opt-label:hover { color: var(--text-1); }
-.opt-label input[type="checkbox"] { display: none; }
-.custom-chk {
-  width: 13px; height: 13px; flex: none;
-  display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line-strong); border-radius: 3px;
-  background: var(--bg-0);
+/* Nut: y het .nut / .nut.chinh cua Cai dat */
+.nut {
+  height: 34px; padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2); border-radius: var(--r-pill);
+  background: var(--bg-1); color: var(--text-1);
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  white-space: nowrap;
   transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
-.opt-label:hover .custom-chk { border-color: var(--accent-line); }
-.opt-label input:checked + .custom-chk { background: var(--accent); border-color: var(--accent); }
-.opt-label input:checked + .custom-chk::after {
-  content: '';
-  width: 4px; height: 7px; margin-top: -1px;
-  border: solid var(--bg-0); border-width: 0 1.8px 1.8px 0;
-  transform: rotate(45deg);
+.nut:hover { background: var(--bg-hover); }
+.nut.chinh {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--accent-on, #fff);
+  font-size: 13px; font-weight: 700; /* luat: chu tren cam dac >=13px bold */
 }
+.nut.chinh:hover { filter: brightness(1.08); }
 
-/* Nut phu (Luu PNG) + nut chinh (Sao chep): cao --h-ctrl 28px.
-   Chu tren cam dac o co 12px phai la chu TOI (MASTER.md: trang tren cam = 3,00:1, chi hop le bold >=14px). */
-.btn-sub, .btn-primary {
-  display: inline-flex; align-items: center; gap: var(--sp-2);
-  height: var(--h-ctrl); padding: 0 var(--sp-4);
-  border-radius: var(--r-sm);
-  font-size: var(--fs-sm); white-space: nowrap;
-  cursor: pointer; flex: none;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-.btn-sub {
-  background: var(--bg-4); color: var(--text-1);
-  border: 1px solid var(--line-2);
-  font-weight: var(--fw-medium);
-}
-.btn-sub:hover { background: var(--bg-5); border-color: var(--line-strong); }
-.btn-primary {
-  background: var(--accent); color: var(--bg-0);
-  border: 1px solid var(--accent);
-  font-weight: var(--fw-semibold);
-}
-.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-.btn-primary:active, .btn-sub:active { transform: scale(0.97); }
-.btn-primary:active { background: var(--accent-pressed); }
-
-/* ── Vung xem dai: phang nhu vung anh cua khay ──────────────────────── */
+/* ── Vung xem dai: dat trong mot "the" nhu cac muc cua Cai dat ─────── */
 #viewport {
   flex: 1; min-height: 0;
+  margin: var(--sp-4);
   display: flex; align-items: center; justify-content: center;
-  padding: var(--sp-6);
+  padding: var(--sp-5);
   overflow: auto;
   background: var(--bg-2);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
   position: relative;
 }
 #viewport::-webkit-scrollbar { width: 6px; height: 6px; }
 #viewport::-webkit-scrollbar-track { background: transparent; }
 #viewport::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--r-pill); }
-#viewport::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 
 #canvas-wrapper {
   position: relative;
   line-height: 0;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: var(--shadow-md);
   cursor: grab;
-  transition: border-color var(--dur) var(--ease);
 }
-#canvas-wrapper:hover { border-color: var(--line-strong); }
 #canvas-wrapper:active { cursor: grabbing; }
-
 #main-canvas {
   display: block;
-  border-radius: 5px; /* vua khit trong vien 1px cua wrapper */
+  border-radius: var(--r-md);
   max-width: 100%;
-  max-height: calc(100vh - 30px - 40px - 2 * var(--sp-6) - 4px);
+  /* 46 header + toolbar ~51 + 2 x margin 12 + 2 x padding 16 + 2 vien */
+  max-height: calc(100vh - 46px - 51px - 2 * var(--sp-4) - 2 * var(--sp-5) - 4px);
 }
 
-/* O tung shot: re chuot -> vien cam + nut bo (giong o anh trong khay) */
+/* O tung shot: re chuot -> vien cam + nut bo tron */
 #shot-overlays { position: absolute; inset: 0; pointer-events: none; }
 .shot-target-box {
   position: absolute;
   pointer-events: auto;
-  border: 1px solid transparent;
-  border-radius: 3px;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
   transition: border-color var(--dur) var(--ease);
 }
 .shot-target-box:hover { border-color: var(--accent); }
-
 .shot-remove-btn {
-  position: absolute; top: 4px; right: 4px;
-  width: 18px; height: 18px;
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
-  border: none; border-radius: var(--r-pill);
+  border: none; border-radius: 50%;
   background: rgb(10 10 10 / 74%); color: var(--text-2);
   cursor: pointer; opacity: 0;
   transition: opacity var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.shot-remove-btn svg.ic { width: 10px; height: 10px; stroke-width: 2.4; }
+.shot-remove-btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
 .shot-target-box:hover .shot-remove-btn { opacity: 1; }
 .shot-remove-btn:hover { background: var(--danger-strong); color: #fff; }
 
-/* ── Thong bao nhanh ─────────────────────────────────────────────────── */
+/* ── Thong bao nhanh: vien thuoc nhu cac nut ─────────────────────────── */
 .toast {
-  position: fixed; left: 50%; bottom: var(--sp-5);
+  position: fixed; left: 50%; bottom: 28px;
   transform: translate(-50%, 8px);
-  padding: 7px var(--sp-4);
-  background: var(--bg-3); color: var(--text-1);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-md);
+  padding: 8px var(--sp-5);
+  background: var(--bg-1); color: var(--text-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
   box-shadow: var(--shadow-md);
-  font-size: var(--fs-sm); font-weight: var(--fw-medium);
+  font-size: 12.5px; font-weight: 600;
   white-space: nowrap;
   opacity: 0; pointer-events: none;
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
@@ -242,5 +168,13 @@ svg.ic {
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-/* ── Cua so hep (toi thieu 640px): bo chu dan, giu icon + title (re chuot van thay ten) ── */
-@media (max-width: 820px) { .btn-tool span { display: none; } .btn-tool { padding: 0 var(--sp-2); } }
+/* ── Cua so hep (toi thieu 640px): bo nhan chu truoc cum pill, giu nguyen pill ── */
+@media (max-width: 900px) { .nhan-chon { display: none; } #toolbar { gap: var(--sp-3); } }
+
+/* Phan THEM cho storyboard (ngoai khoi chep tu Cai dat): hang ngang khong duoc gay chu / co nut */
+#toolbar .nhan-chon, #toolbar .chon-nut { white-space: nowrap; }
+#toolbar .nut { flex: none; }
+/* Cua so hep (<= 720px): thu dem pill, khong thu chu */
+@media (max-width: 720px) { #toolbar .chon-nut { padding: 5px 10px; } #toolbar { padding: var(--sp-3); } }
+/* Cum "Hien thi" bat DUOC CA HAI (Cai dat moi cum chi 1 lua chon): 2 pill cam dac dung sat nhau thanh mot khoi -> chen khe */
+#toolbar .chon-nhom.nhieu { gap: 3px; }

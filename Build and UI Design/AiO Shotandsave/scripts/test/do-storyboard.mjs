@@ -92,7 +92,13 @@ const thieuToken = dungToi.filter((v) => !tokenCo.has(v))
 kiem('storyboard/index.html nap assets/tokens.css (chung khay anh)', sbHtml.includes('../../assets/tokens.css'))
 kiem('storyboard.css KHONG tu khai token rieng (' + tuKhai.length + ')', tuKhai.length === 0, tuKhai.join(', '))
 kiem('storyboard.css dung ' + dungToi.length + ' token - tat ca co trong tokens.css', dungToi.length > 10 && thieuToken.length === 0, 'THIEU: ' + thieuToken.join(', '))
-kiem('Thanh tren storyboard cung khuon #bar cua khay anh (30px)', sbHtml.includes('id="bar"') && /#bar\s*\{[^}]*height:\s*30px/.test(sbCss))
+// Chuan giao dien = man Cai dat (anh Tien 28/09: "font chu - pill - cach em sap xep"): header 46px + cum pill + nut vien thuoc.
+const setCss = fs.readFileSync(path.join(ROOT, 'src', 'settings', 'settings.css'), 'utf8')
+const khoi = (css, sel) => { const m = css.match(new RegExp('\\n' + sel.replace(/[.#]/g, '\\$&') + '\\s*\\{([^}]*)\\}')); return m ? m[1].replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').trim() : null }
+const giongCaiDat = ['.chon-nhom', '.chon-nut', '.chon-nut:hover', '.nut', '.nut.chinh', '.nhan-chon', '.dong']
+  .filter((s) => khoi(setCss, s) !== khoi(sbCss, s))
+kiem('Header storyboard cung khuon #tieu-de cua Cai dat (46px)', sbHtml.includes('id="tieu-de"') && /#tieu-de\s*\{[^}]*height:\s*46px/.test(sbCss))
+kiem('Pill + nut + nhan storyboard CHEP NGUYEN tu settings.css (7 khoi)', giongCaiDat.length === 0, 'LECH: ' + giongCaiDat.join(', '))
 
 const sbJs = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.js'), 'utf8')
 kiem('storyboard.js co engine renderFilmstrip', sbJs.includes('function renderFilmstrip()'))

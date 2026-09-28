@@ -489,15 +489,18 @@ btnGrid.addEventListener('click', () => {
 })
 
 // Toggles
-chkShotBadge.addEventListener('change', (e) => {
-  showShotBadge = e.target.checked
-  render()
-})
-
-chkInfoBar.addEventListener('change', (e) => {
-  showInfoBar = e.target.checked
-  render()
-})
+// [28/09] O tick -> pill bat/tat (cung kieu cum pill cua Cai dat): cam dac = dang bat.
+function batTat(nut, dat) {
+  nut.addEventListener('click', () => {
+    const bat = !nut.classList.contains('active')
+    nut.classList.toggle('active', bat)
+    nut.setAttribute('aria-pressed', String(bat))
+    dat(bat)
+    render()
+  })
+}
+batTat(chkShotBadge, (v) => { showShotBadge = v })
+batTat(chkInfoBar, (v) => { showInfoBar = v })
 
 // Phim tat
 window.addEventListener('keydown', (e) => {

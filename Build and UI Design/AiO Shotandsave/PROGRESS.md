@@ -1,7 +1,8 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 14:19 +0700
-> - **0.7.2 (28/09 14:19, Claude):** khay Storyboard thiet ke lai cung khuon khay anh (muc 0.7.2 duoi). [CHO ANH] cai + mo khay.
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 15:35 +0700
+> - **0.7.3 (28/09 15:35, Claude):** khay Storyboard theo dung khuon MAN CAI DAT (font, pill, sap xep) — muc 0.7.3 duoi. [CHO ANH] cai + mo khay.
+> - **0.7.2 (28/09 14:19, Claude):** khay Storyboard lan 1 (khuon thanh tren khay anh) — anh: "chua chuan nhu UI dang co".
 > - **0.7.1 (28/09 14:03, Claude ra 0.7.0 cua Gemini + gop `main`):** nut Storyboard tren khung chon + toolbar + phim S.
 >   ☠️ NUT CHUA LAM GI: `isStoryboardMode` khong duoc doc o dau ca, bat len van luu 1 anh nhu cu. Chi de anh xem giao dien.
 >   KHONG dua len web cho toi khi nut chay that.
@@ -13,6 +14,28 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+
+## [0.7.3] - 2026-09-28 15:35 - Khay Storyboard theo khuon man Cai dat
+- Boi canh: anh xem 0.7.2: "chua chuan nhu UI dang co em" roi "font chu - pill - cach em sap xep", gui anh Cai dat
+  canh anh Storyboard. Em chon SAI thuoc o 0.7.2: chep thanh tren KHAY ANH (30px, chu xam 11px) + nut vuong cam nhat,
+  trong khi ngon ngu giao dien that cua app la man Cai dat.
+- Da lam: header = #tieu-de Cai dat (46px, logo 18px, ten trang 13px/700, nut tron 28px Keo/Dong) · hang dieu khien
+  xep kieu Cai dat: nhan chu "Bo cuc"/"Hien thi" + cum pill (.chon-nhom/.chon-nut, lua chon CAM DAC chu trang dam)
+  · bo o tick -> pill bat/tat (cum "Hien thi" chen khe 3px vi bat duoc ca hai, khong thi 2 pill cam dinh thanh 1 khoi)
+  · Luu PNG = .nut, Sao chep = .nut.chinh (vien thuoc 34px), bo icon + phim tat trong nut (phim tat o tooltip)
+  · vung xem dai nam trong "the" bo 12px nhu cac muc Cai dat. i18n them sb.hienThi/sb.copyNut/sb.luuNut, sb.boCuc bo dau ":".
+- Phat hien: nut ben Cai dat hien bang ARIAL (button khong ke thua font, co san tu truoc) — do la thu anh dang nhin
+  va coi la chuan, nen storyboard de nut giong het (khong dat font-family:inherit). Doi ca bo sang Inter = hoi anh, doi 2 man cung luc.
+- Kiem (Playwright, man Cai dat THAT canh storyboard, getComputedStyle 7 thuoc tinh/thanh phan):
+  + 9/9 khop (header, ten, nhan, cum pill, pill chon, pill thuong, nut, nut chinh, nut dong). Lan do dau 7/9: pill 26
+    vs 25px (gốc: font Inter vs Arial) + thuoc chon nham nut (15 anh -> app tu chuyen Luoi).
+  + 2 ngon ngu x 5 kho (640/720/760/900/901): 0 tran, nut Sao chep cach mep dung le. vi@640 lan dau sat mep -> them
+    luat <=720px thu dem pill 14->10px.
+  + Chuc nang: tat/bat Nhan SHOT, doi Dai/Luoi, bo shot 15->14, Sao chep hien toast, copy/save/close goi dung, 0 loi.
+  + Bai kiem: them muc "7 khoi pill/nut/nhan CHEP NGUYEN tu settings.css" (so chuoi khoi CSS, bo chu thich) — lan dau
+    TRUOT dung 3 khoi em lo them thuoc tinh (doi chung song), tach phan them ra rule rieng -> DAT. Header 46px.
+- CHUA kiem: app that tren may anh (150%/125%).
+- File: src/storyboard/{index.html,storyboard.css,storyboard.js}, src/i18n.js, scripts/test/do-storyboard.mjs.
 
 ## [0.7.2] - 2026-09-28 14:19 - Khay Storyboard dong bo voi khay anh
 - Boi canh: anh "thiet ke lai giao dien cua khay Multi-Shot Storyboard Strip cho dong bo va dep voi khay anh thuong di em".
