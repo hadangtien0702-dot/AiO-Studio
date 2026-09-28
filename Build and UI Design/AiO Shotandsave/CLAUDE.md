@@ -373,9 +373,31 @@ Chot voi anh Tien toi 27/09: phat trien tinh nang ghep nhieu anh chup thanh dai 
 - Xuat: `Ctrl+C` copy clipboard, `Ctrl+S` luu file vao thu muc anh (tu dong nap lai vao khay), hoac keo tha file vao Premiere Pro.
 
 ### 3. Kien truc & File can thiep (28/09)
-- `src/shelf/index.html` & `shelf.css`: Nut `#storyboard`, style tooltip, hieu ung hover theo token `--acc` / `#f86820`.
+- `src/shelf/index.html` & `shelf.css`: Nut `#storyboard`, style tooltip, hieu ung hover theo token `--accent` (#f86820).
+  [Sua 28/09 Claude: ban dau ghi `--acc` — token do KHONG co trong tokens.css, la token tu khai rieng cua storyboard.css cu.]
 - `src/shelf/shelf.js`: Bat su kien click / phim `S`, thu thap danh sach anh.
 - Module ghep anh `src/storyboard/`: Dung HTML5 Canvas 2D (khong can thu vien ngoai nang ne), render tai ty le goc 1:1.
 - `src/i18n.js`: Bo tu dien VI/EN cho tieu de va cac nut thao tac storyboard.
 - `src/main.js`: IPC handler mo modal/cua so xem truoc hoac luu file anh ghep.
 
+
+### 4. TRANG THAI THAT 28/09 (ban 0.7.4) — thay cho ke hoach tren
+Nguoi xai:
+- **Ghep tu khay:** nut Storyboard tren khay anh -> cua so ghep MOI anh dang co trong khay, chon Dai cuon phim / Luoi,
+  bam x tren tung shot de bo, Sao chep / Luu PNG / keo tha. Nhan SHOT luon hien, KHONG co dai ngay gio (anh bo 28/09).
+- **Quay 3 giay (anh chot 28/09):** khoanh vung -> bam S (hoac nut "Storyboard Strip" o goc khung) -> Xong/Enter ->
+  vien cam + dem 3-2-1 quanh vung -> 6 khung (0,5 s/khung) -> cua so ghep mo dang dai va TU LUU dai (dai vao khay,
+  6 khung le KHONG vao khay). Vi du doi thuong: dang xem mot canh video, khoanh vung la duoc ngay 1 dai phan canh
+  3 giay de gui dao dien.
+Builder:
+- overlay.js `xong()` + `isStoryboardMode` -> `{rect, storyboard:true}` -> main.js `quay3Giay` (cho 350 ms) ->
+  `layKhungVung` = `luong.catVung` (renderer luong cat DUNG vung, JPEG) / du phong `grabDisplaysList` -> `daiQuay` ->
+  `storyboard:get-data` tra `{boCuc:'filmstrip', tuLuu}` (tuLuu chi lan dau). Mo tu khay -> `daiQuay = null`.
+- ☠️ Vien quanh vung la 4 cua so thanh DAC ngoai vung, khong cua so trong suot nao phu vung (video den).
+- Giao dien cua so ghep chep khuon man Cai dat (xem AGENTS.md muc 5). Nut ben Cai dat dang hien font Arial (button
+  khong ke thua font) -> cua so ghep giu y het; doi sang Inter thi doi CA HAI man cung luc (cho anh quyet).
+MVP ("xong" = so nao):
+- DAT (trinh duyet, 28/09): cat vung dung co + dung cho (DIP 200 -> 300 px o sf 1.5), 6 khung khac nhau, nhip 0..2,51 s,
+  16-31 ms/lan; cua so ghep khop man Cai dat 9/9 thanh phan; 2 ngon ngu x 5 kho 0 tran.
+- CHUA DAT: chua chay tren app that (vien/dong ho tren man 150%/125%, khung dau, video co den khong) · vung vat 2 man
+  khong ho tro (di duong chup thuong) · anh chua dung tren viec that.

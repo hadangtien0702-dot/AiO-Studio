@@ -44,6 +44,10 @@ phiên bản kẹt ở 0.5.5 trong khi app đã 0.6.4.
 1. Commit + push nhánh của mình (luật git mục 2, số phiên bản mục 3).
 2. Mục trên cùng `PROGRESS.md` của app, dòng đầu **`[BAN GIAO CHO <CLAUDE|GEMINI>]`**: làm gì · file nào ·
    **đã kiểm bằng gì, ra số nào** · **CHƯA kiểm gì** (ghi thẳng) · chỗ người soát cần soi kỹ.
+   ☠️ Bài kiểm phải kiểm **HÀNH VI** (mở trang/đo giao diện, bấm thử, đọc kết quả), không chỉ "file có chứa chuỗi X".
+   28/09: 7/7 mục mới của bản 0.7.0 là `includes()` → vẫn ĐẠT khi còn 2 lỗi thật (đèn nút lệch nhau, nút chồng nhãn
+   ở 4/7 bề rộng khung); 1 mục còn BẮT màu sai `#090a0d` phải có trong CSS. Tính năng mới mà nút chưa làm gì thì ghi
+   thẳng "nút chưa làm gì" ở dòng đầu bàn giao.
 3. Nhắn anh một câu: *"Xong [việc], đã push nhánh [x], anh bảo [người kia] rà nhé."*
 
 **Người SOÁT** (thường là Claude) khi anh bảo "rà bản Gemini": `git fetch` · đọc diff nhánh `gemini` so `main` · đọc
@@ -85,12 +89,16 @@ File này là luật chung. Cả hai cùng theo **sổ lỗi tái diễn** của
 | Khay: nạp ảnh gần nhất | 27/09 ảnh vừa chụp hiện 2 lần | `shelfAdd` gọi `napAnhGanNhatVaoKhay(filePath)` TRƯỚC `ensureShelf` — đừng gỡ |
 | Bài test bật cửa sổ chụp | #12 bung overlay lên màn anh đang làm | anh đang ngồi máy thì **không chạy selftest** — hỏi trước |
 | Bản mới / Release | anh Tiến chốt 28/09: "mỗi lần làm xong cứ thêm vào bản release anh tự cài" | `npm run dist` -> chép bộ cài `.exe` vào `Release/<app>/win/` + cập nhật `HUONG-DAN-CAI-DAT.txt` (để anh tự cài) |
+| Cửa sổ / màn hình mới, sửa giao diện | 28/09 anh chê 2 lần: *"chưa chuẩn như UI đang có · font chữ - pill - cách em sắp xếp"* | Chuẩn = **màn Cài đặt** (`src/settings/settings.css`): header 46px chữ trắng 13/700, cụm pill `.chon-nhom/.chon-nut` (chọn = cam đặc chữ trắng đậm), nhãn chữ trái + pill phải, nút `.nut` viên thuốc 34px. KHÔNG khai `:root` riêng. `npm run test:storyboard` so 7 khối CSS với settings.css |
+| Quay vùng màn hình theo thời gian (Storyboard quay 3 giây) | sổ lỗi: cửa sổ TRONG SUỐT phủ lên video tăng tốc phần cứng → video ĐEN trong ảnh chụp | Không cửa sổ nào đè lên vùng đang quay: viền = 4 thanh đặc NGOÀI vùng, đồng hồ trên/dưới vùng (`main.js moVienQuay`) |
 
 Chữ người dùng thấy: đủ **VI + EN** (`src/i18n.js`), **không dùng gạch ngang dài "—"**, câu hướng dẫn nói **đúng
 hành vi thật**. Máy/thư mục mới: `npm install` trong thư mục app trước khi chạy.
 
-**Shot & Save còn mở (27/09 20:47, bản 0.6.5):** chưa ai chạy harness kéo-chọn cho 0.5.7 (8 tay nắm co giãn khung) ·
-kích thước khối làm mờ (8–15 px) chờ anh quyết · ~0,1–0,2 s đầu làm mờ có thể lấy mẫu từ ảnh nửa độ phân giải (hiếm).
+**Shot & Save còn mở (28/09 16:0x, bản 0.7.4 trên `main`):** quay 3 giây Storyboard CHƯA chạy trên app thật (viền +
+đồng hồ trên màn 150%/125%, khung đầu sau 350 ms, video có đen không) · chưa ai chạy harness kéo-chọn cho 0.5.7 và
+0.7.x (nút Storyboard trên khung chọn) · kích thước khối làm mờ (8–15 px) chờ anh quyết · ~0,1–0,2 s đầu làm mờ có thể
+lấy mẫu từ ảnh nửa độ phân giải (hiếm). **Gemini:** `git merge origin/main` trước khi sửa — nhánh `gemini` đang ở 0.7.0.
 
 ## 6. Báo anh khi xong việc
 
