@@ -83,7 +83,9 @@ async function init() {
 
 function updateShotBadgeCount() {
   const n = activeItems.length
-  badgeCountEl.textContent = t('sb.shots', { n: String(n) })
+  // Chi con so, giong #count cua khay anh; cau day du nam o tooltip.
+  badgeCountEl.textContent = String(n)
+  badgeCountEl.title = t('sb.shots', { n: String(n) })
 }
 
 /** Load song song toan bo image elements */
@@ -121,10 +123,11 @@ function render() {
   if (activeItems.length === 0) {
     canvas.width = 640
     canvas.height = 360
-    ctx.fillStyle = '#090a0d'
+    // Man trong = mau khung app (tokens --bg-0 / --text-3), khong phai mau anh xuat.
+    ctx.fillStyle = '#0e0e0e'
     ctx.fillRect(0, 0, 640, 360)
-    ctx.fillStyle = '#6f7185'
-    ctx.font = '14px sans-serif'
+    ctx.fillStyle = '#8d8d95'
+    ctx.font = '500 13px Inter, "Segoe UI", sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(t('sb.chuaCoAnh'), 320, 180)
     overlaysEl.innerHTML = ''

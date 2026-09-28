@@ -80,7 +80,19 @@ kiem('storyboard/index.html co nut Luu PNG', sbHtml.includes('id="btn-save"'))
 kiem('storyboard/index.html co chuyen doi bo cuc filmstrip va grid', sbHtml.includes('id="btn-filmstrip"') && sbHtml.includes('id="btn-grid"'))
 
 const sbCss = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.css'), 'utf8')
-kiem('storyboard.css ap dung dung token mau Studio Console (--acc: #f86820, --bg-0: #090a0d)', sbCss.includes('#f86820') && sbCss.includes('#090a0d'))
+/* [28/09 Claude] Truoc: muc nay BAT storyboard.css tu khai #090a0d / #f86820 — chinh bo mau rieng do lam khay
+   Storyboard lech khay anh (anh Tien: "dong bo va dep voi khay anh thuong"). Nay kiem dieu nguoc lai:
+   dung CHUNG assets/tokens.css, khong tu khai token, va moi var(--x) dung toi PHAI co trong tokens.css
+   (token khong ton tai -> trinh duyet bo ca khai bao, im lang — LESSONS 07/09 muc 4). */
+const tokensCss = fs.readFileSync(path.join(ROOT, 'assets', 'tokens.css'), 'utf8')
+const tokenCo = new Set([...tokensCss.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))
+const tuKhai = [...sbCss.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1])
+const dungToi = [...new Set([...sbCss.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]))]
+const thieuToken = dungToi.filter((v) => !tokenCo.has(v))
+kiem('storyboard/index.html nap assets/tokens.css (chung khay anh)', sbHtml.includes('../../assets/tokens.css'))
+kiem('storyboard.css KHONG tu khai token rieng (' + tuKhai.length + ')', tuKhai.length === 0, tuKhai.join(', '))
+kiem('storyboard.css dung ' + dungToi.length + ' token - tat ca co trong tokens.css', dungToi.length > 10 && thieuToken.length === 0, 'THIEU: ' + thieuToken.join(', '))
+kiem('Thanh tren storyboard cung khuon #bar cua khay anh (30px)', sbHtml.includes('id="bar"') && /#bar\s*\{[^}]*height:\s*30px/.test(sbCss))
 
 const sbJs = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.js'), 'utf8')
 kiem('storyboard.js co engine renderFilmstrip', sbJs.includes('function renderFilmstrip()'))

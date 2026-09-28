@@ -1,6 +1,7 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 14:03 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 14:19 +0700
+> - **0.7.2 (28/09 14:19, Claude):** khay Storyboard thiet ke lai cung khuon khay anh (muc 0.7.2 duoi). [CHO ANH] cai + mo khay.
 > - **0.7.1 (28/09 14:03, Claude ra 0.7.0 cua Gemini + gop `main`):** nut Storyboard tren khung chon + toolbar + phim S.
 >   ☠️ NUT CHUA LAM GI: `isStoryboardMode` khong duoc doc o dau ca, bat len van luu 1 anh nhu cu. Chi de anh xem giao dien.
 >   KHONG dua len web cho toi khi nut chay that.
@@ -12,6 +13,29 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+
+## [0.7.2] - 2026-09-28 14:19 - Khay Storyboard dong bo voi khay anh
+- Boi canh: anh "thiet ke lai giao dien cua khay Multi-Shot Storyboard Strip cho dong bo va dep voi khay anh thuong di em".
+- Nguyen nhan lech (do): storyboard.css tu khai `:root` 17 token (8 cai khong co trong tokens.css: --acc, --t1..3,
+  --line, --header-h...; 9 cai DE LEN token chung: --bg-0 #090a0d thay #0e0e0e, --r-sm 4px thay 6px...), font he
+  thong thay Inter, thanh tren 46px, nhan "5 KHUNG HINH" viet hoa, logo trang, nen loang tron. Bai kiem cua Gemini
+  con BAT css phai chua #090a0d (khoa cai sai).
+- Da lam: `storyboard/index.html` + `storyboard.css` viet lai. Thanh tren = khuon #bar cua khay (30px, logo cam, ten
+  11px/600, so dem vien thuoc chi con so, nut icon 21px Keo/Dong). Nut dieu khien xuong hang #toolbar 40px: bo cuc
+  (nut dang chon = cam nhat, cam dac chi danh cho nut chinh) · 2 o tick · Luu PNG (nut phu) · Sao chep (nut chinh
+  duy nhat, chu TOI tren cam vi 12px). Vung xem nen phang --bg-2, o shot re chuot vien cam + nut bo nhu o anh khay.
+  JS: so dem chi con so (cau day du o tooltip); man "chua co anh" dung mau khung. main.js: nen cua so #181818.
+  Mau VE TRONG ANH XUAT (canvas: nen #090a0d, nhan SHOT) GIU NGUYEN, la san pham, khong phai khung.
+- Kiem (Playwright, trang storyboard that + cau noi gia + 5 anh tu ve, khong dung anh cua anh):
+  + Thanh tren so voi khay anh that: cao 30/30, ten 11px 600 rgb(195,195,200) khop, so dem 15px 10px/700 cung mau khop, nut 21/21.
+  + 2 ngon ngu x 4 kho (640/700/760/821): 0 chu bi cat, 0 tran, chu o tick luon hien (ban dau em an chu o tick
+    o <700px -> 2 o vuong khong nhan; bo luat do). Thuoc "chu bi cat" lan dau bao SAI ca 1080px vi span thu
+    thieu letter-spacing; sua thuoc roi moi tin.
+  + Chuc nang: bo shot 5->4, doi luoi, Sao chep hien toast, copy/save/close goi dung, 0 loi trang.
+  + Bai kiem storyboard: thay muc "#090a0d" bang 4 muc (nap tokens.css · tu khai 0 token · 45 var() deu co trong
+    tokens.css · #bar 30px). Doi chung CSS cu: tu khai 17, thieu 8 -> TRUOT dung. `npm run test:storyboard` TAT CA DAT.
+- CHUA kiem: mo khay tren app that (Electron) · man 150%/125% cua may anh.
+- File: src/storyboard/{index.html,storyboard.css,storyboard.js}, src/main.js (1 dong), scripts/test/do-storyboard.mjs.
 
 ## [0.7.1] - 2026-09-28 14:03 - Claude ra ban Gemini 0.7.0, gop main, sua 2 loi
 - Boi canh: anh "Anh bao Claude ra soat ban 0.7.0 tren nhanh gemini, sau do dong goi ban cai de anh xem thu truc quan".

@@ -483,7 +483,7 @@ function openStoryboardWindow() {
     minWidth: 640, minHeight: 460,
     frame: false,
     title: 'AiO Shot & Save - Storyboard Strip',
-    backgroundColor: '#090a0d',
+    backgroundColor: '#181818', // = --bg-2 cua tokens (khop khay anh)
     show: false,
     alwaysOnTop: true,
     icon: path.join(__dirname, '..', 'assets', 'app.ico'),
