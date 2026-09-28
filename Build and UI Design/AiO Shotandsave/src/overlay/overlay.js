@@ -262,7 +262,17 @@ function capNhatGiaoDienKhung() {
   selEl.style.height = curRect.h + 'px'
   sizeEl.textContent = Math.round(curRect.w * DPR) + ' × ' + Math.round(curRect.h * DPR)
   sizeEl.classList.toggle('inside', curRect.y < 28)
-  if (selStoryboardBtn) selStoryboardBtn.classList.toggle('inside', curRect.y < 28)
+  if (selStoryboardBtn) {
+    selStoryboardBtn.classList.toggle('inside', curRect.y < 28)
+    // Khung hep: nut chong len nhan kich thuoc (cung hang, left 0 / right 0). Do be rong THAT roi
+    // bo chu (con icon + S), van chong thi an han (nut duoi toolbar + phim S van dung duoc).
+    selStoryboardBtn.classList.remove('gon', 'an')
+    const du = () => sizeEl.offsetWidth + selStoryboardBtn.offsetWidth + 8 <= curRect.w
+    if (!du()) {
+      selStoryboardBtn.classList.add('gon')
+      if (!du()) selStoryboardBtn.classList.add('an')
+    }
+  }
 
   veEl.style.left = curRect.x + 'px'
   veEl.style.top = curRect.y + 'px'
@@ -514,6 +524,8 @@ function chonCongCu(x) {
     veEl.style.cursor = 'default'
   }
   toolbarEl.querySelectorAll('.cong-cu[data-tool]').forEach((b) => {
+    // Storyboard la cong tac bat/tat rieng, khong phai cong cu ve — dung dong den cua no.
+    if (b.dataset.tool === 'storyboard') return
     b.classList.toggle('chon', b.dataset.tool === x)
   })
   redraw()

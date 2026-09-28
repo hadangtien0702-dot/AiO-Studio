@@ -1,7 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 13:23 +0700
-> - **BAN TREN NHANH GEMINI: 0.7.0** (28/09 13:23, Gemini) — Tich hop nut va menu chon Multi-Shot Storyboard Strip ngay tren khung keo chon Overlay va thanh toolbar (phim S). 58/58 test DAT.
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 14:03 +0700
+> - **0.7.1 (28/09 14:03, Claude ra 0.7.0 cua Gemini + gop `main`):** nut Storyboard tren khung chon + toolbar + phim S.
+>   ☠️ NUT CHUA LAM GI: `isStoryboardMode` khong duoc doc o dau ca, bat len van luu 1 anh nhu cu. Chi de anh xem giao dien.
+>   KHONG dua len web cho toi khi nut chay that.
+> - **0.7.0** (28/09 13:23, Gemini, nhanh `gemini` `404e9c7`) — ban giao nut Storyboard (xem muc 0.7.1).
 > - **0.6.9 (28/09 12:51, Claude ra + gop `main`):** Storyboard 0.6.8 cua Gemini + sua 6 loi (muc 0.6.9 ngay duoi).
 >   Bo cai `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.6.9.exe` (84,3 MB) — ANH TU CAI (luat 28/09).
 >   Web da co the Storyboard. [CHO ANH] keo dai Storyboard vao Premiere tren may that; chua ai chay app that 0.6.9.
@@ -9,6 +12,23 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+
+## [0.7.1] - 2026-09-28 14:03 - Claude ra ban Gemini 0.7.0, gop main, sua 2 loi
+- Boi canh: anh "Anh bao Claude ra soat ban 0.7.0 tren nhanh gemini, sau do dong goi ban cai de anh xem thu truc quan".
+- Doc diff `origin/main...origin/gemini`: 9 file, 143 dong. Gop vao `claude/ra-066` khong xung dot.
+- Loi 1 (that, do): chonCongCu() bat/tat lop `chon` cho MOI nut `[data-tool]`, ke ca nut Storyboard -> bat S roi bam
+  phim 1-4 thi nut toolbar TAT sang trong khi nut o goc khung van sang (2 den bao 2 trang thai). Sua: bo qua nut
+  storyboard trong vong lap. Do lai: S -> [bat,bat]; phim 2 -> [bat,bat] + mui ten chon; S lan 2 -> [tat,tat].
+- Loi 2 (that, do): nut goc phai (`right:0; top:-24px`) cung hang voi nhan kich thuoc (`left:0`). Do tren trang
+  overlay that (Playwright, gia lap cau noi app) o 7 be rong khung: ban Gemini CHONG o 4/7 (w <= 200 px), ban sua 0/7.
+  Sua: do be rong that; khong du cho thi bo chu (con icon + S, 44 px), van khong du (w=60) thi an nut
+  (nut toolbar + phim S van dung). Anh chup kiem: scratchpad rong.png / hep.png.
+- Nhan xet ve bai kiem cua Gemini: 7 muc moi chi kiem "file co chua chuoi X" -> van DAT khi 2 loi tren con nguyen
+  (dem khong phai kiem). `npm run test:storyboard` sau sua: TAT CA DAT; `node --check overlay.js` OK.
+- CHUA kiem: harness keo-chon `test-keo-vat-man.js` / `test-overlay-drag.js` (bat cua so chup len man anh, luat #12,
+  anh dang ngoi may) · chay app that 0.7.1 · phan chup nhieu shot va ghep dai (chua co ma).
+- Ngoai pham vi, co san: trang overlay bi CSP chan tai font Inter (`default-src 'none'`, khong co font-src), khong do 0.7.0.
+- File: `src/overlay/overlay.js`, `src/overlay/overlay.css`, `package.json` (0.7.1), CLAUDE.md goc + TOOL_VERSION_TRACKER.
 
 ## [0.7.0] - 2026-09-28 13:23 - [BAN GIAO CHO CLAUDE]
 - Boi canh: Loi anh Tien (28/09): "o day minh se co mot menu o goc tren cua khung chon vao option Multi-Shot Storyboard Strip (neu nguoi dung khong chon thi van luu nhu binh thuong)", "truoc tien em lam tinh nang nut Multi-Shot Storyboard Strip nguoi drag vung chon anh xem thu da".

@@ -137,6 +137,8 @@ html, body {
   box-shadow: 0 0 8px rgba(248, 104, 32, 0.4);
 }
 .sel-opt-chip.inside { top: 4px; right: 4px; }
+.sel-opt-chip.gon .chip-text { display: none; }
+.sel-opt-chip.an { display: none; }
 .sel-opt-chip .chip-hotkey {
   font-size: 10px;
   font-weight: 700;
