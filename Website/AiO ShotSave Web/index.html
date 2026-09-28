@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AiO Shot & Save</title>
-<meta name="description" content="Capture any part of your screen, pin it, mark it up and drag it straight into your app. One payment of $7.99.">
+<meta name="description" content="Capture any part of your screen, pin it, mark it up and drag it straight into your app. One payment of $14.99, every future update included.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 386 352'%3E%3Cpath fill='%23F86820' d='M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z'/%3E%3Cpath fill='%23F86820' d='M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -504,7 +504,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
   .hero .hero-cta{animation-delay:.44s}
   .hero .demo{animation-delay:.56s}
 }
-@keyframes vao-hero{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+/* 28/09: from opacity .01 (không phải 0): Chrome bỏ qua phần tử opacity 0 khi chấm LCP → tiêu đề không được tính,
+   LCP rơi vào ảnh demo tự chạy ở giây 5,5-11 (đo). .01 mắt không thấy khác. */
+@keyframes vao-hero{from{opacity:.01;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hero-sel{position:absolute;z-index:1;pointer-events:none;border:2px solid var(--brand);border-radius:4px;
   animation:chon-hero 2s cubic-bezier(.3,.7,.3,1) both}
 .hero-sel b{position:absolute;left:-2px;top:-28px;padding:3px 8px;border-radius:6px;background:#141414;color:#fff;
@@ -958,7 +960,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
     <div class="wrap">
       <div class="sec-head">
         <h2 data-i="priceTitle">One price. Pay once.</h2>
-        <p data-i="priceSub">No subscription to start. Keep getting new features for a few dollars a year, only if you want them.</p>
+        <p data-i="priceSub">No subscription, no renewal. Every future update is included.</p>
       </div>
 
       <div class="price-shell" id="checkout" data-hien>
@@ -967,23 +969,23 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <div class="ph">
             <span class="ph-logo"><svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
             <div class="ph-ten"><h3 class="price-name">Shot &amp; Save</h3><small data-i="priceWhat">Capture, mark up, pin, drag</small></div>
-            <div class="amount"><strong>$7.99</strong></div>
+            <div class="amount"><strong>$14.99</strong></div>
           </div>
 
           <ul class="list">
             <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li1">Every feature, no limits</span></li>
-            <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li2">First year of new features included</span></li>
+            <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li2">Every future update included</span></li>
             <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="li3">Windows 10/11 · macOS (beta)</span></li>
           </ul>
 
           <!-- Ghi chú tiền: hiện thẳng ra, không giấu trong tooltip -->
           <div class="bill" aria-label="What you pay">
-            <div class="bill-row"><span><b data-i="b1">Today</b><small data-i="b1s">First charge</small></span><span class="num">$7.99</span></div>
-            <div class="bill-row"><span><b data-i="b2">Each year after</b><small data-i="b2s">Optional, keeps new features coming</small></span><span class="num" data-i="b2n">$2/year</span></div>
-            <p class="bill-note" data-i="bNote">The $2 keeps Shot &amp; Save improving. Skip it and your app still works, you just won't get new features.</p>
+            <div class="bill-row"><span><b data-i="b1">Today</b><small data-i="b1s">First charge</small></span><span class="num">$14.99</span></div>
+            <div class="bill-row"><span><b data-i="b2">Future updates</b><small data-i="b2s">New features and fixes</small></span><span class="num" data-i="b2n">Free</span></div>
+            <p class="bill-note" data-i="bNote">Pay once and every new version is yours. No subscription, nothing to renew.</p>
           </div>
 
-          <a class="btn btn-main" href="#" id="buy" data-i="buyBtn">Buy now $7.99</a>
+          <a class="btn btn-main" href="#" id="buy" data-i="buyBtn">Buy now $14.99</a>
           <p class="price-foot" data-i="priceFoot">Prices in USD. Taxes may apply at checkout.</p>
         </div>
       </div>
@@ -994,9 +996,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
     <div class="wrap">
       <div class="sec-head"><h2 data-i="faqTitle">Questions</h2></div>
       <div class="faq">
-        <details><summary data-i="q1">What exactly do I pay?</summary><p data-i="a1">$7.99 the first time. That's it for year one. From the second year, $2 a year if you want to keep receiving new features.</p></details>
-        <details><summary data-i="q2">What happens if I don't pay the $2?</summary><p data-i="a2">Nothing breaks. The version you have keeps working forever. You can pay later whenever you want the newest features.</p></details>
-        <details><summary data-i="q3">What does the $2 a year pay for?</summary><p data-i="a3">A real team that keeps adding features and fixing issues. It's the cost of keeping the app growing, not a subscription to use it.</p></details>
+        <details><summary data-i="q1">What exactly do I pay?</summary><p data-i="a1">$14.99, once. That covers every feature and every update we release after, with nothing to renew.</p></details>
+        <details><summary data-i="q2">Do I pay again for new versions?</summary><p data-i="a2">No. Every new version is free for the license you already own.</p></details>
+        <details><summary data-i="q3">How many computers can I use it on?</summary><p data-i="a3">Two, for example one at work and one at home. Changing computers? Press Deactivate on this computer in Settings on the old one, then activate on the new one.</p></details>
         <details><summary data-i="q4">Does it work on Mac?</summary><p data-i="a4">Yes, as a beta for Apple Silicon and Intel Macs. The first time you open it, macOS may ask you to confirm in System Settings → Privacy &amp; Security → Open Anyway.</p></details>
       </div>
     </div>
@@ -1043,15 +1045,15 @@ const T = {
     f7t:"Làm mờ thông tin riêng", f7p:"Bấm <kbd>4</kbd> rồi kéo qua tên, email hay số tài khoản để che trước khi gửi đi. Chọn kiểu khảm khối hoặc mờ mịn trong Cài đặt.",
     f8t:"Chỉnh lại trước khi lưu", f8p:"Kéo xong vẫn co giãn, dời được khung chụp. Bấm <kbd>V</kbd> để chọn nét vẽ rồi di chuyển hoặc xoá.",
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
-    priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao hằng tháng. Nếu muốn tiếp tục nhận tính năng mới, bạn có thể gia hạn $2 mỗi năm.",
-    priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật trong năm đầu", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
-    b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Từ năm thứ hai", b2s:"Không bắt buộc, để tiếp tục nhận bản cập nhật", b2n:"$2/năm",
-    bNote:"Khoản $2 giúp Shot & Save tiếp tục được cải tiến. Nếu không gia hạn, ứng dụng vẫn hoạt động bình thường, chỉ không nhận thêm tính năng mới.",
-    buyBtn:"Mua ngay $7.99", priceFoot:"Giá tính bằng USD, có thể cộng thêm thuế tuỳ quốc gia khi thanh toán.",
+    priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
+    priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
+    b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Các bản cập nhật sau", b2s:"Tính năng mới và bản sửa lỗi", b2n:"Miễn phí",
+    bNote:"Trả một lần, mọi phiên bản mới đều là của bạn. Không thuê bao, không phải gia hạn.",
+    buyBtn:"Mua ngay $14.99", priceFoot:"Giá tính bằng USD, có thể cộng thêm thuế tuỳ quốc gia khi thanh toán.",
     faqTitle:"Hỏi đáp",
-    q1:"Tôi cần trả bao nhiêu?", a1:"Bạn trả $7.99 một lần, đã gồm mọi bản cập nhật trong năm đầu. Từ năm thứ hai, nếu muốn tiếp tục nhận tính năng mới, bạn gia hạn $2 mỗi năm.",
-    q2:"Nếu tôi không gia hạn thì sao?", a2:"Ứng dụng vẫn hoạt động bình thường với phiên bản bạn đang có, không giới hạn thời gian. Khi cần tính năng mới, bạn có thể gia hạn bất cứ lúc nào.",
-    q3:"Khoản $2 mỗi năm dùng để làm gì?", a3:"Để duy trì đội ngũ phát triển tính năng mới và sửa lỗi. Đây là phí nhận bản cập nhật, không phải phí để được tiếp tục sử dụng.",
+    q1:"Tôi cần trả bao nhiêu?", a1:"Bạn trả $14.99 một lần, đã gồm mọi tính năng và mọi bản cập nhật về sau, không phải gia hạn.",
+    q2:"Có bản mới tôi có phải trả thêm không?", a2:"Không. Mọi phiên bản mới đều miễn phí với bản quyền bạn đã mua.",
+    q3:"Dùng được trên mấy máy?", a3:"Hai máy, ví dụ máy công ty và máy ở nhà. Đổi máy thì ở máy cũ bấm Huỷ kích hoạt trên máy này trong Cài đặt, rồi kích hoạt ở máy mới.",
     q4:"Có chạy trên Mac không?", a4:"Có. Bản thử nghiệm chạy trên Mac chip Apple và Intel. Lần đầu mở, macOS có thể yêu cầu bạn xác nhận tại Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở.",
     endTitle:"Chụp màn hình nhanh hơn,<br>bắt đầu từ hôm nay.", endBtn:"Mua Shot & Save",
     footRight:"Dành cho editor, designer và bất kỳ ai thường xuyên chụp màn hình.", fRefund:"Hoàn tiền", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư",
@@ -1106,6 +1108,7 @@ function setLang(l){
   try { localStorage.setItem("ss-lang", lang); } catch (e) {}
   if (window.ssDemoRelang) window.ssDemoRelang();
   if (window.ssStRelang) window.ssStRelang();
+  if (window.ssKhRelang) window.ssKhRelang();
 }
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 let saved = null;
@@ -1727,9 +1730,9 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     ve() {
       app.className = "kh-app chat"; app.style.setProperty("--acc", o.acc);
       app.innerHTML = `<div class="kh-appbar"><i></i>${o.ten}</div><div class="kh-body">${o.rail ? '<div class="kh-rail"><i></i><i></i><i></i><i></i></div>' : ""}
-        <div class="kh-main"><div class="kh-chat-top"><span class="kh-ava">${o.chu}</span><span><b>${T(o.nhom)}</b><small>${T("khOnline")}</small></span></div>
-        <div class="kh-msgs"><div class="kh-b trai">${T(o.m1)}</div><div class="kh-b phai">${T(o.m2)}</div></div>
-        <div class="kh-input"><span>${T("khType")}</span><i></i></div></div></div>`;
+        <div class="kh-main"><div class="kh-chat-top"><span class="kh-ava">${o.chu}</span><span><b data-k="${o.nhom}">${T(o.nhom)}</b><small data-k="khOnline">${T("khOnline")}</small></span></div>
+        <div class="kh-msgs"><div class="kh-b trai" data-k="${o.m1}">${T(o.m1)}</div><div class="kh-b phai" data-k="${o.m2}">${T(o.m2)}</div></div>
+        <div class="kh-input"><span data-k="khType">${T("khType")}</span><i></i></div></div></div>`;
     },
     dich: () => app.querySelector(".kh-msgs"),
     async tha(bay) {
@@ -1740,27 +1743,29 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       await ngu(800);
       const go = bong("trai go"); go.innerHTML = "<i></i><i></i><i></i>";
       await ngu(1000);
-      go.remove(); bong("trai").textContent = T(o.reply);
+      go.remove(); const tl = bong("trai"); tl.dataset.k = o.reply; tl.textContent = T(o.reply);
     },
   });
   // Cảnh THIẾT KẾ (Photoshop / Figma): thả vào tấm canvas, thêm 1 dòng lớp mới trên cùng
   const thietKe = o => ({
     ve() {
       app.className = "kh-app " + o.lop; app.style.removeProperty("--acc");
-      const lop = o.lopCo.map(k => `<div><i></i>${T(k)}</div>`).join("");
+      const lop = o.lopCo.map(k => `<div><i></i><span data-k="${k}">${T(k)}</span></div>`).join("");
       app.innerHTML = `<div class="kh-appbar"><i style="background:${o.mau}"></i>${o.ten}</div>
-        <div class="kh-2c"><div class="kh-can"><div class="kh-board" data-ten="${o.frame ? T(o.frame) : ""}"></div></div><div class="kh-lay">${lop}</div></div>`;
+        <div class="kh-2c"><div class="kh-can"><div class="kh-board" data-ten="${o.frame ? T(o.frame) : ""}"${o.frame ? ` data-kten="${o.frame}"` : ""}></div></div><div class="kh-lay">${lop}</div></div>`;
     },
     dich: () => app.querySelector(".kh-board"),
     async tha(bay) {
       const b = app.querySelector(".kh-board"), a = banSao(); b.append(a);
       await bay(a); nay(a, 1.06);
-      const dong = document.createElement("div"); dong.className = "moi kh-moi"; dong.innerHTML = "<i></i>" + T("khLayer");
+      const dong = document.createElement("div"); dong.className = "moi kh-moi"; dong.innerHTML = "<i></i><span data-k=\"khLayer\">" + T("khLayer") + "</span>";
       app.querySelector(".kh-lay").prepend(dong);
       await ngu(1200);
     },
     nhanLop: true,
   });
+  // 28/09: đổi ngôn ngữ giữa chừng → dịch lại chữ đang hiện (đo: VI vẫn thấy "Edit team", "One sec" tới vòng sau)
+  window.ssKhRelang = () => { app.querySelectorAll("[data-k]").forEach(e => { e.textContent = T(e.dataset.k); }); app.querySelectorAll("[data-kten]").forEach(e => { e.dataset.ten = T(e.dataset.kten); }); };
   const CANH = [
     chat({ ten: "Lark", acc: "#245bdb", chu: "E", nhom: "khName", m1: "khM1", m2: "khM2", reply: "khReply" }),
     chat({ ten: "Microsoft Teams", acc: "#5b5fc7", chu: "P", rail: true, nhom: "khTeam", m1: "khT1", m2: "khT2", reply: "khTReply" }),
@@ -2112,7 +2117,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const gia = document.querySelector(".price .amount strong");
   function demGia() {
     if (giam || !gia) return;
-    const dich = 7.99, t0 = performance.now(), ms = 800;
+    const dich = 14.99, t0 = performance.now(), ms = 800;
     const buoc = () => { const k = Math.min(1, (performance.now() - t0) / ms), e = 1 - (1 - k) ** 3; gia.textContent = "$" + (dich * e).toFixed(2); if (k < 1) setTimeout(buoc, 16); };
     gia.textContent = "$0.00"; setTimeout(buoc, 250);
   }
@@ -2129,7 +2134,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
 })();
 
 // ===== Bảng giá bằng GSAP (24/09 anh: "animation phần bảng giá cũng làm luôn"): nhịp nhanh chậm =====
-// Thẻ bật lên → logo xoay vào → giá VỤT lên rồi chậm dần về $7.99, nảy + quầng cam → ✓ vẽ lần lượt → dòng tiền → nút Mua bật + vệt sáng.
+// Thẻ bật lên → logo xoay vào → giá VỤT lên rồi chậm dần về $14.99, nảy + quầng cam → ✓ vẽ lần lượt → dòng tiền → nút Mua bật + vệt sáng.
 // Rê chuột (máy tính): thẻ nghiêng 3D theo chuột. Không GSAP / giảm chuyển động: giữ bản CSS cũ.
 (() => {
   const shell = document.getElementById("checkout"); if (!shell) return;
@@ -2156,7 +2161,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         .fromTo(tag, { y: -10 }, { autoAlpha: 1, y: 0, duration: .4, ease: "power3.out" }, .1)
         .to(logo, { scale: 1, rotate: 0, duration: .6, ease: "back.out(3)" }, .25)
         .fromTo(ten, { x: -14 }, { autoAlpha: 1, x: 0, duration: .45, ease: "power3.out" }, .3)
-        .to(so, { v: 7.99, duration: 1.2, ease: "expo.out", onUpdate() { gia.textContent = "$" + so.v.toFixed(2); } }, .3)   // vụt lên rồi chậm dần
+        .to(so, { v: 14.99, duration: 1.2, ease: "expo.out", onUpdate() { gia.textContent = "$" + so.v.toFixed(2); } }, .3)   // vụt lên rồi chậm dần
         .fromTo(gia, { scale: 1 }, { keyframes: [{ scale: 1.14, textShadow: "0 0 28px rgba(248,104,32,.55)", duration: .14, ease: "power2.out" },
                                                   { scale: 1, textShadow: "0 0 0 rgba(248,104,32,0)", duration: .6, ease: "elastic.out(1,.45)" }], transformOrigin: "100% 50%" }, 1.15)
         .to(li, { autoAlpha: 1, x: 0, duration: .4, ease: "power3.out", stagger: .09 }, .55)
