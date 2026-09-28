@@ -449,6 +449,7 @@ function veBlurPixelate(ctx, x, y, w, h, k) {
   ctx.restore()
 }
 
+let offscreenLotMo = null
 function veBlurSmooth(ctx, x, y, w, h, k) {
   if (w <= 0 || h <= 0) return
   if (!img || !img.naturalWidth) return
@@ -471,10 +472,23 @@ function veBlurSmooth(ctx, x, y, w, h, k) {
 
   const blurRadius = Math.max(4, Math.round(10 * k))
 
+  // [do 28/09 Claude ra soat] sat mep ANH GHIM, blur lay mau ra ngoai = trong suot ->
+  // lo chu goc khi luu (do: lop ve chi 89-104/255). Lot 1 lop DUC thu nho ~40 DIP/diem.
+  const lw = Math.max(1, Math.round(w / 40)), lh = Math.max(1, Math.round(h / 40))
+  if (!offscreenLotMo) offscreenLotMo = document.createElement('canvas')
+  offscreenLotMo.width = lw
+  offscreenLotMo.height = lh
+  const lotCtx = offscreenLotMo.getContext('2d')
+  lotCtx.imageSmoothingEnabled = true
+  lotCtx.imageSmoothingQuality = 'high'
+  lotCtx.drawImage(img, sx, sy, sw, sh, 0, 0, lw, lh)
+
   ctx.save()
   ctx.beginPath()
   ctx.rect(x * k, y * k, w * k, h * k)
   ctx.clip()
+  ctx.imageSmoothingEnabled = true
+  ctx.drawImage(offscreenLotMo, 0, 0, lw, lh, x * k, y * k, w * k, h * k)
   ctx.filter = 'blur(' + blurRadius + 'px)'
   ctx.drawImage(img, sxPad, syPad, swPad, shPad, dx, dy, dw, dh)
   ctx.restore()

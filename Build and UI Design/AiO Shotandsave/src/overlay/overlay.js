@@ -740,6 +740,7 @@ function veBlurPixelate(ctx, x, y, w, h) {
   }
 }
 
+let offscreenLotMo = null
 function veBlurSmooth(ctx, x, y, w, h) {
   if (w <= 0 || h <= 0) return
   if (frozenImg && frozenImg.naturalWidth > 0) {
@@ -759,10 +760,24 @@ function veBlurSmooth(ctx, x, y, w, h) {
     const dw = swPad / DPR
     const dh = shPad / DPR
 
+    // [do 28/09 Claude ra soat] blur lay mau ra ngoai anh (sat mep man / pad hut) la
+    // TRONG SUOT -> file ghep lo chu goc (do: sat mep tren, lop ve chi 89-106/255, doc
+    // duoc so tai khoan). Lot truoc 1 lop DUC thu nho ~40 DIP/diem (khong con net chu).
+    const lw = Math.max(1, Math.round(w / 40)), lh = Math.max(1, Math.round(h / 40))
+    if (!offscreenLotMo) offscreenLotMo = document.createElement('canvas')
+    offscreenLotMo.width = lw
+    offscreenLotMo.height = lh
+    const lotCtx = offscreenLotMo.getContext('2d')
+    lotCtx.imageSmoothingEnabled = true
+    lotCtx.imageSmoothingQuality = 'high'
+    lotCtx.drawImage(frozenImg, sx, sy, sw, sh, 0, 0, lw, lh)
+
     ctx.save()
     ctx.beginPath()
     ctx.rect(x, y, w, h)
     ctx.clip()
+    ctx.imageSmoothingEnabled = true
+    ctx.drawImage(offscreenLotMo, 0, 0, lw, lh, x, y, w, h)
     ctx.filter = 'blur(10px)'
     ctx.drawImage(frozenImg, sxPad, syPad, swPad, shPad, dx, dy, dw, dh)
     ctx.restore()
