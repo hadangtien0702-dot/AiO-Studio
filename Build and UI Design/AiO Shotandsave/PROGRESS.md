@@ -1,6 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-28 15:54 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 08:15 +0700
+> - **0.7.5 (29/09 08:15, Claude, may cong ty):** icon Storyboard doi sang CLAPPER (Lucide, net 1,9) o ca 3 cho
+>   (khay, nut tren khung chon, thanh ve) + the Storyboard tren web. Bo cai `Release/.../AiO-Shot-and-Save-Setup-0.7.5.exe`
+>   (88,4 MB) — [CHO ANH] tu cai de xem icon. May cong ty dang chay 0.7.4.0 (do 29/09 08:04).
 > - **0.7.4 (28/09 15:54, Claude):** bat Storyboard + khoanh vung + Xong = QUAY 3 GIAY (6 khung, vien cam + dem 3-2-1)
 >   -> cua so dai tu luu. NUT STORYBOARD 0.7.0 NAY DA CHAY THAT. [CHO ANH] thu tren may that (chua ai chay app that).
 >   Chua dua len web (cho anh thu).
@@ -16,7 +19,33 @@
 > - **0.6.7 (28/09 10:47, Claude ra soat ban Gemini 0.6.6):** tuy chon lam mo Kham khoi / Mo min DAT; sua 1 loi Mo min
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
-> - **BAN DANG DUNG TREN MAY: 0.6.5** (Claude, may nha, cai de 20:45; tien trinh 0.6.5.0; run-log `boot v0.6.5 dang-ky=OK`, 0 CANH BAO).
+> - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.7.5] - 2026-09-29 08:15 - Icon Storyboard: o luoi # -> clapper
+- Boi canh: anh gui anh khay 0.7.4, khoanh nut Storyboard: *"icon khay anh danh cho strips story gom qua em"*. Em ve
+  nhap 4 phuong an o dung co 13 px, ti le 150% (bang CSS that cua khay); anh tra loi: *"theo dang icon svg nhu minh
+  dang lam cho AIO di em"*.
+- Nguyen nhan that: nut o khay la khung + 4 net ke (2 doc, 2 ngang) net 2 -> o 13 px thanh o luoi "#" dac, 3 icon
+  canh no chi 1-2 net. Kem: app co 2 icon Storyboard KHAC nhau (khay = o luoi; khung chon + thanh ve = khung chia 3
+  o, lai de nham voi cong cu Khung nam ngay canh tren thanh ve).
+- Thay doi: panel tong AiO dung nguyen bo icon Lucide net 1,9 (`AiO WELCOME/dist/hub.js`, luat icon MASTER.md) ->
+  chon `clapperboard` cua Lucide (phuong an duy nhat trong 4 la icon Lucide nguyen ban), net 1,9, thay o CA 3 cho.
+  Web: the "A storyboard in one key" doi hinh sang clapper, giu net 2 nhu 9 the tinh nang khac cua trang.
+  Bai kiem `do-storyboard.mjs`: muc cu doi `rect x="2" y="4"` (KHOA dung hinh o luoi anh che) -> doi thanh 2 muc:
+  dung Luat 02 AiO (viewBox 24, fill none, currentColor, net 1,9, dau net tron) + icon khay = khung chon = thanh ve.
+- File: `src/shelf/index.html`, `src/overlay/index.html` (2 cho), `scripts/test/do-storyboard.mjs`, `package.json`
+  0.7.5, `Website/AiO ShotSave Web/index.html`, 2 bang phien ban, `Release/AiO Shotandsave/win/HUONG-DAN-CAI-DAT.txt`.
+- Kiem chung:
+  - Chup trang dung tu NGUYEN VAN markup + CSS that (khay binh thuong/re chuot, thanh ve, nut tren khung chon) o
+    Chrome khong giao dien, ti le 150%: ca 3 cho hien clapper, net manh bang icon thu muc/thung rac.
+  - `src/`: icon moi 3 cho, icon cu 0 cho.
+  - `npm run test:storyboard` 67/67 DAT. Doi chung: tra 2 file src ve icon 0.7.4 -> 2 muc moi cung TRUOT dung ly do
+    (`stroke-width="1.9"` thieu; hinh khay khac overlay).
+  - `npm run dist` 26 s -> Setup-0.7.5.exe 88.437.404 B; mo `app.asar` doc thang: `package.json` 0.7.5, khay clapper
+    1 / cu 0, overlay clapper 2 / cu 0; exe ProductVersion 0.7.5.0; ban chep vao Release trung md5 `6f306cb0`.
+  - Web chay cuc bo (Playwright, 1280 px): the Storyboard co svg 3 net clapper 24x24, 0 loi console.
+- CHUA kiem: chua chay app that 0.7.5 (khong chay selftest vi anh dang ngoi may — so loi #12); anh tu cai tu Release.
+  Web chua deploy truoc khi push (Vercel tu deploy khi push `main`).
 
 ## [0.7.4] - 2026-09-28 15:54 - Quay 3 giay thanh dai + bo cum Hien thi
 - Boi canh: anh gui anh khay 0.7.3: "Thu 1 anh muon bo 2 cai pill nay tu dong hien shot la duoc em / thu 2 la khi chon

@@ -53,7 +53,17 @@ kiem('Khong dung gach ngang dai "—" trong chuoi i18n Storyboard (Luat muc 5)',
 console.log('\n[2] Kiem tra Khay anh (Shelf UI & Keybindings)')
 const shelfHtml = fs.readFileSync(path.join(ROOT, 'src', 'shelf', 'index.html'), 'utf8')
 kiem('Nut #storyboard co mat tren thanh bar khay anh', shelfHtml.includes('id="storyboard"'))
-kiem('Nut #storyboard su dung icon SVG inline (Luat 02)', shelfHtml.includes('<svg') && shelfHtml.includes('rect x="2" y="4"'))
+// 29/09: muc cu doi `rect x="2" y="4"` = KHOA hinh o luoi # anh che "gom qua". Nay kiem LUAT ICON AiO (MASTER.md
+// Luat 02) + khay dung CUNG hinh voi 2 nut Storyboard o overlay (mot khai niem, mot icon).
+const svgCua = (html, mo) => { const i = html.indexOf(mo); const j = html.indexOf('</svg>', i); return i < 0 || j < 0 ? '' : html.slice(html.indexOf('<svg', i), j) }
+const netVe = (svg) => [...svg.matchAll(/ d="([^"]+)"/g)].map((m) => m[1]).join('|')
+const icKhay = svgCua(shelfHtml, 'id="storyboard"')
+const luat02 = ['viewBox="0 0 24 24"', 'fill="none"', 'stroke="currentColor"', 'stroke-width="1.9"', 'stroke-linecap="round"', 'stroke-linejoin="round"']
+const thieuLuat = luat02.filter((a) => !icKhay.includes(a))
+kiem('Nut #storyboard dung icon SVG inline dung Luat 02 AiO', icKhay !== '' && thieuLuat.length === 0, thieuLuat.join(', '))
+const overlayHtmlIc = fs.readFileSync(path.join(ROOT, 'src', 'overlay', 'index.html'), 'utf8')
+const netOverlay = [netVe(svgCua(overlayHtmlIc, 'id="sel-storyboard-btn"')), netVe(svgCua(overlayHtmlIc, 'data-tool="storyboard"'))]
+kiem('Icon Storyboard khay = khung chon = thanh ve (cung net ve)', netVe(icKhay) !== '' && netOverlay.every((n) => n === netVe(icKhay)))
 
 const shelfCss = fs.readFileSync(path.join(ROOT, 'src', 'shelf', 'shelf.css'), 'utf8')
 kiem('shelf.css co style hover mau cam neon cho #storyboard', shelfCss.includes('#bar #storyboard:hover'))
