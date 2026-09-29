@@ -32,6 +32,10 @@ contextBridge.exposeInMainWorld('overlay', {
   onLocked: (cb) => ipcRenderer.on('overlay:locked', () => cb()),
   /** Ghi nhat ky chay (qua main). */
   log: (msg) => ipcRenderer.send('overlay:log', msg),
+  /** 29/09 Doc chu (phim 5): { key, x, y, w, h (px thiet bi), sf } -> { ok, dong: [chuoi], boDoc, ngonNguMay, loi }. */
+  ocr: (q) => ipcRenderer.invoke('overlay:ocr', q),
+  /** Chep chu vao clipboard (qua main). */
+  copyText: (s) => ipcRenderer.send('overlay:copy-text', s),
   /** Cap nhat cau hinh khi dang mo: { lamMoKieu }. */
   onUpdateConfig: (cb) => ipcRenderer.on('overlay:update-config', (_e, d) => cb(d)),
 })

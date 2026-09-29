@@ -473,6 +473,11 @@ window.addEventListener('keydown', (e) => {
       return
     }
   }
+  // Phim 5 = doc chu trong vung (29/09 anh Tien) — mo bang chu, khong phai cong cu ve
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
+      (e.key === '5' || e.code === 'Digit5' || e.code === 'Numpad5')) {
+    e.preventDefault(); docChuVung(); return
+  }
   // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09)
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
@@ -910,6 +915,7 @@ toolbarEl.addEventListener('click', (e) => {
       toggleStoryboardMode()
       return
     }
+    if (b.dataset.tool === 'ocr') { if (ocrMo()) dongBangChu(); else docChuVung(); return }
     chonCongCu(b.dataset.tool)
   }
   else if (b.id === 'undo') hoanTac()
@@ -1156,3 +1162,133 @@ function autoSelftest() {
   }
   window.overlay.confirm({ rect: curRect })
 }
+
+/* ── 29/09 DOC CHU (phim 5 / nut "Lay chu") ─────────────────────────────────
+   Anh Tien: "khoanh vung, bam phim so 5, sinh ra bang cac dong text va nut copy". Main cat DUNG VUNG tu anh GOC +
+   doc bang bo doc co san cua he dieu hanh (src/ocr.js). Sao chep = chep het (hoac phan dang boi den) roi dong man chup. */
+const ocrBang = document.getElementById('ocr-bang')
+const ocrDs = document.getElementById('ocr-ds')
+const ocrDem = document.getElementById('ocr-dem')
+const ocrGhichu = document.getElementById('ocr-ghichu')
+const ocrChep = document.getElementById('ocr-chep')
+const ocrChepChu = ocrChep.querySelector('span')
+let ocrDong = []
+let ocrLuot = 0
+const ocrMo = () => !ocrBang.hidden
+const nutOcr = () => toolbarEl.querySelector('.cong-cu[data-tool="ocr"]')
+
+function datViTriBangChu() {
+  const gap = 12, rong = ocrBang.offsetWidth || 340, cao = ocrBang.offsetHeight || 200
+  let x = curRect.x + curRect.w + gap
+  if (x + rong > window.innerWidth - gap) x = curRect.x - gap - rong
+  if (x < gap) x = Math.max(gap, Math.min(curRect.x, window.innerWidth - rong - gap))
+  let y = Math.max(gap, Math.min(curRect.y, window.innerHeight - cao - gap))
+  // Khong de bang de len thanh cong cu khi phai dat trong/sat vung
+  const tb = toolbarEl.hidden ? null : toolbarEl.getBoundingClientRect()
+  if (tb && x < tb.right && x + rong > tb.left && y < tb.bottom && y + cao > tb.top) y = Math.max(gap, tb.top - cao - gap)
+  ocrBang.style.left = Math.round(x) + 'px'
+  ocrBang.style.top = Math.round(y) + 'px'
+}
+
+function veBangChu(kieu, chu) {
+  ocrDs.textContent = ''
+  ocrDs.classList.toggle('dang-doc', kieu === 'dang-doc')
+  if (kieu !== 'dong') {
+    const p = document.createElement('div'); p.className = 'rong'; p.textContent = chu; ocrDs.appendChild(p)
+    return
+  }
+  for (const s of ocrDong) { const d = document.createElement('div'); d.className = 'dong'; d.textContent = s; ocrDs.appendChild(d) }
+}
+
+/* cach: undefined = main chon theo ngon ngu app (Windows + tieng Viet -> Tesseract); 'tesseract' | 'he-thong' = nguoi
+   dung bam "doc lai bang bo kia" tren bang. */
+const ocrDoi = document.getElementById('ocr-doi')
+let ocrCachVua = null
+async function docChuVung(cach) {
+  if (mode !== 'annotate' || !curRect.w || !curRect.h) return
+  chotOGoChu()
+  const luot = ++ocrLuot
+  ocrDong = []
+  ocrDem.textContent = ''
+  ocrGhichu.hidden = true
+  ocrDoi.hidden = true
+  ocrChep.disabled = true; ocrChep.classList.remove('xong'); ocrChepChu.textContent = t('ocr.chep')
+  veBangChu('dang-doc', t('ocr.dangDoc'))
+  ocrBang.hidden = false
+  const nb = nutOcr(); if (nb) nb.classList.add('chon')
+  datViTriBangChu()
+  const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  let kq = null
+  if (own && own.key) {
+    try {
+      kq = await window.overlay.ocr({ key: own.key, x: curRect.x * DPR, y: curRect.y * DPR, w: curRect.w * DPR, h: curRect.h * DPR, sf: DPR, cach })
+    } catch (e) { kq = { ok: false, loi: e.message } }
+  } else kq = { ok: false, loi: 'chua co anh (grab chua xong)' }
+  if (luot !== ocrLuot || !ocrMo()) return // da dong / doc lai
+  if (!kq || !kq.ok) {
+    window.overlay.log('ocr LOI: ' + (kq && kq.loi))
+    veBangChu('rong', t('ocr.loi'))
+  } else if (!kq.dong.length) {
+    veBangChu('rong', t('ocr.khongCo'))
+  } else {
+    ocrDong = kq.dong
+    veBangChu('dong')
+    ocrDem.textContent = '· ' + t('ocr.dem').replace('{n}', String(ocrDong.length))
+    ocrChep.disabled = false
+    ocrDs.focus()
+  }
+  // Dang dung bo doc Windows + app tieng Viet -> noi ro chu co dau se sai (Windows KHONG co bo doc tieng Viet)
+  const may = kq && kq.ngonNguMay
+  if (kq && kq.cach === 'he-thong' && window.i18n.lang === 'vi' && Array.isArray(may) && !may.some((x) => /^vi/i.test(x))) {
+    ocrGhichu.textContent = t('ocr.thieuVi'); ocrGhichu.hidden = false
+  }
+  // Nut doc lai bang bo KIA (chi Windows): dang Tesseract -> "Doc bang bo doc Windows"; dang Windows -> "Doc lai tieng Viet"
+  ocrCachVua = kq && kq.cach
+  if (kq && kq.coTheDoi && ocrCachVua) {
+    ocrDoi.textContent = t(ocrCachVua === 'tesseract' ? 'ocr.docHeThong' : 'ocr.docTiengViet')
+    ocrDoi.hidden = false
+  }
+  datViTriBangChu()
+}
+ocrDoi.addEventListener('click', () => docChuVung(ocrCachVua === 'tesseract' ? 'he-thong' : 'tesseract'))
+
+function dongBangChu() {
+  ocrLuot++
+  ocrBang.hidden = true
+  const nb = nutOcr(); if (nb) nb.classList.remove('chon')
+}
+
+function chepChu(chuoi) {
+  if (!chuoi || !chuoi.trim()) return
+  window.overlay.copyText(chuoi)
+  window.overlay.log('ocr chep ' + chuoi.length + ' ky tu')
+  ocrChep.classList.add('xong'); ocrChepChu.textContent = t('ocr.daChep'); ocrChep.disabled = true
+  setTimeout(() => window.overlay.cancel(), 450) // chep xong = xong viec, dong man chup
+}
+
+ocrChep.addEventListener('click', () => chepChu(ocrDong.join('\n')))
+document.getElementById('ocr-dong').addEventListener('click', dongBangChu)
+ocrBang.addEventListener('mousedown', (e) => e.stopPropagation()) // khong ve / khong keo vung khi bam trong bang
+// Bam ra ngoai bang (khong phai thanh cong cu) = dong bang, quay ve ve binh thuong
+window.addEventListener('mousedown', (e) => {
+  if (ocrMo() && !ocrBang.contains(e.target) && !toolbarEl.contains(e.target)) dongBangChu()
+}, true)
+// Phim khi bang dang mo: CHAN het phim ve (1-5, V, S, Ctrl+C = xong...) truoc handler chinh (capture)
+window.addEventListener('keydown', (e) => {
+  if (!ocrMo()) return
+  e.stopImmediatePropagation()
+  const k = e.key.toLowerCase()
+  if (e.key === 'Escape') { e.preventDefault(); dongBangChu(); return }
+  if (e.key === 'Enter') { e.preventDefault(); if (!ocrChep.disabled) chepChu(ocrDong.join('\n')); return }
+  if ((e.ctrlKey || e.metaKey) && k === 'c') {
+    e.preventDefault()
+    const sel = String(window.getSelection() || '')
+    chepChu(sel.trim() ? sel : ocrDong.join('\n'))
+    return
+  }
+  if ((e.ctrlKey || e.metaKey) && k === 'a') {
+    e.preventDefault()
+    const r = document.createRange(); r.selectNodeContents(ocrDs)
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r)
+  }
+}, true)

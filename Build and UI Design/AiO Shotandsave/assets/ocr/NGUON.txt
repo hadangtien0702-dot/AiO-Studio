@@ -1,0 +1,4 @@
+Du lieu nhan dang chu Tesseract (LSTM, "best_int"), dung cho Doc chu (phim 5) khi app o tieng Viet tren Windows.
+Nguon: https://cdn.jsdelivr.net/npm/@tesseract.js-data/{vie,eng}/4.0.0_best_int/ (tai 29/09/2026, da giai nen .gz)
+Goc: github.com/tesseract-ocr/tessdata_best — giay phep Apache 2.0.
+eng.traineddata 5.199.098 B · vie.traineddata 1.667.949 B

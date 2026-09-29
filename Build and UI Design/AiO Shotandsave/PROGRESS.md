@@ -41,6 +41,65 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.7.9] - 2026-09-29 16:09 - Ra ban: DOC CHU (phim 5) — gom 3 muc [chua ra ban] 15:13 -> 16:06 ben duoi
+- Anh test that tren khung chat: *"anh test kha la tot roi do em"*. Run-log: 16:07:52 vung 1261x668 dao-mau 18 dong
+  2.139 ms (lan dau, gom nap bo doc); 16:08:19 vung 909x76 1 dong 130 ms.
+- Bump package.json + dong 12 tracker + dong 12 CLAUDE.md goc cung commit (so loi #5). CLAUDE.md panel: them muc
+  "DOC CHU" 3 lop (nguoi xai / builder / MVP). Chua dong goi bo cai (anh chay ban nguon); ban dong goi da do bang
+  `--thu-ocr` o win-unpacked 15:4x.
+
+## [chua ra ban] - 2026-09-29 16:06 - Doc chu: Windows LUON Tesseract + dao mau nen toi
+- Anh: *"tieng viet khong on, loi con nhieu lam"* + dan doan chup/doan chep ra. Run-log: 2 lan bam 5 (15:55, 15:56) deu
+  `he-thong` en-US vi app dang lang=en -> TESSERACT CHUA CHAY LAN NAO. Chon bo doc theo ngon ngu app SAI voi cach anh
+  dung (giao dien Anh, noi dung Viet). Chu anh chep ("Viéc do bån d6ng g6i") = dau vet bo doc Windows.
+- Do CER (Electron, nativeImage nhu app): doan chuan 1.226 ky tu (co ca doan anh chup), nen toi kieu khung chat, Segoe
+  UI 13px, chup o 100/125/150%: Windows sai 19,7-20,6%; Tesseract sai 0,1-0,7%; Tesseract + dao mau (xam, chu toi nen
+  sang) cung sai 0,2-0,7% nhung 1,2-1,5 s thay 2,2-3,0 s. ☠️ Mau tong hop (chu sach, khong JPEG) — anh that co the kem hon.
+- Anh chon "Luon Tesseract". Lam: main mac dinh win32 -> tesseract; `daoNeuNenToi()` (do sang TB < 128 -> dao, chi cho
+  Tesseract); run-log ghi `dao-mau`. Nut tren bang = "Đọc bằng bộ đọc Windows" (nhanh, cho chu Anh/Nhat/Han/Trung).
+- Kiem: bai kiem cu DAT. Khoi dong lai ban nguon 16:06:16 dang-ky=OK. Cho anh bam 5 tren khung chat that.
+
+## [chua ra ban] - 2026-09-29 15:48 - Doc chu: TIENG VIET bang Tesseract (Windows khong co bo doc tieng Viet)
+- Anh thu tren khung chat: *"tieng viet bi loi em"* (dan ra chu mat dau).
+- Goc DA DO: bang FOD chinh thuc cua Microsoft (Windows-10-1809-FOD-to-LP-Mapping-Table.xlsx) co 35 goi OCR, vi-vn CHI
+  co Basic + TextToSpeech, KHONG co OCR. ☠️ Loi khuyen 15:13 "cai them Tieng Viet vao Windows" la SAI -> da sua chu
+  ghi chu trong app + chu thich src/ocr.js ngay. Mac: Apple Vision co tieng Viet tu Sonoma (chua do).
+- Do truoc khi xay (vung chat 1447x666 tu anh that): Windows 0,03-0,44 s, 1/4 cau mau khop (chi cau tieng Anh);
+  Tesseract vie+eng 0,8-0,9 s (+1,1 s nap lan dau), 3/4 khop tung chu (sai "bao"/"a" thay "báo"/"ạ").
+- Anh chon "theo ngon ngu app": app tieng Viet tren Windows -> Tesseract; app English -> bo doc Windows; bang co nut
+  doc lai bang bo KIA ("Đọc lại tiếng Việt" / "Đọc bằng bộ đọc Windows"); Mac luon Apple Vision.
+- Lam: dependency `tesseract.js` 5.1.1 (ghim) — app truoc day 0 dependency. Du lieu `assets/ocr/{vie,eng}.traineddata`
+  (best_int, giai nen, 6,8 MB, nguon + giay phep Apache 2.0 trong NGUON.txt). package.json: asarUnpack node_modules/** +
+  assets/ocr/**; bo `*.wasm.js` + `*-lstm.*`. main `--thu-ocr <anh> <ra.json>`: doc 1 anh CA 2 cach roi thoat, khong
+  cua so, userData rieng (khong danh thuc ban dang chay) — de do BAN DONG GOI.
+- ☠️ 3 BAY cua tesseract.js 5.1.1 trong Electron (Node tran chay dung het — 5ak "nguon dung ≠ ban dong goi dung"):
+  (1) langPath -> thu vien nhan "electron" -> fetch(duong dan) -> "Only absolute URLs are supported";
+  (2) langs {code,data} -> Init ghep nham l.data -> "initialization failed"; (3) getCore(lstmOnly=true) so voi ma OEM
+  -> LUON nap core DAY DU (simd / thuong), khong phai -lstm -> em loai nham core day du, bo cai bao "Cannot find module
+  tesseract-core-simd" (ban nguon con file nen khong lo). Chay dung: cachePath=assets/ocr + cacheMethod 'readOnly'.
+- Do BAN DONG GOI (dist/win-unpacked, --thu-ocr): tesseract 1.145 / 777 ms, windows 1.708 / 31 ms; dong tieng Viet dung
+  dau ("Dạ anh cho em xin số phone của anh nhé", "Đã nhỡ cuộc gọi thoại"). app.asar.unpacked 20 MB. May khong SIMD: chua do.
+- Bai kiem cu van DAT; 24 chuoi i18n moi du VI/EN. Khoi dong lai ban nguon 15:48:28 dang-ky=OK, app dang lang=en.
+
+## [chua ra ban] - 2026-09-29 15:13 - DOC CHU TRONG ANH (OCR): khoanh vung + phim 5 -> bang cac dong chu + Sao chep
+- Boi canh: danh gia thi truong 13:3x: thieu OCR (ca Snipping Tool mien phi cung co). Anh: *"ung dung cai nay vao"*.
+  Anh chot UX: *"khoanh vung, bam phim so 5, sinh ra bang cac dong text va nut copy"*; bo doc: *"uu tien Native,
+  chinh xac, dung duoc tren win va mac"*.
+- Lam: `src/ocr.js` — Windows: Windows.Media.Ocr qua 1 tien trinh PowerShell GIU SAN (-EncodedCommand, khong file
+  .ps1 nen khong vuong app.asar; tu tat sau 10 phut ranh + khi thoat app); Mac: Apple Vision qua `osascript -l
+  JavaScript` (CHUA DO tren Mac). main `overlay:ocr` cat dung vung tu anh GOC (rawStore, cho toi 1,5 s; roi ve JPEG dong
+  bang), phong x2 khi man < 200%. Overlay: nut "Lay chu (5)" (icon Lucide scan-text) + phim 5 + bang `#ocr-bang` canh
+  vung: dong chu CHON duoc, dem dong, nut Sao chep (Enter) = chep het / phan boi den (Ctrl+C) roi DONG man chup; Esc
+  dong bang (khong huy chup); bam ra ngoai dong bang. App dang tieng Viet + may thieu bo doc vi -> ghi chu cach cai.
+- Do bo doc (ngoai app, 5 anh that cua anh): lan dau 526 ms (mo PowerShell), sau 17-208 ms. Tieng Anh dung tung chu
+  ("Thinksmart Insurance would like to send you messages, which may be promotional."). ☠️ May cong ty CHI CO en-US ->
+  tieng Viet MAT DAU ("Tra loi" -> "Trå Idi"). Phong x2 tren anh thu 50%: 51 -> 77 dong. Chu ~7 px van doc kem.
+- Do giao dien (trinh duyet, mo that overlay/index.html + gia lap main): phim 5 -> "Dang doc chu…" -> 3 dong + "· 3 dong"
+  + ghi chu vi; Esc dong bang, huy=0; nut mo lai, Enter chep dung 3 dong + dong man chup (huy=1). Muc "phim 1 khi bang
+  mo" do HONG (Khung von dang chon san) — khong ket luan. test:storyboard / khodai / vienquay / banquyen van DAT.
+- CHUA: chay that trong app (overlay bung len man anh — so loi #12, cho anh bam); Mac; bo doc tieng Viet tren may anh.
+- Thay san (khong phai do em): CSP overlay thieu `font-src` -> Inter.woff2 BI CHAN, overlay dang ve bang font du phong.
+
 ## [web] - 2026-09-29 13:3x - Dua Storyboard 0.7.8 len aio-shotsave.vercel.app + danh gia thi truong
 - Anh: *"danh gia lai tool so voi thi truong ... push code ... them vao trang web tinh nang tu sang toi gio, chon loc"*.
 - Chon len web: CHI Storyboard (quay 3 giay -> 6 khung, khay Storyboard giu dai, keo CA DAI). KHONG dua: man Cai dat

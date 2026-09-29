@@ -26,6 +26,7 @@ const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
+const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
 const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
@@ -88,6 +89,24 @@ if (IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST) {
 }
 // [do] AIO_USERDATA=<thu muc>: chay ban nguon SONG SONG voi ban cai (khoa single-instance theo userData) de do CPU/GPU nam nen (0.5.0).
 else if (process.env.AIO_USERDATA) app.setPath('userData', process.env.AIO_USERDATA)
+// [do 29/09] --thu-ocr <anh> <ra.json>: doc chu 1 anh bang CA 2 cach roi THOAT. Khong cua so, khong tray, userData rieng
+// (khoa single-instance rieng -> KHONG danh thuc ban dang chay, so loi #12). De do BAN DONG GOI (tesseract asarUnpack).
+const iThuOcr = process.argv.indexOf('--thu-ocr')
+const THU_OCR = iThuOcr > 0 ? { anh: process.argv[iThuOcr + 1], ra: process.argv[iThuOcr + 2] } : null
+if (THU_OCR) app.setPath('userData', path.join(require('os').tmpdir(), 'aio-thu-ocr'))
+async function thuOcr() {
+  const kq = { ban: app.getVersion(), dongGoi: app.isPackaged }
+  try {
+    const buf = fs.readFileSync(THU_OCR.anh)
+    for (const cach of ['tesseract', 'tesseract', 'he-thong', 'he-thong']) {
+      const r = await ocr.docChu(buf, cach)
+      kq[cach] = (kq[cach] || []).concat({ ok: r.ok, ms: r.ms, soDong: (r.dong || []).length, loi: r.loi || null, dong: r.dong })
+    }
+  } catch (e) { kq.loi = e.message }
+  try { fs.writeFileSync(THU_OCR.ra, JSON.stringify(kq, null, 1)) } catch (e) {}
+  ocr.tatHost()
+  app.exit(0)
+}
 const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
 let currentHotkey = DEFAULT_HOTKEY // nap tu config khi app ready
 let lang = 'vi' // 'vi' | 'en' — nap tu config
@@ -191,6 +210,7 @@ app.setName('AiO Shot & Save')
 if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsave')
 
 app.whenReady().then(() => {
+  if (THU_OCR) { thuOcr(); return } // che do do: khong tray, khong phim tat, khong luong chup
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
     const headers = {
@@ -339,6 +359,7 @@ app.on('window-all-closed', (e) => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
+  ocr.tatHost() // tien trinh PowerShell doc chu (neu dang giu san)
 })
 
 /* ---------------------------------------------------------------------- */
@@ -1154,6 +1175,59 @@ function closeOverlay() {
 
 // Renderer gui { rect } (khong ve shape -> main cat full-res, net) HOAC
 // { dataUrl } (co ve shape -> renderer da ghep san bang canvas).
+/* 29/09 DOC CHU (phim 5 tren man khoanh vung): cat DUNG VUNG tu anh GOC (rawStore; raw chua ve thi cho toi 1,5 s roi
+   dung JPEG dong bang), PHONG x2 khi man < 200% (do 29/09: anh thu 50% doc 51 dong, phong x2 doc 77 dong, "Offers and
+   announcements" tu cut -> du), roi src/ocr.js. Ben goi (overlay) PHAI kiem ok. */
+function daoNeuNenToi(img) {
+  const s = img.getSize(), b = img.toBitmap() // BGRA
+  let tong = 0, dem = 0
+  for (let i = 0; i < b.length; i += 4 * 7) { tong += 0.114 * b[i] + 0.587 * b[i + 1] + 0.299 * b[i + 2]; dem++ }
+  if (!dem || tong / dem >= 128) return { img, dao: false }
+  for (let i = 0; i < b.length; i += 4) {
+    const y = 255 - Math.round(0.114 * b[i] + 0.587 * b[i + 1] + 0.299 * b[i + 2])
+    b[i] = b[i + 1] = b[i + 2] = y
+  }
+  return { img: nativeImage.createFromBitmap(b, { width: s.width, height: s.height }), dao: true }
+}
+ipcMain.handle('overlay:ocr', async (_e, q) => {
+  const t0 = Date.now()
+  try {
+    let img = rawStore.get(q.key)
+    for (let i = 0; (!img || img.isEmpty()) && i < 15; i++) { await new Promise((r) => setTimeout(r, 100)); img = rawStore.get(q.key) }
+    if ((!img || img.isEmpty()) && frozenStore.get(q.key)) img = nativeImage.createFromBuffer(frozenStore.get(q.key))
+    if (!img || img.isEmpty()) return { ok: false, loi: 'chua co anh goc' }
+    const sz = img.getSize()
+    const x = Math.max(0, Math.min(Math.round(q.x), sz.width - 1)), y = Math.max(0, Math.min(Math.round(q.y), sz.height - 1))
+    const w = Math.max(1, Math.min(Math.round(q.w), sz.width - x)), h = Math.max(1, Math.min(Math.round(q.h), sz.height - y))
+    let vung = img.crop({ x, y, width: w, height: h })
+    // Bo doc (anh chot lai 29/09 16:1x "luon Tesseract"): Windows -> LUON Tesseract. Ban dau chon theo ngon ngu app,
+    // nhung anh de app tieng Anh ma doc noi dung tieng Viet -> 2 lan bam 5 deu ra bo doc Windows, mat dau. Do tren doan
+    // chuan 1.226 ky tu (nen toi kieu khung chat): Windows sai ~20%, Tesseract sai 0,2-0,7%. Mac: Apple Vision.
+    // q.cach = nguoi dung bam nut doi bo doc tren bang.
+    const cach = q.cach === 'tesseract' || q.cach === 'he-thong' ? q.cach
+      : (process.platform === 'win32' ? 'tesseract' : 'he-thong')
+    // Phong: bo doc he thong x2 khi man < 200%. Tesseract x1,5 chi khi man ~100% (thoi gian tang theo so diem anh:
+    // vung 1447x666 = 0,9 s), tran 4,5 trieu diem anh.
+    let k = cach === 'tesseract' ? ((q.sf || 1) < 1.2 ? 1.5 : 1) : ((q.sf || 1) >= 2 ? 1 : 2)
+    k = Math.max(1, Math.min(k, 9000 / Math.max(w, h), Math.sqrt(4.5e6 / (w * h))))
+    if (k > 1.05) vung = vung.resize({ width: Math.round(w * k), height: Math.round(h * k), quality: 'best' })
+    // Nen TOI (chu sang) + Tesseract -> dao thanh chu toi nen sang, thang xam. Do 29/09: cung do dung (sai 0,2-0,7%)
+    // ma nhanh gap doi (2,2-3,0 s -> 1,2-1,5 s) vi Tesseract khong phai tu thu dao mau.
+    let dao = false
+    if (cach === 'tesseract') { const d = daoNeuNenToi(vung); vung = d.img; dao = d.dao }
+    const kq = await ocr.docChu(vung.toPNG(), cach)
+    kq.daoMau = dao
+    kq.coTheDoi = process.platform === 'win32' // Mac: Apple Vision doc duoc tieng Viet, khong can doi
+    ghiLog('ocr ' + w + 'x' + h + ' x' + k.toFixed(2) + ' ' + cach + (dao ? ' dao-mau' : '') + ': ' + (kq.ok ? kq.dong.length + ' dong' : 'LOI ' + kq.loi) +
+      ' bo doc=' + (kq.boDoc || '?') + ' doc ' + kq.ms + ' ms, tong ' + (Date.now() - t0) + ' ms')
+    return kq
+  } catch (err) {
+    ghiLog('ocr LOI: ' + err.message)
+    return { ok: false, loi: err.message }
+  }
+})
+ipcMain.on('overlay:copy-text', (_e, s) => { if (typeof s === 'string') clipboard.writeText(s) })
+
 ipcMain.on('overlay:confirm', (e, payload) => {
   const shot = overlayShots.get(e.sender.id)
   ghiLog('confirm tu display=' + (shot && shot.display ? shot.display.id : '?') +

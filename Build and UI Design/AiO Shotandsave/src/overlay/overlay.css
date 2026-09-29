@@ -297,3 +297,53 @@ html, body {
   border-radius: 4px; /* = hop nen khi xuat (veChu), WYSIWYG */
   white-space: pre; caret-color: #fff;
 }
+
+/* ── 29/09 BANG CHU (phim 5): cac dong chu doc duoc + nut Sao chep. Dat canh vung chon (phai > trai > duoi). ── */
+#ocr-bang[hidden] { display: none !important; }
+#ocr-bang {
+  position: fixed; z-index: 12;
+  width: 340px; max-height: min(60vh, 460px);
+  display: flex; flex-direction: column;
+  background: rgb(22 22 22 / 98%);
+  border: 1px solid var(--line-2); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop, var(--shadow-md));
+  font-family: var(--font-ui); color: var(--text-1);
+  animation: mo-vao 140ms ease both;
+}
+.ocr-dau { display: flex; align-items: center; gap: var(--sp-2); padding: 10px 10px 8px 14px; border-bottom: 1px solid var(--line-1); }
+#ocr-tieu-de { font-size: 13px; font-weight: 700; white-space: nowrap; }
+#ocr-dem { font-size: 11px; color: var(--text-3); flex: 1; white-space: nowrap; }
+.ocr-x { width: 26px; height: 26px; display: grid; place-items: center; border: none; border-radius: 50%; background: transparent; color: var(--text-3); cursor: pointer; }
+.ocr-x:hover { background: var(--bg-hover); color: var(--text-1); }
+#ocr-ds {
+  flex: 1; min-height: 0; overflow: auto; padding: 8px 14px;
+  font-size: 13px; line-height: 1.5; color: var(--text-1);
+  user-select: text; -webkit-user-select: text; cursor: text; outline: none;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+#ocr-ds::-webkit-scrollbar { width: 6px; }
+#ocr-ds::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--r-pill); }
+#ocr-ds .dong { padding: 2px 0; }
+#ocr-ds .dong + .dong { border-top: 1px solid rgb(255 255 255 / 5%); }
+#ocr-ds .rong { color: var(--text-3); cursor: default; }
+#ocr-ds.dang-doc .rong::before {
+  content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; vertical-align: -1px;
+  border: 2px solid var(--line-strong); border-top-color: var(--accent); border-radius: 50%;
+  animation: ocr-xoay .7s linear infinite;
+}
+@keyframes ocr-xoay { to { transform: rotate(360deg); } }
+#ocr-ghichu { margin: 0; padding: 8px 14px; font-size: 11.5px; line-height: 1.45; color: var(--warn, #f5b041); border-top: 1px solid var(--line-1); }
+#ocr-ghichu[hidden] { display: none; }
+.ocr-chan { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 10px; border-top: 1px solid var(--line-1); }
+.ocr-doi { margin-right: auto; padding: 4px 6px; border: none; border-radius: var(--r-sm); background: transparent; color: var(--text-2); font: 600 12px/1.2 var(--font-ui); cursor: pointer; text-align: left; }
+.ocr-doi:hover { background: var(--bg-hover); color: var(--text-1); }
+.ocr-doi[hidden] { display: none; }
+.ocr-nut {
+  height: 32px; padding: 0 12px 0 16px; display: inline-flex; align-items: center; gap: 10px;
+  border: none; border-radius: var(--r-md); background: var(--accent); color: var(--accent-on, #fff);
+  font: 700 13px/1 var(--font-ui); cursor: pointer; /* luat: chu tren cam dac >= 13px dam */
+}
+.ocr-nut:hover { filter: brightness(1.08); }
+.ocr-nut:disabled { opacity: .45; cursor: default; filter: none; }
+.ocr-nut kbd { font: 600 10.5px/1 var(--font-ui); padding: 3px 5px; border-radius: 4px; background: rgb(0 0 0 / 22%); color: #fff; }
+.ocr-nut.xong { background: var(--ok, #35c46a); }

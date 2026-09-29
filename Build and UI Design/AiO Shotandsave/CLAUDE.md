@@ -241,6 +241,14 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
 DUNG go):
+- ☠️ **DOC CHU (phim 5, 29/09):** Windows KHONG co bo doc tieng Viet (bang FOD Microsoft: vi-vn khong co goi OCR) ->
+  app tieng Viet dung Tesseract (`src/ocr.js`). tesseract.js 5.1.1 co 3 bay CHI lo trong Electron / ban dong goi:
+  langPath -> fetch loi; langs {code,data} -> Init loi; getCore luon nap core DAY DU (khong phai -lstm). Duong dung:
+  cachePath=assets/ocr + cacheMethod 'readOnly' + asarUnpack node_modules. Doi gi o day PHAI do lai bang
+  `"dist/win-unpacked/AiO Shot & Save.exe" --thu-ocr <anh> <ra.json>` (khong cua so, khong danh thuc ban dang chay).
+  Chay electron tu shell cua Claude: bo `ELECTRON_RUN_AS_NODE` (VS Code dat =1 -> electron chay nhu Node tran).
+  ☠️ NGON NGU GIAO DIEN ≠ NGON NGU NOI DUNG: ban dau chon bo doc theo ngon ngu app -> anh de app tieng Anh, doc chat
+  tieng Viet -> 2 lan bam 5 deu ra bo doc Windows, mat dau ~20%. Nay Windows LUON Tesseract (sai 0,2-0,7%, ~1-1,5 s).
 - `getSources` CHAN main ~0,5-1,5s: khong grab truoc khi overlay hien; UI theo
   chuot phai ve LOCAL trong renderer, khong cho main phat (0.3.9 "drop fps").
 - Video MPO (YouTube) nhin xuyen cua so trong suot ra DEN -> PHAI dan frozen
@@ -346,6 +354,17 @@ per-user, ra `dist/AiO-Shot-and-Save-Setup-<ver>.exe` (~99MB, KHONG len git —
 ☠️ 2 bay da vap: (1) RUN_LOG trong app.asar CHI DOC -> ban dong goi phai ghi
 vao userData (da lam trong ghiLog); (2) bo cai NSIS TU DE loi tat Desktop cung
 ten -> sau khi cai, loi tat tro BAN CAI chu khong phai ban nguon.
+
+DOC CHU TRONG ANH (0.7.9, 29/09 — anh test "kha la tot roi"):
+- Nguoi xai: khoanh vung -> phim **5** (hoac nut "Lay chu" tren thanh cong cu) -> bang canh vung hien cac dong chu ->
+  **Sao chep** (Enter) chep het roi dong man chup; boi den 1 doan + Ctrl+C = chep doan do; Esc dong bang, ve tiep.
+  Vi du doi thuong: dang xem video co phu de / tin nhan khach, muon lay chu de dan vao Premiere hay Zalo ma khong go lai.
+- Builder: `src/ocr.js`. Windows LUON Tesseract (tesseract.js 5.1.1 + assets/ocr vie/eng, luong phu, giu san 10 phut),
+  nen toi thi `daoNeuNenToi()` truoc; nut tren bang doi sang bo doc Windows (PowerShell giu san, 0,03 s, KHONG co tieng
+  Viet). Mac: Apple Vision qua osascript. Bay tesseract.js trong Electron: xem "Bay 1-lan" o tren.
+- MVP (so): doan chuan 1.226 ky tu nen toi, 100/125/150%: Tesseract sai 0,2-0,7%, 1,2-1,5 s; Windows sai ~20%. Anh bam
+  that 16:07: 1261x668 -> 18 dong 2,1 s (lan dau, gom nap), 909x76 -> 0,13 s. CHUA: Mac, may khong SIMD, anh chup nhieu
+  nhieu/chu rat nho (~7 px), ngon ngu khac Viet/Anh (Tesseract chi co vie+eng -> bam nut doi sang bo doc Windows).
 
 ## Chua lam (xem PROGRESS.md)
 
