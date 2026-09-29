@@ -1,0 +1,6 @@
+# ☠️ repo PUBLIC: mật khẩu ứng dụng Gmail nằm trong .env — KHÔNG BAO GIỜ đưa lên git
+.env
+node_modules/
+hop-thu/
+# file mau (khong co bi mat) thi DUOC len git — .gitignore cha chan .env*
+!.env.example

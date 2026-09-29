@@ -1,0 +1,17 @@
+{
+  "name": "aio-shotsave-web-dev",
+  "private": true,
+  "type": "module",
+  "description": "Chay thu web Shot & Save tren may: trang demo mua gui THU CAM ON that qua Gmail (chi localhost, khong len Vercel).",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node thu-server.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  },
+  "devDependencies": {
+    "mailparser": "^3.7.1",
+    "smtp-server": "^3.13.6"
+  }
+}
