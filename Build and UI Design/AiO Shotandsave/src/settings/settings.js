@@ -56,6 +56,9 @@ function dichGiaoDien() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.getAttribute('data-i18n'))
   })
+  // 29/09: chu phu dua vao tooltip (anh: "text phu lam gon lai")
+  btnReset.title = btnReset.ariaLabel = t('set.phim.macDinh')
+  if (lamMoBox) lamMoBox.title = t('set.lamMo.goiY')
 }
 
 /* Tach accelerator thanh mang nhan phim de ve keycap. */
@@ -106,7 +109,10 @@ function datTrangThai(s) {
 }
 
 function datFolder(p) {
-  folderPath.textContent = p || '—'
+  // 29/09: rut gon thu muc nguoi dung thanh ~ (C:\Users\ten\... -> ~\...); title van giu du duong dan
+  // ☠️ .tm-duong co direction:rtl (cat DAU chuoi dai) -> '~' la ky tu trung tinh, bi day ra CUOI ("...\shotandsave\~").
+  //    Dat dau LRM (U+200E, vo hinh) truoc chuoi de '~' giu dung cho.
+  folderPath.textContent = String.fromCharCode(0x200e) + (p || '—').replace(/^([A-Za-z]:)?[\\/](Users|home)[\\/][^\\/]+/i, '~')
   folderPath.title = p || ''
   const ten = (p || '').split(/[\\/]/).filter(Boolean).pop() || '—'
   folderTen.textContent = ten
@@ -297,7 +303,7 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
   function ve(s) {
     if (!s) { the.hidden = true; return }
     const co = s.loai === 'da-kich-hoat'
-    khoiNhap.hidden = co; khoiCo.hidden = !co
+    khoiNhap.hidden = co; khoiCo.hidden = !co; nutMua.hidden = co
     the.classList.toggle('het', s.loai === 'het-han-thu')
     const dungThu = !co && !s.biThuHoi && s.lyDoMatMa !== 'may-bi-go' && s.loai === 'dung-thu'
     ngayEl.textContent = dungThu ? t('bq.conNgay').replace('{n}', s.ngayConLai) : ''

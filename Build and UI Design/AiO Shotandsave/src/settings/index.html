@@ -34,9 +34,10 @@
   <main>
     <!-- ── Ban quyen: dung thu 14 ngay / nhap ma / huy kich hoat ─────── -->
     <section class="nhom bq" id="the-bq">
+      <!-- 29/09 anh "text phu lam gon lai": Mua ban quyen don len goc phai hang tieu de (bot 1 hang) -->
       <div class="bq-dau">
-        <h1 id="bq-tieu-de" data-i18n="bq.tieuDe">Bản quyền</h1>
-        <span id="bq-ngay" class="bq-ngay"></span>
+        <div class="bq-trai"><h1 id="bq-tieu-de" data-i18n="bq.tieuDe">Bản quyền</h1><span id="bq-ngay" class="bq-ngay"></span></div>
+        <button id="bq-mua" class="lien-ket mua" data-i18n="bq.mua"></button>
       </div>
       <div id="bq-tien-do" class="tien-do" hidden><i id="bq-tien-do-i"></i></div>
       <p class="goi-y" id="bq-mo-ta"></p>
@@ -46,7 +47,6 @@
           <input id="bq-ma" class="bq-o" type="text" spellcheck="false" autocomplete="off" data-i18n-ph="bq.nhapMa" />
           <button id="bq-kich-hoat" class="nut chinh" data-i18n="bq.kichHoat"></button>
         </div>
-        <button id="bq-mua" class="lien-ket" data-i18n="bq.mua"></button>
       </div>
       <!-- da kich hoat: nut huy (bam 2 lan) -->
       <div id="bq-co" hidden>
@@ -59,14 +59,13 @@
     <h2 class="nhom-ten" data-i18n="set.nhom.chup">Chụp ảnh</h2>
     <section class="nhom">
       <div class="hang">
-        <div class="nhan">
-          <span class="nhan-chon" data-i18n="set.phim.tieuDe">Phím tắt</span>
-          <span class="goi-y goi-y-phim"><span data-i18n="set.phim.goiY"></span><button id="reset" class="lien-ket" data-i18n="set.phim.macDinh"></button></span>
-        </div>
+        <span class="nhan-chon" data-i18n="set.phim.tieuDe">Phím tắt</span>
         <div class="phai">
           <!-- idle: keycaps · recording: dong chu nhap nhay (nhan to hop = luu ngay) -->
           <div id="keys" class="keycaps" aria-live="polite"></div>
           <button id="doi" class="nut" data-i18n="set.phim.doiPhim"></button>
+          <!-- Ve mac dinh = nut icon (chu o title, settings.js dat) thay dong goi y 2 hang -->
+          <button id="reset" class="nut icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
           <button id="huy-ghi" class="nut phu" data-i18n="set.phim.huyNgan" hidden></button>
         </div>
       </div>
@@ -88,10 +87,7 @@
         </div>
       </div>
       <div class="hang">
-        <div class="nhan">
-          <span class="nhan-chon" data-i18n="set.lamMo.kieu"></span>
-          <span class="goi-y" data-i18n="set.lamMo.goiY"></span>
-        </div>
+        <span class="nhan-chon" data-i18n="set.lamMo.kieu"></span>
         <div class="chon-nhom" id="lam-mo-kieu" role="group">
           <button class="chon-nut" data-v="mosaic" data-i18n="set.lamMo.mosaic"></button>
           <button class="chon-nut" data-v="blur" data-i18n="set.lamMo.blur"></button>

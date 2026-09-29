@@ -1,6 +1,8 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 08:45 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 08:57 +0700
+> - **0.7.7 (29/09 08:57, Claude):** gon 4 chu phu man Cai dat (anh khoanh tren 0.7.6) — moi hang con 1 dong.
+>   Bo cai `Release/.../Setup-0.7.7.exe` — [CHO ANH] tu cai. Van con cho anh quay thu vien Storyboard (muc 0.7.6).
 > - **0.7.6 (29/09 08:45, Claude, may cong ty):** man Cai dat lam lai (huong B anh chon: danh sach nhom, lua chon xam
 >   noi, cam chi o nut chinh) + thanh cuon manh + sua cau chu; vien quay Storyboard kieu 1 (vien 2 px + 4 goc, thuoc
 >   "● 3 giay | 6 o"), SUA LOI vien 0.7.4 lot cam vao 3/6 khung. Bo cai `Release/.../Setup-0.7.6.exe` 88,4 MB —
@@ -25,6 +27,23 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.7.7] - 2026-09-29 08:57 - Gon chu phu man Cai dat
+- Boi canh: anh cai 0.7.6, khoanh 4 cho: *"cac text phu nay em lam gon lai cho anh di em"* — "Mua ban quyen" 1 hang rieng,
+  goi y phim tat 2 dong ("Dung duoc trong moi ung dung" + "Ve mac dinh"), goi y lam mo, duong dan
+  "...sers\DRT-G21\AppData\Local\shotandsave" bi cat.
+- Thay doi: "Mua ban quyen" len goc phai hang tieu de ("Dung thu · con 13 ngay"), an khi da kich hoat; bo goi y phim tat,
+  "Ve mac dinh" = nut icon ↺ canh "Doi" (chu o tooltip); goi y lam mo -> tooltip cum lua chon; duong dan rut
+  `C:\Users\<ten>` -> `~` (~\AppData\Local\shotandsave, hien du). ☠️ Bay gap luc do: `.tm-duong` co `direction: rtl`
+  (de cat DAU chuoi dai) -> `~` la ky tu trung tinh bi day ra CUOI ("AppData\Local\shotandsave\~"); so do chu KHONG bat
+  duoc, chi anh chup lo ra. Sua: them dau LRM (U+200E) truoc chuoi. `bq.conNgay` "Con n / 14 ngay" -> "con n ngay".
+- File: `src/settings/{index.html,settings.css,settings.js}`, `src/i18n.js` (2 dong), `package.json` 0.7.7.
+- Kiem chung (trang dung tu file that, 440x700): 0 hang cao hon 50 px (tuc 0 hang 2 dong) o VI/EN/da kich hoat, 0 chu
+  bi cat, 0 px cuon; vi tri THAT tren man: `~` x=57 < "AppData" x=68; duong dan dai 6 cap van cat dau, giu duoi;
+  ham rut gon dung 4 ca (Windows, /Users mac, o D:, "Users2" khong bi cat nham) — thu bang regex lay tu file, khong go
+  tay (lan go tay qua vo lenh ra "C:UsersDRT-G21..." = bay 5ax). test:storyboard 67/67, test:vienquay DAT,
+  test:banquyen 27/27. app.asar: 0.7.7 + 3 thay doi co trong goi. Setup md5 Release = build `eaf6a8a5`.
+- CHUA kiem: anh chua mo 0.7.7 that.
 
 ## [0.7.6] - 2026-09-29 08:45 - Man Cai dat huong B + vien quay Storyboard kieu 1 (sua loi lot cam vao anh)
 - Boi canh: anh gui 3 anh: (1) menu khay + man Cai dat *"lam trang settings nay cho dep di em - lon xon qua - noi dung
