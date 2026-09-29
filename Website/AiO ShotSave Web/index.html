@@ -229,8 +229,8 @@ h1,h2,h3{text-wrap:balance}
 .nw{white-space:nowrap}   /* phím + chữ đi kèm không bị tách dòng ("3 | chữ." mồ côi ở 1024px, 22/09) */
 .sec-head p{margin:0;color:var(--ink-2);font-size:var(--fs-sub)}
 .grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
-@media (min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}.grid .card.rong{grid-column:1 / -1}}   /* 28/09: the thu 10 trai het hang, khong le 1 the */
+@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}.grid .card:nth-child(9){grid-column:1 / -1}}   /* 29/09: 9 the thuong + 2 the rong -> 2 cot: the thu 9 trai hang, 2 the rong dung canh nhau */
+@media (min-width:1000px){.grid{grid-template-columns:repeat(6,1fr)}.grid .card{grid-column:span 2}.grid .card:nth-child(9){grid-column:span 2}.grid .card.rong{grid-column:span 3}}   /* 29/09: luoi 6 cot con: 3 the/hang, 2 the rong (Lay chu + Storyboard) chung 1 hang, khong le the */
 .card{padding:28px;border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .2s ease,transform .2s ease}
 .card:hover{box-shadow:inset 0 0 0 1px var(--line-strong),var(--shadow)}
 .ico{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--brand-soft);color:var(--brand-ink);margin-bottom:20px}
@@ -912,6 +912,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f9t">A shelf that remembers</h3>
           <p data-i="f9p">Shots are numbered #1, #2 and so on. Restart the app and your 5 latest shots are still in the shelf.</p>
         </article>
+        <!-- 29/09: Doc chu (app 0.7.9, anh test "kha la tot roi"). Chi hua tieng Viet du dau TREN WINDOWS (Mac chua do). -->
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8h8M7 12h10M7 16h6"/></svg></div>
+          <h3 data-i="f11t">Copy text from any shot</h3>
+          <p data-i-html="f11p">Box any text and press <kbd>5</kbd>. Every line shows up in a small panel, ready to copy. Works offline, and on Windows it reads Vietnamese with full accents.</p>
+        </article>
         <!-- 29/09: Storyboard theo app 0.7.8 (the cu 28/09 ta kieu 0.6.9 "bam S trong khay, anh khay xep thanh dai" — app da bo:
              anh chup thuong KHONG vao khay Storyboard). Nay: khoanh vung + S -> quay 3 giay -> 6 khung -> keo ca dai. -->
         <article class="card rong" data-hien>
@@ -1176,6 +1182,7 @@ const T = {
     f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm vào là ghim lên màn hình.",
     f7t:"Làm mờ thông tin riêng", f7p:"Bấm <kbd>4</kbd> rồi kéo qua tên, email hay số tài khoản để che trước khi gửi đi. Chọn kiểu khảm khối hoặc mờ mịn trong Cài đặt.",
     f8t:"Chỉnh lại trước khi lưu", f8p:"Kéo xong vẫn co giãn, dời được khung chụp. Bấm <kbd>V</kbd> để chọn nét vẽ rồi di chuyển hoặc xoá.",
+    f11t:"Lấy chữ trong ảnh", f11p:"Khoanh vùng có chữ rồi bấm <kbd>5</kbd>. Các dòng chữ hiện trong một bảng nhỏ, bấm là chép. Không cần mạng, trên Windows đọc được tiếng Việt đủ dấu.",
     f10t:"Dải phân cảnh trong 3 giây", f10p:"Khoanh vùng đang chuyển động rồi bấm <kbd>S</kbd>. 3 giây sau bạn có 6 khung đánh số trong một dải, nằm sẵn trong khay Storyboard. Bỏ bớt khung thừa, rồi kéo cả dải thả vào ứng dụng nào cũng được.",
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",

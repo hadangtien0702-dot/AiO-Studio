@@ -41,6 +41,12 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [web] - 2026-09-29 16:1x - Dua "Lay chu trong anh" (0.7.9) len aio-shotsave.vercel.app
+- The moi f11 "Copy text from any shot" / "Lấy chữ trong ảnh" (icon scan-text nhu app). Chi hua tieng Viet du dau TREN
+  WINDOWS (Mac chua do). Luoi tinh nang doi sang 6 cot con o >= 1000 px: 3 the/hang, 2 the rong (Lay chu + Storyboard)
+  chung 1 hang; 640-999 px the thu 9 trai hang -> khong le the.
+- Do (Playwright, may chu tinh): 1280 px 3-3-3-2; 800 px 2-2-2-2-1(rong)-2; 360 px 1 cot; 0 cuon ngang; VI doi du; 0 loi.
+
 ## [0.7.9] - 2026-09-29 16:09 - Ra ban: DOC CHU (phim 5) — gom 3 muc [chua ra ban] 15:13 -> 16:06 ben duoi
 - Anh test that tren khung chat: *"anh test kha la tot roi do em"*. Run-log: 16:07:52 vung 1261x668 dao-mau 18 dong
   2.139 ms (lan dau, gom nap bo doc); 16:08:19 vung 909x76 1 dong 130 ms.
