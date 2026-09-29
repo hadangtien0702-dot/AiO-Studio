@@ -5,11 +5,10 @@
 >   `729566a` the Lay chu, `6214188` phim Storyboard het de chu + xoe 6 khung dung app — live khop git.
 > - **0.7.9 = DOC CHU (phim 5):** Windows LUON Tesseract (Windows KHONG co bo doc tieng Viet), anh test "kha la tot roi".
 >   [CHUA] dong goi bo cai 0.7.9 (anh chay BAN NGUON, boot 16:06) · Mac chua do · may khong SIMD chua do.
-> - [CHO ANH] chon huong trinh bay phan 11 tinh nang tren web: NHAP `Website/Nhap web ShotSave/nhap-11-tinh-nang.html` (mo
->   bang trinh duyet hoac may chu tinh bat ky). Huong A = 11 dong + man hinh phim lon (em nghieng A);
->   Huong B = 6 o bang nhau ghi du 11 ten. Nam NGOAI thu muc web nen push KHONG len Vercel. Mo ta
->   o muc [web] 16:4x ben duoi (11 canh: chup / keo tha / ghim / chu thich 1-2-3 / 2 man / khay / lam mo 4 / chinh V /
->   khay nho / lay chu 5 / storyboard S).
+> - **[CHO ANH] 29/09 23:54: anh bo ca A lan B ("chua du Creative") -> NHAP "RAP CHIEU" GHEP THANG vao
+>   `Website/AiO ShotSave Web/index.html` (anh: "lam them tren trang ... nay nhe"), CHUA COMMIT, CHUA PUSH** (push = Vercel
+>   deploy). Xem tai may: `cd Website; python -m http.server 8133 --bind 127.0.0.1` -> /AiO%20ShotSave%20Web/index.html.
+>   Chi tiet muc [web] 23:54 ben duoi. Nhap A/B cu van o `Website/Nhap web ShotSave/nhap-11-tinh-nang.html`.
 > - [CHO ANH] khung 1 cua dai quay tren video co the DEN (thay trong anh khay 10:41: Storyboard 04 SHOT 01 den, dai 03 bat
 >   dau tu SHOT 02) — chua do, chua sua.
 > - Kiem: test:storyboard 73/73 · test:khodai 11/11 · test:vienquay DAT · test:banquyen 27/27.
@@ -41,6 +40,30 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [web] - 2026-09-29 23:54 - NHAP "Rap chieu" cho phan 11 tinh nang, ghep thang vao index.html (CHUA commit/push)
+- Boi canh: anh xem lai nhap A/B: "ca 2 ban a va b anh chua thay du Creative"; em dua 4 y tuong (ban phim song / timeline
+  Premiere / mot ngay cua editor / dai phim 11 shot), anh: "de xuat cho anh mot kieu moi Creative hon" -> em tu chon va dung;
+  giua chung anh: "co y tuong moi em lam them tren trang index.html nay nhe" -> ghep vao trang that (ban may).
+- Y tuong: section thanh "rap chieu" toi, DINH giua man (sticky, 11 x 80vh), cuon toi dau dien toi do. Cong cu DIEN THANG
+  LEN CHU tren san khau (chu la vat the bi tac dong): chup chinh tieu de section roi bay vao khay · chu "Hai man hinh" vat qua
+  khe 2 man · "v3_final_FINAL.mp4" bi khoanh + mui ten + ghi "Ban cuoi that chua?" (1 2 3) · email/SDT bi kham khoi (4) ·
+  khung chon co gian bang tay nam + V doi khung ve · 3 chu bi chup lan luot vao khay, bam #2 la ghim · cua so thay nhau len,
+  anh ghim van tren · keo tu khay vao Zalo · tat app / mo lai 5 anh van con · CHU PHU DE BAY ra khoi video vao bang Lay chu (5)
+  · bam S: xoe 6 khung (chep sb-xoe cua overlay.css) -> vien quay NGOAI vung + dong ho -> dai SHOT 01-06. Duoi cung timeline
+  11 clip kieu Premiere (bam de nhay), ten + mo ta lay DUNG khoa f1t..f11p cua luoi the; bam phim THAT 1-5/V/S nhay toi canh.
+- Ky thuat: toan bo rap nam trong SHADOW DOM (`#rap` + `<template id="rap-mau">`) — trang co hang tram class ngan, rap cung
+  (.sel .th .cs .h .l ...) -> tach han de khong de nhau (bai 5ar). Luoi the `#featGrid` GIU NGUYEN lam du phong: JS chi an no
+  khi GSAP tai duoc. Ctrl+Shift+S de nguyen cho demo dau trang. setLang goi `ssRapRelang`. Khung chon/tay nam/nhan co/kham
+  khoi chep so do tu src/overlay (vien 1px cam + phu 42%, tay nam 8px, o kham = mau TRUNG BINH o).
+- Do (Playwright, ban may): 0 loi JS o 390/1280/2560 · 11/11 canh dung + chay · 0 phan tu tran san khau o 390 va 1280 ·
+  390 px khong cuon ngang · anh con trong khay giu 16:10 va nam gon (khe phai >= 8 px) · nhay canh 11 -> 1: 10/10 clip khac
+  fill = 0 · chan GSAP: rap an, luoi the hien. Sua trong luc do: kham khoi ra khoi trang/den nhu ma vach (drawImage thu 1
+  buoc chi lay vai diem) -> tinh trung binh tung o; "Tham khao" gay 2 dong (display:grid tach <em>); clip 11 sot mau cam;
+  chu ACTION chay ra khoi khung; man doc: khay chi hien 1,5 anh, bang Lay chu gay chu giua tu -> bo cuc doc rieng canh
+  7/9/10 + anh con co theo so anh; nhan "#1" de chu o anh < 64 px -> an.
+- CHUA: anh xem; chua do tren Safari/iPhone that; man doc chu trong khay 5 anh con nho (45 px); cuon 11 x 80vh = dai
+  (~7.800 px o 800 px cao) — neu anh thay dai thi giam 60vh/canh.
 
 ## [/xong] - 2026-09-29 22:17 - Chot so
 - Nhap 2 huong phan 11 tinh nang chep tu scratchpad (mat theo phien) vao repo `Website/Nhap web ShotSave/nhap-11-tinh-nang.html`

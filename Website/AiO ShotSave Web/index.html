@@ -874,7 +874,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         <h2 data-i="featTitle">Everything you need. Nothing you don't.</h2>
         <p data-i="featSub">Built by a video editor who takes hundreds of screenshots a week.</p>
       </div>
-      <div class="grid">
+      <div class="grid" id="featGrid">
         <article class="card" data-hien>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
           <h3 data-i="f1t">Instant capture</h3>
@@ -936,6 +936,143 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         </article>
       </div>
     </div>
+    <!-- 29/09 NHAP "Rap chieu" (anh: 2 huong A/B "chua du Creative"): 11 canh dien thang len CHU tren san khau, dinh giua man,
+         cuon toi dau dien toi do, timeline 11 clip kieu Premiere, bam phim that 1-5 V S. Nam trong shadow DOM de CSS trang
+         va CSS rap khong de nhau. Luoi the #featGrid o tren la duong du phong: JS chi an no khi GSAP da tai. CHUA push. -->
+    <div id="rap" hidden></div>
+    <template id="rap-mau">
+<style>
+:host{display:block;position:relative;margin-top:48px;background:#0e0e0e;color:#f5f5f7;
+  --acc:#F86820;--bg0:#0e0e0e;--bg2:#181818;--t1:#f5f5f7;--t2:#c3c3c8;--t3:#8d8d95;--l1:rgb(255 255 255/6%)}
+*{box-sizing:border-box}
+.dinh{position:sticky;top:64px;height:calc(100vh - 64px);height:calc(100svh - 64px);display:flex;flex-direction:column;overflow:hidden;font-family:Inter,system-ui,sans-serif}
+.dinh::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(55% 45% at 50% 42%,rgb(248 104 32/.09),transparent 70%)}
+.le{padding-left:clamp(16px,4vw,48px);padding-right:clamp(16px,4vw,48px)}
+.tren{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:20px;font:700 11.5px/1 Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--t3)}
+.tren .rec{display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#ff3b30;vertical-align:1px;animation:nhay 1.2s steps(2) infinite}
+@keyframes nhay{50%{opacity:.2}}
+.so-dem{font:800 13px/1 Inter,sans-serif;letter-spacing:.08em;color:var(--t2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.so-dem b{color:var(--acc)}
+.san-khung{position:relative;flex:1;min-height:0;display:flex}
+.san{position:relative;flex:1;min-height:0;margin-top:14px;container-type:size;overflow:hidden;border-radius:14px;background:var(--bg0);box-shadow:inset 0 0 0 1px var(--l1);--u:min(1cqw,1.9cqh)}
+.duoi{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-top:16px}
+.cap{min-width:0}
+.cap h3{margin:0;font:800 clamp(21px,2.4vw,32px)/1.12 Inter,sans-serif;letter-spacing:-.025em}
+.cap p{margin:6px 0 0;color:var(--t2);font-size:clamp(14px,1.1vw,16.5px);line-height:1.5;max-width:60ch}
+kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;background:#1f1f1f;box-shadow:inset 0 -2px 0 #000,0 0 0 1px rgb(255 255 255/10%);color:var(--t1);font:700 11.5px/1.7 Inter,sans-serif;text-align:center}
+.phim-cap{display:flex;gap:6px;flex:none}
+.kc{min-width:38px;height:38px;padding:0 10px;display:grid;place-items:center;border-radius:9px;background:#1f1f1f;color:#fff;font:700 14px/1 Inter,sans-serif;box-shadow:inset 0 -3px 0 #000,0 0 0 1px rgb(255 255 255/10%);transition:transform .12s,background .12s}
+.kc.nhan{background:var(--acc);box-shadow:inset 0 -3px 0 #b84210;transform:translateY(2px)}
+.tl{position:relative;padding-top:14px;padding-bottom:16px}
+.tl-ray{position:relative;display:flex;gap:4px;height:32px}
+.clip{position:relative;flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:0 9px;border:0;border-radius:6px;background:#1b1b1b;box-shadow:inset 0 0 0 1px var(--l1);color:var(--t3);font:700 11px/1 Inter,sans-serif;white-space:nowrap;overflow:hidden;cursor:pointer;text-align:left}
+.clip:hover{background:#232323}
+.clip:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.clip .fill{position:absolute;inset:0;background:var(--acc);transform-origin:0 50%;transform:scaleX(0)}
+.clip span{position:relative}
+.clip .ten{overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.clip.qua .fill{opacity:.28}
+.clip.on{color:#fff}
+.goi-y{margin-top:9px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px;line-height:1.5;color:var(--t3)}
+.goi-y kbd{font-size:11px}
+@media (max-width:900px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}
+@media (max-width:640px){.duoi{flex-direction:column;align-items:flex-start;gap:10px}.goi-y .phim-thu{display:none}.tren .nhan-tren{display:none}}
+@media (hover:none){.goi-y .phim-thu{display:none}}
+/* đồ nghề trên sân khấu — khung chọn / tay nắm / nhãn cỡ / xoè 6 khung chép số đo từ src/overlay/overlay.css của app */
+.chu{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font-weight:800;letter-spacing:-.045em;line-height:1;white-space:nowrap;color:var(--t1);font-size:calc(var(--u)*9);text-align:center}
+.chu em{font-style:normal;color:var(--acc)}
+.chu.trai{text-align:left}
+.sel{position:absolute;z-index:10;border:1px solid var(--acc);box-shadow:0 0 0 200vmax rgb(0 0 0/42%);pointer-events:none}
+.sel.sb{border-width:2px}
+.sz{position:absolute;left:-1px;top:-24px;height:20px;padding:0 8px;display:flex;align-items:center;border-radius:6px;background:var(--acc);color:#fff;font:600 11px/1 Inter,sans-serif;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sz.trong{top:4px;left:4px}
+.hd{position:absolute;width:8px;height:8px;background:#fff;border:1.5px solid var(--acc);border-radius:1.5px;box-shadow:0 1px 3px rgb(0 0 0/60%);transition:transform .15s,background .15s}
+.hd.on{transform:scale(1.25);background:var(--acc);border-color:#fff}
+.ma{position:absolute;inset:-2px;border:1.5px solid var(--acc);border-radius:2px;opacity:0}
+.demso{position:absolute;left:50%;top:50%;display:flex;gap:5px;transform:translate(-50%,-50%);opacity:0}
+.demso span{width:22px;height:14px;display:grid;place-items:center;background:rgb(20 20 20/90%);border:1px solid rgb(255 255 255/18%);border-radius:3px;font:700 9px/1 Inter,sans-serif;color:#fff}
+.cur{position:absolute;left:0;top:0;z-index:40;width:max(18px,calc(var(--u)*2.4));aspect-ratio:1;margin:-2px 0 0 -4px;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(0 0 0/55%))}
+.cur svg{width:100%;height:100%;transition:transform .12s}.cur.bam svg{transform:scale(.8)}
+.flash{position:absolute;inset:0;z-index:30;background:#fff;opacity:0;pointer-events:none}
+.toi{position:absolute;inset:0;z-index:9;background:rgb(0 0 0/55%);opacity:0}
+.pk{position:absolute;left:50%;bottom:5%;z-index:45;display:flex;gap:calc(var(--u)*.8);transform:translateX(-50%);opacity:0}
+.pk b{min-width:max(34px,calc(var(--u)*5));height:max(34px,calc(var(--u)*5));padding:0 calc(var(--u)*1.3);display:grid;place-items:center;border-radius:calc(var(--u)*1.1);background:#1f1f1f;color:#fff;font:700 max(13px,calc(var(--u)*1.9))/1 Inter,sans-serif;box-shadow:inset 0 -4px 0 #000,0 0 0 1px rgb(255 255 255/12%);transition:background .1s,transform .1s}
+.pk b.cam{background:var(--acc);box-shadow:inset 0 -4px 0 #b84210;transform:translateY(2px)}
+.nh{position:absolute;left:50%;top:5%;z-index:46;transform:translateX(-50%);max-width:calc(100% - 16px);width:max-content;text-align:center;padding:6px 14px;border-radius:999px;background:rgb(30 30 30/92%);box-shadow:0 0 0 1px rgb(255 255 255/10%);color:#fff;font:600 13px/1.4 Inter,sans-serif;opacity:0}
+.nh i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#35c46a;vertical-align:1px}
+.anh{position:absolute;z-index:25;overflow:hidden;background:var(--bg0);box-shadow:0 0 0 1.5px var(--acc),0 20px 40px -16px #000}
+.khay{position:absolute;z-index:20;display:flex;flex-direction:column;overflow:hidden;border-radius:12px;background:var(--bg2);box-shadow:0 24px 50px -20px #000,0 0 0 1px rgb(255 255 255/9%)}
+.khay .kb{flex:none;height:26px;display:flex;align-items:center;gap:6px;padding:0 10px;color:var(--t2);font:700 11px/1 Inter,sans-serif;border-bottom:1px solid rgb(255 255 255/7%)}
+.khay .kb svg{width:13px;height:13px;color:var(--acc)}
+.khay .kb .sl{margin-left:auto;color:var(--t3);font-weight:600}
+.khay .kl{flex:1;min-height:0;display:flex;gap:8px;padding:8px;align-items:center;overflow:hidden;container-type:size}
+.khay .th{flex:none;height:auto;width:min(calc(100cqh * 1.6),calc((100cqw - 8px * (var(--n, 1) - 1)) / var(--n, 1)));aspect-ratio:16/10}
+.th{position:relative;flex:0 1 auto;min-width:0;height:100%;aspect-ratio:16/10;border-radius:6px;overflow:hidden;background:var(--bg0);box-shadow:0 0 0 1px rgb(255 255 255/12%);container-type:size}
+.th .so{position:absolute;left:3px;bottom:3px;z-index:2;padding:0 4px;border-radius:3px;background:rgb(0 0 0/72%);color:#fff;font:700 9px/1.5 Inter,sans-serif}
+@container (max-width:64px){.th .so{display:none}}
+.th .tc{position:absolute;inset:0;display:block;text-align:center;font:800 min(22cqh,14cqw)/100cqh Inter,sans-serif;letter-spacing:-.04em;color:var(--t1);white-space:nowrap}
+.th .tc em{font-style:normal;color:var(--acc)}
+.ghim{position:absolute;z-index:30;border-radius:8px;overflow:hidden;background:var(--bg0);box-shadow:0 0 0 2px var(--acc),0 30px 60px -20px #000}
+.ghim .pi{position:absolute;right:8px;top:8px;z-index:3;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center}
+.ghim .pi svg{width:14px}
+.cs{position:absolute;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 30px 60px -24px #000,0 0 0 1px rgb(255 255 255/8%)}
+.cs .tb{flex:none;height:26px;display:flex;align-items:center;gap:6px;padding:0 10px;background:#f4f2f0;border-bottom:1px solid #ece6e0;font:600 11px/1 Inter,sans-serif;color:#5a524b;white-space:nowrap}
+.cs .tb i{flex:none;width:8px;height:8px;border-radius:50%;background:#ddd4cb}
+.cs .bd{position:relative;flex:1;min-height:0;padding:12px}
+.cs.toi-mau{background:#1d1d1d}.cs.toi-mau .tb{background:#262626;border-color:#333;color:#bdbdbd}.cs.toi-mau .tb i{background:#444}
+.ray{position:absolute;left:12px;right:12px;height:12%;border-radius:4px;display:flex;gap:3px}
+.ray i{height:100%;border-radius:3px}
+.bong{max-width:78%;padding:8px 12px;border-radius:14px;font:500 13px/1.4 Inter,sans-serif}
+.bong.trai{align-self:flex-start;background:#f3eee9;color:#16110d}
+.bong.phai{align-self:flex-end;background:#245bdb;color:#fff}
+.chat{display:flex;flex-direction:column;justify-content:flex-end;gap:8px}
+.kv{position:absolute;z-index:14;border:3px solid var(--acc);border-radius:2px}
+.kv.chon{box-shadow:0 0 0 2px rgb(255 255 255/85%)}
+.muiten{position:absolute;z-index:14;height:4px;background:var(--acc);transform-origin:0 50%;border-radius:2px}
+.muiten::after{content:"";position:absolute;right:-3px;top:50%;width:16px;height:16px;border-top:4px solid var(--acc);border-right:4px solid var(--acc);transform:translateY(-50%) rotate(45deg)}
+.chuve{position:absolute;z-index:14;padding:4px 10px;border-radius:6px;background:rgb(0 0 0/78%);color:var(--acc);font:700 max(14px,calc(var(--u)*2.4))/1.3 Inter,sans-serif;white-space:nowrap;box-shadow:0 0 0 1px rgb(255 255 255/10%)}
+.chuve::after{content:"";display:inline-block;width:2px;height:1em;margin-left:2px;background:var(--acc);vertical-align:-2px;animation:nhay .8s steps(2) infinite}
+.chuve.xong::after{display:none}
+.mosaic{position:absolute;z-index:12;outline:1px solid rgb(255 255 255/30%)}
+.man{position:absolute;border-radius:10px;background:#262626;box-shadow:0 0 0 1px rgb(255 255 255/8%),0 30px 60px -30px #000}
+.man .n{position:absolute;overflow:hidden;border-radius:5px}
+.man .ten-man{position:absolute;left:0;right:0;top:100%;margin-top:8px;text-align:center;font:600 11px/1 Inter,sans-serif;color:var(--t3)}
+.video{position:absolute;overflow:hidden;border-radius:8px;container-type:size;background:linear-gradient(180deg,#27305a,#6a5bd0 68%,#f6b37e)}
+.video .mt{position:absolute;top:18%;width:14cqh;aspect-ratio:1;margin-left:-7cqh;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff4d6,#ffb454 55%,#f86820)}
+.video .nui{position:absolute;left:-5%;right:-5%;bottom:0;height:44%;background:#3b2a4a;clip-path:polygon(0 100%,0 55%,15% 25%,30% 55%,45% 15%,60% 50%,75% 28%,90% 55%,100% 35%,100% 100%)}
+.video .vw{position:absolute;top:44%;font:800 24cqh/1 Inter,sans-serif;letter-spacing:-.05em;color:#fff;white-space:nowrap;transform:translate(-50%,-50%);text-shadow:0 1cqh 3cqh rgb(0 0 0/35%)}
+.video .pd{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);padding:.4em .7em;border-radius:.3em;background:rgb(0 0 0/62%);color:#fff;font:700 7.5cqh/1.2 Inter,sans-serif;white-space:nowrap}
+.video .pd span{white-space:pre}
+.video .tcd{position:absolute;right:3%;top:5%;font:700 4cqh/1 Inter,sans-serif;color:rgb(255 255 255/80%);font-variant-numeric:tabular-nums}
+.bang{position:absolute;z-index:22;display:flex;flex-direction:column;overflow:hidden;border-radius:12px;background:#161616;color:#f3f3f3;box-shadow:0 30px 60px -20px #000,0 0 0 1px rgb(255 255 255/10%)}
+.bang .h{padding:11px 14px;font:700 13px/1.3 Inter,sans-serif;border-bottom:1px solid rgb(255 255 255/8%)}
+.bang .h small{color:var(--t3);font-weight:500}
+.bang .l{flex:1;padding:14px;font:600 max(15px,calc(var(--u)*2.3))/1.45 Inter,sans-serif}
+.bang .l span{display:inline-block;white-space:pre}
+.bang .f{display:flex;justify-content:flex-end;padding:10px 12px;border-top:1px solid rgb(255 255 255/8%)}
+.bang .nut{padding:7px 16px;border-radius:999px;background:var(--acc);color:#fff;font:700 13px/1.2 Inter,sans-serif;transition:background .2s}
+.bang .nut.xong{background:#35c46a}
+.bay{position:absolute;z-index:35;white-space:pre;font-family:Inter,sans-serif;font-weight:700;color:#fff;pointer-events:none}
+.vq{position:absolute;z-index:16;background:var(--acc)}
+.demq{position:absolute;z-index:17;display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:rgb(20 20 20/94%);box-shadow:0 0 0 1px rgb(255 255 255/10%);color:#f3f3f3;font:600 12px/1.3 Inter,sans-serif;white-space:nowrap}
+.demq .r{width:8px;height:8px;border-radius:50%;background:#ff3b30}
+.demq .pp{display:flex;gap:3px}.demq .pp i{width:10px;height:6px;border-radius:2px;background:rgb(255 255 255/18%)}.demq .pp i.co{background:var(--acc)}
+.dai{position:absolute;z-index:18;display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:8px;border-radius:10px;background:#101010;box-shadow:0 30px 50px -20px #000,0 0 0 1px rgb(255 255 255/8%)}
+.dai .k{position:relative;aspect-ratio:16/9;border-radius:4px;overflow:hidden}
+.dai .k .video{inset:0;border-radius:0}
+.dai .k b{position:absolute;left:3px;top:3px;z-index:2;padding:0 4px;border-radius:2px;background:rgb(9 10 13/88%);color:var(--acc);font:800 9px/1.5 Inter,sans-serif}
+@media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after{animation:none}}
+</style>
+<div class="dinh">
+  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / 11</span></div>
+  <div class="san-khung le"><div class="san" id="san"></div></div>
+  <div class="duoi le"><div class="cap"><h3 id="capTen"></h3><p id="capMo"></p></div><div class="phim-cap" id="capPhim"></div></div>
+  <div class="tl le">
+    <div class="tl-ray" id="ray"></div>
+    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>V</kbd> <kbd>S</kbd></span></div>
+  </div>
+</div>
+    </template>
   </section>
 
   <!-- Section KHAY (anh 22/09): kéo ảnh từ khay vào NHIỀU app — Lark → Teams → Premiere Pro, lặp.
@@ -1263,6 +1400,7 @@ function setLang(l){
   if (window.ssStRelang) window.ssStRelang();
   if (window.ssKhRelang) window.ssKhRelang();
   if (window.ssSbRelang) window.ssSbRelang();
+  if (window.ssRapRelang) window.ssRapRelang();
 }
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 let saved = null;
@@ -2715,6 +2853,429 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     window.ssSb = { epChay: () => { epChay = true; capNhat(); } };   // chỉ để đo
   }
   if (document.readyState === "complete") batDau(); else addEventListener("load", batDau);
+})();
+</script>
+<script>
+/* ===== 29/09 NHAP "Rap chieu" cho phan 11 tinh nang (xem comment o #rap). Thu tu canh theo mach mot ngay lam viec;
+   chu ten + mo ta lay DUNG khoa f1t..f11p cua luoi the (mot nguon chu). Chu rieng tren san khau o bang RT duoi. ===== */
+(() => {
+  const host = document.getElementById("rap"), mau = document.getElementById("rap-mau"), luoi = document.getElementById("featGrid");
+  if (!host || !mau || !host.attachShadow) return;
+  const RT = {
+    vi: { tren: "Shot & Save · 11 tính năng", goiY: "Cuộn để xem cảnh tiếp · bấm clip để nhảy tới", thu: "Thử bấm trên bàn phím:",
+      tit: "Gọn nhẹ,<br>đủ những gì <em>bạn cần.</em>", luu: "Đã lưu vào khay", khay: "Khay ảnh", anh: "ảnh",
+      m1: "Màn 1 · 150%", m2: "Màn 2 · 125%", hai: "Hai <em>màn</em> hình", haiNh: "Một vùng vắt qua 2 màn, liền mạch, đúng nét",
+      ghiChu: "Bản cuối thật chưa?", khach: "Khách: Nguyễn Văn An", sdt: "0908 123 456", moNh: "Che xong rồi mới gửi đi",
+      chinh: 'Chỉnh <span class="l">lại</span>', chinhNh: "Khung trúng rồi mới Xong",
+      tu: ["Ý tưởng", "Tham <em>khảo</em>", "Màu sắc", "Logo", "Frame"], trinh: "Trình duyệt · Brief khách", ghimNh: "Cửa sổ nào lên trước, ảnh ghim vẫn nằm trên",
+      zalo: "Zalo · Khách hàng", hoi: "Gửi anh bản nháp nhé?", duyet: "Ổn rồi, duyệt nhé!", apps: "Zalo · Messenger · Premiere · Figma · Photoshop…",
+      tat: "Tắt ứng dụng.", mo: "Mở lại…", con: "5 ảnh <em>vẫn còn.</em>", phuDe: "Xin chào, Sài Gòn!",
+      ocr: "Chữ trong vùng chọn", dong: "1 dòng", chep: "Sao chép", daChep: "Đã chép", giay: "giây", daiNh: "Tự lưu thành 1 dải vào khay Storyboard",
+      ngan: ["Chụp", "2 màn hình", "Chú thích", "Làm mờ", "Chỉnh lại", "Khay", "Ghim", "Kéo thả", "Nhớ ảnh", "Lấy chữ", "Storyboard"] },
+    en: { tren: "Shot & Save · 11 features", goiY: "Scroll for the next scene · click a clip to jump", thu: "Try it on your keyboard:",
+      tit: "Everything you need.<br><em>Nothing you don't.</em>", luu: "Saved to the shelf", khay: "Shelf", anh: "shots",
+      m1: "Screen 1 · 150%", m2: "Screen 2 · 125%", hai: "Across <em>two</em> screens", haiNh: "One box across 2 screens, seamless and sharp",
+      ghiChu: "Is this really final?", khach: "Client: Anna Nguyen", sdt: "+1 408 555 0123", moNh: "Hidden before you hit send",
+      chinh: 'Nudge <span class="l">it</span>', chinhNh: "On target, then Done",
+      tu: ["Ideas", "<em>Refs</em>", "Colors", "Logo", "Frame"], trinh: "Browser · Client brief", ghimNh: "Any window comes forward, the pin stays on top",
+      zalo: "Zalo · Client", hoi: "Can you send the draft?", duyet: "Looks good, approved!", apps: "Zalo · Messenger · Premiere · Figma · Photoshop…",
+      tat: "Quit the app.", mo: "Open it again…", con: "5 shots, <em>still here.</em>", phuDe: "Hello, Saigon!",
+      ocr: "Text in selection", dong: "1 line", chep: "Copy", daChep: "Copied", giay: "sec", daiNh: "Saved as one strip in the Storyboard shelf",
+      ngan: ["Capture", "2 screens", "Markup", "Blur", "Adjust", "Shelf", "Pin", "Drag", "Memory", "Copy text", "Storyboard"] },
+  };
+  const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = k => RT[LG()][k];
+  // canh i -> khoa chu cua the (f?t/f?p) + phim
+  const TN = [{ k: 1, phim: ["Ctrl", "Shift", "S"] }, { k: 5 }, { k: 4, phim: ["1", "2", "3"] }, { k: 7, phim: ["4"] }, { k: 8, phim: ["V"] },
+    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }];
+
+  function batDau() {
+    if (!window.gsap) return;                       // CDN hong -> giu luoi the
+    const goc = host.attachShadow({ mode: "open" }); goc.append(mau.content.cloneNode(true));
+    host.hidden = false; luoi.style.display = "none";
+    const $ = id => goc.getElementById(id);
+    const san = $("san"), ray = $("ray"), soNay = $("soNay"), capTen = $("capTen"), capMo = $("capMo"), capPhim = $("capPhim");
+    const CUR = '<svg viewBox="0 0 24 24"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M9 10.8V4h6v6.8l2.8 3.2H6.2z"/></svg>';
+    const KHAY_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h5l1.5 2h5L16 14h5"/></svg>';
+    const W = () => san.clientWidth, H = () => san.clientHeight;
+    function el(p, cls, css, html) { const e = document.createElement("div"); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; p.append(e); return e; }
+    function R(e) { const a = e.getBoundingClientRect(), s = san.getBoundingClientRect(); return { x: a.left - s.left, y: a.top - s.top, w: a.width, h: a.height }; }
+    function conTro(x, y) { const c = el(san, "cur", null, CUR); gsap.set(c, { x, y }); return c; }
+    function di(tl, c, x, y, d, at) { tl.to(c, { x, y, duration: d, ease: "power2.inOut" }, at); }
+    function bam(tl, c, at) { tl.add(() => { c.classList.add("bam"); setTimeout(() => c.classList.remove("bam"), 160); }, at); }
+    function phim(keys) { const p = el(san, "pk"); keys.forEach(k => { const b = document.createElement("b"); b.textContent = k; p.append(b); }); return p; }
+    function hienPhim(tl, p, at) {
+      tl.fromTo(p, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .22 }, at);
+      tl.add(() => { [...p.children].forEach(b => b.classList.add("cam")); nhanPhimCap([...p.children].map(b => b.textContent)); }, at + .26);
+      tl.to(p, { opacity: 0, duration: .3 }, at + 1.05);
+    }
+    function nhan(tl, text, at, css) { const n = el(san, "nh", css, "<i></i>" + text); tl.fromTo(n, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: .3 }, at); return n; }
+    function flash(tl, at) { const f = el(san, "flash"); tl.to(f, { opacity: .85, duration: .06 }, at).to(f, { opacity: 0, duration: .35 }, at + .06); }
+    function capNhatSz(s) { s.sz.textContent = Math.round(s.offsetWidth * 1.5) + " × " + Math.round(s.offsetHeight * 1.5); s.sz.classList.toggle("trong", s.offsetTop < 28); }
+    function sel(x, y, w, h) { const s = el(san, "sel", `left:${x}px;top:${y}px;width:${w || 0}px;height:${h || 0}px;opacity:0`); s.sz = el(s, "sz"); capNhatSz(s); return s; }
+    function keoSel(tl, s, c, w, h, d, at) {
+      tl.to(s, { width: w, height: h, duration: d, ease: "power2.inOut", onUpdate: () => capNhatSz(s) }, at);
+      if (c) tl.to(c, { x: parseFloat(s.style.left) + w, y: parseFloat(s.style.top) + h, duration: d, ease: "power2.inOut" }, at);
+    }
+    function khay(x, y, w, h) {
+      const k = el(san, "khay", `left:${x}px;top:${y}px;width:${w}px;height:${h}px`);
+      el(k, "kb", null, KHAY_IC + "<span>" + L("khay") + '</span><span class="sl"></span>');
+      k.l = el(k, "kl"); k.dem = n => { k.querySelector(".sl").textContent = (n == null ? k.l.children.length : n) + " " + L("anh"); }; k.dem(0);
+      return k;
+    }
+    function themTh(K, so, chu) { K.l.style.setProperty("--n", K.l.children.length + 1); return el(K.l, "th", null, (chu ? '<div class="tc">' + chu + "</div>" : "") + '<span class="so">#' + so + "</span>"); }
+    function anhChup(nguon, x, y, w, h) {
+      const a = el(san, "anh", `left:${x}px;top:${y}px;width:${w}px;height:${h}px`);
+      const r = R(nguon), cl = nguon.cloneNode(true);
+      cl.style.left = (r.x + r.w / 2 - x) + "px"; cl.style.top = (r.y + r.h / 2 - y) + "px"; a.append(cl);
+      return a;
+    }
+    function bayVao(tl, a, dich, at, d) {
+      tl.add(() => {
+        const t = R(dich), x = parseFloat(a.style.left), y = parseFloat(a.style.top), w = a.offsetWidth, h = a.offsetHeight, k = Math.min(t.w / w, t.h / h);
+        gsap.to(a, { x: t.x + (t.w - w * k) / 2 - x, y: t.y + (t.h - h * k) / 2 - y, scale: k, transformOrigin: "0 0", duration: d || .7, ease: "power3.inOut" });
+      }, at);
+    }
+    function video(p, css, t) { const v = el(p, "video", css); el(v, "mt", "left:" + (12 + t * 70) + "%"); el(v, "nui"); return v; }
+    function taySel(s) { ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach(k => { const h = el(s, "hd"); h.dataset.k = k; const c = h.style;
+      if (k.includes("n")) c.top = "-4.5px"; if (k.includes("s")) c.bottom = "-4.5px"; if (k.includes("w")) c.left = "-4.5px"; if (k.includes("e")) c.right = "-4.5px";
+      if (k === "n" || k === "s") c.left = "calc(50% - 4px)"; if (k === "e" || k === "w") c.top = "calc(50% - 4px)"; }); }
+    function khoiMo(span) {   // khảm khối như app (veBlurPixelate): vẽ chữ lên canvas, thu nhỏ rồi phóng lại không làm mịn
+      const r = R(span), dpr = window.devicePixelRatio || 1, cs = getComputedStyle(span), fs = parseFloat(cs.fontSize);
+      const pad = 6, w = r.w + pad * 2, h = r.h + pad * 2;
+      const g = document.createElement("canvas"); g.width = w * dpr; g.height = h * dpr; const x = g.getContext("2d");
+      x.scale(dpr, dpr); x.fillStyle = "#0e0e0e"; x.fillRect(0, 0, w, h); x.fillStyle = "#f5f5f7";
+      x.font = cs.fontWeight + " " + fs + "px Inter, sans-serif"; try { x.letterSpacing = cs.letterSpacing; } catch (e) {} x.textBaseline = "middle"; x.fillText(span.textContent, pad, h / 2);
+      // mỗi ô = màu TRUNG BÌNH của ô đó (drawImage thu nhỏ một bước chỉ lấy vài điểm -> ra khối trắng/đen như mã vạch, đo 29/09)
+      const blk = Math.max(8, fs * .42) * dpr, d = x.getImageData(0, 0, g.width, g.height).data;
+      const o = document.createElement("canvas"); o.width = g.width; o.height = g.height; const ox = o.getContext("2d");
+      for (let by = 0; by < g.height; by += blk) for (let bx = 0; bx < g.width; bx += blk) {
+        let r = 0, gg = 0, b = 0, c = 0; const x1 = Math.min(g.width, bx + blk), y1 = Math.min(g.height, by + blk);
+        for (let yy = by | 0; yy < y1; yy++) for (let xx = bx | 0; xx < x1; xx++) { const q = (yy * g.width + xx) * 4; r += d[q]; gg += d[q + 1]; b += d[q + 2]; c++; }
+        ox.fillStyle = `rgb(${r / c | 0},${gg / c | 0},${b / c | 0})`; ox.fillRect(bx | 0, by | 0, Math.ceil(x1 - bx), Math.ceil(y1 - by));
+      }
+      o.className = "mosaic"; o.style.cssText = `left:${r.x - pad}px;top:${r.y - pad}px;width:${w}px;height:${h}px;clip-path:inset(0 100% 0 0)`;
+      san.append(o); return o;
+    }
+
+    const CANH = [
+      // 0. Chụp tức thì: chụp CHÍNH tiêu đề section
+      () => {
+        const tl = gsap.timeline();
+        const ch = el(san, "chu", "font-size:calc(var(--u)*7.6);top:44%", L("tit"));
+        const r = R(ch), pad = Math.max(14, W() * .018), x0 = r.x - pad, y0 = r.y - pad, w = r.w + pad * 2, h = r.h + pad * 2;
+        const c = conTro(W() * .8, H() * .88), p = phim(["Ctrl", "Shift", "S"]), s = sel(x0, y0);
+        hienPhim(tl, p, .2);
+        tl.to(s, { opacity: 1, duration: .12 }, .55); di(tl, c, x0, y0, .5, .5);
+        keoSel(tl, s, c, w, h, .9, 1.05);
+        flash(tl, 2.05);
+        const K = khay(W() * .58, H() * .74, W() * .38, Math.max(70, H() * .2)); gsap.set(K, { opacity: 0 });
+        const th = themTh(K, 1); gsap.set(th, { opacity: 0 });
+        tl.to(K, { opacity: 1, duration: .3 }, 2.2).set(s, { opacity: 0 }, 2.1).to(c, { opacity: 0, duration: .2 }, 2.1);
+        const a = anhChup(ch, x0, y0, w, h); gsap.set(a, { opacity: 0 }); tl.set(a, { opacity: 1 }, 2.1).to(ch, { opacity: .12, duration: .3 }, 2.1);
+        bayVao(tl, a, th, 2.45, .75);
+        tl.add(() => K.dem(1), 3.2);
+        nhan(tl, L("luu"), 3.25);
+        return tl.to({}, { duration: 1.6 }, 3.3);
+      },
+      // 1. Hai màn hình: chữ vắt qua khe giữa 2 màn
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const gap = w * .025, mw = (w * .92 - gap) / 2, mh = h * .6, top = h * .12, l1 = w * .04, l2 = l1 + mw + gap, bz = Math.max(6, w * .007);
+        const chu = [];
+        [[l1, "linear-gradient(160deg,#1c1c22,#121216)", L("m1")], [l2, "linear-gradient(160deg,#221c18,#161210)", L("m2")]].forEach(([l, bg, ten]) => {
+          const m = el(san, "man", `left:${l}px;top:${top}px;width:${mw}px;height:${mh}px`);
+          const n = el(m, "n", `inset:${bz}px;background:${bg}`);
+          chu.push(el(n, "chu", `font-size:calc(var(--u)*9);left:${w / 2 - l - bz}px`, L("hai")));
+          el(m, "ten-man", null, ten);
+        });
+        const r = R(chu[0]), pad = Math.max(12, w * .015), x0 = r.x - pad, y0 = r.y - pad, sw = r.w + pad * 2, sh = r.h + pad * 2;
+        const c = conTro(x0 - 30, y0 - 30), s = sel(x0, y0);
+        di(tl, c, x0, y0, .5, .2); tl.to(s, { opacity: 1, duration: .12 }, .7);
+        keoSel(tl, s, c, sw, sh, 1.2, .75);
+        flash(tl, 2.1); tl.set(s, { opacity: 0 }, 2.1).to(c, { opacity: 0, duration: .2 }, 2.1);
+        const toi = el(san, "toi"); tl.to(toi, { opacity: 1, duration: .3 }, 2.2);
+        const kw = sw * .92, kh = sh * .92;
+        const kq = el(san, "anh", `z-index:26;left:${(w - kw) / 2}px;top:${top + mh / 2 - kh / 2}px;width:${kw}px;height:${kh}px;border-radius:6px`);
+        el(kq, "chu", "font-size:calc(var(--u)*9*.92)", L("hai"));
+        tl.fromTo(kq, { opacity: 0, scale: .8 }, { opacity: 1, scale: 1, duration: .5, ease: "back.out(1.7)" }, 2.35);
+        nhan(tl, L("haiNh"), 2.7);
+        return tl.to({}, { duration: 1.8 }, 2.9);
+      },
+      // 2. Chú thích 1 2 3
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu", "font-size:calc(var(--u)*7.2);top:38%", 'v3_final_<span class="f">FINAL</span>.mp4');
+        const f = R(ch.querySelector(".f")), pad = Math.max(8, w * .01);
+        const c = conTro(w * .9, h * .9), p1 = phim(["1"]), p2 = phim(["2"]), p3 = phim(["3"]);
+        const kv = el(san, "kv", `left:${f.x - pad}px;top:${f.y - pad}px;width:0;height:0`);
+        hienPhim(tl, p1, .15); di(tl, c, f.x - pad, f.y - pad, .5, .3);
+        tl.to(kv, { width: f.w + pad * 2, height: f.h + pad * 2, duration: .6, ease: "power2.out" }, .85).to(c, { x: f.x + f.w + pad, y: f.y + f.h + pad, duration: .6, ease: "power2.out" }, .85);
+        const ax = Math.max(w * .08, f.x - w * .26), ay = Math.min(h * .84, f.y + f.h + h * .3), bx = f.x - pad - 4, by = f.y + f.h + pad + 4;
+        const len = Math.hypot(bx - ax, by - ay), goc = Math.atan2(by - ay, bx - ax) * 180 / Math.PI;
+        const m = el(san, "muiten", `left:${ax}px;top:${ay}px;width:${len}px`); gsap.set(m, { rotation: goc, scaleX: 0 });
+        hienPhim(tl, p2, 1.6); di(tl, c, ax, ay, .45, 1.7);
+        tl.to(m, { scaleX: 1, duration: .5, ease: "power2.out" }, 2.2).to(c, { x: bx, y: by, duration: .5, ease: "power2.out" }, 2.2);
+        const cv = el(san, "chuve", `left:${Math.max(8, ax - 10)}px;top:${ay + 10}px;opacity:0`, "");
+        hienPhim(tl, p3, 2.95); di(tl, c, ax, ay + 40, .3, 3.0); tl.set(cv, { opacity: 1 }, 3.25).to(c, { opacity: 0, duration: .2 }, 3.25);
+        const chu = L("ghiChu");
+        for (let i = 1; i <= chu.length; i++) tl.add(() => { cv.textContent = chu.slice(0, i); }, 3.3 + i * .055);
+        tl.add(() => cv.classList.add("xong"), 3.3 + chu.length * .055 + .4);
+        return tl.to({}, { duration: 1.6 }, 4.4);
+      },
+      // 3. Làm mờ: khảm khối quét theo con trỏ
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu trai", "font-size:calc(var(--u)*5.2);line-height:1.3;top:46%",
+          L("khach") + '<br><span class="m1">an.nguyen@gmail.com</span><br><span class="m2">' + L("sdt") + "</span>");
+        const s1 = ch.querySelector(".m1"), s2 = ch.querySelector(".m2"), o1 = khoiMo(s1), o2 = khoiMo(s2), r1 = R(s1), r2 = R(s2);
+        const c = conTro(w * .9, h * .9), p = phim(["4"]);
+        hienPhim(tl, p, .15); di(tl, c, r1.x - 6, r1.y + r1.h / 2, .5, .35);
+        tl.to(o1, { clipPath: "inset(0 0% 0 0)", duration: .8, ease: "power1.inOut" }, .95).to(c, { x: r1.x + r1.w + 6, duration: .8, ease: "power1.inOut" }, .95);
+        di(tl, c, r2.x - 6, r2.y + r2.h / 2, .4, 1.9);
+        tl.to(o2, { clipPath: "inset(0 0% 0 0)", duration: .6, ease: "power1.inOut" }, 2.35).to(c, { x: r2.x + r2.w + 6, duration: .6, ease: "power1.inOut" }, 2.35);
+        tl.to(c, { opacity: 0, duration: .2 }, 3.1);
+        nhan(tl, L("moNh"), 3.1);
+        return tl.to({}, { duration: 1.6 }, 3.2);
+      },
+      // 4. Chỉnh lại: co giãn khung chọn rồi bấm V dời nét vẽ
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu", "font-size:calc(var(--u)*10.5);top:48%", L("chinh"));
+        const r = R(ch), l = R(ch.querySelector(".l")), pad = Math.max(16, w * .02);
+        const s = sel(r.x - pad, r.y - pad, r.w * .58, r.h + pad * 2); gsap.set(s, { opacity: 1 }); taySel(s); capNhatSz(s);
+        const hse = s.querySelector('[data-k="se"]');
+        const kv = el(san, "kv", `left:${r.x + r.w * .05}px;top:${l.y - pad * .4}px;width:${l.w + pad * .8}px;height:${l.h + pad * .8}px`);
+        const c = conTro(w * .85, h * .9), p = phim(["V"]);
+        const sx = parseFloat(s.style.left) + s.offsetWidth, sy = parseFloat(s.style.top) + s.offsetHeight;
+        di(tl, c, sx, sy, .6, .2); tl.add(() => hse.classList.add("on"), .75); bam(tl, c, .85);
+        keoSel(tl, s, c, r.w + pad * 2, r.h + pad * 2, .8, .95);
+        tl.add(() => hse.classList.remove("on"), 1.8);
+        hienPhim(tl, p, 1.9);
+        const kx = parseFloat(kv.style.left), ky = parseFloat(kv.style.top), dx = (l.x - pad * .4) - kx;
+        di(tl, c, kx + 6, ky + 6, .5, 2.05); bam(tl, c, 2.6); tl.add(() => kv.classList.add("chon"), 2.62);
+        tl.to(kv, { x: dx, duration: .7, ease: "power2.inOut" }, 2.75).to(c, { x: kx + 6 + dx, duration: .7, ease: "power2.inOut" }, 2.75);
+        tl.add(() => kv.classList.remove("chon"), 3.55).to(c, { opacity: 0, duration: .2 }, 3.6);
+        nhan(tl, L("chinhNh"), 3.6);
+        return tl.to({}, { duration: 1.5 }, 3.7);
+      },
+      // 5. Khay: 3 chữ lần lượt bị chụp, bay vào khay; bấm #2 là ghim
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const K = khay(w * .2, h * .7, w * .6, Math.max(72, h * .24)), tu = L("tu").slice(0, 3), ths = [];
+        tu.forEach((t, i) => {
+          const at = .15 + i * 1.15;
+          const ch = el(san, "chu", "font-size:calc(var(--u)*9);top:34%;opacity:0", t);
+          const r = R(ch), pad = Math.max(12, w * .015), x0 = r.x - pad, y0 = r.y - pad, sw = r.w + pad * 2, sh = r.h + pad * 2;
+          const th = themTh(K, i + 1, t); gsap.set(th, { opacity: 0 }); ths.push(th);
+          const s = sel(x0, y0);
+          tl.fromTo(ch, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .3 }, at);
+          tl.to(s, { opacity: 1, duration: .1 }, at + .3); keoSel(tl, s, null, sw, sh, .35, at + .3);
+          flash(tl, at + .7); tl.set(s, { opacity: 0 }, at + .72);
+          const a = anhChup(ch, x0, y0, sw, sh); gsap.set(a, { opacity: 0 }); tl.set(a, { opacity: 1 }, at + .72).set(ch, { opacity: 0 }, at + .72);
+          bayVao(tl, a, th, at + .75, .5);
+          tl.set(th, { opacity: 1 }, at + 1.25).set(a, { opacity: 0 }, at + 1.26).add(() => K.dem(i + 1), at + 1.25);
+        });
+        const c = conTro(w * .9, h * .4); gsap.set(c, { opacity: 0 });
+        tl.to(c, { opacity: 1, duration: .2 }, 3.7);
+        tl.add(() => { const t = R(ths[1]); gsap.to(c, { x: t.x + t.w / 2, y: t.y + t.h / 2, duration: .55, ease: "power2.inOut" }); }, 3.75);
+        bam(tl, c, 4.35);
+        const g = el(san, "ghim", `left:${w * .64}px;top:${h * .06}px;width:${w * .32}px;height:${w * .32 * .56}px;opacity:0`, '<div class="th" style="position:absolute;inset:0;height:auto;border-radius:0;box-shadow:none"><div class="tc">' + tu[1] + '</div></div><span class="pi">' + PIN + "</span>");
+        tl.fromTo(g, { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .45, ease: "back.out(2)" }, 4.4);
+        return tl.to({}, { duration: 1.5 }, 4.8);
+      },
+      // 6. Ghim: cửa sổ thay nhau lên trước, ảnh ghim vẫn nằm trên
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const pr = el(san, "cs toi-mau", `left:${w * .04}px;top:${h * .1}px;width:${w * .55}px;height:${h * .72}px;z-index:2`, '<div class="tb"><i></i><i></i><i></i><span>Premiere Pro</span></div>');
+        const pb = el(pr, "bd");
+        el(pb, null, "position:absolute;left:12px;right:12px;top:10px;height:30%;border-radius:4px;background:#111");
+        [["#6f63ff", "#8b82ff", "#6f63ff"], ["#2fb36b", "#35c46a"], ["#f86820", "#ffb454", "#f86820", "#ffb454"]].forEach((mau, i) => {
+          const r = el(pb, "ray", `top:${42 + i * 17}%`); mau.forEach((m, j) => el(r, null, `background:${m};flex:${[3, 2, 4, 1][j]}`));
+        });
+        const cr = el(san, "cs", `left:${w * .26}px;top:${h * .2}px;width:${w * .5}px;height:${h * .66}px;z-index:3`, '<div class="tb"><i></i><i></i><i></i><span>' + L("trinh") + "</span></div>");
+        const cb = el(cr, "bd"); [80, 60, 90, 45, 70].forEach(p => el(cb, null, `height:10px;border-radius:5px;background:#ece6e0;margin:0 0 12px;width:${p}%`));
+        const g = el(san, "ghim", `left:${w * .63}px;top:${h * .07}px;width:${w * .33}px;height:${w * .33 * .56}px`);
+        const vd = video(g, "inset:0;border-radius:0", .45); el(vd, "vw", "left:50%", "Ref"); el(g, "pi", null, PIN);
+        const c = conTro(w * .5, h * .95);
+        tl.fromTo(g, { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: .5, ease: "back.out(2)" }, .15);
+        tl.to(g, { y: -8, duration: 1.1, yoyo: true, repeat: 3, ease: "sine.inOut" }, .7);
+        di(tl, c, w * .12, h * .3, .6, .5); bam(tl, c, 1.1); tl.set(pr, { zIndex: 4 }, 1.15).fromTo(pr, { scale: .985 }, { scale: 1, duration: .25 }, 1.15);
+        di(tl, c, w * .5, h * .78, .6, 1.8); bam(tl, c, 2.4); tl.set(cr, { zIndex: 5 }, 2.45).fromTo(cr, { scale: .985 }, { scale: 1, duration: .25 }, 2.45);
+        di(tl, c, w * .2, h * .6, .5, 3.0); bam(tl, c, 3.5); tl.set(pr, { zIndex: 6 }, 3.55);
+        nhan(tl, L("ghimNh"), 2.6, "top:auto;bottom:5%");
+        return tl.to({}, { duration: 1.2 }, 3.9);
+      },
+      // 7. Kéo thả: từ khay thả thẳng vào chat
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const doc = w < h * .9, tx = doc ? w * .5 : w * .72, ty = doc ? h * .66 : h * .5;   // man doc: khay tren, chat duoi
+        const cw = el(san, "cs", doc ? `left:${w * .05}px;top:${h * .4}px;width:${w * .9}px;height:${h * .56}px` : `left:${w * .52}px;top:${h * .06}px;width:${w * .44}px;height:${h * .8}px`, '<div class="tb"><i style="background:#0068ff"></i><span>' + L("zalo") + "</span></div>");
+        const cb = el(cw, "bd chat"); el(cb, "bong trai", null, L("hoi"));
+        const tu = L("tu"), K = doc ? khay(w * .05, h * .14, w * .9, Math.max(72, h * .2)) : khay(w * .04, h * .3, w * .42, Math.max(72, h * .26));
+        const ths = tu.slice(0, 3).map((t, i) => themTh(K, i + 1, t)); K.dem();
+        const c = conTro(w * .3, h * .9); let gh;
+        tl.add(() => { const t = R(ths[1]); gsap.to(c, { x: t.x + t.w / 2, y: t.y + t.h / 2, duration: .6, ease: "power2.inOut" }); }, .2);
+        tl.add(() => {
+          c.classList.add("bam"); const t = R(ths[1]);
+          gh = el(san, "th", `position:absolute;z-index:39;left:${t.x}px;top:${t.y}px;width:${t.w}px;height:${t.h}px;box-shadow:0 0 0 2px #f86820,0 16px 30px -10px #000`, '<div class="tc">' + tu[1] + "</div>");
+          gsap.to(gh, { rotation: -5, duration: .2 });
+          const dx = tx - (t.x + t.w / 2), dy = ty - (t.y + t.h / 2);
+          gsap.to(gh, { x: dx, y: dy, duration: 1, ease: "power2.inOut" }); gsap.to(c, { x: "+=" + dx, y: "+=" + dy, duration: 1, ease: "power2.inOut" });
+          gsap.to(cw, { boxShadow: "0 0 0 3px #f86820,0 30px 60px -24px #000", duration: .3, delay: .6 });
+        }, .95);
+        tl.add(() => {
+          c.classList.remove("bam"); if (gh) gh.remove(); gsap.to(cw, { boxShadow: "0 30px 60px -24px #000,0 0 0 1px rgb(255 255 255/8%)", duration: .3 });
+          const b = el(cb, "bong phai", "padding:5px"); el(b, "th", `height:${h * (doc ? .13 : .2)}px;aspect-ratio:16/10`, '<div class="tc">' + tu[1] + "</div>");
+          gsap.fromTo(b, { scale: .6, opacity: 0 }, { scale: 1, opacity: 1, duration: .4, ease: "back.out(2)" });
+        }, 2.05);
+        tl.add(() => { const b = el(cb, "bong trai", null, L("duyet")); gsap.fromTo(b, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3 }); }, 2.9);
+        nhan(tl, L("apps"), 3.1, doc ? "top:3%" : "left:25%");
+        return tl.to({}, { duration: 1.6 }, 3.2);
+      },
+      // 8. Khay nhớ: tắt app, mở lại, 5 ảnh vẫn còn
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu", "font-size:calc(var(--u)*7.5);top:26%", "");
+        const K = khay(w * .1, h * .52, w * .8, Math.max(80, h * .3)), ths = L("tu").map((t, i) => themTh(K, i + 1, t)); K.dem();
+        const doi = (t, at) => tl.add(() => { ch.innerHTML = t; gsap.fromTo(ch, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .35 }); }, at);
+        doi(L("tat"), .2);
+        tl.to(K, { opacity: 0, y: 30, duration: .45, ease: "power2.in" }, 1.1);
+        doi(L("mo"), 1.9);
+        tl.set(ths, { opacity: 0, scale: .5 }, 1.9).fromTo(K, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .45, ease: "back.out(1.6)" }, 2.4);
+        tl.to(ths, { opacity: 1, scale: 1, duration: .4, stagger: .1, ease: "back.out(2)" }, 2.7);
+        doi(L("con"), 3.4);
+        return tl.to({}, { duration: 1.6 }, 3.6);
+      },
+      // 9. Lấy chữ: chữ phụ đề bay ra khỏi ảnh vào bảng
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const doc = w < h * .9, vw = doc ? w * .92 : w * .56, vh = doc ? vw * .6 : Math.min(h * .78, vw * .6), vy = doc ? h * .05 : (h - vh) / 2;
+        const vd = video(san, `left:${w * .04}px;top:${vy}px;width:${vw}px;height:${vh}px`, .35);
+        el(vd, "tcd", null, "00:14:32:08");
+        const cau = L("phuDe");
+        const pd = el(vd, "pd", null, [...cau].map(k => "<span>" + k + "</span>").join(""));
+        const r = R(pd), pad = 10, x0 = r.x - pad, y0 = r.y - pad;
+        const c = conTro(x0 - 40, y0 - 60), p = phim(["5"]), s = sel(x0, y0);
+        const bw = doc ? w * .92 : w * .34, bx = doc ? w * .04 : w * .63, by = doc ? vy + vh + 16 : h * .18, bh = doc ? Math.min(h * .34, h - by - h * .04) : h * .5;
+        const bg = el(san, "bang", `left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px;opacity:0`,
+          '<div class="h">' + L("ocr") + " <small>· " + L("dong") + '</small></div><div class="l"></div><div class="f"><span class="nut">' + L("chep") + "</span></div>");
+        const dong = bg.querySelector(".l"); dong.innerHTML = [...cau].map(k => "<span>" + k + "</span>").join("");
+        const dich = [...dong.children], nguon = [...pd.children]; gsap.set(dich, { opacity: 0 });
+        di(tl, c, x0, y0, .5, .2); tl.to(s, { opacity: 1, duration: .12 }, .7); keoSel(tl, s, c, r.w + pad * 2, r.h + pad * 2, .7, .75);
+        hienPhim(tl, p, 1.6); tl.set(s, { opacity: 0 }, 1.9).to(c, { opacity: 0, duration: .2 }, 1.9);
+        tl.fromTo(bg, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: .35, ease: "power2.out" }, 1.95);
+        tl.add(() => {
+          nguon.forEach((ng, i) => {
+            const a = R(ng), b = R(dich[i]), fsA = parseFloat(getComputedStyle(ng).fontSize), fsB = parseFloat(getComputedStyle(dich[i]).fontSize);
+            const bay = el(san, "bay", `left:${a.x}px;top:${a.y}px;font-size:${fsA}px;line-height:${a.h}px`); bay.textContent = ng.textContent;
+            gsap.to(bay, { x: b.x - a.x, y: b.y - a.y, scale: fsB / fsA, transformOrigin: "0 0", duration: .6, delay: i * .035, ease: "power3.inOut",
+              onComplete() { gsap.set(dich[i], { opacity: 1 }); bay.remove(); } });
+          });
+        }, 2.3);
+        const c2 = conTro(bx + bw * .5, h * .95); gsap.set(c2, { opacity: 0 });
+        tl.to(c2, { opacity: 1, duration: .2 }, 3.2);
+        tl.add(() => { const n = R(bg.querySelector(".nut")); gsap.to(c2, { x: n.x + n.w / 2, y: n.y + n.h / 2, duration: .5, ease: "power2.inOut" }); }, 3.25);
+        bam(tl, c2, 3.8); tl.add(() => { const n = bg.querySelector(".nut"); n.textContent = L("daChep"); n.classList.add("xong"); }, 3.82);
+        return tl.to({}, { duration: 1.6 }, 3.9);
+      },
+      // 10. Storyboard: bấm S -> xoè 6 khung (chép app) -> quay 3 giây -> dải 6 khung
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const doc = w < h * .9, vw = w * (doc ? .92 : .8), vh = doc ? Math.min(h * .42, vw * .7) : Math.min(h * .62, vw * .5), vx = (w - vw) / 2, vy = h * .05;
+        const vd = video(san, `left:${vx}px;top:${vy}px;width:${vw}px;height:${vh}px`, 0);
+        const mt = vd.querySelector(".mt"), wd = el(vd, "vw", "left:0%", "ACTION");
+        const o = { t: 0 }, ve = t => { mt.style.left = (12 + t * 70) + "%"; wd.style.left = (22 + t * 56) + "%"; };
+        ve(0); tl.to(o, { t: 1, duration: 5.2, ease: "none", onUpdate() { ve(o.t); } }, 0);
+        const pad = vw * .06, x0 = vx + pad, y0 = vy + pad * .7, sw = vw - pad * 2, sh = vh - pad * 1.4;
+        const c = conTro(x0 - 30, y0 - 30), p = phim(["S"]), s = sel(x0, y0);
+        di(tl, c, x0, y0, .4, .1); tl.to(s, { opacity: 1, duration: .12 }, .5); keoSel(tl, s, c, sw, sh, .6, .55);
+        hienPhim(tl, p, 1.15);
+        const buoc = Math.max(4, sw * .012);
+        tl.add(() => s.classList.add("sb"), 1.4);
+        for (let n = 1; n <= 5; n++) { const m = el(s, "ma");
+          tl.to(m, { keyframes: [{ x: 0, y: 0, opacity: 0, duration: 0 }, { x: n * buoc, y: -n * buoc, opacity: 1 - n * .16, duration: .4 }, { duration: .4 }, { x: 0, y: 0, opacity: 0, duration: .35 }], ease: "power2.out" }, 1.4 + n * .045); }
+        const ds = el(s, "demso", null, [1, 2, 3, 4, 5, 6].map(k => "<span>" + k + "</span>").join(""));
+        tl.fromTo(ds, { opacity: 0, yPercent: -40 }, { opacity: 1, yPercent: -50, duration: .3 }, 1.6).to(ds, { opacity: 0, duration: .3 }, 2.4);
+        tl.set(s, { opacity: 0 }, 2.75).to(c, { opacity: 0, duration: .2 }, 2.75);
+        const vqs = [[x0 - 4, y0 - 4, sw + 8, 2], [x0 - 4, y0 + sh + 2, sw + 8, 2], [x0 - 4, y0 - 4, 2, sh + 8], [x0 + sw + 2, y0 - 4, 2, sh + 8]]
+          .map(([l, t, ww, hh]) => el(san, "vq", `left:${l}px;top:${t}px;width:${ww}px;height:${hh}px;opacity:0`));
+        const dq = el(san, "demq", `left:${x0}px;top:${y0 + sh + 10}px;opacity:0`, '<span class="r"></span><b class="so">3</b><span style="color:#9a9a9a">' + L("giay") + '</span><span class="pp">' + "<i></i>".repeat(6) + "</span>");
+        tl.set(vqs, { opacity: 1 }, 2.8).set(dq, { opacity: 1 }, 2.8);
+        const dai = el(san, "dai", `left:${w * .04}px;right:${w * .04}px;bottom:${h * .03}px;opacity:0` + (doc ? ";grid-template-columns:repeat(3,1fr)" : ""));
+        tl.to(dai, { opacity: 1, duration: .3 }, 2.8);
+        const pp = dq.querySelectorAll(".pp i"), so = dq.querySelector(".so");
+        for (let k = 0; k < 6; k++) tl.add(() => {
+          pp[k].classList.add("co"); so.textContent = 3 - Math.floor(k / 2);
+          const kh = el(dai, "k", null, "<b>SHOT 0" + (k + 1) + "</b>"), v = video(kh, "", o.t);
+          v.querySelector(".mt").style.left = mt.style.left; el(v, "vw", "left:" + wd.style.left, "ACTION");
+          gsap.fromTo(kh, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .25 });
+        }, 2.85 + k * .5);
+        tl.to([...vqs, dq], { opacity: 0, duration: .25 }, 5.9);
+        nhan(tl, L("daiNh"), 5.9);
+        return tl.to({}, { duration: 1.6 }, 6);
+      },
+    ];
+
+    /* cuộn tới đâu, diễn cảnh đó */
+    const N = TN.length, BUOC = () => innerHeight * .8;
+    host.style.height = `calc(${N} * 80vh + 100vh)`;
+    TN.forEach((f, i) => {
+      const b = document.createElement("button"); b.className = "clip"; b.type = "button";
+      b.innerHTML = '<i class="fill"></i><span>' + String(i + 1).padStart(2, "0") + '</span><span class="ten"></span>';
+      b.addEventListener("click", () => toi(i)); ray.append(b);
+    });
+    let dang = -1, tl = null, hen = null, dungYen = null, fillTw = null, thay = false;
+    const tuDong = matchMedia("(prefers-reduced-motion: reduce)");
+    function nhanPhimCap(keys) { [...capPhim.children].forEach(k => { if (keys.includes(k.textContent)) { k.classList.add("nhan"); setTimeout(() => k.classList.remove("nhan"), 260); } }); }
+    function chuTinh() {
+      goc.querySelectorAll("[data-r]").forEach(e => { e.textContent = L(e.dataset.r); });
+      [...ray.children].forEach((b, i) => { b.querySelector(".ten").textContent = L("ngan")[i]; b.title = window.ssT("f" + TN[i].k + "t"); b.setAttribute("aria-label", b.title); });
+    }
+    function capNhatCap(i) {
+      if (fillTw) fillTw.kill();
+      const f = TN[i]; soNay.textContent = String(i + 1).padStart(2, "0");
+      capTen.textContent = window.ssT("f" + f.k + "t"); capMo.innerHTML = window.ssT("f" + f.k + "p");
+      capPhim.innerHTML = (f.phim || []).map(k => '<span class="kc">' + k + "</span>").join("");
+      [...ray.children].forEach((c, j) => { c.classList.toggle("on", j === i); c.classList.toggle("qua", j < i); if (j !== i) gsap.set(c.querySelector(".fill"), { scaleX: j < i ? 1 : 0 }); });
+    }
+    function dien(i) {
+      clearTimeout(hen); if (tl) tl.kill(); if (fillTw) fillTw.kill();
+      gsap.killTweensOf(san.querySelectorAll("*")); san.innerHTML = "";
+      tl = CANH[i]();
+      fillTw = gsap.fromTo(ray.children[i].querySelector(".fill"), { scaleX: 0 }, { scaleX: 1, duration: tl.duration(), ease: "none" });
+      tl.eventCallback("onComplete", () => { hen = setTimeout(() => { if (dang === i) dien(i); }, 900); });
+      if (tuDong.matches) { tl.progress(1); fillTw.progress(1); tl.eventCallback("onComplete", null); }
+      else if (!thay) { tl.pause(); fillTw.pause(); }
+    }
+    const dinhTren = () => host.getBoundingClientRect().top + scrollY;
+    function chiSo() { return Math.max(0, Math.min(N - 1, Math.floor((scrollY - dinhTren()) / BUOC()))); }
+    function khiCuon() {
+      const i = chiSo(); if (i === dang) return;
+      dang = i; capNhatCap(i);
+      clearTimeout(dungYen); if (tl) tl.pause();
+      dungYen = setTimeout(() => dien(i), 140);      // cuộn nhanh qua nhiều cảnh: chỉ dựng cảnh nơi dừng lại
+    }
+    let cho = false;
+    addEventListener("scroll", () => { if (cho) return; cho = true; requestAnimationFrame(() => { cho = false; khiCuon(); }); }, { passive: true });
+    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => { if (dang >= 0) dien(dang); }, 200); });
+    function toi(i) { window.scrollTo({ top: dinhTren() + i * BUOC() + BUOC() * .35, behavior: "smooth" }); }
+    new IntersectionObserver(es => { thay = es[0].isIntersecting; if (!tl) return; if (thay) { tl.resume(); fillTw && fillTw.resume(); } else { tl.pause(); fillTw && fillTw.pause(); } }, { threshold: .3 }).observe(san);
+    // bấm phím thật khi rạp đang chiếm giữa màn (Ctrl+Shift+S để dành cho demo đầu trang)
+    addEventListener("keydown", e => {
+      if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "") || e.ctrlKey || e.metaKey || e.altKey) return;
+      const r = host.getBoundingClientRect(); if (r.top > innerHeight * .5 || r.bottom < innerHeight * .5) return;
+      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10 }[e.code];
+      if (i == null) return;
+      e.preventDefault();
+      if (i === dang) dien(i); else toi(i);
+    });
+    window.ssRapRelang = () => { chuTinh(); if (dang >= 0) { capNhatCap(dang); dien(dang); } };
+    window.ssRap = { dien: i => { dang = i; capNhatCap(i); dien(i); }, tl: () => tl, san };   // chỉ để đo
+    chuTinh();
+    document.fonts.ready.then(() => { dang = -1; khiCuon(); });
+  }
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", batDau); else batDau();
 })();
 </script>
 </body>
