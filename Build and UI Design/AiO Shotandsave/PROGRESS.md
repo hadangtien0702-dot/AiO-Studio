@@ -5,10 +5,9 @@
 >   `729566a` the Lay chu, `6214188` phim Storyboard het de chu + xoe 6 khung dung app — live khop git.
 > - **0.7.9 = DOC CHU (phim 5):** Windows LUON Tesseract (Windows KHONG co bo doc tieng Viet), anh test "kha la tot roi".
 >   [CHUA] dong goi bo cai 0.7.9 (anh chay BAN NGUON, boot 16:06) · Mac chua do · may khong SIMD chua do.
-> - **[CHO ANH] 29/09 23:54: anh bo ca A lan B ("chua du Creative") -> NHAP "RAP CHIEU" GHEP THANG vao
->   `Website/AiO ShotSave Web/index.html` (anh: "lam them tren trang ... nay nhe"), CHUA COMMIT, CHUA PUSH** (push = Vercel
->   deploy). Xem tai may: `cd Website; python -m http.server 8133 --bind 127.0.0.1` -> /AiO%20ShotSave%20Web/index.html.
->   Chi tiet muc [web] 23:54 ben duoi. Nhap A/B cu van o `Website/Nhap web ShotSave/nhap-11-tinh-nang.html`.
+> - **WEB "RAP CHIEU" DA LEN LIVE 30/09 (`d7300fd`)** — anh bo A/B ("chua du Creative"), xem ban rap chieu: "qua xin",
+>   "merge len di em". Live md5 = git blob; do tren live 1280 + 390: 11/11 canh chay, 0 tran, 0 loi JS. [CHO ANH] thu tren
+>   iPhone that. Chi tiet muc [web] 23:54 ben duoi. Nhap A/B cu (bo) van o `Website/Nhap web ShotSave/nhap-11-tinh-nang.html`.
 > - [CHO ANH] khung 1 cua dai quay tren video co the DEN (thay trong anh khay 10:41: Storyboard 04 SHOT 01 den, dai 03 bat
 >   dau tu SHOT 02) — chua do, chua sua.
 > - Kiem: test:storyboard 73/73 · test:khodai 11/11 · test:vienquay DAT · test:banquyen 27/27.
@@ -41,7 +40,7 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
-## [web] - 2026-09-29 23:54 - NHAP "Rap chieu" cho phan 11 tinh nang, ghep thang vao index.html (CHUA commit/push)
+## [web] - 2026-09-29 23:54 - "Rap chieu" cho phan 11 tinh nang, ghep thang vao index.html (anh duyet, len live 30/09 `d7300fd`)
 - Boi canh: anh xem lai nhap A/B: "ca 2 ban a va b anh chua thay du Creative"; em dua 4 y tuong (ban phim song / timeline
   Premiere / mot ngay cua editor / dai phim 11 shot), anh: "de xuat cho anh mot kieu moi Creative hon" -> em tu chon va dung;
   giua chung anh: "co y tuong moi em lam them tren trang index.html nay nhe" -> ghep vao trang that (ban may).
