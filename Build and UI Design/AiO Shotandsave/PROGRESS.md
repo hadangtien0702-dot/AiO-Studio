@@ -41,6 +41,25 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [web] - 2026-09-29 13:3x - Dua Storyboard 0.7.8 len aio-shotsave.vercel.app + danh gia thi truong
+- Anh: *"danh gia lai tool so voi thi truong ... push code ... them vao trang web tinh nang tu sang toi gio, chon loc"*.
+- Chon len web: CHI Storyboard (quay 3 giay -> 6 khung, khay Storyboard giu dai, keo CA DAI). KHONG dua: man Cai dat
+  moi, vien quay, icon, "Dan key" (viec noi bo, khach khong mua vi no).
+- The tinh nang cu (28/09) ta SAI hanh vi hien tai ("bam S trong khay, anh khay xep thanh dai" — 0.7.8 anh chup thuong
+  KHONG vao khay Storyboard) -> sua EN+VI. Them section `#storyboard` (sau "khay co gian"): phim GSAP dung luong app
+  (khoanh vung -> chip Storyboard Strip + quat 6 khung -> Xong -> vien cam + thuoc "● 3 giay | 6 o" chep src/dem ->
+  6 khung SHOT 01..06 vao khay chep src/storyboard -> nam CA HANG keo vao chat). Khach TU nam hang keo vao chat duoc
+  (phim dung, 7 s sau chay lai). Canh video ve bang CSS theo t -> 6 khung khac nhau that (timecode cach ~0,5 s).
+- Do (Playwright, may chu tinh 127.0.0.1:8131): thu tu buoc dung (so 3->2->1, 6 khung); keo tay: chat sang vien, anh
+  1 -> 2, co tra loi; VI doi du (tieu de, buoc, chu trong phim, meta "6 khung"); 1280 + 360 px: 0 cuon ngang, 0 tran
+  hang nut; 0 loi console; nen sang + toi xem anh. Bat 1 loi: timecode trong luoi nho bi cat ("00:12:3") vi luat
+  `.sb-k .sb-canh .sb-tc` manh hon `.sb-luoi .sb-tc` -> sua, do lai 24/33 px vua.
+- Thi truong (agent tra 29/09, nguon trong bao cao phien): KHONG thay app desktop nao khoanh vung -> tu quay -> ra 1 anh
+  dai co nhan SHOT (gan nhat: ShareX Auto capture + Image combiner = 2 buoc tay, file roi). Thieu so voi doi thu:
+  OCR, chup cuon, quay video/GIF, link chia se, ky so bo cai, ban Mac chua thu. Web KHONG viet "dau tien the gioi".
+- ☠️ Thay trong anh chup khay cua anh (10:41): Storyboard 04 SHOT 01 DEN tren video dong ho, Storyboard 03 bat dau
+  tu SHOT 02 (anh da bo SHOT 01?) -> khung 1 tren video phan cung co the van den. Chua do, chua sua — hoi anh.
+
 ## [0.7.8] - 2026-09-29 13:18 - Ra ban: gom cac muc [chua ra ban] 09:18 -> 11:13 ben duoi
 - Anh dung thu keo ca dai: *"khá mượt rồi"*. Gom: vien quay trong suot (het vien trang), animation phim S "xoe 6 khung",
   khay Storyboard rieng (kho dai trong userData, moi dai 1 hang, xoa tung khung, tach khoi khay anh), bo hang "Xuat dang"

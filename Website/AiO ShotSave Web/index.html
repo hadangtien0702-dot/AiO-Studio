@@ -692,6 +692,87 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:12px 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;transition:opacity .2s ease,transform .2s ease;z-index:90;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
+/* ===== Section STORYBOARD (29/09, app 0.7.8) — cùng khung màn hình .kh-mon với section khay. Mọi cỡ theo cqw ===== */
+#storyboard{margin-top:96px;padding:88px 0;background:radial-gradient(70% 90% at 12% 30%,#fff6ef 0,transparent 60%),linear-gradient(115deg,#fbf8f5 0%,#f3ebe4 55%,#e7d9cc 100%)}
+:root[data-theme="dark"] #storyboard{background:radial-gradient(70% 90% at 12% 30%,rgb(248 104 32/10%) 0,transparent 60%),linear-gradient(115deg,#141210 0%,#1d1814 55%,#2a2019 100%)}
+.sb-buoc{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:10px}
+.sb-buoc li{display:flex;align-items:center;gap:12px;font-weight:600;color:var(--ink)}
+.sb-buoc li>b{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--brand-soft);color:var(--brand-ink);font-size:13px}
+.sb-visual{container-type:inline-size;position:relative;aspect-ratio:16/10;border-radius:9px;overflow:hidden;user-select:none;-webkit-user-select:none;
+  font-family:Inter,system-ui,sans-serif;background:radial-gradient(60% 70% at 85% 10%,rgb(124 77 255/.22) 0,transparent 65%),linear-gradient(135deg,#2a2420,#171311 60%,#0f0c0a)}
+/* Khung video đang phát (cảnh vẽ bằng CSS, tính theo thời gian t) */
+.sb-vid{position:absolute;left:4%;top:6%;width:54%;aspect-ratio:16/9;border-radius:1cqw;overflow:hidden;background:#000;box-shadow:0 2cqw 4cqw -1cqw rgb(0 0 0/60%),0 0 0 1px rgb(255 255 255/8%)}
+.sb-canh{--x:20%;--h:210;position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,hsl(var(--h) 55% 30%),hsl(calc(var(--h) + 25) 60% 62%) 70%,#f6b37e)}
+.sb-bong{position:absolute;left:var(--x);top:24%;width:14%;aspect-ratio:1;margin-left:-7%;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff4d6,#ffb454 55%,#f86820);box-shadow:0 0 6cqw 1cqw rgb(255 170 80/45%)}
+.sb-nui{position:absolute;left:-10%;right:-10%;bottom:18%;height:42%;background:#3b2a4a;clip-path:polygon(0 100%,0 60%,14% 30%,27% 58%,41% 18%,57% 55%,70% 32%,84% 60%,100% 38%,100% 100%)}
+.sb-dat{position:absolute;left:0;right:0;bottom:0;height:22%;background:linear-gradient(180deg,#221a26,#140f16)}
+.sb-tc{position:absolute;left:4%;bottom:6%;padding:.2em .45em;border-radius:.3em;background:rgb(0 0 0/55%);color:#fff;font:700 3.4cqw/1 ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+/* Vùng khoanh (nằm TRONG khung video, lớp tối phủ phần ngoài vùng) */
+.sb-chon{position:absolute;z-index:2;border:1.5px dashed rgb(255 255 255/85%);box-shadow:0 0 0 999px rgb(0 0 0/48%);pointer-events:none}
+.sb-chon[hidden]{display:none}
+.sb-chon.quay{border:2px solid #f86820;box-shadow:0 0 0 999px rgb(0 0 0/30%),0 0 2.4cqw rgb(248 104 32/45%)}
+.sb-chip{position:absolute;left:0;top:calc(100% + .8cqw);display:inline-flex;align-items:center;gap:.7cqw;height:3.4cqw;padding:0 .9cqw 0 1cqw;border-radius:999px;white-space:nowrap;
+  background:rgb(20 20 20/94%);box-shadow:0 0 0 1px rgb(255 255 255/14%);color:#cfcfcf;font-size:1.55cqw;font-weight:600;transition:background .2s,color .2s,box-shadow .2s}
+.sb-chip svg{width:1.8cqw;height:1.8cqw}
+.sb-chip kbd{font:700 1.3cqw/1 Inter,sans-serif;padding:.25cqw .5cqw;border-radius:.4cqw;background:rgb(255 255 255/12%);color:#fff}
+.sb-chip.on{background:#f86820;color:#fff;box-shadow:0 0 0 1px #f86820,0 0 2cqw rgb(248 104 32/55%)}
+.sb-chip.on kbd{background:rgb(0 0 0/22%)}
+.sb-xong{position:absolute;right:0;top:calc(100% + .8cqw);display:grid;place-items:center;width:3.4cqw;height:3.4cqw;border-radius:50%;background:#f86820;color:#fff}
+.sb-xong svg{width:1.8cqw;height:1.8cqw}
+.sb-chon.quay .sb-chip,.sb-chon.quay .sb-xong{display:none}
+/* Quạt 6 khung khi bật Storyboard (giống animation phím S "xoè 6 khung" của app) */
+.sb-quat{position:absolute;z-index:3;width:5.5cqw;aspect-ratio:16/9;border-radius:.4cqw;border:1px solid #f86820;background:rgb(248 104 32/22%);pointer-events:none}
+/* Thước đếm "● 3 giây | 6 ô" — chép src/dem/index.html, nằm NGOÀI vùng (sát dưới) */
+.sb-thuoc{position:absolute;z-index:3;display:inline-flex;align-items:center;gap:.8cqw;height:3.2cqw;padding:0 1.1cqw 0 1cqw;border-radius:999px;white-space:nowrap;
+  background:rgb(20 20 20/94%);box-shadow:0 0 0 1px rgb(255 255 255/12%),0 .4cqw 1cqw rgb(0 0 0/45%);color:#f3f3f3;font-size:1.5cqw;font-weight:600}
+.sb-thuoc[hidden]{display:none}
+.sb-thuoc .rec{width:.9cqw;height:.9cqw;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 .35cqw rgb(255 59 48/22%);animation:sb-nhay 1s ease-in-out infinite}
+@keyframes sb-nhay{50%{opacity:.4}}
+.sb-thuoc .so{font-weight:700;font-variant-numeric:tabular-nums}
+.sb-thuoc .giay{color:#9a9a9a;font-weight:500}
+.sb-thuoc .chia{width:1px;height:1.5cqw;background:rgb(255 255 255/14%)}
+.sb-thuoc .pip{display:flex;gap:.3cqw}
+.sb-thuoc .pip i{width:1.1cqw;height:.65cqw;border-radius:.2cqw;background:rgb(255 255 255/18%);transition:background .12s}
+.sb-thuoc .pip i.co{background:#f86820}
+.sb-chop{position:absolute;inset:0;z-index:2;background:#fff;opacity:0;pointer-events:none}
+/* Chat nhận dải */
+.sb-chat{top:6%;right:4%;width:36%;height:54%}
+.sb-chat .kh-appbar{height:3.4cqw;font-size:1.5cqw}
+.sb-chat .kh-chat-top{padding:1cqw 1.4cqw;gap:1cqw}
+.sb-chat .kh-chat-top b{font-size:1.7cqw}.sb-chat .kh-chat-top small{font-size:1.35cqw}
+.sb-chat .kh-ava{width:3.4cqw;height:3.4cqw;font-size:1.5cqw}
+.sb-chat .kh-msgs{padding:1.2cqw 1.4cqw;gap:.9cqw}
+.sb-chat .kh-b{font-size:1.6cqw;padding:.9cqw 1.3cqw;border-radius:1.6cqw}
+.sb-chat .kh-b.anh{padding:.5cqw}
+.sb-chat .kh-b.go{padding:1.2cqw 1.4cqw}.sb-chat .kh-b.go i{width:.8cqw;height:.8cqw}
+/* Khay Storyboard — chép src/storyboard (header #tieu-de, hàng .dai, .k SHOT) */
+.sb-khay{position:absolute;left:4%;right:4%;bottom:4%;z-index:2;border-radius:1.2cqw;overflow:hidden;background:#181818;color:#f3f3f3;
+  box-shadow:0 2cqw 5cqw -1.5cqw rgb(0 0 0/70%),0 0 0 1px rgb(255 255 255/9%);transition:opacity .3s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+.sb-khay.an{opacity:0;transform:translateY(12%)}
+.sb-bar{display:flex;align-items:center;gap:.9cqw;height:4cqw;padding:0 1.4cqw;border-bottom:1px solid rgb(255 255 255/7%);font-size:1.6cqw;font-weight:700}
+.sb-bar svg{width:1.7cqw;height:1.6cqw;color:#f86820}
+.sb-bar em{font-style:normal;font-size:1.25cqw;font-weight:700;padding:.1cqw .8cqw;border-radius:999px;color:#ffb58a;background:rgb(248 104 32/16%);box-shadow:0 0 0 1px rgb(248 104 32/35%)}
+.sb-dai{margin:1.2cqw;padding:1.1cqw 1.3cqw 1.3cqw;border-radius:1cqw;background:#202020;box-shadow:0 0 0 1px rgb(255 255 255/8%);cursor:grab;touch-action:none;transition:box-shadow .2s,opacity .2s}
+.sb-dai.nong{box-shadow:0 0 0 1.5px #f86820}
+.sb-dai.dang-keo{opacity:.55;cursor:grabbing}
+.sb-dai:focus-visible{outline:2px solid #f86820;outline-offset:2px}
+.sb-dau{display:flex;align-items:center;gap:1cqw;margin-bottom:1cqw;white-space:nowrap}
+.sb-dau b{font-size:1.5cqw}.sb-dau small{font-size:1.25cqw;color:#9a9a9a}.sb-dau .sp{flex:1}
+.sb-dau .nut{height:2.9cqw;padding:0 1.2cqw;display:inline-flex;align-items:center;border-radius:.8cqw;background:#2a2a2a;box-shadow:inset 0 0 0 1px rgb(255 255 255/12%);font-size:1.3cqw;font-weight:600}
+.sb-dau .nut.chinh{background:#f86820;box-shadow:none;color:#fff;font-weight:700}
+.sb-k6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.7cqw}
+.sb-k{position:relative;aspect-ratio:16/9;border-radius:.5cqw;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/12%);background:#000}
+.sb-k .sb-canh .sb-tc{font-size:1.25cqw}
+.sb-k>b{position:absolute;left:.5cqw;top:.5cqw;z-index:1;padding:.1cqw .4cqw;border-radius:.3cqw;border:1px solid rgb(248 104 32/50%);background:rgb(9 10 13/88%);color:#f86820;font-size:.95cqw;font-weight:800;letter-spacing:.04em}
+/* Ảnh dải khi kéo + trong bong bóng chat: LƯỚI 3×2 như ảnh xuất thật */
+.sb-luoi{display:grid;grid-template-columns:repeat(3,1fr);gap:.35cqw;padding:.45cqw;border-radius:.6cqw;background:#101010}
+.sb-luoi .sb-k{border-radius:.25cqw}.sb-luoi .sb-k>b{font-size:.6cqw;left:.25cqw;top:.25cqw;padding:0 .2cqw}.sb-luoi .sb-k .sb-canh .sb-tc{font-size:.62cqw;padding:.1em .3em}
+.sb-bong-keo{position:absolute;z-index:4;width:21cqw;pointer-events:none;transform:translate(-30%,-40%) rotate(-3deg);box-shadow:0 2cqw 4cqw -1cqw rgb(0 0 0/70%),0 0 0 1.5px #f86820;border-radius:.6cqw}
+.sb-bong-keo[hidden]{display:none}
+.sb-chat .kh-b.anh .sb-luoi{width:19cqw}
+.sb-goi{position:absolute;left:50%;top:36.2cqw;z-index:3;transform:translateX(-50%);padding:.5cqw 1.2cqw;border-radius:999px;background:rgb(0 0 0/60%);color:#fff;font-size:1.4cqw;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+.sb-goi.hien{opacity:1}
+@media (max-width:520px){.sb-dau .nut.an-nho{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -831,12 +912,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f9t">A shelf that remembers</h3>
           <p data-i="f9p">Shots are numbered #1, #2 and so on. Restart the app and your 5 latest shots are still in the shelf.</p>
         </article>
-        <!-- 28/09: Storyboard Strip (app 0.6.9, Gemini dung + Claude ra). Chi ghi thu da do: phim S trong khay, dai / luoi,
-             nhan SHOT, bo shot, chep, luu PNG. CHUA ghi "keo vao Premiere" vi chua thu tren may that. -->
+        <!-- 29/09: Storyboard theo app 0.7.8 (the cu 28/09 ta kieu 0.6.9 "bam S trong khay, anh khay xep thanh dai" — app da bo:
+             anh chup thuong KHONG vao khay Storyboard). Nay: khoanh vung + S -> quay 3 giay -> 6 khung -> keo ca dai. -->
         <article class="card rong" data-hien>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></div>
-          <h3 data-i="f10t">A storyboard in one key</h3>
-          <p data-i-html="f10p">Press <kbd>S</kbd> in the shelf and your shots line up as a numbered strip, or a grid when there are more than five. Remove any shot, then copy it or save it as one PNG to send for review.</p>
+          <h3 data-i="f10t">A storyboard in 3 seconds</h3>
+          <p data-i-html="f10p">Box a moving area and press <kbd>S</kbd>. Three seconds later you have six numbered shots in one strip, kept in the Storyboard shelf. Remove any shot, then drag the whole strip into any app.</p>
         </article>
       </div>
     </div>
@@ -893,6 +974,50 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
       <div class="rs-text">
         <h2 data-i="rsTitle">Stretch to see more</h2>
         <p data-i="rsSub">Drag any corner of the shelf. Bigger means more rows and columns, never blurry zoomed shots. Keep it along the bottom or stand it up on the side.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section STORYBOARD (29/09, app 0.7.8, anh dùng thử: "khá mượt"). Phim diễn ĐÚNG luồng app: khoanh vùng → bật
+       Storyboard Strip (phím S) → Xong → viền cam + thước "● 3 giây | 6 ô" (chép src/dem/index.html) → 6 khung vào
+       khay Storyboard (chép src/storyboard: hàng .dai, SHOT 01..06, nút Kéo / Lưu PNG / Sao chép) → nắm CẢ HÀNG kéo vào chat.
+       Khách tự nắm hàng dải kéo vào chat được. Chỉ ghi thứ có thật trong mã 0.7.8; KHÔNG nói "đầu tiên thế giới"
+       (khảo sát 29/09 không thấy app nào làm vậy, nhưng chưa rà hết App Store / Microsoft Store). -->
+  <section class="sec" id="storyboard">
+    <div class="wrap kh-grid">
+      <div class="kh-text sb-text">
+        <h2 data-i="sbTitle">Three seconds. Six shots.</h2>
+        <p data-i="sbSub">Box any moving area and press S. Shot &amp; Save records 3 seconds as six numbered frames in one strip. Every strip waits in the Storyboard shelf, even after a restart.</p>
+        <ol class="sb-buoc">
+          <li><b>1</b><span data-i-html="sbS1">Box it, press <kbd>S</kbd></span></li>
+          <li><b>2</b><span data-i="sbS2">3 seconds, 6 frames</span></li>
+          <li><b>3</b><span data-i="sbS3">Drag the whole strip into Premiere Pro, Zalo or Messenger</span></li>
+        </ol>
+      </div>
+      <div class="kh-right">
+        <div class="kh-mon"><div class="sb-visual" id="sbVisual">
+          <div class="sb-vid" id="sbVid"><div class="sb-canh" id="sbCanh"><i class="sb-nui"></i><i class="sb-bong"></i><i class="sb-dat"></i><span class="sb-tc">00:00:00:00</span></div></div>
+          <div class="sb-chon" id="sbChon" hidden>
+            <span class="sb-chip" id="sbChip"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><span>Storyboard Strip</span><kbd>S</kbd></span>
+            <span class="sb-xong" id="sbXong" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg></span>
+          </div>
+          <div class="sb-thuoc" id="sbThuoc" hidden><span class="rec"></span><span class="so" id="sbSo">3</span><span class="giay" data-sb="giay">sec</span><span class="chia"></span><span class="pip" id="sbPip"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+          <div class="kh-app chat sb-chat" id="sbChat">
+            <div class="kh-appbar"><i></i><span data-sb="app">Chat</span></div>
+            <div class="kh-chat-top"><span class="kh-ava" style="background:#7b4dff">D</span><div><b data-sb="dir">Director</b><small data-sb="online">Online</small></div></div>
+            <div class="kh-msgs" id="sbMsgs"></div>
+          </div>
+          <div class="sb-khay" id="sbKhay">
+            <div class="sb-bar"><svg viewBox="0 0 386 352" width="12" height="11" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg><span data-sb="khay">Storyboard shelf</span><em id="sbDem">1</em></div>
+            <div class="sb-dai" id="sbDai" role="button" tabindex="0">
+              <div class="sb-dau"><b>Storyboard 01</b><small id="sbMeta">6 frames</small><span class="sp"></span><span class="nut" data-sb="keo">Drag</span><span class="nut an-nho" data-sb="luu">Save PNG</span><span class="nut chinh" data-sb="chep">Copy</span></div>
+              <div class="sb-k6" id="sbK6"></div>
+            </div>
+          </div>
+          <div class="sb-bong-keo" id="sbGhost" hidden></div>
+          <div class="kh-cursor" id="sbCur"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <div class="sb-goi" id="sbGoi" data-sb="goi">Drag the strip into the chat</div>
+        </div></div>
       </div>
     </div>
   </section>
@@ -1051,7 +1176,7 @@ const T = {
     f6t:"Khay lưu ảnh", f6p:"Ảnh vừa chụp nằm sẵn trong khay, bấm vào là ghim lên màn hình.",
     f7t:"Làm mờ thông tin riêng", f7p:"Bấm <kbd>4</kbd> rồi kéo qua tên, email hay số tài khoản để che trước khi gửi đi. Chọn kiểu khảm khối hoặc mờ mịn trong Cài đặt.",
     f8t:"Chỉnh lại trước khi lưu", f8p:"Kéo xong vẫn co giãn, dời được khung chụp. Bấm <kbd>V</kbd> để chọn nét vẽ rồi di chuyển hoặc xoá.",
-    f10t:"Dải phân cảnh bằng một phím", f10p:"Bấm <kbd>S</kbd> trong khay, các ảnh xếp thành dải có đánh số SHOT, hoặc thành lưới khi nhiều hơn năm ảnh. Bỏ bớt ảnh thừa, rồi chép hoặc lưu thành một file PNG để gửi duyệt.",
+    f10t:"Dải phân cảnh trong 3 giây", f10p:"Khoanh vùng đang chuyển động rồi bấm <kbd>S</kbd>. 3 giây sau bạn có 6 khung đánh số trong một dải, nằm sẵn trong khay Storyboard. Bỏ bớt khung thừa, rồi kéo cả dải thả vào ứng dụng nào cũng được.",
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
@@ -1092,6 +1217,10 @@ Object.assign(T.en, { stTitle:"Set it once, forget it", stSub:"Every option live
   stP1:"Your own shortcut", stP1m:"Pick the key combo your hands already know.", stP2:"JPEG or PNG", stP2m:"Light files to send fast, or lossless PNG.",
   stP3:"Save where you want", stP3m:"Pick the folder, open it in one click.", stP4:"Vietnamese or English", stP4m:"Switch the language in one click.", stP5:"Your kind of blur", stP5m:"Pixel blocks or a smooth blur to hide private info." });
 Object.assign(T.vi, { priceWhat:"Chụp, vẽ, ghim, kéo thả" });
+// 29/09 section Storyboard (app 0.7.8). Chữ theo i18n.js của app: "Khay Storyboard", "khung", phím S, quay 3 giây.
+Object.assign(T.vi, { sbTitle:"3 giây, 6 khung hình",
+  sbSub:"Khoanh vùng đang chuyển động rồi bấm S. Shot & Save quay 3 giây thành 6 khung có đánh số trong một dải. Mọi dải nằm sẵn trong khay Storyboard, tắt app mở lại vẫn còn.",
+  sbS1:"Khoanh vùng, bấm <kbd>S</kbd>", sbS2:"3 giây, 6 khung", sbS3:"Kéo cả dải thả vào Premiere Pro, Zalo hay Messenger" });
 Object.assign(T.en, { priceWhat:"Capture, mark up, pin, drag" });
 let lang = "en";
 // Chống "chữ mồ côi" (anh 22/09): dính 2 chữ cuối bằng dấu cách không ngắt, để dòng cuối không bao giờ còn trơ 1 chữ.
@@ -1117,6 +1246,7 @@ function setLang(l){
   if (window.ssDemoRelang) window.ssDemoRelang();
   if (window.ssStRelang) window.ssStRelang();
   if (window.ssKhRelang) window.ssKhRelang();
+  if (window.ssSbRelang) window.ssSbRelang();
 }
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 let saved = null;
@@ -2372,6 +2502,203 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     window.ssSt = { epChay: () => { epChay = true; capNhat(); } };   // chỉ để đo
   }
   if (document.readyState === "complete") batDau(); else addEventListener("load", batDau);   // GSAP nạp kiểu defer → chờ load
+})();
+
+/* ===== Section STORYBOARD (29/09, app 0.7.8) =====
+   Phim: khoanh vùng trên video → bật Storyboard Strip (S) → Xong → viền cam + thước "● 3 giây | 6 ô" → 6 khung vào khay
+   Storyboard → nắm CẢ HÀNG dải kéo vào chat. Khách nắm hàng dải kéo vào chat được (phim dừng, 7 s sau chạy lại).
+   Cảnh video vẽ bằng CSS theo thời gian t: mỗi khung chụp đúng t lúc đó (mặt trời dịch 9%/s + timecode chạy). */
+(() => {
+  const vis = document.getElementById("sbVisual"); if (!vis) return;
+  const $ = id => document.getElementById(id);
+  const vid = $("sbVid"), canh = $("sbCanh"), chon = $("sbChon"), chip = $("sbChip"), xongEl = $("sbXong"), thuoc = $("sbThuoc"),
+    soEl = $("sbSo"), pips = [...$("sbPip").children], chat = $("sbChat"), msgs = $("sbMsgs"), khay = $("sbKhay"), dai = $("sbDai"),
+    k6 = $("sbK6"), ghost = $("sbGhost"), cur = $("sbCur"), goi = $("sbGoi"), meta = $("sbMeta");
+  vid.append(chon, thuoc);                        // lớp tối + thước nằm TRONG khung video (lớp tối không tràn ra ngoài)
+  const W = {
+    en: { giay:"sec", app:"Chat", dir:"Director", online:"Online", khay:"Storyboard shelf", keo:"Drag", luu:"Save PNG", chep:"Copy",
+      goi:"Drag the strip into the chat", frames:"6 frames", ask:"Send me the shots from this scene?", reply:"SHOT 04 it is. Thanks!" },
+    vi: { giay:"giây", app:"Chat", dir:"Đạo diễn", online:"Đang hoạt động", khay:"Khay Storyboard", keo:"Kéo", luu:"Lưu PNG", chep:"Sao chép",
+      goi:"Kéo dải vào khung chat", frames:"6 khung", ask:"Gửi anh mấy shot cảnh này nhé?", reply:"Chốt SHOT 04 nhé, cảm ơn em!" },
+  };
+  const L = () => W[typeof lang !== "undefined" && W[lang] ? lang : "en"];
+  let gioStr = "";
+  function relang() {
+    const d = L();
+    vis.querySelectorAll("[data-sb]").forEach(el => { const v = d[el.dataset.sb]; if (v != null) el.textContent = v; });
+    msgs.querySelectorAll("[data-k]").forEach(el => { el.textContent = d[el.dataset.k]; });
+    meta.textContent = (gioStr ? gioStr + " · " : "") + d.frames;
+  }
+  window.ssSbRelang = relang;
+
+  // ---- cảnh video theo thời gian ----
+  const tc = t => { const f = Math.floor(t * 25), s = Math.floor(f / 25);
+    return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60, f % 25].map(v => String(v).padStart(2, "0")).join(":"); };
+  function veCanh(el, t) {
+    el.style.setProperty("--x", (10 + (t * 9) % 80).toFixed(2) + "%");
+    el.style.setProperty("--h", String(Math.round(205 + 25 * Math.sin(t / 3))));
+    el.querySelector(".sb-tc").textContent = tc(t);
+  }
+  const mkCanh = t => { const c = document.createElement("div"); c.className = "sb-canh"; c.innerHTML = canh.innerHTML; veCanh(c, t); return c; };
+  const mkK = (t, i) => { const k = document.createElement("div"); k.className = "sb-k"; k.append(mkCanh(t));
+    const b = document.createElement("b"); b.textContent = "SHOT " + String(i + 1).padStart(2, "0"); k.append(b); return k; };
+  let khungT = [];                                 // t của 6 khung vừa quay
+  const mkLuoi = () => { const g = document.createElement("div"); g.className = "sb-luoi"; khungT.forEach((t, i) => g.append(mkK(t, i))); return g; };
+
+  // ---- đồng hồ phim + tạm dừng khi ngoài màn hình ----
+  let thay = false, epChay = false;
+  const chay = () => (thay && !document.hidden) || epChay;
+  let vt = 734.2, truocV = performance.now();
+  (function tickVid() { const now = performance.now(); if (chay()) { vt += (now - truocV) / 1000; veCanh(canh, vt); } truocV = now; setTimeout(tickVid, 40); })();
+  veCanh(canh, vt);
+
+  // ---- chờ / tween có thể HUỶ (khách nắm dải giữa chừng → phim dừng ngay) ----
+  const HUY = {}; const dangCho = new Set();
+  function huy() { for (const c of dangCho) { c.huy(); c.rej(HUY); } dangCho.clear(); }
+  const capNhat = () => dangCho.forEach(c => c.tw && (chay() ? c.tw.resume() : c.tw.pause()));
+  new IntersectionObserver(es => { thay = es[0].isIntersecting; capNhat(); }, { threshold: .3 }).observe(vis);
+  document.addEventListener("visibilitychange", capNhat);
+  const ngu = ms => new Promise((res, rej) => {
+    const c = { rej, xong: false }; let con = ms, truoc = performance.now();
+    const tick = () => { if (c.xong) return; const now = performance.now(); if (chay()) con -= now - truoc; truoc = now;
+      if (con <= 0) { dangCho.delete(c); res(); } else c.to = setTimeout(tick, 16); };
+    c.huy = () => { c.xong = true; clearTimeout(c.to); }; dangCho.add(c); c.to = setTimeout(tick, 16);
+  });
+  const hop = (t, vars) => new Promise((res, rej) => {
+    const c = { rej };
+    const tw = gsap.to(t, Object.assign({}, vars, { onComplete() { dangCho.delete(c); if (vars.onComplete) vars.onComplete(); res(); } }));
+    c.tw = tw; c.huy = () => tw.kill(); dangCho.add(c); if (!chay()) tw.pause();
+  });
+  const pos = el => { const r = el.getBoundingClientRect(), v = vis.getBoundingClientRect(); return { x: r.left - v.left, y: r.top - v.top, w: r.width, h: r.height }; };
+  const tam = el => { const p = pos(el); return [p.x + p.w / 2, p.y + p.h / 2]; };
+  let cx = 0, cy = 0;
+  const dat = (x, y) => { cx = x; cy = y; cur.style.transform = `translate3d(${x}px,${y}px,0)`; };
+  const di = (x, y, ms, moiBuoc, ease = "power2.inOut") => { const o = { x: cx, y: cy };
+    return hop(o, { x, y, duration: ms / 1000, ease, onUpdate() { dat(o.x, o.y); if (moiBuoc) moiBuoc(o.x, o.y); } }); };
+  function song(x, y) { const r = document.createElement("i"); r.className = "kh-song"; r.style.left = x + "px"; r.style.top = y + "px"; vis.append(r);
+    gsap.fromTo(r, { scale: .3, opacity: .95 }, { scale: 1.8, opacity: 0, duration: .55, ease: "power2.out", onComplete: () => r.remove() }); }
+  const bam = async () => { cur.classList.add("bam"); song(cx + 2, cy + 2); await ngu(150); cur.classList.remove("bam"); };
+  const datGhost = (x, y) => { ghost.style.left = x + "px"; ghost.style.top = y + "px"; };
+
+  // ---- chat ----
+  let phien = 0;
+  function bong(cls, k, node) {
+    const b = document.createElement("div"); b.className = "kh-b " + cls + " kh-moi";
+    if (k) { b.dataset.k = k; b.textContent = L()[k]; } if (node) b.append(node);
+    msgs.append(b); while (msgs.children.length > 4) msgs.firstChild.remove(); return b;
+  }
+  async function guiDai(p) {                       // thả dải vào chat → bong bóng ẢNH LƯỚI + đạo diễn trả lời
+    bong("anh", null, mkLuoi());
+    await new Promise(r => setTimeout(r, 800)); if (p !== phien) return;
+    const go = bong("trai go", null); go.innerHTML = "<i></i><i></i><i></i>";
+    await new Promise(r => setTimeout(r, 900)); if (p !== phien) return;
+    go.remove(); bong("trai", "reply");
+  }
+  function veKhung() {                             // 6 khung vào khay Storyboard
+    k6.textContent = ""; khungT.forEach((t, i) => k6.append(mkK(t, i)));
+    const d = new Date(), p2 = v => String(v).padStart(2, "0");
+    gioStr = p2(d.getHours()) + ":" + p2(d.getMinutes()) + " · " + p2(d.getDate()) + "/" + p2(d.getMonth() + 1); relang();
+  }
+  function datLai() {
+    phien++; khay.classList.add("an"); chon.hidden = true; chon.classList.remove("quay"); thuoc.hidden = true; chip.classList.remove("on");
+    pips.forEach(i => i.classList.remove("co")); ghost.hidden = true; dai.classList.remove("nong", "dang-keo"); chat.classList.remove("nhan");
+    goi.classList.remove("hien"); msgs.textContent = ""; bong("trai", "ask"); cur.style.opacity = "1";
+  }
+
+  async function motVong() {
+    datLai();
+    const V = pos(vid); dat(V.x + V.w * 1.05, V.y + V.h * 1.25);
+    await ngu(700);
+    // 1. khoanh vùng trên video
+    const rx = .2 * V.w, ry = .14 * V.h, rw = .6 * V.w, rh = .6 * V.h;
+    await di(V.x + rx, V.y + ry, 750, null, "expo.inOut"); await ngu(120);
+    cur.classList.add("bam"); song(cx + 2, cy + 2);
+    Object.assign(chon.style, { left: rx + "px", top: ry + "px", width: "0px", height: "0px" }); chon.hidden = false;
+    await di(V.x + rx + rw, V.y + ry + rh, 850, (x, y) => { chon.style.width = Math.max(0, x - V.x - rx) + "px"; chon.style.height = Math.max(0, y - V.y - ry) + "px"; });
+    cur.classList.remove("bam"); await ngu(350);
+    // 2. bật Storyboard Strip (phím S) → quạt 6 khung
+    await di(...tam(chip), 550, null, "expo.inOut"); await ngu(100); await bam(); chip.classList.add("on");
+    const q = pos(chon), cq = vis.getBoundingClientRect().width / 100;
+    await Promise.all([0, 1, 2, 3, 4, 5].map(i => { const e = document.createElement("i"); e.className = "sb-quat"; vis.append(e);
+      gsap.set(e, { left: q.x + q.w / 2, top: q.y + q.h / 2, xPercent: -50, yPercent: -50, scale: .4, opacity: 0 });
+      return hop(e, { keyframes: [{ x: (i - 2.5) * 6.6 * cq, y: -3.5 * cq + Math.abs(i - 2.5) * .9 * cq, rotate: (i - 2.5) * 9, scale: 1, opacity: 1, duration: .38, ease: "back.out(1.8)", delay: i * .04 },
+        { opacity: 0, scale: .6, y: 0, x: 0, rotate: 0, duration: .3, ease: "power2.in", delay: .25 }], onComplete: () => e.remove() }); }));
+    await ngu(200);
+    // 3. Xong → quay 3 giây, 0,5 s/khung
+    await di(...tam(xongEl), 480, null, "expo.inOut"); await ngu(100); await bam();
+    chon.classList.add("quay"); soEl.textContent = "3";
+    Object.assign(thuoc.style, { left: rx + "px", top: (ry + rh + .7 * cq) + "px" }); thuoc.hidden = false;
+    di(V.x + V.w * 1.04, V.y + V.h * .95, 700).catch(() => {});
+    khungT = [];
+    for (let k = 0; k < 6; k++) {
+      khungT.push(vt); pips[k].classList.add("co");
+      const f = document.createElement("i"); f.className = "sb-chop"; chon.append(f);
+      gsap.fromTo(f, { opacity: .55 }, { opacity: 0, duration: .25, ease: "power2.out", onComplete: () => f.remove() });
+      soEl.textContent = String(3 - Math.floor(k / 2));
+      await ngu(500);
+    }
+    chon.hidden = true; thuoc.hidden = true;
+    // 4. khay Storyboard hiện dải 6 khung
+    veKhung(); khay.classList.remove("an");
+    gsap.fromTo(k6.children, { scale: .5, opacity: 0 }, { scale: 1, opacity: 1, duration: .4, ease: "back.out(2)", stagger: .07, delay: .15, clearProps: "transform,opacity" });
+    await ngu(1300);
+    // 5. nắm CẢ HÀNG dải, kéo vào chat
+    await di(...tam(k6), 650, null, "expo.inOut"); dai.classList.add("nong"); await ngu(350);
+    cur.classList.add("bam"); song(cx + 2, cy + 2); dai.classList.add("dang-keo");
+    ghost.textContent = ""; ghost.append(mkLuoi()); datGhost(cx, cy); ghost.hidden = false;
+    gsap.fromTo(ghost, { scale: .6 }, { scale: 1, duration: .3, ease: "back.out(2)" });
+    const [mx, my] = tam(msgs);
+    await di(mx, my + pos(msgs).h * .15, 1000, (x, y) => { datGhost(x, y); chat.classList.toggle("nhan", x > pos(chat).x); }, "power2.inOut");
+    await ngu(150); cur.classList.remove("bam"); ghost.hidden = true; chat.classList.remove("nhan"); dai.classList.remove("dang-keo", "nong");
+    guiDai(phien);
+    await ngu(2600);
+    goi.classList.add("hien"); await ngu(2600); goi.classList.remove("hien");
+    await di(V.x + V.w * 1.05, V.y + V.h * 1.25, 600); await ngu(500);
+  }
+  async function vongLap() { for (;;) { try { await motVong(); } catch (e) { if (e === HUY) return; throw e; } } }
+
+  // Cảnh cuối đứng yên: máy bật giảm chuyển động hoặc không tải được GSAP
+  let tinh = false;
+  function canhTinh() {
+    datLai(); cur.style.opacity = "0"; khungT = [0, 1, 2, 3, 4, 5].map(i => 734.2 + i * .5); veKhung(); khay.classList.remove("an");
+    bong("anh", null, mkLuoi()); bong("trai", "reply");
+  }
+
+  // ---- khách TỰ kéo: nắm hàng dải thả vào chat ----
+  let keoTay = null, henGio = null;
+  const trongChat = (x, y) => { const c = pos(chat); return x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h; };
+  const toaDo = e => { const v = vis.getBoundingClientRect(); return [e.clientX - v.left, e.clientY - v.top]; };
+  const henChayLai = () => { clearTimeout(henGio); henGio = setTimeout(() => { if (tinh) return; huy(); vongLap(); }, 7000); };
+  dai.addEventListener("pointerenter", () => dai.classList.add("nong"));
+  dai.addEventListener("pointerleave", () => { if (keoTay == null) dai.classList.remove("nong"); });
+  dai.addEventListener("pointerdown", e => {
+    if (khay.classList.contains("an") || e.button > 0) return;
+    e.preventDefault(); huy(); clearTimeout(henGio); keoTay = e.pointerId;
+    try { dai.setPointerCapture(e.pointerId); } catch (er) {}
+    cur.style.opacity = "0"; goi.classList.remove("hien"); ghost.hidden = true; chat.classList.remove("nhan");
+    dai.classList.add("dang-keo", "nong"); ghost.textContent = ""; ghost.append(mkLuoi()); datGhost(...toaDo(e)); ghost.hidden = false;
+  });
+  dai.addEventListener("pointermove", e => { if (keoTay !== e.pointerId) return; const [x, y] = toaDo(e); datGhost(x, y); chat.classList.toggle("nhan", trongChat(x, y)); });
+  const tha = (e, huyBo) => {
+    if (keoTay !== e.pointerId) return; keoTay = null;
+    const trong = !huyBo && trongChat(...toaDo(e));
+    ghost.hidden = true; dai.classList.remove("dang-keo"); chat.classList.remove("nhan"); if (!dai.matches(":hover")) dai.classList.remove("nong");
+    if (trong) { phien++; guiDai(phien); }
+    henChayLai();
+  };
+  dai.addEventListener("pointerup", e => tha(e, false));
+  dai.addEventListener("pointercancel", e => tha(e, true));
+  dai.addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && !khay.classList.contains("an")) { e.preventDefault(); huy(); cur.style.opacity = "0"; phien++; guiDai(phien); henChayLai(); }
+  });
+
+  function batDau() {
+    relang();
+    if (!window.gsap || matchMedia("(prefers-reduced-motion: reduce)").matches) { tinh = true; canhTinh(); return; }
+    vongLap();
+    window.ssSb = { epChay: () => { epChay = true; capNhat(); } };   // chỉ để đo
+  }
+  if (document.readyState === "complete") batDau(); else addEventListener("load", batDau);
 })();
 </script>
 </body>
