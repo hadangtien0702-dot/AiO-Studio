@@ -711,18 +711,27 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 .sb-chon{position:absolute;z-index:2;border:1.5px dashed rgb(255 255 255/85%);box-shadow:0 0 0 999px rgb(0 0 0/48%);pointer-events:none}
 .sb-chon[hidden]{display:none}
 .sb-chon.quay{border:2px solid #f86820;box-shadow:0 0 0 999px rgb(0 0 0/30%),0 0 2.4cqw rgb(248 104 32/45%)}
-.sb-chip{position:absolute;left:0;top:calc(100% + .8cqw);display:inline-flex;align-items:center;gap:.7cqw;height:3.4cqw;padding:0 .9cqw 0 1cqw;border-radius:999px;white-space:nowrap;
+/* 29/09 anh: "chu bi trung" (chip + thuoc de len timecode goc duoi) -> chip / nut Xong / thuoc nam TREN vung chon */
+.sb-chip{position:absolute;left:0;bottom:calc(100% + .8cqw);display:inline-flex;align-items:center;gap:.7cqw;height:3.4cqw;padding:0 .9cqw 0 1cqw;border-radius:999px;white-space:nowrap;
   background:rgb(20 20 20/94%);box-shadow:0 0 0 1px rgb(255 255 255/14%);color:#cfcfcf;font-size:1.55cqw;font-weight:600;transition:background .2s,color .2s,box-shadow .2s}
 .sb-chip svg{width:1.8cqw;height:1.8cqw}
 .sb-chip kbd{font:700 1.3cqw/1 Inter,sans-serif;padding:.25cqw .5cqw;border-radius:.4cqw;background:rgb(255 255 255/12%);color:#fff}
 .sb-chip.on{background:#f86820;color:#fff;box-shadow:0 0 0 1px #f86820,0 0 2cqw rgb(248 104 32/55%)}
 .sb-chip.on kbd{background:rgb(0 0 0/22%)}
-.sb-xong{position:absolute;right:0;top:calc(100% + .8cqw);display:grid;place-items:center;width:3.4cqw;height:3.4cqw;border-radius:50%;background:#f86820;color:#fff}
+.sb-xong{position:absolute;right:0;bottom:calc(100% + .8cqw);display:grid;place-items:center;width:3.4cqw;height:3.4cqw;border-radius:50%;background:#f86820;color:#fff}
 .sb-xong svg{width:1.8cqw;height:1.8cqw}
 .sb-chon.quay .sb-chip,.sb-chon.quay .sb-xong{display:none}
-/* Quạt 6 khung khi bật Storyboard (giống animation phím S "xoè 6 khung" của app) */
-.sb-quat{position:absolute;z-index:3;width:5.5cqw;aspect-ratio:16/9;border-radius:.4cqw;border:1px solid #f86820;background:rgb(248 104 32/22%);pointer-events:none}
-/* Thước đếm "● 3 giây | 6 ô" — chép src/dem/index.html, nằm NGOÀI vùng (sát dưới) */
+/* 29/09 anh: "6 cuc hien ra chua dep" -> CHEP DUNG hieu ung app (src/overlay/overlay.css "sb-xoe", huong B anh chon):
+   bat S = vien cam dac; 5 khung vien mong cung co vung XOE cheo len-phai roi THU lai nhu xap phim + hang so 1..6 giua. */
+.sb-chon.sb{border:2px solid #f86820}
+.sb-ma{position:absolute;inset:-2px;border:1.5px solid #f86820;border-radius:2px;opacity:0;pointer-events:none}
+.sb-chon.xoe .sb-ma{animation:sb-web-xoe 1.15s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--n) * 45ms)}
+@keyframes sb-web-xoe{0%{transform:translate(0,0);opacity:0}35%,70%{transform:translate(calc(var(--n) * .75cqw),calc(var(--n) * -.75cqw));opacity:calc(1 - var(--n) * .16)}100%{transform:translate(0,0);opacity:0}}
+.sb-so6{position:absolute;left:50%;top:50%;display:flex;gap:.5cqw;transform:translate(-50%,-50%);opacity:0;pointer-events:none}
+.sb-so6 span{display:grid;place-items:center;width:2.4cqw;height:1.6cqw;border-radius:.3cqw;background:rgb(20 20 20/90%);box-shadow:0 0 0 1px rgb(255 255 255/18%);color:#fff;font-size:1cqw;font-weight:700}
+.sb-chon.xoe .sb-so6{animation:sb-web-so6 1.6s cubic-bezier(.2,.8,.2,1) .35s both}
+@keyframes sb-web-so6{0%{opacity:0;transform:translate(-50%,-40%)}20%,75%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-50%)}}
+/* Thước đếm "● 3 giây | 6 ô" — chép src/dem/index.html, nằm NGOÀI vùng (sát TRÊN) */
 .sb-thuoc{position:absolute;z-index:3;display:inline-flex;align-items:center;gap:.8cqw;height:3.2cqw;padding:0 1.1cqw 0 1cqw;border-radius:999px;white-space:nowrap;
   background:rgb(20 20 20/94%);box-shadow:0 0 0 1px rgb(255 255 255/12%),0 .4cqw 1cqw rgb(0 0 0/45%);color:#f3f3f3;font-size:1.5cqw;font-weight:600}
 .sb-thuoc[hidden]{display:none}
@@ -2522,6 +2531,9 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     soEl = $("sbSo"), pips = [...$("sbPip").children], chat = $("sbChat"), msgs = $("sbMsgs"), khay = $("sbKhay"), dai = $("sbDai"),
     k6 = $("sbK6"), ghost = $("sbGhost"), cur = $("sbCur"), goi = $("sbGoi"), meta = $("sbMeta");
   vid.append(chon, thuoc);                        // lớp tối + thước nằm TRONG khung video (lớp tối không tràn ra ngoài)
+  // 5 khung xoè + hàng số 1..6 (hiệu ứng phím S của app), đặt TRƯỚC chip trong vùng chọn để chip nằm trên
+  const so6 = document.createElement("div"); so6.className = "sb-so6"; so6.innerHTML = [1, 2, 3, 4, 5, 6].map(n => "<span>" + n + "</span>").join("");
+  chon.prepend(...[1, 2, 3, 4, 5].map(n => { const m = document.createElement("i"); m.className = "sb-ma"; m.style.setProperty("--n", n); return m; }), so6);
   const W = {
     en: { giay:"sec", app:"Chat", dir:"Director", online:"Online", khay:"Storyboard shelf", keo:"Drag", luu:"Save PNG", chep:"Copy",
       goi:"Drag the strip into the chat", frames:"6 frames", ask:"Send me the shots from this scene?", reply:"SHOT 04 it is. Thanks!" },
@@ -2607,7 +2619,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     gioStr = p2(d.getHours()) + ":" + p2(d.getMinutes()) + " · " + p2(d.getDate()) + "/" + p2(d.getMonth() + 1); relang();
   }
   function datLai() {
-    phien++; khay.classList.add("an"); chon.hidden = true; chon.classList.remove("quay"); thuoc.hidden = true; chip.classList.remove("on");
+    phien++; khay.classList.add("an"); chon.hidden = true; chon.classList.remove("quay", "sb", "xoe"); thuoc.hidden = true; chip.classList.remove("on");
     pips.forEach(i => i.classList.remove("co")); ghost.hidden = true; dai.classList.remove("nong", "dang-keo"); chat.classList.remove("nhan");
     goi.classList.remove("hien"); msgs.textContent = ""; bong("trai", "ask"); cur.style.opacity = "1";
   }
@@ -2617,24 +2629,21 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const V = pos(vid); dat(V.x + V.w * 1.05, V.y + V.h * 1.25);
     await ngu(700);
     // 1. khoanh vùng trên video
-    const rx = .2 * V.w, ry = .14 * V.h, rw = .6 * V.w, rh = .6 * V.h;
+    const rx = .2 * V.w, ry = .21 * V.h, rw = .6 * V.w, rh = .52 * V.h;   // chừa phía trên cho chip/thước, phía dưới cho timecode
     await di(V.x + rx, V.y + ry, 750, null, "expo.inOut"); await ngu(120);
     cur.classList.add("bam"); song(cx + 2, cy + 2);
     Object.assign(chon.style, { left: rx + "px", top: ry + "px", width: "0px", height: "0px" }); chon.hidden = false;
     await di(V.x + rx + rw, V.y + ry + rh, 850, (x, y) => { chon.style.width = Math.max(0, x - V.x - rx) + "px"; chon.style.height = Math.max(0, y - V.y - ry) + "px"; });
     cur.classList.remove("bam"); await ngu(350);
-    // 2. bật Storyboard Strip (phím S) → quạt 6 khung
+    // 2. bật Storyboard Strip (phím S) → hiệu ứng "xoè 6 khung" ĐÚNG như app (CSS .sb-chon.sb / .xoe)
     await di(...tam(chip), 550, null, "expo.inOut"); await ngu(100); await bam(); chip.classList.add("on");
-    const q = pos(chon), cq = vis.getBoundingClientRect().width / 100;
-    await Promise.all([0, 1, 2, 3, 4, 5].map(i => { const e = document.createElement("i"); e.className = "sb-quat"; vis.append(e);
-      gsap.set(e, { left: q.x + q.w / 2, top: q.y + q.h / 2, xPercent: -50, yPercent: -50, scale: .4, opacity: 0 });
-      return hop(e, { keyframes: [{ x: (i - 2.5) * 6.6 * cq, y: -3.5 * cq + Math.abs(i - 2.5) * .9 * cq, rotate: (i - 2.5) * 9, scale: 1, opacity: 1, duration: .38, ease: "back.out(1.8)", delay: i * .04 },
-        { opacity: 0, scale: .6, y: 0, x: 0, rotate: 0, duration: .3, ease: "power2.in", delay: .25 }], onComplete: () => e.remove() }); }));
-    await ngu(200);
+    const cq = vis.getBoundingClientRect().width / 100;
+    chon.classList.add("sb"); chon.classList.remove("xoe"); void chon.offsetWidth; chon.classList.add("xoe");
+    await ngu(1950); chon.classList.remove("xoe");
     // 3. Xong → quay 3 giây, 0,5 s/khung
     await di(...tam(xongEl), 480, null, "expo.inOut"); await ngu(100); await bam();
     chon.classList.add("quay"); soEl.textContent = "3";
-    Object.assign(thuoc.style, { left: rx + "px", top: (ry + rh + .7 * cq) + "px" }); thuoc.hidden = false;
+    Object.assign(thuoc.style, { left: rx + "px", top: Math.max(0, ry - 3.9 * cq) + "px" }); thuoc.hidden = false;   // sát TRÊN vùng
     di(V.x + V.w * 1.04, V.y + V.h * .95, 700).catch(() => {});
     khungT = [];
     for (let k = 0; k < 6; k++) {
