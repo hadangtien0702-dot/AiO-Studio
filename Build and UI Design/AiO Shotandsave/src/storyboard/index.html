@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; img-src data: blob: file:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+        content="default-src 'none'; img-src data: blob: file: aioshot:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
   <title>AiO Shot &amp; Save · Storyboard Strip</title>
   <link rel="stylesheet" href="../../assets/tokens.css" />
   <link rel="stylesheet" href="storyboard.css" />
@@ -22,41 +22,21 @@
       <span id="shot-badge">0</span>
     </div>
     <div class="dieu-khien">
-      <button id="btn-drag" class="dong keo" draggable="true" data-i18n-title="sb.keo">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/>
-          <line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/>
-        </svg>
-      </button>
       <button id="btn-close" class="dong" data-i18n-title="sb.dong">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
   </header>
 
-  <div id="toolbar">
-    <div class="hang-chon">
-      <span class="nhan-chon" data-i18n="sb.boCuc">Bố cục</span>
-      <div class="chon-nhom" role="radiogroup">
-        <button id="btn-filmstrip" class="chon-nut active" data-layout="filmstrip" data-i18n="sb.ngang">Dải cuộn phim</button>
-        <button id="btn-grid" class="chon-nut" data-layout="grid" data-i18n="sb.luoi">Lưới phân cảnh</button>
-      </div>
-    </div>
+  <!-- 29/09 anh: xoa hang "Xuat dang" (Dai ngang / Luoi) — anh xuat luon la LUOI -->
 
-    <!-- [28/09] anh bo cum "Hien thi" (Nhan SHOT / Ngay gio): "tu dong hien shot la duoc" -->
-
-    <span class="spacer"></span>
-
-    <button id="btn-save" class="nut" data-i18n="sb.luuNut" data-i18n-title="sb.luu">Lưu PNG</button>
-    <button id="btn-copy" class="nut chinh" data-i18n="sb.copyNut" data-i18n-title="sb.copy">Sao chép</button>
-  </div>
-
+  <!-- 29/09 anh: "moi mot shot stripe la mot hang, xoa duoc anh trong tung stripe" + "anh chup thuong khong vao khay stripe".
+       Danh sach DAI (storyboard.js dung the .dai). Canvas xuat anh chay AN, chi dung khi Luu / Sao chep / Keo. -->
   <main id="viewport">
-    <div id="canvas-wrapper">
-      <canvas id="main-canvas"></canvas>
-      <div id="shot-overlays"></div>
-    </div>
+    <div id="ds-dai"></div>
+    <p id="trong" class="trong" hidden data-i18n="sb.chuaCoDai"></p>
   </main>
+  <canvas id="main-canvas" hidden></canvas>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 

@@ -80,14 +80,18 @@ const pSb = fs.readFileSync(path.join(ROOT, 'src', 'preload-storyboard.js'), 'ut
 kiem('preload-storyboard.js expose getData', pSb.includes('getData:'))
 kiem('preload-storyboard.js expose copy', pSb.includes('copy:'))
 kiem('preload-storyboard.js expose save', pSb.includes('save:'))
-kiem('preload-storyboard.js expose startDrag', pSb.includes('startDrag:'))
+// 29/09 keo CA DAI: startDrag cu (gui byte SAU dragstart) doi thanh chuanBiKeo (ve san) + keoDai (chi gui id)
+kiem('preload-storyboard.js expose chuanBiKeo + keoDai (keo ca dai ve san)', pSb.includes('chuanBiKeo:') && pSb.includes('keoDai:'))
 kiem('preload-storyboard.js expose close', pSb.includes('close:'))
 
 const sbHtml = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'index.html'), 'utf8')
 kiem('storyboard/index.html co title va main-canvas', sbHtml.includes('id="main-canvas"'))
-kiem('storyboard/index.html co nut Copy Primary CTA', sbHtml.includes('id="btn-copy"'))
-kiem('storyboard/index.html co nut Luu PNG', sbHtml.includes('id="btn-save"'))
-kiem('storyboard/index.html co chuyen doi bo cuc filmstrip va grid', sbHtml.includes('id="btn-filmstrip"') && sbHtml.includes('id="btn-grid"'))
+// 29/09 khay Storyboard = danh sach dai: nut Luu / Sao chep / Xoa dai nam TREN MOI HANG (storyboard.js tao), khong con nut chung
+const sbJsSom = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.js'), 'utf8')
+kiem('moi hang dai co nut Sao chep (nut chinh)', sbJsSom.includes("nut('nut chinh', t('sb.copyNut')"))
+kiem('moi hang dai co nut Luu PNG + Xoa dai (bam 2 lan)', sbJsSom.includes("t('sb.luuNut')") && sbJsSom.includes('window.storyboard.xoaDai(') && sbJsSom.includes('xac-nhan'))
+// 29/09 anh: XOA hang "Xuat dang" — anh xuat luon la LUOI (khong con nut doi bo cuc)
+kiem('KHONG con hang "Xuat dang", anh xuat co dinh LUOI', !sbHtml.includes('id="btn-filmstrip"') && !sbHtml.includes('id="toolbar"') && /const currentLayout = 'grid'/.test(fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.js'), 'utf8')))
 
 const sbCss = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.css'), 'utf8')
 /* [28/09 Claude] Truoc: muc nay BAT storyboard.css tu khai #090a0d / #f86820 — chinh bo mau rieng do lam khay
@@ -98,7 +102,8 @@ const tokensCss = fs.readFileSync(path.join(ROOT, 'assets', 'tokens.css'), 'utf8
 const tokenCo = new Set([...tokensCss.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))
 const tuKhai = [...sbCss.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1])
 const dungToi = [...new Set([...sbCss.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]))]
-const thieuToken = dungToi.filter((v) => !tokenCo.has(v))
+const tuDat = new Set([...sbJsSom.matchAll(/setProperty\('(--[\w-]+)'/g)].map((m) => m[1])) // bien cuc bo storyboard.js tu dat (vd --cot)
+const thieuToken = dungToi.filter((v) => !tokenCo.has(v) && !tuDat.has(v))
 kiem('storyboard/index.html nap assets/tokens.css (chung khay anh)', sbHtml.includes('../../assets/tokens.css'))
 kiem('storyboard.css KHONG tu khai token rieng (' + tuKhai.length + ')', tuKhai.length === 0, tuKhai.join(', '))
 kiem('storyboard.css dung ' + dungToi.length + ' token - tat ca co trong tokens.css', dungToi.length > 10 && thieuToken.length === 0, 'THIEU: ' + thieuToken.join(', '))
@@ -115,7 +120,14 @@ kiem('storyboard.js co engine renderFilmstrip', sbJs.includes('function renderFi
 kiem('storyboard.js co engine renderGrid', sbJs.includes('function renderGrid()'))
 kiem('storyboard.js co ham drawShotBadge', sbJs.includes('function drawShotBadge('))
 kiem('storyboard.js co ham drawInfoBar footer', sbJs.includes('function drawInfoBar('))
-kiem('storyboard.js ho tro bo bot shot truc tiep tren viewport (removeShot)', sbJs.includes('function removeShot('))
+kiem('nut x tren tung khung goi storyboard:bo-khung (preload + main)', sbJs.includes('window.storyboard.boKhung(') && fs.readFileSync(path.join(ROOT, 'src', 'preload-storyboard.js'), 'utf8').includes("'storyboard:bo-khung'") && fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8').includes("ipcMain.handle('storyboard:bo-khung'"))
+// 29/09 tach han 2 khay: khay anh BO QUA file dai; Luu dai KHONG shelfAdd; get-data KHONG doc shelfItems
+const mainSom = fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')
+const khoiGet = mainSom.slice(mainSom.indexOf("ipcMain.handle('storyboard:get-data'"), mainSom.indexOf("ipcMain.handle('storyboard:bo-khung'"))
+const khoiSave = mainSom.slice(mainSom.indexOf("ipcMain.handle('storyboard:save'"), mainSom.indexOf("ipcMain.handle('storyboard:chuan-bi-keo'"))
+kiem('khay Storyboard KHONG lay anh chup thuong (get-data khong doc shelfItems)', khoiGet.length > 50 && !khoiGet.includes('shelfItems'))
+kiem('Luu dai KHONG dua vao khay anh thuong (khong shelfAdd)', khoiSave.length > 50 && !/shelfAdd\(/.test(khoiSave))
+kiem('Khay anh thuong bo qua file shotandsave-storyboard-*', mainSom.includes("!f.startsWith('shotandsave-storyboard-')"))
 kiem('storyboard.js bat phim tat Ctrl+C, Ctrl+S va Esc', sbJs.includes("e.key === 'c'") && sbJs.includes("e.key === 's'") && sbJs.includes("'Escape'"))
 
 console.log('\n[4] Kiem tra Main Process IPC')
@@ -125,7 +137,16 @@ kiem('main.js lang nghe shelf:open-storyboard', mainJs.includes("'shelf:open-sto
 kiem('main.js xu ly storyboard:get-data', mainJs.includes("'storyboard:get-data'"))
 kiem('main.js xu ly storyboard:copy', mainJs.includes("'storyboard:copy'"))
 kiem('main.js xu ly storyboard:save', mainJs.includes("'storyboard:save'"))
-kiem('main.js xu ly storyboard:start-drag', mainJs.includes("'storyboard:start-drag'"))
+// 29/09 anh: "click and drag CA MOT CUON" + "khong da". Kiem 3 dieu lam nen cam giac:
+// (a) CA HANG la nguon keo; (b) dragstart KHONG ve canvas/toBlob (ve luc do = tre); (c) main keo-dai KHONG nhan byte
+const sbJsKeo = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.js'), 'utf8')
+kiem('CA HANG dai la nguon keo (hang.draggable + dragstart tren hang)', sbJsKeo.includes('hang.draggable = true') && sbJsKeo.includes("hang.addEventListener('dragstart'"))
+const khoiDrag = sbJsKeo.slice(sbJsKeo.indexOf("hang.addEventListener('dragstart'"), sbJsKeo.indexOf("const bKeo"))
+const thanKeoDai = sbJsKeo.slice(sbJsKeo.indexOf('function keoDai('), sbJsKeo.indexOf('function xuatDai('))
+kiem('dragstart KHONG tu ve canvas/toBlob (goi keoDai, anh ve san luc re chuot)', khoiDrag.includes('keoDai(d)') && !/render\(|toBlob|layBanNen/.test(khoiDrag + thanKeoDai) && sbJsKeo.includes("hang.addEventListener('pointerenter', () => chuanBiKeo(d))"))
+const khoiKeoMain = mainJs.slice(mainJs.indexOf("ipcMain.on('storyboard:keo-dai'"), mainJs.indexOf("ipcMain.on('storyboard:close'"))
+kiem('main storyboard:keo-dai startDrag tu byte VE SAN (khong nhan byte luc keo)', khoiKeoMain.includes('sbVeSan.get(id)') && khoiKeoMain.includes('startDrag(') && !khoiKeoMain.includes('layBuf('))
+kiem('file keo dai ten shotandsave-storyboard-* (khay anh thuong bo qua)', khoiKeoMain.includes("'shotandsave-' + String(id).replace('dai-', 'storyboard-')"))
 kiem('main.js xu ly storyboard:close', mainJs.includes("'storyboard:close'"))
 // 29/09: kiem HANH VI (muc menu mo cua so Storyboard), khong kiem ten khoa chu (menu doi sang 'tray.storyboard', bo "(phim S)")
 kiem('Tray menu co lua chon tao storyboard', /label:\s*T\('tray\.storyboard'\),\s*click:\s*\(\)\s*=>\s*openStoryboardWindow\(\)/.test(mainJs))

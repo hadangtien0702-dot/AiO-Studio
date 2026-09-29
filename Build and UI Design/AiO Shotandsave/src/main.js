@@ -25,6 +25,7 @@ const kho = require('./kho')
 const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
+const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const os = require('os')
 const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
@@ -217,9 +218,18 @@ app.whenReady().then(() => {
       ghiLog('raw crop ' + w + 'x' + h + ' png ' + Math.round(buf.length / 1024) + 'KB ' + (Date.now() - _t) + 'ms')
       return new Response(buf, { headers: Object.assign({ 'Content-Type': 'image/png' }, headers) })
     }
+    // aioshot://dai/<id>/<seq>.jpg — khung cua dai Storyboard trong kho (29/09). Qua protocol (ACAO) de canvas
+    // xuat dai khong bi "taint", va khong day hang chuc MB base64 qua IPC.
+    m = /^aioshot:\/\/dai\/([^/]+)\/(\d{1,2})\.jpg$/.exec(req.url)
+    if (m) {
+      const f = khoDai.duongKhung(m[1], m[2])
+      if (!f) return new Response('', { status: 404 })
+      return new Response(fs.readFileSync(f), { headers: Object.assign({ 'Content-Type': 'image/jpeg' }, headers) })
+    }
     return new Response('', { status: 404 })
   })
 
+  khoDai.khoiTao(app.getPath('userData'))
   kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
@@ -1486,7 +1496,8 @@ function layDanhSachAnhGanNhat(soLuong) {
     const dir = kho.thuMucAnh()
     if (!fs.existsSync(dir)) return []
     const files = fs.readdirSync(dir)
-      .filter((f) => /\.(png|jpe?g)$/i.test(f) && !f.startsWith('.'))
+      // 29/09 anh chot "tach han": file dai Storyboard KHONG vao khay anh thuong (dai nam o khay Storyboard)
+      .filter((f) => /\.(png|jpe?g)$/i.test(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-'))
       .map((f) => {
         const full = path.join(dir, f)
         let mtime = 0
@@ -1696,18 +1707,22 @@ function moVienQuay(display, rect) {
   const wins = []
   for (const c of v.canh) {
     if (!c.shapes.length) continue
+    // ☠️ 0.7.8 (29/09 anh: "vua vien cam mong vua vien trang"): cua so DAC + setShape -> Windows van ve phan ngoai hinh
+    //    mau TRANG (do tren nen #202020: dai 40 px trang f3f3f3, chi net 2 px cam; kieu co khung con lan trang 3 px vao
+    //    vung). Nay: cua so TRONG SUOT, khong khung, net ve bang src/dem/vien.html — do cung cach: chi con net cam.
     const w = new BrowserWindow({
       x: c.bounds.x, y: c.bounds.y, width: c.bounds.width, height: c.bounds.height,
-      frame: false, resizable: false, movable: false, focusable: false, skipTaskbar: true,
-      hasShadow: false, show: false, backgroundColor: '#f86820', enableLargerThanScreen: true,
+      frame: false, transparent: true, backgroundColor: '#00000000', thickFrame: false, roundedCorners: false,
+      resizable: false, movable: false, focusable: false, skipTaskbar: true,
+      hasShadow: false, show: false, enableLargerThanScreen: true,
       webPreferences: { sandbox: true, contextIsolation: true },
     })
     w.setBounds(c.bounds) // thoat kep workArea luc tao (so loi #1)
-    w.setShape(c.shapes)
     w.setContentProtection(true)
     w.setAlwaysOnTop(true, 'screen-saver')
     w.setIgnoreMouseEvents(true)
-    w.showInactive()
+    w.loadFile(path.join(__dirname, 'dem', 'vien.html'), { query: { s: JSON.stringify(c.shapes.map((s) => [s.x, s.y, s.width, s.height])) } })
+    w.once('ready-to-show', () => { if (!w.isDestroyed()) w.showInactive() })
     const that = w.getBounds()
     if (giaoHCN(that, v.vung)) {
       ghiLog('quay3s CANH BAO vien ' + c.ten + ' cham vung (xin ' + JSON.stringify(c.bounds) + ' duoc ' + JSON.stringify(that) + ') -> huy')
@@ -1794,44 +1809,42 @@ async function quay3Giay(display, sf, rect) {
     if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
     return
   }
-  daiQuay = { items: khung, tuLuu: true }
+  // 29/09: luu dai vao kho (giu lai sau khi tat app); khay Storyboard mo ra voi dai moi o tren cung + tu luu PNG 1 lan
+  const idDai = khoDai.luuDai(khung)
+  if (!idDai) {
+    ghiLog('quay3s LOI luu dai vao kho')
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+    return
+  }
+  ghiLog('quay3s luu dai ' + idDai + ' (' + khung.length + ' khung)')
+  daiQuay = { moiId: idDai, tuLuu: true }
   openStoryboardWindow()
 }
 
 /* ── Storyboard Strip IPC ────────────────────────────────────────────── */
 ipcMain.on('shelf:open-storyboard', () => { daiQuay = null; openStoryboardWindow() })
 
+/* 29/09 KHAY STORYBOARD = danh sach DAI trong kho (moi dai 1 hang), KHONG lay anh chup thuong cua khay nua
+   (anh chot "2 khay cho 2 tac vu rieng"). Khung di qua aioshot://dai/<id>/<seq>.jpg. Mo tu QUAY 3 GIAY: dai moi
+   (moiId) tu luu PNG dung MOT lan (mo lai / reload khong luu nua). */
 ipcMain.handle('storyboard:get-data', () => {
-  // Mo tu QUAY 3 GIAY: 6 khung vua quay (khong phai khay). Tu luu dung MOT lan (mo lai / reload khong luu nua).
-  if (daiQuay) {
-    const tuLuu = daiQuay.tuLuu
-    daiQuay.tuLuu = false
-    const items = daiQuay.items.map((it) => {
-      const sz = it.image.getSize()
-      const img = sz.height > 1080 ? it.image.resize({ height: 1080, quality: 'best' }) : it.image
-      return { id: it.id, seq: it.seq, w: sz.width, h: sz.height, kb: 0, dataUrl: 'data:image/jpeg;base64,' + img.toJPEG(92).toString('base64') }
-    })
-    return { items, lang, nguon: 'quay', tuLuu, boCuc: 'filmstrip' }
-  }
-  const items = []
-  for (const it of shelfItems.values()) {
-    const sz = it.image.getSize()
-    let kb = 0
-    try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
-    const maxH = 1080
-    const imgResized = (sz.height && sz.height > maxH) ? it.image.resize({ height: maxH, quality: 'best' }) : it.image
-    const dataUrl = 'data:image/jpeg;base64,' + imgResized.toJPEG(92).toString('base64')
-    items.push({
-      id: it.id,
-      seq: it.seq || it.id,
-      filePath: it.filePath,
-      w: sz.width,
-      h: sz.height,
-      kb,
-      dataUrl,
-    })
-  }
-  return { items, lang }
+  let moiId = null, tuLuu = false
+  if (daiQuay) { moiId = daiQuay.moiId; tuLuu = !!daiQuay.tuLuu; daiQuay.tuLuu = false }
+  const dais = khoDai.danhSach().map((m) => ({
+    id: m.id, taoLuc: m.taoLuc,
+    khung: m.khung.map((k) => ({ seq: k.seq, w: k.w, h: k.h, url: 'aioshot://dai/' + m.id + '/' + k.seq + '.jpg' })),
+  }))
+  return { dais, moiId, tuLuu, lang }
+})
+ipcMain.handle('storyboard:bo-khung', (_e, id, seq) => {
+  const m = khoDai.boKhung(id, seq)
+  ghiLog('storyboard bo khung ' + seq + ' cua ' + id + (m ? ' (con ' + m.khung.length + ')' : ' (het khung -> xoa dai)'))
+  return { ok: true, conLai: m ? m.khung.length : 0 }
+})
+ipcMain.handle('storyboard:xoa-dai', (_e, id) => {
+  const ok = khoDai.xoaDai(id)
+  ghiLog('storyboard xoa dai ' + id + ': ' + (ok ? 'OK' : 'khong co'))
+  return { ok }
 })
 
 /* [ra 28/09 Claude] Renderer gui THANG byte PNG (Uint8Array), khong qua base64 dataURL (+33%) va main
@@ -1874,7 +1887,7 @@ ipcMain.handle('storyboard:save', (_e, u8) => {
   try {
     const filePath = luuFileStoryboard(buf)
     ghiLog('storyboard luu file: ' + filePath)
-    shelfAdd(nativeImage.createFromBuffer(buf), filePath)
+    // 29/09 anh chot "tach han": dai KHONG vao khay anh thuong nua (truoc: shelfAdd)
     return { ok: true, filePath }
   } catch (err) {
     ghiLog('storyboard save LOI: ' + err.message)
@@ -1882,18 +1895,44 @@ ipcMain.handle('storyboard:save', (_e, u8) => {
   }
 })
 
-ipcMain.on('storyboard:start-drag', (e, u8, iconDataUrl) => {
+/* 29/09 KEO CA DAI (anh: "click and drag ca mot cuon tha vao phan mem"). Truoc day renderer ve canvas + toBlob
+   SAU dragstart roi moi gui byte sang day -> startDrag tre so voi tay (anh: "khong da"). Nay renderer VE SAN khi re
+   chuot vao hang, byte PNG giu o day (toi da 6 dai, bo dai cu nhat); dragstart chi gui id -> ghi file (neu chua co)
+   + startDrag ngay. File: thu muc anh, ten theo id + danh sach khung (ver) -> keo lai cung dai KHONG ghi them file
+   moi, bo 1 khung la ten moi (khong ghi de file Premiere da nhan — ly do o chu thich luuFileStoryboard). */
+const sbVeSan = new Map() // id -> { ver, buf, icon, file }
+const MAU_VER = /^[0-9-]{1,40}$/
+ipcMain.handle('storyboard:chuan-bi-keo', (_e, id, ver, u8, iconDataUrl, msVe) => {
   const buf = layBuf(u8)
-  if (!buf) return
+  if (!khoDai.MAU_ID.test(String(id)) || !MAU_VER.test(String(ver)) || !buf) return { ok: false }
+  let icon = iconDataUrl ? nativeImage.createFromDataURL(iconDataUrl) : null
+  if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'icon.png')).resize({ height: 64 })
+  sbVeSan.delete(id)
+  sbVeSan.set(id, { ver, buf, icon, file: null })
+  while (sbVeSan.size > 6) sbVeSan.delete(sbVeSan.keys().next().value)
+  ghiLog('storyboard ve san ' + id + ' v' + ver + ': ' + (msVe | 0) + ' ms, ' + Math.round(buf.length / 1024) + ' KB')
+  return { ok: true }
+})
+ipcMain.on('storyboard:keo-dai', (e, id, ver) => {
+  const t0 = Date.now()
+  const rec = sbVeSan.get(id)
+  if (!rec || rec.ver !== ver) { ghiLog('storyboard keo ' + id + ': CHUA ve san (bo qua)'); return }
   try {
-    const filePath = luuFileStoryboard(buf)
-    const duong = kho.duongDanKeoAnToan(filePath)
-    let icon = iconDataUrl ? nativeImage.createFromDataURL(iconDataUrl) : null
-    if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'icon.png')).resize({ height: 64 })
-    e.sender.startDrag({ file: duong, icon })
-    ghiLog('storyboard startDrag: ' + duong)
+    if (!rec.file || !fs.existsSync(rec.file)) {
+      const dir = kho.baoDamThuMuc(kho.thuMucAnh())
+      const ten = 'shotandsave-' + String(id).replace('dai-', 'storyboard-') + '-shot' + ver + '.png'
+      const f = path.join(dir, ten)
+      if (!fs.existsSync(f)) fs.writeFileSync(f, rec.buf)
+      rec.file = f
+    }
+    const duong = kho.duongDanKeoAnToan(rec.file)
+    const msChuanBi = Date.now() - t0
+    // ☠️ startDrag tren Windows CHAN toi khi THA chuot -> do quanh no la do thoi gian tay keo, KHONG phai do tre
+    // (29/09 ban dau ghi "startDrag sau 2520 ms" — do la anh dang keo). Tach 2 so.
+    e.sender.startDrag({ file: duong, icon: rec.icon })
+    ghiLog('storyboard keo ' + id + ': chuan bi ' + msChuanBi + ' ms (tre truoc khi keo), tay keo ' + (Date.now() - t0 - msChuanBi) + ' ms -> ' + duong)
   } catch (err) {
-    ghiLog('storyboard startDrag LOI: ' + err.message)
+    ghiLog('storyboard keo LOI: ' + err.message)
   }
 })
 

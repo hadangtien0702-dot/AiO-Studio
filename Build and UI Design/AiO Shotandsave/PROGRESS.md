@@ -1,6 +1,19 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 08:57 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 10:45 +0700 (/xong, anh mo chat moi)
+> - ☠️ **CODE CHUA COMMIT, CHUA PUSH** (anh dan "khong ra ban cai, khong push" trong luc thu; /xong hoi push khong -> anh
+>   chua quyet, mo chat moi). Tren may cong ty, sau 0.7.7 (`1b21b43`) con: vien quay trong suot (09:18, anh "qua dep") ·
+>   animation phim S "Xoe 6 khung" (09:39, anh "ok") · KHAY STORYBOARD moi (10:08: moi dai 1 hang, xoa tung khung giu so
+>   goc, dai giu lai trong `<userData>/storyboard`, tach han khoi khay anh) · bo hang "Xuat dang", xuat luon LUOI (10:35).
+>   File: `src/{main.js,i18n.js,kho-dai.js*,preload-storyboard.js}` `src/overlay/*` `src/storyboard/*` `src/dem/vien.*`*
+>   `scripts/test/{do-storyboard.mjs,do-kho-dai.cjs*}` `package.json` (them test:khodai, SO BAN VAN 0.7.7) (*=file moi).
+>   ☠️ root `CLAUDE.md` + `TOOL_VERSION_TRACKER.md` dang sua do la cua GUIDE FRAME, khong phai Shot & Save — dung add.
+> - **May cong ty dang chay BAN NGUON** (`electron .`, boot 10:35:08), app cai 0.7.7 dang TAT. [CHO ANH] xem khay sau khi bo
+>   "Xuat dang" (chua ai nhin). Anh gat -> bump 0.7.8 + (hoi) ban cai + push; nho tat ban nguon, mo lai app cai.
+> - Kiem hien tai: test:storyboard 70/70 · test:khodai 11/11 · test:vienquay DAT · test:banquyen 27/27.
+> - [CHUA RO GOC] khung toi ~50% trong dai 08:09 (khung 4-5) — chua gap lai trong cac dai 10:30-10:33 anh quay (chua do).
+>
+> ---- (khoi cu duoi day, 08:57) ----
 > - **0.7.7 (29/09 08:57, Claude):** gon 4 chu phu man Cai dat (anh khoanh tren 0.7.6) — moi hang con 1 dong.
 >   Bo cai `Release/.../Setup-0.7.7.exe` — [CHO ANH] tu cai. Van con cho anh quay thu vien Storyboard (muc 0.7.6).
 > - **0.7.6 (29/09 08:45, Claude, may cong ty):** man Cai dat lam lai (huong B anh chon: danh sach nhom, lua chon xam
@@ -27,6 +40,121 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.7.8] - 2026-09-29 13:18 - Ra ban: gom cac muc [chua ra ban] 09:18 -> 11:13 ben duoi
+- Anh dung thu keo ca dai: *"khá mượt rồi"*. Gom: vien quay trong suot (het vien trang), animation phim S "xoe 6 khung",
+  khay Storyboard rieng (kho dai trong userData, moi dai 1 hang, xoa tung khung, tach khoi khay anh), bo hang "Xuat dang"
+  (xuat luoi), KEO CA DAI ve san, o ma "Dan key".
+- Kiem truoc commit: test:storyboard 73/73 · test:khodai 11/11 · test:vienquay DAT · test:banquyen 27/27. KHONG chay
+  `npm test` (selftest bung overlay len man anh — so loi #12). CHUA dong goi bo cai (anh chay ban nguon). CHUA thu tren Mac.
+- Bump package.json + dong 12 tracker + dong 12 CLAUDE.md goc cung commit (so loi #5).
+
+## [chua ra ban] - 2026-09-29 11:13 - O nhap ma ban quyen: "Dan key" + sua thuoc do keo dai
+- Anh khoanh o nhap trong Cai dat: *"khong nen de la dan ma aioss - ma hay la dan key"*. `bq.nhapMa` VI "Dán mã AIOSS-…"
+  -> "Dán key", EN "Paste AIOSS-… key" -> "Paste key" (chi i18n.js, web khong co chuoi nay — grep 0).
+- Anh keo thu dai 4 lan 10:58-10:59 (chay, file vao `.keo\shotandsave-storyboard-...-shot1-2-3-4-5-6.png`). Ve san:
+  dai moi 597-636 ms, dai cu 62-124 ms (= do tre cach CU bat anh cho sau dragstart, chua tinh IPC 400-2000 KB).
+  ☠️ THUOC SAI: log "startDrag sau 1002/2520/665/246 ms" la thoi gian TAY KEO — startDrag tren Windows chan toi khi tha.
+  Sua log tach "chuan bi X ms (tre truoc khi keo)" / "tay keo Y ms". Khoi dong lai ban nguon 11:13:16 dang-ky=OK.
+
+## [chua ra ban] - 2026-09-29 10:54 - Khay Storyboard: KEO CA DAI (bam bat ky cho nao tren hang) + het tre khi keo
+- Boi canh: anh khoanh nut "Keo" tren Storyboard 06: *"khi thao tac that no khong da, khong suong"* — muon *"click and
+  drag ca mot cuon va tha vao phan mem"*.
+- Goc "khong da" (doc code): dragstart -> ve canvas LUOI + `toBlob` PNG (async) -> gui byte qua IPC -> main ghi file ->
+  moi `startDrag`. Tay da di truoc mot nhip; trai luat da ghi o `pin:start-drag` ("startDrag PHAI goi trong nhip
+  dragstart"). Kem: MOI lan keo ghi them 1 file PNG moi vao thu muc anh (ten theo gio).
+- Lam: CA HANG `.dai` `draggable` (nut Keo giu nguyen, nam trong hang nen van keo duoc). VE SAN: re chuot vao hang
+  (+ dai moi nhat ngay khi mo) -> ve + toBlob -> `storyboard:chuan-bi-keo` giu byte o main (toi da 6 dai). dragstart chi
+  gui id -> `storyboard:keo-dai` ghi file (lan dau) + `startDrag` ngay. Ten file theo id + ds khung
+  (`shotandsave-storyboard-<id>-shot1-2-...png`): keo lai cung dai KHONG them file; bo 1 khung la ten moi (khong ghi de
+  file Premiere da nhan). Luu/Sao chep di chung hang doi ve (canvas dung chung). Icon keo cao 80 -> 120 px. Giao dien:
+  re chuot = vien cam CA HANG (bo vien cam tung khung — nhin nhu keo tung khung le), con tro nam, tooltip `sb.keoDai`.
+  Bo `startDrag`/`storyboard:start-drag` cu.
+- Kiem: node --check 3 file sach; test:storyboard **73/73** (2 muc cu doi ten + 4 muc moi — van la kiem CHU trong ma,
+  chua phai hanh vi). Khoi dong lai ban nguon 10:54:23 dang-ky=OK. **CHUA do tren tay anh**: run-log se ghi
+  `storyboard ve san <id>: X ms` (= do tre cach cu bat anh chiu) va `storyboard keo <id>: startDrag sau Y ms`.
+
+## [chua ra ban] - 2026-09-29 10:35 - Khay Storyboard: bo hang "Xuat dang", anh xuat luon la LUOI
+- Boi canh: anh thu khay (4 dai that, hoat dong) hoi nut "Keo" lam gi -> em giai thich (nhan giu keo dai ra app khac) +
+  de xuat bo. Anh: *"remove cho nay, cach hien thi dang luoi la mac dinh"* — em HIEU NHAM, xoa nut Keo. Anh sua: *"khong
+  khong y anh la xoa cai nay"* (khoanh hang "Xuat dang" Dai ngang / Luoi + chu "Anh chup thuong nam o Khay anh").
+- Lam: tra nut Keo ve nhu cu (bo luon phan keo-tu-hang-khung em vua them, anh khong xin); xoa `#toolbar` (Xuat dang +
+  goi y) khoi `storyboard/index.html`; `const currentLayout = 'grid'`, bo nut/phim 1-2 doi bo cuc. renderFilmstrip de lai
+  (chua dung). Bai kiem: muc "co chuyen doi filmstrip/grid" -> "KHONG con hang Xuat dang, xuat co dinh LUOI".
+- Kiem: node --check sach; test:storyboard 70/70. Khoi dong lai ban nguon 10:35:08 dang-ky=OK. Chua xem man that.
+- Bai hoc: anh noi "remove cho nay" ngay sau cau hoi ve nut Keo — em gan "cho nay" vao nut dang ban. Khi chi thi co
+  "cho nay/cai nay" ma anh CO GUI ANH khoanh vung, doc vung khoanh truoc; khong co anh thi hoi lai 1 cau truoc khi xoa.
+
+## [chua ra ban] - 2026-09-29 10:08 - KHAY STORYBOARD: moi dai 1 hang, xoa tung khung, tach han khoi khay anh
+- Boi canh: anh cham animation B "ok roi". Xin tiep: (1) *"anh chup theo dang stripe khi view o dai cuon phim dang bi be
+  va dai — moi mot shot stripe la mot hang, xoa duoc cac anh trong tung stripe"*; (2) *"anh chup thuong chi view o khay
+  anh thuong, khong cho vao khay anh cua stripe... 2 khay anh cho 2 tac vu rieng biet"*. Em ve nhap (1 hang/dai), anh
+  chon: dai **GIU LAI** sau khi tat app · file PNG dai **TACH HAN** khoi khay anh · xoa khung **GIU SO GOC**.
+- Nguyen nhan cu: cua so Storyboard ve TAT CA anh vao MOT dai canvas (mo tu khay = lay anh chup THUONG; mo tu quay 3s =
+  6 khung vua quay, khong luu lai) -> dai dai, nho, 2 loai anh lan nhau; dai PNG luu xong con `shelfAdd` vao khay thuong.
+- Lam:
+  - `src/kho-dai.js` (moi): `<userData>/storyboard/dai-YYYYMMDD-HHMMSS-mmm/khung-<seq>.jpg` + `dai.json` (ghi atomic).
+    Chi nhan id dung mau (chan `..`/duong dan la). Het khung -> xoa ca dai.
+  - main: quay 3s xong -> `khoDai.luuDai` (hong -> run-log + bao); `aioshot://dai/<id>/<seq>.jpg` (ACAO, khong day
+    base64 qua IPC); `storyboard:get-data` tra danh sach dai (KHONG doc shelfItems); `storyboard:bo-khung`,
+    `storyboard:xoa-dai`; `storyboard:save` BO `shelfAdd`; khay anh bo qua file `shotandsave-storyboard-*`.
+  - Khay Storyboard (`src/storyboard/`): danh sach dai MOI NHAT tren, moi hang: ten "Storyboard NN" · gio · so khung ·
+    Keo · Luu PNG · Sao chep · Xoa dai (bam 2 lan, title noi PNG da luu van con). Khung chia deu be ngang
+    (`--cot` = max(6, so khung)), re chuot -> vien cam + x. "Xuat dang" Dai ngang / Luoi ap khi xuat; nhan SHOT xuat =
+    so goc. Canvas xuat chay AN. Chu VI/EN moi (sb.*), nut khay + menu khay -> "Mo khay Storyboard".
+  - Bai kiem: `do-storyboard.mjs` doi 4 muc khoa cau truc cu (nut Luu/Copy chung, removeShot) sang kiem cau truc moi +
+    3 muc tach khay; `npm run test:khodai` (moi, 11 muc tren thu muc tam).
+- Kiem chung: test:khodai 11/11 (luu/liet ke moi nhat truoc/thu 2556x1484 -> 1860x1080/bo khung 3 giu 1,2,4,5,6/het
+  khung xoa dai/doi chung `..` bi tu choi, file ngoai kho con nguyen). test:storyboard 70/70; doi chung main.js CU (git):
+  3 muc tach khay deu truot dung. Khay dung tu file that + du lieu gia, 1080x700: 3 hang 6/5/6 khung, khung 161x93,
+  bam x SHOT 04 -> con 01,02,03,05,06 + "5 khung", Luu PNG xuat 5,3 MB (canvas khong taint), xoa dai 2 lan -> con 2 hang.
+  Bay gap va sua: (1) `#main-canvas{display:block}` (id) de len `[hidden]` -> KHOI DEN che ca khay (so do khong bat, anh
+  chup lo ra) -> `#main-canvas[hidden]{display:none!important}`; (2) regex bai kiem mat `\` qua vo lenh (bay 5ax) ->
+  sua bang Edit; (3) emoji trong ghi chu CSS -> bai kiem bat, bo. vienquay DAT, banquyen 27/27.
+- CHUA kiem tren app that (quay 3s -> dai vao kho -> khay hien). Dai quay TRUOC ban nay khong co trong kho (luc do khong
+  luu khung) -> khay trong den lan quay dau tien. Khoi dong lai ban nguon 10:08:26 dang-ky=OK de anh thu.
+
+## [chua ra ban] - 2026-09-29 09:39 - Animation phim S: doi sang huong B "Xoe 6 khung"
+- Boi canh: anh thu ban 09:31 (dai lo phim): *"animation nay khong dep em, co cach nao lam moi va dep hon khong"*. Em dung
+  trang xem truoc CHAY THAT 3 huong (A vien sang chay vong kieu Apple Intelligence · B xoe 6 khung · C tia quet), mo tren
+  trinh duyet anh; anh chon B: *"anh thay cai B ok do em nhin hien dai"*. Khong lam kieu chia vung thanh 6 o doc: de hieu
+  nham la cat vung, trong khi Storyboard la 6 khung THEO THOI GIAN cua cung vung.
+- Lam: bo dai lo phim + 4 goc ngam + dong bao (va khoa i18n `overlay.sbBao`). `#sel.sb`: vien cam 2 px; 5 `.sb-ma.n1..n5`
+  xoe len-phai 9 px/khung (mo 0,84 -> 0,20) roi thu lai trong 1,15 s, tre 45 ms/khung; `#sb-dem` 6 o so 1..6 giua khung
+  hien 0,35 s -> mo (an khi khung < 240x70). ☠️ Ban dau viet `:nth-of-type` de gan so khung -> dem ca div #size dung truoc
+  nen khung 5 mat so; doi sang class `n1..n5`.
+- Kiem (CSS that, tua 150/600/1400 ms): 600 ms 5 khung o 9/18/27/36/45 px, do mo 0,84/0,68/0,52/0,36/0,20; 1400 ms ca 5
+  ve 0; hang so opacity 0,99-1; 6 o cach deu 27 px (khong chong — cho trong nhu chong la goc thumbnail YouTube o nen).
+  Khoi dong lai ban nguon 09:39:10 dang-ky=OK de anh thu.
+
+## [chua ra ban] - 2026-09-29 09:31 - Animation khi bat Storyboard (phim S) tren khung chon
+- Boi canh: anh thu vien moi: *"thay dep roi do em, qua dep luon"* (vien trong suot 09:18 = DAT). Anh xin tiep: bam chup ->
+  bam S -> *"khi khung stripe hien thi anh muon co mot animation de biet ho dang su dung stripe"*.
+- Lam (CHI CSS + 1 class, khong dung logic keo so loi #8): `#sel.sb` — vien loe cam (outline tu 12 px ve 0, 520 ms) +
+  4 goc ngam `#sb-khung` "bat vao" (inset -26 -> -7 px, 460 ms) + 2 dai lo phim chay o mep TRONG tren/duoi (tren khung
+  da co nhan WxH) + dong bao `#sb-bao` "Storyboard · quay 3 giay, 6 khung" giua khung, mo sau ~1,2 s (an khi khung
+  < 240x70). Bat lai = chay lai tu dau. prefers-reduced-motion: tat chuyen dong + an dong bao. i18n `overlay.sbBao`.
+- File: `src/overlay/{index.html,overlay.css,overlay.js}`, `src/i18n.js`.
+- Kiem: `node --check` sach; dung khung bang CSS THAT tren nen anh YouTube, tua animation 100/400/1000 ms: goc -11 ->
+  -6 -> -7 px, dong bao hien (opacity 0,93 -> 1), anh chup dung thiet ke. Chua bam S tren app that — da khoi dong lai ban
+  nguon 09:31:48 (dang-ky=OK) de anh thu.
+
+## [chua ra ban] - 2026-09-29 09:18 - Vien quay Storyboard: het vien TRANG (cua so trong suot thay setShape)
+- Boi canh: anh quay thu 0.7.7: *"vua vien cam mong vua vien trang"*. Anh dan: sua code + chay cho anh thu, KHONG ra
+  ban cai, KHONG push.
+- Do: dai 09:12 (`...091207-472-5.png`) mep khung SACH (0 pixel cam/trang) -> vien trang chi tren MAN HINH luc quay.
+  Tai hien bang harness (tao vien nhu app tren NEN #202020, tat content protection de chup duoc vien): kieu 0.7.7
+  (cua so dac + setShape) -> ca dai 40 px cua canh tren ra TRANG f3f3f3, chi net 2 px cam; co khung Windows con lan
+  trang 3 px vao mep vung; goc chu L bi hut (net tren va trai khong noi). setShape SAU khi hien: van trang. Cua so
+  TRONG SUOT + ve net bang HTML: chi 3 px cam, 0 trang, goc L lien.
+- Sua: `main.js moVienQuay` — cua so trong suot, thickFrame false, roundedCorners false, bo setShape, nap
+  `src/dem/vien.html` (+ `vien.js`, net lay tu query ?s=). Van nam NGOAI vung (vien-quay.js khong doi), van content
+  protection, van do getBounds cham vung -> huy.
+- Kiem: harness nap dung `src/dem/vien.html` that: cot giua canh tren tu -21..+3 px chi co 202020 va 3 px f86820;
+  anh phong to goc tren-trai: goc L lien, 0 trang. `node --check` main.js sach.
+- Dang chay: da tat app cai 0.7.7 (7 tien trinh), chay ban nguon (`electron .`, boot 09:17:51 dang-ky=OK). [CHO ANH]
+  quay thu; RUI RO chua do: cua so trong suot NGOAI vung ma video phan cung trai qua vien -> video co den khong (so loi
+  MPO). Anh cham DAT moi bump + dong goi + push. Nho mo lai ban cai sau khi thu.
 
 ## [0.7.7] - 2026-09-29 08:57 - Gon chu phu man Cai dat
 - Boi canh: anh cai 0.7.6, khoanh 4 cho: *"cac text phu nay em lam gon lai cho anh di em"* — "Mua ban quyen" 1 hang rieng,

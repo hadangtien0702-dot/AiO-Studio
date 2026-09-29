@@ -47,6 +47,48 @@ html, body {
   pointer-events: none;
 }
 
+/* ── 29/09 CHE DO STORYBOARD (bam S) — huong B "Xoe 6 khung" anh chon ──
+   Anh: "khi khung stripe hien thi anh muon co mot animation de biet ho dang su dung stripe"; ban dai lo phim dau tien
+   anh che "khong dep"; xem 3 huong chay that, anh chon B: "nhin hien dai".
+   Luc bat: vien cam 2 px + 5 khung mo XOE ra sau (len-phai) roi THU lai nhu xap phim (6 khung theo THOI GIAN, khong
+   chia vung) + hang so 1..6 giua khung roi mo. CHI CSS + 1 class (khong dung logic keo — so loi #8).
+   Overlay dong truoc khi quay 3 giay -> khong lop nao vao anh. */
+#sel.sb { border: 2px solid var(--accent); }
+.sb-ma, #sb-dem { display: none; }
+#sel.sb .sb-ma {
+  display: block; position: absolute; inset: -2px; pointer-events: none;
+  border: 1.5px solid var(--accent); border-radius: 2px; opacity: 0;
+  animation: sb-xoe 1.15s var(--ease) both;
+  animation-delay: calc(var(--n) * 45ms);
+}
+.sb-ma.n1 { --n: 1; } .sb-ma.n2 { --n: 2; } .sb-ma.n3 { --n: 3; }
+.sb-ma.n4 { --n: 4; } .sb-ma.n5 { --n: 5; }
+@keyframes sb-xoe {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  35%  { transform: translate(calc(var(--n) * 9px), calc(var(--n) * -9px)); opacity: calc(1 - var(--n) * .16); }
+  70%  { transform: translate(calc(var(--n) * 9px), calc(var(--n) * -9px)); opacity: calc(1 - var(--n) * .16); }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+#sel.sb #sb-dem {
+  display: flex; gap: 5px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  pointer-events: none; opacity: 0;
+  animation: sb-dem 1.6s var(--ease) .35s both;
+}
+#sb-dem span {
+  width: 22px; height: 14px; display: grid; place-items: center;
+  background: rgb(20 20 20 / 90%); border: 1px solid rgb(255 255 255 / 18%); border-radius: 3px;
+  font-size: 9px; font-weight: 700; color: #fff;
+}
+@keyframes sb-dem {
+  0%       { opacity: 0; transform: translate(-50%, -40%); }
+  20%, 75% { opacity: 1; transform: translate(-50%, -50%); }
+  100%     { opacity: 0; transform: translate(-50%, -50%); }
+}
+#sel.sb.sb-nho #sb-dem { display: none; }  /* khung qua nho: khong che */
+@media (prefers-reduced-motion: reduce) {
+  #sel.sb .sb-ma, #sel.sb #sb-dem { display: none; }
+}
+
 /* 8 tay nam doi co khung */
 .sel-handle {
   position: absolute;

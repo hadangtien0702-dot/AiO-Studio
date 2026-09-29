@@ -19,6 +19,14 @@ let isStoryboardMode = false
 
 function toggleStoryboardMode(force) {
   isStoryboardMode = typeof force === 'boolean' ? force : !isStoryboardMode
+  // 29/09: animation bao dang o che do Storyboard (CSS #sel.sb). Go class + doc offsetWidth = chay lai tu dau moi lan bat.
+  selEl.classList.remove('sb')
+  if (isStoryboardMode) {
+    void selEl.offsetWidth
+    const r = typeof curRect !== 'undefined' && curRect ? curRect : null
+    selEl.classList.toggle('sb-nho', !!r && (r.w < 240 || r.h < 70))
+    selEl.classList.add('sb')
+  }
   if (selStoryboardBtn) {
     selStoryboardBtn.classList.toggle('active', isStoryboardMode)
   }
