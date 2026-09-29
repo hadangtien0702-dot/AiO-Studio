@@ -24,6 +24,7 @@ const fs = require('fs')
 const kho = require('./kho')
 const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
+const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const os = require('os')
 const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
@@ -369,7 +370,7 @@ function rebuildTrayMenu() {
     { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
-    { label: T('khay.storyboard'), click: () => openStoryboardWindow() },
+    { label: T('tray.storyboard'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
@@ -1684,52 +1685,61 @@ let daiQuay = null // { items: [{ id, seq, image }], tuLuu } -> storyboard:get-d
 
 const cho = (ms) => new Promise((r) => setTimeout(r, ms))
 
+/* 29/09 VIEN MOI (kieu 1 anh chon): vien cam 2 px + 4 goc chu L, thuoc toi "● 3 giay | 6 o khung".
+   ☠️ 0.7.4 xin thanh 3 px nhung Windows ep >= ~30 px -> thanh 31 px lan vao vung, dinh vao 3/6 khung (do anh 08:09).
+   Nay hinh hoc o src/vien-quay.js: 4 cua so >= 40 px nam HOAN TOAN NGOAI vung + setShape() chi giu net manh.
+   Them 2 lop chot: setContentProtection (vien khong bao gio vao anh chup) + do getBounds sau khi hien, cua so nao
+   cham vung (Windows kep vao workArea — so loi #1) thi HUY ngay va ghi run-log. */
 function moVienQuay(display, rect) {
   const b = display.bounds
-  const G = 3, T = 3, DH_W = 64, DH_H = 26 // khe, do day thanh, co dong ho
-  const gx = Math.round(b.x + rect.x), gy = Math.round(b.y + rect.y)
-  const rw = Math.round(rect.w), rh = Math.round(rect.h)
-  const ngoai = G + T
-  const thanh = [
-    { x: gx - ngoai, y: gy - ngoai, w: rw + 2 * ngoai, h: T },        // tren
-    { x: gx - ngoai, y: gy + rh + G, w: rw + 2 * ngoai, h: T },       // duoi
-    { x: gx - ngoai, y: gy - G, w: T, h: rh + 2 * G },                // trai
-    { x: gx + rw + G, y: gy - G, w: T, h: rh + 2 * G },               // phai
-  ]
+  const v = tinhVienQuay({ x: b.x + rect.x, y: b.y + rect.y, w: rect.w, h: rect.h })
   const wins = []
-  for (const t of thanh) {
+  for (const c of v.canh) {
+    if (!c.shapes.length) continue
     const w = new BrowserWindow({
-      x: t.x, y: t.y, width: Math.max(1, t.w), height: Math.max(1, t.h),
+      x: c.bounds.x, y: c.bounds.y, width: c.bounds.width, height: c.bounds.height,
       frame: false, resizable: false, movable: false, focusable: false, skipTaskbar: true,
       hasShadow: false, show: false, backgroundColor: '#f86820', enableLargerThanScreen: true,
       webPreferences: { sandbox: true, contextIsolation: true },
     })
-    w.setBounds({ x: t.x, y: t.y, width: Math.max(1, t.w), height: Math.max(1, t.h) }) // Windows kep co toi thieu luc tao
+    w.setBounds(c.bounds) // thoat kep workArea luc tao (so loi #1)
+    w.setShape(c.shapes)
+    w.setContentProtection(true)
     w.setAlwaysOnTop(true, 'screen-saver')
     w.setIgnoreMouseEvents(true)
     w.showInactive()
+    const that = w.getBounds()
+    if (giaoHCN(that, v.vung)) {
+      ghiLog('quay3s CANH BAO vien ' + c.ten + ' cham vung (xin ' + JSON.stringify(c.bounds) + ' duoc ' + JSON.stringify(that) + ') -> huy')
+      w.destroy(); continue
+    }
     wins.push(w)
   }
-  // Dong ho: tren vung neu con cho, khong thi duoi; het cho ca hai -> khong hien (de khong lot vao anh).
-  let dhY = null
-  if (gy - ngoai - 4 - DH_H >= b.y) dhY = gy - ngoai - 4 - DH_H
-  else if (gy + rh + ngoai + 4 + DH_H <= b.y + b.height) dhY = gy + rh + ngoai + 4
-  let dongHo = null
-  if (dhY != null) {
-    dongHo = new BrowserWindow({
-      x: gx - ngoai, y: dhY, width: DH_W, height: DH_H,
+  // Thuoc dem nguoc: sat TREN khung vien neu con cho trong man, khong thi sat DUOI; het cho -> khong hien.
+  const TH_W = 200, TH_H = 40 // cua so trong suot; vien thuoc 28 px nam trong, chua 6 px cho bong
+  const n = v.vungNgoai
+  let thY = null
+  if (n.y - TH_H >= b.y) thY = n.y - TH_H
+  else if (n.y + n.height + TH_H <= b.y + b.height) thY = n.y + n.height
+  let thuoc = null
+  if (thY != null) {
+    thuoc = new BrowserWindow({
+      x: n.x - 6, y: thY, width: TH_W, height: TH_H,
       frame: false, transparent: true, backgroundColor: '#00000000', resizable: false, movable: false,
       focusable: false, skipTaskbar: true, hasShadow: false, show: false,
       webPreferences: { sandbox: true, contextIsolation: true },
     })
-    dongHo.setAlwaysOnTop(true, 'screen-saver')
-    dongHo.setIgnoreMouseEvents(true)
-    dongHo.loadFile(path.join(__dirname, 'dem', 'index.html'))
-    dongHo.once('ready-to-show', () => { if (!dongHo.isDestroyed()) dongHo.showInactive() })
-    wins.push(dongHo)
-  } else ghiLog('quay3s: khong co cho dat dong ho (vung sat ca mep tren lan duoi)')
+    thuoc.setContentProtection(true)
+    thuoc.setAlwaysOnTop(true, 'screen-saver')
+    thuoc.setIgnoreMouseEvents(true)
+    thuoc.loadFile(path.join(__dirname, 'dem', 'index.html'), { query: { lang, vi: thY < n.y ? 'tren' : 'duoi' } })
+    thuoc.once('ready-to-show', () => { if (!thuoc.isDestroyed()) thuoc.showInactive() })
+    wins.push(thuoc)
+  } else ghiLog('quay3s: khong co cho dat thuoc dem (vung sat ca mep tren lan duoi)')
+  const goi = (js) => { if (thuoc && !thuoc.isDestroyed()) thuoc.webContents.executeJavaScript(js).catch(() => {}) }
   return {
-    datSo: (n) => { if (dongHo && !dongHo.isDestroyed()) dongHo.webContents.executeJavaScript('window.datSo && window.datSo(' + n + ')').catch(() => {}) },
+    datSo: (s) => goi('window.datSo && window.datSo(' + s + ')'),
+    datKhung: (k) => goi('window.datKhung && window.datKhung(' + k + ')'),
     dong: () => { for (const w of wins) if (!w.isDestroyed()) w.destroy() },
   }
 }
@@ -1767,6 +1777,7 @@ async function quay3Giay(display, sf, rect) {
       const k = await layKhungVung(display, sf, rect)
       if (k && k.image && !k.image.isEmpty()) {
         khung.push({ id: i + 1, seq: i + 1, image: k.image })
+        vien.datKhung(khung.length) // thuoc: to cam them 1 o (6 o = 6 khung)
         nhatKy.push(t + 'ms/' + k.nguon + '/' + (Date.now() - batDau - t) + 'ms')
       } else nhatKy.push(t + 'ms/LOI')
     }

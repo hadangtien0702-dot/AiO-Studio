@@ -7,18 +7,31 @@
   <title>AiO Shot &amp; Save · Storyboard</title>
   <link rel="stylesheet" href="../../assets/tokens.css" />
   <style>
-    /* 28/09 QUAY 3 GIAY: vien thuoc dem nguoc 3-2-1, dat NGOAI vung dang quay (tren hoac duoi).
-       Vien cam quanh vung la 4 cua so thanh DAC rieng (main.js moVienQuay) — KHONG co cua so trong suot
-       nao phu len vung: sổ lỗi app ghi cua so trong suot phu len video tang toc phan cung -> video DEN trong anh. */
+    /* 29/09 THUOC QUAY 3 GIAY (kieu 1 anh chon): vien thuoc toi "● 3 giay | 6 o", nam NGOAI vung dang quay.
+       Vien cam + 4 goc la 4 cua so rieng (main.js moVienQuay + src/vien-quay.js). Cua so nay trong suot 200x40,
+       vien thuoc 28 px ben trong, 6 px le cho bong. setContentProtection -> khong bao gio vao anh chup. */
     html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: var(--font-ui); }
-    #dong-ho { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
-               border-radius: 999px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; }
-    #cham { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: nhay 1s ease-in-out infinite; }
-    @keyframes nhay { 50% { opacity: .35; } }
+    #thuoc {
+      position: absolute; left: 6px; top: 6px; height: 28px; box-sizing: border-box;
+      display: inline-flex; align-items: center; gap: 8px; padding: 0 12px 0 10px;
+      background: rgb(20 20 20 / 94%); border: 1px solid rgb(255 255 255 / 12%); border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(0 0 0 / 45%);
+      font-size: 12px; font-weight: 600; color: var(--text-1); white-space: nowrap;
+    }
+    body.duoi #thuoc { top: 6px; }
+    #rec { width: 8px; height: 8px; border-radius: 50%; background: #ff3b30; box-shadow: 0 0 0 3px rgb(255 59 48 / 22%);
+           animation: nhay 1s ease-in-out infinite; }
+    @keyframes nhay { 50% { opacity: .4; } }
+    #so { font-weight: 700; font-variant-numeric: tabular-nums; }
+    #giay { color: var(--text-3); font-weight: 500; }
+    .chia { width: 1px; height: 14px; background: rgb(255 255 255 / 14%); }
+    #khung { display: flex; gap: 3px; }
+    #khung i { width: 10px; height: 6px; border-radius: 2px; background: rgb(255 255 255 / 18%); transition: background 120ms; }
+    #khung i.co { background: var(--accent); }
   </style>
 </head>
 <body>
-  <div id="dong-ho"><span id="cham"></span><span id="so">3</span></div>
+  <div id="thuoc"><span id="rec"></span><span id="so">3</span><span id="giay">giây</span><span class="chia"></span><span id="khung"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
   <script src="dem.js"></script>
 </body>
 </html>

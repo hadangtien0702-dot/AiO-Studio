@@ -291,11 +291,18 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
   const ngay = (iso) => new Date(iso).toLocaleDateString(window.i18n.lang === 'en' ? 'en-US' : 'vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
   const bao = (chu, kieu) => { msg.textContent = chu || ''; msg.className = 'msg' + (kieu ? ' ' + kieu : '') }
 
+  // 29/09 (huong B): dung thu = tieu de "Dung thu" + "Con n / 14 ngay" ben phai + thanh ngay cam; trang thai khac an 2 thu nay
+  const ngayEl = document.getElementById('bq-ngay'), tienDo = document.getElementById('bq-tien-do'), tienDoI = document.getElementById('bq-tien-do-i')
+
   function ve(s) {
     if (!s) { the.hidden = true; return }
     const co = s.loai === 'da-kich-hoat'
     khoiNhap.hidden = co; khoiCo.hidden = !co
     the.classList.toggle('het', s.loai === 'het-han-thu')
+    const dungThu = !co && !s.biThuHoi && s.lyDoMatMa !== 'may-bi-go' && s.loai === 'dung-thu'
+    ngayEl.textContent = dungThu ? t('bq.conNgay').replace('{n}', s.ngayConLai) : ''
+    tienDo.hidden = !dungThu
+    if (dungThu) tienDoI.style.width = Math.max(0, Math.min(100, (s.ngayConLai / 14) * 100)) + '%'
     if (co) {
       tieuDe.textContent = t('bq.daKichHoat') + ' · ' + s.maHienThi
       // [28/09] gia $14.99 cap nhat TRON DOI: ma KHONG co ngay het han = tron doi (truoc: bao nham 'da het han')
@@ -306,7 +313,7 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
     } else if (s.lyDoMatMa === 'may-bi-go') {
       tieuDe.textContent = t('bq.biGo'); moTa.textContent = t('bq.biGoMoTa')
     } else if (s.loai === 'dung-thu') {
-      tieuDe.textContent = t('bq.dungThu').replace('{n}', s.ngayConLai); moTa.textContent = t('bq.dungThuMoTa')
+      tieuDe.textContent = t('bq.dungThuTieuDe'); moTa.textContent = '' // o nhap ma ngay duoi da noi viec can lam
     } else {
       tieuDe.textContent = t('bq.hetThu'); moTa.textContent = t('bq.hetThuMoTa')
     }

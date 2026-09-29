@@ -16,8 +16,9 @@ html, body {
   user-select: none;
 }
 body { display: flex; flex-direction: column; border: 1px solid var(--line-strong); }
-/* KHONG dat button{font-family:inherit}: nut ben Cai dat hien bang font mac dinh cua nut (Arial, do 28/09) —
-   day la thu anh Tien dang nhin va coi la chuan. Doi ca bo sang Inter thi doi O CA HAI man cung luc. */
+/* 29/09: Cai dat lam lai (huong B anh chon) + doi ca bo sang Inter O CA HAI man cung luc — nut/o nhap
+   khong tu ke thua font (truoc do hien Arial). */
+button, input { font-family: inherit; }
 img, canvas { -webkit-user-drag: none; }
 
 /* ── Header: y het #tieu-de cua Cai dat ──────────────────────────────── */
@@ -63,33 +64,37 @@ img, canvas { -webkit-user-drag: none; }
 .spacer { flex: 1; }
 
 .hang-chon { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
-.nhan-chon { font-size: 12.5px; color: var(--text-2); font-weight: 600; }
+.nhan-chon { font-size: 12.5px; color: var(--text-1); font-weight: 600; }
 .chon-nhom {
-  display: flex; padding: 2px;
+  display: flex; flex: none; padding: 2px;
   background: var(--bg-0);
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-pill);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
 }
 .chon-nut {
-  border: none; background: transparent; cursor: pointer;
-  padding: 5px 14px; border-radius: var(--r-pill);
-  font-size: 12px; font-weight: 700; color: var(--text-3);
+  min-width: 58px; padding: 4px 10px;
+  border: none; border-radius: var(--r-sm); background: transparent; cursor: pointer;
+  font: 600 12px/1.35 var(--font-ui); color: var(--text-3);
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .chon-nut:hover { color: var(--text-1); }
-.chon-nut.active { background: var(--accent); color: var(--accent-on, #fff); font-size: 13px; }
+.chon-nut.active {
+  background: var(--bg-5); color: var(--text-1);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 45%), inset 0 0 0 1px rgb(255 255 255 / 6%);
+}
 
 /* Nut: y het .nut / .nut.chinh cua Cai dat */
 .nut {
-  height: 34px; padding: 0 var(--sp-4);
-  border: 1px solid var(--line-2); border-radius: var(--r-pill);
-  background: var(--bg-1); color: var(--text-1);
-  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  height: 28px; padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2); border-radius: var(--r-md);
+  background: var(--bg-3); color: var(--text-1);
+  font: 600 12px/1 var(--font-ui); cursor: pointer;
   white-space: nowrap;
   transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 .nut:hover { background: var(--bg-hover); }
 .nut.chinh {
+  height: 32px; padding: 0 var(--sp-5);
   background: var(--accent); border-color: var(--accent);
   color: var(--accent-on, #fff);
   font-size: 13px; font-weight: 700; /* luat: chu tren cam dac >=13px bold */

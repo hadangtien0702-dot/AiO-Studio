@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; script-src 'self'" />
+        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
   <title>AiO Shot & Save — Cài đặt</title>
   <link rel="stylesheet" href="../../assets/tokens.css" />
   <link rel="stylesheet" href="settings.css" />
@@ -29,18 +29,17 @@
     </div>
   </header>
 
+  <!-- 29/09 anh: "lon xon qua" -> huong B anh chon: danh sach NHOM (ten nhom nam ngoai, hang ke manh, lua chon
+       dang bat mau xam noi; cam chi con o nut chinh + thanh ngay dung thu). Giu NGUYEN moi id settings.js dung. -->
   <main>
-    <!-- ── Ban quyen (24/09): dung thu 14 ngay / nhap ma / huy kich hoat ─ -->
-    <section class="the" id="the-bq">
-      <div class="dau-muc">
-        <span class="icon-chip">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.7-8.7M17 6l2.5 2.5M14.5 8.5 16.5 10.5"/></svg>
-        </span>
-        <div class="dau-chu">
-          <h1 id="bq-tieu-de" data-i18n="bq.tieuDe">Bản quyền</h1>
-          <p class="mo-ta" id="bq-mo-ta"></p>
-        </div>
+    <!-- ── Ban quyen: dung thu 14 ngay / nhap ma / huy kich hoat ─────── -->
+    <section class="nhom bq" id="the-bq">
+      <div class="bq-dau">
+        <h1 id="bq-tieu-de" data-i18n="bq.tieuDe">Bản quyền</h1>
+        <span id="bq-ngay" class="bq-ngay"></span>
       </div>
+      <div id="bq-tien-do" class="tien-do" hidden><i id="bq-tien-do-i"></i></div>
+      <p class="goi-y" id="bq-mo-ta"></p>
       <!-- chua kich hoat: o nhap ma + Kich hoat + Mua -->
       <div id="bq-nhap">
         <div class="bq-hang">
@@ -53,56 +52,34 @@
       <div id="bq-co" hidden>
         <button id="bq-huy" class="nut phu" data-i18n="bq.huy"></button>
       </div>
-      <p id="bq-msg" class="msg" style="text-align:left"></p>
+      <p id="bq-msg" class="msg"></p>
     </section>
 
-    <!-- ── Phim tat chup ─────────────────────────────────────────────── -->
-    <section class="the">
-      <div class="dau-muc">
-        <span class="icon-chip">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M6 14h0M18 14h0M9 14h6"/></svg>
-        </span>
-        <div class="dau-chu">
-          <h1 data-i18n="set.phim.tieuDe">Phím tắt chụp</h1>
-          <p class="mo-ta" data-i18n="set.phim.goiY"></p>
+    <!-- ── Chup anh ─────────────────────────────────────────────────── -->
+    <h2 class="nhom-ten" data-i18n="set.nhom.chup">Chụp ảnh</h2>
+    <section class="nhom">
+      <div class="hang">
+        <div class="nhan">
+          <span class="nhan-chon" data-i18n="set.phim.tieuDe">Phím tắt</span>
+          <span class="goi-y goi-y-phim"><span data-i18n="set.phim.goiY"></span><button id="reset" class="lien-ket" data-i18n="set.phim.macDinh"></button></span>
         </div>
-      </div>
-
-      <div class="hang-phim">
-        <!-- idle: keycaps · recording: dong chu nhap nhay (nhan to hop = luu ngay) -->
-        <div id="keys" class="keycaps" aria-live="polite"></div>
-        <div class="nut-phim">
+        <div class="phai">
+          <!-- idle: keycaps · recording: dong chu nhap nhay (nhan to hop = luu ngay) -->
+          <div id="keys" class="keycaps" aria-live="polite"></div>
           <button id="doi" class="nut" data-i18n="set.phim.doiPhim"></button>
           <button id="huy-ghi" class="nut phu" data-i18n="set.phim.huyNgan" hidden></button>
         </div>
       </div>
+      <p id="msg" class="msg hang-msg"></p>
 
-      <div class="chan-the">
-        <button id="reset" class="lien-ket" data-i18n="set.phim.macDinh"></button>
-        <p id="msg" class="msg"></p>
-      </div>
-    </section>
-
-    <!-- ── Anh chup: dinh dang + chat luong ──────────────────────────── -->
-    <section class="the">
-      <div class="dau-muc">
-        <span class="icon-chip">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 15-4.35-4.35a1 1 0 0 0-1.42 0L8 18"/></svg>
-        </span>
-        <div class="dau-chu">
-          <h1 data-i18n="set.anh.tieuDe">Ảnh chụp</h1>
-          <p class="mo-ta" data-i18n="set.anh.moTa"></p>
-        </div>
-      </div>
-
-      <div class="hang-chon">
+      <div class="hang">
         <span class="nhan-chon" data-i18n="set.anh.dinhDang"></span>
         <div class="chon-nhom" id="anh-loai" role="group">
           <button class="chon-nut" data-v="jpeg">JPEG</button>
           <button class="chon-nut" data-v="png">PNG</button>
         </div>
       </div>
-      <div class="hang-chon" id="hang-chat-luong">
+      <div class="hang" id="hang-chat-luong">
         <span class="nhan-chon" data-i18n="set.anh.chatLuong"></span>
         <div class="chon-nhom" id="anh-chat-luong" role="group">
           <button class="chon-nut" data-v="thap" data-i18n="set.anh.thap"></button>
@@ -110,30 +87,31 @@
           <button class="chon-nut" data-v="sieu" data-i18n="set.anh.sieu"></button>
         </div>
       </div>
-      <p id="msg-anh" class="msg" style="text-align:left"></p>
-    </section>
-
-    <!-- ── Khay anh: kieu xep ────────────────────────────────────────── -->
-    <section class="the">
-      <div class="dau-muc">
-        <span class="icon-chip">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
-        </span>
-        <div class="dau-chu">
-          <h1 data-i18n="set.khay.tieuDe">Khay ảnh</h1>
-          <p class="mo-ta" data-i18n="set.khay.moTa"></p>
+      <div class="hang">
+        <div class="nhan">
+          <span class="nhan-chon" data-i18n="set.lamMo.kieu"></span>
+          <span class="goi-y" data-i18n="set.lamMo.goiY"></span>
+        </div>
+        <div class="chon-nhom" id="lam-mo-kieu" role="group">
+          <button class="chon-nut" data-v="mosaic" data-i18n="set.lamMo.mosaic"></button>
+          <button class="chon-nut" data-v="blur" data-i18n="set.lamMo.blur"></button>
         </div>
       </div>
-      <div class="hang-chon">
+    </section>
+
+    <!-- ── Khay anh ──────────────────────────────────────────────────── -->
+    <h2 class="nhom-ten" data-i18n="set.nhom.khay">Khay ảnh</h2>
+    <section class="nhom">
+      <div class="hang">
         <span class="nhan-chon" data-i18n="set.khay.kieu"></span>
         <div class="chon-nhom" id="khay-kieu" role="group">
           <button class="chon-nut" data-v="ngang" data-i18n="set.khay.ngang"></button>
           <button class="chon-nut" data-v="doc" data-i18n="set.khay.doc"></button>
         </div>
       </div>
-      <div class="hang-chon">
+      <div class="hang">
         <span class="nhan-chon" data-i18n="set.khay.soAnh"></span>
-        <div class="chon-nhom" id="khay-so-anh" role="group">
+        <div class="chon-nhom nho" id="khay-so-anh" role="group">
           <button class="chon-nut" data-v="0" data-i18n="set.khay.tat"></button>
           <button class="chon-nut" data-v="5">5</button>
           <button class="chon-nut" data-v="10">10</button>
@@ -142,49 +120,23 @@
       </div>
     </section>
 
-    <!-- ── Hieu ung lam mo ───────────────────────────────────────────── -->
-    <section class="the">
-      <div class="dau-muc">
-        <span class="icon-chip">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 8a4 4 0 0 1 0 8"/></svg>
-        </span>
-        <div class="dau-chu">
-          <h1 data-i18n="set.lamMo.tieuDe">Hiệu ứng làm mờ</h1>
-          <p class="mo-ta" data-i18n="set.lamMo.moTa"></p>
+    <!-- ── Luu anh ───────────────────────────────────────────────────── -->
+    <h2 class="nhom-ten" data-i18n="set.nhom.luu">Lưu ảnh</h2>
+    <section class="nhom">
+      <div class="hang">
+        <div class="thu-muc">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <div class="tm-chu">
+            <div id="folder-ten" class="tm-ten">—</div>
+            <div id="folder-path" class="tm-duong" title="">—</div>
+          </div>
         </div>
-      </div>
-      <div class="hang-chon">
-        <span class="nhan-chon" data-i18n="set.lamMo.kieu"></span>
-        <div class="chon-nhom" id="lam-mo-kieu" role="group">
-          <button class="chon-nut" data-v="mosaic" data-i18n="set.lamMo.mosaic"></button>
-          <button class="chon-nut" data-v="blur" data-i18n="set.lamMo.blur"></button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Thu muc luu anh ───────────────────────────────────────────── -->
-    <section class="the">
-      <div class="dau-muc">
-        <span class="icon-chip">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        </span>
-        <div class="dau-chu">
-          <h1 data-i18n="set.thuMuc.tieuDe">Thư mục lưu ảnh</h1>
-          <p class="mo-ta" data-i18n="set.thuMuc.moTa"></p>
-        </div>
-      </div>
-
-      <div class="thu-muc">
-        <div class="tm-chu">
-          <div id="folder-ten" class="tm-ten">—</div>
-          <div id="folder-path" class="tm-duong" title="">—</div>
-        </div>
-        <div class="nut-phim">
-          <button id="open-folder" class="nut phu" data-i18n="set.thuMuc.mo"></button>
+        <div class="phai">
+          <button id="open-folder" class="nut" data-i18n="set.thuMuc.mo"></button>
           <button id="pick-folder" class="nut" data-i18n="set.thuMuc.doi"></button>
         </div>
       </div>
-      <p id="msg-folder" class="msg"></p>
+      <p id="msg-folder" class="msg hang-msg"></p>
     </section>
   </main>
 

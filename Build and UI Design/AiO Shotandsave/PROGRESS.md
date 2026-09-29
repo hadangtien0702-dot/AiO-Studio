@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 08:15 +0700
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 08:45 +0700
+> - **0.7.6 (29/09 08:45, Claude, may cong ty):** man Cai dat lam lai (huong B anh chon: danh sach nhom, lua chon xam
+>   noi, cam chi o nut chinh) + thanh cuon manh + sua cau chu; vien quay Storyboard kieu 1 (vien 2 px + 4 goc, thuoc
+>   "● 3 giay | 6 o"), SUA LOI vien 0.7.4 lot cam vao 3/6 khung. Bo cai `Release/.../Setup-0.7.6.exe` 88,4 MB —
+>   [CHO ANH] tu cai + quay thu 1 lan xem khung sach. Chua dua len web (web co phim man Cai dat cu, cho anh gat).
+>   [CHUA RO GOC] khung 4-5 cua dai 08:09 bi toi ~50% (do sang 125 vs 245) — can chay thu tren man anh moi do duoc.
 > - **0.7.5 (29/09 08:15, Claude, may cong ty):** icon Storyboard doi sang CLAPPER (Lucide, net 1,9) o ca 3 cho
 >   (khay, nut tren khung chon, thanh ve) + the Storyboard tren web. Bo cai `Release/.../AiO-Shot-and-Save-Setup-0.7.5.exe`
 >   (88,4 MB) — [CHO ANH] tu cai de xem icon. May cong ty dang chay 0.7.4.0 (do 29/09 08:04).
@@ -20,6 +25,47 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.7.6] - 2026-09-29 08:45 - Man Cai dat huong B + vien quay Storyboard kieu 1 (sua loi lot cam vao anh)
+- Boi canh: anh gui 3 anh: (1) menu khay + man Cai dat *"lam trang settings nay cho dep di em - lon xon qua - noi dung
+  - cau tu chau chuot lai"*; (2) *"thanh scroll trong settings lac que voi UI"*; (3) anh quay Storyboard *"khung duoc
+  chon cua strip story thay gom chua - lam lai cho no giong mot app nam 2026"*. Em ve nhap cung co that (Cai dat: hien
+  tai/A/B; khung quay: hien tai/1/2/3), anh chon **B** + **kieu 1**.
+- Nguyen nhan that (khung quay, do tren dai anh quay 08:09 `shotandsave-storyboard-2026-09-29-080927-302-1.png`):
+  khung 2, 3, 6 dinh cam **31 px** canh tren + trai; khung 1 sach. Code xin thanh 3 px nhung **Windows khong cho cua so
+  mong hon ~30 px** (do: 7 cau hinh deu bi ep 30-38 px, xem so loi #13) -> thanh phinh, lan vao vung. Kem: o man 150%
+  cua so that to hon xin 1 px phai/duoi. Khung 4-5 toi ~50% (sang 125 vs 245): CHUA RO GOC (khong phai overlay tao
+  san: an + chan khoi anh chup).
+- Thay doi:
+  - Cai dat: danh sach 3 nhom (Chup anh / Khay anh / Luu anh) + the Ban quyen tren cung (dung thu: "Con n / 14 ngay"
+    + thanh cam). Bo 6 o icon + 6 dong mo ta. Cum lua chon o bang nhau, dang chon = xam noi (`--bg-5`), cam chi o
+    nut Kich hoat. Thanh cuon 6 px khong ray khong mui ten. CSP them `font-src file:` (truoc do man nay KHONG nap
+    duoc Inter) + nut/o nhap `font-family: inherit` (truoc hien Arial). Giu nguyen moi id settings.js dung.
+  - Chu (VI + EN): Thap/Cao/Sieu net -> Chuan/Cao/Toi da ("Thap" thuc ra la JPEG q95); Kham khoi (Mosaic) -> Kham o;
+    So anh gan nhat -> Mo lai anh gan nhat; goi y phim tat "Bam o bat ky dau..." (sai nghia) -> "Dung duoc trong moi
+    ung dung"; them "phim 4 hoac B" (ca 2 phim deu bat lam mo); bo 3 gach ngang dai. Menu khay: Chup man hinh / Mo khay
+    anh / Tao dai Storyboard (bo "(phim S)" — S chi an trong khay) / Mo thu muc anh.
+  - Khay Storyboard: chep lai 7 khoi CSS tu Cai dat moi (luat "chuan = man Cai dat"), dang chon cung xam noi.
+  - Vien quay: `src/vien-quay.js` (hinh hoc thuan, khong Electron): 4 cua so >= 40 px cach vung 2 px, `setShape` giu
+    vien 2 px + 4 goc L 4x18 px, `setContentProtection`, do `getBounds` sau khi hien (cham vung -> huy + run-log).
+    Thuoc `src/dem/`: "● 3 giay | 6 o", o to cam theo so khung da chup (`vien.datKhung`).
+- File: `src/settings/{index.html,settings.css,settings.js}`, `src/i18n.js` (40 dong), `src/main.js` (moVienQuay,
+  menu khay, datKhung), `src/vien-quay.js` (moi), `src/dem/{index.html,dem.js}`, `src/storyboard/storyboard.css`,
+  `scripts/test/do-vien-quay.mjs` (moi), `scripts/test/do-storyboard.mjs`, `package.json` 0.7.6 + `test:vienquay`,
+  AGENTS.md (luat chuan giao dien + bay cua so nho), CLAUDE.md app (so loi #13), 2 bang phien ban, Release.
+- Kiem chung:
+  - Cai dat dung tu NGUYEN VAN html/css/js that (chi gia cau noi preload), 440x700, 4 trang thai (VI dung thu, EN,
+    het dung thu, da kich hoat): 0 chu bi cat, 0 gach ngang dai, 5/5 cum lua chon thang mep phai x=407, font Inter tren
+    moi nut, 0 cuon ngang, 0 px phai cuon (truoc sua: het dung thu du 6 px -> bot le).
+  - `npm run test:vienquay`: 2006 vung (ca vung 1x1, sat mep) DAT 5 dieu kien voi cua so bi ep 40 px + 1 px; doi chung
+    hinh hoc 0.7.4 truot dung 2/4 thanh (tren, trai) = khop anh 08:09. Lan dau test bat 2 loi cua chinh em (goc L
+    dai hon khung o vung 1 px; khe 2 px lam ho net doc) — da sua.
+  - Chay THAT tren Windows (opacity 0, khong hien gi): 12/12 cua so vien (giua man, sat taskbar, sat goc) nam ngoai
+    vung, setShape khong loi. Lan dau (chua co khe) do ra 2/4 cua so CHAM vung 1 px vi +1 px -> them KE = 2.
+  - `test:storyboard` 67/67, `test:banquyen` 27/27. Mo `app.asar` doc thang: 0.7.6, Cai dat moi, vien-quay, setShape,
+    chu moi. Setup-0.7.6.exe 88.440.254 B, ban chep Release trung md5 `c7a5562d`.
+- CHUA kiem: chua quay that 3 giay tren man anh (vien + thuoc hien that, khung co sach khong, khung toi 4-5 con khong)
+  — can anh cai 0.7.6 va quay 1 lan (so loi #12: khong tu chay tren man anh dang lam). Web chua cap nhat.
 
 ## [0.7.5] - 2026-09-29 08:15 - Icon Storyboard: o luoi # -> clapper
 - Boi canh: anh gui anh khay 0.7.4, khoanh nut Storyboard: *"icon khay anh danh cho strips story gom qua em"*. Em ve

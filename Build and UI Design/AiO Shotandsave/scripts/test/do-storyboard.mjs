@@ -127,7 +127,8 @@ kiem('main.js xu ly storyboard:copy', mainJs.includes("'storyboard:copy'"))
 kiem('main.js xu ly storyboard:save', mainJs.includes("'storyboard:save'"))
 kiem('main.js xu ly storyboard:start-drag', mainJs.includes("'storyboard:start-drag'"))
 kiem('main.js xu ly storyboard:close', mainJs.includes("'storyboard:close'"))
-kiem('Tray menu co lua chon tao storyboard', mainJs.includes("T('khay.storyboard')"))
+// 29/09: kiem HANH VI (muc menu mo cua so Storyboard), khong kiem ten khoa chu (menu doi sang 'tray.storyboard', bo "(phim S)")
+kiem('Tray menu co lua chon tao storyboard', /label:\s*T\('tray\.storyboard'\),\s*click:\s*\(\)\s*=>\s*openStoryboardWindow\(\)/.test(mainJs))
 
 console.log('\n[5] Kiem tra Cam tuyet doi Emoji trong UI (Luat 01)')
 const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u
