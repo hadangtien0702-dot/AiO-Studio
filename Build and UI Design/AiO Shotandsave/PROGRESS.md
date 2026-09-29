@@ -1,17 +1,18 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 10:45 +0700 (/xong, anh mo chat moi)
-> - ☠️ **CODE CHUA COMMIT, CHUA PUSH** (anh dan "khong ra ban cai, khong push" trong luc thu; /xong hoi push khong -> anh
->   chua quyet, mo chat moi). Tren may cong ty, sau 0.7.7 (`1b21b43`) con: vien quay trong suot (09:18, anh "qua dep") ·
->   animation phim S "Xoe 6 khung" (09:39, anh "ok") · KHAY STORYBOARD moi (10:08: moi dai 1 hang, xoa tung khung giu so
->   goc, dai giu lai trong `<userData>/storyboard`, tach han khoi khay anh) · bo hang "Xuat dang", xuat luon LUOI (10:35).
->   File: `src/{main.js,i18n.js,kho-dai.js*,preload-storyboard.js}` `src/overlay/*` `src/storyboard/*` `src/dem/vien.*`*
->   `scripts/test/{do-storyboard.mjs,do-kho-dai.cjs*}` `package.json` (them test:khodai, SO BAN VAN 0.7.7) (*=file moi).
->   ☠️ root `CLAUDE.md` + `TOOL_VERSION_TRACKER.md` dang sua do la cua GUIDE FRAME, khong phai Shot & Save — dung add.
-> - **May cong ty dang chay BAN NGUON** (`electron .`, boot 10:35:08), app cai 0.7.7 dang TAT. [CHO ANH] xem khay sau khi bo
->   "Xuat dang" (chua ai nhin). Anh gat -> bump 0.7.8 + (hoi) ban cai + push; nho tat ban nguon, mo lai app cai.
-> - Kiem hien tai: test:storyboard 70/70 · test:khodai 11/11 · test:vienquay DAT · test:banquyen 27/27.
-> - [CHUA RO GOC] khung toi ~50% trong dai 08:09 (khung 4-5) — chua gap lai trong cac dai 10:30-10:33 anh quay (chua do).
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 22:17 +0700 (/xong)
+> - **Ban 0.7.9 DA COMMIT + PUSH** (`82d832f` 0.7.8 Storyboard · `14ea322` 0.7.9 Doc chu). Web: `8dda50f` section Storyboard,
+>   `729566a` the Lay chu, `6214188` phim Storyboard het de chu + xoe 6 khung dung app — live khop git.
+> - **0.7.9 = DOC CHU (phim 5):** Windows LUON Tesseract (Windows KHONG co bo doc tieng Viet), anh test "kha la tot roi".
+>   [CHUA] dong goi bo cai 0.7.9 (anh chay BAN NGUON, boot 16:06) · Mac chua do · may khong SIMD chua do.
+> - [CHO ANH] chon huong trinh bay phan 11 tinh nang tren web: NHAP `Website/Nhap web ShotSave/nhap-11-tinh-nang.html` (mo
+>   bang trinh duyet hoac may chu tinh bat ky). Huong A = 11 dong + man hinh phim lon (em nghieng A);
+>   Huong B = 6 o bang nhau ghi du 11 ten. Nam NGOAI thu muc web nen push KHONG len Vercel. Mo ta
+>   o muc [web] 16:4x ben duoi (11 canh: chup / keo tha / ghim / chu thich 1-2-3 / 2 man / khay / lam mo 4 / chinh V /
+>   khay nho / lay chu 5 / storyboard S).
+> - [CHO ANH] khung 1 cua dai quay tren video co the DEN (thay trong anh khay 10:41: Storyboard 04 SHOT 01 den, dai 03 bat
+>   dau tu SHOT 02) — chua do, chua sua.
+> - Kiem: test:storyboard 73/73 · test:khodai 11/11 · test:vienquay DAT · test:banquyen 27/27.
 >
 > ---- (khoi cu duoi day, 08:57) ----
 > - **0.7.7 (29/09 08:57, Claude):** gon 4 chu phu man Cai dat (anh khoanh tren 0.7.6) — moi hang con 1 dong.
@@ -40,6 +41,23 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [/xong] - 2026-09-29 22:17 - Chot so
+- Nhap 2 huong phan 11 tinh nang chep tu scratchpad (mat theo phien) vao repo `Website/Nhap web ShotSave/nhap-11-tinh-nang.html`
+  — NGOAI thu muc web (Vercel Root Directory = `Website/AiO ShotSave Web`, push ngoai do bi CANCELED) nen khong len live.
+- Khoi TRANG THAI dau file viet lai (khoi 10:45 ghi "code chua commit" da sai: 0.7.8 + 0.7.9 da push).
+- Khong bump them: tu 0.7.9 (`14ea322`) chi doi web + tai lieu, ma app khong doi.
+
+## [web] - 2026-09-29 16:4x - Phim Storyboard het de chu + xoe 6 khung dung app; NHAP 2 huong cho phan 11 tinh nang
+- Anh chup: chip "Storyboard Strip" + thuoc "● 3 giay" DE LEN timecode goc duoi video; "6 cuc hien ra chua dep" (quat 6
+  o cam trong suot em tu che). Sua: chip / nut Xong / thuoc len TREN vung chon (vung doi 21-73% cao video); hieu ung bat S
+  CHEP DUNG app (overlay.css sb-xoe: vien cam dac + 5 khung xoe cheo len-phai roi thu + hang so 1-6). Do: giao voi
+  timecode 0 px2, nam trong video, o 1280 + 360 px. Commit `6214188`, live khop git.
+- Anh: phan 11 the chu "vo duyen, khong du thuyet phuc", nhieu qua; "tong la 11 tinh nang" (giu du 11); "chua nghi ra
+  trinh bay kieu gi". -> NHAP rieng (scratchpad `nhap-tinh-nang/index.html`, http://127.0.0.1:8133, CHUA dung trang that):
+  11 canh phim GSAP viet 1 lan; Huong A = 11 dong + man hinh lon tu chay, bam dong xem dong do; Huong B = 6 o bang nhau
+  (3x2), moi o ghi du ten tinh nang con, dien lan luot (tong du 11). Sua trong nhap: B 6 o bang nhau (bento lech cao),
+  mui ten canh 4, vet mo canh 7. Cho anh chon.
 
 ## [web] - 2026-09-29 16:1x - Dua "Lay chu trong anh" (0.7.9) len aio-shotsave.vercel.app
 - The moi f11 "Copy text from any shot" / "Lấy chữ trong ảnh" (icon scan-text nhu app). Chi hua tieng Viet du dau TREN
