@@ -1,0 +1,888 @@
+<!doctype html>
+<!-- NHÁP 25/09/2026 — trang bộ tool Premiere, lấy trang Shot & Save làm chuẩn (anh chốt 25/09).
+     Khung dùng chung (token, nút, thanh trên, section, thẻ, hỏi đáp, chân trang) chép NGUYÊN từ ../index.html qua script ghép.
+     Mọi con số trên trang lấy từ số đo đã ghi trong repo (scratchpad/du-lieu-tool.md có nguồn file:dòng). Không có giá (anh chốt 25/09). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiO Studio for Premiere Pro</title>
+<meta name="description" content="Eleven tools that dock into Adobe Premiere Pro: cut silence, follow the speaker across cameras, caption, frame for every platform, pull footage in. Windows. Opening soon.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 386 352'%3E%3Cpath fill='%23F86820' d='M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z'/%3E%3Cpath fill='%23F86820' d='M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== Token — sửa màu ở đây, không sửa trong từng khối ===== */
+:root{
+  --bg:#ffffff; --bg-soft:#fbf8f5; --surface:#ffffff; --line:#ece6e0; --line-strong:#ddd4cb;
+  --ink:#16110d; --ink-2:#4f4740; --ink-3:#6f665e;
+  --brand:#F86820;              /* cam AiO — chỉ để trang trí, KHÔNG làm nền chữ nhỏ */
+  --btn:#F86820; --btn-hover:#e0560f; --on-btn:#ffffff;   /* nút = đúng cam logo (anh 22/09); 24/09 anh: "nền cam chữ trắng" — trắng/cam 3,0:1 chỉ đạt cho chữ ĐẬM ≥14px (mọi nút đều 15–17px 700); hover ĐẬM hơn (3,6:1), không nhạt hơn */
+  --brand-soft:#fff1e8; --brand-ink:#9A3412;
+  --glow:rgba(248,104,32,.16);
+  --shadow:0 1px 2px rgba(22,17,13,.05),0 12px 32px -12px rgba(22,17,13,.16);
+  --radius:20px;
+  --fs-sub:18px;                /* chữ phụ dưới tiêu đề MỌI section — một chỗ duy nhất (22/09: khay 19px vs giá 18px lệch nhau) */
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141210; --bg-soft:#1a1714; --surface:#1f1b18; --line:#2e2925; --line-strong:#3b352f;
+    --ink:#f6f1ec; --ink-2:#cfc6bd; --ink-3:#a89e94;
+    --btn:#F86820; --btn-hover:#e0560f; --on-btn:#ffffff;
+    --brand-soft:#2d1d12; --brand-ink:#ffb58a;
+    --glow:rgba(248,104,32,.22);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 40px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141210; --bg-soft:#1a1714; --surface:#1f1b18; --line:#2e2925; --line-strong:#3b352f;
+  --ink:#f6f1ec; --ink-2:#cfc6bd; --ink-3:#a89e94;
+  --btn:#F86820; --btn-hover:#e0560f; --on-btn:#ffffff;
+  --brand-soft:#2d1d12; --brand-ink:#ffb58a;
+  --glow:rgba(248,104,32,.22);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 40px -16px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,svg{display:block}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+@media (min-width:768px){.wrap{padding:0 32px}}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--bg);padding:8px 12px;border-radius:8px;z-index:100}
+.skip:focus{left:8px}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px;border-radius:6px}
+
+/* ===== Nút ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:14px;
+  font:700 16px/1 Inter,sans-serif;text-decoration:none;cursor:pointer;border:0;transition:background-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.btn-main{background:var(--btn);color:var(--on-btn);box-shadow:0 8px 24px -8px var(--glow),0 2px 0 rgba(0,0,0,.08) inset}
+.btn-main:hover{background:var(--btn-hover)}
+.btn-main:active{transform:scale(.98)}
+.btn-ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.btn-ghost:hover{background:var(--bg-soft)}
+
+/* ===== Thanh trên ===== */
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid transparent;transition:border-color .2s}
+header.scrolled{border-bottom-color:var(--line)}
+.nav{display:flex;align-items:center;gap:16px;height:64px}
+.logo{display:flex;align-items:center;min-height:44px;gap:10px;text-decoration:none;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.logo svg{width:26px;height:24px}
+.nav-links{display:none;gap:4px;margin-left:16px}
+.nav-links a{padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink-2);font-weight:500;font-size:15px}
+.nav-links a:hover{color:var(--ink);background:var(--bg-soft)}
+@media (min-width:768px){.nav-links{display:flex}}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.lang{display:inline-flex;padding:2px;border-radius:12px;   /* 44 + 2×2 = 48: bằng ô sáng/tối và nút Mua (22/09 lệch 50 vs 44) */background:var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
+.lang button{min-width:44px;min-height:44px;border:0;border-radius:9px;background:transparent;color:var(--ink-3);font:600 13px Inter,sans-serif;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+/* Nút sáng/tối (anh chốt 22/09: "cho anh cả 2 option chuyển đổi") — hiện icon của chế độ SẼ chuyển sang */
+.theme{display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:12px;background:var(--bg-soft);color:var(--ink-2);
+  box-shadow:inset 0 0 0 1px var(--line);cursor:pointer;transition:background-color .18s ease,color .18s ease}
+.theme:hover{color:var(--ink);background:var(--surface)}
+.theme svg{width:20px;height:20px}
+.theme .i-sun{display:none}
+.theme.is-dark .i-sun{display:block}
+.theme.is-dark .i-moon{display:none}
+.nav .btn{min-height:48px;padding:0 16px;font-size:15px;border-radius:12px}
+
+/* ===== Hero ===== */
+.hero{position:relative;padding:56px 0 24px;text-align:center;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-200px 0 auto;height:640px;z-index:-1;
+  background:radial-gradient(600px 320px at 50% 30%,var(--glow),transparent 70%)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-weight:600;font-size:14px}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+h1{margin:20px auto 16px;max-width:820px;font-size:clamp(36px,6.4vw,64px);line-height:1.05;letter-spacing:-.035em;font-weight:800}
+h1 em{font-style:normal;color:var(--brand)}
+.lede{margin:0 auto;max-width:600px;color:var(--ink-2);font-size:clamp(17px,2.2vw,19px)}
+.hero-cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:32px 0 12px}
+/* ===== Tính năng ===== */
+section{scroll-margin-top:80px}
+.sec{padding:96px 0 24px}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 48px}
+h2{margin:0 0 12px;font-size:clamp(28px,4.4vw,42px);line-height:1.12;letter-spacing:-.028em;font-weight:800}
+/* Chống chữ mồ côi (anh 22/09): JS `chongMoCoi` dính 2 chữ cuối. KHÔNG dùng text-wrap:pretty cho đoạn văn — nó xuống hàng SỚM để cân đoạn, để lại khoảng trống lớn bên phải (anh chê 22/09). Tiêu đề giữ balance. */
+h1,h2,h3{text-wrap:balance}
+.nw{white-space:nowrap}   /* phím + chữ đi kèm không bị tách dòng ("3 | chữ." mồ côi ở 1024px, 22/09) */
+.sec-head p{margin:0;color:var(--ink-2);font-size:var(--fs-sub)}
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+@media (min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{padding:28px;border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .2s ease,transform .2s ease}
+.card:hover{box-shadow:inset 0 0 0 1px var(--line-strong),var(--shadow)}
+.ico{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--brand-soft);color:var(--brand-ink);margin-bottom:20px}
+.ico svg{width:24px;height:24px}
+.card h3{margin:0 0 8px;font-size:19px;letter-spacing:-.01em;font-weight:700}
+.card p{margin:0;color:var(--ink-2);font-size:16px}
+kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;background:var(--bg-soft);box-shadow:inset 0 -2px 0 var(--line-strong),inset 0 0 0 1px var(--line-strong);font:600 13px/1.6 Inter,sans-serif;color:var(--ink);text-align:center}
+
+/* ===== Chuyển động khi cuộn tới (chép luật từ trang Shot & Save: chỉ transform/opacity; ẩn CHỈ khi JS đã chạy; giảm chuyển động → hiện ngay) ===== */
+@media (prefers-reduced-motion:no-preference){
+  .hien-js [data-hien]{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1);transition-delay:var(--tre,0ms)}
+  .hien-js [data-hien].hien{opacity:1;transform:none}
+  .card.choi .ico{animation:ico-nen .8s ease}
+  .hero .eyebrow,.hero .h1a,.hero h1 em,.hero .lede,.hero .hero-cta,.hero .demo{animation:vao-hero .7s cubic-bezier(.2,.8,.2,1) both}
+  .hero .h1a{animation-delay:.08s}
+  .hero h1 em{animation-delay:.2s}
+  .hero .lede{animation-delay:.32s}
+  .hero .hero-cta{animation-delay:.44s}
+  .hero .demo{animation-delay:.56s}
+}
+@keyframes vao-hero{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes ico-nen{30%{transform:scale(1.08)}}
+
+/* ===== Riêng trang này ===== */
+.logo-sub{margin-left:2px;padding:4px 9px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font:600 12px/1 Inter,sans-serif;letter-spacing:0;white-space:nowrap}
+@media (max-width:480px){.logo-sub{display:none}}
+
+/* --- Đầu trang: cửa sổ Premiere giả lập có panel AiO cắm bên phải (tên app viết chữ, không chép giao diện/logo Adobe) --- */
+.demo{margin:48px auto 0;max-width:980px;border-radius:18px;padding:10px;background:linear-gradient(180deg,var(--line),transparent)}
+.pr{--pr-bg:#1e1e1e;--pr-2:#262626;--pr-3:#303030;--pr-line:#3a3a3a;--pr-ink:#d8d8d8;--pr-mute:#8a8a8a;
+  container-type:inline-size;position:relative;aspect-ratio:16/9.4;border-radius:12px;overflow:hidden;background:var(--pr-bg);color:var(--pr-ink);
+  font-family:Inter,sans-serif;box-shadow:0 30px 60px -30px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.25);user-select:none;-webkit-user-select:none;text-align:left}
+.pr-bar{display:flex;align-items:center;gap:1.4cqw;height:5cqw;padding:0 1.6cqw;background:#161616;border-bottom:1px solid var(--pr-line);font-size:1.5cqw;color:var(--pr-mute)}
+.pr-dots{display:flex;gap:.6cqw}.pr-dots i{width:1.1cqw;height:1.1cqw;border-radius:50%;background:#4a4a4a}
+.pr-title{font-weight:600;color:var(--pr-ink)}
+.pr-seq{margin-left:auto}
+.pr-body{position:absolute;inset:5cqw 0 0 0;display:grid;grid-template-columns:1fr 29%}
+.pr-left{display:grid;grid-template-rows:1fr auto;min-height:0;padding:1.4cqw;gap:1.2cqw}
+.pr-mon{position:relative;border-radius:.8cqw;overflow:hidden;background:#0b0b0b;min-height:0}
+.pr-vid{position:absolute;inset:0;background:linear-gradient(160deg,#4a342a,#1c1614 70%)}
+.pr-vid i{position:absolute;transition:left .35s ease,width .35s ease,opacity .3s ease,background-color .35s ease}
+.pr-vid .h{width:13%;aspect-ratio:1;border-radius:50%;background:#c9a58c;left:43.5%;top:22%}
+.pr-vid .s{width:34%;aspect-ratio:2/1.15;border-radius:45% 45% 0 0;background:#8a6a55;left:33%;bottom:0}
+.pr-vid .h2,.pr-vid .s2{opacity:0}
+.pr-vid .h2{width:11%;aspect-ratio:1;border-radius:50%;background:#b58f7a;left:69%;top:30%}   /* thiếu aspect-ratio = cao 0 = vô hình (ảnh phóng to 25/09) */
+.pr-vid .s2{width:28%;aspect-ratio:2/1.15;border-radius:45% 45% 0 0;background:#6f5445;left:60.5%;bottom:0}
+.pr-vid[data-cam="b"] .h{left:43.5%;background:#e2b8a0}.pr-vid[data-cam="b"] .s{background:#a17d67}
+.pr-vid[data-cam="b"]{background:linear-gradient(200deg,#2a3a4a,#141a1f 70%)}
+.pr-vid[data-cam="w"] .h{width:9%;left:22%;top:34%}.pr-vid[data-cam="w"] .s{width:24%;left:14.5%}
+.pr-vid[data-cam="w"] .h2,.pr-vid[data-cam="w"] .s2{opacity:1}
+.pr-cap{position:absolute;left:8%;right:8%;bottom:7%;text-align:center;font-size:1.9cqw;line-height:1.3;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9);opacity:0;transition:opacity .3s}
+.pr-cap.on{opacity:1}
+.pr-safe{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+.pr-safe.on{opacity:1}
+.sz{position:absolute;border:1px dashed rgba(255,255,255,.7);background:rgba(248,104,32,.18);border-radius:.6cqw}
+.sz.r{right:3%;top:28%;width:9%;height:58%}
+.sz.b{left:3%;right:16%;bottom:4%;height:24%}
+.sz.t{left:0;right:0;top:0;height:10%;border-radius:0}
+.sz-tag{position:absolute;left:3%;top:13%;padding:.45cqw 1cqw;border-radius:999px;background:#F86820;color:#fff;font-size:1.35cqw;font-weight:700}
+.pr-cam{position:absolute;left:3%;top:5%;padding:.35cqw .8cqw;border-radius:.5cqw;background:rgba(0,0,0,.6);color:#fff;font-size:1.3cqw;font-weight:700;letter-spacing:.04em;opacity:0;transition:opacity .3s}
+.pr-cam.on{opacity:1}
+.pr-chip{position:absolute;right:3%;top:5%;max-width:64%;padding:.55cqw 1cqw;border-radius:.7cqw;background:#F86820;color:#fff;font-size:1.4cqw;line-height:1.3;font-weight:700;opacity:0;transform:translateY(-.6cqw);transition:opacity .3s ease,transform .3s ease}
+.pr-chip.on{opacity:1;transform:none}
+.pr-tl{position:relative;display:grid;gap:.5cqw;padding:.9cqw 1cqw;border-radius:.8cqw;background:var(--pr-2);overflow:hidden}
+.pr-head{position:absolute;top:.4cqw;bottom:.4cqw;left:0;width:2px;background:#F86820;z-index:2;pointer-events:none;opacity:0}   /* left đặt bằng px theo mép lane (JS), không dùng % của cả khối: 100% + lề từng chạy lố sang panel AiO */
+.pr-head::before{content:"";position:absolute;top:-.2cqw;left:-.55cqw;border:.65cqw solid transparent;border-top:.8cqw solid #F86820;border-bottom:0}
+.pr-head.on{opacity:1}
+.tr{display:grid;grid-template-columns:3.4cqw 1fr;align-items:center;gap:.8cqw;height:3.2cqw}
+.tr b{font-size:1.15cqw;color:var(--pr-mute);font-weight:600}
+.lane{position:relative;height:100%;border-radius:.4cqw;background:var(--pr-3);overflow:hidden}
+.clip{position:absolute;top:8%;height:84%;border-radius:.35cqw;font-size:1.05cqw;font-weight:600;padding:0 .7cqw;line-height:2.7cqw;overflow:hidden;white-space:nowrap;color:#fff;box-sizing:border-box}
+.clip.v{background:#2f80ed}.clip.b{background:#2e9e4f}.clip.w{background:#6b6b6b}.clip.c{background:#F86820}.clip.g{background:#0f9d8a}
+.clip.a{background:#127a6c;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.32) 0 .3cqw,transparent .3cqw .85cqw)}
+.clip.dim{opacity:.32}
+.seg{position:absolute;top:8%;height:84%;border-radius:.35cqw;opacity:0;transition:opacity .2s}
+.seg.a{background:#2f80ed}.seg.b{background:#2e9e4f}.seg.w{background:#9a9a9a}
+.seg.on{opacity:1}
+.pieces{position:absolute;inset:8% 0;display:flex}
+.pc{flex:0 0 auto;height:100%;border-radius:.35cqw}
+.pc.talk{background:#2f80ed}.pc.gap{background:#3c3c3c;transition:background-color .2s}.pc.gap.cut{background:#b42318}
+.pc.wave{background:#127a6c;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.32) 0 .3cqw,transparent .3cqw .85cqw)}
+.pc.gapa{background:#3c3c3c;transition:background-color .2s}.pc.gapa.cut{background:#b42318}
+.pr-aio{border-left:1px solid var(--pr-line);background:#181818;display:flex;flex-direction:column;min-height:0}
+.aio-bar{display:flex;align-items:center;gap:.8cqw;padding:1.1cqw 1.4cqw;font:800 1.5cqw Inter,sans-serif;color:#fff;border-bottom:1px solid var(--pr-line)}
+.aio-bar svg{width:2cqw;height:1.85cqw;color:#F86820}
+.aio-list{display:grid;gap:.4cqw;padding:.9cqw;overflow:hidden}
+.aio-t{display:flex;align-items:center;gap:.9cqw;padding:.5cqw .8cqw;border-radius:.7cqw;background:transparent;border:0;color:var(--pr-ink);font:600 1.3cqw Inter,sans-serif;text-align:left;cursor:default;white-space:nowrap}
+.aio-t i{display:grid;place-items:center;width:2.4cqw;height:2.4cqw;border-radius:.6cqw;background:var(--c);color:#fff;flex:none}
+.aio-t i svg{width:1.45cqw;height:1.45cqw}
+.aio-t.on{background:#2b2420;box-shadow:inset 0 0 0 1px #F86820}
+.pr-cur{position:absolute;left:0;top:0;z-index:5;pointer-events:none;will-change:transform;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55));opacity:0;transition:opacity .3s}
+.pr-cur.hien{opacity:1}
+.pr-cur svg{width:2.6cqw;height:2.6cqw;min-width:14px;min-height:14px;transition:transform .1s}
+.pr-cur.bam svg{transform:scale(.82)}
+
+/* --- Dải số đo thật --- */
+.stats{padding:72px 0 0}
+.stat-grid{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media (min-width:900px){.stat-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-grid li{padding:24px 22px;border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.stat-grid b{display:block;font-size:clamp(30px,3.6vw,42px);line-height:1;letter-spacing:-.03em;font-weight:800;font-variant-numeric:tabular-nums;color:var(--brand)}
+.stat-grid b em{font-style:normal;font-size:.55em;color:var(--ink-3);font-weight:700}
+.stat-grid span{display:block;margin-top:10px;color:var(--ink-2);font-size:15px;line-height:1.45}
+.stat-grid small{display:block;margin-top:12px;color:var(--ink-3);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+
+/* --- Thẻ tool: icon mỗi tool một màu (đồng bộ với panel AiO Studio: "mỗi tool một màu riêng", anh chốt 22/09) --- */
+.tool .ico{background:color-mix(in srgb,var(--c) 14%,var(--surface));color:color-mix(in srgb,var(--c) 72%,var(--ink))}
+:root[data-theme="dark"] .tool .ico{background:color-mix(in srgb,var(--c) 22%,var(--surface));color:color-mix(in srgb,var(--c) 55%,#fff)}
+.tool-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.tag{flex:none;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap}
+.tag.ok{background:#e4f5ea;color:#175f35}
+.tag.new{background:var(--brand-soft);color:var(--brand-ink)}
+.tag.wip{background:#fff1cc;color:#6b4300}
+.tag.soon{background:var(--bg-soft);color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--line)}
+:root[data-theme="dark"] .tag.ok{background:#173a26;color:#9be3b6}
+:root[data-theme="dark"] .tag.wip{background:#3d2e0a;color:#ffd47a}
+.tool .stat{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-strong);color:var(--ink);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.tool .stat.soon{color:var(--ink-3);font-weight:500}
+
+/* --- Vì sao: 3 khối xen kẽ (chữ | hình), cùng công thức section 2 cột của trang Shot & Save --- */
+.why{padding:96px 0 0}
+.why-row{display:grid;gap:40px;align-items:center}
+.why-row + .why-row{margin-top:120px}   /* = nhịp giữa 2 section .sec của trang chuẩn (24 dưới + 96 trên), đo 25/09 */
+@media (min-width:900px){.why-row{grid-template-columns:.85fr 1.15fr;gap:56px}.why-row.rev{grid-template-columns:1.15fr .85fr}.why-row.rev .why-text{order:2}}
+.why-text h2{text-align:left}
+.why-text p{margin:0;color:var(--ink-2);font-size:var(--fs-sub);max-width:34ch}
+.why-visual{position:relative;aspect-ratio:16/11;border-radius:24px;overflow:hidden;container-type:inline-size;
+  background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line);
+  display:grid;place-items:center;padding:6cqw}
+/* 1: máy của bạn */
+.wv1{position:relative;width:100%;display:grid;grid-template-columns:1fr auto;gap:5cqw;align-items:center}
+.pc-box{position:relative;border-radius:2.6cqw;padding:3.6cqw;background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--line)}
+.pc-box .win{display:flex;align-items:center;gap:1.6cqw;font:600 3cqw/1 Inter,sans-serif;color:var(--ink-2)}
+.pc-box .win i{width:1.8cqw;height:1.8cqw;border-radius:50%;background:var(--line-strong)}
+.pc-box .flow{margin-top:3.4cqw;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2.2cqw}
+.pc-box .node{padding:2.8cqw 2cqw;border-radius:1.8cqw;background:var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line);font:600 2.8cqw/1.3 Inter,sans-serif;text-align:center}
+.pc-box .node.aio{background:var(--brand-soft);color:var(--brand-ink)}
+.pc-box .flow svg{width:6.5cqw;height:6.5cqw;color:var(--brand)}
+.pc-box .viec{margin-top:2.8cqw;display:flex;flex-wrap:wrap;gap:1.2cqw}
+.pc-box .viec span{padding:1.1cqw 1.8cqw;border-radius:999px;background:var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line);font:500 2.2cqw/1 Inter,sans-serif;color:var(--ink-2);white-space:nowrap}
+.pc-box .lock{margin-top:3cqw;display:flex;align-items:center;gap:1.2cqw;font:600 2.5cqw/1 Inter,sans-serif;color:#175f35}
+:root[data-theme="dark"] .pc-box .lock{color:#9be3b6}
+.pc-box .lock svg{width:2.8cqw;height:2.8cqw}
+.cloud{position:relative;display:grid;place-items:center;width:20cqw;height:20cqw;border-radius:50%;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-3)}
+.cloud svg{width:10cqw;height:10cqw}
+.cloud::after{content:"";position:absolute;width:2px;height:70%;background:#b42318;transform:rotate(45deg);border-radius:2px}
+.cloud b{position:absolute;bottom:-4.6cqw;font:600 2.4cqw/1 Inter,sans-serif;color:var(--ink-3);white-space:nowrap}
+/* 2: biên nhận bài thật */
+.wv2{width:100%;display:grid;gap:2.4cqw}
+.rc{display:grid;grid-template-columns:auto 1fr;gap:2.8cqw;align-items:center;padding:3.6cqw 3.8cqw;border-radius:2.2cqw;background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--line);font:600 2.9cqw/1.35 Inter,sans-serif}
+.rc .ok{display:grid;place-items:center;width:6.4cqw;height:6.4cqw;border-radius:1.8cqw;background:#e4f5ea;color:#175f35}
+:root[data-theme="dark"] .rc .ok{background:#173a26;color:#9be3b6}
+.rc .ok svg{width:3.6cqw;height:3.6cqw}
+.rc small{display:block;margin-top:.4cqw;color:var(--ink-3);font-weight:500;font-size:2.3cqw}
+/* 3: đường menu */
+.wv3{position:relative;width:100%;height:100%;display:grid;place-items:center}
+.menu{position:absolute;width:26cqw;border-radius:1.6cqw;padding:1.2cqw;background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--line);font:500 2.3cqw/1 Inter,sans-serif}
+.menu span{display:block;padding:1.6cqw 2cqw;border-radius:1cqw;color:var(--ink-2)}
+.menu span.on{background:var(--brand);color:#fff;font-weight:700}
+/* 3 menu bậc thang trái→phải, ô dock đứng riêng góc phải dưới, không đè nhau (ảnh phóng to 25/09: bản đầu đè 14cqw) */
+.menu.m1{left:0;top:6cqw}.menu.m2{left:18cqw;top:18cqw}.menu.m3{left:36cqw;top:30cqw}
+.wv3 .dock{position:absolute;right:0;bottom:4cqw;width:22cqw;padding:2cqw;border-radius:1.6cqw;background:#181818;color:#fff;font:700 2.2cqw/1 Inter,sans-serif;box-shadow:var(--shadow)}
+.wv3 .dock i{display:block;margin-top:1.6cqw;height:1.4cqw;border-radius:1cqw;background:#2f2f2f}
+.wv3 .dock i.c{background:#F86820;width:60%}
+@media (max-width:520px){.why-visual{padding:5cqw}}
+
+/* --- Ô "Sắp mở bán" (vỏ thẻ giá của trang Shot & Save, không có giá) --- */
+#notify{scroll-margin-top:80px}
+.price-shell{max-width:560px;margin:0 auto;border-radius:28px;padding:8px;background:linear-gradient(180deg,var(--brand-soft),var(--bg-soft));box-shadow:inset 0 0 0 1px var(--line)}
+.price-tag{padding:12px 0 14px;text-align:center;font-weight:600;color:var(--brand-ink);font-size:15px}
+.price{padding:36px 32px 32px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--line)}
+.price-name{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.ph{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px;margin:0 0 24px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.ph-logo{flex:none;display:grid;place-items:center;width:48px;height:48px;color:#f86820}
+.ph-logo svg{width:44px;height:40px}
+.ph-ten small{display:block;margin-top:3px;color:var(--ink-3);font-size:15px}
+.nt-form{display:grid;gap:10px;margin:0 0 22px}
+@media (min-width:480px){.nt-form{grid-template-columns:1fr auto}.nt-form .nt-label,.nt-form .nt-err{grid-column:1/-1}}
+.nt-label{margin:0 0 -2px;font-size:14px;font-weight:600;color:var(--ink-2)}   /* nhãn nhìn thấy, không chỉ placeholder (luật form) */
+.nt-err{margin:0;min-height:20px;font-size:14px;color:#b42318}   /* báo lỗi ngay dưới ô, giữ chỗ sẵn để không xô bố cục */
+:root[data-theme="dark"] .nt-err{color:#ff9a8a}
+.nt-err:empty{visibility:hidden}
+@media (pointer:coarse){.foot-links a{padding:11px 0}}   /* link chân trang 22px → 44px vùng chạm trên điện thoại (chuẩn Shot & Save cũng thiếu, sửa sau ở đó) */
+.nt-form input{min-height:56px;padding:0 18px;border:0;border-radius:16px;background:var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line-strong);font:500 16px Inter,sans-serif;color:var(--ink)}
+.nt-form input::placeholder{color:var(--ink-3)}
+.nt-form input:focus{outline:3px solid var(--brand);outline-offset:2px}
+.nt-form input[aria-invalid="true"]{box-shadow:inset 0 0 0 2px #b42318}
+.nt-form .btn{min-height:56px;font-size:17px;border-radius:16px;padding:0 22px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.list{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:12px}
+.list li{display:flex;gap:14px;align-items:flex-start;font-weight:500}
+.list li .ok{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--brand-soft);color:var(--brand-ink)}
+.list li .ok svg{width:16px;height:16px}
+.price-foot{margin:14px 0 0;text-align:center;color:var(--ink-3);font-size:14px}
+@media (max-width:420px){.price{padding:28px 20px 24px}}
+/* ===== FAQ ===== */
+.faq{max-width:720px;margin:0 auto;display:grid;gap:10px}
+details{border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:56px;padding:14px 20px;cursor:pointer;font-weight:600;font-size:17px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";flex:none;width:10px;height:10px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(45deg) translateY(-3px);transition:transform .2s ease}
+details[open] summary::after{transform:rotate(225deg) translateY(-2px)}
+details p{margin:0;padding:0 20px 18px;color:var(--ink-2)}
+
+/* ===== Cuối trang ===== */
+.end{padding:96px 0;text-align:center}
+.end h2{margin-bottom:24px}
+footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--ink-3);font-size:14px}
+.foot-links{display:flex;gap:16px}.foot-links a{color:var(--ink-2);text-decoration:none}.foot-links a:hover{color:var(--ink);text-decoration:underline}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:12px 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;transition:opacity .2s ease,transform .2s ease;z-index:90;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i="skip">Skip to content</a>
+
+<header id="top">
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="AiO Studio">
+      <svg viewBox="0 0 386 352" aria-hidden="true"><path fill="#F86820" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="#F86820" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>
+      AiO Studio<span class="logo-sub" data-i="logoSub">for Premiere Pro</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#tools" data-i="navTools">Tools</a>
+      <a href="#why" data-i="navWhy">Why AiO</a>
+      <a href="#faq" data-i="navFaq">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <button type="button" class="theme" id="theme" aria-label="Switch to dark mode" data-i-aria="themeToDark">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="vi" aria-pressed="false">VI</button>
+      </div>
+      <a class="btn btn-main" href="#notify"><span data-i="navNotify">Notify me</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow"><i></i><span data-i="eyebrow">Plugins for Adobe Premiere Pro · Windows</span></span>
+      <h1 data-i-html="h1"><span class="h1a">The boring half of editing,</span><br><em>done inside Premiere.</em></h1>
+      <p class="lede" data-i="lede">Eleven tools that dock into Premiere Pro: cut silence, follow the speaker across cameras, caption in English or Vietnamese, frame for every platform, pull footage in. No exports, no uploads, no round trips.</p>
+      <div class="hero-cta">
+        <a class="btn btn-main" href="#notify" data-i="heroNotify">Notify me at launch</a>
+        <a class="btn btn-ghost" href="#tools" data-i="heroSee">See the tools</a>
+      </div>
+
+      <!-- Cửa sổ Premiere giả lập: tự diễn Auto Cut → Auto Podcast → Transcripts → Guideline Frame, lặp. Chỉ để nhìn (aria-hidden). -->
+      <div class="demo">
+        <div class="pr" id="pr" aria-hidden="true">
+          <div class="pr-bar"><span class="pr-dots"><i></i><i></i><i></i></span><span class="pr-title">Premiere Pro</span><span class="pr-seq" data-i="prSeq">Sequence 01 · 1920×1080</span></div>
+          <div class="pr-body">
+            <div class="pr-left">
+              <div class="pr-mon" id="prMon">
+                <div class="pr-vid" id="prVid" data-cam="a"><i class="s"></i><i class="h"></i><i class="s2"></i><i class="h2"></i></div>
+                <div class="pr-safe" id="prSafe"><i class="sz t"></i><i class="sz r"></i><i class="sz b"></i><b class="sz-tag">TikTok</b></div>
+                <div class="pr-cap" id="prCap"></div>
+                <span class="pr-cam" id="prCam">CAM A</span>
+                <span class="pr-chip" id="prChip"></span>
+              </div>
+              <div class="pr-tl" id="prTl">
+                <div class="pr-head" id="prHead"></div>
+                <div class="tr"><b>C1</b><div class="lane" id="laneC"></div></div>
+                <div class="tr"><b>V3</b><div class="lane" id="laneV3"></div></div>
+                <div class="tr"><b>V2</b><div class="lane" id="laneV2"></div></div>
+                <div class="tr"><b>V1</b><div class="lane" id="laneV1"></div></div>
+                <div class="tr"><b>A1</b><div class="lane" id="laneA1"></div></div>
+              </div>
+            </div>
+            <aside class="pr-aio">
+              <div class="aio-bar"><svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>AiO Studio</div>
+              <div class="aio-list" id="aioList">
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#F86820"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></i><span>Auto Cut</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#7c4dff"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4M8 22h8"/></svg></i><span>Auto Podcast</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#2f80ed"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M6 12h4M6 16h8M14 12h4"/></svg></i><span>Transcripts</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#e5397b"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="m12 8 .9 2.1 2.1.3-1.5 1.5.4 2.1-1.9-1-1.9 1 .4-2.1L9 10.4l2.1-.3z" fill="currentColor" stroke="none"/></svg></i><span>Auto Short Viral</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#0f9d8a"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg></i><span>Guideline Frame</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#5b5fc7"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2" opacity=".5"/><rect x="8.5" y="2" width="7" height="20" rx="2"/></svg></i><span>Re-Frames</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#c98a00"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v3"/><path d="M3 7v10a2 2 0 0 0 2 2h6"/><circle cx="17" cy="17" r="3.5"/><path d="m19.5 19.5 2 2"/></svg></i><span>Asset Manager</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#2e9e4f"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M9 6V4a3 3 0 0 1 6 0v2M8 14h8"/></svg></i><span>Power Bins</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#0ea5e9"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></i><span>Video Download</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#8d6e63"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v15a2 2 0 0 0 2 2h4M4 11h6"/><rect x="12" y="2" width="9" height="5" rx="1.5"/><rect x="12" y="9.5" width="9" height="5" rx="1.5"/><rect x="12" y="17" width="9" height="5" rx="1.5"/></svg></i><span>Organize Folder</span></button>
+                <button type="button" tabindex="-1" class="aio-t" style="--c:#c026d3"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></i><span>Keynote</span></button>
+              </div>
+            </aside>
+          </div>
+          <div class="pr-cur" id="prCur"><svg viewBox="0 0 24 24"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dải số đo thật (mỗi số có nguồn trong repo: Autocut/PROGRESS 28/07 · Podcast/CLAUDE 06/08 · Autocut/PROGRESS 29/07 · Asset Manager/CLAUDE 29/07) -->
+  <section class="stats" aria-label="Measured results">
+    <div class="wrap">
+      <ul class="stat-grid">
+        <li data-hien><b data-n="413">413</b><span data-i="s1">silences cut from a 58-minute talk, 0 words lost</span><small>Auto Cut</small></li>
+        <li data-hien><b>588<em>/588</em></b><span data-i="s2">camera switches landed on the person talking</span><small>Auto Podcast</small></li>
+        <li data-hien><b>2:23</b><span data-i="s3">to caption 60 minutes of Vietnamese, 765 of 765 lines kept</span><small>Transcripts</small></li>
+        <li data-hien><b data-n="28846">28,846</b><span data-i="s4">assets searchable without leaving Premiere</span><small>Asset Manager</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="tools">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 data-i="toolsTitle">Eleven tools. One dock.</h2>
+        <p data-i="toolsSub">Every panel lives inside Premiere Pro. Open the AiO Studio hub, pick a tool, keep editing.</p>
+      </div>
+      <div class="grid">
+        <article class="card tool" data-hien style="--c:#F86820">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Auto Cut</h3>
+          <p data-i="t1p">Finds the silences in speech, cuts them and closes the gaps. Breathing room stays.</p>
+          <p class="stat" data-i="t1s">58-minute talk: 413 cuts, 4 min 03 s shorter, 0 words lost.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#7c4dff">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4M8 22h8"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Auto Podcast</h3>
+          <p data-i="t2p">Two or three cameras and a mic. It switches to whoever is talking, drops in the wide shot, ducks the music.</p>
+          <p class="stat" data-i="t2s">58-minute episode: 588 of 588 switches on the speaker, 0 black frames.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#2f80ed">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M6 12h4M6 16h8M14 12h4"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Transcripts</h3>
+          <p data-i="t3p">Mark in and out, press once. Captions land on the sequence, with a marker wherever it wasn't sure.</p>
+          <p class="stat" data-i="t3s">60 minutes of Vietnamese: 2 min 23 s. 765 of 765 lines kept.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#e5397b">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="m12 8 .9 2.1 2.1.3-1.5 1.5.4 2.1-1.9-1-1.9 1 .4-2.1L9 10.4l2.1-.3z" fill="currentColor" stroke="none"/></svg></div><span class="tag new" data-i="tNew">New</span></div>
+          <h3>Auto Short Viral</h3>
+          <p data-i="t4p">Reads an interview and splits it into question and answer cards. Pick the cards, get a sequence for each.</p>
+          <p class="stat" data-i="t4s">40-minute interview: 61 cards. 20-minute sequence: 37 cards in 0.25 s.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#0f9d8a">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><rect x="7.5" y="7.5" width="9" height="9" rx="1.5" stroke-dasharray="2 2"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Auto Guideline Frame</h3>
+          <p data-i="t5p">Overlays the safe zones of TikTok, Reels, Shorts and seven more platforms, right on your sequence.</p>
+          <p class="stat" data-i="t5s">4K sequence, 306 clips: guides placed in 0.74 s. 10 platforms, 53 zones.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#5b5fc7">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2" opacity=".45"/><rect x="8.5" y="2" width="7" height="20" rx="2"/></svg></div><span class="tag wip" data-i="tWip">In progress</span></div>
+          <h3>Auto Re-Frames</h3>
+          <p data-i="t6p">One click turns a landscape sequence into 9:16 with the subject tracked. Mark a range to track just that part.</p>
+          <p class="stat" data-i="t6s">Vertical sequence ready in 3.9 s.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#c98a00">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v3"/><path d="M3 7v10a2 2 0 0 0 2 2h6"/><circle cx="17" cy="17" r="3.5"/><path d="m19.5 19.5 2 2"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Asset Manager</h3>
+          <p data-i="t7p">Point it at your drives. Video, music, SFX, mogrt and presets, searchable and previewable inside Premiere.</p>
+          <p class="stat" data-i="t7s">28,846 assets indexed, previews included.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#2e9e4f">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M9 6V4a3 3 0 0 1 6 0v2M8 14h8M8 18h8"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Power Bins</h3>
+          <p data-i="t8p">Brand kits that follow you. Logos, intros and music pinned once, visible in every project you open.</p>
+          <p class="stat" data-i="t8s">Open another project: still there. Thumbnails and proxies pre-rendered.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#0ea5e9">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div><span class="tag ok" data-i="tReady">Ready</span></div>
+          <h3>Video Download</h3>
+          <p data-i="t9p">Paste a link. The video lands next to your project and in its own bin, ready to drag onto the timeline.</p>
+          <p class="stat" data-i="t9s">YouTube 1080p: 256 MB in about 30 seconds.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#8d6e63">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v15a2 2 0 0 0 2 2h4M4 11h6"/><rect x="12" y="2" width="9" height="5" rx="1.5"/><rect x="12" y="9.5" width="9" height="5" rx="1.5"/><rect x="12" y="17" width="9" height="5" rx="1.5"/></svg></div><span class="tag soon" data-i="tSoon">Coming soon</span></div>
+          <h3>Auto Organize Folder</h3>
+          <p data-i="t10p">One click sorts your project bins and mirrors the same structure on disk: footage, A-roll, B-roll, music, graphics.</p>
+          <p class="stat soon" data-i="t10s">In planning.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#c026d3">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="tag soon" data-i="tSoon">Coming soon</span></div>
+          <h3>Keynote</h3>
+          <p data-i="t11p">Music, sound and rhythm for your cut. Being reshaped, details soon.</p>
+          <p class="stat soon" data-i="t11s">In planning.</p>
+        </article>
+        <article class="card tool" data-hien style="--c:#16110d">
+          <div class="tool-top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><span class="tag new" data-i="tNew">New</span></div>
+          <h3>AiO Studio hub</h3>
+          <p data-i="t12p">One panel that opens every tool. Each in its own colour, ready in a click, in Vietnamese or English.</p>
+          <p class="stat" data-i="t12s">Fits 11 panel sizes with nothing cut off.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="why" id="why">
+    <div class="wrap">
+      <div class="why-row">
+        <div class="why-text" data-hien>
+          <h2 data-i="why1t">Your footage stays on your machine.</h2>
+          <p data-i="why1p">Speech recognition and video processing run on your PC. Nothing is uploaded, nothing waits in a queue. The only tool that touches the internet is Video Download, for the link you paste.</p>
+        </div>
+        <div class="why-visual" data-hien aria-hidden="true">
+          <div class="wv1">
+            <div class="pc-box">
+              <div class="win"><i></i><span data-i="wvWin">Premiere Pro · your PC</span></div>
+              <div class="flow">
+                <div class="node" data-i="wvFoot">Your footage</div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <div class="node aio">AiO Studio</div>
+              </div>
+              <div class="viec"><span data-i="wvV1">Speech recognition</span><span data-i="wvV2">Silence detection</span><span data-i="wvV3">Caption render</span><span data-i="wvV4">Camera switching</span></div>
+              <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i="wvLock">Nothing leaves this box</span></div>
+            </div>
+            <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H7a5 5 0 0 1-.9-9.9A7 7 0 0 1 19.6 12 3.5 3.5 0 0 1 17.5 19z"/></svg><b data-i="wvCloud">No upload</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="why-row rev">
+        <div class="why-text" data-hien>
+          <h2 data-i="why2t">Used on real edits before it's sold.</h2>
+          <p data-i="why2p">Every tool ships only after it survives a real job: a 58-minute talk, a 40-minute two-camera podcast, a 4K sequence with 306 clips. If it loses a word, it doesn't ship.</p>
+        </div>
+        <div class="why-visual" data-hien aria-hidden="true">
+          <div class="wv2">
+            <div class="rc"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><div><span data-i="rc1">58:37 talk · 413 cuts · 0 words lost</span><small data-i="rc1s">Auto Cut, checked by ear</small></div></div>
+            <div class="rc"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><div><span data-i="rc2">40:27 podcast · 411 switches · no wrong cuts heard</span><small data-i="rc2s">Auto Podcast, two people and a wide</small></div></div>
+            <div class="rc"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><div><span data-i="rc3">4K · 306 clips · guides placed in 0.74 s</span><small data-i="rc3s">Auto Guideline Frame</small></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="why-row">
+        <div class="why-text" data-hien>
+          <h2 data-i="why3t">Install once. Dock anywhere.</h2>
+          <p data-i="why3p">A normal installer, no admin rights. Then Window › Extensions › AiO Studio, and every tool docks like any other Premiere panel. Windows today, Mac later.</p>
+        </div>
+        <div class="why-visual" data-hien aria-hidden="true">
+          <div class="wv3">
+            <div class="menu m1"><span>File</span><span>Edit</span><span class="on">Window</span></div>
+            <div class="menu m2"><span>Workspaces</span><span class="on">Extensions</span><span>Timeline</span></div>
+            <div class="menu m3"><span class="on">AiO Studio</span><span>Auto Cut</span><span>Transcripts</span></div>
+            <div class="dock"><span>AiO Studio</span><i class="c"></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="notify-sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 data-i="ntTitle">Opening soon.</h2>
+        <p data-i="ntSub">The suite is in its last stretch of real-world testing. Leave your email and you'll get one message when it opens, with the price.</p>
+      </div>
+      <div class="price-shell" id="notify" data-hien>
+        <div class="price-tag" data-i="ntTag">Coming soon</div>
+        <div class="price">
+          <div class="ph">
+            <span class="ph-logo"><svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+            <div class="ph-ten"><h3 class="price-name">AiO Studio for Premiere Pro</h3><small data-i="ntWhat">Eleven tools, one dock. Windows.</small></div>
+          </div>
+          <form class="nt-form" id="ntForm" novalidate>
+            <label class="nt-label" for="ntEmail" data-i="ntLabel">Your email</label>
+            <input id="ntEmail" type="email" inputmode="email" autocomplete="email" required placeholder="you@studio.com" data-i-ph="ntPh" aria-describedby="ntErr">
+            <button class="btn btn-main" type="submit" data-i="ntBtn">Notify me</button>
+            <p class="nt-err" id="ntErr" role="alert"></p>
+          </form>
+          <ul class="list">
+            <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="ntLi1">One email when it opens, with the price</span></li>
+            <li><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-i="ntLi2">No newsletter, and your address is never shared</span></li>
+          </ul>
+          <p class="price-foot" data-i="ntFoot">Windows first. Mac is planned.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="wrap">
+      <div class="sec-head"><h2 data-i="faqTitle">Questions</h2></div>
+      <div class="faq">
+        <details><summary data-i="q1">Does it work with DaVinci Resolve or Final Cut?</summary><p data-i="a1">No. Every tool is a Premiere Pro panel and lives inside Premiere.</p></details>
+        <details><summary data-i="q2">Is there a Mac version?</summary><p data-i="a2">Windows first. Mac is planned: the panels themselves run there, but the speech and video engines are still Windows builds.</p></details>
+        <details><summary data-i="q3">Does my footage get uploaded anywhere?</summary><p data-i="a3">No. Speech recognition and video processing run on your machine. The only tool that uses the internet is Video Download, for the link you paste.</p></details>
+        <details><summary data-i="q4">Do I need admin rights to install?</summary><p data-i="a4">No. The installer runs under your own user account and turns on the one Premiere setting the panels need.</p></details>
+        <details><summary data-i="q5">When does it open, and what will it cost?</summary><p data-i="a5">Soon. Leave your email above and you'll get exactly one message when it opens, with the price in it.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="end">
+    <div class="wrap">
+      <h2 data-i-html="endTitle">Less busywork.<br>More cuts that matter.</h2>
+      <a class="btn btn-main" href="#notify" data-i="endBtn">Notify me at launch</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 AiO Studio</span>
+    <nav class="foot-links" aria-label="More"><a href="../" data-i="fShot">Shot &amp; Save</a><a href="../legal.html#terms" data-i="fTerms">Terms</a><a href="../legal.html#privacy" data-i="fPrivacy">Privacy</a></nav>
+    <span data-i="footRight">Made by a working editor.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" defer></script>
+<script>
+// ===== Song ngữ: EN viết thẳng trong HTML (nguồn chuẩn), VI ở bảng dưới. Cùng cơ chế + cùng khoá lưu (ss-lang) với trang Shot & Save. =====
+const T = {
+  vi: {
+    skip:"Bỏ qua tới nội dung", logoSub:"cho Premiere Pro", navTools:"Công cụ", navWhy:"Vì sao", navFaq:"Hỏi đáp", navNotify:"Báo khi mở bán",
+    themeToDark:"Chuyển sang nền tối", themeToLight:"Chuyển sang nền sáng",
+    eyebrow:"Bộ công cụ cho Adobe Premiere Pro · Windows",
+    h1:"<span class=\"h1a\">Việc tẻ nhạt khi dựng phim,</span><br><em>xong ngay trong Premiere.</em>",
+    lede:"Mười một công cụ cắm thẳng vào Premiere Pro: cắt khoảng lặng, tự bật đúng cam của người đang nói, phụ đề tiếng Việt hoặc tiếng Anh, khung an toàn cho từng nền tảng, tải video vào bin. Không xuất file, không đưa lên mạng, không đi vòng.",
+    heroNotify:"Báo tôi khi mở bán", heroSee:"Xem các công cụ",
+    prSeq:"Sequence 01 · 1920×1080",
+    prCap:"Mỗi công cụ chỉ phát hành sau khi qua một bài dựng thật.",
+    prChip1:"413 nhát cắt · 0 chữ mất", prChip2:"588/588 đúng người nói", prChip3:"60 phút trong 2:23", prChip4:"10 nền tảng · 53 vùng",
+    s1:"khoảng lặng được cắt khỏi bài nói 58 phút, không mất chữ nào", s2:"lần đổi cam đúng người đang nói", s3:"để làm phụ đề cho 60 phút tiếng Việt, đủ 765/765 câu", s4:"file tìm được mà không rời Premiere",
+    toolsTitle:"Mười một công cụ. Một chỗ mở.", toolsSub:"Mọi panel nằm ngay trong Premiere Pro. Mở AiO Studio, chọn công cụ, dựng tiếp.",
+    tReady:"Sẵn sàng", tNew:"Mới", tWip:"Đang làm", tSoon:"Sắp có",
+    t1p:"Tìm khoảng lặng trong lời nói, cắt bỏ và dồn clip lại. Nhịp thở vẫn giữ.", t1s:"Bài nói 58 phút: 413 nhát cắt, ngắn đi 4 phút 03 giây, không mất chữ nào.",
+    t2p:"Hai ba cam và một mic. Tool tự bật đúng cam của người đang nói, chèn cảnh rộng, hạ nhạc nền.", t2s:"Tập 58 phút: 588/588 lần đổi cam đúng người, 0 khung đen.",
+    t3p:"Khoanh in/out, bấm một lần. Phụ đề nằm ngay trên sequence, chỗ nào máy nghe không chắc thì có marker.", t3s:"60 phút tiếng Việt: 2 phút 23 giây. Đủ 765/765 câu.",
+    t4p:"Đọc buổi phỏng vấn rồi chia thành các thẻ hỏi đáp. Chọn thẻ, mỗi thẻ ra một sequence.", t4s:"Phỏng vấn 40 phút: 61 thẻ. Sequence 20 phút: 37 thẻ trong 0,25 giây.",
+    t5p:"Phủ vùng an toàn của TikTok, Reels, Shorts và bảy nền tảng nữa lên thẳng sequence.", t5s:"Sequence 4K, 306 clip: đặt khung trong 0,74 giây. 10 nền tảng, 53 vùng.",
+    t6p:"Một cú bấm đổi sequence ngang thành dọc 9:16, tự bám chủ thể. Khoanh đoạn nào thì chỉ bám đoạn đó.", t6s:"Sequence dọc sẵn sàng sau 3,9 giây.",
+    t7p:"Chỉ vào ổ cứng của bạn. Video, nhạc, SFX, mogrt, preset: tìm được, xem thử được, ngay trong Premiere.", t7s:"28.846 file đã lập chỉ mục, kèm bản xem thử.",
+    t8p:"Bộ nhận diện thương hiệu đi theo bạn. Logo, intro, nhạc nền ghim một lần, mở project nào cũng thấy.", t8s:"Mở project khác: vẫn còn nguyên. Thumbnail và proxy dựng sẵn.",
+    t9p:"Dán link. Video về nằm cạnh project và tự vào bin riêng, kéo lên timeline là xong.", t9s:"YouTube 1080p: 256 MB trong khoảng 30 giây.",
+    t10p:"Một cú bấm sắp xếp bin trong project và tạo đúng cấu trúc đó trên ổ cứng: footage, A-roll, B-roll, nhạc, đồ hoạ.", t10s:"Đang lên kế hoạch.",
+    t11p:"Nhạc, âm thanh và nhịp cho bài dựng. Đang định hình lại, chi tiết sẽ có sau.", t11s:"Đang lên kế hoạch.",
+    t12p:"Một panel mở được mọi công cụ. Mỗi tool một màu, bấm là mở, tiếng Việt hoặc tiếng Anh.", t12s:"Vừa 11 cỡ panel, không cắt mất chữ nào.",
+    why1t:"Video của bạn ở yên trên máy bạn.", why1p:"Nhận dạng giọng nói và xử lý video chạy trên chính máy bạn. Không tải lên đâu, không xếp hàng chờ. Công cụ duy nhất dùng mạng là Video Download, cho đúng cái link bạn dán.",
+    wvWin:"Premiere Pro · máy của bạn", wvFoot:"Video của bạn", wvLock:"Không gì rời khỏi máy", wvCloud:"Không tải lên",
+    wvV1:"Nhận dạng giọng nói", wvV2:"Dò khoảng lặng", wvV3:"Dựng phụ đề", wvV4:"Đổi cam",
+    why2t:"Dùng trên bài thật trước khi bán.", why2p:"Mỗi công cụ chỉ được phát hành sau khi qua một bài dựng thật: bài nói 58 phút, podcast hai cam 40 phút, sequence 4K 306 clip. Mất một chữ là chưa phát hành.",
+    rc1:"Bài nói 58:37 · 413 nhát cắt · 0 chữ mất", rc1s:"Auto Cut, nghe lại bằng tai", rc2:"Podcast 40:27 · 411 lần đổi cam · nghe lại không thấy sai", rc2s:"Auto Podcast, hai người và một cảnh rộng", rc3:"4K · 306 clip · đặt khung trong 0,74 giây", rc3s:"Auto Guideline Frame",
+    why3t:"Cài một lần. Cắm vào đâu cũng được.", why3p:"Bộ cài bình thường, không cần quyền admin. Rồi Window › Extensions › AiO Studio, mọi công cụ cắm vào như panel Premiere bình thường. Windows trước, Mac sau.",
+    ntTitle:"Sắp mở bán.", ntSub:"Bộ công cụ đang ở chặng thử nghiệm cuối trên bài thật. Để lại email, bạn sẽ nhận đúng một thư khi mở bán, kèm giá.",
+    ntTag:"Sắp mở bán", ntWhat:"Mười một công cụ, một chỗ mở. Windows.", ntLabel:"Email của bạn", ntPh:"ban@studio.com", ntBtn:"Báo tôi khi mở bán",
+    ntLi1:"Một thư khi mở bán, kèm giá", ntLi2:"Không bản tin, không chia sẻ địa chỉ của bạn", ntFoot:"Windows trước. Mac đang trong kế hoạch.",
+    ntToast:"Bản nháp: chưa nối gửi, chưa lưu gì cả.", ntErr:"Bạn kiểm tra lại địa chỉ email giúp nhé.",
+    faqTitle:"Hỏi đáp",
+    q1:"Có chạy với DaVinci Resolve hay Final Cut không?", a1:"Không. Mọi công cụ đều là panel của Premiere Pro, nằm ngay trong Premiere.",
+    q2:"Có bản Mac không?", a2:"Windows trước. Bản Mac đang trong kế hoạch: panel thì chạy được, nhưng bộ máy nhận dạng giọng nói và xử lý video hiện mới có bản Windows.",
+    q3:"Video của tôi có bị tải lên đâu không?", a3:"Không. Nhận dạng giọng nói và xử lý video chạy trên máy bạn. Chỉ Video Download dùng mạng, cho đúng cái link bạn dán.",
+    q4:"Cài có cần quyền admin không?", a4:"Không. Bộ cài chạy theo tài khoản người dùng của bạn và tự bật một thiết lập của Premiere mà panel cần.",
+    q5:"Khi nào mở bán, giá bao nhiêu?", a5:"Sớm thôi. Để lại email ở trên, bạn nhận đúng một thư khi mở bán, trong đó có giá.",
+    endTitle:"Bớt việc lặt vặt.<br>Dành sức cho những nhát cắt đáng giá.", endBtn:"Báo tôi khi mở bán",
+    fShot:"Shot & Save", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư", footRight:"Làm bởi một editor đang dựng phim mỗi ngày."
+  },
+  en: { themeToLight:"Switch to light mode", prCap:"Every tool ships only after it survives a real edit.", prChip1:"413 cuts · 0 words lost", prChip2:"588/588 on the speaker", prChip3:"60 min in 2:23", prChip4:"10 platforms · 53 zones", ntToast:"Draft: not connected yet, nothing was sent.", ntErr:"Please check that email address." }
+};
+document.querySelectorAll("[data-i]").forEach(el => T.en[el.dataset.i] = el.textContent);
+document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] = el.innerHTML);
+document.querySelectorAll("[data-i-aria]").forEach(el => T.en[el.dataset.iAria] = el.getAttribute("aria-label"));
+document.querySelectorAll("[data-i-ph]").forEach(el => T.en[el.dataset.iPh] = el.getAttribute("placeholder"));
+window.ssT = k => (T[lang] && T[lang][k]) || T.en[k] || "";
+let lang = "en";
+// Chống "chữ mồ côi": dính 2 chữ cuối bằng dấu cách không ngắt (chép từ trang Shot & Save)
+function chongMoCoi(el) {
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n, cuoi = null;
+  while ((n = w.nextNode())) if (n.nodeValue.trim()) cuoi = n;
+  if (!cuoi) return;
+  const s = cuoi.nodeValue, i = s.trimEnd().lastIndexOf(" ");
+  if (i >= 0 && (i > 0 || cuoi.previousSibling)) cuoi.nodeValue = s.slice(0, i) + " " + s.slice(i + 1);
+}
+function setLang(l){
+  lang = T[l] ? l : "en";
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i]").forEach(el => { const v = d[el.dataset.i]; if (v != null) el.textContent = v; });
+  document.querySelectorAll("[data-i-html]").forEach(el => { const v = d[el.dataset.iHtml]; if (v != null) el.innerHTML = v; });
+  document.querySelectorAll("[data-i-aria]").forEach(el => { const v = d[el.dataset.iAria]; if (v != null) el.setAttribute("aria-label", v); });
+  document.querySelectorAll("[data-i-ph]").forEach(el => { const v = d[el.dataset.iPh]; if (v != null) el.setAttribute("placeholder", v); });
+  document.querySelectorAll("[data-i],[data-i-html]").forEach(chongMoCoi);
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  try { localStorage.setItem("ss-lang", lang); } catch (e) {}
+  if (window.ssRelang) window.ssRelang();
+}
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+let saved = null;
+try { saved = localStorage.getItem("ss-lang"); } catch (e) {}
+setLang(saved || ((navigator.language || "").toLowerCase().startsWith("vi") ? "vi" : "en"));
+
+const toast = document.getElementById("toast");
+window.ssToast = key => {
+  toast.textContent = window.ssT(key);
+  toast.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove("show"), 3500);
+};
+
+// ---- Ô để lại email: BẢN NHÁP chưa nối đi đâu, nói thẳng bằng toast (không hứa "đã gửi") ----
+(() => {
+  const f = document.getElementById("ntForm"), inp = document.getElementById("ntEmail"), err = document.getElementById("ntErr");
+  const hopLe = () => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(inp.value.trim());
+  const baoLoi = co => { inp.setAttribute("aria-invalid", String(co)); err.textContent = co ? window.ssT("ntErr") : ""; };
+  inp.addEventListener("blur", () => { if (inp.value.trim()) baoLoi(!hopLe()); });   // kiểm khi rời ô (luật form), không đợi bấm gửi
+  inp.addEventListener("input", () => { if (inp.getAttribute("aria-invalid") === "true" && hopLe()) baoLoi(false); });
+  f.addEventListener("submit", e => {
+    e.preventDefault();
+    if (!hopLe()) { baoLoi(true); inp.focus(); return; }
+    baoLoi(false); window.ssToast("ntToast");
+  });
+})();
+
+// ---- Sáng / tối: mặc định theo máy khách, bấm nút thì ghi nhớ (cùng khoá ss-theme với trang Shot & Save) ----
+const themeBtn = document.getElementById("theme");
+const darkMQ = matchMedia("(prefers-color-scheme: dark)");
+let themeChon = null;
+try { themeChon = localStorage.getItem("ss-theme"); } catch (e) {}
+function apTheme() {
+  const dark = themeChon ? themeChon === "dark" : darkMQ.matches;
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  themeBtn.classList.toggle("is-dark", dark);
+  const k = dark ? "themeToLight" : "themeToDark";
+  themeBtn.dataset.iAria = k;
+  themeBtn.setAttribute("aria-label", window.ssT(k));
+}
+themeBtn.addEventListener("click", () => {
+  themeChon = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  try { localStorage.setItem("ss-theme", themeChon); } catch (e) {}
+  apTheme();
+});
+darkMQ.addEventListener("change", () => { if (!themeChon) apTheme(); });
+apTheme();
+
+const header = document.querySelector("header");
+addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8), { passive: true });
+
+// ===== Hiện dần khi cuộn tới: thẻ tool lần lượt (70 ms) + icon nảy; dải số đếm lên =====
+(() => {
+  document.documentElement.classList.add("hien-js");
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cards = [...document.querySelectorAll(".grid .card")];
+  cards.forEach((c, i) => c.style.setProperty("--tre", (i % 3) * 70 + "ms"));   // mỗi hàng 3 thẻ lần lượt; hàng dưới không chờ hàng trên
+  document.querySelectorAll(".stat-grid li").forEach((c, i) => c.style.setProperty("--tre", i * 70 + "ms"));
+  const choi = c => { c.classList.remove("choi"); void c.offsetWidth; c.classList.add("choi"); clearTimeout(c._t); c._t = setTimeout(() => c.classList.remove("choi"), 900); };
+  cards.forEach(c => c.addEventListener("mouseenter", () => { if (!giam) choi(c); }));
+  const dinhDang = n => n.toLocaleString(document.documentElement.lang === "vi" ? "vi-VN" : "en-US");
+  const demSo = b => {
+    const dich = +b.dataset.n; if (!dich || giam || !window.gsap) { b.textContent = dinhDang(dich || +b.textContent.replace(/\D/g, "")); return; }
+    const o = { v: 0 }; gsap.to(o, { v: dich, duration: 1.2, ease: "expo.out", delay: .15, onUpdate() { b.textContent = dinhDang(Math.round(o.v)); } });
+  };
+  window.ssRelang = () => document.querySelectorAll(".stat-grid b[data-n]").forEach(b => { if (b.closest("li").classList.contains("hien")) b.textContent = dinhDang(+b.dataset.n); });
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    el.classList.add("hien"); io.unobserve(el);
+    if (el.classList.contains("card") && !giam) setTimeout(() => choi(el), parseInt(el.style.getPropertyValue("--tre")) + 300);
+    el.querySelectorAll("b[data-n]").forEach(demSo);
+  }), { threshold: .2 });
+  document.querySelectorAll("[data-hien]").forEach(el => io.observe(el));
+  window.ssHien = { epHien: () => document.querySelectorAll("[data-hien]").forEach(el => { if (!el.classList.contains("hien")) { el.classList.add("hien"); el.querySelectorAll("b[data-n]").forEach(b => b.textContent = dinhDang(+b.dataset.n)); } }) };   // chỉ để đo
+})();
+
+// ===== Đầu trang: cửa sổ Premiere tự diễn 4 công cụ (GSAP, chỉ transform/opacity/width trong khung nhỏ). Ngoài màn hình: tạm dừng. =====
+(() => {
+  const pr = document.getElementById("pr"); if (!pr) return;
+  const q = s => pr.querySelector(s), qa = s => [...pr.querySelectorAll(s)];
+  const cur = q("#prCur"), head = q("#prHead"), cap = q("#prCap"), safe = q("#prSafe"), cam = q("#prCam"), chip = q("#prChip"), vid = q("#prVid");
+  const lanes = { c: q("#laneC"), v3: q("#laneV3"), v2: q("#laneV2"), v1: q("#laneV1"), a1: q("#laneA1") };
+  const rows = qa(".aio-t");
+  const Tk = k => window.ssT ? window.ssT(k) : k;
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const CLIP = (cls, l, w, txt = "") => `<i class="clip ${cls}" style="left:${l}%;width:${w}%">${txt}</i>`;
+  const datLanes = o => { for (const k in lanes) lanes[k].innerHTML = o[k] || ""; };
+  const goc = () => {
+    datLanes({ v1: CLIP("v", 0, 100, "A-Cam.mp4"), a1: CLIP("a", 0, 100) });
+    cap.classList.remove("on"); safe.classList.remove("on"); cam.classList.remove("on"); chip.classList.remove("on"); head.classList.remove("on");
+    head.style.left = lanes.v1.offsetLeft + "px"; vid.dataset.cam = "a"; rows.forEach(r => r.classList.remove("on"));
+  };
+  goc();
+  // Không chuyển động / không GSAP: dựng sẵn cảnh Auto Cut đã cắt xong (khung hình đầu vẫn đẹp)
+  const tinh = () => {
+    rows[0].classList.add("on");
+    const w = [14, 16, 12, 18, 20];
+    lanes.v1.innerHTML = `<div class="pieces">${w.map(x => `<i class="pc talk" style="width:${x}%;margin-right:.3cqw"></i>`).join("")}</div>`;
+    lanes.a1.innerHTML = `<div class="pieces">${w.map(x => `<i class="pc wave" style="width:${x}%;margin-right:.3cqw"></i>`).join("")}</div>`;
+    chip.textContent = Tk("prChip1"); chip.classList.add("on");
+  };
+  if (giam) { tinh(); return; }
+
+  let thay = false; const tweens = new Set(); const chay = () => thay && !document.hidden;
+  const capNhat = () => tweens.forEach(t => chay() ? t.resume() : t.pause());
+  new IntersectionObserver(es => { thay = es[0].isIntersecting; capNhat(); }, { threshold: .25 }).observe(pr);
+  document.addEventListener("visibilitychange", capNhat);
+  const tw = (t, vars) => new Promise(res => {
+    const x = gsap.to(t, Object.assign({}, vars, { onComplete() { tweens.delete(x); if (vars.onComplete) vars.onComplete(); res(); } }));
+    tweens.add(x); if (!chay()) x.pause();
+  });
+  const ngu = ms => tw({}, { duration: ms / 1000 });
+  const nhip = ms => ms * (.85 + Math.random() * .3);   // ±15% cho khỏi đều như máy (luật 24/09)
+  const rel = el => { const r = el.getBoundingClientRect(), v = pr.getBoundingClientRect(); return { x: r.left - v.left, y: r.top - v.top, w: r.width, h: r.height }; };
+  let cx = 0, cy = 0;
+  const dat = (x, y) => { cx = x; cy = y; cur.style.transform = `translate3d(${x}px,${y}px,0)`; };
+  const di = (x, y, ms, ease = "expo.inOut") => { const x0 = cx, y0 = cy, o = { k: 0 }, cong = Math.min(40, Math.abs(x - x0) * .12); return tw(o, { k: 1, duration: ms / 1000, ease, onUpdate() { dat(x0 + (x - x0) * o.k, y0 + (y - y0) * o.k - cong * Math.sin(Math.PI * o.k)); } }); };
+  const quet = (ms, moi) => { head.classList.add("on"); const o = { p: 0 }, x0 = lanes.v1.offsetLeft, w = lanes.v1.clientWidth; return tw(o, { p: 100, duration: ms / 1000, ease: "none", onUpdate() { head.style.left = (x0 + w * o.p / 100) + "px"; if (moi) moi(o.p); } }); };
+  const bamRow = async i => {
+    const r = rel(rows[i]); await di(r.x + r.w * .45, r.y + r.h * .5, nhip(520));
+    cur.classList.add("bam"); await ngu(120); rows.forEach(x => x.classList.remove("on")); rows[i].classList.add("on");
+    gsap.fromTo(rows[i], { scale: .96 }, { scale: 1, duration: .35, ease: "back.out(3)", clearProps: "transform" });
+    cur.classList.remove("bam"); await ngu(nhip(350));
+  };
+  const hienChip = k => { chip.textContent = Tk(k); chip.classList.add("on"); };
+  // 1. Auto Cut: khoảng lặng đỏ lên khi đầu đọc quét qua, rồi dồn lại
+  async function scAutocut() {
+    const w = [14, 5, 16, 4, 12, 6, 18, 5, 20];
+    lanes.v1.innerHTML = `<div class="pieces">${w.map((x, i) => `<i class="pc ${i % 2 ? "gap" : "talk"}" style="width:${x}%"></i>`).join("")}</div>`;
+    lanes.a1.innerHTML = `<div class="pieces">${w.map((x, i) => `<i class="pc ${i % 2 ? "gapa" : "wave"}" style="width:${x}%"></i>`).join("")}</div>`;
+    await ngu(300);
+    const gaps = qa(".pc.gap,.pc.gapa"), laneW = lanes.v1.clientWidth;
+    await quet(1500, p => gaps.forEach(g => { if (p >= (g.offsetLeft / laneW) * 100) g.classList.add("cut"); }));
+    await ngu(250);
+    await tw(gaps, { width: "0%", duration: .7, ease: "power3.inOut", stagger: .05 });
+    qa(".pc.talk,.pc.wave").forEach(t => t.style.marginRight = ".3cqw");
+    hienChip("prChip1"); await ngu(nhip(1500));
+  }
+  // 2. Auto Podcast: 3 track cam, đầu đọc quét tới đâu thì cam của người đang nói sáng tới đó
+  async function scPodcast() {
+    datLanes({ v3: CLIP("w dim", 0, 100, "Wide"), v2: CLIP("b dim", 0, 100, "Cam B"), v1: CLIP("v dim", 0, 100, "Cam A"), a1: CLIP("a", 0, 100) });
+    cam.textContent = "CAM A"; cam.classList.add("on");
+    const seg = [["a", 0, 18], ["b", 18, 30], ["a", 30, 46], ["w", 46, 55], ["b", 55, 75], ["a", 75, 88], ["w", 88, 100]];
+    seg.forEach(([c, l, r]) => (c === "a" ? lanes.v1 : c === "b" ? lanes.v2 : lanes.v3).insertAdjacentHTML("beforeend", `<i class="seg ${c}" style="left:${l}%;width:${r - l}%"></i>`));
+    const segs = qa(".seg"); await ngu(300);
+    await quet(2800, p => {
+      segs.forEach(s => { if (p >= parseFloat(s.style.left)) s.classList.add("on"); });
+      const c = seg.find(([, l, r]) => p >= l && p < r); if (c && vid.dataset.cam !== c[0]) { vid.dataset.cam = c[0]; cam.textContent = { a: "CAM A", b: "CAM B", w: "WIDE" }[c[0]]; }
+    });
+    hienChip("prChip2"); await ngu(nhip(1500));
+  }
+  // 3. Transcripts: caption hiện dần trên màn xem + khối caption rơi vào track C1
+  async function scTranscripts() {
+    goc(); rows[2].classList.add("on"); cap.classList.add("on"); cap.textContent = "";
+    const words = Tk("prCap").split(" "), blocks = [[2, 18], [21, 40], [43, 60], [63, 80], [83, 98]];
+    await ngu(250);
+    await quet(2600, p => {
+      blocks.forEach(([l, r], i) => { if (p >= l && !lanes.c.querySelector(`[data-k="${i}"]`)) lanes.c.insertAdjacentHTML("beforeend", `<i class="clip c" data-k="${i}" style="left:${l}%;width:${r - l}%"></i>`); });
+      cap.textContent = words.slice(0, Math.round(words.length * p / 100)).join(" ");
+    });
+    cap.textContent = words.join(" "); hienChip("prChip3"); await ngu(nhip(1500));
+  }
+  // 4. Guideline Frame: lớp guide phủ lên màn xem, clip guide nằm trên V3
+  async function scGuide() {
+    goc(); rows[4].classList.add("on"); await ngu(250);
+    lanes.v3.innerHTML = CLIP("g", 0, 100, "Guide · TikTok"); safe.classList.add("on");
+    gsap.fromTo(q(".sz-tag"), { scale: .6 }, { scale: 1, duration: .5, ease: "back.out(3)", clearProps: "transform" });
+    hienChip("prChip4"); await ngu(nhip(1900));
+  }
+  const CANH = [[0, scAutocut], [1, scPodcast], [2, scTranscripts], [4, scGuide]];
+  async function vong() {
+    const v = pr.getBoundingClientRect(); dat(v.width * .5, v.height * .8);
+    await ngu(400); cur.classList.add("hien");
+    for (;;) for (const [i, sc] of CANH) {
+      goc(); await ngu(nhip(300));
+      await bamRow(i);
+      await sc();
+      await tw(q(".pr-left"), { autoAlpha: .25, duration: .25 }); goc(); await tw(q(".pr-left"), { autoAlpha: 1, duration: .3 });
+    }
+  }
+  const batDau = () => { if (!window.gsap) { tinh(); return; } vong(); };
+  if (document.readyState === "complete") batDau(); else addEventListener("load", batDau);
+  window.ssPr = { dangThay: () => thay, epThay: () => { thay = true; capNhat(); } };   // chỉ để đo
+})();
+</script>
+</body>
+</html>

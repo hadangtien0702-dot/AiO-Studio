@@ -40,6 +40,49 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.7.9 bo cai] - 2026-09-30 12:50 - Dong goi + CAI 0.7.9 len may cong ty (truoc do may chay 0.7.7)
+- Boi canh: anh gui anh khay he thong "AiO Shot & Save v0.7.7": "may anh dang o ban nay ne em" (hoi sao chua cai ban moi).
+  0.7.9 (Doc chu) co trong ma tu 29/09 nhung CHUA ai dong goi bo cai — anh chay ban nguon.
+- Dong goi: `npm run dist` -> `AiO-Shot-and-Save-Setup-0.7.9.exe` 96,1 MB (0.7.7: 88,4 MB -> +7,7 MB = bo doc chu).
+  Chep vao `Release/AiO Shotandsave/win/` (md5 `C96629B1...` khop dist) + sua HUONG-DAN-CAI-DAT.txt.
+- Kiem BAN DONG GOI doc chu (khong phai ban nguon — ocr.js ghi bay "Node tran dung, Electron hong"): chay chinh exe
+  (ELECTRON_RUN_AS_NODE, electron 43.4.1) doc anh 3 dong tieng Viet tu tao: 3/3 dong dung dau, sai 1 ky tu
+  ("v3_final" -> "v3 final"), 510 ms. Du lieu trong goi: vie 1,7 MB + eng 5,2 MB + tesseract-core(-simd).wasm.
+- Cai: bo cai mo qua explorer.exe (ngoai container MSIX cua Claude); dung o hop "AiO Shot & Save is running. Click OK" ->
+  em bam OK. Sau cai: exe 0.7.9.0, run-log "boot v0.7.9 hotkey=Shift+` lang=en" 12:49:38, app tu mo lai.
+  Truoc = sau: anh 413/413 (0 mat/doi) · Storyboard 61/61 · cau-hinh.json giong het · ban-quyen.json chi doi `gioLonNhat`
+  (moc chong lui dong ho), `batDauThu` giu nguyen -> van con 12 ngay dung thu.
+- CHUA kiem: anh bam phim 5 doc chu tren ban cai that (em chi do duong goi thu vien, chua do qua giao dien).
+- Release/win van giu 10 bo cai cu 0.5.5 -> 0.7.7 (~88 MB/ban) — cho anh gat xoa (luat chi giu ban moi nhat).
+
+## [web-premiere] - 2026-09-30 00:39 - Trang bo tool Premiere NHAP 2 "ca trang la mot bai dang duoc dung" (chua vao web, chua commit)
+- Boi canh: anh hoi trang web moi cho AIO dau (nhap 25/09 nam trong scratchpad may cong ty, chua vao repo, may chu 8124 da tat
+  -> bat lai). Anh xem xong: "chua du Creative do em, em phai lam Creative hon - animation long lon len cho anh".
+- Y tuong (em tu chon, cung tinh than "Rap chieu" anh da duyet): (1) dau trang TIEU DE BI AUTO CUT CAT: "The um boring uh half
+  of erm editing," -> dau doc quet, tieng um/uh do len, dong lai; dong 2 "done inside Premiere." hien nhu phu de; timeline mini
+  C1/V1/A1 dien cung; chuot re tren dau trang = vach playhead co timecode. (2) bang chay ten 12 tool doi chieu + nghieng theo
+  van toc cuon. (3) 4 so do kieu dong ho cuon. (4) SAN KHAU 12 CANH ghim giua man, cuon toi dau dien toi do (ScrollTrigger scrub,
+  hut ve canh gan nhat): Auto Cut / Podcast doi cam theo dong ho am / Transcripts chu bay tu song am + marker vang cho khong chac /
+  Short Viral cau hoi sang len roi bay thanh 3 the doc / Re-Frames khung 9:16 bam chu the roi co lai / Guide Frame chu trong vung
+  giao dien app do -> doi vao vung an toan xanh / Video Download / Asset Manager go "whoosh" loc 28.846 file / Power Bins doi 3
+  project bin van nguyen / Organize (sap co) file bay vao thu muc / Keynote (sap co) / panel tong rong=the, hep=thanh icon.
+  Timeline 12 clip ben duoi bam de nhay, phim J/L nhu Premiere. (5) "Vi sao" 3 hinh tu dien. (6) cuoi trang DAO RAZOR cat doi
+  dong chu roi khep lai (ripple delete).
+- File: scratchpad `.../web/Website/AiO ShotSave Web/premiere/index.html` (1.535 dong, chay tai http://127.0.0.1:8124/premiere/),
+  BAN SAO trong repo `Website/Nhap web ShotSave/premiere-nhap-2.html` (md5 khop `c3cda805`) + nhap 1 `premiere-nhap-1.html`.
+  Link `../legal.html` chi dung khi chay tu scratchpad. CHUA commit, CHUA len Vercel.
+- So tren trang: giu so da co nguon cua nhap 1; Guide Frame doi 53 -> 59 vung theo CLAUDE.md goc. Hinh vung an toan tren san khau
+  ghi ro "Illustration" (khong phai so do that).
+- Kiem (Chrome that qua Playwright, `scratchpad/do-v2.mjs`): 1440x900 toi+sang, 390x844, 1280 tieng Viet -> 0 loi JS o ca 4 lan;
+  tran ngang 0 px; tieu de sau phim: 3 khoang um/uh/erm = 0 px; 12/12 canh vao dung so + dung ten o ca may tinh va dien thoai;
+  0 chuoi tieng Viet sot khi doi sang EN; 0 gach dai. Nut cuoi trang opacity 1 (1440 + 390).
+  3 loi em tu bat khi do: (a) chu thich san khau tre 1 canh (11/12) vi doc thoi gian luc cuon dung ma timeline con troi 0,7 s
+  -> doc tu onUpdate cua timeline; (b) nhay thang toi canh bi hut sai canh vi snap tinh theo quan tinh -> hut ve canh gan vi tri;
+  (c) nut cuoi trang mo mai vi hieu ung cho vi tri cuon khong toi duoc -> "bottom bottom". Them: `--u` phai dang ky @property,
+  khong thi cqw tinh lai theo khung dien thoai (chu ti 4 lan); dien thoai 5 canh tran 505/374 px -> luoi 1 cot minmax(0,1fr).
+- CHUA kiem: iPhone/Safari that; may yeu (26 clip troi + san khau); trinh doc man hinh.
+- [CHO ANH] xem http://127.0.0.1:8124/premiere/ tren may cong ty, chon: giu huong nay / bot / them.
+
 ## [web] - 2026-09-29 23:54 - "Rap chieu" cho phan 11 tinh nang, ghep thang vao index.html (anh duyet, len live 30/09 `d7300fd`)
 - Boi canh: anh xem lai nhap A/B: "ca 2 ban a va b anh chua thay du Creative"; em dua 4 y tuong (ban phim song / timeline
   Premiere / mot ngay cua editor / dai phim 11 shot), anh: "de xuat cho anh mot kieu moi Creative hon" -> em tu chon va dung;
