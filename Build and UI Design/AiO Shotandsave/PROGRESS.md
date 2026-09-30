@@ -1,6 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-29 22:17 +0700 (/xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-30 12:5x +0700 (/xong)
+> - **MAY CONG TY DA CAI 0.7.9** (30/09 12:49, bo cai `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.7.9.exe` 96,1 MB;
+>   anh 413/413 + Storyboard 61/61 con nguyen, ban quyen giu 12 ngay thu). [CHO ANH] bam phim 5 doc chu tren ban cai.
+>   Release/win con 10 bo cai cu 0.5.5 -> 0.7.7 — [CHO ANH] gat xoa. May nha chua cai 0.7.9.
+> - **WEB BO TOOL PREMIERE nhap 2** (khong phai web Shot & Save): `Website/Nhap web ShotSave/premiere-nhap-2.html`, xem muc
+>   [web-premiere] ben duoi. [CHO ANH] duyet huong.
+> ---- (khoi 29/09 22:17 duoi day) ----
 > - **Ban 0.7.9 DA COMMIT + PUSH** (`82d832f` 0.7.8 Storyboard · `14ea322` 0.7.9 Doc chu). Web: `8dda50f` section Storyboard,
 >   `729566a` the Lay chu, `6214188` phim Storyboard het de chu + xoe 6 khung dung app — live khop git.
 > - **0.7.9 = DOC CHU (phim 5):** Windows LUON Tesseract (Windows KHONG co bo doc tieng Viet), anh test "kha la tot roi".
