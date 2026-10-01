@@ -336,7 +336,14 @@ mở phiên mới. Gmail connector chỉ tạo THƯ NHÁP, không tự gửi.
   GitHub · soi node_modules/FFmpeg; `-CaiThem` = tự npm install). 31/08: 636/636.
 - Máy công ty push bị 403 (gh CLI đè credential `Vincentnguyen1809`):
   `git -c credential.helper= -c credential.helper=manager push`. Sửa gốc
-  (`~/.gitconfig`) cần anh gật — chưa làm.
+  (`~/.gitconfig`) cần anh gật — chưa làm. (01/10: `git push origin HEAD:main` thường chạy được 2 lần liền, không 403.
+  Cứ thử lệnh thường trước, 403 mới dùng lệnh né.)
+- **Đẩy RIÊNG việc web khi `main` trên máy đang giữ commit chưa được push** (luật 01/10: Shot & Save test xong hết mới
+  push). KHÔNG `git push` từ `main`, nó kéo theo cả commit đang chờ. Cách đã chạy 3 lần ngày 01/10 (`ce061fd`, `12609a2`,
+  `fe54c7d`): `git worktree add --detach <thư mục nháp> origin/main` → sửa/chép file trong đó → `git commit -- <đúng file>`
+  → `git push origin HEAD:main` → về thư mục chính `git merge origin/main` → `git worktree remove`. Việc web ghi sổ ở
+  `PROGRESS.md` gốc (file này giống nhau giữa máy và GitHub nên gộp không đụng nhau); `CLAUDE.md` gốc thì KHÁC (có dòng
+  0.8.0 chưa push) nên phần sửa `CLAUDE.md` chỉ commit trên máy, lên GitHub cùng lượt push 0.8.0.
 - `/xong` bản gốc nằm **trong repo** `.claude/commands/xong.md`; script đồng bộ
   chép về `~/.claude/commands`. Sửa bản trong repo, đừng sửa bản `~/.claude`.
 
@@ -392,6 +399,7 @@ Re-Frames, Guide Frame, WELCOME) là mã viết tay → **trong** git.
 | **Khay tự thu về nút tròn (01/10 16:07, đã nạp vào app đang cài, vẫn 0.8.0)**: anh CHƯA thấy nó chạy lần nào trên màn thật (run-log từ 16:07 tới 19:07 không có lượt chụp). Cần anh: chụp 1 tấm → để chuột ngoài khay 5 giây → bấm nút tròn → kéo khay sang màn phụ rồi bấm "–". Chưa đo: độ mượt, nháy hình lúc đổi bản vẽ ↔ cửa sổ thật, màn 125%, nút tròn đè lên video có làm video đen không, RAM 2 tiến trình mới, `test:khay` + `test:co-khay` (bật cửa sổ lên màn). Chưa làm: kiểu C, bản Mac | Shot & Save | Chờ anh thử; chi tiết đầu `PROGRESS.md` của app |
 | **Cửa sổ Khay gộp 2 thẻ Storyboard + Video (bản xem trước 13:59)**: anh mở thật 15:18 không lỗi, CHƯA chốt giữ. Trên Khay ảnh vẫn 2 nút. Hướng "một khay 3 thẻ" (`ROADMAP.md` 0b/0c) chưa chốt · `test:quayapp` chưa chạy lại sau khi gộp | Shot & Save | Chờ anh quyết |
 | 3 cụm việc 01/10 chiều của Shot & Save mới COMMIT TRÊN MÁY CÔNG TY, chưa push (luật 01/10: test xong hết mới đóng gói + push + web) → máy nhà chưa có | Shot & Save | Chờ anh báo test xong |
+| **Trang bộ tool Premiere đã LIVE 01/10 19:3x ở `aio-shotsave.vercel.app/premiere/`** nhưng: (1) ô email "Báo tôi khi mở bán" CHƯA lưu gì, khách bấm gửi thấy câu "Bản nháp: chưa nối gửi, chưa lưu gì cả" → email khách để lại là mất; (2) trang Shot & Save `/` chưa có link sang `/premiere/`, chưa có trang chủ chung; (3) trên live chưa đo: điện thoại thật, Safari, tiếng Việt, nền sáng, phím J K L, kéo ngang | Web | Chờ anh chốt lưu email vào đâu + có gắn link từ trang Shot & Save không |
 | Tiến trình chính Shot & Save 0.7.9 giữ **1.168 MB RAM** sau ~21 giờ chạy (đo 01/10 09:36 máy công ty, bình thường các tiến trình khác 43–300 MB) — chưa tìm gốc (nghi ảnh gốc BGRA 4K ~33 MB/màn giữ lại sau mỗi lần chụp) | Shot & Save | Đã lập việc riêng (chip "Đo vì sao Shot & Save ăn 1,1 GB RAM"), chưa ai làm |
 | Máy công ty: thư mục chính `E:\2026\Production\AiO Studio` **đã khớp GitHub (đo 30/09 12:5x: chậm 0 commit)**, vẫn còn file sửa dở của phiên Guide Frame (1 dòng CLAUDE.md, TOOL_VERSION_TRACKER, 7 file Guide Frame) | Cả bộ | Việc của phiên Guide Frame, đừng commit giùm |
 | Thư mục làm việc của Gemini (git worktree nhánh `gemini`) mới có ở **máy nhà** — máy công ty chưa tạo | Shot & Save | Tạo khi ngồi máy công ty: `git worktree add "E:\2026\Production\AiO Studio - Gemini" gemini` |
