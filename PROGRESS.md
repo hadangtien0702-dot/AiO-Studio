@@ -5,6 +5,31 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-premiere] - 2026-10-01 19:31 (UTC+7) - Trang bộ tool Premiere (nháp 3) LÊN LIVE ở aio-shotsave.vercel.app/premiere/
+
+- **Bối cảnh:** anh: *"aio-shotsave.vercel.app/premiere/ đưa thằng này lên http://127.0.0.1:8124/premiere/?v=3 đi em lẹ lên"*.
+  Trước đó `/premiere/` trên live trả 404 (thư mục chưa có trong web).
+- **Đã làm:** chép nguyên văn `Website/Nhap web ShotSave/premiere-nhap-3.html` thành
+  `Website/AiO ShotSave Web/premiere/index.html`, không sửa chữ nào. Bản ở cổng 8124, file nháp 3 và file mới cùng md5
+  `83d975d9` (154.691 byte). Trang chỉ gọi 3 đường dẫn nội bộ (`../`, `../legal.html#privacy`, `../legal.html#terms`),
+  font Google và GSAP 3.13.0 từ cdnjs, không có ảnh hay file phụ phải chép kèm.
+- **Cách push:** máy công ty đang giữ 6 commit Shot & Save 0.8.0 chưa được push (luật 01/10, chờ anh test) nên dựng
+  commit trên đúng `origin/main` trong một worktree tạm rồi đẩy riêng: `12609a2..fe54c7d`, 1 file. Sau đó gộp về `main` trên máy.
+- **Kiểm chứng trên LIVE:**
+  - md5 live = md5 blob git `fe54c7d` = `83d975d9`; `/premiere`, `/premiere/`, `/premiere/index.html` đều 200 (154.691 byte).
+    Ngay sau deploy `/premiere` (không gạch cuối) trả 404 một lần, đo lại vài giây sau là 200.
+  - Trang Shot & Save `/` 200 (271.841 byte), `/legal.html` 200, `/.env.local` 404.
+  - Chrome thật qua Playwright, 1440×900, lăn chuột thật: vào section ra clip 01, 5 nấc xuống = 02, 03, 04, 05, 06,
+    2 nấc lên = 05, 04. GSAP 3.13.0 + ScrollTrigger nạp được, font Inter nạp được, 0 lỗi console, 0 request hỏng, tràn ngang 0.
+- **CHƯA kiểm trên live:** điện thoại thật, Safari, tiếng Việt, nền sáng, phím J K L, kéo ngang (các mục này đã đo trên
+  bản ở máy lúc 16:20, cùng file từng byte, nhưng chưa đo lại trên live).
+- **Còn hở:**
+  - Ô email "Báo tôi khi mở bán" CHƯA nối lưu. Bấm gửi chỉ hiện câu *"Bản nháp: chưa nối gửi, chưa lưu gì cả."*
+    Khách thật để lại email lúc này là mất. Cần anh chốt lưu vào đâu rồi mới nối.
+  - Trang Shot & Save (`/`) chưa có link sang `/premiere/`. Chưa có trang chủ chung (quyết định 25/09).
+  - Sửa trang về sau: sửa `premiere-nhap-3.html` rồi chép đè sang `premiere/index.html` (hai file phải cùng md5), và chạy
+    lại `tao-artifact.cjs` nếu muốn bản xem trên điện thoại khớp.
+
 ## [web-premiere] - 2026-10-01 16:20 (UTC+7) - Trang bộ tool Premiere NHÁP 3: sân khấu thành TIMELINE PREMIERE TRÔI NGANG
 
 > Ghi ở sổ gốc vì trang này là web chung AiO Studio (không phải Shot & Save), và `AiO Shotandsave/PROGRESS.md` đang có
