@@ -5,6 +5,24 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-premiere] - 2026-10-01 21:49 (UTC+7) - Làm lại 4 cảnh tool + 3 hình "Vì sao" để người không làm dựng hiểu ngay - máy nhà
+
+- **Bối cảnh:** anh duyệt trang /premiere/ từng cảnh: Podcast *"chưa diễn tả được Podcast là gì"*, Short Viral *"khó hiểu"*,
+  Re-Frames *"người diễn tả bị xấu"*, Guide Frame *"vừa xấu vừa khó hiểu"*, 3 hình phần Vì sao *"nhìn vào cũng ko hiểu gì"* /
+  *"cần show ra phần mềm mình đang dùng"*. Rồi: *"xong cái nào push code lên cái đó"*.
+- **Cách làm:** workflow 42 agent: kiểm công dụng thật 4 tool (đọc CLAUDE/PROGRESS/mã từng panel) → mỗi chỗ 2 bản thử dựng
+  trên bản sao trang + chụp Chrome ngầm (máy tính + điện thoại, EN + VI) → 2 giám khảo (người ngoài nghề / độ đẹp + sự thật +
+  điện thoại) → 1 agent ghép bản cuối. Bộ nhân vật chung nv- (2 người, có miệng nói, tư thế cận / ngồi mic / đứng / đi) thay
+  hình tròn + khối hộp. Gộp 7 bản cuối bằng git merge-file, giải 9 chỗ chồng bằng tay (từ điển VI, khối CSS điện thoại, 3 thẻ).
+- **Sửa sai sự thật trên trang (theo kiểm công dụng):** ô số Podcast 588/588 "đúng người" → 411 lần đổi cam podcast 40 phút
+  nghe lại không thấy sai (588 chỉ đếm cấu trúc) · why2p "hai cam" → "hai người" · Guide Frame 59 → 54 vùng, bỏ câu "đo từ màn
+  hình thật từng app", animation không còn tự dời chữ (con trỏ "Bạn" kéo) · Short Viral bỏ điện thoại dọc + chữ trên hình (tool
+  ra sequence ngang) · Re-Frames bỏ "sẵn sàng sau 3,9 giây". CHƯA SỬA: thẻ Podcast "ducks the music" nếu còn; hero + cảnh 1
+  diễn cắt "um/uh" trong khi Auto Cut cắt khoảng lặng (chờ anh trả lời); icon sv vẫn là điện thoại dọc.
+- **Kiểm:** mỗi bản cuối agent tự đo: 0 lỗi console, 0 gạch dài, chữ điện thoại ≥ 10px, 0 phần tử tràn ở 6–8 khổ. Sau khi gộp:
+  chụp 7 cảnh + bản VI + điện thoại trên bản gộp, 0 lỗi console; 1 bộ nhân vật (bỏ 2 bản chép thừa). CHƯA làm: thông số cuộn
+  mới (đo xong, đẩy đợt sau); soát lại 8 cảnh còn lại (bảng soát trong scratchpad audit/).
+
 ## [web-shotsave] - 2026-10-01 20:07 (UTC+7) - Web Shot & Save theo app 0.8.0: Quay video, Khay tự thu, cửa sổ Cài đặt mới, thanh công cụ 8 nút - máy công ty
 
 - **Bối cảnh:** anh: *"cập nhật tính năng mới lên website đi em"*, rồi *"chiều nay mình mới làm hiệu ứng thu nhỏ khi không
