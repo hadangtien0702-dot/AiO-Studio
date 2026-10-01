@@ -90,7 +90,7 @@ header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 8
 .theme:hover{color:var(--ink);background:var(--surface)}
 .theme svg{width:20px;height:20px}
 .theme .i-sun{display:none}.theme.is-dark .i-sun{display:block}.theme.is-dark .i-moon{display:none}
-.nav .btn{min-height:48px;padding:0 16px;font-size:15px;border-radius:12px}
+.nav .btn{min-height:48px;min-width:148px;padding:0 16px;font-size:15px;border-radius:12px}
 @media (max-width:420px){.nav .btn{display:none}}
 /* thanh tien do cuon = playhead cua ca trang */
 .prog{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brand);transform-origin:0 50%;transform:scaleX(0)}
@@ -321,89 +321,102 @@ h2 em{font-style:normal;color:var(--brand)}
 .pp::after{content:"";position:absolute;left:0;right:0;bottom:0;height:52%;border-radius:45% 45% 0 0;background:var(--sh)}
 .pp.a{--sk:#d6ae93;--sh:#9a6f58}.pp.b{--sk:#e8c3a8;--sh:#4f7ea8}
 
-/* 2 Auto Podcast: PHONG QUAY (ai noi thi co bong thoai + den do may quay cua nguoi do sang; mic nguoi nghe vat nho: vach am xam lai)
-   -> man hinh "Video cua ban" hien dung nguoi do; khong ai noi thi hien ca hai (dung luat tool: im > 2 s ve canh toan).
-   Luoi 3 cot x 3 hang (subgrid): hang 1 tieu de phong | hang 2 khung phong = mui ten = man hinh (canh giua theo nhau) | hang 3 mic / dai hinh nho.
-   Moi khoi la container rieng -> chu tinh theo cqw cua khoi, san 10px. */
-.sc-pod .p2-a-set{width:min(100% - 24px,calc(var(--u)*94));display:grid;grid-template-columns:minmax(0,1fr) calc(var(--u)*4.2) minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:calc(var(--u)*1.2);row-gap:calc(var(--u)*1.2)}
-.p2-a-room,.p2-a-out{container-type:inline-size;min-width:0;grid-row:1/4;display:grid;grid-template-rows:subgrid}
-.p2-a-room > .p2-a-h{grid-row:1;align-self:end}
-.p2-a-stg{grid-row:2;align-self:center;position:relative}
-.p2-a-mics{grid-row:3}
-.p2-a-scr{grid-row:2;align-self:center;display:grid;row-gap:max(6px,2.4cqw)}
-.p2-a-strip{grid-row:3}
-.p2-a-ar{grid-column:2;grid-row:2;align-self:center;display:grid;place-items:center;color:var(--c)}
-.p2-a-ar svg{width:100%;height:auto}
-.p2-a-h{display:flex;align-items:center;min-height:max(20px,6.4cqw);gap:max(6px,1.8cqw);font:700 max(10px,3.1cqw)/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--s-ink-3);white-space:nowrap}
-.p2-a-rec{flex:none;width:max(7px,2cqw);aspect-ratio:1;border-radius:50%;background:#ff453a;box-shadow:0 0 0 max(3px,.9cqw) rgb(255 69 58/.2)}
-.p2-a-auto{display:inline-flex;align-items:center;gap:max(4px,1cqw);padding:max(4px,1.1cqw) max(7px,2cqw);border-radius:999px;background:var(--c);color:#fff;font:800 max(10px,3cqw)/1 Inter,sans-serif;letter-spacing:.02em;text-transform:none}
-.p2-a-auto svg{width:max(10px,3cqw);height:max(10px,3cqw)}
-.p2-a-fr{position:relative;aspect-ratio:320/236;border-radius:3cqw;overflow:hidden;background:linear-gradient(180deg,#282233,#15131a 80%);box-shadow:inset 0 0 0 1px var(--s-line)}
-.p2-a-fr > svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.p2-a-cn,.p2-a-tl{opacity:var(--p2-a-k,0)}
-/* bong thoai: neo dau duoi o dinh dau nguoi noi (--x), than bong lech sang ngoai (--o) */
-.p2-a-bb{position:absolute;margin:0;left:var(--x);bottom:66%;width:max-content;max-width:47%;padding:max(5px,1.7cqw) max(8px,2.8cqw);border-radius:max(9px,3cqw);background:#fff;color:#151518;font:700 max(10px,4.2cqw)/1.22 Inter,sans-serif;text-align:center;text-wrap:balance;
-  transform-origin:var(--o) 100%;transform:translateX(calc(var(--o) * -1)) translateY(calc((1 - var(--p2-a-k,0)) * 2.5cqw)) scale(calc(.55 + var(--p2-a-k,0) * .45));opacity:var(--p2-a-k,0);box-shadow:0 1cqw 3cqw rgb(0 0 0/.4)}
-.p2-a-bb::after{content:"";position:absolute;top:calc(100% - 1px);left:var(--o);width:max(9px,3.2cqw);height:max(7px,2.4cqw);background:inherit;clip-path:polygon(0 0,100% 0,var(--t) 100%);transform:translateX(-50%)}
-.p2-a-ba{--x:32.5%;--o:66%;--t:70%}.p2-a-bbb{--x:67.5%;--o:34%;--t:30%}
-/* im lang: bong xam o giua, ba cham, khong chu */
-.p2-a-qt{--x:50%;--o:50%;--t:50%;bottom:70%;display:flex;gap:max(4px,1.3cqw);padding:max(7px,2.2cqw) max(11px,3.4cqw);background:#3a3a42;box-shadow:inset 0 0 0 1px rgb(255 255 255/.12),0 1cqw 3cqw rgb(0 0 0/.4)}
-.p2-a-qt i{width:max(5px,1.6cqw);aspect-ratio:1;border-radius:50%;background:#c3c3c8;opacity:var(--p2-a-o,.6)}
-/* mic tung nguoi, ngay duoi khung phong: dang noi = vach am nhay mau; nguoi kia noi = vach xam, thap xuong + nhan "Mic vat nho" (--p2-a-d 0..1) */
-.p2-a-mics{display:grid;grid-template-columns:1fr 1fr;column-gap:max(6px,2cqw);align-items:start;padding:0 1.5cqw}
-.p2-a-mic[data-k="a"]{justify-self:start}.p2-a-mic[data-k="b"]{justify-self:end}
-.p2-a-mic{display:flex;align-items:center;gap:max(5px,1.5cqw);height:max(28px,9cqw);padding:0 max(9px,2.6cqw) 0 max(4px,1.1cqw);border-radius:999px;white-space:nowrap;
-  background:color-mix(in srgb,rgb(255 159 10/.14) calc(var(--p2-a-d,0) * 100%),rgb(255 255 255/.06));box-shadow:inset 0 0 0 1px color-mix(in srgb,rgb(255 159 10/.55) calc(var(--p2-a-d,0) * 100%),rgb(255 255 255/.12))}
-.p2-a-mi{flex:none;display:grid;place-items:center;width:max(19px,6cqw);aspect-ratio:1;border-radius:50%;background:var(--p2-a-pc);color:#1a1410}
-.p2-a-mi svg{width:58%;height:58%}
-.p2-a-mic[data-k="a"]{--p2-a-pc:#e0a63a}.p2-a-mic[data-k="b"]{--p2-a-pc:#7fb2ea}
-.p2-a-lv{display:flex;align-items:flex-end;gap:max(2px,.7cqw);height:max(16px,5cqw)}
-.p2-a-lv i{width:max(3px,1cqw);height:100%;border-radius:1px;transform-origin:50% 100%;transform:scaleY(var(--h,.12));background:color-mix(in srgb,#6b6b73 calc(var(--p2-a-d,0) * 100%),var(--c))}
-.p2-a-da{display:none}
-.p2-a-room > *,.p2-a-out > *{min-width:0}
-.p2-a-dn{overflow:hidden;max-width:calc(var(--p2-a-d,0) * 14em);margin-left:calc((var(--p2-a-d,0) - 1) * max(5px,1.5cqw));opacity:var(--p2-a-d,0);font:700 max(10px,3.4cqw)/1 Inter,sans-serif;color:#ffc070}
-/* man hinh ket qua */
-.p2-a-tv{position:relative;aspect-ratio:16/9;border-radius:2.4cqw;overflow:hidden;box-shadow:0 0 0 max(3px,1cqw) #0b0b0d,0 0 0 calc(max(3px,1cqw) + 1px) rgb(255 255 255/.14),0 3cqw 6cqw rgb(0 0 0/.5)}
-.p2-a-ly{position:absolute;inset:0;opacity:0}
-.p2-a-ly svg{width:100%;height:100%}
-.p2-a-tv[data-cam="a"] .p2-a-la,.p2-a-tv[data-cam="b"] .p2-a-lb,.p2-a-tv[data-cam="w"] .p2-a-lw{opacity:1}
-.p2-a-la,.p2-a-th[data-c="a"]{background:linear-gradient(160deg,#5a3a2c,#1c1614 72%)}
-.p2-a-lb,.p2-a-th[data-c="b"]{background:linear-gradient(200deg,#23405a,#12181e 72%)}
-.p2-a-lw,.p2-a-th[data-c="w"]{background:linear-gradient(180deg,#3d3348,#15131a 72%)}
-.p2-a-la svg{--nv-mieng:var(--nv-mieng-a,0);--nv-nhay:var(--nv-nhay-a,0)}
-.p2-a-lb svg{--nv-mieng:var(--nv-mieng-b,0);--nv-nhay:var(--nv-nhay-b,0)}
-.p2-a-tv .p2-a-lw svg,.p2-a-tv .p2-a-la svg,.p2-a-tv .p2-a-lb svg{--nv-song-a:0;--nv-song-b:0;--nv-song:0}
-.p2-a-fl{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-/* cuoi canh: the xanh "Video moi" ngay tren man hinh */
-.p2-a-new{position:absolute;left:max(6px,2.2cqw);top:max(6px,2.2cqw);display:flex;align-items:center;gap:max(4px,1.2cqw);padding:max(4px,1.3cqw) max(8px,2.4cqw) max(4px,1.3cqw) max(5px,1.6cqw);border-radius:999px;background:#34c759;color:#fff;font:800 max(10px,3.4cqw)/1 Inter,sans-serif;
-  opacity:var(--p2-a-k,0);transform:scale(calc(.6 + var(--p2-a-k,0) * .4));transform-origin:0 0;box-shadow:0 1cqw 3cqw rgb(0 0 0/.35)}
-.p2-a-new svg{width:max(11px,3.6cqw);height:max(11px,3.6cqw)}
-.p2-a-cap{display:grid;min-height:max(30px,10cqw)}
-.p2-a-cap > *{grid-area:1/1;margin:0;align-self:center}
-.p2-a-c{display:flex;align-items:center;justify-content:center;gap:max(6px,1.8cqw);font:600 max(10.5px,3.9cqw)/1.2 Inter,sans-serif;color:var(--s-ink-2);white-space:nowrap;opacity:var(--p2-a-k,0);transform:translateY(calc((1 - var(--p2-a-k,0)) * 1.6cqw))}
-.p2-a-c svg{flex:none;width:max(13px,4.4cqw);height:max(13px,4.4cqw);color:var(--c)}
-.p2-a-c b{padding:max(4px,1.2cqw) max(8px,2.4cqw);border-radius:999px;background:var(--c);color:#fff;font-weight:800}
-.p2-a-end{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:var(--p2-a-k,0);transform:translateY(calc((1 - var(--p2-a-k,0)) * 2cqw))}
-.p2-a-end b{display:block;color:#fff;font:800 max(10.5px,3.9cqw)/1.25 Inter,sans-serif}
-.p2-a-end i{display:block;font:500 max(10px,3.3cqw)/1.3 Inter,sans-serif;font-style:normal;color:var(--s-ink-2)}
-/* dai hinh nho: video moi duoc ghep tu cac canh, moi lan doi nguoi noi them mot canh */
-.p2-a-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:max(4px,1.6cqw);align-self:start;--nv-mieng-a:0;--nv-mieng-b:0;--nv-song-a:0;--nv-song-b:0;--nv-nhay-a:0;--nv-nhay-b:0}
-.p2-a-th{position:relative;aspect-ratio:16/9;border-radius:max(3px,1.2cqw);overflow:hidden;opacity:var(--p2-a-k,0);transform:scale(calc(.7 + var(--p2-a-k,0) * .3));box-shadow:0 0 0 calc(var(--p2-a-on,0) * max(2px,.6cqw)) var(--c)}
-.p2-a-th svg{width:100%;height:100%;--nv-mieng:0;--nv-nhay:0}
-/* khoi rat hep (dien thoai man thap 375x667, 360x740: moi khoi ~150-170px): giu chu chinh >= 9.5px, bo bot thu phu (nhan "Auto", dai hinh nho) */
-@container (max-width:230px){
-  .p2-a-h{font-size:max(9.5px,3.1cqw);min-height:16px;gap:5px}
-  .p2-a-auto span{display:none}.p2-a-auto{padding:3px 5px}
-  .p2-a-bb{font-size:max(9.5px,4.2cqw);padding:4px 7px;border-radius:8px}
-  .p2-a-mic{height:22px;gap:4px;padding:0 6px 0 3px}.p2-a-mi{width:16px}
-  .p2-a-dn{display:none}.p2-a-mics{padding:0}
-  .p2-a-da{display:block;flex:none;width:calc(var(--p2-a-d,0) * 11px);height:11px;opacity:var(--p2-a-d,0);color:#ffb35c;margin-left:calc((var(--p2-a-d,0) - 1) * 4px)}
-  .p2-a-c{font-size:10px;gap:3px 4px;flex-wrap:wrap;white-space:normal}.p2-a-c svg{width:11px;height:11px}.p2-a-c b{padding:3px 7px}
-  .p2-a-end b{font-size:10px}.p2-a-end i{font-size:9.5px}
-  .p2-a-new{font-size:9.5px;padding:3px 7px 3px 4px}
-  .p2-a-cap{min-height:24px}
-  .p2-a-strip{display:none}
+/* ===== pm-: CANH DIEN TRONG CUA SO PREMIERE (01/10, anh: "lam animation phai co them phan mem vao de dien ta... nguoi khong phai editor cung
+   phai hieu", "giong 02 phan o duoi rat de hieu khi em dua hoat hoa phan mem vao"). Moi canh = 3 buoc chu doi thuong + cua so Adobe Premiere Pro
+   (Project | man hinh xem | Timeline | panel cua chinh tool do). Mach chung: con tro bam nut tool -> timeline + man hinh doi -> ket qua.
+   Khung dung chung dung boi pmKhung() trong JS; moi canh chi viet noi dung 4 o + ham dien fn(p). Cua so chiem tron o canh (het "roi rac"). */
+.pm{position:relative;width:100%;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:max(6px,1.1cqh);padding:max(6px,1.6cqh) max(6px,1.3cqw) max(6px,1.8cqh);
+  --pm-f:max(10px,min(1.14cqw,1.9cqh));font:500 var(--pm-f)/1.25 Inter,sans-serif;color:var(--s-ink-2);transform:translateX(calc(var(--d,0) * 6cqw))}
+.pm-steps{list-style:none;margin:0;padding:0;display:flex;justify-content:center;align-items:center;gap:max(6px,1cqw);min-width:0}
+.pm-steps li{display:flex;align-items:center;gap:.5em;min-width:0;padding:.42em .9em .42em .42em;border-radius:999px;background:rgb(255 255 255/.05);box-shadow:inset 0 0 0 1px rgb(255 255 255/.08);
+  color:var(--s-ink-3);font-weight:600;white-space:nowrap;transition:background-color .25s,color .25s,box-shadow .25s}
+.pm-steps b{flex:none;display:grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:rgb(255 255 255/.1);color:var(--s-ink-2);font:800 .92em/1 var(--mono)}
+.pm-steps span{overflow:hidden;text-overflow:ellipsis}
+.pm[data-buoc="1"] .pm-steps li:nth-child(1),.pm[data-buoc="2"] .pm-steps li:nth-child(2),.pm[data-buoc="3"] .pm-steps li:nth-child(3){background:color-mix(in srgb,var(--c) 22%,#111113);color:#fff;box-shadow:inset 0 0 0 1.5px var(--c)}
+.pm[data-buoc="1"] .pm-steps li:nth-child(1) b,.pm[data-buoc="2"] .pm-steps li:nth-child(2) b,.pm[data-buoc="3"] .pm-steps li:nth-child(3) b{background:var(--c);color:#fff}
+.pm[data-buoc="2"] .pm-steps li:nth-child(1) b,.pm[data-buoc="3"] .pm-steps li:nth-child(1) b,.pm[data-buoc="3"] .pm-steps li:nth-child(2) b{background:#1f9d55;color:#fff}
+.pm-win{position:relative;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr);border-radius:max(8px,1cqw);overflow:hidden;background:#1d1d21;box-shadow:0 0 0 1px rgb(255 255 255/.12),0 2cqh 5cqh rgb(0 0 0/.55)}
+.pm-tit{display:flex;align-items:center;gap:.8em;padding:.5em .9em;background:#141416;color:#e9e9ee;white-space:nowrap}
+.pm-tit b{font-weight:700}
+.pm-tit span{color:var(--s-ink-3);overflow:hidden;text-overflow:ellipsis}
+.pm-tit i{margin-left:auto;flex:none;display:flex;gap:.9em;color:var(--s-ink-3)}
+.pm-tit i svg{width:.8em;height:.8em}
+.pm-menu{display:flex;gap:1.4em;padding:.38em .9em;background:#19191c;border-bottom:1px solid rgb(255 255 255/.06);color:#b4b4bb;white-space:nowrap;overflow:hidden;font-size:.92em}
+.pm-body{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) clamp(96px,25cqw,300px);gap:max(3px,.4cqw);padding:max(3px,.4cqw);background:#0f0f11}
+.pm-main{min-width:0;min-height:0;display:grid;grid-template-rows:minmax(0,1.25fr) minmax(0,1fr);gap:max(3px,.4cqw)}
+.pm-top{min-height:0;display:grid;grid-template-columns:clamp(70px,17cqw,200px) minmax(0,1fr);gap:max(3px,.4cqw)}
+.pm-fr{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;border-radius:max(4px,.5cqw);background:#1f1f23;overflow:hidden}
+.pm-tab{flex:none;display:flex;align-items:center;gap:.5em;padding:.42em .7em;font-weight:700;font-size:.92em;color:#d3d3d9;border-bottom:1px solid rgb(255 255 255/.06);white-space:nowrap}
+.pm-tab svg{flex:none;width:1.25em;height:1.25em}
+.pm-tab.tool{color:#fff;box-shadow:inset 0 2px 0 var(--c)}
+.pm-tab.tool i{flex:none;display:grid;place-items:center;width:1.7em;height:1.7em;border-radius:.45em;background:var(--c);color:#fff}
+.pm-tab.tool i svg{width:62%;height:62%}
+/* o Project: luoi anh nho */
+.pm-bin{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:.5em;padding:.55em;overflow:hidden}
+.pm-bi{min-width:0;display:grid;gap:.25em;font-size:.86em;color:#b9b9c0;text-align:left}
+.pm-bi > i{position:relative;display:block;aspect-ratio:16/10;border-radius:.3em;overflow:hidden;background:var(--bg,#2b2b31)}
+.pm-bi > i svg{position:absolute;inset:0;width:100%;height:100%}
+.pm-bi > span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-bi.moi{opacity:var(--k,0);transform:scale(calc(.7 + var(--k,0) * .3))}
+.pm-bi.moi > i{box-shadow:0 0 0 1.5px var(--c)}
+.pm-bi.moi > span{color:#fff;font-weight:700}
+/* man hinh xem */
+.pm-mon{align-items:center;justify-content:center;padding:max(3px,.5cqw);background:#101012}
+.pm-scr{position:relative;height:100%;max-width:100%;aspect-ratio:16/9;border-radius:max(3px,.4cqw);overflow:hidden;background:#000;container-type:size}
+/* timeline */
+.pm-trk{position:relative;flex:1;min-height:0;display:grid;grid-auto-rows:minmax(0,1fr);gap:max(2px,.35cqh);padding:.45em .55em .5em}
+.pm-ln{position:relative;display:grid;grid-template-columns:clamp(18px,2.6cqw,34px) minmax(0,1fr);gap:.4em;align-items:stretch;min-height:0}
+.pm-lh{display:grid;place-items:center;border-radius:.3em;background:#2a2a2f;color:#c9c9d0;overflow:hidden}
+.pm-lh svg{width:74%;height:74%}
+.pm-lc{position:relative;min-width:0;border-radius:.3em;background:rgb(255 255 255/.035)}
+.pm-ph{position:absolute;top:0;bottom:0;left:calc(var(--pp,0) * 100%);width:2px;margin-left:-1px;background:#F86820;z-index:3;pointer-events:none}
+.pm-ph::before{content:"";position:absolute;left:-4px;top:0;border:5px solid transparent;border-top:6px solid #F86820;border-bottom:0}
+.pm-pha{position:absolute;inset:.45em .55em .5em calc(.55em + clamp(18px,2.6cqw,34px) + .4em);pointer-events:none}
+/* panel cua tool */
+.pm-pan{flex:1;min-height:0;display:flex;flex-direction:column;gap:.6em;padding:.7em}
+.pm-btn{position:relative;margin-top:auto;display:flex;align-items:center;justify-content:center;gap:.5em;padding:.75em .5em;border-radius:.6em;background:var(--c);color:#fff;font-weight:800;white-space:nowrap;
+  transform:scale(calc(1 - var(--bam,0) * .06));box-shadow:0 0 0 calc(var(--bam,0) * .5em) color-mix(in srgb,var(--c) 35%,transparent)}
+.pm-btn.xong{background:#1f9d55}
+.pm-row{display:flex;align-items:center;gap:.5em;padding:.5em .6em;border-radius:.5em;background:rgb(255 255 255/.045);color:#d6d6dc;white-space:nowrap;overflow:hidden}
+.pm-row > i{flex:none;width:1.5em;height:1.5em;border-radius:50%;overflow:hidden;background:#2f2f35}
+.pm-row > i svg{width:100%;height:100%}
+.pm-row > span{overflow:hidden;text-overflow:ellipsis}
+.pm-row > b{margin-left:auto;flex:none;color:#7ddc9c;font-weight:800}
+/* con tro: toa do % theo cua so */
+.pm-cur{position:absolute;left:calc(var(--cx,80) * 1%);top:calc(var(--cy,40) * 1%);width:max(14px,1.7cqw);height:max(14px,1.7cqw);z-index:6;pointer-events:none;opacity:var(--co,1);
+  transform:scale(calc(1 - var(--bam,0) * .18));filter:drop-shadow(0 2px 3px rgb(0 0 0/.6))}
+.pm-cur svg{display:block;width:100%;height:100%}
+/* dien thoai / o hep: bo thanh menu + o Project, chi hien chu cua buoc dang dien */
+@container (max-width:560px){
+  .pm{padding:6px 5px 8px;gap:5px}
+  .pm-menu,.pm-bin-fr{display:none}
+  .pm-win{grid-template-rows:auto minmax(0,1fr)}
+  .pm-top{grid-template-columns:minmax(0,1fr)}
+  .pm-steps{gap:5px}
+  .pm-steps li{padding:.35em}
+  .pm-steps li span{display:none}
+  .pm[data-buoc="1"] .pm-steps li:nth-child(1),.pm[data-buoc="2"] .pm-steps li:nth-child(2),.pm[data-buoc="3"] .pm-steps li:nth-child(3){padding-right:.8em}
+  .pm[data-buoc="1"] .pm-steps li:nth-child(1) span,.pm[data-buoc="2"] .pm-steps li:nth-child(2) span,.pm[data-buoc="3"] .pm-steps li:nth-child(3) span{display:block}
+  .pm-body{grid-template-columns:minmax(0,1fr) 92px}
+  .pm-pan{padding:5px;gap:4px}
+  .pm-row{padding:.35em .4em}
 }
+
+/* 2 Auto Podcast (pm): 3 may quay tren timeline, bam nut -> tool cat theo NGUOI DANG NOI, man hinh chuyen theo */
+.pmp-shot{position:absolute;inset:0;opacity:0;transition:opacity .18s}
+.pmp-shot svg{position:absolute;left:50%;bottom:0;height:92%;transform:translateX(-50%)}
+.pmp-shot.w svg{height:100%;width:100%;left:0;transform:none}
+.pmp-shot.a{background:linear-gradient(160deg,#5a3a2c,#1c1614 78%)}
+.pmp-shot.b{background:linear-gradient(200deg,#23405a,#12181e 78%)}
+.pmp-shot.w{background:linear-gradient(180deg,#3d3348,#15131a 78%)}
+.pm-scr[data-cam="a"] .pmp-shot.a,.pm-scr[data-cam="b"] .pmp-shot.b,.pm-scr[data-cam="w"] .pmp-shot.w{opacity:1}
+.pmp-bb{position:absolute;left:50%;top:6%;max-width:88%;transform:translateX(-50%) scale(var(--k,0));transform-origin:50% 100%;padding:.45em .8em;border-radius:.9em;background:#fff;color:#16110d;
+  font:800 max(10px,5.2cqw)/1.15 Inter,sans-serif;white-space:nowrap;box-shadow:0 .3em .9em rgb(0 0 0/.45)}
+.pmp-seg{position:absolute;top:0;bottom:0;left:calc(var(--l) * 100%);width:calc(var(--w) * 100%);border-radius:.25em;background:var(--kc);opacity:.5;overflow:hidden;transition:opacity .2s,box-shadow .2s}
+.pmp-seg.x{box-shadow:inset 2px 0 0 #0f0f11,inset -2px 0 0 #0f0f11;opacity:.14}
+.pmp-seg.x.on{opacity:1}
+.pmp-seg svg{position:absolute;inset:12% 2%;width:96%;height:76%;transform-origin:50% 50%;transition:transform .2s}
+.pmp-seg.x:not(.on) svg{transform:scaleY(.3)}
 
 /* 3 Transcripts */
 .tr{display:grid;gap:calc(var(--u)*2)}
@@ -1407,89 +1420,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           </div>
         </div>
 
-        <!-- 2 Auto Podcast -->
-        <div class="sc sc-pod" style="--c:#7c4dff">
-          <div class="bgw">SWITCH</div>
-          <div class="set p2-a-set" id="p2-a-set">
-            <!-- phong quay: 2 nguoi, 2 mic, 3 may quay (moi nguoi 1 may + 1 may toan canh). Trang thai ban dau (va ban giam chuyen dong) = nguoi A dang noi, mic B vat nho -->
-            <div class="p2-a-room">
-              <div class="p2-a-h" data-i="p2-a-room">In the room</div>
-              <div class="p2-a-stg">
-                <div class="p2-a-fr">
-                  <svg viewBox="0 0 320 236" aria-hidden="true">
-                    <defs><radialGradient id="p2-a-gh"><stop offset="0" style="stop-color:var(--c);stop-opacity:.62"/><stop offset=".55" style="stop-color:var(--c);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--c);stop-opacity:0"/></radialGradient></defs>
-                    <rect x="18" y="18" width="54" height="74" rx="6" fill="#2f2939"/><rect x="24" y="24" width="42" height="62" rx="4" fill="#352e40"/>
-                    <rect x="248" y="18" width="54" height="74" rx="6" fill="#2f2939"/><rect x="254" y="24" width="42" height="62" rx="4" fill="#352e40"/>
-                    <path d="M160 0V22" stroke="#3a3346" stroke-width="2"/><path d="M146 30a14 9 0 0 1 28 0z" fill="#3a3346"/><ellipse cx="160" cy="31" rx="9" ry="2.4" fill="#ffd9a0" opacity=".55"/>
-                    <g class="p2-a-cam" data-k="a" style="--p2-a-k:1"><ellipse class="p2-a-cn" cx="104" cy="112" rx="62" ry="66" fill="url(#p2-a-gh)"/></g><g class="p2-a-cam" data-k="w"><ellipse class="p2-a-cn" cx="160" cy="114" rx="150" ry="70" fill="url(#p2-a-gh)"/></g><g class="p2-a-cam" data-k="b"><ellipse class="p2-a-cn" cx="216" cy="112" rx="62" ry="66" fill="url(#p2-a-gh)"/></g>
-                    <use href="#nv-podcast" x="0" y="40" width="320" height="180"/>
-                    <g class="p2-a-cam" data-k="a" transform="translate(70 -70) scale(1.36)" style="--p2-a-k:1">
-                      <path d="M0 206L-12 224M0 206L12 224M0 206V224" stroke="#3b3b43" stroke-width="2.6" stroke-linecap="round"/>
-                      <rect x="-8" y="180" width="16" height="6" rx="2" fill="#2c2c31"/><rect x="-17" y="184" width="34" height="23" rx="4" fill="#232327" stroke="#4a4a52"/>
-                      <rect class="p2-a-tl" x="-18.5" y="182.5" width="37" height="26" rx="5" fill="none" style="stroke:var(--c)" stroke-width="2"/>
-                      <rect x="-13" y="188" width="21" height="15" rx="2" fill="#0d0e12"/>
-                      <path d="M-9.5 203q0-6.5 7-7t7 7z" fill="#e0a63a"/><circle cx="-2.5" cy="192.6" r="2.7" fill="#a86a4b"/><path d="M-5.2 191.6a2.7 2.7 0 0 1 5.4 0z" fill="#2a1c17"/>
-                      <circle cx="12.4" cy="191.5" r="3" fill="#4a1e1e"/><circle class="p2-a-tl" cx="12.4" cy="191.5" r="6.4" fill="#ff453a" opacity=".3"/><circle class="p2-a-tl" cx="12.4" cy="191.5" r="3" fill="#ff453a"/>
-                    </g>
-                    <g class="p2-a-cam" data-k="w" transform="translate(160 -70) scale(1.36)">
-                      <path d="M0 206L-12 224M0 206L12 224M0 206V224" stroke="#3b3b43" stroke-width="2.6" stroke-linecap="round"/>
-                      <rect x="-8" y="180" width="16" height="6" rx="2" fill="#2c2c31"/><rect x="-17" y="184" width="34" height="23" rx="4" fill="#232327" stroke="#4a4a52"/>
-                      <rect class="p2-a-tl" x="-18.5" y="182.5" width="37" height="26" rx="5" fill="none" style="stroke:var(--c)" stroke-width="2"/>
-                      <rect x="-13" y="188" width="21" height="15" rx="2" fill="#0d0e12"/>
-                      <path d="M-12 203q0-5 4.6-5.4t4.6 5.4z" fill="#e0a63a"/><circle cx="-7.4" cy="195" r="2" fill="#a86a4b"/>
-                      <path d="M-1.6 203q0-5 4.6-5.4t4.6 5.4z" fill="#7fb2ea"/><circle cx="3" cy="195" r="2" fill="#f0c9a8"/><path d="M0.8 195.6a2.3 2.3 0 0 1 4.4 0v1.6h-.8v-1.2h-2.8v1.2h-.8z" fill="#b5532a"/>
-                      <circle cx="12.4" cy="191.5" r="3" fill="#4a1e1e"/><circle class="p2-a-tl" cx="12.4" cy="191.5" r="6.4" fill="#ff453a" opacity=".3"/><circle class="p2-a-tl" cx="12.4" cy="191.5" r="3" fill="#ff453a"/>
-                    </g>
-                    <g class="p2-a-cam" data-k="b" transform="translate(250 -70) scale(1.36)">
-                      <path d="M0 206L-12 224M0 206L12 224M0 206V224" stroke="#3b3b43" stroke-width="2.6" stroke-linecap="round"/>
-                      <rect x="-8" y="180" width="16" height="6" rx="2" fill="#2c2c31"/><rect x="-17" y="184" width="34" height="23" rx="4" fill="#232327" stroke="#4a4a52"/>
-                      <rect class="p2-a-tl" x="-18.5" y="182.5" width="37" height="26" rx="5" fill="none" style="stroke:var(--c)" stroke-width="2"/>
-                      <rect x="-13" y="188" width="21" height="15" rx="2" fill="#0d0e12"/>
-                      <path d="M-9.5 203q0-6.5 7-7t7 7z" fill="#7fb2ea"/><circle cx="-2.5" cy="192.6" r="2.7" fill="#f0c9a8"/><path d="M-5.6 193.4a3.1 3.1 0 0 1 6.2 0v2.6h-1.1v-2h-4v2h-1.1z" fill="#b5532a"/>
-                      <circle cx="12.4" cy="191.5" r="3" fill="#4a1e1e"/><circle class="p2-a-tl" cx="12.4" cy="191.5" r="6.4" fill="#ff453a" opacity=".3"/><circle class="p2-a-tl" cx="12.4" cy="191.5" r="3" fill="#ff453a"/>
-                    </g>
-                  </svg>
-                </div>
-                <p class="p2-a-bb p2-a-ba" data-s="1" data-i="p2-a-s1" style="--p2-a-k:1">So, how did you start?</p>
-                <p class="p2-a-bb p2-a-bbb" data-s="2" data-i="p2-a-s2">Honestly? By accident.</p>
-                <p class="p2-a-bb p2-a-ba" data-s="3" data-i="p2-a-s3">No way!</p>
-                <p class="p2-a-bb p2-a-qt" data-s="4" aria-hidden="true"><i></i><i></i><i></i></p>
-                <p class="p2-a-bb p2-a-bbb" data-s="5" data-i="p2-a-s5">True story.</p>
-              </div>
-              <div class="p2-a-mics">
-                <span class="p2-a-mic" data-k="a"><i class="p2-a-mi"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></i><i class="p2-a-lv"><i style="--h:.55"></i><i style="--h:.85"></i><i style="--h:.65"></i><i style="--h:.95"></i><i style="--h:.5"></i></i><svg class="p2-a-da" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5.5 12.5 12 19l6.5-6.5"/></svg><span class="p2-a-dn" data-i="p2-a-mic">Mic turned down</span></span>
-                <span class="p2-a-mic" data-k="b" style="--p2-a-d:1"><i class="p2-a-mi"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></i><i class="p2-a-lv"><i style="--h:.24"></i><i style="--h:.3"></i><i style="--h:.22"></i><i style="--h:.28"></i><i style="--h:.25"></i></i><svg class="p2-a-da" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5.5 12.5 12 19l6.5-6.5"/></svg><span class="p2-a-dn" data-i="p2-a-mic">Mic turned down</span></span>
-              </div>
-            </div>
-            <div class="p2-a-ar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h16M13 6l6 6-6 6"/></svg></div>
-            <!-- ket qua: video moi, ai noi thi hien nguoi do -->
-            <div class="p2-a-out">
-              <div class="p2-a-scr">
-                <div class="p2-a-h"><i class="p2-a-rec"></i><span data-i="p2-a-tvh">Your video</span><b class="p2-a-auto"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2L12 19.5l-2.2-6.3L3.5 11l6.3-2.2z"/></svg><span data-i="p2-a-auto">Auto</span></b></div>
-                <div class="p2-a-tv" data-cam="a">
-                  <div class="p2-a-ly p2-a-la"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-a-ngoi" width="320" height="180"/></svg></div>
-                  <div class="p2-a-ly p2-a-lb"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-b-ngoi" width="320" height="180"/></svg></div>
-                  <div class="p2-a-ly p2-a-lw"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-podcast" width="320" height="180"/></svg></div>
-                  <i class="p2-a-fl"></i>
-                  <span class="p2-a-new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span data-i="p2-a-new">New video</span></span>
-                </div>
-                <div class="p2-a-cap">
-                  <p class="p2-a-c" data-k="a" style="--p2-a-k:1"><span data-i="p2-a-hT">He's talking</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h16M13 6l6 6-6 6"/></svg><b data-i="p2-a-hS">Show him</b></p>
-                  <p class="p2-a-c" data-k="b"><span data-i="p2-a-sT">She's talking</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h16M13 6l6 6-6 6"/></svg><b data-i="p2-a-sS">Show her</b></p>
-                  <p class="p2-a-c" data-k="w"><span data-i="p2-a-wT">Nobody talking</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h16M13 6l6 6-6 6"/></svg><b data-i="p2-a-wS">Show both</b></p>
-                  <p class="p2-a-end"><b data-i="p2-a-e1">Cut for you, start to finish.</b><i data-i="p2-a-e2">Your original stays as it was.</i></p>
-                </div>
-              </div>
-              <div class="p2-a-strip">
-                <i class="p2-a-th" data-c="a" style="--p2-a-k:1"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-a-ngoi" width="320" height="180"/></svg></i>
-                <i class="p2-a-th" data-c="b"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-b-ngoi" width="320" height="180"/></svg></i>
-                <i class="p2-a-th" data-c="a"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-a-ngoi" width="320" height="180"/></svg></i>
-                <i class="p2-a-th" data-c="w"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-podcast" width="320" height="180"/></svg></i>
-                <i class="p2-a-th" data-c="b"><svg class="nv" viewBox="0 0 320 180" aria-hidden="true"><use href="#nv-b-ngoi" width="320" height="180"/></svg></i>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- 2 Auto Podcast: noi dung do JS dung (pmKhung) -->
+        <div class="sc sc-pod" style="--c:#7c4dff"></div>
 
         <!-- 3 Transcripts -->
         <div class="sc sc-tr" style="--c:#2f80ed">
@@ -2562,6 +2494,50 @@ function batDauDien() {
   $$("[data-split]").forEach(h => gsap.set($$(".sw > span", h), { yPercent: 110 }));
 
   // ================== SAN KHAU 12 CANH ==================
+  // ================== pm-: KHUNG CUA SO PREMIERE DUNG CHUNG CHO CAC CANH (01/10) ==================
+  // Anh: "lam animation phai co them phan mem vao de dien ta... nguoi khong phai editor cung phai hieu". Moi canh goi pmKhung() de dung
+  // 3 buoc chu + cua so Premiere (Project | man hinh | Timeline | panel tool), roi tu viet fn(p). Chu them qua pmTxt (EN + VI) va data-i.
+  const PM_MENU = ["File", "Edit", "Clip", "Sequence", "Markers", "Graphics", "View", "Window", "Help"];
+  const pmTxt = (en, vi) => { Object.assign(T.en, en); Object.assign(T.vi, vi); };
+  const pmI = (k, tag = "span") => `<${tag} data-i="${k}">${tt(k)}</${tag}>`;
+  const nv = (id, w, h) => `<svg class="nv" viewBox="0 0 ${w} ${h}" aria-hidden="true"><use href="#nv-${id}" width="${w}" height="${h}"/></svg>`;
+  const PM_IC = {
+    cam: '<path d="M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m15 10 6-3v10l-6-3"/>',
+    mic: '<path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M18 11a6 6 0 0 1-12 0M12 17v4"/>',
+    ok: '<path d="m5 12 5 5 9-10"/>'
+  };
+  const pmIc = (k, w = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PM_IC[k]}</svg>`;
+  function pmKhung(sc, o) {
+    sc.innerHTML = `<div class="pm" data-buoc="1"><ol class="pm-steps">${o.buoc.map((k, i) => `<li><b>${i + 1}</b>${pmI(k)}</li>`).join("")}</ol>` +
+      `<div class="pm-win"><div class="pm-tit"><b>Adobe Premiere Pro</b>${pmI(o.proj)}<i><svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="currentColor" stroke-width="1.2"/></svg><svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><svg viewBox="0 0 12 12"><path d="m2.8 2.8 6.4 6.4M9.2 2.8 2.8 9.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></i></div>` +
+      `<div class="pm-menu">${PM_MENU.map(m => `<span>${m}</span>`).join("")}</div>` +
+      `<div class="pm-body"><div class="pm-main"><div class="pm-top">` +
+      `<div class="pm-fr pm-bin-fr"><div class="pm-tab">Project</div><div class="pm-bin">${o.bin}</div></div>` +
+      `<div class="pm-fr pm-mon"><div class="pm-scr">${o.mon}</div></div></div>` +
+      `<div class="pm-fr"><div class="pm-tab">Timeline</div><div class="pm-trk">${o.tl}</div><div class="pm-pha"><i class="pm-ph"></i></div></div></div>` +
+      `<div class="pm-fr"><div class="pm-tab tool"><i>${svgIc(o.k, 2.2)}</i>${o.ten}</div><div class="pm-pan">${o.pan}<span class="pm-btn">${o.btn}</span></div></div></div>` +
+      `<i class="pm-cur"><svg viewBox="0 0 24 24"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></i></div></div>`;
+    const root = $(".pm", sc), win = $(".pm-win", sc);
+    const r = { root, win, scr: $(".pm-scr", sc), btn: $(".pm-btn", sc), cur: $(".pm-cur", sc), ph: $(".pm-ph", sc), bx: 87, by: 90 };
+    // vi tri nut tinh theo % cua cua so, do bang offset (khong dinh transform nghieng cua the), chi do lai khi doi co man / doi ngon ngu
+    r.do = () => {
+      if (!win.offsetWidth) return;
+      let x = 0, y = 0, e = r.btn;
+      while (e && e !== win) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; }
+      r.bx = (x + r.btn.offsetWidth * .55) / win.offsetWidth * 100; r.by = (y + r.btn.offsetHeight * .5) / win.offsetHeight * 100;
+    };
+    r.do(); addEventListener("resize", r.do); relangFns.push(r.do); document.fonts && document.fonts.ready.then(r.do);
+    r.buoc = n => { if (root.dataset.buoc !== String(n)) root.dataset.buoc = n; };
+    // con tro di toi nut trong [a,b], bam ngay sau b, roi mo dan
+    r.bam = (p, a, b, x0 = 60, y0 = 34) => {
+      const k = em(loc(p, a, b)), c = loc(p, b, b + .02) - loc(p, b + .02, b + .04);
+      r.cur.style.setProperty("--cx", (x0 + (r.bx - x0) * k).toFixed(2)); r.cur.style.setProperty("--cy", (y0 + (r.by - y0) * k).toFixed(2));
+      r.cur.style.setProperty("--bam", c.toFixed(3)); r.btn.style.setProperty("--bam", c.toFixed(3));
+      r.cur.style.setProperty("--co", (1 - loc(p, b + .08, b + .14)).toFixed(3));
+    };
+    return r;
+  }
+
   const scenes = $$("#rpStage .sc");
   const BUILD = [
     // 1 Auto Cut: khoang lang do len khi dau doc quet qua, roi dong lai; dem thoi gian ngan di
@@ -2576,58 +2552,50 @@ function batDauDien() {
       el._fnA = fnA; el._fnB = fnB; el._p = 1;
       return gsap.timeline().add(step(fnA, .55)).add(step(fnB, .55), "+=.05");
     },
-    // 2 Auto Podcast: trong phong quay ai noi thi bong thoai bat ra + den do may quay cua nguoi do sang; man hinh "Video cua ban" cat sang
-    // dung nguoi do; khong ai noi thi hien ca hai (luat that cua tool: im ro > 2 s -> canh toan). Mic nguoi dang nghe vat nho: vach am xam + thap.
-    // Cuoi: the "Video moi" tren man hinh + dai hinh nho, ban goc giu nguyen. Moi trang thai tinh tu p (tua lui/toi nhu nhau).
+    // 2 Auto Podcast (pm): timeline co 3 may quay quay suot buoi. Bam nut -> tool nghe ai dang noi -> cat, chi giu may quay cua nguoi dang noi
+    //   (im lang thi ve canh ca hai), mic nguoi dang nghe nho lai. Man hinh chuyen theo. Cuoi: mot BAN DUNG MOI trong Project (ban goc giu nguyen).
     el => {
-      // [ai len hinh, bat dau, ket thuc]. Doan 0 va doan 4 = khong ai noi -> canh toan
-      const SEG = [["w", 0, .03], ["a", .03, .24], ["b", .24, .46], ["a", .46, .55], ["w", .55, .72], ["b", .72, .86]], END = .86;
-      const tv = $(".p2-a-tv", el), fl = $(".p2-a-fl", el), nw = $(".p2-a-new", el);
-      const bubs = $$(".p2-a-bb", el).map(b => [b, SEG[+b.dataset.s]]);
-      const dots = $$(".p2-a-qt i", el);
-      const mics = $$(".p2-a-mic", el).map(m => [m, m.dataset.k, $$(".p2-a-lv i", m)]);
-      const cams = $$(".p2-a-cam", el).map(c => [c, c.dataset.k]);
-      const caps = $$(".p2-a-c", el).map(c => [c, c.dataset.k]), endC = $(".p2-a-end", el);
-      const ths = $$(".p2-a-th", el);
-      const env = (p, a, b, ri, ro) => em(loc(p, a, a + ri)) * (1 - em(loc(p, b - ro, b)));
-      const set = (n, k, v) => { if (n["_" + k] !== v) { n["_" + k] = v; n.style.setProperty(k, v); } };
-      const chop = (p, a) => { const x = (p - a) / .012; return x > 0 && x < 1 ? (1 - Math.abs(x * 2 - 1)).toFixed(2) : "0"; };
-      let camCu = "a";
+      pmTxt({ pmP0: "Podcast EP12", pmP1: "Click one button", pmP2: "It listens for who is talking", pmP3: "The picture follows the speaker",
+              pmPc1: "Camera 1", pmPc2: "Camera 2", pmPc3: "Camera 3", pmPm1: "Him", pmPm2: "Her", pmPm3: "Both of them", pmPnew: "New edit",
+              pmPb: "So, how did you start?|Honestly? By accident.|No way!|…|True story.|Tell me more." },
+            { pmP0: "Podcast tập 12", pmP1: "Bấm một nút", pmP2: "Tool nghe xem ai đang nói", pmP3: "Hình tự chuyển sang người đang nói",
+              pmPc1: "Máy quay 1", pmPc2: "Máy quay 2", pmPc3: "Máy quay 3", pmPm1: "Anh ấy", pmPm2: "Cô ấy", pmPm3: "Cả hai", pmPnew: "Bản dựng mới",
+              pmPb: "Chị bắt đầu thế nào?|Thật ra là tình cờ.|Thật á?|…|Chuyện thật đấy.|Kể tiếp đi." });
+      const SEG = [["a", 0, .17], ["b", .17, .4], ["a", .4, .52], ["w", .52, .63], ["b", .63, .84], ["a", .84, 1]];
+      const A = nv("a-bust", 200, 200), B = nv("b-bust", 200, 200), Wd = nv("podcast", 320, 180);
+      const wave = n => `<svg viewBox="0 0 100 20" preserveAspectRatio="none"><path fill="rgb(255 255 255/.8)" d="${Array.from({ length: n }, (_, i) => { const h = 3 + rnd() * 14, w = 60 / n; return `M${(i * 100 / n).toFixed(1)} ${(10 - h / 2).toFixed(1)}h${w.toFixed(1)}v${h.toFixed(1)}h-${w.toFixed(1)}z`; }).join("")}"/></svg>`;
+      // lit(c): doan co ma c thi lan nay "sang" hay khong
+      const lane = (head, kc, lit, audio) => `<div class="pm-ln"><span class="pm-lh">${head}</span><div class="pm-lc">${SEG.map(([c, l, r]) =>
+        `<b class="pmp-seg${lit(c) ? " on" : ""}" style="--l:${l};--w:${(r - l).toFixed(3)};--kc:${kc}">${audio ? wave(Math.max(6, Math.round((r - l) * 70))) : ""}</b>`).join("")}</div></div>`;
+      const r = pmKhung(el, { k: "pod", ten: "Auto Podcast", proj: "pmP0", buoc: ["pmP1", "pmP2", "pmP3"], btn: "Auto Podcast",
+        bin: [[A, "pmPc1", "#3a271e"], [B, "pmPc2", "#1c2f42"], [Wd, "pmPc3", "#2c2536"]].map(([s, k, bg]) => `<span class="pm-bi" style="--bg:${bg}"><i>${s}</i>${pmI(k)}</span>`).join("") +
+          `<span class="pm-bi moi" style="--bg:#2c2536"><i>${Wd}</i>${pmI("pmPnew")}</span>`,
+        mon: `<div class="pmp-shot a">${A}</div><div class="pmp-shot b">${B}</div><div class="pmp-shot w">${Wd}</div><span class="pmp-bb"></span>`,
+        tl: lane(nv("a-dau", 100, 130), "#b5754d", c => c === "a") + lane(nv("b-dau", 100, 130), "#4f86c6", c => c === "b") + lane(pmIc("cam"), "#8a7aa6", c => c === "w") +
+            lane(pmIc("mic"), "#2f9e7c", c => c !== "b", 1) + lane(pmIc("mic"), "#2f9e7c", c => c !== "a", 1),
+        pan: [["a-dau", "pmPm1", "pmPc1"], ["b-dau", "pmPm2", "pmPc2"]].map(([f, m, c]) => `<span class="pm-row"><i>${nv(f, 100, 130)}</i>${pmI(m)}<b>${pmIc("ok", 3)}</b></span>`).join("") +
+             `<span class="pm-row"><i style="display:grid;place-items:center;color:#c9c9d0">${pmIc("cam")}</i>${pmI("pmPm3")}<b>${pmIc("ok", 3)}</b></span>` });
+      $$(".pm-row > b svg", el).forEach(s => { s.style.width = "1.1em"; s.style.height = "1.1em"; s.style.display = "block"; });
+      const lanes = $$(".pm-lc", el).map(lc => $$(".pmp-seg", lc)), bb = $(".pmp-bb", el), moi = $(".pm-bi.moi", el), shots = $$(".pmp-shot svg", el);
+      let cuIdx = -2;
+      relangFns.push(() => { cuIdx = -2; fn(el._p || 0); });
       const fn = p => {
-        let si = SEG.findIndex(s => p >= s[1] && p < s[2]); if (si < 0) si = SEG.length - 1;
-        const cur = SEG[si][0], kEnd = em(loc(p, END, END + .05));
-        if (cur !== camCu) { camCu = cur; tv.dataset.cam = cur; }
-        // ai dang noi (0..1, vao/ra mem) va mic ai dang bi vat nho (bat dau ngay sau khi nguoi kia mo loi)
-        let ta = 0, tb = 0, da = 0, db = 0;
-        SEG.forEach(([c, a, b], k) => {
-          if (!k || c === "w") return;
-          const e = env(p, a, b, .012, .012), d = env(p, a + .01, b, .025, .012);
-          if (c === "a") { ta = Math.max(ta, e); db = Math.max(db, d); } else { tb = Math.max(tb, e); da = Math.max(da, d); }
-        });
-        da *= 1 - ta; db *= 1 - tb;
-        set(el, "--nv-mieng-a", (ta * Math.max(0, Math.sin(p * 170))).toFixed(2)); set(el, "--nv-mieng-b", (tb * Math.max(0, Math.sin(p * 170 + 2))).toFixed(2));
-        set(el, "--nv-song-a", ta.toFixed(2)); set(el, "--nv-song-b", tb.toFixed(2));
-        set(el, "--nv-nhay-a", (ta * (.25 + .25 * Math.sin(p * 60))).toFixed(2)); set(el, "--nv-nhay-b", (tb * (.25 + .25 * Math.sin(p * 60 + 1))).toFixed(2));
-        set(el, "--nv-chop-a", chop(p, .615)); set(el, "--nv-chop-b", chop(p, .665));
-        bubs.forEach(([b, s]) => set(b, "--p2-a-k", env(p, s[1], s[2], .022, .016).toFixed(3)));
-        dots.forEach((d, i) => set(d, "--p2-a-o", (.3 + .7 * Math.max(0, Math.sin(p * 55 - i * .9))).toFixed(2)));
-        // vach am cua tung mic: noi -> nhay cao, mau canh; bi vat nho -> xam, sat day
-        mics.forEach(([m, k, bars]) => {
-          const t = k === "a" ? ta : tb, d = k === "a" ? da : db, s = k === "a" ? 0 : 2.6;
-          set(m, "--p2-a-d", d.toFixed(3));
-          bars.forEach((b, i) => {
-            const h = .3 + t * (.1 + .6 * Math.abs(Math.sin(p * 210 + i * 1.9 + s)));
-            set(b, "--h", (h * (1 - d) + d * (.2 + .12 * Math.abs(Math.sin(p * 160 + i * 2.3)))).toFixed(3));
-          });
-        });
-        // may quay dang len hinh: den do + vien + chum sang (cat tuc thi nhu ban dung that, chi mem 1 chut cho mat)
-        cams.forEach(([c, k]) => set(c, "--p2-a-k", k === cur ? em(loc(p, SEG[si][1], SEG[si][1] + .008)).toFixed(3) : "0"));
-        const dd = p - SEG[si][1]; set(fl, "opacity", si && dd < .014 ? ((1 - dd / .014) * .32).toFixed(3) : "0");
-        caps.forEach(([c, k]) => { let v = 0; SEG.forEach(([cc, a, b], j) => { if (j && cc === k) v = Math.max(v, env(p, a, b, .014, .012)); }); set(c, "--p2-a-k", (v * (1 - kEnd)).toFixed(3)); });
-        set(endC, "--p2-a-k", kEnd.toFixed(3)); set(nw, "--p2-a-k", kEnd.toFixed(3));
-        ths.forEach((t, j) => { const s = SEG[j + 1]; set(t, "--p2-a-k", em(loc(p, s[1], s[1] + .025)).toFixed(3)); set(t, "--p2-a-on", p >= s[1] && p < s[2] ? "1" : "0"); });
+        el._p = p;
+        r.bam(p, 0, .1);
+        const chay = p >= .13, pp = loc(p, .15, .96);
+        r.ph.style.setProperty("--pp", pp.toFixed(4));
+        lanes.forEach(ss => ss.forEach((s, i) => s.classList.toggle("x", chay && pp >= SEG[i][1] - 1e-6)));
+        const idx = chay ? Math.max(0, SEG.findIndex(s => pp >= s[1] && pp < s[2])) : -1, cam = idx < 0 ? "w" : (pp >= 1 ? "a" : SEG[idx][0]);
+        if (r.scr.dataset.cam !== cam) r.scr.dataset.cam = cam;
+        if (idx !== cuIdx) { cuIdx = idx; bb.textContent = idx < 0 ? "" : (tt("pmPb").split("|")[idx] || ""); }
+        const s = idx < 0 ? null : SEG[idx];
+        bb.style.setProperty("--k", s ? (em(loc(pp, s[1], s[1] + .03)) * (1 - loc(pp, s[2] - .02, s[2]))).toFixed(3) : 0);
+        const noi = s && s[0] !== "w" ? Math.abs(Math.sin(pp * 130)).toFixed(2) : 0;
+        shots.forEach(sv => sv.style.setProperty("--nv-mieng", noi));
+        r.buoc(!chay ? 1 : pp < .17 ? 2 : 3);
+        moi.style.setProperty("--k", em(loc(p, .95, 1)).toFixed(3));
       };
-      return gsap.timeline().add(step(fn, 1.1));
+      return gsap.timeline().add(step(fn, 1.5));
     },
     // 3 Transcripts: chu bay len tu song am thanh vao phu de; khoi phu de roi xuong C1; cho khong chac co marker vang
     el => {
