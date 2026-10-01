@@ -5,6 +5,37 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-premiere] - 2026-10-01 19:52 (UTC+7) - Sửa chữ viền lộ đường nối bên trong (dải cam, chữ nền, số thứ tự) - máy nhà
+
+- **Bối cảnh:** anh gửi 2 ảnh dải cam ("Auto Short Viral", "Auto Podcast" có vạch thừa trong chữ A, S, t): *"sửa cho anh
+  cái này"*, rồi ảnh chữ nền "SAFE" ở cảnh Guide Frame: *"lỗi luôn"*.
+- **Nguyên nhân thật:** Inter từ Google Fonts là font biến thiên, mỗi chữ ghép từ nhiều nét CHỒNG nhau. `-webkit-text-stroke`
+  với ruột trong suốt vẽ viền của từng nét, nên lộ cả đường nối bên trong. Không phải lỗi CSS viết sai.
+- **Đo trên bản cũ** (Chrome headless, hệ số 2, chữ 120px, đếm điểm mực nằm trong thân chữ đã co 4 điểm ảnh):
+  dải cam lỗi **12/12 tên** (19.333 điểm) · chữ nền `.bgw` lỗi **9/12** (CUT, 9:16, HUB sạch: chữ không có nét chồng) ·
+  số `.pn-no` lỗi **1/12** (04).
+- **Đã sửa** (`premiere/index.html`, chép y hệt sang `premiere-nhap-3.html`):
+  - Dải cam (nền một màu): ruột chữ tô trùng màu dải (`--mq-nen`), viền 3px, `paint-order:stroke fill` (ruột vẽ SAU viền
+    nên che nửa trong và mọi đường nối, còn 1,5px viền ngoài). Đo: 19.333 → **0**.
+  - Chữ nền + số (nền chuyển màu, không tô ruột trùng nền được): chữ đặc + bộ lọc SVG `#chu-vien` đặt đầu `<body>`
+    (`feMorphology` nới 1,5px rồi `feComposite out` khoét thân chữ). Đo: 9.530 → 56 điểm, 1.013 → 8.
+  - ☠️ **Lần sửa 1 trên trang thật vẫn hỏng:** màu cũ là `color-mix(... 55%, transparent)`. Bộ lọc khoét theo độ đặc
+    của chữ, nên chữ đặc 55% chỉ bị khoét 55%, ruột còn ~25% màu (chữ "SAFE", số "06" hiện thành chữ đặc mờ). Trang thử
+    của em dùng màu trắng đặc nên không thấy. Sửa: màu đặc `var(--c)`, phần trong suốt dồn sang `opacity`
+    (`.bgw` .28 × .55 = **.154**, `.pn-no` .55 × .7 = **.385**). Đo lại bằng màu có độ trong suốt như trang thật:
+    bản lỗi 571.546 điểm, bản sửa **24**.
+- **Kiểm trên trang thật** (máy chủ tĩnh 127.0.0.1:8131, Chrome 152): phóng to chữ trên trang (chỉ để soi, không sửa
+  file) thấy "Auto Podcast" và "SAFE" sạch, ruột trong suốt. **Cuộn 12 cảnh, so cũ/mới xen kẽ 3 lượt mỗi bản:** tổng
+  5.011–5.532 ms vs 5.045–5.516 ms, khung hình khựng (LoAF) **0 và 0**, khung >20 ms 0–2 mỗi lượt ở CẢ HAI bản → bộ
+  lọc không làm cuộn nặng thêm. (Thước rAF bị khoá theo tần số màn hình, không thấy chi phí của bộ dựng hình GPU.)
+- **Bản điện thoại** https://claude.ai/artifact/RKgs9dfNu3U8sjM8z1MVV9 đăng đè (Version 2) bằng `tao-artifact.cjs` từ
+  nháp 3. Bản đang đăng trước đó khớp từng dòng với bản cũ sinh lại (chỉ thêm phần vỏ do Claude bọc ngoài), bản mới
+  khác đúng 12 dòng. Script báo "còn thẻ `<head`" là báo nhầm do khớp vào thẻ `<header`.
+- **Bẫy đo trong buổi:** mở trang bằng `file://` trong khung trình duyệt của Claude thì sân khấu 12 cảnh KHÔNG chạy
+  (đứng ở cảnh đầu, timecode 00:00:00:00) → phải mở qua máy chủ. Chụp Chrome headless cao hơn ~16.384 điểm ảnh bị cắt.
+- **Chưa kiểm:** Safari / Firefox / iPhone (máy chỉ có Chrome, Edge). Nếu trình duyệt không nhận bộ lọc SVG thì chữ
+  nền hiện thành chữ đặc mờ (không vỡ trang); nếu không nhận `paint-order` thì dải cam hiện viền dày 3px chồng lên chữ.
+
 ## [web-premiere] - 2026-10-01 19:31 (UTC+7) - Trang bộ tool Premiere (nháp 3) LÊN LIVE ở aio-shotsave.vercel.app/premiere/
 
 - **Bối cảnh:** anh: *"aio-shotsave.vercel.app/premiere/ đưa thằng này lên http://127.0.0.1:8124/premiere/?v=3 đi em lẹ lên"*.
