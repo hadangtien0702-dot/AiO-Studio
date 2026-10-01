@@ -21,6 +21,8 @@
   - Trang Shot & Save `/` 200 (271.841 byte), `/legal.html` 200, `/.env.local` 404.
   - Chrome thật qua Playwright, 1440×900, lăn chuột thật: vào section ra clip 01, 5 nấc xuống = 02, 03, 04, 05, 06,
     2 nấc lên = 05, 04. GSAP 3.13.0 + ScrollTrigger nạp được, font Inter nạp được, 0 lỗi console, 0 request hỏng, tràn ngang 0.
+  - Đo lại lần 2 lúc 19:32, đủ cả dải, hai khổ 1440×900 và 2048×1030: 12 nấc xuống = clip 01 → 12 (12/12), 3 nấc lên =
+    11, 10, 9; 0 lỗi console, 0 request hỏng, tràn ngang 0; 3 link `../` trỏ đúng `/`, `/legal.html#terms`, `/legal.html#privacy`.
 - **CHƯA kiểm trên live:** điện thoại thật, Safari, tiếng Việt, nền sáng, phím J K L, kéo ngang (các mục này đã đo trên
   bản ở máy lúc 16:20, cùng file từng byte, nhưng chưa đo lại trên live).
 - **Còn hở:**
