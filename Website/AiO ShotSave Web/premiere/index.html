@@ -296,30 +296,35 @@ h2 em{font-style:normal;color:var(--brand)}
 .caret{display:inline-block;width:2px;height:1em;background:var(--c);vertical-align:-.15em;margin-left:2px;animation:rec 1s steps(2) infinite}
 .pill{display:inline-flex;align-items:center;gap:calc(var(--u)*.8);padding:calc(var(--u)*.8) calc(var(--u)*1.6);border-radius:999px;background:var(--c);color:#fff;font:800 calc(var(--u)*1.9)/1 Inter,sans-serif;white-space:nowrap}
 
-/* 1 Auto Cut */
-.sc-cut .set{display:grid;justify-items:center}
-.cut-w{position:relative;width:max-content;max-width:100%;padding:calc(var(--u)*2) 0}
-.cut-trk{display:flex;align-items:stretch;height:calc(var(--u)*14)}
-.tk{position:relative;flex:none;border-radius:calc(var(--u)*.8);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--u)*1) calc(var(--u)*1.2);margin-right:calc(var(--u)*.5)}
-.tk .tx{font:800 calc(var(--u)*3.4)/1 Inter,sans-serif;letter-spacing:-.03em;color:#fff;white-space:nowrap}
-.tk .wv{display:flex;align-items:center;gap:calc(var(--u)*.35);height:calc(var(--u)*5)}
-.tk .wv i{flex:1;min-width:1px;border-radius:2px;background:rgb(255 255 255/.7);height:var(--h)}
-.tk.w{background:#2f80ed}
-.tk.g{background:#2a2a2e;width:calc(var(--u)*9 * var(--k,1));padding-left:calc(var(--u)*1.2 * var(--k,1));padding-right:calc(var(--u)*1.2 * var(--k,1));margin-right:calc(var(--u)*.5 * var(--k,1));opacity:var(--k,1);transition:background-color .2s}
-.tk.g .tx{font-size:calc(var(--u)*2.6);color:#9b9ba3;font-weight:700}
-.tk.g .wv i{background:rgb(255 255 255/.25)}
-.tk.g.cut{background:#d92d20}.tk.g.cut .tx{color:#fff;text-decoration:line-through}
-.cut-ph{position:absolute;top:0;bottom:0;left:calc(100% * var(--pp,0));width:2px;background:#F86820;z-index:2}
-.cut-ph::before{content:"";position:absolute;left:-6px;top:-8px;border:7px solid transparent;border-top:8px solid #F86820;border-bottom:0}
- .cut-foot{display:flex;justify-content:center;text-align:center;gap:calc(var(--u)*6);margin-top:calc(var(--u)*3);font:600 calc(var(--u)*2)/1.2 Inter,sans-serif;color:var(--s-ink-2)}
-.cut-foot b{display:block;font:900 calc(var(--u)*6)/1 var(--mono);letter-spacing:-.04em;color:#F86820}
-.cut-foot .z b{color:#34c759}
-
-/* hinh nguoi don gian dung chung (Short Viral, Guide Frame) */
-.pp{position:absolute;bottom:0;left:50%;width:44cqw;height:62cqw;transform:translateX(-50%);transition:left .3s,width .3s,height .3s,opacity .3s}
-.pp::before{content:"";position:absolute;left:50%;top:0;width:36%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:var(--sk)}
-.pp::after{content:"";position:absolute;left:0;right:0;bottom:0;height:52%;border-radius:45% 45% 0 0;background:var(--sh)}
-.pp.a{--sk:#d6ae93;--sh:#9a6f58}.pp.b{--sk:#e8c3a8;--sh:#4f7ea8}
+/* 1 Auto Cut (pm): bai noi tren timeline co nhung doan IM LANG (song phang). Bam nut -> dau doc quet, cho im lang do len -> bi rut di, cac doan
+   doi sat lai, ca bai NGAN LAI thay ro. Man hinh: nguoi noi + dong ho thoi luong. Panel: 3 dong chu thuong (tim thay / ngan di / chu bi mat). */
+.pmc-row{position:absolute;inset:0;display:flex}
+.pmc-s,.pmc-g{position:relative;flex:none;min-width:0;border-radius:.25em;overflow:hidden}
+.pmc-s{width:calc(var(--f) * 1%);background:var(--kc);box-shadow:inset -2px 0 0 #1f1f23}
+.pmc-g{width:calc(var(--f) * var(--k,1) * 1%);background:#2c2c32;opacity:calc(.25 + var(--k,1) * .75);box-shadow:inset -2px 0 0 #1f1f23;transition:background-color .15s}
+.pmc-g.cut{background:#d92d20}
+.pmc-s svg,.pmc-g svg{position:absolute;inset:14% 3%;width:94%;height:72%}
+.pmc-g::after{content:"";position:absolute;left:8%;right:8%;top:50%;height:2px;margin-top:-1px;border-radius:2px;background:rgb(255 255 255/.4)}
+.pmc-g.hinh::after{display:none}
+.pmc-g.hinh svg{inset:22% 0;width:100%;height:56%;color:rgb(255 255 255/.75)}
+.pmc-shot{position:absolute;inset:0;background:linear-gradient(160deg,#4d3527,#191412 78%)}
+.pmc-shot svg{position:absolute;left:50%;bottom:0;height:90%;transform:translateX(-50%)}
+.pmc-dur{position:absolute;right:4%;top:6%;padding:.3em .6em;border-radius:.4em;background:rgb(0 0 0/.6);color:#fff;font:700 max(10px,5cqw)/1 var(--mono);font-variant-numeric:tabular-nums}
+.pmc-chip{position:absolute;left:4%;bottom:7%;display:inline-flex;align-items:center;gap:.4em;padding:.35em .7em;border-radius:999px;font:800 max(10px,4.6cqw)/1 Inter,sans-serif;white-space:nowrap;
+  opacity:var(--k,0);transform:translateY(calc((1 - var(--k,0)) * 40%))}
+.pmc-chip.im{background:#d92d20;color:#fff}
+.pmc-chip.ok{background:#1f9d55;color:#fff}
+.pmc-chip svg{width:1.1em;height:1.1em}
+.pmc-st{display:grid;gap:.15em;padding:.55em .7em;border-radius:.5em;background:rgb(255 255 255/.045);min-width:0}
+.pmc-st > span{color:var(--s-ink-3);font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pmc-st > b{color:#fff;font:800 1.35em/1.1 Inter,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pmc-st.do > b{color:#ff8a7a}.pmc-st.cam > b{color:#F86820}.pmc-st.xanh > b{color:#5fd38a}
+.pmc-note{color:var(--s-ink-3);font-size:.86em}
+@container (max-width:560px){
+  .pmc-st{padding:.35em .45em}
+  .pmc-st > b{font-size:1.1em}
+  .pmc-note{display:none}
+}
 
 /* ===== pm-: CANH DIEN TRONG CUA SO PREMIERE (01/10, anh: "lam animation phai co them phan mem vao de dien ta... nguoi khong phai editor cung
    phai hieu", "giong 02 phan o duoi rat de hieu khi em dua hoat hoa phan mem vao"). Moi canh = 3 buoc chu doi thuong + cua so Adobe Premiere Pro
@@ -1411,14 +1416,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           </div>
         </div>
 
-        <!-- 1 Auto Cut -->
-        <div class="sc sc-cut" style="--c:#F86820">
-          <div class="bgw">CUT</div>
-          <div class="set">
-            <div class="cut-w"><div class="cut-trk" id="cutTrk"></div><i class="cut-ph" id="cutPh"></i></div>
-            <div class="cut-foot"><span><b id="cutSave">0:00</b><span data-i="cutShorter">shorter, on a 58-minute talk</span></span><span class="z"><b>0</b><span data-i="cutLost">words lost</span></span></div>
-          </div>
-        </div>
+        <!-- 1 Auto Cut: noi dung do JS dung (pmKhung) -->
+        <div class="sc sc-cut" style="--c:#F86820"></div>
 
         <!-- 2 Auto Podcast: noi dung do JS dung (pmKhung) -->
         <div class="sc sc-pod" style="--c:#7c4dff"></div>
@@ -2540,17 +2539,53 @@ function batDauDien() {
 
   const scenes = $$("#rpStage .sc");
   const BUILD = [
-    // 1 Auto Cut: khoang lang do len khi dau doc quet qua, roi dong lai; dem thoi gian ngan di
+    // 1 Auto Cut (pm): bam nut -> dau doc quet, cho im lang do len -> rut di, cac doan doi sat lai, bai ngan lai. So that: bai noi 58:37,
+    //   413 nhat cat, ngan di 4 phut 03 giay (243 s), 0 chu mat (anh nghe lai 19/08).
     el => {
-      const trk = $("#cutTrk"), ph = $("#cutPh"), sv = $("#cutSave");
-      const ve = () => {
-        trk.innerHTML = tokens(tt("cutWords")).map(x => `<div class="tk ${x.g ? "g" : "w"}"><span class="tx">${x.t}</span><i class="wv">${Array.from({ length: x.g ? 8 : Math.max(8, x.t.length * 2) }, () => `<i style="--h:${x.g ? 6 : Math.round(25 + rnd() * 75)}%"></i>`).join("")}</i></div>`).join("");
+      pmTxt({ pmC0: "58-minute talk", pmC1: "Click one button", pmC2: "It finds the silent gaps", pmC3: "Cuts them out, closes the gaps",
+              pmCf: "Silent gaps found", pmCs: "Video is shorter by", pmCl: "Words lost", pmCn: "Measured on a real 58-minute talk.", pmCim: "Silence", pmCok: "No words lost", pmCb: "Talk" },
+            { pmC0: "Bài nói 58 phút", pmC1: "Bấm một nút", pmC2: "Tool tìm những chỗ im lặng", pmC3: "Cắt bỏ rồi dồn lại cho liền",
+              pmCf: "Chỗ im lặng tìm thấy", pmCs: "Video ngắn đi", pmCl: "Chữ bị mất", pmCn: "Đo trên một bài nói thật 58 phút.", pmCim: "Im lặng", pmCok: "Không mất chữ nào", pmCb: "Bài nói" });
+      // doan noi / doan im lang xen ke; so = be rong (% cua lan)
+      const SEG = [["s", 17], ["g", 6], ["s", 13], ["g", 4], ["s", 20], ["g", 7], ["s", 11], ["g", 5], ["s", 17]];
+      const TONG_G = SEG.filter(x => x[0] === "g").reduce((a, x) => a + x[1], 0);
+      let acc = 0; const GIUA = [], VUNG = [];      // tam cua tung doan im lang + khoang [l,r] cua no (0..1)
+      SEG.forEach(([k, f]) => { if (k === "g") { GIUA.push((acc + f / 2) / 100); VUNG.push([acc / 100, (acc + f) / 100]); } acc += f; });
+      const wave = n => `<svg viewBox="0 0 100 20" preserveAspectRatio="none"><path fill="rgb(255 255 255/.85)" d="${Array.from({ length: n }, (_, i) => { const h = 4 + rnd() * 14, w = 58 / n; return `M${(i * 100 / n).toFixed(1)} ${(10 - h / 2).toFixed(1)}h${w.toFixed(1)}v${h.toFixed(1)}h-${w.toFixed(1)}z`; }).join("")}"/></svg>`;
+      const tamDung = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 6h3v12H8zM13 6h3v12h-3z"/></svg>`;
+      const lane = (head, kc, audio) => `<div class="pm-ln"><span class="pm-lh">${head}</span><div class="pm-lc"><div class="pmc-row">${SEG.map(([k, f]) =>
+        k === "s" ? `<b class="pmc-s" style="--f:${f};--kc:${kc}">${audio ? wave(Math.round(f * 1.1)) : ""}</b>` : `<b class="pmc-g${audio ? "" : " hinh"}" style="--f:${f}">${audio ? "" : tamDung}</b>`).join("")}</div></div></div>`;
+      const A = nv("a-bust", 200, 200);
+      const r = pmKhung(el, { k: "cut", ten: "Auto Cut", proj: "pmC0", buoc: ["pmC1", "pmC2", "pmC3"], btn: "Auto Cut",
+        bin: `<span class="pm-bi" style="--bg:#3a271e"><i>${A}</i>${pmI("pmCb")}</span>`,
+        mon: `<div class="pmc-shot">${A}</div><span class="pmc-dur">58:37</span><span class="pmc-chip im">${tamDung}${pmI("pmCim")}</span><span class="pmc-chip ok">${pmIc("ok", 3)}${pmI("pmCok")}</span>`,
+        tl: lane(pmIc("cam"), "#2f80ed", 0) + lane(pmIc("mic"), "#2f9e7c", 1),
+        pan: `<span class="pmc-st do">${pmI("pmCf")}<b class="pmc-f">0</b></span><span class="pmc-st cam">${pmI("pmCs")}<b class="pmc-n">0</b></span>` +
+             `<span class="pmc-st xanh">${pmI("pmCl")}<b>0</b></span><span class="pmc-note" data-i="pmCn">${tt("pmCn")}</span>` });
+      const gs = $$(".pm-lc", el).map(lc => $$(".pmc-g", lc)), shot = $(".pmc-shot svg", el), dur = $(".pmc-dur", el), cIm = $(".pmc-chip.im", el), cOk = $(".pmc-chip.ok", el), bF = $(".pmc-f", el), bN = $(".pmc-n", el);
+      const f2 = n => String(n).padStart(2, "0");
+      const ngan = s => lang === "vi" ? `${Math.floor(s / 60)} phút ${f2(s % 60)} giây` : `${Math.floor(s / 60)} min ${f2(s % 60)} s`;
+      let cu = {};
+      const dat = (e, k, v) => { if (cu[k] !== v) { cu[k] = v; e.textContent = v; } };
+      relangFns.push(() => { cu = {}; fn(el._p || 0); });
+      const fn = p => {
+        el._p = p;
+        r.bam(p, 0, .1);
+        const chay = p >= .13, q = loc(p, .15, .5), kc = em(loc(p, .56, .84));          // q: dau doc quet; kc: muc da rut khoang lang
+        gs.forEach(ss => ss.forEach((g, i) => { g.classList.toggle("cut", chay && q >= GIUA[i]); g.style.setProperty("--k", (1 - kc).toFixed(4)); }));
+        r.ph.style.setProperty("--pp", (chay ? q * (1 - TONG_G / 100 * kc) : 0).toFixed(4));
+        const trongIm = chay && q < 1 && VUNG.some(([l, rr]) => q >= l && q < rr);
+        const noi = (chay && q < 1 && !trongIm) || p > .86;
+        shot.style.setProperty("--nv-mieng", noi ? Math.abs(Math.sin(p * 260)).toFixed(2) : 0);
+        cIm.style.setProperty("--k", trongIm ? 1 : 0);
+        cOk.style.setProperty("--k", em(loc(p, .88, .96)).toFixed(3));
+        dat(bF, "f", String(Math.round(413 * (chay ? q : 0))));
+        const s = Math.round(243 * kc);
+        dat(bN, "n", ngan(s));
+        const t = 3517 - s; dat(dur, "d", `${Math.floor(t / 60)}:${f2(t % 60)}`);
+        r.buoc(!chay ? 1 : p < .54 ? 2 : 3);
       };
-      ve(); relangFns.push(() => { ve(); if (el._p != null) { el._fnA(el._pa || 0); el._fnB(el._pb || 0); } });
-      const fnA = p => { el._pa = p; ph.style.setProperty("--pp", p); $$(".tk.g", trk).forEach(g => g.classList.toggle("cut", p >= (g.offsetLeft + g.offsetWidth / 2) / trk.scrollWidth)); };
-      const fnB = p => { el._pb = p; $$(".tk.g", trk).forEach((g, i) => g.style.setProperty("--k", 1 - em(loc(p, i * .12, i * .12 + .6)))); const s = Math.round(243 * em(p)); sv.textContent = `−${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
-      el._fnA = fnA; el._fnB = fnB; el._p = 1;
-      return gsap.timeline().add(step(fnA, .55)).add(step(fnB, .55), "+=.05");
+      return gsap.timeline().add(step(fn, 1.5));
     },
     // 2 Auto Podcast (pm): timeline co 3 may quay quay suot buoi. Bam nut -> tool nghe ai dang noi -> cat, chi giu may quay cua nguoi dang noi
     //   (im lang thi ve canh ca hai), mic nguoi dang nghe nho lai. Man hinh chuyen theo. Cuoi: mot BAN DUNG MOI trong Project (ban goc giu nguyen).
