@@ -29,6 +29,9 @@
   - Trang Shot & Save (`/`) chưa có link sang `/premiere/`. Chưa có trang chủ chung (quyết định 25/09).
   - Sửa trang về sau: sửa `premiere-nhap-3.html` rồi chép đè sang `premiere/index.html` (hai file phải cùng md5), và chạy
     lại `tao-artifact.cjs` nếu muốn bản xem trên điện thoại khớp.
+    Sửa 19:3x: trên Windows đừng so md5 hai file TRONG MÁY. Sau khi gộp về máy, `premiere/index.html` được git chép ra
+    kiểu xuống dòng Windows nên md5 thành `d3a4f861` dù nội dung y hệt. So bằng bản trong git:
+    `git show HEAD:"Website/AiO ShotSave Web/premiere/index.html" | md5sum` (ra `83d975d9`, khớp live).
 
 ## [web-premiere] - 2026-10-01 16:20 (UTC+7) - Trang bộ tool Premiere NHÁP 3: sân khấu thành TIMELINE PREMIERE TRÔI NGANG
 
