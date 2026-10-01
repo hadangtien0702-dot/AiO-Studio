@@ -5,6 +5,55 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-01 20:07 (UTC+7) - Web Shot & Save theo app 0.8.0: Quay video, Khay tự thu, cửa sổ Cài đặt mới, thanh công cụ 8 nút - máy công ty
+
+- **Bối cảnh:** anh: *"cập nhật tính năng mới lên website đi em"*, rồi *"chiều nay mình mới làm hiệu ứng thu nhỏ khi không
+  dùng đó"*, *"em cũng chưa cập nhật UI settings mới lên website"*, *"còn gì chưa đưa lên em phải đưa lên website chứ chuẩn bị
+  bán hàng"*. Anh chọn **chỉ đẩy web** (mã app 0.8.0 vẫn là 3 commit trên máy công ty, chưa đóng gói, chưa push).
+- **Rà app so với web (đo trước khi sửa):** web dừng ở 0.7.9 (29/09), 0 chỗ nhắc quay video / Khay video / nút tròn; cửa sổ
+  Cài đặt trên web là bản 5 thẻ dựng 23/09, app đã đổi sang danh sách nhóm từ 0.7.6; thanh công cụ demo có 4 nút, app có 8.
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`, một file):
+  - **Rạp chiếu 11 → 13 cảnh.** Cảnh 12 *Quay video*: khoanh vùng, phím R, viền cam ngoài vùng + đồng hồ đếm giây thật +
+    nút Dừng (chép `src/dem/quay.html`), MP4 bay vào Khay video (chép thẻ `.dai.vd`), phát lại, chọn Không tiếng. Cảnh 13
+    *Khay tự thu*: chuyển động chép `src/dien/dien.js` + `__khayBung` của app (thu về kiểu xấp ảnh, nút đếm 1→5 rồi hiện tấm
+    mới nhất; bấm nút, ống kính lướt tới chỗ khay, màn trập bung + nháy sáng), chạy chậm hơn app 1,6 lần. Phím R nhảy cảnh 12.
+  - **Cửa sổ Cài đặt dựng lại** theo `src/settings` của 0.8.0: thẻ Bản quyền (trạng thái Đã kích hoạt, cập nhật trọn đời), 3
+    nhóm Chụp ảnh / Khay ảnh / Lưu ảnh, 8 hàng, có hàng *Tự thu khay về góc sau 5s / 10s / 15s*. Chữ lấy nguyên `i18n.js`.
+    Phim 5 bước → 6 bước (thêm bước tự thu), danh sách bên trái thêm dòng "Khay tự thu gọn".
+  - **Thanh công cụ demo đầu trang:** thêm V, 5, S, R cho đủ 8 nút như app. Demo chỉ vẽ được 1–4 nên 4 nút mới đưa người
+    xem xuống đúng cảnh của tính năng đó (`window.ssRapToi`). Ẩn trên điện thoại (thanh đã phải xuống 2 hàng).
+  - 2 thẻ dự phòng trong lưới (f12, f13), thẻ giá "Chụp, quay, vẽ, ghim, kéo thả", mô tả trang thêm "or record".
+- **3 lỗi CÓ SẴN lộ ra khi đo, sửa luôn:**
+  - Chữ to trong cảnh đổi câu bị **lệch tâm**: GSAP đổi `translate(-50%,-50%)` ra px theo bề rộng câu ĐẦU, câu sau rộng khác
+    là lệch. Đo: cảnh 9 "Mở lại…" lệch 31 px ở 360; cảnh mới bản EN lệch 138 px. Sửa: `gsap.set(ch, {xPercent:-50, yPercent:-50})`.
+  - Tên "Shot & Save" trên thanh trên **bẻ 2–3 dòng** ở điện thoại 360–390 px (đo trên bản LIVE: logo cao 54–82 px thay vì
+    44). Sửa: `nowrap` + dồn gọn dưới 480 px; dưới 360 px chỉ còn dấu logo.
+  - `aria-label="What you pay"` không đổi theo ngôn ngữ.
+- **Đo (Playwright headless + khung trình duyệt của Claude, máy chủ tĩnh 127.0.0.1:8126):**
+  - Cảnh 9, 12, 13 ở 6 khổ (360, 390, 768, 1024, 1280, 1440) × VI/EN × 12 mốc phim: **144/144** không tràn sân khấu, không
+    khối chữ đè nhau, hàng đầu thẻ video không tràn, chữ to lệch tâm ≤ 2 px. Thước này trước khi sửa đã bắt đúng 3 loại
+    lỗi (thẻ video tràn 31–220 px ở sân hẹp, nhãn đè thẻ 17 px, chữ lệch tâm) → không phải thước mù.
+  - Lăn chuột THẬT qua rạp (nấc 100 px): đi qua đủ **13/13** cảnh sau 92 nấc và ra khỏi rạp được; lăn ngược lùi cảnh;
+    phím R → cảnh 12, phím S → cảnh 11.
+  - Cửa sổ Cài đặt: **440 × 705 px** (app 440 × 700); 0 hàng tràn / đè ở 1280 và 360, VI và EN. Phim chạy thật trong khung
+    trình duyệt đang hiện: đủ 6 bước rồi lặp (ghi phím → PNG làm mờ hàng chất lượng → Mờ mịn → 10s → 5s → thư mục → EN → VI).
+  - Thanh công cụ demo: 8 nút `V 1 2 3 4 5 S R`, rộng 535 px trong khung 960 px; phím 2 vẫn đổi công cụ; bấm R → cảnh 12.
+    Demo tự chạy: 3 ảnh vào khay sau 18 giây (khung trình duyệt đang hiện).
+  - Cả trang: 0 gạch ngang dài trong 2.146 đoạn chữ + thuộc tính (2 ngôn ngữ, gồm shadow DOM); 0 lỗi console; cuộn ngang
+    0 px ở 6 khổ; lưới thẻ dự phòng 13 thẻ không lẻ hàng (3-3-3-2-2).
+- **Bẫy đo trong buổi:** (1) Playwright headless + chụp ảnh liên tục làm đồng hồ GSAP chạy chậm (7,6 giây thật = 0,9 giây
+  phim) → đo cảnh bằng `tl.pause(); tl.time(t)` rồi chụp; (2) demo tự chạy và phim Cài đặt KHÔNG tiến trong headless, kể cả
+  trên bản live (thước mù, không phải trang hỏng) → hai thứ này đo trong khung trình duyệt đang hiện.
+- **CHƯA kiểm / chưa đúng với lời trên web, anh cần biết trước khi bán:**
+  - Web giờ giới thiệu tính năng 0.8.0 trong khi **bộ cài mới nhất là 0.7.9** (chưa có quay video, chưa có khay tự thu).
+    Phải đóng gói 0.8.0 trước khi người mua đầu tiên tải.
+  - Thẻ Quay video ghi "kéo cả hàng thả vào khung chat hay ứng dụng khác": đường kéo có trong mã nhưng **chưa ai thả thử
+    file MP4 vào Zalo / Messenger / Premiere**; Premiere có nhận MP4 phân mảnh hay không vẫn chưa đo (nên web không ghi tên
+    Premiere cho video). "Trên Windows quay được tiếng máy": Mac chưa đo.
+  - Khay tự thu: anh chưa thấy nó chạy trên màn thật lần nào. Anh đổi ý về chuyển động thì cảnh 13 phải làm lại.
+  - Web chưa có nút Tải / chưa nhắc dùng thử 14 ngày (chưa có chỗ để bộ cài công khai).
+  - Safari / iPhone thật chưa đo (máy chỉ có Chromium).
+
 ## [web-premiere] - 2026-10-01 19:52 (UTC+7) - Sửa chữ viền lộ đường nối bên trong (dải cam, chữ nền, số thứ tự) - máy nhà
 
 - **Bối cảnh:** anh gửi 2 ảnh dải cam ("Auto Short Viral", "Auto Podcast" có vạch thừa trong chữ A, S, t): *"sửa cho anh
