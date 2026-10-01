@@ -5,6 +5,65 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-premiere] - 2026-10-01 16:20 (UTC+7) - Trang bộ tool Premiere NHÁP 3: sân khấu thành TIMELINE PREMIERE TRÔI NGANG
+
+> Ghi ở sổ gốc vì trang này là web chung AiO Studio (không phải Shot & Save), và `AiO Shotandsave/PROGRESS.md` đang có
+> phiên khác sửa dở (0.8.0, ghi tới 16:07). Mục nháp 2 (30/09 00:39) nằm trong `AiO Shotandsave/PROGRESS.md`.
+
+- **Bối cảnh:** anh mở `http://127.0.0.1:8124/premiere/`, chụp dải 12 clip cuối sân khấu (đầu đọc kẹt ở `00:00:03:09`):
+  *"anh muốn ở chỗ này khi scroll thì section sang ngang đi em hiện tại nó đứng yên à"*, rồi nhắn thêm *"đặc biệt phải
+  Creative hơn nữa đó em em ơi section phải đặc biệt"*.
+- **Nguyên nhân gốc của "đứng yên" (đã đo trước khi sửa):** lăn chuột THẬT trên bản nháp 2 ở 2048×1030: 16 nấc xuống +
+  6 nấc lên + 6 chùm 3 nấc = **0/28 lần qua được cảnh**, kẹt ở cảnh 01 (tiến độ 0,0559 = đúng `00:00:03:09` trong ảnh anh).
+  Gốc: 30/09 em đổi snap thành "hút về mốc GẦN VỊ TRÍ nhất" (để nhảy thẳng không hút sai cảnh) → mỗi nấc 100 px bị kéo
+  ngược về chỗ cũ (phải lăn liền > 374 px mới qua). Bài đo 30/09 chỉ NHẢY `scrollTo` tới đúng mốc, không lăn chuột như
+  người dùng → "12/12 cảnh đạt" là đo trên thao tác không ai làm. Cùng lỗi: cuộn chậm không RA được khỏi section ở hai đầu.
+- **Đã làm (bản nháp 3):**
+  - Sân khấu = một timeline Premiere: dãy ngang `[thẻ tiêu đề][12 clip][mốc Out "}"]`, cuộn dọc → cả dãy trượt ngang dưới
+    đầu đọc cố định ở giữa. Mỗi clip = thước timecode | gáy tên dọc | cột chữ (số clip, nhãn, tên, mô tả, số thứ tự viền
+    cỡ lớn, số đo) | cảnh diễn (12 cảnh cũ giữ nguyên) | dải âm thanh đầy dần theo tiến độ cảnh diễn.
+  - Clip hai bên ló ra, nghiêng 7°, nhỏ 6%, mờ 55%; chữ trong clip trượt lệch tốc độ (tên 90 px, mô tả 56 px…), chữ nền
+    trôi tiếp trong lúc cảnh diễn; thẻ vào hơi lệch phải rồi trôi về giữa → không lúc nào đứng yên. JS đặt 3 biến trên
+    từng clip: `--d` (lệch bao nhiêu clip), `--a`, `--ap`.
+  - Chữ của clip NHÂN BẢN từ lưới thẻ `#toolGrid` (giữ `data-i`) → một nguồn chữ, đổi ngôn ngữ tự đổi.
+  - Snap: `snapTo: [0, 12 mốc, 1], inertia: false` (hút THEO HƯỚNG cuộn, có mốc 0 và 1 để ra được khỏi section).
+  - Điều khiển: nút Lùi / Phát / Tới, phím J K L Space ← →, kéo ngang bằng chuột hoặc ngón tay, lăn ngang trackpad, dải 12
+    clip thu nhỏ = thanh tua (chạm / rê). Link trong trang tự cuộn bằng GSAP (CSS `scroll-behavior:smooth` chỉ còn cho bản tĩnh).
+- **File:** `Website/Nhap web ShotSave/premiere-nhap-3.html` (1.736 dòng, md5 `83d975d9`, = bản đang chạy ở scratchpad
+  `…/premiere/index.html`; nháp 2 giữ ở `premiere-nhap-2.html` và `index-v2-30-09.html`). Bài đo: scratchpad phiên cũ
+  `do-lan.mjs` (đo trước khi sửa), `do-v3.mjs` (lan | canh | phim | vi | mob), `do-v3b.mjs`, `do-duphong.mjs`.
+- **Kiểm chứng (Chrome thật qua Playwright, thao tác thật):**
+  - Lăn chuột 2048×1030 và 1440×900: mỗi nấc = đúng 1 clip (01→12 rồi ra khỏi section); lăn ngược lùi từng clip; chùm 3
+    nấc = 1 clip; vuốt nhanh 20 nấc dừng ở clip 08 (k nguyên); từ clip 1 lăn lên 2 nấc là ra khỏi section. Trước: 0/28.
+  - 12/12 clip vào giữa (lệch ≤ 1 px), đúng tên, cảnh diễn chạy hết (`--ap` 1), 0 phần tử lọt ngoài ô diễn, tiêu đề 0 px tràn.
+    Ô diễn: 848×683 (u 9,14 px) ở 1440×900; 1218×813 (u 13,1 px) ở 2048×1030 (nháp 2: 10,86 / 13,3 px).
+  - Phím + nút: L×3 → 03, J → 02, → → 03, clip thu nhỏ 7 → 07, Lùi → 06, Tới → 07, Phát từ 07 chạy 9 s → 10 (nhịp
+    2,4 s vào + diễn, nghỉ 1,4 s; nhịp đầu 1,6 + 1,1 s ra 4 clip / 9 s, không kịp xem) rồi bấm lại là dừng đứng yên,
+    Space 6,5 s 01→03 / K dừng, kéo trái 420 px 03→04, kéo phải 04→03, lăn ngang 03→04, thanh tua rê 2→9 = 09, bấm
+    không kéo không đổi cảnh, link FAQ / Why / Tools tới đúng chỗ (top 64 px), không bị hút ngược.
+  - Điện thoại 390×844 (sự kiện chạm thật): vuốt dọc 14 lần = 01→12 rồi ra; vuốt ngang trái 03→04, phải →03; chạm nút Tới;
+    tràn ngang 0; nút 44×44.
+  - Tiếng Việt: 0 chuỗi sót khi về EN (kể cả aria-label), 0 gạch dài; tiêu đề mỗi câu một dòng ở 1440 / 2048 / 390 / 820.
+  - Tương phản 13 loại chữ mới: thấp nhất 3,51:1 (chữ 40 px đậm, cần 3), chữ nhỏ thấp nhất 5,94:1.
+  - Trượt 1→4 lấy mẫu 206 khung: header lệch 0 px, khung ghim lệch tối đa 0,44 px, p50 16,7 ms, p95 16,8 ms, 2 khung > 33 ms.
+  - Màn thấp 1366×650, 1280×600, 1024×700: số đo nằm trong thẻ (23–30 px), cột chữ không tràn.
+  - Dự phòng: `prefers-reduced-motion` và chặn CDN GSAP → sân khấu ẩn, lưới 12 thẻ hiện, 0 lỗi JS. 0 lỗi JS ở mọi lượt.
+- **Bẫy đo vấp trong buổi:** `Input.synthesizeScrollGesture` kiểu touch KHÔNG cuộn được trang nào trong Chrome không đầu
+  (y đứng 0 cả trên trang đối chứng) → dùng chuỗi `Input.dispatchTouchEvent`. Ảnh chụp giữa lúc đang cuộn lệch 11–13 px
+  (header + khung ghim cùng lệch) là lỗi của phép chụp, đo trong trang ra 0 / 0,44 px. `st.isActive` = false ngay tại mốc
+  đầu (tiến độ 0) → phím L không ăn ở thẻ tiêu đề → tự kiểm theo `scrollY`. Heredoc nuốt `\s` trong regex (bài `5ax`),
+  bắt nhờ grep lại dòng vừa sửa.
+- **CHƯA kiểm:** iPhone / Safari thật; trackpad thật (mới giả lập `deltaX`); máy yếu; trình đọc màn hình.
+- **16:33 anh xem nháp 3: *"quá đẹp em push lên git cho a đi em"*.** Lúc đó `main` trên máy = `dd0716c` "Shot and Save 0.8.0
+  (CHUA PUSH, cho anh test)" của phiên khác + commit web của em nằm TRÊN nó → `git push` thường sẽ đẩy luôn bản 0.8.0 đang
+  test lên repo public (trái luật anh chốt 01/10: test xong hết mới push). Cách đã làm, KHÔNG đụng thư mục làm việc và
+  vùng chờ commit của phiên kia: dựng một commit mới = `origin/main` + đúng phần thay đổi của em (index tạm, `git read-tree`
+  → `git apply --cached` → `git commit-tree`), push commit đó lên `origin/main`, rồi gộp nó vào `main` trên máy bằng một
+  merge commit CÙNG CÂY (`git update-ref` có so mốc cũ). Kết quả: GitHub có trang web, chưa có 0.8.0; `main` trên máy đi
+  trước GitHub đúng phần 0.8.0, không lệch nhánh. Phiên Shot & Save push sau thì không phải làm gì thêm.
+- **[CHỜ ANH]** nháp 3 mới là file nháp trong repo (`Website/Nhap web ShotSave/`, ngoài thư mục web, KHÔNG lên Vercel):
+  có muốn đưa lên web thật (`/premiere/`) không.
+
 ## [congty] - 2026-09-23 10:12 (UTC+7) - Lệnh /congty, gộp vào /xong bước 2f
 
 - **Bối cảnh:** anh cần một lệnh để gắn sản phẩm vào Trung tâm Điều hành (artifact
