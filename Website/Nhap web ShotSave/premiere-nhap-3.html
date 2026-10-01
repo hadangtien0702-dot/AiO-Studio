@@ -2585,7 +2585,7 @@ function batDauDien() {
         const t = 3517 - s; dat(dur, "d", `${Math.floor(t / 60)}:${f2(t % 60)}`);
         r.buoc(!chay ? 1 : p < .54 ? 2 : 3);
       };
-      return gsap.timeline().add(step(fn, 1.5));
+      return gsap.timeline().add(step(fn, 2.2));
     },
     // 2 Auto Podcast (pm): timeline co 3 may quay quay suot buoi. Bam nut -> tool nghe ai dang noi -> cat, chi giu may quay cua nguoi dang noi
     //   (im lang thi ve canh ca hai), mic nguoi dang nghe nho lai. Man hinh chuyen theo. Cuoi: mot BAN DUNG MOI trong Project (ban goc giu nguyen).
@@ -2630,7 +2630,7 @@ function batDauDien() {
         r.buoc(!chay ? 1 : pp < .17 ? 2 : 3);
         moi.style.setProperty("--k", em(loc(p, .95, 1)).toFixed(3));
       };
-      return gsap.timeline().add(step(fn, 1.5));
+      return gsap.timeline().add(step(fn, 2.2));
     },
     // 3 Transcripts: chu bay len tu song am thanh vao phu de; khoi phu de roi xuong C1; cho khong chac co marker vang
     el => {
@@ -3037,18 +3037,19 @@ function batDauDien() {
 
   // Timeline tong: voi moi clip = [the chay vao] -> [canh dien, the van troi nhe ve giua] -> [giu].
   const M = gsap.timeline({ defaults: { ease: "none" } });
-  const A0 = [], DONE = [], LECH = .07;      // LECH: the vao hoi lech phai roi troi ve giua trong luc dien -> khong luc nao "dung yen"
+  const A0 = [], DONE = [], LECH = .07, CHAM = { 3: 1.7, 4: 1.4, 5: 1.5, 6: 1.35, 8: 1.35 };   // chi so canh (0 = Auto Cut): Short Viral, Re-Frames, Guide Frame, Video Download, Power Bins      // LECH: the vao hoi lech phai roi troi ve giua trong luc dien -> khong luc nao "dung yen"
   let t = .12;
   scenes.forEach((sc, i) => {
     const n = i + 1, act = BUILD[i](sc);
-    M.fromTo(pos, { k: n - 1 }, { k: n - LECH, duration: .55, ease: "power2.inOut", immediateRender: false }, t);
-    const a = t + .42, d = a + act.duration();
+    if (CHAM[i]) act.timeScale(1 / CHAM[i]);                          // canh nhieu buoc: dien cham hon (he so > 1 = dai hon)
+    M.fromTo(pos, { k: n - 1 }, { k: n - LECH, duration: .9, ease: "sine.inOut", immediateRender: false }, t);
+    const a = t + .55, d = a + act.duration() / act.timeScale();
     M.add(act, a);
-    M.fromTo(pos, { k: n - LECH }, { k: n, duration: d - (t + .55), ease: "sine.out", immediateRender: false }, t + .55);
-    A0.push(a); DONE.push(d); t = d + .3;
+    M.fromTo(pos, { k: n - LECH }, { k: n, duration: d - (t + .9), ease: "sine.out", immediateRender: false }, t + .9);
+    A0.push(a); DONE.push(d); t = d + .05;
   });
   M.fromTo(pos, { k: N }, { k: N + .8, duration: .5, ease: "power1.in", immediateRender: false }, t);     // qua clip cuoi: lo moc Out
-  const TOTAL = M.duration(), PTS = [0, ...DONE.map(d => d / TOTAL), 1];                                    // moc nghi: tieu de, 12 clip dien xong, het
+  const RATE = .34, TOTAL = M.duration(), PTS = [0, ...DONE.map(d => d / TOTAL), 1];   // RATE: so giay timeline dien trong 1 giay that khi trang tu troi (nho hon = cham hon)                                    // moc nghi: tieu de, 12 clip dien xong, het
   // Doc trang thai tu CHINH timeline (khong tu su kien cuon): scrub lam timeline troi them sau khi cuon dung (bai 30/09)
   M.eventCallback("onUpdate", () => {
     const tg = M.time();
@@ -3058,14 +3059,16 @@ function batDauDien() {
   // section dang troi len tu duoi: ca day truot tu phai vao, dau doc ha xuong
   gsap.fromTo(vao, { v: 0 }, { v: 1, ease: "power2.out", onUpdate: ve, scrollTrigger: { trigger: "#tools", start: "top bottom", end: "top top", scrub: true } });
 
-  ScrollTrigger.config({ ignoreMobileResize: true });
+  ScrollTrigger.config({ ignoreMobileResize: true, syncInterval: 40 });
   const st = ScrollTrigger.create({
-    trigger: "#tools", pin: "#rpPin", start: "top top", end: () => "+=" + innerHeight * N * .85,
-    animation: M, scrub: .5,
+    trigger: "#tools", pin: "#rpPin", start: "top top", end: () => "+=" + Math.round(innerHeight * .438 * TOTAL),
+    animation: M, scrub: 1,
     // HUT THEO HUONG CUON, khong tinh quan tinh: lan 1 nac la sang clip ke. Ban 30/09 "hut ve moc gan vi tri nhat" keo nguoc ve cho cu:
     // do 01/10 bang lan chuot that: 16 nac xuong + 6 nac len + 6 chum 3 nac = 0 lan qua duoc canh ("dung yen").
     // 0 va 1 nam trong danh sach moc de cuon cham van RA duoc khoi section, khong bi hut nguoc vao clip dau/cuoi.
-    snap: { snapTo: PTS, inertia: false, duration: { min: .6, max: 2.2 }, delay: .12, ease: "power1.inOut" },
+    snap: { snapTo: PTS, inertia: false, delay: .05, ease: "none", duration: { min: .3, max: 9 },
+      // thoi gian hut = quang duong (giay timeline) / RATE -> canh dien cung toc do du lan 1 nac hay 3 nac. Than ham la khoi {} (khong tra tween ve)
+      onStart: (s, tw) => { const tl = tw.data / ((s.end - s.start) / TOTAL); tw.duration(Math.max(.5, Math.min(9, tl / RATE))); } },
     onRefresh: () => { doLai(); ve(); }
   });
   addEventListener("resize", () => { doLai(); ve(); });
@@ -3077,19 +3080,20 @@ function batDauDien() {
   const trong = () => scrollY >= st.start - 2 && scrollY <= st.end + 2;
   const btnPlay = $("#tpPlay");
   const huyNav = () => { if (nav) { nav.kill(); nav = null; } };
-  const cuonToi = (y, dur, xong) => {                                   // tu cuon trang toi y voi nhip dinh san (khong dung cuon muot cua trinh duyet: khong chinh duoc toc do)
+  const cuonToi = (y, dur, xong, ease) => {                                   // tu cuon trang toi y voi nhip dinh san (khong dung cuon muot cua trinh duyet: khong chinh duoc toc do)
     huyNav(); const o = { y: scrollY };
-    nav = gsap.to(o, { y: Math.round(y), duration: dur, ease: "power1.inOut", onUpdate: () => scrollTo(0, o.y), onComplete: () => { nav = null; xong && xong(); } });
+    nav = gsap.to(o, { y: Math.round(y), duration: dur, ease: ease || "power1.inOut", onUpdate: () => scrollTo(0, o.y), onComplete: () => { nav = null; xong && xong(); } });
   };
   const toi = (n, xong, dur) => {                                       // n: 0 = the tieu de, 1..N = clip, N+1 = het (ra khoi section)
     dich = n = Math.max(0, Math.min(N + 1, n));
     const y = st.start + (st.end - st.start) * PTS[n], xa = Math.abs(y - scrollY) / (st.end - st.start) * N;
-    cuonToi(y, dur || Math.min(2.6, .9 + xa * .7), xong);
+    const mot = xa <= 1.6, tl = Math.abs(y - scrollY) / (st.end - st.start) * TOTAL;
+    cuonToi(y, dur || (mot ? Math.max(.6, Math.min(9, tl / RATE)) : Math.min(2.6, .9 + xa * .7)), xong, mot ? "none" : null);
   };
   const dangO = () => nav ? dich : cur;                                 // dang chay toi dau thi tinh tu dich do (bam L lien tiep khong bi dung o canh cu)
   const datNut = on => { phat = on; btnPlay.classList.toggle("phat", on); const kk = on ? "tpPause" : "tpPlay"; btnPlay.dataset.iAria = kk; btnPlay.setAttribute("aria-label", tt(kk)); };
   const dungPhat = () => { clearTimeout(hen); if (phat) datNut(false); };
-  const buocPhat = () => { if (!phat) return; if (cur >= N) { dungPhat(); return; } toi(cur + 1, () => { hen = setTimeout(buocPhat, 1400); }, 2.4); };
+  const buocPhat = () => { if (!phat) return; if (cur >= N) { dungPhat(); return; } toi(cur + 1, () => { hen = setTimeout(buocPhat, 1400); }); };
   const batPhat = () => { datNut(true); if (cur >= N) toi(0, () => { hen = setTimeout(buocPhat, 500); }); else buocPhat(); };
   const doiPhat = () => { if (phat) { dungPhat(); huyNav(); } else batPhat(); };
   const nguoiDung = e => { if (e && e.type === "touchstart" && e.target.closest && e.target.closest(".rp-bot")) return; huyNav(); dungPhat(); };   // nguoi dung tu cuon -> nha tay lai

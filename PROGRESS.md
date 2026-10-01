@@ -5,6 +5,34 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-premiere] - 2026-10-01 23:42 (UTC+7) - Cảnh diễn TRONG cửa sổ Premiere (khung pm-): Auto Cut + Podcast; làm chậm + mượt sân khấu - máy nhà
+
+- **Bối cảnh:** anh xem bản 21:49: *"thiết kế UI thì đẹp nhưng layout từng section lại bị rời rạc"*, *"những con số và câu từ gây khó hiểu…
+  người không phải editor không hiểu"*, rồi chốt hướng: *"em làm animation phải có thêm phần mềm vào để diễn tả… giống như 02 phần ở dưới
+  rất dễ hiểu khi em đưa hoạt họa phần mềm vào"* (2 hình phần Vì sao có cửa sổ Premiere). Sau đó: *"animation quá nhanh người xem không hiểu"*.
+- **Số đo trước khi sửa** (1920x1000, live): hình diễn chỉ phủ 26% ô (Auto Cut), 34% (Organize), 41% (Video Download), 44–58% phần lớn cảnh;
+  mỗi cảnh diễn hết trong 1,3–1,5 giây khi lăn 1 nấc.
+- **Đã làm:**
+  - Khung dùng chung `pm-` (CSS + `pmKhung()` trước `const BUILD`): 3 bước chữ đời thường + cửa sổ "Adobe Premiere Pro" (Project | màn hình |
+    Timeline | panel của tool) chiếm trọn ô; con trỏ bấm nút (`r.bam`), bước (`r.buoc`), chữ EN+VI qua `pmTxt` + `data-i`.
+  - Cảnh 01 Auto Cut (`pmc-`): đầu đọc quét, chỗ im lặng đỏ lên, bị rút đi, timeline ngắn lại, đồng hồ 58:37 → 54:34, panel: 413 chỗ im lặng /
+    ngắn đi 4 phút 03 giây / 0 chữ mất. Hết khối "um/uh" trong cảnh. Cảnh 02 Podcast (`pmp-`): 3 máy quay + 2 mic trên timeline, cắt theo người
+    đang nói, màn hình chuyển theo, "Bản dựng mới" hiện trong Project.
+  - Làm chậm + mượt (`cham.cjs`, theo bộ số agent đo): thẻ trượt .9 sine, `scrub 1`, snap tuyến tính theo `RATE .34`, `syncInterval 40`,
+    `end` theo TOTAL, cảnh pm `step 2.2`, hệ số `CHAM` cho Short Viral 1.7 / Re-Frames 1.4 / Guide Frame 1.5 / Video Download + Power Bins 1.35.
+  - Nút Notify trên thanh menu `min-width:148px` (đổi EN/VI từng đẩy cụm nút 42px).
+- **Kiểm:** Auto Cut và Podcast diễn 6,66 s (trước 1,53 / 1,43 s), Short Viral 5,67 s, Transcripts 3,41 s, chờ thẻ vào 1,5–1,7 s; sân khấu
+  9.180 → 10.151 px. 0 lỗi console; chụp cảnh 1, 2, 4, 12 + VI + điện thoại. Commit `a577947` (Podcast), `19a3f39` (Auto Cut) đã live, md5 khớp git.
+- **Bẫy đo:** Chrome ngầm đột nhiên báo `prefers-reduced-motion: reduce` (Windows tắt hiệu ứng, có thể do đang điều khiển từ xa) → trang hiện
+  lưới thẻ tĩnh, `__rp` không có, phép đo ra rỗng. `chup.mjs` nay ép `no-preference` (GIAM=1 để thử chế độ giảm). `nhay.js`: lần gọi đầu sau
+  khi nạp trang ra sai thời điểm vì tween scrub còn chạy → thêm `gsap.killTweensOf(r.M)`.
+- **[CHO] mai làm tiếp:** 10 cảnh còn lại theo khung pm- (Transcripts, Short Viral, Re-Frames, Guide Frame, Video Download, Asset Manager,
+  Power Bins, Organize, Keynote, Hub), anh chưa trả lời "kiểu này đúng ý chưa" · anh báo "thanh menu lỗi, light dark lỗi" nhưng chụp 4 tổ hợp
+  không thấy vỡ, cần anh chụp màn hình · tiêu đề đầu trang còn diễn cắt "um/uh" (Auto Cut cắt khoảng lặng) · hình "Install once" vẽ một bộ cài
+  chung chưa có thật · icon Short Viral còn là điện thoại dọc · thẻ lưới (bản giảm chuyển động) chưa soát lại câu chữ · chưa đo Safari/iPhone.
+  Công cụ chụp khung hình đã chép vào repo: `Website/Nhap web ShotSave/cong-cu/` (chup.mjs, nhay.js, README). Các mảnh pm.css / pm.js /
+  cut.* / pod.* chỉ là bản nháp ở scratchpad, mã thật đã nằm hết trong `premiere/index.html` (sửa thẳng ở đó, rồi chép đè sang nháp 3).
+
 ## [web-premiere] - 2026-10-01 21:49 (UTC+7) - Làm lại 4 cảnh tool + 3 hình "Vì sao" để người không làm dựng hiểu ngay - máy nhà
 
 - **Bối cảnh:** anh duyệt trang /premiere/ từng cảnh: Podcast *"chưa diễn tả được Podcast là gì"*, Short Viral *"khó hiểu"*,
