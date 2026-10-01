@@ -1,6 +1,13 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-01 19:07 +0700 (/xong lan 2 trong ngay)
+> - **19:22 BO CAI 0.8.0 DA DONG GOI (phien khac — phien lam web Premiere, theo loi anh):** 19:13 anh nhan *"gui cho anh ban
+>   shot and save moi nhat"*, trong bang hoi chon **"0.8.0 dang test"** (da duoc bao: nut tron chua chay lan nao tren man
+>   that). `npm run dist` -> `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.8.0.exe` 96,1 MB (md5 `5181fe53`),
+>   ProductVersion 0.8.0, HUONG-DAN-CAI-DAT.txt da doi. So voi ban dang chay: app.asar md5 `955f7fc8` = `955f7fc8`,
+>   165/165 file di kem giong het -> bo cai DUNG la ban anh dang test. KHONG cai lai, KHONG push, KHONG len web
+>   (2 dieu sau van theo luat 01/10). Ma nguon khong doi (file sua cuoi `src/khay-thu.js` 19:11:49, truoc lan nap 19:12).
+>   => Dong "CHUA dong goi" ngay duoi day chi con dung cho push + web.
 > - **Ban dang chay tren may cong ty: 0.8.0, app.asar md5 955f7fc8 (nap lan 10, boot 19:12:57).** Trong ngay 01/10 chieu da
 >   nap 4 cum viec, TAT CA van la 0.8.0, CHUA dong goi, CHUA push, CHUA len web (luat 01/10: test xong het moi lam):
 >   (1) 12:58 vien quay du 4 canh tren man 125% (`DAI` 40 -> 64) · (2) 13:08 Khay video dong bo chu · (3) 13:59 cua so

@@ -61,8 +61,18 @@
   → `git apply --cached` → `git commit-tree`), push commit đó lên `origin/main`, rồi gộp nó vào `main` trên máy bằng một
   merge commit CÙNG CÂY (`git update-ref` có so mốc cũ). Kết quả: GitHub có trang web, chưa có 0.8.0; `main` trên máy đi
   trước GitHub đúng phần 0.8.0, không lệch nhánh. Phiên Shot & Save push sau thì không phải làm gì thêm.
+- **19:13–19:23 anh: *"gửi cho anh bản shot and save mới nhất và bản cho PR mới nhất nha"*.** Câu có ≥ 2 cách hiểu (bộ
+  cài hay link web; 0.7.9 đã đóng gói hay 0.8.0 đang test) → hỏi bằng bảng chọn, anh chọn **"Link trang web"** +
+  **"0.8.0 đang test"**. Đã làm: (1) web Shot & Save đang chạy thật `https://aio-shotsave.vercel.app` (HTTP 200, md5 live =
+  md5 git); (2) nháp 3 đăng thành trang riêng tư `https://claude.ai/artifact/RKgs9dfNu3U8sjM8z1MVV9` để mở được trên điện
+  thoại. Bản đăng sinh từ `premiere-nhap-3.html` bằng `Website/Nhap web ShotSave/tao-artifact.cjs` (nơi đăng tự bọc
+  `<html><head><body>`; script đổi đúng 5 chỗ: header chừa vùng tai thỏ, phần đệm khung ghim, `color-scheme:dark`, 3 link
+  `../` thành địa chỉ đầy đủ, sáng/tối theo nơi đăng). Kiểm bản bọc vỏ trên máy: lăn 3 nấc → clip 03, tràn ngang 0 ở
+  1440 và 390, nguồn ngoài chỉ có Google Fonts + cdnjs. CHƯA mở kiểm trên chính link đã đăng. (3) bộ cài Shot & Save
+  0.8.0: xem `AiO Shotandsave/PROGRESS.md` dòng 19:22.
 - **[CHỜ ANH]** nháp 3 mới là file nháp trong repo (`Website/Nhap web ShotSave/`, ngoài thư mục web, KHÔNG lên Vercel):
-  có muốn đưa lên web thật (`/premiere/`) không.
+  có muốn đưa lên web thật (`/premiere/`) không. Sửa trang thì sửa `premiere-nhap-3.html` rồi chạy lại `tao-artifact.cjs`
+  và đăng đè lên link trên (truyền `url`), đừng sửa tay bản đăng.
 
 ## [congty] - 2026-09-23 10:12 (UTC+7) - Lệnh /congty, gộp vào /xong bước 2f
 
