@@ -65,7 +65,11 @@ html, body {
 }
 #bar button:hover { background: var(--bg-hover); color: var(--text-1); }
 #bar button:active { transform: scale(0.92); }
-#bar #storyboard:hover { background: var(--bg-hover); color: var(--accent); }
+#bar #storyboard:hover, #bar #video:hover { background: var(--bg-hover); color: var(--accent); }
+/* 01/10: them nut Khay video -> khay DOC (252 px) het cho, tieu de "Khay anh" bi bop con 38/48 px (do tren trang that,
+   so dem 3 chu so). Khay doc: 5 nut dung sat nhau hon (khe 2 px thay vi 6) = tra lai 16 px. Khay ngang giu nguyen. */
+body.doc #bar button + button { margin-left: -4px; }
+#title { white-space: nowrap; }
 #bar #clear:hover { background: var(--danger-strong); color: #fff; }
 
 /* ── Day anh ─────────────────────────────────────────────────────────── */

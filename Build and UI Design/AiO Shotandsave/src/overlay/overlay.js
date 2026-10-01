@@ -82,6 +82,16 @@ window.overlay.onInit((data) => {
   if (data) cheDoTest = data
   if (data && data.selftest) setTimeout(autoSelftest, 1600)
 })
+
+/* ── 01/10 QUAY VIDEO: nut Quay / phim R = quay NGAY vung dang chon toi khi bam Dung ──────────────────────
+   Net ve (neu co) khong ap len video dang chay -> chi gui vung. Main dong overlay, dung vien cam + dong ho + nut Dung
+   NGOAI vung, quay MP4 LUON co tieng may, xong mo Khay video. Chon "Co tieng / Khong tieng" nam trong Khay video
+   (anh chot 01/10 10:4x: bo nut loa tren thanh nay, "vao khay roi cho nguoi dung chon ... se do thao tac hon"). */
+function quayVideo() {
+  chotOGoChu()
+  window.overlay.log('quay video ' + curRect.w + 'x' + curRect.h)
+  window.overlay.confirm({ rect: curRect, quay: true })
+}
 if (window.overlay.onUpdateConfig) {
   window.overlay.onUpdateConfig((data) => {
     if (data && data.lamMoKieu) {
@@ -472,6 +482,11 @@ window.addEventListener('keydown', (e) => {
       toggleStoryboardMode()
       return
     }
+  }
+  // Phim R = quay video vung dang chon (01/10)
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
+      (e.key === 'r' || e.key === 'R' || e.code === 'KeyR')) {
+    e.preventDefault(); quayVideo(); return
   }
   // Phim 5 = doc chu trong vung (29/09 anh Tien) — mo bang chu, khong phai cong cu ve
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
@@ -916,9 +931,9 @@ toolbarEl.addEventListener('click', (e) => {
       return
     }
     if (b.dataset.tool === 'ocr') { if (ocrMo()) dongBangChu(); else docChuVung(); return }
+    if (b.dataset.tool === 'quay') { quayVideo(); return }
     chonCongCu(b.dataset.tool)
-  }
-  else if (b.id === 'undo') hoanTac()
+  }  else if (b.id === 'undo') hoanTac()
   else if (b.id === 'huy') window.overlay.cancel()
   else if (b.id === 'xong') xong()
 })

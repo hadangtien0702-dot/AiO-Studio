@@ -34,7 +34,7 @@ let win = null
 let ghiLog = () => {}
 let sanSangLuc = 0 // Date.now() khi renderer bao 'san-sang' (0 = chua)
 let cauHinh = []   // [{displayId, srcId, w, h, sf, bounds}]
-let hangChon = []  // srcId cho setDisplayMediaRequestHandler, theo thu tu renderer xin
+let hangChon = []  // srcId (hoac { id, tieng } cho QUAY VIDEO) cho setDisplayMediaRequestHandler, theo thu tu renderer xin
 let dangKhoiDong = false
 let timerLai = null
 let gen = 0
@@ -74,14 +74,18 @@ async function khoiDong(opts) {
     win.webContents.session.setDisplayMediaRequestHandler((req, cb) => {
       // Chi phuc vu cua so luong; cua so khac (khong co) thi tu choi.
       if (!win || win.isDestroyed() || req.frame !== win.webContents.mainFrame) { cb({}); return }
-      const id = hangChon.shift()
+      const muc = hangChon.shift()
+      const id = muc && typeof muc === 'object' ? muc.id : muc
       const src = sources.find((s) => s.id === id)
       if (!src) { cb({}); return }
-      cb({ video: src })
+      // 01/10 QUAY VIDEO co tieng may: 'loopback' = tieng dang phat tren may (do: AAC 48 kHz 2 kenh). Chi Windows.
+      if (muc && typeof muc === 'object' && muc.tieng) cb({ video: src, audio: 'loopback' })
+      else cb({ video: src })
     })
-    win.on('closed', () => { if (win === w0) { win = null; sanSangLuc = 0 } })
+    win.on('closed', () => { if (win === w0) { win = null; sanSangLuc = 0; ketQuay('cua so luong dong') } })
     win.webContents.on('render-process-gone', (_e, d) => {
       ghiLog('LUONG: renderer chet (' + (d && d.reason) + ') -> khoi dong lai')
+      ketQuay('renderer luong chet')
       lenLichLai(1500)
     })
     await win.loadFile(path.join(__dirname, 'luong', 'index.html'))
@@ -196,10 +200,85 @@ function catVung(display, rect) {
   })
 }
 
+/* ── 01/10 QUAY VIDEO vung man hinh (anh chot: bam Dung, nut bat tieng may, MP4) ─────────────────────────
+   Renderer luong (cua so AN nay) mo THEM mot luong getDisplayMedia 30 fps cua dung man do (luong 5 fps chay san
+   giu nguyen), cat vung -> canvas -> MediaRecorder MP4 H.264 (+AAC). Do 01/10 tren Electron 43.4.1, cua so an:
+   vung 1280x720 tu man 4K = 119-120 khung / 4 s; ca man 3840x2160 = 118 khung / 3,93 s; vung le 37x23 -> 36x22.
+   File la MP4 PHAN MANH (moof/mdat), cu ~1 s renderer gui 1 khuc -> main ghi noi vao dia (khong giu ca doan trong
+   RAM: 5 phut x 8 Mbit/s = 300 MB). Trinh phat Chromium doc dung thoi luong + tua duoc (do).
+   Moi luc chi MOT luot quay. onKhuc(Buffer) goi theo dung thu tu; onXong({ loi, ms, khung }) goi DUNG 1 lan. */
+let quay = null // { id, onKhuc, onXong }
+let soQuay = 0
+
+function ketQuay(loi, info) {
+  const q = quay
+  if (!q) return
+  quay = null
+  try { q.onXong(Object.assign({ loi: loi || null }, info || {})) } catch (e) { ghiLog('LUONG quay onXong loi: ' + e.message) }
+}
+
+ipcMain.on('luong:quay-khuc', (e, d) => {
+  if (!win || e.sender.id !== win.webContents.id || !quay || d.id !== quay.id || !d.buf) return
+  try { quay.onKhuc(Buffer.from(d.buf)) } catch (err) { ghiLog('LUONG quay onKhuc loi: ' + err.message) }
+})
+ipcMain.on('luong:quay-xong', (e, d) => {
+  if (!win || e.sender.id !== win.webContents.id || !quay || d.id !== quay.id) return
+  ketQuay(d.loi, { ms: d.ms, khung: d.khung, tre: d.tre || null, treTieng: d.treTieng || 0 })
+})
+
+/* Bat dau quay vung `rect` (DIP cuc bo cua man `display`). opts: { tieng, onKhuc, onXong }.
+   Tra ve { ok, w, h, mime, duoi, tieng, msMo } hoac { ok: false, loi }. */
+async function batDauQuay(display, rect, opts) {
+  if (!sanSang()) return { ok: false, loi: 'luong chua san sang' }
+  if (quay) return { ok: false, loi: 'dang quay' }
+  const cfg = cauHinh.find((c) => String(c.displayId) === String(display.id))
+  if (!cfg) return { ok: false, loi: 'khong co nguon cho man ' + display.id }
+  const id = ++soQuay
+  const tieng = !!(opts && opts.tieng) && process.platform === 'win32'
+  quay = { id, onKhuc: opts.onKhuc, onXong: opts.onXong }
+  hangChon.push({ id: cfg.srcId, tieng })
+  const q = {
+    id, tieng, rect, w: cfg.w, h: cfg.h,
+    dipW: display.bounds.width, dipH: display.bounds.height,
+    // opts.fps / opts.nhip chi de bai do so cac cach (scripts/test/do-nhip-quay.mjs); app goi khong truyen -> mac dinh
+    fps: (opts && opts.fps) || QUAY_FPS, nhip: (opts && opts.nhip) || QUAY_NHIP,
+    treTieng: (opts && typeof opts.treTieng === 'number') ? opts.treTieng : undefined, // ms, chi bai do truyen
+    displayId: String(display.id), nang: !(opts && opts.nang === false), // nang = nang luong chay san len q.fps khi quay
+    toiDaW: QUAY_TOI_DA.w, toiDaH: QUAY_TOI_DA.h,
+  }
+  try {
+    // ☠️ getDisplayMedia can user gesture -> executeJavaScript voi userGesture=true (nhu batDauLuong)
+    const r = await win.webContents.executeJavaScript('window.batDauQuay(' + JSON.stringify(q) + ')', true)
+    if (!r || !r.ok) { quay = null; return { ok: false, loi: (r && r.loi) || 'renderer khong tra loi' } }
+    return r
+  } catch (e) {
+    quay = null
+    return { ok: false, loi: (e && e.message) || String(e) }
+  }
+}
+
+/* Bao renderer dung. Ket qua ve qua onXong; qua 4 s khong thay thi tu ket (file da ghi toi khuc cuoi van phat duoc). */
+function dungQuay() {
+  if (!quay) return
+  const id = quay.id
+  if (win && !win.isDestroyed()) win.webContents.send('luong:quay-dung', { id })
+  setTimeout(() => { if (quay && quay.id === id) { ghiLog('LUONG quay: het gio cho renderer dung'); ketQuay('het gio dung') } }, 4000)
+}
+
+const QUAY_FPS = 30
+const QUAY_NHIP = 'xuly' // 'xuly' (mac dinh) | 'khung' (du phong) | 'dongho' (cach cu, doi chung) — xem src/luong/luong.js
+/* Tran co video ra: vung to hon thi THU NHO cho vua (giu ti le). Anh: "khong can nang de dep, can nhe de nhanh".
+   2560x1440 = man 2K nguyen co; ca man 4K ra 2560x1440. */
+const QUAY_TOI_DA = { w: 2560, h: 1440 }
+
 /* Man hinh doi / may ngu day -> nguon doi -> khoi dong lai (debounce). */
 function theoDoiMoiTruong() {
   if (TAT) return
-  const lai = (ly) => { soLoiLienTiep = 0; ghiLog('LUONG: ' + ly + ' -> khoi dong lai'); lenLichLai(1200) }
+  const lai = (ly) => {
+    // Dang quay video thi KHONG pha cua so luong (doan quay se dut): doi quay xong roi moi khoi dong lai.
+    if (quay) { ghiLog('LUONG: ' + ly + ' nhung dang quay video -> hoan khoi dong lai'); setTimeout(() => lai(ly), 3000); return }
+    soLoiLienTiep = 0; ghiLog('LUONG: ' + ly + ' -> khoi dong lai'); lenLichLai(1200)
+  }
   screen.on('display-added', () => lai('them man'))
   screen.on('display-removed', () => lai('rut man'))
   screen.on('display-metrics-changed', () => lai('doi man'))
@@ -209,4 +288,4 @@ function theoDoiMoiTruong() {
   } catch (e) {}
 }
 
-module.exports = { khoiDong, sanSang, layKhung, catVung, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH }
+module.exports = { khoiDong, sanSang, layKhung, catVung, batDauQuay, dungQuay, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH }

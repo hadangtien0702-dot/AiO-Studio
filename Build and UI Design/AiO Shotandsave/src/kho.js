@@ -129,6 +129,19 @@ function luuAnh(image, dd) {
   }
 }
 
+/* 01/10 QUAY VIDEO: duong dan file video MOI trong thu muc anh — 'shotandsave-video-YYYY-MM-DD-HHMMSS-mmm.<duoi>'.
+   Tien to 'shotandsave-video-' de khay anh thuong khong nham (khay anh chi nap .png/.jpg). Tra null neu khong tao
+   duoc thu muc (ben goi phai kiem). */
+function duongVideoMoi(duoi) {
+  try {
+    const dir = baoDamThuMuc(thuMucAnh())
+    return path.join(dir, tenTheoGio(new Date(), duoi || 'mp4').replace('shotandsave-', 'shotandsave-video-'))
+  } catch (err) {
+    console.error('[kho] khong tao duoc duong dan video:', err)
+    return null
+  }
+}
+
 /* ── Cau hinh (vi tri khay, thu muc anh) ─────────────────────────────────
    Nam trong userData, KHONG nam canh ma nguon — de ban cai dat sau nay
    khong ghi de len cau hinh cua nguoi dung. */
@@ -166,5 +179,5 @@ function ghiCauHinh(patch) {
 
 module.exports = {
   thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan,
-  docCauHinh, ghiCauHinh,
+  duongVideoMoi, docCauHinh, ghiCauHinh,
 }

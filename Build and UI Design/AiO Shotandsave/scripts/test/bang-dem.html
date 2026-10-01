@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>bang dem nhip</title>
+<style>
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="400" height="140"></canvas>
+<script>
+/* BANG DEM cho bai do nhip quay (scripts/test/do-nhip-quay.mjs): moi lan man hinh ve lai (requestAnimationFrame) so dem
+   tang 1 va duoc ve thanh 16 O den/trang (nhi phan, o trai nhat = bit cao). Quay lai bang nay roi doc so tren tung
+   khung cua file -> biet chinh xac khung nao LAP (so khong doi), khung nao ROT (so nhay qua buoc).
+   Hang duoi: vach chay ngang de MAT nguoi nhin cung thay giat hay khong. */
+const cv = document.getElementById('c'), ctx = cv.getContext('2d')
+let n = 0
+// Tu do chinh minh: bang dem ma bi hut nhip (man hinh ve lai tre) thi do la loi cua NGUON, khong phai cua bo quay
+let tTruoc = 0, hut = 0, soLan = 0, tong = 0
+function ve(t) {
+  if (tTruoc) { const d = t - tTruoc; soLan++; tong += d; if (soLan > 30 && d > 1.6 * (tong / soLan)) hut++ }
+  tTruoc = t
+  n = (n + 1) & 0xffff
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 400, 140)
+  for (let i = 0; i < 16; i++) {
+    ctx.fillStyle = (n >> (15 - i)) & 1 ? '#fff' : '#000'
+    ctx.fillRect(8 + i * 24, 8, 24, 60)
+  }
+  ctx.strokeStyle = '#444'; ctx.strokeRect(7.5, 7.5, 385, 61)
+  if (BIP) {
+    /* Che do DONG BO TIENG (?bip=1): cu 60 lan ve (1 giay o 60 Hz) thi CHOP mot o trang 6 lan ve (100 ms) va cung
+       luc do keu BIP 3 kHz 80 ms. Quay lai roi so luc chop (hinh) voi luc bip (tieng) = do lech tieng-hinh. */
+    const pha = n % 60
+    if (pha === 0) bip()
+    ctx.fillStyle = pha < 6 ? '#fff' : '#000'; ctx.fillRect(250, 80, 140, 52)
+    ctx.strokeStyle = '#444'; ctx.strokeRect(249.5, 79.5, 141, 53)
+    ctx.fillStyle = '#f86820'; ctx.fillRect((n * 4) % 230, 84, 12, 40)
+  } else {
+    ctx.fillStyle = '#f86820'; ctx.fillRect((n * 4) % 400, 84, 12, 40)
+  }
+  ctx.fillStyle = '#888'; ctx.font = '12px sans-serif'; ctx.fillText(String(n), 8, 136)
+  requestAnimationFrame(ve)
+}
+const BIP = new URLSearchParams(location.search).get('bip') === '1'
+let ac = null
+function bip() {
+  try {
+    if (!ac) ac = new AudioContext({ latencyHint: 'interactive' })
+    const o = ac.createOscillator(), g = ac.createGain()
+    o.frequency.value = 3000; g.gain.value = 0.12 // 3 kHz: bai do loc dung tan so nay nen am thanh khac dang phat khong lam nhieu
+    o.connect(g); g.connect(ac.destination)
+    o.start(); o.stop(ac.currentTime + 0.08)
+  } catch (e) {}
+}
+window.treTieng = () => (ac ? { ra: ac.outputLatency, nen: ac.baseLatency, hz: ac.sampleRate, trangThai: ac.state } : null)
+requestAnimationFrame(ve)
+window.thongKe = () => ({ n, hut, nhipMs: soLan ? +(tong / soLan).toFixed(2) : 0 })
+window.datLai = () => { hut = 0; soLan = 0; tong = 0; tTruoc = 0 }
+</script>
+</body>
+</html>

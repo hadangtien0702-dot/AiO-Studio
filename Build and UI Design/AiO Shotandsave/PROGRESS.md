@@ -1,6 +1,25 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-09-30 12:5x +0700 (/xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-01 12:45 +0700 (/xong)
+> - ☠️ **LUAT MOI anh chot 01/10 10:0x:** *"moi lan update em chi can cai vao ban hien tai, khong cai bo cai moi; khi nao
+>   test xong het thi em moi dong goi va push code len git va update tinh nang len website"*. => Dang lam / dang test:
+>   `node scripts/cai-tai-cho.mjs` (nap thang vao app dang cai). KHONG `npm run dist`, KHONG push, KHONG dua len web
+>   cho toi khi anh bao "test xong het". Luat ghi o `AGENTS.md` muc 5 dong "Ban moi / Release".
+> - **0.8.0 = QUAY VIDEO VUNG MAN HINH — DA NAP VAO APP DANG CAI may cong ty, lan 5 luc 11:38:19** (`boot v0.8.0 ...
+>   dang-ky=OK`). CHUA COMMIT, CHUA PUSH, CHUA tao bo cai, CHUA len web (dung luat moi).
+>   ☠️ 11:10 SUA LOI GIUT (hinh that 5 -> 30 lan/giay) · 11:38 SUA TIENG LECH HINH (tieng di truoc 100-200 ms -> con
+>   -11..+40 ms). Thuoc: `npm run test:nhipquay` + `npm run test:dongbotieng` (ca hai co doi chung, hien bang dem +
+>   phat bip -> hoi anh truoc). Video anh quay TRUOC 11:38 van la ban loi. [CHO ANH] quay doan moi co nguoi noi de xem.
+>   Khoanh vung -> nut Quay / phim R -> vien cam + dong ho + nut Dung ngoai vung -> MP4 vao thu muc anh -> Khay video
+>   rieng. **Quay LUON co tieng may, KHONG con nut loa; moi video trong khay co 2 nut "Co tieng / Khong tieng"** (anh
+>   chot 10:4x) — ban dang chon la ban duoc phat + keo tha. Tran 5 phut. Khong can FFmpeg. Chi tiet: cac muc [0.8.0] duoi.
+>   [CHO ANH] bam that tren app (R -> Dung -> keo hang video vao Premiere / Zalo) · keo file mau
+>   `.selftest/thu-quay/mau-quay-thu-720p-co-tieng.mp4` vao Premiere xem co nhan MP4 phan manh khong.
+>   [CHUA DO] quay tren video YouTube (co den khong) · man thu 2 · may yeu · Mac.
+>   [CHUA LAM] GIF + tieng micro (anh chot lam sau).
+> - Thay them 01/10 09:36: tien trinh chinh ban cai 0.7.9 giu 1.168 MB RAM sau ~21 gio chay — chua tim goc (da lap viec rieng).
+> - `ROADMAP.md` muc 0 = danh sach 11 tinh nang co the lam tiep (anh hoi lai danh sach goi y 29/09; anh chon muc 4).
+> ---- (khoi 30/09 12:5x duoi day) ----
 > - **MAY CONG TY DA CAI 0.7.9** (30/09 12:49, bo cai `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.7.9.exe` 96,1 MB;
 >   anh 413/413 + Storyboard 61/61 con nguyen, ban quyen giu 12 ngay thu). [CHO ANH] bam phim 5 doc chu tren ban cai.
 >   Release/win con 10 bo cai cu 0.5.5 -> 0.7.7 — [CHO ANH] gat xoa. May nha chua cai 0.7.9.
@@ -45,6 +64,235 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [/xong] - 2026-10-01 12:45 - Chot so (may cong ty)
+- Phien 01/10 09:27 -> 12:45: viet lai danh sach 11 tinh nang (`ROADMAP.md` muc 0) -> anh chon QUAY VUNG MAN HINH ->
+  dung 0.8.0 + nap tai cho 5 lan (10:07, 10:42, 11:08, 11:10, 11:38). Chi tiet tung lan: 5 muc ngay duoi.
+- Trang thai luc chot: app dang cai chay 0.8.0 (boot 11:38:19, app.asar md5 21870a62). Run-log that: tu 11:38 toi 12:45
+  KHONG co luot quay nao -> anh CHUA test ban da sua giut + sua lech tieng. Theo luat anh chot hom nay ("test xong het
+  moi dong goi + push + web") => CHUA dong goi, CHUA dua len web.
+- GIT: anh chon trong bang hoi luc /xong: **commit tren may cong ty, CHUA PUSH**. => GitHub + may nha CHUA co 0.8.0
+  (may nha `git pull` se khong thay gi moi — dung, khong phai loi). Commit chi gom file Shot & Save + AGENTS.md + dong
+  Shot & Save trong CLAUDE.md goc / tracker; 7 file Guide Frame + dong Guide Frame trong 2 file do van de nguyen (viec
+  cua phien khac). Khi anh bao test xong: `git push` (may cong ty: `git -c credential.helper= -c
+  credential.helper=manager push`).
+- [CHO ANH] quay 1 doan moi co nguoi noi, xem trong Khay video: het giut chua, mieng khop tieng chua · keo hang video
+  (ca ban Khong tieng) vao Premiere + Zalo · Premiere co nhan MP4 phan manh khong.
+- [CHO] sau khi anh bao test xong: `npm run dist` -> chep bo cai vao Release + HUONG-DAN -> push -> cap nhat web (them
+  the / phim "Quay video" tren aio-shotsave.vercel.app, chu lay tu `src/i18n.js`).
+- [CHUA DO] may khac / man thu 2 (muc lam tre tieng can tren 1 may) · man 144 Hz · video YouTube co den khong · Mac ·
+  CPU luc quay (luong chay san len 30 khung/giay) · cua so Khay video 560 px dong thong tin bi cat.
+- Bai do moi trong phien (deu co doi chung): test:khovideo · test:quayvideo · test:quayapp · test:botieng ·
+  test:nhipquay · test:dongbotieng. Hai bai cuoi + quayapp HIEN len man / phat bip -> hoi anh truoc khi chay.
+
+## [0.8.0 nap lan 5] - 2026-10-01 11:38 - SUA tieng lech hinh ("sai voice"): tieng di truoc hinh 100-200 ms -> lam tre tieng; sua khung ghi doi
+- Boi canh: anh: *"bi sai voice nua em oi"*. Run-log that: tu luc nap ban 11:10 anh CHUA quay video moi (chi chup 1 anh
+  11:14) -> anh dang xem video quay TRUOC khi sua giut. Em khong doan "ban moi da het" ma do.
+- Nguyen nhan that (DA DO): bang dem them che do CHOP + BIP (o trang chop va tieng bip 3 kHz phat cung luc, moi giay
+  1 lan); quay lai roi so luc chop trong hinh voi luc bip trong tieng. Ban 11:10: tieng di TRUOC hinh 110-123 ms
+  (vung 600x210) va 152-205 ms (vung 2400x1350). Hinh di qua nhieu khau hon tieng (chup man -> trinh phat an -> canvas
+  -> bo ghi) nen toi tre hon. Bo quay tu do "tre hinh" bang captureTime cua khung chi ra 4 ms -> so do KHONG dung duoc
+  (captureTime khong phai luc man hinh that su doi) -> phai can bang so do ngoai.
+- ☠️ Thuoc cua em sai 1 lan: ban dau do tieng bip bang BIEN DO (vuot 25 % dinh) -> may anh dang phat am thanh khac to
+  hon nen chi bat 2-5 / 9 tieng, so nhay tu -487 toi +30 ms. Doi sang loc dung tan so (Goertzel 3 kHz): 9/9.
+- Lo them 1 loi that nho bai do nhip: 2 / ~35 luot, moi lan `requestFrame()` (captureStream(0)) ra HAI khung -> file 353
+  khung / 6 s, mot nua la khung lap (bo quay chi ve 175 lan). Doi sang `captureStream(60)` de bo ghi tu bat khung.
+- Thay doi (`src/luong/luong.js`, `src/luong-chup.js`):
+  + LAM TRE TIENG: tieng may di qua WebAudio DelayNode truoc khi vao bo ghi; muc tre = 105 + 12 x (trieu diem anh cua
+    video ra) ms (vung 600x210 -> 107 ms, 2400x1350 -> 144 ms, 2560x1440 -> 149 ms).
+  + Lay khung THANG tu luong man hinh (MediaStreamTrackProcessor, `nhip: 'xuly'`, mac dinh): do lech it dao dong hon
+    cach `requestVideoFrameCallback` (vung lon -147..-121 ms so voi -279..-135), khoang cach khung deu hon (31/34/37 ms
+    so voi 19/34/50). Cach cu `khung` giu lam du phong, `dongho` lam doi chung.
+  + Bo `captureStream(0)` + `requestFrame()`.
+  + Moi `scripts/test/do-dong-bo-tieng.mjs` (`npm run test:dongbotieng`), `bang-dem.html?bip=1`.
+- Kiem chung bang so (lech = luc bip - luc chop; bang do tu no lech +20 ms vi loa cham hon hinh, nen dich la +20):
+  | luot | co | lech giua | khoang |
+  | mac-dinh | 600x210 | +26 ms | dao dong 27 ms |
+  | mac-dinh-lon | 2400x1350 | +40 ms | dao dong 97 ms |
+  | mac-dinh-lai | 600x210 | -11 ms | dao dong 67 ms |
+  | doi-chung-khong-tre (treTieng = 0) | 2400x1350 | -182 ms | (tieng di truoc hinh) |
+  Luot truoc do voi muc 120 + 12/MP: +39 / +52 / +9 ms -> ha goc xuong 105.
+  + test:nhipquay sau khi doi: mac dinh 91,5-95 % dung nhip, lap 0-4, rot 0; du phong `khung` 93,8 %; doi chung cu 0 %.
+  + test:quayvideo (AAC 2 kenh van du), test:botieng, test:khovideo, test:quayapp --tieng (77 khung = 29,6; ban khong
+    tieng 0 duong tieng, 77/77 khung) DAT -> moi nap (chuoi `&&`).
+  + NAP TAI CHO 11:38:19 (`boot v0.8.0 ... dang-ky=OK`), app.asar 21870a62; 597 anh/video, 9 dai giu nguyen.
+- CHUA kiem: anh xem / nghe lai tren video quay SAU 11:38 (tai anh la thuoc cuoi) · ☠️ muc lam tre can tren DUNG may nay
+  (4K 60 Hz, RTX 4060 Ti) — may khac / man thu 2 co the lech them ±50 ms, chua do · micro (chua co).
+
+## [0.8.0 nap lan 4] - 2026-10-01 11:10 - SUA video quay bi giut: hinh that chi 5 lan/giay (nay 30), them bai do nhip co doi chung
+- Boi canh: anh: *"luc anh xem preview playback trong khay video no bi giut giong nhu kieu la dang bi thieu fps dung
+  khong em?"* — dung, va loi nam trong FILE quay, khong phai trinh phat cua khay.
+- Nguyen nhan that (DA DO, 2 duong doc lap):
+  + File that cua anh (10:26 / 10:28 / 10:55): muc khac biet giua 2 khung lien tiep cho thay hinh chi DOI moi 6 khung
+    (53 / 56 / 36 lan), 13 % khung co hinh moi, 87 % la khung lap.
+  + Bang dem chay tren man 60 Hz (so tang 1 moi lan man ve lai), quay lai roi doc so tren tung khung: so chi nhay moi
+    12 lan ve = 5 hinh/giay, 137/164 khung lap.
+  + Goc: luong chay san (de bam phim la co anh) cua cung man xin toi da 5 khung/giay; Chromium chia CHUNG mot bo chup
+    cho moi luong cua cung man -> luong quay 30 khung/giay mo them van chi nhan 5 hinh/giay. (App thu rieng luc 09:3x
+    khong co luong chay san nen do ra ~28 hinh/giay -> em tuong bo quay du khung.)
+- ☠️ VI SAO LOT (thuoc cua em sai 2 lop, brain 5k "dem khong phai la kiem"):
+  (1) test:quayvideo / test:quayapp chi DEM so khung trong file (29-30/giay) -> bao DAT. Khung lap van la khung.
+  (2) Lan dau soi file anh bang md5 tung khung: bao "2,5-10,4 % khung lap" -> dem THIEU: bo nen H.264 tinh chinh dan
+      nen khung lap giai ma ra khong giong het tung bit. Muc khac biet giua 2 khung moi tach duoc (13 % hinh moi).
+- Thay doi (`src/luong/luong.js`, `src/luong-chup.js`):
+  + Luc quay NANG gioi han luong chay san cua man do len 30 khung/giay (`applyConstraints`), quay xong / loi thi ha ve 5.
+  + Ve theo KHUNG THAT: `requestVideoFrameCallback` + `captureStream(0)` + `requestFrame()` (1 khung nguon = 1 khung
+    ghi) thay cho `setInterval` (dong ho lech nhip nguon -> lap + rot). Cach cu giu lai lam doi chung (`nhip: 'dongho'`,
+    `nang: false`, chi bai do truyen).
+  + Man dung yen: hen gio 60 ms sau moi khung that, het hen thi ve lai khung cu moi 33 ms -> file van ~30 khung/giay.
+    (Ban dau dung setInterval "qua 2 nhip thi ve": vung dung yen chi ra 21 khung/giay, test:quayapp truot -> doi.)
+  + Moi: `scripts/test/do-nhip-quay.mjs` + `nhip-quay-main.cjs` + `bang-dem.html` (`npm run test:nhipquay`).
+- Kiem chung bang so (man chinh 60 Hz, moi luot 6 s; "dung nhip" = buoc nhay cua so dem dung bang 2):
+  | luot | co | dung nhip | lap | rot | buoc (gia tri:so lan) |
+  | mac-dinh | 600x210 | 91,3 % | 1 | 0 | 0:1 1:3 2:147 3:10 |
+  | mac-dinh-lon | 2400x1350 | 92,7 % | 3 | 0 | 0:3 2:152 3:9 |
+  | doi-chung-cu (cach cu) | 600x210 | 0 % | 137 | 27 | 0:137 12:26 13:1 |
+  | mac-dinh-lai | 600x210 | 93,2 % | 1 | 0 | 0:1 1:1 2:150 3:9 |
+  11 luot khac cung cach mac dinh trong buoi: 91-94 %. Doi chung chay SAU luot mac dinh ma van ra 5 hinh/giay => quay
+  xong luong chay san DA duoc ha ve 5 (CPU nam nen khong tang). Bang dem tu do: 0 lan hut nhip (16,67 ms).
+  + 6-8 % con lai: khung cach 50 ms thay vi 33 ms (buoc 3). Da thu xin nguon 32 / 36 / 45 / 60 khung/giay, moi muc 2
+    luot: 32 -> 90-91 %, 36 -> 72 %, 45 / 60 -> 45-50 % (nguon thuc chi len ~40 khung/giay) => KHONG deu hon, giu 30.
+    Moc thoi gian tung khung la gio ve that nen khi phat chuyen dong van dung toc do.
+  + test:quayvideo 6 luot DAT (29,3-30,0), test:quayapp --tieng DAT (78 khung = 29,9), test:khovideo DAT.
+  + NAP TAI CHO 11:10:40 (`boot v0.8.0 ... dang-ky=OK`), app.asar 2f15e927; anh 596 / 9 dai / cau hinh giu nguyen.
+- ☠️ Em noi lenh bang `;` nen 11:08 da nap mot ban TRUOT test:quayapp (vung dung yen 21 khung/giay) vao app cua anh
+  trong ~2 phut; sua xong chay lai chuoi `&&` (3 bai dat het moi nap). Luat: buoc nap dung sau bai do phai noi bang `&&`.
+- CHUA kiem: anh xem lai tren app that (quay mot doan co chuyen dong) · man 144 Hz / 75 Hz (buoc mong se khac 2) ·
+  may yeu (nang luong chay san len 30 khung/giay ton CPU hon luc quay — chua do) · man thu 2.
+
+## [0.8.0 nap lan 2] - 2026-10-01 10:42 - Quay LUON co tieng, BO nut loa; vao Khay video moi chon "Co tieng / Khong tieng"
+- Boi canh: anh test lai (da bat loa): *"co tieng roi em ... anh nghi mac dinh se cho nguoi xem quay video co tieng di
+  em · khi quay xong vao khay roi em hay cho nguoi dung chon 2 nut nay phia trong thi no se do thao tac hon · o ngoai
+  thanh menu em bo luon nut loa"*. Em hieu: quay luon co tieng; moi video trong khay co 2 nut Co tieng / Khong tieng,
+  chon ben nao thi PHAT va KEO THA ra ngoai la ban do. (De muc 10:27 ngay duoi: khong con nut loa de ma mac dinh.)
+- Do TRUOC khi xay: bo tieng khoi MP4 da quay ma KHONG can FFmpeg = chep file roi doi ten cac hop cua duong tieng
+  (trak / trex / traf / tfra) thanh `free`; khong hop nao doi kich thuoc nen duong hinh giu nguyen. `test:botieng`
+  (thuoc ngoai ffprobe + ffmpeg): 3 file (0,1 / 0,8 / 90,0 MB) -> 0 duong tieng, so khung + thoi luong giu nguyen
+  (8.967 khung, 300,00 s), md5 toan bo khung da giai ma = ban goc, giai ma khong loi; 90 MB mat 27 ms; file goc md5
+  khong doi. Duong loi: file khong co tieng / file rac / file cut / nguon trung dich -> tu choi, khong de lai file.
+- Thay doi:
+  + Moi `src/mp4-bo-tieng.js` (taoBanKhongTieng). `src/kho-video.js` them `sua()` (chi nhan boTieng, fileKhongTieng).
+  + `src/main.js`: quay tu overlay luon `tieng = true`, bo ghi `quayTieng` vao cau hinh, bo 2 truong trong overlay:init;
+    IPC `video:chon-tieng` (lan dau chon Khong tieng -> tao `<ten>-khong-tieng.mp4` CANH ban goc, giu tren dia vi
+    Premiere noi file theo duong dan); keo tha + Mo thu muc lay file dang chon; Xoa dua CA HAI ban vao Thung rac;
+    get-data tra coNutTieng / boTieng / bytesXoa.
+  + Overlay: go nut loa (`index.html`, `overlay.css`, `overlay.js`). Khay video (`video.js`, `video.css`,
+    `preload-video.js`): cum 2 nut khuon `.chon-nhom` cua man Cai dat, dang chon = xam noi; trinh phat tat tieng khi
+    chon Khong tieng; nut Xoa ghi tong dung luong ca 2 ban. Video quay khong co tieng thi khong co cum nay.
+  + `src/i18n.js`: bo overlay.quayTiengBat/Tat + vd.coTieng; them vd.coTiengNut, vd.khongTieng, vd.chonTieng,
+    vd.khongBoDuocTieng (VI + EN). package.json them `test:botieng`. Bai do cap nhat: do-kho-video (sua), do-quay-app.
+- Kiem chung bang so:
+  + test:quayapp --tieng (duong that, hien len man): mo khay "Có tiếng*|Không tiếng", muted false -> bam Khong tieng:
+    "Có tiếng|Không tiếng*", muted true, so ghi boTieng, co file `...-khong-tieng.mp4`, keo tha se lay file do, nut Xoa
+    178 KB -> 355 KB -> bam lai Co tieng: tro ve, keo lay ban goc, ban khong tieng van con. ffprobe ban khong tieng do
+    APP tao: 0 duong tieng, 74/74 khung. --tieng --xoa: ca 2 file vao Thung rac, thu muc con 0, so con 0.
+  + Giao dien (trinh duyet + gia lap main): thanh cong cu con 11 nut (khong con loa), rong 588 px (truoc 624); phim R
+    gui `{ rect, quay: true }`; khay 860 px khong tran, 560 px khong tran nhung dong thong tin hang co cum nut con
+    51 px (bi cat "…") — CHUA sua, cua so mac dinh 860 px hien du; EN "With sound | No sound"; tao ban khong tieng
+    loi -> thong bao + nut giu nguyen.
+  + test:khovideo, test:botieng, test:storyboard DAT.
+  + NAP TAI CHO 10:42:26: dung 7 s, app.asar 90b12720 -> 4a1c19d8, run-log that `10:42:36.890 boot v0.8.0 ...
+    dang-ky=OK`. Truoc = sau (lan nay dem tren file THAT): 592 anh/video, 9 dai, cau hinh eb68f111.
+    ☠️ Ban cat trong `.selftest/ban-cai-truoc/` gio la 0.8.0 lan 1 (script chi giu 1 ban cat) — 0.7.9 con trong bo
+    cai `Release/.../Setup-0.7.9.exe`.
+- ☠️ Em vap lai bay gach cheo nguoc (brain 5ax, lan 7): viet script sua file qua heredoc co `\\r\\n` -> vo lenh nuot
+  gach -> loi cu phap, CHUA file nao bi ghi; chuyen sang cong cu Edit.
+- CHUA kiem: anh bam tren ban cai (chon Khong tieng roi keo vao Premiere / Zalo co dung ban khong tieng khong) ·
+  Premiere voi file phan manh co hop `free` · 2 video anh quay luc 10:25 / 10:26 la video KHONG tieng nen khong co
+  cum nut (dung thiet ke). Thung rac may co them 3 file thu cua em (tong ~0,5 MB).
+
+## [chua nap] - 2026-10-01 10:27 - Quay video: tieng may mac dinh BAT cho nguoi chua tung chon (ma da sua, CHUA nap vao app)
+- Boi canh: anh test ban 0.8.0 vua nap: *"video ko co tieng em oi"*. Doc run-log THAT (qua `\\localhost\C$`): 2 luot
+  quay 10:25:24 (10,1 s, 2374x1440, 2.323 KB, 305 khung) va 10:26:02 (17,4 s, 2404x1314, 10.147 KB, 527 khung), ca hai
+  ghi `[overlay] quay video WxH` KHONG co `+tieng`, mime `avc1.640033` khong co `mp4a`, so video ghi `tieng:false`,
+  cau-hinh `quayTieng:false`. Anh xac nhan: *"a anh chua bat nut loa"*.
+- Nguyen nhan that: khong phai loi thu tieng (ban dong goi do 10:07 ra AAC 2 kenh). Loi BAY: nut loa nho, nam lan giua
+  cac cong cu ve, mac dinh TAT -> nguoi quay lan dau khong de y. Em hoi mac dinh bat / giu tat, anh khong chon ben nao
+  -> lam theo de xuat: mac dinh BAT.
+- Thay doi: `src/main.js` 2 cho `quayTieng: kho.docCauHinh().quayTieng !== false` (chua tung chon = bat; da tat thi nho
+  tat); `src/overlay/overlay.js` trang thai dau `datQuayTieng(true)`. May anh dang luu `quayTieng:false` (tu 2 luot
+  tren) nen tren may anh van tat cho toi khi anh bam loa 1 lan.
+- Kiem chung: node --check 2 file; test:khovideo DAT. CHUA nap vao app dang cai (anh dang test, nap = tat/mo lai app
+  giua chung) -> lan nap toi se mang theo. CHUA do tren giao dien that sau khi doi mac dinh.
+- Thay tu 2 luot quay cua anh (so that, may cong ty): vung lon 1997x1211 DIP bi thu ve tran 2374x1440 dung thiet ke;
+  30,3 khung/giay (305 / 10,07 s va 527 / 17,4 s); 17,4 s = 10,1 MB.
+
+## [0.8.0 nap tai cho] - 2026-10-01 10:09 - Luat moi "cai vao ban hien tai" + nap 0.8.0 vao app dang cai + luot quay 5 phut
+- Boi canh: em bao sap dong goi bo cai 0.8.0; anh: *"moi lan update em chi can cai vao ban hien tai - khong cai bo cai
+  moi, khi nao test xong het thi em moi dong goi va push code len git va update tinh nang len website luon"*.
+  (De luat 28/09 "moi lan lam xong them bo cai vao Release": `Release/.../win` dang co 11 bo cai.)
+- Thay doi: `scripts/cai-tai-cho.mjs` (moi): `electron-builder --win dir` -> so bo may Electron ban dung voi ban cai
+  (4 file, khac thi dung lai) -> tat app -> cat `app.asar` + `app.asar.unpacked` cu vao `.selftest/ban-cai-truoc/` ->
+  chep ban moi (hong thi tra ban cu) -> mo lai qua explorer.exe -> doc dong boot. Co `--chi-dung`, `--bo-qua-dung`,
+  `--chi-kiem`. `AGENTS.md` muc 5 doi dong "Ban moi / Release". `do-quay-app.mjs` them `AIO_THU_EXE` (do ban dong goi).
+  `main.js`: `batDauGhiHinh(...).catch(huyGhiHinhLoi)` (ham async khong await: nem loi la `ghiHinh` ket, phim tat chup chet).
+- Kiem chung bang so:
+  + LUOT QUAY 5 PHUT (bo quay that, cua so an, ca man 2560x1440 co tieng): 300,00 s, 8.967 khung = 29,9 khung/giay,
+    AAC 2 kenh 14.060 goi, file 90,0 MB (89 khuc). Bo nho tong 842-894 MB suot 5 phut (lay mau 10 s/lan, 31 mau),
+    tien trinh to nhat 287-338 MB -> KHONG phinh. CPU app 1-2 %.
+  + BAN DONG GOI (`dist/win-unpacked`, dung 27 s, app.asar 752 KB): test:quayapp --tieng voi AIO_THU_EXE -> DAT het
+    (dongGoi true, 77 khung = 29,5, AAC 2 kenh, vien cam 0,0 %, khay phat duoc).
+  + NAP TAI CHO 10:07:31: bo may Electron 4/4 file khop · tat 7 tien trinh · app.asar ban cai md5 946f6158 -> 90b12720
+    (= ban dung) · unpacked 165 file · app mo lai 6 tien trinh · run-log THAT: `10:07:33.371 boot v0.8.0
+    hotkey=Shift+`(config) dang-ky=OK lang=en`, luong san sang 2 man 10:07:35.
+  + ☠️ THUOC MU (em, khong phai app): lan chay dau script bao "KHONG thay dong boot" + "88 anh trong Downloads, cau hinh
+    d6a2e983". Goc: tool cua Claude nam trong container MSIX -> `%APPDATA%\AiO Shot & Save` la BAN AO cu (sua lan cuoi
+    16/09 10:38) de len ban that. Doc qua `\\localhost\C$\Users\...\AppData\Roaming\...` moi ra file THAT (sua 01/10
+    10:07:35). Script da doi sang duong do. He qua: so "truoc = sau" cua lan nap nay dem tren ban ao -> KHONG dung lam
+    bang chung. Bang chung that: script chi dung toi 2 muc trong `resources/`; sau khi nap thu muc anh that
+    `%LOCALAPPDATA%\shotandsave` co 589 anh, userData that co 9 dai Storyboard, cau-hinh.json that con phim Shift+`.
+- CHUA kiem: anh bam tren ban cai (R -> Dung -> keo vao Premiere / Zalo). Chua commit / push / bo cai / web (luat moi).
+
+## [0.8.0] - 2026-10-01 10:03 - QUAY VIDEO vung man hinh: nut Quay / phim R -> MP4, nut Dung, tieng may, Khay video rieng
+- Boi canh: anh hoi lai danh sach tinh nang em goi y 29/09 (chi nam trong chat, khong tim lai duoc -> dung lai vao
+  `ROADMAP.md` muc 0, 11 muc), anh chon: *"quay vung man hinh nha em"*. Bang hoi 4 cau, anh chot: quay toi khi BAM DUNG
+  (tran 5 phut) · co NUT BAT TIENG MAY · video nam o KHAY RIENG (em de xuat chung khay anh, anh chon rieng) · MP4 truoc,
+  GIF sau.
+- Do TRUOC khi xay (app thu nho, cua so an, Electron 43.4.1): MediaRecorder ra duoc MP4 H.264 + AAC (14/14 dinh dang thu
+  deu ra file); man 4K cat vung 1280x720 = 119-120 khung / 4 s; ca man 3840x2160 = 118 khung / 3,93 s; vung le 37x23 ->
+  36x22; tieng may 'loopback' mac dinh ra MONO da xu ly, xin channelCount 2 + tat 3 bo xu ly -> AAC 2 kenh 48 kHz;
+  trinh phat Chromium doc dung thoi luong file (3,93-4,01 s) va tua duoc. => KHONG gan FFmpeg.
+  File ra la MP4 PHAN MANH (ftyp moov moof mdat...), Premiere nhan hay khong: CHUA DO (cho anh keo file mau).
+- Thay doi:
+  + Bo quay trong cua so luong an: `src/luong-chup.js` (batDauQuay / dungQuay / ketQuay, handler xin man nhan them
+    `{ id, tieng }`, dang quay thi hoan khoi dong lai luong) + `src/luong/luong.js` (window.batDauQuay: luong 30 fps
+    rieng, cat vung -> canvas ve bang setInterval -> captureStream -> MediaRecorder, khuc gui ve main theo thu tu) +
+    `src/preload-luong.js`.
+  + `src/main.js`: handleConfirm nhanh `payload.quay`; batDauGhiHinh / dungGhiHinh / ketThucGhiHinh / huyGhiHinhLoi
+    (ghi noi khuc vao file `.tam`, xong doi ten, ghi so, mo khay); moVienQuay(..., 'video') = dong ho bam duoc; phim
+    tat chup + bam tray luc dang quay = DUNG; menu tray them "Dung quay video" + "Mo khay video"; cua so Khay video +
+    IPC video:*; che do do `--thu-quay`; `AIO_QUAY_TOI_DA_MS` de ha tran khi do.
+  + Moi: `src/kho-video.js` (so), `src/video/` (khay: index.html, video.css, video.js — dung chung storyboard.css),
+    `src/preload-video.js`, `src/dem/quay.html` + `quay.js` + `src/preload-dem.js` (dong ho + nut Dung).
+  + `src/kho.js` duongVideoMoi; overlay: nut Quay (R) + nut loa (`index.html`, `overlay.css`, `overlay.js`); khay anh:
+    nut mo Khay video (`shelf/index.html`, `shelf.js`, `shelf.css`, `preload-shelf.js`); `src/i18n.js` 23 khoa VI + EN.
+  + Bai do moi: `scripts/test/do-quay-video.mjs` + `quay-video-main.cjs` (test:quayvideo), `do-quay-app.mjs`
+    (test:quayapp), `do-kho-video.cjs` (test:khovideo). package.json 0.7.9 -> 0.8.0 + 3 lenh test.
+- Kiem chung bang so (may cong ty, man chinh 2560x1440 @150% = 3840x2160, RTX 4060 Ti):
+  + test:quayvideo (bo quay that, cua so AN, soi bang ffprobe): 6 luot DAT. 640x360 DIP -> 960x540, 89 khung / 3,00 s
+    (29,6); co tieng -> AAC 2 kenh; ca man -> 2560x1440 (dung tran), 74 khung / 2,50 s; 21x15 -> 32x22; dung sau
+    0,25 s van ra file lanh; 12 s co tieng 342 khung (28,5), 807 KB; goi quay lan 2 khi dang quay bi tu choi.
+  + test:quayapp (duong THAT, hien len man ~6 s, anh cho chay): 4 luot DAT — khong tieng, co tieng, --xoa, --tu-dung.
+    4 thanh vien + 1 dong ho, 0 cua so cham vung; dong ho "0:02" + cham do; bam nut Dung that -> 1 file
+    `shotandsave-video-*.mp4` dung thu muc, khong con `.tam`; khay 1 hang, video nap qua file:// ready 4, thoi luong
+    2,6061 s vs so 2,604 s; icon keo ve duoc; 76 khung = 29,2 khung/giay; VIEN CAM 0,0% lot vao video (doi chung: tu
+    ve vach cam vao mep -> thuoc bat duoc); xoa bam 2 lan -> file vao Thung rac, so + khay con 0; ha tran 2 s -> tu
+    dung o 2.003 ms. Em mo 1 khung ra nhin: noi dung man hinh net, khong vien, khong dong ho.
+  + test:khovideo: so video 14 muc hanh vi + day noi preload <-> main + 23 khoa chu du VI/EN — DAT.
+  + Giao dien (trinh duyet, mo that trang + gia lap main): thanh cong cu 19 nut, phim R / bam nut -> confirm
+    { quay, tieng }, Ctrl+R khong quay, may khong co tieng may -> nut loa an + khong gui tieng; dong ho rong toi da
+    163 px trong cua so 240 px; khay video 4 hang, 1 luc 1 video phat, keo goi dung id, 560 px khong tran.
+  + ☠️ Them nut vao thanh khay anh lam khay DOC (252 px) bop tieu de "Khay anh" con 38/48 px -> khay doc: khe nut
+    6 -> 2 px, do lai 48/48 px (so dem 3 chu so van vua). Khay ngang khong doi.
+  + Bai cu van DAT: test:storyboard, khodai 11/11, vienquay, banquyen 27/27, lammo 25/25. KHONG chay `npm test`
+    (selftest bung overlay — so loi #12).
+  + ☠️ Thuoc cua em sai 2 lan trong buoi (khong phai app): (1) bai day noi chi do `webContents.send`, bao oan
+    'shelf:removed' khong ai gui (main dung `e.sender.send`); (2) bai do bo quay co chot 120 s -> luot dai 300 s bi
+    giet giua chung, phai noi han theo thoi gian quay.
+- CHUA kiem: anh chua bam tren app that (overlay that -> R; anh dong bang co lot vao khung dau khong) · keo tha hang
+  video vao Premiere / Zalo · Premiere voi MP4 phan manh · video tang toc phan cung · man thu 2 (4K @125%) · may yeu,
+  may khong co bo nen H.264 · Mac · ban DONG GOI (chua `npm run dist`) · luot dai 5 phut (dang chay, ghi so sau).
+- 1 file thu 121 KB dang nam trong Thung rac cua may (tu luot --xoa). File mau cho anh: `.selftest/thu-quay/`.
 
 ## [0.7.9 bo cai] - 2026-09-30 12:50 - Dong goi + CAI 0.7.9 len may cong ty (truoc do may chay 0.7.7)
 - Boi canh: anh gui anh khay he thong "AiO Shot & Save v0.7.7": "may anh dang o ban nay ne em" (hoi sao chua cai ban moi).

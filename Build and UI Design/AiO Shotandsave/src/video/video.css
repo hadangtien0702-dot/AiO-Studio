@@ -1,0 +1,38 @@
+/* KHAY VIDEO (01/10) — phan THEM tren storyboard.css (header, the .dai, .nut, .toast lay tu do; khong khai token rieng).
+   Moi doan quay = 1 the: hang dau [ten · thong tin · Keo · Mo thu muc · Xoa], duoi la khung phat.
+   Khung phat KHONG dung thanh dieu khien co san cua trinh duyet: thanh do nuot thao tac keo, ma CA HANG phai keo duoc
+   (tha vao Premiere / Zalo). Bam vao video = phat / dung; vach tien do mong o day. */
+/* Cum "Co tieng | Khong tieng" tren hang dau: khuon .chon-nhom / .chon-nut cua man Cai dat (lay tu storyboard.css),
+   chi thu nho cho vua hang 26 px cua .dai-dau. Dang chon = xam noi (khong phai cam: cam chi cho nut chinh). */
+.dai-dau .chon-tieng { flex: none; }
+.dai-dau .chon-tieng .chon-nut { min-width: 0; padding: 3px 9px; font-size: 11.5px; white-space: nowrap; }
+.dai-dau .chon-tieng .chon-nut:disabled { opacity: .5; cursor: default; }
+
+.vd .vd-khung {
+  position: relative; display: inline-block; max-width: 100%;
+  border-radius: var(--r-sm); overflow: hidden;
+  border: 1px solid var(--line-2); background: var(--bg-0);
+  cursor: grab; line-height: 0;
+}
+.vd .vd-khung:active { cursor: grabbing; }
+.vd video { display: block; max-width: 100%; max-height: 300px; width: auto; height: auto; background: var(--bg-0); }
+
+/* Nut phat giua khung: hien khi dang dung, an khi dang phat */
+.vd .vd-phat {
+  position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: rgb(10 10 10 / 62%); color: #fff;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+.vd.dang-phat .vd-phat { opacity: 0; }
+
+/* Thoi luong goc duoi-phai + vach tien do day khung */
+.vd .vd-gio {
+  position: absolute; right: 6px; bottom: 8px; padding: 2px 6px; border-radius: 4px;
+  background: rgb(10 10 10 / 74%); color: var(--text-1);
+  font-size: 10.5px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.vd .vd-thanh { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgb(255 255 255 / 14%); pointer-events: none; }
+.vd .vd-thanh i { display: block; height: 100%; width: 0; background: var(--accent); }

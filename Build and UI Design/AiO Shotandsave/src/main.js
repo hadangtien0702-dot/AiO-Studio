@@ -26,6 +26,9 @@ const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
+const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
+const { taoBanKhongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
+const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
 const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
@@ -105,6 +108,81 @@ async function thuOcr() {
   } catch (e) { kq.loi = e.message }
   try { fs.writeFileSync(THU_OCR.ra, JSON.stringify(kq, null, 1)) } catch (e) {}
   ocr.tatHost()
+  app.exit(0)
+}
+/* [do 01/10] --thu-quay <ra.json> [--tieng]: QUAY THU ~3 giay vung giua man chinh bang DUNG duong that cua app
+   (batDauGhiHinh -> vien cam + dong ho -> bam nut Dung -> file MP4 -> so video -> Khay video) roi ghi ket qua + THOAT.
+   Khong tray, khong phim tat, userData rieng (khoa single-instance rieng -> khong danh thuc ban dang chay).
+   ☠️ CO hien vien cam + dong ho + Khay video len man hinh ~6 giay -> anh dang ngoi may thi HOI TRUOC (so loi #12).
+   Chay qua scripts/test/do-quay-app.mjs (no dat thu muc luu rieng trong .selftest, khong dung toi anh cua nguoi dung). */
+const iThuQuay = process.argv.indexOf('--thu-quay')
+const THU_QUAY = iThuQuay > 0 ? { ra: process.argv[iThuQuay + 1], tieng: process.argv.includes('--tieng') } : null
+if (THU_QUAY) app.setPath('userData', process.env.AIO_USERDATA || path.join(require('os').tmpdir(), 'aio-thu-quay'))
+async function thuQuay() {
+  const kq = { ban: app.getVersion(), dongGoi: app.isPackaged, xinTieng: THU_QUAY.tieng }
+  const doi = async (dk, ms) => { const han = Date.now() + ms; while (!dk() && Date.now() < han) await cho(100); return dk() }
+  const js = (w, code) => w.webContents.executeJavaScript(code).catch((e) => 'LOI: ' + e.message)
+  try {
+    khoVideo.khoiTao(app.getPath('userData'))
+    lang = kho.docCauHinh().lang || 'vi'
+    kq.thuMucLuu = kho.thuMucAnh()
+    await luong.khoiDong({ ghiLog })
+    kq.luongSanSang = await doi(() => luong.sanSang(), 15000)
+    const d = screen.getPrimaryDisplay()
+    const W = 640, H = 360
+    const rect = { x: Math.round((d.bounds.width - W) / 2), y: Math.round((d.bounds.height - H) / 2), w: W, h: H }
+    kq.man = { bounds: d.bounds, sf: d.scaleFactor }
+    kq.rect = rect
+    await batDauGhiHinh(d, rect, THU_QUAY.tieng)
+    kq.dangQuay = !!ghiHinh
+    kq.luot = ghiHinh ? { w: ghiHinh.w, h: ghiHinh.h, tieng: ghiHinh.tieng, coThuoc: ghiHinh.vien.coThuoc, tam: ghiHinh.tam } : null
+    await cho(process.argv.includes('--tu-dung') ? 600 : 2600)
+    // Cua so dang hien quanh vung: KHONG cai nao duoc cham vung dang quay
+    const vung = { x: d.bounds.x + rect.x, y: d.bounds.y + rect.y, width: W, height: H }
+    kq.cuaSo = BrowserWindow.getAllWindows().filter((w) => w.isVisible()).map((w) => {
+      const b = w.getBounds()
+      return { url: w.webContents.getURL().split('/src/')[1] || '?', b, chamVung: !!giaoHCN(b, vung) }
+    })
+    const thuoc = BrowserWindow.getAllWindows().find((w) => /dem\/quay\.html/.test(w.webContents.getURL()))
+    if (process.argv.includes('--tu-dung')) kq.dongHo = 'tu-dung: khong bam, cho het tran ' + GHI_TOI_DA_MS + ' ms'
+    else if (thuoc) {
+      kq.dongHo = await js(thuoc, "JSON.stringify({ gio: document.getElementById('gio').textContent, chay: document.body.classList.contains('chay'), loa: getComputedStyle(document.getElementById('loa')).display, nut: document.getElementById('dung').textContent.trim(), coCau: typeof window.dem })")
+      await js(thuoc, "document.getElementById('dung').click()") // dung bang DUNG nut that -> preload-dem -> 'quay:dung'
+    } else { kq.dongHo = 'KHONG CO cua so dong ho'; dungGhiHinh('thu-quay') }
+    kq.daDung = await doi(() => !ghiHinh, 8000)
+    kq.conVien = BrowserWindow.getAllWindows().filter((w) => /dem\/(quay|vien)\.html/.test(w.webContents.getURL())).length
+    kq.so = khoVideo.danhSach()
+    kq.fileConTam = kq.luot ? fs.existsSync(kq.luot.tam) : null
+    if (await doi(() => videoWin && !videoWin.isDestroyed() && !videoWin.webContents.isLoading(), 6000)) {
+      await cho(1500)
+      kq.khay = await js(videoWin, "JSON.stringify({ hang: [...document.querySelectorAll('.vd')].map(h => { const v = h.querySelector('video'); return { ten: h.querySelector('.dai-ten').textContent, meta: h.querySelector('.dai-meta').textContent, ready: v.readyState, dur: v.duration, kich: v.videoWidth + 'x' + v.videoHeight, loi: v.error && v.error.code } }), dem: document.getElementById('shot-badge').textContent, font: getComputedStyle(document.querySelector('.nut') || document.body).fontFamily.slice(0, 24) })")
+      kq.iconKeo = videoIcon.size // khung dau da ve ra canvas va gui ve main (canvas khong bi "taint" voi file://)
+      // 01/10 CHON TIENG trong khay: bam nut that "Khong tieng" roi "Co tieng", doc lai giao dien + so + file dang chon
+      const docTieng = "JSON.stringify({ nut: [...document.querySelectorAll('.vd .chon-tieng .chon-nut')].map(b => b.textContent + (b.classList.contains('active') ? '*' : '')), muted: document.querySelector('.vd video').muted, xoa: document.querySelector('.vd .dai-dau .nut.icon').title })"
+      const bamTieng = (i) => "document.querySelectorAll('.vd .chon-tieng .chon-nut')[" + i + "].click()"
+      kq.tieng0 = await js(videoWin, docTieng)
+      if (kq.so[0] && kq.so[0].tieng) {
+        await js(videoWin, bamTieng(1)); await cho(700)
+        const m1 = khoVideo.tim(kq.so[0].id)
+        kq.tieng1 = { giaoDien: await js(videoWin, docTieng), boTieng: m1.boTieng, fileKhongTieng: m1.fileKhongTieng, coFile: !!banKhongTieng(m1), keoSeLay: fileDangChon(m1) }
+        await js(videoWin, bamTieng(0)); await cho(400)
+        const m2 = khoVideo.tim(kq.so[0].id)
+        kq.tieng2 = { giaoDien: await js(videoWin, docTieng), boTieng: m2.boTieng, conFileKhongTieng: !!banKhongTieng(m2), keoSeLay: fileDangChon(m2) }
+      }
+      if (process.argv.includes('--xoa') && kq.so[0]) {
+        // Bam nut Xoa THAT 2 lan (lan 1 = hoi lai). File thu vao Thung rac cua may. Do: Windows co nha file dang mo khong.
+        const bam = "document.querySelector('.vd .dai-dau .nut.icon').click()"
+        await js(videoWin, bam)
+        kq.xoaLan1 = { conFile: fs.existsSync(kq.so[0].file), chuNut: await js(videoWin, "document.querySelector('.vd .dai-dau .nut.icon').textContent") }
+        await js(videoWin, bam)
+        await doi(() => !fs.existsSync(kq.so[0].file), 5000)
+        await cho(400)
+        kq.xoaLan2 = { conFile: fs.existsSync(kq.so[0].file), conFileKhongTieng: !!(kq.tieng1 && kq.tieng1.fileKhongTieng && fs.existsSync(kq.tieng1.fileKhongTieng)), conTrongThuMuc: fs.readdirSync(kq.thuMucLuu).length, conTrongSo: khoVideo.danhSach().length, hang: await js(videoWin, "document.querySelectorAll('.vd').length"), toast: await js(videoWin, "document.getElementById('toast').textContent") }
+      }
+    } else kq.khay = 'KHONG mo duoc khay video'
+  } catch (e) { kq.loi = String((e && e.stack) || e) }
+  try { fs.writeFileSync(THU_QUAY.ra, JSON.stringify(kq, null, 1)) } catch (e) {}
+  dangThoat = true
   app.exit(0)
 }
 const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
@@ -211,6 +289,7 @@ if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsa
 
 app.whenReady().then(() => {
   if (THU_OCR) { thuOcr(); return } // che do do: khong tray, khong phim tat, khong luong chup
+  if (THU_QUAY) { thuQuay(); return } // che do do quay video: khong tray, khong phim tat
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
     const headers = {
@@ -250,6 +329,7 @@ app.whenReady().then(() => {
   })
 
   khoDai.khoiTao(app.getPath('userData'))
+  khoVideo.khoiTao(app.getPath('userData'))
   kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
@@ -398,10 +478,13 @@ function rebuildTrayMenu() {
   if (!tray) return
   const menu = Menu.buildFromTemplate([
     ...dongBanQuyenTray(),
-    { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
+    // 01/10: dang quay video -> muc DAU la Dung quay (phim tat chup luc nay cung = dung, xem startCapture)
+    ...(ghiHinh ? [{ label: T('tray.dungQuay'), accelerator: currentHotkey, click: () => dungGhiHinh('tray') }, { type: 'separator' }] : []),
+    { label: T('tray.chup'), accelerator: ghiHinh ? undefined : currentHotkey, enabled: !ghiHinh, click: () => startCapture() },
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
     { label: T('tray.storyboard'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
+    { label: T('tray.video'), click: () => openVideoWindow() },
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
@@ -415,7 +498,9 @@ function rebuildTrayMenu() {
   tray.setContextMenu(menu)
 }
 
+let dangThoat = false // 01/10: thoat giua luc quay video -> chot file nhung KHONG mo khay video nua
 function forceQuit() {
+  dangThoat = true
   for (const w of BrowserWindow.getAllWindows()) w.destroy()
   app.quit()
 }
@@ -689,6 +774,9 @@ const GRAB_TRUOC = process.env.AIO_GRAB_TRUOC !== '0'
 let layersSanSang = null // layers cua the he hien tai — overlay nao nap xong SAU grab thi lay o day
 
 async function startCapture() {
+  // 01/10: dang QUAY VIDEO -> phim tat chup / bam tray = DUNG quay (duong dung luon co, ke ca khi vung kin man
+  // khong con cho dat nut Dung). Khong mo overlay luc dang quay: anh dong bang se lot vao video.
+  if (ghiHinh) { dungGhiHinh('phim tat'); return }
   if (overlayWins.length) return // dang chon vung, bo qua
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
   if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
@@ -1245,6 +1333,11 @@ async function handleConfirm(wcId, payload) {
 
   // 28/09: dang bat Multi-Shot Storyboard (nut/phim S tren khung chon) -> QUAY 3 GIAY vung nay thay vi chup 1 tam.
   if (payload.storyboard && payload.rect) { quay3Giay(display, sf, payload.rect); return }
+  // 01/10: nut Quay / phim R tren khung chon -> QUAY VIDEO vung nay toi khi bam Dung (MP4, khay video rieng).
+  // ☠️ Ham async goi khong await: loi nem ben trong KHONG len uncaughtException (quy tac 1 trong CLAUDE.md app) ->
+  //    phai .catch, khong thi `ghiHinh` ket mai va phim tat chup chet toi khi mo lai app.
+  //    01/10 10:4x anh chot: quay LUON co tieng may (tham so thu 3 = true); chon co / khong tieng nam trong Khay video.
+  if (payload.quay && payload.rect) { batDauGhiHinh(display, payload.rect, true).catch(huyGhiHinhLoi); return }
 
   let cropped
 
@@ -1775,7 +1868,8 @@ const cho = (ms) => new Promise((r) => setTimeout(r, ms))
    Nay hinh hoc o src/vien-quay.js: 4 cua so >= 40 px nam HOAN TOAN NGOAI vung + setShape() chi giu net manh.
    Them 2 lop chot: setContentProtection (vien khong bao gio vao anh chup) + do getBounds sau khi hien, cua so nao
    cham vung (Windows kep vao workArea — so loi #1) thi HUY ngay va ghi run-log. */
-function moVienQuay(display, rect) {
+function moVienQuay(display, rect, kieu) {
+  const laVideo = kieu === 'video' // 01/10: quay video -> thuoc la DONG HO dem len + nut Dung (bam duoc)
   const b = display.bounds
   const v = tinhVienQuay({ x: b.x + rect.x, y: b.y + rect.y, w: rect.w, h: rect.h })
   const wins = []
@@ -1805,30 +1899,43 @@ function moVienQuay(display, rect) {
     wins.push(w)
   }
   // Thuoc dem nguoc: sat TREN khung vien neu con cho trong man, khong thi sat DUOI; het cho -> khong hien.
-  const TH_W = 200, TH_H = 40 // cua so trong suot; vien thuoc 28 px nam trong, chua 6 px cho bong
+  const TH_W = laVideo ? 240 : 200, TH_H = 40 // cua so trong suot; vien thuoc 28 px nam trong, chua 6 px cho bong
   const n = v.vungNgoai
   let thY = null
   if (n.y - TH_H >= b.y) thY = n.y - TH_H
   else if (n.y + n.height + TH_H <= b.y + b.height) thY = n.y + n.height
   let thuoc = null
   if (thY != null) {
+    // Thuoc khong tran khoi man (vung sat mep phai): kep x trong man
+    const thX = Math.max(b.x, Math.min(n.x - 6, b.x + b.width - TH_W))
     thuoc = new BrowserWindow({
-      x: n.x - 6, y: thY, width: TH_W, height: TH_H,
+      x: thX, y: thY, width: TH_W, height: TH_H,
       frame: false, transparent: true, backgroundColor: '#00000000', resizable: false, movable: false,
       focusable: false, skipTaskbar: true, hasShadow: false, show: false,
-      webPreferences: { sandbox: true, contextIsolation: true },
+      webPreferences: laVideo
+        ? { preload: path.join(__dirname, 'preload-dem.js'), contextIsolation: true, sandbox: false }
+        : { sandbox: true, contextIsolation: true },
     })
     thuoc.setContentProtection(true)
     thuoc.setAlwaysOnTop(true, 'screen-saver')
-    thuoc.setIgnoreMouseEvents(true)
-    thuoc.loadFile(path.join(__dirname, 'dem', 'index.html'), { query: { lang, vi: thY < n.y ? 'tren' : 'duoi' } })
+    if (!laVideo) thuoc.setIgnoreMouseEvents(true) // quay video: nut Dung phai bam duoc (cua so nam NGOAI vung)
+    thuoc.loadFile(path.join(__dirname, 'dem', laVideo ? 'quay.html' : 'index.html'), {
+      query: laVideo ? { lang, dung: T('quay.dung'), dungTitle: T('quay.dungTitle') } : { lang, vi: thY < n.y ? 'tren' : 'duoi' },
+    })
     thuoc.once('ready-to-show', () => { if (!thuoc.isDestroyed()) thuoc.showInactive() })
     wins.push(thuoc)
-  } else ghiLog('quay3s: khong co cho dat thuoc dem (vung sat ca mep tren lan duoi)')
-  const goi = (js) => { if (thuoc && !thuoc.isDestroyed()) thuoc.webContents.executeJavaScript(js).catch(() => {}) }
+  } else ghiLog((laVideo ? 'quay-video' : 'quay3s') + ': khong co cho dat thuoc dem (vung sat ca mep tren lan duoi)')
+  const goi = (js) => {
+    if (!thuoc || thuoc.isDestroyed()) return
+    const chay = () => { if (!thuoc.isDestroyed()) thuoc.webContents.executeJavaScript(js).catch(() => {}) }
+    // Trang chua nap xong ma goi thi lenh roi mat (dong ho quay video se dung o 0:00) -> doi nap xong
+    if (thuoc.webContents.isLoading()) thuoc.webContents.once('did-finish-load', chay); else chay()
+  }
   return {
+    coThuoc: !!thuoc,
     datSo: (s) => goi('window.datSo && window.datSo(' + s + ')'),
     datKhung: (k) => goi('window.datKhung && window.datKhung(' + k + ')'),
+    batDau: (o) => goi('window.batDau && window.batDau(' + JSON.stringify(o || {}) + ')'),
     dong: () => { for (const w of wins) if (!w.isDestroyed()) w.destroy() },
   }
 }
@@ -1894,6 +2001,244 @@ async function quay3Giay(display, sf, rect) {
   daiQuay = { moiId: idDai, tuLuu: true }
   openStoryboardWindow()
 }
+
+/* ── QUAY VIDEO vung man hinh (01/10) ─────────────────────────────────────────────────────────────────
+   Anh chot 01/10 (bang hoi): quay toi khi BAM DUNG (tran 5 phut) · co nut bat TIENG MAY (mac dinh tat) · video nam
+   o KHAY RIENG · MP4 truoc, GIF lam sau.
+   Nguoi dung: khoanh vung -> bam nut Quay (hoac phim R) -> vien cam + dong ho dem len + nut Dung nam NGOAI vung
+   -> bam Dung (hoac bam lai phim tat chup / bam tray) -> file MP4 vao thu muc anh, Khay video mo ra.
+   - Bo quay nam trong cua so luong AN (src/luong-chup.js batDauQuay): khuc MP4 ve toi dau ghi NOI vao dia toi do
+     (file `.tam`), xong moi doi ten -> khong giu ca doan trong RAM, tat app giua chung van con file phat duoc.
+   - ☠️ Nhu quay 3 giay: KHONG cua so nao de len vung dang quay (vien + dong ho deu nam ngoai). Vung kin ca chieu cao
+     man -> khong co cho dat dong ho: bao bang thong bao he thong, dung bang phim tat chup / tray.
+   - Vung vat 2 man: khong co nut Quay (duong ghep 2 man luu thang, khong qua thanh cong cu). */
+const GHI_TOI_DA_MS = Number(process.env.AIO_QUAY_TOI_DA_MS) > 0 ? Number(process.env.AIO_QUAY_TOI_DA_MS) : 5 * 60 * 1000 // [do] AIO_QUAY_TOI_DA_MS: ha tran de do duong tu dung
+let ghiHinh = null // luot dang quay: { fd, tam, duong, bytes, khuc, batDau, vien, hetGio, w, h, tieng, dangDung, loiGhi }
+let videoMoi = null // id video vua quay xong -> khay video danh dau + phat ngay
+
+function baoKhongQuayDuoc(ly) {
+  ghiLog('quay-video LOI: ' + ly)
+  if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongQuayDuoc') }).show()
+}
+
+async function batDauGhiHinh(display, rect, tieng) {
+  if (ghiHinh || dangQuay) return
+  const duong = kho.duongVideoMoi('mp4')
+  if (!duong) { baoKhongQuayDuoc('khong tao duoc thu muc ' + kho.thuMucAnh()); return }
+  const tam = duong + '.tam'
+  let fd
+  try { fd = fs.openSync(tam, 'w') } catch (e) { baoKhongQuayDuoc('khong mo duoc ' + tam + ': ' + e.message); return }
+  const g = { fd, tam, duong, bytes: 0, khuc: 0, batDau: 0, vien: null, hetGio: null, w: 0, h: 0, tieng: false, dangDung: false, loiGhi: null }
+  ghiHinh = g // dat SOM: chan bam lan 2, va phim tat chup tu luc nay = dung
+  rebuildTrayMenu()
+  g.vien = moVienQuay(display, rect, 'video')
+  await cho(QUAY_CHO_MS) // overlay (anh dong bang) vua dong -> doi man that hien lai
+  const r = await luong.batDauQuay(display, rect, {
+    tieng,
+    onKhuc: (buf) => {
+      try { fs.writeSync(g.fd, buf); g.bytes += buf.length; g.khuc++ } catch (e) {
+        // O day day / mat quyen giua chung: dung ngay, giu phan da ghi
+        if (!g.loiGhi) { g.loiGhi = e.message; ghiLog('quay-video LOI ghi dia: ' + e.message); dungGhiHinh('loi ghi dia') }
+      }
+    },
+    onXong: (info) => ketThucGhiHinh(g, info),
+  })
+  if (!r.ok) {
+    g.vien.dong()
+    try { fs.closeSync(fd) } catch (e) {}
+    try { fs.unlinkSync(tam) } catch (e) {} // file .tam do chinh luot nay tao, dung ten
+    ghiHinh = null
+    rebuildTrayMenu()
+    baoKhongQuayDuoc(r.loi)
+    return
+  }
+  g.batDau = Date.now(); g.w = r.w; g.h = r.h; g.tieng = !!r.tieng
+  if (r.duoi && r.duoi !== 'mp4') g.duong = g.duong.replace(/\.mp4$/, '.' + r.duoi) // may khong co H.264 -> webm
+  ghiLog('quay-video bat dau ' + r.w + 'x' + r.h + ' ' + r.mime + (g.tieng ? ' +tieng' : '') + ' (mo luong ' + r.msMo + ' ms) rect=' + JSON.stringify(rect))
+  g.vien.batDau({ tieng: g.tieng })
+  if (tray) tray.setToolTip('AiO Shot & Save · ' + T('tray.dungQuay'))
+  if (!g.vien.coThuoc && Notification.isSupported()) {
+    new Notification({ title: 'AiO Shot & Save', body: T('quay.dungBangPhim').replace('{phim}', formatAccel(currentHotkey)) }).show()
+  }
+  g.hetGio = setTimeout(() => dungGhiHinh('het tran ' + Math.round(GHI_TOI_DA_MS / 1000) + ' s'), GHI_TOI_DA_MS)
+  if (g.dangDung) luong.dungQuay() // nguoi dung da bam dung trong luc luong dang mo
+}
+
+/* batDauGhiHinh nem loi giua chung (tao cua so vien hong, ...): tra app ve trang thai KHONG quay, bao nguoi dung.
+   Khong co ham nay thi `ghiHinh` ket -> moi lan bam phim tat chup deu thanh "dung quay" va khong chup duoc nua. */
+function huyGhiHinhLoi(e) {
+  const g = ghiHinh
+  ghiHinh = null
+  if (g) {
+    clearTimeout(g.hetGio)
+    try { if (g.vien) g.vien.dong() } catch (err) {}
+    if (g.batDau) luong.dungQuay()
+    try { fs.closeSync(g.fd) } catch (err) {}
+    if (!g.bytes) { try { fs.unlinkSync(g.tam) } catch (err) {} } // file .tam RONG do chinh luot nay tao
+  }
+  if (tray) tray.setToolTip('AiO Shot & Save')
+  rebuildTrayMenu()
+  baoKhongQuayDuoc('nem loi: ' + ((e && e.stack) || e))
+}
+
+function dungGhiHinh(lyDo) {
+  const g = ghiHinh
+  if (!g || g.dangDung) return
+  g.dangDung = true
+  ghiLog('quay-video dung (' + lyDo + ')')
+  if (g.batDau) luong.dungQuay() // chua bat dau xong -> batDauGhiHinh tu goi dungQuay khi luong mo xong
+}
+
+function ketThucGhiHinh(g, info) {
+  if (ghiHinh !== g) return
+  ghiHinh = null
+  clearTimeout(g.hetGio)
+  g.vien.dong()
+  try { fs.closeSync(g.fd) } catch (e) {}
+  if (tray) tray.setToolTip('AiO Shot & Save')
+  rebuildTrayMenu()
+  const ms = (info && info.ms) || (g.batDau ? Date.now() - g.batDau : 0)
+  ghiLog('quay-video xong ' + Math.round(ms / 100) / 10 + ' s, ' + g.khuc + ' khuc, ' + Math.round(g.bytes / 1024) + ' KB, ' +
+    ((info && info.khung) || 0) + ' khung' + (info && info.loi ? ' LOI=' + info.loi : '') + (g.loiGhi ? ' LOI-GHI=' + g.loiGhi : ''))
+  if (!g.bytes) {
+    try { fs.unlinkSync(g.tam) } catch (e) {} // 0 byte: bo file .tam cua chinh luot nay
+    baoKhongQuayDuoc((info && info.loi) || 'khong co du lieu')
+    return
+  }
+  let file = g.duong
+  try { fs.renameSync(g.tam, file) } catch (e) { ghiLog('quay-video LOI doi ten ' + g.tam + ': ' + e.message); file = g.tam }
+  const m = khoVideo.them({ file, ms, w: g.w, h: g.h, tieng: g.tieng, bytes: g.bytes })
+  if (!m) ghiLog('quay-video LOI ghi so (file van nam o ' + file + ')')
+  videoMoi = m ? m.id : null
+  if (!dangThoat) openVideoWindow()
+}
+
+ipcMain.on('quay:dung', () => dungGhiHinh('nut Dung'))
+
+/* --- Cua so KHAY VIDEO (01/10): danh sach doan quay, moi doan 1 hang. Khuon = khay Storyboard. --- */
+let videoWin = null
+function openVideoWindow() {
+  if (videoWin && !videoWin.isDestroyed()) {
+    videoWin.webContents.reload() // mo lai = nap lai so (co video vua quay)
+    videoWin.show()
+    videoWin.focus()
+    return
+  }
+  const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+  const wa = d.workArea
+  const w = Math.min(860, Math.round(wa.width * 0.8))
+  const h = Math.min(680, Math.round(wa.height * 0.8))
+  videoWin = new BrowserWindow({
+    x: wa.x + Math.round((wa.width - w) / 2), y: wa.y + Math.round((wa.height - h) / 2), width: w, height: h,
+    minWidth: 560, minHeight: 420,
+    frame: false,
+    title: 'AiO Shot & Save - Video',
+    backgroundColor: '#181818',
+    show: false,
+    alwaysOnTop: true,
+    icon: path.join(__dirname, '..', 'assets', 'app.ico'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload-video.js'),
+      contextIsolation: true, sandbox: false,
+    },
+  })
+  videoWin.loadFile(path.join(__dirname, 'video', 'index.html'))
+  // che do do --thu-quay: hien nhung KHONG cuop tieu diem cua nguoi dang lam viec
+  videoWin.once('ready-to-show', () => (THU_QUAY ? videoWin.showInactive() : videoWin.show()))
+  videoWin.on('closed', () => { videoWin = null })
+}
+ipcMain.on('shelf:open-video', () => openVideoWindow())
+
+/* 01/10 10:4x anh chot: quay LUON co tieng; vao khay moi chon "Co tieng / Khong tieng" cho tung video.
+   Ban KHONG TIENG = file rieng nam canh ban goc, ten them "-khong-tieng" (src/mp4-bo-tieng.js: chep + doi ten hop
+   tieng thanh 'free', khong nen lai hinh, 90 MB = 27 ms). Tao 1 lan khi nguoi dung chon, GIU tren dia (Premiere noi
+   file theo duong dan — xoa di la mat lien ket). Lua chon ghi vao so (boTieng) nen mo lai khay van nho. */
+function banKhongTieng(m) { return m && m.fileKhongTieng && fs.existsSync(m.fileKhongTieng) ? m.fileKhongTieng : null }
+/* File nguoi dung DANG CHON cua 1 video: dung khi keo tha ra ngoai va khi bam Mo thu muc. */
+function fileDangChon(m) { return (m.boTieng && banKhongTieng(m)) || m.file }
+function bytesSeXoa(m) { const k = banKhongTieng(m); let b = m.bytes; if (k) { try { b += fs.statSync(k).size } catch (e) {} } return b }
+
+ipcMain.handle('video:get-data', () => {
+  const moiId = videoMoi
+  videoMoi = null // chi danh dau "moi" dung 1 lan (mo lai / reload khong tu phat nua)
+  const ds = khoVideo.danhSach().map((m) => ({
+    id: m.id, ten: path.basename(m.file), url: pathToFileURL(m.file).href,
+    ms: m.ms, w: m.w, h: m.h, bytes: m.bytes, taoLuc: m.taoLuc,
+    coNutTieng: !!m.tieng && /\.mp4$/i.test(m.file), // video quay khong tieng (mac) / webm: khong co gi de chon
+    boTieng: !!(m.boTieng && banKhongTieng(m)),
+    bytesXoa: bytesSeXoa(m),
+  }))
+  return { ds, moiId, lang, dangQuay: !!ghiHinh }
+})
+
+ipcMain.handle('video:chon-tieng', (_e, id, coTieng) => {
+  const m = khoVideo.tim(id)
+  if (!m || !m.tieng || !fs.existsSync(m.file)) return { ok: false, loi: 'khong co video / video khong co tieng' }
+  if (coTieng) {
+    const m2 = khoVideo.sua(id, { boTieng: false })
+    return m2 ? { ok: true, boTieng: false, bytesXoa: bytesSeXoa(m2) } : { ok: false, loi: 'khong ghi duoc so' }
+  }
+  let f = banKhongTieng(m)
+  if (!f) {
+    f = m.file.replace(/\.mp4$/i, '') + '-khong-tieng.mp4'
+    const t0 = Date.now()
+    const r = taoBanKhongTieng(m.file, f)
+    ghiLog('video bo tieng ' + id + ': ' + (r.ok ? 'xong ' + (Date.now() - t0) + ' ms, ' + r.soTraf + ' doan -> ' + f : 'LOI ' + r.loi))
+    if (!r.ok) return { ok: false, loi: r.loi }
+  }
+  const m2 = khoVideo.sua(id, { boTieng: true, fileKhongTieng: f })
+  return m2 ? { ok: true, boTieng: true, bytesXoa: bytesSeXoa(m2) } : { ok: false, loi: 'khong ghi duoc so' }
+})
+
+/* Anh nho lam ICON luc keo (renderer ve khung dau cua video ra canvas). Giu toi da 40. */
+const videoIcon = new Map() // id -> NativeImage
+ipcMain.on('video:icon', (_e, id, dataUrl) => {
+  if (!khoVideo.MAU_ID.test(String(id)) || typeof dataUrl !== 'string') return
+  try {
+    const img = nativeImage.createFromDataURL(dataUrl)
+    if (img.isEmpty()) return
+    videoIcon.delete(id); videoIcon.set(id, img)
+    while (videoIcon.size > 40) videoIcon.delete(videoIcon.keys().next().value)
+  } catch (e) {}
+})
+ipcMain.on('video:keo', (e, id) => {
+  const m = khoVideo.tim(id)
+  if (!m || !fs.existsSync(m.file)) { ghiLog('video keo ' + id + ': khong con file'); return }
+  try {
+    const duong = kho.duongDanKeoAnToan(fileDangChon(m)) // ban Co tieng / Khong tieng theo nut dang chon tren khay
+    let icon = videoIcon.get(id)
+    if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'tray.png')).resize({ height: 64, quality: 'best' })
+    const t0 = Date.now()
+    e.sender.startDrag({ file: duong, icon }) // ☠️ Windows: chan toi khi THA chuot -> so duoi la thoi gian tay keo
+    ghiLog('video keo ' + id + ': tay keo ' + (Date.now() - t0) + ' ms -> ' + duong)
+  } catch (err) { ghiLog('video keo LOI: ' + err.message) }
+})
+ipcMain.on('video:mo-thu-muc', (_e, id) => {
+  const m = khoVideo.tim(id)
+  if (m && fs.existsSync(m.file)) shell.showItemInFolder(fileDangChon(m))
+  else shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh()))
+})
+/* Xoa = dua file vao THUNG RAC (lay lai duoc) roi go khoi so. Nut tren khay noi ro dung luong + bam 2 lan. */
+ipcMain.handle('video:xoa', async (_e, id) => {
+  const m = khoVideo.tim(id)
+  if (!m) return { ok: false }
+  try {
+    if (fs.existsSync(m.file)) await shell.trashItem(m.file)
+    const k = banKhongTieng(m) // ban khong tieng (neu da tao) di cung ban goc: nut Xoa ghi tong dung luong ca hai
+    if (k) await shell.trashItem(k)
+  } catch (err) {
+    ghiLog('video xoa ' + id + ' LOI dua vao thung rac: ' + err.message)
+    return { ok: false, loi: err.message }
+  }
+  khoVideo.bo(id)
+  videoIcon.delete(id)
+  ghiLog('video xoa ' + id + ' -> thung rac: ' + m.file)
+  return { ok: true }
+})
+ipcMain.on('video:close', (e) => {
+  const w = BrowserWindow.fromWebContents(e.sender)
+  if (w && !w.isDestroyed()) w.close()
+})
 
 /* ── Storyboard Strip IPC ────────────────────────────────────────────── */
 ipcMain.on('shelf:open-storyboard', () => { daiQuay = null; openStoryboardWindow() })

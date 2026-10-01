@@ -172,6 +172,8 @@ document.getElementById('storyboard')?.addEventListener('click', () => {
   if (listEl.children.length === 0) return
   window.shelf.openStoryboard()
 })
+// 01/10: mo Khay video (cac doan quay vung man hinh nam o khay rieng, khong chung khay anh)
+document.getElementById('video')?.addEventListener('click', () => window.shelf.openVideo())
 document.getElementById('folder').addEventListener('click', () => window.shelf.openFolder())
 document.getElementById('clear').addEventListener('click', () => window.shelf.clear())
 document.getElementById('hide').addEventListener('click', () => window.shelf.hide())
