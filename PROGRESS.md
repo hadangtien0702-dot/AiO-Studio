@@ -26,6 +26,10 @@
 - **Bẫy đo:** Chrome ngầm đột nhiên báo `prefers-reduced-motion: reduce` (Windows tắt hiệu ứng, có thể do đang điều khiển từ xa) → trang hiện
   lưới thẻ tĩnh, `__rp` không có, phép đo ra rỗng. `chup.mjs` nay ép `no-preference` (GIAM=1 để thử chế độ giảm). `nhay.js`: lần gọi đầu sau
   khi nạp trang ra sai thời điểm vì tween scrub còn chạy → thêm `gsap.killTweensOf(r.M)`.
+- **[CHO] VIEC DAU TIEN ngay mai — cuộn khó kiểm soát:** sau bản làm chậm (live 23:45) anh báo *"phần scroll ở các section chính đang bị lỗi…
+  scroll rất khó để kiểm soát các animation"*. Chưa đo, chưa sửa (anh đã bảo mai làm tiếp). Nghi: animation buộc vào cuộn (scrub) + trang tự trôi
+  tới hết cảnh, nay trôi 6–8 s nên lăn chuột là mất lái. Đề xuất: tách animation khỏi cuộn (lăn 1 nấc = sang 1 cảnh, cảnh tự diễn theo thời gian
+  rồi lặp, như 3 hình Vì sao). Lùi nhanh nếu anh cần: `git revert 7267808` phần `premiere/index.html` (trả thông số cuộn về `19a3f39`).
 - **[CHO] mai làm tiếp:** 10 cảnh còn lại theo khung pm- (Transcripts, Short Viral, Re-Frames, Guide Frame, Video Download, Asset Manager,
   Power Bins, Organize, Keynote, Hub), anh chưa trả lời "kiểu này đúng ý chưa" · anh báo "thanh menu lỗi, light dark lỗi" nhưng chụp 4 tổ hợp
   không thấy vỡ, cần anh chụp màn hình · tiêu đề đầu trang còn diễn cắt "um/uh" (Auto Cut cắt khoảng lặng) · hình "Install once" vẽ một bộ cài
