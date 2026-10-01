@@ -53,6 +53,7 @@ const DICH = {
     'quay.dungBangPhim': 'Đang quay video. Bấm {phim} hoặc bấm biểu tượng ở khay hệ thống để dừng.',
     'khay.video': 'Mở khay video',
     'vd.tieuDe': 'Khay video',
+    'vd.tab': 'Video',
     'vd.chuaCo': 'Chưa có video nào. Bấm chụp, khoanh vùng rồi bấm nút Quay (phím R).',
     'vd.ten': 'Video {n}',
     // 01/10 anh chot: quay luon co tieng, vao khay moi chon ban Co tieng / Khong tieng (dung khi phat va khi keo tha ra ngoai)
@@ -109,6 +110,7 @@ const DICH = {
     'set.khay.doc': 'Dọc',
     'set.khay.soAnh': 'Mở lại ảnh gần nhất',
     'set.khay.tat': 'Tắt',
+    'set.khay.tuThu': 'Tự thu khay về góc sau',
     'khay.doiCo': 'Kéo để phóng to / thu nhỏ khay',
     // Settings — lam mo
     'set.lamMo.tieuDe': 'Hiệu ứng làm mờ',
@@ -129,7 +131,9 @@ const DICH = {
     'khay.trong2': 'để chụp',
     'khay.moThuMuc': 'Mở thư mục lưu ảnh',
     'khay.don': 'Dọn khay',
-    'khay.an': 'Ẩn khay',
+    'khay.an': 'Thu khay về góc',
+    'nut.mo': 'Mở khay ảnh',
+    'nut.an': 'Ẩn nút này (mở lại từ biểu tượng ở khay hệ thống)',
     'khay.oGhim': 'Bấm để ghim lại · Kéo để thả vào app khác',
     'khay.oXoa': 'Bỏ khỏi khay (ảnh vẫn còn trong thư mục)',
     // Ghim
@@ -141,6 +145,7 @@ const DICH = {
     // Storyboard (Multi-Shot Storyboard Strip)
     'khay.storyboard': 'Mở khay Storyboard (phím S)',
     'sb.tieuDe': 'Khay Storyboard',
+    'sb.tab': 'Storyboard',
     'sb.goiY': 'Ảnh chụp thường nằm ở Khay ảnh',
     'sb.chuaCoDai': 'Chưa có dải nào. Bấm chụp, bấm S, khoanh vùng rồi bấm Xong để quay 3 giây.',
     'sb.khungDem': '{n} khung',
@@ -248,6 +253,7 @@ const DICH = {
     'quay.dungBangPhim': 'Recording. Press {phim} or click the tray icon to stop.',
     'khay.video': 'Open video shelf',
     'vd.tieuDe': 'Video shelf',
+    'vd.tab': 'Video',
     'vd.chuaCo': 'No videos yet. Take a capture, select an area, then press Record (key R).',
     'vd.ten': 'Video {n}',
     'vd.coTiengNut': 'With sound',
@@ -299,6 +305,7 @@ const DICH = {
     'set.khay.doc': 'Vertical',
     'set.khay.soAnh': 'Reopen recent shots',
     'set.khay.tat': 'Off',
+    'set.khay.tuThu': 'Collapse shelf to corner after',
     'khay.doiCo': 'Drag to resize the shelf',
     // Settings — blur
     'set.lamMo.tieuDe': 'Blur & Obfuscate',
@@ -317,7 +324,9 @@ const DICH = {
     'khay.trong2': 'to capture',
     'khay.moThuMuc': 'Open save folder',
     'khay.don': 'Clear shelf',
-    'khay.an': 'Hide shelf',
+    'khay.an': 'Collapse to corner',
+    'nut.mo': 'Open shelf',
+    'nut.an': 'Hide this button (reopen from the system tray icon)',
     'khay.oGhim': 'Click to pin · Drag to drop into another app',
     'khay.oXoa': 'Remove from shelf (file stays in folder)',
     'ghim.keoFile': 'Drag to drop file into Premiere / Photoshop / other apps',
@@ -328,6 +337,7 @@ const DICH = {
     // Storyboard (Multi-Shot Storyboard Strip)
     'khay.storyboard': 'Open Storyboard shelf (S key)',
     'sb.tieuDe': 'Storyboard shelf',
+    'sb.tab': 'Storyboard',
     'sb.goiY': 'Regular shots stay in the shelf',
     'sb.chuaCoDai': 'No strips yet. Capture, press S, select an area, then Done to record 3 seconds.',
     'sb.khungDem': '{n} frames',

@@ -108,7 +108,8 @@ if (m && !XOA) {
   if (h) {
     kiem('Video trong khay nap duoc qua file:// (khong loi, co khung hinh)', h.loi == null && h.ready >= 1 && h.kich === m.w + 'x' + m.h, 'ready ' + h.ready + ', ' + h.kich + ', loi ' + h.loi)
     kiem('Trinh phat doc dung thoi luong (lech <= 0,6 s so voi so)', Math.abs(h.dur - m.ms / 1000) <= 0.6, h.dur + ' s vs ' + m.ms / 1000 + ' s')
-    kiem('Dong thong tin co thoi luong + co + dung luong', /0:0[1-4]/.test(h.meta) && h.meta.includes(m.w + '×' + m.h), h.meta)
+    // 01/10 13:xx: thoi luong chi con o nhan tren khung video (.vd-gio), dong thong tin = gio · co · dung luong (khong noi 2 lan)
+    kiem('Nhan thoi luong tren khung + dong thong tin co kich thuoc, KHONG lap thoi luong', /^0:0[1-4]$/.test(h.gio) && h.meta.includes(m.w + '×' + m.h) && !h.meta.includes(' · ' + h.gio + ' · '), h.gio + ' | ' + h.meta)
     kiem('Chu tren khay la Inter', /Inter/.test(khay.font), khay.font)
   }
   kiem('Icon keo: khung dau ve duoc ra canvas va gui ve main', r.iconKeo >= 1, 'so icon ' + r.iconKeo)

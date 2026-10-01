@@ -9,12 +9,15 @@
    - Khung dau cua video duoc ve ra canvas nho -> gui main lam ICON luc keo.
    ========================================================================= */
 
+/* 01/10 GOP KHAY: chung trang voi src/storyboard/storyboard.js (src/khay/index.html, 2 the) -> boc trong ham de ten
+   bien khong dung nhau. Nut dong + phim Esc do storyboard.js lo cho ca cua so. */
+;(() => {
 const t = (k, params) => window.i18n ? window.i18n.t(k, params) : k
 const EN = !!window.i18n && window.i18n.lang === 'en'
 
 const dsEl = document.getElementById('ds-video')
-const trongEl = document.getElementById('trong')
-const demEl = document.getElementById('shot-badge')
+const trongEl = document.getElementById('trong-video')
+const demEl = document.getElementById('dem-video') // so video, nam tren the Video
 const toastEl = document.getElementById('toast')
 let ds = []
 let toastTimer = null
@@ -86,7 +89,8 @@ function taoHang(m, so) {
   ten.textContent = t('vd.ten', { n: p2(so) })
   const meta = document.createElement('span')
   meta.className = 'dai-meta'
-  meta.textContent = [gio(m.taoLuc), thoiLuong(m.ms), m.w + '×' + m.h, dungLuong(m.bytes)].join(' · ')
+  // 01/10 (anh: "dong bo font / text"): thoi luong da nam tren khung video (.vd-gio) -> khong noi lai o day (mot thong diep mot noi)
+  meta.textContent = [gio(m.taoLuc), m.w + '×' + m.h, dungLuong(m.bytes)].join(' · ')
   meta.title = m.ten
   const spacer = document.createElement('span')
   spacer.className = 'spacer'
@@ -230,9 +234,5 @@ async function init() {
   veDanhSach()
 }
 
-document.getElementById('btn-close').addEventListener('click', () => window.video.close())
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { e.preventDefault(); window.video.close() }
-})
-
 init()
+})()

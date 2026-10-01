@@ -42,6 +42,47 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
+> 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
+> Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.
+> 01/10 15:18 anh mo that tren app (run-log: `khay mo the=dai`, `khay mo the=video`, khong co `khay LOI`), roi hoi
+> *"cach nao tien hon nua khong"*.
+
+### 0c. KHAY TU THU VE NUT TRON O GOC MAN HINH (anh neu 01/10/2026 15:2x) — anh CHUA chot chi tiet
+Anh: *"khi khong dung toi chup anh khay se tu thu ve thanh mot nut tron o goc man hinh de do ton dien tich ...
+animation phai dep"*. Claude tra loi + dua ban thu bam duoc trong chat (3 kieu chuyen dong: co mem / hut anh vao nut /
+nhanh gon; nut tron 48 px o goc duoi-phai; tu thu sau 3 giay khong re chuot; bam nut de mo).
+- Lam duoc: cua so Khay anh von TRONG SUOT (`main.js ensureShelf`) nen chuyen dong chay ben trong cua so, khong phai
+  keo cua so tung khung. Nut tron phai nam trong cua so >= 64 px (Windows khong cho cua so nho hon ~58 px diem anh that,
+  so loi #13) -> vong tron ve 44-48 px giua cua so trong suot.
+- "Tien hon nua" Claude de xuat: MOT khay noi co 3 the Anh · Video · Storyboard (the Anh = luoi dang co, khong sua),
+  thu ve thanh MOT nut tron -> tren man chi con 1 thu; cua so khay gop 13:59 thanh phan than cua 2 the kia.
+- Cho anh chon: kieu chuyen dong (1/2/3) · khi nao thu (sau N giay / chi khi bam) · goc nao · mo bang bam hay re chuot
+  · co lam "mot khay 3 the" luon hay chi lam nut tron truoc.
+- 01/10 15:5x anh che 3 kieu dau: *"3 option animation nay chua du dep va creative"*. => NHAP 2 (chay that, keo khay duoc,
+  co "xem cham"): `nhap/khay-nut-tron.html` (KHONG phai ma cua app, khong dong goi). 3 y tuong, moi cai ke mot viec app
+  lam: **A Ong kinh** (khay khep nhu man trap, con ong kinh luot ve goc, mo ra co nhay sang) · **B Xap anh** (tung tam bay
+  vao nut, nut dem len, luc nghi nut hien anh moi nhat, mo ra chia nhu chia bai) · **C Khoanh vung** (khung cam 4 goc om
+  khay, chup lai, thu ve goc; mo ra 4 goc bung truoc). Them cho ca 3: chup anh moi luc khay dang thu thi nut GIAN thanh
+  vien thuoc hien anh vua luu ~1,5 giay. Do toc do that: thu ve mat ~1,4 giay (A) — con cham cho viec lap lai ca ngay,
+  chot y tuong roi moi ep nhip. Anh CHUA chon.
+- **01/10 16:07 ANH CHOT + DA LAM, nap vao app dang cai:** xuat hien kieu A (ong kinh), thu ve kieu B (xap anh), tu thu 5
+  giay + Cai dat 5s / 10s / 15s, bam nut de mo. Ma: `src/khay-thu.js`, `src/nut/`, `src/dien/`. Bai do `npm run
+  test:khaynut` 30/30 (offscreen). CHUA xem tren man that. Con lai chua lam: kieu C, mot khay 3 the.
+- 01/10 15:3x anh hoi: *"khi anh drag cai khay di tum lum cho, khi thu ve no van nam o goc dung khong?"* => anh muon nut
+  tron LUON ve goc, khong phu thuoc khay dang nam dau. Claude tra loi: dung; de xuat goc duoi-phai cua MAN khay dang
+  nam, bam nut thi khay mo lai DUNG CHO CU. Anh chua xac nhan goc nao + mo lai o dau.
+Hien co 3 cho: Khay anh (noi, nho, luon tren cung) · cua so Khay Storyboard · cua so Khay video (sang 01/10 anh chon
+"khay rieng" trong bang hoi; Claude luc do de xuat chung Khay anh). Hai cua so sau da dung chung mot khuon CSS
+(`storyboard.css`, do 01/10 13:08: 14 luot dat). Claude tra loi anh 2 huong:
+- **A. Gop 2 cua so (Storyboard + Video) thanh MOT cua so co 2 the, Khay anh noi giu nguyen.** 3 cho -> 2 cho, tren Khay
+  anh 2 nut -> 1 nut. It rui ro: khong dung vao Khay anh (phan da chinh nhieu nhat: cuon, keo to, keo tha).
+- **B. Gop ca ba vao Khay anh noi:** anh / video / dai nam chung mot luoi theo thoi gian, co hang loc Tat ca · Anh ·
+  Video · Storyboard; video la o co nut phat + thoi luong, dai la o co so khung; bam vao moi mo phan chi tiet (phat, chon
+  Co tieng / Khong tieng, bo khung, Luu / Sao chep). Mot cho duy nhat, keo tha thang tu khay. Rui ro: dung vao Khay anh.
+- De xuat cua Claude: lam A truoc (cung la phan "chi tiet" ma B can), anh dung thu roi moi lam buoc dua o video / dai
+  vao Khay anh. Loai moi sau nay (GIF) khong sinh them khay thu tu.
+
 ---
 
 ## 1. UU TIEN SO 1 (Phat trien ngay phien 28/09): Multi-Shot Storyboard Strip

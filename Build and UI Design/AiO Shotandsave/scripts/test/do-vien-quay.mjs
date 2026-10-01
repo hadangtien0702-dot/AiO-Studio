@@ -17,9 +17,11 @@ const require = createRequire(import.meta.url)
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const { tinhVienQuay, giao, THONG_SO } = require(path.join(ROOT, 'src', 'vien-quay.js'))
 
-const EP = 40 // Windows co the ep cua so to toi day (do 29/09: 30-38) — phinh tu goc tren-trai ra phai/xuong
-// + do that 29/09 man 150%: cua so that to hon xin 1 px phai/duoi (40 -> 41)
-const epCo = (b) => ({ x: b.x, y: b.y, width: Math.max(b.width + 1, EP), height: Math.max(b.height + 1, EP) })
+/* Windows ep cua so to toi day — phinh tu goc tren-trai ra phai/xuong. Muc ep tinh theo diem anh THAT (~57-58 px):
+   150% -> 38 DIP (do 29/09) · 125% -> 46 DIP (do 01/10, run-log 12:56:23: xin 823x40 duoc 824x46) · 100% -> 58 DIP
+   (suy ra, chua do). Thu o muc cao nhat. + cua so that to hon xin 1 px phai/duoi (40 -> 41, 823 -> 824). */
+const EP = 58
+const epCo = (b, ep = EP) => ({ x: b.x, y: b.y, width: Math.max(b.width + 1, ep), height: Math.max(b.height + 1, ep) })
 
 function kiemMot(rect) {
   const v = tinhVienQuay(rect)
@@ -76,6 +78,15 @@ const chamCu = hinhCu(r0).map((b) => ({ x: b.x, y: b.y, width: Math.max(b.width,
 console.log('\n[2] Doi chung: hinh hoc 0.7.4 voi thanh bi ep 31 px (so do that 29/09)')
 console.log(chamCu === 2 ? '  DAT  doi chung TRUOT dung: 2/4 thanh (tren, trai) lan vao vung — khop anh 08:09 (cam canh tren + trai)' : '  TRUOT doi chung khong bat duoc loi cu (' + chamCu + ' thanh cham)')
 
-const dat = truot === 0 && chamCu === 2
+// Doi chung 2 (01/10): dung so do THAT tren man 125% — cua so "tren" cao 40 bi ep 46 PHAI cham vung; cao DAI moi thi khong
+const vungThat = { x: -1352, y: 560, width: 809, height: 1013 } // vung anh quay 12:56 (toan cuc DIP): xin tren y=518 cao 40
+const trenCu = { x: -1359, y: 518, width: 824, height: 46 } // dung so run-log "duoc"
+const vMoi = tinhVienQuay({ x: vungThat.x, y: vungThat.y, w: vungThat.width, h: vungThat.height })
+const trenMoi = epCo(vMoi.canh.find((c) => c.ten === 'tren').bounds, 46)
+const dc2 = !!giao(trenCu, vungThat) && !giao(trenMoi, vMoi.vung) && vMoi.canh.every((c) => !giao(epCo(c.bounds, 46), vMoi.vung))
+console.log('\n[3] Doi chung: man 125% ep cua so 46 px (so do that 01/10 12:56)')
+console.log(dc2 ? '  DAT  cua so cu (cao 40 -> 46) cham vung ' + giao(trenCu, vungThat).height + ' px; cua so moi (cao ' + THONG_SO.DAI + ') khong cham' : '  TRUOT')
+
+const dat = truot === 0 && chamCu === 2 && dc2
 console.log('\n' + '='.repeat(60) + '\nKet qua: ' + (dat ? 'TAT CA DAT (PASS)' : 'CO MUC TRUOT (FAIL)'))
 process.exit(dat ? 0 : 1)

@@ -1,21 +1,6 @@
 'use strict'
 const { contextBridge, ipcRenderer } = require('electron')
-const i18n = require('./i18n')
-
-const lang = ipcRenderer.sendSync('i18n:lang') || 'vi'
-
-contextBridge.exposeInMainWorld('i18n', {
-  lang,
-  t: (key, params) => {
-    let s = i18n.t(lang, key)
-    if (params) {
-      for (const [k, v] of Object.entries(params)) {
-        s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), v)
-      }
-    }
-    return s
-  },
-})
+/* 01/10 GOP KHAY: file nay la PHAN cau noi Storyboard cua src/preload-khay.js (i18n khai o do). Khong dung lam preload rieng. */
 
 contextBridge.exposeInMainWorld('storyboard', {
   getData: () => ipcRenderer.invoke('storyboard:get-data'),

@@ -84,7 +84,7 @@ kiem('preload-storyboard.js expose save', pSb.includes('save:'))
 kiem('preload-storyboard.js expose chuanBiKeo + keoDai (keo ca dai ve san)', pSb.includes('chuanBiKeo:') && pSb.includes('keoDai:'))
 kiem('preload-storyboard.js expose close', pSb.includes('close:'))
 
-const sbHtml = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'index.html'), 'utf8')
+const sbHtml = fs.readFileSync(path.join(ROOT, 'src', 'khay', 'index.html'), 'utf8')
 kiem('storyboard/index.html co title va main-canvas', sbHtml.includes('id="main-canvas"'))
 // 29/09 khay Storyboard = danh sach dai: nut Luu / Sao chep / Xoa dai nam TREN MOI HANG (storyboard.js tao), khong con nut chung
 const sbJsSom = fs.readFileSync(path.join(ROOT, 'src', 'storyboard', 'storyboard.js'), 'utf8')
@@ -155,7 +155,7 @@ console.log('\n[5] Kiem tra Cam tuyet doi Emoji trong UI (Luat 01)')
 const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u
 const filesToCheck = [
   path.join(ROOT, 'src', 'shelf', 'index.html'),
-  path.join(ROOT, 'src', 'storyboard', 'index.html'),
+  path.join(ROOT, 'src', 'khay', 'index.html'),
   path.join(ROOT, 'src', 'storyboard', 'storyboard.css'),
   path.join(ROOT, 'src', 'storyboard', 'storyboard.js'),
 ]

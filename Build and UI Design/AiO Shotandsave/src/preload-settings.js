@@ -26,6 +26,8 @@ contextBridge.exposeInMainWorld('settings', {
   setKhay: (kieu) => ipcRenderer.invoke('settings:set-khay', kieu),
   /** So anh tu dong nap vao khay: 0 | 5 | 10 | 20. */
   setKhaySoAnh: (n) => ipcRenderer.invoke('settings:set-khay-so-anh', n),
+  /** So giay cho roi khay tu thu ve nut tron: 5 | 10 | 15. */
+  setKhayTuThu: (n) => ipcRenderer.invoke('settings:set-khay-tu-thu', n),
   /** Doi kieu lam mo: 'mosaic' | 'blur'. */
   setLamMo: (kieu) => ipcRenderer.invoke('settings:set-lam-mo', kieu),
   /** Doi ngon ngu 'vi' | 'en' — main nap lai cua so de dich. */

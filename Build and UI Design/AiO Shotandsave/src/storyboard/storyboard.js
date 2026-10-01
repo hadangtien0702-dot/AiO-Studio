@@ -11,13 +11,16 @@
      Khung nap qua aioshot://dai/... (main tra ACAO) + crossOrigin -> canvas khong bi taint.
    ========================================================================= */
 
+/* 01/10 GOP KHAY: file nay va src/video/video.js cung nap vao MOT trang (src/khay/index.html, 2 the). Boc trong ham de
+   ten bien (t, dsEl, nut, ICON, init...) cua hai file khong dung nhau. Dong ham o cuoi file. */
+;(() => {
 const t = (k, params) => window.i18n ? window.i18n.t(k, params) : k
 
 const canvas = document.getElementById('main-canvas')
 const ctx = canvas.getContext('2d', { alpha: false })
 const dsEl = document.getElementById('ds-dai')
-const trongEl = document.getElementById('trong')
-const badgeCountEl = document.getElementById('shot-badge')
+const trongEl = document.getElementById('trong-dai')
+const badgeCountEl = document.getElementById('dem-dai') // so dai, nam tren the Storyboard
 const toastEl = document.getElementById('toast')
 
 const btnClose = document.getElementById('btn-close')
@@ -481,11 +484,14 @@ function drawInfoBar(x, y, w, h) {
 
 btnClose.addEventListener('click', () => window.storyboard.close())
 
-// Phim tat: Esc dong · Ctrl+C / Ctrl+S = dai MOI NHAT
+// Phim tat: Esc dong CA cua so khay (ca 2 the) · Ctrl+C / Ctrl+S = dai MOI NHAT, chi khi dang o the Storyboard
+const oTheDai = () => document.body.dataset.tab === 'dai'
 window.addEventListener('keydown', async (e) => {
   if (e.key === 'Escape') {
     e.preventDefault()
     window.storyboard.close()
+  } else if (!oTheDai()) {
+    return
   } else if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
     e.preventDefault()
     if (dais[0] && await xuatDai(dais[0], 'chep')) showToast(t('sb.copyThanhCong'))
@@ -496,3 +502,4 @@ window.addEventListener('keydown', async (e) => {
 })
 
 init()
+})()

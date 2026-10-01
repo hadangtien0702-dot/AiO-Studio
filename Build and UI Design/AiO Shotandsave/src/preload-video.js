@@ -1,20 +1,7 @@
 'use strict'
 /* 01/10 Cua so KHAY VIDEO (src/video). Khuon = preload-storyboard.js. */
 const { contextBridge, ipcRenderer } = require('electron')
-const i18n = require('./i18n')
-
-const lang = ipcRenderer.sendSync('i18n:lang') || 'vi'
-
-contextBridge.exposeInMainWorld('i18n', {
-  lang,
-  t: (key, params) => {
-    let s = i18n.t(lang, key)
-    if (params) {
-      for (const [k, v] of Object.entries(params)) s = s.split('{' + k + '}').join(String(v))
-    }
-    return s
-  },
-})
+/* 01/10 GOP KHAY: file nay la PHAN cau noi Video cua src/preload-khay.js (i18n khai o do). Khong dung lam preload rieng. */
 
 contextBridge.exposeInMainWorld('video', {
   /** { ds: [{ id, ten, url, ms, w, h, tieng, bytes, taoLuc }], moiId, lang, dangQuay } — moi nhat truoc. */
@@ -29,5 +16,4 @@ contextBridge.exposeInMainWorld('video', {
   chonTieng: (id, coTieng) => ipcRenderer.invoke('video:chon-tieng', id, !!coTieng),
   /** Dua file vao Thung rac + go khoi so -> { ok }. */
   xoa: (id) => ipcRenderer.invoke('video:xoa', id),
-  close: () => ipcRenderer.send('video:close'),
 })

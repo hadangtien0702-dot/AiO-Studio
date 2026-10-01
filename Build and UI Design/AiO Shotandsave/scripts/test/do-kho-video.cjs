@@ -84,7 +84,7 @@ for (const [bien, file] of [['kho', 'kho.js'], ['khoVideo', 'kho-video.js'], ['l
 const { DICH } = require(path.join(ROOT, 'src', 'i18n.js'))
 const khoa = new Set()
 for (const p of [['video', 'video.js'], ['overlay', 'overlay.js']]) for (const m of doc('src', ...p).matchAll(/\bt\(\s*(?:\w+\s*\?\s*)?'((?:vd|overlay\.quay)[\w.]*)'(?:\s*:\s*'((?:vd|overlay\.quay)[\w.]*)')?/g)) { khoa.add(m[1]); if (m[2]) khoa.add(m[2]) }
-for (const p of [['video', 'index.html'], ['overlay', 'index.html'], ['shelf', 'index.html']]) for (const m of doc('src', ...p).matchAll(/data-i18n(?:-title)?="((?:vd\.|overlay\.quay|khay\.video)[\w.]*)"/g)) khoa.add(m[1])
+for (const p of [['khay', 'index.html'], ['overlay', 'index.html'], ['shelf', 'index.html']]) for (const m of doc('src', ...p).matchAll(/data-i18n(?:-title)?="((?:vd\.|overlay\.quay|khay\.video)[\w.]*)"/g)) khoa.add(m[1])
 for (const m of doc('src', 'main.js').matchAll(/T\('((?:quay|tray\.video|tray\.dungQuay|app\.khongQuay)[\w.]*)'\)/g)) khoa.add(m[1])
 const ds2 = [...khoa]
 const thieuVi = ds2.filter((k) => !(k in DICH.vi)), thieuEn = ds2.filter((k) => !(k in DICH.en))
@@ -103,11 +103,11 @@ const tuKhai = [...css.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1])
 const dungToi = [...new Set([...css.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]))]
 kiem('video.css KHONG tu khai token rieng', tuKhai.length === 0, tuKhai.join(', '))
 kiem('video.css dung ' + dungToi.length + ' token - deu co trong tokens.css', dungToi.length >= 5 && dungToi.every((v) => token.has(v)), dungToi.filter((v) => !token.has(v)).join(', '))
-const html = doc('src', 'video', 'index.html')
+const html = doc('src', 'khay', 'index.html')
 kiem('Khay video nap tokens.css + storyboard.css (cung khuon man Cai dat) + video.css', html.includes('../../assets/tokens.css') && html.includes('../storyboard/storyboard.css') && html.includes('video.css'))
 kiem('CSP khay video cho phep phat file:// va KHONG mo mang', /media-src file:/.test(html) && /default-src 'none'/.test(html) && !/https?:/.test(html.replace(/<!--[\s\S]*?-->/g, '')))
 const emoji = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u
-const coEmoji = [['video', 'index.html'], ['video', 'video.js'], ['video', 'video.css'], ['dem', 'quay.html'], ['dem', 'quay.js']].filter((p) => emoji.test(doc('src', ...p)))
+const coEmoji = [['khay', 'index.html'], ['video', 'video.js'], ['video', 'video.css'], ['dem', 'quay.html'], ['dem', 'quay.js']].filter((p) => emoji.test(doc('src', ...p)))
 kiem('Khong emoji trong giao dien moi', coEmoji.length === 0, coEmoji.map((p) => p.join('/')).join(', '))
 
 console.log('\n' + '='.repeat(60))

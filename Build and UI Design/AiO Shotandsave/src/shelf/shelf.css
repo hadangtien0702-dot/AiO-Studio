@@ -21,6 +21,11 @@ html, body {
   overflow: hidden;
 }
 
+/* 01/10 KHAY THU VE NUT TRON (src/khay-thu.js): body.an = noi dung khay tang hinh (cua so van do) trong luc "bong" tren
+   san dien dien thay; #chop = nhay sang luc khay bung ra kieu ong kinh (shelf.js __khayBung). */
+body.an #shelf { opacity: 0; }
+#chop { position: absolute; inset: 0; z-index: 20; background: #fff; opacity: 0; pointer-events: none; }
+
 /* ── Thanh tren: tay cam keo + ten + nut ─────────────────────────────── */
 #bar {
   display: flex; align-items: center; gap: var(--sp-2);

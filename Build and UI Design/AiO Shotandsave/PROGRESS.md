@@ -1,6 +1,21 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-01 12:45 +0700 (/xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-01 19:07 +0700 (/xong lan 2 trong ngay)
+> - **Ban dang chay tren may cong ty: 0.8.0, app.asar md5 955f7fc8 (nap lan 10, boot 19:12:57).** Trong ngay 01/10 chieu da
+>   nap 4 cum viec, TAT CA van la 0.8.0, CHUA dong goi, CHUA push, CHUA len web (luat 01/10: test xong het moi lam):
+>   (1) 12:58 vien quay du 4 canh tren man 125% (`DAI` 40 -> 64) · (2) 13:08 Khay video dong bo chu · (3) 13:59 cua so
+>   Khay GOP 2 the Storyboard | Video (ban xem truoc; anh mo that 15:18, khong loi, CHUA chot giu) · (4) 16:07 KHAY ANH TU
+>   THU VE NUT TRON o goc (anh chot: xuat hien kieu ong kinh, thu ve kieu xap anh, 5s / 10s / 15s, bam de mo).
+> - ☠️ **(4) CHUA CHAY LAN NAO TREN MAN THAT:** run-log tu 16:07 toi 19:07 khong co luot chup nao (chi co dong boot + doi
+>   man hinh). Bai do an `npm run test:khaynut` 30/30 khong thay duoc do muot / thu tu chong cua so / man 125%.
+>   [CHO ANH] chup 1 tam -> de chuot ngoai khay 5 giay -> bam nut tron -> keo khay sang man phu roi bam "–". Phien sau
+>   doc run-log: `khay thu (...)` / `khay bung (...)`; co `khay-thu LOI` / `khay-thu CANH BAO` la co van de.
+>   ☠️ Ban TRUOC khi co nut tron KHONG con cat san (`.selftest/ban-cai-truoc` nay la md5 22461d3b, da co nut tron). Nut
+>   tron lam phien anh: doi `tuDong: () => false` trong `main.js` (khoi `taoKhayThu`) roi `node scripts/cai-tai-cho.mjs`
+>   = khay het tu thu (nut "–" van thu ve nut).
+> - [CHO ANH, con tu trua] quay 1 doan tren man phu de xac nhan vien du 4 canh · keo video vao Premiere / Zalo · Premiere
+>   co nhan MP4 phan manh khong.
+> - GIT: /xong 19:07 commit TREN MAY CONG TY, KHONG push (giong lua chon cua anh luc /xong 12:45). May nha chua co.
 > - ☠️ **LUAT MOI anh chot 01/10 10:0x:** *"moi lan update em chi can cai vao ban hien tai, khong cai bo cai moi; khi nao
 >   test xong het thi em moi dong goi va push code len git va update tinh nang len website"*. => Dang lam / dang test:
 >   `node scripts/cai-tai-cho.mjs` (nap thang vao app dang cai). KHONG `npm run dist`, KHONG push, KHONG dua len web
@@ -64,6 +79,133 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [/xong] - 2026-10-01 19:07 - Chot so lan 2 trong ngay (may cong ty)
+- Phien 12:55 -> 19:07: 4 lan nap tai cho (lan 6-9), chi tiet o 4 muc ngay duoi. Khong tang so phien ban (van 0.8.0) vi
+  khong push.
+- Trang thai luc chot: app chay 0.8.0 md5 955f7fc8 tu 19:12:57 (nap lan 10). Run-log that 16:07 -> 19:07: 0 luot chup, 0
+  dong `khay` -> tinh nang nut tron CHUA chay lan nao tren man that; khong co dong LOI / CANH BAO nao.
+- NAP LAN 10 (19:12), sua luc chot so: 18:57 anh rut mot man -> man chinh thanh 2560x1440 125% -> `test:khaynut` TRUOT 1
+  muc (cua so nut xin 80 px duoc 81 px: Windows tra cua so to them 1 px, so loi #13). Tren app that no se ghi `CANH BAO`
+  gia moi lan dat cua so. Sua `src/khay-thu.js`: `lechDang()` coi "dung goc, to hon toi da 1 px" la dung cho; bai do nhan
+  80-81 px + them doi chung (lech goc / to them 2 px phai bi bat). Chay lai: 31/31. Lan chay DAU luc 19:0x bao 3 muc
+  truot, 3 lan sau deu chi 1 muc (muc tren) — 2 muc kia em KHONG bat lai duoc, khong biet la gi.
+- Bai do chay lai luc chot (deu khong hien gi len man): test:khaynut 31/31 · do-storyboard · test:khovideo · test:vienquay
+  · test:khodai 11/11 · test:lammo 25/0. CHUA chay (hien len man, can anh cho gio): test:quayapp · test:khay ·
+  test:co-khay · test:nhipquay · test:dongbotieng.
+- Luat 2d cua /xong (xem thi truong truoc khi lam tinh nang moi): KHONG lam cho "khay thu ve nut tron" — em vao thang ban
+  thu chuyen dong, chua tra app cung loai (CleanShot, ShareX, Snagit...) xu ly khay noi / nut thu gon the nao. Cong
+  nghe khong doi (van Electron) nen khong co lua chon cong nghe nao bi bo qua, nhung phan "nguoi ta lam the nao" con thieu.
+- [CHO] khi anh bao test xong het: `npm run dist` -> Release + HUONG-DAN -> push (bump so phien ban) -> web.
+
+## [0.8.0 nap lan 9] - 2026-10-01 16:07 - KHAY ANH TU THU VE NUT TRON O GOC (xuat hien kieu ong kinh, thu ve kieu xap anh)
+- Boi canh: 15:2x anh xin *"khi khong dung toi chup anh khay se tu thu ve thanh mot nut tron o goc man hinh de do ton dien
+  tich ... animation phai dep"*. 3 kieu dau (co mem / hut / nhanh) anh che *"chua du dep va creative"* -> nhap 2
+  `nhap/khay-nut-tron.html` (A ong kinh · B xap anh · C khoanh vung), anh: *"cai nao cung dep het"*. ANH CHOT trong bang hoi:
+  **xuat hien kieu A, thu ve kieu B** · **tu thu sau 5 giay, Cai dat co 5s / 10s / 15s** · **mo lai bang BAM nut tron** ·
+  keo khay di dau thi nut van ve goc (anh hoi, em de xuat goc duoi-phai cua man khay dang nam + mo lai dung cho cu, anh
+  khong phan doi).
+- Cach lam (doc dau `src/khay-thu.js`): 3 cua so. Khay anh giu nguyen, chi them 3 ham (`__khayThongTin`, `__khayAn`,
+  `__khayBung`) + lop nhay sang `#chop`. NUT TRON `src/nut/` = cua so 80x80 trong suot, vong tron 52 px (cua so phai >= 64 px:
+  so loi #13). SAN DIEN `src/dien/` = cua so trong suot phu workArea, bam xuyen qua, chi hien < 1 giay luc chuyen dong: thu ve
+  thi chup anh cua so khay (capturePage) lam "bong" + cat tung o anh tu chinh anh do cho bay vao nut; xuat hien thi ong kinh
+  luot tu goc toi tam khay, khay that bung bang clip-path trong chinh trang cua no. Moi buoc co hen gio: san dien khong tra
+  loi thi an / hien thang.
+- Doi kem: nut "–" tren khay = thu ve nut (truoc la an han); an han = nut x hien khi re chuot vao nut tron; chup anh moi
+  luc dang la nut -> khay bung ra, 5 giay khong dung lai thu ve; dang keo / doi co / chon vung / quay video / quay
+  Storyboard 3 giay thi KHONG tu thu; bat dau chup thi go san dien ngay. Cai dat: hang "Tu thu khay ve goc sau" 5s / 10s /
+  15s (`khayTuThu`). Che do tu kiem (`--selftest*`, `--thu-quay`, `--thu-ocr`) khong tu thu.
+- File moi: `src/khay-thu.js`, `src/nut/{index.html,nut.css,nut.js}`, `src/dien/{index.html,dien.js}`, `src/preload-nut.js`,
+  `src/preload-dien.js`, `scripts/test/do-khay-nut.mjs` + `khay-nut-main.cjs`, `nhap/khay-nut-tron.html`. Sua: `main.js`
+  (noi `khayThu`, `showShelf`, `shelf:hide`, `settings:set-khay-tu-thu`), `shelf/{index.html,shelf.css,shelf.js}`,
+  `settings/{index.html,settings.js}`, `preload-settings.js`, `i18n.js` (4 khoa), `package.json` (`test:khaynut`).
+- Kiem chung: `npm run test:khaynut` (MOI, khong hien gi len man, ~35 giay) 30/30 DAT: hinh hoc nut (4 man, co man toa do
+  am; doi chung cua so 52 px bi Windows ep), day noi, chu VI + EN, va chay THAT module + 3 trang bang Electron offscreen:
+  thu ve 0,86-1,06 giay (3 o bay), xuat hien 0,90 giay, tu thu sau 5 giay (6,2 giay ke ca chuyen dong); doi chung con tro
+  trong khay / dang ban 6,3 giay KHONG thu; anh moi giua chung thi tu bung lai; khay trong; an han; san dien HONG (nap trang
+  trong) van thu + hien lai dung trang thai va co dong `LOI` trong log. 5 bai do khac cua app van DAT.
+  Nap tai cho 16:07:38 `boot v0.8.0 ... dang-ky=OK`, app.asar md5 22461d3b, anh/video 616 = 616, 9 dai = 9. Ban truoc
+  (c62267fc) cat o `.selftest/ban-cai-truoc`.
+- ☠️ [CHUA KIEM TREN MAN THAT] Bai do chay offscreen nen KHONG do duoc: thu tu chong cua so (san dien tren khay), cua so
+  trong suot + luon tren cung + khong lot anh chup, do muot, man phu 125%, nhay hinh luc doi tu ban ve sang cua so that.
+  Anh dung thu -> doc run-log: `khay thu (...): n o bay, N anh, ms` / `khay bung (...): ms`; co `khay-thu LOI` hoac
+  `khay-thu CANH BAO` la co van de.
+- [CHUA DO] RAM cua 2 tien trinh moi (nut + san dien song suot sau lan thu dau) · nut tron (cua so trong suot 80x80)
+  nam tren video co lam video den trong anh chup khong · `npm run test:khay` + `test:co-khay` (2 bai do khay, hien len man)
+  chua chay lai sau khi sua shelf.js.
+- Chua lam (anh chua yeu cau / chua chot): kieu C; gop 2 nut Storyboard + Video tren khay; "mot khay 3 the" (ROADMAP 0b/0c).
+
+## [0.8.0 nap lan 8] - 2026-10-01 13:59 - GOP Khay Storyboard + Khay video thanh MOT cua so 2 the (ban XEM TRUOC, anh chua chot)
+- Boi canh: anh hoi *"phan khay minh toi uu hoa thanh 1 khay?"* -> em de xuat gop 2 cua so (huong A, `ROADMAP.md` muc 0b),
+  Khay anh noi giu nguyen. Anh: *"vay em gop cho anh xem truoc di em"*. => day la ban de anh XEM, chua phai quyet dinh chot.
+- Da lam:
+  - MOI `src/khay/index.html` + `khay.js` (doi the, moi the nho cho cuon rieng, roi the Video thi dung video dang phat) +
+    `khay.css` (2 the tren thanh tieu de = cum `.chon-nhom` cua man Cai dat, so muc canh ten the) + `src/preload-khay.js`.
+  - `storyboard.js` + `video.js`: boc trong ham (chung 1 trang, ten bien khong dung nhau), so dem ghi vao `#dem-dai` /
+    `#dem-video`, chu trong `#trong-dai` / `#trong-video`. Nut dong + Esc do storyboard.js lo cho ca cua so; Ctrl+C / Ctrl+S
+    (dai moi nhat) chi an khi dang o the Storyboard.
+  - `preload-storyboard.js` + `preload-video.js`: thanh PHAN cua preload-khay (bo doan i18n trung), bo kenh `video:close`.
+  - `main.js`: `moKhay(tab)` thay 2 ham mo cua so (`openStoryboardWindow` / `openVideoWindow` giu ten, goi `moKhay`);
+    cua so 1080x700 (toi thieu 640x460); mo lai = nap lai + nhay dung the; ghi run-log `khay mo the=...`, `khay LOI trang`,
+    `khay LOI preload`. XOA `src/storyboard/index.html`, `src/video/index.html`.
+  - i18n them `sb.tab` / `vd.tab`. Bai do `do-storyboard.mjs`, `do-kho-video.cjs` tro sang `src/khay/index.html`.
+  - `.trong` them `text-wrap: balance` (cau "…(phim R)." het rot rieng chu "R).").
+- CHUA doi (noi ro voi anh): tren Khay anh van 2 nut (Storyboard, Video) va menu khay he thong van 2 dong; ca hai cung mo
+  MOT cua so, moi cai nhay vao the cua no. Gop thanh 1 nut hay khong: cho anh xem xong roi quyet.
+- Kiem chung (chup AN bang Electron offscreen, PRELOAD THAT `preload-khay.js`, phan main gia lap, video that cua anh):
+  11/11 luot DAT (640-1080 px x VI/EN x 2 the + 2 the trong): dung the mo, so tren the = so hang, 0 chu cat, dieu khien
+  cao 26 px, thanh tieu de 46 px khong de nhau, 0 loi console. Hanh vi (bam chuot that vao the): doi the, nho cho cuon
+  240 / 120, video dung khi roi the, Esc va nut x moi cai gui dong DUNG 1 lan; doi chung: `console.error` co y thi thuoc
+  bat duoc. `do-storyboard` (74 muc), `do-kho-video`, `do-vien-quay`, `do-kho-dai` (11/11) DAT.
+  Nap tai cho 13:59:07 `boot v0.8.0`, app.asar md5 c62267fc, anh/video 605 = 605, 9 dai = 9. Ban truoc (e0e9932c) cat o
+  `.selftest/ban-cai-truoc`.
+- [DA KIEM TREN APP THAT 15:18] anh bam ca 2 nut: run-log `15:18:18 khay mo the=dai`, `15:18:20 khay mo the=video (cua so
+  dang co -> nap lai)`, `storyboard ve san ... 897 ms / 134 ms`, KHONG co dong `khay LOI`. Anh: *"anh moi thu ma cach nao
+  tien hon nua khong em"* + xin tinh nang khay tu thu ve nut tron o goc co animation dep -> `ROADMAP.md` muc 0c (ban thu
+  3 kieu chuyen dong da dua trong chat, cho anh chon). CHUA viet dong ma nao cho tinh nang nay.
+- [CHUA CHAY] `npm run test:quayapp` (hien len man ~6 s) — nay di qua cua so gop, can chay lai khi anh cho gio.
+
+## [0.8.0 nap lan 7] - 2026-10-01 13:08 - Khay video: dong bo co chu / chieu cao dieu khien, het cat dong thong tin
+- Boi canh: anh nhan "ngon lanh roi em" (video quay duoc) roi giao tiep: *"toi uu hoa khay UI cua video cho dong bo font /
+  text ,..."*. => anh CHUA bao "test xong het", van dang lam: chi nap tai cho, KHONG dong goi / push / web.
+- Do truoc khi sua (chup AN bang Electron offscreen, video that cua anh, 2 ngon ngu; app anh dang de `lang=en`):
+  (1) cum "Co tieng | Khong tieng" cao 27,5 px canh 3 nut cao 26 px -> lech 1,5 px, tam hang 95,8 vs 95;
+  (2) dong thong tin 11 px / 400 trong khi chu phu cua man Cai dat (`.goi-y`) la 11 px / 500;
+  (3) thoi luong noi 2 lan (dong thong tin + nhan tren khung video);
+  (4) nhan thoi luong 10,5 px — co chu khong co o nhan nao khac cua khay (so dem la 11 px / 700);
+  (5) cua so hep: dong thong tin bi cat — 560 px con 53 / 208 px (tieng Anh 31 / 208), 720 px tieng Anh 191 / 208.
+- Da sua: `src/video/video.css` (o pill cao dung 20 px -> cum 26 px; nhan thoi luong 11 px / 700; cua so <= 760 px thi
+  dong thong tin xuong hang rieng duoi ten) · `src/video/video.js` (dong thong tin = gio · kich thuoc · dung luong, bo
+  thoi luong) · `src/storyboard/storyboard.css` `.dai-meta` 400 -> 500 + so deu cot (DUNG CHUNG: khay Storyboard doi theo,
+  dong "12:56 · 01/10 · 6 khung" rong 116 -> 125 px, khong cat) · `src/main.js` + `scripts/test/do-quay-app.mjs` (bai do
+  doc thoi luong tu nhan `.vd-gio`, kiem dong thong tin KHONG lap thoi luong).
+- Kiem chung (cung mot thuoc, chay tren ban cu HEAD lam doi chung): ban moi 14/14 luot DAT (12 luot khay video 560-860 px
+  x VI/EN + 2 luot khay Storyboard): 0 chu bi cat, 4/4 dieu khien hang dau cao 26 px cung tam 95, 0 tran ngang. Ban cu:
+  7/7 luot khay video TRUOT (cao 27,5/26; cat o 3 luot), khay Storyboard dat. `test:khovideo`, `do-storyboard.mjs`,
+  `test:vienquay` DAT. Nap tai cho 13:08:46 `boot v0.8.0`, app.asar md5 e0e9932c, anh/video 601 = 601, 9 dai = 9.
+- Bay thuoc trong luot nay: (a) `getComputedStyle(el).font` ra RONG khi phan tu co `font-variant-numeric` -> span thu roi
+  ve 16 px, bao "cat" gia (280 vs 193 px) — dat tung thuoc tinh font rieng; (b) `test:khovideo` cam emoji trong file giao
+  dien: ghi chu CSS co ky tu canh bao la truot (bat duoc truoc khi nap).
+- [CHUA CHAY] `npm run test:quayapp` sau khi doi dong thong tin (bai nay hien len man ~6 s -> cho anh cho gio).
+- [CHUA LAM, cho anh chon] video DOC (1010x1264) chi chiem 1/3 the, 2/3 con lai trong; neu anh muon khay gon hon thi
+  doi sang dang "anh nho ben trai, chu + nut ben phai" (thay 3-4 video / man thay vi 1,5).
+
+## [0.8.0 nap lan 6] - 2026-10-01 12:58 - SUA vien quay MAT CANH TREN tren man phu 125%
+- Boi canh: 12:56 anh quay 1 doan 9,6 s tren man phu (2560x1440, 125%), roi nhan "ngon lanh roi em". Run-log that:
+  `quay-video xong 9.6 s, 3 khuc, 4359 KB, 282 khung` (282 / 9,6 = 29,4 khung/giay) — nhung ngay truoc do co dong
+  `CANH BAO vien tren cham vung (xin ...height 40 duoc ...height 46) -> huy`. Tuc doan anh quay CHI CO 3/4 canh vien cam
+  (mat canh tren). Video khong dinh vien (chot chan huy cua so da chay dung).
+- Nguyen nhan (do tu run-log): co toi thieu cua so cua Windows tinh theo DIEM ANH THAT (~57-58 px), khong theo DIP.
+  Man 150% -> 38 DIP (do 29/09), man 125% -> 46 DIP (do hom nay). `DAI = 40` chi du cho man 150%; tren man 125% cua so
+  "tren" phinh xuong 6 px, lan 4 px vao vung -> bi huy. Suy ra man 100% can ~58 DIP (CHUA do tren man 100%).
+- Da sua: `src/vien-quay.js` `DAI` 40 -> 64. `scripts/test/do-vien-quay.mjs`: muc ep 40 -> 58 + them doi chung [3] bang
+  dung so do that 12:56 (cua so cu cao 40 -> 46 cham vung 4 px; cua so moi khong cham).
+- Kiem chung: `npm run test:vienquay` ban moi DAT 2006/2006 vung + 2 doi chung; chay lai tren ban cu (DAI 40): TRUOT
+  2006/2006 + doi chung [3] truot (thuoc biet do). Nap tai cho 12:58:41 `boot v0.8.0 ... dang-ky=OK`, app.asar md5
+  338bb000, anh/video 599 = 599, 9 dai = 9, cau hinh giong truoc. Ban cu cat o `.selftest/ban-cai-truoc` (md5 21870a62).
+- [CHUA DO tren app that] vien du 4 canh tren man 125%: can anh quay them 1 doan tren man phu, em doc run-log (khong
+  con dong `CANH BAO vien` la dat). Man 100% chua co may de do.
+- [CHO ANH tra loi] "ngon lanh" = test xong het (dong goi + push + web) hay con thu keo vao Premiere / Zalo.
 
 ## [/xong] - 2026-10-01 12:45 - Chot so (may cong ty)
 - Phien 01/10 09:27 -> 12:45: viet lai danh sach 11 tinh nang (`ROADMAP.md` muc 0) -> anh chon QUAY VUNG MAN HINH ->

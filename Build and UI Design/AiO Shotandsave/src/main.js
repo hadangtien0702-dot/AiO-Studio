@@ -24,6 +24,7 @@ const fs = require('fs')
 const kho = require('./kho')
 const luong = require('./luong-chup') // 0.5.0: luong chup chay san
 const i18n = require('./i18n')
+const { taoKhayThu, giayHopLe } = require('./khay-thu') // 01/10: khay tu thu ve nut tron o goc
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
@@ -153,31 +154,31 @@ async function thuQuay() {
     kq.conVien = BrowserWindow.getAllWindows().filter((w) => /dem\/(quay|vien)\.html/.test(w.webContents.getURL())).length
     kq.so = khoVideo.danhSach()
     kq.fileConTam = kq.luot ? fs.existsSync(kq.luot.tam) : null
-    if (await doi(() => videoWin && !videoWin.isDestroyed() && !videoWin.webContents.isLoading(), 6000)) {
+    if (await doi(() => khayWin && !khayWin.isDestroyed() && !khayWin.webContents.isLoading(), 6000)) {
       await cho(1500)
-      kq.khay = await js(videoWin, "JSON.stringify({ hang: [...document.querySelectorAll('.vd')].map(h => { const v = h.querySelector('video'); return { ten: h.querySelector('.dai-ten').textContent, meta: h.querySelector('.dai-meta').textContent, ready: v.readyState, dur: v.duration, kich: v.videoWidth + 'x' + v.videoHeight, loi: v.error && v.error.code } }), dem: document.getElementById('shot-badge').textContent, font: getComputedStyle(document.querySelector('.nut') || document.body).fontFamily.slice(0, 24) })")
+      kq.khay = await js(khayWin, "JSON.stringify({ hang: [...document.querySelectorAll('.vd')].map(h => { const v = h.querySelector('video'); return { ten: h.querySelector('.dai-ten').textContent, meta: h.querySelector('.dai-meta').textContent, gio: h.querySelector('.vd-gio').textContent, ready: v.readyState, dur: v.duration, kich: v.videoWidth + 'x' + v.videoHeight, loi: v.error && v.error.code } }), dem: document.getElementById('dem-video').textContent, font: getComputedStyle(document.querySelector('.nut') || document.body).fontFamily.slice(0, 24) })")
       kq.iconKeo = videoIcon.size // khung dau da ve ra canvas va gui ve main (canvas khong bi "taint" voi file://)
       // 01/10 CHON TIENG trong khay: bam nut that "Khong tieng" roi "Co tieng", doc lai giao dien + so + file dang chon
       const docTieng = "JSON.stringify({ nut: [...document.querySelectorAll('.vd .chon-tieng .chon-nut')].map(b => b.textContent + (b.classList.contains('active') ? '*' : '')), muted: document.querySelector('.vd video').muted, xoa: document.querySelector('.vd .dai-dau .nut.icon').title })"
       const bamTieng = (i) => "document.querySelectorAll('.vd .chon-tieng .chon-nut')[" + i + "].click()"
-      kq.tieng0 = await js(videoWin, docTieng)
+      kq.tieng0 = await js(khayWin, docTieng)
       if (kq.so[0] && kq.so[0].tieng) {
-        await js(videoWin, bamTieng(1)); await cho(700)
+        await js(khayWin, bamTieng(1)); await cho(700)
         const m1 = khoVideo.tim(kq.so[0].id)
-        kq.tieng1 = { giaoDien: await js(videoWin, docTieng), boTieng: m1.boTieng, fileKhongTieng: m1.fileKhongTieng, coFile: !!banKhongTieng(m1), keoSeLay: fileDangChon(m1) }
-        await js(videoWin, bamTieng(0)); await cho(400)
+        kq.tieng1 = { giaoDien: await js(khayWin, docTieng), boTieng: m1.boTieng, fileKhongTieng: m1.fileKhongTieng, coFile: !!banKhongTieng(m1), keoSeLay: fileDangChon(m1) }
+        await js(khayWin, bamTieng(0)); await cho(400)
         const m2 = khoVideo.tim(kq.so[0].id)
-        kq.tieng2 = { giaoDien: await js(videoWin, docTieng), boTieng: m2.boTieng, conFileKhongTieng: !!banKhongTieng(m2), keoSeLay: fileDangChon(m2) }
+        kq.tieng2 = { giaoDien: await js(khayWin, docTieng), boTieng: m2.boTieng, conFileKhongTieng: !!banKhongTieng(m2), keoSeLay: fileDangChon(m2) }
       }
       if (process.argv.includes('--xoa') && kq.so[0]) {
         // Bam nut Xoa THAT 2 lan (lan 1 = hoi lai). File thu vao Thung rac cua may. Do: Windows co nha file dang mo khong.
         const bam = "document.querySelector('.vd .dai-dau .nut.icon').click()"
-        await js(videoWin, bam)
-        kq.xoaLan1 = { conFile: fs.existsSync(kq.so[0].file), chuNut: await js(videoWin, "document.querySelector('.vd .dai-dau .nut.icon').textContent") }
-        await js(videoWin, bam)
+        await js(khayWin, bam)
+        kq.xoaLan1 = { conFile: fs.existsSync(kq.so[0].file), chuNut: await js(khayWin, "document.querySelector('.vd .dai-dau .nut.icon').textContent") }
+        await js(khayWin, bam)
         await doi(() => !fs.existsSync(kq.so[0].file), 5000)
         await cho(400)
-        kq.xoaLan2 = { conFile: fs.existsSync(kq.so[0].file), conFileKhongTieng: !!(kq.tieng1 && kq.tieng1.fileKhongTieng && fs.existsSync(kq.tieng1.fileKhongTieng)), conTrongThuMuc: fs.readdirSync(kq.thuMucLuu).length, conTrongSo: khoVideo.danhSach().length, hang: await js(videoWin, "document.querySelectorAll('.vd').length"), toast: await js(videoWin, "document.getElementById('toast').textContent") }
+        kq.xoaLan2 = { conFile: fs.existsSync(kq.so[0].file), conFileKhongTieng: !!(kq.tieng1 && kq.tieng1.fileKhongTieng && fs.existsSync(kq.tieng1.fileKhongTieng)), conTrongThuMuc: fs.readdirSync(kq.thuMucLuu).length, conTrongSo: khoVideo.danhSach().length, hang: await js(khayWin, "document.querySelectorAll('.vd').length"), toast: await js(khayWin, "document.getElementById('toast').textContent") }
       }
     } else kq.khay = 'KHONG mo duoc khay video'
   } catch (e) { kq.loi = String((e && e.stack) || e) }
@@ -440,6 +441,7 @@ app.on('window-all-closed', (e) => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
   ocr.tatHost() // tien trinh PowerShell doc chu (neu dang giu san)
+  khayThu.dongHet() // nut tron + san dien cua khay
 })
 
 /* ---------------------------------------------------------------------- */
@@ -577,14 +579,18 @@ function openSettings() {
   settingsWin.on('closed', () => { settingsWin = null })
 }
 
-/* --- Cua so Multi-Shot Storyboard Strip --- */
-let storyboardWin = null
-function openStoryboardWindow() {
-  if (storyboardWin && !storyboardWin.isDestroyed()) {
-    // [ra 28/09] mo lai = nap lai khay (truoc: hien dai CU, thieu anh vua chup them)
-    storyboardWin.webContents.reload()
-    storyboardWin.show()
-    storyboardWin.focus()
+/* --- Cua so KHAY GOP (01/10): MOT cua so, 2 the Storyboard | Video ---
+   Anh Tien 01/10: "phan khay minh toi uu hoa thanh 1 khay". Truoc la 2 cua so (Storyboard 1080x700, Video 860x680)
+   voi 2 trang + 2 preload rieng; nay 1 trang src/khay/index.html + preload-khay.js. `tab` = 'dai' | 'video': the mo dau.
+   Mo lai khi cua so dang co = NAP LAI trang (co dai / video vua tao) va nhay dung the. Khay anh noi KHONG lien quan. */
+let khayWin = null
+function moKhay(tab) {
+  const trang = path.join(__dirname, 'khay', 'index.html')
+  ghiLog('khay mo the=' + tab + (khayWin && !khayWin.isDestroyed() ? ' (cua so dang co -> nap lai)' : ''))
+  if (khayWin && !khayWin.isDestroyed()) {
+    khayWin.loadFile(trang, { query: { tab } })
+    khayWin.show()
+    khayWin.focus()
     return
   }
 
@@ -595,25 +601,34 @@ function openStoryboardWindow() {
   const x = wa.x + Math.round((wa.width - w) / 2)
   const y = wa.y + Math.round((wa.height - h) / 2)
 
-  storyboardWin = new BrowserWindow({
+  khayWin = new BrowserWindow({
     x, y, width: w, height: h,
     minWidth: 640, minHeight: 460,
     frame: false,
-    title: 'AiO Shot & Save - Storyboard Strip',
+    title: 'AiO Shot & Save - Khay',
     backgroundColor: '#181818', // = --bg-2 cua tokens (khop khay anh)
     show: false,
     alwaysOnTop: true,
     icon: path.join(__dirname, '..', 'assets', 'app.ico'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload-storyboard.js'),
+      preload: path.join(__dirname, 'preload-khay.js'),
       contextIsolation: true, sandbox: false,
     },
   })
 
-  storyboardWin.loadFile(path.join(__dirname, 'storyboard', 'index.html'))
-  storyboardWin.once('ready-to-show', () => storyboardWin.show())
-  storyboardWin.on('closed', () => { storyboardWin = null })
+  // Trang hong (loi script / preload) thi cua so van mo nhung trong tron, khong ai biet -> ghi vao run-log.
+  // Electron moi: su kien la 1 doi tuong { level, message }; ban cu: (e, level so, message) -> nhan ca hai.
+  khayWin.webContents.on('console-message', (e, level, msg) => {
+    const nang = typeof level === 'number' ? level >= 3 : e.level === 'error'
+    if (nang) ghiLog('khay LOI trang: ' + String(msg || e.message).slice(0, 300))
+  })
+  khayWin.webContents.on('preload-error', (_e, p, err) => ghiLog('khay LOI preload ' + path.basename(p) + ': ' + (err && err.message)))
+  khayWin.loadFile(trang, { query: { tab } })
+  // che do do --thu-quay: hien nhung KHONG cuop tieu diem cua nguoi dang lam viec
+  khayWin.once('ready-to-show', () => (THU_QUAY ? khayWin.showInactive() : khayWin.show()))
+  khayWin.on('closed', () => { khayWin = null })
 }
+function openStoryboardWindow() { moKhay('dai') }
 
 ipcMain.handle('settings:get', () => {
   const c = kho.docCauHinh()
@@ -624,6 +639,7 @@ ipcMain.handle('settings:get', () => {
     anhChatLuong: CHAT_LUONG_Q[c.anhChatLuong] ? c.anhChatLuong : 'cao',
     khayKieu: kieuKhay(),
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
+    khayTuThu: giayHopLe(c.khayTuThu),
     lamMoKieu: c.lamMoKieu === 'blur' ? 'blur' : 'mosaic',
   }
 })
@@ -648,6 +664,14 @@ ipcMain.handle('settings:set-khay-so-anh', (_e, n) => {
   kho.ghiCauHinh({ khaySoAnh: so })
   ghiLog('doi so anh tu dong vao khay: ' + so)
   return { khaySoAnh: so }
+})
+
+// 01/10: so giay khay cho roi tu thu ve nut tron o goc (anh chot 5 / 10 / 15, mac dinh 5)
+ipcMain.handle('settings:set-khay-tu-thu', (_e, n) => {
+  const g = giayHopLe(n)
+  kho.ghiCauHinh({ khayTuThu: g })
+  ghiLog('doi so giay khay tu thu: ' + g)
+  return { khayTuThu: g }
 })
 
 /* Doi dinh dang / chat luong anh — ap dung ngay tu lan chup sau. */
@@ -696,7 +720,7 @@ ipcMain.handle('settings:set-khay', (_e, kieu) => {
           try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
           w.webContents.send('shelf:add', { id: it.id, seq: it.seq || it.id, thumb, filePath: it.filePath, w: sz.width, h: sz.height, kb })
         }
-        w.showInactive()
+        khayThu.hienThang(w) // 01/10: cua so khay dung lai -> hien thang, cat nut tron (neu dang la nut)
       })
     }
   }
@@ -778,6 +802,7 @@ async function startCapture() {
   // khong con cho dat nut Dung). Khong mo overlay luc dang quay: anh dong bang se lot vao video.
   if (ghiHinh) { dungGhiHinh('phim tat'); return }
   if (overlayWins.length) return // dang chon vung, bo qua
+  khayThu.huy() // 01/10: khay dang bay ve nut / bung ra thi go san dien ngay (cua so trong suot phu video lau = video den)
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
   if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
     ghiLog('capture: KHOA — het dung thu, chua co ma')
@@ -1756,7 +1781,10 @@ function ensureShelf() {
  */
 function showShelf() {
   const w = ensureShelf()
-  if (!w.isVisible()) w.showInactive()
+  // 01/10: khay dang la NUT TRON o goc -> bung ra kieu "ong kinh" (src/khay-thu.js); khong thi hien thang nhu cu
+  if (khayThu.trangThai() === 'thu') { khayThu.bung('hien khay'); return }
+  if (!w.isVisible()) khayThu.hienThang(w)
+  khayThu.chamVao()
 }
 
 /** Them mot anh vao khay (goi sau khi da luu file). */
@@ -1830,9 +1858,24 @@ ipcMain.on('shelf:open-folder', () => {
   }
 })
 
-ipcMain.on('shelf:hide', () => {
-  if (shelfWin && !shelfWin.isDestroyed()) shelfWin.hide()
+/* 01/10 KHAY TU THU VE NUT TRON O GOC (anh chot: xuat hien kieu ong kinh, thu ve kieu xap anh, tu thu sau 5 / 10 / 15 giay,
+   bam nut de mo). Toan bo dieu phoi o src/khay-thu.js; o day chi dua cho no thu no can. Che do tu kiem thi KHONG tu thu
+   (cac bai do khay mo khay ca phut). */
+const khayThu = taoKhayThu({
+  electron: { BrowserWindow, screen, ipcMain },
+  layKhay: () => (shelfWin && !shelfWin.isDestroyed() ? shelfWin : null),
+  damBaoKhay: () => ensureShelf(),
+  anhMoiNhat: () => { const it = [...shelfItems.values()].pop(); try { return it ? thumbKhay(it.image) : '' } catch (e) { return '' } },
+  soAnh: () => shelfItems.size,
+  docGiay: () => giayHopLe(kho.docCauHinh().khayTuThu),
+  // dang keo / doi co khay, dang chon vung, dang quay video, dang quay Storyboard 3 giay: KHONG thu (san dien la cua so
+  // trong suot phu ca man ~1 giay; phu len video luc dang quay la khung video den — so loi 0.4.15)
+  banKhac: () => dragAnchors.size > 0 || resizeAnchors.size > 0 || overlayWins.length > 0 || !!ghiHinh || dangQuay,
+  tuDong: () => !(IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || THU_QUAY || THU_OCR),
+  ghiLog,
 })
+// Nut "–" tren khay: truoc 01/10 la an han khay; nay la thu ve nut tron (an han = nut x tren nut tron)
+ipcMain.on('shelf:hide', () => { khayThu.thu('nut tru') })
 
 ipcMain.on('shelf:drag-start', (e) => {
   batDauKeo(BrowserWindow.fromWebContents(e.sender), e.sender.id)
@@ -2115,38 +2158,8 @@ function ketThucGhiHinh(g, info) {
 
 ipcMain.on('quay:dung', () => dungGhiHinh('nut Dung'))
 
-/* --- Cua so KHAY VIDEO (01/10): danh sach doan quay, moi doan 1 hang. Khuon = khay Storyboard. --- */
-let videoWin = null
-function openVideoWindow() {
-  if (videoWin && !videoWin.isDestroyed()) {
-    videoWin.webContents.reload() // mo lai = nap lai so (co video vua quay)
-    videoWin.show()
-    videoWin.focus()
-    return
-  }
-  const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
-  const wa = d.workArea
-  const w = Math.min(860, Math.round(wa.width * 0.8))
-  const h = Math.min(680, Math.round(wa.height * 0.8))
-  videoWin = new BrowserWindow({
-    x: wa.x + Math.round((wa.width - w) / 2), y: wa.y + Math.round((wa.height - h) / 2), width: w, height: h,
-    minWidth: 560, minHeight: 420,
-    frame: false,
-    title: 'AiO Shot & Save - Video',
-    backgroundColor: '#181818',
-    show: false,
-    alwaysOnTop: true,
-    icon: path.join(__dirname, '..', 'assets', 'app.ico'),
-    webPreferences: {
-      preload: path.join(__dirname, 'preload-video.js'),
-      contextIsolation: true, sandbox: false,
-    },
-  })
-  videoWin.loadFile(path.join(__dirname, 'video', 'index.html'))
-  // che do do --thu-quay: hien nhung KHONG cuop tieu diem cua nguoi dang lam viec
-  videoWin.once('ready-to-show', () => (THU_QUAY ? videoWin.showInactive() : videoWin.show()))
-  videoWin.on('closed', () => { videoWin = null })
-}
+/* --- KHAY VIDEO (01/10) = the "Video" cua cua so khay gop (moKhay o tren). Moi doan quay 1 hang. --- */
+function openVideoWindow() { moKhay('video') }
 ipcMain.on('shelf:open-video', () => openVideoWindow())
 
 /* 01/10 10:4x anh chot: quay LUON co tieng; vao khay moi chon "Co tieng / Khong tieng" cho tung video.
@@ -2234,10 +2247,6 @@ ipcMain.handle('video:xoa', async (_e, id) => {
   videoIcon.delete(id)
   ghiLog('video xoa ' + id + ' -> thung rac: ' + m.file)
   return { ok: true }
-})
-ipcMain.on('video:close', (e) => {
-  const w = BrowserWindow.fromWebContents(e.sender)
-  if (w && !w.isDestroyed()) w.close()
 })
 
 /* ── Storyboard Strip IPC ────────────────────────────────────────────── */
