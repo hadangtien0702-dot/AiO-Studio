@@ -256,6 +256,14 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
 DUNG go):
+- ☠️ **CHUYEN DONG CUA CUA SO NOI BI "MAT" KHI APP KHAC (Premiere) DANG O TRUOC (02/10):** anh bao khay bung tu nut tron "mat
+  hieu ung khi dang su dung PR". Goc DA DO: ~0,2 s sau khi cua so khay hien, Chromium coi no la BI CHE (co che
+  `CalculateNativeWinOcclusion` tren Windows) -> `document.hidden` = true, rAF dung, hen gio bi ham 0,5-1 s -> man trap chi ve
+  12-13 khung / 0,7-1,25 s roi "bup" ra (5/5 lan co Premiere; 10/10 lan khong co Premiere thi du 21-25 khung / 0,43 s). Chot:
+  `src/main.js` `disable-features=CalculateNativeWinOcclusion` (doi chung `AIO_OCCLUSION=1`); sau khi tat: 2/2 lan `an 0`, du
+  khung. DUNG go dong do. Bai do an (offscreen) va bai do cua so that deu KHONG thay loi nay vi khong co Premiere dang chay;
+  thu bat duoc la 2 so trong dong `khay bung` cua run-log: `an` (trang bi coi la an) va `hen` (hen gio 8 ms tre nhat).
+  Cua so noi moi nao co chuyen dong ma "luc co luc mat" -> doc 2 so nay TRUOC khi nghi ma chuyen dong.
 - ☠️ **DOC CHU (phim 5, 29/09):** Windows KHONG co bo doc tieng Viet (bang FOD Microsoft: vi-vn khong co goi OCR) ->
   app tieng Viet dung Tesseract (`src/ocr.js`). tesseract.js 5.1.1 co 3 bay CHI lo trong Electron / ban dong goi:
   langPath -> fetch loi; langs {code,data} -> Init loi; getCore luon nap core DAY DU (khong phai -lstm). Duong dung:

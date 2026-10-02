@@ -45,6 +45,15 @@ app.commandLine.appendSwitch(
   'AllowWgcScreenCapturer,AllowWgcWindowCapturer,AllowWgcZeroHz'
 )
 
+/* ☠️ 02/10 TAT "TINH CUA SO BI CHE" cua Chromium (anh Tien: "hieu ung bi mat khi anh nhan vao va khi anh dang su dung PR").
+   Run-log that 02/10: 10 lan bung khay luc KHONG dung Premiere -> trang khay `an 0`, man trap 21-25 khung / 0,41-0,43 s.
+   5/5 lan bung luc DANG dung Premiere (10:31-10:40) -> `an 1`: ~0,2 s sau khi khay hien, Chromium coi cua so khay la BI CHE
+   (du khay luon noi tren cung) -> trang bi cho "ngu": rAF dung, hen gio 8 ms bi ham toi 0,5-1 s (`hen 486-1005`), man trap
+   chi ve 12-13 khung roi dung, keo dai 0,7-1,25 s, cuoi cung "bup" ra. Thu ve cung cham 0,96 -> 1,33-1,40 s.
+   App nay toan cua so noi tren cung / cua so nho tinh -> co che nay khong co loi gi, chi gay hai. Phai goi TRUOC app ready.
+   Doi chung: AIO_OCCLUSION=1 = de nguyen co che cu. Vi sao Chromium tinh nham khi co Premiere: CHUA biet. */
+if (process.env.AIO_OCCLUSION !== '1') app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
+
 /* ☠️ ANH DONG BANG DI QUA aioshot:// CHU KHONG QUA IPC (may nha anh Tien 31/08
    "van giat y chang" du may cong ty da DAT): man 5120x2160 -> PNG base64
    ~15-25MB, gui 'overlay:frozen' la renderer DANG VE KHUNG THEO CHUOT phai

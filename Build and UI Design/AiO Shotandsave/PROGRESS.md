@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 07:56 +0700 (dang lam do, chua /xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 10:44 +0700 (dang lam do, chua /xong)
+> - **02/10 10:44 GOC "mat hieu ung" DA TIM RA, BAN SUA CHO ANH XAC NHAN.** Dang dung Premiere thi Chromium coi cua so khay
+>   la bi che -> trang khay ngu giua luc bung (run-log: `an 1` 5/5 lan co Premiere, `an 0` 10/10 lan khong co). Da tat co che
+>   do trong `src/main.js` (`disable-features=CalculateNativeWinOcclusion`), nap lan 13 luc 10:44:29, app.asar md5 `e308607d`.
+>   [CHO ANH] bam nut tron LUC DANG DUNG PREMIERE -> doc dong `khay bung`: dat = `an 0`, 21-25 khung. CHUA commit `main.js`.
+>   Chi tiet: muc [0.8.0 nap lan 13] ngay duoi. (Cac dong 07:56 / 08:15 / 08:31 ben duoi la cac buoc do truoc do.)
 > - **02/10 07:56 DANG LAM DO — nut tron bung khay "chua muot" (anh dung that lan dau, bao 07:5x).** Ban dang chay: 0.8.0,
 >   app.asar md5 `5d19fbe6` (nap lan 11, boot 07:56:19) = ban 19:12 hom qua + DONG HO DO tung chang cua lan bung (dong
 >   `khay bung (bam nut): ... | cho | bay | noi | bung | tan | don` trong run-log). CHUA sua chuyen dong, CHUA biet khung
@@ -95,6 +100,42 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 nap lan 13] - 2026-10-02 10:44 - TIM RA GOC "mat hieu ung": dang dung Premiere thi Chromium coi khay la BI CHE -> tat co che do (cho anh xac nhan)
+
+- **Boi canh:** 10:4x anh bao: *"hieu ung bi mat khi anh nhan vao va khi anh dang su dung PR"*. Day la manh con thieu cua cu
+  dung 333 ms luc 08:11 (em khong tai hien duoc: 21/21 lan muot trong bai do, 13/13 lan muot trong app luc khong co Premiere).
+- **So do (run-log that, dong ho gan tu nap lan 12):**
+  | Luc | Tinh huong | Man trap | `an` (trang khay bi coi la an) | `hen` (hen gio 8 ms tre nhat) |
+  |---|---|---|---|---|
+  | 08:35 -> 09:30, 10 lan | khong dung Premiere | 21-25 khung, 412-430 ms | 0 / 10 | 9-10 ms |
+  | 10:31 -> 10:40, 5 lan (3 `bam nut`, 2 `hien khay`) | dang dung Premiere | **12-13 khung, 695-1253 ms** | **5 / 5** | **486-1005 ms** |
+  Ong kinh bay (25-26 khung) va ong kinh tan (15 khung, `an 0`) KHONG bi anh huong: chi trang KHAY bi cho ngu. `main` 8-77 ms,
+  `chuot 0` ca 5 lan -> khong phai luong chinh nghen, khong phai con tro. Thu ve cung cham theo: 0,96 -> 1,33-1,40 s.
+- **Nguyen nhan:** ~0,2 s sau khi cua so khay hien (12-13 khung dau van ve), trang khay chuyen sang trang thai AN
+  (`document.hidden`) -> rAF dung, hen gio bi ham toi 0,5-1 s -> man trap dung giua chung, toi luc het han thi "bup" ra.
+  Cua so khay khong he bi an / thu nho boi ma cua minh => do co che "tinh cua so bi che" cua Chromium tren Windows
+  (`CalculateNativeWinOcclusion`) tinh nham khi Premiere dang o truoc. VI SAO no tinh nham (khay luon noi tren cung): CHUA BIET.
+  Dong ho `an` / `hen` them luc 08:31 chinh la thu bat duoc: khong co no thi chi thay "it khung".
+- **Thay doi:** `src/main.js`: `app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')` truoc app
+  ready (doi chung: `AIO_OCCLUSION=1` giu co che cu). App toan cua so noi tren cung / cua so nho tinh nen co che nay khong
+  co loi gi cho app.
+- **File anh huong:** `src/main.js`.
+- **Kiem chung bang so:** `node --check` OK. Nap tai cho 10:44:29 (`boot v0.8.0 ... dang-ky=OK`, luong chup san sang 2 man),
+  app.asar md5 `e308607d` (ban truoc `f5157f0c` cat o `.selftest/ban-cai-truoc`); truoc / sau 630 anh-video, 9 dai, cau hinh
+  `c8552a81` giong nhau. **CHUA XAC NHAN LA HET:** can anh bam nut tron LUC DANG DUNG PREMIERE; dat = dong `khay bung` co
+  `an 0`, man trap 21-25 khung, ~0,43 s. Em khong tu thu duoc (khong dieu khien Premiere cua anh).
+- **LOI QUY TRINH CUA EM (lap lai dung bay 01/10):** noi `test:khaynut ; cai-tai-cho` bang dau `;` -> bai do bao TRUOT 2 muc ma
+  app van bi nap. Kiem lai: bai do khong nap `main.js`, chay lai 2 lan deu TAT CA DAT; lan truot la `capturePage` nem
+  `UnknownVizError` thoang qua (may dang chay Premiere). Lan nay khong hai, nhung buoc nap PHAI noi bang `&&`.
+- CHUA commit (cho anh xac nhan roi commit mot luot voi ket qua).
+- **11:49 ANH BAM LAI (anh: "anh bam kiem tra lai roi do em"), run-log that sau nap lan 13:**
+  `11:49:25 khay bung (bam nut): 903 ms | ... | bung 413 (21 khung, max 50, hen 10, an 0) | tan 271 (13 khung, max 50 ...)`
+  `11:49:40 khay bung (bam nut): 931 ms | ... | bung 429 (25 khung, max 17, hen 10, an 0) | tan 264 (15 khung, max 17 ...)`
+  => **2/2 lan `an 0`**, man trap 21 va 25 khung trong 413 / 429 ms (truoc khi sua, co Premiere: 12-13 khung, 695-1253 ms, `an 1`
+  5/5). Thu ve 1013-1140 ms (truoc 1330-1396). Lan dau van hut vai khung (max 50) nhu moi lan bung dau sau khi app nam im.
+  GIOI HAN: moi 2 mau; log khong ghi Premiere co dang o truoc khong, dua vao loi anh. Dong ho do GIU LAI trong app.
+  Da commit tren may (khong push). Bay nay da ghi vao `CLAUDE.md` cua app, muc "Bay 1-lan".
 
 ## [0.8.0 nap lan 12] - 2026-10-02 08:31 - Bai do CUA SO THAT: 21/21 lan bung MUOT -> cu dung 333 ms chi co trong app that; them 3 so do phan loai
 
