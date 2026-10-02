@@ -120,7 +120,11 @@
     `hien(khay, true)` o ca `bung()` va `hienThang()` (san dien van duoc dua len tren khay ngay sau do).
   - `src/main.js`: GO `disable-features=CalculateNativeWinOcclusion` (ban sua sai 10:44) -> so `an` trong dong `khay bung` lai
     noi that: `an 1` = khay dang bi che. `AIO_OCCLUSION=0` = tat, chi de doi chung.
-- **File anh huong:** `src/khay-thu.js`, `src/main.js`, `scripts/test/khay-bung-that.cjs` (lenh `che` / `che-chon`).
+- **File anh huong:** `src/khay-thu.js`, `src/main.js`, `scripts/test/khay-bung-that.cjs` (lenh `che` / `che-chon`),
+  `scripts/test/theo-doi-khay.ps1` (MOI, 13:32: chep bo theo doi tu scratchpad vao repo de khoi mat; CHI DOC, khong hien gi
+  len man: moi 0,09 giay, khi cua so "Khay anh" dang hien thi ghi cua so nam tai tam khay + cac cua so de len khay vao
+  `theo-doi-khay.log` canh no. Chay: `powershell -ExecutionPolicy Bypass -File scripts\test\theo-doi-khay.ps1 -Giay 180`).
+  Da commit tren may 13:32 (`khong push`), gom 6 file tren + PROGRESS.md + CLAUDE.md.
 - **Kiem chung bang so:** `node --check` 2 file OK · `npm run test:khaynut` TAT CA DAT (chay TRUOC khi nap, noi bang `&&`) · bai do
   cua so that co cua so che: 4/4 lan `an 0`, 20-24 khung, 0 dong LOI · bo theo doi `theo-doi-khay.ps1` chay cung luc: 13/13 dong
   "TAI TAM KHAY: chinh khay", khay o vi tri 5-7 tu tren xuong, chi co san dien nam tren khay dung luc dien (=> bo theo doi KHONG
