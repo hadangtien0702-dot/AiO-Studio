@@ -1,7 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 10:44 +0700 (dang lam do, chua /xong)
-> - **02/10 10:44 GOC "mat hieu ung" DA TIM RA, BAN SUA CHO ANH XAC NHAN.** Dang dung Premiere thi Chromium coi cua so khay
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 13:30 +0700 (dang lam do, chua /xong)
+> - **02/10 13:30 KHAY BUNG BI KHUAT DUOI PREMIERE: da nap ban sua lan 14, CHUA CO XAC NHAN.** Ban sua 10:44 (dong ngay duoi)
+>   SAI HUONG: tat co che tinh bi che cua Chromium chi bit mat cai bao, anh van thay khay "bi an o duoi". Nay: `khay-thu.js`
+>   `hien(khay, true)` (dua khay len tren cung luc hien), go cong tac sai trong `main.js`. app.asar md5 `57c17e37`, boot
+>   13:30:49. [CHO ANH] dang dung Premiere thi bam nut tron: phai THAY khay; dong `khay bung` phai `an 0` (co che tinh bi che
+>   dang BAT, `an 1` = van bi che). Bai do KHONG tai hien duoc loi nay. Chi tiet: muc [0.8.0 nap lan 14] + [do] 13:13.
+> - ~~02/10 10:44 GOC "mat hieu ung" DA TIM RA, BAN SUA CHO ANH XAC NHAN.~~ (SAI, xem dong tren) Dang dung Premiere thi Chromium coi cua so khay
 >   la bi che -> trang khay ngu giua luc bung (run-log: `an 1` 5/5 lan co Premiere, `an 0` 10/10 lan khong co). Da tat co che
 >   do trong `src/main.js` (`disable-features=CalculateNativeWinOcclusion`), nap lan 13 luc 10:44:29, app.asar md5 `e308607d`.
 >   [CHO ANH] bam nut tron LUC DANG DUNG PREMIERE -> doc dong `khay bung`: dat = `an 0`, 21-25 khung. CHUA commit `main.js`.
@@ -100,6 +105,50 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 nap lan 14] - 2026-10-02 13:30 - Khay bung PHAI len tren cung (`hien(khay, true)`), go ban sua sai 10:44 (CHUA co xac nhan cua anh)
+
+- **Boi canh:** tiep muc 13:13 ngay duoi. Hai luot theo doi 13:13-13:26 khong bat duoc gi (run-log: tu 13:11:39 khay khong bung
+  lan nao). Khong cho suong: co bang chung phan biet ngay trong loi anh ke.
+- **Nguyen nhan (suy tu bang chung, CHUA quan sat truc tiep luc co Premiere):** luc dang dung Premiere anh van THAY va BAM duoc
+  nut tron, con khay thi "bi an o duoi". Trong `src/khay-thu.js` hai cua so nay chi khac nhau mot cho luc hien: nut tron (va san
+  dien) `hien(w, true)` = `showInactive()` + `moveTop()`; khay `hien(khay, false)` = chi `showInactive()`, hien lai dung cho cu
+  trong thu tu tren-duoi -> nam duoi cua so cua Premiere. Khop voi `an 1` 5/5 lan luc 10:31-10:40 (Chromium bao bi che, bao DUNG).
+  Cua so nao cua Premiere che khay, va vi sao cua so thuong trong bai do khong che duoc (8/8 lan): VAN CHUA BIET.
+- **Thay doi:**
+  - `src/khay-thu.js`: `hien(w, lenTren)` khi `lenTren` thi `setAlwaysOnTop(true, 'screen-saver')` + `moveTop()`; khay hien bang
+    `hien(khay, true)` o ca `bung()` va `hienThang()` (san dien van duoc dua len tren khay ngay sau do).
+  - `src/main.js`: GO `disable-features=CalculateNativeWinOcclusion` (ban sua sai 10:44) -> so `an` trong dong `khay bung` lai
+    noi that: `an 1` = khay dang bi che. `AIO_OCCLUSION=0` = tat, chi de doi chung.
+- **File anh huong:** `src/khay-thu.js`, `src/main.js`, `scripts/test/khay-bung-that.cjs` (lenh `che` / `che-chon`).
+- **Kiem chung bang so:** `node --check` 2 file OK · `npm run test:khaynut` TAT CA DAT (chay TRUOC khi nap, noi bang `&&`) · bai do
+  cua so that co cua so che: 4/4 lan `an 0`, 20-24 khung, 0 dong LOI · bo theo doi `theo-doi-khay.ps1` chay cung luc: 13/13 dong
+  "TAI TAM KHAY: chinh khay", khay o vi tri 5-7 tu tren xuong, chi co san dien nam tren khay dung luc dien (=> bo theo doi KHONG
+  mu, thay duoc khay). Nap 13:30:49 (`boot v0.8.0 ... dang-ky=OK`), app.asar md5 `57c17e37` (ban truoc `e308607d` cat o
+  `.selftest/ban-cai-truoc`); truoc / sau 638 anh-video, 9 dai, cau hinh `ef1fccef` giong nhau.
+- **GIOI HAN — CHUA DUOC COI LA XONG:** bai do KHONG tai hien duoc loi (khong co Premiere) nen khong chung minh duoc ban sua chua
+  dung benh. Chi co hai thu xac nhan duoc: mat anh luc dang dung Premiere, va dong `khay bung` luc do phai `an 0` (co che tinh bi
+  che dang BAT lai). Bo theo doi dang chay ngam 9 phut tu 13:31 de bat lan bung ke tiep.
+- CHUA commit.
+
+## [do] - 2026-10-02 13:13 - BAN SUA 10:44 SAI HUONG: khay that su bi PREMIERE CHE, em lai di tat cai bao "bi che"
+
+- **Boi canh:** 13:0x anh bao: *"no van bi em oi luc no bay ra thi no bi an o duoi ngoai luon a"*.
+- **Su that (run-log 11:50 -> 13:08, 6 lan bung):** dong nao cung `an 0`, man trap 24 khung, 410-413 ms — tuc la TRANG khay ve du,
+  trong khi MAT anh thay khay bi khuat. => Luc 10:31-10:40 Chromium bao `an 1` la bao DUNG: cua so khay that su nam DUOI mot
+  cua so cua Premiere. Ban nap lan 13 (`disable-features=CalculateNativeWinOcclusion`) chi BIT MAT cai bao do, khong dua khay
+  len tren. Em da ket luan "Chromium tinh nham" ma KHONG kiem cua so khay that su nam o dau (WindowFromPoint / thu tu tren-duoi).
+  Muc [0.8.0 nap lan 13] ben duoi va muc "Bay 1-lan" trong CLAUDE.md dang ghi SAI nguyen nhan — se sua khi co nguyen nhan that.
+- **Nghi pham (CHUA xac nhan):** `khay-thu.js` hien khay bang `hien(khay, false)` = `showInactive()` KHONG dua len tren, trong khi
+  nut tron va san dien deu `moveTop()`.
+- **Thu tai hien bang bai do cua so that** (`scripts/test/khay-bung-that.cjs`, them lenh `che` / `che-chon`: mot cua so THUONG phu
+  len cho khay, co / khong kich hoat truoc moi lan bung; bai nay de nguyen co che tinh bi che): **8/8 lan `an 0`** -> cua so
+  thuong, ke ca khi duoc kich hoat, KHONG che duoc khay. => thu che khay la thu rieng cua Premiere, chua biet la cua so nao.
+- **So cua so tren may (13:0x, Premiere dang thu nho):** cua so khay co co TOPMOST; nut tron TOPMOST dang hien; Premiere chi co 1
+  cua so chinh, khong co cua so TOPMOST nao luc thu nho.
+- **Dang lam:** `theo-doi-khay.ps1` (scratchpad, CHI DOC) chay ngam 4 phut tu 13:13: moi 0,1 giay, khi khay hien thi ghi cua so nao
+  nam tai tam khay + cac cua so de len khay. [CHO ANH] mo Premiere, bam nut tron 2-3 lan trong 4 phut do.
+- **File anh huong:** `scripts/test/khay-bung-that.cjs`. Ma app CHUA doi so voi nap lan 13.
 
 ## [0.8.0 nap lan 13] - 2026-10-02 10:44 - TIM RA GOC "mat hieu ung": dang dung Premiere thi Chromium coi khay la BI CHE -> tat co che do (cho anh xac nhan)
 

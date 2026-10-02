@@ -104,8 +104,24 @@ app.whenReady().then(async () => {
                moi man) ngay trong tien trinh nay -> cac kieu dung SAU no la "co luong", dung TRUOC la "khong luong".
        'bam'  : thu ve roi BAM vao nut tron (su kien chuot gui vao trang nut) -> di dung duong `nut:mo` nhu nguoi dung.
      Vi du: AIO_KIEU=day-du,bam,luong,day-du,bam */
-  let coLuong = false, thuTu = 0
+  /* Lan 3 (02/10 13:1x): anh bao "luc no bay ra thi no bi an o duoi" khi dung Premiere. Them LENH:
+       'che'      : dung mot cua so THUONG (khong noi tren cung, nen xam) phu len cho khay, dong vai Premiere. Hien khong
+                    cuop tieu diem. Cac kieu dung SAU no la "co cua so che".
+       'che-chon' : nhu 'che' nhung KICH HOAT cua so che truoc moi lan bung (giong nguoi dung bam vao Premiere) — CUOP tieu diem.
+     Thuoc: `an` trong dong `khay bung` (bai nay de nguyen co che tinh cua so bi che cua Chromium): an 1 = khay bi che that. */
+  let coLuong = false, thuTu = 0, che = null, cheChon = false
   for (const k of KIEU) {
+    if (k === 'che' || k === 'che-chon') {
+      cheChon = k === 'che-chon'
+      if (!che) {
+        che = new BrowserWindow({ x: KHAY.x - 150, y: KHAY.y - 150, width: KHAY.width + 300, height: KHAY.height + 300, frame: true, show: false, backgroundColor: '#3a3a3a', title: 'cua so che (bai do Shot & Save)', skipTaskbar: true, minimizable: false })
+        che.setMenuBarVisibility(false)
+        await che.loadURL('data:text/html,<body style="background:%233a3a3a;color:%23aaa;font:14px sans-serif;padding:20px">cua so che (bai do, tu tat)</body>')
+        che.showInactive()
+        await cho(600)
+      }
+      continue
+    }
     if (k === 'luong') {
       const luong = require(path.join(ROOT, 'src', 'luong-chup.js'))
       await luong.khoiDong({ ghiLog: (s) => log.push(s) })
@@ -116,13 +132,14 @@ app.whenReady().then(async () => {
       await cho(1500)
       continue
     }
-    const ten = (++thuTu) + '. ' + k + (coLuong ? ' + luong' : '')
+    const ten = (++thuTu) + '. ' + k + (coLuong ? ' + luong' : '') + (che ? (cheChon ? ' + CHE co kich hoat' : ' + CHE') : '')
     kq.kieu[ten] = []
     for (let i = 0; i < LAN; i++) {
       let r = null
       if (k === 'day-du' || k === 'bam') {
         await kt.thu('do that')
         await cho(NGHI)
+        if (che) { if (cheChon) che.focus(); else che.moveTop(); await cho(300) }   // "nguoi dung dang lam viec trong app kia"
         batNghen()
         const t0 = Date.now()
         if (k === 'bam') {

@@ -76,7 +76,15 @@ function taoKhayThu(deps) {
   // Che do do: cua so offscreen khong duoc show() that (se bat mot cua so len man anh) -> tu nho trang thai hien / an
   const hienGia = new WeakMap()
   const dangHien = (w) => !!w && !w.isDestroyed() && (TN ? !!hienGia.get(w) : w.isVisible())
-  const hien = (w, lenTren) => { if (TN) hienGia.set(w, true); else { w.showInactive(); if (lenTren) w.moveTop() } }
+  /* 02/10 13:3x — anh: "luc no bay ra thi no bi an o duoi" khi dang dung Premiere. showInactive() KHONG dua cua so len tren:
+     no hien lai dung cho cu trong thu tu tren-duoi. Nut tron va san dien luon di kem moveTop() nen anh van thay / bam duoc
+     nut; rieng KHAY truoc day hien bang hien(khay, false) -> nam duoi cua so cua Premiere (run-log 10:31-10:40: trang khay
+     `an 1` 5/5 lan = bi che THAT). lenTren = khang dinh lai "noi tren cung" roi dua len dau; khong cuop tieu diem. */
+  const hien = (w, lenTren) => {
+    if (TN) { hienGia.set(w, true); return }
+    w.showInactive()
+    if (lenTren) { try { w.setAlwaysOnTop(true, 'screen-saver') } catch (e) {} w.moveTop() }
+  }
   const an = (w) => { if (!w || w.isDestroyed()) return; if (TN) hienGia.set(w, false); else w.hide() }
   /** Chay JS trong trang, khong bao gio treo: trang an thi rAF dung (so loi "thuoc" 5ao) -> dua voi hen gio. */
   const js = (w, ma, ms = 1200) => Promise.race([
@@ -165,7 +173,7 @@ function taoKhayThu(deps) {
     if (!w || w.isDestroyed()) return
     js(w, 'window.__khayAn && window.__khayAn(false)')
     an(nut)
-    if (!dangHien(w)) hien(w, false)
+    if (!dangHien(w)) hien(w, true)   // 02/10: dua len tren (truoc: false -> co the nam duoi cua so app khac)
     tt = 'mo'; lanCuoi = Date.now(); truocHien = true
   }
 
@@ -274,7 +282,7 @@ function taoKhayThu(deps) {
       if (!kBay) log('khay-thu CANH BAO: san dien khong bao toi (bung)')
       m.toi = Date.now()
       try { m.chuot = trongO(deps.conTro ? deps.conTro() : screen.getCursorScreenPoint(), b, 8) ? 1 : 0 } catch (e) {}
-      hien(khay, false)
+      hien(khay, true)    // 02/10: khay PHAI len tren cung luc hien (san dien duoc dua len tren khay ngay duoi day)
       m.hienKhay = Date.now()
       const bungXong = js(khay, 'window.__khayBung ? window.__khayBung() : (window.__khayAn && window.__khayAn(false))', 1500)
         .then((k) => { m.bung = Date.now(); return k })

@@ -256,14 +256,17 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
 DUNG go):
-- ☠️ **CHUYEN DONG CUA CUA SO NOI BI "MAT" KHI APP KHAC (Premiere) DANG O TRUOC (02/10):** anh bao khay bung tu nut tron "mat
-  hieu ung khi dang su dung PR". Goc DA DO: ~0,2 s sau khi cua so khay hien, Chromium coi no la BI CHE (co che
-  `CalculateNativeWinOcclusion` tren Windows) -> `document.hidden` = true, rAF dung, hen gio bi ham 0,5-1 s -> man trap chi ve
-  12-13 khung / 0,7-1,25 s roi "bup" ra (5/5 lan co Premiere; 10/10 lan khong co Premiere thi du 21-25 khung / 0,43 s). Chot:
-  `src/main.js` `disable-features=CalculateNativeWinOcclusion` (doi chung `AIO_OCCLUSION=1`); sau khi tat: 2/2 lan `an 0`, du
-  khung. DUNG go dong do. Bai do an (offscreen) va bai do cua so that deu KHONG thay loi nay vi khong co Premiere dang chay;
-  thu bat duoc la 2 so trong dong `khay bung` cua run-log: `an` (trang bi coi la an) va `hen` (hen gio 8 ms tre nhat).
-  Cua so noi moi nao co chuyen dong ma "luc co luc mat" -> doc 2 so nay TRUOC khi nghi ma chuyen dong.
+- ☠️ **KHAY BUNG RA MA "BI AN O DUOI" KHI DANG DUNG PREMIERE (02/10, sua lai 13:30 — ban ghi 11:5x SAI nguyen nhan):** run-log
+  luc co Premiere: trang khay `an 1` 5/5 lan (Chromium bao cua so bi che), man trap 12-13 khung roi "bup" ra; khong co Premiere:
+  `an 0` 10/10. Em TUONG Chromium tinh nham, tat `CalculateNativeWinOcclusion` -> log dep (`an 0`, du 24 khung, 8/8 lan) ma anh
+  van thay khay khuat: **Chromium bao DUNG, khay nam DUOI cua so cua Premiere that**; tat co che do chi bit mat cai bao.
+  Goc (suy tu bang chung: nut tron anh van thay + bam duoc, khay thi khong): `khay-thu.js` hien nut / san dien bang
+  `showInactive()` + `moveTop()`, con khay chi `showInactive()` = hien lai dung cho cu trong thu tu tren-duoi. Chot:
+  `hien(khay, true)` (khang dinh lai noi tren cung + `moveTop()`), va DE NGUYEN co che tinh bi che de `an` con noi that.
+  ☠️ CHUA duoc anh xac nhan luc dang dung Premiere; bai do khong tai hien duoc (cua so thuong khong che noi khay, 8/8 lan).
+  Luat rut ra: **so do noi "trang ve du khung" KHONG noi duoc "nguoi dung nhin thay"**. Cua so noi "luc thay luc khong" ->
+  kiem cua so nao nam tai tam no (WindowFromPoint, `theo-doi-khay.ps1` trong so 02/10) TRUOC khi dung toi Chromium; va moi cho
+  `showInactive()` mot cua so noi deu phai di kem `moveTop()`.
 - ☠️ **DOC CHU (phim 5, 29/09):** Windows KHONG co bo doc tieng Viet (bang FOD Microsoft: vi-vn khong co goi OCR) ->
   app tieng Viet dung Tesseract (`src/ocr.js`). tesseract.js 5.1.1 co 3 bay CHI lo trong Electron / ban dong goi:
   langPath -> fetch loi; langs {code,data} -> Init loi; getCore luon nap core DAY DU (khong phai -lstm). Duong dung:
