@@ -998,7 +998,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 .san-khung{position:relative;flex:1;min-height:0;display:flex}
 .san{position:relative;flex:1;min-height:0;margin-top:14px;container-type:size;overflow:hidden;border-radius:14px;background:var(--bg0);box-shadow:inset 0 0 0 1px var(--l1);--u:min(1cqw,1.9cqh)}
 .duoi{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-top:16px}
-.cap{min-width:0}
+.cap{min-width:0;align-self:flex-start}   /* 02/10: .duoi giữ chỗ theo chú thích cao nhất (giuCao) → tên cảnh neo ở TRÊN, không trồi sụt theo số dòng mô tả */
 .cap h3{margin:0;font:800 clamp(21px,2.4vw,32px)/1.12 Inter,sans-serif;letter-spacing:-.025em}
 .cap p{margin:6px 0 0;color:var(--t2);font-size:clamp(14px,1.1vw,16.5px);line-height:1.5;max-width:60ch}
 kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;background:#1f1f1f;box-shadow:inset 0 -2px 0 #000,0 0 0 1px rgb(255 255 255/10%);color:var(--t1);font:700 11.5px/1.7 Inter,sans-serif;text-align:center}
@@ -3444,9 +3444,28 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     let dang = -1, tl = null, hen = null, dungYen = null, fillTw = null, thay = false;
     const tuDong = matchMedia("(prefers-reduced-motion: reduce)");
     function nhanPhimCap(keys) { [...capPhim.children].forEach(k => { if (keys.includes(k.textContent)) { k.classList.add("nhan"); setTimeout(() => k.classList.remove("nhan"), 260); } }); }
+    /* 02/10 anh Tiến: "khi chuyển giữa các phần đang bị giật và khựng lại". Đo trên live 1920×950, 12 lần chuyển: chú thích
+       dưới sân dài 1–3 dòng tuỳ cảnh → sân (flex:1) đổi chiều cao 25–50 px ở 7/12 lần, hình đang đứng trên sân bị nhảy.
+       Giữ chỗ cho chú thích theo cảnh CAO NHẤT → sân cùng một chiều cao ở mọi cảnh. Gọi lại khi đổi ngôn ngữ / đổi cỡ / font về. */
+    const duoi = capTen.closest(".duoi");
+    function giuCao() {
+      duoi.style.minHeight = "";
+      /* Điện thoại (≤ 640 px, chú thích xếp dọc) KHÔNG giữ chỗ: đo 02/10 ở 360×740, giữ theo chú thích dài nhất làm sân lùn
+         từ 421 xuống 317 px (−25%), nhãn cảnh 9 đè khay 4 px. Ở đó sân đổi chiều cao đúng lúc đang mờ (tuSang / khiCuon)
+         nên hình không nhảy. */
+      if (innerWidth <= 640) return;
+      let max = 0;
+      TN.forEach(f => {
+        capTen.textContent = window.ssT("f" + f.k + "t"); capMo.innerHTML = window.ssT("f" + f.k + "p");
+        capPhim.innerHTML = (f.phim || []).map(k => '<span class="kc">' + k + "</span>").join("");
+        max = Math.max(max, duoi.getBoundingClientRect().height);
+      });
+      duoi.style.minHeight = Math.ceil(max) + "px";
+    }
     function chuTinh() {
       goc.querySelectorAll("[data-r]").forEach(e => { e.textContent = L(e.dataset.r); });
       [...ray.children].forEach((b, i) => { b.querySelector(".ten").textContent = L("ngan")[i]; b.title = window.ssT("f" + TN[i].k + "t"); b.setAttribute("aria-label", b.title); });
+      giuCao();   // ghi đè chữ chú thích: nơi gọi phải capNhatCap(dang) lại (ssRapRelang, resize, lúc font về đều làm)
     }
     function capNhatCap(i) {
       if (fillTw) fillTw.kill();
@@ -3458,6 +3477,9 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     function dien(i) {
       clearTimeout(hen); if (tl) tl.kill(); if (fillTw) fillTw.kill();
       gsap.killTweensOf(san.querySelectorAll("*")); san.innerHTML = "";
+      // cảnh mới HIỆN DẦN 0,22 giây (trước: cắt thẳng). Sân đã được làm mờ ở khiCuon / tuSang trước khi tới đây.
+      gsap.killTweensOf(san);
+      if (tuDong.matches) gsap.set(san, { opacity: 1 }); else gsap.fromTo(san, { opacity: 0 }, { opacity: 1, duration: .22, ease: "power1.out" });
       tl = CANH[i]();
       fillTw = gsap.fromTo(ray.children[i].querySelector(".fill"), { scaleX: 0 }, { scaleX: 1, duration: tl.duration(), ease: "none" });
       /* 02/10 anh Tiến: "chạy xong cái số 1 nó tự nhảy qua chạy cái số 2… hiện tại mình không bấm next nó sẽ loop lại cái số 1".
@@ -3467,10 +3489,12 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       // Người bật "giảm chuyển động": cảnh đứng ở khung cuối, KHÔNG tự cuộn, không diễn lại (đo 02/10: gắn onComplete
       // trước tl.progress(1) thì nó bắn ngay → trang tự cuộn mỗi 1,2 giây qua hết các cảnh).
       if (tuDong.matches) { tl.progress(1); fillTw.progress(1); return; }
+      /* 02/10 (lần 2) đo trên live: cảnh xong → đứng hình 0,93 giây → trang cuộn mượt 0,33 giây → chữ chú thích đổi → 0,14
+         giây sau mới cắt sang cảnh mới = 1,25 giây "khựng" rồi nhảy hai nhịp. Nay: nghỉ 0,5 giây → tuSang() làm MỘT nhịp. */
       tl.eventCallback("onComplete", () => { hen = setTimeout(() => {
         if (dang !== i) return;
-        if (i < N - 1 && thay && ganGiua()) toi(i + 1); else dien(i);
-      }, 900); });
+        if (i < N - 1 && thay && ganGiua()) tuSang(i + 1); else dien(i);
+      }, 500); });
       if (!thay) { tl.pause(); fillTw.pause(); }
     }
     const dinhTren = () => host.getBoundingClientRect().top + scrollY;
@@ -3481,12 +3505,24 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       const i = chiSo(); if (i === dang) return;
       dang = i; capNhatCap(i);
       clearTimeout(dungYen); if (tl) tl.pause();
+      // người xem tự cuộn sang cảnh khác: làm mờ cảnh cũ ngay (trước: cảnh cũ đứng hình dưới chú thích của cảnh mới 0,14 giây)
+      if (!tuDong.matches) gsap.to(san, { opacity: 0, duration: .12, ease: "power1.in", overwrite: true });
       dungYen = setTimeout(() => dien(i), 140);      // cuộn nhanh qua nhiều cảnh: chỉ dựng cảnh nơi dừng lại
     }
     let cho = false;
     addEventListener("scroll", () => { if (cho) return; cho = true; requestAnimationFrame(() => { cho = false; khiCuon(); }); }, { passive: true });
-    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => { if (dang >= 0) dien(dang); }, 200); });
+    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => { if (dang >= 0) { giuCao(); capNhatCap(dang); dien(dang); } }, 200); });
     function toi(i) { window.scrollTo({ top: dinhTren() + i * BUOC() + BUOC() * .35, behavior: "smooth" }); }
+    /* Cảnh diễn xong TỰ sang cảnh kế, một nhịp: sân mờ đi 0,18 giây → nhảy vị trí cuộn NGAY (sân ghim nên trên màn không
+       có gì trượt; cuộn mượt 0,33 giây chỉ làm chậm) → đổi chú thích + dựng cảnh mới cùng lúc → dien() cho sân hiện dần. */
+    function tuSang(i) {
+      gsap.to(san, { opacity: 0, duration: .18, ease: "power1.in", overwrite: true, onComplete() {
+        if (dang !== i - 1) return;                 // người xem vừa tự cuộn đi chỗ khác: khiCuon đã lo cảnh đó
+        dang = i; capNhatCap(i); clearTimeout(dungYen);
+        window.scrollTo({ top: dinhTren() + i * BUOC() + BUOC() * .35, behavior: "instant" });
+        dien(i);
+      } });
+    }
     new IntersectionObserver(es => { thay = es[0].isIntersecting; if (!tl) return; if (thay) { tl.resume(); fillTw && fillTw.resume(); } else { tl.pause(); fillTw && fillTw.pause(); } }, { threshold: .3 }).observe(san);
     // bấm phím thật khi rạp đang chiếm giữa màn (Ctrl+Shift+S để dành cho demo đầu trang)
     addEventListener("keydown", e => {
@@ -3501,7 +3537,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     window.ssRapToi = toi;   // 01/10: 4 nút V / 5 / S / R trên thanh công cụ demo đầu trang nhảy tới cảnh tương ứng
     window.ssRap = { dien: i => { dang = i; capNhatCap(i); dien(i); }, tl: () => tl, san };   // chỉ để đo
     chuTinh();
-    document.fonts.ready.then(() => { dang = -1; khiCuon(); });
+    document.fonts.ready.then(() => { giuCao(); dang = -1; khiCuon(); });   // font về thì chữ đổi bề rộng → đo lại chỗ giữ cho chú thích
   }
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", batDau); else batDau();
 })();
