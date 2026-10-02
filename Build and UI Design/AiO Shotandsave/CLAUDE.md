@@ -263,7 +263,8 @@ DUNG go):
   Goc (suy tu bang chung: nut tron anh van thay + bam duoc, khay thi khong): `khay-thu.js` hien nut / san dien bang
   `showInactive()` + `moveTop()`, con khay chi `showInactive()` = hien lai dung cho cu trong thu tu tren-duoi. Chot:
   `hien(khay, true)` (khang dinh lai noi tren cung + `moveTop()`), va DE NGUYEN co che tinh bi che de `an` con noi that.
-  ☠️ CHUA duoc anh xac nhan luc dang dung Premiere; bai do khong tai hien duoc (cua so thuong khong che noi khay, 8/8 lan).
+  13:43 anh xac nhan *"thay roi em"*; run-log luc do: 2/2 lan `an 0` (co che tinh bi che dang BAT), 24-25 khung. Bai do van
+  KHONG tai hien duoc loi (cua so thuong khong che noi khay, 8/8 lan) -> cua so nao cua Premiere che khay: chua biet.
   Luat rut ra: **so do noi "trang ve du khung" KHONG noi duoc "nguoi dung nhin thay"**. Cua so noi "luc thay luc khong" ->
   kiem cua so nao nam tai tam no (WindowFromPoint, `theo-doi-khay.ps1` trong so 02/10) TRUOC khi dung toi Chromium; va moi cho
   `showInactive()` mot cua so noi deu phai di kem `moveTop()`.

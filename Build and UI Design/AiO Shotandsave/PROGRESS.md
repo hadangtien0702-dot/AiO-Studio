@@ -1,7 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 13:30 +0700 (dang lam do, chua /xong)
-> - **02/10 13:30 KHAY BUNG BI KHUAT DUOI PREMIERE: da nap ban sua lan 14, CHUA CO XAC NHAN.** Ban sua 10:44 (dong ngay duoi)
+> - **02/10 13:43 ANH XAC NHAN "thay roi em"** (2/2 lan `an 0`, 24-25 khung) cho ban sua lan 14 duoi day. Da commit tren may,
+>   CHUA push, CHUA dong goi lai (bo cai 0.8.0 trong Release la ban 01/10 19:22, chua co cac ban sua 02/10).
+> - **02/10 13:30 KHAY BUNG BI KHUAT DUOI PREMIERE: da nap ban sua lan 14.** (dong "CHUA CO XAC NHAN" da duoc thay bang dong tren) Ban sua 10:44 (dong ngay duoi)
 >   SAI HUONG: tat co che tinh bi che cua Chromium chi bit mat cai bao, anh van thay khay "bi an o duoi". Nay: `khay-thu.js`
 >   `hien(khay, true)` (dua khay len tren cung luc hien), go cong tac sai trong `main.js`. app.asar md5 `57c17e37`, boot
 >   13:30:49. [CHO ANH] dang dung Premiere thi bam nut tron: phai THAY khay; dong `khay bung` phai `an 0` (co che tinh bi che
@@ -130,7 +132,13 @@
   "TAI TAM KHAY: chinh khay", khay o vi tri 5-7 tu tren xuong, chi co san dien nam tren khay dung luc dien (=> bo theo doi KHONG
   mu, thay duoc khay). Nap 13:30:49 (`boot v0.8.0 ... dang-ky=OK`), app.asar md5 `57c17e37` (ban truoc `e308607d` cat o
   `.selftest/ban-cai-truoc`); truoc / sau 638 anh-video, 9 dai, cau hinh `ef1fccef` giong nhau.
-- **GIOI HAN — CHUA DUOC COI LA XONG:** bai do KHONG tai hien duoc loi (khong co Premiere) nen khong chung minh duoc ban sua chua
+- **13:43 ANH XAC NHAN: *"thay roi em"*.** Run-log that, co che tinh bi che dang BAT (so `an` noi that):
+  `13:43:27 khay bung (bam nut): 959 ms | ... | bung 442 (25 khung, max 33, hen 10, an 0) | tan 261 (14 khung ...)`
+  `13:43:37 khay bung (bam nut): 921 ms | ... | bung 409 (24 khung, max 17, hen 9, an 0) | tan 260 (15 khung ...)`
+  => 2/2 lan khay KHONG bi che, man trap du khung; truoc khi sua (10:31-10:40, co Premiere): `an 1` 5/5 lan, 12-13 khung.
+  Log khong ghi Premiere co dang o truoc khong -> dua vao loi anh. Cua so nao cua Premiere tung che khay: van chua biet.
+  Bo theo doi 13:31-13:40 chi bat duoc 1 lan khay hien (13:38, anh dang o Lark): khay tren cung, 0 cua so de len.
+- **(ghi luc 13:30, truoc khi anh xac nhan)** GIOI HAN — CHUA DUOC COI LA XONG: bai do KHONG tai hien duoc loi (khong co Premiere) nen khong chung minh duoc ban sua chua
   dung benh. Chi co hai thu xac nhan duoc: mat anh luc dang dung Premiere, va dong `khay bung` luc do phai `an 0` (co che tinh bi
   che dang BAT lai). Bo theo doi dang chay ngam 9 phut tu 13:31 de bat lan bung ke tiep.
 - CHUA commit.
