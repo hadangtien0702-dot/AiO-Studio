@@ -5,6 +5,136 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-premiere] - 2026-10-01 23:42 (UTC+7) - Cảnh diễn TRONG cửa sổ Premiere (khung pm-): Auto Cut + Podcast; làm chậm + mượt sân khấu - máy nhà
+
+- **Bối cảnh:** anh xem bản 21:49: *"thiết kế UI thì đẹp nhưng layout từng section lại bị rời rạc"*, *"những con số và câu từ gây khó hiểu…
+  người không phải editor không hiểu"*, rồi chốt hướng: *"em làm animation phải có thêm phần mềm vào để diễn tả… giống như 02 phần ở dưới
+  rất dễ hiểu khi em đưa hoạt họa phần mềm vào"* (2 hình phần Vì sao có cửa sổ Premiere). Sau đó: *"animation quá nhanh người xem không hiểu"*.
+- **Số đo trước khi sửa** (1920x1000, live): hình diễn chỉ phủ 26% ô (Auto Cut), 34% (Organize), 41% (Video Download), 44–58% phần lớn cảnh;
+  mỗi cảnh diễn hết trong 1,3–1,5 giây khi lăn 1 nấc.
+- **Đã làm:**
+  - Khung dùng chung `pm-` (CSS + `pmKhung()` trước `const BUILD`): 3 bước chữ đời thường + cửa sổ "Adobe Premiere Pro" (Project | màn hình |
+    Timeline | panel của tool) chiếm trọn ô; con trỏ bấm nút (`r.bam`), bước (`r.buoc`), chữ EN+VI qua `pmTxt` + `data-i`.
+  - Cảnh 01 Auto Cut (`pmc-`): đầu đọc quét, chỗ im lặng đỏ lên, bị rút đi, timeline ngắn lại, đồng hồ 58:37 → 54:34, panel: 413 chỗ im lặng /
+    ngắn đi 4 phút 03 giây / 0 chữ mất. Hết khối "um/uh" trong cảnh. Cảnh 02 Podcast (`pmp-`): 3 máy quay + 2 mic trên timeline, cắt theo người
+    đang nói, màn hình chuyển theo, "Bản dựng mới" hiện trong Project.
+  - Làm chậm + mượt (`cham.cjs`, theo bộ số agent đo): thẻ trượt .9 sine, `scrub 1`, snap tuyến tính theo `RATE .34`, `syncInterval 40`,
+    `end` theo TOTAL, cảnh pm `step 2.2`, hệ số `CHAM` cho Short Viral 1.7 / Re-Frames 1.4 / Guide Frame 1.5 / Video Download + Power Bins 1.35.
+  - Nút Notify trên thanh menu `min-width:148px` (đổi EN/VI từng đẩy cụm nút 42px).
+- **Kiểm:** Auto Cut và Podcast diễn 6,66 s (trước 1,53 / 1,43 s), Short Viral 5,67 s, Transcripts 3,41 s, chờ thẻ vào 1,5–1,7 s; sân khấu
+  9.180 → 10.151 px. 0 lỗi console; chụp cảnh 1, 2, 4, 12 + VI + điện thoại. Commit `a577947` (Podcast), `19a3f39` (Auto Cut) đã live, md5 khớp git.
+- **Bẫy đo:** Chrome ngầm đột nhiên báo `prefers-reduced-motion: reduce` (Windows tắt hiệu ứng, có thể do đang điều khiển từ xa) → trang hiện
+  lưới thẻ tĩnh, `__rp` không có, phép đo ra rỗng. `chup.mjs` nay ép `no-preference` (GIAM=1 để thử chế độ giảm). `nhay.js`: lần gọi đầu sau
+  khi nạp trang ra sai thời điểm vì tween scrub còn chạy → thêm `gsap.killTweensOf(r.M)`.
+- **[CHO] VIEC DAU TIEN ngay mai — cuộn khó kiểm soát:** sau bản làm chậm (live 23:45) anh báo *"phần scroll ở các section chính đang bị lỗi…
+  scroll rất khó để kiểm soát các animation"*. Chưa đo, chưa sửa (anh đã bảo mai làm tiếp). Nghi: animation buộc vào cuộn (scrub) + trang tự trôi
+  tới hết cảnh, nay trôi 6–8 s nên lăn chuột là mất lái. Đề xuất: tách animation khỏi cuộn (lăn 1 nấc = sang 1 cảnh, cảnh tự diễn theo thời gian
+  rồi lặp, như 3 hình Vì sao). Lùi nhanh nếu anh cần: `git revert 7267808` phần `premiere/index.html` (trả thông số cuộn về `19a3f39`).
+- **[CHO] mai làm tiếp:** 10 cảnh còn lại theo khung pm- (Transcripts, Short Viral, Re-Frames, Guide Frame, Video Download, Asset Manager,
+  Power Bins, Organize, Keynote, Hub), anh chưa trả lời "kiểu này đúng ý chưa" · anh báo "thanh menu lỗi, light dark lỗi" nhưng chụp 4 tổ hợp
+  không thấy vỡ, cần anh chụp màn hình · tiêu đề đầu trang còn diễn cắt "um/uh" (Auto Cut cắt khoảng lặng) · hình "Install once" vẽ một bộ cài
+  chung chưa có thật · icon Short Viral còn là điện thoại dọc · thẻ lưới (bản giảm chuyển động) chưa soát lại câu chữ · chưa đo Safari/iPhone.
+  Công cụ chụp khung hình đã chép vào repo: `Website/Nhap web ShotSave/cong-cu/` (chup.mjs, nhay.js, README). Các mảnh pm.css / pm.js /
+  cut.* / pod.* chỉ là bản nháp ở scratchpad, mã thật đã nằm hết trong `premiere/index.html` (sửa thẳng ở đó, rồi chép đè sang nháp 3).
+
+## [web-premiere] - 2026-10-01 21:49 (UTC+7) - Làm lại 4 cảnh tool + 3 hình "Vì sao" để người không làm dựng hiểu ngay - máy nhà
+
+- **Bối cảnh:** anh duyệt trang /premiere/ từng cảnh: Podcast *"chưa diễn tả được Podcast là gì"*, Short Viral *"khó hiểu"*,
+  Re-Frames *"người diễn tả bị xấu"*, Guide Frame *"vừa xấu vừa khó hiểu"*, 3 hình phần Vì sao *"nhìn vào cũng ko hiểu gì"* /
+  *"cần show ra phần mềm mình đang dùng"*. Rồi: *"xong cái nào push code lên cái đó"*.
+- **Cách làm:** workflow 42 agent: kiểm công dụng thật 4 tool (đọc CLAUDE/PROGRESS/mã từng panel) → mỗi chỗ 2 bản thử dựng
+  trên bản sao trang + chụp Chrome ngầm (máy tính + điện thoại, EN + VI) → 2 giám khảo (người ngoài nghề / độ đẹp + sự thật +
+  điện thoại) → 1 agent ghép bản cuối. Bộ nhân vật chung nv- (2 người, có miệng nói, tư thế cận / ngồi mic / đứng / đi) thay
+  hình tròn + khối hộp. Gộp 7 bản cuối bằng git merge-file, giải 9 chỗ chồng bằng tay (từ điển VI, khối CSS điện thoại, 3 thẻ).
+- **Sửa sai sự thật trên trang (theo kiểm công dụng):** ô số Podcast 588/588 "đúng người" → 411 lần đổi cam podcast 40 phút
+  nghe lại không thấy sai (588 chỉ đếm cấu trúc) · why2p "hai cam" → "hai người" · Guide Frame 59 → 54 vùng, bỏ câu "đo từ màn
+  hình thật từng app", animation không còn tự dời chữ (con trỏ "Bạn" kéo) · Short Viral bỏ điện thoại dọc + chữ trên hình (tool
+  ra sequence ngang) · Re-Frames bỏ "sẵn sàng sau 3,9 giây". CHƯA SỬA: thẻ Podcast "ducks the music" nếu còn; hero + cảnh 1
+  diễn cắt "um/uh" trong khi Auto Cut cắt khoảng lặng (chờ anh trả lời); icon sv vẫn là điện thoại dọc.
+- **Kiểm:** mỗi bản cuối agent tự đo: 0 lỗi console, 0 gạch dài, chữ điện thoại ≥ 10px, 0 phần tử tràn ở 6–8 khổ. Sau khi gộp:
+  chụp 7 cảnh + bản VI + điện thoại trên bản gộp, 0 lỗi console; 1 bộ nhân vật (bỏ 2 bản chép thừa). CHƯA làm: thông số cuộn
+  mới (đo xong, đẩy đợt sau); soát lại 8 cảnh còn lại (bảng soát trong scratchpad audit/).
+
+## [web-shotsave] - 2026-10-01 20:07 (UTC+7) - Web Shot & Save theo app 0.8.0: Quay video, Khay tự thu, cửa sổ Cài đặt mới, thanh công cụ 8 nút - máy công ty
+
+- **Bối cảnh:** anh: *"cập nhật tính năng mới lên website đi em"*, rồi *"chiều nay mình mới làm hiệu ứng thu nhỏ khi không
+  dùng đó"*, *"em cũng chưa cập nhật UI settings mới lên website"*, *"còn gì chưa đưa lên em phải đưa lên website chứ chuẩn bị
+  bán hàng"*. Anh chọn **chỉ đẩy web** (mã app 0.8.0 vẫn là 3 commit trên máy công ty, chưa đóng gói, chưa push).
+- **Rà app so với web (đo trước khi sửa):** web dừng ở 0.7.9 (29/09), 0 chỗ nhắc quay video / Khay video / nút tròn; cửa sổ
+  Cài đặt trên web là bản 5 thẻ dựng 23/09, app đã đổi sang danh sách nhóm từ 0.7.6; thanh công cụ demo có 4 nút, app có 8.
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`, một file):
+  - **Rạp chiếu 11 → 13 cảnh.** Cảnh 12 *Quay video*: khoanh vùng, phím R, viền cam ngoài vùng + đồng hồ đếm giây thật +
+    nút Dừng (chép `src/dem/quay.html`), MP4 bay vào Khay video (chép thẻ `.dai.vd`), phát lại, chọn Không tiếng. Cảnh 13
+    *Khay tự thu*: chuyển động chép `src/dien/dien.js` + `__khayBung` của app (thu về kiểu xấp ảnh, nút đếm 1→5 rồi hiện tấm
+    mới nhất; bấm nút, ống kính lướt tới chỗ khay, màn trập bung + nháy sáng), chạy chậm hơn app 1,6 lần. Phím R nhảy cảnh 12.
+  - **Cửa sổ Cài đặt dựng lại** theo `src/settings` của 0.8.0: thẻ Bản quyền (trạng thái Đã kích hoạt, cập nhật trọn đời), 3
+    nhóm Chụp ảnh / Khay ảnh / Lưu ảnh, 8 hàng, có hàng *Tự thu khay về góc sau 5s / 10s / 15s*. Chữ lấy nguyên `i18n.js`.
+    Phim 5 bước → 6 bước (thêm bước tự thu), danh sách bên trái thêm dòng "Khay tự thu gọn".
+  - **Thanh công cụ demo đầu trang:** thêm V, 5, S, R cho đủ 8 nút như app. Demo chỉ vẽ được 1–4 nên 4 nút mới đưa người
+    xem xuống đúng cảnh của tính năng đó (`window.ssRapToi`). Ẩn trên điện thoại (thanh đã phải xuống 2 hàng).
+  - 2 thẻ dự phòng trong lưới (f12, f13), thẻ giá "Chụp, quay, vẽ, ghim, kéo thả", mô tả trang thêm "or record".
+- **3 lỗi CÓ SẴN lộ ra khi đo, sửa luôn:**
+  - Chữ to trong cảnh đổi câu bị **lệch tâm**: GSAP đổi `translate(-50%,-50%)` ra px theo bề rộng câu ĐẦU, câu sau rộng khác
+    là lệch. Đo: cảnh 9 "Mở lại…" lệch 31 px ở 360; cảnh mới bản EN lệch 138 px. Sửa: `gsap.set(ch, {xPercent:-50, yPercent:-50})`.
+  - Tên "Shot & Save" trên thanh trên **bẻ 2–3 dòng** ở điện thoại 360–390 px (đo trên bản LIVE: logo cao 54–82 px thay vì
+    44). Sửa: `nowrap` + dồn gọn dưới 480 px; dưới 360 px chỉ còn dấu logo.
+  - `aria-label="What you pay"` không đổi theo ngôn ngữ.
+- **Đo (Playwright headless + khung trình duyệt của Claude, máy chủ tĩnh 127.0.0.1:8126):**
+  - Cảnh 9, 12, 13 ở 6 khổ (360, 390, 768, 1024, 1280, 1440) × VI/EN × 12 mốc phim: **144/144** không tràn sân khấu, không
+    khối chữ đè nhau, hàng đầu thẻ video không tràn, chữ to lệch tâm ≤ 2 px. Thước này trước khi sửa đã bắt đúng 3 loại
+    lỗi (thẻ video tràn 31–220 px ở sân hẹp, nhãn đè thẻ 17 px, chữ lệch tâm) → không phải thước mù.
+  - Lăn chuột THẬT qua rạp (nấc 100 px): đi qua đủ **13/13** cảnh sau 92 nấc và ra khỏi rạp được; lăn ngược lùi cảnh;
+    phím R → cảnh 12, phím S → cảnh 11.
+  - Cửa sổ Cài đặt: **440 × 705 px** (app 440 × 700); 0 hàng tràn / đè ở 1280 và 360, VI và EN. Phim chạy thật trong khung
+    trình duyệt đang hiện: đủ 6 bước rồi lặp (ghi phím → PNG làm mờ hàng chất lượng → Mờ mịn → 10s → 5s → thư mục → EN → VI).
+  - Thanh công cụ demo: 8 nút `V 1 2 3 4 5 S R`, rộng 535 px trong khung 960 px; phím 2 vẫn đổi công cụ; bấm R → cảnh 12.
+    Demo tự chạy: 3 ảnh vào khay sau 18 giây (khung trình duyệt đang hiện).
+  - Cả trang: 0 gạch ngang dài trong 2.146 đoạn chữ + thuộc tính (2 ngôn ngữ, gồm shadow DOM); 0 lỗi console; cuộn ngang
+    0 px ở 6 khổ; lưới thẻ dự phòng 13 thẻ không lẻ hàng (3-3-3-2-2).
+- **Bẫy đo trong buổi:** (1) Playwright headless + chụp ảnh liên tục làm đồng hồ GSAP chạy chậm (7,6 giây thật = 0,9 giây
+  phim) → đo cảnh bằng `tl.pause(); tl.time(t)` rồi chụp; (2) demo tự chạy và phim Cài đặt KHÔNG tiến trong headless, kể cả
+  trên bản live (thước mù, không phải trang hỏng) → hai thứ này đo trong khung trình duyệt đang hiện.
+- **CHƯA kiểm / chưa đúng với lời trên web, anh cần biết trước khi bán:**
+  - Web giờ giới thiệu tính năng 0.8.0 trong khi **bộ cài mới nhất là 0.7.9** (chưa có quay video, chưa có khay tự thu).
+    Phải đóng gói 0.8.0 trước khi người mua đầu tiên tải.
+  - Thẻ Quay video ghi "kéo cả hàng thả vào khung chat hay ứng dụng khác": đường kéo có trong mã nhưng **chưa ai thả thử
+    file MP4 vào Zalo / Messenger / Premiere**; Premiere có nhận MP4 phân mảnh hay không vẫn chưa đo (nên web không ghi tên
+    Premiere cho video). "Trên Windows quay được tiếng máy": Mac chưa đo.
+  - Khay tự thu: anh chưa thấy nó chạy trên màn thật lần nào. Anh đổi ý về chuyển động thì cảnh 13 phải làm lại.
+  - Web chưa có nút Tải / chưa nhắc dùng thử 14 ngày (chưa có chỗ để bộ cài công khai).
+  - Safari / iPhone thật chưa đo (máy chỉ có Chromium).
+
+## [web-premiere] - 2026-10-01 19:52 (UTC+7) - Sửa chữ viền lộ đường nối bên trong (dải cam, chữ nền, số thứ tự) - máy nhà
+
+- **Bối cảnh:** anh gửi 2 ảnh dải cam ("Auto Short Viral", "Auto Podcast" có vạch thừa trong chữ A, S, t): *"sửa cho anh
+  cái này"*, rồi ảnh chữ nền "SAFE" ở cảnh Guide Frame: *"lỗi luôn"*.
+- **Nguyên nhân thật:** Inter từ Google Fonts là font biến thiên, mỗi chữ ghép từ nhiều nét CHỒNG nhau. `-webkit-text-stroke`
+  với ruột trong suốt vẽ viền của từng nét, nên lộ cả đường nối bên trong. Không phải lỗi CSS viết sai.
+- **Đo trên bản cũ** (Chrome headless, hệ số 2, chữ 120px, đếm điểm mực nằm trong thân chữ đã co 4 điểm ảnh):
+  dải cam lỗi **12/12 tên** (19.333 điểm) · chữ nền `.bgw` lỗi **9/12** (CUT, 9:16, HUB sạch: chữ không có nét chồng) ·
+  số `.pn-no` lỗi **1/12** (04).
+- **Đã sửa** (`premiere/index.html`, chép y hệt sang `premiere-nhap-3.html`):
+  - Dải cam (nền một màu): ruột chữ tô trùng màu dải (`--mq-nen`), viền 3px, `paint-order:stroke fill` (ruột vẽ SAU viền
+    nên che nửa trong và mọi đường nối, còn 1,5px viền ngoài). Đo: 19.333 → **0**.
+  - Chữ nền + số (nền chuyển màu, không tô ruột trùng nền được): chữ đặc + bộ lọc SVG `#chu-vien` đặt đầu `<body>`
+    (`feMorphology` nới 1,5px rồi `feComposite out` khoét thân chữ). Đo: 9.530 → 56 điểm, 1.013 → 8.
+  - ☠️ **Lần sửa 1 trên trang thật vẫn hỏng:** màu cũ là `color-mix(... 55%, transparent)`. Bộ lọc khoét theo độ đặc
+    của chữ, nên chữ đặc 55% chỉ bị khoét 55%, ruột còn ~25% màu (chữ "SAFE", số "06" hiện thành chữ đặc mờ). Trang thử
+    của em dùng màu trắng đặc nên không thấy. Sửa: màu đặc `var(--c)`, phần trong suốt dồn sang `opacity`
+    (`.bgw` .28 × .55 = **.154**, `.pn-no` .55 × .7 = **.385**). Đo lại bằng màu có độ trong suốt như trang thật:
+    bản lỗi 571.546 điểm, bản sửa **24**.
+- **Kiểm trên trang thật** (máy chủ tĩnh 127.0.0.1:8131, Chrome 152): phóng to chữ trên trang (chỉ để soi, không sửa
+  file) thấy "Auto Podcast" và "SAFE" sạch, ruột trong suốt. **Cuộn 12 cảnh, so cũ/mới xen kẽ 3 lượt mỗi bản:** tổng
+  5.011–5.532 ms vs 5.045–5.516 ms, khung hình khựng (LoAF) **0 và 0**, khung >20 ms 0–2 mỗi lượt ở CẢ HAI bản → bộ
+  lọc không làm cuộn nặng thêm. (Thước rAF bị khoá theo tần số màn hình, không thấy chi phí của bộ dựng hình GPU.)
+- **Bản điện thoại** https://claude.ai/artifact/RKgs9dfNu3U8sjM8z1MVV9 đăng đè (Version 2) bằng `tao-artifact.cjs` từ
+  nháp 3. Bản đang đăng trước đó khớp từng dòng với bản cũ sinh lại (chỉ thêm phần vỏ do Claude bọc ngoài), bản mới
+  khác đúng 12 dòng. Script báo "còn thẻ `<head`" là báo nhầm do khớp vào thẻ `<header`.
+- **Bẫy đo trong buổi:** mở trang bằng `file://` trong khung trình duyệt của Claude thì sân khấu 12 cảnh KHÔNG chạy
+  (đứng ở cảnh đầu, timecode 00:00:00:00) → phải mở qua máy chủ. Chụp Chrome headless cao hơn ~16.384 điểm ảnh bị cắt.
+- **Chưa kiểm:** Safari / Firefox / iPhone (máy chỉ có Chrome, Edge). Nếu trình duyệt không nhận bộ lọc SVG thì chữ
+  nền hiện thành chữ đặc mờ (không vỡ trang); nếu không nhận `paint-order` thì dải cam hiện viền dày 3px chồng lên chữ.
+
 ## [web-premiere] - 2026-10-01 19:31 (UTC+7) - Trang bộ tool Premiere (nháp 3) LÊN LIVE ở aio-shotsave.vercel.app/premiere/
 
 - **Bối cảnh:** anh: *"aio-shotsave.vercel.app/premiere/ đưa thằng này lên http://127.0.0.1:8124/premiere/?v=3 đi em lẹ lên"*.

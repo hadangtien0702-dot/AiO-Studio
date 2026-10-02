@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AiO Shot & Save</title>
-<meta name="description" content="Capture any part of your screen, pin it, mark it up and drag it straight into your app. One payment of $14.99, every future update included.">
+<meta name="description" content="Capture or record any part of your screen, pin it, mark it up and drag it straight into your app. One payment of $14.99, every future update included.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 386 352'%3E%3Cpath fill='%23F86820' d='M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z'/%3E%3Cpath fill='%23F86820' d='M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -85,6 +85,18 @@ header.scrolled{border-bottom-color:var(--line)}
 .theme.is-dark .i-sun{display:block}
 .theme.is-dark .i-moon{display:none}
 .nav .btn{min-height:48px;padding:0 16px;font-size:15px;border-radius:12px}
+/* 01/10: điện thoại 360–390 px tên "Shot & Save" bị bẻ 2–3 dòng (đo trên bản live: logo cao 54–82 px thay vì 44). Dồn gọn để tên nằm một dòng. */
+.logo{white-space:nowrap}
+@media (max-width:480px){
+  .nav{gap:8px}
+  .logo{font-size:15px;gap:7px}
+  .logo svg{width:22px;height:20px}
+  .nav-right{gap:6px}
+  .theme{width:44px;height:44px}
+  .lang button{min-width:40px}
+  .nav .btn{padding:0 12px}
+}
+@media (max-width:359px){.logo{font-size:0;gap:0}}   /* máy dưới 360 px: không đủ chỗ cho tên (đo: tràn 3–31 px) → chỉ còn dấu logo */
 
 /* ===== Hero ===== */
 .hero{position:relative;padding:56px 0 24px;text-align:center;overflow:hidden}
@@ -141,7 +153,8 @@ h1 em{font-style:normal;color:var(--brand)}
 .mau-nhom{display:flex;align-items:center;gap:4px;padding:0 2px}
 .mau{width:14px;height:14px;border-radius:50%;border:0;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgb(255 255 255/25%)}
 .mau[aria-pressed="true"]{box-shadow:0 0 0 2px #161616,0 0 0 3.5px #fff}
-@media (max-width:640px){.mau-nhom .mau:nth-child(n+4){display:none}.cc{width:30px;height:30px}}
+@media (max-width:640px){.mau-nhom .mau:nth-child(n+4){display:none}.cc{width:30px;height:30px}.cc.xem{display:none}}
+@media (pointer:coarse){.cc.xem{display:none}}
 /* Ô gõ chữ */
 .dtext{position:absolute;min-width:60px;padding:3px 7px;border:1px dashed rgb(255 255 255/50%);border-radius:5px;background:rgb(0 0 0/72%);
   font:600 16px/1.3 Inter,sans-serif;outline:none;cursor:text}
@@ -229,8 +242,8 @@ h1,h2,h3{text-wrap:balance}
 .nw{white-space:nowrap}   /* phím + chữ đi kèm không bị tách dòng ("3 | chữ." mồ côi ở 1024px, 22/09) */
 .sec-head p{margin:0;color:var(--ink-2);font-size:var(--fs-sub)}
 .grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}.grid .card:nth-child(9){grid-column:1 / -1}}   /* 29/09: 9 the thuong + 2 the rong -> 2 cot: the thu 9 trai hang, 2 the rong dung canh nhau */
-@media (min-width:1000px){.grid{grid-template-columns:repeat(6,1fr)}.grid .card{grid-column:span 2}.grid .card:nth-child(9){grid-column:span 2}.grid .card.rong{grid-column:span 3}}   /* 29/09: luoi 6 cot con: 3 the/hang, 2 the rong (Lay chu + Storyboard) chung 1 hang, khong le the */
+@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}.grid .card:nth-child(9){grid-column:1 / -1}}   /* 9 the thuong + 4 the rong (01/10: them Quay video, Khay tu thu) -> 2 cot: the thu 9 trai hang, cac the rong dung canh nhau tung doi */
+@media (min-width:1000px){.grid{grid-template-columns:repeat(6,1fr)}.grid .card{grid-column:span 2}.grid .card:nth-child(9){grid-column:span 2}.grid .card.rong{grid-column:span 3}}   /* luoi 6 cot con: 3 the/hang, 4 the rong (Lay chu, Storyboard, Quay video, Khay tu thu) 2 the/hang, khong le the (do 01/10: 3-3-3-2-2) */
 .card{padding:28px;border-radius:var(--radius);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .2s ease,transform .2s ease}
 .card:hover{box-shadow:inset 0 0 0 1px var(--line-strong),var(--shadow)}
 .ico{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--brand-soft);color:var(--brand-ink);margin-bottom:20px}
@@ -601,63 +614,73 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .st-lang{transition:box-shadow .35s ease}
 .st-lang.on{box-shadow:0 0 0 3px rgb(248 104 32/30%)}
 
+/* 01/10: cửa sổ dựng LẠI theo màn Cài đặt mới của app (0.7.6 hướng B anh chọn + 0.7.7 gọn chữ phụ + hàng Tự thu 0.8.0):
+   danh sách NHÓM, tên nhóm nằm ngoài, mỗi hàng một dòng kẻ mảnh, lựa chọn đang bật = xám nổi (cam chỉ còn ở VI/EN + logo).
+   Số đo + màu chép từ src/settings/settings.css (token đã đổi ra số: bg-1 #141414, bg-2 #181818, bg-0 #0e0e0e, bg-3 #1f1f1f,
+   bg-5 #333, line-1 6%, line-2 10%, line-strong 16%, r-sm 6, r-md 8, r-lg 12). Cửa sổ app 440 x 700. */
 .st-win{position:relative;width:min(100%,440px);font-family:Inter,system-ui,sans-serif;color:#f5f5f7;background:#141414;
-  border:1px solid rgb(255 255 255/10%);border-radius:14px;overflow:hidden;box-shadow:0 40px 80px -30px rgb(0 0 0/55%),0 0 0 1px rgb(0 0 0/4%)}
-.st-top{display:flex;align-items:center;gap:6px;height:46px;padding:0 8px 0 12px;border-bottom:1px solid rgb(255 255 255/6%)}
-.st-hieu{display:flex;align-items:center;gap:6px;margin-right:auto}
+  border:1px solid rgb(255 255 255/10%);border-radius:12px;overflow:hidden;box-shadow:0 40px 80px -30px rgb(0 0 0/55%),0 0 0 1px rgb(0 0 0/4%)}
+.st-top{display:flex;align-items:center;gap:6px;height:46px;padding:0 8px 0 16px;border-bottom:1px solid rgb(255 255 255/6%)}
+.st-hieu{display:flex;align-items:center;gap:8px;margin-right:auto}
 .st-hieu svg{color:#f86820}
 .st-hieu b{font-size:13px;font-weight:700;letter-spacing:.2px}
-.st-lang,.st-seg{display:flex;padding:2px;background:#0e0e0e;border:1px solid rgb(255 255 255/10%);border-radius:999px}
+.st-lang{display:flex;padding:2px;background:#0e0e0e;border:1px solid rgb(255 255 255/10%);border-radius:999px}
 .st-lang i{padding:3px 10px;border-radius:999px;font:normal 700 11px/1.4 Inter,sans-serif;color:#8d8d95;transition:background-color .15s,color .15s}
-.st-lang i.on,.st-seg i.on{background:#f86820;color:#fff}
+.st-lang i.on{background:#f86820;color:#fff}
 .st-x{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;color:#8d8d95}
-.st-main{display:flex;flex-direction:column;gap:8px;padding:12px}
-.st-the{background:#181818;border:1px solid rgb(255 255 255/6%);border-radius:12px;padding:12px;transition:border-color .35s ease,box-shadow .35s ease}
-.st-the.on{border-color:rgb(248 104 32/45%);box-shadow:0 0 0 3px rgb(248 104 32/10%)}
-.st-dau{display:flex;align-items:flex-start;gap:8px;margin-bottom:12px}
-.st-chip{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:rgb(248 104 32/16%);color:#ffb891;border:1px solid rgb(248 104 32/40%)}
-.st-chip svg{width:15px;height:15px}
-.st-dau b{display:block;font-size:13.5px;font-weight:700;margin-bottom:2px}
-.st-dau small{display:block;font-size:11.5px;line-height:1.45;color:#8d8d95}
-.st-hang-phim{display:flex;align-items:center;gap:8px}
-.st-keys{display:flex;align-items:center;gap:6px;min-height:40px;flex-wrap:wrap;margin-right:auto;font-size:12.5px;font-weight:600;color:#ffb891}
-.st-keys kbd{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:34px;padding:0 10px;border-radius:8px;
-  background:linear-gradient(180deg,#141414,#0e0e0e);border:1px solid rgb(255 255 255/16%);border-bottom-width:3px;font:700 14px/1 Inter,sans-serif;letter-spacing:.3px;color:#f5f5f7}
-.st-keys .cong{color:#8d8d95;font-weight:600;font-size:12px}
+.st-main{padding:12px 18px 12px 16px}
+.st-nhom-ten{margin:16px 2px 7px;font-size:10.5px;line-height:1.3;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8d8d95}
+.st-nhom{background:#181818;border:1px solid rgb(255 255 255/6%);border-radius:12px;overflow:hidden}
+.st-hang{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:8px 14px;
+  transition:background-color .35s ease,box-shadow .35s ease,opacity .25s ease}
+.st-hang + .st-hang{border-top:1px solid rgb(255 255 255/6%)}
+/* hàng phim đang diễn (chỉ có trên web, app không tô hàng): nền cam rất nhạt + vạch cam mép trái */
+.st-hang.on{background:rgb(248 104 32/7%);box-shadow:inset 2px 0 0 #f86820}
+.st-nhan{min-width:0;font-size:12.5px;line-height:1.3;font-weight:600;color:#f5f5f7}
+.st-phai{display:flex;align-items:center;gap:6px;flex:none}
+/* cụm lựa chọn: ô bằng nhau, đang chọn = xám nổi */
+.st-seg{display:flex;flex:none;padding:2px;background:#0e0e0e;border:1px solid rgb(255 255 255/6%);border-radius:8px}
+.st-seg i{min-width:58px;padding:4px 10px;border-radius:6px;font:normal 600 12px/1.35 Inter,sans-serif;color:#8d8d95;text-align:center;white-space:nowrap;transition:background-color .15s,color .15s}
+.st-seg i.on{background:#333;color:#f5f5f7;box-shadow:0 1px 2px rgb(0 0 0/45%),inset 0 0 0 1px rgb(255 255 255/6%)}
+.st-seg.nho i{min-width:38px}
+#stCL.mo{opacity:.45}
+.st-keys{display:flex;align-items:center;gap:4px;min-height:28px;font-size:12px;font-weight:600;color:#ffb891;white-space:nowrap}
+.st-keys kbd{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;padding:0 7px;border-radius:6px;
+  background:linear-gradient(180deg,#1f1f1f,#0e0e0e);border:1px solid rgb(255 255 255/16%);border-bottom-width:2px;box-shadow:none;font:700 11.5px/1 Inter,sans-serif;letter-spacing:.2px;color:#f5f5f7}
+.st-keys .cong{padding:0 2px;color:#8d8d95;font-weight:600;font-size:11px}
 /* đang ghi phím: viền cam đứt nét nhấp nháy (y như app) */
 .st-keys.ghi{padding:0 8px;border:1.5px dashed #f86820;border-radius:8px;animation:st-nhay 1.1s ease-in-out infinite}
 @keyframes st-nhay{0%,100%{opacity:1}50%{opacity:.45}}
 /* vừa lưu: phím loé XANH một nhịp, không có chữ (anh 31/08) */
 .st-keys.vua-luu kbd{animation:st-luu .9s cubic-bezier(.32,.72,0,1)}
-@keyframes st-luu{0%,45%{border-color:#35c46a;color:#35c46a;box-shadow:0 0 0 3px rgb(53 196 106/22%)}}
-.st-nut{flex:none;display:inline-flex;align-items:center;height:34px;padding:0 12px;border:1px solid rgb(255 255 255/10%);border-radius:999px;
-  background:#141414;color:#f5f5f7;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background-color .15s}
-.st-nut.phu{color:#8d8d95}
-.st-nut.bam,.st-seg i.bam,.st-lang i.bam{background:#333}
-.st-chan{margin-top:8px;min-height:18px}
-.st-lk{font-size:11.5px;color:#8d8d95;text-decoration:underline;text-underline-offset:3px}
-.st-hang{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.st-hang > span:first-child{font-size:12.5px;font-weight:600;color:#c3c3c8}
-.st-seg i{padding:5px 14px;border-radius:999px;font:normal 700 12px/1.4 Inter,sans-serif;color:#8d8d95;transition:background-color .15s,color .15s}
-.st-seg i.on{font-size:13px}
-#stCL{transition:opacity .25s ease}
-#stCL.mo{opacity:.45}
-.st-luuy{margin:2px 0 0;font-size:11.5px;line-height:1.4;color:#8d8d95;opacity:0;max-height:0;transition:opacity .25s ease,max-height .25s ease}
-.st-luuy.hien{opacity:1;max-height:3em}
-.st-tm{display:flex;align-items:center;gap:8px}
+@keyframes st-luu{0%,45%{border-color:#4ec98a;color:#4ec98a;box-shadow:0 0 0 3px rgb(53 196 106/22%)}}
+.st-nut{flex:none;display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 12px;border:1px solid rgb(255 255 255/10%);border-radius:8px;
+  background:#1f1f1f;color:#f5f5f7;font-size:12px;line-height:1;font-weight:600;white-space:nowrap;transition:background-color .15s}
+.st-nut.phu{color:#c3c3c8}
+.st-nut.icon{width:28px;padding:0;color:#8d8d95}
+.st-nut.bam,.st-seg i.bam{background:#282828}
+.st-lang i.bam{background:#333}
+/* thẻ Bản quyền ở đầu: trạng thái ĐÃ KÍCH HOẠT (khách đã mua), đúng chữ bq.* của app */
+.st-bq{padding:14px}
+.st-bq b{display:block;font-size:13px;line-height:1.3;font-weight:700}
+.st-bq b span{font-weight:700}
+.st-goiy{margin:4px 0 0;font-size:11px;line-height:1.4;font-weight:500;color:#8d8d95}
+.st-bq-co{margin-top:12px}
+.st-tm{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.st-tm svg{flex:none;width:16px;height:16px;color:#8d8d95}
 .st-tm-chu{min-width:0;flex:1}
-.st-tm-chu b{display:block;font-size:14px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.st-tm-chu small{display:block;font-size:11px;color:#8d8d95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tm-chu b{display:block;font-size:12.5px;line-height:1.3;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tm-chu small{display:block;margin-top:1px;font-size:11px;line-height:1.3;color:#8d8d95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-win [hidden]{display:none!important}   /* .st-nut{display:inline-flex} đè thuộc tính hidden → nút Huỷ hiện sẵn (đo 23/09) */
-/* Điện thoại: cửa sổ hẹp hơn app thật (338 vs 440px) → phím tắt một hàng riêng, nút xuống dưới; tên thư mục một hàng riêng */
+/* Điện thoại: cửa sổ hẹp hơn app thật (≈338 so với 440 px) → bớt lề, ô lựa chọn hẹp lại, nhãn dài được xuống dòng */
 @media (max-width:520px){
-  .st-hang-phim,.st-tm{flex-wrap:wrap}
-  .st-keys{flex:1 0 100%;flex-wrap:nowrap}
-  .st-tm-chu{flex:1 0 100%}
-  .st-hang:has(#stMoKieu){flex-wrap:wrap}   /* 28/09: "Khảm khối (Mosaic)" dài, 360px bị xuống 2 dòng trong nút */
+  .st-main{padding:10px}
+  .st-hang{gap:8px;padding:8px 10px}
+  .st-seg i{min-width:44px;padding:4px 7px}
+  .st-seg.nho i{min-width:32px}
+  .st-nut{padding:0 9px}
 }
-#stMoKieu i{white-space:nowrap}
-.st-chan-win{display:flex;justify-content:center;padding:0 0 12px;font-size:10.5px;letter-spacing:.3px;color:#8d8d95}
+.st-chan-win{display:flex;justify-content:center;padding:2px 0 10px;font-size:10.5px;letter-spacing:.2px;color:#8d8d95}
 
 /* Thư mục ảnh bật lên khi bấm "Mở thư mục" */
 .st-folder{position:absolute;z-index:3;left:6%;top:14%;width:min(76%,340px);font-family:Inter,system-ui,sans-serif;background:#fff;color:#1b1b1f;
@@ -832,10 +855,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <button type="button" class="try" id="dtry"><span class="dot"></span><span data-i="demoTry">Try it here</span> <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></button>
           <span class="dsize" id="dsize" hidden></span>
           <div class="dtools" id="dtools" role="toolbar" aria-label="Annotate" data-i-aria="aTools" hidden>
+            <!-- 01/10: thanh công cụ app 0.8.0 có 8 nút (V 1 2 3 4 5 S R). Demo này chỉ vẽ được 1–4; bốn nút .xem (V, 5, S, R) đưa người xem
+                 xuống đúng cảnh của tính năng đó trong "Rạp chiếu" (data-xem = số cảnh). Ẩn trên điện thoại vì thanh đã phải xuống 2 hàng. -->
+            <button type="button" class="cc xem" data-xem="4" aria-label="Select and move a mark (V), see it below" data-i-aria="aSelect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7 18 3-7 7-3L3 3z"/></svg><i class="so">V</i></button>
             <button type="button" class="cc" data-tool="box" aria-pressed="true" aria-label="Box (1)" data-i-aria="aBox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg><i class="so">1</i></button>
             <button type="button" class="cc" data-tool="arrow" aria-pressed="false" aria-label="Arrow (2)" data-i-aria="aArrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5M11 5h8v8"/></svg><i class="so">2</i></button>
             <button type="button" class="cc" data-tool="text" aria-pressed="false" aria-label="Text (3)" data-i-aria="aText"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg><i class="so">3</i></button>
             <button type="button" class="cc" data-tool="blur" aria-pressed="false" aria-label="Blur (4)" data-i-aria="aBlur"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="5" height="5" rx="1"/><rect x="9.5" y="4" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="4" width="5" height="5" rx="1"/><rect x="4" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="15" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="4" y="15" width="5" height="5" rx="1"/><rect x="9.5" y="15" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="15" width="5" height="5" rx="1"/></svg><i class="so">4</i></button>
+            <button type="button" class="cc xem" data-xem="9" aria-label="Grab text in the area (5), see it below" data-i-aria="aOcr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8h8M7 12h10M7 16h6"/></svg><i class="so">5</i></button>
+            <button type="button" class="cc xem" data-xem="10" aria-label="Storyboard Strip (S), see it below" data-i-aria="aSb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><i class="so">S</i></button>
+            <button type="button" class="cc xem" data-xem="11" aria-label="Record this area as video (R), see it below" data-i-aria="aRec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg><i class="so">R</i></button>
             <span class="chia"></span>
             <div class="mau-nhom" role="group" aria-label="Color">
               <button type="button" class="mau" data-color="#f86820" style="background:#f86820" aria-label="Orange" aria-pressed="false"></button>
@@ -934,6 +963,19 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f10t">A storyboard in 3 seconds</h3>
           <p data-i-html="f10p">Box a moving area and press <kbd>S</kbd>. Three seconds later you have six numbered shots in one strip, kept in the Storyboard shelf. Remove any shot, then drag the whole strip into any app.</p>
         </article>
+        <!-- 01/10: 2 tinh nang cua app 0.8.0. Quay video: chi hua thu CO trong ma (phim R, bam Dung, tran 5 phut, Khay video,
+             Co tieng / Khong tieng, keo ca hang). Tieng may: chi Windows (Mac chua do). Khay tu thu: 5 giay mac dinh, nut tron
+             hien anh moi nhat + so anh, bam la mo lai dung cho cu. -->
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div>
+          <h3 data-i="f12t">Record any area as video</h3>
+          <p data-i-html="f12p">Box an area and press <kbd>R</kbd>. Recording runs until you hit Stop, up to 5 minutes. The MP4 waits in the Video shelf: pick With sound or No sound, then drag the row into your chat or any other app. On Windows it records your computer's sound too.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="14" height="9" rx="2"/><circle cx="18" cy="17.5" r="3.5"/><path d="m10 15.5 3 2-3 2"/></svg></div>
+          <h3 data-i="f13t">A shelf that tucks itself away</h3>
+          <p data-i="f13p">Leave the shelf alone for 5 seconds and it folds into a small round button in the corner, showing your latest shot and how many are waiting. Click the button and the shelf opens right where it was.</p>
+        </article>
       </div>
     </div>
     <!-- 29/09 NHAP "Rap chieu" (anh: 2 huong A/B "chua du Creative"): 11 canh dien thang len CHU tren san khau, dinh giua man,
@@ -975,7 +1017,9 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .clip.on{color:#fff}
 .goi-y{margin-top:9px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px;line-height:1.5;color:var(--t3)}
 .goi-y kbd{font-size:11px}
-@media (max-width:900px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}
+/* 01/10: 13 clip (trước 11) -> clip hẹp lại: bớt đệm + chữ tên 10.5px; dưới 1180px ẩn tên, chỉ còn số (đo: "Storyboard", "Quay video" bị cắt ở 1280) */
+.clip{gap:4px;padding:0 5px 0 6px}.clip .ten{font-size:10.5px}
+@media (max-width:1180px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}
 @media (max-width:640px){.duoi{flex-direction:column;align-items:flex-start;gap:10px}.goi-y .phim-thu{display:none}.tren .nhan-tren{display:none}}
 @media (hover:none){.goi-y .phim-thu{display:none}}
 /* đồ nghề trên sân khấu — khung chọn / tay nắm / nhãn cỡ / xoè 6 khung chép số đo từ src/overlay/overlay.css của app */
@@ -1061,15 +1105,53 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .dai .k{position:relative;aspect-ratio:16/9;border-radius:4px;overflow:hidden}
 .dai .k .video{inset:0;border-radius:0}
 .dai .k b{position:absolute;left:3px;top:3px;z-index:2;padding:0 4px;border-radius:2px;background:rgb(9 10 13/88%);color:var(--acc);font:800 9px/1.5 Inter,sans-serif}
-@media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after{animation:none}}
+/* 01/10 app 0.8.0 · QUAY VIDEO: đồng hồ chép src/dem/quay.html (#thuoc), thẻ video chép .dai.vd (src/video/video.css + storyboard.css).
+   Vạch nhạc .eq là NỘI DUNG của video giả (máy đang phát tiếng), không phải giao diện app. */
+.video .eq{position:absolute;left:11%;bottom:15%;display:flex;align-items:flex-end;gap:1.6cqh;height:16cqh}
+.video .eq i{width:2.4cqh;height:100%;border-radius:1.2cqh;background:rgb(255 255 255/85%);transform-origin:50% 100%}
+.dhq{position:absolute;z-index:17;height:28px;display:inline-flex;align-items:center;gap:8px;padding:0 3px 0 10px;border-radius:999px;background:rgb(20 20 20/94%);border:1px solid rgb(255 255 255/12%);box-shadow:0 3px 8px rgb(0 0 0/45%);color:#f5f5f7;font:600 12px/1 Inter,sans-serif;white-space:nowrap}
+.dhq .r{flex:none;width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 3px rgb(255 59 48/22%);animation:nhay 1s ease-in-out infinite}
+.dhq .gio{min-width:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.dhq .loa{flex:none;width:13px;height:13px;color:var(--t3)}
+.dhq .chia{flex:none;width:1px;height:14px;background:rgb(255 255 255/14%)}
+.dhq .dung{height:22px;padding:0 10px 0 8px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:rgb(255 255 255/10%);font-weight:700;transition:background .12s}
+.dhq .dung i{width:8px;height:8px;border-radius:2px;background:currentColor}
+.dhq .dung.bam{background:#ff3b30}
+.khay.kvd{background:#141414}
+.kvd.hep .nutk{display:none}   /* thẻ hẹp (điện thoại, màn ~1000 px): hàng đầu không đủ chỗ cho nút Kéo (đo 01/10: tràn 10–28 px) → chỉ giữ cụm Có tiếng / Không tiếng */
+.vthe{margin:8px;padding:10px 12px 12px;border-radius:12px;background:#181818;border:1px solid rgb(255 255 255/6%)}
+.vdau{display:flex;align-items:center;gap:8px;min-width:0}
+.vdau b{font:700 12.5px/1 Inter,sans-serif;white-space:nowrap}
+.vdau .sp{flex:1}
+.vdau .chon{display:flex;flex:none;padding:2px;background:#0e0e0e;border:1px solid rgb(255 255 255/6%);border-radius:8px}
+.vdau .chon i{height:20px;padding:0 9px;border-radius:6px;font:normal 600 11.5px/20px Inter,sans-serif;color:var(--t3);white-space:nowrap;transition:background .15s,color .15s}
+.vdau .chon i.on{background:#333;color:var(--t1);box-shadow:0 1px 2px rgb(0 0 0/45%),inset 0 0 0 1px rgb(255 255 255/6%)}
+.vdau .nutk{flex:none;height:26px;padding:0 11px;display:inline-flex;align-items:center;border:1px solid rgb(255 255 255/10%);border-radius:8px;background:#1f1f1f;color:var(--t1);font:600 11.5px/1 Inter,sans-serif}
+.vmeta{margin:6px 0 9px;font:500 11px/1.3 Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vkhung{position:relative;overflow:hidden;border-radius:6px;box-shadow:0 0 0 1px rgb(255 255 255/10%);background:var(--bg0)}
+.vkhung .phat{position:absolute;left:50%;top:50%;z-index:2;width:44px;height:44px;margin:-22px 0 0 -22px;display:grid;place-items:center;border-radius:50%;background:rgb(10 10 10/62%);color:#fff}
+.vkhung .phat svg{width:20px;height:20px}
+.vkhung .tg{position:absolute;right:6px;bottom:8px;z-index:2;padding:2px 6px;border-radius:4px;background:rgb(10 10 10/74%);color:var(--t1);font:700 11px/1.3 Inter,sans-serif;font-variant-numeric:tabular-nums}
+.vkhung .thanh{position:absolute;left:0;right:0;bottom:0;z-index:2;height:3px;background:rgb(255 255 255/14%)}
+.vkhung .thanh i{display:block;height:100%;background:var(--acc);transform-origin:0 50%;transform:scaleX(0)}
+/* 01/10 app 0.8.0 · KHAY TỰ THU: nút tròn chép src/nut/nut.css (52 px, viền cam, số ảnh), vòng sóng + nháy sáng chép src/dien, src/shelf */
+.ntr{position:absolute;z-index:32;width:52px;height:52px;border-radius:26px;background:radial-gradient(circle at 34% 28%,#34343b,#19191c 62%);box-shadow:0 4px 10px rgb(0 0 0/55%),0 0 0 1.5px rgb(248 104 32/60%),inset 0 1px 0 rgb(255 255 255/12%)}
+.ntr .mat{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;color:var(--acc)}
+.ntr .mat.anh{inset:4px;border-radius:22px;overflow:hidden}
+.ntr .mat.anh .th{flex:none;width:70px;height:44px;aspect-ratio:auto;border-radius:0;box-shadow:none}
+.ntr .so{position:absolute;right:-5px;top:-5px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--acc);color:#fff;font:normal 700 11px/20px Inter,sans-serif;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px rgb(14 14 14/92%)}
+.ntr .so:empty{display:none}
+.song{position:absolute;z-index:31;width:52px;height:52px;border-radius:26px;border:2px solid var(--acc);opacity:0;pointer-events:none}
+.chop{position:absolute;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after,.dhq .r{animation:none}}
 </style>
 <div class="dinh">
-  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / 11</span></div>
+  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / 13</span></div>
   <div class="san-khung le"><div class="san" id="san"></div></div>
   <div class="duoi le"><div class="cap"><h3 id="capTen"></h3><p id="capMo"></p></div><div class="phim-cap" id="capPhim"></div></div>
   <div class="tl le">
     <div class="tl-ray" id="ray"></div>
-    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>V</kbd> <kbd>S</kbd></span></div>
+    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>V</kbd> <kbd>S</kbd> <kbd>R</kbd></span></div>
   </div>
 </div>
     </template>
@@ -1188,6 +1270,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
           <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg></span><div><b data-i="stP1">Your own shortcut</b><small data-i="stP1m">Pick the key combo your hands already know.</small></div><i class="st-tien"></i></li>
           <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 15-4.35-4.35a1 1 0 0 0-1.42 0L8 18"/></svg></span><div><b data-i="stP2">JPEG or PNG</b><small data-i="stP2m">Light files to send fast, or lossless PNG.</small></div><i class="st-tien"></i></li>
           <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 8a4 4 0 0 1 0 8"/></svg></span><div><b data-i="stP5">Your kind of blur</b><small data-i="stP5m">Pixel blocks or a smooth blur to hide private info.</small></div><i class="st-tien"></i></li>
+          <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="14" height="9" rx="2"/><circle cx="18" cy="17.5" r="3.5"/><path d="m10 15.5 3 2-3 2"/></svg></span><div><b data-i="stP6">A shelf that tucks away</b><small data-i="stP6m">It folds into a corner button after 5, 10 or 15 seconds.</small></div><i class="st-tien"></i></li>
           <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><div><b data-i="stP3">Save where you want</b><small data-i="stP3m">Pick the folder, open it in one click.</small></div><i class="st-tien"></i></li>
           <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><div><b data-i="stP4">Vietnamese or English</b><small data-i="stP4m">Switch the language in one click.</small></div><i class="st-tien"></i></li>
         </ol>
@@ -1199,29 +1282,30 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
             <span class="st-lang" id="stLang"><i data-l="vi">VI</i><i data-l="en">EN</i></span>
             <span class="st-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
           </div>
+          <!-- 01/10: theo src/settings/index.html của app 0.8.0: thẻ Bản quyền, rồi 3 nhóm Chụp ảnh / Khay ảnh / Lưu ảnh.
+               data-buoc = bước phim sẽ làm sáng hàng đó (0 phím tắt · 1 định dạng · 2 làm mờ · 3 tự thu · 4 thư mục). -->
           <div class="st-main">
-            <div class="st-the" data-the="0">
-              <div class="st-dau"><span class="st-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M6 14h0M18 14h0M9 14h6"/></svg></span><div><b data-w="phimTieuDe"></b><small data-w="phimGoiY"></small></div></div>
-              <div class="st-hang-phim"><div class="st-keys" id="stKeys"></div><span class="st-nut" id="stDoi" data-w="doiPhim"></span><span class="st-nut phu" id="stHuy" data-w="huy" hidden></span></div>
-              <div class="st-chan"><span class="st-lk" data-w="macDinh"></span></div>
+            <div class="st-nhom st-bq">
+              <b><span data-w="daKichHoat"></span> · ****-7F3A2C</b>
+              <p class="st-goiy" data-w="tronDoi"></p>
+              <div class="st-bq-co"><span class="st-nut phu" data-w="huyMay"></span></div>
             </div>
-            <div class="st-the" data-the="1">
-              <div class="st-dau"><span class="st-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 15-4.35-4.35a1 1 0 0 0-1.42 0L8 18"/></svg></span><div><b data-w="anhTieuDe"></b><small data-w="anhMoTa"></small></div></div>
-              <div class="st-hang"><span data-w="dinhDang"></span><span class="st-seg" id="stLoai"><i data-v="jpeg">JPEG</i><i data-v="png">PNG</i></span></div>
-              <div class="st-hang" id="stCL"><span data-w="chatLuong"></span><span class="st-seg" id="stChat"><i data-v="thap" data-w="thap"></i><i data-v="cao" data-w="cao"></i><i data-v="sieu" data-w="sieu"></i></span></div>
-              <p class="st-luuy" id="stLuuY" data-w="pngLuuY"></p>
+            <div class="st-nhom-ten" data-w="nhomChup"></div>
+            <div class="st-nhom">
+              <div class="st-hang" data-buoc="0"><span class="st-nhan" data-w="phim"></span><span class="st-phai"><span class="st-keys" id="stKeys"></span><span class="st-nut" id="stDoi" data-w="doiPhim"></span><span class="st-nut icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span class="st-nut phu" id="stHuy" data-w="huy" hidden></span></span></div>
+              <div class="st-hang" data-buoc="1"><span class="st-nhan" data-w="dinhDang"></span><span class="st-seg" id="stLoai"><i data-v="jpeg">JPEG</i><i data-v="png">PNG</i></span></div>
+              <div class="st-hang" data-buoc="1" id="stCL"><span class="st-nhan" data-w="chatLuong"></span><span class="st-seg" id="stChat"><i data-v="thap" data-w="thap"></i><i data-v="cao" data-w="cao"></i><i data-v="sieu" data-w="sieu"></i></span></div>
+              <div class="st-hang" data-buoc="2"><span class="st-nhan" data-w="moKieu"></span><span class="st-seg" id="stMoKieu"><i data-v="mosaic" data-w="moMosaic"></i><i data-v="blur" data-w="moBlur"></i></span></div>
             </div>
-            <div class="st-the" data-the="2">
-              <div class="st-dau"><span class="st-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></span><div><b data-w="khayTieuDe"></b><small data-w="khayMoTa"></small></div></div>
-              <div class="st-hang"><span data-w="kieu"></span><span class="st-seg"><i data-w="ngang"></i><i class="on" data-w="doc"></i></span></div>
+            <div class="st-nhom-ten" data-w="nhomKhay"></div>
+            <div class="st-nhom">
+              <div class="st-hang"><span class="st-nhan" data-w="kieu"></span><span class="st-seg"><i class="on" data-w="ngang"></i><i data-w="doc"></i></span></div>
+              <div class="st-hang"><span class="st-nhan" data-w="soAnh"></span><span class="st-seg nho"><i data-w="tat"></i><i class="on">5</i><i>10</i><i>20</i></span></div>
+              <div class="st-hang" data-buoc="3"><span class="st-nhan" data-w="tuThu"></span><span class="st-seg nho" id="stTuThu"><i data-v="5">5s</i><i data-v="10">10s</i><i data-v="15">15s</i></span></div>
             </div>
-            <div class="st-the" data-the="3">
-              <div class="st-dau"><span class="st-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 8a4 4 0 0 1 0 8"/></svg></span><div><b data-w="moTieuDe"></b><small data-w="moMoTa"></small></div></div>
-              <div class="st-hang"><span data-w="moKieu"></span><span class="st-seg" id="stMoKieu"><i data-v="mosaic" data-w="moMosaic"></i><i data-v="blur" data-w="moBlur"></i></span></div>
-            </div>
-            <div class="st-the" data-the="4">
-              <div class="st-dau"><span class="st-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><div><b data-w="tmTieuDe"></b><small data-w="tmMoTa"></small></div></div>
-              <div class="st-tm"><div class="st-tm-chu"><b>shotandsave</b><small>…AppData\Local\shotandsave</small></div><span class="st-nut phu" id="stMo" data-w="mo"></span><span class="st-nut" data-w="doi"></span></div>
+            <div class="st-nhom-ten" data-w="nhomLuu"></div>
+            <div class="st-nhom">
+              <div class="st-hang" data-buoc="4"><span class="st-tm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="st-tm-chu"><b>shotandsave</b><small>…AppData\Local\shotandsave</small></span></span><span class="st-phai"><span class="st-nut" id="stMo" data-w="mo"></span><span class="st-nut" data-w="doi"></span></span></div>
             </div>
           </div>
           <div class="st-chan-win">AiO Shot &amp; Save</div>
@@ -1252,7 +1336,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
         <div class="price">
           <div class="ph">
             <span class="ph-logo"><svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
-            <div class="ph-ten"><h3 class="price-name">Shot &amp; Save</h3><small data-i="priceWhat">Capture, mark up, pin, drag</small></div>
+            <div class="ph-ten"><h3 class="price-name">Shot &amp; Save</h3><small data-i="priceWhat">Capture, record, mark up, pin, drag</small></div>
             <div class="amount"><strong>$14.99</strong></div>
           </div>
 
@@ -1263,7 +1347,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
           </ul>
 
           <!-- Ghi chú tiền: hiện thẳng ra, không giấu trong tooltip -->
-          <div class="bill" aria-label="What you pay">
+          <div class="bill" aria-label="What you pay" data-i-aria="aPay">
             <div class="bill-row"><span><b data-i="b1">Today</b><small data-i="b1s">First charge</small></span><span class="num">$14.99</span></div>
             <div class="bill-row"><span><b data-i="b2">Future updates</b><small data-i="b2s">New features and fixes</small></span><span class="num" data-i="b2n">Free</span></div>
             <p class="bill-note" data-i="bNote">Pay once and every new version is yours. No subscription, nothing to renew.</p>
@@ -1331,6 +1415,8 @@ const T = {
     f11t:"Lấy chữ trong ảnh", f11p:"Khoanh vùng có chữ rồi bấm <kbd>5</kbd>. Các dòng chữ hiện trong một bảng nhỏ, bấm là chép. Không cần mạng, trên Windows đọc được tiếng Việt đủ dấu.",
     f10t:"Dải phân cảnh trong 3 giây", f10p:"Khoanh vùng đang chuyển động rồi bấm <kbd>S</kbd>. 3 giây sau bạn có 6 khung đánh số trong một dải, nằm sẵn trong khay Storyboard. Bỏ bớt khung thừa, rồi kéo cả dải thả vào ứng dụng nào cũng được.",
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
+    f12t:"Quay video vùng màn hình", f12p:"Khoanh vùng rồi bấm <kbd>R</kbd>. App quay tới khi bạn bấm Dừng, tối đa 5 phút. File MP4 nằm sẵn trong Khay video: chọn bản Có tiếng hoặc Không tiếng rồi kéo cả hàng thả vào khung chat hay ứng dụng khác. Trên Windows quay được cả tiếng đang phát trên máy.",
+    f13t:"Khay tự thu gọn", f13p:"Không dùng tới 5 giây, khay tự thu về một nút tròn nhỏ ở góc màn hình, hiện ảnh mới nhất và số ảnh đang có. Bấm nút, khay mở lại đúng chỗ cũ.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
     b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Các bản cập nhật sau", b2s:"Tính năng mới và bản sửa lỗi", b2n:"Miễn phí",
@@ -1354,7 +1440,8 @@ const T = {
 document.querySelectorAll("[data-i]").forEach(el => T.en[el.dataset.i] = el.textContent);
 document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] = el.innerHTML);
 document.querySelectorAll("[data-i-aria]").forEach(el => T.en[el.dataset.iAria] = el.getAttribute("aria-label"));
-Object.assign(T.vi, { demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)", aBlur:"Làm mờ (4)",
+Object.assign(T.vi, { aSelect:"Chọn và di chuyển nét vẽ (V), xem bên dưới", aOcr:"Lấy chữ trong vùng (5), xem bên dưới", aSb:"Dải phân cảnh Storyboard (S), xem bên dưới", aRec:"Quay video vùng này (R), xem bên dưới",
+  demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)", aBlur:"Làm mờ (4)",
   aUndo:"Hoàn tác (Ctrl+Z)", aCancel:"Huỷ (Esc)", aExit:"Thoát (Esc)", aDone:"Xong (Enter)", aClear:"Dọn khay",
   themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
 T.en.themeToLight = "Switch to light mode";
@@ -1365,16 +1452,17 @@ window.ssT = k => (T[lang] && T[lang][k]) || T.en[k] || "";
 
 Object.assign(T.vi, { stTitle:"Cài đặt một lần, dùng lâu dài", stSub:"Mọi tuỳ chọn nằm gọn trong một cửa sổ nhỏ, dễ hiểu, không cần đọc hướng dẫn.",
   stP1:"Phím tắt của bạn", stP1m:"Chọn tổ hợp phím quen tay của bạn.", stP2:"JPEG hoặc PNG", stP2m:"JPEG nhẹ để gửi nhanh, hoặc PNG giữ nguyên chất lượng.",
-  stP3:"Lưu đúng nơi bạn muốn", stP3m:"Chọn thư mục lưu, mở ra chỉ với một cú bấm.", stP4:"Tiếng Việt, tiếng Anh", stP4m:"Chuyển ngôn ngữ chỉ với một cú bấm.", stP5:"Kiểu làm mờ theo ý", stP5m:"Khảm khối hoặc mờ mịn để che thông tin riêng." });
+  stP3:"Lưu đúng nơi bạn muốn", stP3m:"Chọn thư mục lưu, mở ra chỉ với một cú bấm.", stP4:"Tiếng Việt, tiếng Anh", stP4m:"Chuyển ngôn ngữ chỉ với một cú bấm.", stP5:"Kiểu làm mờ theo ý", stP5m:"Khảm khối hoặc mờ mịn để che thông tin riêng.",
+  stP6:"Khay tự thu gọn", stP6m:"Khay thu về nút tròn ở góc sau 5, 10 hoặc 15 giây." });
 Object.assign(T.en, { stTitle:"Set it once, forget it", stSub:"Every option lives in one small window. No nested menus, no manual to read.",
   stP1:"Your own shortcut", stP1m:"Pick the key combo your hands already know.", stP2:"JPEG or PNG", stP2m:"Light files to send fast, or lossless PNG.",
   stP3:"Save where you want", stP3m:"Pick the folder, open it in one click.", stP4:"Vietnamese or English", stP4m:"Switch the language in one click.", stP5:"Your kind of blur", stP5m:"Pixel blocks or a smooth blur to hide private info." });
-Object.assign(T.vi, { priceWhat:"Chụp, vẽ, ghim, kéo thả" });
+Object.assign(T.vi, { priceWhat:"Chụp, quay, vẽ, ghim, kéo thả", aPay:"Số tiền bạn trả" });
 // 29/09 section Storyboard (app 0.7.8). Chữ theo i18n.js của app: "Khay Storyboard", "khung", phím S, quay 3 giây.
 Object.assign(T.vi, { sbTitle:"3 giây, 6 khung hình",
   sbSub:"Khoanh vùng đang chuyển động rồi bấm S. Shot & Save quay 3 giây thành 6 khung có đánh số trong một dải. Mọi dải nằm sẵn trong khay Storyboard, tắt app mở lại vẫn còn.",
   sbS1:"Khoanh vùng, bấm <kbd>S</kbd>", sbS2:"3 giây, 6 khung", sbS3:"Kéo cả dải thả vào Premiere Pro, Zalo hay Messenger" });
-Object.assign(T.en, { priceWhat:"Capture, mark up, pin, drag" });
+Object.assign(T.en, { priceWhat:"Capture, record, mark up, pin, drag" });
 let lang = "en";
 // Chống "chữ mồ côi" (anh 22/09): dính 2 chữ cuối bằng dấu cách không ngắt, để dòng cuối không bao giờ còn trơ 1 chữ.
 // Lớp dự phòng cho trình duyệt chưa hỗ trợ `text-wrap: pretty` (CSS bên trên lo phần chính).
@@ -1659,7 +1747,10 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   function chonTool(t) { tool = t; tools.querySelectorAll("[data-tool]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tool === t))); }
   tools.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
-    if (b.dataset.tool) chonTool(b.dataset.tool);
+    if (b.dataset.xem) {   // V, 5, S, R: demo không làm được ở đây → cuộn xuống cảnh của tính năng đó
+      if (window.ssRapToi) window.ssRapToi(+b.dataset.xem); else document.getElementById("features").scrollIntoView({ behavior: "smooth" });
+    }
+    else if (b.dataset.tool) chonTool(b.dataset.tool);
     else if (b.dataset.color) { color = b.dataset.color; tools.querySelectorAll(".mau").forEach(m => m.setAttribute("aria-pressed", String(m === b))); }
     else if (b.dataset.act === "undo") { shapes.pop(); drawOv(); }
     else if (b.dataset.act === "cancel") huy();
@@ -2521,24 +2612,22 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
 (() => {
   const vis = document.getElementById("stVisual"); if (!vis) return;
   const win = document.getElementById("stWin"), cur = document.getElementById("stCur");
-  const ds = [...document.querySelectorAll("#stDs li")], the = [...win.querySelectorAll(".st-the")];
+  const ds = [...document.querySelectorAll("#stDs li")], hang = [...win.querySelectorAll(".st-hang")];
   const keysEl = document.getElementById("stKeys"), nutDoi = document.getElementById("stDoi"), nutHuy = document.getElementById("stHuy");
-  const loai = document.getElementById("stLoai"), chat = document.getElementById("stChat"), cl = document.getElementById("stCL"), luuy = document.getElementById("stLuuY");
-  const moKieu = document.getElementById("stMoKieu"), nutMo = document.getElementById("stMo"), langEl = document.getElementById("stLang"), folder = document.getElementById("stFolder");
-  // Chữ trong cửa sổ = chữ app thật (src/i18n.js set.*), bỏ gạch ngang dài theo luật web
+  const loai = document.getElementById("stLoai"), chat = document.getElementById("stChat"), cl = document.getElementById("stCL");
+  const moKieu = document.getElementById("stMoKieu"), tuThu = document.getElementById("stTuThu"), nutMo = document.getElementById("stMo"), langEl = document.getElementById("stLang"), folder = document.getElementById("stFolder");
+  // Chữ trong cửa sổ = chữ app thật (src/i18n.js set.* + bq.*), bản 0.8.0 (01/10)
   const ST_W = {
-    vi: { tieuDe: "Cài đặt", phimTieuDe: "Phím tắt chụp", phimGoiY: "Bấm ở bất kỳ đâu để chụp nhanh", doiPhim: "Đổi phím…", huy: "Huỷ", macDinh: "Về mặc định",
-      nhanToHop: "Nhấn tổ hợp mới…", anhTieuDe: "Ảnh chụp", anhMoTa: "Định dạng và chất lượng file lưu.", dinhDang: "Định dạng", chatLuong: "Chất lượng",
-      thap: "Thấp", cao: "Cao", sieu: "Siêu nét", pngLuuY: "PNG luôn nguyên gốc 100%, không cần chọn chất lượng.", khayTieuDe: "Khay ảnh",
-      khayMoTa: "Cách xếp ảnh trong khay.", kieu: "Kiểu khay", ngang: "Ngang", doc: "Dọc", tmTieuDe: "Thư mục lưu ảnh", tmMoTa: "Nơi mọi ảnh chụp được lưu.",
-      mo: "Mở thư mục", doi: "Đổi thư mục…", moTieuDe: "Hiệu ứng làm mờ", moMoTa: "Kiểu che thông tin nhạy cảm cho công cụ Làm mờ (phím 4 / B).",
-      moKieu: "Kiểu làm mờ", moMosaic: "Khảm khối (Mosaic)", moBlur: "Mờ mịn (Blur)" },
-    en: { tieuDe: "Settings", phimTieuDe: "Capture shortcut", phimGoiY: "Press anywhere to capture instantly", doiPhim: "Change key…", huy: "Cancel", macDinh: "Reset",
-      nhanToHop: "Press new combo…", anhTieuDe: "Image", anhMoTa: "Saved file format and quality.", dinhDang: "Format", chatLuong: "Quality",
-      thap: "Low", cao: "High", sieu: "Ultra", pngLuuY: "PNG is always lossless, no quality needed.", khayTieuDe: "Shelf",
-      khayMoTa: "How shots are arranged in the shelf.", kieu: "Layout", ngang: "Horizontal", doc: "Vertical", tmTieuDe: "Save folder", tmMoTa: "Where every screenshot is saved.",
-      mo: "Open folder", doi: "Change folder…", moTieuDe: "Blur & Obfuscate", moMoTa: "Obfuscation style for the Blur tool (key 4 / B).",
-      moKieu: "Blur style", moMosaic: "Mosaic (Pixelate)", moBlur: "Smooth Blur" },
+    vi: { tieuDe: "Cài đặt", daKichHoat: "Đã kích hoạt", tronDoi: "Nhận mọi bản cập nhật, trọn đời.", huyMay: "Huỷ kích hoạt trên máy này",
+      nhomChup: "Chụp ảnh", nhomKhay: "Khay ảnh", nhomLuu: "Lưu ảnh", phim: "Phím tắt", doiPhim: "Đổi", huy: "Huỷ", nhanToHop: "Nhấn tổ hợp mới…",
+      dinhDang: "Định dạng", chatLuong: "Chất lượng JPEG", thap: "Chuẩn", cao: "Cao", sieu: "Tối đa",
+      moKieu: "Kiểu làm mờ", moMosaic: "Khảm ô", moBlur: "Mờ mịn", kieu: "Hướng khay", ngang: "Ngang", doc: "Dọc",
+      soAnh: "Mở lại ảnh gần nhất", tat: "Tắt", tuThu: "Tự thu khay về góc sau", mo: "Mở", doi: "Đổi…" },
+    en: { tieuDe: "Settings", daKichHoat: "Activated", tronDoi: "Lifetime updates included.", huyMay: "Deactivate on this computer",
+      nhomChup: "Capture", nhomKhay: "Shelf", nhomLuu: "Saving", phim: "Shortcut", doiPhim: "Change", huy: "Cancel", nhanToHop: "Press new combo…",
+      dinhDang: "Format", chatLuong: "JPEG quality", thap: "Standard", cao: "High", sieu: "Max",
+      moKieu: "Blur style", moMosaic: "Mosaic", moBlur: "Smooth", kieu: "Layout", ngang: "Horizontal", doc: "Vertical",
+      soAnh: "Reopen recent shots", tat: "Off", tuThu: "Collapse shelf to corner after", mo: "Open", doi: "Change…" },
   };
   const langTrang = () => document.documentElement.lang === "vi" ? "vi" : "en";
   let wl = langTrang(), dangChay = false;
@@ -2551,8 +2640,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const PHIM = [["Ctrl", "Shift", "S"], ["Alt", "S"]]; let phimI = 0;
   const veKeys = ks => { keysEl.innerHTML = ks.map(k => `<kbd>${k}</kbd>`).join('<span class="cong">+</span>'); };
   const chonSeg = (box, v) => box.querySelectorAll("i").forEach(i => i.classList.toggle("on", i.dataset.v === v));
-  const datLoai = v => { chonSeg(loai, v); cl.classList.toggle("mo", v === "png"); luuy.classList.toggle("hien", v === "png"); };
-  veChu(wl); veKeys(PHIM[0]); datLoai("jpeg"); chonSeg(chat, "cao"); chonSeg(moKieu, "mosaic");
+  const datLoai = v => { chonSeg(loai, v); cl.classList.toggle("mo", v === "png"); };
+  veChu(wl); veKeys(PHIM[0]); datLoai("jpeg"); chonSeg(chat, "cao"); chonSeg(moKieu, "mosaic"); chonSeg(tuThu, "5");
   window.ssStRelang = () => { if (!dangChay || !keysEl.classList.contains("ghi")) veChu(langTrang()); };
 
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) { cur.style.display = "none"; return; }
@@ -2584,12 +2673,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const nay = (el, tu = .88) => gsap.fromTo(el, { scale: tu }, { scale: 1, duration: .5, ease: "back.out(3)", clearProps: "transform" });
     async function bam(el) { cur.classList.add("bam"); el.classList.add("bam"); vongSong(cx + 2, cy + 2); await cho(150); cur.classList.remove("bam"); el.classList.remove("bam"); }
     // bước i: sáng dòng i bên trái + thẻ tương ứng trong cửa sổ, vạch tiến độ chạy đúng ms
-    const THE_CUA = [0, 1, 3, 4, -1];                             // 28/09: them the Lam mo (app 0.6.6)                                  // dòng 4 (ngôn ngữ) = nút VI/EN trên thanh tiêu đề
+    // bước i: sáng dòng i bên trái + (các) hàng có data-buoc = i trong cửa sổ, vạch tiến độ chạy đúng ms.
+    // Bước cuối (ngôn ngữ) không có hàng: sáng nút VI/EN trên thanh tiêu đề.
+    const BUOC_LANG = 5;
     function buoc(i, ms, viec) {
       ds.forEach((li, k) => li.classList.toggle("on", k === i));
-      the.forEach((t, k) => t.classList.toggle("on", k === THE_CUA[i]));
-      if (the[THE_CUA[i]]) gsap.fromTo(the[THE_CUA[i]], { scale: .98 }, { scale: 1, duration: .6, ease: "elastic.out(1,.5)", clearProps: "transform" });
-      langEl.classList.toggle("on", THE_CUA[i] === -1);
+      hang.forEach(h => h.classList.toggle("on", h.dataset.buoc === String(i)));
+      langEl.classList.toggle("on", i === BUOC_LANG);
       const vach = ds[i].querySelector(".st-tien");
       return Promise.all([giu(gsap.fromTo(vach, { scaleX: 0 }, { scaleX: 1, duration: ms / 1000, ease: "none" })), viec()]);
     }
@@ -2615,7 +2705,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           nutDoi.hidden = false; nutHuy.hidden = true;
           void keysEl.offsetWidth; keysEl.classList.add("vua-luu");
         });
-        await buoc(1, 5200, async () => {                            // PNG làm mờ hàng Chất lượng; về JPEG chọn Siêu nét
+        await buoc(1, 5200, async () => {                            // PNG làm mờ hàng Chất lượng JPEG; về JPEG chọn Tối đa
           const png = loai.querySelector('[data-v="png"]'), jpg = loai.querySelector('[data-v="jpeg"]');
           await di(png); await bam(png); datLoai("png"); nay(png);
           await cho(nhip(1300));
@@ -2625,13 +2715,19 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           const dich = chat.querySelector(".on") === sieu ? cao : sieu;
           await di(dich, 300); await bam(dich); chonSeg(chat, dich.dataset.v); nay(dich);
         });
-        await buoc(2, 3600, async () => {                            // 28/09: kiểu làm mờ, Mờ mịn rồi trả về Khảm khối (mặc định app)
+        await buoc(2, 3600, async () => {                            // kiểu làm mờ: Mờ mịn rồi trả về Khảm ô (mặc định app)
           const mm = moKieu.querySelector('[data-v="blur"]'), kk = moKieu.querySelector('[data-v="mosaic"]');
           await di(mm); await bam(mm); chonSeg(moKieu, "blur"); nay(mm);
           await cho(nhip(1300));
           await di(kk, 300); await bam(kk); chonSeg(moKieu, "mosaic"); nay(kk);
         });
-        await buoc(3, 4200, async () => {                            // Mở thư mục → thư mục ảnh vừa chụp bật lên
+        await buoc(3, 3600, async () => {                            // 01/10 (app 0.8.0): tự thu khay về góc sau 10s rồi trả về 5s (mặc định app)
+          const m10 = tuThu.querySelector('[data-v="10"]'), m5 = tuThu.querySelector('[data-v="5"]');
+          await di(m10); await bam(m10); chonSeg(tuThu, "10"); nay(m10);
+          await cho(nhip(1300));
+          await di(m5, 300); await bam(m5); chonSeg(tuThu, "5"); nay(m5);
+        });
+        await buoc(4, 4200, async () => {                            // Mở → thư mục ảnh vừa chụp bật lên
           await di(nutMo); await bam(nutMo);
           const hinh = folder.querySelectorAll("figure");
           gsap.fromTo(hinh, { opacity: 0, y: 14, scale: .7 }, { opacity: 1, y: 0, scale: 1, duration: .45, ease: "back.out(2.2)", stagger: .09, delay: .12, clearProps: "opacity,transform" });
@@ -2639,14 +2735,14 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           await cho(nhip(1700));
           await giu(gsap.to(folder, { autoAlpha: 0, y: 10, duration: .2, ease: "power1.in" }));
         });
-        await buoc(4, 3800, async () => {                            // đổi ngôn ngữ cửa sổ rồi trả về ngôn ngữ của trang
+        await buoc(5, 3800, async () => {                            // đổi ngôn ngữ cửa sổ rồi trả về ngôn ngữ của trang
           const khac = wl === "vi" ? "en" : "vi";
           const n1 = langEl.querySelector(`[data-l="${khac}"]`); await di(n1); await bam(n1); nay(n1); await doiNgonNgu(khac);
           await cho(nhip(1400));
           const n2 = langEl.querySelector(`[data-l="${langTrang()}"]`); await di(n2, 260); await bam(n2); nay(n2); await doiNgonNgu(langTrang());
         });
         dangChay = false;
-        ds.forEach(li => li.classList.remove("on")); the.forEach(t => t.classList.remove("on")); langEl.classList.remove("on");
+        ds.forEach(li => li.classList.remove("on")); hang.forEach(h => h.classList.remove("on")); langEl.classList.remove("on");
         const W = vis.getBoundingClientRect(); await toi(W.width * .9, W.height * .96, 700, "power2.inOut");
         await cho(900);
       }
@@ -2883,10 +2979,18 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       ocr: "Text in selection", dong: "1 line", chep: "Copy", daChep: "Copied", giay: "sec", daiNh: "Saved as one strip in the Storyboard shelf",
       ngan: ["Capture", "2 screens", "Markup", "Blur", "Adjust", "Shelf", "Pin", "Drag", "Memory", "Copy text", "Storyboard"] },
   };
+  // 01/10 (app 0.8.0): thêm 2 cảnh Quay video (phím R) + Khay tự thu về nút tròn -> 13 cảnh. Chữ nút lấy đúng src/i18n.js (quay.dung, vd.*).
+  Object.assign(RT.vi, { tren: "Shot & Save · 13 tính năng", dung: "Dừng", khayVideo: "Khay video", vdTen: "Video 01", coTieng: "Có tiếng", khongTieng: "Không tiếng", keo: "Kéo",
+    quayNh: "MP4 nằm sẵn trong Khay video", nghi1: "Không dùng tới?", nghi2: "Khay <em>tự thu gọn.</em>", nghi3: "Bấm là <em>mở lại.</em>",
+    thuNh: "Tự thu sau 5, 10 hoặc 15 giây, chọn trong Cài đặt" });
+  Object.assign(RT.en, { tren: "Shot & Save · 13 features", dung: "Stop", khayVideo: "Video shelf", vdTen: "Video 01", coTieng: "With sound", khongTieng: "No sound", keo: "Drag",
+    quayNh: "The MP4 waits in the Video shelf", nghi1: "Not using it?", nghi2: "The shelf <em>tucks away.</em>", nghi3: "One click, <em>it's back.</em>",
+    thuNh: "Collapses after 5, 10 or 15 seconds. Pick one in Settings" });
+  RT.vi.ngan.push("Quay video", "Tự thu"); RT.en.ngan.push("Record", "Tuck away");
   const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = k => RT[LG()][k];
   // canh i -> khoa chu cua the (f?t/f?p) + phim
   const TN = [{ k: 1, phim: ["Ctrl", "Shift", "S"] }, { k: 5 }, { k: 4, phim: ["1", "2", "3"] }, { k: 7, phim: ["4"] }, { k: 8, phim: ["V"] },
-    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }];
+    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }, { k: 12, phim: ["R"] }, { k: 13 }];
 
   function batDau() {
     if (!window.gsap) return;                       // CDN hong -> giu luoi the
@@ -2957,6 +3061,15 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       o.className = "mosaic"; o.style.cssText = `left:${r.x - pad}px;top:${r.y - pad}px;width:${w}px;height:${h}px;clip-path:inset(0 100% 0 0)`;
       san.append(o); return o;
     }
+
+    // 01/10 (app 0.8.0) đồ nghề cho 2 cảnh mới: icon chép từ src/ của app (overlay nút Quay, dem/quay.html, nut/index.html, dien/dien.js)
+    const VID_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>';
+    const LOA = '<svg class="loa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+    const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
+    const LOGO = '<svg viewBox="0 0 385.89 351.31" width="21" height="19"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>';
+    const ONG = '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m14.31 8 5.74 9.94"/><path d="M9.69 8h11.48"/><path d="m7.38 12 5.74-9.94"/><path d="M9.69 16 3.95 6.06"/><path d="M14.31 16H2.83"/><path d="m16.62 12-5.74 9.94"/></svg>';
+    const eIO = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);          // đường bay của app (dien.js)
+    const eLo = t => 1 - Math.exp(-6.5 * t) * Math.cos(9.5 * t);                            // lò xo của app: vượt ~6% rồi về
 
     const CANH = [
       // 0. Chụp tức thì: chụp CHÍNH tiêu đề section
@@ -3137,6 +3250,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       () => {
         const tl = gsap.timeline(), w = W(), h = H();
         const ch = el(san, "chu", "font-size:calc(var(--u)*7.5);top:26%", "");
+        // 01/10: GSAP đổi translate(-50%,-50%) của .chu ra px theo bề rộng câu ĐẦU → câu sau rộng khác là lệch tâm (đo: "Mở lại…" lệch 31 px ở 360). Khai % cho GSAP giữ.
+        gsap.set(ch, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
         const K = khay(w * .1, h * .52, w * .8, Math.max(80, h * .3)), ths = L("tu").map((t, i) => themTh(K, i + 1, t)); K.dem();
         const doi = (t, at) => tl.add(() => { ch.innerHTML = t; gsap.fromTo(ch, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .35 }); }, at);
         doi(L("tat"), .2);
@@ -3215,6 +3330,106 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         nhan(tl, L("daiNh"), 5.9);
         return tl.to({}, { duration: 1.6 }, 6);
       },
+      // 11. Quay video (app 0.8.0): khoanh vùng -> R -> viền cam NGOÀI vùng + đồng hồ đếm lên + nút Dừng -> MP4 vào Khay video
+      //     -> phát lại -> chọn bản Không tiếng. Đồng hồ đếm đúng giây thật (quay 3 giây).
+      () => {
+        // doc = sân khấu hẹp (điện thoại): video chiếm cả sân, bấm Dừng xong video nguồn tắt hẳn, Khay video hiện đúng chỗ đó
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < 880 || w < h * .9;   // đo 01/10: sân 691 px mà xếp ngang thì hàng đầu thẻ tràn 31 px
+        const vw = doc ? w * .92 : w * .54, vh = doc ? Math.min(h * .6, vw * .62) : Math.min(h * .66, vw * .6), vx = w * .04, vy = doc ? h * .04 : (h - vh) / 2 - h * .05;
+        const canh = (p, css) => {
+          const v = video(p, css, 0), mt = v.querySelector(".mt"), chu = el(v, "vw", "left:0%", "TAKE 2"), eq = el(v, "eq", null, "<i></i>".repeat(5));
+          v.ve = t => { mt.style.left = (12 + t * 70) + "%"; chu.style.left = (26 + t * 48) + "%"; };
+          v.nhac = (t, g) => [...eq.children].forEach((b, i) => { b.style.transform = "scaleY(" + (.14 + g * .86 * Math.abs(Math.sin(t * 9 + i * 1.7))).toFixed(3) + ")"; });
+          v.ve(0); v.nhac(0, 1); return v;
+        };
+        const vd = canh(san, `left:${vx}px;top:${vy}px;width:${vw}px;height:${vh}px`);
+        const o = { t: 0 }; tl.to(o, { t: 1, duration: 4.6, ease: "none", onUpdate() { vd.ve(o.t); vd.nhac(o.t * 4.6, 1); } }, 0);
+        const pad = vw * .06, x0 = vx + pad, y0 = vy + pad * .7, sw = vw - pad * 2, sh = vh - pad * 1.4;
+        const c = conTro(x0 - 30, y0 - 30), p = phim(["R"]), s = sel(x0, y0);
+        di(tl, c, x0, y0, .4, .1); tl.to(s, { opacity: 1, duration: .12 }, .5); keoSel(tl, s, c, sw, sh, .6, .55);
+        hienPhim(tl, p, 1.15);
+        const vqs = [[x0 - 4, y0 - 4, sw + 8, 2], [x0 - 4, y0 + sh + 2, sw + 8, 2], [x0 - 4, y0 - 4, 2, sh + 8], [x0 + sw + 2, y0 - 4, 2, sh + 8]]
+          .map(([l, t, ww, hh]) => el(san, "vq", `left:${l}px;top:${t}px;width:${ww}px;height:${hh}px;opacity:0`));
+        const dh = el(san, "dhq", `left:${x0}px;top:${y0 + sh + 10}px;opacity:0`, '<span class="r"></span><b class="gio">0:00</b>' + LOA + '<span class="chia"></span><span class="dung"><i></i>' + L("dung") + "</span>");
+        const gio = dh.querySelector(".gio"), nutDung = dh.querySelector(".dung"), nd = R(nutDung);
+        tl.set(s, { opacity: 0 }, 1.45).set(vqs, { opacity: 1 }, 1.45).set(dh, { opacity: 1 }, 1.45);
+        [1, 2, 3].forEach(k => tl.add(() => { gio.textContent = "0:0" + k; }, 1.45 + k));
+        di(tl, c, nd.x + nd.w / 2, nd.y + nd.h / 2, .5, 3.95); bam(tl, c, 4.5); tl.add(() => nutDung.classList.add("bam"), 4.5);
+        tl.to([...vqs, dh], { opacity: 0, duration: .2 }, 4.62).to(vd, { opacity: doc ? 0 : .3, duration: .3 }, 4.62);
+        // Khay video: thẻ [Video 01 · Có tiếng | Không tiếng · Kéo] + dòng thông tin + khung phát (đúng tỉ lệ vùng vừa quay)
+        const THEM = 104, kx = doc ? w * .04 : vx + vw + w * .04, kw = doc ? w * .92 : w - kx - w * .04, kyDoc = h * .04;
+        let fw = kw - 42, fh = fw * sh / sw;
+        if (doc) { const toiDa = h - kyDoc - THEM - 46; if (fh > toiDa) { fh = Math.max(40, toiDa); fw = fh * sw / sh; } }
+        const ky = doc ? kyDoc : Math.max(h * .03, (h - fh - THEM) / 2 - h * .03);
+        const meta = "10:24 · 01/10 · " + Math.round(sw * 1.5) + "×" + Math.round(sh * 1.5) + " · " + (LG() === "vi" ? "1,2 MB" : "1.2 MB");
+        const K = el(san, "khay kvd" + (kw - 42 < 285 ? " hep" : ""), `left:${kx}px;top:${ky}px;width:${kw}px;opacity:0`,
+          '<div class="kb">' + VID_IC + "<span>" + L("khayVideo") + '</span><span class="sl">1</span></div><div class="vthe"><div class="vdau"><b>' + L("vdTen") +
+          '</b><span class="sp"></span><span class="chon"><i class="on">' + L("coTieng") + "</i><i>" + L("khongTieng") + '</i></span><span class="nutk">' + L("keo") + "</span></div>" +
+          '<div class="vmeta">' + meta + '</div><div class="vkhung" style="width:' + fw.toFixed(1) + "px;height:" + fh.toFixed(1) + 'px"></div></div>');
+        const cat = `left:${((vx - x0) / sw * 100).toFixed(3)}%;top:${((vy - y0) / sh * 100).toFixed(3)}%;width:${(vw / sw * 100).toFixed(3)}%;height:${(vh / sh * 100).toFixed(3)}%;border-radius:0`;
+        const a = el(san, "anh", `left:${x0}px;top:${y0}px;width:${sw}px;height:${sh}px;opacity:0`); canh(a, cat).ve(1);
+        const khung = K.querySelector(".vkhung"), kq = canh(khung, cat); kq.ve(1);
+        const phat = el(khung, "phat", null, PLAY), tg = el(khung, "tg", null, "0:03"), thanh = el(khung, "thanh", null, "<i></i>");
+        gsap.set([kq, phat, tg, thanh], { opacity: 0 });
+        tl.set(a, { opacity: 1 }, 4.62).to(K, { opacity: 1, duration: .3 }, 4.7);
+        bayVao(tl, a, khung, 4.85, .7);
+        tl.set([kq, phat, tg, thanh], { opacity: 1 }, 5.55).set(a, { opacity: 0 }, 5.57);
+        const o2 = { t: 0, g: 1 };
+        tl.to(phat, { opacity: 0, duration: .15 }, 5.85);
+        tl.to(o2, { t: 1, duration: 2.6, ease: "none", onUpdate() { kq.ve(o2.t); kq.nhac(o2.t * 2.6 + 1, o2.g); thanh.firstChild.style.transform = "scaleX(" + o2.t.toFixed(4) + ")"; } }, 5.85);
+        const chon = K.querySelector(".chon"), kt = chon.children[1], kr = R(kt);
+        di(tl, c, kr.x + kr.w / 2, kr.y + kr.h / 2, .55, 6.25); bam(tl, c, 6.85);
+        tl.add(() => { chon.children[0].classList.remove("on"); kt.classList.add("on"); }, 6.9).to(o2, { g: 0, duration: .3 }, 6.9);
+        nhan(tl, L("quayNh"), 7.35, doc ? "top:auto;bottom:1.5%" : "");
+        return tl.to({}, { duration: 1.7 }, 7.5);
+      },
+      // 12. Khay tự thu về nút tròn (app 0.8.0). Chuyển động CHÉP từ src/dien/dien.js + src/shelf/shelf.js (__khayBung):
+      //     THU VỀ kiểu "xấp ảnh" (tấm cũ nhất bay trước, nút đếm lên, xong hiện tấm mới nhất) · MỞ RA kiểu "ống kính"
+      //     (ống kính lướt tới chỗ khay, màn trập bung từ tâm + một nháy sáng). Chạy chậm hơn app 1,6 lần cho người xem kịp thấy.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), ms = v => v / 1000 * 1.6;
+        const ch = el(san, "chu", "font-size:calc(var(--u)*7.2);top:21%", ""); gsap.set(ch, { xPercent: -50, yPercent: -50, x: 0, y: 0 });
+        const doi = (t, at) => tl.add(() => { ch.innerHTML = t; gsap.fromTo(ch, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .35 }); }, at);
+        const tu = L("tu"), kx = w * .1, ky = h * .42, kw = w * .8, kh = Math.max(80, h * .28);
+        const K = khay(kx, ky, kw, kh), ths = tu.map((t, i) => themTh(K, i + 1, t)), chop = el(K, "chop"); K.dem();
+        const D = 52, gx = w - 20 - D, gy = h - 20 - D, tam = { x: gx + D / 2, y: gy + D / 2 };
+        const song = el(san, "song", `left:${gx}px;top:${gy}px`);
+        const nut = el(san, "ntr", `left:${gx}px;top:${gy}px`, '<span class="mat logo">' + LOGO + '</span><span class="mat ong">' + ONG + '</span><span class="mat anh"><span class="th"><span class="tc">' + tu[tu.length - 1] + '</span></span></span><i class="so"></i>');
+        const mLogo = nut.querySelector(".logo"), mOng = nut.querySelector(".ong"), mAnh = nut.querySelector(".anh"), so = nut.querySelector(".so");
+        gsap.set(nut, { scale: 0 }); gsap.set(mLogo, { opacity: 1 });
+        const c = conTro(kx + kw * .55, ky + kh * .62);
+        doi(L("nghi1"), .2);
+        di(tl, c, w * .14, h * .1, .7, .5); tl.to(c, { opacity: 0, duration: .2 }, 1.3);
+        // --- THU VỀ ---
+        const T0 = 1.75, bay = ths.map((th, i) => { const r = R(th); return { r, e: el(san, "th", `position:absolute;z-index:${24 + i};left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;opacity:0`, th.innerHTML) }; });
+        tl.set(bay.map(b => b.e), { opacity: 1 }, T0).to(K, { opacity: 0, duration: ms(240) }, T0 + ms(40)).to(nut, { scale: 1, duration: ms(340), ease: eLo }, T0);
+        bay.forEach((b, i) => {
+          const d = { x: tam.x - (b.r.x + b.r.w / 2), y: tam.y - (b.r.y + b.r.h / 2) }, sc = Math.min(40 / b.r.w, 40 / b.r.h), nang = 40 + i * 5, goc = [9, -7, 5, -11, 8, -6, 10][i % 7], o = { p: 0 }, at = T0 + ms(60 + i * 40);
+          tl.to(o, { p: 1, duration: ms(360), ease: "none", onUpdate() { const q = eIO(o.p); gsap.set(b.e, { x: d.x * q, y: d.y * q - nang * Math.sin(Math.PI * q), rotation: goc * q * 2, scale: 1 + (sc - 1) * q }); } }, at);
+          tl.add(() => { b.e.style.opacity = 0; so.textContent = i + 1; }, at + ms(360));
+          tl.to(nut, { keyframes: [{ scale: 1.13, duration: ms(80) }, { scale: 1, duration: ms(80) }], ease: "power1.out", overwrite: "auto" }, at + ms(360));
+        });
+        const T1 = T0 + ms(60 + (bay.length - 1) * 40 + 360);
+        tl.set(song, { opacity: .8, scale: 1 }, T1).to(song, { opacity: 0, scale: 1.9, duration: ms(480), ease: "power2.out" }, T1);
+        tl.to(mLogo, { opacity: 0, duration: ms(140) }, T1).fromTo(mAnh, { opacity: 0, scale: .3, rotation: -25 }, { opacity: 1, scale: 1, rotation: 0, duration: ms(260), ease: eLo }, T1);
+        doi(L("nghi2"), T1 + .4);
+        // --- MỞ RA: bấm nút tròn ---
+        const T2 = T1 + 2.1, dich = { x: kx + kw / 2, y: ky + kh / 2 }, lech = { x: dich.x - tam.x, y: dich.y - tam.y }, xa = Math.hypot(lech.x, lech.y);
+        const tBay = ms(240 + Math.min(200, xa * .35)), vong = Math.min(70, xa * .2), o = { p: 0 };
+        tl.set(c, { x: w * .5, y: h * .24 }, T2 - 1).to(c, { opacity: 1, duration: .2 }, T2 - 1);
+        di(tl, c, tam.x + 3, tam.y + 5, .65, T2 - .85); bam(tl, c, T2 - .12);
+        tl.to([mAnh, so], { opacity: 0, duration: ms(120) }, T2).fromTo(mOng, { opacity: 0, rotation: 90, scale: .5 }, { opacity: 1, rotation: 0, scale: 1, duration: ms(180) }, T2);
+        tl.to(o, { p: 1, duration: tBay, ease: "none", onUpdate() { const q = eIO(o.p); gsap.set(nut, { x: lech.x * q, y: lech.y * q - vong * Math.sin(Math.PI * q), scale: 1 - .14 * Math.sin(Math.PI * o.p) }); } }, T2);
+        tl.to(c, { opacity: 0, duration: .2 }, T2 + .15);
+        const T3 = T2 + tBay, r0 = (Math.hypot(kw, kh) / 2 + 6).toFixed(1);
+        tl.set(K, { opacity: 1, clipPath: "circle(26px at 50% 50%)" }, T3).to(K, { clipPath: `circle(${r0}px at 50% 50%)`, duration: ms(400), ease: "power3.out" }, T3).set(K, { clipPath: "none" }, T3 + ms(400) + .02);
+        tl.set(chop, { opacity: .5 }, T3 + ms(40)).to(chop, { opacity: 0, duration: ms(300), ease: "power1.out" }, T3 + ms(40));
+        tl.set(K.l, { filter: "brightness(.35)" }, T3).to(K.l, { filter: "brightness(1)", duration: ms(280) }, T3);
+        tl.to(mOng.firstElementChild, { rotation: 150, transformOrigin: "50% 50%", duration: ms(380), ease: "power2.out" }, T3).to(nut, { opacity: 0, scale: 2.2, duration: ms(240), ease: "power1.out" }, T3);
+        doi(L("nghi3"), T3 + .55);
+        nhan(tl, L("thuNh"), T3 + 1, "top:auto;bottom:4%");
+        return tl.to({}, { duration: 2 }, T3 + 1.1);
+      },
     ];
 
     /* cuộn tới đâu, diễn cảnh đó */
@@ -3265,12 +3480,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     addEventListener("keydown", e => {
       if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "") || e.ctrlKey || e.metaKey || e.altKey) return;
       const r = host.getBoundingClientRect(); if (r.top > innerHeight * .5 || r.bottom < innerHeight * .5) return;
-      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10 }[e.code];
+      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10, KeyR: 11 }[e.code];
       if (i == null) return;
       e.preventDefault();
       if (i === dang) dien(i); else toi(i);
     });
     window.ssRapRelang = () => { chuTinh(); if (dang >= 0) { capNhatCap(dang); dien(dang); } };
+    window.ssRapToi = toi;   // 01/10: 4 nút V / 5 / S / R trên thanh công cụ demo đầu trang nhảy tới cảnh tương ứng
     window.ssRap = { dien: i => { dang = i; capNhatCap(i); dien(i); }, tl: () => tl, san };   // chỉ để đo
     chuTinh();
     document.fonts.ready.then(() => { dang = -1; khiCuon(); });
