@@ -948,7 +948,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         <article class="card" data-hien>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 8 21M16 3l-2 18M4 8.5h16M3.5 15.5h16"/></svg></div>
           <h3 data-i="f9t">A shelf that remembers</h3>
-          <p data-i="f9p">Shots are numbered #1, #2 and so on. Restart the app and your 5 latest shots are still in the shelf.</p>
+          <p data-i="f9p">Shots are numbered #1, #2 and so on. Reopen the app and your latest shots are back in the shelf. Choose how many in Settings: Off, 5, 10 or 20.</p>
         </article>
         <!-- 29/09: Doc chu (app 0.7.9, anh test "kha la tot roi"). Chi hua tieng Viet du dau TREN WINDOWS (Mac chua do). -->
         <article class="card rong" data-hien>
@@ -1414,7 +1414,7 @@ const T = {
     f8t:"Chỉnh lại trước khi lưu", f8p:"Kéo xong vẫn co giãn, dời được khung chụp. Bấm <kbd>V</kbd> để chọn nét vẽ rồi di chuyển hoặc xoá.",
     f11t:"Lấy chữ trong ảnh", f11p:"Khoanh vùng có chữ rồi bấm <kbd>5</kbd>. Các dòng chữ hiện trong một bảng nhỏ, bấm là chép. Không cần mạng, trên Windows đọc được tiếng Việt đủ dấu.",
     f10t:"Dải phân cảnh trong 3 giây", f10p:"Khoanh vùng đang chuyển động rồi bấm <kbd>S</kbd>. 3 giây sau bạn có 6 khung đánh số trong một dải, nằm sẵn trong khay Storyboard. Bỏ bớt khung thừa, rồi kéo cả dải thả vào ứng dụng nào cũng được.",
-    f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, 5 ảnh chụp gần nhất vẫn nằm sẵn trong khay.",
+    f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, những ảnh chụp gần nhất tự hiện sẵn trong khay. Số ảnh chọn trong Cài đặt: Tắt, 5, 10 hoặc 20.",
     f12t:"Quay video vùng màn hình", f12p:"Khoanh vùng rồi bấm <kbd>R</kbd>. App quay tới khi bạn bấm Dừng, tối đa 5 phút. File MP4 nằm sẵn trong Khay video: chọn bản Có tiếng hoặc Không tiếng rồi kéo cả hàng thả vào khung chat hay ứng dụng khác. Trên Windows quay được cả tiếng đang phát trên máy.",
     f13t:"Khay tự thu gọn", f13p:"Không dùng tới 5 giây, khay tự thu về một nút tròn nhỏ ở góc màn hình, hiện ảnh mới nhất và số ảnh đang có. Bấm nút, khay mở lại đúng chỗ cũ.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
@@ -2965,7 +2965,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       chinh: 'Chỉnh <span class="l">lại</span>', chinhNh: "Khung trúng rồi mới Xong",
       tu: ["Ý tưởng", "Tham <em>khảo</em>", "Màu sắc", "Logo", "Frame"], trinh: "Trình duyệt · Brief khách", ghimNh: "Cửa sổ nào lên trước, ảnh ghim vẫn nằm trên",
       zalo: "Zalo · Khách hàng", hoi: "Gửi anh bản nháp nhé?", duyet: "Ổn rồi, duyệt nhé!", apps: "Zalo · Messenger · Premiere · Figma · Photoshop…",
-      tat: "Tắt ứng dụng.", mo: "Mở lại…", con: "5 ảnh <em>vẫn còn.</em>", phuDe: "Xin chào, Sài Gòn!",
+      tat: "Tắt ứng dụng.", mo: "Mở lại…", con: "Ảnh gần nhất<br><em>tự hiện lại.</em>", conNh: "Chọn số ảnh mở lại trong Cài đặt: Tắt, 5, 10 hoặc 20", phuDe: "Xin chào, Sài Gòn!",
       ocr: "Chữ trong vùng chọn", dong: "1 dòng", chep: "Sao chép", daChep: "Đã chép", giay: "giây", daiNh: "Tự lưu thành 1 dải vào khay Storyboard",
       ngan: ["Chụp", "2 màn hình", "Chú thích", "Làm mờ", "Chỉnh lại", "Khay", "Ghim", "Kéo thả", "Nhớ ảnh", "Lấy chữ", "Storyboard"] },
     en: { tren: "Shot & Save · 11 features", goiY: "Scroll for the next scene · click a clip to jump", thu: "Try it on your keyboard:",
@@ -2975,7 +2975,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       chinh: 'Nudge <span class="l">it</span>', chinhNh: "On target, then Done",
       tu: ["Ideas", "<em>Refs</em>", "Colors", "Logo", "Frame"], trinh: "Browser · Client brief", ghimNh: "Any window comes forward, the pin stays on top",
       zalo: "Zalo · Client", hoi: "Can you send the draft?", duyet: "Looks good, approved!", apps: "Zalo · Messenger · Premiere · Figma · Photoshop…",
-      tat: "Quit the app.", mo: "Open it again…", con: "5 shots, <em>still here.</em>", phuDe: "Hello, Saigon!",
+      tat: "Quit the app.", mo: "Open it again…", con: "Your latest shots<br><em>come right back.</em>", conNh: "Pick how many reopen in Settings: Off, 5, 10 or 20", phuDe: "Hello, Saigon!",
       ocr: "Text in selection", dong: "1 line", chep: "Copy", daChep: "Copied", giay: "sec", daiNh: "Saved as one strip in the Storyboard shelf",
       ngan: ["Capture", "2 screens", "Markup", "Blur", "Adjust", "Shelf", "Pin", "Drag", "Memory", "Copy text", "Storyboard"] },
   };
@@ -3246,7 +3246,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         nhan(tl, L("apps"), 3.1, doc ? "top:3%" : "left:25%");
         return tl.to({}, { duration: 1.6 }, 3.2);
       },
-      // 8. Khay nhớ: tắt app, mở lại, 5 ảnh vẫn còn
+      // 8. Khay nhớ: tắt app, mở lại, ảnh gần nhất tự hiện lại (02/10 anh Tiến: nói rõ số ảnh chỉnh được trong Cài đặt; app có sẵn hàng "Mở lại ảnh gần nhất": Tắt / 5 / 10 / 20)
       () => {
         const tl = gsap.timeline(), w = W(), h = H();
         const ch = el(san, "chu", "font-size:calc(var(--u)*7.5);top:26%", "");
@@ -3260,7 +3260,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         tl.set(ths, { opacity: 0, scale: .5 }, 1.9).fromTo(K, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .45, ease: "back.out(1.6)" }, 2.4);
         tl.to(ths, { opacity: 1, scale: 1, duration: .4, stagger: .1, ease: "back.out(2)" }, 2.7);
         doi(L("con"), 3.4);
-        return tl.to({}, { duration: 1.6 }, 3.6);
+        nhan(tl, L("conNh"), 4.1, "top:auto;bottom:4%");
+        return tl.to({}, { duration: 2.6 }, 3.6);
       },
       // 9. Lấy chữ: chữ phụ đề bay ra khỏi ảnh vào bảng
       () => {
