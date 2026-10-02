@@ -5,6 +5,38 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-02 09:33 (UTC+7) - Rạp: chuyển cảnh hết "giật và khựng" (một nhịp mờ ra / hiện vào, sân giữ nguyên chiều cao) - máy công ty
+
+- **Bối cảnh:** sau bản tự chuyển cảnh 08:58 anh báo: *"khi chuyển giữa các phần có đang bị giật và khựng lại"*.
+- **Nguyên nhân (đo trên LIVE, Chrome ngầm 1920×950, ghi từng khung hình 12 lần chuyển):**
+  - **Khựng:** cảnh xong → đứng hình 0,93 giây → trang cuộn mượt 0,33 giây → cảnh mới bắt đầu sau **1,25 giây**.
+  - **Giật:** chú thích dưới sân dài 1–3 dòng tuỳ cảnh → sân đổi chiều cao **25–50 px ở 7/12 lần** (642 / 667 / 617 / 592),
+    và chữ chú thích đổi trước, 0,14 giây sau hình trên sân mới bị cắt sang cảnh mới = nhảy hai nhịp.
+  - KHÔNG phải rớt khung: khoảng cách khung lớn nhất 17 ms (một lần 42 ms), 0 tác vụ dài.
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`):
+  - `tuSang(i)`: cảnh xong nghỉ **0,5 giây** (trước 0,9) → sân mờ đi 0,18 giây → nhảy vị trí cuộn NGAY (`behavior: "instant"`;
+    sân ghim nên trên màn không có gì trượt) → đổi chú thích + dựng cảnh mới cùng một lúc → sân hiện dần 0,22 giây.
+  - `dien()`: mọi cảnh mới đều hiện dần 0,22 giây (trước: cắt thẳng). `khiCuon()`: người xem tự cuộn thì cảnh cũ mờ ngay.
+  - `giuCao()`: giữ chỗ cho chú thích theo cảnh có chú thích cao nhất → sân cùng một chiều cao ở mọi cảnh; `.cap` neo trên
+    để tên cảnh không trồi sụt. Gọi lại khi đổi ngôn ngữ, đổi cỡ cửa sổ, font về.
+- **Lỗi do chính bản sửa, bài đo bắt được trước khi đẩy:** giữ chỗ trên điện thoại làm sân ở 360×740 lùn 421 → 317 px (−25%)
+  và nhãn cảnh 9 đè khay 4 px → ở bề rộng ≤ 640 px KHÔNG giữ chỗ (sân vẫn đổi chiều cao, nhưng đúng lúc đang mờ).
+- **Đo sau sửa** (phim tua ×4 nên đoạn mờ 0,18 giây chỉ còn 0,045 giây trong số đo; tốc độ thật ≈ 0,68 giây):
+  | | Trước (live 08:58) | Sau |
+  |---|---|---|
+  | Cảnh xong → cảnh mới bắt đầu | 1,23–1,33 giây | 0,57–0,60 giây đo ×4 (≈ 0,68 giây thật) |
+  | Trang cuộn kéo dài | 0,32–0,38 giây | 0 (nhảy ngay) |
+  | Sân đổi chiều cao, 1920×950 | 7/12 lần | **0/12** (592 px cả 13 cảnh) |
+  | Khung chậm > 34 ms | 1 | 0–1 |
+  390×844: 12/12 lần chuyển một nhịp; sân còn đổi chiều cao 9/12 lần (cố ý, xem trên). Tự chuyển 12/12 bước đúng thứ tự;
+  giảm chuyển động: 8 giây không tự cuộn; cảnh 9 ở 6 khổ × 2 ngôn ngữ: 0 tràn, 0 đè; 0 lỗi console.
+- **CHƯA đo / giới hạn:** bài đo là Chrome ngầm, đếm khung của luồng chính, KHÔNG thấy độ mượt thật trên card màn hình →
+  cần mắt anh xác nhận. Ở 1920×950 sân thấp đi tối đa 75 px ở cảnh có chú thích ngắn (667 → 592). Trên điện thoại, người
+  xem TỰ cuộn thì chú thích đổi trước khi cảnh cũ mờ hết (0,12 giây). Điện thoại thật / Safari chưa đo.
+- **Sân thấp hơn có làm hình tràn không:** 13 cảnh × 3 khổ (1024×768, 1280×800, 1920×950) ở khung cuối, đếm phần tử đang
+  thấy tràn ra ngoài sân > 3 px: bản sửa **0/39 cảnh**, bản live 0/39, không cảnh nào xấu hơn. Đối chứng: bóp sân còn 60%
+  thì thước bắt được 13/13 cảnh. (Thước chỉ đo TRÀN và nhãn đè chữ to, không đo các khối đè nhau bên trong sân.)
+
 ## [web-shotsave] - 2026-10-02 09:17 (UTC+7) - Cảnh 9 "Nhớ ảnh": đổi "5 ảnh vẫn còn" thành "Ảnh gần nhất tự hiện lại" + nói số ảnh chỉnh trong Cài đặt - máy công ty
 
 - **Bối cảnh:** anh chụp cảnh 9 của rạp: *"cái này anh cần sửa lại là 5 ảnh vẫn còn như sau: mở lại sẽ tự động hiển thị ảnh
