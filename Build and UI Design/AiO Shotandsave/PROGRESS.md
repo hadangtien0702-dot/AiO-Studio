@@ -111,6 +111,41 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [soat] - 2026-10-02 15:25 - ECC soat ma 0.8.0 chua push: 17 loi, khong co loi nghiem trong, CHUA SUA muc nao
+
+**Boi canh.** Anh: *"dùng ecc soát lại code đi em"*. Pham vi em chon: 43 file trong `src/` khac GitHub (`origin/main..HEAD`,
+2.439 dong them). Hai agent ECC chi doc, khong chay app: `typescript-reviewer` (logic, vong doi cua so, cong nhan lenh,
+file nguoi dung) va `silent-failure-hunter` (hong ma im lang). Ton ~526 nghin token phu, 2,4 + 4,1 phut.
+Em doc lai ma doi chieu tung muc: cot "Ma" = DUNG la em thay dung dong ma nhu mo ta; "tinh huong" = da lan het duong
+hay con la suy luan. ☠️ Ca hai agent la Claude soat ma Claude viet (thuoc cung vat lieu, brain `5d-ter`); khong agent
+nao doc het `settings`, `nut`, `khay`, `storyboard`, `vien-quay`. Khong co bai do nao chay cho cac muc nay.
+
+**Nhom A — lien quan MAT / KHONG THAY video, nen sua truoc khi phat hanh:**
+| # | Cho | Loi | Nguoi dung thay gi | Ma |
+|---|---|---|---|---|
+| A1 | `kho-video.js:17-23` `doc()` | Doc so hong / bi khoa 1 lan thi tra `[]` khong ghi log; `them` / `sua` / `bo` ghi de so tu danh sach rong do | Quay them 1 doan la MOI video cu bien khoi khay (file van tren dia). Cung kieu loi `cau-hinh.json` tra `{}` ngay truoc | DUNG (2 agent cung bat) |
+| A2 | `main.js:2079` + khong co buoc quet luc mo app | App bi tat dot ngot giua luc quay -> `*.mp4.tam` nam lai trong thu muc anh, khong vao so, khong ai don. Ghi chu "tat app giua chung van con file phat duoc" SAI | Doan quay mat khoi khay, de lai file la | DUNG (2 agent) |
+| A3 | `main.js:2151-2164`, `luong.js:178-216` | Quay loi giua chung (dia day, gui khuc loi, doc khung loi, het 4 giay cho dung) van vao khay nhu video binh thuong, loi chi nam trong log | Tuong la doan quay du, mo ra thieu / dung hinh | DUNG |
+| A4 | `main.js:743` `settings:set-lang` | Nap lai MOI cua so, gom cua so quay an + dong ho + nut tron + san dien | Doi ngon ngu luc dang quay: doan quay hong, dong ho ve 0:00. Luong chup chay san co tu mo lai sau khi nap lai khong: CHUA lan | DUNG (tinh huong chua lan het) |
+| A5 | `main.js:2161-2164` | Ghi so that bai sau khi quay: chi ghi log, khong thong bao | File co tren dia nhung khay khong hien | DUNG |
+
+**Nhom B — nho hon / hiem:**
+- B1 `main.js:2243` `video:xoa`: ban goc vao thung rac roi ban khong-tieng xoa loi -> bao "khong xoa duoc", muc trong so con, ban khong-tieng nam lai mo coi. (2 agent, DUNG)
+- B2 `main.js:2160`: doi ten `.tam` that bai -> ghi chinh file `.tam` vao so -> o den, keo ra la file `.tam`. (DUNG)
+- B3 `luong.js:121-126`: khong nang duoc 30 khung/giay thi nuot loi, khong ghi log -> video giat lai (so loi #14) ma khong ai biet. (DUNG)
+- B4 `main.js:2225` + `kho.js:72-88`: keo video lon khi khong tao duoc lien ket cung -> chep dong bo, dung luong chinh vai giay. (suy luan)
+- B5 `main.js:2076`: bam R luc dang quay 3 giay Storyboard -> man chup dong, khong co gi xay ra, khong log. (DUNG, hiem)
+- B6 `main.js:2114`: hen 5 phut dat SAU khi luong mo xong; neu luot do ket thuc som thi hen con song va dung nham luot quay sau. (suy luan)
+- B7 `main.js:2120-2133` `huyGhiHinhLoi`: dong file trong khi bo quay con gui khuc; con de lai `.tam` co du lieu. (suy luan)
+- B8 `luong-chup.js:239`: `hangChon.push` truoc khi hoi trang; trang tu choi thi muc cu nam lai, luot sau co the quay nham man. (suy luan)
+- B9 `khay-thu.js:102-106` `choBao`: het gio khong go nguoi cho khoi `doi`; tin den muon cua luot truoc lam luot sau chay som. (2 agent, DUNG ve ma)
+- B10 `main.js:599, 634`: `khayWin.loadFile` khong `catch`. B11 `video.js:230-235`: `getData` loi thi hien "chua co video". B12 `main.js:512-515`: thoat app giua luc quay dua vao su kien `closed`. (suy luan)
+
+**Khong tim thay:** loi nghiem trong; duong dan tu giao dien di thang vao xoa / mo file (cac lenh video chi nhan ma `vid-...`
+va lay duong dan tu so); loi trong cong cu danh so buoc (phim 6).
+
+[CHO ANH] chon: sua nhom A (5 muc) truoc khi phat hanh hay khong. CHUA sua muc nao.
+
 ## [0.8.0 nap lan 15] - 2026-10-02 14:44 - TINH NANG MOI: danh so buoc 1-2-3 (phim 6) o man chup + anh ghim (cho anh bam thu)
 
 **Boi canh.** 13:5x anh hoi *"tinh nang nao dang can de phat trien tiep em ?"*, em de xuat thu tu: danh so buoc -> GIF ->
