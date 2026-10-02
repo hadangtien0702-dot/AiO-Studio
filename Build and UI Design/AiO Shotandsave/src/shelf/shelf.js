@@ -279,10 +279,30 @@ window.__khayBung = () => {
     const a = el.animate(kf, Object.assign({ fill: 'both' }, o))
     return Promise.race([a.finished.catch(() => {}), choNgan(o.duration + (o.delay || 0) + 150)]).then(() => { a.cancel(); return true })
   }
+  /* 02/10 do do muot: dau = khung dau toi sau bao lau ke tu luc ham nay bat dau chay, n / max = so khung + khoang cach
+     lon nhat giua 2 khung trong luc man trap bung, ms = ca ham chay bao lau. Main (khay-thu.js ghiDo) ghi vao run-log. */
+  const t0 = performance.now()
+  let truoc = 0, n = 0, max = 0, dau = -1, dung = false
+  const buoc = (t) => {
+    if (dung) return
+    if (truoc) max = Math.max(max, t - truoc); else dau = performance.now() - t0
+    truoc = t; n++
+    requestAnimationFrame(buoc)
+  }
+  requestAnimationFrame(buoc)
+  // hen = do tre lon nhat cua hen gio 8 ms (luong chinh trang nay co ban khong); an = so lan trang bi coi la AN trong luc bung
+  let hTruoc = t0, hen = 0, an = document.hidden ? 1 : 0
+  const dem = setInterval(() => { const b = performance.now(); hen = Math.max(hen, b - hTruoc); hTruoc = b }, 8)
+  const khiAn = () => { if (document.hidden) an++ }
+  document.addEventListener('visibilitychange', khiAn)
   document.body.classList.remove('an')
   if (chop) chay(chop, [{ opacity: .5 }, { opacity: 0 }], { duration: 300, delay: 40, easing: 'ease-out' })
   chay(listEl, [{ filter: 'brightness(.35)' }, { filter: 'brightness(1)' }], { duration: 280 })
   return chay(khay, [{ clipPath: 'circle(26px at 50% 50%)' }, { clipPath: 'circle(' + r.toFixed(1) + 'px at 50% 50%)' }], { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)' })
+    .then(() => {
+      dung = true; clearInterval(dem); document.removeEventListener('visibilitychange', khiAn)
+      return { dau: Math.round(dau), n, max: Math.round(max), ms: Math.round(performance.now() - t0), hen: Math.round(hen), an }
+    })
 }
 
 capNhatSoLuong()

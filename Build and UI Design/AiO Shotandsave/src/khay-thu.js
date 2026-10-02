@@ -86,10 +86,10 @@ function taoKhayThu(deps) {
 
   // San dien bao ve: 'san-sang' (da ve bong) · 'toi' (ong kinh toi tam khay) · 'xong' · 'sach' (da xoa het hinh)
   const doi = new Map()
-  ipcMain.on('dien:bao', (e, ten) => {
+  ipcMain.on('dien:bao', (e, ten, kem) => {
     if (!dien || dien.isDestroyed() || e.sender !== dien.webContents) return
     const ds = doi.get(ten)
-    if (ds) { doi.delete(ten); ds.forEach((r) => r(true)) }
+    if (ds) { doi.delete(ten); ds.forEach((r) => r(kem && typeof kem === 'object' ? kem : true)) } // kem = so do cua chang do
   })
   const choBao = (ten, ms) => new Promise((res) => {
     if (!doi.has(ten)) doi.set(ten, [])
@@ -213,6 +213,34 @@ function taoKhayThu(deps) {
     }
   }
 
+  /* 02/10 SO DO TUNG CHANG cua lan bung (anh: "animation thuc te chua muot lam" — bai do an 30/30 dat ma man that van
+     khung, vi cua so offscreen khong co do tre HIEN cua so that). Mot dong trong run-log, doc tu trai sang:
+       cho N        = tu luc bam toi luc ong kinh bat dau bay (chuan bi + hien san dien + ve nut gia; ma / 2k = giai ma anh,
+                      cho 2 khung) — trong luc nay nguoi dung KHONG thay gi chuyen dong
+       bay N        = ong kinh bay (n khung, max = khoang cach lon nhat giua 2 khung; xa = quang duong px)
+       noi +N/+N    = tu luc ong kinh TOI NOI toi luc trang khay bat dau chay / ve khung dau — ong kinh dung im trong luc nay
+       bung N       = man trap cua khay bung ra (n khung, max)
+       tan N        = ong kinh tan (n khung, max) · don N = xoa san dien
+     ☠️ So khung do bang rAF: bat duoc khung rot cua luong chinh trang, KHONG thay do tre ghep hinh cua Windows. */
+  function ghiDo(t0, m, kSan, kBay, kTan, kBung) {
+    try {
+      const o = (k) => (k && typeof k === 'object' ? k : null)
+      const s = o(kSan), b = o(kBay), t = o(kTan), u = o(kBung)
+      /* Do tre "noi" KHONG so dong ho cua 2 tien trinh (do 02/10: Date.now() cua trang va cua main lech nhau ~8 ms, ra so
+         am). Tinh trong MOT dong ho: (main thay lenh bung di + ve mat bao lau) - (trang tu do no chay bao lau) = thoi gian
+         lenh nam cho truoc khi trang bat dau chay; + dau = toi khung dau tien. */
+      const tre = u && u.ms != null && m.bung ? Math.max(0, m.bung - m.hienKhay - u.ms) : null
+      return ' | cho ' + (m.san - t0) + ' (chuan bi ' + (m.dien - t0) + ', hien san ' + (m.hienDien - m.dien) + (s ? ', ma ' + s.ma + ', 2k ' + s.khung : '') + ')'
+        + ' | bay ' + (m.toi - m.san) + (b ? ' (' + b.n + ' khung, max ' + b.max + ', dau ' + b.dau + ', xa ' + b.xa + ')' : '')
+        + ' | noi ' + (tre != null ? '+' + (m.hienKhay - m.toi + tre) + '/+' + (m.hienKhay - m.toi + tre + u.dau) : '?') + ' (hien khay ' + (m.hienKhay - m.toi) + ')'
+        + ' | bung ' + (u && u.ms != null ? u.ms + ' (' + u.n + ' khung, max ' + u.max + ', hen ' + u.hen + ', an ' + u.an + ')' : '?')
+        + ' | tan ' + (m.tan - m.hienKhay) + (t ? ' (' + t.n + ' khung, max ' + t.max + ', dau ' + t.dau + ', hen ' + t.hen + ', an ' + t.an + ')' : '')
+        + ' | don ' + (m.don - m.tan)
+        // main = do nghen lon nhat cua luong chinh trong ca lan bung (hen 4 ms) · chuot = con tro co nam trong khay luc khay hien
+        + ' | main ' + m.main + ' | chuot ' + (m.chuot == null ? '?' : m.chuot)
+    } catch (e) { return '' }
+  }
+
   /** XUAT HIEN khay tu nut tron (kieu A). Khong co nut (tt 'an' / chua tung thu) thi hien thang. */
   async function bung(lyDo) {
     if (dangChay) return false
@@ -221,37 +249,52 @@ function taoKhayThu(deps) {
     if (tt !== 'thu' || !dangHien(nut)) { hienThang(khay); return true }
     dangChay = true
     const t0 = Date.now()
+    let henMain = null
     try {
       const b = khay.getBounds()
       const man = manCua(b), wa = man.workArea
       if (!TN && manCua(nut.getBounds()).id !== man.id) throw new Error('nut va khay khac man hinh')
       js(khay, 'window.__khayAn && window.__khayAn(true)') // khay dang an: dat san trang thai, khong cho (rAF dung)
       const d = await damBaoDien(wa)
+      const m = { dien: Date.now(), main: 0 } // 02/10: moc gio tung chang, ghi vao run-log (xem ghiDo ben duoi)
+      // do nghen cua luong chinh (main) suot lan bung: hen gio 4 ms, ghi khoang cach lon nhat
+      let hTruoc = Date.now()
+      henMain = setInterval(() => { const bay = Date.now(); m.main = Math.max(m.main, bay - hTruoc); hTruoc = bay }, 4)
       const san = choBao('san-sang', 1800)
       hien(d, true)
+      m.hienDien = Date.now()
       d.webContents.send('dien:lenh', Object.assign({ viec: 'mo', nut: tuongDoi(oTronNut(wa), wa), dich: { x: b.x - wa.x + b.width / 2, y: b.y - wa.y + b.height / 2 } }, goiNut()))
-      if (!(await san)) throw new Error('san dien khong san sang')
+      const kSan = await san
+      if (!kSan) throw new Error('san dien khong san sang')
+      m.san = Date.now()
       an(nut)
       const toi = choBao('toi', 2500)
       d.webContents.send('dien:lenh', { viec: 'chay' })
-      if (!(await toi)) log('khay-thu CANH BAO: san dien khong bao toi (bung)')
+      const kBay = await toi
+      if (!kBay) log('khay-thu CANH BAO: san dien khong bao toi (bung)')
+      m.toi = Date.now()
+      try { m.chuot = trongO(deps.conTro ? deps.conTro() : screen.getCursorScreenPoint(), b, 8) ? 1 : 0 } catch (e) {}
       hien(khay, false)
+      m.hienKhay = Date.now()
       const bungXong = js(khay, 'window.__khayBung ? window.__khayBung() : (window.__khayAn && window.__khayAn(false))', 1500)
+        .then((k) => { m.bung = Date.now(); return k })
       if (!TN) d.moveTop() // ong kinh tan PHIA TREN khay vua hien
       const xong = choBao('xong', 1500)
       d.webContents.send('dien:lenh', { viec: 'tan' })
-      await xong
+      const kTan = await xong
+      m.tan = Date.now()
       await donDien()
-      await bungXong
+      m.don = Date.now()
+      const kBung = await bungXong
       tt = 'mo'; lanCuoi = Date.now(); truocHien = true
-      log('khay bung (' + lyDo + '): ' + (Date.now() - t0) + ' ms')
+      log('khay bung (' + lyDo + '): ' + (Date.now() - t0) + ' ms' + ghiDo(t0, m, kSan, kBay, kTan, kBung))
       return true
     } catch (err) {
       log('khay-thu LOI bung (' + lyDo + '): ' + (err && err.message) + ' -> hien thang')
       an(dien)
       hienThang(khay)
       return true
-    } finally { dangChay = false }
+    } finally { dangChay = false; if (henMain) clearInterval(henMain) }
   }
 
   /** Nguoi dung bam x tren nut: an han nut. Lan chup sau / menu khay he thong se hien khay lai. */

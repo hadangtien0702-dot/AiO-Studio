@@ -18,6 +18,32 @@
     const a = el.animate(kf, { duration: o.duration, delay: o.delay || 0, easing: o.easing || 'linear', fill: 'both' })
     return Promise.race([a.finished.catch(() => {}), cho(o.duration + (o.delay || 0) + 150)])
   }
+  /* 02/10 DO DO MUOT (anh: "animation thuc te chua muot lam"): dem khung trong luc mot chang dien. Goi doKhung() luc bat dau,
+     goi ham tra ve luc xong -> { ms: chang dai bao lau, n: so khung, max: khoang cach lon nhat giua 2 khung, dau: khung dau
+     toi sau bao lau }. Gui kem theo bao() ve main de ghi run-log. CANH BAO: rAF chi thay nhip cua luong chinh trang nay, KHONG
+     thay do tre ghep hinh cua Windows (bai hoc 5ao) -> so nay bat duoc khung rot / dung hinh, khong chung minh duoc "muot". */
+  /* Lan 2 (02/10 08:3x): them `hen` = khoang cach lon nhat giua 2 lan hen gio 8 ms, `an` = so lan trang bi coi la AN
+     (visibilityState hidden) trong chang. De phan biet: hen cung tre -> luong chinh cua trang nay ban; hen dung gio ma
+     khong co khung -> khong ai phat khung cho trang (GPU / Windows / trang bi coi la bi che). */
+  function doKhung() {
+    const t0 = performance.now()
+    let truoc = 0, n = 0, max = 0, dau = -1, dung = false
+    let hTruoc = t0, hen = 0, an = document.hidden ? 1 : 0
+    const buoc = (t) => {
+      if (dung) return
+      if (truoc) max = Math.max(max, t - truoc); else dau = performance.now() - t0
+      truoc = t; n++
+      requestAnimationFrame(buoc)
+    }
+    requestAnimationFrame(buoc)
+    const dem = setInterval(() => { const b = performance.now(); hen = Math.max(hen, b - hTruoc); hTruoc = b }, 8)
+    const khiAn = () => { if (document.hidden) an++ }
+    document.addEventListener('visibilitychange', khiAn)
+    return () => {
+      dung = true; clearInterval(dem); document.removeEventListener('visibilitychange', khiAn)
+      return { ms: Math.round(performance.now() - t0), n, max: Math.round(max), dau: Math.round(dau), hen: Math.round(hen), an }
+    }
+  }
   const eIO = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
   const eLo = (t) => 1 - Math.exp(-6.5 * t) * Math.cos(9.5 * t) // lo xo: vuot ~6% roi ve
   const cssLo = 'linear(' + Array.from({ length: 41 }, (_, i) => (i === 40 ? 1 : eLo(i / 40)).toFixed(4)).join(',') + ')'
@@ -108,25 +134,29 @@
     matNghi.classList.add('hien')
     p.so.textContent = g.so > 0 ? g.so : ''
     san.append(p.nut)
+    const tA = performance.now()
     await giaiMa(g.mat)
+    const tB = performance.now()
     await haiKhung()
-    window.dien.bao('san-sang')
+    window.dien.bao('san-sang', { ma: Math.round(tB - tA), khung: Math.round(performance.now() - tB) })
 
     const tam = { x: g.nut.x + 26, y: g.nut.y + 26 }
     const lech = { x: g.dich.x - tam.x, y: g.dich.y - tam.y }, xa = Math.hypot(lech.x, lech.y)
     viec = {
       chay: async () => {
+        const xongDo = doKhung()
         chay(matNghi, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 })
         chay(p.so, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 })
         chay(p.ong, [{ opacity: 0, transform: 'rotate(90deg) scale(.5)' }, { opacity: 1, transform: 'rotate(0deg) scale(1)' }], { duration: 180 })
         await chay(p.nut, duong({ x: 0, y: 0 }, lech, Math.min(70, xa * .2), eIO, (q, pp) => ' scale(' + (1 - .14 * Math.sin(Math.PI * pp)).toFixed(3) + ')'), { duration: 240 + Math.min(200, xa * .35) })
-        window.dien.bao('toi')
+        window.dien.bao('toi', Object.assign(xongDo(), { xa: Math.round(xa) }))
       },
       tan: async () => {
+        const xongDo = doKhung()
         chay(p.ong.firstElementChild, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(150deg)' }], { duration: 380, easing: 'cubic-bezier(.2,.7,.2,1)' })
         const cho_ = 'translate(' + lech.x.toFixed(2) + 'px,' + lech.y.toFixed(2) + 'px)'
         await chay(p.nut, [{ opacity: 1, transform: cho_ + ' scale(1)' }, { opacity: 0, transform: cho_ + ' scale(2.2)' }], { duration: 240, easing: 'ease-out' })
-        window.dien.bao('xong')
+        window.dien.bao('xong', xongDo())
       },
     }
   }

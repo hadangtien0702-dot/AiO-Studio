@@ -1,6 +1,15 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-01 19:07 +0700 (/xong lan 2 trong ngay)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 07:56 +0700 (dang lam do, chua /xong)
+> - **02/10 07:56 DANG LAM DO — nut tron bung khay "chua muot" (anh dung that lan dau, bao 07:5x).** Ban dang chay: 0.8.0,
+>   app.asar md5 `5d19fbe6` (nap lan 11, boot 07:56:19) = ban 19:12 hom qua + DONG HO DO tung chang cua lan bung (dong
+>   `khay bung (bam nut): ... | cho | bay | noi | bung | tan | don` trong run-log). CHUA sua chuyen dong, CHUA biet khung
+>   o dau, CHUA commit. **08:15 DA CO SO DAU TIEN:** bay 27 khung khong rot; khay hien ra thi ca 2 trang ngung ve 333 ms
+>   (man trap 6 khung / 430 ms) -> goc cua "mat hieu ung". Vi sao 333 ms: CHUA biet.
+>   **08:31 (nap lan 12, md5 `f5157f0c`):** bai do cua so that `scripts/test/khay-bung-that.cjs` 21/21 lan bung MUOT (ke ca co
+>   luong chup + bam nut) -> ma chuyen dong khong tu gay khung; cu dung chi co trong app that luc anh bam that (1 mau). Da them
+>   so do `hen / an / main / chuot` vao dong `khay bung`. [CHO ANH] bam nut tron 5 lan lien. Chi tiet: 3 muc ngay duoi. Bo cai 0.8.0 trong Release (md5 `5181fe53`) la ban TRUOC lan nap nay.
+> - (phan duoi day chot 2026-10-01 19:07, /xong lan 2 trong ngay)
 > - **19:22 BO CAI 0.8.0 DA DONG GOI (phien khac — phien lam web Premiere, theo loi anh):** 19:13 anh nhan *"gui cho anh ban
 >   shot and save moi nhat"*, trong bang hoi chon **"0.8.0 dang test"** (da duoc bao: nut tron chua chay lan nao tren man
 >   that). `npm run dist` -> `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.8.0.exe` 96,1 MB (md5 `5181fe53`),
@@ -86,6 +95,115 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 nap lan 12] - 2026-10-02 08:31 - Bai do CUA SO THAT: 21/21 lan bung MUOT -> cu dung 333 ms chi co trong app that; them 3 so do phan loai
+
+- **Boi canh:** anh cho gio ("chay di em"), em chay `scripts/test/khay-bung-that.cjs` 2 luot tren man phu 125% (khay gia 551x129,
+  6 thumbnail JPEG that, cua so THAT, dung `src/khay-thu.js`).
+- **LOI CUA EM (08:2x):** lan chay dau em truyen duong dan TUONG DOI -> `app.setPath` nem "Path must be absolute" -> Electron bat
+  HOP BAO LOI len man anh va treo (anh chup gui lai). Da tat dung 1 tien trinh `electron.exe ... khay-bung-that.cjs` (app
+  cua anh 10 tien trinh van chay), sua: `path.resolve` + bat moi loi -> in ra + thoat, khong hop thoai + tu thoat sau 150 giay.
+- **So do (moi dong = 1 lan bung; "khung" = so khung man trap ve duoc trong ~410 ms, "max" = khoang trong lon nhat):**
+  | Kieu | 3 lan |
+  |---|---|
+  | lanh (an 2,5 s -> hien -> bung ngay, khong san dien) | 22 khung max 67 · 24 / 17 · 24 / 17 |
+  | am (khay van hien) | 25 / 17 · 24 / 17 · 24 / 17 |
+  | lanh-cho (hien truoc 500 ms) | 24 / 17 · 24 / 17 · 26 / 34 |
+  | day-du (thu + bung qua khay-thu.js), luot 1 | 25 / 17 · 24 / 17 · 24 / 17 — ong kinh tan 15 khung ca 3 lan |
+  | day-du, luot 2 | 23 / 33 · 24 / 17 · 24 / 17 |
+  | bam (su kien chuot gui vao trang nut -> `nut:mo`) | 25 / 17 · 24 / 17 · 24 / 17 |
+  | day-du + LUONG CHUP 5 khung/giay chay trong cung tien trinh | 24 / 17 · 25 / 17 · 24 / 17 |
+  | bam + luong chup | 24 / 17 · 24 / 17 · 24 / 17 |
+  Luong chinh khong nghen (max 6-38 ms). => 21/21 lan MUOT. Ma chuyen dong, buoc hien cua so dang an, lenh dua san dien len
+  tren, luong chup ngam: KHONG tu gay khung. LOAI 4 nghi pham em neu luc 08:15.
+- **App that (run-log):** 08:11:09 `bam nut`: bung **6 khung, max 333**, tan 3 khung (cu anh bao "mat hieu ung") · 08:21:58
+  `hien khay` (bung ngay sau mot luot chup): 21 khung, max 50, tan 13 khung (khung nhe; luc do main dang luu anh + tao lai
+  overlay). => Cu dung 333 ms moi co 1 MAU, chi xay ra khi anh BAM THAT trong app that. Chua biet no la gi.
+- **Con khac giua bai do va app that (chua loai):** chuot that cua anh (bai do gui su kien vao trang, khong qua Windows) va
+  con tro re vao khay luc khay hien · main cua app dang ban viec khac · thu khac tren man anh luc do (video dang phat?) ·
+  cua so khay cua bai do dat `focusable: false` (app that khong dat) — lech nay la so suat cua em.
+- **Thay doi (nap lan 12, 08:31:08, app.asar md5 `f5157f0c`):** dong `khay bung` them `hen N` (hen gio 8 ms trong trang tre
+  nhat bao lau: lon = luong chinh cua trang ban) · `an N` (so lan trang bi coi la AN trong luc dien: > 0 = Windows / Chromium
+  coi cua so bi che) · `main N` (luong chinh cua app nghen lon nhat) · `chuot 0/1` (con tro co nam trong khay luc khay hien).
+  Cach doc: hen dung gio + an 0 + main nho ma van mat khung => khong ai phat khung (GPU / Windows), khong phai ma cua minh.
+- **File anh huong:** `src/khay-thu.js`, `src/dien/dien.js`, `src/shelf/shelf.js`, `scripts/test/khay-bung-that.cjs`.
+- **Kiem chung bang so:** `node --check` OK · `npm run test:khaynut` TAT CA DAT · nap: truoc / sau 620 anh-video, 9 dai, cau hinh
+  `bffb01bb` giong nhau; ban truoc (`5d19fbe6`) cat o `.selftest/ban-cai-truoc`.
+- **[CHO ANH]** bam nut tron 5 lan lien (bam -> cho khay tu thu 5 giay -> bam lai), khong can chup them. Doc dong `khay bung (bam nut)`.
+- CHUA sua chuyen dong. CHUA commit.
+- **08:36 ANH BAM THAT 3 LAN (run-log 08:35:29 / 08:35:39 / 08:35:56), nhan "ok roi do":** man trap 21 khung max 50 · 25 khung
+  max 17 · 24 khung max 17; ong kinh tan 13 / 15 / 15 khung; `hen 9, an 0` ca 3 lan (trang khong ban, khong bi coi la an);
+  `main 12-19`; `chuot 0`. => 3/3 lan khong co cu dung 333 ms. EM KHONG SUA GI vao chuyen dong: cu dung 08:11:09 khong lap
+  lai, NGUYEN NHAN VAN CHUA BIET (1 mau). Lan dau trong moi phien (08:21:58, 08:35:29) deu rot vai khung (max 50), cac lan
+  sau du khung: co the la chi phi lan dau, chua du mau de ket luan. Dong ho do GIU LAI trong app de lan sau anh thay khung
+  la co so ngay. Anh nhan tiep: *"update len website di em"* -> web DA co canh Khay tu thu + Quay video tu 01/10 20:08
+  (`30446f0`; 08:36 do lai: live HTTP 200, md5 live `454cc5bf` = blob git) -> hoi lai anh muon lam gi them (xem muc sau).
+- **09:00 Em hoi anh 4 lua chon (phat hanh 0.8.0 / chi ra web / them nut Tai / khong lam gi) -> anh KHONG chon** (tra loi
+  "No preference"), roi nhan viec web khac: rap 13 canh phai TU SANG canh ke. Da lam + day rieng phan web (`79f76da`, live
+  09:00:17, md5 live `f4440523` = blob git; do tren live: 12/12 buoc chuyen, giam chuyen dong khong tu cuon, 0 loi console).
+  Nhat ky: `PROGRESS.md` goc repo, muc [web-shotsave] 02/10 08:58. => **MA APP 0.8.0 VAN CHUA PUSH, CHUA DONG GOI LAI** (bo cai
+  0.8.0 trong Release la ban 01/10 19:22, truoc 2 lan nap hom nay). Anh chua noi "test xong het" -> KHONG tu day.
+- **Bai hoc bai do hien len man (bo sung so loi #12):** bai do Electron chay tren man anh PHAI co `process.on('uncaughtException')`
+  in ra + thoat; khong co thi mot loi vat (duong dan tuong doi) thanh HOP BAO LOI treo tren man anh.
+
+## [do] - 2026-10-02 08:15 - SO DO DAU TIEN tren man that: khay bung chi ve 6 khung, dung hinh 333 ms (chua sua)
+
+- **Boi canh:** 08:11 anh bam nut tron tren ban co dong ho (nap lan 11) va bao *"mat luon hieu ung roi em"*.
+- **So do (run-log that, 08:11:09, man phu 125%, khay 551x129, 6 anh):**
+  `khay bung (bam nut): 927 ms | cho 27 (chuan bi 0, hien san 2, ma 1, 2k 17) | bay 466 (27 khung, max 17, dau 15, xa 1288)
+  | noi +4/+17 (hien khay 3) | bung 430 (6 khung, max 333) | tan 372 (3 khung, max 17, dau 13) | don 27`
+  - Bam -> ong kinh bat dau bay: 27 ms. Ong kinh bay: 27 khung / 466 ms, khong rot khung nao. => HAI chang nay KHONG phai thu pham.
+  - Khay hien ra: trang khay ve khung dau sau 17 ms, nhung ca 430 ms man trap chi co **6 khung, mot khoang 333 ms khong co
+    khung nao** (dung ra ~25 khung). Ong kinh tan cung chi **3 khung** va keo dai 372 ms (thiet ke 240 ms).
+  - => Ngay sau khi cua so khay duoc HIEN, CA HAI trang (khay + san dien) cung ngung ve ~1/3 giay roi nhay thang toi cuoi.
+    Mat thay: khay "bup" ra, khong co man trap. Day la goc cua "chua muot" / "mat hieu ung".
+- **Nguyen nhan cua 333 ms: CHUA BIET** (1 mau, chua tach duoc). Nghi pham: (a) hien mot cua so dang AN (trang bi ngu,
+  tai nguyen ve bi thu hoi) dung luc can dien; (b) `d.moveTop()` san dien 2560x1383 px co chan chup man; (c) luong chinh
+  bi nghen; (d) clip-path + filter ve lan dau. Thumbnail khay chi 320 px JPEG nen (e) "giai ma anh nang" kho xay ra.
+  Em KHONG nghi dong ho do gay ra (chi them vong rAF), nhung chua co so doi chung cua ban truoc -> chua loai duoc.
+- **Thay doi:** them `scripts/test/khay-bung-that.cjs` — bai do CUA SO THAT (hien len man ~45 giay), tach 4 kieu:
+  `lanh` (an -> hien -> bung ngay, khong san dien) · `am` (khay van hien, chi an noi dung -> bung) · `lanh-cho` (hien truoc
+  500 ms roi moi bung) · `day-du` (thu + bung bang dung `src/khay-thu.js`). Moi kieu 3 lan, do so khung + khoang trong lon
+  nhat + do nghen luong chinh. CHUA CHAY: so loi #12 (bat cua so len man luc anh dang ngoi may) -> xin anh gio truoc.
+- **File anh huong:** `scripts/test/khay-bung-that.cjs` (moi). Ma app khong doi so voi lan nap 11.
+- **Kiem chung bang so:** `node --check` OK; 0 byte chuong. Chua co so tu bai do nay.
+- 08:11:20 run-log co dong `boot v0.8.0` moi (anh mo lai app, khong phai em nap). 08:12:22 khay thu 1607 ms, chua co lan bung nao sau do.
+
+## [0.8.0 nap lan 11] - 2026-10-02 07:56 - GAN DONG HO DO tung chang cua lan BUNG khay (chua sua chuyen dong)
+
+- **Boi canh:** 02/10 07:5x anh dung that lan dau va bao: *"animation thuc te chua muot lam, luc icon nho o goc anh bam vao
+  va no bung khay ra"*. Run-log that sang nay: 2 lan bung 938 ms va 918 ms, 3 lan thu 1138 / 1200 / 2635 ms. Dong log cu chi
+  ghi TONG thoi gian nen khong biet khung o chang nao.
+- **Nguyen nhan that: CHUA BIET.** Lan nap nay chi them thuoc do, KHONG doi chuyen dong. Vi sao bai `test:khaynut` 30/30
+  khong bat duoc: no chay cua so offscreen, khong co do tre luc Windows HIEN mot cua so that (trong bai an, tu luc ong kinh
+  toi noi den khung dau cua khay = 0 ms). Cho nghi (chua do, khong duoc coi la ket luan): (a) tu luc bam toi luc ong kinh
+  bat dau bay phai hien cua so san dien 2048x1105 + giai ma anh + cho 2 khung; (b) luc ong kinh toi noi, main moi `show`
+  cua so khay dang an roi moi goi `__khayBung`, trong khi lenh "tan" cua ong kinh da gui ngay -> ong kinh co the tan xong
+  truoc khi khay ve khung dau.
+- **Thay doi:**
+  - `src/khay-thu.js`: `bung()` ghi moc gio tung chang (`m`), ham moi `ghiDo()` noi vao dong `khay bung (...)` trong run-log:
+    `| cho N (chuan bi, hien san, ma, 2k) | bay N (n khung, max, dau, xa) | noi +N/+N (hien khay) | bung N (n khung, max)
+    | tan N (n khung, max, dau) | don N`. Kenh `dien:bao` nhan them tham so `kem` (so do cua chang).
+  - `src/dien/dien.js`: `doKhung()` dem khung bang rAF trong chang bay va chang tan; `bao('san-sang' | 'toi' | 'xong', so do)`.
+  - `src/preload-dien.js`: `bao(ten, kem)`.
+  - `src/shelf/shelf.js`: `__khayBung()` tra `{ dau, n, max, ms }` thay vi `true`.
+- **Bay thuoc do da vap trong luc lam:** so gio `Date.now()` cua TRANG voi cua MAIN lech nhau ~8 ms (do "noi" ra -8 ms) ->
+  doi sang tinh trong mot dong ho: (main thay lenh bung di + ve bao lau) - (trang tu do no chay bao lau). Va: rAF chi thay
+  nhip luong chinh cua trang, KHONG thay do tre ghep hinh cua Windows (bai hoc 5ao) -> so nay bat duoc khung rot / dung hinh,
+  khong chung minh duoc "muot". So dep ma anh van thay giat thi phai quay man hinh that (xin anh ~15 giay).
+- **File anh huong:** `src/khay-thu.js`, `src/dien/dien.js`, `src/preload-dien.js`, `src/shelf/shelf.js`.
+- **Kiem chung bang so:** `node --check` 4 file OK. `npm run test:khaynut` (an, khong hien gi len man): lan 1 TRUOT 2 muc
+  (em de emoji trong chu thich `dien.js` -> da bo; "THU VE duoi 1,3 giay" ra 1318 ms), lan 2 TAT CA DAT. Dong do trong bai
+  an: `khay bung (bai do): 911 ms | cho 28 (... 2k 27) | bay 467 (27 khung, max 17, xa 1196) | noi +0/+0 | bung 416 (22
+  khung, max 50) | tan 267 (14 khung, max 33) | don 33`. Nap tai cho 07:56:19 (`boot v0.8.0 ... dang-ky=OK`), app.asar md5
+  `5d19fbe6` (ban truoc `955f7fc8` cat o `.selftest/ban-cai-truoc`); truoc / sau: 617 anh-video, 9 dai, cau hinh `aaa89bcf`
+  giong nhau.
+- **[CHO ANH]** chup 1 tam -> de khay tu thu -> bam nut tron, 3 lan. Sau do doc run-log that
+  (`\\localhost\C$\Users\DRT-G21\AppData\Roaming\AiO Shot & Save\run-log.txt`), dong `khay bung (bam nut)`.
+- **[CHUA SUA, thay trong log sang nay]** moi lan thu / bung tren man phu 125% deu ghi `khay-thu CANH BAO cua so san dien
+  xin ...height 1105 duoc ...1107` (Windows tra cua so to them 2 px; `lechDang()` chi nhan 1 px) -> canh bao gia + dat lai
+  cua so 2 lan moi luot. Lan thu 07:49 mat 2635 ms (2 lan truoc ~1,2 giay): chua biet vi sao.
+- CHUA commit (cho so do roi sua, commit mot luot). Bo cai 0.8.0 trong Release (md5 `5181fe53`) la ban TRUOC lan nap nay.
 
 ## [/xong] - 2026-10-01 19:07 - Chot so lan 2 trong ngay (may cong ty)
 - Phien 12:55 -> 19:07: 4 lan nap tai cho (lan 6-9), chi tiet o 4 muc ngay duoi. Khong tang so phien ban (van 0.8.0) vi
