@@ -5,6 +5,29 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-02 09:17 (UTC+7) - Cảnh 9 "Nhớ ảnh": đổi "5 ảnh vẫn còn" thành "Ảnh gần nhất tự hiện lại" + nói số ảnh chỉnh trong Cài đặt - máy công ty
+
+- **Bối cảnh:** anh chụp cảnh 9 của rạp: *"cái này anh cần sửa lại là 5 ảnh vẫn còn như sau: mở lại sẽ tự động hiển thị ảnh
+  gần nhất, có thể tùy chỉnh trong settings số ảnh cần gợi ý trong phiên mở mới"*.
+- **Kiểm app trước khi viết lên web:** app CÓ SẴN tuỳ chọn này: `src/settings/index.html` hàng "Mở lại ảnh gần nhất" với 4 nút
+  Tắt / 5 / 10 / 20, `main.js napAnhGanNhatVaoKhay()` đọc `khaySoAnh` (mặc định 5). Web không hứa thứ app chưa có.
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`):
+  - Chữ to cuối cảnh: VI *"Ảnh gần nhất / tự hiện lại."*, EN *"Your latest shots / come right back."* (2 dòng: câu mới dài gần
+    gấp đôi câu cũ, 1 dòng sẽ chiếm ~94% bề rộng sân).
+  - Thêm nhãn nhỏ dưới khay: VI *"Chọn số ảnh mở lại trong Cài đặt: Tắt, 5, 10 hoặc 20"*, EN *"Pick how many reopen in
+    Settings: Off, 5, 10 or 20"*. Cảnh giữ lâu hơn 1 giây (1,6 → 2,6 giây) để kịp đọc.
+  - Thẻ mô tả `f9p` (VI + EN): bỏ con số "5 ảnh", thêm câu chọn số ảnh trong Cài đặt.
+- **Đo** (Chrome ngầm, 6 khổ 360 → 1440 × VI/EN = 12 lượt, cảnh ở khung cuối): chữ to và nhãn tràn sân **0/12**, đè khay
+  **0/12**, đè nhau **0/12**, chữ to lệch tâm **0 px**; 0 lỗi console. Ảnh chụp 1440 và 390 (VI): 5 thumbnail hiện đủ, nhãn
+  nằm dưới khay. Ở 360 và 390 nhãn xuống 2 dòng, cách đáy khay 11 và 24 px.
+- **Bẫy đo (thước sai 3 lần trong một việc nhỏ):** (1) trang có cuộn mượt: đo ngay sau `scrollTo` thì cảnh bị dựng lại giữa
+  chừng → bản VI đo nhầm câu "Tắt ứng dụng." (phải chờ vị trí cuộn đứng yên + kiểm chữ đang hiện đúng là câu cuối);
+  (2) `tl.progress(1)` bắn `onComplete` → 0,9 giây sau trang TỰ SANG cảnh 10 (tính năng thêm lúc 08:58) đúng lúc chụp → ảnh ra
+  chữ cảnh 9 với chú thích cảnh 10; đưa phim tới 99,9% thay vì 100%; (3) ép từng tween về cuối làm thumbnail trong khay biến
+  mất (lệnh `set` opacity 0 chạy sau lệnh hiện) → không ép tween, chờ 600 ms. Phép đếm thumbnail bằng nhãn "#n" ra 0 ở khổ
+  hẹp vì nhãn số bị ẩn trên điện thoại (ảnh chụp cho thấy đủ 5).
+- **CHƯA đo:** điện thoại thật / Safari; nền sáng.
+
 ## [web-shotsave] - 2026-10-02 08:58 (UTC+7) - Rạp 13 cảnh: cảnh diễn xong TỰ SANG cảnh kế (trước: lặp lại chính nó) - máy công ty
 
 - **Bối cảnh:** anh chụp dải 13 clip của rạp trên web Shot & Save: *"chạy xong cái số 1 nó tự nhảy qua chạy cái số 2 được
