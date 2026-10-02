@@ -16,6 +16,9 @@ DA XONG, khong con trong danh sach: Storyboard quay 3 giay (0.7.4-0.7.8) · Doc 
 **01/10 anh chon muc 4 (quay vung man hinh) -> da lam o 0.8.0: MP4 + nut tieng may + khay video rieng (xem CLAUDE.md).
 Con lai cua muc 4: xuat GIF (anh chot "lam sau") · thu tieng micro.**
 
+**02/10 14:44 muc 1 (danh so buoc) DA LAM, phim 6, nap vao app dang cai, cho anh bam thu (xem CLAUDE.md + PROGRESS.md).
+Anh nhan "thêm tính năng đi em" sau khi em de xuat thu tu 1 -> GIF -> 3 -> 2; anh khong chi dich danh muc nao.**
+
 Nhom 1 - re, hop editor, lam ngay duoc:
 | # | Tinh nang | Nguoi dung duoc gi | Cong suc + luu y |
 |---|---|---|---|

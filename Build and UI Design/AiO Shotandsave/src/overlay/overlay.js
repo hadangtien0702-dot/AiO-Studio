@@ -57,7 +57,7 @@ const DPR = window.devicePixelRatio || 1
 const MAU = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f86820'
 
 let mode = 'select'       // 'select' | 'annotate'
-let tool = 'rect'         // 'rect' | 'arrow' | 'text'
+let tool = 'rect'         // 'select' | 'rect' | 'arrow' | 'text' | 'blur' | 'so'
 let curColor = '#f86820'  // mac dinh CAM (accent). Doi qua bang mau.
 let curBlurType = 'mosaic' // 'mosaic' | 'blur'
 let dragging = false
@@ -347,7 +347,7 @@ function xuLyChinhKhung(e) {
     const shiftX = nx - curRect.x
     const shiftY = ny - curRect.y
     for (const s of shapes) {
-      if (s.type === 'text') {
+      if (s.type === 'text' || s.type === 'so') {
         s.x -= shiftX
         s.y -= shiftY
       } else {
@@ -463,7 +463,7 @@ window.addEventListener('keydown', (e) => {
     const step = e.shiftKey ? 10 : 1
     const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
     const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
-    if (selectedShape.type === 'text') {
+    if (selectedShape.type === 'text' || selectedShape.type === 'so') {
       selectedShape.x += dx; selectedShape.y += dy
     } else {
       selectedShape.x1 += dx; selectedShape.x2 += dx
@@ -493,14 +493,14 @@ window.addEventListener('keydown', (e) => {
       (e.key === '5' || e.code === 'Digit5' || e.code === 'Numpad5')) {
     e.preventDefault(); docChuVung(); return
   }
-  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09)
+  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09); 6 = danh so buoc (02/10)
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
       'v': 'select', 'V': 'select', 'KeyV': 'select',
-      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur',
+      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so',
       'b': 'blur', 'B': 'blur', 'KeyB': 'blur',
-      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur',
-      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur'
+      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so',
+      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so'
     }
     const t = keyMap[e.key] || keyMap[e.code]
     if (t) chonCongCu(t)
@@ -611,13 +611,19 @@ function layHopBaoShape(s) {
     const b = tinhHopBaoChu(s)
     return { x: b.x - 2, y: b.y - 2, w: b.w + 4, h: b.h + 4 }
   }
+  if (s.type === 'so') {
+    const r = R_SO + 4
+    return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 }
+  }
   return null
 }
 
 function timShapeTaiDiem(lx, ly) {
   for (let i = shapes.length - 1; i >= 0; i--) {
     const s = shapes[i]
-    if (s.type === 'rect' || s.type === 'blur') {
+    if (s.type === 'so') {
+      if (Math.hypot(lx - s.x, ly - s.y) <= R_SO + 4) return { shape: s, index: i }
+    } else if (s.type === 'rect' || s.type === 'blur') {
       const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
       const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2)
       const pad = 6
@@ -689,6 +695,13 @@ function batDauVe(e) {
   }
   if (tool === 'text') { moOGoChu(document.body, lx, ly, curRect.x, curRect.y); return }
   chotOGoChu() // bam ve khung/mui ten khi dang go chu -> chot chu truoc
+  if (tool === 'so') {
+    // Bam = dong so ngay; con giu chuot thi keo chinh cho, tha ra la xong.
+    soDangDat = { type: 'so', ...kepTamSo(lx, ly, curRect.w, curRect.h), color: curColor }
+    shapes.push(soDangDat)
+    redraw()
+    return
+  }
   veStart = { x: lx, y: ly }
 }
 
@@ -700,6 +713,7 @@ function chonLaiTuDau(e) {
   mode = 'select'
   shapes = []
   veStart = null
+  soDangDat = null
   isAdjusting = false
   adjustType = null
   toolbarEl.style.opacity = '1'
@@ -727,7 +741,7 @@ function veDangKeo(e) {
         selectedShape.y1 = shapeBanDau.y1 + dy
         selectedShape.x2 = shapeBanDau.x2 + dx
         selectedShape.y2 = shapeBanDau.y2 + dy
-      } else if (selectedShape.type === 'text') {
+      } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
         selectedShape.x = shapeBanDau.x + dx
         selectedShape.y = shapeBanDau.y + dy
       }
@@ -736,6 +750,11 @@ function veDangKeo(e) {
       const hit = timShapeTaiDiem(lx, ly)
       veEl.style.cursor = hit ? 'move' : 'default'
     }
+    return
+  }
+  if (soDangDat) {
+    Object.assign(soDangDat, kepTamSo(e.clientX - curRect.x, e.clientY - curRect.y, curRect.w, curRect.h))
+    redraw()
     return
   }
   if (!veStart) return
@@ -753,6 +772,7 @@ function ketThucVe(e) {
     }
     return
   }
+  if (soDangDat) { soDangDat = null; return }
   if (!veStart) return
   const lx = clamp(e.clientX - curRect.x, 0, curRect.w)
   const ly = clamp(e.clientY - curRect.y, 0, curRect.h)
@@ -767,6 +787,7 @@ function ketThucVe(e) {
 function redraw(preview) {
   if (!veCtx) return
   veCtx.clearRect(0, 0, curRect.w, curRect.h)
+  danhSoLai()
   const ds = preview ? shapes.concat(preview) : shapes
   for (const s of ds) veShape(veCtx, s)
   if (selectedShape && tool === 'select') {
@@ -885,6 +906,8 @@ function veShape(ctx, s) {
     veMuiTen(ctx, s.x1, s.y1, s.x2, s.y2)
   } else if (s.type === 'text') {
     veChu(ctx, s, 1)
+  } else if (s.type === 'so') {
+    veSo(ctx, s, 1)
   } else if (s.type === 'blur') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
     const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
@@ -914,8 +937,54 @@ function veMuiTen(ctx, x1, y1, x2, y2) {
 function hoanTac() {
   if (mode !== 'annotate') return
   if (oGoChu) { huyOGoChu(); return } // dang go thi Ctrl+Z = bo o go
+  soDangDat = null
   shapes.pop()
   redraw()
+}
+
+/* ── Cong cu DANH SO BUOC (phim 6, 02/10 — ROADMAP muc 0 so 1) ───────────
+   Bam len anh = dong mot huy hieu tron co so; bam tiep la 2, 3, 4... Nguoi dung: ghi chu sua cho khach ("1 doi mau,
+   2 cat ngan"), lam huong dan tung buoc. Shape {type:'so', x, y (TAM, DIP cuc bo), n, color}. So KHONG luu co dinh:
+   danhSoLai() dem lai theo thu tu trong shapes moi lan ve -> hoan tac / xoa mot so o giua thi cac so con lai tu don
+   lai lien nhau (khong bao gio co 1, 3, 4). Cung ham nay nam trong pin.js — sua o day thi sua ca ben do. */
+const R_SO = 13 // ban kinh huy hieu, px DIP
+let soDangDat = null // huy hieu vua bam, con dang giu chuot de chinh cho
+function danhSoLai() { let n = 0; for (const s of shapes) if (s.type === 'so') s.n = ++n }
+/* Tam huy hieu phai cach mep vung du de ca vong tron + vien nam trong anh. */
+function kepTamSo(lx, ly, w, h) {
+  const le = R_SO + 3
+  return {
+    x: w > le * 2 ? clamp(Math.round(lx), le, w - le) : Math.round(w / 2),
+    y: h > le * 2 ? clamp(Math.round(ly), le, h - le) : Math.round(h / 2)
+  }
+}
+/* Mau chu so: trang, tru khi nen sang (vang, xanh la, trang) thi den — tinh bang do tuong phan WCAG voi chu trang,
+   nguong 2,6 (cam 3,0 · do 3,6 · xanh duong 3,7 -> chu trang; xanh la 2,2 · vang 1,5 -> chu den). */
+function chuTrenMau(mau) {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(mau || ''))
+  if (!m) return '#ffffff'
+  const k = [1, 2, 3].map((i) => { const v = parseInt(m[i], 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) })
+  const L = 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2]
+  return 1.05 / (L + 0.05) >= 2.6 ? '#ffffff' : '#111111'
+}
+/* k = he so phong (1 khi ve tren man; anh that / kich thuoc hien thi khi xuat). */
+function veSo(ctx, s, k) {
+  const cx = s.x * k, cy = s.y * k, r = R_SO * k
+  const chu = chuTrenMau(s.color)
+  const so = String(s.n || 1)
+  const kb = k * (ctx.getTransform ? ctx.getTransform().a : 1) // bong do KHONG theo he so phong cua canvas
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 4 * kb; ctx.shadowOffsetY = 1 * kb
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.fillStyle = s.color; ctx.fill()
+  ctx.shadowColor = 'transparent'
+  ctx.lineWidth = 2 * k; ctx.strokeStyle = chu; ctx.stroke()
+  ctx.font = '700 ' + ((so.length > 2 ? 10 : so.length > 1 ? 12 : 14) * k) + 'px Inter, "Segoe UI", sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'
+  const m = ctx.measureText(so)
+  ctx.fillStyle = chu
+  ctx.fillText(so, cx + (m.actualBoundingBoxLeft - m.actualBoundingBoxRight) / 2, cy + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2) // can theo NET chu, khong theo o chu
+  ctx.restore()
 }
 
 /* ── Thanh cong cu ────────────────────────────────────────────────────── */

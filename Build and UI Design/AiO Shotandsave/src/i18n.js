@@ -29,6 +29,7 @@ const DICH = {
     'overlay.text': 'Ghi chữ (phím 3) — bấm vào ảnh rồi gõ · Enter xong · Shift+Enter xuống dòng',
     'overlay.blur': 'Làm mờ / Che thông tin (phím 4)',
     'overlay.ocr': 'Lấy chữ trong vùng (phím 5)',
+    'overlay.so': 'Đánh số bước 1, 2, 3 (phím 6): bấm vào ảnh, số tự tăng',
     'ocr.tieuDe': 'Chữ trong vùng chọn',
     'ocr.dem': '{n} dòng',
     'ocr.dangDoc': 'Đang đọc chữ…',
@@ -140,7 +141,7 @@ const DICH = {
     'ghim.keoFile': 'Kéo để thả file vào Premiere / Photoshop / Zalo',
     'ghim.copy': 'Sao chép (Ctrl+C)',
     'ghim.dong': 'Đóng (Esc)',
-    'ghim.goiY': 'Kéo để di chuyển · 1 / 2 / 3 để vẽ · 4 làm mờ · V chọn nét vẽ · Ctrl + lăn chuột = độ mờ',
+    'ghim.goiY': 'Kéo để di chuyển · 1 / 2 / 3 để vẽ · 4 làm mờ · 6 đánh số · V chọn nét vẽ · Ctrl + lăn chuột = độ mờ',
     'ghim.veXong': 'Lưu nét vẽ (Enter)',
     // Storyboard (Multi-Shot Storyboard Strip)
     'khay.storyboard': 'Mở khay Storyboard (phím S)',
@@ -230,6 +231,7 @@ const DICH = {
     'overlay.text': 'Text (key 3) — click the image and type · Enter to finish · Shift+Enter for a new line',
     'overlay.blur': 'Blur / Obfuscate (key 4)',
     'overlay.ocr': 'Grab text in the area (key 5)',
+    'overlay.so': 'Step numbers 1, 2, 3 (key 6): click the image, the number counts up',
     'ocr.tieuDe': 'Text in selection',
     'ocr.dem': '{n} lines',
     'ocr.dangDoc': 'Reading text…',
@@ -332,7 +334,7 @@ const DICH = {
     'ghim.keoFile': 'Drag to drop file into Premiere / Photoshop / other apps',
     'ghim.copy': 'Copy (Ctrl+C)',
     'ghim.dong': 'Close (Esc)',
-    'ghim.goiY': 'Drag to move · 1 / 2 / 3 to draw · 4 blur · V select · Ctrl + scroll = opacity',
+    'ghim.goiY': 'Drag to move · 1 / 2 / 3 to draw · 4 blur · 6 step numbers · V select · Ctrl + scroll = opacity',
     'ghim.veXong': 'Save drawing (Enter)',
     // Storyboard (Multi-Shot Storyboard Strip)
     'khay.storyboard': 'Open Storyboard shelf (S key)',

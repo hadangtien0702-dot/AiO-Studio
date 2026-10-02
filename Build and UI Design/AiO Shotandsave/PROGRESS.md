@@ -1,6 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 13:30 +0700 (dang lam do, chua /xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 14:44 +0700 (dang lam do, chua /xong)
+> - **02/10 14:44 TINH NANG MOI: DANH SO BUOC (phim 6) — da nap lan 15, CHO ANH BAM THU.** Bam len anh ra huy hieu tron
+>   1, 2, 3 tu tang, co o man chup va anh ghim. app.asar md5 `7a98d8a2`, boot 14:44:38. `npm run test:sobuoc` 72/72 (chay an,
+>   3 ti le man). CHUA co tren man that. Da commit tren may, CHUA push. Chi tiet: muc [0.8.0 nap lan 15] ngay duoi.
 > - **02/10 13:43 ANH XAC NHAN "thay roi em"** (2/2 lan `an 0`, 24-25 khung) cho ban sua lan 14 duoi day. Da commit tren may,
 >   CHUA push, CHUA dong goi lai (bo cai 0.8.0 trong Release la ban 01/10 19:22, chua co cac ban sua 02/10).
 > - **02/10 13:30 KHAY BUNG BI KHUAT DUOI PREMIERE: da nap ban sua lan 14.** (dong "CHUA CO XAC NHAN" da duoc thay bang dong tren) Ban sua 10:44 (dong ngay duoi)
@@ -107,6 +110,58 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 nap lan 15] - 2026-10-02 14:44 - TINH NANG MOI: danh so buoc 1-2-3 (phim 6) o man chup + anh ghim (cho anh bam thu)
+
+**Boi canh.** 13:5x anh hoi *"tinh nang nao dang can de phat trien tiep em ?"*, em de xuat thu tu: danh so buoc -> GIF ->
+hut mau -> but tu do (ROADMAP muc 0). 14:2x anh nhan *"thêm tính năng đi em"*. Em lam muc dau tien cua danh sach (danh so
+buoc, ROADMAP muc 0 so 1); anh KHONG chi dich danh tinh nang nao, day la em chon theo thu tu da de xuat.
+
+**Nguoi dung duoc gi.** Khoanh vung (hoac mo mot anh ghim) -> bam phim **6** (hoac nut hinh tron co so 1 tren thanh cong
+cu) -> bam len anh: ra huy hieu tron so 1, bam tiep ra 2, 3, 4... Con giu chuot thi keo chinh cho duoc. Doi mau bang bang
+mau nhu cac net khac. Phim V chon mot huy hieu de keo di / xoa (Delete). Ctrl+Z bo so cuoi.
+
+**Da lam gi (ma).**
+- `src/overlay/overlay.js` + `src/pin/pin.js`: kieu net ve moi `{ type: 'so', x, y (TAM), n, color }`. 4 ham GIONG HET
+  nhau o hai file (bai do so tung ky tu): `veSo` (ve vong tron ban kinh 13 px + vien 2 px + bong + chu so can theo NET
+  chu), `danhSoLai` (so KHONG luu co dinh, dem lai theo thu tu moi lan ve -> xoa so o giua thi cac so con lai tu don lai
+  lien nhau), `kepTamSo` (bam sat mep thi tam bi day vao 16 px de ca vong tron nam trong anh), `chuTrenMau` (chu so trang;
+  nen vang / xanh la / trang thi chu den, tinh bang do tuong phan WCAG voi nguong 2,6).
+- Cac cho phai biet kieu moi: tim net tai diem bam, hop bao khi chon, keo bang V, phim mui ten, keo co khung (net phai
+  dung yen tren man), hoan tac, bo vung chon lai.
+- `src/overlay/index.html` + `src/pin/index.html`: nut `data-tool="so"`, so nho goc nut la 6.
+- `src/i18n.js`: khoa `overlay.so` (VI + EN, khong gach ngang dai); cau goi y anh ghim them "6 danh so".
+- Phim 6 chu khong phai 5: phim 5 da la Doc chu o man chup; anh ghim dung cung phim cho khoi nho hai kieu.
+
+**Kiem chung (so).** `npm run test:sobuoc` (moi, chay AN, khong hien cua so): **72/72 DAT**, gom 8 muc day noi + 21 muc
+x 3 ti le man (100 / 125 / 150%) + 1 doi chung.
+- Doc DIEM ANH that tren canvas: trong huy hieu la mau cam 248,104,32; cach tam 25 px la trong suot.
+- Net chu so cua 1, 2, 3 khac nhau it nhat 20 / 43 / 51 diem anh (100 / 125 / 150%) -> khong phai ba huy hieu cung mot so.
+- Chu so lech tam huy hieu nhieu nhat 0,5 px.
+- Xoa so 2 trong 1-2-3-4: con lai 1, 2, 3 (khong ra 1, 3, 4). Ve mot khung xen giua: so tiep theo van la 4.
+- Keo co khung (-30, -20): huy hieu so 1 o man 180:160 truoc va sau (dung yen).
+- Anh ghim: anh that 900x600 hien 600x400 -> luu ra 900x600, huy hieu phong 1,5 lan dung cho, cho khong bam con nguyen.
+- DOI CHUNG: lam hong ham dem so + ham kep mep ngay trong trang -> 7 muc truot, du ca 4 muc phai bat.
+- Hoi quy chay an: `test:khaynut` 31/31, `test:lammo` 25/25, `test:storyboard` DAT.
+- Nap vao app dang cai bang `node scripts/cai-tai-cho.mjs` (noi `&&` sau 2 bai do): app.asar md5 `57c17e37` -> `7a98d8a2`,
+  boot 14:44:38, anh/video 641 -> 641, 9 dai Storyboard, cau hinh giong truoc.
+
+**Thuoc sai 2 lan trong luc lam (san pham khong sai):**
+1. Bai cham bao "ham `danhSoLai` o 2 file khac nhau": bieu thuc tim ham thu kieu nhieu dong truoc nen voi ham MOT DONG no
+   an luon sang ham ke tiep (ben overlay co them dong ghi chu). Sua: thu kieu mot dong truoc.
+2. Diem anh sat vien o man 125% ra cam nhat (250,142,88): su kien chuot la so nguyen con mep canvas cua anh ghim o 125% la
+   so le -> huy hieu nam o y = 79 thay vi 80, bai do lai soi hang y = 80. Sua: soi theo toa do THAT cua huy hieu.
+
+**CHUA lam / CHUA do.**
+- [CHO ANH] bam thu tren app that: khoanh vung -> 6 -> bam 3 cho -> Xong; mo anh ghim -> 6 -> bam -> Enter.
+- Chuot that tren cua so that chua do (bai do dung su kien gia lap trong trang). `test:chu` / `test:khung` (hien cua so len
+  man, phai hoi anh truoc) CHUA chay lai sau khi sua `pin.js`.
+- Huy hieu co dinh 26 px: tren anh 4K co the nho, chua co cach doi co. So tu 100 tro len chu 10 px (chua xem bang mat).
+- Vao ve lai mot anh ghim da luu so: dem lai tu 1 (so cu da la diem anh). Chua co cach dem tiep.
+- Chua len web, chua dong goi, chua push (luat 01/10). Mac chua thu.
+- ☠️ Phat hien kem, CO SAN tu truoc, chua sua: trang man chup va anh ghim KHONG nap duoc font Inter (chinh sach noi dung
+  cua trang thieu `font-src`, trinh duyet chan `assets/fonts/Inter.woff2`) -> chu tren thanh cong cu, cong cu Chu va chu so
+  huy hieu deu dang ve bang Segoe UI. Sua la doi hinh dang chu anh dang nhin quen -> cho anh quyet.
 
 ## [0.8.0 nap lan 14] - 2026-10-02 13:30 - Khay bung PHAI len tren cung (`hien(khay, true)`), go ban sua sai 10:44 (CHUA co xac nhan cua anh)
 

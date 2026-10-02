@@ -116,7 +116,7 @@ window.addEventListener('keydown', (e) => {
     const step = e.shiftKey ? 10 : 1
     const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
     const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
-    if (selectedShape.type === 'text') {
+    if (selectedShape.type === 'text' || selectedShape.type === 'so') {
       selectedShape.x += dx; selectedShape.y += dy
     } else {
       selectedShape.x1 += dx; selectedShape.x2 += dx
@@ -127,14 +127,14 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Enter' && mode === 've') { luuVe(); return }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { window.pin.copy(); return }
-  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09)
+  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09); 6 = danh so buoc (02/10)
   if (!e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
       'v': 'select', 'V': 'select', 'KeyV': 'select',
-      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur',
+      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so',
       'b': 'blur', 'B': 'blur', 'KeyB': 'blur',
-      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur',
-      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur'
+      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so',
+      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so'
     }
     const t = keyMap[e.key] || keyMap[e.code]
     if (t) { if (mode !== 've') vaoCheDoVe(); chonCongCu(t) }
@@ -191,6 +191,7 @@ function thoatVe() {
   frame.classList.remove('dang-ve')
   shapes = []
   veStart = null
+  soDangDat = null
   selectedShape = null
   dangKeoShape = false
   shapeBanDau = null
@@ -271,13 +272,19 @@ function layHopBaoShape(s) {
     const b = tinhHopBaoChu(s)
     return { x: b.x - 2, y: b.y - 2, w: b.w + 4, h: b.h + 4 }
   }
+  if (s.type === 'so') {
+    const r = R_SO + 4
+    return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 }
+  }
   return null
 }
 
 function timShapeTaiDiem(lx, ly) {
   for (let i = shapes.length - 1; i >= 0; i--) {
     const s = shapes[i]
-    if (s.type === 'rect' || s.type === 'blur') {
+    if (s.type === 'so') {
+      if (Math.hypot(lx - s.x, ly - s.y) <= R_SO + 4) return { shape: s, index: i }
+    } else if (s.type === 'rect' || s.type === 'blur') {
       const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
       const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2)
       const pad = 6
@@ -347,6 +354,13 @@ veEl.addEventListener('mousedown', (e) => {
   }
   if (tool === 'text') { moOGoChu(frame, lx, ly, veEl.offsetLeft, veEl.offsetTop); return }
   chotOGoChu()
+  if (tool === 'so') {
+    // Bam = dong so ngay; con giu chuot thi keo chinh cho, tha ra la xong.
+    soDangDat = { type: 'so', ...kepTamSo(lx, ly, dip.w, dip.h), color: curColor }
+    shapes.push(soDangDat)
+    redraw()
+    return
+  }
   veStart = { x: lx, y: ly }
 })
 
@@ -364,7 +378,7 @@ window.addEventListener('mousemove', (e) => {
         selectedShape.y1 = shapeBanDau.y1 + dy
         selectedShape.x2 = shapeBanDau.x2 + dx
         selectedShape.y2 = shapeBanDau.y2 + dy
-      } else if (selectedShape.type === 'text') {
+      } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
         selectedShape.x = shapeBanDau.x + dx
         selectedShape.y = shapeBanDau.y + dy
       }
@@ -373,6 +387,11 @@ window.addEventListener('mousemove', (e) => {
       const hit = timShapeTaiDiem(lx, ly)
       veEl.style.cursor = hit ? 'move' : 'default'
     }
+    return
+  }
+  if (soDangDat) {
+    Object.assign(soDangDat, kepTamSo(lx, ly, dip.w, dip.h))
+    redraw()
     return
   }
   if (!veStart) return
@@ -389,6 +408,7 @@ window.addEventListener('mouseup', (e) => {
     }
     return
   }
+  if (soDangDat) { soDangDat = null; return }
   if (!veStart) return
   const r = veEl.getBoundingClientRect()
   const lx = clamp(e.clientX - r.left, 0, dip.w)
@@ -402,13 +422,57 @@ window.addEventListener('mouseup', (e) => {
 
 function hoanTac() {
   if (oGoChu) { huyOGoChu(); return }
+  soDangDat = null
   shapes.pop()
   redraw()
+}
+
+/* ── Cong cu DANH SO BUOC (phim 6, 02/10) — CUNG ham voi overlay.js, sua ben nay thi sua ca ben do ─────────
+   Bam len anh = huy hieu tron co so, bam tiep la 2, 3, 4... Shape {type:'so', x, y (TAM, DIP), n, color}. So dem lai
+   theo thu tu trong shapes moi lan ve -> hoan tac / xoa mot so o giua thi cac so con lai tu don lai lien nhau.
+   ☠️ Dem lai tu 1 moi lan VAO che do ve: so da luu vao anh o luot truoc la diem anh, app khong con biet. */
+const R_SO = 13 // ban kinh huy hieu, px DIP
+let soDangDat = null // huy hieu vua bam, con dang giu chuot de chinh cho
+function danhSoLai() { let n = 0; for (const s of shapes) if (s.type === 'so') s.n = ++n }
+function kepTamSo(lx, ly, w, h) {
+  const le = R_SO + 3
+  return {
+    x: w > le * 2 ? clamp(Math.round(lx), le, w - le) : Math.round(w / 2),
+    y: h > le * 2 ? clamp(Math.round(ly), le, h - le) : Math.round(h / 2)
+  }
+}
+/* Mau chu so: trang, tru khi nen sang (vang, xanh la, trang) thi den — do tuong phan WCAG voi chu trang, nguong 2,6. */
+function chuTrenMau(mau) {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(mau || ''))
+  if (!m) return '#ffffff'
+  const k = [1, 2, 3].map((i) => { const v = parseInt(m[i], 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) })
+  const L = 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2]
+  return 1.05 / (L + 0.05) >= 2.6 ? '#ffffff' : '#111111'
+}
+/* k = he so phong (1 khi ve tren man; anh that / kich thuoc hien thi khi xuat). */
+function veSo(ctx, s, k) {
+  const cx = s.x * k, cy = s.y * k, r = R_SO * k
+  const chu = chuTrenMau(s.color)
+  const so = String(s.n || 1)
+  const kb = k * (ctx.getTransform ? ctx.getTransform().a : 1) // bong do KHONG theo he so phong cua canvas
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 4 * kb; ctx.shadowOffsetY = 1 * kb
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.fillStyle = s.color; ctx.fill()
+  ctx.shadowColor = 'transparent'
+  ctx.lineWidth = 2 * k; ctx.strokeStyle = chu; ctx.stroke()
+  ctx.font = '700 ' + ((so.length > 2 ? 10 : so.length > 1 ? 12 : 14) * k) + 'px Inter, "Segoe UI", sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'
+  const m = ctx.measureText(so)
+  ctx.fillStyle = chu
+  ctx.fillText(so, cx + (m.actualBoundingBoxLeft - m.actualBoundingBoxRight) / 2, cy + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2) // can theo NET chu, khong theo o chu
+  ctx.restore()
 }
 
 function redraw(preview) {
   if (!veCtx) return
   veCtx.clearRect(0, 0, dip.w, dip.h)
+  danhSoLai()
   const ds = preview ? shapes.concat(preview) : shapes
   for (const s of ds) veShape(veCtx, s, 1)
   if (selectedShape && tool === 'select') {
@@ -514,6 +578,8 @@ function veShape(ctx, s, k) {
     veMuiTen(ctx, s.x1 * k, s.y1 * k, s.x2 * k, s.y2 * k, 13 * k)
   } else if (s.type === 'text') {
     veChu(ctx, s, k)
+  } else if (s.type === 'so') {
+    veSo(ctx, s, k)
   } else if (s.type === 'blur') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
     const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
@@ -566,6 +632,7 @@ function luuVe() {
     out.height = nh
     const ctx = out.getContext('2d')
     ctx.drawImage(img, 0, 0, nw, nh)
+    danhSoLai()
     for (const s of shapes) veShape(ctx, s, k)
     const dataUrl = out.toDataURL('image/png')
     img.src = dataUrl            // cua so ghim hien ban da ve ngay

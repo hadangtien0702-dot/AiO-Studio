@@ -449,6 +449,23 @@ KHAY TU THU VE NUT TRON (01/10 16:07 — anh chot kieu chuyen dong trong bang ho
   doi chung. CHUA DAT: chua ai xem tren man that (thu tu chong cua so, do muot, man 125%, nhay hinh luc doi ban ve <->
   cua so that) · RAM 2 tien trinh moi chua do · `test:khay` / `test:co-khay` chua chay lai · Mac chua thu · kieu C chua lam.
 
+DANH SO BUOC 1-2-3 (02/10 14:44, phim 6 — da nap vao app dang cai, anh CHUA bam thu):
+- Nguoi xai: khoanh vung (hoac mo anh ghim) -> phim **6** hoac nut hinh tron co so 1 -> bam len anh ra huy hieu tron 1, bam
+  tiep ra 2, 3, 4...; con giu chuot thi keo chinh cho. Doi mau bang bang mau; V chon de keo / Delete xoa; Ctrl+Z bo so cuoi.
+  Xoa mot so o giua thi cac so con lai tu don lai lien nhau. Vi du doi thuong: gui khach mot tam anh timeline co danh
+  "1 doi mau, 2 cat ngan, 3 doi nhac" thay vi viet mot doan mo ta vi tri.
+- Builder: net ve `{ type: 'so', x, y (TAM, DIP), n, color }` trong `overlay.js` va `pin.js`. 4 ham `veSo`, `danhSoLai`,
+  `kepTamSo`, `chuTrenMau` phai GIONG HET nhau o hai file (bai do so tung ky tu) — sua mot ben la sua ca hai. So khong luu
+  co dinh: `danhSoLai()` dem lai theo thu tu trong `shapes` moi lan `redraw`. Cho de hong: (1) net co toa do TAM (`x, y`)
+  nhu cong cu Chu, khong phai `x1..y2` -> moi cho dich / keo net phai xet `type === 'text' || type === 'so'`; (2) `veSo`
+  doi `textAlign` nen phai `save / restore`, khong thi cong cu Chu ve lech; (3) bong do khong theo he so phong cua canvas
+  -> nhan them `getTransform().a`; (4) phim 5 la Doc chu, dung lay lai; (5) su kien chuot la so nguyen con mep canvas anh
+  ghim o man 125% la so le -> huy hieu co the lech 1 px so voi cho bam (co san voi moi cong cu).
+- MVP (so): `npm run test:sobuoc` 72/72 chay an o 100 / 125 / 150% (doc diem anh: mau huy hieu, net chu tung so khac nhau,
+  chu lech tam <= 0,5 px, xoa so giua don lai, keo co khung huy hieu dung yen, anh ghim luu 900x600 dung cho) + doi chung
+  lam hong 2 ham phai bi bat. CHUA DAT: anh chua bam tren app that · chuot that chua do · huy hieu co dinh 26 px (anh 4K
+  co the nho) · vao ve lai anh ghim thi dem lai tu 1 · chua len web · Mac chua thu.
+
 ## Chua lam (xem PROGRESS.md)
 
 Cai thu MAY SACH (khong Node/nguon) truoc khi phat ra ngoai · ky so (SmartScreen Windows; mac = Apple
