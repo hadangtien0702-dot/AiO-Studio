@@ -213,7 +213,12 @@ window.batDauQuay = async function (q) {
           o.soVe++
           clearTimeout(o.hen); o.hen = setTimeout(giuNhip, 1800 / q.fps)
         }
-      })().catch((e) => { o.loi = o.loi || 'doc khung loi: ' + (e && e.message) })
+      })().catch((e) => {
+        // 02/10 (ECC soat, muc A3): doc khung hong ma van ghi tiep = video DUNG HINH toi khi nguoi dung bam Dung.
+        // Dung ngay bo ghi: phan da quay duoc luu, main danh dau "Bi ngat" + bao nguoi dung.
+        o.loi = o.loi || 'doc khung loi: ' + (e && e.message)
+        if (rec.state !== 'inactive') rec.stop()
+      })
       o.hen = setTimeout(giuNhip, 1800 / q.fps)
     } else if (theoKhung) {
       /* GIU NHIP khi man dung yen: luong khong ra khung moi (WGC zero-hz) -> file se thua khung (Premiere khong ua).

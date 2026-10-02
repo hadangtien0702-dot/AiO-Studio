@@ -28,7 +28,7 @@ const { taoKhayThu, giayHopLe } = require('./khay-thu') // 01/10: khay tu thu ve
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
-const { taoBanKhongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
+const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
@@ -132,7 +132,7 @@ async function thuQuay() {
   const doi = async (dk, ms) => { const han = Date.now() + ms; while (!dk() && Date.now() < han) await cho(100); return dk() }
   const js = (w, code) => w.webContents.executeJavaScript(code).catch((e) => 'LOI: ' + e.message)
   try {
-    khoVideo.khoiTao(app.getPath('userData'))
+    khoVideo.khoiTao(app.getPath('userData'), ghiLog)
     lang = kho.docCauHinh().lang || 'vi'
     kq.thuMucLuu = kho.thuMucAnh()
     await luong.khoiDong({ ghiLog })
@@ -338,7 +338,8 @@ app.whenReady().then(() => {
   })
 
   khoDai.khoiTao(app.getPath('userData'))
-  khoVideo.khoiTao(app.getPath('userData'))
+  khoVideo.khoiTao(app.getPath('userData'), ghiLog)
+  setTimeout(khoiPhucVideoDo, 5000) // 02/10: file quay do cua lan truoc (app bi tat giua luc quay) -> dua lai vao khay
   kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
@@ -735,13 +736,19 @@ ipcMain.handle('settings:set-khay', (_e, kieu) => {
   return { khayKieu: kieuKhay() }
 })
 
+/* Cua so nao DUOC nap lai khi doi ngon ngu. ☠️ 02/10 (ECC soat, muc A4): truoc do nap lai MOI cua so, gom ca cua so
+   luong AN (src/luong: bo quay video + luong chup chay san), dong ho / vien quay (src/dem) va san dien cua khay
+   (src/dien) -> doi ngon ngu luc dang quay la doan quay hong, dong ho ve 0:00; luong chup chay san cung chet theo.
+   Ba loai cua so do khong co chu can dich lai (nut Dung tren dong ho giu ngon ngu cu toi luot quay sau). */
+function duocNapLai(url) { return !/\/src\/(luong|dem|dien)\//.test(String(url || '').replace(/\\/g, '/')) }
+
 // Doi ngon ngu: luu, cap nhat tray, NAP LAI cac cua so dang mo de dich lai.
 ipcMain.handle('settings:set-lang', (_e, l) => {
   lang = (l === 'en') ? 'en' : 'vi'
   kho.ghiCauHinh({ lang })
   rebuildTrayMenu()
   for (const w of BrowserWindow.getAllWindows()) {
-    if (!w.isDestroyed()) w.webContents.reload()
+    if (!w.isDestroyed() && duocNapLai(w.webContents.getURL())) w.webContents.reload()
   }
   return { lang }
 })
@@ -2156,12 +2163,57 @@ function ketThucGhiHinh(g, info) {
     baoKhongQuayDuoc((info && info.loi) || 'khong co du lieu')
     return
   }
-  let file = g.duong
-  try { fs.renameSync(g.tam, file) } catch (e) { ghiLog('quay-video LOI doi ten ' + g.tam + ': ' + e.message); file = g.tam }
-  const m = khoVideo.them({ file, ms, w: g.w, h: g.h, tieng: g.tieng, bytes: g.bytes })
-  if (!m) ghiLog('quay-video LOI ghi so (file van nam o ' + file + ')')
-  videoMoi = m ? m.id : null
+  /* 02/10 (ECC soat, muc A3 / A5): that bai KHONG duoc im lang.
+     - Khong doi ten duoc `.tam`: KHONG ghi file `.tam` vao so (khay hien o den, keo ra la file `.tam`). De nguyen file,
+       bao nguoi dung; lan mo app sau khoiPhucVideoDo() doi ten + dua vao khay.
+     - Ghi so that bai: file van tren dia -> bao + mo dung thu muc khi nguoi dung bam thong bao; lan mo khay sau
+       khoVideo.doiChieu() tu dua lai vao so.
+     - Luot quay ket thuc vi LOI giua chung (dia day, luong man hinh chet, het 4 giay cho dung): van luu, nhung ghi
+       `loi` vao so (khay danh dau "Bi ngat") + thong bao. Truoc do loi chi nam trong log, video thieu trong nhu du. */
+  const loiQuay = (info && info.loi) || g.loiGhi || null
+  const c = khoVideo.chotQuay({ tam: g.tam, file: g.duong, ms, w: g.w, h: g.h, tieng: g.tieng, bytes: g.bytes, loi: !!loiQuay })
+  if (c.hong) { baoVideo('quay.ngoaiKhay', c.file); return } // chotQuay da ghi log ly do
+  videoMoi = c.m.id
+  if (loiQuay) baoVideo('quay.biNgat', null)
   if (!dangThoat) openVideoWindow()
+}
+
+/* Thong bao he thong ve mot video. file != null: bam thong bao = mo thu muc co file do; file == null: mo Khay video.
+   Giu tham chieu toi thong bao (khong giu thi bi don rac, bam vao khong con ai nghe). */
+const thongBaoVideo = new Set()
+function baoVideo(khoaChu, file, thamSo) {
+  if (dangThoat || !Notification.isSupported()) return
+  let body = T(khoaChu)
+  for (const [k, v] of Object.entries(thamSo || {})) body = body.split('{' + k + '}').join(String(v))
+  const n = new Notification({ title: 'AiO Shot & Save', body })
+  thongBaoVideo.add(n)
+  if (thongBaoVideo.size > 8) thongBaoVideo.delete(thongBaoVideo.values().next().value)
+  n.on('click', () => { if (file) shell.showItemInFolder(file); else openVideoWindow() })
+  n.on('close', () => thongBaoVideo.delete(n))
+  n.show()
+}
+
+/* 02/10 (ECC soat, muc A2): app bi tat dot ngot giua luc quay (mat dien, treo may, bo cai tat app) -> doan dang quay
+   nam lai thanh `shotandsave-video-*.mp4.tam`, khong vao so, khong ai don. Luc mo app: doi ten thanh video + dua vao
+   khay, danh dau "Bi ngat". File quay la MP4 phan manh nen cut o dau cung van phat duoc toi khuc cuoi da ghi.
+   ☠️ Cho 4 giay roi moi dung vao: file con dang lon len = co ban app KHAC (AIO_USERDATA, cung thu muc anh) dang quay
+   vao no (bo quay ghi 1 khuc moi giay). Ham nay TU bat loi: goi tu setTimeout, loi nem ra se khong ai thay. */
+async function khoiPhucVideoDo() {
+  try {
+    const thuMuc = kho.thuMucAnh()
+    let doi = []
+    const ung = khoVideo.timTam(thuMuc)
+    if (ung.length) {
+      await cho(4000)
+      const kq = khoVideo.khoiPhucTam(ung, ghiHinh ? ghiHinh.tam : null)
+      doi = kq.doi
+      ghiLog('video khoi phuc file quay do: doi ten ' + kq.doi.length + ', bo file rong ' + kq.bo.length +
+        (kq.loi.length ? ', KHONG dung vao ' + kq.loi.length + ' (' + kq.loi.join('; ') + ')' : ''))
+    }
+    const r = khoVideo.doiChieu(thuMuc, { coTieng: coDuongTieng, biNgat: doi })
+    if (r.them || r.loi) ghiLog('video doi chieu so voi dia: them ' + r.them + ' muc' + (r.loi ? ', LOI ' + r.loi : ''))
+    if (doi.length) baoVideo('quay.daKhoiPhuc', null, { n: doi.length })
+  } catch (e) { ghiLog('video khoi phuc LOI: ' + ((e && e.stack) || e)) }
 }
 
 ipcMain.on('quay:dung', () => dungGhiHinh('nut Dung'))
@@ -2182,9 +2234,14 @@ function bytesSeXoa(m) { const k = banKhongTieng(m); let b = m.bytes; if (k) { t
 ipcMain.handle('video:get-data', () => {
   const moiId = videoMoi
   videoMoi = null // chi danh dau "moi" dung 1 lan (mo lai / reload khong tu phat nua)
+  // 02/10: video do app quay nam tren dia ma khong co trong so (so hong, ghi so that bai) -> dua lai truoc khi hien
+  try {
+    const r = khoVideo.doiChieu(kho.thuMucAnh(), { coTieng: coDuongTieng })
+    if (r.them || r.loi) ghiLog('video doi chieu so voi dia: them ' + r.them + ' muc' + (r.loi ? ', LOI ' + r.loi : ''))
+  } catch (e) { ghiLog('video doi chieu LOI: ' + e.message) }
   const ds = khoVideo.danhSach().map((m) => ({
     id: m.id, ten: path.basename(m.file), url: pathToFileURL(m.file).href,
-    ms: m.ms, w: m.w, h: m.h, bytes: m.bytes, taoLuc: m.taoLuc,
+    ms: m.ms, w: m.w, h: m.h, bytes: m.bytes, taoLuc: m.taoLuc, loi: !!m.loi,
     coNutTieng: !!m.tieng && /\.mp4$/i.test(m.file), // video quay khong tieng (mac) / webm: khong co gi de chon
     boTieng: !!(m.boTieng && banKhongTieng(m)),
     bytesXoa: bytesSeXoa(m),

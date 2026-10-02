@@ -90,8 +90,19 @@ function taoHang(m, so) {
   const meta = document.createElement('span')
   meta.className = 'dai-meta'
   // 01/10 (anh: "dong bo font / text"): thoi luong da nam tren khung video (.vd-gio) -> khong noi lai o day (mot thong diep mot noi)
-  meta.textContent = [gio(m.taoLuc), m.w + '×' + m.h, dungLuong(m.bytes)].join(' · ')
+  // 02/10: muc duoc dua lai vao so (so hong / file quay do) khong co so do luc quay (w = h = ms = 0) -> doc tu chinh video
+  const veMeta = () => { meta.textContent = [gio(m.taoLuc), ...(m.w && m.h ? [m.w + '×' + m.h] : []), dungLuong(m.bytes)].join(' · ') }
+  veMeta()
   meta.title = m.ten
+  /* 02/10 (ECC soat, muc A3): luot quay ket thuc vi loi giua chung / app bi tat giua luc quay -> noi ro tren hang,
+     khong de nguoi dung tuong la doan quay du. */
+  let nhanLoi = null
+  if (m.loi) {
+    nhanLoi = document.createElement('span')
+    nhanLoi.className = 'vd-bi-ngat'
+    nhanLoi.textContent = t('vd.biNgat')
+    nhanLoi.title = t('vd.biNgatGoiY')
+  }
   const spacer = document.createElement('span')
   spacer.className = 'spacer'
 
@@ -158,7 +169,7 @@ function taoHang(m, so) {
       showToast(t('vd.khongXoaDuoc'))
     }
   })
-  dau.append(ten, meta, spacer, ...(nhomTieng ? [nhomTieng] : []), bKeo, bMo, bXoa)
+  dau.append(ten, ...(nhanLoi ? [nhanLoi] : []), meta, spacer, ...(nhomTieng ? [nhomTieng] : []), bKeo, bMo, bXoa)
 
   const khung = document.createElement('div')
   khung.className = 'vd-khung'
@@ -176,6 +187,7 @@ function taoHang(m, so) {
   const nhanGio = document.createElement('span')
   nhanGio.className = 'vd-gio'
   nhanGio.textContent = thoiLuong(m.ms)
+  nhanGio.hidden = !m.ms // chua biet thoi luong (muc dua lai vao so): an nhan, khong ghi "0:01" sai
   const thanh = document.createElement('span')
   thanh.className = 'vd-thanh'
   const vach = document.createElement('i')
@@ -184,7 +196,12 @@ function taoHang(m, so) {
 
   // Khung dau: tua nhe de trinh duyet giai ma 1 khung (preload=metadata chua chac da ve), roi ve icon keo
   let daIcon = false
-  v.addEventListener('loadedmetadata', () => { try { v.currentTime = Math.min(0.1, (v.duration || 1) / 2) } catch (e) {} })
+  v.addEventListener('loadedmetadata', () => {
+    // So khong co co / thoi luong -> lay tu chinh file (thoi luong cua MP4 phan manh co the la vo han: khi do van an nhan)
+    if (!(m.w && m.h) && v.videoWidth && v.videoHeight) { m.w = v.videoWidth; m.h = v.videoHeight; v.style.aspectRatio = m.w + ' / ' + m.h; veMeta() }
+    if (!m.ms && isFinite(v.duration) && v.duration > 0) { m.ms = Math.round(v.duration * 1000); nhanGio.textContent = thoiLuong(m.ms); nhanGio.hidden = false }
+    try { v.currentTime = Math.min(0.1, (v.duration || 1) / 2) } catch (e) {}
+  })
   v.addEventListener('seeked', () => {
     if (daIcon) return
     daIcon = true

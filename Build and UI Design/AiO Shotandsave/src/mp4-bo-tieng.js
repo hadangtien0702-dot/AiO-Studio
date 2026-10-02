@@ -134,4 +134,26 @@ function taoBanKhongTieng(nguon, dich) {
   }
 }
 
-module.exports = { taoBanKhongTieng }
+/* 02/10: file MP4 co duong TIENG khong (doc hop moov o dau file). Dung khi dua lai vao so mot video khong con so do
+   luc quay (kho-video.doiChieu). File cut cuoi (quay do) van doc duoc vi moov nam truoc. Loi / khong phai MP4 -> false. */
+function coDuongTieng(file) {
+  let fd = null
+  try {
+    fd = fs.openSync(file, 'r')
+    const het = fs.fstatSync(fd).size
+    let pos = 0
+    for (;;) {
+      const h = dauHop(fd, pos, het)
+      if (!h) return false
+      if (h.type === 'moov') {
+        if (h.size > 64 * 1024 * 1024) return false
+        const moov = Buffer.alloc(h.size)
+        fs.readSync(fd, moov, 0, h.size, pos)
+        return phanTichMoov(moov).tieng.length > 0
+      }
+      pos += h.size
+    }
+  } catch (e) { return false } finally { if (fd != null) { try { fs.closeSync(fd) } catch (err) {} } }
+}
+
+module.exports = { taoBanKhongTieng, coDuongTieng }

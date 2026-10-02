@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 14:44 +0700 (dang lam do, chua /xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 15:48 +0700 (dang lam do, chua /xong)
+> - **02/10 15:48 DA SUA 5 LOI NHOM A cua luot ECC soat (deu o phan QUAY VIDEO) — nap lan 16.** app.asar md5 `b26fc16e`,
+>   boot 15:47:44. `npm run test:khovideo` 76/76 (chay an). Sau khi nap: so video that 6/6 muc con nguyen, log khong co
+>   dong LOI. CHUA thu tren app that cac tinh huong hong (tat app giua luc quay, dia day, doi ngon ngu luc quay).
+>   12 loi nhom B CHUA sua (B2 da het theo). Da commit tren may, CHUA push. Chi tiet: muc [0.8.0 nap lan 16] ngay duoi.
 > - **02/10 14:44 TINH NANG MOI: DANH SO BUOC (phim 6) — da nap lan 15, CHO ANH BAM THU.** Bam len anh ra huy hieu tron
 >   1, 2, 3 tu tang, co o man chup va anh ghim. app.asar md5 `7a98d8a2`, boot 14:44:38. `npm run test:sobuoc` 72/72 (chay an,
 >   3 ti le man). CHUA co tren man that. Da commit tren may, CHUA push. Chi tiet: muc [0.8.0 nap lan 15] ngay duoi.
@@ -111,7 +115,52 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
-## [soat] - 2026-10-02 15:25 - ECC soat ma 0.8.0 chua push: 17 loi, khong co loi nghiem trong, CHUA SUA muc nao
+## [0.8.0 nap lan 16] - 2026-10-02 15:48 - Sua 5 loi nhom A cua luot ECC soat: quay video hong thi KHONG duoc im lang, KHONG duoc mat video
+
+**Boi canh.** Anh xem danh sach 17 loi ECC bat (muc [soat] ngay duoi) roi nhan *"sửa 5 mục đó đi em"*. So tu log that
+truoc khi sua: 6 luot quay cua anh, 0 luot ket thuc co loi, 0 file quay do nam lai -> 5 loi nay CHUA tung xay ra tren may
+anh; sua cho may khach.
+
+**Nguyen nhan that + da sua gi.**
+| # | Goc | Sua |
+|---|---|---|
+| A1 | `kho-video.js` `doc()` nuot MOI loi doc so va tra `[]`; cac ham ghi ghi de so tu danh sach rong do | `docSo()` tach 3 truong hop: doc duoc / KHONG doc duoc (cam ghi de, tra that bai) / noi dung hong (cat ban hong sang `danh-sach.hong-<gio>.json` roi moi lap so moi). `doiChieu(thuMuc)` dung lai so tu cac file `shotandsave-video-*.mp4|webm` dang nam tren dia (goi luc mo app + moi lan mo Khay video). So co BOM van doc duoc |
+| A2 | Khong co buoc nao nhin lai file `*.mp4.tam` cua luot quay bi tat giua chung | `timTam()` + `khoiPhucTam()`: luc mo app (sau 5 giay) doi ten file quay do thanh video, dua vao so, danh dau "Bi ngat", thong bao. File 0 byte thi xoa. KHONG dung vao file: khong phai video, da co file dich, ten khong dung mau, hoac CON DANG LON LEN sau 4 giay (ban app khac dang quay vao no) |
+| A3 | Loi luc quay chi ghi log; video thieu vao khay nhu video du | So ghi them `loi: true`; khay hien nhan "Bi ngat" (mau canh bao) + thong bao he thong. `luong.js`: doc khung hong thi DUNG bo ghi ngay thay vi ghi tiep hinh dung |
+| A4 | `settings:set-lang` nap lai MOI cua so, gom cua so quay an | Ham `duocNapLai(url)`: bo qua `src/luong`, `src/dem`, `src/dien`. Tien the het luon loi co san: doi ngon ngu lam chet luong chup chay san |
+| A5 | Ghi so that bai sau khi quay chi ghi log | `khoVideo.chotQuay()` tra ro `hong: 'doi-ten' | 'ghi-so'`; `main.js` thong bao "Video da luu vao thu muc anh nhung chua hien duoc trong Khay video", bam thong bao = mo dung thu muc. Het theo luon B2: file `.tam` khong bao gio duoc ghi vao so nua |
+
+File sua: `src/kho-video.js` (viet lai), `src/mp4-bo-tieng.js` (+`coDuongTieng`), `src/main.js` (`ketThucGhiHinh`,
+`baoVideo`, `khoiPhucVideoDo`, `duocNapLai`, `video:get-data`), `src/luong/luong.js`, `src/video/video.js` + `video.css`
+(nhan "Bi ngat"; muc dua lai vao so khong co co / thoi luong thi doc tu chinh video), `src/i18n.js` (5 khoa VI + EN).
+
+**Kiem chung (so).**
+- `npm run test:khovideo`: **76/76 DAT** (truoc 44). Moi: so hong / so khong doc duoc / BOM / `chotQuay` 3 nhanh /
+  `doiChieu` 7 muc / `khoiPhucTam` 7 file gia lap du 7 tinh huong / `coDuongTieng` tren file mau that / `duocNapLai` chay
+  bang chinh ham lay tu `main.js` / khay hien file quay do (Electron an).
+- ☠️ 3 muc cu cua bai do nay KHOA CAI SAI ("so hong van them duoc muc moi (ghi de so hong)") -> da thay.
+- DOI CHUNG A1 (`.selftest/doi-chung/a1.cjs`, cung kich ban tren 2 ban): ban cu 3 video -> so hong -> quay them 1 doan
+  -> con **1** video trong khay, 0 ban luu. Ban moi: **4** video, 1 ban luu so hong.
+- File mau that bi CUT 40% cuoi (gia lap quay do): khay mo duoc, readyState 4, 1280x720, thoi luong doc ra 3,45 giay,
+  khong loi trinh phat; dong thong tin tu lay "1280×720" (khong ghi "0×0").
+- Hoi quy chay an: `test:botieng` 29, `test:quayvideo` 76 (6 luot quay that bang bo quay cua app), `test:khaynut` 31,
+  `test:sobuoc` 72 — 0 truot. Nap bang `cai-tai-cho.mjs` noi `&&` sau 5 bai: md5 `7a98d8a2` -> `b26fc16e`, boot
+  15:47:44, anh/video 641 -> 641.
+- Tren app that sau khi nap (doc qua `\\localhost\C$`): so video 6 muc / 6 con file / 0 muc bi danh dau loi / 0 muc bi
+  them nham (2 ban `-khong-tieng` khong bi dua vao so); run-log sau boot khong co dong LOI.
+
+**CHUA do / CHUA lam.**
+- Chua co luot nao tren app THAT cho cac tinh huong hong: tat app giua luc quay roi mo lai, dia day, doi ngon ngu luc
+  dang quay, thong bao he thong co hien va bam co mo dung cho khong. Muon thu phai hien thong bao + bieu tuong khay thu
+  hai len man anh -> hoi anh truoc.
+- Duong "doc khung hong thi dung bo ghi" (`luong.js`) khong co bai do nao kich duoc.
+- 12 loi nhom B con nguyen (tru B2). B3 (khong nang duoc 30 khung/giay thi im lang) la muc dang lam nhat tiep theo.
+- Ghi chu dau khoi QUAY VIDEO trong `main.js` van viet "tat app giua chung van con file phat duoc": nay DUNG nho buoc
+  khoi phuc, chua sua loi van (sua la lech md5 voi ban dang chay).
+- Sau lan nap 15:47 chi con sua CHU GHI CHU dau `scripts/test/do-kho-video.cjs` + them dong #16 vao so loi trong
+  `CLAUDE.md` (15:5x); khong file nao trong `src/` doi sau lan nap -> ban dang chay = ma nguon da commit.
+
+## [soat] - 2026-10-02 15:25 - ECC soat ma 0.8.0 chua push: 17 loi, khong co loi nghiem trong (15:48: nhom A + B2 DA SUA, xem muc tren)
 
 **Boi canh.** Anh: *"dùng ecc soát lại code đi em"*. Pham vi em chon: 43 file trong `src/` khac GitHub (`origin/main..HEAD`,
 2.439 dong them). Hai agent ECC chi doc, khong chay app: `typescript-reviewer` (logic, vong doi cua so, cong nhan lenh,
