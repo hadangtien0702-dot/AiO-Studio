@@ -3459,11 +3459,22 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       gsap.killTweensOf(san.querySelectorAll("*")); san.innerHTML = "";
       tl = CANH[i]();
       fillTw = gsap.fromTo(ray.children[i].querySelector(".fill"), { scaleX: 0 }, { scaleX: 1, duration: tl.duration(), ease: "none" });
-      tl.eventCallback("onComplete", () => { hen = setTimeout(() => { if (dang === i) dien(i); }, 900); });
-      if (tuDong.matches) { tl.progress(1); fillTw.progress(1); tl.eventCallback("onComplete", null); }
-      else if (!thay) { tl.pause(); fillTw.pause(); }
+      /* 02/10 anh Tiến: "chạy xong cái số 1 nó tự nhảy qua chạy cái số 2… hiện tại mình không bấm next nó sẽ loop lại cái số 1".
+         Cảnh diễn xong → nghỉ 0,9 giây → tự cuộn sang cảnh kế. Cảnh cuối thì diễn lại chính nó (cuộn tiếp là ra khỏi rạp).
+         Chỉ tự sang khi rạp đang chiếm phần lớn màn hình (ganGiua): người đang đọc phần phía trên / phía dưới mà rạp mới
+         ló ra một ít thì trang KHÔNG tự cuộn, cảnh diễn lại như cũ. */
+      // Người bật "giảm chuyển động": cảnh đứng ở khung cuối, KHÔNG tự cuộn, không diễn lại (đo 02/10: gắn onComplete
+      // trước tl.progress(1) thì nó bắn ngay → trang tự cuộn mỗi 1,2 giây qua hết các cảnh).
+      if (tuDong.matches) { tl.progress(1); fillTw.progress(1); return; }
+      tl.eventCallback("onComplete", () => { hen = setTimeout(() => {
+        if (dang !== i) return;
+        if (i < N - 1 && thay && ganGiua()) toi(i + 1); else dien(i);
+      }, 900); });
+      if (!thay) { tl.pause(); fillTw.pause(); }
     }
     const dinhTren = () => host.getBoundingClientRect().top + scrollY;
+    // rạp đang chiếm phần lớn màn hình: mép trên của rạp đã lên quá 40% màn, mép dưới còn dưới 60% màn
+    const ganGiua = () => { const r = host.getBoundingClientRect(); return r.top <= innerHeight * .4 && r.bottom >= innerHeight * .6; };
     function chiSo() { return Math.max(0, Math.min(N - 1, Math.floor((scrollY - dinhTren()) / BUOC()))); }
     function khiCuon() {
       const i = chiSo(); if (i === dang) return;

@@ -5,6 +5,35 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-02 08:58 (UTC+7) - Rạp 13 cảnh: cảnh diễn xong TỰ SANG cảnh kế (trước: lặp lại chính nó) - máy công ty
+
+- **Bối cảnh:** anh chụp dải 13 clip của rạp trên web Shot & Save: *"chạy xong cái số 1 nó tự nhảy qua chạy cái số 2 được
+  không, hiện tại mình không bấm next nó sẽ loop lại cái số 1"*.
+- **Nguyên nhân:** `dien(i)` gắn `onComplete` → 0,9 giây sau gọi lại `dien(i)` (cố ý từ đầu: cuộn tới đâu diễn cảnh đó, đứng
+  yên thì lặp). Không có đường nào tự sang cảnh kế.
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`, khối "cuộn tới đâu, diễn cảnh đó"):
+  - Cảnh xong → nghỉ 0,9 giây → `toi(i + 1)` (cuộn mượt sang cảnh kế, đúng đường bấm clip đang dùng). Cảnh 13 thì diễn lại
+    chính nó (cuộn tiếp là ra khỏi rạp).
+  - Chỉ tự sang khi rạp đang chiếm phần lớn màn hình (`ganGiua()`: mép trên rạp ≤ 40% màn, mép dưới ≥ 60% màn) và sân đang
+    thấy; rạp mới ló ra một ít thì trang KHÔNG tự cuộn, cảnh lặp như cũ.
+  - Người bật "giảm chuyển động": cảnh đứng ở khung cuối, không tự cuộn. ☠️ Bản sửa đầu gắn `onComplete` TRƯỚC
+    `tl.progress(1)` nên nó bắn ngay → trang tự cuộn mỗi 1,2 giây qua 7 cảnh trong 8 giây (bài đo F2 bắt được) → đổi thứ tự.
+    Bản cũ cũng có lỗi cùng gốc nhưng vô hại: dựng lại cảnh tĩnh mỗi 0,9 giây.
+- **Đo** (Chrome chạy ngầm qua CDP, máy chủ tĩnh 127.0.0.1, cuộn bằng BÁNH XE CHUỘT thật `Input.dispatchMouseEvent`, 0 lỗi console):
+  - Tốc độ thật, 1440×900, vào cảnh 1 rồi không đụng gì: sang cảnh 2 sau **5,7 giây**, cảnh 3 sau **11,7 giây**.
+  - Phim tua ×8, từ cảnh 1: **12/12** bước chuyển, mỗi bước đúng +1 cảnh, tới cảnh 13 sau 22,9 giây. Cảnh 13: diễn lại tại
+    chỗ 5 lần / 9 giây, vị trí cuộn đứng yên.
+  - Tự lăn ngược 52 nấc về cảnh 6 giữa chừng: chạy tiếp 6 → 7 → 8.
+  - Rạp mới ló (mép trên ở 55% màn): 9 giây, vị trí cuộn không đổi (937 px), cảnh 1 lặp 6 lần.
+  - Bề rộng 390 px: 3/3 bước chuyển. Giảm chuyển động: 8 giây không tự cuộn.
+  - **Đối chứng bản đang live (bản cũ):** cảnh 1 lặp 6 lần / 9 giây, vị trí cuộn không đổi → thước phân biệt được hai hành vi.
+- **Bẫy đo:** (1) giả lập điện thoại (`mobile: true`) thì lệnh bánh xe chuột không bao giờ được trả lời → bài đo treo 8
+  phút; nay mỗi lệnh CDP có hạn 15 giây và đo 390 px bằng chuột. (2) `Runtime.evaluate` với `returnByValue` trên lệnh trả
+  về cả đối tượng GSAP (`gsap.globalTimeline.timeScale(8)`) treo > 15 giây, trong lúc đó trang đi tiếp 2 cảnh → trông như
+  "nhảy cóc 2 cảnh"; cho biểu thức trả về số 1.
+- **CHƯA đo:** vuốt tay trên điện thoại thật / Safari; người xem lăn chuột đúng lúc trang đang tự cuộn. **Chưa có nút
+  tạm dừng**: người muốn đọc kỹ một cảnh sẽ bị đưa sang cảnh kế sau khi cảnh diễn xong (muốn xem lại thì bấm clip đó).
+
 ## [web-premiere] - 2026-10-01 23:42 (UTC+7) - Cảnh diễn TRONG cửa sổ Premiere (khung pm-): Auto Cut + Podcast; làm chậm + mượt sân khấu - máy nhà
 
 - **Bối cảnh:** anh xem bản 21:49: *"thiết kế UI thì đẹp nhưng layout từng section lại bị rời rạc"*, *"những con số và câu từ gây khó hiểu…
