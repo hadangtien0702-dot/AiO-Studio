@@ -1,0 +1,3 @@
+import { chay, CONG, ngu } from '../lib.mjs';
+const c = CONG.podcast;
+console.log(await chay(c, `JSON.stringify({ seq: (document.querySelector('#seqBtn').innerText || '').trim(), o: Array.from(document.querySelectorAll('input')).filter((e) => e.offsetParent !== null).map((e) => (e.getAttribute('aria-label') || '').slice(0, 14) + '=' + e.value), chon: Array.from(document.querySelectorAll('select')).filter((e) => e.offsetParent !== null).map((s) => (s.getAttribute('aria-label') || '').slice(0, 14) + '=' + s.value + ' [' + Array.from(s.options).map((o) => o.value + ':' + o.text).join(',') + ']'), cuoi: (document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(-230) })`));

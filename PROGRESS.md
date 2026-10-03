@@ -5,6 +5,56 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [mac-thu-that] - 2026-10-04 01:56 (UTC+7) - Thử VIỆC THẬT của 11 panel trong Premiere trên Mac + cài Shot & Save 0.8.0 - máy Mac nhà
+
+- **Bối cảnh:** anh: *"em test toàn bộ cho anh luôn nha em"* rồi *"cài luôn cho anh AiO Studio nha em"*. So bản đang chạy với repo
+  của MỌI app trong bộ (bài 5ay-bis): 11 panel đã bằng repo, chỉ Shot & Save lệch (máy 0.7.9, mã 0.8.0) nên "cài" = Shot & Save 0.8.0.
+- **Cách thử** (`scripts/thu-panel-mac/`, mới): bấm nút thật của panel qua cổng gỡ lỗi, đọc lại kết quả bằng ExtendScript. Tự dựng
+  1 bin + file thử riêng (clip nói 55 s và 14 s, bài nhạc 3:07, liệu podcast 89 s có đáp án) + 18 sequence `CL04 …`; thử xong dọn theo
+  danh sách: project về đúng ảnh chụp trước khi thử (13 item, 8 sequence, 0 dòng khác), lưu lại 1 lần (Re-Frames + Podcast tự lưu
+  project khi dựng nên file trên đĩa từng dính đồ thử; sau khi lưu: 0 chữ `CL04` trong file). Liệu thử + dữ liệu panel sinh ra đã vào Thùng rác.
+- **ĐẠT (đo trên Premiere Beta 26.5, Mac Intel):**
+  | Panel | Đã bấm gì | Số đo |
+  |---|---|---|
+  | Autocut | Cắt khoảng lặng: Sequence mới · Cắt tại chỗ · Hoàn tác cắt | 8 nhát, 55,28 → 40,04 s, 0 khe hở hình + tiếng (y hệt 30/09); 8/8 câu còn nguyên (3 mép nghi mất chữ đo ra −91 dB = lặng thật, đối chứng tiếng nói −18 dB); bước cắt 33,7 s; hoàn tác về 1 clip 55,28 s |
+  | Transcripts | Làm phụ đề · Xoá marker | 9 khối, 38,1 s, `.srt` đúng thứ tự + có dấu, 2 marker; xoá marker chỉ đụng sequence đang làm (sequence khác giữ 2 marker) |
+  | Short Viral | Đọc nội dung · Đặt marker · Tạo sequence | 3 khối trong 1,5 s (dùng lại bộ đệm nghe), 3 marker, 3 sequence 7,0 / 14,64 / 31,52 s trong 3 s; in/out clip gốc không đổi |
+  | Video Download | Nhập file đã tải · Tải MP3 · Bỏ khỏi danh sách | nhập vào bin, nhãn "Trong project"; tải 6 s, file mp3 thật 19,0 s, tự vào bin; bỏ khỏi danh sách không xoá file |
+  | Guide Frame | Hiện khung · Thay khung ở sequence khác | guide lên V2 đúng độ dài; **lỗi 25/09 không tái diễn**: đặt rồi thay guide ở sequence B, guide ở A còn nguyên (clip + item + PNG) |
+  | Re-Frames | Cả sequence dọc 9:16 · Xuất check 720p · Tìm đoạn theo nội dung → Tạo short | sequence 1080×1920 có hiệu ứng Auto Reframe; file check h264 1280×720 14,36 s **trùng từng byte** bản 30/09; tìm ra 1 đoạn 32 s, tạo short 31,52 s |
+  | Asset Manager (lần đầu đo trên Mac) | Thêm thư mục · Chèn vào timeline · lọc · tìm · Gỡ thư mục | 4 asset, 3 ảnh xem trước / sóng âm tạo bằng FFmpeg Mac, hiện qua máy chủ nội bộ; tiếng xuống A2, video lên V3 + A3, 0 clip cũ bị đè |
+  | Power Bins (lần đầu đo trên Mac) | Tạo brand · Thêm khay · Thêm từ timeline · mở lại panel · Chèn · Xoá brand | asset vào khay, còn nguyên sau khi đóng mở panel; chèn lên V4 + A4 (panel tự thêm track) |
+  | Music (lần đầu đo trên Mac) | Tìm Key · Tìm BPM · Import thư mục · phát · Chèn vào Timeline | tiếng nói: cảnh báo "cao độ không rõ" (đúng); bài nhạc: C#m 84 %, 126 BPM; 60 s đầu của cùng bài đo nền ra đúng C#m + 126; phát chạy 0,17 → 2,18 s; chèn vào A2 |
+  | Podcast, tiếng máy quay làm mic (tiếng 2 kênh) | Auto Podcast | **10/10 đoạn bật đúng máy quay của người đang nói**, 0 màn đen, 0 chồng cam, mép cắt sớm đúng 0,40 s ở cả 9 ranh, 19 keyframe ducking mỗi mic, 24 s |
+  | Panel tổng | 10 thẻ · đổi ngôn ngữ · thẻ Shot & Save | 10/10 mở; VI → EN: 3 panel đang mở đổi theo trong 3,5 s (0 ký tự có dấu), trả lại VI |
+- **LỖI TÌM RA (không lỗi nào riêng của Mac trừ dòng ghi rõ):**
+  1. **Podcast, 2 mic rời MỘT KÊNH: hỏng.** Mic của người thứ hai mặc định lấy kênh PHẢI (`pan=mono|c0=c1`, `dist/index.html`
+     ~1948 và ~1971); file mic một kênh không có kênh phải nên file phân tích ra −91 dB (đo; đối chứng `c0=c0` ra −30,8 dB). Hộp
+     Cài đặt cắt không có chỗ chọn kênh. Hậu quả: báo "mic có tín hiệu phẳng/đều", hoặc nếu project có sẵn file mic thì rơi vào nhánh
+     "tự tìm mic trong project" và **lặp vô hạn** (đếm 390 lệnh host, panel đứng ở "Đang phân tích tiếng nói…" tới khi nạp lại):
+     lệnh panel gửi có 6 trường (`A,3,<file>,0,89,0`) còn host `pc_datTieng` đòi 5 → `daDat=0|soLoi=2`, panel không đọc kết quả mà
+     chạy lại. CHƯA sửa (tool anh đã chốt xong 06/08; chờ anh gật). Chi tiết: `AiO Auto Podcast/PROGRESS.md`.
+  2. Video Download: tải MP3 xong danh sách ghi "OPUS · 0:19" (file là mp3 thật).
+  3. Asset Manager: gỡ thư mục xong nút dưới vẫn sáng "Chèn video-thu vào timeline" (lựa chọn cũ); 3 ảnh xem trước mồ côi không được dọn.
+  4. Music: màn Key không theo clip được chọn lúc đang ở màn khác (giữ kết quả cũ tới khi chọn lại) · BPM bản tăng tốc 12,2 % ra 71
+     (kỳ vọng 141, tức ra nửa nhịp) mà vẫn ghi tin cậy 100 % · key bản nâng 2 nửa cung ra B 48 % có cảnh báo (kỳ vọng D#m), 1 mẫu ·
+     thông báo "Da chen vao A2 tai 0.00s" không dấu · **riêng Mac:** nhật ký thả file ghi vào `~/AppData/Roaming/AiOMusic` (đường Windows).
+  5. Guide Frame: panel rộng 340 px thì ô tên sequence co thành ô trống, chữ trong hình xem trước chồng nhau (ảnh:
+     `scripts/thu-panel-mac/anh-04-10/guide-frame-340px.png`).
+  6. Podcast: lúc chạy hiện tên từng bước ("Đang thay tiếng mic thu riêng…"), trái luật "không lộ quy trình"; đổi sequence thì dòng lỗi cũ còn.
+  7. Transcripts: khối phụ đề 4 chỉ có một chữ "đề." dài 0,73 s (câu 3 bị ngắt lẻ).
+  8. Nút ngôn ngữ: Re-Frames + Podcast ghi "EN" khi đang ở tiếng Việt, các panel khác ghi "VI".
+  9. Premiere: 2 lần không trả lời ExtendScript > 18 s ngay sau khi Autocut dựng xong (khoảng 170 lệnh); hỏi lại thì được.
+- **Shot & Save 0.8.0 trên Mac:** dựng `electron-builder --mac --x64 --dir` (ký ad-hoc), cài vào `/Applications` 01:54; bản 0.7.9 cất ở
+  `~/Library/Application Support/AiO-Studio/ban-cai-truoc/AiO Shot & Save 0.7.9.app`; 432/432 file, `app.asar` md5 khớp bản dựng. Mở lên:
+  `boot v0.8.0`, 4 ảnh + cấu hình còn nguyên. **CHƯA chụp được:** nhật ký ghi `Failed to get sources` (4/4 lần lúc khởi động) = macOS
+  chưa cấp quyền quay màn hình. Bản 0.7.9 cũng vậy từ 02/10 (12 lần anh bấm chụp, 57 dòng lỗi này). Em đã mở sẵn trang quyền trong
+  System Settings; bật công tắc là việc của anh. Dùng thử còn 11 ngày. Quay video / khay / số bước của 0.8.0 CHƯA thử trên Mac.
+- **Thước sai trong lúc thử:** regex dừng khớp nhầm chữ có sẵn (3 lần) · hộp `confirm()` của Power Bins làm script đứng 20 s (anh bấm
+  giúp) · bộ liệu `podcast-lieu` thiếu 2 file mic nên lượt đầu chỉ có tiếng tone (panel từ chối đúng).
+- **CHƯA thử:** kéo-thả từ panel ra timeline và từ Finder vào panel · hộp chọn thư mục thật (em trả lời sẵn thay hộp thoại) · Podcast
+  có cam toàn cảnh / Auto Sync · Transcripts dọc 9:16 + Câu dài · video dài (mọi số trên là clip ≤ 3 phút) · máy Mac chip M.
+
 ## [mac-do-premiere] - 2026-10-04 00:27 (UTC+7) - Đo 11 panel vừa cài trong Premiere trên Mac: 10/10 mở từ panel tổng, trả lời đúng - máy Mac nhà
 
 - **Bối cảnh:** tối 03/10 Premiere dừng ở một cửa sổ nhỏ nên em chưa đo được. Anh: *"anh mở panel rồi em kiểm tra đi"* (anh mở panel tổng AiO Studio).

@@ -1,5 +1,25 @@
 # AiO Auto Podcast - Nhat ky
 
+## [mac-thu-that] - 2026-10-04 01:56 (UTC+7) - Thu Auto Podcast that tren Mac: tieng cam 2 kenh DAT 10/10; 2 mic roi MOT KENH hong + lap vo han (CHUA SUA)
+
+- **Boi canh:** anh: *"em test toan bo cho anh luon"*. Thu trong Premiere Beta 26.5 tren Mac, sequence tu dung, lieu `tests/sinh-lieu-media.mjs`
+  (2 cam + 2 mic, 89 s, 10 luot, co dap an). Khong sua ma.
+- **DAT (cam co tieng 2 kenh lam mic, `Cam_A.mp4` + `Cam_B.mp4`):** Auto Podcast 24 s -> `... - Podcast Cut`: 10/10 doan bat dung cam cua nguoi
+  dang noi, 0 man den, 0 chong cam, 9/9 ranh som dung 0,40 s (cai dat "cat som"), A1/A2 = 2 file `.aio-mono-n.wav` lien mach, 19 keyframe moi mic.
+- **HONG (2 mic roi, file MOT kenh: `micA.wav` + `micB.wav` tren A3/A4, tieng cam = tone):**
+  1. Mic thu hai bi doc thanh IM LANG. `tachMot` / `tachMono`: `(i === 1) ? 'pan=mono|c0=c1' : 'pan=mono|c0=c0'` -> nguoi thu hai lay kenh
+     PHAI. File mono khong co kenh phai: do file phan tich `$TMPDIR/aio-podcast/m-*.wav` cua mic 2 = **-91,0 dB** (mic 1: -31,7 dB); doi chung
+     tren chinh `micB.wav`: `c0=c1` -> -91,0 dB, `c0=c0` -> -30,8 dB. Hop Cai dat cat khong co o chon kenh (`caiDat.kenhAudio` khong co giao dien).
+  2. Chot "mic deu" bat (dung), roi goi `tuTimVaSyncMicProject`. Project co san `micA.wav`/`micB.wav` nen `pc_timFileMic` tra 2 file ->
+     panel gui lenh **6 truong** `A,3,<duong dan>,0,89,0`, host `pc_datTieng` chi nhan **5 truong** -> `OK:daDat=0|soLoi=2|loiDau=dinh dang`.
+     Panel KHONG doc ket qua, goi `cb(true)` -> `dungBan()` lai -> lap vo han: dem 390 lenh host (`$.evalFile` -> `pc_thongTinSeq` ->
+     `pc_timFileMic` -> `pc_datTieng`), khoang 4 lenh/giay, nut dung o "Dang phan tich tieng noi…", khong loi JS nao. Thoat bang nap lai panel.
+  3. Khi project KHONG co file mic nao (luot dau, tieng tone): thoat dung bang cau "Mic cua Cam 1 (track A1) co tin hieu phang/deu".
+- **De xuat sua (CHO ANH GAT, tool da chot xong 06/08):** (a) chi lay kenh phai khi file co >= 2 kenh (doc so kenh tu chinh dong `Audio:` cua
+  ffmpeg), con lai `c0=c0`; (b) `tuTimVaSyncMicProject` gui dung 5 truong va chi `cb(true)` khi `daDat > 0`, moi luot dung chi duoc tu cuu 1 lan.
+  Do lai bang chinh bo lieu nay: mic mono phai ra 10/10 nhu ban tieng 2 kenh.
+- **Khac:** luc chay hien ten tung buoc (trai luat "khong lo quy trinh" 13/08); doi sequence thi dong loi cua sequence truoc con hien.
+
 ## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
 
 - Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).

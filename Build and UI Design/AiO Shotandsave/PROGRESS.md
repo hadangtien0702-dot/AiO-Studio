@@ -1,6 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 01:38 +0700 (may Mac, chi SOAT, khong sua ma)
+> - **04/10 01:56 MAC: da dung + cai 0.8.0 vao /Applications (ban 0.7.9 cat o `ban-cai-truoc`).** Mo duoc (`boot v0.8.0`), anh + cau hinh
+>   con nguyen, nhung **CHUA chup duoc: macOS chua cap quyen quay man hinh** (`Failed to get sources` 4/4; 0.7.9 cung vay tu 02/10).
+>   Cho anh bat quyen trong System Settings roi mo lai app. Tinh nang 0.8.0 chua thu tren Mac. Chi tiet: muc [0.8.0 mac] ngay duoi.
 > - **04/10 01:38 ECC SOAT LAN 2 (may Mac, nhanh `mac`): 6 loi MOI ngoai 17 loi cua luot 02/10, CHUA SUA CAI NAO, cho anh
 >   chon thu tu.** 4 loi da DO tren module that (khong mo app): keo-tha qua `.keo` mat file sau khi mo lai app voi ten nguoi
 >   dung Windows co dau cach / dau tieng Viet · khach da tra tien MAT MA khi may chu tra 403/407/401/400 hoac file
@@ -120,6 +123,22 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 mac] - 2026-10-04 01:56 - Dung + cai 0.8.0 tren Mac (lan dau); mo duoc, CHUA chup duoc vi macOS chua cap quyen quay man hinh
+
+- **Boi canh:** anh: *"cai luon cho anh AiO Studio nha em"*. May Mac dang cai 0.7.9 (30/09), ma la 0.8.0. Khong sua ma.
+- **Lam:** `node_modules/.bin/electron-builder --mac --x64 --dir --publish never` (Electron 43.4.1, ky ad-hoc, khong tao dmg, khong vao Release,
+  dung luat 01/10 "dang test thi nap vao ban dang cai"). Ban 0.7.9 doi cho sang
+  `~/Library/Application Support/AiO-Studio/ban-cai-truoc/AiO Shot & Save 0.7.9.app` (khong xoa), `ditto` ban moi vao `/Applications`.
+- **Do:** 432/432 file, `app.asar` md5 `29229301` = ban dung, chu ky ad-hoc hop le, khong co co cach ly. Mo app: `boot v0.8.0 hotkey=Alt+1
+  dang-ky=OK lang=vi`, 4 tien trinh, khong co bao cao sap. Du lieu nguoi dung: 4 anh con 4, `cau-hinh.json` md5 khong doi;
+  `ban-quyen.json` doi (dem ngay dung thu 12 -> 11). The Shot & Save tren panel tong: bam ra "Dang mo Shot & Save…", app van chay.
+- **CHUA CHUP DUOC:** `LUONG LOI khoi dong: Failed to get sources.` 4/4 lan roi "ngung thu, dung duong grab cu". Cung loi voi 0.7.9 tu
+  02/10 21:09-21:38: anh mo app 6 lan, bam chup 12 lan, 57 dong `Failed to get sources`, 0 anh moi. Goc: app ky ad-hoc, moi ban dung la mot
+  danh tinh moi voi macOS nen quyen "Screen & System Audio Recording" phai bat lai sau MOI lan cai. Em da mo san trang quyen trong System
+  Settings; bat cong tac + mo lai app la viec cua anh.
+- **CHUA thu tren Mac:** chup / ghim / khay / doc chu (Apple Vision) / quay video co tieng / khay tu thu / so buoc cua 0.8.0. Quay ve 0.7.9:
+  thoat app, bo `/Applications/AiO Shot & Save.app`, keo ban trong `ban-cai-truoc` ve va doi ten lai.
 
 ## [soat] - 2026-10-04 01:38 - ECC soat lan 2 tren may Mac: 6 loi moi (ban quyen, keo-tha, cau hinh, anh ghim, RAM), CHUA sua
 

@@ -1,0 +1,10 @@
+import { chay, es, CONG, ngu } from '../lib.mjs';
+const [ten, tenAsset] = process.argv.slice(2); const c = CONG[ten];
+console.log('mo sequence: ' + await es(`app.project.openSequence("b5a5b195-8a4c-4789-a7e1-8aa66c4b8888"); var a = app.project.activeSequence; a.setPlayerPosition("0"); return a.name + "|playhead=" + a.getPlayerPosition().seconds;`));
+await ngu(1500);
+console.log(await chay(c, `(() => { const nut = Array.from(document.querySelectorAll('*')).filter((e) => e.children.length === 0 && (e.textContent || '').trim() === ${JSON.stringify(tenAsset)}); if (!nut.length) return 'KHONG THAY ' + ${JSON.stringify(tenAsset)}; const the = nut[0].closest('.card-asset') || nut[0].parentElement; const r = the.getBoundingClientRect(); const o = { bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, button: 0 }; the.dispatchEvent(new MouseEvent('mousedown', o)); the.dispatchEvent(new MouseEvent('mouseup', o)); the.dispatchEvent(new MouseEvent('click', o)); return 'da bam the: ' + (the.className || '').toString().slice(0, 60); })()`));
+await ngu(800);
+const nut = await chay(c, `(() => { const b = Array.from(document.querySelectorAll('button')).find((e) => /Chèn vào timeline|^Import$/.test(((e.getAttribute('aria-label') || e.title || '') + '|' + (e.innerText || '').trim()).split('|')[0]) || (e.innerText || '').trim() === 'Import'); if (!b) return 'KHONG THAY NUT CHEN'; if (b.disabled) return 'NUT CHEN DANG TAT'; b.click(); return 'da bam Chen vao timeline'; })()`);
+console.log(nut);
+await ngu(5000);
+console.log('panel: ' + (await chay(c, `(document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(-200)`)));
