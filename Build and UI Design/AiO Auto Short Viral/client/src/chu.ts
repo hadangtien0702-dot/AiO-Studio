@@ -87,6 +87,8 @@ export const CHU: BangChu = {
     'Toàn bộ lời': 'Full transcript',
     'Hoàn tác': 'Undo',
     'Hoàn tác ({n}) — Ctrl+Z': 'Undo ({n}) — Ctrl+Z',
+    // [Mac 30/09/2026] Trên Mac phím lệnh là Cmd, không phải Ctrl.
+    'Hoàn tác ({n}) · Cmd+Z': 'Undo ({n}) · Cmd+Z',
     'Chưa có gì để hoàn tác': 'Nothing to undo',
 
     // ── Thẻ khối ──────────────────────────────────────────────────────────
@@ -266,6 +268,8 @@ export const CHU: BangChu = {
     'Không có chữ nào để chép.': 'There is no text to copy.',
     'Không chép được vào bộ nhớ tạm. Bấm vào một câu, chọn chữ rồi nhấn Ctrl+C.':
       'Could not copy to the clipboard. Click a sentence, select the text and press Ctrl+C.',
+    'Không chép được vào bộ nhớ tạm. Bấm vào một câu, chọn chữ rồi nhấn Cmd+C.':
+      'Could not copy to the clipboard. Click a sentence, select the text and press Cmd+C.',
 
     // Xuất file
     '.txt': '.txt',

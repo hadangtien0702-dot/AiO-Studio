@@ -55,6 +55,7 @@ import {
 import type { HostLoi, KetQuaDung, SeqMuc } from './lib/cep'
 import { layBanNghe, kiemBoMay, donTamCu } from './services/nghe'
 import { taoCoHuy } from './services/ffmpeg'
+import { laMac } from './lib/node'
 import type { CoHuy } from './services/ffmpeg'
 import { chonClipNghe, dungNoiDung, doanDung, lanDung, LOI_LECH_TU } from './services/moc'
 import {
@@ -2285,7 +2286,13 @@ export default function App() {
                   disabled={!phien.lui.length || dangChay}
                   onClick={hoanTac}
                   aria-label={dich('Hoàn tác')}
-                  title={phien.lui.length ? dp('Hoàn tác ({n}) — Ctrl+Z', { n: phien.lui.length }) : dich('Chưa có gì để hoàn tác')}
+                  title={
+                    phien.lui.length
+                      ? laMac()
+                        ? dp('Hoàn tác ({n}) · Cmd+Z', { n: phien.lui.length })
+                        : dp('Hoàn tác ({n}) — Ctrl+Z', { n: phien.lui.length })
+                      : dich('Chưa có gì để hoàn tác')
+                  }
                 >
                   <Ic ten="hoanTac" />
                 </button>
@@ -2327,7 +2334,7 @@ export default function App() {
                 {khoi.length > 0 && (
                   <p className="phim-tat">
                     <kbd>J</kbd>/<kbd>K</kbd> {dich('chọn khối')} · <kbd>Enter</kbd> {dich('nhảy tới')} · <kbd>M</kbd>{' '}
-                    {dich('gộp với khối trên')} · <kbd>X</kbd> {dich('tích chọn')} · <kbd>Ctrl+Z</kbd> {dich('hoàn tác')}
+                    {dich('gộp với khối trên')} · <kbd>X</kbd> {dich('tích chọn')} · <kbd>{laMac() ? 'Cmd+Z' : 'Ctrl+Z'}</kbd> {dich('hoàn tác')}
                   </p>
                 )}
                 {trongHost && soMarker > 0 && xacNhanXoa === null && (

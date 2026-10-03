@@ -361,6 +361,7 @@ export const CHU: BangChu = {
     'Không đọc được thư mục ': 'Could not read the folder ',
     'Panel không dùng được Node.js.': 'The panel cannot use Node.js.',
     'dữ liệu nghe hiểu (khoảng 3 GB)': 'the speech model (about 3 GB)',
+    'dữ liệu nghe hiểu (khoảng 1,6 GB)': 'the speech model (about 1.6 GB)',
     'Nghe kỹ hơn · câu phụ đề dài hơn': 'More careful · longer caption lines',
     'Chép nhanh hơn · câu ngắn, nhiều khối': 'Faster · shorter lines, more blocks',
     'Thiếu thành phần xử lý media của panel': 'The panel is missing its media component',

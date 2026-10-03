@@ -1491,7 +1491,8 @@ function duongDanTuLanTha(dt) {
     try { s = dt.getData(thu[k]) || ''; } catch (e) {}
     s = String(s).split(/\r?\n/)[0].trim();
     if (!s) continue;
-    if (/^file:\/\//i.test(s)) { try { s = decodeURIComponent(s.replace(/^file:\/\/\/?/i, '')); } catch (e) {} }
+    // "file:///C:/a.mp3" -> "C:/a.mp3" (Windows); "file:///Users/a.mp3" -> "/Users/a.mp3" (Mac, giu dau "/").
+    if (/^file:\/\//i.test(s)) { try { s = decodeURIComponent(s.replace(/^file:\/\//i, '')).replace(/^\/([a-zA-Z]:[\\/])/, '$1'); } catch (e) {} }
     if (/^[a-zA-Z]:[\\/]/.test(s) || /^\//.test(s)) return s;
   }
   return '';

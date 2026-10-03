@@ -1,5 +1,7 @@
 /**
  * ytdlp.ts — LÕI của panel: gọi `yt-dlp.exe` đóng gói trong `bin/win64/`.
+ * Mac: `yt-dlp` / `qjs` / `ffmpeg` KHÔNG đuôi .exe, dò theo `ungVienMac()`;
+ * mở thư mục bằng Finder (`open -R`), dừng tải bằng tín hiệu (`gietMac`).
  *
  * ══════════════════════════════════════════════════════════════════════════
  * VÌ SAO LÀ yt-dlp (đo 08/09/2026, xem PROGRESS.md)
@@ -23,7 +25,7 @@
  * `video:` in trước khi tải.
  */
 
-import { getChildProcess, getFs, getPath, bienMT, nodeRequire } from '../lib/node'
+import { getChildProcess, getFs, getPath, bienMT, nodeRequire, laMac, thuMucAiO, thuMucKhoMac } from '../lib/node'
 import { extensionPath } from '../lib/cep'
 
 export const EXT_ID = 'com.aiostudio.videodownload'
@@ -102,9 +104,32 @@ export interface LoiTai {
 
 // ── Tìm binary ────────────────────────────────────────────────────────────
 
+/** Tên file của công cụ: Windows có đuôi `.exe`, Mac không có. */
+function tenBin(ten: string): string {
+  return laMac() ? ten : ten + '.exe'
+}
+
+/**
+ * Mac: `<extension>/bin/mac` → `~/Library/Application Support/AiO-Studio/bin/mac`
+ * (kho chung cả bộ) → Homebrew. ☠️ PATH của Node trong CEP trên Mac KHÔNG có
+ * Homebrew → luôn dò bằng ĐƯỜNG DẪN TUYỆT ĐỐI, không gọi tên trần.
+ */
+function ungVienMac(ten: string): string[] {
+  const path = getPath()
+  if (!path) return []
+  const ds: string[] = []
+  const ext = extensionPath()
+  if (ext) ds.push(path.join(ext, 'bin', 'mac', ten))
+  const kho = thuMucKhoMac()
+  if (kho) ds.push(path.join(kho, 'bin', 'mac', ten))
+  ds.push(path.join('/opt/homebrew/bin', ten), path.join('/usr/local/bin', ten))
+  return ds
+}
+
 function ungVien(tenFile: string): string[] {
   const path = getPath()
   if (!path) return []
+  if (laMac()) return ungVienMac(tenFile)
   const ds: string[] = []
   const ext = extensionPath()
   if (ext) ds.push(path.join(ext, 'bin', 'win64', tenFile))
@@ -134,11 +159,26 @@ function timBinary(tenFile: string): string {
 // ra %APPDATA%\AiOStudio\videodownload\engine\ rồi `-U` ở đó; ghi phiên bản
 // vào engine.json. Dùng bản sao khi nó MỚI HƠN bản đóng gói (so chuỗi ngày
 // YYYY.MM.DD của yt-dlp — so chữ là đủ).
+// Mac: ~/Library/Application Support/AiO-Studio/videodownload/engine/yt-dlp. Bản
+// gốc là `yt-dlp_macos` (yt-dlp tự nhận biến thể `darwin_exe`) nên `-U` tải đúng
+// bản macOS; sau khi chép / cập nhật thì chmod 755 cho chắc chạy được.
 
 function thuMucBanSao(): string {
   const path = getPath()
+  if (laMac()) {
+    const kho = thuMucKhoMac()
+    return path && kho ? path.join(kho, 'videodownload', 'engine') : ''
+  }
   const appData = bienMT('APPDATA')
   return path && appData ? path.join(appData, 'AiOStudio', 'videodownload', 'engine') : ''
+}
+
+/** Mac: bật quyền chạy (755) cho file vừa chép / vừa được `-U` thay. Windows: không làm gì. */
+function choChay(f: string): void {
+  if (!laMac()) return
+  try {
+    getFs().chmodSync(f, 0o755)
+  } catch {}
 }
 
 let _phienBanGoi = ''
@@ -158,7 +198,7 @@ export function exeLanCuoi(): string {
 let _choBanGoi: Promise<void> | null = null
 export function docBanGoi(): Promise<void> {
   if (!_choBanGoi) {
-    const goc = timBinary('yt-dlp.exe')
+    const goc = timBinary(tenBin('yt-dlp'))
     _choBanGoi = goc
       ? chayLay(goc, ['--version']).then((r) => {
           if (/^\d{4}\.\d{2}\.\d{2}/.test(r.out)) _phienBanGoi = r.out
@@ -174,7 +214,7 @@ function banSaoMoiHon(): string {
   const tm = thuMucBanSao()
   if (!fs || !path || !tm || _dangCapNhat) return ''
   try {
-    const exe = path.join(tm, 'yt-dlp.exe')
+    const exe = path.join(tm, tenBin('yt-dlp'))
     const js = path.join(tm, 'engine.json')
     if (!fs.existsSync(exe) || !fs.existsSync(js)) return ''
     const v = String(JSON.parse(fs.readFileSync(js, 'utf8')).phienBan || '')
@@ -185,21 +225,21 @@ function banSaoMoiHon(): string {
 }
 
 export function duongYtDlp(): string {
-  return banSaoMoiHon() || timBinary('yt-dlp.exe')
+  return banSaoMoiHon() || timBinary(tenBin('yt-dlp'))
 }
 export function duongQjs(): string {
-  return timBinary('qjs.exe')
+  return timBinary(tenBin('qjs'))
 }
 export function duongFfmpeg(): string {
-  return timBinary('ffmpeg.exe')
+  return timBinary(tenBin('ffmpeg'))
 }
 
 /** Ba thứ phải có để chạy; thiếu cái nào thì trả tên cái đó. Gọi lại trước MỖI lần đọc/tải (vài existsSync). */
 export function kiemEngine(): { du: boolean; thieu: string[] } {
   const thieu: string[] = []
-  if (!duongYtDlp()) thieu.push('yt-dlp.exe')
-  if (!duongQjs()) thieu.push('qjs.exe')
-  if (!duongFfmpeg()) thieu.push('ffmpeg.exe')
+  if (!duongYtDlp()) thieu.push(tenBin('yt-dlp'))
+  if (!duongQjs()) thieu.push(tenBin('qjs'))
+  if (!duongFfmpeg()) thieu.push(tenBin('ffmpeg'))
   return { du: thieu.length === 0, thieu }
 }
 
@@ -279,7 +319,7 @@ function docThongTinMotLan(url: string, cookies: CookieTrinhDuyet): { huy: () =>
   const xong = new Promise<ThongTinVideo>((resolve, reject) => {
     const eng = kiemEngine()
     if (!cp || !eng.du) {
-      reject(<LoiTai>{ ma: 'thieu-engine', chiTiet: eng.thieu.join(', ') || 'yt-dlp.exe' })
+      reject(<LoiTai>{ ma: 'thieu-engine', chiTiet: eng.thieu.join(', ') || tenBin('yt-dlp') })
       return
     }
     // ☠️ --flat-playlist: link kênh/playlist KHÔNG đi đọc từng video (đo 21/09:
@@ -460,7 +500,7 @@ function taiVideoMotLan(
   const xong = new Promise<KetQuaTai>((resolve, reject) => {
     const eng = kiemEngine()
     if (!cp || !fs || !path || !eng.du) {
-      reject(<LoiTai>{ ma: 'thieu-engine', chiTiet: eng.thieu.join(', ') || 'yt-dlp.exe' })
+      reject(<LoiTai>{ ma: 'thieu-engine', chiTiet: eng.thieu.join(', ') || tenBin('yt-dlp') })
       return
     }
 
@@ -669,6 +709,10 @@ function giet(proc: any): Promise<void> {
       resolve()
       return
     }
+    if (laMac()) {
+      gietMac(proc, resolve)
+      return
+    }
     const cha = String(proc.pid)
     const caCay = () => {
       try {
@@ -709,12 +753,82 @@ function giet(proc: any): Promise<void> {
   })
 }
 
+/**
+ * Mac: không có taskkill / PowerShell. `yt-dlp_macos` cũng là PyInstaller một
+ * file (cha giải nén ra $TMPDIR/_MEIxxxx rồi chạy CON; ffmpeg là cháu). Cùng thứ
+ * tự như Windows: đọc cây tiến trình bằng /bin/ps, SIGTERM mọi HẬU DUỆ (con +
+ * ffmpeg) → cha tự dọn _MEI rồi thoát; sau 4 s cha còn sống → SIGKILL cả cây.
+ * Tiến trình chết vì tín hiệu có exitCode = null → phải xét cả signalCode.
+ */
+function gietMac(proc: any, xong: () => void): void {
+  const cp = getChildProcess()
+  const r = nodeRequire()
+  const pr = r ? r('process') : null
+  const cha = Number(proc.pid)
+  const daChet = () => proc.exitCode !== null || (proc.signalCode !== null && proc.signalCode !== undefined)
+  if (daChet()) {
+    xong()
+    return
+  }
+  const guiTin = (pids: number[], tin: string) => {
+    for (const p of pids) {
+      try {
+        pr.kill(p, tin)
+      } catch {}
+    }
+  }
+  const hauDue = (cb: (ds: number[]) => void) => {
+    let out = ''
+    try {
+      const k = cp.spawn('/bin/ps', ['-A', '-o', 'pid=,ppid='])
+      k.stdout.on('data', (d: any) => (out += d.toString()))
+      k.on('error', () => cb([]))
+      k.on('close', () => {
+        const con = new Map<number, number[]>()
+        for (const dong of out.split('\n')) {
+          const m = /^\s*(\d+)\s+(\d+)/.exec(dong)
+          if (!m) continue
+          const ds = con.get(Number(m[2])) || []
+          ds.push(Number(m[1]))
+          con.set(Number(m[2]), ds)
+        }
+        const ra: number[] = []
+        const di = (p: number) => {
+          for (const c of con.get(p) || []) {
+            ra.push(c)
+            di(c)
+          }
+        }
+        di(cha)
+        cb(ra)
+      })
+    } catch {
+      cb([])
+    }
+  }
+  hauDue((ds) => {
+    // Không thấy con (ps hỏng / chưa kịp sinh) → SIGTERM thẳng vào cha.
+    guiTin(ds.length ? ds : [cha], 'SIGTERM')
+    const t0 = Date.now()
+    const cho = () => {
+      if (daChet()) xong()
+      else if (Date.now() - t0 > 4000) {
+        hauDue((ds2) => {
+          guiTin(ds2.concat(cha), 'SIGKILL')
+          setTimeout(xong, 300)
+        })
+      } else setTimeout(cho, 150)
+    }
+    cho()
+  })
+}
+
 // ── Dịch lỗi ──────────────────────────────────────────────────────────────
 
 /** Lỗi khi CHẠY exe (không phải thiếu file): diệt virus / Smart App Control chặn. */
 function loiSpawn(e: any): LoiTai {
   const s = String((e && e.code) || e)
-  if (/ENOENT/.test(s)) return { ma: 'thieu-engine', chiTiet: 'yt-dlp.exe' }
+  if (/ENOENT/.test(s)) return { ma: 'thieu-engine', chiTiet: tenBin('yt-dlp') }
   return { ma: 'khong-chay-duoc', chiTiet: s }
 }
 
@@ -784,12 +898,13 @@ export async function capNhatEngine(): Promise<{ ok: boolean; phienBan: string; 
   const fs = getFs()
   const path = getPath()
   const tm = thuMucBanSao()
-  const goc = timBinary('yt-dlp.exe')
-  if (!fs || !path || !tm || !goc) return { ok: false, phienBan: '', moi: false, chiTiet: 'yt-dlp.exe' }
-  const exe = path.join(tm, 'yt-dlp.exe')
+  const goc = timBinary(tenBin('yt-dlp'))
+  if (!fs || !path || !tm || !goc) return { ok: false, phienBan: '', moi: false, chiTiet: tenBin('yt-dlp') }
+  const exe = path.join(tm, tenBin('yt-dlp'))
   try {
     if (!fs.existsSync(tm)) fs.mkdirSync(tm, { recursive: true })
     if (!fs.existsSync(exe)) fs.copyFileSync(goc, exe)
+    choChay(exe)
   } catch (e) {
     return { ok: false, phienBan: '', moi: false, chiTiet: String(e) }
   }
@@ -797,6 +912,7 @@ export async function capNhatEngine(): Promise<{ ok: boolean; phienBan: string; 
   try {
     const truoc = (await chayLay(exe, ['--version'])).out
     const r = await chayLay(exe, ['-U'])
+    choChay(exe)
     const sau = (await chayLay(exe, ['--version'])).out
     const ok = r.code === 0 && /^\d{4}\.\d{2}\.\d{2}/.test(sau)
     if (ok) {
@@ -849,7 +965,7 @@ export function tuCapNhatEngine(ep = false): Promise<{ ok: boolean; moi: boolean
 
 /** Phiên bản engine ĐANG DÙNG. Lần đầu gọi cũng ghi nhớ phiên bản bản đóng gói (để so bản sao). */
 export async function phienBanEngine(): Promise<string> {
-  const goc = timBinary('yt-dlp.exe')
+  const goc = timBinary(tenBin('yt-dlp'))
   await docBanGoi()
   const dung = duongYtDlp()
   if (dung === goc) return _phienBanGoi
@@ -864,6 +980,10 @@ export async function phienBanEngine(): Promise<string> {
 
 function thuMucThumb(): string {
   const path = getPath()
+  if (laMac()) {
+    const aio = thuMucAiO()
+    return path && aio ? path.join(aio, 'vd-thumbs') : ''
+  }
   const appData = bienMT('APPDATA')
   return path && appData ? path.join(appData, 'AiOStudio', 'vd-thumbs') : ''
 }
@@ -923,6 +1043,8 @@ export function taoThumb(id: string, duongDanVideo: string): Promise<string> {
 /** Đường dẫn Windows → URL file:/// để <img> trong CEP nạp được. */
 export function fileUrl(p: string): string {
   if (!p) return ''
+  // Mac: đường dẫn đã có '/' đầu → 'file://' + '/Users/...' (không thành 4 gạch).
+  if (laMac()) return 'file://' + p.split('/').map(encodeURIComponent).join('/')
   return 'file:///' + p.replace(/\\/g, '/').split('/').map(encodeURIComponent).join('/')
 }
 
@@ -970,6 +1092,7 @@ export function moThuMuc(duongDan: string, laThuMuc = false): Promise<{ kq: KetQ
   } catch {
     return Promise.resolve({ kq: 'mat', len: '' })
   }
+  if (laMac()) return moThuMucMac(conFile ? duongDan : thuMuc, conFile)
   try {
     if (conFile) cp.spawn('explorer.exe', ['/select,', duongDan])
     else cp.spawn('explorer.exe', [thuMuc])
@@ -988,6 +1111,26 @@ export function moThuMuc(duongDan: string, laThuMuc = false): Promise<{ kq: KetQ
       p.on('close', () => resolve({ kq, len: out.trim() }))
     } catch {
       resolve({ kq, len: 'LOI_PS' })
+    }
+  })
+}
+
+/**
+ * Mac: Finder thay Explorer. `open -R <file>` mở thư mục và TÔ SẴN file,
+ * `open <thư mục>` mở thư mục; Finder tự lên trước nên không cần đoạn "kéo lên".
+ * Gọi /usr/bin/open bằng đường dẫn tuyệt đối (PATH của CEP trên Mac không tin được).
+ * `len` = 'OPEN_OK' hoặc 'OPEN_LOI:<mã thoát>' — để đo trên panel thật (__vdMoCuoi).
+ */
+function moThuMucMac(dich: string, chonFile: boolean): Promise<{ kq: KetQuaMo; len: string }> {
+  const cp = getChildProcess()
+  const kq: KetQuaMo = chonFile ? 'chon-file' : 'mo-thu-muc'
+  return new Promise((resolve) => {
+    try {
+      const p = cp.spawn('/usr/bin/open', chonFile ? ['-R', dich] : [dich])
+      p.on('error', () => resolve({ kq, len: 'OPEN_LOI:spawn' }))
+      p.on('close', (code: number) => resolve({ kq, len: code === 0 ? 'OPEN_OK' : 'OPEN_LOI:' + code }))
+    } catch {
+      resolve({ kq, len: 'OPEN_LOI:spawn' })
     }
   })
 }

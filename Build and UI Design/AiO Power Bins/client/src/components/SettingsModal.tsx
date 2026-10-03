@@ -11,6 +11,7 @@ import { useLibrary } from '../state/store'
 import { analyzeCache, type CacheBreakdown } from '../services/cacheService'
 import { getCacheRoot } from '../services/cachePaths'
 import { findMacJunk, moveToRecycleBin, type MacJunkResult } from '../services/macJunk'
+import { isMac } from '../lib/platform'
 import { IconSettings, IconClose, IconTrash, IconFolder } from './Icons'
 
 /** Đổi byte sang câu chữ ngắn. Rác macOS thường chỉ vài KB mỗi file. */
@@ -248,9 +249,15 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               <div className="setting-row__info">
                 <span className="setting-row__label">{dich('Rác macOS trên ổ')}</span>
                 <span className="setting-row__desc">
-                  {dich(
-                    '{n} file thừa ({dung}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được',
-                  )
+                  {/* [mac] Trên macOS rác `._` / `__MACOSX` không đến từ việc
+                      giải nén trên Windows, nên có câu riêng. */}
+                  {(isMac()
+                    ? dich(
+                        '{n} file thừa ({dung}) do macOS tạo trên ổ không phải định dạng Mac, không phải nhạc/video, Premiere cũng không mở được',
+                      )
+                    : dich(
+                        '{n} file thừa ({dung}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được',
+                      ))
                     .replace('{n}', junk.paths.length.toLocaleString())
                     .replace('{dung}', doDung(junk.bytes))}
                 </span>
@@ -260,9 +267,14 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                 disabled={junkBusy}
                 title={
                   confirmJunk
-                    ? dich('Bấm lần nữa để chuyển vào Thùng rác Windows')
-                    : dich(
-                        'Chuyển {n} file rác vào Thùng rác Windows — khôi phục lại được nếu cần',
+                    ? isMac()
+                      ? dich('Bấm lần nữa để chuyển vào Thùng rác của Mac')
+                      : dich('Bấm lần nữa để chuyển vào Thùng rác Windows')
+                    : (isMac()
+                        ? dich('Chuyển {n} file rác vào Thùng rác của Mac, khôi phục lại được nếu cần')
+                        : dich(
+                            'Chuyển {n} file rác vào Thùng rác Windows — khôi phục lại được nếu cần',
+                          )
                       ).replace('{n}', junk.paths.length.toLocaleString())
                 }
                 onClick={() => {
@@ -279,15 +291,20 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                     setJunkBusy(false)
                     showToast(
                       res.failed > 0
-                        ? dich(
-                            'Đã chuyển {n} file vào Thùng rác — {loi} file không chuyển được (đang mở?)',
+                        ? (isMac()
+                            ? dich(
+                                'Đã chuyển {n} file vào Thùng rác của Mac, {loi} file không chuyển được (đang mở?)',
+                              )
+                            : dich(
+                                'Đã chuyển {n} file vào Thùng rác — {loi} file không chuyển được (đang mở?)',
+                              )
                           )
                             .replace('{n}', res.moved.toLocaleString())
                             .replace('{loi}', res.failed.toLocaleString())
-                        : dich('Đã chuyển {n} file rác vào Thùng rác').replace(
-                            '{n}',
-                            res.moved.toLocaleString(),
-                          ),
+                        : (isMac()
+                            ? dich('Đã chuyển {n} file rác vào Thùng rác của Mac')
+                            : dich('Đã chuyển {n} file rác vào Thùng rác')
+                          ).replace('{n}', res.moved.toLocaleString()),
                     )
                     void findMacJunk(useLibrary.getState().folders).then(setJunk)
                   })

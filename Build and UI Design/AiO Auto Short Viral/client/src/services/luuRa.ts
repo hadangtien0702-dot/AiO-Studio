@@ -8,7 +8,7 @@
  */
 
 import { dich } from '../ngonngu'
-import { getFs, getPath, nodeAvailable } from '../lib/node'
+import { getFs, getPath, laMac, nodeAvailable } from '../lib/node'
 
 // ═══════════════════════════════ BỘ NHỚ TẠM ═══════════════════════════════
 
@@ -57,7 +57,12 @@ export async function chepChu(chu: string): Promise<'api' | 'lenh-cu'> {
   } finally {
     if (o && o.parentNode) o.parentNode.removeChild(o)
   }
-  throw new Error(dich('Không chép được vào bộ nhớ tạm. Bấm vào một câu, chọn chữ rồi nhấn Ctrl+C.'))
+  // [Mac 30/09/2026] Mac chép bằng Cmd+C — Ctrl+C trên Mac không chép gì.
+  throw new Error(
+    laMac()
+      ? dich('Không chép được vào bộ nhớ tạm. Bấm vào một câu, chọn chữ rồi nhấn Cmd+C.')
+      : dich('Không chép được vào bộ nhớ tạm. Bấm vào một câu, chọn chữ rồi nhấn Ctrl+C.'),
+  )
 }
 
 // ═══════════════════════════════ GHI FILE ═══════════════════════════════

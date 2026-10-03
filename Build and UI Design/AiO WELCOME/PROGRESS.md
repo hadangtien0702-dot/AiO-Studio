@@ -1,5 +1,25 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Panel tong: thay du 11 panel (getExtensions), doi EN->VI ghi `{"lang":"vi"}` vao `~/Library/Application Support/AiOStudio/ngonngu.json`, 6 panel React doi VI theo. Mo 10 panel bang the: 10/10 len giao dien, duong dan extension dung `/Users/...`, host tra loi.
+
+## [2.1.1+mac] - 2026-09-30 19:27 (UTC+7) - File ngon ngu chung tren Mac (CHUA do trong Premiere tren Mac)
+
+- **Boi canh:** anh: *"ok em lam het 8 panel cho mac luon di"* (Mac Intel, Premiere Pro Beta 26.5).
+- **Goc:** Mac khong co `APPDATA` -> `layAppData()` lui ve `~/AppData/Roaming` (thu muc Windows tren may Mac).
+- **Da sua:** `hub.js layAppData` nhanh Mac -> `~/Library/Application Support`, file chung thanh
+  `~/Library/Application Support/AiOStudio/ngonngu.json`. Sua CUNG LUC o `design-system/ngonngu.tsx` (+6 ban chep
+  trong client/src cua cac panel React) va `design-system/ngonngu-chung.js` (+3 ban chep dist) -> ca bo cung mot file.
+  Windows khong doi (van `%APPDATA%\AiOStudio\ngonngu.json`).
+- **Kiem (Node, ham duongDan cua ngonngu-chung.js):** darwin -> `/Users/u/Library/Application Support/AiOStudio/ngonngu.json`;
+  win32 co APPDATA va khong co APPDATA -> `C:\Users\u\AppData\Roaming\AiOStudio\ngonngu.json` (nhu cu).
+  7 ban ngonngu.tsx cung md5, 4 ban ngonngu-chung.js cung md5. `node --check hub.js` dat.
+- **Soi them:** trang thai da cai doc bang `getExtensions()` (khong phu thuoc he dieu hanh); Shot & Save da co nhanh
+  Mac (`/Applications/AiO Shot & Save.app`, mo bang `open -a`). Khong con cho nao chi chay Windows.
+- **Chua kiem:** trong Premiere tren Mac (12 the, mo panel, doi VI/EN lan sang cac panel).
+
 ## [2.1.1] - 2026-09-27 20:34 (UTC+7) - Tang so phien ban
 
 - manifest 2.1.0 -> 2.1.1 (mac dinh ngon ngu 'en' cua hub.js). Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.

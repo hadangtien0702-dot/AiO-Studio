@@ -36,6 +36,7 @@
  *   song am           -> waveform
  *   bo nho dem        -> cache
  *   Thung rac Windows -> Windows Recycle Bin
+ *   Thung rac cua Mac -> Trash                 ([mac] tu cua Finder)
  *   yeu thich         -> favorites
  *   nua cung          -> semitone
  *   clip / timeline / track / project / bin / proxy / asset / brand / Mogrt
@@ -255,6 +256,11 @@ export const CHU: BangChu = {
       'Pick a bin in the left menu, or put assets into a bin to share them across every project.',
     'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.':
       'Drag files from Explorer here, or select clips on the timeline and press “Add from timeline”.',
+    // [mac] Ban macOS: keo tu Finder thay vi Explorer (khong dau gach dai).
+    'ở thanh trên, hoặc kéo thẳng file từ Finder vào đây.':
+      'in the top bar, or drag files straight from Finder into this grid.',
+    'Kéo file từ Finder vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.':
+      'Drag files from Finder here, or select clips on the timeline and press “Add from timeline”.',
     'Brand là bộ nhận diện dùng lại ở mọi dự án: logo, intro, nhạc nền… Tạo brand đầu tiên bằng nút':
       'A brand is an identity set you reuse in every project: logos, intros, background music… Create your first brand with',
 
@@ -286,6 +292,8 @@ export const CHU: BangChu = {
       'Only deletes cache files no asset uses any more',
     'Bấm lần nữa để chuyển vào Thùng rác Windows':
       'Press again to move them to the Windows Recycle Bin',
+    // [mac] Ban macOS: Thung rac cua Finder.
+    'Bấm lần nữa để chuyển vào Thùng rác của Mac': 'Press again to move them to the Trash',
     'Xoá toàn bộ ảnh xem trước đã tạo (phải tạo lại từ đầu)':
       'Clear every thumbnail already built (they must be rebuilt from scratch)',
     'Chuyển ảnh xem trước sang ổ khác — panel sẽ chuyển file và sửa đường dẫn giúp anh':
@@ -385,6 +393,14 @@ export const CHU: BangChu = {
       'Moved {n} files to the Recycle Bin — {loi} files could not be moved (still open?)',
     '{n} file thừa ({dung}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được':
       '{n} leftover files ({dung}) left behind by unzipping Mac archives — not audio or video, and Premiere cannot open them either',
+    // [mac] Ban macOS cua 4 cau tren (khong dau gach dai).
+    'Đã chuyển {n} file rác vào Thùng rác của Mac': 'Moved {n} junk files to the Trash',
+    'Chuyển {n} file rác vào Thùng rác của Mac, khôi phục lại được nếu cần':
+      'Move {n} junk files to the Trash, you can restore them if you need to',
+    'Đã chuyển {n} file vào Thùng rác của Mac, {loi} file không chuyển được (đang mở?)':
+      'Moved {n} files to the Trash, {loi} files could not be moved (still open?)',
+    '{n} file thừa ({dung}) do macOS tạo trên ổ không phải định dạng Mac, không phải nhạc/video, Premiere cũng không mở được':
+      '{n} leftover files ({dung}) created by macOS on a non-Mac drive, not audio or video, and Premiere cannot open them either',
 
     // ─── components\Sidebar.tsx ───
     'Gỡ thư mục {ten}': 'Remove the folder {ten}',

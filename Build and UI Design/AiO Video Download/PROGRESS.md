@@ -2,7 +2,17 @@
 
 > Mục mới trên cùng. Giờ lấy bằng lệnh `date`, không suy từ mục trước.
 
-## Trạng thái hiện tại (21/09/2026 18:48)
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Dan link "Me at the zoo" (19 s): doc link ra ten + 240p; tai + nhap bin "AiO Video Download" ~9 s, nhan "Trong project", file 744.412 byte o `.../26.0/AiO Studio Download/` (canh project).
+
+## Trạng thái hiện tại (30/09/2026 19:28)
+
+- **30/09: đã thêm nhánh macOS** (mục "[Mac] 2026-09-30" ngay dưới). Chạy mã thật của
+  panel ngoài Premiere trên Mac Intel: đọc link + tải + Dừng + tự cập nhật engine đều
+  đạt. **Chưa kiểm trong Premiere trên Mac** (chưa cài, chưa bấm nút nào trên panel thật).
+  Chưa tăng số phiên bản, chưa commit. Nhánh Windows giữ nguyên (chưa kiểm lại trên Windows).
 
 - **0.2.2 ĐÃ CÀI máy công ty (18:4x)**: sửa 3 lỗi của 0.2.1 + 1 lỗi do chính bản vá
   sinh ra, tất cả do **Codex (OpenAI) soát chéo** bắt được — lượt thử đầu của "QA khác
@@ -22,6 +32,53 @@
   ≥880 hai cột). Đã commit + push 21/09; chưa đóng gói bộ cài.
 - **[CHO] Chờ đo:** lượt thử Shorts 1080p TRÊN PANEL không ra kết quả trong 40 s (lý do
   chưa đo; cùng tham số chạy ngoài panel thì đọc được 3,5 s, 46 định dạng).
+
+---
+
+## [Mac] 2026-09-30 19:28 · port sang macOS (chưa bump, chưa commit)
+
+**Bối cảnh:** anh chuyển sang máy Mac (Intel x86_64, macOS 26, Premiere Pro Beta 26.5).
+Panel chỉ chạy Windows: gọi `bin/win64/*.exe`, `explorer.exe`, `powershell.exe`,
+`taskkill`, đọc `%APPDATA%` / `%USERPROFILE%`, host đổi đường dẫn sang `\`.
+
+**Đã sửa (chỉ THÊM nhánh Mac, dò bằng `process.platform === 'darwin'`):**
+| Chỗ | Windows (giữ nguyên) | Mac |
+|---|---|---|
+| `lib/node.ts` | | thêm `laMac()`, `thuMucNha()`, `thuMucAiO()` (Win `%APPDATA%\AiOStudio`, Mac `~/Library/Application Support/AiOStudio`), `thuMucKhoMac()` (`~/Library/Application Support/AiO-Studio`) |
+| `ytdlp.ts` tìm công cụ | `bin/win64/*.exe` | tên không `.exe`; dò `<extension>/bin/mac` → `AiO-Studio/bin/mac` → `/opt/homebrew/bin` → `/usr/local/bin`, luôn đường tuyệt đối (qjs, ffmpeg truyền cho yt-dlp bằng đường tuyệt đối) |
+| Engine tự cập nhật | `%APPDATA%\AiOStudio\videodownload\engine` | `AiO-Studio/videodownload/engine/yt-dlp`; chmod 755 sau khi chép và sau `-U` |
+| Dừng tải (`giet`) | PowerShell + taskkill | `gietMac`: đọc cây bằng `/bin/ps`, SIGTERM hậu duệ, 4 s cha còn sống thì SIGKILL cả cây; xét cả `signalCode` |
+| Mở thư mục | explorer + PowerShell kéo lên | `/usr/bin/open -R <file>` / `/usr/bin/open <thư mục>`, `len` = `OPEN_OK` / `OPEN_LOI:<mã>` |
+| Cài đặt, lịch sử, ảnh bìa (`caidat.ts`, `vd-thumbs`) | `%APPDATA%\AiOStudio` | `~/Library/Application Support/AiOStudio` (cùng chỗ `ngonngu.json`) |
+| Thư mục lùi khi project chưa lưu | `%USERPROFILE%\Downloads` | `~/Downloads` (trước đây ra đường TƯƠNG ĐỐI) |
+| `fileUrl` ảnh bìa | như cũ | `file://` + đường `/Users/...` (không thành 4 gạch) |
+| `App.tsx` | như cũ | câu lỗi "macOS chặn engine tải..." (VI+EN), gợi ý "Dán link (Cmd+V)", đường dẫn rút gọn dùng `/` |
+| `host/videodownload.jsx` | như cũ | `VD_LA_MAC` theo `$.os`; `vd__gachNguoc` giữ gạch xuôi (đổi sang `\` thì importFiles / findItemsMatchingMediaPath không thấy file trên Mac) |
+
+**Kiểm chứng (30/09 19:2x, mã THẬT của panel đóng gói bằng esbuild, chạy bằng Node 24
+với shim `window.cep_node`, HOME giả trong $TMPDIR để không ghi vào Application Support thật):**
+| Phép thử | Kết quả |
+|---|---|
+| `kiem-chu.mjs` · `npm run build` (`tsc -b && vite build`) | 91 khoá, thiếu 0 · build sạch, `dist/index.html` 494,93 kB |
+| Dò công cụ | yt-dlp, qjs, ffmpeg đều ra `AiO-Studio/bin/mac/...`; `kiemEngine().du = true` |
+| Đọc link "Me at the zoo" (jNQXAC9IVRw) | 3,9 s; tiêu đề đúng, 19 s, mức 240/144 |
+| Tải mức 1080 (video chỉ có 240p) | 4,2 s; `Me at the zoo [jNQXAC9IVRw] 320x240.mp4`, 744.412 byte; 20 dòng tiến độ chỉ đi lên, tới 100 |
+| ffprobe file tải về | h264 320x240 + aac, 19,06 s; giải mã trọn file bằng ffmpeg: mã thoát 0 |
+| Ảnh bìa (`taoThumb`) | jpg 7.014 byte trong `AiOStudio/vd-thumbs` |
+| Dừng ở 5,4% (Big Buck Bunny aqz-KE-bpKQ, mức 480) | trả `huy` sau 180 ms; thư mục trước 1 file = sau 1 file (file có sẵn giữ nguyên, 0 file `.part`); 0 tiến trình yt-dlp/ffmpeg sót; 0 thư mục `_MEI` trong $TMPDIR |
+| Tự cập nhật engine | bản sao hạ về 2026.07.04, chmod 700 → `capNhatEngine()`: `moi=true`, lên 2026.08.19, quyền 755, biến thể `darwin_exe` (bản macOS) |
+| Mở thư mục | spawn giả (không bật Finder lên màn anh): dựng đúng `/usr/bin/open -R <file>` và `/usr/bin/open <thư mục>`; file mất → `mat`. `/usr/bin/open -R <file không có>` thật: mã thoát 1 |
+| Nhánh Windows (shim `platform: 'win32'`) | tên `yt-dlp.exe/qjs.exe/ffmpeg.exe`, `%APPDATA%/AiOStudio`, `%USERPROFILE%/Downloads` như cũ |
+| `host/videodownload.jsx` | `node --check` cú pháp đạt |
+File tải thử và HOME giả đã xoá sau khi đo.
+
+**Chưa kiểm:**
+- **Chưa kiểm trong Premiere trên Mac**: nạp panel, `$.evalFile` host, nhập vào bin,
+  nhãn "Trong project", nút Mở thư mục có đưa Finder lên trước Premiere không, cookie
+  trình duyệt trên Mac (Chrome cần Keychain), hộp chọn thư mục.
+- Chưa kiểm lại trên Windows sau khi sửa (chỉ shim đường dẫn ở trên).
+- `bin/mac/` chưa có trong thư mục extension; panel đang dựa vào kho chung
+  `~/Library/Application Support/AiO-Studio/bin/mac`. `package-release.ps1` chưa đóng gói bản Mac.
 
 ---
 

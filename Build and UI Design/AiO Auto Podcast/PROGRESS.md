@@ -1,5 +1,50 @@
 # AiO Auto Podcast - Nhat ky
 
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Doc ban do track dung (V1 cam, A1 tieng cam, A2 mic roi), canh bao "mic dinh dau clip cam" hien dung, Auto Match bao dung "can it nhat 2 cam va 2 mic". Auto Sync chay 13 s nhung KHONG doi clip mic (chua gan nguoi cho mic) -> CHUA KIEM luong Auto Sync / Auto Podcast that.
+
+## [mac-port] - 2026-09-30 06:49 +0700 - Them duong chay tren macOS (tim ffmpeg ban Mac), Windows giu nguyen
+
+- **Boi canh:** chuyen bo AiO sang may Mac (Intel x86_64, macOS 26, Premiere Pro Beta 26.5). Viec: panel nay chay
+  duoc tren Mac ma KHONG doi hanh vi Windows.
+- **Kiem ke cho chi-Windows (grep dist/, host/, tests/, scripts/):**
+  - `dist/index.html` `timFfmpeg`: chi tim `bin/win64/ffmpeg.exe` cua panel anh em (transcript, autocut) -> tren Mac
+    luon tra null, nut Cat va nut Sync bao "Thieu bo xu ly media". Day la cho DUY NHAT chan panel tren Mac.
+  - 5 lenh `cp.execFile(ffmpeg, ...)` (tach 16k, tach mono loudnorm, sync 16k, sync mono): tham so da trung lap
+    tren moi he (khong cmd/powershell, khong shell), `windowsHide` vo hai tren Mac -> khong sua.
+  - `host/*.jsx`: khong co `$.os`, `.exe`, `callSystem`, o dia; duong dan chi chuan hoa `\` -> `/` -> khong sua.
+  - `tests/stress.mjs` (ca 12) va `tests/sinh-lieu-media.mjs`: chi tim `ffmpeg.exe`; tren Mac file .exe chep tu
+    Windows CO ton tai trong repo nhung chay ra `EACCES` (do that: stress.mjs vang loi truoc khi sua).
+  - `scripts/sign-install.ps1`, `scripts/do-tren-panel.ps1`: cong cu dev chi Windows (PowerShell) -> KHONG port.
+  - `dist/ngonngu-chung.js` (ban chep tu design-system, khong sua o day): tren Mac khong co `APPDATA` nen ghi vao
+    `~/AppData/Roaming/AiOStudio/ngonngu.json` -> van chay, nhung phai khop voi panel tong tren Mac moi dong bo
+    ngon ngu. Da bao lai, chua sua.
+  - `dist/CSInterface.js` (ban chep dung chung): `getSystemPath` tren Mac tung bo ca `file:///` -> ra `Users/...`
+    (thieu `/` dau) -> `napLaiHost` ($.evalFile) va `timFfmpeg` nhan duong dan tuong doi. Da duoc sua TAP TRUNG cho
+    moi panel (khong phai trong phien nay). Ma rieng cua panel (index.html, khop.js, host/*.jsx) khong tu boc
+    `file://` va khong gia dinh o dia: grep `file:`/`decodeURI`/`[A-Z]:` = 0 cho.
+- **Da sua:**
+  - `dist/index.html`: them `laMac()` (doc `process.platform === 'darwin'` qua `cep_node`) va nhanh Mac trong
+    `timFfmpeg`, thu tu: `<panel>/bin/mac/ffmpeg` -> `com.aiostudio.transcript|autocut/bin/mac/ffmpeg` ->
+    `~/Library/Application Support/AiO-Studio/bin/mac/ffmpeg` -> `/opt/homebrew/bin/ffmpeg` -> `/usr/local/bin/ffmpeg`.
+    Luon tra duong dan tuyet doi. Nhanh Windows giu nguyen tung dong.
+  - `tests/stress.mjs`, `tests/sinh-lieu-media.mjs`: tren Mac bo qua `.exe`, tim ffmpeg theo cung thu tu tren.
+- **Kiem chung bang so (may Mac, Node v24.21.0):**
+  - `node --check`: script nhung trong index.html (1 khoi), khop.js, nao.js, sync.js, 7 file tests -> 0 loi.
+  - Chay CHINH ham `laMac`/`timFfmpeg` cat ra tu index.html voi CEP gia lap: Mac -> `laMac=true`, tra
+    `~/Library/Application Support/AiO-Studio/bin/mac/ffmpeg`; fs rong -> hoi dung 6 cho theo thu tu tren, tra null;
+    gia lap Windows (`win32`, `C:/...`) -> hoi dung 2 cho `bin/win64/ffmpeg.exe` nhu cu, tra ban autocut.
+  - Bo kiem: kiem-host 86/86 · kiem-wide 11/11 · kiem-nao 24/24 · kiem-sync 9/9 · kiem-khop 32/32 · stress 14 DAT +
+    6 BAOCAO, "MOI CA BAT BUOC DEU DAT"; ca 12 (44.1k+48k qua ffmpeg THAT ban Mac) 10 luot, lech toi da 20 ms.
+  - Chay DUNG 5 bo tham so ffmpeg cua panel bang `execFile` + `windowsHide`, env PATH chi `/usr/bin:/bin`, duong dan
+    co dau cach, lieu sinh bang lavfi 5 s (mp3 stereo 440/660 Hz, mp4 testsrc + aac): ca 5 lenh thoat 0 trong 88-285 ms,
+    `AiONao.taiWav` doc duoc ca 5 file (16 kHz 80000 mau; loudnorm 48 kHz 240000 mau, dbTB -15,4; mono goc 44,1 kHz).
+- **Chua kiem:** chua mo panel trong Premiere tren Mac (nut Cat, Sync, Auto Match, ducking, nap host, hop thoai chon
+  file cua CEP tren Mac); chua kiem ten file Mac co dau `"` (ham `chuoiJsx` xoa dau `"` khoi duong dan truoc khi
+  gui host); chua kiem lieu that tren Mac. Khong doi so phien ban.
+
 ## [ui-0.6.7] - 2026-09-27 20:34 (UTC+7) - Tang so phien ban giao dien
 
 - Nhan giao dien v0.6.6 -> v0.6.7 (ngon ngu chung). Manifest VAN 0.1.0 (cho anh gat, viec cho o CLAUDE.md goc). Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.

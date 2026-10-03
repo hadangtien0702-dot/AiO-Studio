@@ -198,13 +198,17 @@ function layAppData(): string | null {
     canhBao('doc require("process").env.APPDATA hỏng', e)
   }
 
-  // 3. Suy từ thư mục nhà. Đường lùi cuối, chỉ đúng trên Windows — mà panel
-  //    CEP của bộ này vốn chỉ chạy Windows.
+  // 3. Suy từ thư mục nhà. Windows: `AppData\Roaming`. Mac không có APPDATA
+  //    nên luôn đi đường này: `~/Library/Application Support` (file chung thành
+  //    `~/Library/Application Support/AiOStudio/ngonngu.json`, panel tổng cũng vậy).
   try {
     const os = napNode('os')
     const path = napNode('path')
     if (os && path && typeof os.homedir === 'function') {
       const nha = os.homedir()
+      if (nha && typeof os.platform === 'function' && os.platform() === 'darwin') {
+        return path.join(nha, 'Library', 'Application Support')
+      }
       if (nha) return path.join(nha, 'AppData', 'Roaming')
     }
   } catch (e) {

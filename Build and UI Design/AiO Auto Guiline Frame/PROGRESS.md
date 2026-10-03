@@ -1,5 +1,22 @@
 # PROGRESS — AiO Auto Guiline Frame
 
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Hien khung an toan TikTok tren sequence 1920x1080: PNG 206.336 byte ghi o `~/Library/Application Support/AiOStudio/GuideFrame/`, nam tren V2 cua sequence. Canh bao lech ti le hien dung.
+
+## [0.3.2+mac] - 2026-09-30 19:27 (UTC+7) - Chay duoc tren Mac (CHUA do trong Premiere tren Mac)
+
+- **Boi canh:** anh: *"ok em lam het 8 panel cho mac luon di"* (Mac Intel, Premiere Pro Beta 26.5).
+- **Goc:** `dist/index.html` ghi PNG guide vao `C:/AiOStudio/GuideFrame` -> tren Mac khong co o C:, `mkdirSync` tao
+  thu muc `C:` tuong doi (vo nghia) va host khong import duoc. Cong them 2 file chung: `CSInterface.js` bo mat "/" dau
+  duong dan tren Mac, `ngonngu-chung.js` lui ve `~/AppData/Roaming` (sua o design-system, chep dong bo).
+- **Da sua (chi them nhanh Mac):** `THU_MUC` = `~/Library/Application Support/AiOStudio/GuideFrame` khi `process.platform`
+  la darwin (Mac khong ao hoa thu muc nhu Windows). Windows giu `C:/AiOStudio/GuideFrame`.
+- **Kiem:** ham THU_MUC cat tu index.html: darwin -> `/Users/mvvk2option/Library/Application Support/AiOStudio/GuideFrame`,
+  win32 -> `C:/AiOStudio/GuideFrame`. `node --check` script trong index.html dat.
+- **Chua kiem:** trong Premiere tren Mac (dat/go guide, import PNG, font Inter).
+
 ## [0.3.2] - 2026-09-27 20:34 (UTC+7) — Tăng số phiên bản
 
 - 0.3.1 -> 0.3.2 ở cả 3 nơi (manifest · `PHIEN_BAN` dist/index.html · `gf_phienBan()` host) + dòng đầu host.
@@ -39,6 +56,95 @@
   "Bi UI che", "Vung an toan", "Khung dich hep hon sequence…", "Lech ti le…", 5 aria-label, tooltip vung. Dem: 181 dong ma
   co chu Viet ngoai DICT; mo ta vung `m:` 60 cho, chi 1 co `mEn`. Cho anh gat moi dich.
 
+## 2026-09-26 18:38 — LÔ CUỐI (Snapchat · X) ÁP XONG: 10/11 ĐỊNH DẠNG DỌC 9:16 ĐÃ ĐO TỪ ẢNH APP THẬT, CÀI ĐÈ
+
+**Bối cảnh.** 2 agent lô cuối trả kết quả: snap-916 (Google Play ảnh 5 "Spotlight", màn đầy đủ 5 tab, đối chiếu
+App Store tile + bố cục "Simple Snapchat" 3 tab 09/2024) và x-vertical (2 ảnh chụp iPhone THẬT của player mới X
+02/2026 từ piunikaweb + bài X, đo độc lập khớp nhau trong 0,3%; 31 ảnh App Store/Google Play không có màn
+Immersive Viewer). Pinterest vẫn không có ảnh → chưa áp.
+
+**Thay đổi.**
+- `safe-zones.json` (4 cạnh đổi, 55 → **59 vùng**): snap-916 **14/25/20/7 crop** (cũ 7,81/17,19, KHÔNG có cạnh
+  bên — số ads 150/330 cắt ngang hàng avatar/tìm kiếm trên và cột 3 vòng tròn phải lấn 14,9%) · x-vertical
+  **15/23/7 crop/7 crop** (cũ –/20,83/12,96 ui/– ước lượng: player mới không còn cột icon dọc, hàng pill ngang nằm
+  trong dải dưới; cạnh phải HẠ 12,96 → 7 vì số cũ tả UI không còn tồn tại, số đo UI phải = 0, crop iPhone 4,6%).
+- `ap-ket-qua.mjs`: cạnh phải cũng nhận loại crop (`rightLoai`), in dòng `HA` khi hạ số so với hiện tại.
+- `dist/ve-guide.js`: +2 bảng `MOCK_DO` (22 + 23) = **9 bảng**; `sinh-du-lieu` ĐẠT; `sign-install` cài đè **18:38**
+  (Premiere đang tắt, mở lại là nhận).
+
+**Kiểm chứng bằng số.** Ghép chồng: Snapchat (`ghep-snap/ghep-snap-916-khit.jpg`, mapping khít theo công thức
+agent vì ảnh marketing 9:16 giả) tim/gửi/ba chấm 3 vòng, avatar + kính lúp + "Spotlight", kaytoji + nút lưu + 3 pill
+hashtag trùng ảnh thật; X (`ghep-x/`) back/ba chấm, avatar/tên/Follow, dòng chữ, hàng pill 15/3/60/lưu/chia sẻ trùng
+ảnh iPhone thật. Tổng kết đợt B: **10/11 định dạng dọc** đo từ ảnh thật, 9 bảng mock, 55 → 59 vùng.
+**Độ tin cậy** (agent tự chấm): Snapchat trung bình (ảnh listing marketing, chưa rõ bố cục 5 tab hay 3 tab đang chạy
+2026, neo dọc video không xác định) · X trung bình-khá (ảnh thu nhỏ 0,51; X tuyên bố 17/02/2026 bỏ crop video dọc,
+chưa có ảnh sau đó → giữ 2 dải crop 7% cho an toàn). **Chưa:** Pinterest (cần ảnh máy anh), 6 định dạng ngang/vuông/
+lưới không thuộc đợt này, chưa đo trên panel thật (Premiere tắt), chưa có ảnh nào từ máy anh ngoài YouTube.
+
+## 2026-09-26 18:21 — LÔ 3 ÁP XONG (IG Reels · IG Stories · Zalo) = 8/11 ĐỊNH DẠNG DỌC 9:16 ĐÃ ĐO TỪ ẢNH THẬT; SỬA LỖI SCRIPT XOÁ MẤT LÔ TRƯỚC
+
+**Bối cảnh.** 3 agent lô 2 trả kết quả (`anh-app/<id>/ket-qua.json`): ig-reels (App Store US, khung iPhone Pro Max,
+fill cắt 8,9%, 21 phần tử mock), zalo-916 (ảnh quantrimang 300 px bố cục 2022 + đối chứng ads.zalo.me 07/2025, 22 phần
+tử), ig-stories (App Store "Close Friends", thẻ khít 9:16, thanh trả lời NGOÀI thẻ, 7 phần tử). pin-916: không có ảnh
+video toàn màn hợp lệ → KHÔNG áp. Lô cuối (snap-916, x-vertical) đã khởi động song song.
+
+**Nguyên nhân thật (lỗi mới, do em).** `ap-ket-qua.mjs` ghi ĐÈ toàn bộ đoạn giữa 2 dòng đánh dấu bằng đúng lô đang
+áp → áp lô 3 xong `grep MOCK_DO[` chỉ còn **3 bảng**, 4 bảng lô 2 (fb-reels, fb-stories, tiktok, li-vertical) **mất
+sạch** mà `node --check` vẫn xanh. Bắt được nhờ đếm bảng sau khi ghi (đúng luật `5w`: replace xong phải đếm lại).
+Đoạn "sinh tự động" mà chạy theo LÔ thì phải **gộp theo khoá**, không ghi đè cả đoạn.
+
+**Thay đổi.**
+- `scripts/do-anh-that/ap-ket-qua.mjs`: (a) gộp: giữ nguyên `MOCK_DO[id]` của id không thuộc lô, chỉ thay/thêm id
+  trong lô, in "ghi N mới + giữ M cũ = tổng"; (b) `nguon` idempotent: cắt đoạn ` | DO ANH APP THAT …` cũ trước khi nối,
+  chạy lại cùng lô không nhân đôi. Áp lại lô 2 rồi lô 3 → **7 bảng**, JSON 0 cạnh đổi thêm, nguồn mỗi app đúng 1 lần.
+- `safe-zones.json` (lô 3, 5 cạnh đổi): ig-reels 14/35/**19**/**9 crop** (cũ 6/6 hai bên — cột icon thật lấn 18,1%,
+  giữ top/bottom chính thức Meta làm biên trên) · ig-stories giữ 13,02/13,02 (đo top thật chỉ 8,0% nhưng số Meta 250 px
+  lớn hơn → giữ; bottom trong video = 0 trên máy 19,5:9 vì thanh "Send message" nằm ngoài thẻ, giữ 13,02 làm biên cho
+  máy 16:9 chưa đo) · zalo-916 10/**20**/**17**/**10** (cũ 10/18/12/5 — 12% cũ CẮT NGANG cột icon thật).
+- `dist/ve-guide.js`: +3 bảng `MOCK_DO` (21 + 22 + 7); `sinh-du-lieu` ĐẠT 55 vùng; `sign-install` cài đè **18:21**
+  (Premiere đang TẮT — mở lại là nhận, không đổi host).
+
+**Kiểm chứng bằng số.** `veTatCa` vẽ 3 PNG (344/182/123 KB) → `ghep-tat-ca.py` ghép lên ảnh thật
+(`scratchpad/ghep-3app/`): IG Reels tim/bình luận/repost/gửi/ô nhạc + avatar/tên/caption + thanh tab trùng icon thật;
+IG Stories dải trên (tiến trình, avatar, tên, pill xanh, ba chấm, X) trùng, thanh trả lời đúng là ngoài thẻ; Zalo
+(ảnh 300 px, phóng 3×) tim/bình luận/chia sẻ + avatar/"Theo dõi"/caption trùng trong ±1 px ảnh gốc.
+**Độ tin cậy** (agent tự chấm): IG Reels khá · IG Stories trung bình-khá · Zalo THẤP-trung bình (ảnh nhỏ, bố cục 2022,
+không có ảnh App Store/Google Play của màn Zalo Video). **Chưa:** Pinterest (không ảnh), Snapchat + X đang đo, 5 định dạng
+ngang/vuông (yt-16-9, fb-feed-4-5, ig-feed-4-5, li-feed…, broadcast) chưa thuộc vòng này; chưa đo trên panel thật vì
+Premiere tắt.
+
+## 2026-09-26 18:06 — 4 APP ĐẦU ĐÃ ĐO TỪ ẢNH THẬT VÀ ÁP VÀO PANEL (FB Reels · FB Stories · TikTok · LinkedIn), ĐÃ CÀI
+
+**Bối cảnh.** Vòng 2 (16:33) lại chết 8/10 agent vì hạn mức ("resets 6pm"); còn 2 kết quả trong journal (fb-reels,
+fb-stories) + 4 file `ket-qua.json` agent kịp ghi sớm (nhờ luật "ghi ngay sau khi đo"): tiktok-video, li-vertical
+đầy đủ; ig-reels, zalo-916 mới có số thô. Hạn mức reset 18:00.
+
+**Nguyên nhân thật.** Chạy 10 agent song song nặng là cháy hạn mức phiên; kết quả chỉ sống nếu đã ghi ra đĩa.
+→ Từ nay chạy theo lô 4, agent phải ghi `ket-qua.json` trước khi soạn đề xuất.
+
+**Thay đổi.**
+- `scripts/do-anh-that/ap-ket-qua.mjs`: thêm 2 luật khi ghi vùng: (a) cạnh `chinh_thuc` đang LỚN hơn đề xuất thì
+  GIỮ (biên trên, như YouTube bottom 25%) — fb-stories bottom giữ 20% dù organic đo 5%; (b) left loại crop so với
+  `cropMoiMepPx` chứ không phải mép chữ; (c) bỏ qua cạnh đề xuất 0.
+- Áp 4 app (`--ap`): `safe-zones.json` **10 cạnh đổi số**, 54 → **55 vùng**; `dist/ve-guide.js` thêm **4 bảng
+  `MOCK_DO`** (17 + 9 + 17 + 14 phần tử) giữa 2 dòng đánh dấu. Số mới (top/bottom/right/left %):
+  fb-reels 14/35/**17**/**7 crop** (cũ 14/35/6/6 — cột icon thật lấn 14,6%, ảnh App Store 2026 + Meta 2023 khớp ≤ 0,4%) ·
+  fb-stories **15**/20/**8**/– (cũ 14/20, ảnh iPhone 1206 px bài SocialBee 07/2026, thẻ 9:16 khít, thanh trả lời NGOÀI thẻ) ·
+  tiktok-video **11**/25,21/**19**/**10 crop** (cũ 6,77/25,21/12,96/4,07 — App Store US, khung iPhone XS Max, fill cắt 8,9%) ·
+  li-vertical **14/30/20/11** (cũ 5,63/16,67/11,11/5,56 — ảnh blog Loomly 636 px + SỐ CHÍNH THỨC LinkedIn Help 260/560/210/112).
+- Đã `sinh-du-lieu` ĐẠT, `sign-install` cài đè 18:05 (panel đóng, mở lại là nhận).
+- Chạy lô 2 bằng Agent tool (4 agent nền): ig-reels + zalo-916 hoàn tất từ số thô; ig-stories + pin-916 đo mới.
+
+**File ảnh hưởng:** `safe-zones.json`, `dist/ve-guide.js`, `dist/safe-zones.js` (sinh), `scripts/do-anh-that/ap-ket-qua.mjs`.
+Bản trước khi áp lưu ở scratchpad (`safe-zones-truoc-ap.json`, `ve-guide-truoc-ap.js`).
+
+**Kiểm chứng bằng số.** `node --check` sạch; `veTatCa()` vẽ 5 định dạng (kích thước PNG 182–350 KB) → `ghep-tat-ca.py`
+ghép lên đúng ảnh app thật (k = 1,12 / 1,12 / 1,06 / 0,63): montage `scratchpad/ghep-4app/montage.jpg` — icon giả trùng
+icon thật ở cả 4 app (FB Reels: 99.9K/7K/12/Send; TikTok: avatar/991K/3456/1256/2281/đĩa; LinkedIn: 258/14/share/lưu;
+FB Stories: avatar + tên + X + Follow, thanh trả lời ngoài thẻ), vùng đỏ phủ trọn cột icon. Độ tin cậy theo agent:
+FB Reels cao · TikTok trung bình (ảnh marketing, không status bar) · LinkedIn trung bình-thấp (636 px) · FB Stories
+trung bình-khá. **Chưa:** ảnh từ máy anh cho 4 app này; Snapchat, X chưa đo; 6 app chờ lô 2/3.
+
 ## 2026-09-26 16:35 — VÒNG ĐO 10 APP LẦN 1 CHẾT VÌ HẾT HẠN MỨC; LẬP BỘ TÍCH HỢP TỰ ĐỘNG, CHẠY LẠI LẦN 2
 
 **Bối cảnh.** Workflow 10 agent đo (đường B, ảnh app thật) chạy ~10:0x, **cả 10 agent chết cùng lúc vì hết hạn mức
@@ -68,8 +174,9 @@ sẵn script đo dở của agent. Chưa có số đo nào được áp — ch�
 ## TRẠNG THÁI HIỆN TẠI (cập nhật 2026-09-26 16:35)
 
 - **Phiên bản:** v0.3.1 (manifest · `gf_phienBan()` · `PHIEN_BAN`; huy hiệu đọc từ `PHIEN_BAN`). Đã cài máy công ty.
-- **Dữ liệu safe zone:** chỉ **YouTube Shorts** đã đo từ ảnh app thật (25/09, iPhone của anh). **12 định dạng có mock
-  còn lại đang dùng số từ tài liệu = CHƯA KIỂM** (anh 26/09: *"em đã lấy thông số ảo để áp vào"*, bài brain `5bf`).
+- **Dữ liệu safe zone (18:06):** đã đo từ ảnh app thật **5/13** định dạng có mock: YouTube Shorts (máy anh), FB Reels,
+  FB Stories, TikTok, LinkedIn (ảnh App Store / bài báo, chưa phải máy anh). Đang đo: IG Reels, IG Stories, Pinterest,
+  Zalo (lô 2). Chưa: Snapchat, X (lô 3). Mock cũ vẽ theo tài liệu = CHƯA KIỂM (bài brain `5bf`).
 - **Đang chạy (26/09 16:33, vòng 2):** workflow 10 agent đo trên 137 ảnh app thật đã tải (vòng 1 chết vì hạn mức).
   Kết quả về → `ap-ket-qua.mjs` duyệt + ghi `MOCK_DO` + `safe-zones.json` → `veTatCa()` + `ghep-tat-ca.py` ghép
   chồng kiểm 10 app → cài → ghi sổ. Ảnh tạm 172 MB trong scratchpad, xong sẽ xoá, giữ ảnh đã dùng.

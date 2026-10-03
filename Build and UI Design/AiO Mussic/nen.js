@@ -22,6 +22,23 @@ function timBin(ten) {
   if (!path || !fs) return '';
   var ext = duongDanExt();
   if (!ext) return '';
+  // Mac: khong co .exe. Cung thu tu tim voi 7 panel kia: bin/mac cua panel ->
+  // bin/mac cua Asset Manager -> kho chung ~/Library/Application Support/AiO-Studio/bin/mac
+  // -> Homebrew. Luon tra DUONG DAN TUYET DOI (PATH cua Node trong CEP khong co Homebrew).
+  var pr = nodeRequire('process'), os = nodeRequire('os');
+  if (pr && pr.platform === 'darwin') {
+    var mac = [
+      path.join(ext, 'bin', 'mac', ten),
+      path.join(ext, '..', 'com.aiostudio.assetmanager', 'bin', 'mac', ten),
+      os ? path.join(os.homedir(), 'Library', 'Application Support', 'AiO-Studio', 'bin', 'mac', ten) : '',
+      '/opt/homebrew/bin/' + ten,
+      '/usr/local/bin/' + ten
+    ];
+    for (var j = 0; j < mac.length; j++) {
+      try { if (mac[j] && fs.existsSync(mac[j])) return mac[j]; } catch (e) {}
+    }
+    return '';
+  }
   var ungVien = [
     path.join(ext, 'bin', 'win64', ten + '.exe'),
     path.join(ext, 'bin', ten + '.exe'),

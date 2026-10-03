@@ -1,12 +1,13 @@
 /**
  * caidat.ts — lưu lựa chọn của người dùng ra đĩa để lần sau mở panel còn nguyên.
  *
- * File: %APPDATA%\AiOStudio\videodownload.json — cùng thư mục với ngonngu.json
+ * File: %APPDATA%\AiOStudio\videodownload.json (Mac: ~/Library/Application
+ * Support/AiOStudio/videodownload.json) — cùng thư mục với ngonngu.json
  * và kho FFmpeg dùng chung của cả bộ. Đọc/ghi qua Node của CEP; chạy ngoài
  * Premiere (trình duyệt) thì rơi về localStorage.
  */
 
-import { getFs, getPath, bienMT } from '../lib/node'
+import { getFs, getPath, bienMT, laMac, thuMucNha, thuMucAiO } from '../lib/node'
 import type { ChatLuong, CookieTrinhDuyet } from './ytdlp'
 
 export interface CaiDat {
@@ -29,9 +30,9 @@ const KHOA_LS = 'aio-videodownload'
 
 function duongFile(): string {
   const path = getPath()
-  const appData = bienMT('APPDATA')
-  if (!path || !appData) return ''
-  return path.join(appData, 'AiOStudio', 'videodownload.json')
+  const tm = thuMucAiO() // Windows %APPDATA%\AiOStudio · Mac ~/Library/Application Support/AiOStudio
+  if (!path || !tm) return ''
+  return path.join(tm, 'videodownload.json')
 }
 
 export function docCaiDat(): CaiDat {
@@ -74,9 +75,9 @@ const TOI_DA_LICH_SU = 30
 
 function duongLichSu(): string {
   const path = getPath()
-  const appData = bienMT('APPDATA')
-  if (!path || !appData) return ''
-  return path.join(appData, 'AiOStudio', 'videodownload-lichsu.json')
+  const tm = thuMucAiO()
+  if (!path || !tm) return ''
+  return path.join(tm, 'videodownload-lichsu.json')
 }
 
 /**
@@ -117,10 +118,11 @@ export function ghiLichSu<T>(ds: T[]): void {
   } catch {}
 }
 
-/** Thư mục Downloads của Windows — đường lùi khi project chưa lưu. */
+/** Thư mục Downloads (Windows %USERPROFILE%, Mac ~/Downloads) — đường lùi khi project chưa lưu. */
 export function thuMucDownloads(): string {
   const path = getPath()
-  const home = bienMT('USERPROFILE')
+  // Mac không có USERPROFILE → trước đây ra '' và path.join thành đường TƯƠNG ĐỐI.
+  const home = laMac() ? thuMucNha() : bienMT('USERPROFILE')
   if (!path || !home) return ''
   return path.join(home, 'Downloads')
 }

@@ -122,7 +122,8 @@
   function layAppData() {
     try { if (window.cep_node && window.cep_node.process && window.cep_node.process.env.APPDATA) return String(window.cep_node.process.env.APPDATA); } catch (e) { /* bỏ qua */ }
     try { var pr = napNode('process'); if (pr && pr.env && pr.env.APPDATA) return String(pr.env.APPDATA); } catch (e) { /* bỏ qua */ }
-    try { var os = napNode('os'), path = napNode('path'); if (os && path) return path.join(os.homedir(), 'AppData', 'Roaming'); } catch (e) { /* bỏ qua */ }
+    // Mac không có APPDATA -> ~/Library/Application Support (cùng chỗ với mọi panel khác).
+    try { var os = napNode('os'), path = napNode('path'); if (os && path) return os.platform && os.platform() === 'darwin' ? path.join(os.homedir(), 'Library', 'Application Support') : path.join(os.homedir(), 'AppData', 'Roaming'); } catch (e) { /* bỏ qua */ }
     return null;
   }
   function fileNgonNgu() {

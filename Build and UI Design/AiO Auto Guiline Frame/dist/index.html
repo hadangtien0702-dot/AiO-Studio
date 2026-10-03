@@ -782,8 +782,17 @@ function nodeFs(){
   return null;
 }
 /* ☠️ KHÔNG dùng %APPDATA% / os.tmpdir() — Premiere ảo hoá thư mục mới tạo
-   trong đó nên host mở ra thấy file rỗng (đo 28/07/2026). */
-const THU_MUC = 'C:/AiOStudio/GuideFrame';
+   trong đó nên host mở ra thấy file rỗng (đo 28/07/2026).
+   Mac không có ổ C: và không ảo hoá thư mục -> ~/Library/Application Support/AiOStudio/GuideFrame. */
+const THU_MUC = (function(){
+  try {
+    const rq = window.cep_node && window.cep_node.require;
+    if (rq && rq('process').platform === 'darwin') {
+      return rq('path').join(rq('os').homedir(), 'Library', 'Application Support', 'AiOStudio', 'GuideFrame');
+    }
+  } catch(e) {}
+  return 'C:/AiOStudio/GuideFrame';
+})();
 function ghiFile(duongDan, duLieu, encoding){
   const fs = nodeFs();
   if (!fs) throw new Error('KHONG_NODE');

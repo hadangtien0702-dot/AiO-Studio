@@ -16,6 +16,9 @@
 
 var VD_TEN_BIN = 'AiO Video Download';
 
+/** Mac? ($.os tren Mac la "Macintosh OS ...", tren Windows la "Windows/...".) */
+var VD_LA_MAC = /^mac/i.test(String($.os || ''));
+
 /** Chuan hoa duong dan de so: gach nguoc, chu thuong (Windows khong phan biet hoa/thuong). */
 function vd__chuan(p) {
   return String(p || '').replace(/\//g, '\\').toLowerCase();
@@ -35,8 +38,11 @@ function vd__file(p) {
 /**
  * Duong dan dang gach nguoc, KHONG qua File (tranh giai ma %XX). Viet hoa chu o
  * dia nhu File.fsName tung lam (do 21/09: fsName tra 'E:\...' ca khi dua 'e:/...').
+ * Mac: GIU NGUYEN gach xuoi ('/Users/...') — doi sang '\' thi importFiles va
+ * findItemsMatchingMediaPath khong thay file.
  */
 function vd__gachNguoc(p) {
+  if (VD_LA_MAC) return String(p || '');
   var s = String(p || '').replace(/\//g, '\\');
   if (/^[a-z]:/.test(s)) s = s.charAt(0).toUpperCase() + s.slice(1);
   return s;

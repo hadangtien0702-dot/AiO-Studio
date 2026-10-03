@@ -364,6 +364,16 @@ for (const [bleed, batBuoc] of [[-12, true], [-10, true], [-8, true], [-7, false
     const c = join(suite, p, 'bin', 'win64', 'ffmpeg.exe')
     if (existsSync(c)) { ffmpeg = c; break }
   }
+  if (process.platform === 'darwin') {
+    // Mac: khong co .exe — cung thu tu tim nhu panel (dist/index.html timFfmpeg).
+    // ffmpeg.exe trong repo (chep tu Windows) co ton tai nhung khong chay duoc tren Mac.
+    ffmpeg = null
+    const home = (await import('node:os')).homedir()
+    for (const c of [
+      join(home, 'Library', 'Application Support', 'AiO-Studio', 'bin', 'mac', 'ffmpeg'),
+      '/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg',
+    ]) { if (existsSync(c)) { ffmpeg = c; break } }
+  }
   if (!ffmpeg) {
     ghi('BAOCAO', '12 sample-rate lan', 'BO QUA — khong thay ffmpeg')
   } else {

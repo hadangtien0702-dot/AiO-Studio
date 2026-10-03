@@ -17,10 +17,43 @@
  */
 
 import { dich } from '../ngonngu'
-import { getFs, getPath, nodeRequire } from '../lib/node'
+import { conQuyenChay, getFs, getPath, laMac, nodeRequire, thuMucAppSupportMac } from '../lib/node'
 import { execFileAsync, getFFmpegPath, soLuongCpu } from './ffmpeg'
 import { parseDuration, parseVideoFps } from './silencelog'
 import type { Cau } from './srt'
+
+/**
+ * Mac chip Intel: bắt whisper chạy CPU (`-ng`). Đo 30/09/2026 trên i9-9980HK + Radeon Pro 5500M,
+ * câu 14 s, mô hình turbo: GPU (Metal) 18,7 s, CPU 11,4 s, chữ ra y hệt; trong Premiere GPU còn bị
+ * Premiere giành nên Autocut đo 59 s. Chip M (arm64) giữ GPU. Windows không đổi (trả mảng rỗng).
+ */
+function chiChayCpu(): string[] {
+  if (!laMac()) return []
+  try {
+    const r = nodeRequire()
+    return r && r('os').arch() === 'x64' ? ['-ng'] : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Số luồng cho whisper. Mac: theo NHÂN THẬT (hw.physicalcpu) trừ 2. Đo 30/09/2026 trong Premiere Beta
+ * trên i9-9980HK (8 nhân thật / 16 luồng), câu 14 s, turbo, CPU: 6 luồng 12,0 s · 8 luồng 14,6 s ·
+ * 9 luồng 54,3 s · 10 luồng 78,0 s · 11 luồng ~100 s (ngoài Premiere 11 luồng vẫn 11,4 s): vượt số nhân
+ * thật là các luồng của ggml chờ nhau vì Premiere cũng giành CPU. Windows giữ nguyên soLuongCpu().
+ */
+function soLuongWhisper(): number {
+  if (!laMac()) return soLuongCpu()
+  try {
+    const r = nodeRequire()
+    const n = r ? parseInt(String(r('child_process').execFileSync('/usr/sbin/sysctl', ['-n', 'hw.physicalcpu'])).trim(), 10) : 0
+    if (n > 0) return Math.max(2, Math.min(soLuongCpu(), n - 2))
+  } catch {
+    /* lùi về nửa số luồng */
+  }
+  return Math.max(2, Math.floor(soLuongCpu() / 2))
+}
 
 export type { Cau }
 
@@ -104,19 +137,44 @@ export type MaMoHinh = (typeof MO_HINH)[number]['ma']
  */
 const NOI_DE = ['C:/AiO-Studio/whisper']
 
+/**
+ * macOS: `~/Library/Application Support/AiO-Studio/whisper` — luật chung cả bộ.
+ * Bẫy AppData ảo hoá ở trên là chuyện riêng của Windows; trên Mac Node đọc
+ * thư mục này bình thường. Windows vẫn dùng `NOI_DE` như cũ.
+ */
+function noiDe(): string[] {
+  if (!laMac()) return NOI_DE
+  const appSup = thuMucAppSupportMac()
+  const path = getPath()
+  return appSup && path ? [path.join(appSup, 'AiO-Studio', 'whisper')] : []
+}
+
+/**
+ * File chạy của bộ nghe hiểu trong thư mục gốc.
+ * Windows: `bin/Release/whisper-cli.exe` · macOS: `bin/whisper-cli` (không đuôi,
+ * không có thư mục Release).
+ */
+function duongExe(goc: string): string {
+  const path = getPath()
+  return laMac()
+    ? path.join(goc, 'bin', 'whisper-cli')
+    : path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
+}
+
 /** Thư mục gốc của bộ máy Whisper ('' nếu không tìm thấy chỗ nào). */
 function thuMucWhisper(): string {
   const fs = getFs()
   const path = getPath()
   if (!fs || !path) return ''
-  for (const d of NOI_DE) {
+  const noi = noiDe()
+  for (const d of noi) {
     try {
       if (fs.existsSync(d)) return d
     } catch {
       /* thử chỗ tiếp theo */
     }
   }
-  return NOI_DE[0] // trả về chỗ mặc định để thông báo lỗi chỉ đúng đường dẫn
+  return noi[0] ?? '' // trả về chỗ mặc định để thông báo lỗi chỉ đúng đường dẫn
 }
 
 /**
@@ -132,9 +190,10 @@ export function timBoMay(ma: MaMoHinh = 'turbo'): BoMayWhisper | null {
   if (!fs || !path || !goc) return null
 
   const chon = MO_HINH.find((m) => m.ma === ma) ?? MO_HINH[0]
-  const exe = path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
+  const exe = duongExe(goc)
   try {
     if (!fs.existsSync(exe)) return null
+    if (laMac()) conQuyenChay(exe)
     const model = path.join(goc, 'models', chon.file)
     if (fs.existsSync(model)) return { exe, model }
     // Thiếu đúng mô hình được chọn thì lùi sang cái còn lại, còn hơn không chạy.
@@ -155,7 +214,7 @@ export function thieuGi(): string {
   const goc = thuMucWhisper()
   if (!fs || !path) return dich('Panel không dùng được Node.js.')
   if (!goc) return dich('Không xác định được thư mục cài đặt của bộ nghe hiểu.')
-  const exe = path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
+  const exe = duongExe(goc)
   const model = path.join(goc, 'models', 'ggml-large-v3.bin')
   const thieu: string[] = []
   try {
@@ -163,7 +222,12 @@ export function thieuGi(): string {
     // *"ban thuong mai khong de nguoi dung biet minh dung gi va lam gi"*.
     // Khach biet panel boc mot cong cu ma nguon mo la tu chay duoc, khoi mua.
     if (!fs.existsSync(exe)) thieu.push(dich('bộ nghe hiểu'))
-    if (!fs.existsSync(model)) thieu.push(dich('dữ liệu nghe hiểu (khoảng 3 GB)'))
+    if (laMac()) {
+      // Mac chỉ cài mô hình turbo (~1,6 GB), không có large-v3 — coi là thiếu
+      // khi KHÔNG có mô hình nào, đừng đòi đúng file large-v3 như Windows.
+      const coMoHinh = MO_HINH.some((m) => fs.existsSync(path.join(goc, 'models', m.file)))
+      if (!coMoHinh) thieu.push(dich('dữ liệu nghe hiểu (khoảng 1,6 GB)'))
+    } else if (!fs.existsSync(model)) thieu.push(dich('dữ liệu nghe hiểu (khoảng 3 GB)'))
   } catch {
     return dich('Không đọc được thư mục ') + goc
   }
@@ -369,8 +433,8 @@ export async function nghe(
     //   biên dB   — tiếng Anh nói nhanh, nối âm, khoảng lặng giữa từ ngắn hơn
     //   từ đệm    — "ờ, ừm" khác "uh, um, like"
     // Mỗi ngôn ngữ cần MỘT FILE THẬT để đo lại. Chưa đo thì chưa được hứa.
-    ['-m', boMay.model, '-f', wavPath, '-l', 'auto', '-t', String(soLuongCpu()),
-     '-mc', '0', '-np', '-pp', '-ojf', '-of', goc],
+    ['-m', boMay.model, '-f', wavPath, '-l', 'auto', '-t', String(soLuongWhisper()),
+     '-mc', '0', '-np', '-pp', '-ojf', '-of', goc, ...chiChayCpu()],
     {
       uuTienThap: false, // anh Tiến đang ngồi đợi — đừng nhường CPU cho ai
       ngheStderr: bao

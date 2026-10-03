@@ -25,6 +25,7 @@
  *      cách này để lỡ tay còn khôi phục được.
  */
 import { getFs, getPath, nodeRequire } from '../lib/node'
+import { isMac } from '../lib/platform'
 
 export interface MacJunkResult {
   paths: string[]
@@ -137,6 +138,48 @@ export async function moveToRecycleBin(
   const listFile = path.join(os.tmpdir(), `aio-mac-junk-${stamp}.txt`)
 
   await fs.promises.writeFile(listFile, paths.join('\r\n'), 'utf8')
+
+  // [2026-09-30] macOS: không có PowerShell. Chuyển vào THÙNG RÁC của Mac
+  // (Trash, khôi phục được bằng "Put Back") qua `NSFileManager.trashItemAtURL`
+  // gọi bằng JavaScript for Automation. Không cần Finder, không cần quyền
+  // Automation. Vẫn đọc đường dẫn từ CÙNG file tạm UTF-8 ở trên, không nhét
+  // vào dòng lệnh. Tuyệt đối không `unlink` — giữ đúng luật của file này.
+  if (isMac()) {
+    const jxa = [
+      'ObjC.import("Foundation");',
+      'function run(argv) {',
+      '  var s = $.NSString.stringWithContentsOfFileEncodingError(argv[0], $.NSUTF8StringEncoding, null);',
+      '  if (!s || s.isNil()) return "0";',
+      '  var fm = $.NSFileManager.defaultManager;',
+      '  var ok = 0;',
+      '  s.js.split(/\\r?\\n/).forEach(function (p) {',
+      '    if (!p) return;',
+      '    if (fm.trashItemAtURLResultingItemURLError($.NSURL.fileURLWithPath(p), null, null)) ok++;',
+      '  });',
+      '  return String(ok);',
+      '}',
+    ].join('\n')
+
+    const movedMac = await new Promise<number>((resolve) => {
+      cp.execFile(
+        '/usr/bin/osascript',
+        ['-l', 'JavaScript', '-e', jxa, listFile],
+        { maxBuffer: 4 * 1024 * 1024 },
+        (_err: any, stdout: string) => {
+          const n = parseInt(String(stdout).trim(), 10)
+          resolve(isNaN(n) ? 0 : n)
+        },
+      )
+    })
+
+    try {
+      await fs.promises.unlink(listFile)
+    } catch {
+      /* file tạm để lại cũng không sao */
+    }
+
+    return { moved: movedMac, failed: paths.length - movedMac }
+  }
 
   //  -Encoding UTF8 để đọc đúng tên file tiếng Việt.
   //  Bọc từng file trong try/catch để một file khoá không chặn cả mẻ.

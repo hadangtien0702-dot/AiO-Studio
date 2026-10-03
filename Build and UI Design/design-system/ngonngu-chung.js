@@ -28,7 +28,8 @@
     var ad = null;
     try { if (window.cep_node && window.cep_node.process && window.cep_node.process.env.APPDATA) ad = String(window.cep_node.process.env.APPDATA); } catch (e) { /* bỏ qua */ }
     if (!ad) { try { var pr = napNode('process'); if (pr && pr.env && pr.env.APPDATA) ad = String(pr.env.APPDATA); } catch (e) { /* bỏ qua */ } }
-    if (!ad) { try { var os = napNode('os'); if (os) ad = path.join(os.homedir(), 'AppData', 'Roaming'); } catch (e) { /* bỏ qua */ } }
+    // Mac không có APPDATA -> ~/Library/Application Support (cùng chỗ với panel tổng và các panel React).
+    if (!ad) { try { var os = napNode('os'); if (os) ad = os.platform && os.platform() === 'darwin' ? path.join(os.homedir(), 'Library', 'Application Support') : path.join(os.homedir(), 'AppData', 'Roaming'); } catch (e) { /* bỏ qua */ } }
     return ad ? path.join(ad, 'AiOStudio', 'ngonngu.json') : null;
   }
   function hopLe(l) { return l === 'vi' || l === 'en'; }

@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNgonNgu, NutDoiNgonNgu, dich } from './ngonngu'
 import { isInHost, chonThuMuc, nhapVaoProject } from './lib/cep'
-import { getFs, getPath, nodeAvailable } from './lib/node'
+import { getFs, getPath, nodeAvailable, laMac } from './lib/node'
 import {
   rutLink, docThongTin, taiVideo, kiemEngine, tuCapNhatEngine, docBanGoi, exeLanCuoi, duongYtDlp, moThuMuc,
   dinhDangThoiLuong, dinhDangMB, taoThumb, duongThumb, fileUrl,
@@ -402,7 +402,10 @@ export default function App() {
       case 'bi-chan': return t('Trang từ chối yêu cầu (bị chặn). Thử lại sau, hoặc dùng cookie trình duyệt trong Cài đặt.')
       case 'mat-mang': return t('Không kết nối được. Kiểm tra mạng rồi thử lại.')
       case 'thieu-engine': return tp('Thiếu file {f} trong bộ cài. Cài lại panel.', { f: e.chiTiet })
-      case 'khong-chay-duoc': return t('Windows chặn engine tải (phần mềm diệt virus?). Cho phép trong Windows Security rồi thử lại.')
+      case 'khong-chay-duoc':
+        return laMac()
+          ? t('macOS chặn engine tải. Mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật, cho phép rồi thử lại.')
+          : t('Windows chặn engine tải (phần mềm diệt virus?). Cho phép trong Windows Security rồi thử lại.')
       case 'cookie': return tp('Không đọc được cookie của {b}. Đóng hẳn {b} (kể cả chạy nền), hoặc chọn Firefox / Không trong Cài đặt.', { b: tenCookie })
       case 'khong-ghi-duoc': return t('Không ghi được vào thư mục lưu (ổ đã rút, hết chỗ hoặc không có quyền). Bấm "Đổi" để chọn chỗ khác.')
       case 'la-playlist':
@@ -520,7 +523,7 @@ export default function App() {
             </button>
           )}
           {!dangChay && (
-            <button type="button" className="nut-ic nut-ic--nho" aria-label={t('Dán link')} title={t('Dán link (Ctrl+V)')} onClick={dan}>
+            <button type="button" className="nut-ic nut-ic--nho" aria-label={t('Dán link')} title={laMac() ? t('Dán link (Cmd+V)') : t('Dán link (Ctrl+V)')} onClick={dan}>
               <Ic ten="dan" co={14} />
             </button>
           )}
@@ -933,6 +936,11 @@ function rutGonDuongDan(p: string): { cha: string; ten: string } {
   if (!p) return { cha: '', ten: dich('(chưa chọn)') }
   const ds = p.split(/[\\/]+/).filter(Boolean)
   const ten = ds.pop() || p
+  if (laMac()) {
+    // Mac: gạch xuôi, giữ '/' đầu cho đường ngắn ("/Users/…").
+    const cha = ds.length > 2 ? '…/' + ds[ds.length - 1] + '/' : '/' + ds.map((x) => x + '/').join('')
+    return { cha, ten }
+  }
   const cha = ds.length > 2 ? '…\\' + ds[ds.length - 1] + '\\' : ds.length ? ds.join('\\') + '\\' : ''
   return { cha, ten }
 }

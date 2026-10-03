@@ -757,9 +757,32 @@ select option{background:var(--bg-2);color:var(--text-1)}
     try { if (typeof require === 'function') return require(mod) } catch (e) {}
     return null
   }
+  // Mac hay Windows — đọc qua Node của CEP (panel bật --enable-nodejs).
+  function laMac() {
+    try { if (window.cep_node && window.cep_node.process) return window.cep_node.process.platform === 'darwin' } catch (e) {}
+    try { if (typeof process !== 'undefined' && process.platform) return process.platform === 'darwin' } catch (e) {}
+    return false
+  }
   function timFfmpeg(fs) {
     var goc = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/')
     var ung = ['com.aiostudio.transcript', 'com.aiostudio.autocut']
+    // Mac (30/09/2026): ffmpeg KHÔNG có đuôi .exe, nằm ở bin/mac. Thứ tự: của
+    // chính panel → panel anh em (như Windows) → kho chung AiO-Studio → Homebrew.
+    // ☠️ PATH của Node trong CEP trên Mac không có Homebrew — luôn trả đường
+    // dẫn TUYỆT ĐỐI, đừng bao giờ gọi trần 'ffmpeg'.
+    if (laMac()) {
+      var os = napNode('os')
+      var dsMac = [goc + '/bin/mac/ffmpeg']
+      for (var u = 0; u < ung.length; u++) {
+        dsMac.push(goc.replace(/com\.aiostudio\.[a-z]+$/, ung[u]) + '/bin/mac/ffmpeg')
+      }
+      if (os) dsMac.push(os.homedir() + '/Library/Application Support/AiO-Studio/bin/mac/ffmpeg')
+      dsMac.push('/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg')
+      for (var k = 0; k < dsMac.length; k++) {
+        try { if (fs.existsSync(dsMac[k])) return dsMac[k] } catch (e) {}
+      }
+      return null
+    }
     for (var i = 0; i < ung.length; i++) {
       var p = goc.replace(/com\.aiostudio\.[a-z]+$/, ung[i]) + '/bin/win64/ffmpeg.exe'
       try { if (fs.existsSync(p)) return p } catch (e) {}

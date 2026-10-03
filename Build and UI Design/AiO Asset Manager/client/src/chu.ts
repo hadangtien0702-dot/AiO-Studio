@@ -223,6 +223,9 @@ export const CHU: BangChu = {
       'Pick a bin in the left menu, or assign assets to a bin to reuse them across every project.',
     'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.':
       'Drag files from Explorer in here, or select clips on the timeline and press “Add from timeline”.',
+    // [2026-09-30] ban Mac (Finder thay cho Explorer)
+    'Kéo file từ Finder vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.':
+      'Drag files from Finder in here, or select clips on the timeline and press “Add from timeline”.',
     'Brand là bộ nhận diện dùng lại ở mọi dự án: logo, intro, nhạc nền… Tạo brand đầu tiên bằng nút':
       'A brand is an identity kit you reuse in every project: logo, intro, background music… Create your first brand with',
     // Grid.tsx — cau co CHO TRONG, dien bang `.replace()` o cho goi (xem muc 3)
@@ -315,6 +318,15 @@ export const CHU: BangChu = {
       'Moved {n} files to the Recycle Bin — {loi} files could not be moved (still open?)',
     '{n} file thừa ({dungluong}) do giải nén file zip của máy Mac — không phải nhạc/video, Premiere cũng không mở được':
       '{n} leftover files ({dungluong}) left behind by unzipping Mac archives — not audio or video, and Premiere cannot open them either',
+    // [2026-09-30] ban Mac cua hang "Rac macOS" — Thung rac cua Mac = Trash (tu cua Finder)
+    '{n} file thừa ({dungluong}) do macOS tạo trên ổ không phải định dạng Mac, không phải nhạc/video, Premiere cũng không mở được':
+      '{n} leftover files ({dungluong}) created by macOS on a non-Mac drive, not audio or video, and Premiere cannot open them either',
+    'Bấm lần nữa để chuyển vào Thùng rác của Mac': 'Press again to move them to the Trash',
+    'Chuyển {n} file rác vào Thùng rác của Mac, khôi phục lại được nếu cần':
+      'Move {n} junk files to the Trash, you can restore them if you need to',
+    'Đã chuyển {n} file rác vào Thùng rác của Mac': 'Moved {n} junk files to the Trash',
+    'Đã chuyển {n} file vào Thùng rác của Mac, {loi} file không chuyển được (đang mở?)':
+      'Moved {n} files to the Trash, {loi} files could not be moved (still open?)',
 
     // ─── PowerBinHub.tsx — menu trai cua Power Bins ───
     'Lưu': 'Save',

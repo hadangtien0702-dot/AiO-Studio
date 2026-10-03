@@ -12,6 +12,7 @@
  */
 import { userDataPath } from '../lib/cep'
 import { getFs, getPath } from '../lib/node'
+import { isMac, macAppSupportDir } from '../lib/platform'
 
 /**
  * ☠️ [13/08/2026] LẤY BIẾN MÔI TRƯỜNG — TUYỆT ĐỐI KHÔNG VIẾT `process.env`.
@@ -57,8 +58,10 @@ let memoProxies: string | null = null
 export function defaultCacheRoot(): string {
   const path = getPath()
   if (!path) return ''
+  // [2026-09-30] Mac không có %APPDATA%: lùi về ~/Library/Application Support
+  // (cũng là giá trị CEP trả cho USER_DATA trên Mac).
   const base =
-    userDataPath() || bienMT('APPDATA') || ''
+    userDataPath() || bienMT('APPDATA') || (isMac() ? macAppSupportDir() : '') || ''
   return base ? path.join(base, 'AiOPowerBins') : ''
 }
 

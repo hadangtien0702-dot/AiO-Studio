@@ -1,5 +1,50 @@
 # AiO Auto Re-Frames - Nhat ky
 
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Xuat check 720p sequence 1 clip 14 s: ~3 s, `AiO Mac Test-check-720p.mp4` h264 1280x720 + aac, 14,36 s, 4,4 MB, canh video goc. Sequence 2 clip: bao dung "chi xuat sequence 1 clip".
+
+## [0.6.1+mac] - 2026-09-30 06:48 (UTC+7) - Nhanh macOS cho panel (Windows giu nguyen, CHUA tang so)
+
+- **Boi canh:** dua ca bo AiO len may Mac Intel (macOS 26, Premiere Pro Beta 26.5). Panel nay khong co buoc build,
+  `dist/index.html` la nguon. Kiem ke cho chi chay tren Windows (grep `.exe`, `win64`, `powershell`, `cmd`,
+  `explorer`, `APPDATA`, `C:/`, `\\`, `windowsHide`, `$.os`, `callSystem`, `Folder/File` trong `dist/`, `host/`, `xem-rieng.mjs`).
+- **Nguyen nhan that (2 cho hong tren Mac):**
+  1. `timFfmpeg` chi tim `<panel anh em>/bin/win64/ffmpeg.exe` (Transcripts, Autocut) -> tren Mac luon `null`,
+     nut xuat check bao thieu bo xu ly media.
+  2. `CSInterface.js` (ban chep CHUNG, md5 giong het 9 panel) cat ca `file:///` -> tren Mac duong extension ra
+     `Users/...` MAT dau `/`. Hau qua: `napLaiHost` goi `$.evalFile("Users/.../host/index.jsx")` sai duong, va
+     duong tim ffmpeg cung sai. Da do bang mo phong `__adobe_cep__` tra `file:///Users/...`: ra `Users/mvvk2option/...`.
+- **Da sua (chi `dist/index.html`, them nhanh Mac, khong doi logic Windows):**
+  - Them `napNode` / `laMac` (`process.platform === 'darwin'` qua `cep_node`) / `duongExt` (Mac: tra lai `/` dau).
+    `napLaiHost` va `timFfmpeg` dung `duongExt()`; tren Windows `duongExt()` = y chuoi cu.
+  - `timFfmpegMac`: khong duoi `.exe`, luon tra duong tuyet doi (PATH cua Node trong CEP khong co Homebrew).
+    Thu tu: `<panel>/bin/mac/ffmpeg` -> `~/Library/Application Support/AiO-Studio/bin/mac/ffmpeg` ->
+    `<Transcripts|Autocut>/bin/mac/ffmpeg` (canh panel + `~/Library/Application Support/Adobe/CEP/extensions/`) ->
+    `/opt/homebrew/bin/ffmpeg` -> `/usr/local/bin/ffmpeg`.
+  - Chuoi moi song ngu `xuat_thieu_ffmpeg_mac` (VI + EN, khong gach dai) chi hien tren Mac khi khong thay ffmpeg.
+- **Khong phai sua:** `host/*.jsx` chi co `replace(/\\/g,'/')` (chay ca 2 he), khong `$.os`, `callSystem`, `Folder/File`,
+  `.exe`. Tham so ffmpeg (`libopenh264`, `aac`) giu nguyen vi ban ffmpeg Mac co san ca hai encoder.
+  `xem-rieng.mjs` da dung `node:path`, chay duoc ca 2 he.
+- **Chua port / bao lai (ngoai pham vi panel):**
+  - `dist/ngonngu-chung.js` (ban chep chung): tren Mac khong co `APPDATA` -> lui ve `~/AppData/Roaming/AiOStudio/ngonngu.json`.
+    Van doc/ghi duoc nhung khong theo quy uoc Mac `~/Library/Application Support/...`. Phai sua o `design-system/`.
+  - `dist/CSInterface.js` (ban chep chung): nen sua goc (Mac chi cat `file://`). Panel nay da tu che bang `duongExt()`.
+  - `scripts/*.ps1` (ky + cai, do tren panel, dong goi) la cong cu dev Windows, chua co ban Mac.
+- **Kiem chung bang so (may Mac, 30/09):**
+  - `node --check`: script inline cua `index.html` + `CSInterface.js`, `ngonngu-chung.js`, `tai-nguyen.js` -> OK.
+  - Chay DUNG cac ham trong `index.html` (vm, gia lap `__adobe_cep__`): Mac -> `duongExt()` =
+    `/Users/mvvk2option/Library/Application Support/Adobe/CEP/extensions/com.aiostudio.reframe`, `timFfmpeg` =
+    `~/Library/Application Support/AiO-Studio/bin/mac/ffmpeg`; co `<panel>/bin/mac/ffmpeg` thi file do thang.
+    Gia lap win32 -> `duongExt()` = `C:/Users/x/.../com.aiostudio.reframe` y nhu truoc, `laMac()` = false.
+  - ffmpeg Mac (9.0.2-tessus, x86_64) chay bang `execFile` voi DUNG tham so cua `xuatCheck` tren video thu
+    3 s 1920x1080 + tieng, thu muc co dau cach, `-ss 0.500 -t 2.000`: 720p OK 406 ms 0,279 MB (h264 1280x720 + aac,
+    2,000 s) · 480p OK 854x480 · 360p OK 640x360 (ffprobe doc lai).
+  - **chua kiem**: chay trong Premiere tren Mac (nap host, vong tham do, tao ban doc, khoanh I/O, Auto Reframe Sensei,
+    xuat check tu panel that). Chua cai ban nay vao CEP extensions.
+- File: `dist/index.html`, `PROGRESS.md`.
+
 ## [0.6.1] - 2026-09-27 20:34 (UTC+7) - Tang so phien ban
 
 - manifest + nhan topbar 0.6.0 -> 0.6.1 (ngon ngu chung). Cai lai ban ky tren may nha. Luat /xong 2b (push = tang so). Thay doi cua phien 27/09 da bi phien Shot & Save gom vao commit e62ec52 va push khi chua tang so; nay tang bu.
@@ -121,6 +166,9 @@ chi NHAC DI (khong don lo), do tham so thi LAM SAP Premiere. Duong chinh thuc la
 3. Version 0.1.0 -> **0.5.0** khop 3 cho (manifest x2 + UI topbar).
 
 ## Trang thai hien tai  (chot phien 2026-08-01 15:09)
+
+**30/09/2026:** da them nhanh macOS (duong extension + tim ffmpeg bin/mac) trong `dist/index.html`;
+ffmpeg Mac da chay dung tham so xuat check. Trong Premiere tren Mac: chua kiem. Xem muc [0.6.1+mac] tren cung.
 
 **v0.4.2 da cai — panel hoan thien nhat bo, lam CHUAN cho 4 panel kia.**
 Loi: shorts theo noi dung (hoi-dap, ngat cau 0,000s) · bam chu the Sensei ·
