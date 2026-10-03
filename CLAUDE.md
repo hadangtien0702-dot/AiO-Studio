@@ -324,10 +324,10 @@ mở phiên mới. Gmail connector chỉ tạo THƯ NHÁP, không tự gửi.
 |---|---|
 | Công ty (DRT-G21) | `E:\2026\Production\AiO Studio` |
 | Nhà (user `hadan`) | `D:\Production\AiO Studio` |
-| **Nhà — MAC** (thêm 21/09: anh *"máy ở nhà anh có 2 máy là máy mac và máy win"*) | đề xuất `~/Production/AiO Studio` — **chưa đo**, lần đầu phải `git clone` |
+| **Nhà — MAC** (thêm 21/09: anh *"máy ở nhà anh có 2 máy là máy mac và máy win"*) | `~/Production/AiO Studio` (clone lần đầu 01/10) |
 
 - Làm xong ở máy nào → **pull rồi push** ngay (`/xong` bước 2c).
-- **Mac không có PowerShell** → dùng `bash scripts/dong-bo-mac.sh` (cùng 5 bước: pull · đếm file · node_modules · /xong+/batdau · nhận brain) và `--day-brain` thay cho `dong-bo-brain.ps1 -Day`. Viết + thử 21/09 **trên Windows** (thư mục HOME giả, brain đẩy vào bản sao cục bộ) — **CHƯA chạy trên Mac thật**. ☠️ FFmpeg/whisper trong `bin/` là `.exe` → 7 panel dùng chúng chưa chạy được trên Mac.
+- **Mac không có PowerShell** → dùng `bash scripts/dong-bo-mac.sh` (cùng 5 bước: pull · đếm file · node_modules · /xong+/batdau · nhận brain) và `--day-brain` thay cho `dong-bo-brain.ps1 -Day`. Viết + thử 21/09 **trên Windows** (thư mục HOME giả, brain đẩy vào bản sao cục bộ) — **01/10 23:5x chạy lần đầu trên Mac thật (clone + `--cai-them`): anh báo 5 bước xanh hết** (Claude không thấy bảng in ra; GitHub `main` lúc đó `4f8f0fb`). `--day-brain` trên Mac CHƯA chạy. ☠️ FFmpeg/whisper trong `bin/` là `.exe` → 7 panel dùng chúng chưa chạy được trên Mac.
 - Ngồi máy kia → chạy `scripts\dong-bo-may.ps1` TRƯỚC (pull · đếm file so
   GitHub · soi node_modules/FFmpeg; `-CaiThem` = tự npm install). 31/08: 636/636.
 - Máy công ty push bị 403 (gh CLI đè credential `Vincentnguyen1809`):
