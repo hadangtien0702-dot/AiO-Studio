@@ -5,6 +5,33 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [mac-may-chinh] - 2026-10-03 18:15 (UTC+7) - Lấy lại bản Mac 11 panel từ Thùng rác, gom 3 bản sao về một thư mục, Mac là máy chính - máy Mac nhà
+
+- **Bối cảnh:** anh: *"đây là folder được download mới xong"* → *"cứ kiểm tra đi"* → *"em lấy lại cho anh rồi giúp anh tổng hợp thành một
+  file duy nhất và từ nay mac sẽ là máy làm việc chính của anh"* → *"lắp brain vào luôn… chắc chắn rằng máy mac ở nhà làm việc như ở công ty"*.
+- **Tìm ra:** trên Mac có 3 bản AiO Studio. Bản clone 01/10 (`~/Production`, sạch) · `Downloads/Production` (chép từ máy công ty 02/10,
+  20 GB) · Thùng rác (bản 29/09, 20 GB). Bản Mac của 11 panel làm 30/09 (82 file đổi thật + 3 file mới, +2.352 / −239 dòng, đã đo trong
+  Premiere Beta 26.5 trên Mac) CHỈ còn ở Thùng rác và trong panel đang cài; 0 nhánh GitHub có. Số phiên bản panel đang cài = repo 11/11
+  nên so số không thấy; so nội dung thì 6 panel lệch.
+- **Sai của em trong lúc kiểm:** báo "11/11 panel khớp repo" khi chỉ so số phiên bản; báo "Mac không có FFmpeg" khi chỉ tìm ở PATH và
+  `bin/` của repo (bản Mac nằm ở kho chung `~/Library/Application Support/AiO-Studio/`).
+- **Đã làm:**
+  - Bản dự phòng ngoài repo: `~/Production/cuu-ban-mac-30-09/` (bản vá 82 file + 3 file mới). Không đụng Thùng rác.
+  - Nhánh `mac` (từ `may-cong-ty` `49e3b6e`), 2 commit, đã đẩy: `0312c82` việc dở Guide Frame của máy công ty 26/09 (8 file; bản Thùng rác
+    và bản Downloads giống nhau) · `8ccbcb6` bản Mac 11 panel (77 file). Không tăng số phiên bản.
+  - Chép phần không qua git từ Downloads (+ 4 file chỉ có ở Thùng rác): Test Media 242 file (bỏ bộ đệm tiếng Premiere 3,7 GB), Release
+    (bản mới nhất, 623 MB; bỏ 11 bộ cài Shot & Save cũ), liệu thử Transcripts + `mogrt/`, 2 file `preview.mp4`. Thư mục 2,8 → 7,1 GB.
+  - Electron 43.4.1 cho Shot & Save (`node_modules/electron/install.js`). Hook `SessionStart` + `Stop`: đã có sẵn từ 17:54 (không phải em lắp).
+- **Kiểm:** bản vá áp lên bản gốc ra đúng bản Mac (0 file khác); 83/85 file trong repo = bản Thùng rác (2 file còn lại là `CLAUDE.md` gốc
+  + tracker, repo mới hơn); thử ghép 82/82 sạch, đối chứng ghép ngược 0/82. Sau khi ghép: **11/11 panel đang cài khớp nội dung repo**
+  (trước: 6 panel lệch); **6/6 panel có build ra đúng từng byte** với bản đang cài (Asset Manager + Power Bins phải `build:release`).
+  `git ls-remote` nhánh `mac` = `8ccbcb6`. Test Media 242/242, 0 thiếu (4 file "thiếu" + 3 file "lệch cỡ" là thước sai: tên có dấu khác
+  chuẩn Unicode, và file git theo dõi lệch CRLF). Bài kiểm thuần node trên Mac: 6/8 đạt; Short Viral `kiem` cần file ở `E:\` máy công ty;
+  Transcripts `kiem` lỗi biên dịch `cep.ts` (thiếu `--jsx`), chưa thử trên máy khác.
+- **CHƯA làm / CHƯA kiểm:** script cài panel cho Mac · Codex CLI trên Mac · mở Shot & Save 0.8.0 từ mã nguồn trên Mac · nhánh Windows
+  của 11 panel sau khi thêm nhánh Mac · gộp `mac` vào `main` · `.env.local`, `.vercel`, `Anh chup` chưa chép (lớp bảo vệ chặn) · 2 bản
+  cũ 40 GB chưa xoá (anh tự xoá). Ai đổi nhánh sang `may-cong-ty` + kéo brain + lắp hook lúc 17:54 thì em không xác định được.
+
 ## [web-shotsave] - 2026-10-02 09:33 (UTC+7) - Rạp: chuyển cảnh hết "giật và khựng" (một nhịp mờ ra / hiện vào, sân giữ nguyên chiều cao) - máy công ty
 
 - **Bối cảnh:** sau bản tự chuyển cảnh 08:58 anh báo: *"khi chuyển giữa các phần có đang bị giật và khựng lại"*.

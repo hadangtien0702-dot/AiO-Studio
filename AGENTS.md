@@ -12,7 +12,9 @@
   nói bằng **kết quả + con số** (trước/sau, bao nhiêu, đo bằng gì), không nói bằng tính từ.
 - Anh quyết định, AI thực thi. Việc khó đảo ngược (xoá, ghi đè, đổi cấu hình dùng chung, cài đè) → **hỏi trước**.
 - Repo `hadangtien0702-dot/AiO-Studio` là **PUBLIC**: không commit token, mật khẩu, `.exe`, ảnh của anh.
-- Anh làm trên nhiều máy (công ty `E:\2026\Production\AiO Studio`, nhà `D:\Production\AiO Studio`), đồng bộ qua GitHub.
+- Anh làm trên nhiều máy, đồng bộ qua GitHub. **Từ 03/10/2026 máy chính là MAC ở nhà** (`~/Production/AiO Studio`, nhánh `mac`,
+  Intel, không có PowerShell: script `.ps1` không chạy, dùng `bash`/`node`). Máy khác: công ty `E:\2026\Production\AiO Studio`,
+  nhà Windows `D:\Production\AiO Studio`.
 
 ## 1. ☠️ BA LUẬT LÀM CHUNG (chốt 27/09/2026)
 
