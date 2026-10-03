@@ -54,19 +54,42 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
     return Math.max(t, s.gioLonNhat || 0)
   }
 
+  /* 04/10 (ECC soat, DA DO): ban cu coi MOI loi doc la "lan chay dau" roi GHI DE -> file co ma, doc hong dung 1 lan
+     la mat `key` + `activationId` (khach da tra tien ve dung thu, nhap lai ma thi ton them 1 trong 2 cho tren Polar).
+     Luat (so loi #16): ham DOC phan biet "chua co" voi "khong doc duoc"; ham GHI khong ghi de len thu vua doc that bai.
+     Hop dong voi ben goi:  doc() tra object = trang thai · null = CHUA co file · NEM LOI = co file ma khong doc duoc.
+       ram    = ban dung nhat ma tien trinh nay biet (doc duoc gan nhat, hoac vua ghi)
+       choGhi = ram co thay doi CHUA xuong duoc dia (lan ghi truoc hong) -> lan nap sau ghi lai */
+  let ram = null
+  let choGhi = false
+  const chep = (s) => JSON.parse(JSON.stringify(s))
+
   function napTrangThai() {
-    let s = {}
-    try { s = doc() || {} } catch (e) { s = {} }
-    let doi = false
+    let s = null
+    let docDuoc = true
+    try { s = doc() } catch (e) { docDuoc = false }
+    if (docDuoc) {
+      if (choGhi && ram) s = chep(ram)                      // dia cu hon RAM (lan ghi truoc hong)
+      else if (!s || typeof s !== 'object') s = {}          // chua co file = lan chay dau
+    } else if (ram) {
+      s = chep(ram)                                         // dang chay: dung ban da doc duoc truoc do
+    } else {
+      /* Vua mo app + co file ma khong doc duoc: KHONG biet khach da kich hoat chua. Tra trang thai TAM
+         (cho chup — khong khoa nguoi da tra tien), KHONG ghi, KHONG nho -> lan goi sau doc lai tu dia. */
+      const t0 = now()
+      return { batDauThu: t0, gioLonNhat: t0 }
+    }
+    let doi = choGhi
     if (!s.batDauThu) { s.batDauThu = now(); doi = true }
     const t = now()
     if (!s.gioLonNhat || t > s.gioLonNhat) { s.gioLonNhat = t; doi = true }
-    if (doi) luu(s)
+    if (doi) luu(s); else ram = chep(s)
     return s
   }
 
   function luu(s) {
-    try { ghi(s) } catch (e) { /* ghi hong thi giu trong RAM, lan sau thu lai */ }
+    ram = chep(s)
+    try { ghi(s); choGhi = false } catch (e) { choGhi = true } // ghi hong: giu trong RAM, lan nap sau ghi lai
   }
 
   /** Trang thai de UI + duong chup doc. Khong goi mang. */
@@ -211,7 +234,13 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
       luu(moi)
       return { daHoi: true, trangThai: trangThai() }
     }
-    /* 404 khac: activation bi go (khach go tu cong khach hang Polar) hoac ma bi doi
+    /* 04/10 (ECC soat, DA DO): ban cu coi MOI tra loi con lai la "may bi go" -> 403 trang chan cua proxy cong ty,
+       407, 401, 400, 200 khong phai JSON deu XOA ma cua khach da tra tien (5/5 ca). Chi "404 + JSON loi cua Polar"
+       moi la activation bi go. Tra loi la khac = KHONG BIET -> giu nguyen ma, khong ghi kiemLanCuoi (lan sau hoi lai). */
+    const polar404 = r.status === 404 && r.json && typeof r.json === 'object' &&
+      (typeof r.json.detail === 'string' || typeof r.json.error === 'string')
+    if (!polar404) return { daHoi: false, loi: 'tra-loi-la', maTraLoi: r.status, trangThai: trangThai() }
+    /* 404 cua Polar: activation bi go (khach go tu cong khach hang Polar) hoac ma bi doi
        -> may nay mat ma, quay ve che do dung thu (thuong da het). */
     for (const k of ['key', 'activationId', 'maHienThi', 'hetHan', 'kiemLanCuoi', 'vinhVienKhongMay']) delete moi[k]
     moi.lyDoMatMa = 'may-bi-go'
@@ -222,6 +251,52 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
   return { trangThai, kichHoat, huyKichHoat, kiemTra }
 }
 
+/** Doc / ghi file ban-quyen.json cho taoBanQuyen (04/10). Tach khoi main.js de do duoc bang node thuan.
+    doc(): object = trang thai · null = CHUA co file · NEM LOI = co file ma khong doc duoc (ben goi khong duoc ghi de).
+    File HONG (khong phai JSON object): CAT sang `ban-quyen.hong-<gio>.json` (con nguyen de lay lai ma bang tay) roi
+    coi nhu chua co. BOM dau file (Notepad) duoc bo qua. ghi(): atomic (tmp + rename). */
+function taoKhoFile(file, { fs = require('fs'), path = require('path'), log = () => {}, now = () => Date.now() } = {}) {
+  let loiCu = ''
+  const bao = (ma) => { // chi ghi nhat ky khi DOI trang thai (ham nay duoc goi moi lan chup)
+    if (ma === loiCu) return
+    loiCu = ma
+    if (ma) log('ban-quyen: KHONG DOC DUOC file (' + ma + '), giu nguyen, khong ghi de')
+  }
+  function doc() {
+    let txt
+    try { txt = fs.readFileSync(file, 'utf8') } catch (e) {
+      if (e && e.code === 'ENOENT') { bao(''); return null }
+      bao((e && e.code) || 'loi-doc')
+      throw e
+    }
+    try {
+      if (txt.charCodeAt(0) === 0xFEFF) txt = txt.slice(1)
+      const s = JSON.parse(txt)
+      if (!s || typeof s !== 'object' || Array.isArray(s)) throw new Error('khong phai object')
+      bao('')
+      return s
+    } catch (e) {
+      const d = new Date(now())
+      const p2 = (n) => String(n).padStart(2, '0')
+      const dich = file.replace(/\.json$/i, '') + '.hong-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) +
+        '-' + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds()) + '.json'
+      try { fs.renameSync(file, dich) } catch (e2) {
+        bao('hong, khong cat duoc: ' + ((e2 && e2.code) || 'loi'))
+        throw e2 // khong cat duoc ban hong thi coi la "khong doc duoc": KHONG ghi de len no
+      }
+      loiCu = ''
+      log('ban-quyen: file HONG (' + e.message + '), da cat sang ' + path.basename(dich) + ', bat dau lai')
+      return null
+    }
+  }
+  function ghi(s) {
+    fs.mkdirSync(path.dirname(file), { recursive: true })
+    fs.writeFileSync(file + '.tmp', JSON.stringify(s, null, 2))
+    fs.renameSync(file + '.tmp', file)
+  }
+  return { doc, ghi }
+}
+
 /** AIOSS-1234-ABCD-...-WXYZ -> AIOSS-****-WXYZ (khong dua ma day du ra log/UI). */
 function anMa(key) {
   const k = String(key || '')
@@ -230,4 +305,4 @@ function anMa(key) {
   return dau + '-****-' + k.slice(-4)
 }
 
-module.exports = { taoBanQuyen, anMa, ORG_ID, SO_NGAY_THU, NHAN_MA_HET_HAN }
+module.exports = { taoBanQuyen, taoKhoFile, anMa, ORG_ID, SO_NGAY_THU, NHAN_MA_HET_HAN }

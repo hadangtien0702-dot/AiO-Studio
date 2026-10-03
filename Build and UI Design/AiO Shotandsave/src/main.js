@@ -32,7 +32,7 @@ const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: b
 const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
-const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
+const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
    Video tang toc phan cung nam o lop OVERLAY ma bo chup cu (Desktop Duplication
@@ -206,12 +206,13 @@ const WEB_MUA = 'https://aio-shotsave.vercel.app/#checkout'
 let bq = null
 function khoiTaoBanQuyen() {
   const file = path.join(app.getPath('userData'), 'ban-quyen.json')
+  /* 04/10: doc/ghi qua taoKhoFile (banquyen.js). Ban cu tra null cho MOI loi doc -> bo nao tuong "lan chay dau" roi
+     ghi de, khach da tra tien mat ma (do: doc hong 1 lan la mat). Nay: chua co = null, khong doc duoc = nem loi
+     (khong ghi de), file hong = cat sang ban-quyen.hong-<gio>.json + dong run-log. */
+  const khoBq = taoKhoFile(file, { fs, path, log: ghiLog })
   bq = taoBanQuyen({
-    doc: () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { return null } },
-    ghi: (s) => {
-      fs.mkdirSync(path.dirname(file), { recursive: true })
-      fs.writeFileSync(file + '.tmp', JSON.stringify(s, null, 2)); fs.renameSync(file + '.tmp', file)
-    },
+    doc: khoBq.doc,
+    ghi: khoBq.ghi,
     fetch: (url, opt) => net.fetch(url, opt), // net.fetch = mang Chromium, theo proxy he thong (may cong ty)
     tenMay: os.hostname(),
     meta: { nen_tang: process.platform, ban: app.getVersion() },
@@ -225,7 +226,7 @@ async function kiemBanQuyenNen() {
   try {
     const r = await bq.kiemTra()
     if (r.daHoi) ghiLog('ban-quyen kiem lai: ' + r.trangThai.loai + (r.trangThai.lyDoMatMa ? ' (' + r.trangThai.lyDoMatMa + ')' : ''))
-    else if (r.loi) ghiLog('ban-quyen kiem lai: bo qua (' + r.loi + ')')
+    else if (r.loi) ghiLog('ban-quyen kiem lai: bo qua (' + r.loi + (r.maTraLoi ? ' ' + r.maTraLoi : '') + ')' + (r.loi === 'tra-loi-la' ? ', GIU ma' : ''))
   } catch (e) { ghiLog('ban-quyen kiem lai LOI: ' + e.message) }
   rebuildTrayMenu()
 }
@@ -264,6 +265,7 @@ function ghiLog(msg) {
     fs.appendFileSync(RUN_LOG, dong)
   } catch (e) {}
 }
+kho.noiNhatKy(ghiLog) // 04/10: cau-hinh.json khong doc / khong ghi duoc thi phai co dong trong run-log (truoc: im lang)
 
 /** Con tro app: tray + cac cua so dang song. */
 let tray = null

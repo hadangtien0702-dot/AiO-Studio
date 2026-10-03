@@ -6,7 +6,8 @@
 // Chay: node scripts/test/do-ban-quyen.mjs   (npm run test:banquyen)
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
-const { taoBanQuyen, ORG_ID } = require('../../src/banquyen.js')
+const { taoBanQuyen, taoKhoFile, ORG_ID } = require('../../src/banquyen.js')
+const fs = require('fs'), os = require('os'), path = require('path')
 
 const NGAY = 86400000
 let dat = 0, truot = 0
@@ -22,6 +23,7 @@ function polarGia({ han = Date.now() + 365 * NGAY } = {}) {
     const duong = url.split('/').pop(), b = JSON.parse(opt.body)
     p.goi.push(duong)
     if (p.matMang) throw new Error('getaddrinfo ENOTFOUND api.polar.sh')
+    if (p.ep && p.ep.duong === duong) return p.ep.tra   // [10] ep mot cau tra loi LA (proxy, tuong lua) cho 1 duong
     const tra = (status, json) => ({ status, text: async () => (json == null ? '' : JSON.stringify(json)) })
     const loi = (status, detail) => tra(status, { error: status === 403 ? 'NotPermitted' : 'ResourceNotFound', detail })
     if (b.organization_id !== ORG_ID) return loi(404, 'Not found')
@@ -52,11 +54,17 @@ function polarGia({ han = Date.now() + 365 * NGAY } = {}) {
 function mayMoi(polar, { gio } = {}) {
   let kho = null
   const dongHo = { t: gio ?? Date.now() }
-  const bq = taoBanQuyen({
-    doc: () => kho, ghi: (s) => { kho = JSON.parse(JSON.stringify(s)) },
+  /* 04/10: dia gia tra BAN SAO (truoc tra chinh doi tuong `kho` nen bo nao sua thang vao "dia" ma khong can ghi —
+     che mat loi ghi hong). hong.doc / hong.ghi = so lan doc / ghi KE TIEP se nem loi. */
+  const hong = { doc: 0, ghi: 0 }
+  const tao = () => taoBanQuyen({
+    doc: () => { if (hong.doc > 0) { hong.doc--; throw new Error('EBUSY') } return kho ? JSON.parse(JSON.stringify(kho)) : kho },
+    ghi: (s) => { if (hong.ghi > 0) { hong.ghi--; throw new Error('EPERM') } kho = JSON.parse(JSON.stringify(s)) },
     fetch: polar.fetch, now: () => dongHo.t, tenMay: 'MAY-TEST',
   })
-  return { bq, dongHo, kho: () => kho, datKho: (s) => { kho = s } }
+  const m = { bq: tao(), dongHo, hong, kho: () => kho, datKho: (s) => { kho = s } }
+  m.moLaiApp = () => { m.bq = tao() }   // tien trinh moi: mat het thu trong RAM, dia giu nguyen
+  return m
 }
 
 console.log('\n[1] Dung thu 14 ngay')
@@ -175,6 +183,120 @@ console.log('\n[9] File hong')
   const bq = taoBanQuyen({ doc: () => { throw new Error('JSON hong') }, ghi: () => { throw new Error('dia day') }, fetch: p.fetch, tenMay: 'X' })
   const s = bq.trangThai()
   kiem('doc/ghi loi: khong vang, van dung thu', s.loai === 'dung-thu' && s.choPhepChup, JSON.stringify(s))
+}
+
+/* ── 04/10 (ECC soat) ─────────────────────────────────────────────────────────────────────────────
+   Do truoc khi sua: khach DA TRA TIEN mat ma khi (a) may chu tra 403 HTML / 407 / 401 / 400 / 200 khong phai JSON
+   (5/5 ca), (b) file ban-quyen.json doc hong dung 1 lan. Cac muc duoi phai TRUOT tren ban cu. */
+console.log('\n[10] May chu tra loi LA (proxy cong ty, tuong lua, API doi): khach da tra tien KHONG duoc mat ma')
+{
+  const html = (status) => ({ status, text: async () => '<html><body>Access denied</body></html>' })
+  const json = (status, o) => ({ status, text: async () => JSON.stringify(o) })
+  const ca = [
+    ['403 trang chan HTML', html(403)],
+    ['407 proxy doi dang nhap (than rong)', { status: 407, text: async () => '' }],
+    ['401 JSON', json(401, { detail: 'Unauthorized' })],
+    ['400 JSON', json(400, { detail: 'Bad request' })],
+    ['422 JSON (detail la mang)', json(422, { detail: [{ msg: 'field required' }] })],
+    ['200 nhung than la HTML', html(200)],
+    ['404 HTML cua proxy', html(404)],
+    ['404 JSON khong phai kieu Polar', json(404, { message: 'no route' })],
+  ]
+  for (const [ten, tra] of ca) {
+    const p = polarGia(), m = mayMoi(p)
+    await m.bq.kichHoat(p.key)
+    const kiemTruoc = m.kho().kiemLanCuoi
+    m.dongHo.t += 20 * NGAY                 // dung thu da het: mat ma = bi khoa chup
+    p.ep = { duong: 'validate', tra }
+    const r = await m.bq.kiemTra()
+    kiem(ten + ': giu ma, van chup, bao tra-loi-la',
+      m.kho().key === p.key && m.kho().activationId === 'act-1' && r.trangThai.loai === 'da-kich-hoat' && r.trangThai.choPhepChup && r.daHoi === false && r.loi === 'tra-loi-la',
+      JSON.stringify({ loi: r.loi, daHoi: r.daHoi, loai: r.trangThai.loai, lyDo: r.trangThai.lyDoMatMa }))
+    kiem(ten + ': khong ghi moc kiemLanCuoi (lan sau hoi lai)', m.kho().kiemLanCuoi === kiemTruoc)
+    p.ep = null
+    const r2 = await m.bq.kiemTra()
+    kiem(ten + ': het tra loi la -> hoi lai Polar duoc, van da kich hoat', r2.daHoi === true && r2.trangThai.loai === 'da-kich-hoat', JSON.stringify({ daHoi: r2.daHoi, loai: r2.trangThai.loai }))
+  }
+}
+
+console.log('\n[11] File ban quyen KHONG DOC DUOC / KHONG GHI DUOC: khong ghi de, khong mat ma')
+{
+  const p = polarGia(), m = mayMoi(p)
+  await m.bq.kichHoat(p.key)
+  m.dongHo.t += 20 * NGAY
+  m.hong.doc = 1
+  let s = m.bq.trangThai()
+  kiem('dang chay, doc hong 1 lan: van da-kich-hoat (ban trong RAM)', s.loai === 'da-kich-hoat' && s.choPhepChup, JSON.stringify(s))
+  kiem('dang chay, doc hong 1 lan: dia con ma + activation', m.kho().key === p.key && m.kho().activationId === 'act-1', JSON.stringify(m.kho()))
+  m.moLaiApp(); m.hong.doc = 1
+  s = m.bq.trangThai()
+  kiem('vua mo app, doc hong: KHONG khoa chup (chua biet da tra tien chua)', s.choPhepChup === true, JSON.stringify(s))
+  kiem('vua mo app, doc hong: dia KHONG bi ghi de (con ma + activation)', m.kho().key === p.key && m.kho().activationId === 'act-1', JSON.stringify(m.kho()))
+  s = m.bq.trangThai()
+  kiem('lan sau doc duoc: da-kich-hoat nhu cu, Polar van 1 may', s.loai === 'da-kich-hoat' && p.may.size === 1, JSON.stringify(s))
+}
+{
+  // Het dung thu, chua mua: doc hong KHONG duoc thanh cach lam moi 14 ngay
+  const p = polarGia(), m = mayMoi(p)
+  m.bq.trangThai(); const batDau = m.kho().batDauThu
+  m.dongHo.t += 30 * NGAY
+  kiem('doi chung: het thu thi khoa', m.bq.trangThai().loai === 'het-han-thu')
+  m.moLaiApp(); m.hong.doc = 1
+  m.bq.trangThai()
+  kiem('doc hong luc het thu: moc batDauThu tren dia KHONG doi', m.kho().batDauThu === batDau, m.kho().batDauThu + ' vs ' + batDau)
+  kiem('lan sau doc duoc: van het-han-thu', m.bq.trangThai().loai === 'het-han-thu')
+}
+{
+  // Kich hoat xong ma GHI file hong: khong duoc mat activation (da ton 1 cho tren Polar)
+  const p = polarGia(), m = mayMoi(p)
+  m.bq.trangThai()
+  m.hong.ghi = 1                           // lan ghi cua kichHoat se hong
+  const r = await m.bq.kichHoat(p.key)
+  kiem('ghi hong luc kich hoat: van bao da kich hoat (giu trong RAM)', r.ok && r.trangThai.loai === 'da-kich-hoat', JSON.stringify(r))
+  m.bq.trangThai()
+  kiem('lan nap sau ghi lai duoc: dia co ma + activation, Polar 1 may', !!m.kho() && m.kho().key === p.key && m.kho().activationId === 'act-1' && p.may.size === 1, JSON.stringify(m.kho()))
+}
+
+console.log('\n[12] Doc / ghi FILE THAT (taoKhoFile) trong thu muc tam')
+if (typeof taoKhoFile !== 'function') kiem('co ham taoKhoFile', false, 'ban cu khong co')
+else {
+  const tam = fs.mkdtempSync(path.join(os.tmpdir(), 'aio-ban-quyen-'))
+  const file = path.join(tam, 'ban-quyen.json'), nhatKy = []
+  const k = taoKhoFile(file, { log: (x) => nhatKy.push(x) })
+  kiem('chua co file: doc tra null (lan chay dau)', k.doc() === null)
+  k.ghi({ batDauThu: 1, key: 'K' })
+  kiem('ghi roi doc lai: dung noi dung, khong de lai file .tmp', k.doc().key === 'K' && !fs.existsSync(file + '.tmp'))
+  fs.writeFileSync(file, String.fromCharCode(0xFEFF) + JSON.stringify({ batDauThu: 2, key: 'BOM' }))
+  kiem('file co BOM (luu bang Notepad): van doc duoc', !!k.doc() && k.doc().key === 'BOM')
+  for (const [ten, noiDung] of [['JSON cut', '{"key":"K","activationId":'], ['file rong', ''], ['mang', '[1,2]'], ['chuoi', '"x"']]) {
+    fs.writeFileSync(file, noiDung)
+    const truoc = nhatKy.length
+    let r, nem = null
+    try { r = k.doc() } catch (e) { nem = e.message }
+    const cat = fs.readdirSync(tam).filter((f) => f.startsWith('ban-quyen.hong-') && f.endsWith('.json'))
+    const conNguyen = cat.some((f) => fs.readFileSync(path.join(tam, f), 'utf8') === noiDung)
+    kiem('file hong (' + ten + '): tra null, CAT ban hong sang ben (con nguyen noi dung), co ghi nhat ky',
+      nem === null && r === null && !fs.existsSync(file) && conNguyen && nhatKy.length > truoc, JSON.stringify({ r, nem, cat, nhatKy: nhatKy.slice(truoc) }))
+    for (const f of cat) fs.unlinkSync(path.join(tam, f))
+  }
+  k.ghi({ batDauThu: 3, key: 'K3', activationId: 'A3' })
+  fs.chmodSync(file, 0o000)
+  let docDuoc = true
+  try { fs.readFileSync(file) } catch (e) { docDuoc = false }
+  if (docDuoc) console.log('  BO QUA  ca "co file ma khong doc duoc" (he dieu hanh nay chmod khong chan duoc doc)')
+  else {
+    let nem = false
+    try { k.doc() } catch (e) { nem = true }
+    kiem('co file ma khong doc duoc: doc() NEM LOI (khong tra null = khong bi coi la lan chay dau)', nem)
+    kiem('co file ma khong doc duoc: co ghi nhat ky', nhatKy.some((x) => x.includes('KHONG DOC DUOC')), JSON.stringify(nhatKy))
+    const bq = taoBanQuyen({ doc: k.doc, ghi: k.ghi, fetch: async () => { throw new Error('x') }, tenMay: 'X' })
+    const s = bq.trangThai()
+    fs.chmodSync(file, 0o600)
+    const sau = JSON.parse(fs.readFileSync(file, 'utf8'))
+    kiem('bo nao + file that khong doc duoc: cho chup, file con nguyen ma + activation', s.choPhepChup && sau.key === 'K3' && sau.activationId === 'A3', JSON.stringify({ loai: s.loai, sau }))
+  }
+  try { fs.chmodSync(file, 0o600) } catch (e) {}
+  fs.rmSync(tam, { recursive: true, force: true })   // thu muc do bai nay tao (mkdtemp)
 }
 
 console.log(`\nKET QUA: ${dat} DAT / ${truot} TRUOT`)

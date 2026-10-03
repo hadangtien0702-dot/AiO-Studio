@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 01:38 +0700 (may Mac, chi SOAT, khong sua ma)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 02:13 +0700 (may Mac, sua o lop MODULE, chua chay app that)
+> - **04/10 02:13 DA SUA 3 trong 6 loi cua luot ECC soat 04/10: khach da tra tien KHONG con mat ma, `cau-hinh.json` KHONG
+>   con bi ghi de.** `npm run test:banquyen` 71/71 (truoc 27 muc; ban cu truot 33 muc moi) · `npm run test:cauhinh` 22/22
+>   (bai MOI; ban cu truot 15). CHUA chay tren app that, CHUA nap vao ban cai Windows (`node scripts/cai-tai-cho.mjs` tren
+>   may cong ty), 2 ca "khong doc duoc" tu BO QUA tren Windows. Loi keo-tha `.keo` CHO ANH CHON huong. Da commit tren may,
+>   CHUA push. Chi tiet: muc [0.8.0 sua ECC 04/10] ngay duoi.
 > - **04/10 01:56 MAC: da dung + cai 0.8.0 vao /Applications (ban 0.7.9 cat o `ban-cai-truoc`).** Mo duoc (`boot v0.8.0`), anh + cau hinh
 >   con nguyen, nhung **CHUA chup duoc: macOS chua cap quyen quay man hinh** (`Failed to get sources` 4/4; 0.7.9 cung vay tu 02/10).
 >   Cho anh bat quyen trong System Settings roi mo lai app. Tinh nang 0.8.0 chua thu tren Mac. Chi tiet: muc [0.8.0 mac] ngay duoi.
@@ -139,6 +144,49 @@
   Settings; bat cong tac + mo lai app la viec cua anh.
 - **CHUA thu tren Mac:** chup / ghim / khay / doc chu (Apple Vision) / quay video co tieng / khay tu thu / so buoc cua 0.8.0. Quay ve 0.7.9:
   thoat app, bo `/Applications/AiO Shot & Save.app`, keo ban trong `ban-cai-truoc` ve va doi ten lai.
+
+## [0.8.0 sua ECC 04/10] - 2026-10-04 02:13 - Khach da tra tien khong con mat ma (may chu tra loi la / file doc hong); cau-hinh.json khong con bi ghi de
+
+- **Boi canh:** anh: *"sua theo thu tu em de xuat di em"* (thu tu em de xuat: mat ma -> keo-tha -> cau hinh). Lam truoc 3 loi
+  KHONG can anh chon huong (so 2, 3, 4 cua muc [soat] ngay duoi); loi keo-tha `.keo` co 2 huong nen hoi anh truoc khi sua.
+  May Mac, nhanh `mac`, van 0.8.0 (khong push nen khong tang so).
+- **Nguyen nhan that (da do o muc [soat]):** ca 3 la MOT kieu voi so loi #16: ham doc gop "chua co file" voi "khong doc duoc"
+  thanh mot, ham ghi roi ghi de len do. Them: `kiemTra` gop moi tra loi la cua may chu vao "may bi go".
+- **Thay doi:**
+  - `src/banquyen.js` `kiemTra`: chi `404 + JSON loi cua Polar` (co `detail` hoac `error` dang chuoi) moi la "may bi go". Tra
+    loi la khac -> `{ daHoi: false, loi: 'tra-loi-la', maTraLoi }`, GIU ma, khong ghi `kiemLanCuoi` (6 gio sau hoi lai).
+  - `src/banquyen.js` `napTrangThai` / `luu`: hop dong moi cua `doc()`: object = trang thai · `null` = CHUA co file · NEM LOI
+    = co file ma khong doc duoc. Giu ban `ram`. Khong doc duoc + dang chay -> dung `ram`. Khong doc duoc + vua mo app ->
+    trang thai TAM (cho chup), khong ghi, khong nho. Ghi hong -> giu trong RAM (`choGhi`), lan nap sau ghi lai. Truoc day ghi
+    chu noi "giu trong RAM" nhung khong giu gi: kich hoat xong ma ghi hong la MAT luot kich hoat (bai kiem moi bat duoc).
+  - `src/banquyen.js` them `taoKhoFile(file, { fs, path, log })`: ENOENT -> `null`; loi doc khac -> nem loi + 1 dong nhat ky
+    moi lan DOI ma loi; bo BOM; khong phai JSON object -> doi ten sang `ban-quyen.hong-<namthangngay-giophutgiay>.json` +
+    nhat ky + `null`; ghi atomic (tmp + rename).
+  - `src/main.js`: `khoiTaoBanQuyen` dung `taoKhoFile` (bo 2 ham doc / ghi viet tai cho); `kiemBanQuyenNen` ghi them ma tra
+    loi + "GIU ma"; `kho.noiNhatKy(ghiLog)` ngay sau `ghiLog`.
+  - `src/kho.js`: `docCauHinhThat()` 3 trang thai (`co` / `chua-co` / `khong-doc-duoc`), bo BOM, file hong cat sang
+    `cau-hinh.hong-<gio>.json`, nho ban doc duoc gan nhat dang CHU (`nhoCauHinh`). `docCauHinh()` khong doc duoc thi tra ban
+    trong RAM (truoc: `{}` -> thu muc anh + phim tat roi ve mac dinh). `ghiCauHinh()` KHONG ghi khi chua doc duoc lan nao
+    (tra ban ghep cho lan do); ghi hong co dong nhat ky. Them `noiNhatKy(fn)`.
+  - Bai kiem: `scripts/test/do-ban-quyen.mjs` them [10] [11] [12] (27 -> 71 muc). "Dia gia" nay tra BAN SAO: truoc tra chinh
+    doi tuong nen bo nao sua thang vao "dia" ma khong can ghi, che mat loi ghi hong. `scripts/test/do-cau-hinh.cjs` MOI
+    (22 muc, gia `electron.app.getPath`, thu muc `mkdtemp` tu xoa) + `npm run test:cauhinh`.
+- **Kiem chung bang so (may Mac, node 24.21, khong mo app):**
+  - Doi chung, 2 bai kiem moi chay tren MA CU: `test:banquyen` 29 DAT / 33 TRUOT · `test:cauhinh` 7 DAT / 15 TRUOT.
+  - Sau khi sua: `test:banquyen` 71 / 0 · `test:cauhinh` 22 / 0 · `test:khodai` 11 / 11 · `node --check` 5 file dat.
+  - Thuoc cua luot soat chay lai: 403 HTML / 407 / 401 / 400 / 200 khong phai JSON: truoc 5/5 MAT ma, sau 5/5 CON ma.
+    404 "Not found" cua Polar van go ma (dung y). Mat mang / 500 / 429 van giu.
+- **CHUA kiem:** chua chay tren app that (chua thay dong `ban-quyen:` trong run-log cua ban moi) · chua tren Windows: 2 ca "co
+  file ma khong doc duoc" dung `chmod 000`, tren Windows bai kiem tu in BO QUA · chua nap vao ban cai (`cai-tai-cho.mjs` can
+  may Windows co ban cai) · chua chay `npm test` va cac bai bat cua so (luat #12) · phan noi day trong `main.js` moi qua
+  `node --check` + doc lai diff. Cau tra loi THAT cua Polar cho 404 chua goi that (dua tren ghi chu dau `banquyen.js`, doc tu
+  ma nguon Polar 24/09): neu Polar tra 404 KHONG co `detail` / `error` dang chuoi thi may bi go se KHONG bi go ma (sai ve
+  phia giu ma cho khach).
+- **Con lai cua luot soat 04/10:** keo-tha `.keo` (cho anh chon huong) · sua tay `ban-quyen.json` la mo khoa (cho anh quyet)
+  · `pin:save-edit` · `shelfItems` giu anh · cac muc nho. `setHotkey` van ghi "OK, da luu config" ke ca khi ghi hong (nay
+  co them dong `cau-hinh: KHONG GHI DUOC` ngay truoc no).
+- **File anh huong:** `src/banquyen.js`, `src/kho.js`, `src/main.js`, `package.json`, `scripts/test/do-ban-quyen.mjs`,
+  `scripts/test/do-cau-hinh.cjs` (moi), `CLAUDE.md` (so loi #17).
 
 ## [soat] - 2026-10-04 01:38 - ECC soat lan 2 tren may Mac: 6 loi moi (ban quyen, keo-tha, cau hinh, anh ghim, RAM), CHUA sua
 

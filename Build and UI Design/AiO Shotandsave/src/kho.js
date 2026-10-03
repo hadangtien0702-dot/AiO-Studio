@@ -150,17 +150,68 @@ function duongDanCauHinh() {
   return path.join(app.getPath('userData'), 'cau-hinh.json')
 }
 
-function docCauHinh() {
+/* 04/10 (ECC soat, DA DO): ban cu `docCauHinh` tra {} cho MOI loi, `ghiCauHinh` ghi de tu {} do -> file co BOM
+   (mo bang Notepad) doc ra 0 muc, keo khay 1 lan la file chi con `viTriKhay`: mat phim tat + ngon ngu + thu muc anh.
+   Luat (so loi #16): ham DOC phan biet "chua co" voi "khong doc duoc"; ham GHI khong ghi de len thu vua doc that bai.
+     nhoCauHinh = ban doc duoc / ghi duoc gan nhat (RAM) -> file tam thoi khong doc duoc thi app van dung dung
+                  thu muc anh + phim tat cua nguoi dung, khong roi ve mac dinh.
+   That bai KHONG im lang: main.js noi `ghiLog` vao qua noiNhatKy(). */
+let nhoCauHinh = null
+let ghiNhatKy = null
+let loiDocCu = ''
+function noiNhatKy(fn) { ghiNhatKy = typeof fn === 'function' ? fn : null }
+function baoKho(msg) {
+  try { if (ghiNhatKy) ghiNhatKy(msg); else console.error('[kho] ' + msg) } catch (e) {}
+}
+
+/** -> { tt: 'co' | 'chua-co' | 'khong-doc-duoc', c } — c luon la object dung duoc ngay. */
+function docCauHinhThat() {
+  const file = duongDanCauHinh()
+  const tuRam = () => (nhoCauHinh ? JSON.parse(nhoCauHinh) : {}) // nho dang CHU: moi lan tra mot ban rieng
+  let txt
+  try { txt = fs.readFileSync(file, 'utf8') } catch (e) {
+    if (e && e.code === 'ENOENT') { loiDocCu = ''; return { tt: 'chua-co', c: {} } }
+    const ma = (e && e.code) || 'loi-doc'
+    if (ma !== loiDocCu) { loiDocCu = ma; baoKho('cau-hinh: KHONG DOC DUOC (' + ma + '), dung ban trong RAM, khong ghi de') }
+    return { tt: 'khong-doc-duoc', c: tuRam() }
+  }
+  loiDocCu = ''
   try {
-    return JSON.parse(fs.readFileSync(duongDanCauHinh(), 'utf8')) || {}
+    if (txt.charCodeAt(0) === 0xFEFF) txt = txt.slice(1) // BOM tung lam JSON.parse chet (24/08)
+    const c = JSON.parse(txt)
+    if (!c || typeof c !== 'object' || Array.isArray(c)) throw new Error('khong phai object')
+    nhoCauHinh = txt
+    return { tt: 'co', c }
   } catch (e) {
-    return {}
+    /* Hong that: CAT ban hong sang ben (lay lai tay duoc) roi dung ban trong RAM neu co, khong thi ve mac dinh. */
+    const d = new Date()
+    const p2 = (n) => String(n).padStart(2, '0')
+    const dich = file.replace(/\.json$/i, '') + '.hong-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) +
+      '-' + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds()) + '.json'
+    try { fs.renameSync(file, dich) } catch (e2) {
+      baoKho('cau-hinh: file HONG (' + e.message + ') ma khong cat duoc (' + ((e2 && e2.code) || 'loi') + '), khong ghi de')
+      return { tt: 'khong-doc-duoc', c: tuRam() }
+    }
+    baoKho('cau-hinh: file HONG (' + e.message + '), da cat sang ' + path.basename(dich) +
+      (nhoCauHinh ? ', dung ban trong RAM' : ', ve mac dinh'))
+    return { tt: 'chua-co', c: tuRam() }
   }
 }
 
+function docCauHinh() {
+  return docCauHinhThat().c
+}
+
 function ghiCauHinh(patch) {
+  const r = docCauHinhThat()
+  if (r.tt === 'khong-doc-duoc' && !nhoCauHinh) {
+    /* Co file ma khong doc duoc + chua doc duoc lan nao: ghi luc nay = xoa moi cai dat khac. Tra ban ghep cho
+       lan nay (app chay tiep), KHONG dung vao dia. */
+    baoKho('cau-hinh: BO QUA lan ghi [' + Object.keys(patch || {}).join(',') + '] vi chua doc duoc file')
+    return Object.assign({}, r.c, patch)
+  }
   try {
-    const cur = docCauHinh()
+    const cur = r.c
     const next = Object.assign({}, cur, patch)
     fs.mkdirSync(path.dirname(duongDanCauHinh()), { recursive: true })
     /* Ghi ATOMIC (tmp + rename): file nay duoc ghi RAT thuong xuyen (moi lan
@@ -170,14 +221,15 @@ function ghiCauHinh(patch) {
     const tmp = duongDanCauHinh() + '.tmp'
     fs.writeFileSync(tmp, JSON.stringify(next, null, 2))
     fs.renameSync(tmp, duongDanCauHinh())
+    nhoCauHinh = JSON.stringify(next)
     return next
   } catch (err) {
-    console.error('[kho] khong ghi duoc cau hinh:', err)
+    baoKho('cau-hinh: KHONG GHI DUOC [' + Object.keys(patch || {}).join(',') + ']: ' + ((err && err.code) || (err && err.message) || err))
     return docCauHinh()
   }
 }
 
 module.exports = {
   thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan,
-  duongVideoMoi, docCauHinh, ghiCauHinh,
+  duongVideoMoi, docCauHinh, ghiCauHinh, noiNhatKy,
 }
