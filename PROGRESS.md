@@ -5,6 +5,22 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [mac-do-premiere] - 2026-10-04 00:27 (UTC+7) - Đo 11 panel vừa cài trong Premiere trên Mac: 10/10 mở từ panel tổng, trả lời đúng - máy Mac nhà
+
+- **Bối cảnh:** tối 03/10 Premiere dừng ở một cửa sổ nhỏ nên em chưa đo được. Anh: *"anh mở panel rồi em kiểm tra đi"* (anh mở panel tổng AiO Studio).
+- **Cách đo** (`scripts/do-panel-qua-hub.mjs`, mới, chỉ đọc, không đụng project / sequence): nối cổng gỡ lỗi 8101 của panel tổng, **bấm
+  từng thẻ** (`button[data-i]`.click(), đúng đường người dùng bấm) → chờ cổng của panel tool sống → đọc giao diện + gọi `app.version`
+  và `typeof <hàm host>` qua cầu nối → đóng panel vừa mở (`closeExtension`). Project thử `Untitled.prproj`, Premiere Beta 26.5.0.
+- **Kết quả 00:26:**
+  - Panel tổng 442×571: 12 thẻ, 0 nhãn "Chưa cài", số phiên bản trên thẻ 10/10 khớp manifest (1.6.0 · 0.1.0 · 0.1.2 · 0.6.1 · 2.5.5 ·
+    0.3.2 · 2.0.0 · 2.0.0 · 0.2.2 · 1.0.1); Shot & Save là thẻ mở app, Organize "Sắp có".
+  - **10/10 panel mở từ thẻ** sau 1.266–1.285 ms (thước nhảy từng 250 ms, nên thật ra trong khoảng 1,0–1,3 giây; Windows 25/09 đo
+    458–486 ms bằng thước khác, không so trực tiếp được); giao diện 29–445 thẻ HTML, có chữ, không có chuỗi lỗi; `app.version` =
+    26.5.0 trả về trong 1–54 ms; hàm host của cả 10 panel = `function` (host `.jsx` đã nạp); 10/10 đóng lại được, sau khi đo chỉ
+    còn cổng 8101 sống (đúng trạng thái anh để).
+- **CHƯA đo:** việc thật của từng panel sau lần cài 03/10 (cắt, nghe lời, tải video, đặt guide); thẻ Shot & Save (bấm là mở app
+  lên màn anh); lỗi "ExtendScript ngừng trả lời" ghi 30/09 ở Short Viral không gặp trong lần đo này (10 lượt gọi, 0 lượt hết giờ).
+
 ## [mac-cai-panel + gom-production] - 2026-10-03 22:43 (UTC+7) - Script cài panel cho Mac, cài 11/11; gom cả Production về ~/Production; bản thừa vào Thùng rác - máy Mac nhà
 
 - **Bối cảnh:** anh: *"cần làm gì thì làm luôn đi em ơi"* → *"cài rồi kiểm tra xem đúng chưa - xóa đi các file nào dư thừa luôn đi em"*.
