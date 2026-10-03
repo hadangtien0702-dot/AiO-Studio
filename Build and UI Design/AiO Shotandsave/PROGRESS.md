@@ -1,6 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 15:48 +0700 (dang lam do, chua /xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 01:38 +0700 (may Mac, chi SOAT, khong sua ma)
+> - **04/10 01:38 ECC SOAT LAN 2 (may Mac, nhanh `mac`): 6 loi MOI ngoai 17 loi cua luot 02/10, CHUA SUA CAI NAO, cho anh
+>   chon thu tu.** 4 loi da DO tren module that (khong mo app): keo-tha qua `.keo` mat file sau khi mo lai app voi ten nguoi
+>   dung Windows co dau cach / dau tieng Viet · khach da tra tien MAT MA khi may chu tra 403/407/401/400 hoac file
+>   `ban-quyen.json` doc hong 1 lan · `cau-hinh.json` co BOM thi keo khay 1 lan la mat phim tat + ngon ngu + thu muc anh ·
+>   sua tay `ban-quyen.json` la mo khoa. 2 loi moi DOC MA, chua do: lam mo anh ghim ma ghi file hong thi file gui di van
+>   la ban CHUA mo · khay giu anh goc khong gioi han (ung vien cho vu 1.168 MB RAM). Chi tiet: muc [soat] 04/10 ngay duoi.
 > - **02/10 15:48 DA SUA 5 LOI NHOM A cua luot ECC soat (deu o phan QUAY VIDEO) — nap lan 16.** app.asar md5 `b26fc16e`,
 >   boot 15:47:44. `npm run test:khovideo` 76/76 (chay an). Sau khi nap: so video that 6/6 muc con nguyen, log khong co
 >   dong LOI. CHUA thu tren app that cac tinh huong hong (tat app giua luc quay, dia day, doi ngon ngu luc quay).
@@ -114,6 +120,55 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [soat] - 2026-10-04 01:38 - ECC soat lan 2 tren may Mac: 6 loi moi (ban quyen, keo-tha, cau hinh, anh ghim, RAM), CHUA sua
+
+- **Boi canh:** anh: *"anh can dung ECC de kiem tra file trong folder AiO Studio... kiem tra xem dang co bi loi o phan nao khong"*.
+  May Mac, nhanh `mac` (`083cd26`), plugin ECC 2.2.3 vua cai 04/10 00:45. Phien nay KHONG sua dong ma nao.
+- **Cach lam:** (1) lop may do trong BAN SAO `git archive HEAD` (khong ghi vao thu muc that); (2) 3 agent ECC chi-doc
+  (`security-reviewer`, `silent-failure-hunter`, `typescript-reviewer` cho phan port Mac cua cac panel), tong 963.833 token;
+  (3) em doc lai ma tung loi nang va DO tren chinh module cua app bang node + electron gia + thu muc tam. KHONG mo app,
+  KHONG chay `npm test` (luat #12: anh dang ngoi may).
+- **Lop may do (ca repo):** 7/7 app build sach, 0 loi kieu · 157 file JS + 22 file JSX host + 51 file JSON: 0 loi cu phap ·
+  12 ID + cong khong trung · khong lot khoa bi mat moi trong 926 file git theo doi. Shot & Save: chi kiem cu phap, khong chay
+  bai kiem nao cua app (deu bat cua so).
+- **Loi da DO (module that, co doi chung):**
+  1. `src/kho.js:67` `AN_TOAN` khong nhan dau cach va chu co dau. Ten nguoi dung Windows co dau cach / dau tieng Viet thi
+     `%LOCALAPPDATA%` (thu muc anh mac dinh) la "khong an toan": MOI lan keo-tha di qua lien ket trong `.keo`, ma
+     `donKeoAnToan()` xoa `.keo` moi lan mo app (`main.js:343`). Do: nguoi dung `DRT-G21` dua thang file goc, mo lai app file
+     CON; `Nguyen Van A` va `Tiến` deu di qua `.keo`, mo lai app file da dua cho app dich MAT (anh goc CON). Suy ra, CHUA do
+     tren Premiere: clip da keo vao timeline thanh Media Offline. Thu muc `.keo` cung nam trong `%LOCALAPPDATA%` nen voi ten
+     co dau cach duong dan lien ket van co dau cach (khong "an toan" hon gi).
+  2. `src/banquyen.js:214-219` nhanh cuoi cua `kiemTra`: moi tra loi la deu coi la "may bi go". Do: khach co ma + activation,
+     may chu tra 403 HTML / 407 / 401 / 400 / 200 khong phai JSON -> 5/5 ca XOA ma, ve `het-han-thu`, khoa chup. Doi chung:
+     mat mang / 500 / 429 -> 3/3 ca giu ma. Chi 404 "Not found" moi dung nghia "activation bi go" (ghi chu dau file).
+  3. `src/banquyen.js:57-66` + `main.js:210`: `doc()` tra `null` cho MOI loi doc, `napTrangThai()` coi la lan chay dau va
+     GHI DE. Do: file co ma, doc hong dung 1 lan -> file tren dia mat `key` + `activationId`, thanh dung thu 14 ngay moi.
+     Doi chung doc hong 0 lan: giu nguyen. Cung kieu voi so loi #16 (`kho-video.js` da sua 02/10); 2 file nay CHUA sua.
+  4. `src/kho.js:153-178` `docCauHinh()` tra `{}` cho moi loi, `ghiCauHinh(patch)` ghi de tu `{}`. Do: `cau-hinh.json` co BOM
+     doc ra 0 muc; keo khay 1 lan -> file chi con `viTriKhay`, mat `hotkey, lang, thuMucAnh, khayCo`. Doi chung file sach: con
+     du 5 muc. (Bay BOM da ghi trong CLAUDE.md muc "Bay 1-lan" nhung chua co chot trong ma.)
+  5. `src/banquyen.js:79`: ghi `{"key":"x","vinhVienKhongMay":true}` vao `ban-quyen.json` -> `da-kich-hoat`, goi Polar 0 lan.
+     Xoa file -> 14 ngay thu moi. Day la GIOI HAN cua kieu khoa (ma nguon cong khai, file khong ky), khong phai loi go nham.
+- **Loi moi DOC MA, chua do:**
+  6. `src/main.js:1573-1609` `pin:save-edit`: doi `rec.image` va thumbnail khay TRUOC, roi `writeFileSync` de len file; ghi
+     hong chi co 1 dong log. Khi do anh ghim + khay hien ban da lam mo / da ve, con keo-tha (`rec.filePath`) dua file CU chua
+     mo. Ghi khong atomic: hong giua chung de lai file cut. Kich ban gay hong (file dang bi app khac giu, dia day): chua tai lap.
+  7. `src/main.js:1810` `shelfItems` giu `NativeImage` cua MOI lan chup, chi bo khi bam x / Xoa het. Anh la `image.crop()`
+     cua khung goc ~33 MB (man 4K). Ung vien cho vu 1.168 MB RAM sau 21 gio (viec cho o CLAUDE.md goc). Phep thu re: chup 10
+     tam, bam Xoa het khay, so RAM tien trinh chinh.
+- **Nho hon, doc ma khop, chua do:** `quay3Giay` dat `dangQuay = true` roi goi `moVienQuay` NGOAI `try` (nem loi la Storyboard
+  ket cho toi khi tat app) · `closeOverlay()` khong `clearInterval(dragTimer)` (Esc luc dang giu chuot de lai hen gio 16 ms)
+  · `handleConfirm` co 4 loi thoat im lang sau khi da dong man chup · 4 cua thu con trong ban phat hanh (`AIO_USERDATA`,
+  `--selftest*` bo qua khoa ban quyen). CHUA doi chieu: `khay-thu.js` `__xong` nho ket qua 4 giay (agent neu).
+- **Phan lanh (agent bao, em chua tu doi chieu):** 10 cua so deu `contextIsolation: true`, khong `nodeIntegration`; preload
+  khong dua ham nhan duong dan / lenh; `shell.openExternal` chi goi voi link mua co dinh; web ban hang khong co duong chen ma.
+- **Trieu chung run-log im lang tu 14/09:** khong tim ra goc trong ma. Suy luan duy nhat: anh van luu nen `ghiLog` DA duoc
+  goi; hoac ghi hong (2 lop `catch` rong), hoac ghi vao file khac file da doc (ban nguon ghi `.run-log.txt` canh ma nguon,
+  ban dong goi ghi `userData/run-log.txt`).
+- **Chua kiem:** khong loi nao duoc chay tren app that / tren Windows. Agent khong doc het `overlay`, `pin`, `storyboard`,
+  `video`, `settings`, `vien-quay.js`. 12 loi nhom B cua luot 02/10 van nguyen (khong trung voi 6 loi nay).
+- **File anh huong:** chi file nay (nhat ky). Cong cu do nam o thu muc tam cua phien, khong vao repo.
 
 ## [0.8.0 nap lan 16] - 2026-10-02 15:48 - Sua 5 loi nhom A cua luot ECC soat: quay video hong thi KHONG duoc im lang, KHONG duoc mat video
 
