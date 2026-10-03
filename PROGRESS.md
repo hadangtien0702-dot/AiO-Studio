@@ -5,6 +5,44 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [mac-cai-panel + gom-production] - 2026-10-03 22:43 (UTC+7) - Script cài panel cho Mac, cài 11/11; gom cả Production về ~/Production; bản thừa vào Thùng rác - máy Mac nhà
+
+- **Bối cảnh:** anh: *"cần làm gì thì làm luôn đi em ơi"* → *"cài rồi kiểm tra xem đúng chưa - xóa đi các file nào dư thừa luôn đi em"*.
+  Em hỏi lại 2 câu vì đo ra `Downloads/Production` là CẢ bộ thư mục công ty (27 dự án, 40 GB): anh chọn **một thư mục duy nhất
+  = `~/Production`** và **bản thừa đưa vào Thùng rác**.
+- **Script `scripts/cai-panel-mac.mjs`** (mới): bảng 11 panel (id, thư mục, mục cần chép, lệnh build); build → dựng ra thư mục tạm →
+  kiểm manifest (đúng id, MainPath/ScriptPath trỏ tới file có thật) → đổi chỗ bản đang cài sang `AiO-Studio/ban-cai-truoc/<id>`
+  (không xoá) → chép → so lại từng file. `--thu` chỉ so, `--dich` cài chỗ khác, `--khong-build`.
+  - Thử (không ghi): 11/11 panel, 0 file lệch nội dung so với bản đang chạy; Transcripts bản cài thừa 8 file thử trong `mogrt/`.
+  - Đối chứng trên thư mục tạm: cài lần đầu 3 panel khớp 33/33; cài lần hai bản trước được cất (file đánh dấu còn ở bản cất, không
+    còn ở bản mới); cố ý sửa 1 file + cất 1 file + thêm 1 file → thước báo đúng 1 lệch / 1 thiếu / 2 thừa; ẩn `host/index.jsx`
+    → script từ chối cài, không ghi gì vào đích; tên panel sai → báo danh sách tên đúng.
+  - **Cài thật 19:43: 11/11 panel, 101/101 file khớp**, 11 bản trước cất ở `ban-cai-truoc` (8,6 MB). Chạy `--thu` lại: 11/11 giống hết.
+  - **CHƯA đo trong Premiere:** mở Premiere Beta 26.5 với project thử `~/Documents/Adobe/Premiere Pro (Beta)/26.0/Untitled.prproj`
+    (19:44), CEP khởi động 19:45:16, nhưng 3 phút sau và lúc 22:42 vẫn 0/11 cổng panel sống, 0 tiến trình CEPHtmlEngine; Premiere
+    chỉ có một cửa sổ 800×812 (màn chào hoặc hộp thoại). Em không nhìn / không bấm được màn hình. Premiere đang để mở.
+- **Gom Production:** 26 mục (79.334 file, 18,6 GB) chuyển chỗ từ `~/Downloads/Production` về `~/Production` (cùng ổ, không chép,
+  không xoá); đếm lại 26/26 khớp số file, 0 mục sót. File bản đồ `~/Production/CLAUDE.md` thêm ghi chú Mac.
+- **Lắp brain (theo README trong `Brain Claude - Gemini - Chatgpt`, bản `.ps1` không chạy trên Mac):** lệnh `/brain` (Mac thiếu),
+  70 file ngăn nhớ của 9 dự án thuộc Production đổi tên theo đường dẫn Mac (8/9 có thư mục khớp; `AiO-Editing` là thư mục cũ đã
+  bỏ). 11 ngăn của dự án ngoài Production (N8N, Porto, DRT…) không lắp vì Mac không có thư mục đó. Brain chính + skill + hook: đã
+  có sẵn và mới hơn gói (GitHub `ad9f94b` 03/10 15:16 so với gói 14:10).
+- **Việc làm trên Mac chỉ còn trong Thùng rác, đã lấy lại:** bộ cài Mac Shot & Save 0.7.9 (x64 115 MB + arm64 111 MB) vào
+  `Release/AiO Shotandsave/mac/` (sửa `HUONG-DAN-CAI-DAT.txt` 0.5.6 → 0.7.9) · portfolio `Pored/V3.2/V3`: 4 ảnh reels + 2 file
+  `.tsx` sửa 30/09 01:29 (bản công ty 12/08 cất ở `Pored/V3.2/_ban-cong-ty-truoc-khi-gop-03-10/`). `Cha - 1 Min For Bibble`: việc
+  30/09 trên Mac là commit `8bbedf3`, đã là tổ tiên của bản công ty `56f2a36`, 24 file "chỉ có ở Thùng rác" là file công ty đã chủ
+  động xoá/đổi tên 01/10 → không cần lấy.
+- **Bản thừa → Thùng rác (không xoá vĩnh viễn):** bản AiO Studio cũ ở Downloads (202 mục, 20 GB; giữ lại tại chỗ 19 mục cấu hình /
+  chứng chỉ / ảnh chụp, 66 MB), thư mục Gemini cũ (984 MB, 0 file sửa dở, nhánh `gemini` có trên GitHub), thư mục dự phòng
+  `cuu-ban-mac-30-09`, 2 bộ cài Mac 0.5.5. Trước khi đưa: so từng file bản cũ với thư mục chính (xem bảng mục 8 `CLAUDE.md`) và cứu
+  nhánh `backup-cong-ty-26-09` (`e5fcab9`) + bản cất tạm 29/09 (`cffe418` → nhánh `cat-tam-cong-ty-29-09`) vào repo chính.
+- **Sửa kèm:** `scripts/dong-bo-mac.sh` so với nhánh GitHub của chính nhánh đang dùng (trước: luôn `origin/main` → trên nhánh `mac`
+  sẽ báo LỆCH giả); bỏ câu "7 panel chưa chạy được trên Mac", thay bằng kiểm 4 file ở kho chung (đo: 4/4 có).
+- **Thước sai gặp trong lúc làm:** "thiếu 4 file Test Media" + "3 file lệch cỡ" (tên có dấu khác chuẩn Unicode; file git theo dõi lệch
+  CRLF) · `echo "ma thoat: $?"` sau một ống `| cut` in mã thoát của `cut`, không phải của script (2 lần).
+- **CHƯA làm:** Codex CLI · plugin ECC · Shot & Save 0.8.0 chạy thử trên Mac · gộp `mac` vào `main` · tăng số phiên bản · kiểm lại
+  nhánh Windows của 11 panel · đẩy 2 nhánh cứu lên GitHub · bản Mac cho `dong-bo-cuoi-ngay.ps1` · `--day-brain` trên Mac.
+
 ## [mac-may-chinh] - 2026-10-03 18:15 (UTC+7) - Lấy lại bản Mac 11 panel từ Thùng rác, gom 3 bản sao về một thư mục, Mac là máy chính - máy Mac nhà
 
 - **Bối cảnh:** anh: *"đây là folder được download mới xong"* → *"cứ kiểm tra đi"* → *"em lấy lại cho anh rồi giúp anh tổng hợp thành một
