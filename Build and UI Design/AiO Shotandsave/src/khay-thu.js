@@ -120,7 +120,8 @@ function taoKhayThu(deps) {
       frame: false, transparent: true, backgroundColor: '#00000000', thickFrame: false, roundedCorners: false,
       resizable: false, movable: false, minimizable: false, maximizable: false, fullscreenable: false,
       focusable: false, skipTaskbar: true, hasShadow: false, show: false, enableLargerThanScreen: true,
-      webPreferences: { preload: path.join(__dirname, preload), contextIsolation: true, sandbox: false, offscreen: TN },
+      // 04/10 Mac: nut tron + san dien cung an / hien lien tuc -> khong de trang bi ham ve luc vua hien lai (xem ensureShelf)
+      webPreferences: { preload: path.join(__dirname, preload), contextIsolation: true, sandbox: false, offscreen: TN, backgroundThrottling: false },
     })
     if (!TN) {
       w.setAlwaysOnTop(true, 'screen-saver')

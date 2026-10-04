@@ -70,7 +70,8 @@ app.whenReady().then(async () => {
     x: KHAY.x, y: KHAY.y, width: KHAY.width, height: KHAY.height,
     frame: false, transparent: true, backgroundColor: '#00000000', alwaysOnTop: true, skipTaskbar: true, resizable: false,
     minimizable: false, maximizable: false, fullscreenable: false, hasShadow: false, show: false, focusable: false,
-    webPreferences: { preload: path.join(ROOT, 'src', 'preload-shelf.js'), contextIsolation: true, sandbox: false },
+    // 04/10 (Mac): AIO_BT=1 -> thu `backgroundThrottling: false` cho cua so khay (trang khong bi ham khi cua so an)
+    webPreferences: { preload: path.join(ROOT, 'src', 'preload-shelf.js'), contextIsolation: true, sandbox: false, backgroundThrottling: process.env.AIO_BT === '1' ? false : true },
   })
   khay.setAlwaysOnTop(true, 'screen-saver')
   khay.setBounds(KHAY)
@@ -157,7 +158,7 @@ app.whenReady().then(async () => {
         const t0 = Date.now()
         if (k !== 'am') khay.showInactive()
         const tHien = Date.now() - t0
-        if (k === 'lanh-cho') await cho(500)
+        if (k === 'lanh-cho') await cho(Number(process.env.AIO_CHO || 500)) // 04/10: AIO_CHO=ms de do can cho bao lau sau khi hien
         const u = await js(khay, 'window.__khayBung()')
         r = Object.assign({ hien: tHien, nghenMain: nghenMax }, u)
       }

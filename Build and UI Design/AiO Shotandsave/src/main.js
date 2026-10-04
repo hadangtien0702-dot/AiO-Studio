@@ -1815,6 +1815,11 @@ function ensureShelf() {
     webPreferences: {
       preload: path.join(__dirname, 'preload-shelf.js'),
       contextIsolation: true, sandbox: false,
+      /* 04/10 Mac (anh: "animation o goc khi bam mo ra bi giat, khong muot nhu ban Windows"): cua so khay vua duoc HIEN lai
+         sau khi an thi trang bi ham ve — do bang khay-bung-that.cjs: hien roi bung ngay = 3 / 6 / 13 khung trong ~0,5 giay;
+         cua so van hien = 25 / 25 / 24; tat ham = 24 / 23 / 24 / 24. Trang khay khong co vong ve nao chay lien tuc nen
+         tat ham khong ton CPU luc khay an. */
+      backgroundThrottling: false,
     },
   })
   shelfWin.setAlwaysOnTop(true, 'screen-saver')
