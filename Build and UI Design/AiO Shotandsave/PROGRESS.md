@@ -11,9 +11,12 @@
 >   lan mo app. Sua anh ghim: ghi file TRUOC + atomic, hong thi tra anh ghim ve ban cu + hop thoai. Khay khong giu anh goc
 >   (do: 12 anh 4K +381 MB -> +34 MB). macOS thieu quyen: hop thoai noi ro + nut mo trang quyen (anh bam 35 lan chi thay
 >   overlay chop). 9 bai kiem chay an deu xanh (`test:banquyen` 71 · `cauhinh` 22 · `quyen` 28 · `keo` 22 · `khayram` 12).
->   **CHUA CHUP DUOC tren Mac: macOS van `Failed to get sources`**, cho anh chay `tccutil reset ScreenCapture
->   com.aiostudio.shotandsave` + bat lai quyen. CHUA ai chup / ghim / keo-tha / lam mo tren ban moi. Da commit tren may,
->   CHUA push. Chi tiet: muc [0.8.0 sua ECC lan 2] ngay duoi.
+>   **14:31 MAC DA CHUP DUOC tren ban moi** (anh bam cho phep trong bang hoi cua macOS, app tu mo lai 14:31:23; anh:
+>   *"anh thay app chay roi nha em"*): `LUONG: san sang 1 man [3584x2240]`, 1 lan chup -> `luu ...143147-959.jpg 2484x1324`,
+>   khay nap 4 anh cu + 1 anh moi, 0 dong LOI, tien trinh chinh 167 MB. **[DANG DO] anh bao 14:3x: nut tron bung khay tren
+>   Mac "bi giat, khong muot nhu ban Windows"**: run-log `bung 472 ms (3 khung)` va `bung 553 (11 khung, max 167)`, `tan`
+>   4-10 khung; chang `bay` van du 18 khung. CHUA tim ra goc, CHUA sua. CHUA thu tren ban moi: bam ghim tu khay, ve / lam mo
+>   anh ghim, keo-tha ra Premiere roi mo lai app. Da commit tren may, CHUA push. Chi tiet: muc [0.8.0 sua ECC lan 2] duoi.
 > - **04/10 02:13 DA SUA 3 trong 6 loi cua luot ECC soat 04/10: khach da tra tien KHONG con mat ma, `cau-hinh.json` KHONG
 >   con bi ghi de.** `npm run test:banquyen` 71/71 (truoc 27 muc; ban cu truot 33 muc moi) · `npm run test:cauhinh` 22/22
 >   (bai MOI; ban cu truot 15). CHUA chay tren app that, CHUA nap vao ban cai Windows (`node scripts/cai-tai-cho.mjs` tren
