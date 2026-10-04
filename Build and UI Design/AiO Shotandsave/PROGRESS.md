@@ -3,7 +3,8 @@
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
 > - **04/10 17:13 MAC: app KHONG con bieu tuong o Dock, chi con tren thanh menu (anh yeu cau). DA NAP (`app.asar` `0dcbb8c4`).**
 >   Do: macOS xep app `Foreground` -> `UIElement`; anh chup + keo-tha duoc ngay sau do (17:13:16). Luc mo app bieu tuong con
->   nhay len Dock mot nhip (het han khi cai ca `.app`, da dat `LSUIElement`). CHO ANH nhin Dock + mo thu Cai dat tu menu.
+>   nhay len Dock mot nhip (het han khi cai ca `.app`, da dat `LSUIElement`). **17:15 ANH XAC NHAN bang mat: *"okie rồi em,
+>   dock hết hiện icon rồi"*.** Con cho: anh mo thu Cai dat tu menu (cua so co len truoc + go phim duoc khong).
 >   Chi tiet: muc [0.8.0 mac an Dock] ngay duoi.
 > - **04/10 17:02 MAC: ANH XAC NHAN ban 16:58 bang MAT: *"mượt hơn rồi - okie rồi đó em"*.** Run-log 17:02:18 (1 lan bung, di
 >   duong moi `som 7`): `noi +1/+2` (truoc +3..+9/+16..+17), `main 11` ms (truoc 33-47), bay 27 / bung 24 / tan 15 khung, ho max
