@@ -30,12 +30,12 @@
   // ── 12 tool. id = Extension Id THẬT (grep manifest 22/09). c = màu nhận diện (nền ô icon đặc,
   //    icon trắng trên nền này đo ≥ 3:1). Autocut giữ cam thương hiệu.
   var TOOLS = [
-    { id: 'com.aiostudio.autocut.panel', ten: 'Autocut', icon: 'scissors', nhom: 'dung', c: '#f86820', viec: { vi: 'Cắt khoảng lặng', en: 'Cut silences' } },
+    { id: 'com.aiostudio.autocut.panel', ten: 'Autocut', icon: 'scissors', nhom: 'dung', c: '#f86820', canh: 'cat', viec: { vi: 'Cắt khoảng lặng', en: 'Cut silences' } },
     { id: 'com.aiostudio.podcast.panel', ten: 'Auto Podcast', icon: 'mic', nhom: 'dung', c: '#2563eb', viec: { vi: 'Cắt theo người đang nói', en: 'Cut to whoever is speaking' } },
     { id: 'com.aiostudio.shortviral.panel', ten: 'Auto Short Viral', icon: 'messages', nhom: 'dung', c: '#059669', viec: { vi: 'Chia hỏi–đáp thành short', en: 'Turn Q&A into shorts' } },
     { id: 'com.aiostudio.reframe.panel', ten: 'Auto Re-Frames', icon: 'crop', nhom: 'dung', c: '#7c3aed', viec: { vi: 'Dựng dọc 9:16 bám chủ thể', en: 'Vertical 9:16 that follows the subject' } },
     { id: 'com.aiostudio.transcript.panel', ten: 'Transcripts', icon: 'captions', nhom: 'chu', c: '#0284c7', viec: { vi: 'Làm phụ đề từ giọng nói', en: 'Captions from speech' } },
-    { id: 'com.aiostudio.guideframe.panel', ten: 'Auto Guideline Frame', icon: 'frame', nhom: 'chu', c: '#d97706', viec: { vi: 'Đặt vùng an toàn mạng xã hội', en: 'Social media safe zones' } },
+    { id: 'com.aiostudio.guideframe.panel', ten: 'Auto Guideline Frame', icon: 'frame', nhom: 'chu', c: '#d97706', nhung: true, viec: { vi: 'Đặt vùng an toàn mạng xã hội', en: 'Social media safe zones' } },
     { id: 'com.aiostudio.assetmanager.panel', ten: 'Asset Manager', icon: 'layers', nhom: 'tainguyen', c: '#db2777', viec: { vi: 'Kho nhạc, logo, hiệu ứng', en: 'Music, logo and effects library' } },
     { id: 'com.aiostudio.powerbin.panel', ten: 'Power Bins', icon: 'backpack', nhom: 'tainguyen', c: '#0d9488', viec: { vi: 'Brand kit hiện ở mọi project', en: 'Brand kit in every project' } },
     { id: 'com.aiostudio.videodownload.panel', ten: 'Video Download', icon: 'download', nhom: 'tainguyen', c: '#4f46e5', viec: { vi: 'Tải video từ link vào bin', en: 'Download a video link into a bin' } },
@@ -57,7 +57,9 @@
       tbSapCo: 'Tính năng này sắp có.', tbToolSapCo: ' sắp có, chưa phát hành.',
       tbChuaCai: ' chưa cài trên máy này. Cài từ bộ cài AiO Studio rồi mở lại Premiere.',
       tbNgoaiPremiere: 'Chỉ mở được tool khi panel chạy trong Premiere.', tbLoiMo: 'Không mở được ',
-      tbMoApp: 'Đang mở Shot & Save…', tbChuaCaiApp: 'Chưa cài Shot & Save trên máy này.'
+      tbMoApp: 'Đang mở Shot & Save…', tbChuaCaiApp: 'Chưa cài Shot & Save trên máy này.',
+      veDs: 'Tất cả tool', veDsGiai: 'Về danh sách tool', moRieng: 'Mở thành cửa sổ riêng',
+      tbKhongNhung: ' chưa hiện được trong panel này nên đã mở thành cửa sổ riêng.'
     },
     en: {
       tatCa: 'All', dung: 'Edit & cut', chu: 'Text & frames', tainguyen: 'Assets', khac: 'Other',
@@ -69,7 +71,9 @@
       tbSapCo: 'This is coming soon.', tbToolSapCo: ' is coming soon, not released yet.',
       tbChuaCai: ' is not installed on this computer. Install it from the AiO Studio installer, then restart Premiere.',
       tbNgoaiPremiere: 'Tools can only be opened when this panel runs inside Premiere.', tbLoiMo: 'Could not open ',
-      tbMoApp: 'Opening Shot & Save…', tbChuaCaiApp: 'Shot & Save is not installed on this computer.'
+      tbMoApp: 'Opening Shot & Save…', tbChuaCaiApp: 'Shot & Save is not installed on this computer.',
+      veDs: 'All tools', veDsGiai: 'Back to all tools', moRieng: 'Open in its own panel',
+      tbKhongNhung: ' could not be shown inside this panel, so it opened in its own panel.'
     }
   };
 
@@ -94,7 +98,8 @@
     moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-    plus: '<path d="M5 12h14"/><path d="M12 5v14"/>'
+    plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    truoc: '<path d="m15 18-6-6 6-6"/>'
   };
   function ic(ten, s, w) {
     return '<svg width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.9) +
@@ -106,7 +111,8 @@
 
   // ── Trạng thái ───────────────────────────────────────────────────────────
   // moDau: lần vẽ này là "mở panel / đổi dạng" → chạy animation vào (#hub.khoi-dong). vaoNhe: vẽ lại vì lọc/tìm → thẻ .moi
-  var st = { lang: 'vi', theme: 'dark', nhom: 'tatca', tim: '', moTim: false, daCai: {}, ban: {}, coCep: !!cep, dang: '', rong: null, ratRong: null, cao: null, moDau: false, vaoNhe: false };
+  var st = { lang: 'vi', theme: 'dark', nhom: 'tatca', tim: '', moTim: false, daCai: {}, ban: {}, coCep: !!cep, dang: '', rong: null, ratRong: null, cao: null, moDau: false, vaoNhe: false,
+    duong: {}, khung: {}, hostDaNap: {}, tinHieu: {}, toolMo: null }; // 04/10 mẫu nhúng: đường dẫn từng tool · khung con đã mở · tool đang hiện
   var hub = document.getElementById('hub');
 
   // ── Nền sáng / tối: token của web Shot & Save. Mặc định TỐI (panel nằm trong Premiere tối),
@@ -171,7 +177,7 @@
 
   // ── Tool nào đã cài + phiên bản — hỏi thẳng Premiere ────────────────────
   function docDaCai() {
-    st.daCai = {}; st.ban = {};
+    st.daCai = {}; st.ban = {}; st.duong = {};
     if (!cep) return;
     var ds = null;
     try { ds = JSON.parse(cep.getExtensions()); } catch (e) { canhBao('getExtensions() khong tham so hong', e); }
@@ -188,6 +194,9 @@
           var xml = String(fs.readFileSync(path.join(x.basePath, 'CSXS', 'manifest.xml'), 'utf8'));
           var m = xml.match(/ExtensionBundleVersion="([^"]+)"/);
           if (m) st.ban[x.id] = m[1];
+          // 04/10: đường dẫn để NHÚNG tool vào panel này (trang chính + file host khai trong manifest của nó)
+          var h = xml.match(/<ScriptPath>\s*([^<\s][^<]*?)\s*<\/ScriptPath>/);
+          st.duong[x.id] = { base: x.basePath, main: x.mainPath || '', host: h ? path.join(x.basePath, h[1]) : '' };
         } catch (e) { /* manifest không đọc được thì bỏ số phiên bản */ }
       }
     });
@@ -227,8 +236,96 @@
     if (t.app) { moApp(); return; }
     if (!cep) { bao(C.tbNgoaiPremiere); return; }
     if (tt === 'chua') { bao(t.ten + C.tbChuaCai); return; }
-    try { cep.requestOpenExtension(t.id, ''); } catch (e) { canhBao('requestOpenExtension ' + t.id, e); bao(C.tbLoiMo + t.ten); }
+    if (t.nhung) { moNhung(i); return; }
+    moRieng(t);
   }
+  function moRieng(t) {
+    try { cep.requestOpenExtension(t.id, ''); } catch (e) { canhBao('requestOpenExtension ' + t.id, e); bao(CHU[st.lang].tbLoiMo + t.ten); }
+  }
+
+  // ── 04/10 MẪU: tool hiện NGAY TRONG panel tổng (khung con), không mở tab riêng ───────────────
+  //    Anh Tiến: "anh muốn tất cả tool trong PR chỉ sử dụng trong 1 bảng panel duy nhất". Mới bật cho tool có `nhung: true`.
+  //    Đo 04/10 trên Premiere 26.5: khung con có đủ Node + __adobe_cep__ + evalScript, NHƯNG getSystemPath('extension') và
+  //    getExtensionId() trả về của PANEL TỔNG → tool tìm host/, bin/ nhầm chỗ. Cách làm: chép trang chính của tool ra một
+  //    file tạm, chèn lên đầu <base> (đường dẫn tương đối vẫn trỏ về thư mục tool) + lớp đệm trả đúng đường dẫn / ID của
+  //    tool (lớp đệm chỉ có tác dụng trong khung con, đã đo). Khung con GIỮ SỐNG khi về danh sách: việc đang chạy không
+  //    bị ngắt. Không dựng được trang nhúng → mở cửa sổ riêng như cũ + báo, không im lặng.
+  //    ☠️ Chưa đo: kéo-thả từ khung con ra timeline (sổ tay CEP: hỏng từ Premiere 2022) — tool sống bằng kéo-thả chưa bật.
+  var khungTool = document.getElementById('khung-tool');
+  function urlFile(p) { p = String(p).replace(/\\/g, '/'); return 'file://' + (p.charAt(0) === '/' ? '' : '/') + encodeURI(p); }
+  function trangNhung(t) {
+    var fs = napNode('fs'), path = napNode('path'), os = napNode('os'), d = st.duong[t.id];
+    if (!fs || !path || !os || !d || !d.main) return null;
+    var html = String(fs.readFileSync(d.main, 'utf8'));
+    var G = JSON.stringify({ id: t.id, goc: urlFile(d.base) });
+    var dem = '<base href="' + urlFile(path.dirname(d.main)) + '/">' +
+      '<script>(function(){var G=' + G + ';try{var c=window.__adobe_cep__,cu=c.getSystemPath;' +
+      'c.getSystemPath=function(k){return k==="extension"?G.goc:cu.call(c,k)};c.getExtensionId=function(){return G.id}}catch(e){}' +
+      'var gui=function(o){o.aioNhung=G.id;try{parent.postMessage(o,"*")}catch(e){}};' +
+      'window.addEventListener("error",function(e){gui({loi:String(e.message||e).slice(0,200)})});' +
+      'window.addEventListener("load",function(){gui({san:true})})})();<\/script>';
+    html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function (m) { return m + dem; }) : dem + html;
+    var thuMuc = path.join(os.tmpdir(), 'aio-studio-hub');
+    fs.mkdirSync(thuMuc, { recursive: true });
+    var f = path.join(thuMuc, t.id.replace(/[^A-Za-z0-9.]/g, '_') + '.html');
+    fs.writeFileSync(f, html);
+    return urlFile(f);
+  }
+  // ☠️ $.evalFile phải gọi ở tầng NGOÀI CÙNG: bọc trong hàm là mọi hàm host bị nhốt trong hàm đó (ghi chú đầu host/index.jsx).
+  function napHost(t, xong) {
+    var d = st.duong[t.id];
+    if (!d || !d.host || st.hostDaNap[t.id]) { xong(); return; }
+    var het = setTimeout(function () { het = null; canhBao('nap host ' + t.id + ': het gio 8 giay'); xong(); }, 8000);
+    try {
+      cep.evalScript('$.evalFile(' + JSON.stringify(d.host) + ')', function (r) {
+        if (het === null) return;
+        clearTimeout(het);
+        if (String(r).indexOf('EvalScript error') >= 0) canhBao('nap host ' + t.id + ' loi: ' + r); else st.hostDaNap[t.id] = true;
+        xong();
+      });
+    } catch (e) { clearTimeout(het); canhBao('nap host ' + t.id, e); xong(); }
+  }
+  function moNhung(i) {
+    var t = TOOLS[i], k = st.khung[t.id];
+    if (!k) {
+      var url = null;
+      try { url = trangNhung(t); } catch (e) { canhBao('trangNhung ' + t.id, e); }
+      if (!url) { moRieng(t); bao(t.ten + CHU[st.lang].tbKhongNhung); return; }
+      k = document.createElement('iframe');
+      k.className = 'kt-khung'; k.title = t.ten;
+      st.khung[t.id] = k; st.tinHieu[t.id] = { san: false, loi: [] };
+      document.getElementById('kt-than').appendChild(k);
+      napHost(t, function () { k.src = url; });
+    }
+    st.toolMo = i; veKhungTool();
+  }
+  function veKhungTool() {
+    var mo = st.toolMo !== null;
+    hub.hidden = mo; khungTool.hidden = !mo;
+    if (!mo) return;
+    var t = TOOLS[st.toolMo], C = CHU[st.lang];
+    document.getElementById('kt-dau').innerHTML =
+      '<button type="button" class="kt-ve" id="kt-ve" title="' + thoat(C.veDsGiai) + '">' + ic('truoc', 16, 2.2) + '<img class="logo" src="assets/logo-mark.png" alt=""><span>' + thoat(C.veDs) + '</span></button>' +
+      '<span class="kt-vach" aria-hidden="true"></span>' +
+      '<span class="kt-ten">' + oIcon(t, 13) + '<span class="kt-chu">' + thoat(t.ten) + '</span></span>' +
+      '<span class="gian"></span>' +
+      '<button type="button" class="nut-ic" id="kt-rieng" aria-label="' + thoat(C.moRieng) + '" title="' + thoat(C.moRieng) + '">' + ic('external', 16) + '</button>';
+    Object.keys(st.khung).forEach(function (id) { st.khung[id].hidden = id !== t.id; });
+  }
+  khungTool.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('button') : null;
+    if (!el) return;
+    if (el.id === 'kt-ve') { st.toolMo = null; veKhungTool(); return; }
+    if (el.id === 'kt-rieng' && st.toolMo !== null) moRieng(TOOLS[st.toolMo]);
+  });
+  // Tool trong khung con báo về: đã nạp xong / lỗi JS (đọc qua cổng gỡ lỗi: window.__aioHub.st.tinHieu)
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || !d.aioNhung || !st.tinHieu[d.aioNhung]) return;
+    if (d.san) st.tinHieu[d.aioNhung].san = true;
+    if (d.loi) { st.tinHieu[d.aioNhung].loi.push(d.loi); canhBao('tool nhung ' + d.aioNhung + ': ' + d.loi); }
+  });
+
   function moApp() {
     var C = CHU[st.lang], cp = napNode('child_process'), pr = napNode('process');
     if (!cp) { bao(C.tbNgoaiPremiere); return; }
@@ -271,6 +368,13 @@
     if (t.app) return '<span class="nhan" title="' + thoat(C.appGiai) + '">' + ic('external', 11) + C.app + '</span>';
     return '';
   }
+  // ── 04/10 MẪU "mỗi tool là một cảnh diễn": thẻ tự diễn việc tool làm khi rê chuột (CSS .cd-*). Mới có Autocut:
+  //    4 đoạn có tiếng (cd-c) xen 3 khoảng lặng (cd-l) + đầu đọc (cd-ph). Tổng bề rộng 74% + 3 × 8,66% = 100%.
+  var CANH = {
+    cat: '<span class="cd cd-cat" aria-hidden="true"><span class="cd-ray">' +
+      '<i class="cd-c" style="--w:22"></i><i class="cd-l cd-l0"></i><i class="cd-c" style="--w:14"></i><i class="cd-l cd-l1"></i>' +
+      '<i class="cd-c" style="--w:26"></i><i class="cd-l cd-l2"></i><i class="cd-c" style="--w:12"></i></span><i class="cd-ph"></i></span>'
+  };
   // k = thứ tự thẻ ĐANG HIỆN (sau lọc), quyết định độ trễ animation:
   //   mở panel: 260 ms (sau banner/chip) + k × 55 ms · lọc/tìm: k × 25 ms (nhẹ như .ditem.moi của web)
   function veThe(t, i, k) {
@@ -281,6 +385,7 @@
       oIcon(t, 22) +
       '<span class="the-chu"><span class="the-dong"><span class="the-ten">' + thoat(t.ten) + '</span>' + nhanThe(t, tt) + '</span>' +
       '<span class="the-viec">' + thoat(t.viec[st.lang]) + '</span></span>' +
+      (t.canh && tt === 'ok' ? CANH[t.canh] : '') +
       (tt === 'ok' ? '<span class="chev">' + ic('chevron', 16, 2.2) + '</span>' : '') +
       '</button>';
   }
@@ -384,6 +489,7 @@
     } else {
       hub.classList.remove('cuon');
     }
+    if (st.toolMo !== null) veKhungTool(); // đang hiện tool nhúng mà đổi ngôn ngữ → thanh trên của khung tool đổi theo
   }
   // Chỉ vẽ lại danh sách thẻ khi gõ tìm — giữ nguyên ô nhập (khỏi mất con trỏ)
   function veLaiLuoi() {

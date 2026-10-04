@@ -240,6 +240,48 @@ button:focus-visible, .the:focus-visible, .o-rail:focus-visible { outline: none;
 /* Lọc / tìm: thẻ mới hiện nhẹ như .ditem.moi của web (220 ms) */
 .the.moi { animation: vao .22s var(--ease) both; animation-delay: var(--tre, 0ms); }
 
+/* ── 04/10 MẪU 1: TOOL HIỆN NGAY TRONG PANEL (tiền tố kt-) ─────────────────────────────────────
+   #hub có display:flex nên [hidden] không tự ẩn được — phải ép (bẫy đã vấp ở Shot & Save 31/08). */
+#hub[hidden], #khung-tool[hidden], .kt-khung[hidden] { display: none !important; }
+#khung-tool { height: 100%; display: flex; flex-direction: column; background: var(--bg); }
+.kt-dau { flex: none; display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 6px; border-bottom: 1px solid var(--line); }
+.kt-dau .gian { flex: 1 1 auto; }
+.kt-ve { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 4px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-2); font: 600 12px/1 var(--font); white-space: nowrap; cursor: pointer; transition: background-color .15s, color .15s; }
+.kt-ve:hover { background: var(--bg-soft); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+.kt-ve .logo { width: 16px; height: 15px; }
+.kt-vach { flex: none; width: 1px; height: 18px; background: var(--line-strong); }
+.kt-ten { display: flex; align-items: center; gap: 8px; min-width: 0; padding-left: 4px; }
+.kt-ten .o-icon { width: 24px; height: 24px; border-radius: 7px; }
+.kt-ten .o-icon svg { width: 13px; height: 13px; }
+.kt-chu { font-size: 13px; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kt-dau .nut-ic { width: 28px; height: 28px; border-radius: 9px; }
+.kt-than { flex: 1 1 auto; min-height: 0; position: relative; }
+.kt-khung { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; background: #181818; }
+
+/* ── 04/10 MẪU 2: "MỖI TOOL LÀ MỘT CẢNH DIỄN" (tiền tố cd-) — mới có cảnh của Autocut ────────────
+   Đứng im: thấy rõ 3 khoảng lặng (ô gạch chéo) xen giữa 4 đoạn có tiếng. Rê chuột / focus: đầu đọc quét qua, từng
+   khoảng lặng đỏ lên rồi biến mất, các đoạn dồn lại, bài ngắn đi. Đầu đọc chép kiểu .pm-ph của web /premiere/.
+   Chỉ dùng thứ Chromium 99 có (không color-mix, :has, container query). */
+.cd { position: relative; display: block; flex: none; overflow: hidden; border-radius: 9px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
+#hub:not(.rong) .cd { width: 100%; height: 44px; margin-top: 10px; }
+#hub.rong .cd { width: 150px; height: 46px; }
+.cd-ray { position: absolute; left: 7px; right: 7px; top: 9px; bottom: 9px; display: flex; align-items: stretch; }
+.cd-c { flex: 0 0 calc(var(--w) * 1%); min-width: 0; border-radius: 4px; background: #f86820 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='26' preserveAspectRatio='none' viewBox='0 0 34 26'%3E%3Cg fill='%23fff' fill-opacity='.78'%3E%3Crect x='2' y='9' width='2' height='8' rx='1'/%3E%3Crect x='6' y='5' width='2' height='16' rx='1'/%3E%3Crect x='10' y='8' width='2' height='10' rx='1'/%3E%3Crect x='14' y='3' width='2' height='20' rx='1'/%3E%3Crect x='18' y='7' width='2' height='12' rx='1'/%3E%3Crect x='22' y='4' width='2' height='18' rx='1'/%3E%3Crect x='26' y='10' width='2' height='6' rx='1'/%3E%3Crect x='30' y='6' width='2' height='14' rx='1'/%3E%3C/g%3E%3C/svg%3E") left center / 34px 100% repeat-x; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18); }
+.cd-l { position: relative; flex: 0 0 calc(8.66% - 2px); min-width: 0; margin: 0 1px; /* trừ 2 px lề: tổng đúng 100% ray (đo 04/10: không trừ thì tràn 6 px) */ border-radius: 3px; background-color: transparent; background-image: repeating-linear-gradient(135deg, rgba(160, 150, 140, .34) 0 2px, transparent 2px 5px); }
+.cd-l::after { content: ""; position: absolute; left: 1px; right: 1px; top: 50%; height: 1px; background: var(--ink-3); opacity: .7; }
+.cd-ph { position: absolute; top: 3px; bottom: 3px; left: 7px; width: 2px; margin-left: -1px; border-radius: 2px; background: #ffffff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; }
+.cd-ph::before { content: ""; position: absolute; left: -3px; top: -1px; border: 4px solid transparent; border-top: 5px solid #ffffff; border-bottom: 0; }
+.the:hover .cd-ph, .the:focus-visible .cd-ph { animation: cd-quet 3.6s linear infinite; }
+.the:hover .cd-ray, .the:focus-visible .cd-ray { animation: cd-vong 3.6s linear infinite; }
+.the:hover .cd-l0, .the:focus-visible .cd-l0 { animation: cd-l0 3.6s var(--ease) infinite; }
+.the:hover .cd-l1, .the:focus-visible .cd-l1 { animation: cd-l1 3.6s var(--ease) infinite; }
+.the:hover .cd-l2, .the:focus-visible .cd-l2 { animation: cd-l2 3.6s var(--ease) infinite; }
+@keyframes cd-quet { 0% { left: 7px; opacity: 1; } 39% { left: calc(100% - 7px); opacity: 1; } 43%, 100% { left: calc(100% - 7px); opacity: 0; } }
+@keyframes cd-vong { 0%, 88% { opacity: 1; } 93%, 96% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes cd-l0 { 0%, 9% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } 11%, 46% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: rgba(239, 68, 68, .6); } 54%, 94% { flex-basis: 0%; margin: 0; opacity: 0; background-color: rgba(239, 68, 68, .6); } 95%, 100% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } }
+@keyframes cd-l1 { 0%, 18% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } 20%, 49% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: rgba(239, 68, 68, .6); } 57%, 94% { flex-basis: 0%; margin: 0; opacity: 0; background-color: rgba(239, 68, 68, .6); } 95%, 100% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } }
+@keyframes cd-l2 { 0%, 31% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } 33%, 52% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: rgba(239, 68, 68, .6); } 60%, 94% { flex-basis: 0%; margin: 0; opacity: 0; background-color: rgba(239, 68, 68, .6); } 95%, 100% { flex-basis: calc(8.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

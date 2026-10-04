@@ -1,5 +1,37 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [mau nhung + canh dien] - 2026-10-04 16:53 (UTC+7) - MAU: Guide Frame hien NGAY TRONG panel tong + the Autocut biet "dien"; da cai vao Premiere may Mac, CHO ANH XEM
+
+- **Boi canh:** anh chon trong bang hoi (muc ngay duoi): *"Nhúng, làm mẫu trước"* va *"Mỗi tool là một cảnh diễn"*. Lam MOT mau
+  (luat 5bh), chua nhan ra 12 tool. Van 2.1.1, chua push.
+- **Thay doi:**
+  - `dist/index.html`: them `#khung-tool` (thanh tren + vung chua khung con), nam NGOAI `#hub` vi `#hub` ve lai ca khoi.
+  - `dist/hub.js`: `docDaCai` nho them duong dan tung tool (`st.duong`: base / main / host doc tu `<ScriptPath>`). Tool co
+    `nhung: true` (moi Guide Frame) -> `moNhung`: `trangNhung` chep trang chinh cua tool ra `<tmp>/aio-studio-hub/<id>.html`,
+    chen `<base>` + lop dem (tra dung `getSystemPath('extension')` / `getExtensionId()` cua TOOL, chi co tac dung trong khung
+    con) -> `napHost` goi `$.evalFile(host/index.jsx)` o tang ngoai cung -> gan vao khung con. Khung con GIU SONG khi ve danh
+    sach. Khong dung duoc trang nhung -> mo cua so rieng + bao. Tool bao ve `san` / loi JS qua `postMessage` (`st.tinHieu`).
+    Them `moRieng` + nut "Mo thanh cua so rieng" tren thanh cua khung tool.
+  - The Autocut (`canh: 'cat'`): dai canh dien `.cd` (4 doan co tieng xen 3 khoang lang + dau doc). Re chuot / focus: dau doc
+    quet, tung khoang lang do len roi bien mat, cac doan don lai. Chi CSS, dau doc chep kieu `.pm-ph` cua web /premiere/.
+  - `dist/hub.css`: khoi `kt-*` + `cd-*`; ep `#hub[hidden]` an (`display:flex` de len `[hidden]`).
+- **Kiem chung bang so (Premiere Beta 26.5 that, cong 8101, bam + re chuot that bang CDP; script o thu muc tam cua phien):**
+  - Bam the Guide Frame: sau 4,5 giay `#hub` an, khung con 664x513 tai y=40, tin hieu `san: true`, 0 loi JS; ham host
+    `gf_tatOverlay` tu `undefined` thanh `function`; chu trong khung: "Guide Frame v0.3.2 Premiere 26.5.0 … Sequence AiO Mac
+    Test dai 2 Khung 1920×1080" = tool doc dung sequence dang mo. Bam "Tat ca tool": ve danh sach, khung con van con (1).
+  - The Autocut: dung im 3 khoang lang, dau doc an, 0 animation. Re chuot 0,5 giay: dau doc o x=78, hien. Giua vong: 3 khoang
+    lang = 0 px, mep phai doan cuoi 171 -> 122 px (ray 165). Bo chuot: ve nguyen, 0 animation.
+  - Loi tu gay, da sua trong buoi: dai clip tran 6 px khoi ray (quen tru le 2 px moi khoang lang) -> `calc(8.66% - 2px)`,
+    do lai: mep phai 165,3 = ray 165,3.
+- **CHUA kiem / chua lam:** anh chua xem. Moi 1/10 tool nhung; 9 tool con lai van mo tab rieng. KEO-THA trong khung con CHUA
+  do (can tool co keo-tha + them co manifest + tat mo Premiere). Chua do: bam nut that trong Guide Frame nhung (dat / go
+  guide), doi ngon ngu khi dang o tool, panel hep < 340 px bam tool nhung, Windows. Cai dat rieng cua Guide Frame
+  (localStorage) khi nhung la kho cua panel tong: cai dat cu cua no khong theo sang. Hang the dau cao 170 px (hang khac 116)
+  vi moi 1 the co canh. File tam trong `<tmp>/aio-studio-hub/` chua ai don.
+- **Tra ve ban truoc mau:** `git checkout aa682b7 -- "Build and UI Design/AiO WELCOME/dist"` roi `node scripts/cai-panel-mac.mjs
+  hub` (thu muc `ban-cai-truoc` chi giu 1 ban, hien la ban mau lan 1).
+- **File anh huong:** `dist/index.html`, `dist/hub.js`, `dist/hub.css`, file nay, `CLAUDE.md` goc (dong quyet dinh 04/10).
+
 ## [do + cho anh chot] - 2026-10-04 16:36 (UTC+7) - Anh muon MOI tool chay trong MOT panel + giao dien "chua du dac sac cho GenZ": do kha nang NHUNG, CHUA sua ma
 
 - **Boi canh:** anh gui anh chup panel tong 2.1.1 (luoi 12 the): *"phần này anh thấy nó hơi bị đơn điệu quá… chưa đủ đặc sắc cho
