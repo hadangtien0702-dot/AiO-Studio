@@ -1,5 +1,22 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [3 mau cho anh chon] - 2026-10-04 17:29 (UTC+7) - Nhap "the ap phich" cung bi che ("toan bo deu xau"); dung 3 mau KHAC Y, CHO ANH CHON
+
+- **Boi canh:** anh xem `nhap/the-canh-dien.html`: *"vẫn xấu em"*; hoi xau o dau thi anh tra loi *"toàn bộ đều xấu"*; hoi mau nao
+  gan y thi anh noi *"mấy cái anh khen thì mấy cái đó okie rồi - em hãy làm cái pannel này thôi mấy cái anh khen giữ nguyên"*
+  (= KHONG dung vao web / app da khen, chi lam panel nay); roi *"em tạo cho anh vài mẫu để anh chọn đi"*.
+- **Thay doi:** `nhap/3-mau-panel-tong.html` MOI, 3 mau trong mot trang, cung 12 tool that, cung be rong 664 px, re chuot la chay:
+  - **A · Timeline:** 12 tool la 12 clip tren 4 track (CAT / CHU / KHO / KHAC), co thuoc thoi gian + dau doc cam chay toi
+    clip dang re; phia tren la "man hinh" hien ten tool lon + viec no lam + nut Mo tool.
+  - **B · Bang so:** so "12" lon, 12 hang danh so 01-12 chia 2 cot, ten tool chu to; re chuot thi mau cua tool quet qua ca hang.
+  - **C · Ban pad:** 12 pad phat sang kieu ban pad lam nhac, co man LCD doc ten tool, bam phim 1 2 3 4 / Q W E R / A S D F
+    la pad sang va lun xuong.
+- **Kiem chung bang so (khung Browser cua app, 700 px):** ca 3 mau rong 664 px, cao 319 / 452 / 449 px, tran ngang 0; A: 12
+  clip, 0 ten bi cat; B: 0 ten va 0 dong mo ta bi cat; C: 12 pad, 12/12 ten nam tren 1 dong. Em tu nhin anh chup ca trang.
+- **CHUA kiem:** anh chua chon. Chua chay trong Chromium 99 cua CEP, chua co ban sang / EN, chua thu khung hep 380 px, chua
+  noi voi phan nhung tool. `nhap/the-canh-dien.html` (bi che) van de do, chua xoa.
+- **File anh huong:** `nhap/3-mau-panel-tong.html` (moi), file nay. Panel that KHONG doi (van la luoi cu 2.1.1 + nhung Guide Frame).
+
 ## [go dai canh + nhap moi] - 2026-10-04 17:20 (UTC+7) - Anh che mau "xau du vay": GO dai song am khoi panel that, dung NHAP ca luoi kieu "the ap phich"; CHO ANH DUYET nhap
 
 - **Boi canh:** anh chup panel that co mau 16:53 va hoi: *"anh thấy em có sửa tab này ở đây rồi mà sao nó xấu dữ vậy em"*.
