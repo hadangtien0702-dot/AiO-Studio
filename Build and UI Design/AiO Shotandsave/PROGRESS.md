@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 14:54 MAC: nut tron bung khay bi GIAT (anh bao) -> DA SUA trong ma, CHUA cai vao app.** Cua so khay vua hien lai
+>   thi trang chua ve deu: do cua so that `lanh` 3 / 6 / 13 khung -> tat `backgroundThrottling` 24 / 23 / 24 / 24; du duong 8/8 lan
+>   22-25 khung. Agent ECC nghi huong khac (luong chup + khay khong duoc bao ve), CHUA do. Cai ban moi = anh phai bat lai quyen
+>   quay man hinh. `test:khaynut` tren Mac truot san 1 muc. Commit `115c68f`. Chi tiet: muc [0.8.0 mac giat khay] ngay duoi.
 > - **04/10 14:52 DA SUA 4 diem con mo cua muc [soat] 13:56 (lop MODULE; chua chay app that, chua cai, chua do Windows).**
 >   Sua anh ghim cua tam chua luu khong con de len tam chua luu khac (`test:khaymuc` 16/16, bai moi) · `ghiDeAnh` doi ten
 >   hong thi ghi thang (`test:keo` 22 -> 36 muc; ban cu truot 9) · `.keo` khac o dia: CHUA HET, moi DEM duoc ban chep + MB
@@ -149,6 +153,37 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 mac giat khay] - 2026-10-04 14:54 - Mac: nut tron bung khay bi giat -> tat `backgroundThrottling` cho 3 cua so; do bang cua so that, CHUA cai vao app
+
+- **Boi canh:** anh (Mac, ban `b57cf56e`): *"animation o goc khi anh bam mo ra no bi giat khong duoc muot nhu ban o windown"*,
+  roi *"su dung ecc de sua nha em"*. Phien "ECC AiO Shot". Phien thu hai dang sua 4 diem sau soat cung luc (da bao nhau qua tin).
+- **So tren app that (run-log, 5 lan bung 14:32-14:48):** chang `bay` luon du (18-27 khung). Chang `bung`: 3 khung / 472 ms ·
+  11 khung, max 167 · 25 · 13 / 553 ms (dung luc bai do cua em dang khoi dong) · 25. Tuc 3/5 lan giat, khong theo thoi gian an
+  (an 2 giay va 5 giay: giat; 58 giay va 4 phut: muot). `hen` 9-10, `an 0`, `main` 9-55.
+- **Do bang `scripts/test/khay-bung-that.cjs` (cua so that tren man anh, KHONG co luong chup; anh duoc bao truoc):**
+  - `lanh` (an -> hien -> bung ngay): 3 / 6 / 13 khung · `am` (cua so van hien): 25 / 25 / 24 · `lanh-cho` 500 ms: 25 / 25 / 23 ·
+    `day-du`: 7 (max 300) / 24 / 24. -> cua so khay vua HIEN lai thi trang chua ve deu ngay; khong can san dien che len.
+  - `lanh` + `backgroundThrottling: false` cho cua so khay (`AIO_BT=1`): 24 / 23 / 24 / 24. `lanh-cho` 150 ms: 23 / 25 / 25 / 24.
+  - Sau sua, `day-du` + `bam` (8 lan): `bung` 22-25 khung (mot lan max 50, con lai 17-18), `tan` 15 khung, `bay` 27.
+    Doi chung chi sua nut + san dien, khay van bi ham: 21 / 24 / 24 / 24 -> tren duong day-du bai do KHONG tach duoc ro
+    (truoc sua cung chi 1/3 lan giat). Bang chung chac nhat la kieu `lanh`.
+- **Agent ECC `performance-optimizer` (chi doc ma + run-log, 259.320 token):** xep hang nghi pham khac: (H1, ~35%) cua so
+  khay la cua so DUY NHAT khong `setContentProtection` trong khi luong chup 5 khung/giay dang chay -> khay chuyen dong la
+  ca bo ghep hinh nghen; (H2, ~25%) vong an / hien; va cho rang `backgroundThrottling: false` se KHONG doi gi (`an 0`,
+  `hen` 9-10). So do cua em trai y cuoi: tren bai do KHONG co luong chup van giat va tat ham thi het. H1 CHUA duoc do (bai
+  do khong chay duoc luong chup tren Mac vi Electron cua bai do khong co quyen quay man hinh) -> neu cai ban nay ma app
+  that van giat thi thu H1: tam dung luong chup / `setContentProtection` cho khay trong luc bung.
+- **Thay doi:** `src/main.js` `ensureShelf()` + `src/khay-thu.js` `taoCuaSo`: them `backgroundThrottling: false` (khay, nut tron,
+  san dien). Ba trang khong co `requestAnimationFrame` / `setInterval` / animation `infinite` nao chay lien tuc (grep) nen
+  khong ton CPU luc an: CHUA do CPU. `scripts/test/khay-bung-that.cjs`: 2 cong tac `AIO_BT=1`, `AIO_CHO=<ms>`; tren Mac phai
+  dat `LOCALAPPDATA="$HOME/Library/Application Support/AiO Shot & Save"` thi khay gia moi co anh.
+- **`npm run test:khaynut` tren Mac TRUOT SAN 1 muc** (khong do dong vua them): ban sao sach `git archive HEAD` truoc khi sua:
+  `THU VE duoi 1,3 giay (1746 ms)`; them dung dong cua em: 1812 ms, 1646 ms. Nguong 1,3 giay dat theo may Windows. Tren thu muc
+  that luc 14:50 (dang co phan sua do cua phien thu hai) truot 2 muc (5111 ms, 1214 ms): chua biet vi sao, khong phai cua em.
+- **CHUA kiem:** chua cai vao `/Applications` (cai = macOS bat anh bat lai quyen quay man hinh), nen CHUA co so tren app that
+  sau sua · chua do tren Windows (dong nay ap cho ca Windows) · chua do CPU luc khay an.
+- **File:** `src/main.js` (1 khoi), `src/khay-thu.js`, `scripts/test/khay-bung-that.cjs`. Commit tren may `115c68f`, CHUA push.
 
 ## [0.8.0 sua sau soat] - 2026-10-04 14:52 - Sua 4 diem con mo cua muc [soat] 13:56: anh chua luu khong con bi de, ghi de co duong lui, dem duoc ban chep `.keo`, 3 loi nho ECC
 
