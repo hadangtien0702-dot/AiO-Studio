@@ -59,7 +59,7 @@ const MAU = getComputedStyle(document.documentElement).getPropertyValue('--accen
 let mode = 'select'       // 'select' | 'annotate'
 let tool = 'rect'         // 'select' | 'rect' | 'arrow' | 'text' | 'blur' | 'so'
 let curColor = '#f86820'  // mac dinh CAM (accent). Doi qua bang mau.
-let curBlurType = 'mosaic' // 'mosaic' | 'blur'
+let curBlurType = 'mosaic' // 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10)
 let dragging = false
 let startX = 0, startY = 0
 let curRect = { x: 0, y: 0, w: 0, h: 0 }
@@ -892,6 +892,23 @@ function veBlurSmooth(ctx, x, y, w, h) {
   }
 }
 
+/* 04/10 KIEU THU BA "TO KIN" (anh: "them kieu lam mo"): mot thanh DAC che han vung chon. Khac Kham o / Mo min o cho no
+   KHONG lay diem anh nao cua anh goc -> khong con gi de khoi phuc (kham 8-15 px voi chu nho con doan lai duoc, AGENTS.md
+   27/09). Vien mo de luc dang keo tren nen toi van thay khung. Ham nay phai cung cach ve voi ban trong src/pin/pin.js
+   (ben do nhan them he so k); bai do: npm run test:chekin. */
+function veCheKin(ctx, x, y, w, h) {
+  if (w <= 0 || h <= 0) return
+  ctx.save()
+  ctx.globalAlpha = 1
+  ctx.filter = 'none'
+  ctx.fillStyle = '#000'
+  ctx.fillRect(x, y, w, h)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(x, y, w, h)
+  ctx.restore()
+}
+
 function veShape(ctx, s) {
   const mau = s.color || MAU
   ctx.strokeStyle = mau
@@ -914,6 +931,8 @@ function veShape(ctx, s) {
     const bType = s.blurType || curBlurType
     if (bType === 'blur') {
       veBlurSmooth(ctx, x, y, w, h)
+    } else if (bType === 'kin') {
+      veCheKin(ctx, x, y, w, h)
     } else {
       veBlurPixelate(ctx, x, y, w, h)
     }

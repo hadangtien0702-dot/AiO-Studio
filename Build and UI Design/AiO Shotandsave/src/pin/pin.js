@@ -21,7 +21,7 @@ document.querySelectorAll('[data-i18n-title]').forEach((el) => {
 let opacity = 1
 const PLOG = (m) => { try { window.pin.log(m) } catch (e) {} }
 let dip = { w: 0, h: 0 } // kich thuoc hien thi (DIP) tu main
-let curBlurType = 'mosaic' // 'mosaic' | 'blur'
+let curBlurType = 'mosaic' // 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10)
 
 window.pin.onData((data) => {
   img.src = data.dataUrl
@@ -565,6 +565,21 @@ function veBlurSmooth(ctx, x, y, w, h, k) {
 }
 
 /* k = he so phong (1 khi xem truoc; naturalW/dipW khi xuat ra anh that). */
+/* 04/10 KIEU THU BA "TO KIN": thanh DAC che han, khong lay diem anh nao cua anh goc (xem src/overlay/overlay.js veCheKin).
+   Cung cach ve voi ban ben do, chi khac he so k (anh ghim xuat ra co to hon co hien). Bai do: npm run test:chekin. */
+function veCheKin(ctx, x, y, w, h, k) {
+  if (w <= 0 || h <= 0) return
+  ctx.save()
+  ctx.globalAlpha = 1
+  ctx.filter = 'none'
+  ctx.fillStyle = '#000'
+  ctx.fillRect(x * k, y * k, w * k, h * k)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+  ctx.lineWidth = 1 * k
+  ctx.strokeRect(x * k, y * k, w * k, h * k)
+  ctx.restore()
+}
+
 function veShape(ctx, s, k) {
   ctx.strokeStyle = s.color
   ctx.fillStyle = s.color
@@ -586,6 +601,8 @@ function veShape(ctx, s, k) {
     const bType = s.blurType || curBlurType
     if (bType === 'blur') {
       veBlurSmooth(ctx, x, y, w, h, k)
+    } else if (bType === 'kin') {
+      veCheKin(ctx, x, y, w, h, k)
     } else {
       veBlurPixelate(ctx, x, y, w, h, k)
     }

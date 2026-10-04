@@ -24,6 +24,7 @@
     "test:khayram": "node scripts/test/do-khay-ram.cjs",
     "test:khaymuc": "node scripts/test/do-khay-muc.cjs",
     "test:lammo": "node scripts/test/do-kieu-lam-mo.mjs",
+    "test:chekin": "node scripts/test/do-che-kin.mjs",
     "test:storyboard": "node scripts/test/do-storyboard.mjs",
     "test:vienquay": "node scripts/test/do-vien-quay.mjs",
     "test:khaynut": "node scripts/test/do-khay-nut.mjs",

@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 17:41: THEM KIEU LAM MO THU BA "TO KIN" (thanh den dac che han; anh chon "Them kieu lam mo" trong bang hoi). DA NAP
+>   (`app.asar` `2df69edd`).** `npm run test:chekin` 40/40 (doc diem anh 3 ti le man, co doi chung). Chon o Cai dat > Kieu lam
+>   mo. Anh CHUA bam thu; hang 3 nut trong Cai dat chua nhin bang mat. Lo ra 1 loi co san: trang man chup + anh ghim khong
+>   nap duoc font Inter (thieu `font-src`), CHUA sua. Chi tiet: muc [0.8.0 to kin] ngay duoi.
 > - **04/10 17:26: icon LAM MO (phim 4) doi tu "4 o vuong" sang KHUNG CO O KHAM (anh chon kieu D trong 4 kieu). DA NAP
 >   (`app.asar` `13bf9f48`), o ca man chup lan anh ghim; doc ruot app: 2/2 trang co hinh moi, 0 hinh cu, chu phim 4 con.**
 >   Anh noi kem: *"chọn D mà em thêm kiểu cho anh được không em"* -> CHUA RO "them kieu" la gi (them KIEU LAM MO cho cong cu,
@@ -186,6 +190,33 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 to kin] - 2026-10-04 17:41 - Icon lam mo (phim 4) doi sang KHUNG CO O KHAM (kieu D) + them kieu lam mo thu ba "TO KIN"; da nap, bai do diem anh 40/40
+
+- **Boi canh:** anh: *"icon làm mờ nhìn nó cũng không hiểu gì hết"* -> em ve 4 kieu trong thanh cong cu that, anh: *"chọn D mà em
+  thêm kiểu cho anh được không em"*. "Them kieu" co 2 cach hieu nen em hoi lai 1 cau (bang hoi 4 lua chon), anh chon
+  **"Thêm kiểu làm mờ"**. Truoc do cong cu co 2 kieu: Kham o, Mo min (chon trong Cai dat).
+- **Da lam:** (1) icon nut `data-tool="blur"` o `src/overlay/index.html` + `src/pin/index.html` = khung chu nhat co 5 o to dac
+  (commit `7e5498b`, nap 17:26). (2) Kieu moi `'kin'` = "Tô kín" / "Solid": mot thanh den DAC che han vung chon, KHONG lay diem
+  anh nao cua anh goc (kham 8-15 px voi chu nho con doan lai duoc). `veCheKin()` trong `overlay.js` (x, y, w, h) va `pin.js`
+  (them he so k), nhanh `bType === 'kin'` trong `veShape`; `main.js` `kieuLamMo()` nhan `mosaic | blur | kin` (gia tri la ->
+  mosaic) dung o ca `settings:get` lan `settings:set-lam-mo`; Cai dat them nut thu ba; `i18n.js` `set.lamMo.kin` VI + EN.
+- **Kiem chung (so):** bai MOI `npm run test:chekin` **40/40** (chay an, 3 ti le man 100 / 150 / 200%, doc DIEM ANH): vung To kin
+  0 diem khong den tren canvas (0 / 18.236 · 41.031 · 72.944), trong ANH XUAT tu man chup va trong ANH LUU cua anh ghim
+  (0 / 41.031, anh 900x600); ngoai vung 0 diem den, 0 / 14.400 diem bi doi; kieu di theo net (doi Cai dat sau khong lam doi net
+  da ve). Doi chung trong luot: Kham o tren cung vung ra `25,25,25,235` / anh nhieu khong den. Doi chung HONG (thay `veCheKin`
+  bang ham rong): ca 4 phep do deu bat. Bai cu: `test:lammo` 25/0, `test:sobuoc` khong truot. Nap tai cho 17:41:22: `app.asar`
+  `13bf9f48` -> `2df69edd`, CDHash khong doi, quyen Ghi man hinh con, 11 anh = 11, cau hinh khong doi; ruot app co du 4 cho.
+- **CHUA kiem:** anh CHUA bam thu (cai dat cua anh dang la Kham o: vao Cai dat > Kieu lam mo > To kin) · hang 3 nut trong Cai dat
+  chua nhin bang mat (co tran / xuong dong khong) · keo chuot that tren man that (bai do dua net thang vao `shapes`) · chua len web
+  (web dang ghi 2 kieu) · Windows chua nap.
+- **Loi CO SAN lo ra khi viet bai do (KHONG sua trong luot nay):** trang man chup + anh ghim thieu `font-src file:` trong
+  Content-Security-Policy tu 24/08 -> `assets/fonts/Inter.woff2` bi chan, chu tren 2 trang do dang ve bang font du phong (trang
+  khay + Cai dat thi co `font-src file:`). `do-so-buoc.mjs` loc bo loi nay tu truoc; `do-che-kin.mjs` cung loc. Sua = them
+  `font-src file:` vao 2 the meta, nhung chu / huy hieu so se doi net -> phai chay lai `test:sobuoc` + nhin bang mat. Da lap viec rieng.
+- **File:** `src/overlay/index.html`, `src/pin/index.html`, `src/overlay/overlay.js`, `src/pin/pin.js`, `src/main.js`,
+  `src/settings/index.html`, `src/preload-settings.js`, `src/i18n.js`, `package.json`, `scripts/test/do-che-kin.mjs` (moi),
+  `scripts/test/che-kin-main.cjs` (moi).
 
 ## [0.8.0 icon phim 6] - 2026-10-04 17:24 - Icon cong cu danh so (phim 6): vong tron so 1 -> GHIM VI TRI (anh chon kieu A); da nap. Icon lam mo (phim 4): CHO ANH CHON
 

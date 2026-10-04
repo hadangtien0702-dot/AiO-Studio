@@ -135,6 +135,7 @@ const DICH = {
     'set.lamMo.goiY': 'Công cụ Làm mờ (phím 4 hoặc B)',
     'set.lamMo.mosaic': 'Khảm ô',
     'set.lamMo.blur': 'Mờ mịn',
+    'set.lamMo.kin': 'Tô kín',
     // Settings — thu muc
     'set.thuMuc.tieuDe': 'Thư mục lưu ảnh',
     'set.thuMuc.moTa': 'Nơi mọi ảnh chụp được lưu.',
@@ -344,6 +345,7 @@ const DICH = {
     'set.lamMo.goiY': 'For the Blur tool (key 4 or B)',
     'set.lamMo.mosaic': 'Mosaic',
     'set.lamMo.blur': 'Smooth',
+    'set.lamMo.kin': 'Solid',
     'set.thuMuc.tieuDe': 'Save folder',
     'set.thuMuc.moTa': 'Where every screenshot is saved.',
     'set.thuMuc.mo': 'Open',

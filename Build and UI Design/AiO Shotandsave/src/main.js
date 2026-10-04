@@ -673,12 +673,15 @@ ipcMain.handle('settings:get', () => {
     khayKieu: kieuKhay(),
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
     khayTuThu: giayHopLe(c.khayTuThu),
-    lamMoKieu: c.lamMoKieu === 'blur' ? 'blur' : 'mosaic',
+    lamMoKieu: kieuLamMo(c.lamMoKieu),
   }
 })
 
+/** Kieu lam mo hop le: 'mosaic' (Kham o, mac dinh) | 'blur' (Mo min) | 'kin' (To kin, 04/10). Gia tri la -> mac dinh. */
+function kieuLamMo(v) { return v === 'blur' || v === 'kin' ? v : 'mosaic' }
+
 ipcMain.handle('settings:set-lam-mo', (_e, kieu) => {
-  const val = kieu === 'blur' ? 'blur' : 'mosaic'
+  const val = kieuLamMo(kieu)
   kho.ghiCauHinh({ lamMoKieu: val })
   ghiLog('doi kieu lam mo: ' + val)
   for (const w of overlayWins) {
