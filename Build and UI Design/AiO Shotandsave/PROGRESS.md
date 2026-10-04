@@ -220,6 +220,12 @@
   cong ty giu file bang PowerShell `[IO.File]::Open(p,'Open','Read','ReadWrite')` roi sua anh ghim, run-log phai co
   `GHI THANG`. Ba loi nho trong `main.js` chi qua `node --check` + doc lai diff, KHONG co bai do; chua chay
   `test-keo-vat-man.js` / `test-overlay-drag.js` (bat man chup len man anh, luat #12).
+- **Su co khi commit (da sua, 14:55):** commit `17cc661` dat 3 dong `vien = moVienQuay(...)` LECH 5 dong, roi vao trong vong
+  lap `for` (moi khung se mo them mot vien). Goc: em tach phan cua minh khoi hunk `ensureShelf` cua phien kia bang ban va
+  KHONG ngu canh (`git diff -U0` + `git apply --cached --unidiff-zero`); bo mot hunk 5 dong o tren thi hunk CHI-THEM o duoi
+  bi dat lech dung 5 dong. Ban dang lam viec van dung suot. Bat duoc vi sau commit em doc phan con lai cua `git diff` va
+  thay 2 hunk la. Sua bang commit `977affb` (ban va CO ngu canh). Kiem: `main.js` da commit giong ban lam viec tung byte,
+  `moVienQuay(` trong `quay3Giay` dung 1 lan, `node --check` dat.
 - **Con lai:** ban chep `.keo` khi khac o dia (cho do Windows) · man chup gui Xong hai lan khong bi chan: doc ma thay luot
   thu hai co the luu them 1 file, CHUA do · ghim tu khay doc lai JPEG nen moi vong ghim + sua them 1 lan nen · `shelf:pin`
   bao "anh khong con" ca khi file dang bi khoa · sua tay `ban-quyen.json` · 4 cua thu trong ban phat hanh · 12 loi nhom B.
