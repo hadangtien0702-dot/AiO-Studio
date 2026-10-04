@@ -139,7 +139,10 @@ function duongDanKeoAnToan(filePath) {
 
 /** Goi 1 lan luc mo app. KHONG xoa sach nua (xem ghi chu 04/10 o tren). Tra { giu, bo, khongRo }. */
 function donKeoAnToan() {
-  const kq = { giu: 0, bo: 0, khongRo: 0 }
+  /* 04/10 14:4x: banChep / byteChep = lien ket dang GIU ma la BAN CHEP day du (nlink 1 trong khi anh goc con): thu muc
+     anh nam o o dia khac `.keo` nen khong noi cung duoc. Truoc huong A no bi don moi lan mo app; nay nam lai toi khi
+     xoa file goc, ke ca VIDEO. Chua co cach bo ma khong lam file da dua cho Premiere mat lai -> dem de biet that. */
+  const kq = { giu: 0, bo: 0, khongRo: 0, banChep: 0, byteChep: 0 }
   try {
     const dir = thuMucKeo()
     if (!fs.existsSync(dir)) return kq
@@ -150,7 +153,11 @@ function donKeoAnToan() {
     for (const ten of ds) {
       const goc = so[ten]
       if (!goc) { kq.khongRo++; continue }                               // khong ro goc: GIU
-      if (fs.existsSync(goc)) { kq.giu++; continue }                      // anh goc con: GIU
+      if (fs.existsSync(goc)) {                                           // anh goc con: GIU
+        kq.giu++
+        try { const s = fs.statSync(path.join(dir, ten)); if (s.nlink === 1) { kq.banChep++; kq.byteChep += s.size } } catch (e) {}
+        continue
+      }
       if (!fs.existsSync(path.dirname(goc))) { kq.khongRo++; continue }   // ca thu muc / o dia khong thay: khong ket luan
       const f = path.join(dir, ten)
       let nlink = 1
@@ -187,15 +194,29 @@ function lamMoiKeo(filePath) {
 /** Ghi de MOT file anh co san, ATOMIC: ghi sang file tam CUNG thu muc roi doi ten vao. Hong (file dang bi app khac
     giu, dia day, mat quyen) thi file cu con NGUYEN — truoc: writeFileSync thang vao file that, hong giua chung la file
     cut. Tra { ok, loi }. Ben goi PHAI kiem `ok` truoc khi coi nhu da luu (04/10, loi "lam mo ma file gui di chua mo"). */
+/* 04/10 14:4x (soat commit 565b446): DOI TEN hong thi THU GHI THANG vao file dich mot lan, tu file tam da ghi du.
+   Vi sao: tren Windows doi ten de len file dang bi app khac mo ma khong cho xoa la hong (EPERM / EBUSY), trong khi cach
+   cu (ghi thang vao file) van ghi duoc neu app do cho ghi. Khong co duong lui thi ca TRUOC DAY ghi duoc bien thanh
+   "khong luu duoc", va anh ghim bi tra ve ban cu = mat net vua ve. Ca hai cach deu hong moi tra ok=false.
+   CHUA DO tren Windows that (bai kiem gia loi doi ten). Tra { ok, loi, cach: 'doi-ten' | 'ghi-thang', loiDoiTen }. */
 function ghiDeAnh(filePath, buf) {
   const tam = filePath + '.tam-' + process.pid
-  try {
-    fs.writeFileSync(tam, buf)
-    fs.renameSync(tam, filePath)
-    return { ok: true, loi: null }
-  } catch (e) {
+  const ma = (e) => (e && e.code) || (e && e.message) || 'loi'
+  try { fs.writeFileSync(tam, buf) } catch (e) {
     try { fs.unlinkSync(tam) } catch (e2) {} // file tam do chinh lan goi nay tao, dung ten
-    return { ok: false, loi: (e && e.code) || (e && e.message) || 'loi' }
+    return { ok: false, loi: ma(e) }
+  }
+  try {
+    fs.renameSync(tam, filePath)
+    return { ok: true, loi: null, cach: 'doi-ten' }
+  } catch (e) {
+    let kq
+    try {
+      fs.copyFileSync(tam, filePath)
+      kq = { ok: true, loi: null, cach: 'ghi-thang', loiDoiTen: ma(e) }
+    } catch (e2) { kq = { ok: false, loi: ma(e) + ' / ' + ma(e2) } }
+    try { fs.unlinkSync(tam) } catch (e3) {}
+    return kq
   }
 }
 

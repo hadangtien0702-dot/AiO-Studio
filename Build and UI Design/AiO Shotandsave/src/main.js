@@ -33,7 +33,7 @@ const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
-const { taoMucKhay, anhMucKhay, capNhatMucKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
+const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
@@ -350,7 +350,9 @@ app.whenReady().then(() => {
   { // 04/10 (anh chot huong A): KHONG xoa sach .keo nua — file da dua cho Premiere bi mat sau khi mo lai app.
     // Chi bo lien ket ma anh goc da bi xoa han (xem kho.js donKeoAnToan).
     const k = kho.donKeoAnToan()
-    if (k.giu || k.bo || k.khongRo) ghiLog('keo: giu ' + k.giu + ', bo ' + k.bo + ' (anh goc da xoa), khong ro goc ' + k.khongRo)
+    // banChep: thu muc anh o O DIA KHAC nen "lien ket" la ban chep day du (ca video) — ton dia that, in ra de do.
+    if (k.giu || k.bo || k.khongRo) ghiLog('keo: giu ' + k.giu + ', bo ' + k.bo + ' (anh goc da xoa), khong ro goc ' + k.khongRo +
+      (k.banChep ? ', trong so giu co ' + k.banChep + ' BAN CHEP ' + (k.byteChep / 1048576).toFixed(1) + ' MB (thu muc anh khac o dia)' : ''))
   }
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
@@ -1302,6 +1304,11 @@ function openOverlays(displays) {
 }
 
 function closeOverlay() {
+  // 04/10 (ECC soat): dong man chup GIUA luc dang keo (Esc khi con giu chuot) thi khong co 'overlay:drag-end' nao toi
+  // -> hen gio 16 ms chay mai, va luot chup SAU nhan khung chon tinh tu diem neo CU truoc khi nguoi dung bam chuot.
+  if (dragTimer) { clearInterval(dragTimer); dragTimer = null }
+  dragAnchor = null
+  dragOwnerId = null
   for (const w of overlayWins) { if (!w.isDestroyed()) w.close() }
   overlayWins = []
   pending = null
@@ -1376,12 +1383,22 @@ ipcMain.on('overlay:confirm', (e, payload) => {
   handleConfirm(e.sender.id, payload)
 })
 
+/* 04/10 (ECC soat): handleConfirm tung co 5 loi thoat IM LANG sau khi da dong man chup — nguoi dung bam Xong, man
+   chup dong lai, khong co anh, khong log, khong thong bao. Nay moi loi thoat deu ghi log; 4 loi chac chan mat anh thi
+   bao them "khong chup duoc". `chiGhiLog`: loi "khong con ban ghi cua man chup" KHONG bao — overlay.js khong chan gui
+   Xong hai lan (Enter dup), lenh thu hai den sau khi luot dau da luu anh ma bao thi la BAO NHAM. */
+function boLuotChup(lyDo, chiGhiLog) {
+  ghiLog('LOI confirm: ' + lyDo + ' — bo luot chup')
+  if (!chiGhiLog && Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+}
+
 async function handleConfirm(wcId, payload) {
   const shot = overlayShots.get(wcId)
   const display = shot && shot.display
   const sf = shot ? shot.sf : 1
   closeOverlay()
-  if (!display || !payload) return
+  if (!display) { boLuotChup('khong con ban ghi cua man chup ' + wcId + ' (lenh Xong thu hai sau khi man chup da dong?)', true); return }
+  if (!payload) { boLuotChup('khong co du lieu vung chon'); return }
 
   // 28/09: dang bat Multi-Shot Storyboard (nut/phim S tren khung chon) -> QUAY 3 GIAY vung nay thay vi chup 1 tam.
   if (payload.storyboard && payload.rect) { quay3Giay(display, sf, payload.rect); return }
@@ -1396,11 +1413,11 @@ async function handleConfirm(wcId, payload) {
   // Truong hop CO VE SHAPE: renderer da ghep (crop + shape) roi gui dataURL.
   if (payload.dataUrl) {
     try { cropped = nativeImage.createFromDataURL(payload.dataUrl) } catch (e) { cropped = null }
-    if (!cropped || cropped.isEmpty()) return
+    if (!cropped || cropped.isEmpty()) { boLuotChup('anh da ve gui len bi rong (' + payload.dataUrl.length + ' ky tu)'); return }
   } else {
     // Khong ve shape: cat tu anh GOC full-res (net khong mat).
     const rect = payload.rect
-    if (!rect) return
+    if (!rect) { boLuotChup('khong co vung chon lan anh da ve'); return }
     // Anh dong bang co the CHUA grab xong (chon nhanh hon ~0,5s). Cho.
     let image = shot.image
     if (!image) {
@@ -1427,10 +1444,10 @@ async function handleConfirm(wcId, payload) {
     try {
       cropped = image.crop({ x: cx, y: cy, width: cw, height: ch })
     } catch (err) {
-      if (IS_DEV) console.error('[shotandsave] crop loi', err)
+      boLuotChup('cat vung ' + cw + 'x' + ch + ' tai ' + cx + ',' + cy + ' loi: ' + (err && err.message || err))
       return
     }
-    if (!cropped || cropped.isEmpty()) return
+    if (!cropped || cropped.isEmpty()) { boLuotChup('vung cat ' + cw + 'x' + ch + ' tai ' + cx + ',' + cy + ' ra anh rong'); return }
   }
 
   // 0) Ctrl+C: copy vao clipboard luon (them, ngoai Enter/nut check) — anh Tien
@@ -1622,19 +1639,18 @@ ipcMain.on('pin:save-edit', (e, dataUrl) => {
     const r = buf && buf.length ? kho.ghiDeAnh(rec.filePath, buf) : { ok: false, loi: 'khong ma hoa duoc anh' }
     if (!r.ok) { hoanTacSuaPin(rec, 'ghi file ' + path.basename(rec.filePath) + ': ' + r.loi); return }
     const n = kho.lamMoiKeo(rec.filePath) // file moi doi ten vao cho cu -> lien ket .keo (neu co) phai noi lai
-    ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath) + (n ? ' (lam moi ' + n + ' lien ket keo)' : ''))
+    ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath) +
+      (r.cach === 'ghi-thang' ? ' (GHI THANG vi khong doi ten duoc: ' + r.loiDoiTen + ')' : '') +
+      (n ? ' (lam moi ' + n + ' lien ket keo)' : ''))
   }
 
-  rec.image = daVe // copy / keo-tha tu cua so ghim dung ban da ve
-
-  // Cap nhat o khay dang tro cung file (thumbnail + dung luong).
-  for (const [id, it] of shelfItems) {
-    if (it.filePath !== rec.filePath) continue
-    capNhatMucKhay(it, daVe, thumbKhay)
+  // Doi anh trong bo nho cua anh ghim + cap nhat DUNG muc khay cua no (thumbnail + dung luong). 04/10: anh chua luu
+  // duoc (filePath null) khop theo doi tuong anh; truoc day "null === null" khop moi muc chua luu (src/khay-muc.js).
+  for (const it of apDungSuaVaoKhay(shelfItems.values(), rec, daVe, thumbKhay)) {
     let kb = 0
     try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (err) {}
     if (shelfWin && !shelfWin.isDestroyed()) {
-      shelfWin.webContents.send('shelf:update', { id, thumb: it.thumb, w: it.w, h: it.h, kb })
+      shelfWin.webContents.send('shelf:update', { id: it.id, thumb: it.thumb, w: it.w, h: it.h, kb })
     }
   }
 })
@@ -2065,7 +2081,7 @@ async function layKhungVung(display, sf, rect) {
 async function quay3Giay(display, sf, rect) {
   if (dangQuay) return
   dangQuay = true
-  const vien = moVienQuay(display, rect)
+  let vien = null
   const khung = []
   const nhatKy = []
   try {
@@ -2074,6 +2090,9 @@ async function quay3Giay(display, sf, rect) {
     for (let i = 0; i < QUAY_SO_KHUNG; i++) {
       const tre = batDau + i * QUAY_BUOC_MS - Date.now()
       if (tre > 0) await cho(tre)
+    // 04/10 (ECC soat): mo vien TRONG try. Truoc day nam ngoai: nem loi la `dangQuay` ket o true toi khi tat app
+    // (Storyboard khong quay nua, khay khong tu thu) ma khong co dong log nao (ham async goi khong await).
+    vien = moVienQuay(display, rect)
       vien.datSo(Math.max(1, 3 - Math.floor((Date.now() - batDau) / 1000)))
       const t = Date.now() - batDau
       const k = await layKhungVung(display, sf, rect)
@@ -2088,7 +2107,7 @@ async function quay3Giay(display, sf, rect) {
   } catch (e) {
     ghiLog('quay3s LOI: ' + (e && e.message || e))
   } finally {
-    vien.dong()
+    try { if (vien) vien.dong() } catch (e) { ghiLog('quay3s LOI dong vien: ' + (e && e.message || e)) }
     dangQuay = false
   }
   ghiLog('quay3s ' + khung.length + '/' + QUAY_SO_KHUNG + ' khung [' + nhatKy.join(' ') + ']')

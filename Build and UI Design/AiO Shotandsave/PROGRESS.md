@@ -1,7 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
-> - **04/10 13:56 PHIEN THU HAI SOAT commit `565b446`: 4 diem CON MO, CHUA sua.** (1) sua anh ghim cua tam chua luu duoc thi
+> - **04/10 14:52 DA SUA 4 diem con mo cua muc [soat] 13:56 (lop MODULE; chua chay app that, chua cai, chua do Windows).**
+>   Sua anh ghim cua tam chua luu khong con de len tam chua luu khac (`test:khaymuc` 16/16, bai moi) · `ghiDeAnh` doi ten
+>   hong thi ghi thang (`test:keo` 22 -> 36 muc; ban cu truot 9) · `.keo` khac o dia: CHUA HET, moi DEM duoc ban chep + MB
+>   trong dong `keo:` luc mo app · `closeOverlay` / `handleConfirm` / `quay3Giay`: chi `node --check`, khong co bai do.
+>   Da commit tren may, CHUA push. Chi tiet: muc [0.8.0 sua sau soat] ngay duoi.
+> - **04/10 13:56 PHIEN THU HAI SOAT commit `565b446`: 4 diem CON MO (14:52 DA SUA, xem dong tren).** (1) sua anh ghim cua tam chua luu duoc thi
 >   de len MOI tam chua luu khac trong khay (`pin:save-edit`, `filePath` null; loi co san) · (2) `kho.ghiDeAnh` doi ten de
 >   khong co duong lui, tren Windows file dang bi app khac giu thi mat net vua ve: CHUA do · (3) `.keo` khong don: thu muc
 >   anh o o khac thi moi anh / VIDEO tung keo co them ban chep o o C · (4) 3 loi nho luot ECC 04/10 chua sua. Do doc lap
@@ -144,6 +149,45 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 sua sau soat] - 2026-10-04 14:52 - Sua 4 diem con mo cua muc [soat] 13:56: anh chua luu khong con bi de, ghi de co duong lui, dem duoc ban chep `.keo`, 3 loi nho ECC
+
+- **Boi canh:** anh: *"em sửa 4 điểm đó ở đây luôn đi"* (4 diem CON MO cua muc [soat] 13:56 ngay duoi). Phien "ECC AiO Shot"
+  cung dang chay (sua nut tron giat tren Mac) va nhan sang: no chi dung khoi `ensureShelf` cua `main.js`, `khay-thu.js`,
+  `scripts/test/khay-bung-that.cjs`; phien nay khong dung 3 cho do. Van 0.8.0. KHONG cai vao /Applications (ban dang cai la
+  ban dung 13:52, anh da cap quyen quay man hinh cho no luc 14:31; cai de la anh phai bat quyen lai).
+- **Nguyen nhan that + thay doi:**
+  1. *Anh chua luu bi de.* Vong lap trong `pin:save-edit` so `it.filePath !== rec.filePath`; tam khong luu duoc co `filePath`
+     null o ca hai ben nen khop MOI muc chua luu. Sua: `src/khay-muc.js` them `mucCuaAnhGhim` (co file: khop duong dan;
+     khong file: khop DOI TUONG anh) + `apDungSuaVaoKhay`; `main.js` `pin:save-edit` goi `apDungSuaVaoKhay`.
+  2. *Ghi de khong co duong lui.* `kho.ghiDeAnh`: ghi file tam xong ma `renameSync` hong thi thu `copyFileSync(tam, file)`
+     mot lan (cach ban cu van lam), ca hai hong moi tra `ok=false`. Tra them `cach` (`doi-ten` / `ghi-thang`) + `loiDoiTen`;
+     run-log ghi `GHI THANG vi khong doi ten duoc: <ma>`.
+  3. *`.keo` giu ban chep khi thu muc anh o o dia khac.* CHUA HET. Bo ban chep luc mo app = file da dua cho Premiere mat
+     lai (dung loi huong A vua sua), nen lan nay chi lam cho DO DUOC: `kho.donKeoAnToan` tra them `banChep` / `byteChep`
+     (lien ket dang giu co `nlink` 1 trong khi file goc con), dong `keo:` luc mo app in so ban chep + MB. Huong sua that,
+     CHUA lam vi can do tren Windows: dat lien ket o mot thu muc ten sach CUNG o dia voi thu muc anh (noi cung duoc, 0 byte).
+  4. *Ba loi nho cua luot ECC 04/10.* `closeOverlay`: tat `dragTimer`, xoa `dragAnchor` / `dragOwnerId` (truoc: Esc luc con
+     giu chuot de lai hen gio 16 ms chay mai, luot chup sau nhan khung chon tu diem neo cu). `handleConfirm`: 5 loi thoat
+     im lang nay deu ghi log qua `boLuotChup`; 4 loi chac chan mat anh thi bao them; loi "khong con ban ghi cua man chup"
+     CHI ghi log vi `overlay.js` khong chan gui Xong hai lan (Enter dup), bao o do la bao nham. `quay3Giay`: `moVienQuay`
+     vao trong `try`, `vien.dong()` co kiem + bat loi (truoc: nem loi la `dangQuay` ket o true toi khi tat app).
+- **File anh huong:** `src/khay-muc.js`, `src/kho.js`, `src/main.js` (7 cho; KHONG gom khoi `ensureShelf` cua phien kia),
+  `scripts/test/do-keo.cjs` (them [7] [8] + bien `AIO_TEST_KHO` de chay doi chung tren ban cu), `scripts/test/do-khay-muc.cjs`
+  (MOI), `package.json` (`test:khaymuc`).
+- **Kiem chung bang so (may Mac, node 24, khong mo app):**
+  - `npm run test:keo` 22 -> 36 muc: 36 DAT / 0 TRUOT. Doi chung: cung bai do chay tren `kho.js` cua commit truoc
+    (`AIO_TEST_KHO=<ban cu>`): 27 DAT / 9 TRUOT, dung 9 muc moi cua [7] [8].
+  - `npm run test:khaymuc` (bai MOI): 16 DAT / 0 TRUOT, trong do 1 muc doi chung chay cach cu va thay tam thu hai bi de.
+  - `test:cauhinh` 22 / 0 · `test:khayram` 12 / 0 (Electron an, 9 giay) · `node --check` 5 file dat.
+- **CHUA kiem:** khong muc nao chay tren app that, chua nap vao ban cai nao. [7] [8] GIA loi he dieu hanh (thay tam
+  `fs.renameSync` / `fs.copyFileSync` / `fs.linkSync` roi tra lai), chua do tren Windows that / o dia khac that: tren may
+  cong ty giu file bang PowerShell `[IO.File]::Open(p,'Open','Read','ReadWrite')` roi sua anh ghim, run-log phai co
+  `GHI THANG`. Ba loi nho trong `main.js` chi qua `node --check` + doc lai diff, KHONG co bai do; chua chay
+  `test-keo-vat-man.js` / `test-overlay-drag.js` (bat man chup len man anh, luat #12).
+- **Con lai:** ban chep `.keo` khi khac o dia (cho do Windows) · man chup gui Xong hai lan khong bi chan: doc ma thay luot
+  thu hai co the luu them 1 file, CHUA do · ghim tu khay doc lai JPEG nen moi vong ghim + sua them 1 lan nen · `shelf:pin`
+  bao "anh khong con" ca khi file dang bi khoa · sua tay `ban-quyen.json` · 4 cua thu trong ban phat hanh · 12 loi nhom B.
 
 ## [soat] - 2026-10-04 13:56 - Phien thu hai soat commit `565b446` (3 loi ECC vua sua): 4 diem con mo, KHONG sua dong ma nao
 

@@ -10,7 +10,8 @@ const os = require('os')
 const path = require('path')
 
 const ROOT = path.resolve(__dirname, '..', '..')
-const KHO = path.join(ROOT, 'src', 'kho.js')
+// AIO_TEST_KHO=<duong dan mot ban kho.js khac>: chay bai nay tren ban CU de doi chung ([7] [8] phai TRUOT tren 565b446)
+const KHO = process.env.AIO_TEST_KHO ? path.resolve(process.env.AIO_TEST_KHO) : path.join(ROOT, 'src', 'kho.js')
 let userData = ''
 const napGoc = Module._load
 Module._load = function (req) {
@@ -124,6 +125,63 @@ console.log('\n[6] GHI DE anh (sua / lam mo anh ghim): atomic, hong thi file cu 
     }
     try { fs.chmodSync(m.thuMucAnh, 0o755) } catch (e) {}
   }
+}
+
+/* 04/10 14:4x (soat commit 565b446). Hai muc duoi GIA loi cua he dieu hanh bang cach thay tam ham cua `fs` (kho.js dung
+   chung doi tuong `fs` nay) roi tra lai trong `finally`. CHUA do tren Windows that / o dia khac that. */
+const loiHdh = (ma) => { const e = new Error(ma + ': gia loi he dieu hanh'); e.code = ma; return e }
+const cung = (a, b) => path.resolve(String(a)) === path.resolve(String(b))
+const soFileTam = (dir) => fs.readdirSync(dir).filter((t) => t.includes('.tam-')).length
+
+console.log('\n[7] GHI DE khi KHONG DOI TEN duoc (Windows: file dang bi app khac giu): ghi thang, khong mat ban sua')
+{
+  const m = may('Nguyen Van A'), f = m.anh('shotandsave-1.png', 'BAN-CU')
+  const k = m.kho.duongDanKeoAnToan(f)                                       // lien ket cung da dua cho app khac
+  const doiTenGoc = fs.renameSync, chepGoc = fs.copyFileSync
+  try {
+    // doi ten DE LEN dung file anh nay bi tu choi; cac lan doi ten khac (so .goc.json) van chay binh thuong
+    fs.renameSync = (a, b) => { if (cung(b, f)) throw loiHdh('EPERM'); return doiTenGoc(a, b) }
+    const r = m.kho.ghiDeAnh(f, Buffer.from('BAN-MOI-DA-LAM-MO'))
+    kiem('doi ten hong -> VAN luu duoc (ok, cach ghi-thang, kem ma loi doi ten)', r.ok === true && r.cach === 'ghi-thang' && r.loiDoiTen === 'EPERM', JSON.stringify(r))
+    kiem('file la ban moi', fs.readFileSync(f, 'utf8') === 'BAN-MOI-DA-LAM-MO', fs.readFileSync(f, 'utf8'))
+    kiem('khong de lai file tam trong thu muc anh', soFileTam(m.thuMucAnh) === 0, fs.readdirSync(m.thuMucAnh).join(','))
+    kiem('lien ket cung da dua cho app khac cung la ban moi', fs.readFileSync(k, 'utf8') === 'BAN-MOI-DA-LAM-MO', fs.readFileSync(k, 'utf8'))
+
+    // ca doi ten LAN ghi thang deu hong -> moi bao hong
+    fs.copyFileSync = (a, b, c) => { if (cung(b, f)) throw loiHdh('EBUSY'); return chepGoc(a, b, c) }
+    const r2 = m.kho.ghiDeAnh(f, Buffer.from('BAN-THU-3'))
+    kiem('ca hai cach hong -> ok=false, ly do co ca hai ma loi', r2.ok === false && /EPERM/.test(String(r2.loi)) && /EBUSY/.test(String(r2.loi)), JSON.stringify(r2))
+    kiem('ca hai cach hong -> file cu con NGUYEN, khong de lai file tam', fs.readFileSync(f, 'utf8') === 'BAN-MOI-DA-LAM-MO' && soFileTam(m.thuMucAnh) === 0)
+  } finally { fs.renameSync = doiTenGoc; fs.copyFileSync = chepGoc }
+  const r3 = m.kho.ghiDeAnh(f, Buffer.from('BAN-BINH-THUONG'))
+  kiem('doi chung: doi ten duoc thi di duong doi ten (atomic)', r3.ok === true && r3.cach === 'doi-ten' && fs.readFileSync(f, 'utf8') === 'BAN-BINH-THUONG', JSON.stringify(r3))
+}
+
+console.log('\n[8] Thu muc anh o O DIA KHAC (khong noi cung duoc): lien ket la BAN CHEP — giu khi goc con, DEM duoc, bo khi goc da xoa')
+{
+  const m = may('Nguyen Van A')
+  const f1 = m.anh('shotandsave-1.png', 'ANH-MOT'), f2 = m.anh('shotandsave-video-2.mp4', 'V'.repeat(5000))
+  const noiGoc = fs.linkSync
+  try {
+    fs.linkSync = () => { throw loiHdh('EXDEV') }                            // khac o dia: khong tao duoc lien ket cung
+    const k1 = m.kho.duongDanKeoAnToan(f1), k2 = m.kho.duongDanKeoAnToan(f2)
+    kiem('khong noi cung duoc -> van co file de keo, dung noi dung', co(k1) && co(k2) && fs.readFileSync(k1, 'utf8') === 'ANH-MOT' && fs.statSync(k2).size === 5000)
+    kiem('do la BAN CHEP (khong chung du lieu voi file goc)', fs.statSync(k1).nlink === 1 && fs.statSync(f1).nlink === 1, 'nlink ' + fs.statSync(k1).nlink)
+    m.moLaiApp()
+    const kq = m.moLaiApp()
+    kiem('mo lai app 2 lan: ban chep CON (file da dua cho Premiere khong mat)', co(k1) && co(k2), JSON.stringify(kq))
+    kiem('ham don DEM duoc ban chep + dung luong (2 ban, 5007 byte)', !!kq && kq.banChep === 2 && kq.byteChep === 5007, JSON.stringify(kq))
+    const r = m.kho.ghiDeAnh(f1, Buffer.from('ANH-MOT-DA-LAM-MO'))
+    const n = m.kho.lamMoiKeo(f1)
+    kiem('sua anh goc: ban chep duoc lam moi (khong con ban chua mo)', r.ok && n === 1 && fs.readFileSync(k1, 'utf8') === 'ANH-MOT-DA-LAM-MO', 'n=' + n + ' ' + fs.readFileSync(k1, 'utf8'))
+    fs.unlinkSync(f2)                                                        // nguoi dung xoa han video goc
+    const kq2 = m.moLaiApp()
+    kiem('xoa video goc -> ban chep bi bo, tra lai dia', !co(k2) && co(k1) && kq2.bo === 1 && kq2.banChep === 1, JSON.stringify(kq2))
+  } finally { fs.linkSync = noiGoc }
+  const m2 = may('Nguyen Van A'), g = m2.anh('shotandsave-1.png', 'CUNG-O')
+  m2.kho.duongDanKeoAnToan(g)
+  const kq3 = m2.moLaiApp()
+  kiem('doi chung: cung o dia (noi cung duoc) -> 0 ban chep', kq3.giu === 1 && kq3.banChep === 0 && kq3.byteChep === 0, JSON.stringify(kq3))
 }
 
 for (const d of tamDaTao) { try { fs.rmSync(d, { recursive: true, force: true }) } catch (e) {} }   // chi thu muc mkdtemp cua bai nay

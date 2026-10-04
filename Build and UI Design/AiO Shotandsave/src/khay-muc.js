@@ -46,4 +46,28 @@ function capNhatMucKhay(it, image, taoAnhNho) {
   return it
 }
 
-module.exports = { taoMucKhay, anhMucKhay, capNhatMucKhay }
+/** Cac muc khay ung voi MOT anh ghim.
+    Co file: cung duong dan. KHONG co file (luu hong, anh chi con trong RAM): khop theo DOI TUONG anh — anh ghim mo tu
+    khay dung chinh `it.image` (anhMucKhay tra thang no).
+    04/10 (soat commit 565b446): ban cu so `it.filePath !== rec.filePath`. Hai ben cung null thi khop MOI muc chua luu
+    -> sua anh ghim cua tam nay la de luon cac tam chua luu khac, ma cac tam do chi con trong RAM (mat han). */
+function mucCuaAnhGhim(cacMuc, filePath, anhTruocKhiSua) {
+  const kq = []
+  for (const it of cacMuc) {
+    if (filePath) { if (it.filePath === filePath) kq.push(it) }
+    else if (!it.filePath && it.image && it.image === anhTruocKhiSua) kq.push(it)
+  }
+  return kq
+}
+
+/** Anh ghim vua luu ban sua xong: doi anh trong bo nho cua anh ghim + cap nhat DUNG cac muc khay cua no.
+    Tra cac muc da cap nhat (ben goi gui 'shelf:update' cho tung muc). */
+function apDungSuaVaoKhay(cacMuc, rec, daVe, taoAnhNho) {
+  const anhCu = rec.image
+  rec.image = daVe // copy / keo-tha tu cua so ghim dung ban da ve
+  const kq = mucCuaAnhGhim(cacMuc, rec.filePath, anhCu)
+  for (const it of kq) capNhatMucKhay(it, daVe, taoAnhNho)
+  return kq
+}
+
+module.exports = { taoMucKhay, anhMucKhay, capNhatMucKhay, mucCuaAnhGhim, apDungSuaVaoKhay }
