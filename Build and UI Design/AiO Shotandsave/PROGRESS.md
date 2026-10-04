@@ -1,7 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
-> - **04/10 16:58 MAC: anh van thay "KHUNG" du so khung du (*"khá mượt nhưng vẫn khựng"*) -> DA NAP ban thu, CHO MAT ANH.**
+> - **04/10 17:02 MAC: ANH XAC NHAN ban 16:58 bang MAT: *"mượt hơn rồi - okie rồi đó em"*.** Run-log 17:02:18 (1 lan bung, di
+>   duong moi `som 7`): `noi +1/+2` (truoc +3..+9/+16..+17), `main 11` ms (truoc 33-47), bay 27 / bung 24 / tan 15 khung, ho max
+>   17-18 ms, tong 941 ms, 0 dong loi. Moi 1 mau tren log. Windows CHUA ap duong nay. Bay + luat: `CLAUDE.md` app, muc
+>   "Bay 1-lan", dong "MAC: SO KHUNG DU MA MAT VAN THAY KHUNG".
+> - **04/10 16:58 MAC: anh van thay "KHUNG" du so khung du (*"khá mượt nhưng vẫn khựng"*) -> DA NAP ban thu (17:02 anh da xac nhan, dong tren).**
 >   Bo dem khung khong thay cho anh nhin. Ban 16:58 (`app.asar` `0c4adecb`, chi macOS): cua so khay hien TU DAU luot bung
 >   (noi dung tang hinh), luc ong kinh toi noi khong con lenh cua so nao, san dien an SAU khi man trap xong. La GIA THUYET,
 >   chua do duoc tren man hinh. Dong run-log co them `| som N`. Chi tiet + huong tiep neu khong kha hon: muc

@@ -276,6 +276,16 @@ DUNG go):
   Luat rut ra: **so do noi "trang ve du khung" KHONG noi duoc "nguoi dung nhin thay"**. Cua so noi "luc thay luc khong" ->
   kiem cua so nao nam tai tam no (WindowFromPoint, `theo-doi-khay.ps1` trong so 02/10) TRUOC khi dung toi Chromium; va moi cho
   `showInactive()` mot cua so noi deu phai di kem `moveTop()`.
+- ☠️ **MAC: SO KHUNG DU MA MAT VAN THAY "KHUNG" LUC BUNG KHAY (04/10):** sau khi tat `backgroundThrottling`, run-log 4/4 lan
+  24-25 khung, ho max 17-18 ms, anh van: *"kha muot nhung van khung"*. Bo dem rAF chi thay nhip cua TRANG, khong thay luc nao
+  cua so len man. Goc (suy tu ma, KHONG do duoc tren man hinh; anh xac nhan bang mat 17:02 *"muot hon roi, okie"*): lenh cua
+  so roi vao GIUA chuyen dong: `showInactive` + `moveTop` cua khay dung luc ong kinh toi noi, `hide` cua san dien luc man trap
+  moi mo ~70%. Sua `khay-thu.js` `HIEN_SOM` (chi macOS): cua so khay len man tu DAU luot bung voi noi dung tang hinh
+  (`body.an`, kem `pointer-events: none`), san dien an SAU khi man trap xong. So doi theo (1 mau sau sua, 4 mau truoc):
+  `noi +3..+9/+16..+17` -> `+1/+2`; `main` 33-47 ms -> 11 ms; so khung giu 24-27. Dong run-log co `| som N` = da di duong moi.
+  Luat: **KHONG goi show / hide / moveTop cua so nao trong luc mot chuyen dong dang chay; cua so can cho chuyen dong thi dua
+  len man TRUOC (tang hinh), an SAU.** Windows chua ap (anh thay muot san); muon ap thi phai do lai tren Windows.
+  Va: so khung dep ma anh van che thi DOC LAI THU TU LENH CUA SO quanh chuyen dong truoc khi di tim thuoc moi.
 - ☠️ **DOC CHU (phim 5, 29/09):** Windows KHONG co bo doc tieng Viet (bang FOD Microsoft: vi-vn khong co goi OCR) ->
   app tieng Viet dung Tesseract (`src/ocr.js`). tesseract.js 5.1.1 co 3 bay CHI lo trong Electron / ban dong goi:
   langPath -> fetch loi; langs {code,data} -> Init loi; getCore luon nap core DAY DU (khong phai -lstm). Duong dung:
