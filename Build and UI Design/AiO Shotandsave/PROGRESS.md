@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 17:13 MAC: app KHONG con bieu tuong o Dock, chi con tren thanh menu (anh yeu cau). DA NAP (`app.asar` `0dcbb8c4`).**
+>   Do: macOS xep app `Foreground` -> `UIElement`; anh chup + keo-tha duoc ngay sau do (17:13:16). Luc mo app bieu tuong con
+>   nhay len Dock mot nhip (het han khi cai ca `.app`, da dat `LSUIElement`). CHO ANH nhin Dock + mo thu Cai dat tu menu.
+>   Chi tiet: muc [0.8.0 mac an Dock] ngay duoi.
 > - **04/10 17:02 MAC: ANH XAC NHAN ban 16:58 bang MAT: *"mượt hơn rồi - okie rồi đó em"*.** Run-log 17:02:18 (1 lan bung, di
 >   duong moi `som 7`): `noi +1/+2` (truoc +3..+9/+16..+17), `main 11` ms (truoc 33-47), bay 27 / bung 24 / tan 15 khung, ho max
 >   17-18 ms, tong 941 ms, 0 dong loi. Moi 1 mau tren log. Windows CHUA ap duong nay. Bay + luat: `CLAUDE.md` app, muc
@@ -174,6 +178,26 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 mac an Dock] - 2026-10-04 17:13 - Mac: app khong con bieu tuong o Dock, chi con bieu tuong tren thanh menu; da nap, do `Foreground` -> `UIElement`
+
+- **Boi canh:** anh gui anh thanh menu, noi: *"ở thanh doc anh không muốn nó hiện icon ở thanh doc em - chỉ cần hiện ở thanh
+  bar như này là được rồi"*. Ban Windows von chi co bieu tuong khay he thong (cac cua so `skipTaskbar`); ban Mac chua tung
+  lam viec tuong ung nen app hien o Dock nhu mot app thuong.
+- **Da sua:** `src/main.js`: `anDock()` = `app.dock.hide()` chi tren macOS, goi luc nap file + goi lai dau `whenReady` (truoc
+  khi co cua so nao); cac che do tu kiem / do (`--selftest*`, `--thu-ocr`, `--thu-quay`) giu Dock. `package.json`
+  `build.mac.extendInfo.LSUIElement: true` cho lan cai CA `.app` sau.
+- **Kiem chung (so):** `lsappinfo info -only ApplicationType`: truoc `"Foreground"` (pid 80071) -> sau `"UIElement"` (pid 85234)
+  = macOS khong dua app len Dock, khong vao Cmd+Tab. App KHONG nam trong muc ghim cua Dock (`persistent-apps`: 0 dong). Nap
+  tai cho 17:13:05: `app.asar` `0c4adecb` -> `0dcbb8c4`, CDHash khong doi, `LUONG: san sang` 17:13:07, 8 anh = 8, cau hinh
+  khong doi. Anh tu chup ngay sau do tren ban nay: 17:13:10 phim tat -> overlay hien -> keo 137 khung -> 17:13:16 confirm ->
+  luu `...171316-899.jpg` 1352x1158 -> keo ra ngoai qua `.keo`. Tuc phim tat, overlay, luu, keo-tha van chay khi khong co Dock.
+- **CHUA kiem:** em khong nhin duoc Dock (so `UIElement` la bang chung gian tiep, cho anh nhin) · luc MO app bieu tuong con
+  nhay len Dock mot nhip roi moi mat (nap tai cho khong doi duoc `Info.plist`; `LSUIElement` chi co tac dung khi cai ca
+  `.app`, luc do anh phai bat lai quyen Ghi man hinh) · cua so Cai dat / Khay video mo tu menu co len TRUOC cac app khac va go
+  phim duoc khong · phim tren overlay (Esc, 1/2/3, Enter) khi app khong co Dock: luot 17:13 xac nhan duoc nhung log khong ghi
+  la bang phim hay chuot · hop thoai thieu quyen · Windows khong dung toi (lenh chi chay tren darwin).
+- **File:** `src/main.js`, `package.json`.
 
 ## [0.8.0 mac khung khay] - 2026-10-04 16:58 - Mac: so khung du ma anh van thay "khung" -> hien cua so khay SOM + an san dien SAU khi man trap xong; da nap, CHO MAT ANH
 

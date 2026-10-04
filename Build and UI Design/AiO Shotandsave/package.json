@@ -100,6 +100,7 @@
       ],
       "artifactName": "AiO-Shot-and-Save-${version}-mac-${arch}.${ext}",
       "extendInfo": {
+        "LSUIElement": true,
         "NSScreenCaptureUsageDescription": "AiO Shot & Save can chup man hinh de ban chon vung va ghim anh."
       }
     },

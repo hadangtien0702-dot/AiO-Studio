@@ -303,9 +303,20 @@ if (!gotLock) {
 app.setName('AiO Shot & Save')
 if (process.platform === 'win32') app.setAppUserModelId('com.aiostudio.shotandsave')
 
+/* 04/10 Mac (anh: "o thanh dock anh khong muon no hien icon, chi can hien o thanh bar"): app la tien ich song o thanh menu,
+   nhu ban Windows (khong co nut tren taskbar, chi co bieu tuong khay he thong). An bieu tuong Dock NGAY luc khoi dong, truoc
+   khi co cua so nao. Thoat app / mo Cai dat van o menu cua bieu tuong tren thanh menu. Cac che do do / tu kiem giu Dock.
+   ☠️ Nap tai cho KHONG doi duoc Info.plist (doi la doi CDHash -> mat quyen Ghi man hinh) nen bieu tuong con nhay len Dock mot
+   nhip luc mo app roi moi mat. `LSUIElement` (package.json, build.mac.extendInfo) lam het han nhay, co tac dung tu lan cai
+   CA .app tiep theo. */
+const AN_DOCK = process.platform === 'darwin' && !(IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || THU_QUAY || THU_OCR)
+const anDock = () => { if (AN_DOCK && app.dock) { try { app.dock.hide() } catch (e) {} } }
+anDock()
+
 app.whenReady().then(() => {
   if (THU_OCR) { thuOcr(); return } // che do do: khong tray, khong phim tat, khong luong chup
   if (THU_QUAY) { thuQuay(); return } // che do do quay video: khong tray, khong phim tat
+  anDock() // 04/10 Mac: goi lai sau khi app san sang, phong lan goi luc nap file chua co tac dung (chua co cua so nao)
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
     const headers = {
