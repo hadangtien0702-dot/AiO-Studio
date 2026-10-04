@@ -2090,14 +2090,14 @@ async function quay3Giay(display, sf, rect) {
   const khung = []
   const nhatKy = []
   try {
+    // 04/10 (ECC soat): mo vien TRONG try. Truoc day nam ngoai: nem loi la `dangQuay` ket o true toi khi tat app
+    // (Storyboard khong quay nua, khay khong tu thu) ma khong co dong log nao (ham async goi khong await).
+    vien = moVienQuay(display, rect)
     await cho(QUAY_CHO_MS)
     const batDau = Date.now()
     for (let i = 0; i < QUAY_SO_KHUNG; i++) {
       const tre = batDau + i * QUAY_BUOC_MS - Date.now()
       if (tre > 0) await cho(tre)
-    // 04/10 (ECC soat): mo vien TRONG try. Truoc day nam ngoai: nem loi la `dangQuay` ket o true toi khi tat app
-    // (Storyboard khong quay nua, khay khong tu thu) ma khong co dong log nao (ham async goi khong await).
-    vien = moVienQuay(display, rect)
       vien.datSo(Math.max(1, 3 - Math.floor((Date.now() - batDau) / 1000)))
       const t = Date.now() - batDau
       const k = await layKhungVung(display, sf, rect)
