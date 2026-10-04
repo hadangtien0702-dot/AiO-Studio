@@ -30,7 +30,7 @@
   // ── 12 tool. id = Extension Id THẬT (grep manifest 22/09). c = màu nhận diện (nền ô icon đặc,
   //    icon trắng trên nền này đo ≥ 3:1). Autocut giữ cam thương hiệu.
   var TOOLS = [
-    { id: 'com.aiostudio.autocut.panel', ten: 'Autocut', icon: 'scissors', nhom: 'dung', c: '#f86820', canh: 'cat', viec: { vi: 'Cắt khoảng lặng', en: 'Cut silences' } },
+    { id: 'com.aiostudio.autocut.panel', ten: 'Autocut', icon: 'scissors', nhom: 'dung', c: '#f86820', viec: { vi: 'Cắt khoảng lặng', en: 'Cut silences' } },
     { id: 'com.aiostudio.podcast.panel', ten: 'Auto Podcast', icon: 'mic', nhom: 'dung', c: '#2563eb', viec: { vi: 'Cắt theo người đang nói', en: 'Cut to whoever is speaking' } },
     { id: 'com.aiostudio.shortviral.panel', ten: 'Auto Short Viral', icon: 'messages', nhom: 'dung', c: '#059669', viec: { vi: 'Chia hỏi–đáp thành short', en: 'Turn Q&A into shorts' } },
     { id: 'com.aiostudio.reframe.panel', ten: 'Auto Re-Frames', icon: 'crop', nhom: 'dung', c: '#7c3aed', viec: { vi: 'Dựng dọc 9:16 bám chủ thể', en: 'Vertical 9:16 that follows the subject' } },

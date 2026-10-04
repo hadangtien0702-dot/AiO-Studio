@@ -1,5 +1,28 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [go dai canh + nhap moi] - 2026-10-04 17:20 (UTC+7) - Anh che mau "xau du vay": GO dai song am khoi panel that, dung NHAP ca luoi kieu "the ap phich"; CHO ANH DUYET nhap
+
+- **Boi canh:** anh chup panel that co mau 16:53 va hoi: *"anh thấy em có sửa tab này ở đây rồi mà sao nó xấu dữ vậy em"*.
+- **Nguyen nhan that (do tren panel that):** em gan dai canh vao MOT the -> hang dau cao 170 px, cac hang khac 116 px, 2 the ben
+  canh ho 54 px trong; dai chi 179x44 px nen doc thanh "thanh tien do gan them", the chua he LA mot canh; phan anh che tu dau
+  (the xam, icon nho) chua doi gi. Loi cach lam mau: mau cho mot cai LUOI phai la ca luoi dong bo, khong gan nua voi vao
+  panel anh dang dung.
+- **Thay doi:**
+  - `dist/hub.js`: bo co `canh: 'cat'` cua Autocut -> panel that ve luoi cu. Ma `CANH` + CSS `cd-*` con nam do nhung khong
+    the nao dung (se thay khi kieu the moi duoc duyet). Phan NHUNG (Guide Frame hien trong panel) GIU NGUYEN.
+  - `nhap/the-canh-dien.html` MOI (khong nam trong ban cai): ca 12 the cung mot khuon "ap phich": nua tren la SAN KHAU mang
+    mau rieng cua tool (104 px), nua duoi la ten + mot dong. 3 the dau co canh: Autocut (doan co tieng mau trang xen khoang
+    lang, re chuot: dau doc quet, khoang lang toi lai roi bien mat, cac doan don sat) · Auto Podcast (hai nguoi, khung may
+    quay co cham do nhay sang nguoi dang noi) · Auto Short Viral (mot bai dai co 3 doan, re chuot: 3 doan roi xuong thanh 3
+    video doc). 9 the con lai moi giu khuon (icon lon tren nen mau). `?dien=1` = cho dien san de chup.
+- **Kiem chung bang so:** panel that sau khi go (cong 8101): 12 the, 0 dai canh, 9 the dau deu cao 116 px, co nhung cua Guide
+  Frame con. Trang nhap o khung 664 px (khung Browser cua app): 12/12 the cao 181 px, tran ngang 0 px; Autocut: dung im 3
+  khoang lang 8,6 px, mep phai doan cuoi 164 = mep trong cua ray; 2,5 giay sau khi dien: 3 khoang lang = 0, mep phai 132
+  (ngan di 32 px); re chuot that len Podcast: khung may quay sang nguoi thu hai; len Short Viral: 3 the doc hien ro, xoe.
+- **CHUA kiem:** anh chua xem nhap. Nhap moi chay tren Chrome moi, CHUA chay trong Chromium 99 cua CEP (da tranh color-mix,
+  :has, container query; chua do that). Chua co ban sang, chua co EN, chua thu khung hep 380 px / rong > 720 px.
+- **File anh huong:** `dist/hub.js`, `nhap/the-canh-dien.html` (moi), file nay.
+
 ## [mau nhung + canh dien] - 2026-10-04 16:53 (UTC+7) - MAU: Guide Frame hien NGAY TRONG panel tong + the Autocut biet "dien"; da cai vao Premiere may Mac, CHO ANH XEM
 
 - **Boi canh:** anh chon trong bang hoi (muc ngay duoi): *"Nhúng, làm mẫu trước"* va *"Mỗi tool là một cảnh diễn"*. Lam MOT mau
