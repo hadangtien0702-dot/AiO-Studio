@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 13:56 PHIEN THU HAI SOAT commit `565b446`: 4 diem CON MO, CHUA sua.** (1) sua anh ghim cua tam chua luu duoc thi
+>   de len MOI tam chua luu khac trong khay (`pin:save-edit`, `filePath` null; loi co san) · (2) `kho.ghiDeAnh` doi ten de
+>   khong co duong lui, tren Windows file dang bi app khac giu thi mat net vua ve: CHUA do · (3) `.keo` khong don: thu muc
+>   anh o o khac thi moi anh / VIDEO tung keo co them ban chep o o C · (4) 3 loi nho luot ECC 04/10 chua sua. Do doc lap
+>   RAM khop (708 MB -> 116 MB). Khong sua dong ma nao. Chi tiet: muc [soat] 13:56 ngay duoi.
 > - **04/10 13:53 DA SUA NOT 3 loi con lai cua luot ECC soat + THEM hop thoai thieu quyen tren Mac; ban moi da cai vao
 >   /Applications (van 0.8.0, `app.asar` md5 `b57cf56e`, boot 13:53:22).** Keo-tha huong A (anh chot): khong xoa `.keo` moi
 >   lan mo app. Sua anh ghim: ghi file TRUOC + atomic, hong thi tra anh ghim ve ban cu + hop thoai. Khay khong giu anh goc
@@ -136,6 +141,48 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [soat] - 2026-10-04 13:56 - Phien thu hai soat commit `565b446` (3 loi ECC vua sua): 4 diem con mo, KHONG sua dong ma nao
+
+- **Boi canh:** anh nhan mot phien MOI: *"ECC AiO Shot and Save"* roi *"tiếp tục ECC cho AiO Studio đi em"*, trong khi phien
+  "ECC AiO Shot" dang sua dung cac loi do (commit `565b446` luc 13:52). Phien moi doc ma + do RAM xong moi thay `main.js`
+  doi duoi tay -> dung lai, chuyen sang SOAT commit do. Phien moi KHONG sua file ma nao.
+- **Nguyen nhan that (vi sao hai phien trung viec):** phien moi khong xem phien nao dang chay truoc khi phan tich. Dau hieu co
+  tu dau: commit `4ba8a64` ra truoc do 1 phut, `package-lock.json` sua do khong phai cua no. Da ghi vao ngan nho may Mac.
+- **Do doc lap (Electron 43.4.1, khong cua so; script o thu muc tam cua phien, khong vao repo):** nen 71 MB · giu 20 manh cat
+  900x600 cua khung 3840x2160 = 708 MB (bang dung giu ca khung: 708 MB) · tach rieng roi giu = 116 MB · bo het ve 75 MB.
+  Ban tach giong ban cat tung byte (2.160.000 byte, PNG giong). Tach 900x600 mat 2,2 ms, ca khung 4K 32,7 ms. Khop so cua
+  `test:khayram` (705 MB / 75 MB) -> goc vu 1.168 MB RAM da duoc do tu hai phia.
+- **Soat `565b446`** (doc het phan sua `kho.js`, `main.js`, `khay-muc.js`, `i18n.js`; KHONG chay bai kiem nao, KHONG mo app):
+  - Dat (doc ma): ghi file truoc roi moi doi `rec.image` + khay · `lamMoiKeo` noi lai lien ket sau khi doi ten de (khong con
+    lien ket tro ban cu chua lam mo) · anh ve rong cung bao · 6/6 cho dung `shelfItems` da doi sang `thumb / w / h /
+    anhMucKhay` (grep `it.image`: khong con cho nao doc anh goc cua muc khay) · file tam `<anh>.tam-<pid>` khong khop
+    `MAU_TAM` cua kho-video, khong khop bo loc `png|jpg` cua khay.
+  - CON MO 1 (loi co san, ban va khong gay ra): `main.js`, vong lap cap nhat khay trong `pin:save-edit`, dieu kien
+    `it.filePath !== rec.filePath`. Anh ghim cua mot tam KHONG luu duoc co `filePath` null, moi muc khay khong luu duoc cung
+    null -> `null !== null` la sai -> MOI muc chua luu deu bi `capNhatMucKhay` de bang anh vua sua, ma cac muc do chi con
+    anh trong RAM. Kich ban: o day / thu muc mat -> chup 2 tam -> ghim tam 1 roi ve -> tam 2 trong khay thanh tam 1.
+    Doc ma, chua chay.
+  - CON MO 2 (chua do, can may Windows): `kho.ghiDeAnh` = ghi tam + `renameSync`, khong co duong lui. Tren Windows doi ten de
+    len file dang bi app khac mo ma khong cho xoa se hong (EPERM), trong khi cach cu (`writeFileSync` thang) van ghi duoc
+    neu app do cho ghi. Hong thi `hoanTacSuaPin` tra anh ghim ve ban cu = MAT net vua ve. `test:keo` gia loi ghi bang `chmod`
+    (tu BO QUA khi chmod khong chan duoc), khong co ca "file dang bi giu". De xuat: doi ten hong thi thu
+    `copyFileSync(tam, file)` mot lan roi moi bao hong; do tren may cong ty bang PowerShell
+    `[IO.File]::Open(p,'Open','Read','ReadWrite')` (giu file, cho doc + ghi, khong cho xoa).
+  - CON MO 3 (he qua cua huong A, anh can biet): `.keo` khong con don moi lan mo app. Thu muc anh o O KHAC voi
+    `%LOCALAPPDATA%` thi `linkSync` hong -> `copyFileSync` = BAN CHEP day du, giu toi khi file goc bi xoa.
+    `duongDanKeoAnToan` duoc goi o 4 cho, 2 cho la VIDEO (`main.js:2334`, `:2469`) -> moi video tung keo nam them mot ban o
+    o C. `test:keo` khong co ca khac o dia. Chua do dung luong that.
+  - CON MO 4: 3 loi nho cua muc [soat] 04/10 01:38 khong nam trong `565b446`, van nguyen: `quay3Giay` goi `moVienQuay` ngoai
+    `try` · `closeOverlay` khong `clearInterval(dragTimer)` · `handleConfirm` thoat im lang sau khi da dong man chup.
+  - Nho hon, chua do: ghim tu khay nay doc lai file JPEG (mac dinh q85) -> moi vong ghim + sua them mot lan nen (truoc: anh
+    trong RAM, khong nen lai) · `shelf:pin` khong doc duoc file thi bao "anh khong con" ke ca khi file con ma dang bi khoa.
+- **Thay doi:** khong co thay doi ma. Chi them muc nay + 1 dong o khoi trang thai.
+- **Su co cua phien soat:** lenh ghi script do bi hook GateGuard chan, nhung lenh chay Electron gui cung luot van chay voi
+  file chua co -> Electron treo khoang 2 phut (co the kem hop bao loi tren man anh) toi khi `pkill -f do-ram-crop.cjs`.
+  App da cai (`/Applications/AiO Shot & Save.app`) khong bi dung. Luat "ghi file xong moi chay" da vao ngan nho may Mac.
+- **File anh huong:** chi file nay.
+- **Kiem chung bang so:** so do RAM o tren (1 lan chay, ma thoat 0). 4 diem CON MO la doc ma, CHUA co bai do nao.
 
 ## [0.8.0 sua ECC lan 2] - 2026-10-04 13:53 - Keo-tha giu file tam (huong A), sua anh ghim khong con lech voi file, khay khong giu anh goc, Mac thieu quyen thi co hop thoai; cai ban moi vao /Applications
 
