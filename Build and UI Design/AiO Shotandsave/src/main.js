@@ -17,7 +17,7 @@
 const {
   app, BrowserWindow, Tray, Menu, globalShortcut,
   ipcMain, screen, desktopCapturer, nativeImage, clipboard, shell, dialog,
-  Notification, protocol, net,
+  Notification, protocol, net, systemPreferences,
 } = require('electron')
 const path = require('path')
 const fs = require('fs')
@@ -32,6 +32,7 @@ const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: b
 const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
+const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
@@ -266,6 +267,9 @@ function ghiLog(msg) {
   } catch (e) {}
 }
 kho.noiNhatKy(ghiLog) // 04/10: cau-hinh.json khong doc / khong ghi duoc thi phai co dong trong run-log (truoc: im lang)
+/* 04/10 macOS: chua co quyen Ghi man hinh thi hien HOP THOAI noi ro + nut mo dung trang quyen (anh bam chup 35 lan chi
+   thay overlay chop roi mat; Notification khong hien tren may anh). Windows: khong lam gi. Xem src/quyen-man-hinh.js. */
+const kiemQuyen = taoKiemQuyen({ systemPreferences, dialog, shell, T, ghiLog, app })
 
 /** Con tro app: tray + cac cua so dang song. */
 let tray = null
@@ -827,6 +831,8 @@ async function startCapture() {
     openSettings()
     return
   }
+  // 04/10 macOS: quyen Ghi man hinh bi tu choi -> hop thoai + nut mo Cai dat he thong, KHONG mo overlay (se chi chop roi mat)
+  if (!BO_QUA_BAN_QUYEN && kiemQuyen.chanTruocKhiChup()) return
 
   const displays = screen.getAllDisplays()
   if (!displays.length) return
@@ -932,7 +938,8 @@ function phatFrozen(list, _tg, nguon, nhanh) {
   if (!list.length && overlayWins.length) {
     ghiLog('LOI grab: 0/' + screen.getAllDisplays().length + ' man chup duoc — dong overlay')
     closeOverlay()
-    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+    // 04/10 macOS thieu quyen: hop thoai (kiemQuyen); con lai (Windows, hoac co quyen ma van hong): thong bao nhu cu
+    if (!kiemQuyen.baoKhiChupHong() && Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
     return
   }
   // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —

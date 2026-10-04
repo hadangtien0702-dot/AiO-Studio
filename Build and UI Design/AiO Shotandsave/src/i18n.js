@@ -9,6 +9,11 @@ const DICH = {
     'app.phimBiGiu': 'Phím tắt chụp {phim} đang bị ứng dụng khác giữ — bấm sẽ không ăn. Mở Cài đặt để đổi phím.',
     'app.khongLuuDuoc': 'Không lưu được ảnh vào {thuMuc} (ổ đầy hoặc mất quyền). Ảnh đã chép vào clipboard — mở Cài đặt để đổi thư mục lưu.',
     'app.khongChupDuoc': 'Không chụp được màn hình (hệ thống chưa cấp quyền hoặc lỗi hiển thị). Trên macOS: mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Ghi màn hình. Thử lại sau vài giây hoặc khởi động lại ứng dụng.',
+    // 04/10: macOS chua cap quyen Ghi man hinh -> hop thoai that (src/quyen-man-hinh.js), khong chi Notification
+    'quyen.tieuDe': 'Shot & Save chưa được phép chụp màn hình',
+    'quyen.noiDung': 'macOS chưa cấp quyền Ghi màn hình cho bản đang chạy, nên bấm chụp chỉ thấy khung chớp rồi mất.\n\n1. Mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Ghi màn hình & âm thanh hệ thống.\n2. Nếu đã có dòng AiO Shot & Save thì chọn nó, bấm dấu trừ để gỡ (dòng cũ thuộc bản cũ, bật cũng không ăn).\n3. Bấm dấu cộng, chọn AiO Shot & Save trong Applications, bật công tắc.\n4. Thoát rồi mở lại ứng dụng.\n\nMỗi lần cài bản mới cần làm lại các bước này.',
+    'quyen.moCaiDat': 'Mở Cài đặt hệ thống',
+    'quyen.deSau': 'Để sau',
     'app.khongQuayDuoc': 'Không quay được video vùng này. Thử lại sau vài giây hoặc khởi động lại ứng dụng.',
     // Tray
     'tray.chup': 'Chụp màn hình',
@@ -218,6 +223,10 @@ const DICH = {
     'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
     'app.khongLuuDuoc': 'Could not save the image to {thuMuc} (disk full or no permission). It was copied to the clipboard — open Settings to change the save folder.',
     'app.khongChupDuoc': 'Could not capture screen (permission denied or display error). On macOS: open System Settings > Privacy & Security > Screen Recording. Try again in a few seconds or restart the app.',
+    'quyen.tieuDe': 'Shot & Save is not allowed to capture the screen yet',
+    'quyen.noiDung': 'macOS has not granted Screen Recording to the running build, so the capture frame only flashes and closes.\n\n1. Open System Settings > Privacy & Security > Screen & System Audio Recording.\n2. If AiO Shot & Save is already listed, select it and click the minus button to remove it (the old entry belongs to an older build and does not apply).\n3. Click the plus button, pick AiO Shot & Save in Applications, turn the switch on.\n4. Quit and reopen the app.\n\nYou need to repeat these steps after installing a new build.',
+    'quyen.moCaiDat': 'Open System Settings',
+    'quyen.deSau': 'Later',
     'app.khongQuayDuoc': 'Could not record this area. Try again in a few seconds or restart the app.',
     'tray.chup': 'Take screenshot',
     'tray.khay': 'Open shelf',
