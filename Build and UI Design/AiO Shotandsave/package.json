@@ -20,6 +20,8 @@
     "test:banquyen": "node scripts/test/do-ban-quyen.mjs",
     "test:cauhinh": "node scripts/test/do-cau-hinh.cjs",
     "test:quyen": "node scripts/test/do-quyen.cjs",
+    "test:keo": "node scripts/test/do-keo.cjs",
+    "test:khayram": "node scripts/test/do-khay-ram.cjs",
     "test:lammo": "node scripts/test/do-kieu-lam-mo.mjs",
     "test:storyboard": "node scripts/test/do-storyboard.mjs",
     "test:vienquay": "node scripts/test/do-vien-quay.mjs",

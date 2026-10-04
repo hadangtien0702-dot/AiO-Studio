@@ -69,25 +69,134 @@ function thuMucKeo() {
   const goc = process.env.LOCALAPPDATA || app.getPath('userData')
   return path.join(goc, 'shotandsave', '.keo')
 }
+/* 04/10 (ECC soat, DA DO; anh chot huong A "giu file tam lai"): ban cu XOA SACH `.keo` moi lan mo app. Nguoi dung
+   Windows co ten chua dau cach / dau tieng Viet thi thu muc anh MAC DINH (%LOCALAPPDATA%) da "khong an toan" -> moi lan
+   keo deu di qua `.keo` -> keo anh vao Premiere, mo lai app la file do MAT (do: `Nguyen Van A` va `Tiến` mat, `DRT-G21`
+   con). Nay:
+     - KHONG xoa `.keo` luc mo app. So `.keo/.goc.json` ghi { <ten lien ket>: <duong dan file goc> }.
+     - Luc mo app chi bo lien ket khi DU 3 dieu: file goc khong con o cho cu + thu muc cua no van con (khong phai o dia
+       dang thao) + lien ket la ban DUY NHAT con lai cua du lieu (nlink 1: anh goc da bi xoa han, hoac day la ban chep
+       sang o khac). Anh goc chi DOI CHO / dang nam trong Thung rac thi lien ket khong ton dia -> giu. Khong ro goc -> giu.
+     - Hai file goc khac nhau trung ten sau khi lam sach -> lien ket thu hai them hau to -2, -3 (truoc: de len nhau). */
+const TEN_SO_KEO = '.goc.json'
+const khoaDuong = (p) => {
+  const r = path.resolve(String(p || ''))
+  return process.platform === 'win32' ? r.toLowerCase() : r
+}
+/** So lien ket. {} = chua co / hong (so chi la bo nho phu: mat thi chi la khong don duoc). null = co ma khong doc duoc. */
+function docSoKeo() {
+  let txt
+  try { txt = fs.readFileSync(path.join(thuMucKeo(), TEN_SO_KEO), 'utf8') } catch (e) {
+    return e && e.code === 'ENOENT' ? {} : null
+  }
+  try {
+    const s = JSON.parse(txt)
+    return s && typeof s === 'object' && !Array.isArray(s) ? s : {}
+  } catch (e) { return {} }
+}
+function ghiSoKeo(so) {
+  try {
+    const f = path.join(baoDamThuMuc(thuMucKeo()), TEN_SO_KEO)
+    fs.writeFileSync(f + '.tmp', JSON.stringify(so, null, 1))
+    fs.renameSync(f + '.tmp', f)
+    return true
+  } catch (e) {
+    baoKho('keo: KHONG GHI DUOC so lien ket: ' + ((e && e.code) || e))
+    return false
+  }
+}
+function noiLienKet(filePath, dich) {
+  try { fs.unlinkSync(dich) } catch (e) {}
+  try { fs.linkSync(filePath, dich) } catch (e) { fs.copyFileSync(filePath, dich) } // khac o dia -> copy
+}
+
 function duongDanKeoAnToan(filePath) {
   if (!filePath) return filePath
   if (AN_TOAN.test(filePath)) return filePath
   try {
     const dir = baoDamThuMuc(thuMucKeo())
+    const so = docSoKeo()
     // Ten file cung phai sach (thu muc nguoi dung co the dat ten anh co '&'/dau cach)
-    const ten = path.basename(filePath).replace(/[^A-Za-z0-9_.-]/g, '-')
+    const sach = path.basename(filePath).replace(/[^A-Za-z0-9_.-]/g, '-')
+    let ten = sach
+    if (so) {
+      const duoi = path.extname(sach)
+      const than = sach.slice(0, sach.length - duoi.length)
+      // ten nay dang la lien ket cua mot file goc KHAC con ton tai -> lay ten khac, dung de len
+      for (let i = 2; so[ten] && khoaDuong(so[ten]) !== khoaDuong(filePath) && fs.existsSync(so[ten]); i++) ten = than + '-' + i + duoi
+    }
     const dich = path.join(dir, ten)
+    let conMoi = false
     try {
       const a = fs.statSync(filePath), b = fs.statSync(dich)
-      if (a.size === b.size && a.mtimeMs <= b.mtimeMs) return dich // da co, con moi
+      conMoi = a.size === b.size && a.mtimeMs <= b.mtimeMs // da co, con moi
     } catch (e) {}
-    try { fs.unlinkSync(dich) } catch (e) {}
-    try { fs.linkSync(filePath, dich) } catch (e) { fs.copyFileSync(filePath, dich) } // khac o dia -> copy
+    if (!conMoi) noiLienKet(filePath, dich)
+    if (so && so[ten] !== filePath) { so[ten] = filePath; ghiSoKeo(so) }
     return dich
   } catch (e) { return filePath } // khong lam duoc thi keo duong cu, con hon khong keo
 }
+
+/** Goi 1 lan luc mo app. KHONG xoa sach nua (xem ghi chu 04/10 o tren). Tra { giu, bo, khongRo }. */
 function donKeoAnToan() {
-  try { fs.rmSync(thuMucKeo(), { recursive: true, force: true }) } catch (e) {}
+  const kq = { giu: 0, bo: 0, khongRo: 0 }
+  try {
+    const dir = thuMucKeo()
+    if (!fs.existsSync(dir)) return kq
+    const ds = fs.readdirSync(dir).filter((t) => t !== TEN_SO_KEO && t !== TEN_SO_KEO + '.tmp')
+    const so = docSoKeo()
+    if (!so) { kq.khongRo = ds.length; return kq } // khong doc duoc so: giu het
+    let doi = false
+    for (const ten of ds) {
+      const goc = so[ten]
+      if (!goc) { kq.khongRo++; continue }                               // khong ro goc: GIU
+      if (fs.existsSync(goc)) { kq.giu++; continue }                      // anh goc con: GIU
+      if (!fs.existsSync(path.dirname(goc))) { kq.khongRo++; continue }   // ca thu muc / o dia khong thay: khong ket luan
+      const f = path.join(dir, ten)
+      let nlink = 1
+      try { nlink = fs.statSync(f).nlink } catch (e) {}
+      if (nlink > 1) { kq.giu++; continue }                               // du lieu con o cho khac (doi cho / Thung rac): giu
+      try { fs.unlinkSync(f); kq.bo++; delete so[ten]; doi = true } catch (e) { kq.khongRo++ }
+    }
+    for (const ten of Object.keys(so)) {
+      if (!fs.existsSync(path.join(dir, ten))) { delete so[ten]; doi = true } // muc trong so ma lien ket khong con
+    }
+    if (doi) ghiSoKeo(so)
+  } catch (e) {}
+  return kq
+}
+
+/** File goc vua duoc GHI DE bang ghiDeAnh (file moi doi ten vao cho cu -> lien ket cung van tro ban CU): noi lai.
+    Tra so lien ket da lam moi. */
+function lamMoiKeo(filePath) {
+  let n = 0
+  try {
+    const so = docSoKeo()
+    if (!so) return 0
+    for (const ten of Object.keys(so)) {
+      if (khoaDuong(so[ten]) !== khoaDuong(filePath)) continue
+      const dich = path.join(thuMucKeo(), ten)
+      if (!fs.existsSync(dich)) continue
+      noiLienKet(filePath, dich)
+      n++
+    }
+  } catch (e) {}
+  return n
+}
+
+/** Ghi de MOT file anh co san, ATOMIC: ghi sang file tam CUNG thu muc roi doi ten vao. Hong (file dang bi app khac
+    giu, dia day, mat quyen) thi file cu con NGUYEN — truoc: writeFileSync thang vao file that, hong giua chung la file
+    cut. Tra { ok, loi }. Ben goi PHAI kiem `ok` truoc khi coi nhu da luu (04/10, loi "lam mo ma file gui di chua mo"). */
+function ghiDeAnh(filePath, buf) {
+  const tam = filePath + '.tam-' + process.pid
+  try {
+    fs.writeFileSync(tam, buf)
+    fs.renameSync(tam, filePath)
+    return { ok: true, loi: null }
+  } catch (e) {
+    try { fs.unlinkSync(tam) } catch (e2) {} // file tam do chinh lan goi nay tao, dung ten
+    return { ok: false, loi: (e && e.code) || (e && e.message) || 'loi' }
+  }
 }
 
 function baoDamThuMuc(dir) {
@@ -230,6 +339,6 @@ function ghiCauHinh(patch) {
 }
 
 module.exports = {
-  thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan,
+  thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan, lamMoiKeo, ghiDeAnh, thuMucKeo,
   duongVideoMoi, docCauHinh, ghiCauHinh, noiNhatKy,
 }

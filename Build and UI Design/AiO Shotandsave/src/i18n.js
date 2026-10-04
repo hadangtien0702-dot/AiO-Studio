@@ -14,6 +14,11 @@ const DICH = {
     'quyen.noiDung': 'macOS chưa cấp quyền Ghi màn hình cho bản đang chạy, nên bấm chụp chỉ thấy khung chớp rồi mất.\n\n1. Mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Ghi màn hình & âm thanh hệ thống.\n2. Nếu đã có dòng AiO Shot & Save thì chọn nó, bấm dấu trừ để gỡ (dòng cũ thuộc bản cũ, bật cũng không ăn).\n3. Bấm dấu cộng, chọn AiO Shot & Save trong Applications, bật công tắc.\n4. Thoát rồi mở lại ứng dụng.\n\nMỗi lần cài bản mới cần làm lại các bước này.',
     'quyen.moCaiDat': 'Mở Cài đặt hệ thống',
     'quyen.deSau': 'Để sau',
+    // 04/10: sua / lam mo anh ghim ma ghi file hong -> bao ro, tra anh ghim ve ban trong file
+    'pin.khongLuuSua': 'Chưa lưu được phần vừa sửa',
+    'pin.khongLuuSuaCt': 'Không ghi được vào file ảnh (file đang được ứng dụng khác mở, ổ đầy, hoặc mất quyền ghi).\n\nẢnh ghim đã trở về bản đang có trong file, để hình trên màn hình luôn giống file sẽ gửi đi. Đóng ứng dụng đang mở file này rồi sửa lại.',
+    'pin.daHieu': 'Đã hiểu',
+    'khay.anhKhongCon': 'Ảnh này không còn trong thư mục ảnh (đã bị xoá hoặc dời đi) nên được bỏ khỏi khay.',
     'app.khongQuayDuoc': 'Không quay được video vùng này. Thử lại sau vài giây hoặc khởi động lại ứng dụng.',
     // Tray
     'tray.chup': 'Chụp màn hình',
@@ -227,6 +232,10 @@ const DICH = {
     'quyen.noiDung': 'macOS has not granted Screen Recording to the running build, so the capture frame only flashes and closes.\n\n1. Open System Settings > Privacy & Security > Screen & System Audio Recording.\n2. If AiO Shot & Save is already listed, select it and click the minus button to remove it (the old entry belongs to an older build and does not apply).\n3. Click the plus button, pick AiO Shot & Save in Applications, turn the switch on.\n4. Quit and reopen the app.\n\nYou need to repeat these steps after installing a new build.',
     'quyen.moCaiDat': 'Open System Settings',
     'quyen.deSau': 'Later',
+    'pin.khongLuuSua': 'Your edit was not saved',
+    'pin.khongLuuSuaCt': 'Could not write to the image file (it is open in another app, the disk is full, or write permission is missing).\n\nThe pinned image was restored to what is in the file, so what you see always matches the file that gets sent. Close the app that has this file open, then edit again.',
+    'pin.daHieu': 'OK',
+    'khay.anhKhongCon': 'This image is no longer in the image folder (deleted or moved), so it was removed from the tray.',
     'app.khongQuayDuoc': 'Could not record this area. Try again in a few seconds or restart the app.',
     'tray.chup': 'Take screenshot',
     'tray.khay': 'Open shelf',

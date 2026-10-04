@@ -33,6 +33,7 @@ const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
+const { taoMucKhay, anhMucKhay, capNhatMucKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
@@ -346,7 +347,11 @@ app.whenReady().then(() => {
   khoDai.khoiTao(app.getPath('userData'))
   khoVideo.khoiTao(app.getPath('userData'), ghiLog)
   setTimeout(khoiPhucVideoDo, 5000) // 02/10: file quay do cua lan truoc (app bi tat giua luc quay) -> dua lai vao khay
-  kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
+  { // 04/10 (anh chot huong A): KHONG xoa sach .keo nua — file da dua cho Premiere bi mat sau khi mo lai app.
+    // Chi bo lien ket ma anh goc da bi xoa han (xem kho.js donKeoAnToan).
+    const k = kho.donKeoAnToan()
+    if (k.giu || k.bo || k.khongRo) ghiLog('keo: giu ' + k.giu + ', bo ' + k.bo + ' (anh goc da xoa), khong ro goc ' + k.khongRo)
+  }
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
   lang = ch.lang || 'vi'
@@ -729,11 +734,9 @@ ipcMain.handle('settings:set-khay', (_e, kieu) => {
       const w = ensureShelf()
       w.webContents.once('did-finish-load', () => {
         for (const it of shelfItems.values()) {
-          const thumb = thumbKhay(it.image)
-          const sz = it.image.getSize()
           let kb = 0
           try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
-          w.webContents.send('shelf:add', { id: it.id, seq: it.seq || it.id, thumb, filePath: it.filePath, w: sz.width, h: sz.height, kb })
+          w.webContents.send('shelf:add', { id: it.id, seq: it.seq || it.id, thumb: it.thumb, filePath: it.filePath, w: it.w, h: it.h, kb })
         }
         khayThu.hienThang(w) // 01/10: cua so khay dung lai -> hien thang, cat nut tron (neu dang la nut)
       })
@@ -1535,7 +1538,7 @@ function createPinWindow(image, screenX, screenY, dipW, dipH, filePath) {
   // ☠️ Nho `id` NGAY BAY GIO. Trong handler 'closed', `win.webContents` da bi
   // huy — doc `.id` tu no nem "Object has been destroyed" (vap 24/08).
   const wcId = win.webContents.id
-  pins.set(wcId, { image, filePath, win })
+  pins.set(wcId, { image, filePath, win, dipW, dipH }) // dipW/dipH: de tra anh ghim ve ban cu khi luu sua hong (04/10)
 
   win.loadFile(path.join(__dirname, 'pin', 'index.html'))
   win.webContents.once('did-finish-load', () => {
@@ -1579,40 +1582,59 @@ ipcMain.on('pin:start-drag', (e) => {
 /* VE khung/mui ten len anh ghim (anh Tien 26/08): renderer ghep xong gui dataURL
    do phan giai THAT -> ghi de file (dung dinh dang cua chinh file do) + cap nhat
    anh trong bo nho (copy/keo-tha dung ban moi) + lam moi thumbnail khay. */
+/* 04/10 (ECC soat): ban cu doi anh trong bo nho + thumbnail khay TRUOC roi moi ghi file, ghi hong chi co 1 dong log ->
+   anh ghim + khay hien ban DA lam mo / da ve trong khi file keo di van la ban CU (chua mo), khong ai biet. Ghi thang
+   vao file that nen hong giua chung la file cut. Nay: GHI FILE TRUOC, atomic (kho.ghiDeAnh); thanh cong roi moi doi
+   anh trong bo nho + khay + lam moi lien ket .keo. Hong: tra anh ghim ve ban dang co trong file + HOP THOAI noi ro
+   -> hinh tren man luon giong file se gui di. */
+function hoanTacSuaPin(rec, lyDo) {
+  ghiLog('pin ve-xong LOI (' + lyDo + ') -> tra anh ghim ve ban dang co trong file')
+  const win = rec.win
+  if (!win || win.isDestroyed()) return
+  try {
+    win.webContents.send('pin:data', {
+      dataUrl: rec.image.toDataURL(), pad: PIN_PAD, w: rec.dipW, h: rec.dipH,
+      lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic',
+    })
+  } catch (err) { ghiLog('pin hoan tac LOI: ' + err.message) }
+  dialog.showMessageBox(win, {
+    type: 'warning', title: 'AiO Shot & Save',
+    message: T('pin.khongLuuSua'), detail: T('pin.khongLuuSuaCt'),
+    buttons: [T('pin.daHieu')], defaultId: 0, noLink: true,
+  }).catch((err) => ghiLog('pin hop thoai LOI: ' + err.message))
+}
+
 ipcMain.on('pin:save-edit', (e, dataUrl) => {
   const rec = pins.get(e.sender.id)
   if (!rec || !dataUrl) return
-  let daVe
-  try { daVe = nativeImage.createFromDataURL(dataUrl) } catch (err) { return }
-  if (!daVe || daVe.isEmpty()) return
+  let daVe = null
+  try { daVe = nativeImage.createFromDataURL(dataUrl) } catch (err) { daVe = null }
+  if (!daVe || daVe.isEmpty()) { hoanTacSuaPin(rec, 'anh ve rong'); return }
 
-  rec.image = daVe // copy / keo-tha tu cua so ghim dung ban da ve
-
-  // Ghi de DUNG file cu, giu dinh dang theo duoi file (.png / .jpg).
+  // Ghi de DUNG file cu, giu dinh dang theo duoi file (.png / .jpg). GHI TRUOC — thanh cong moi doi trang thai.
   if (rec.filePath) {
+    let buf = null
     try {
       const laPng = /\.png$/i.test(rec.filePath)
       const dd = layDinhDangAnh()
-      fs.writeFileSync(rec.filePath, laPng ? daVe.toPNG() : daVe.toJPEG((dd && dd.q) || 85))
-      ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath))
-    } catch (err) {
-      ghiLog('pin ve-xong LOI ghi file: ' + err.message)
-    }
+      buf = laPng ? daVe.toPNG() : daVe.toJPEG((dd && dd.q) || 85)
+    } catch (err) { buf = null }
+    const r = buf && buf.length ? kho.ghiDeAnh(rec.filePath, buf) : { ok: false, loi: 'khong ma hoa duoc anh' }
+    if (!r.ok) { hoanTacSuaPin(rec, 'ghi file ' + path.basename(rec.filePath) + ': ' + r.loi); return }
+    const n = kho.lamMoiKeo(rec.filePath) // file moi doi ten vao cho cu -> lien ket .keo (neu co) phai noi lai
+    ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath) + (n ? ' (lam moi ' + n + ' lien ket keo)' : ''))
   }
+
+  rec.image = daVe // copy / keo-tha tu cua so ghim dung ban da ve
 
   // Cap nhat o khay dang tro cung file (thumbnail + dung luong).
   for (const [id, it] of shelfItems) {
     if (it.filePath !== rec.filePath) continue
-    it.image = daVe
+    capNhatMucKhay(it, daVe, thumbKhay)
     let kb = 0
     try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (err) {}
-    const sz = daVe.getSize()
     if (shelfWin && !shelfWin.isDestroyed()) {
-      shelfWin.webContents.send('shelf:update', {
-        id,
-        thumb: thumbKhay(daVe),
-        w: sz.width, h: sz.height, kb,
-      })
+      shelfWin.webContents.send('shelf:update', { id, thumb: it.thumb, w: it.w, h: it.h, kb })
     }
   }
 })
@@ -1757,7 +1779,7 @@ function napAnhGanNhatVaoKhay(boQua) {
     try { img = nativeImage.createFromPath(f.path) } catch (e) {}
     if (!img || img.isEmpty()) continue
     const id = ++shelfSeq
-    shelfItems.set(id, { id, filePath: f.path, image: img, seq: id })
+    shelfItems.set(id, taoMucKhay(id, img, f.path, thumbKhay)) // 04/10: chi giu anh nho, anh goc doc lai tu file khi ghim
   }
   ghiLog('tu dong nap ' + shelfItems.size + ' anh gan nhat vao khay')
 }
@@ -1784,13 +1806,11 @@ function ensureShelf() {
   shelfWin.webContents.once('did-finish-load', () => {
     if (shelfItems.size && shelfWin && !shelfWin.isDestroyed()) {
       for (const it of shelfItems.values()) {
-        const thumb = thumbKhay(it.image)
-        const sz = it.image.getSize()
         let kb = 0
         try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
         shelfWin.webContents.send('shelf:add', {
-          id: it.id, seq: it.seq || it.id, thumb, filePath: it.filePath,
-          w: sz.width, h: sz.height, kb,
+          id: it.id, seq: it.seq || it.id, thumb: it.thumb, filePath: it.filePath,
+          w: it.w, h: it.h, kb,
         })
       }
     }
@@ -1816,12 +1836,16 @@ function shelfAdd(image, filePath) {
   napAnhGanNhatVaoKhay(filePath)   // truoc ensureShelf: nap anh cu, TRU anh vua chup (0.6.5)
   const w = ensureShelf()
   const id = ++shelfSeq
-  shelfItems.set(id, { id, filePath, image, seq: id })
+  /* 04/10 (ECC soat, DA DO): khay KHONG giu anh goc nua. `image` la manh cat cua khung man hinh; giu no la ghim ca
+     khung ~32 MB (20 anh trong khay = 705 MB RAM). Muc chi giu anh nho + kich thuoc; bam ghim thi doc lai tu file.
+     Luu hong (filePath null) thi muc van giu anh trong RAM. Xem src/khay-muc.js. */
+  const muc = taoMucKhay(id, image, filePath, thumbKhay)
+  shelfItems.set(id, muc)
 
-  // Thumbnail nho de gui qua IPC cho nhe — anh goc van giu trong shelfItems.
-  const thumb = thumbKhay(image)
+  // Thumbnail nho de gui qua IPC cho nhe.
+  const thumb = muc.thumb
   // Kem kich thuoc + dung luong de khay hien cho nguoi dung (anh Tien 26/08).
-  const sz = image.getSize()
+  const sz = { width: muc.w, height: muc.h }
   let kb = 0
   try { kb = Math.round(fs.statSync(filePath).size / 1024) } catch (e) {}
 
@@ -1834,19 +1858,29 @@ function shelfAdd(image, filePath) {
   showShelf()
 }
 
-ipcMain.on('shelf:pin', (_e, id) => {
+ipcMain.on('shelf:pin', (e, id) => {
   const it = shelfItems.get(id)
   if (!it) return
+  const anh = anhMucKhay(it, nativeImage) // 04/10: khay chi giu anh nho -> doc lai anh goc tu file
+  if (!anh) {
+    // File da bi xoa / doi cho ngoai app -> khong ghim duoc. Bo muc khoi khay + BAO, khong im lang.
+    ghiLog('khay: KHONG doc duoc anh de ghim ' + path.basename(it.filePath || '(khong co file)') + ' -> bo khoi khay')
+    shelfItems.delete(id)
+    if (shelfItems.size === 0) shelfSeq = 0
+    try { e.sender.send('shelf:removed', id) } catch (err) {}
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('khay.anhKhongCon') }).show()
+    return
+  }
   // Dat gan giua man hinh dang co con tro, xep chong nhe cho de nhin.
   const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
-  const size = it.image.getSize()
+  const size = anh.getSize()
   const scale = d.scaleFactor || 1
   const dipW = Math.round(size.width / scale)
   const dipH = Math.round(size.height / scale)
   const off = (cascade++ % 6) * 24
   const x = d.workArea.x + Math.round((d.workArea.width - dipW) / 2) + off
   const y = d.workArea.y + Math.round((d.workArea.height - dipH) / 2) + off
-  createPinWindow(it.image, x, y, dipW, dipH, it.filePath)
+  createPinWindow(anh, x, y, dipW, dipH, it.filePath)
 })
 
 /* KEO-THA tu KHAY ra app khac. Cung `startDrag` nhu pin, nguon la item khay. */
@@ -1856,8 +1890,13 @@ ipcMain.on('shelf:start-drag', (e, id) => {
   try {
     const duong = kho.duongDanKeoAnToan(it.filePath)
     if (duong !== it.filePath) ghiLog('keo qua lien ket an toan: ' + duong)
-    e.sender.startDrag({ file: duong, icon: it.image.resize({ height: 96 }) })
-  } catch (err) { if (IS_DEV) console.error('[shotandsave] shelf startDrag loi', err) }
+    // 04/10: bieu tuong keo lay tu anh nho cua khay (khay khong con giu anh goc); anh nho hong thi doc lai tu file
+    let icon = null
+    try { icon = nativeImage.createFromDataURL(it.thumb) } catch (err) { icon = null }
+    if (!icon || icon.isEmpty()) icon = anhMucKhay(it, nativeImage)
+    if (!icon || icon.isEmpty()) { ghiLog('khay keo LOI: khong tao duoc bieu tuong cho ' + path.basename(it.filePath)); return }
+    e.sender.startDrag({ file: duong, icon: icon.resize({ height: 96 }) })
+  } catch (err) { ghiLog('khay keo LOI: ' + err.message) }
 })
 
 ipcMain.on('shelf:remove', (e, id) => {
@@ -1889,7 +1928,7 @@ const khayThu = taoKhayThu({
   electron: { BrowserWindow, screen, ipcMain },
   layKhay: () => (shelfWin && !shelfWin.isDestroyed() ? shelfWin : null),
   damBaoKhay: () => ensureShelf(),
-  anhMoiNhat: () => { const it = [...shelfItems.values()].pop(); try { return it ? thumbKhay(it.image) : '' } catch (e) { return '' } },
+  anhMoiNhat: () => { const it = [...shelfItems.values()].pop(); return (it && it.thumb) || '' }, // 04/10: anh nho da tao san
   soAnh: () => shelfItems.size,
   docGiay: () => giayHopLe(kho.docCauHinh().khayTuThu),
   // dang keo / doi co khay, dang chon vung, dang quay video, dang quay Storyboard 3 giay: KHONG thu (san dien la cua so
