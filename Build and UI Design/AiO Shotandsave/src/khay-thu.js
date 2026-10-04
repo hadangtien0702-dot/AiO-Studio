@@ -68,8 +68,21 @@ function taoKhayThu(deps) {
   const log = (s) => { try { deps.ghiLog(s) } catch (e) {} }
   const cho = (ms) => new Promise((r) => setTimeout(r, ms))
 
+  /* 04/10 Mac — anh: "kha muot nhung van khung" SAU KHI so khung da du (4/4 lan 24-25 khung, ho max 17-18 ms).
+     Bo dem khung chi thay nhip cua TRANG, khong thay luc nao cua so that su len man. Hai cho trong luot bung co lenh cua so
+     roi dung vao giua chuyen dong:
+       (1) luc ong kinh toi noi moi showInactive() + moveTop() cua so khay: man trap chay ngay (dau nhanh: sau 50 ms da mo ~40%)
+           trong khi cua so vua goi hien — neu man hinh len cham vai khung thi mat doan dau, khay "bup" ra;
+       (2) cua so san dien (phu ca man, trong suot) bi AN o khoang 300 ms, luc man trap (424 ms) con dang bung.
+     hienSom: hien cua so khay NGAY TU DAU luot bung (noi dung dang tang hinh, body.an) -> luc ong kinh toi noi chi con chay
+     man trap, khong con lenh cua so nao; va chi an san dien SAU khi man trap xong.
+     ☠️ GIA THUYET, CHUA DO duoc tren man hinh (khong co thuoc nao nhin duoc man that) -> chi bat tren macOS, Windows giu
+     nguyen duong anh da duyet. deps.hienSom = true / false de ep (bai do an). Thuoc: mat anh + dong `som N` cuoi run-log. */
+  const HIEN_SOM = deps.hienSom != null ? !!deps.hienSom : (process.platform === 'darwin' && !TN)
+
   let tt = 'mo'            // 'mo' = khay la khay · 'thu' = dang la nut tron · 'an' = nguoi dung an han nut
   let dangChay = false, viecMoi = false
+  let anSan = false        // thu() da an NOI DUNG khay roi moi an cua so -> hien cua so khay som khong lo khay cu ra man
   let dien = null, nut = null
   let lanCuoi = Date.now(), truocHien = false
 
@@ -175,7 +188,7 @@ function taoKhayThu(deps) {
     js(w, 'window.__khayAn && window.__khayAn(false)')
     an(nut)
     if (!dangHien(w)) hien(w, true)   // 02/10: dua len tren (truoc: false -> co the nam duoi cua so app khac)
-    tt = 'mo'; lanCuoi = Date.now(); truocHien = true
+    tt = 'mo'; lanCuoi = Date.now(); truocHien = true; anSan = false
   }
 
   /** THU khay ve nut tron (kieu B). Tra true neu da thu. */
@@ -197,7 +210,7 @@ function taoKhayThu(deps) {
       hien(d, true)
       d.webContents.send('dien:lenh', Object.assign({ viec: 'thu', khay: tuongDoi(b, wa), anh: anh.toDataURL(), o, nut: tuongDoi(oTronNut(wa), wa) }, goiNut()))
       if (!(await san)) throw new Error('san dien khong san sang')
-      await js(khay, 'window.__khayAn && window.__khayAn(true)', 400) // bong da de len -> an noi dung khay that
+      const daAn = await js(khay, 'window.__khayAn && window.__khayAn(true)', 400) // bong da de len -> an noi dung khay that
       const xong = choBao('xong', 4000)
       d.webContents.send('dien:lenh', { viec: 'chay' })
       if (!(await xong)) log('khay-thu CANH BAO: san dien khong bao xong (thu)')
@@ -205,12 +218,14 @@ function taoKhayThu(deps) {
       hien(nut, true)
       await cho(TN ? 0 : 70)   // cho nut that ve xong roi moi go ban ve tren san (hai hinh trung nhau, khong nhay)
       an(khay)
+      anSan = daAn === true // trang khay tu bao da ve khung trong -> lan bung sau duoc hien cua so khay som (hienSom)
       await donDien()
       tt = 'thu'
       log('khay thu (' + lyDo + '): ' + soO + ' o bay, ' + deps.soAnh() + ' anh, ' + (Date.now() - t0) + ' ms')
       return true
     } catch (err) {
       log('khay-thu LOI thu (' + lyDo + '): ' + (err && err.message) + ' -> an thang')
+      anSan = false // khong chac noi dung khay da tang hinh -> lan bung sau di duong cu
       try {
         an(dien); an(khay)
         if (wa) { const n = await damBaoNut(wa); n.webContents.send('nut:cap-nhat', goiNut()); hien(n, true); tt = 'thu' } else tt = 'an'
@@ -244,9 +259,11 @@ function taoKhayThu(deps) {
         + ' | noi ' + (tre != null ? '+' + (m.hienKhay - m.toi + tre) + '/+' + (m.hienKhay - m.toi + tre + u.dau) : '?') + ' (hien khay ' + (m.hienKhay - m.toi) + ')'
         + ' | bung ' + (u && u.ms != null ? u.ms + ' (' + u.n + ' khung, max ' + u.max + ', hen ' + u.hen + ', an ' + u.an + ')' : '?')
         + ' | tan ' + (m.tan - m.hienKhay) + (t ? ' (' + t.n + ' khung, max ' + t.max + ', dau ' + t.dau + ', hen ' + t.hen + ', an ' + t.an + ')' : '')
-        + ' | don ' + (m.don - m.tan)
+        + ' | don ' + (m.don - (m.donTu || m.tan))
         // main = do nghen lon nhat cua luong chinh trong ca lan bung (hen 4 ms) · chuot = con tro co nam trong khay luc khay hien
         + ' | main ' + m.main + ' | chuot ' + (m.chuot == null ? '?' : m.chuot)
+        // som N (04/10 Mac) = luot nay cua so khay duoc hien tu dau (hienSom), lenh hien mat N ms; khong co = duong cu
+        + (m.som != null ? ' | som ' + m.som : '')
     } catch (e) { return '' }
   }
 
@@ -270,6 +287,9 @@ function taoKhayThu(deps) {
       let hTruoc = Date.now()
       henMain = setInterval(() => { const bay = Date.now(); m.main = Math.max(m.main, bay - hTruoc); hTruoc = bay }, 4)
       const san = choBao('san-sang', 1800)
+      // hienSom (04/10 Mac): cua so khay len man TU BAY GIO, noi dung dang tang hinh; san dien hien sau nen nam TREN khay
+      const somDuoc = HIEN_SOM && anSan
+      if (somDuoc) { const tS = Date.now(); hien(khay, true); m.som = Date.now() - tS }
       hien(d, true)
       m.hienDien = Date.now()
       d.webContents.send('dien:lenh', Object.assign({ viec: 'mo', nut: tuongDoi(oTronNut(wa), wa), dich: { x: b.x - wa.x + b.width / 2, y: b.y - wa.y + b.height / 2 } }, goiNut()))
@@ -283,19 +303,21 @@ function taoKhayThu(deps) {
       if (!kBay) log('khay-thu CANH BAO: san dien khong bao toi (bung)')
       m.toi = Date.now()
       try { m.chuot = trongO(deps.conTro ? deps.conTro() : screen.getCursorScreenPoint(), b, 8) ? 1 : 0 } catch (e) {}
-      hien(khay, true)    // 02/10: khay PHAI len tren cung luc hien (san dien duoc dua len tren khay ngay duoi day)
+      if (!somDuoc) hien(khay, true)    // 02/10: khay PHAI len tren cung luc hien (san dien duoc dua len tren khay ngay duoi day)
       m.hienKhay = Date.now()
       const bungXong = js(khay, 'window.__khayBung ? window.__khayBung() : (window.__khayAn && window.__khayAn(false))', 1500)
         .then((k) => { m.bung = Date.now(); return k })
-      if (!TN) d.moveTop() // ong kinh tan PHIA TREN khay vua hien
+      if (!TN && !somDuoc) d.moveTop() // ong kinh tan PHIA TREN khay vua hien (hienSom: san dien da nam tren khay tu dau)
       const xong = choBao('xong', 1500)
       d.webContents.send('dien:lenh', { viec: 'tan' })
       const kTan = await xong
       m.tan = Date.now()
+      if (somDuoc) await bungXong // hienSom: khong an cua so san dien (phu ca man) khi man trap con dang bung
+      m.donTu = Date.now()
       await donDien()
       m.don = Date.now()
       const kBung = await bungXong
-      tt = 'mo'; lanCuoi = Date.now(); truocHien = true
+      tt = 'mo'; lanCuoi = Date.now(); truocHien = true; anSan = false
       log('khay bung (' + lyDo + '): ' + (Date.now() - t0) + ' ms' + ghiDo(t0, m, kSan, kBay, kTan, kBung))
       return true
     } catch (err) {

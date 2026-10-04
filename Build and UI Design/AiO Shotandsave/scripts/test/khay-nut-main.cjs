@@ -39,6 +39,7 @@ app.whenReady().then(async () => {
 
   const kt = taoKhayThu({
     electron: { BrowserWindow, screen, ipcMain }, thuNghiem: true,
+    hienSom: process.env.AIO_HIEN_SOM === '1' ? true : undefined, // 04/10: ep duong "hien cua so khay som" (mac dinh cua macOS) trong bai do an
     layKhay: () => khay, damBaoKhay: () => khay,
     anhMoiNhat: () => (soAnh ? anh(soAnh - 1, 200, 100) : ''), soAnh: () => soAnh,
     docGiay: () => giay, banKhac: () => ban, tuDong: () => tuDong,

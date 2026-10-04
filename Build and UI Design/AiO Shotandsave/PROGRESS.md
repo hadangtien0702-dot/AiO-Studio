@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 16:58 MAC: anh van thay "KHUNG" du so khung du (*"khá mượt nhưng vẫn khựng"*) -> DA NAP ban thu, CHO MAT ANH.**
+>   Bo dem khung khong thay cho anh nhin. Ban 16:58 (`app.asar` `0c4adecb`, chi macOS): cua so khay hien TU DAU luot bung
+>   (noi dung tang hinh), luc ong kinh toi noi khong con lenh cua so nao, san dien an SAU khi man trap xong. La GIA THUYET,
+>   chua do duoc tren man hinh. Dong run-log co them `| som N`. Chi tiet + huong tiep neu khong kha hon: muc
+>   [0.8.0 mac khung khay] ngay duoi.
 > - **04/10 16:42 MAC: DO TREN APP THAT sau khi nap: nut tron bung khay 4/4 lan MUOT (24-25 khung), anh tu bam.**
 >   Doc `run-log.txt` tu boot 16:26:54: 16:34:13 bung 25 khung (ho max 17 ms) · 16:34:33 24 (18) · 16:41:27 25 (17; mo sau
 >   7 phut khay nam im, `hien san` 38 ms) · 16:41:34 25 (18). Bay 27 khung, tan 15 khung ca 4 lan. 0 dong loi tu luc nap.
@@ -165,6 +170,35 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 mac khung khay] - 2026-10-04 16:58 - Mac: so khung du ma anh van thay "khung" -> hien cua so khay SOM + an san dien SAU khi man trap xong; da nap, CHO MAT ANH
+
+- **Boi canh:** sau khi nap ban 16:27 anh bam nut tron 4 lan, run-log 4/4 lan 24-25 khung, ho max 17-18 ms. Anh: *"khá mượt
+  nhưng vẫn khựng đó em"*. Tuc bo dem khung (rAF trong trang) dang mu dung cho anh nhin thay: no chi thay nhip cua TRANG,
+  khong thay luc nao cua so that su len man hinh.
+- **Nguyen nhan: GIA THUYET, CHUA DO duoc tren man hinh.** Em khong co thuoc nao nhin duoc man that (khong co quyen quay man
+  hinh; nut tron + san dien lai `setContentProtection` nen quay cung khong thay). Doc lai `bung()` thay 3 cho dang ngo:
+  (1) cua so khay chi `showInactive()` + `moveTop()` DUNG LUC ong kinh toi noi, roi man trap chay ngay (cubic-bezier
+  .2,.8,.2,1: 50 ms dau da mo khoang 40%) -> neu macOS dua cua so len man cham vai khung thi mat doan dau, khay "bup" ra;
+  (2) cua so san dien (trong suot, phu ca man 3584x2240) bi AN o khoang 300 ms sau khi khay hien, luc man trap (424 ms) con
+  dang bung; (3) `main` 33-47 ms = luong chinh nghen 2-3 khung o dau do trong luot bung, chua biet tai lenh nao.
+- **Da sua (chi macOS; Windows giu nguyen duong anh da duyet):** `src/khay-thu.js` them `HIEN_SOM` (mac dinh: darwin va khong
+  phai bai do an; `deps.hienSom` de ep). Luot bung: cua so khay duoc hien NGAY TU DAU (noi dung dang tang hinh `body.an`),
+  san dien hien sau nen nam tren; luc ong kinh toi noi chi con chay man trap, KHONG con lenh cua so nao; san dien chi bi an
+  SAU khi man trap xong. Chi di duong nay khi `anSan` = lan thu ve truoc do trang khay tu bao da ve khung trong (khong thi
+  hien som se lo khay cu). `shelf.css`: `body.an #shelf` them `pointer-events: none` (khay tang hinh khong nhan chuot).
+  Dong run-log them `| som N` o CUOI (N = ms cua lenh hien som); `don` nay tinh tu luc bat dau don.
+- **Kiem chung:** `node --check` dat. `npm run test:khaynut` 2 luot (duong cu / `AIO_HIEN_SOM=1`): ca hai 28 dat, 2 truot, CUNG 2
+  muc nguong thoi gian (thu ve 3168 / 3431 ms; xuat hien 1512 / 1721 ms). Trua nay HEAD truot 1 muc (thu ve 1,6-1,8 giay):
+  may dang ban hon nen bai an KHONG noi duoc gi ve toc do; cac muc trang thai (khay sach, san dien sach, tu thu, co anh moi luc
+  dang thu, san dien hong) dat o ca hai duong. Nap tai cho 16:58:23: `app.asar` `5f5996bc` -> `0c4adecb`, CDHash khong doi,
+  `LUONG: san sang` 16:58:26, 6 anh = 6, cau hinh khong doi; `khay-thu.js` trong ruot app khop file dang lam viec tung ky tu.
+- **CHUA kiem:** MAT ANH (thuoc duy nhat cua viec nay) · chua co dong `som N` nao (anh chua bam) · tong thoi gian mot luot
+  bung tren log se dai them ~150 ms (san dien an muon hon; khay van hien cung luc nhu cu) · Windows khong dung toi.
+  Neu anh thay KHONG kha hon: (a) tam ngung luong chup luc bung (huong H1 cua agent ECC), (b) giu nut that them vai khung luc
+  ong kinh bat dau bay, (c) nho anh quay man hinh (Cmd+Shift+5) de em doc tung khung, can tat bao ve 2 cua so phu luc do.
+  Ruot cu de tra lai: `ban-cai-truoc/shotandsave-ruot-20261004-165820/app.asar`.
+- **File:** `src/khay-thu.js`, `src/shelf/shelf.css`, `scripts/test/khay-nut-main.cjs`.
 
 ## [0.8.0 nap tai cho Mac] - 2026-10-04 16:27 - Nap ruot app moi vao ban dang cai tren Mac (khong thay .app): quyen Ghi man hinh CON, gom sua nut tron + 4 diem sau soat
 

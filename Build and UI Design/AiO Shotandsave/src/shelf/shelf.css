@@ -23,7 +23,9 @@ html, body {
 
 /* 01/10 KHAY THU VE NUT TRON (src/khay-thu.js): body.an = noi dung khay tang hinh (cua so van do) trong luc "bong" tren
    san dien dien thay; #chop = nhay sang luc khay bung ra kieu ong kinh (shelf.js __khayBung). */
-body.an #shelf { opacity: 0; }
+/* 04/10: tang hinh thi cung KHONG nhan chuot — hienSom (khay-thu.js) cho cua so khay len man ~0,5 giay truoc khi noi dung
+   hien, bam vao vung do khong duoc trung nut / anh dang tang hinh. */
+body.an #shelf { opacity: 0; pointer-events: none; }
 #chop { position: absolute; inset: 0; z-index: 20; background: #fff; opacity: 0; pointer-events: none; }
 
 /* ── Thanh tren: tay cam keo + ten + nut ─────────────────────────────── */
