@@ -1,6 +1,14 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 02:13 +0700 (may Mac, sua o lop MODULE, chua chay app that)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 13:53 DA SUA NOT 3 loi con lai cua luot ECC soat + THEM hop thoai thieu quyen tren Mac; ban moi da cai vao
+>   /Applications (van 0.8.0, `app.asar` md5 `b57cf56e`, boot 13:53:22).** Keo-tha huong A (anh chot): khong xoa `.keo` moi
+>   lan mo app. Sua anh ghim: ghi file TRUOC + atomic, hong thi tra anh ghim ve ban cu + hop thoai. Khay khong giu anh goc
+>   (do: 12 anh 4K +381 MB -> +34 MB). macOS thieu quyen: hop thoai noi ro + nut mo trang quyen (anh bam 35 lan chi thay
+>   overlay chop). 9 bai kiem chay an deu xanh (`test:banquyen` 71 · `cauhinh` 22 · `quyen` 28 · `keo` 22 · `khayram` 12).
+>   **CHUA CHUP DUOC tren Mac: macOS van `Failed to get sources`**, cho anh chay `tccutil reset ScreenCapture
+>   com.aiostudio.shotandsave` + bat lai quyen. CHUA ai chup / ghim / keo-tha / lam mo tren ban moi. Da commit tren may,
+>   CHUA push. Chi tiet: muc [0.8.0 sua ECC lan 2] ngay duoi.
 > - **04/10 02:13 DA SUA 3 trong 6 loi cua luot ECC soat 04/10: khach da tra tien KHONG con mat ma, `cau-hinh.json` KHONG
 >   con bi ghi de.** `npm run test:banquyen` 71/71 (truoc 27 muc; ban cu truot 33 muc moi) · `npm run test:cauhinh` 22/22
 >   (bai MOI; ban cu truot 15). CHUA chay tren app that, CHUA nap vao ban cai Windows (`node scripts/cai-tai-cho.mjs` tren
@@ -128,6 +136,68 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 sua ECC lan 2] - 2026-10-04 13:53 - Keo-tha giu file tam (huong A), sua anh ghim khong con lech voi file, khay khong giu anh goc, Mac thieu quyen thi co hop thoai; cai ban moi vao /Applications
+
+- **Boi canh:** anh: *"A di em, roi sua luon 2 loi con lai"* (A = giu file tam `.keo`, em hoi 3 huong A / B / C). Giua chung anh
+  bao tren Mac: *"loi AIO shot anh chup khong duoc"*, *"anh bam option + 1 no chop 1 cai overlay roi mat luon"*,
+  *"0.8.0 da duoc cai xong roi do em ma van chua chup duoc"*, *"anh bam phim tat khong nhan luon"*.
+- **Nguyen nhan that (deu da do):**
+  1. Mac khong chup duoc: run-log 35 lan `capture-start`, lan nao cung `Failed to get sources` = macOS chua cap quyen "Screen
+     & System Audio Recording" cho ban dang chay. App ky ad-hoc -> moi ban dung la mot danh tinh moi; dong "AiO Shot & Save"
+     dang BAT trong danh sach la cua ban dung cu (anh gui anh chup man hinh), bat / tat cong tac khong lam macOS nhan ban
+     moi. App CO goi `Notification` `app.khongChupDuoc` nhung thong bao khong hien tren may anh -> that bai im lang.
+     Luc 13:33 anh con chay nham ban 0.7.9 trong `ban-cai-truoc` (cung ma dinh danh). "Phim tat khong nhan": luc 13:34:37
+     anh doi `Alt+1 -> Alt+\`` (run-log) roi van bam Option+1.
+  2. Keo-tha: muc [soat] 01:38 so 1. Tren MAC loi nay dinh ca anh: thu muc anh mac dinh
+     `~/Library/Application Support/AiO Shot & Save/shotandsave` co dau cach + `&` -> moi lan keo di qua `.keo`.
+  3. Anh ghim: muc [soat] so 6. 4. Khay: DO bang Electron an 43.4.1: nen 71 MB · giu 20 manh cat 800x500 cua khung 4K =
+     705 MB (~32 MB/anh, manh cat dung chung vung nho voi ca khung) · bo het = 73 MB · chi giu anh nho = 75 MB. Khop vu
+     1.168 MB sau 21 gio (01/10): ~35 lan chup.
+- **Thay doi:**
+  - `src/quyen-man-hinh.js` MOI (`taoKiemQuyen`, khong require electron): `chanTruocKhiChup()` (quyen `denied` / `restricted`
+    -> hop thoai, KHONG mo overlay), `baoKhiChupHong()` (0 man co anh ma quyen khac `granted` -> hop thoai), 1 hop thoai mot
+    luc, nut dau mo `x-apple.systempreferences:...Privacy_ScreenCapture`. Windows: khong lam gi. `main.js`: goi o
+    `startCapture` (sau cong ban quyen) + `phatFrozen` (cho "0 man chup duoc"); them `systemPreferences`.
+  - `src/kho.js` keo-tha huong A: so `.keo/.goc.json` { ten lien ket: file goc }; `donKeoAnToan()` KHONG xoa sach nua, chi
+    bo lien ket khi DU 3 dieu (file goc khong con + thu muc cua no con + `nlink` 1), tra `{ giu, bo, khongRo }`; 2 file goc
+    trung ten sau khi lam sach -> hau to `-2`; them `lamMoiKeo(file)`, `ghiDeAnh(file, buf)` (tam + doi ten, tra `{ ok, loi }`),
+    xuat `thuMucKeo`. `main.js` luc mo app ghi dong `keo: giu N, bo N, khong ro goc N`.
+  - `src/main.js` `pin:save-edit`: ma hoa -> `kho.ghiDeAnh` TRUOC; `ok` moi doi `rec.image` + khay + `kho.lamMoiKeo`. Hong ->
+    `hoanTacSuaPin`: gui lai `pin:data` voi anh cu (hinh tren man = file) + `dialog.showMessageBox` (`pin.khongLuuSua`).
+    `pins` giu them `dipW`, `dipH`.
+  - `src/khay-muc.js` MOI (`taoMucKhay`, `anhMucKhay`, `capNhatMucKhay`): muc khay = `{ id, seq, filePath, w, h, thumb, image }`,
+    `image` chi con khi KHONG co file. `main.js`: `napAnhGanNhatVaoKhay`, `ensureShelf`, `settings:set-khay`, `shelfAdd`,
+    `shelf:pin` (doc lai tu file; khong doc duoc -> bo muc + `khay.anhKhongCon`), `shelf:start-drag` (bieu tuong tu anh nho,
+    loi ghi run-log thay vi chi `console` luc dev), `anhMoiNhat`.
+  - `src/i18n.js`: 8 khoa moi x 2 ngon ngu (`quyen.*` 4, `pin.khongLuuSua`, `pin.khongLuuSuaCt`, `pin.daHieu`, `khay.anhKhongCon`).
+  - Bai kiem moi: `test:quyen` (28, node thuan) · `test:keo` (22, gia electron) · `test:khayram` (12, Electron AN khong cua
+    so, co doi chung kieu cu ngay trong bai).
+- **Kiem chung bang so (may Mac, khong bat cua so nao):**
+  - Doi chung tren MA CU: `test:keo` 10 DAT / 8 TRUOT (file da keo MAT sau khi mo lai app voi ten `Nguyen Van A` va `Tiến`).
+  - Ma moi: `banquyen` 71/0 · `cauhinh` 22/0 · `quyen` 28/0 · `keo` 22/0 · `khayram` 12/0 · `khodai` 11/11 · `storyboard` ·
+    `lammo` 25/0 · `vienquay` deu DAT. `khayram`: kieu cu 12 anh +381 MB, kieu moi +34 MB.
+  - Mo thu ban NGUON 8 giay (`AIO_LUONG=0`, `AIO_USERDATA` rieng, phim `Alt+F9`): `boot v0.8.0 dang-ky=OK`, 0 dong loi.
+  - Ban cai: `electron-builder --mac --x64 --dir` 13:52, `ditto` vao `/Applications`: 432/432 file, `app.asar` md5 `b57cf56e`,
+    chu ky ad-hoc hop le, `boot v0.8.0 hotkey=Alt+1 dang-ky=OK` 13:53:22, `ban-quyen: dung-thu con 10 ngay` (doc qua
+    `taoKhoFile` tren file that cua anh). Du lieu: 4 anh con 4, `cau-hinh.json` md5 `775bc707` khong doi.
+- **Da lam tren may anh ngoai ma nguon:** thoat ban 0.7.9 anh mo nham, mo ban trong `/Applications` · dat `hotkey` trong
+  `cau-hinh.json` ve `Alt+1` (ban truoc: `cau-hinh.truoc-doi-phim-1348.json` cung thu muc) · 2 ban cu trong
+  `~/Library/Application Support/AiO-Studio/ban-cai-truoc/` doi duoi thanh `.app-cu` (0.7.9 va 0.8.0 dung 00:45) de khong mo
+  nham. KHONG dung vao quyen cua macOS (em khong duoc, va khong doc duoc bang quyen).
+- **CHUA kiem / CHUA xong:**
+  - Mac VAN chua chup duoc (13:53:23 `Failed to get sources`). Cho anh: `tccutil reset ScreenCapture
+    com.aiostudio.shotandsave` -> bam Option+1 -> bat quyen -> Quit & Reopen. Hop thoai moi CHUA ai thay tren man that.
+  - Duong chup -> khay -> ghim -> lam mo -> keo-tha cua ban moi CHUA chay lan nao (can quyen quay man hinh). Phan noi day
+    trong `main.js` moi qua `node --check` + mo thu 8 giay.
+  - Windows: chua nap (`node scripts/cai-tai-cho.mjs` tren may cong ty), chua chay bai nao tren Windows; ca `chmod` trong
+    `test:keo` / `test:cauhinh` / `test:banquyen` tu BO QUA tren Windows. Premiere co giu duoc clip da keo hay khong: chua do.
+  - `grabPromise` van giu 1 the he khung goc sau khi dong man chup (co tran, khong sua). Anh ghim dang mo van giu anh cua no.
+  - Goc lau dai cua vu "moi ban moi phai bat lai quyen": ky bang MOT chung chi tu tao co dinh (hoac Apple Developer 99
+    USD/nam) -> chua lam, cho anh quyet.
+- **File anh huong:** `src/quyen-man-hinh.js` (moi), `src/khay-muc.js` (moi), `src/kho.js`, `src/main.js`, `src/i18n.js`,
+  `package.json`, `scripts/test/do-quyen.cjs` · `do-keo.cjs` · `do-khay-ram.cjs` · `khay-ram-main.cjs` (moi), `CLAUDE.md`.
+  Commit tren may: `4ba8a64` (hop thoai quyen), `565b446` (3 ban sua). CHUA push.
 
 ## [0.8.0 mac] - 2026-10-04 01:56 - Dung + cai 0.8.0 tren Mac (lan dau); mo duoc, CHUA chup duoc vi macOS chua cap quyen quay man hinh
 

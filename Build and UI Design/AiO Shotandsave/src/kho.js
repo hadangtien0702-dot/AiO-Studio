@@ -63,7 +63,7 @@ function thuMucAnh() {
    duong dan co ky tu ngoai [A-Za-z0-9 _ - . : \ /] thi tao HARD LINK (tuc thi,
    khong ton dung luong; khac o dia thi copy) trong thu muc an toan
    %LOCALAPPDATA%/shotandsave/.keo/<ten file> va dua LIEN KET do cho app dich.
-   Anh goc nam nguyen cho cu. Thu muc .keo don sach moi lan mo app. */
+   Anh goc nam nguyen cho cu. ~~Thu muc .keo don sach moi lan mo app.~~ 04/10: KHONG don sach nua, xem ghi chu ngay duoi. */
 const AN_TOAN = /^[A-Za-z0-9_\-.:\\/]+$/
 function thuMucKeo() {
   const goc = process.env.LOCALAPPDATA || app.getPath('userData')
