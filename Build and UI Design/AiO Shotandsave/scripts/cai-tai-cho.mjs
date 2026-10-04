@@ -51,7 +51,7 @@ const ngu = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0,
 const dung = (ly) => { console.error('\nDUNG LAI: ' + ly); process.exit(1) }
 const dangChay = () => { try { return execFileSync('tasklist', ['/FI', 'IMAGENAME eq ' + TEN_EXE, '/FO', 'CSV', '/NH'], { encoding: 'utf8' }).split('\n').filter((l) => l.includes(TEN_EXE)).length } catch (e) { return 0 } }
 
-if (process.platform !== 'win32') dung('script nay chi cho Windows')
+if (process.platform !== 'win32') dung('script nay chi cho Windows (macOS: node scripts/cai-tai-cho-mac.mjs)')
 
 if (CHI_KIEM) {
   const a = path.join(CAI, 'resources', 'app.asar'), d = path.join(DUNG, 'resources', 'app.asar')

@@ -1,7 +1,13 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
-> - **04/10 14:54 MAC: nut tron bung khay bi GIAT (anh bao) -> DA SUA trong ma, CHUA cai vao app.** Cua so khay vua hien lai
+> - **04/10 16:27 MAC: DA NAP ban moi vao app dang cai (khong thay .app) — quyen Ghi man hinh CON, anh khong phai bat lai.**
+>   `node scripts/cai-tai-cho-mac.mjs`: `app.asar` `b57cf56e` -> `5f5996bc`, boot 16:26:54, `LUONG: san sang` 16:26:56, CDHash
+>   khong doi. Ban dang chay gom sua nut tron giat (`115c68f`) + 4 diem sau soat (`17cc661`, `977affb`). CHO ANH bam nut tron
+>   5-10 lan (doc dong `khay bung ... N khung`), chup, ghim + ve, keo-tha. Ruot cu cat o
+>   `~/Library/Application Support/AiO-Studio/ban-cai-truoc/shotandsave-ruot-20261004-162654/`. Anh dan: chi thay ca `.app`
+>   khi anh keu. Chi tiet: muc [0.8.0 nap tai cho Mac] ngay duoi.
+> - **04/10 14:54 MAC: nut tron bung khay bi GIAT (anh bao) -> DA SUA trong ma (16:27 DA NAP vao app, xem dong tren).** Cua so khay vua hien lai
 >   thi trang chua ve deu: do cua so that `lanh` 3 / 6 / 13 khung -> tat `backgroundThrottling` 24 / 23 / 24 / 24; du duong 8/8 lan
 >   22-25 khung. Agent ECC nghi huong khac (luong chup + khay khong duoc bao ve), CHUA do. Cai ban moi = anh phai bat lai quyen
 >   quay man hinh. `test:khaynut` tren Mac truot san 1 muc. Commit `115c68f`. Chi tiet: muc [0.8.0 mac giat khay] ngay duoi.
@@ -153,6 +159,35 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 nap tai cho Mac] - 2026-10-04 16:27 - Nap ruot app moi vao ban dang cai tren Mac (khong thay .app): quyen Ghi man hinh CON, gom sua nut tron + 4 diem sau soat
+
+- **Boi canh:** anh: *"gom với phần nút tròn rồi cài một lượt đi đi em - cai vao ban hiện tại luôn không cài bản mới - khi nào
+  anh kêu cài bản mới cài nhé"*. Ban dang cai la ban dung 13:52 (`app.asar` `b57cf56e`), chua co sua nut tron (`115c68f`) va
+  4 diem sau soat (`17cc661` + `977affb`). Hai lan truoc thay CA `.app` (01:56, 13:52) anh deu phai bat lai quyen Ghi man hinh.
+- **Nguyen nhan that (vi sao thay ca .app thi mat quyen, thay ruot thi khong):** app ky ad-hoc, macOS nhan app bang CDHash cua
+  file chay chinh. Thay ca `.app` = CDHash moi. Thay rieng `Contents/Resources/app.asar` va KHONG ky lai: file chay chinh +
+  `Info.plist` + `_CodeSignature` khong doi -> CDHash giu nguyen. Dieu kien: khoa `EnableEmbeddedAsarIntegrityValidation` cua
+  ban cai dang TAT (doc bang `@electron/fuses`: tat; phien kia doc doc lap cung ra tat), khong thi ma bam `app.asar` ghi
+  trong `Info.plist` lech la app khong mo. KHONG sua `Info.plist` cho khop: sua no la CDHash doi.
+- **Thay doi:** `scripts/cai-tai-cho-mac.mjs` MOI, ban Mac cua `cai-tai-cho.mjs`: dung `dist/mac` -> kiem Electron cung phien
+  ban + khoa tat -> dem do nguoi dung -> tat app (SIGTERM) -> cat ruot cu vao
+  `~/Library/Application Support/AiO-Studio/ban-cai-truoc/shotandsave-ruot-<ngay-gio>/` -> chep ruot moi -> mo lai -> doc
+  run-log -> khong boot thi tu tra ruot cu. Co `--chi-kiem` / `--chi-dung` / `--bo-qua-dung`. Khong xoa gi.
+  `scripts/cai-tai-cho.mjs`: cau bao "chi cho Windows" chi sang script Mac. `CLAUDE.md` app (so loi #3) + `AGENTS.md` muc 5:
+  them lenh Mac.
+- **Kiem chung bang so (16:26, may Mac):** dung 13 giay · `app.asar` `b57cf56e` -> `5f5996bc` (874 KB); `app.asar.unpacked`
+  165 file giong ban dung nen de nguyen · run-log `16:26:54.945 boot v0.8.0 hotkey=Alt+1(config) dang-ky=OK lang=vi` roi
+  `16:26:56.420 LUONG: san sang 1 man [3584x2240]` = quyen CON, anh khong phai bat lai · CDHash `ce8db8d2` truoc = sau ·
+  anh nguoi dung 5 = 5, `cau-hinh.json` md5 `201097f4` khong doi · ruot dang cai chua `backgroundThrottling` (4 cho),
+  `apDungSuaVaoKhay` (4), `boLuotChup` (7), `banChep` (5) · `codesign --verify`: "a sealed resource is missing or invalid"
+  (dung du kien vi khong ky lai).
+- **CHUA kiem:** anh chua bam gi tren ban moi (nut tron: dong `khay bung ... N khung`; chup; ghim + ve; keo-tha). Quyen moi
+  kiem qua luong chay san luc mo app, chua co luot chup that. Sau khi khoi dong lai may quyen co con khong: chua do. Duong
+  tu tra ruot cu cua script (app khong boot) chua tung chay. Ban phat hanh that van phai dung + ky day du.
+- **Tra ruot cu:** thoat app, chep `.../ban-cai-truoc/shotandsave-ruot-20261004-162654/app.asar` (md5 `b57cf56e`) de len
+  `/Applications/AiO Shot & Save.app/Contents/Resources/app.asar`, mo lai app.
+- **File anh huong:** `scripts/cai-tai-cho-mac.mjs` (moi), `scripts/cai-tai-cho.mjs`, `CLAUDE.md`, `AGENTS.md` (goc repo), file nay.
 
 ## [0.8.0 mac giat khay] - 2026-10-04 14:54 - Mac: nut tron bung khay bi giat -> tat `backgroundThrottling` cho 3 cua so; do bang cua so that, CHUA cai vao app
 
