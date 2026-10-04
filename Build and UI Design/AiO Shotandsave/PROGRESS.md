@@ -232,11 +232,19 @@
   `cau-hinh.json` ve `Alt+1` (ban truoc: `cau-hinh.truoc-doi-phim-1348.json` cung thu muc) · 2 ban cu trong
   `~/Library/Application Support/AiO-Studio/ban-cai-truoc/` doi duoi thanh `.app-cu` (0.7.9 va 0.8.0 dung 00:45) de khong mo
   nham. KHONG dung vao quyen cua macOS (em khong duoc, va khong doc duoc bang quyen).
+- **14:31 CHAY THAT tren Mac (ban `b57cf56e`):** 14:30 anh bao *"anh moi allow cho audio"* (bang hoi cua macOS ghi "screen and
+  audio"); app luc do van la tien trinh 13:53 nen chua an. 14:31:11 em mo lai app: 2 lan dau van `Failed to get sources`;
+  14:31:23 app duoc mo lai lan nua (macOS Quit & Reopen) -> `LUONG: san sang 1 man [3584x2240]`, `bat dau 1 man @5fps`.
+  14:31:43 anh bam Option+1: `grab-xong 693ms nguon=luong` -> keo chon 67 khung, gap-max 20 ms -> `luu
+  shotandsave-2026-10-04-143147-959.jpg 2484x1324` -> `tu dong nap 4 anh gan nhat vao khay` -> khay thu ve nut (5 o bay) va
+  bung ra 2 lan. Tu 14:31:23: 0 dong LOI, 0 `Failed to get sources`. Thu muc anh 4 -> 5 file. Tien trinh chinh 167 MB voi
+  5 anh trong khay. File phe duyet cua macOS (`~/Library/Group Containers/group.com.apple.replayd/
+  ScreenCaptureApprovals.plist`) ghi `com.aiostudio.shotandsave` dung lan cuoi 14:31:24. Anh co chay `tccutil reset` hay
+  khong: em KHONG biet (anh khong noi, em khong doc duoc bang quyen).
 - **CHUA kiem / CHUA xong:**
-  - Mac VAN chua chup duoc (13:53:23 `Failed to get sources`). Cho anh: `tccutil reset ScreenCapture
-    com.aiostudio.shotandsave` -> bam Option+1 -> bat quyen -> Quit & Reopen. Hop thoai moi CHUA ai thay tren man that.
-  - Duong chup -> khay -> ghim -> lam mo -> keo-tha cua ban moi CHUA chay lan nao (can quyen quay man hinh). Phan noi day
-    trong `main.js` moi qua `node --check` + mo thu 8 giay.
+  - Tren ban moi CHUA ai thu: bam anh trong khay de GHIM (duong doc lai anh goc tu file), ve / lam mo anh ghim (duong ghi
+    file truoc), keo-tha ra Premiere roi thoat + mo lai app (duong `.keo` moi), hop thoai thieu quyen (quyen da co nen
+    khong con dip hien; chi qua `test:quyen`).
   - Windows: chua nap (`node scripts/cai-tai-cho.mjs` tren may cong ty), chua chay bai nao tren Windows; ca `chmod` trong
     `test:keo` / `test:cauhinh` / `test:banquyen` tu BO QUA tren Windows. Premiere co giu duoc clip da keo hay khong: chua do.
   - `grabPromise` van giu 1 the he khung goc sau khi dong man chup (co tran, khong sua). Anh ghim dang mo van giu anh cua no.
