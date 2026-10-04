@@ -1,6 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 16:42 MAC: DO TREN APP THAT sau khi nap: nut tron bung khay 4/4 lan MUOT (24-25 khung), anh tu bam.**
+>   Doc `run-log.txt` tu boot 16:26:54: 16:34:13 bung 25 khung (ho max 17 ms) · 16:34:33 24 (18) · 16:41:27 25 (17; mo sau
+>   7 phut khay nam im, `hien san` 38 ms) · 16:41:34 25 (18). Bay 27 khung, tan 15 khung ca 4 lan. 0 dong loi tu luc nap.
+>   Truoc sua, cung app that: 3/5 lan giat (3 / 11 / 13 khung). MOI 4 MAU (chua du 5-10 lan) va CHUA co loi anh xac nhan
+>   bang MAT. Huong H1 cua agent ECC (luong chup + khay khong duoc bao ve) vi vay chua can do. Cung ban nay: chup 16:30:00
+>   luu duoc 1328x1170, keo ra ngoai di qua `.keo` (dong `keo qua lien ket an toan`).
 > - **04/10 16:27 MAC: DA NAP ban moi vao app dang cai (khong thay .app) — quyen Ghi man hinh CON, anh khong phai bat lai.**
 >   `node scripts/cai-tai-cho-mac.mjs`: `app.asar` `b57cf56e` -> `5f5996bc`, boot 16:26:54, `LUONG: san sang` 16:26:56, CDHash
 >   khong doi. Ban dang chay gom sua nut tron giat (`115c68f`) + 4 diem sau soat (`17cc661`, `977affb`). CHO ANH bam nut tron
