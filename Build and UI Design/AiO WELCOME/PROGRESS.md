@@ -1,5 +1,32 @@
 # PROGRESS — AiO Studio (panel tổng)
 
+## [do + cho anh chot] - 2026-10-04 16:36 (UTC+7) - Anh muon MOI tool chay trong MOT panel + giao dien "chua du dac sac cho GenZ": do kha nang NHUNG, CHUA sua ma
+
+- **Boi canh:** anh gui anh chup panel tong 2.1.1 (luoi 12 the): *"phần này anh thấy nó hơi bị đơn điệu quá… chưa đủ đặc sắc cho
+  genz dùng"* va *"hiện tại khi anh mở bản này ra thì nó đang mở ra các tab khác… anh muốn tất cả tool trong PR chỉ sử dụng trong
+  1 bảng pannel duy nhất của PR để gọn gàng"*. Dieu thu hai DAO quyet dinh 21/09 (kieu "be phong": bam the -> mo panel RIENG
+  cua tool; ly do luc do: khong viet lai 11 panel, tool nang khong lam khung panel tong).
+- **Do tren panel tong dang mo trong Premiere Beta 26.5 (Mac, CEP Chromium 99), khung con AN, khong nap tool that, khong dung
+  project** (script o thu muc tam cua phien):
+  - Khung con (iframe) nap mot trang `file://` nam o thu muc KHAC: `__adobe_cep__` co · `cep.fs` co · `require` la ham, doc dia
+    duoc · `evalScript('app.version')` tra `26.5.0`. => Node + cau noi Premiere CHAY trong khung con.
+  - NHUNG trong khung con `getExtensionId()` = `com.aiostudio.hub.panel`, `getSystemPath('extension')` va `__dirname` = thu muc
+    PANEL TONG. => tool nao tim `bin/`, `host/`, file di kem theo duong dan extension se tim NHAM cho; phai co lop dem.
+  - Panel tong doc duoc file cua extension khac (trang chinh Guide Frame 114.740 ky tu qua ca `fetch` lan `fs`; `host/index.jsx` co).
+  - Ham host cua tool khac (`ac_getRange`, `gf_tatOverlay`) nhin tu panel tong = `undefined` khi tool do chua mo => panel
+    tong phai tu nap `host/index.jsx` cua tung tool truoc khi hien tool.
+  - Manifest: 10/10 tool can `--enable-nodejs --mixed-context` (panel tong co san); 7/10 can them `--allow-file-access` +
+    `--allow-file-access-from-files` + co khac ma panel tong CHUA co.
+- **Bay da ghi san trong so tay CEP (dong 529):** panel dung iframe thi KEO-THA hong tu Premiere 2022 (CEP-Resources #483, Adobe
+  chua tra loi). Dung cham 3 tool song bang keo ra timeline: Asset Manager, Power Bins, Music. CHUA do lai tren Premiere 26.5
+  (can tay anh keo thu mot lan).
+- **Cac huong da trinh anh, anh CHUA chot muc nao:**
+  - A. NHUNG: panel tong thanh khung chua (thanh icon mau + vung hien tool); 11 tool giu nguyen ma, hien trong khung con. Re
+    nhat. Viec phai lam: lop dem duong dan / ID, nap host, gop co manifest, giu tool dang chay khi doi tool, thu keo-tha.
+  - B. GOP THAT thanh mot extension (kieu AutoCut): viet lai, dung ca tool da dong bang (Autocut, Asset Manager).
+  - Giao dien: lam MOT mau that theo huong anh chon roi moi nhan ra 12 tool (luat 5bh).
+- **Thay doi:** khong co thay doi ma. **File anh huong:** chi file nay.
+
 ## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
 
 - Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
