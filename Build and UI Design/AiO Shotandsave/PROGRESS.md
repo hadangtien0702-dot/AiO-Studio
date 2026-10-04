@@ -1,6 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 17:24: icon phim 6 (danh so) doi tu "vong tron so 1" sang GHIM VI TRI (anh chon kieu A trong 4 kieu). DA NAP
+>   (`app.asar` `d73681ab`).** Chu goi y doi sang "Danh dau so 1, 2, 3". Icon LAM MO (phim 4) anh cung che kho hieu: em da ve
+>   4 kieu, CHO ANH CHON. Chi tiet: muc [0.8.0 icon phim 6] ngay duoi.
 > - **04/10 17:13 MAC: app KHONG con bieu tuong o Dock, chi con tren thanh menu (anh yeu cau). DA NAP (`app.asar` `0dcbb8c4`).**
 >   Do: macOS xep app `Foreground` -> `UIElement`; anh chup + keo-tha duoc ngay sau do (17:13:16). Luc mo app bieu tuong con
 >   nhay len Dock mot nhip (het han khi cai ca `.app`, da dat `LSUIElement`). **17:15 ANH XAC NHAN bang mat: *"okie rồi em,
@@ -179,6 +182,24 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.8.0 icon phim 6] - 2026-10-04 17:24 - Icon cong cu danh so (phim 6): vong tron so 1 -> GHIM VI TRI (anh chon kieu A); da nap. Icon lam mo (phim 4): CHO ANH CHON
+
+- **Boi canh:** anh: *"cái short cut số 6 anh muốn nó nên thay đổi icon mà mark thì hợp lí hơn là số 1 ... cái đó là mình đánh
+  dấu số, mark số cần note trong ảnh; em để số 1 đó anh nhìn vào không hiểu ngay nó là gì"*. Icon cu = vong tron co so 1,
+  dung ngay canh chu phim "6" o goc nut: hai con so canh nhau. "Mark" co nhieu cach ve nen em ve 4 kieu DAT TRONG THANH CONG CU
+  THAT (co 16 px, canh nut 3 / 4 / 5 / S) cho anh bam chon: A ghim vi tri · B ghim co so · C marker kieu Premiere · D ba diem
+  noi nhau. Anh: *"Anh chọn icon A cho phím 6"*.
+- **Da sua:** `src/overlay/index.html` + `src/pin/index.html`: nut `data-tool="so"` doi hinh sang ghim vi tri (than giot +
+  cham tron, net 1,9 nhu cac icon khac), `aria-label` "number marker". `src/i18n.js` `overlay.so`: VI "Đánh dấu số 1, 2, 3
+  (phím 6): bấm vào chỗ cần ghi chú, số tự tăng", EN "Number markers 1, 2, 3 (key 6): click the spot to note, the number counts up".
+  KHONG doi huy hieu ve len anh (van la vong tron co so), khong doi phim.
+- **Kiem chung:** `npm run test:sobuoc`: khong muc nao TRUOT (nut co o ca man chup lan anh ghim, 2 ngon ngu, phim 6 vao dung
+  cong cu, khong loi trang). Nap tai cho 17:24:21: `app.asar` `0dcbb8c4` -> `d73681ab`, CDHash khong doi, quyen Ghi man hinh
+  con, 10 anh = 10, van `UIElement`. Doc ruot app dang cai: 2 trang deu co hinh ghim moi, 0 cho con hinh cu, chu VI dung.
+- **CHUA kiem:** anh nhin icon moi tren app that · tiep theo anh bao *"icon làm mờ nhìn nó cũng không hiểu gì hết"* (phim 4):
+  em da ve 4 kieu (A thanh che chu · B mat gach cheo · C giot nuoc · D khung co o kham), CHO ANH CHON, chua sua dong nao.
+- **File:** `src/overlay/index.html`, `src/pin/index.html`, `src/i18n.js`.
 
 ## [0.8.0 mac an Dock] - 2026-10-04 17:13 - Mac: app khong con bieu tuong o Dock, chi con bieu tuong tren thanh menu; da nap, do `Foreground` -> `UIElement`
 
