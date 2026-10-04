@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
+> - **04/10 17:26: icon LAM MO (phim 4) doi tu "4 o vuong" sang KHUNG CO O KHAM (anh chon kieu D trong 4 kieu). DA NAP
+>   (`app.asar` `13bf9f48`), o ca man chup lan anh ghim; doc ruot app: 2/2 trang co hinh moi, 0 hinh cu, chu phim 4 con.**
+>   Anh noi kem: *"chọn D mà em thêm kiểu cho anh được không em"* -> CHUA RO "them kieu" la gi (them KIEU LAM MO cho cong cu,
+>   hien co 2: Kham o / Mo min, chon trong Cai dat; hay ve them kieu ICON), em da HOI LAI, chua lam gi cho ve nay.
 > - **04/10 17:24: icon phim 6 (danh so) doi tu "vong tron so 1" sang GHIM VI TRI (anh chon kieu A trong 4 kieu). DA NAP
 >   (`app.asar` `d73681ab`).** Chu goi y doi sang "Danh dau so 1, 2, 3". Icon LAM MO (phim 4) anh cung che kho hieu: em da ve
 >   4 kieu, CHO ANH CHON. Chi tiet: muc [0.8.0 icon phim 6] ngay duoi.
