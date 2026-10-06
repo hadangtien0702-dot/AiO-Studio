@@ -5,6 +5,35 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-06 13:42 (UTC+7) - Đưa 4 tính năng mới của app lên web: đánh số bước, bút + dạ quang, chụp cuộn, xuất GIF (13 → 17 thẻ / cảnh) - máy công ty
+
+- **Bối cảnh:** anh: *"update lên website tính năng mới đi em"*. Web đang có 13 thẻ / 13 cảnh (tới quay video + khay tự thu, 01–02/10).
+  App từ đó thêm: đánh số bước phím 6 (02/10), bút vẽ tay 7 + dạ quang 8, chụp cuộn 9, xuất GIF trong Khay video (06/10).
+- **Đã làm** (`Website/AiO ShotSave Web/index.html`, EN + VI, không gạch ngang dài):
+  - 4 thẻ `f14`–`f17` trong lưới dự phòng; icon chép từ `src/overlay/index.html` của app.
+  - 4 cảnh mới trong rạp (số 14–17): huy hiệu số chép `veSo()` (tròn, viền trắng); bút khoanh tay + dạ quang mờ 0,4 (lớp SVG,
+    `netVe` / `veNet`); chụp cuộn (trang cuộn trong cửa sổ, thước chiều cao + nút Xong ngoài vùng, ảnh dài mọc dần); GIF (ô thứ ba
+    của cụm chọn chạy "GIF n%", rồi kéo thả vào khung chat). Chữ nút lấy từ `src/i18n.js` (`cuon.xong`, `vd.gifNut`).
+  - Thanh công cụ demo đầu trang: thêm 4 nút 6 / 7 / 8 / 9 (bấm là nhảy tới cảnh), đúng thứ tự anh chốt 06/10: V, dãy số, S R, màu.
+  - Số cảnh trên rạp lấy theo `TN.length` (hết ghi cứng "/ 13"); phím 6 / 7 / 8 / 9 nhảy tới cảnh; tên clip ẩn dưới 1560 px (17 clip).
+- **Lỗi do chính bản sửa, bắt được trước khi đẩy:** (1) chèn ghi chú `//` vào GIỮA một dòng khai báo nhiều biến → cả khối script
+  thứ hai chết, rạp không hiện (bài kiểm cú pháp chạy TRƯỚC lần sửa đó nên báo sạch; mở trang mới thấy); (2) cảnh GIF trên sân
+  thấp: thẻ tràn 2 px, bong bóng chat bị đẩy đè thanh tiêu đề; (3) thanh demo 12 nút rộng 671 px → ẩn nút chỉ-để-xem dưới 780 px.
+- **Đo trước khi đẩy** (trình duyệt trong app Claude, máy chủ tĩnh trên bản làm việc; mỗi cảnh tua 11 mốc, đo phần tử có tràn sân không):
+  | Cỡ màn | Ngôn ngữ | Cảnh đo | Tràn / lỗi |
+  |---|---|---|---|
+  | 1920×950 | EN + VI | 17 + 4 | 0 |
+  | 1280×720 | VI | 17 | 0 |
+  | 1000×700 | VI | 17 | 0 |
+  | 375×812 | VI + EN | 17 + 4 | 0, không cuộn ngang |
+  Bấm phím THẬT 9 và 6 → nhảy đúng cảnh 16 và 14; bấm clip 17, bấm nút bút trên thanh demo → đúng cảnh; cảnh 13 diễn xong tự
+  sang 14 rồi 15. Thanh demo 671 px trong khung 960 / 801 px, một hàng. Cú pháp 2 khối script: 0 lỗi.
+- **Thước có giới hạn (khung xem trước chỉ vẽ ~2 khung / giây):** không đo được độ mượt; ảnh chụp giữa chừng có lúc còn hình cũ
+  (ô GIF đã sáng trong DOM mà ảnh chưa đổi) nên trạng thái cuối lấy từ DOM, không lấy từ ảnh.
+- **CHƯA làm / lưu ý:** web quảng cáo 4 tính năng mà anh mới bấm thử chụp cuộn (bút, đánh số, GIF đã nạp vào app nhưng anh chưa
+  xác nhận). Thẻ Chụp cuộn không ghi giới hạn (video chiếm hết vùng thì mất dấu; trần 3 phút / 16.000 px). Chưa đo Safari / iPhone
+  thật, nền sáng, giảm chuyển động. Chưa có bộ cài mới chứa các tính năng này (anh dặn chờ).
+
 ## [web-shotsave] - 2026-10-02 09:33 (UTC+7) - Rạp: chuyển cảnh hết "giật và khựng" (một nhịp mờ ra / hiện vào, sân giữ nguyên chiều cao) - máy công ty
 
 - **Bối cảnh:** sau bản tự chuyển cảnh 08:58 anh báo: *"khi chuyển giữa các phần có đang bị giật và khựng lại"*.
