@@ -115,6 +115,17 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 28] - 2026-10-06 14:06 - Doi icon nut 9 (chup cuon) theo icon anh chon
+
+**Boi canh.** Anh: *"icon số 9 xấu quá em"* (to giay + mui ten). Em ve 4 kieu, anh: *"cả 4 đều xấu"*. Dua 8 icon co san cua bo
+Tabler dat dung co that tren thanh cong cu, anh chon *"số 3 (Kéo dài theo chiều cao)"* = Tabler `arrow-autofit-height` (MIT).
+**Da sua.** `src/overlay/index.html`: net ve cua nut `data-tool="cuon"` lay nguyen van tu `@tabler/icons@3.19.0` (5 net), do day
+1.9 nhu cac nut ben canh. Web cung doi (commit `222d755`, da live).
+**Kiem chung.** `test:chupcuon` 34/34, `test:butve` dat; nap 14:06:00, `app.asar` md5 `56aa49da` co net moi; 717 anh + 9 dai + cau
+hinh giong truoc. CHUA co: anh nhin tren app that.
+**Bai hoc.** Icon la viec ve gu: 3/4 kieu em tu ghep net bi che. Lan sau dua icon co san cua mot bo ve chuyen nghiep (Lucide /
+Tabler), dung co that tren thanh that, cho anh bam chon; khong tu ve.
+
 ## [0.8.0 nap lan 27] - 2026-10-06 13:10 - Chup cuon: thanh menu DINH + video cung nam trong vung (luot that 13:03 con 'lac' 19 khung cuoi)
 
 **Boi canh.** Sau ban 13:02 anh thu lai ngay (khong nhan gi them). Run-log 13:03:34: `chup-cuon dung sau 10332 ms: 1293x2233 khung=84
