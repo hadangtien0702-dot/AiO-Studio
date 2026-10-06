@@ -19,6 +19,10 @@ Con lai cua muc 4: xuat GIF (anh chot "lam sau") · thu tieng micro.**
 **02/10 14:44 muc 1 (danh so buoc) DA LAM, phim 6, nap vao app dang cai, cho anh bam thu (xem CLAUDE.md + PROGRESS.md).
 Anh nhan "thêm tính năng đi em" sau khi em de xuat thu tu 1 -> GIF -> 3 -> 2; anh khong chi dich danh muc nao.**
 
+**06/10 anh chot lam 3 muc trong MOT luot roi moi push: xuat GIF (phan con lai cua muc 4) · muc 2 (but ve tay + da quang,
+phim 7 / 8) · muc 5 (chup cuon, phim 9). Ca 3 DA LAM va nap vao app dang cai (10:36 / 10:49 / 10:59), cho anh bam thu; chup
+cuon CHUA chay tren man that. Con lai trong danh sach: muc 3 (hut mau), 6, 7, 8; thu tieng micro; app tu cuon khi chup cuon.**
+
 Nhom 1 - re, hop editor, lam ngay duoc:
 | # | Tinh nang | Nguoi dung duoc gi | Cong suc + luu y |
 |---|---|---|---|

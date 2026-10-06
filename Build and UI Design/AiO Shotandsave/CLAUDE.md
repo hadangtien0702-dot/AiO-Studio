@@ -467,6 +467,23 @@ DANH SO BUOC 1-2-3 (02/10 14:44, phim 6 — da nap vao app dang cai, anh CHUA ba
   lam hong 2 ham phai bi bat. CHUA DAT: anh chua bam tren app that · chuot that chua do · huy hieu co dinh 26 px (anh 4K
   co the nho) · vao ve lai anh ghim thi dem lai tu 1 · chua len web · Mac chua thu.
 
+CHUP CUON TRANG DAI (06/10, phim 9 — da nap vao app dang cai, ☠️ CHUA chay lan nao tren man that):
+- Nguoi xai: khoanh vung noi dung dang cuon (KHONG gom thanh co dinh o day) -> phim **9** hoac nut trang-co-mui-ten -> quanh
+  vung hien vien cam + nut **Xong** -> tu lan chuot cuon trang xuong, khong can nhanh -> bam Xong (hoac bam lai phim tat chup)
+  -> mot anh dai vao khay. Vi du doi thuong: chup ca mot doan chat dai voi khach, hay ca bang thong so xuat file, thanh MOT
+  tam anh thay vi 5 tam roi rac.
+- Builder: `src/chup-cuon.js` = `taoBoGhep(w, h)` (nhan khung BGRA, tra 'dau' | 'dung' | 'them' | 'lui' | 'lac' | 'day';
+  khong phu thuoc Electron) + `chayPhien()` (vong lap lay khung toi khi Xong / het gio / cham tran). `main.js chupCuon()`:
+  vien + nut tu `moVienQuay(..., 'cuon')`, khung tu `layKhungVung()` (luong chup chay san, JPEG, 5 khung / giay) ->
+  `toBitmap()`; anh cuoi `nativeImage.createFromBitmap` -> `kho.luuAnh` + `shelfAdd`. Cho de hong: (1) 3 nguong trong bo
+  ghep (`NGUONG`, `CO_NOI_DUNG`, `KHAC_DAI`) da tung sai theo ca hai chieu, doi la chay `npm run test:chupcuon`; (2) "chon chi
+  phi nho nhat" va "uu tien troi it" phai la HAI luot; (3) 'lac' thi KHONG cap nhat khung moc; (4) khong cua so nao duoc de
+  len vung (vien + nut nam ngoai, deu setContentProtection); (5) nut Xong dung chung kenh `quay:dung` voi quay video.
+- MVP (so): `npm run test:chupcuon` 23/23 (trang gia co dap an: cuon het 5200 px ra dung 5200 px, lech 1,19 / kenh; co that
+  2400x1300 mat 15 ms / khung; duong anh JPEG that cua Electron). CHUA DAT: chua chay tren man that lan nao (xem PROGRESS
+  06/10 10:59) · thanh co dinh o day vung · khoang trang phang cao hon vung · cuon ngang · chua hien chieu cao da ghep ·
+  cach "nguoi dung tu cuon" la em chon, anh chua duyet · Mac chua thu · chua len web.
+
 BUT VE TAY + BUT DA QUANG (06/10, phim 7 / 8 — da nap vao app dang cai, anh CHUA bam thu):
 - Nguoi xai: khoanh vung (hoac mo anh ghim) -> phim **7** (but) hoac **8** (da quang) -> giu chuot keo de ve; giu Shift ra
   duong thang (gach chan mot dong chu); bam roi tha la mot cham. Doi mau bang bang mau; V chon de keo / Delete; Ctrl+Z bo net

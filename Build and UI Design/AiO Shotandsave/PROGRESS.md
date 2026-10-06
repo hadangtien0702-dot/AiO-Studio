@@ -115,6 +115,53 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 21] - 2026-10-06 10:59 - TINH NANG MOI: chup cuon trang dai (phim 9), CHUA chay tren man that
+
+**Boi canh.** Tinh nang 3/3 cua luot anh chot 06/10 (*"Chụp cuộn trang dài"*). ROADMAP muc 0 so 5 (em tung ghi "lon, rui ro cao nhat").
+
+**Da lam.** Khoanh vung -> nut Chup cuon (icon trang + mui ten xuong, so 9) hoac phim **9** -> cua so chup dong, hien vien cam +
+dong ho + nut **Xong** NGOAI vung (dung chung bo vien / dong ho cua quay video) -> nguoi dung TU LAN CHUOT cuon trang xuong
+-> app lay khung cua vung tu luong chup chay san va ghep -> bam Xong (hoac bam lai phim tat chup) -> MOT anh dai vao khay
+nhu anh chup thuong (luu theo dinh dang anh dang cai). Tran: 3 phut, 16.000 diem anh chieu cao. Em chon cach "nguoi dung tu
+cuon" (nhu CleanShot) thay vi "app tu cuon" (nhu ShareX: phai gia lap chuot vao app khac, rieng tung he dieu hanh); bo ghep
+dung chung cho ca hai nen sau them tu cuon khong phai lam lai. Anh CHUA duyet lua chon nay.
+- `src/chup-cuon.js`: bo ghep `taoBoGhep()` (khong phu thuoc Electron) + vong lap mot phien `chayPhien()`.
+- `main.js`: `chupCuon()`, nhanh `payload.cuon` trong `handleConfirm`, `moVienQuay(..., 'cuon')` doi chu nut thanh "Xong",
+  nut `quay:dung` va phim tat chup deu dung duoc phien cuon. `overlay.js` + `index.html`: nut + phim 9. 5 khoa chu VI + EN.
+
+**Bo ghep tim do troi the nao.** Moi hang thu gon thanh 12 so (do sang 12 dai cot). Thu moi do lech d (am = cuon nguoc), lay d
+co chi phi nho nhat, voi 3 dieu kien: chi phi <= nguong · phan chong nhau co >= 10 hang "co noi dung" · chi phi moi hang bi
+chan tran (thanh co dinh khong pha duoc ket qua). Khong khop thi bao 'lac' va KHONG noi gi (cuon nguoc lai mot chut la bat lai).
+
+**3 loi cua chinh bo ghep, bat duoc bang trang gia co dap an truoc khi nap:**
+1. Gop "chon nho nhat" voi "uu tien troi it" trong mot vong (cho lech 15 %) -> co thanh co dinh thi anh dai lech 1 hang (2679
+   thay vi 2680). Tach 2 luot, chi hoa tiet lap that (lech <= 2 %) moi xet "troi it".
+2. Nguong "hang co noi dung" = 6 nam dung muc nhieu JPEG (~6,4) -> trang trang phang bi BIA ra do cuon. Nang len 24.
+3. "Hang co noi dung = khac hang ke" bo sot cac hang giua mot dong chu -> 12 / 42 khung bi tu choi oan. Them dieu kien "cac
+   dai cua hang khac nhau ro".
+
+**Kiem chung.** `npm run test:chupcuon` (MOI, chay an): **23/23 DAT**.
+- Trang gia 900 x 5200 (dong chu, khoi anh, khoang trang 380 px, bang 8 hang giong het), cua so 600 px, nhieu +-3:
+  cuon het trang (buoc 5..410 px, co dung va cuon nguoc, 42 khung) -> anh dai cao DUNG 5200, tung diem anh lech 1,19;
+  buoc 590 px (vuot phan chong) -> 'lac', khong noi bua, cuon nguoc lai thi bat lai; thanh co dinh 50 px; trang trang
+  phang khong noi gi; tran 1500 dung dung 1500. DOI CHUNG: anh ghep lech 1 hang -> lech 1,19 -> 6,12; trang khac -> 'lac'.
+- Co that 2400 x 1300 (man 4K 150 %): ghep dung, 15 ms / khung (cham nhat 23 ms; app lay 5 khung / giay).
+- Trong Electron an: man chup that, phim 9 va bam nut deu gui dung 1 lenh `{ rect, cuon: true }`; khung di qua DUNG duong anh
+  cua app (nativeImage -> JPEG q85 -> toBitmap): ghep dung 3020 / 3020, lech 1,24; anh dai ra PNG 900x3020; khong ai bam
+  Xong thi tu dung o tran thoi gian; luong chup khong tra khung thi bo, khong treo.
+- Hoi quy (ghi ra file rieng, dung o bai truot): `test:butve` 65, `test:sobuoc` 72, `test:xuatgif` 58, `test:khovideo` 76,
+  `test:nutkhay` 54, `test:khaynut` 31, `test:vienquay`: 0 truot. Nap 10:59 (boot 10:59:22, anh/video 698 -> 698).
+
+**☠️ CHUA do / CHUA lam (phan lon nhat cua tinh nang nay con o day).**
+- **CHUA co luot nao tren man THAT**: vien + nut Xong co hien dung khong, lan chuot co toi app ben duoi khong, khung lay tu
+  luong chup that (5 khung / giay) co ghep duoc khi cuon bang banh xe chuot / cuon muot cua Chrome khong. Muon thu phai cuon
+  mot cua so that tren man anh -> can anh bam thu, hoac cho em gio de em mo mot cua so thu.
+- Trang co thanh co dinh o DAY vung (footer dinh): phan do se bi noi lap lai moi lan -> phai khoanh vung khong gom no.
+- Di qua mot khoang trang PHANG cao hon vung khoanh: khong co gi de bam -> ghep dung lai o do.
+- Cuon NGANG khong ho tro. Vung vat 2 man khong co nut. Anh dong / video trong vung lam khung khong khop ('lac').
+- Dong ho tren thuoc hien THOI GIAN, chua hien chieu cao da ghep; chua co chu nhac "cuon cham lai" khi 'lac' lien tuc.
+- Chua len web, chua tang so phien ban, chua dong goi, Mac chua thu.
+
 ## [0.8.0 nap lan 20] - 2026-10-06 10:49 - TINH NANG MOI: but ve tay (phim 7) + but da quang (phim 8) o man chup va anh ghim, cho anh bam thu
 
 **Boi canh.** Tinh nang 2/3 cua luot anh chot 06/10 (*"Bút vẽ tay + bút dạ quang"*). ROADMAP muc 0 so 2.

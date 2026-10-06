@@ -30,6 +30,7 @@ const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
+const chupCuonLib = require('./chup-cuon') // 06/10: chup cuon trang dai (bo ghep + vong lap mot phien)
 const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
@@ -818,6 +819,7 @@ async function startCapture() {
   // 01/10: dang QUAY VIDEO -> phim tat chup / bam tray = DUNG quay (duong dung luon co, ke ca khi vung kin man
   // khong con cho dat nut Dung). Khong mo overlay luc dang quay: anh dong bang se lot vao video.
   if (ghiHinh) { dungGhiHinh('phim tat'); return }
+  if (cuon) { cuon.dung = true; return } // 06/10: dang chup cuon -> phim tat chup = Xong (duong dung luon co)
   if (overlayWins.length) return // dang chon vung, bo qua
   khayThu.huy() // 01/10: khay dang bay ve nut / bung ra thi go san dien ngay (cua so trong suot phu video lau = video den)
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
@@ -1380,6 +1382,8 @@ async function handleConfirm(wcId, payload) {
   //    phai .catch, khong thi `ghiHinh` ket mai va phim tat chup chet toi khi mo lai app.
   //    01/10 10:4x anh chot: quay LUON co tieng may (tham so thu 3 = true); chon co / khong tieng nam trong Khay video.
   if (payload.quay && payload.rect) { batDauGhiHinh(display, payload.rect, true).catch(huyGhiHinhLoi); return }
+  // 06/10: nut Chup cuon / phim 9 -> chup lien tuc vung nay trong luc nguoi dung tu lan chuot, ghep thanh MOT anh dai.
+  if (payload.cuon && payload.rect) { chupCuon(display, sf, payload.rect).catch((e) => { ghiLog('chup-cuon LOI: ' + (e && e.message || e)); if (cuon && cuon.vien) cuon.vien.dong(); cuon = null }); return }
 
   let cropped
 
@@ -1929,7 +1933,8 @@ const cho = (ms) => new Promise((r) => setTimeout(r, ms))
    Them 2 lop chot: setContentProtection (vien khong bao gio vao anh chup) + do getBounds sau khi hien, cua so nao
    cham vung (Windows kep vao workArea — so loi #1) thi HUY ngay va ghi run-log. */
 function moVienQuay(display, rect, kieu) {
-  const laVideo = kieu === 'video' // 01/10: quay video -> thuoc la DONG HO dem len + nut Dung (bam duoc)
+  const laCuon = kieu === 'cuon' // 06/10: chup cuon dung CHUNG dong ho + nut bam cua quay video, chi doi chu tren nut thanh "Xong"
+  const laVideo = kieu === 'video' || laCuon // 01/10: quay video -> thuoc la DONG HO dem len + nut Dung (bam duoc)
   const b = display.bounds
   const v = tinhVienQuay({ x: b.x + rect.x, y: b.y + rect.y, w: rect.w, h: rect.h })
   const wins = []
@@ -1980,7 +1985,7 @@ function moVienQuay(display, rect, kieu) {
     thuoc.setAlwaysOnTop(true, 'screen-saver')
     if (!laVideo) thuoc.setIgnoreMouseEvents(true) // quay video: nut Dung phai bam duoc (cua so nam NGOAI vung)
     thuoc.loadFile(path.join(__dirname, 'dem', laVideo ? 'quay.html' : 'index.html'), {
-      query: laVideo ? { lang, dung: T('quay.dung'), dungTitle: T('quay.dungTitle') } : { lang, vi: thY < n.y ? 'tren' : 'duoi' },
+      query: laVideo ? { lang, dung: T(laCuon ? 'cuon.xong' : 'quay.dung'), dungTitle: T(laCuon ? 'cuon.xongTitle' : 'quay.dungTitle') } : { lang, vi: thY < n.y ? 'tren' : 'duoi' },
     })
     thuoc.once('ready-to-show', () => { if (!thuoc.isDestroyed()) thuoc.showInactive() })
     wins.push(thuoc)
@@ -2014,6 +2019,55 @@ async function layKhungVung(display, sf, rect) {
       width: Math.max(1, Math.round(rect.w * sf * kx)), height: Math.max(1, Math.round(rect.h * sf * ky)),
     }), nguon: 'grab' }
   } catch (e) { return null }
+}
+
+/* ── CHUP CUON TRANG DAI (06/10, tinh nang 3/3 cua luot anh chot) ───────────────────────────────────────
+   Khoanh vung -> nut Chup cuon / phim 9 -> vien cam + dong ho + nut "Xong" nam NGOAI vung -> nguoi dung TU LAN CHUOT
+   cuon trang xuong (cua so chup da dong, vien bam xuyen qua nen banh xe chuot toi thang app ben duoi) -> app lay khung
+   cua vung tu luong chup chay san (5 khung / giay) va dua vao bo ghep (src/chup-cuon.js) -> bam Xong (hoac bam lai phim
+   tat chup) -> MOT anh dai vao khay nhu anh chup thuong. Tran: 3 phut, 16.000 diem anh chieu cao.
+   ☠️ Nhu quay video: KHONG cua so nao de len vung (vien + nut deu nam ngoai, deu setContentProtection). */
+const CUON_TOI_DA_MS = 3 * 60 * 1000
+const CUON_TOI_DA_CAO = 16000
+let cuon = null // { dung, vien } khi dang chup cuon
+async function chupCuon(display, sf, rect) {
+  if (cuon || ghiHinh || dangQuay) return
+  const c = { dung: false, vien: null }
+  cuon = c
+  c.vien = moVienQuay(display, rect, 'cuon')
+  await cho(QUAY_CHO_MS) // cua so chup (anh dong bang) vua dong -> doi man that hien lai
+  c.vien.batDau({})
+  const kq = await chupCuonLib.chayPhien({
+    layKhung: async () => {
+      const k = await layKhungVung(display, sf, rect)
+      if (!k || !k.image || k.image.isEmpty()) return null
+      const s = k.image.getSize()
+      return { buf: k.image.toBitmap(), w: s.width, h: s.height } // BGRA, diem anh that
+    },
+    coDung: () => c.dung, nghiMs: 90, toiDaMs: CUON_TOI_DA_MS, toiDaCao: CUON_TOI_DA_CAO,
+  })
+  c.vien.dong()
+  cuon = null
+  const d = kq.dem || {}
+  ghiLog('chup-cuon ' + kq.lyDo + ' sau ' + kq.ms + ' ms: ' + (kq.anh ? kq.anh.w + 'x' + kq.anh.h : 'khong co anh') + ' khung=' + d.khung + ' them=' + d.them + ' dung=' + d.dung + ' lui=' + d.lui + ' lac=' + d.lac)
+  if (!kq.anh) {
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+    return
+  }
+  const image = nativeImage.createFromBitmap(kq.anh.buf, { width: kq.anh.w, height: kq.anh.h })
+  if (image.isEmpty()) { ghiLog('chup-cuon LOI: khong dung duoc anh tu ' + kq.anh.w + 'x' + kq.anh.h); return }
+  const filePath = kho.luuAnh(image, layDinhDangAnh())
+  if (!filePath) {
+    ghiLog('LOI luu anh cuon: khong ghi duoc vao ' + kho.thuMucAnh())
+    try { clipboard.writeImage(image) } catch (e) {}
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongLuuDuoc').replace('{thuMuc}', kho.thuMucAnh()) }).show()
+  } else ghiLog('luu ' + path.basename(filePath) + ' ' + kq.anh.w + 'x' + kq.anh.h + ' (chup cuon)')
+  shelfAdd(image, filePath)
+  // Chi bao khi co van de: khong noi duoc hang nao (trang khong cuon / cuon qua nhanh), hoac cham tran
+  const thieu = !(d.them > 0)
+  if ((thieu || kq.lyDo === 'day' || kq.lyDo === 'het-gio') && Notification.isSupported()) {
+    new Notification({ title: 'AiO Shot & Save', body: T(thieu ? 'cuon.khongGhep' : 'cuon.chamTran') }).show()
+  }
 }
 
 async function quay3Giay(display, sf, rect) {
@@ -2218,7 +2272,7 @@ async function khoiPhucVideoDo() {
   } catch (e) { ghiLog('video khoi phuc LOI: ' + ((e && e.stack) || e)) }
 }
 
-ipcMain.on('quay:dung', () => dungGhiHinh('nut Dung'))
+ipcMain.on('quay:dung', () => { if (cuon) { cuon.dung = true; return } dungGhiHinh('nut Dung') }) // 06/10: nut nay cung la "Xong" cua chup cuon
 
 /* --- KHAY VIDEO (01/10) = the "Video" cua cua so khay gop (moKhay o tren). Moi doan quay 1 hang. --- */
 function openVideoWindow() { moKhay('video') }

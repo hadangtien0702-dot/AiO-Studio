@@ -92,6 +92,13 @@ function quayVideo() {
   window.overlay.log('quay video ' + curRect.w + 'x' + curRect.h)
   window.overlay.confirm({ rect: curRect, quay: true })
 }
+/* 06/10 CHUP CUON trang dai (phim 9 / nut tren thanh cong cu): main dong cua so chup, hien vien + nut Xong quanh vung;
+   nguoi dung tu lan chuot cuon trang, app ghep thanh mot anh dai. Net ve (neu co) khong ap len anh cuon. */
+function chupCuon() {
+  chotOGoChu()
+  window.overlay.log('chup cuon ' + curRect.w + 'x' + curRect.h)
+  window.overlay.confirm({ rect: curRect, cuon: true })
+}
 if (window.overlay.onUpdateConfig) {
   window.overlay.onUpdateConfig((data) => {
     if (data && data.lamMoKieu) {
@@ -491,6 +498,11 @@ window.addEventListener('keydown', (e) => {
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
       (e.key === 'r' || e.key === 'R' || e.code === 'KeyR')) {
     e.preventDefault(); quayVideo(); return
+  }
+  // Phim 9 = chup cuon trang dai vung dang chon (06/10)
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
+      (e.key === '9' || e.code === 'Digit9' || e.code === 'Numpad9')) {
+    e.preventDefault(); chupCuon(); return
   }
   // Phim 5 = doc chu trong vung (29/09 anh Tien) — mo bang chu, khong phai cong cu ve
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
@@ -1092,6 +1104,7 @@ toolbarEl.addEventListener('click', (e) => {
     }
     if (b.dataset.tool === 'ocr') { if (ocrMo()) dongBangChu(); else docChuVung(); return }
     if (b.dataset.tool === 'quay') { quayVideo(); return }
+    if (b.dataset.tool === 'cuon') { chupCuon(); return }
     chonCongCu(b.dataset.tool)
   }  else if (b.id === 'undo') hoanTac()
   else if (b.id === 'huy') window.overlay.cancel()

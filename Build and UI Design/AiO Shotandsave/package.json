@@ -25,6 +25,7 @@
     "test:nutkhay": "node scripts/test/do-nut-khay.mjs",
     "test:xuatgif": "node scripts/test/do-xuat-gif.mjs",
     "test:butve": "node scripts/test/do-but-ve.mjs",
+    "test:chupcuon": "node scripts/test/do-chup-cuon.cjs",
     "test:sobuoc": "node scripts/test/do-so-buoc.mjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
     "test:khovideo": "node scripts/test/do-kho-video.cjs",

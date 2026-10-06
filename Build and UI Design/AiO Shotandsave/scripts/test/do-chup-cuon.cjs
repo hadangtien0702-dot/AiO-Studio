@@ -1,0 +1,185 @@
+'use strict'
+/* =========================================================================
+   Do BO GHEP cua CHUP CUON (src/chup-cuon.js) — 06/10 — chay bang: npm run test:chupcuon (node thuong, khong Electron)
+   Dung mot TRANG GIA co noi dung biet truoc (dong chu, khoi anh, khoang trang, bang lap), cho "cua so" 600 px truot
+   tren no theo cac buoc cuon khac nhau (nhanh, cham, dung, cuon nguoc), them nhieu +-3 moi kenh nhu anh JPEG, roi SO
+   TUNG DIEM ANH cua anh dai ghep ra voi trang goc. Co phep do toc do o co that (2400 x 1300).
+   DOI CHUNG: (1) anh ghep bi lech 1 hang -> thuoc so diem anh phai bat; (2) cuon vuot qua phan chong -> phai bao 'lac',
+   khong noi bua; (3) trang khac han -> 'lac'.
+   ========================================================================= */
+const path = require('path')
+const { taoBoGhep } = require(path.join(__dirname, '..', '..', 'src', 'chup-cuon.js'))
+
+const kq = []
+let dat = true
+const kiem = (ten, ok, chiTiet = '') => { kq.push((ok ? '  DAT  ' : '  TRUOT ') + ten + (chiTiet ? ' (' + chiTiet + ')' : '')); if (!ok) dat = false }
+const ngauNhien = (hat) => () => { hat |= 0; hat = (hat + 0x6D2B79F5) | 0; let t = Math.imul(hat ^ (hat >>> 15), 1 | hat); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
+
+/* Trang gia W x H (BGRA): nen trang, cac doan "chu" (vach toi dai ngan khac nhau), khoi anh mau, 1 khoang trang 380 px,
+   1 bang 8 hang GIONG HET nhau (hoa tiet lap). */
+function taoTrang(W, H, hat) {
+  const rnd = ngauNhien(hat)
+  const b = Buffer.alloc(W * H * 4, 255)
+  const to = (x, y, w, h, m) => { for (let yy = Math.max(0, y); yy < Math.min(H, y + h); yy++) for (let xx = Math.max(0, x); xx < Math.min(W, x + w); xx++) { const i = (yy * W + xx) * 4; b[i] = m[2]; b[i + 1] = m[1]; b[i + 2] = m[0] } }
+  let y = 20
+  while (y < H - 40) {
+    const loai = rnd()
+    if (y > 1500 && y < 1520) { y += 380; continue }            // khoang trang phang 380 px
+    if (y > 2600 && y < 2640) {                                  // bang 8 hang giong het nhau, moi hang 36 px
+      for (let k = 0; k < 8; k++) { to(40, y, W - 80, 1, [200, 200, 200]); to(60, y + 12, 180, 10, [60, 60, 60]); to(300, y + 12, 90, 10, [60, 60, 60]); y += 36 }
+      continue
+    }
+    if (loai < 0.72) {                                           // 1 dong chu: cac "tu" dai ngan
+      let x = 40 + Math.floor(rnd() * 30)
+      while (x < W - 80) { const dai = 12 + Math.floor(rnd() * 70); to(x, y, dai, 11, [30 + Math.floor(rnd() * 40), 30, 40]); x += dai + 8 + Math.floor(rnd() * 14) }
+      y += 20 + Math.floor(rnd() * 8)
+    } else {                                                     // khoi anh
+      const hh = 60 + Math.floor(rnd() * 140), ww = 200 + Math.floor(rnd() * (W - 300))
+      const m = [Math.floor(rnd() * 255), Math.floor(rnd() * 255), Math.floor(rnd() * 255)]
+      for (let k = 0; k < hh; k += 6) to(60, y + k, ww, 6, [(m[0] + k) & 255, (m[1] + k * 2) & 255, m[2]])
+      y += hh + 18
+    }
+  }
+  return b
+}
+/* Khung nhin thay khi trang cuon toi hang `tu`: chep h hang + nhieu +-3. dinh > 0: `dinh` hang dau la thanh CO DINH. */
+function khung(trang, W, H, h, tu, hat, dinh) {
+  const rnd = ngauNhien(hat)
+  const f = Buffer.from(trang.subarray(tu * W * 4, (tu + h) * W * 4))
+  if (dinh) for (let i = 0; i < dinh * W * 4; i += 4) { f[i] = 60; f[i + 1] = 40; f[i + 2] = 30 }
+  for (let i = 0; i < f.length; i += 4) { const n = Math.floor(rnd() * 7) - 3; f[i] = Math.max(0, Math.min(255, f[i] + n)); f[i + 1] = Math.max(0, Math.min(255, f[i + 1] + n)); f[i + 2] = Math.max(0, Math.min(255, f[i + 2] + n)) }
+  return f
+}
+/* Lech trung binh moi kenh giua anh ghep (tu hang `tuAnh`) va trang goc (tu hang `tuTrang`), tren `soHang` hang */
+function lech(anh, trang, W, tuAnh, tuTrang, soHang) {
+  let s = 0
+  const a0 = tuAnh * W * 4, t0 = tuTrang * W * 4, n = soHang * W * 4
+  for (let i = 0; i < n; i += 4) s += Math.abs(anh[a0 + i] - trang[t0 + i]) + Math.abs(anh[a0 + i + 1] - trang[t0 + i + 1]) + Math.abs(anh[a0 + i + 2] - trang[t0 + i + 2])
+  return s / (soHang * W * 3)
+}
+/* Chay mot kich ban: buoc = [do cuon tung khung]. Tra { bo, loai: [...], xaNhat, ms: [...] } */
+function chay(trang, W, H, h, buoc, o) {
+  const bo = taoBoGhep(W, h, o && o.tuyChon)
+  let tu = 0, xa = 0
+  const loai = [], ms = []
+  const mot = (i) => { const f = khung(trang, W, H, h, tu, 1000 + i, o && o.dinh); const t0 = process.hrtime.bigint(); const r = bo.them(f); ms.push(Number(process.hrtime.bigint() - t0) / 1e6); loai.push(r.loai); return r }
+  mot(0)
+  buoc.forEach((d, i) => { tu = Math.max(0, Math.min(H - h, tu + d)); const r = mot(i + 1); if (r.loai !== 'lac' && tu > xa) xa = tu })
+  return { bo, loai, xa, ms }
+}
+const dem = (ds, x) => ds.filter((v) => v === x).length
+
+const W = 900, H = 5200, h = 600
+const trang = taoTrang(W, H, 7)
+
+// ── 1. Cuon binh thuong: buoc nho / lon / dung / cuon nguoc, di het trang ──
+{
+  const buoc = []
+  const mau = [37, 120, 5, 0, 0, 240, 333, 80, -150, 200, 410, 64, 0, 18, 290, -40, 130, 360, 75, 220]
+  let tong = 0, i = 0
+  while (tong < H - h + 300) { const d = mau[i++ % mau.length]; buoc.push(d); tong += d }
+  const r = chay(trang, W, H, h, buoc)
+  const a = r.bo.layAnh()
+  const l = a.h <= H ? lech(a.buf, trang, W, 0, 0, a.h) : 999
+  kiem('[1] cuon het trang (buoc 5..410 px, co dung va cuon nguoc): anh dai cao DUNG bang trang', a.h === H && a.w === W, 'cao ' + a.h + ' / ' + H + ', ' + buoc.length + ' khung')
+  kiem('[1] tung diem anh khop trang goc (lech <= 2,5 / kenh, nhieu +-3)', l <= 2.5, 'lech ' + l.toFixed(2))
+  kiem('[1] khong khung nao bi "lac"; co khung "dung" va "lui" dung nhu kich ban', dem(r.loai, 'lac') === 0 && dem(r.loai, 'dung') >= 3 && dem(r.loai, 'lui') >= 2, JSON.stringify(r.bo.dem))
+  // DOI CHUNG cua THUOC: anh ghep lech 1 hang so voi trang -> phep so phai lon hon han
+  const l1 = lech(a.buf, trang, W, 0, 1, a.h - 1)
+  kiem('[DOI CHUNG thuoc] so anh ghep voi trang LECH 1 hang -> lech tang ro (> 3 lan)', l1 > l * 3 && l1 > 6, 'dung ' + l.toFixed(2) + ' -> lech 1 hang ' + l1.toFixed(2))
+  const tb = r.ms.reduce((s, v) => s + v, 0) / r.ms.length
+  console.log('  toc do 900x600: trung binh ' + tb.toFixed(1) + ' ms / khung, cham nhat ' + Math.max(...r.ms).toFixed(1) + ' ms')
+}
+// ── 2. Cuon QUA NHANH (vuot phan chong) roi cuon nguoc lai: khong noi bua, bat lai duoc ──
+{
+  const r = chay(trang, W, H, h, [100, 100, 590, 0, -480, 150, 200, 200])
+  const a = r.bo.layAnh()
+  kiem('[2] buoc 590 px (vuot phan chong 85 %) -> "lac", KHONG noi gi them', r.loai[3] === 'lac' && r.loai[4] === 'lac', r.loai.join(' '))
+  kiem('[2] cuon nguoc lai vao vung da chup -> bat lai, anh cuoi van khop trang', r.loai[5] !== 'lac' && a.h === r.xa + h && lech(a.buf, trang, W, 0, 0, a.h) <= 2.5, 'cao ' + a.h + ' = ' + r.xa + ' + ' + h + ', lech ' + lech(a.buf, trang, W, 0, 0, a.h).toFixed(2))
+}
+// ── 3. Thanh CO DINH 50 px o dinh vung (khong troi theo trang) ──
+{
+  const buoc = Array.from({ length: 16 }, (_, i) => [90, 160, 40, 230][i % 4])
+  const r = chay(trang, W, H, h, buoc, { dinh: 50 })
+  const a = r.bo.layAnh()
+  const l = lech(a.buf, trang, W, 50, 50, a.h - 50) // bo 50 hang dau (la thanh co dinh cua khung dau)
+  kiem('[3] co thanh co dinh 50 px: van ghep dung chieu cao va noi dung', dem(r.loai, 'lac') === 0 && a.h === r.xa + h && l <= 2.5, 'cao ' + a.h + ', lech ' + l.toFixed(2) + ', ' + JSON.stringify(r.bo.dem))
+}
+// ── 4. Trang TRANG PHANG: khong duoc bia ra do cuon ──
+{
+  const phang = Buffer.alloc(W * 2000 * 4, 255)
+  const r = chay(phang, W, 2000, h, [100, 200, 50, 300])
+  kiem('[4] trang trang phang: khong noi them hang nao', r.bo.cao === h && dem(r.loai, 'them') === 0, r.loai.join(' '))
+}
+// ── 5. Tran chieu cao ──
+{
+  const r = chay(trang, W, H, h, [200, 200, 200, 200, 200, 200, 200], { tuyChon: { toiDaCao: 1500 } })
+  const a = r.bo.layAnh()
+  kiem('[5] tran 1500 px: dung DUNG o 1500, bao "day", phan da ghep van khop', a.h === 1500 && r.loai.includes('day') && lech(a.buf, trang, W, 0, 0, 1500) <= 2.5, 'cao ' + a.h + ' ' + r.loai.join(' '))
+}
+// ── 6. DOI CHUNG: dang cuon thi noi dung doi HAN (trang khac) -> 'lac', khong noi ──
+{
+  const bo = taoBoGhep(W, h)
+  bo.them(khung(trang, W, H, h, 0, 1))
+  bo.them(khung(trang, W, H, h, 150, 2))
+  const khac = taoTrang(W, 1400, 99)
+  const r = bo.them(khung(khac, W, 1400, h, 300, 3))
+  kiem('[DOI CHUNG] khung cua mot trang KHAC -> "lac", chieu cao khong doi', r.loai === 'lac' && bo.cao === h + 150, r.loai + ' cao ' + bo.cao)
+}
+// ── 7. Co THAT 2400 x 1300 (man 4K 150 %): dung + toc do ──
+{
+  const W2 = 2400, H2 = 5200, h2 = 1300
+  const t2 = taoTrang(W2, H2, 11)
+  const r = chay(t2, W2, H2, h2, [180, 420, 0, 650, 900, -300, 500, 700, 380])
+  const a = r.bo.layAnh()
+  const tb = r.ms.reduce((s, v) => s + v, 0) / r.ms.length, max = Math.max(...r.ms)
+  kiem('[7] co that 2400x1300: ghep dung (cao + noi dung), khong lac', dem(r.loai, 'lac') === 0 && a.h === r.xa + h2 && lech(a.buf, t2, W2, 0, 0, a.h) <= 2.5, 'cao ' + a.h + ', lech ' + lech(a.buf, t2, W2, 0, 0, a.h).toFixed(2))
+  kiem('[7] toc do: moi khung <= 200 ms (app chup 5 khung / giay)', max <= 200, 'trung binh ' + tb.toFixed(0) + ' ms, cham nhat ' + max.toFixed(0) + ' ms')
+}
+
+// ── 8. Day noi trong app (doc ma) ──
+{
+  const fs = require('fs')
+  const doc = (f) => fs.readFileSync(path.join(__dirname, '..', '..', f), 'utf8')
+  const main = doc('src/main.js'), ov = doc('src/overlay/overlay.js'), html = doc('src/overlay/index.html'), i18n = doc('src/i18n.js')
+  kiem('[8] man chup: co nut Chup cuon (so 9), phim 9 va nut deu goi chupCuon()', /data-tool="cuon"[\s\S]*?<i class="so">9<\/i>/.test(html) && /e\.key === '9'[\s\S]{0,120}chupCuon\(\)/.test(ov) && /dataset\.tool === 'cuon'\) \{ chupCuon\(\)/.test(ov))
+  kiem('[8] main: nhan { cuon } tu man chup; nut Xong va phim tat chup deu dung duoc phien cuon', /payload\.cuon && payload\.rect/.test(main) && /'quay:dung', \(\) => \{ if \(cuon\) \{ cuon\.dung = true/.test(main) && /if \(cuon\) \{ cuon\.dung = true; return \}/.test(main))
+  const khoa = ['overlay.cuon', 'cuon.xong', 'cuon.xongTitle', 'cuon.khongGhep', 'cuon.chamTran']
+  const thieu = khoa.filter((k) => i18n.split('\n').filter((l) => l.includes("'" + k + "'")).length !== 2)
+  kiem('[8] 5 khoa chu cua chup cuon co du 2 ngon ngu, khong gach ngang dai', thieu.length === 0 && !i18n.split('\n').filter((l) => /'(overlay\.cuon|cuon\.)/.test(l)).some((l) => l.includes('—')), thieu.join(', '))
+}
+// ── 9. Trong Electron AN: man chup that gui dung lenh + duong ANH THAT (JPEG cua Electron) + vong lap mot phien ──
+{
+  const fs = require('fs')
+  const { spawnSync } = require('child_process')
+  const ROOT = path.join(__dirname, '..', '..')
+  const RA = path.join(ROOT, '.selftest', 'chup-cuon')
+  fs.mkdirSync(RA, { recursive: true })
+  const fTrang = path.join(RA, 'trang.bin')
+  fs.writeFileSync(fTrang, trang)
+  const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron')
+  const env = Object.assign({}, process.env)
+  delete env.ELECTRON_RUN_AS_NODE
+  const c = spawnSync(electron, [path.join(ROOT, 'scripts', 'test', 'chup-cuon-main.cjs'), fTrang, String(W), String(H), String(h)], { env, encoding: 'utf8', timeout: 120000 })
+  const dong = (c.stdout || '').split(/\r?\n/).find((d) => d.startsWith('KQ='))
+  let u = null
+  try { u = JSON.parse(dong.slice(3)) } catch (e) {}
+  kiem('[9] Electron thu chay xong', c.status === 0 && !!u, 'status ' + c.status + ' ' + ((c.stdout || '').split(/\r?\n/).find((d) => d.startsWith('LOI=')) || '').slice(0, 200))
+  if (u) {
+    const dung = (ds) => ds.length === 1 && ds[0].cuon === true && ds[0].rect && ds[0].rect.w === 600 && ds[0].rect.h === 400
+    kiem('[9] man chup that: nut co chu goi y + so 9, thanh cong cu nam tron trong man', !!u.nut && /9/.test(u.nut.goiY) && u.nut.so === '9' && u.nut.trai >= 0 && u.nut.phai <= u.nut.cuaSo, u.nut ? u.nut.trai + '..' + u.nut.phai + ' / ' + u.nut.cuaSo : 'khong co nut')
+    kiem('[9] phim 9 gui dung 1 lenh { rect 600x400, cuon: true }; bam nut cung vay', dung(u.phim9) && dung(u.bamNut), JSON.stringify(u.phim9).slice(0, 120))
+    const p = u.phien
+    kiem('[9] duong anh THAT (JPEG q85 cua Electron): ghep dung chieu cao, khong lac', p.lyDo === 'dung' && p.h === p.canCao && p.w === W && p.dem.lac === 0, 'cao ' + p.h + ' / ' + p.canCao + ' ' + JSON.stringify(p.dem))
+    kiem('[9] noi dung khop trang goc qua nen JPEG (lech <= 4 / kenh)', p.lech <= 4, 'lech ' + p.lech)
+    kiem('[9] anh dai dung duoc thanh anh that va ghi ra PNG / JPEG dung co', u.anh && !u.anh.rong && u.anh.w === W && u.anh.h === p.h && u.anh.png > 1000 && u.anh.jpg > 1000, JSON.stringify(u.anh))
+    kiem('[9] khong ai bam Xong -> phien tu dung o tran thoi gian (400 ms), van tra anh', u.hetGio.lyDo === 'het-gio' && u.hetGio.ms >= 380 && u.hetGio.ms < 1500 && u.hetGio.cao === h, JSON.stringify(u.hetGio))
+    kiem('[9] luong chup khong tra khung nao -> bo, khong treo, khong co anh', u.khongKhung.lyDo === 'khong-co-khung' && u.khongKhung.anh === false, JSON.stringify(u.khongKhung))
+  }
+}
+
+console.log('\n' + '='.repeat(60))
+console.log(kq.join('\n'))
+console.log('='.repeat(60))
+console.log(`Ket qua: ${dat ? 'TAT CA DAT (PASS)' : 'CO MUC TRUOT (FAIL)'}`)
+if (!dat) process.exit(1)
