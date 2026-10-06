@@ -246,6 +246,39 @@ const trang = taoTrang(W, H, 7)
   const c = chayD({ khongBen: 'khong-bo-dinh' })
   kiem('[DOI CHUNG 13] duong ben ban 13:02 (khong bo hang dung yen): co khung "lac" ngay khi bat dau cuon (nhu luot that 13:03)', dem(c.loai, 'lac') > 0 && c.loai[4] === 'lac', c.bo.dem.chuoi + ' cao ' + c.bo.cao + ' / ' + (r.tu + h))
 }
+// ── 14. ECC soat 06/10: vong lap mot phien (chayPhien) khi nguon khung co van de ──
+const cho14 = (async () => {
+  const { chayPhien } = require(path.join(__dirname, '..', '..', 'src', 'chup-cuon.js'))
+  // (a) khung DOI CO giua phien: phai bi bo qua, anh ghep van dung tung diem anh
+  const buoc = [0, 120, 200, 90, 260, 150]
+  let i = 0, tu = 0, soLay = 0
+  const r = await chayPhien({
+    layKhung: async () => {
+      soLay++
+      if (soLay === 3 || soLay === 5) return { buf: khung(trang, W - 100, H, h, 0, 77), w: W - 100, h } // khung hep hon 100 px: co khac
+      if (i < buoc.length) tu += buoc[i++]
+      return { buf: khung(trang, W, H, h, tu, 900 + i), w: W, h }
+    },
+    coDung: () => i >= buoc.length && soLay > buoc.length + 3, nghiMs: 1, toiDaMs: 20000,
+  })
+  const a = r.anh
+  kiem('[14] khung doi co giua phien bi BO QUA: anh van cao dung va khop trang goc', !!a && a.w === W && a.h === tu + h && lech(a.buf, trang, W, 0, 0, a.h) <= 2.5 && r.dem.lac === 0, a ? 'cao ' + a.h + ' / ' + (tu + h) + ', lech ' + lech(a.buf, trang, W, 0, 0, Math.min(a.h, H)).toFixed(2) + ' ' + JSON.stringify(r.dem).slice(0, 70) : 'khong co anh')
+  // (b) da co anh roi nguon CHET: phai dung som voi ly do 'mat-nguon', van tra phan da ghep
+  let n = 0, tu2 = 0
+  const t0 = Date.now()
+  const r2 = await chayPhien({
+    layKhung: async () => { n++; if (n > 4) return null; tu2 += n > 1 ? 100 : 0; return { buf: khung(trang, W, H, h, tu2, 950 + n), w: W, h } },
+    coDung: () => false, nghiMs: 2, toiDaMs: 20000, toiDaHong: 15,
+  })
+  kiem('[14] nguon khung chet sau 4 khung: dung som "mat-nguon" (khong cho het gio), van tra anh da ghep', r2.lyDo === 'mat-nguon' && Date.now() - t0 < 3000 && !!r2.anh && r2.anh.h === tu2 + h, r2.lyDo + ' sau ' + (Date.now() - t0) + ' ms, cao ' + (r2.anh && r2.anh.h) + ' / ' + (tu2 + h))
+  // (c) vai lan mat khung LE TE roi co lai: khong duoc dung
+  let m = 0, tu3 = 0
+  const r3 = await chayPhien({
+    layKhung: async () => { m++; if (m % 3 === 0) return null; tu3 += m > 1 ? 60 : 0; return { buf: khung(trang, W, H, h, tu3, 980 + m), w: W, h } },
+    coDung: () => m >= 30, nghiMs: 1, toiDaMs: 20000, toiDaHong: 5,
+  })
+  kiem('[14] mat khung le te (1 / 3 lan) roi co lai: KHONG dung som, ghep du', r3.lyDo === 'dung' && !!r3.anh && r3.anh.h === tu3 + h, r3.lyDo + ' cao ' + (r3.anh && r3.anh.h) + ' / ' + (tu3 + h))
+})()
 // ── 8. Day noi trong app (doc ma) ──
 {
   const fs = require('fs')
@@ -253,9 +286,10 @@ const trang = taoTrang(W, H, 7)
   const main = doc('src/main.js'), ov = doc('src/overlay/overlay.js'), html = doc('src/overlay/index.html'), i18n = doc('src/i18n.js')
   kiem('[8] man chup: co nut Chup cuon (so 9), phim 9 va nut deu goi chupCuon()', /data-tool="cuon"[\s\S]*?<i class="so">9<\/i>/.test(html) && /e\.key === '9'[\s\S]{0,120}chupCuon\(\)/.test(ov) && /dataset\.tool === 'cuon'\) \{ chupCuon\(\)/.test(ov))
   kiem('[8] main: nhan { cuon } tu man chup; nut Xong va phim tat chup deu dung duoc phien cuon', /payload\.cuon && payload\.rect/.test(main) && /'quay:dung', \(\) => \{ if \(cuon\) \{ cuon\.dung = true/.test(main) && /if \(cuon\) \{ cuon\.dung = true; return \}/.test(main))
-  const khoa = ['overlay.cuon', 'cuon.xong', 'cuon.xongTitle', 'cuon.khongGhep', 'cuon.chamTran']
+  const khoa = ['overlay.cuon', 'cuon.xong', 'cuon.xongTitle', 'cuon.khongGhep', 'cuon.chamTran', 'cuon.matNguon']
   const thieu = khoa.filter((k) => i18n.split('\n').filter((l) => l.includes("'" + k + "'")).length !== 2)
-  kiem('[8] 5 khoa chu cua chup cuon co du 2 ngon ngu, khong gach ngang dai', thieu.length === 0 && !i18n.split('\n').filter((l) => /'(overlay\.cuon|cuon\.)/.test(l)).some((l) => l.includes('—')), thieu.join(', '))
+  kiem('[8] main: chup cuon loi thi BAO nguoi dung (khong chi ghi log); mat nguon hinh co thong bao rieng', /chup-cuon LOI: [\s\S]{0,260}new Notification/.test(main) && /kq\.lyDo === 'mat-nguon' \? 'cuon\.matNguon'/.test(main))
+  kiem('[8] 6 khoa chu cua chup cuon co du 2 ngon ngu, khong gach ngang dai', thieu.length === 0 && !i18n.split('\n').filter((l) => /'(overlay\.cuon|cuon\.)/.test(l)).some((l) => l.includes('—')), thieu.join(', '))
 }
 // ── 9. Trong Electron AN: man chup that gui dung lenh + duong ANH THAT (JPEG cua Electron) + vong lap mot phien ──
 {
@@ -289,8 +323,11 @@ const trang = taoTrang(W, H, 7)
   }
 }
 
-console.log('\n' + '='.repeat(60))
-console.log(kq.join('\n'))
-console.log('='.repeat(60))
-console.log(`Ket qua: ${dat ? 'TAT CA DAT (PASS)' : 'CO MUC TRUOT (FAIL)'}`)
-if (!dat) process.exit(1)
+// muc [14] chay khong dong bo -> cho no xong roi moi in ket qua (loi trong do cung phai lam bai do TRUOT)
+cho14.catch((e) => kiem('[14] bai do vong lap mot phien chay duoc', false, String((e && e.stack) || e).slice(0, 200))).then(() => {
+  console.log('\n' + '='.repeat(60))
+  console.log(kq.join('\n'))
+  console.log('='.repeat(60))
+  console.log(`Ket qua: ${dat ? 'TAT CA DAT (PASS)' : 'CO MUC TRUOT (FAIL)'}`)
+  if (!dat) process.exit(1)
+})

@@ -297,17 +297,25 @@ function taoBoGhep(w, h, tuyChon) {
 async function chayPhien(o) {
   const nghi = (ms) => new Promise((r) => setTimeout(r, ms))
   const t0 = Date.now()
-  let bo = null, lyDo = 'dung', hong = 0
+  /* 06/10 ECC soat: (1) da co anh roi ma nguon khung CHET (luong chup mat) thi vong lap cu chay du 3 phut moi dung, nguoi dung
+     khong biet -> `toiDaHong` lan LIEN TIEP khong co khung dung duoc la dung, ly do 'mat-nguon', van tra phan da ghep;
+     (2) khung DOI CO giua phien (doi do phan giai / ti le man) truoc day van dua vao bo ghep -> doc sai be rong, ra hang rac
+     ma khong bao 'lac' -> nay bo qua khung khac co voi khung dau. */
+  let bo = null, lyDo = 'dung', hong = 0, w0 = 0, h0 = 0
+  const toiDaHong = o.toiDaHong || 50
   while (!o.coDung()) {
     if (Date.now() - t0 >= (o.toiDaMs || 180000)) { lyDo = 'het-gio'; break }
     let k = null
     try { k = await o.layKhung() } catch (e) { k = null }
-    if (!k || !k.buf || !(k.w > 0) || !(k.h > 0)) {
-      if (++hong >= 20 && !bo) { lyDo = 'khong-co-khung'; break } // 20 lan lien khong co khung nao tu dau: bo
+    const dung = !!(k && k.buf && k.w > 0 && k.h > 0 && k.w * k.h * 4 <= k.buf.length && (!bo || (k.w === w0 && k.h === h0)))
+    if (!dung) {
+      hong++
+      if (!bo && hong >= 20) { lyDo = 'khong-co-khung'; break } // 20 lan lien khong co khung nao tu dau: bo
+      if (bo && hong >= toiDaHong) { lyDo = 'mat-nguon'; break }
       await nghi(o.nghiMs || 90); continue
     }
-    if (!bo) bo = taoBoGhep(k.w, k.h, { toiDaCao: o.toiDaCao })
-    if (k.w * k.h * 4 > k.buf.length) { await nghi(o.nghiMs || 90); continue } // khung thieu du lieu: bo qua
+    hong = 0
+    if (!bo) { bo = taoBoGhep(k.w, k.h, { toiDaCao: o.toiDaCao }); w0 = k.w; h0 = k.h }
     const r = bo.them(k.buf)
     if (o.baoTrangThai) { try { o.baoTrangThai(r) } catch (e) {} }
     if (r.loai === 'day') { lyDo = 'day'; break }

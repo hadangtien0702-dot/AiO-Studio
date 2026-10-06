@@ -115,6 +115,29 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 29] - 2026-10-06 14:59 - ECC soat lai viec hom nay: sua 8 diem o GIF / xoa video / chup cuon
+
+**Boi canh.** Anh: *"dùng ecc để test lại đi em"*. Giao `ecc:silent-failure-hunter` soat moi thay doi cua app tu `083cd26` toi HEAD
+(chi doc, 226 nghin token, 103 giay). No bao 8 diem; em DOC LAI MA xac nhan tung diem roi moi sua (khong diem nao bi bac).
+**Da sua.**
+| # | Loi (kich ban) | Sua o dau |
+|---|---|---|
+| 1 | Xoa video giua luc dang tao GIF -> GIF van ghi ra, so khong con muc -> file `.gif` mo coi | `main.js video:chon-gif`: xong thi kiem lai so + file goc, mat thi go GIF vua tao |
+| 2 | Xoa: ban goc vao Thung rac roi GIF bi khoa -> tra loi, hang bien khoi khay, GIF mo coi | `video:xoa`: ban dan xuat di TRUOC (hong thi ghi log), ban goc di SAU |
+| 3 | Tat app giua luc ghi GIF -> `.gif.tam` nam lai mai | `khoiPhucVideoDo()`: go file dung mau ten `shotandsave-video-*.gif.tam`, cu hon 1 phut |
+| 4 | Chup cuon nem loi -> chi ghi log, nguoi dung khong thay gi | `handleConfirm`: them thong bao |
+| 5 | Khung doi co giua phien cuon (doi do phan giai) -> doc sai be rong, hang rac, khong bao 'lac' | `chup-cuon.js chayPhien`: bo qua khung khac co voi khung dau |
+| 6 | Bam chup cuon luc dang quay / dang cuon -> thoat im lang | `chupCuon`: ghi log ly do |
+| 7 | Da co anh ma nguon khung chet -> lap toi het 3 phut | `chayPhien`: 50 lan lien khong co khung = dung, ly do `mat-nguon`, van luu phan da ghep + thong bao `cuon.matNguon` (VI + EN) |
+| 8 | Dang tao GIF ma chon lai "Co tieng" -> GIF xong gianh lai lua chon | `gifDangTao` / `gifBoChon`: GIF xong chi ghi `fileGif`, khong doi lua chon |
+**Kiem chung.** `test:chupcuon` 38/38 (them [14] 3 muc: khung doi co bi bo qua va anh van khop tung diem anh; nguon chet dung sau 315
+ms thay vi cho het gio; mat khung le te khong dung som + 1 muc day noi), `test:xuatgif` 58/58, `test:khovideo` 76/76. Nap 14:59:08,
+`app.asar` md5 `a1e5b05b`; 724 anh + 9 dai + cau hinh giong truoc.
+**CHUA do.** Diem 1, 2, 3, 8 (cac cuoc dua trong `main.js`) KHONG co bai kiem tu dong: moi kiem bang doc ma + cac bai hoi quy khong
+vo. Chua tai hien tren app that (xoa video luc GIF dang chay, tat app giua luc ghi GIF).
+**Nguoi soat bao SACH:** bo ghep (`them`, `layAnh`), but ve / da quang (ham giong nhau tung byte o 2 file), `createPinWindow`,
+tach MP4 + `VideoDecoder`. No ghi chu: duong "ben" co the nhan do lech sai khi vung video doi hinh (thiet ke, da ghi trong so).
+
 ## [0.8.0 nap lan 28] - 2026-10-06 14:06 - Doi icon nut 9 (chup cuon) theo icon anh chon
 
 **Boi canh.** Anh: *"icon số 9 xấu quá em"* (to giay + mui ten). Em ve 4 kieu, anh: *"cả 4 đều xấu"*. Dua 8 icon co san cua bo
