@@ -5,8 +5,9 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
-## [web-shotsave] - 2026-10-06 14:22 (UTC+7) - Điện thoại: rạp hết dựng lại cảnh khi thanh địa chỉ ẩn / hiện, không nhảy cảnh khi tay còn vuốt - máy công ty
+## [web-shotsave] - 2026-10-06 14:17 (UTC+7) - Điện thoại: rạp hết dựng lại cảnh khi thanh địa chỉ ẩn / hiện, không nhảy cảnh khi tay còn vuốt - máy công ty
 
+- (Sửa giờ: mục này lúc đầu ghi 14:22 do em tự ước lượng; giờ đẩy thật theo lệnh date là 14:17.)
 - **Bối cảnh:** anh: *"nhớ tối ưu hóa trải nghiệm trên điện thoại nữa em… ở điện thoại anh thấy không mượt bằng ở trên desktop"*.
 - **Đo trước khi sửa** (Chrome thật qua DevTools, giả lập 390×844 ×3, bóp CPU 4 lần, trang LIVE):
   - Nhịp khung hình 17 cảnh: **60 khung / giây, 0 khung > 34 ms** ở cả 17 cảnh; bản ghi hiệu năng 5 giai đoạn (cuộn đầu trang, cảnh
