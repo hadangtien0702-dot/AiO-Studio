@@ -155,6 +155,7 @@ h1 em{font-style:normal;color:var(--brand)}
 .mau[aria-pressed="true"]{box-shadow:0 0 0 2px #161616,0 0 0 3.5px #fff}
 @media (max-width:640px){.mau-nhom .mau:nth-child(n+4){display:none}.cc{width:30px;height:30px}.cc.xem{display:none}}
 @media (pointer:coarse){.cc.xem{display:none}}
+@media (max-width:780px){.cc.xem{display:none}}   /* 06/10: thanh có 12 nút (671 px) → cửa sổ máy tính hẹp hơn 780 px (khung demo < 730 px) ẩn 8 nút chỉ để xem */
 /* Ô gõ chữ */
 .dtext{position:absolute;min-width:60px;padding:3px 7px;border:1px dashed rgb(255 255 255/50%);border-radius:5px;background:rgb(0 0 0/72%);
   font:600 16px/1.3 Inter,sans-serif;outline:none;cursor:text}
@@ -863,6 +864,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
             <button type="button" class="cc" data-tool="text" aria-pressed="false" aria-label="Text (3)" data-i-aria="aText"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg><i class="so">3</i></button>
             <button type="button" class="cc" data-tool="blur" aria-pressed="false" aria-label="Blur (4)" data-i-aria="aBlur"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="5" height="5" rx="1"/><rect x="9.5" y="4" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="4" width="5" height="5" rx="1"/><rect x="4" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="15" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="4" y="15" width="5" height="5" rx="1"/><rect x="9.5" y="15" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="15" width="5" height="5" rx="1"/></svg><i class="so">4</i></button>
             <button type="button" class="cc xem" data-xem="9" aria-label="Grab text in the area (5), see it below" data-i-aria="aOcr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8h8M7 12h10M7 16h6"/></svg><i class="so">5</i></button>
+            <!-- 06/10: app co them 6 (danh so) · 7 (but) · 8 (da quang) · 9 (chup cuon); thu tu anh chot: V | day so | S R | mau. Deu la nut .xem. -->
+            <button type="button" class="cc xem" data-xem="13" aria-label="Step numbers 1, 2, 3 (6), see it below" data-i-aria="aSo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10.2 9.7 12.6 8v8.2"/></svg><i class="so">6</i></button>
+            <button type="button" class="cc xem" data-xem="14" aria-label="Pen (7), see it below" data-i-aria="aBut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg><i class="so">7</i></button>
+            <button type="button" class="cc xem" data-xem="14" aria-label="Highlighter (8), see it below" data-i-aria="aDaQuang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><i class="so">8</i></button>
+            <button type="button" class="cc xem" data-xem="15" aria-label="Scrolling capture (9), see it below" data-i-aria="aCuon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M12 8v8"/><path d="m9 13 3 3 3-3"/></svg><i class="so">9</i></button>
             <button type="button" class="cc xem" data-xem="10" aria-label="Storyboard Strip (S), see it below" data-i-aria="aSb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><i class="so">S</i></button>
             <button type="button" class="cc xem" data-xem="11" aria-label="Record this area as video (R), see it below" data-i-aria="aRec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg><i class="so">R</i></button>
             <span class="chia"></span>
@@ -976,6 +982,28 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f13t">A shelf that tucks itself away</h3>
           <p data-i="f13p">Leave the shelf alone for 5 seconds and it folds into a small round button in the corner, showing your latest shot and how many are waiting. Click the button and the shelf opens right where it was.</p>
         </article>
+        <!-- 06/10: 4 tinh nang moi cua app (danh so 02/10, but ve + da quang, chup cuon, xuat GIF 06/10). Chi hua thu CO trong ma:
+             phim 6 / 7 / 8 / 9, Shift ra duong thang, nut Xong, GIF cho doan quay duoi 60 giay. Icon chep tu src/overlay/index.html. -->
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10.2 9.7 12.6 8v8.2"/></svg></div>
+          <h3 data-i="f14t">Number your steps</h3>
+          <p data-i-html="f14p">Press <kbd>6</kbd> and click on the shot: a badge with 1, then 2, then 3. Delete one in the middle and the rest renumber themselves.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></div>
+          <h3 data-i="f15t">Pen and highlighter</h3>
+          <p data-i-html="f15p">Press <kbd>7</kbd> to draw freehand, <kbd>8</kbd> to highlight what matters. Hold Shift for a straight line.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M12 8v8"/><path d="m9 13 3 3 3-3"/></svg></div>
+          <h3 data-i="f16t">Scrolling capture</h3>
+          <p data-i-html="f16p">Box the part of the page that scrolls and press <kbd>9</kbd>. Scroll down with your mouse and the app stitches what passes by into one long image. Click Done to save it.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5H8.5a1.5 1.5 0 0 0-1.5 1.5v2a1.5 1.5 0 0 0 1.5 1.5H10V12.5H9M12.5 9.5v5M15 14.5v-5h2.5M15 12h2"/></svg></div>
+          <h3 data-i="f17t">Turn a recording into a GIF</h3>
+          <p data-i="f17p">In the Video shelf, click GIF on any recording under 60 seconds. A few seconds later the GIF is ready to drag into a chat or any other app, just like the video.</p>
+        </article>
       </div>
     </div>
     <!-- 29/09 NHAP "Rap chieu" (anh: 2 huong A/B "chua du Creative"): 11 canh dien thang len CHU tren san khau, dinh giua man,
@@ -1019,7 +1047,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .goi-y kbd{font-size:11px}
 /* 01/10: 13 clip (trước 11) -> clip hẹp lại: bớt đệm + chữ tên 10.5px; dưới 1180px ẩn tên, chỉ còn số (đo: "Storyboard", "Quay video" bị cắt ở 1280) */
 .clip{gap:4px;padding:0 5px 0 6px}.clip .ten{font-size:10.5px}
-@media (max-width:1180px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}
+@media (max-width:1560px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}   /* 06/10: 17 clip (trước 13) → dưới 1560 px chỉ còn số */
 @media (max-width:640px){.duoi{flex-direction:column;align-items:flex-start;gap:10px}.goi-y .phim-thu{display:none}.tren .nhan-tren{display:none}}
 @media (hover:none){.goi-y .phim-thu{display:none}}
 /* đồ nghề trên sân khấu — khung chọn / tay nắm / nhãn cỡ / xoè 6 khung chép số đo từ src/overlay/overlay.css của app */
@@ -1143,15 +1171,30 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .ntr .so:empty{display:none}
 .song{position:absolute;z-index:31;width:52px;height:52px;border-radius:26px;border:2px solid var(--acc);opacity:0;pointer-events:none}
 .chop{position:absolute;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none}
+/* 06/10 · 4 cảnh mới. ĐÁNH SỐ: huy hiệu chép veSo() của app (tròn 26 px, viền 2 px màu chữ, bóng đổ). BÚT / DẠ QUANG: nét tròn đầu,
+   dạ quang mờ 0,4 như NET trong overlay.js. CHỤP CUỘN: thước + nút Xong dùng chung khuôn đồng hồ quay (.dhq) như app. GIF: ô thứ ba
+   của cụm chọn trong thẻ video. */
+.hh{position:absolute;z-index:15;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--acc);box-shadow:0 1px 4px rgb(0 0 0/45%),inset 0 0 0 2px #fff;color:#fff;font:700 14px/26px Inter,sans-serif;text-align:center}
+.net{position:absolute;left:0;top:0;z-index:14;width:100%;height:100%;overflow:visible;pointer-events:none}
+.net path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.chu .a{margin:0 .22em}   /* chừa chỗ cho vòng khoanh của bút, không đè chữ bên cạnh */
+.trg{position:absolute;left:0;top:0;width:100%;background:#fff}
+.trg .muc{position:absolute;left:6%;right:6%;border-radius:8px;background:#f4f1ed;overflow:hidden}
+.trg .muc b{position:absolute;left:5%;top:50%;transform:translateY(-50%);font:800 calc(var(--u)*5)/1 Inter,sans-serif;letter-spacing:-.04em;color:#16110d}
+.trg .muc i{position:absolute;left:38%;height:9%;border-radius:99px;background:#d9d1c8}
+.anhdai{position:absolute;z-index:26;overflow:hidden;border-radius:6px;background:#fff;box-shadow:0 0 0 1.5px var(--acc),0 20px 40px -16px #000}
+.vdau .chon i.dang{color:var(--acc);font-variant-numeric:tabular-nums}
+.gifo{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px rgb(0 0 0/10%)}
+.gifo .nhg{position:absolute;left:6px;top:6px;z-index:2;padding:0 5px;border-radius:4px;background:rgb(10 10 10/74%);color:#fff;font:700 10px/1.6 Inter,sans-serif}
 @media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after,.dhq .r{animation:none}}
 </style>
 <div class="dinh">
-  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / 13</span></div>
+  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / <span id="soTong">17</span></span></div>
   <div class="san-khung le"><div class="san" id="san"></div></div>
   <div class="duoi le"><div class="cap"><h3 id="capTen"></h3><p id="capMo"></p></div><div class="phim-cap" id="capPhim"></div></div>
   <div class="tl le">
     <div class="tl-ray" id="ray"></div>
-    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>V</kbd> <kbd>S</kbd> <kbd>R</kbd></span></div>
+    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>V</kbd> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>S</kbd> <kbd>R</kbd></span></div>
   </div>
 </div>
     </template>
@@ -1417,6 +1460,10 @@ const T = {
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, những ảnh chụp gần nhất tự hiện sẵn trong khay. Số ảnh chọn trong Cài đặt: Tắt, 5, 10 hoặc 20.",
     f12t:"Quay video vùng màn hình", f12p:"Khoanh vùng rồi bấm <kbd>R</kbd>. App quay tới khi bạn bấm Dừng, tối đa 5 phút. File MP4 nằm sẵn trong Khay video: chọn bản Có tiếng hoặc Không tiếng rồi kéo cả hàng thả vào khung chat hay ứng dụng khác. Trên Windows quay được cả tiếng đang phát trên máy.",
     f13t:"Khay tự thu gọn", f13p:"Không dùng tới 5 giây, khay tự thu về một nút tròn nhỏ ở góc màn hình, hiện ảnh mới nhất và số ảnh đang có. Bấm nút, khay mở lại đúng chỗ cũ.",
+    f14t:"Đánh số từng bước", f14p:"Bấm <kbd>6</kbd> rồi bấm lên ảnh: hiện huy hiệu số 1, rồi 2, rồi 3. Xoá một số ở giữa, các số còn lại tự dồn cho liền.",
+    f15t:"Bút vẽ tay và bút dạ quang", f15p:"Bấm <kbd>7</kbd> để vẽ tay, <kbd>8</kbd> để tô lên chỗ cần chú ý. Giữ Shift ra đường thẳng.",
+    f16t:"Chụp cuộn trang dài", f16p:"Khoanh phần trang đang cuộn rồi bấm <kbd>9</kbd>. Bạn lăn chuột cuộn xuống, app ghép những gì đi qua thành một ảnh dài. Bấm Xong để lưu.",
+    f17t:"Xuất GIF từ đoạn quay", f17p:"Trong Khay video, bấm GIF ở đoạn quay dưới 60 giây. Vài giây sau GIF đã sẵn để kéo thả vào khung chat hay ứng dụng khác, như với video.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
     b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Các bản cập nhật sau", b2s:"Tính năng mới và bản sửa lỗi", b2n:"Miễn phí",
@@ -1440,7 +1487,8 @@ const T = {
 document.querySelectorAll("[data-i]").forEach(el => T.en[el.dataset.i] = el.textContent);
 document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] = el.innerHTML);
 document.querySelectorAll("[data-i-aria]").forEach(el => T.en[el.dataset.iAria] = el.getAttribute("aria-label"));
-Object.assign(T.vi, { aSelect:"Chọn và di chuyển nét vẽ (V), xem bên dưới", aOcr:"Lấy chữ trong vùng (5), xem bên dưới", aSb:"Dải phân cảnh Storyboard (S), xem bên dưới", aRec:"Quay video vùng này (R), xem bên dưới",
+Object.assign(T.vi, { aSo:"Đánh số bước 1, 2, 3 (6), xem bên dưới", aBut:"Bút vẽ tay (7), xem bên dưới", aDaQuang:"Bút dạ quang (8), xem bên dưới", aCuon:"Chụp cuộn trang dài (9), xem bên dưới",
+  aSelect:"Chọn và di chuyển nét vẽ (V), xem bên dưới", aOcr:"Lấy chữ trong vùng (5), xem bên dưới", aSb:"Dải phân cảnh Storyboard (S), xem bên dưới", aRec:"Quay video vùng này (R), xem bên dưới",
   demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)", aBlur:"Làm mờ (4)",
   aUndo:"Hoàn tác (Ctrl+Z)", aCancel:"Huỷ (Esc)", aExit:"Thoát (Esc)", aDone:"Xong (Enter)", aClear:"Dọn khay",
   themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
@@ -2987,10 +3035,19 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     quayNh: "The MP4 waits in the Video shelf", nghi1: "Not using it?", nghi2: "The shelf <em>tucks away.</em>", nghi3: "One click, <em>it's back.</em>",
     thuNh: "Collapses after 5, 10 or 15 seconds. Pick one in Settings" });
   RT.vi.ngan.push("Quay video", "Tự thu"); RT.en.ngan.push("Record", "Tuck away");
+  // 06/10: thêm 4 cảnh (đánh số · bút + dạ quang · chụp cuộn · xuất GIF) -> 17 cảnh. Chữ nút lấy đúng src/i18n.js (cuon.xong, vd.gifNut, vd.gifGoiY).
+  Object.assign(RT.vi, { tren: "Shot & Save · 17 tính năng", buoc: ["Đổi màu", "Cắt ngắn", "Đổi nhạc"], soNh: "Mỗi lần bấm, số tự tăng",
+    butChu: 'Bản <span class="a">nháp 3</span><br><span class="b">gửi trước 5 giờ</span>', butNh: "Giữ Shift ra đường thẳng",
+    xong: "Xong", cuonNh: "Một ảnh dài, vào thẳng khay", gifNh: "Kéo thả GIF như với video" });
+  Object.assign(RT.en, { tren: "Shot & Save · 17 features", buoc: ["Fix the color", "Trim it", "Swap the music"], soNh: "Every click, the number counts up",
+    butChu: 'Draft <span class="a">number 3</span><br><span class="b">send before 5 pm</span>', butNh: "Hold Shift for a straight line",
+    xong: "Done", cuonNh: "One long image, straight to the shelf", gifNh: "Drag the GIF like the video" });
+  RT.vi.ngan.push("Đánh số", "Bút vẽ", "Chụp cuộn", "GIF"); RT.en.ngan.push("Steps", "Pen", "Scroll", "GIF");
   const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = k => RT[LG()][k];
   // canh i -> khoa chu cua the (f?t/f?p) + phim
   const TN = [{ k: 1, phim: ["Ctrl", "Shift", "S"] }, { k: 5 }, { k: 4, phim: ["1", "2", "3"] }, { k: 7, phim: ["4"] }, { k: 8, phim: ["V"] },
-    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }, { k: 12, phim: ["R"] }, { k: 13 }];
+    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }, { k: 12, phim: ["R"] }, { k: 13 },
+    { k: 14, phim: ["6"] }, { k: 15, phim: ["7", "8"] }, { k: 16, phim: ["9"] }, { k: 17 }];
 
   function batDau() {
     if (!window.gsap) return;                       // CDN hong -> giu luoi the
@@ -3068,6 +3125,21 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
     const LOGO = '<svg viewBox="0 0 385.89 351.31" width="21" height="19"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>';
     const ONG = '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m14.31 8 5.74 9.94"/><path d="M9.69 8h11.48"/><path d="m7.38 12 5.74-9.94"/><path d="M9.69 16 3.95 6.06"/><path d="M14.31 16H2.83"/><path d="m16.62 12-5.74 9.94"/></svg>';
+    // 06/10 đồ nghề cho cảnh Bút / Dạ quang: một nét trên lớp SVG phủ sân, vẽ dần theo con trỏ
+    const NS = "http://www.w3.org/2000/svg";
+    function netVe(d, mau, day, mo) {
+      let sv = san.querySelector("svg.net"); if (!sv) { sv = document.createElementNS(NS, "svg"); sv.setAttribute("class", "net"); san.append(sv); }
+      const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); p.setAttribute("stroke", mau); p.setAttribute("stroke-width", day);
+      if (mo != null) p.setAttribute("opacity", mo);
+      sv.append(p); p.dai = p.getTotalLength(); p.style.strokeDasharray = p.dai; p.style.strokeDashoffset = p.dai; p.style.visibility = "hidden"; return p;
+    }
+    function veNet(tl, p, c, d, at) {
+      const o = { t: 0 };
+      tl.set(p, { visibility: "visible" }, at).to(o, { t: 1, duration: d, ease: "power1.inOut", onUpdate() {
+        p.style.strokeDashoffset = p.dai * (1 - o.t);
+        if (c) { const q = p.getPointAtLength(p.dai * o.t); gsap.set(c, { x: q.x, y: q.y }); }
+      } }, at);
+    }
     const eIO = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);          // đường bay của app (dien.js)
     const eLo = t => 1 - Math.exp(-6.5 * t) * Math.cos(9.5 * t);                            // lò xo của app: vượt ~6% rồi về
 
@@ -3431,10 +3503,125 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         nhan(tl, L("thuNh"), T3 + 1, "top:auto;bottom:4%");
         return tl.to({}, { duration: 2 }, T3 + 1.1);
       },
+      // 13. Đánh số bước (app 02/10, phím 6): bấm lên ảnh -> huy hiệu 1, 2, 3 tự tăng. Huy hiệu phóng theo cỡ chữ sân khấu.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), b = L("buoc");
+        const ch = el(san, "chu trai", "font-size:calc(var(--u)*6.4);line-height:1.42;left:55%;top:46%", b.map((t, i) => '<span class="b' + i + '">' + t + "</span>").join("<br>"));
+        const rs = b.map((_, i) => R(ch.querySelector(".b" + i))), kc = Math.max(1.3, Math.min(2.6, rs[0].h / 34));
+        const c = conTro(w * .88, h * .86), p = phim(["6"]);
+        hienPhim(tl, p, .15);
+        rs.forEach((r, i) => {
+          const x = r.x - 13 * kc - Math.max(10, w * .014), y = r.y + r.h / 2, at = .75 + i;
+          const hh = el(san, "hh", `left:${x}px;top:${y}px`, String(i + 1)); gsap.set(hh, { scale: 0 });
+          di(tl, c, x, y, .5, at); bam(tl, c, at + .52);
+          tl.to(hh, { scale: kc, duration: .32, ease: "back.out(2.2)" }, at + .55);
+        });
+        tl.to(c, { opacity: 0, duration: .2 }, 3.75);
+        nhan(tl, L("soNh"), 3.8);
+        return tl.to({}, { duration: 1.7 }, 3.9);
+      },
+      // 14. Bút vẽ tay (7) + bút dạ quang (8) (app 06/10): bút khoanh tay quanh chữ, dạ quang tô ngang dòng dưới (mờ 0,4 như app).
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu", "font-size:calc(var(--u)*6.6);line-height:1.5;top:45%", L("butChu"));
+        const a = R(ch.querySelector(".a")), b = R(ch.querySelector(".b"));
+        const c = conTro(w * .9, h * .9), p7 = phim(["7"]), p8 = phim(["8"]);
+        const cx = a.x + a.w / 2, cy = a.y + a.h / 2, rx = a.w / 2 + Math.max(14, w * .016), ry = a.h / 2 + Math.max(5, h * .01);
+        let d = "";   // vòng khoanh hơi méo, điểm cuối chờm qua điểm đầu như nét tay thật
+        for (let i = 0; i <= 56; i++) { const t = i / 56, g = (-200 + t * 395) * Math.PI / 180, k = 1 + .05 * Math.sin(t * 9) + .035 * t;
+          d += (i ? "L" : "M") + (cx + rx * k * Math.cos(g)).toFixed(1) + " " + (cy + ry * k * Math.sin(g)).toFixed(1); }
+        const n1 = netVe(d, "#F86820", Math.max(3, w * .0035)), q0 = n1.getPointAtLength(0);
+        hienPhim(tl, p7, .15); di(tl, c, q0.x, q0.y, .5, .35);
+        veNet(tl, n1, c, 1, .95);
+        const y2 = b.y + b.h * .54, pad = Math.max(8, w * .008);
+        const n2 = netVe("M" + (b.x - pad).toFixed(1) + " " + y2.toFixed(1) + "L" + (b.x + b.w + pad).toFixed(1) + " " + (y2 - b.h * .03).toFixed(1), "#ffcc00", b.h * .66, .4);
+        hienPhim(tl, p8, 2.15); di(tl, c, b.x - pad, y2, .45, 2.3);
+        veNet(tl, n2, c, .9, 2.85);
+        tl.to(c, { opacity: 0, duration: .2 }, 3.85);
+        nhan(tl, L("butNh"), 3.9);
+        return tl.to({}, { duration: 1.7 }, 4);
+      },
+      // 15. Chụp cuộn trang dài (app 06/10, phím 9): khoanh phần trang đang cuộn -> 9 -> viền cam + thước chiều cao + nút Xong
+      //     NGOÀI vùng -> người dùng tự lăn chuột, ảnh dài mọc dần bên phải -> bấm Xong. Số trên thước = chiều cao đã ghép.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), hep = w < h * .9;
+        const cw = hep ? w * .6 : w * .5, ch = h * .8, cx = w * .05, cy = h * .05;
+        const cs = el(san, "cs", `left:${cx}px;top:${cy}px;width:${cw}px;height:${ch}px`, '<div class="tb"><i></i><i></i><i></i>' + L("trinh") + '</div><div class="bd" style="padding:0;overflow:hidden"></div>');
+        const bd = cs.querySelector(".bd"), br = R(bd), SO = 6, mh = br.h * .42, trH = SO * mh * 1.12 + mh * .12;
+        const taoTrang = p => { const t = el(p, "trg", `width:${br.w}px;height:${trH}px`);
+          for (let i = 0; i < SO; i++) el(t, "muc", `top:${mh * .12 + i * mh * 1.12}px;height:${mh}px`, "<b>0" + (i + 1) + "</b>" +
+            [[24, 34 + (i * 13) % 20], [45, 48 - (i * 7) % 18], [66, 28 + (i * 11) % 24]].map(([tp, ww]) => '<i style="top:' + tp + "%;width:" + ww + '%"></i>').join(""));
+          return t; };
+        const tr = taoTrang(bd), x0 = br.x, y0 = br.y, sw = br.w, sh = br.h;
+        const c = conTro(x0 - 30, y0 - 30), p = phim(["9"]), s = sel(x0, y0);
+        di(tl, c, x0, y0, .4, .1); tl.to(s, { opacity: 1, duration: .12 }, .5); keoSel(tl, s, c, sw, sh, .6, .55);
+        hienPhim(tl, p, 1.15);
+        const vqs = [[x0 - 4, y0 - 4, sw + 8, 2], [x0 - 4, y0 + sh + 2, sw + 8, 2], [x0 - 4, y0 - 4, 2, sh + 8], [x0 + sw + 2, y0 - 4, 2, sh + 8]]
+          .map(([l, t, ww, hh]) => el(san, "vq", `left:${l}px;top:${t}px;width:${ww}px;height:${hh}px;opacity:0`));
+        const dh = el(san, "dhq", `left:${x0}px;top:${y0 + sh + 10}px;opacity:0`, '<span class="r"></span><b class="gio"></b><span class="chia"></span><span class="dung"><i></i>' + L("xong") + "</span>");
+        const gio = dh.querySelector(".gio"), nutXong = dh.querySelector(".dung");
+        // ảnh dài: bản thu nhỏ của CHÍNH trang đó, cao dần theo phần đã cuộn qua
+        const cho = w - (cx + cw) - w * .04, tw = Math.min(cho * .7, w * .22, h * .88 * sw / trH), k = tw / sw, tx = cx + cw + (cho - tw) / 2 + w * .02, ty = h * .05;
+        const ad = el(san, "anhdai", `left:${tx}px;top:${ty}px;width:${tw}px;height:${sh * k}px;opacity:0`), tr2 = taoTrang(ad);
+        gsap.set(tr2, { scale: k, transformOrigin: "0 0" });
+        const o = { y: 0 }, toiDa = trH - sh, soPx = n => Math.round(n).toLocaleString(LG() === "vi" ? "vi-VN" : "en-US") + " px";
+        const ve = () => { tr.style.transform = "translateY(" + (-o.y).toFixed(1) + "px)"; ad.style.height = ((sh + o.y) * k).toFixed(1) + "px"; gio.textContent = soPx((sh + o.y) * 1.5); };
+        ve();
+        tl.set(s, { opacity: 0 }, 1.45).set(vqs, { opacity: 1 }, 1.45).set(dh, { opacity: 1 }, 1.45).to(ad, { opacity: 1, duration: .25 }, 1.5);
+        di(tl, c, x0 + sw * .5, y0 + sh * .55, .35, 1.5);
+        [.34, .68, 1].forEach((q, i) => tl.to(o, { y: toiDa * q, duration: .7, ease: "power2.inOut", onUpdate: ve }, 1.95 + i * .9));
+        tl.add(() => { const nd = R(nutXong); gsap.to(c, { x: nd.x + nd.w / 2, y: nd.y + nd.h / 2, duration: .5, ease: "power2.inOut" }); }, 4.6);
+        bam(tl, c, 5.12); tl.add(() => nutXong.classList.add("bam"), 5.12);
+        tl.to([...vqs, dh, c], { opacity: 0, duration: .2 }, 5.27).to(cs, { opacity: .3, duration: .3 }, 5.27);
+        nhan(tl, L("cuonNh"), 5.4, "top:auto;bottom:3%");
+        return tl.to({}, { duration: 1.8 }, 5.5);
+      },
+      // 16. Xuất GIF từ Khay video (app 06/10): cụm chọn [Có tiếng | Không tiếng | GIF] -> bấm GIF, ô chạy "GIF n%" -> kéo thả vào khung chat.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < 880 || w < h * .9;
+        const canh = (p, css) => { const v = video(p, css, 0), mt = v.querySelector(".mt"), chu = el(v, "vw", "left:0%", "TAKE 2");
+          v.ve = t => { mt.style.left = (12 + t * 70) + "%"; chu.style.left = (26 + t * 48) + "%"; }; v.ve(0); return v; };
+        const DAY = "left:0;top:0;width:100%;height:100%;border-radius:0";
+        const THEM = 104, kx = w * .04, kw = doc ? w * .92 : w * .46;
+        let fw = kw - 42, fh = fw * .5;
+        { const toiDa = (doc ? h * .5 : h * .94) - THEM - (doc ? 0 : 22); if (fh > toiDa) { fh = Math.max(40, toiDa); fw = fh * 2; } }   // sân thấp: thẻ không được tràn sân (đo 06/10: tràn 2 px ở sân 378 px)
+        const ky = doc ? h * .03 : Math.max(h * .03, (h - fh - THEM - 22) / 2);
+        const vi = LG() === "vi", meta0 = "10:24 · 06/10 · 1280×640 · " + (vi ? "1,2 MB" : "1.2 MB"), meta1 = "10:24 · 06/10 · GIF · " + (vi ? "2,0 MB" : "2.0 MB");
+        const K = el(san, "khay kvd" + (kw - 42 < 380 ? " hep" : ""), `left:${kx}px;top:${ky}px;width:${kw}px`,
+          '<div class="kb">' + VID_IC + "<span>" + L("khayVideo") + '</span><span class="sl">1</span></div><div class="vthe"><div class="vdau"><b>' + L("vdTen") +
+          '</b><span class="sp"></span><span class="chon"><i class="on">' + L("coTieng") + "</i><i>" + L("khongTieng") + '</i><i>GIF</i></span><span class="nutk">' + L("keo") + "</span></div>" +
+          '<div class="vmeta">' + meta0 + '</div><div class="vkhung" style="width:' + fw.toFixed(1) + "px;height:" + fh.toFixed(1) + 'px"></div></div>');
+        const khung = K.querySelector(".vkhung"), kq = canh(khung, DAY), vmeta = K.querySelector(".vmeta"), chon = K.querySelector(".chon"), g = chon.children[2];
+        const gx = doc ? w * .04 : kx + kw + w * .04, gw = doc ? w * .92 : w - gx - w * .04, gy = doc ? h * .55 : h * .1, gh = doc ? h * .36 : h * .72;   // điện thoại: cửa sổ chat dừng ở 91% sân, chừa đáy cho nhãn
+        const cs = el(san, "cs", `left:${gx}px;top:${gy}px;width:${gw}px;height:${gh}px`, '<div class="tb"><i></i><i></i><i></i>' + L("zalo") + '</div><div class="bd chat" style="overflow:hidden"><div class="bong trai">' + L("hoi") + "</div></div>");
+        const chat = cs.querySelector(".chat"), cr = R(chat), kr = R(khung), gr = R(g);
+        // chừa chỗ cho 2 bong bóng chữ trên + dưới (đo 06/10: bong bóng đầu bị đẩy đè thanh tiêu đề)
+        const dw = Math.min(cr.w * .66, kr.w, Math.max(56, (cr.h - (doc ? 84 : 126)) * 2)), dhh = dw / 2, dx = cr.x + cr.w - 12 - dw, dy = cr.y + cr.h - 12 - dhh;
+        const xem = [kq], o = { t: 0 };
+        tl.to(o, { t: 1, duration: 7.4, ease: "none", onUpdate() { const q = (o.t * 3) % 1; xem.forEach(v => v.ve(q)); } }, 0);
+        const c = conTro(w * .5, h * .92);
+        di(tl, c, gr.x + gr.w / 2, gr.y + gr.h / 2, .55, .4); bam(tl, c, .98);
+        const pr = { v: 0 };
+        tl.add(() => g.classList.add("dang"), 1).to(pr, { v: 100, duration: 1.3, ease: "none", onUpdate() { g.textContent = "GIF " + Math.round(pr.v) + "%"; } }, 1);
+        tl.add(() => { g.textContent = "GIF"; g.classList.remove("dang"); chon.children[0].classList.remove("on"); g.classList.add("on"); vmeta.textContent = meta1; }, 2.35);
+        di(tl, c, kr.x + kr.w * .5, kr.y + kr.h * .5, .45, 2.65); bam(tl, c, 3.12);
+        const a = el(san, "anh", `left:${kr.x}px;top:${kr.y}px;width:${kr.w}px;height:${kr.h}px;opacity:0`); xem.push(canh(a, DAY));
+        tl.set(a, { opacity: 1 }, 3.2).to(a, { x: dx - kr.x, y: dy - kr.y, scale: dw / kr.w, transformOrigin: "0 0", duration: .8, ease: "power2.inOut" }, 3.25);
+        di(tl, c, dx + dw * .5, dy + dhh * .5, .8, 3.25);
+        tl.add(() => {
+          const o2 = el(chat, "gifo", `align-self:flex-end;flex:none;width:${dw}px;height:${dhh}px`, '<span class="nhg">GIF</span>'); xem.push(canh(o2, DAY));
+          a.style.opacity = 0; gsap.fromTo(o2, { scale: .94 }, { scale: 1, duration: .25, ease: "back.out(2)" });
+        }, 4.08);
+        tl.to(c, { opacity: 0, duration: .2 }, 4.15);
+        if (!doc) tl.add(() => { const b2 = el(chat, "bong trai", null, L("duyet")); gsap.fromTo(b2, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3 }); }, 4.9);   // điện thoại: cửa sổ chat thấp, không đủ chỗ cho bong bóng trả lời
+        nhan(tl, L("gifNh"), 4.4, "top:auto;bottom:1.5%");
+        return tl.to({}, { duration: 2.2 }, 5.2);
+      },
     ];
 
     /* cuộn tới đâu, diễn cảnh đó */
     const N = TN.length, BUOC = () => innerHeight * .8;
+    $("soTong").textContent = String(N).padStart(2, "0");
     host.style.height = `calc(${N} * 80vh + 100vh)`;
     TN.forEach((f, i) => {
       const b = document.createElement("button"); b.className = "clip"; b.type = "button";
@@ -3528,7 +3715,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     addEventListener("keydown", e => {
       if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "") || e.ctrlKey || e.metaKey || e.altKey) return;
       const r = host.getBoundingClientRect(); if (r.top > innerHeight * .5 || r.bottom < innerHeight * .5) return;
-      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10, KeyR: 11 }[e.code];
+      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10, KeyR: 11,
+        Digit6: 13, Numpad6: 13, Digit7: 14, Numpad7: 14, Digit8: 14, Numpad8: 14, Digit9: 15, Numpad9: 15 }[e.code];
       if (i == null) return;
       e.preventDefault();
       if (i === dang) dien(i); else toi(i);
