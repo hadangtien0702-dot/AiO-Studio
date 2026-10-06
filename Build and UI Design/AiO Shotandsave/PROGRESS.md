@@ -125,8 +125,11 @@ co san: 1 x 20 px). Anh ghim luc chua vao che do ve van an moi vach nhu cu.
 **Kiem chung.** `test:butve` 67/67 (them 2 muc: vach nam ngay sau nut V, truoc nut so 1, o ca hai trang; thanh van nam tron
 trong man: 100..842 / 1200), `test:sobuoc` 72, `test:chupcuon` 23. Da CHUP thanh cong cu cua man chup that (cua so an, 200 %)
 va mo ra nhin: `V | 1 2 3 4 5 6 7 8 S R 9 | mau | hoan tac | x | v`. Nap 11:19, anh/video 700 -> 700.
-**CHUA lam / cho anh.** Thu tu hien la `... 8 S R 9`: nut 9 (chup cuon) dung SAU hai nut chu S, R. Neu anh muon day so lien nhau
-(`V | 1..9 | S R`) thi doi cho 1 nut + them 1 vach; em chua doi vi anh chi noi vach sau nut V.
+**11:22 ANH CHOT THU TU:** *"v ở ở đầu - tới dãy số - rồi tới chữ - tới dãy màu"* -> `V | 1 2 3 4 5 6 7 8 9 | S R | mau`. Da doi
+nut 9 (chup cuon) ve lien sau nut 8 va them vach `chia-chu` truoc hai nut chu S, R (`src/overlay/index.html`). `test:butve` 68/68
+(them 1 muc doc thu tu tu chinh file: `V | 1 2 3 4 5 6 7 8 9 | S R | MAU`), `test:sobuoc` 72, `test:chupcuon` 23; da chup lai thanh
+that va mo ra nhin (`.selftest/thanh-cong-cu-06-10.png`); nap 11:22. Anh ghim khong co nut chu nen chi co vach sau nut V.
+Them nut moi vao thanh: dat dung nhom (so / chu) va giu 3 vach ngan.
 
 ## [0.8.0 nap lan 21] - 2026-10-06 10:59 - TINH NANG MOI: chup cuon trang dai (phim 9), CHUA chay tren man that
 

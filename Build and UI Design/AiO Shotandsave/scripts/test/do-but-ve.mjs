@@ -28,6 +28,13 @@ for (const [ten, html] of [['man chup', ovHtml], ['anh ghim', pinHtml]]) {
   // 06/10 anh: vach "|" ngan nut V (phim chu) voi day nut danh so
   kiem(ten + ': co vach ngan ngay sau nut V, truoc nut so 1', /data-tool="select"[\s\S]*?<i class="so">V<\/i>\s*<\/button>\s*(<!--[\s\S]*?-->\s*)?<span class="chia chia-v"><\/span>\s*<button class="cong-cu" data-tool="rect"/.test(html))
 }
+{
+  // 06/10 anh chot thu tu: "v o dau - toi day so - roi toi chu - toi day mau" -> V | 1..9 | S R | mau
+  const thanh = ovHtml.slice(ovHtml.indexOf('id="toolbar"'))
+  const day = [...thanh.matchAll(/<i class="so">([^<]+)<\/i>|<span class="(chia[^"]*)">|id="(mau-nhom)"/g)].map((m) => m[1] || (m[2] ? '|' : 'MAU'))
+  const chuoi = day.slice(0, day.indexOf('MAU') + 1).join(' ')
+  kiem('man chup: thu tu thanh cong cu la V | 1..9 | S R | mau', chuoi === 'V | 1 2 3 4 5 6 7 8 9 | S R | MAU', chuoi)
+}
 for (const k of ['overlay.but', 'overlay.daquang']) {
   const dong = i18n.split('\n').filter((l) => l.includes("'" + k + "'"))
   kiem("Khoa '" + k + "' co du 2 ngon ngu, khong gach ngang dai", dong.length === 2 && !dong.some((l) => l.includes('—')), dong.length + ' dong')
