@@ -155,6 +155,9 @@ h1 em{font-style:normal;color:var(--brand)}
 .mau[aria-pressed="true"]{box-shadow:0 0 0 2px #161616,0 0 0 3.5px #fff}
 @media (max-width:640px){.mau-nhom .mau:nth-child(n+4){display:none}.cc{width:30px;height:30px}.cc.xem{display:none}}
 @media (pointer:coarse){.cc.xem{display:none}}
+/* 06/10 điện thoại: thanh trên cùng làm mờ nền phía sau (backdrop-filter) phải vẽ lại ở MỌI khung khi trang cuộn. Màn cảm ứng
+   dùng nền gần đặc thay cho lớp mờ. ☠️ Phòng ngừa: CHƯA đo được trên điện thoại thật (máy đo có card rời nên không thấy chênh). */
+@media (pointer:coarse){header{backdrop-filter:none;-webkit-backdrop-filter:none;background:color-mix(in srgb,var(--bg) 96%,transparent)}}
 @media (max-width:780px){.cc.xem{display:none}}   /* 06/10: thanh có 12 nút (671 px) → cửa sổ máy tính hẹp hơn 780 px (khung demo < 730 px) ẩn 8 nút chỉ để xem */
 /* Ô gõ chữ */
 .dtext{position:absolute;min-width:60px;padding:3px 7px;border:1px dashed rgb(255 255 255/50%);border-radius:5px;background:rgb(0 0 0/72%);
@@ -3620,7 +3623,11 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     ];
 
     /* cuộn tới đâu, diễn cảnh đó */
-    const N = TN.length, BUOC = () => innerHeight * .8;
+    /* 06/10 anh Tiến: "ở điện thoại anh thấy không mượt bằng ở trên desktop". Trên điện thoại thanh địa chỉ ẩn / hiện khi vuốt
+       → innerHeight đổi 60–100 px → (1) bước cuộn tính theo innerHeight lệch khỏi chiều cao rạp (tính theo vh, KHÔNG đổi) nên
+       ranh giới giữa các cảnh trôi; (2) sự kiện resize bắn → cảnh đang diễn bị DỰNG LẠI TỪ ĐẦU (đo giả lập 844 → 760 px: 1
+       resize = 1 lần dựng lại). Nay bước cuộn lấy từ chính chiều cao rạp, và chỉ dựng lại khi SÂN thật sự đổi cỡ. */
+    const N = TN.length, BUOC = () => host.offsetHeight * 80 / (N * 80 + 100);
     $("soTong").textContent = String(N).padStart(2, "0");
     host.style.height = `calc(${N} * 80vh + 100vh)`;
     TN.forEach((f, i) => {
@@ -3629,6 +3636,10 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       b.addEventListener("click", () => toi(i)); ray.append(b);
     });
     let dang = -1, tl = null, hen = null, dungYen = null, fillTw = null, thay = false;
+    let coSan = [0, 0], chamTay = false, cuonCuoi = 0;   // cỡ sân lúc dựng cảnh · ngón tay đang chạm màn · lần cuộn gần nhất
+    addEventListener("touchstart", () => { chamTay = true; }, { passive: true });
+    addEventListener("touchend", () => { chamTay = false; cuonCuoi = performance.now(); }, { passive: true });
+    addEventListener("touchcancel", () => { chamTay = false; }, { passive: true });
     const tuDong = matchMedia("(prefers-reduced-motion: reduce)");
     function nhanPhimCap(keys) { [...capPhim.children].forEach(k => { if (keys.includes(k.textContent)) { k.classList.add("nhan"); setTimeout(() => k.classList.remove("nhan"), 260); } }); }
     /* 02/10 anh Tiến: "khi chuyển giữa các phần đang bị giật và khựng lại". Đo trên live 1920×950, 12 lần chuyển: chú thích
@@ -3667,6 +3678,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       // cảnh mới HIỆN DẦN 0,22 giây (trước: cắt thẳng). Sân đã được làm mờ ở khiCuon / tuSang trước khi tới đây.
       gsap.killTweensOf(san);
       if (tuDong.matches) gsap.set(san, { opacity: 1 }); else gsap.fromTo(san, { opacity: 0 }, { opacity: 1, duration: .22, ease: "power1.out" });
+      coSan = [san.clientWidth, san.clientHeight];
       tl = CANH[i]();
       fillTw = gsap.fromTo(ray.children[i].querySelector(".fill"), { scaleX: 0 }, { scaleX: 1, duration: tl.duration(), ease: "none" });
       /* 02/10 anh Tiến: "chạy xong cái số 1 nó tự nhảy qua chạy cái số 2… hiện tại mình không bấm next nó sẽ loop lại cái số 1".
@@ -3678,10 +3690,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (tuDong.matches) { tl.progress(1); fillTw.progress(1); return; }
       /* 02/10 (lần 2) đo trên live: cảnh xong → đứng hình 0,93 giây → trang cuộn mượt 0,33 giây → chữ chú thích đổi → 0,14
          giây sau mới cắt sang cảnh mới = 1,25 giây "khựng" rồi nhảy hai nhịp. Nay: nghỉ 0,5 giây → tuSang() làm MỘT nhịp. */
-      tl.eventCallback("onComplete", () => { hen = setTimeout(() => {
+      /* 06/10: tự sang cảnh = trang NHẢY vị trí cuộn. Ngón tay còn chạm màn hoặc trang vừa cuộn (đà vuốt chưa hết) mà nhảy
+         thì cắt ngang cú vuốt của người xem → chờ tới khi yên 0,6 giây mới sang. */
+      tl.eventCallback("onComplete", () => { const thu = () => {
         if (dang !== i) return;
+        if (chamTay || performance.now() - cuonCuoi < 600) { hen = setTimeout(thu, 300); return; }
         if (i < N - 1 && thay && ganGiua()) tuSang(i + 1); else dien(i);
-      }, 500); });
+      }; hen = setTimeout(thu, 500); });
       if (!thay) { tl.pause(); fillTw.pause(); }
     }
     const dinhTren = () => host.getBoundingClientRect().top + scrollY;
@@ -3697,8 +3712,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       dungYen = setTimeout(() => dien(i), 140);      // cuộn nhanh qua nhiều cảnh: chỉ dựng cảnh nơi dừng lại
     }
     let cho = false;
-    addEventListener("scroll", () => { if (cho) return; cho = true; requestAnimationFrame(() => { cho = false; khiCuon(); }); }, { passive: true });
-    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => { if (dang >= 0) { giuCao(); capNhatCap(dang); dien(dang); } }, 200); });
+    addEventListener("scroll", () => { cuonCuoi = performance.now(); if (cho) return; cho = true; requestAnimationFrame(() => { cho = false; khiCuon(); }); }, { passive: true });
+    // Chỉ dựng lại cảnh khi SÂN đổi cỡ thật (xoay máy, đổi cỡ cửa sổ). Thanh địa chỉ điện thoại ẩn / hiện: sân cao theo svh nên không đổi → bỏ qua.
+    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => {
+      if (dang < 0) return;
+      giuCao(); capNhatCap(dang);
+      if (Math.abs(san.clientWidth - coSan[0]) > 2 || Math.abs(san.clientHeight - coSan[1]) > 2) dien(dang);
+    }, 200); });
     function toi(i) { window.scrollTo({ top: dinhTren() + i * BUOC() + BUOC() * .35, behavior: "smooth" }); }
     /* Cảnh diễn xong TỰ sang cảnh kế, một nhịp: sân mờ đi 0,18 giây → nhảy vị trí cuộn NGAY (sân ghim nên trên màn không
        có gì trượt; cuộn mượt 0,33 giây chỉ làm chậm) → đổi chú thích + dựng cảnh mới cùng lúc → dien() cho sân hiện dần. */
