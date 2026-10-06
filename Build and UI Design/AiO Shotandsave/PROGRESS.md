@@ -115,6 +115,23 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 24-25] - 2026-10-06 12:44 - Anh ghim lon hon man: hien thu nho cho vua man (anh cuon dai khong con mat nut tat)
+
+**Boi canh.** Anh thu lai chup cuon: *"chụp dài được luôn rồi mà khi anh bấm vào xem ảnh nó không có nút tắt em"*, roi *"anh đang
+để 1 tấm dài thòng ở desktop nè"*. => ban sua 11:31 CHAY tren man that: run-log 12:42:13 `chup-cuon dung sau 6174 ms: 1178x4103
+khung=52 them=13 dung=38 lac=0`.
+**Nguyen nhan that (run-log).** `[pin 14] data dip=785x2735 DPR=1.5 win=812x1394`: anh can 2735 DIP chieu cao, Windows kep cua so
+con 1394 (bang man) -> noi dung cao gap doi cua so, thanh co nut tat nam ngoai man. `createPinWindow` chua bao gio xet anh lon
+hon man (truoc khi co chup cuon khong co anh nao cao hon man).
+**Da sua.** `main.js createPinWindow()`: anh lon hon vung lam viec cua man (tru le) thi kich thuoc HIEN duoc thu nho cho vua va cua
+so duoc dat nam tron trong man; ghi run-log `pin thu nho cho vua man: ... -> ...`. Anh that khong doi (pin.js da xuat theo ti le
+anh that / kich thuoc hien).
+**Kiem chung.** `node --check`; `test:butve` 68, `test:sobuoc` 72 (anh ghim) dat; doc lai `app.asar` dang chay: CO doan sua. Nap
+12:44 (lan 24 nap nham ban CU vi hook chan lan sua ma chuoi lenh van chay; app khoi dong lai nen tam treo tren man da dong).
+**CHUA do.** Chua co luot nao mo anh cuon tren man that sau ban sua (cho dong `pin thu nho cho vua man` trong run-log + anh xac
+nhan thay nut tat). Anh cuon rat cao hien thu nho thi chu se nho: muon doc ro phai mo file. Chua co bai do tu dong cho
+`createPinWindow` (nam trong main.js, khong tach duoc ra de chay an).
+
 ## [0.8.0 nap lan 23] - 2026-10-06 11:31 - Chup cuon: sua loi "khong hoat dong" khi chi MOT cot cua vung khoanh cuon
 
 **Boi canh.** Anh thu lan dau tren man that roi bao: *"chụp cuộn không hoạt động em nha"*.
