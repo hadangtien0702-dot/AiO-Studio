@@ -115,6 +115,41 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 20] - 2026-10-06 10:49 - TINH NANG MOI: but ve tay (phim 7) + but da quang (phim 8) o man chup va anh ghim, cho anh bam thu
+
+**Boi canh.** Tinh nang 2/3 cua luot anh chot 06/10 (*"Bút vẽ tay + bút dạ quang"*). ROADMAP muc 0 so 2.
+
+**Da lam.** Hai cong cu moi tren thanh cong cu cua man chup VA anh ghim (icon Lucide pencil / highlighter, so 7 / 8):
+- Giu chuot keo = MOT net theo tay; giu Shift = duong thang tu diem dau (gach chan / to mot dong chu); bam roi tha = mot cham.
+- But: net 3 px dac (bang khung / mui ten). Da quang: net 16 px, trong 40 % (chu ben duoi van doc duoc). Dung bang 7 mau dang co.
+- Net la mot shape nhu cac shape khac: cong cu V chon / keo / Delete, phim mui ten nhich 1 px, Ctrl+Z, keo to khung chup thi
+  net dung yen tren man, ra anh ghep (man chup) va anh luu (anh ghim) dung cho.
+- Ma: shape `{ type: 'but' | 'daquang', pts: [x0, y0, ...] (DIP cuc bo), color }`; hang `NET` + 6 ham (`doDayNet`, `veNet`,
+  `hopNet`, `cachNet`, `dichNet`, `themDiemNet`) GIONG HET trong `overlay.js` va `pin.js`. Net ve bang MOT lenh stroke (cho tu
+  de len chinh no khong dam mau), di qua trung diem cac doan bang duong cong bac 2 (tron, khong gay khuc).
+
+**Kiem chung.** `npm run test:butve` (MOI, chay an, 3 ti le 100 / 125 / 150 %): **65/65 DAT**. Doc DIEM ANH tren canvas va tren
+anh xuat ra: net but (248,104,32) dac, cach tam 6 px la trong; da quang (255,204,0) alpha 102 = 40 %, cach tam 6 px van co mau,
+11 px la het; cho net tu de len chinh no van 40 %; Shift: di ngoan ngoeo ra dung 2 diem dau - cuoi; rung 1 px khong them diem;
+ve tran ra ngoai bi kep trong vung; V keo (+40, +30) moi diem di dung; keo to khung (-30, -20) net +30 +20 cuc bo; anh ghim luu
+900x600 net phong 1,5 lan dung cho, da quang tron voi nen xam 64 ra (140,120,38) dung phep tinh. Thanh cong cu nam tron trong
+man (man chup 697 px; anh ghim 624 va 344 px). DOI CHUNG: lam hong ham them diem + da quang thanh dac -> 10 muc truot.
+- Da MO ANH ra nhin (`.selftest/but-ve/overlay-1.5.png`): net tron, goc bo, da quang deu mau.
+- Thuoc sai gap: (1) diem do o x = 280 tren net di ra roi quay lai: net lam tron goc nen chi vuon toi ~270 (diem thua, dich
+  ve 250); (2) anh ghim o 125 %: toa do 109,4 thay vi 110 (mep canvas le, da biet tu bai so buoc) -> sai so 1 px; (3) doi
+  chung lan dau khong cham duoc vi ban hong lam chinh bai do vang loi (doc khung chon cua net khong con chon duoc).
+- Hoi quy (moi bai ghi ra file rieng, KHONG qua ong, dung o bai truot): `test:sobuoc` 72, `test:xuatgif` 58, `test:khovideo` 76,
+  `test:nutkhay` 54, `test:khaynut` 31: 0 truot. Nap 10:49 (md5 `f27a675f`, boot 10:49:03, anh/video 698 -> 698).
+
+**CHUA do / CHUA lam.**
+- Anh chua bam thu tren app that. Chuot that (toc do keo nhanh, but ve tren man 4K 150 %) chua do; bang ve / but cam ung chua thu.
+- Do day co dinh (but 3 px, da quang 16 px), chua co cho chinh. Da quang tren nen TOI kem noi (trong 40 % mau thuong).
+- Thanh cong cu man chup gio co 11 nut, dai 697 px: vung chon hep sat mep man thi thanh bi day vao trong (da co san co che kep).
+- Loi CO SAN thay lai trong luc do (khong sua): 2 trang `overlay` va `pin` KHONG co `font-src` trong CSP -> font Inter bi chan,
+  chu ghi chu / so buoc dang ve bang font du phong Segoe UI (bai do so buoc 02/10 da loc dong loi nay). Cho anh quyet co sua
+  khong (sua la doi dang chu cua ghi chu tren anh).
+- Chua len web, chua tang so phien ban, chua dong goi (anh dan).
+
 ## [0.8.0 nap lan 18-19] - 2026-10-06 10:38 - TINH NANG MOI: xuat GIF tu Khay video (o "GIF" trong cum Co tieng | Khong tieng), cho anh bam thu
 
 **Boi canh.** Anh hoi nen lam gi de canh tranh; em dua bang so doi thu (ShareX, CleanShot deu co GIF) va de xuat; anh chon

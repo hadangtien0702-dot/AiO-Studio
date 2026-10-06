@@ -57,7 +57,7 @@ const DPR = window.devicePixelRatio || 1
 const MAU = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f86820'
 
 let mode = 'select'       // 'select' | 'annotate'
-let tool = 'rect'         // 'select' | 'rect' | 'arrow' | 'text' | 'blur' | 'so'
+let tool = 'rect'         // 'select' | 'rect' | 'arrow' | 'text' | 'blur' | 'so' | 'but' | 'daquang'
 let curColor = '#f86820'  // mac dinh CAM (accent). Doi qua bang mau.
 let curBlurType = 'mosaic' // 'mosaic' | 'blur'
 let dragging = false
@@ -347,7 +347,9 @@ function xuLyChinhKhung(e) {
     const shiftX = nx - curRect.x
     const shiftY = ny - curRect.y
     for (const s of shapes) {
-      if (s.type === 'text' || s.type === 'so') {
+      if (s.pts) {
+        dichNet(s, -shiftX, -shiftY) // net ve tay / da quang: doi tung diem
+      } else if (s.type === 'text' || s.type === 'so') {
         s.x -= shiftX
         s.y -= shiftY
       } else {
@@ -463,7 +465,9 @@ window.addEventListener('keydown', (e) => {
     const step = e.shiftKey ? 10 : 1
     const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
     const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
-    if (selectedShape.type === 'text' || selectedShape.type === 'so') {
+    if (selectedShape.pts) {
+      dichNet(selectedShape, dx, dy)
+    } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
       selectedShape.x += dx; selectedShape.y += dy
     } else {
       selectedShape.x1 += dx; selectedShape.x2 += dx
@@ -497,10 +501,10 @@ window.addEventListener('keydown', (e) => {
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
       'v': 'select', 'V': 'select', 'KeyV': 'select',
-      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so',
+      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so', '7': 'but', '8': 'daquang',
       'b': 'blur', 'B': 'blur', 'KeyB': 'blur',
-      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so',
-      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so'
+      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so', 'Digit7': 'but', 'Digit8': 'daquang',
+      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so', 'Numpad7': 'but', 'Numpad8': 'daquang'
     }
     const t = keyMap[e.key] || keyMap[e.code]
     if (t) chonCongCu(t)
@@ -615,13 +619,16 @@ function layHopBaoShape(s) {
     const r = R_SO + 4
     return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 }
   }
+  if (s.pts) return hopNet(s)
   return null
 }
 
 function timShapeTaiDiem(lx, ly) {
   for (let i = shapes.length - 1; i >= 0; i--) {
     const s = shapes[i]
-    if (s.type === 'so') {
+    if (s.pts) {
+      if (cachNet(s, lx, ly) <= doDayNet(s) / 2 + 6) return { shape: s, index: i }
+    } else if (s.type === 'so') {
       if (Math.hypot(lx - s.x, ly - s.y) <= R_SO + 4) return { shape: s, index: i }
     } else if (s.type === 'rect' || s.type === 'blur') {
       const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
@@ -687,6 +694,7 @@ function batDauVe(e) {
       dangKeoShape = true
       keoShapeStart = { x: lx, y: ly }
       shapeBanDau = { ...hit.shape }
+      if (hit.shape.pts) shapeBanDau.pts = hit.shape.pts.slice() // ban sao RIENG cua mang diem (khong thi keo la cong don)
     } else {
       selectedShape = null
     }
@@ -702,6 +710,13 @@ function batDauVe(e) {
     redraw()
     return
   }
+  if (tool === 'but' || tool === 'daquang') {
+    // Giu chuot keo = ve net theo tay; giu Shift = duong THANG tu diem dau (gach chan chu). Bam roi tha ngay = mot cham.
+    netDangVe = { type: tool, pts: [lx, ly], color: curColor }
+    shapes.push(netDangVe)
+    redraw()
+    return
+  }
   veStart = { x: lx, y: ly }
 }
 
@@ -714,6 +729,7 @@ function chonLaiTuDau(e) {
   shapes = []
   veStart = null
   soDangDat = null
+  netDangVe = null
   isAdjusting = false
   adjustType = null
   toolbarEl.style.opacity = '1'
@@ -744,6 +760,8 @@ function veDangKeo(e) {
       } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
         selectedShape.x = shapeBanDau.x + dx
         selectedShape.y = shapeBanDau.y + dy
+      } else if (selectedShape.pts && shapeBanDau.pts) {
+        for (let i = 0; i < selectedShape.pts.length; i += 2) { selectedShape.pts[i] = shapeBanDau.pts[i] + dx; selectedShape.pts[i + 1] = shapeBanDau.pts[i + 1] + dy }
       }
       redraw()
     } else if (lx >= 0 && ly >= 0 && lx <= curRect.w && ly <= curRect.h) {
@@ -754,6 +772,11 @@ function veDangKeo(e) {
   }
   if (soDangDat) {
     Object.assign(soDangDat, kepTamSo(e.clientX - curRect.x, e.clientY - curRect.y, curRect.w, curRect.h))
+    redraw()
+    return
+  }
+  if (netDangVe) {
+    themDiemNet(netDangVe, clamp(e.clientX - curRect.x, 0, curRect.w), clamp(e.clientY - curRect.y, 0, curRect.h), e.shiftKey)
     redraw()
     return
   }
@@ -773,6 +796,7 @@ function ketThucVe(e) {
     return
   }
   if (soDangDat) { soDangDat = null; return }
+  if (netDangVe) { netDangVe = null; redraw(); return }
   if (!veStart) return
   const lx = clamp(e.clientX - curRect.x, 0, curRect.w)
   const ly = clamp(e.clientY - curRect.y, 0, curRect.h)
@@ -908,6 +932,8 @@ function veShape(ctx, s) {
     veChu(ctx, s, 1)
   } else if (s.type === 'so') {
     veSo(ctx, s, 1)
+  } else if (s.pts) {
+    veNet(ctx, s, 1)
   } else if (s.type === 'blur') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
     const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
@@ -938,8 +964,73 @@ function hoanTac() {
   if (mode !== 'annotate') return
   if (oGoChu) { huyOGoChu(); return } // dang go thi Ctrl+Z = bo o go
   soDangDat = null
+  netDangVe = null
   shapes.pop()
   redraw()
+}
+
+/* ── BUT VE TAY (phim 7) + BUT DA QUANG (phim 8) — 06/10, anh chon trong luot 3 tinh nang ────────────────
+   Giu chuot keo = mot NET theo tay. Shape { type: 'but' | 'daquang', pts: [x0, y0, x1, y1, ...] (DIP cuc bo), color }.
+   But: net 3 px dac (bang khung / mui ten). Da quang: net 16 px, trong 40 % — to len chu ma van doc duoc chu ben duoi.
+   Ca net ve bang MOT lenh stroke nen cho net tu cat chinh no khong bi dam mau. Giu Shift luc ve = duong THANG tu diem
+   dau (gach chan / to mot dong chu). Net qua TRUNG DIEM cac doan bang duong cong bac 2 -> tron, khong gay khuc.
+   6 ham duoi day (NET, doDayNet, veNet, hopNet, cachNet, dichNet, themDiemNet) phai GIONG HET trong pin.js — bai do
+   `npm run test:butve` so tung ky tu; sua mot ben la sua ca hai. */
+const NET = { but: { day: 3, mo: 1 }, daquang: { day: 16, mo: 0.4 } }
+let netDangVe = null // net dang ve do (chuot con giu)
+function doDayNet(s) { return (NET[s.type] || NET.but).day }
+/* k = he so phong (1 khi ve tren man; anh that / kich thuoc hien thi khi xuat). */
+function veNet(ctx, s, k) {
+  const p = s.pts, n = p.length >> 1
+  if (!n) return
+  const c = NET[s.type] || NET.but
+  ctx.save()
+  ctx.globalAlpha = c.mo
+  ctx.strokeStyle = s.color; ctx.fillStyle = s.color
+  ctx.lineWidth = c.day * k; ctx.lineJoin = 'round'; ctx.lineCap = 'round'
+  ctx.beginPath()
+  if (n === 1) { // bam roi tha ngay: mot cham tron
+    ctx.arc(p[0] * k, p[1] * k, c.day * k / 2, 0, Math.PI * 2); ctx.fill(); ctx.restore(); return
+  }
+  ctx.moveTo(p[0] * k, p[1] * k)
+  for (let i = 1; i < n - 1; i++) {
+    ctx.quadraticCurveTo(p[i * 2] * k, p[i * 2 + 1] * k, (p[i * 2] + p[i * 2 + 2]) / 2 * k, (p[i * 2 + 1] + p[i * 2 + 3]) / 2 * k)
+  }
+  ctx.lineTo(p[n * 2 - 2] * k, p[n * 2 - 1] * k)
+  ctx.stroke()
+  ctx.restore()
+}
+/* Hop bao (da tinh do day net + 3 px le) — khung chon cua cong cu V */
+function hopNet(s) {
+  const p = s.pts
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
+  for (let i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1] }
+  const le = doDayNet(s) / 2 + 3
+  return { x: x0 - le, y: y0 - le, w: x1 - x0 + le * 2, h: y1 - y0 + le * 2 }
+}
+/* Khoang cach tu diem (lx, ly) toi net (gan nhat trong cac doan) */
+function cachNet(s, lx, ly) {
+  const p = s.pts
+  if (p.length === 2) return Math.hypot(lx - p[0], ly - p[1])
+  let tot = Infinity
+  for (let i = 0; i + 3 < p.length; i += 2) {
+    const dx = p[i + 2] - p[i], dy = p[i + 3] - p[i + 1], l2 = dx * dx + dy * dy
+    let t = l2 ? ((lx - p[i]) * dx + (ly - p[i + 1]) * dy) / l2 : 0
+    t = t < 0 ? 0 : t > 1 ? 1 : t
+    const d = Math.hypot(lx - (p[i] + t * dx), ly - (p[i + 1] + t * dy))
+    if (d < tot) tot = d
+  }
+  return tot
+}
+function dichNet(s, dx, dy) { for (let i = 0; i < s.pts.length; i += 2) { s.pts[i] += dx; s.pts[i + 1] += dy } }
+/* Them diem luc dang ve. thang = dang giu Shift: net chi con 2 diem dau - cuoi. Bo diem cach diem truoc duoi 2 px
+   (chuot rung) de net khong nang va khong rang cua. */
+function themDiemNet(s, x, y, thang) {
+  const p = s.pts
+  if (thang) { s.pts = [p[0], p[1], x, y]; return }
+  const n = p.length
+  if (Math.hypot(x - p[n - 2], y - p[n - 1]) < 2) return
+  p.push(x, y)
 }
 
 /* ── Cong cu DANH SO BUOC (phim 6, 02/10 — ROADMAP muc 0 so 1) ───────────

@@ -467,6 +467,19 @@ DANH SO BUOC 1-2-3 (02/10 14:44, phim 6 — da nap vao app dang cai, anh CHUA ba
   lam hong 2 ham phai bi bat. CHUA DAT: anh chua bam tren app that · chuot that chua do · huy hieu co dinh 26 px (anh 4K
   co the nho) · vao ve lai anh ghim thi dem lai tu 1 · chua len web · Mac chua thu.
 
+BUT VE TAY + BUT DA QUANG (06/10, phim 7 / 8 — da nap vao app dang cai, anh CHUA bam thu):
+- Nguoi xai: khoanh vung (hoac mo anh ghim) -> phim **7** (but) hoac **8** (da quang) -> giu chuot keo de ve; giu Shift ra
+  duong thang (gach chan mot dong chu); bam roi tha la mot cham. Doi mau bang bang mau; V chon de keo / Delete; Ctrl+Z bo net
+  cuoi. Vi du doi thuong: khoanh tay mot cho bi lech tren khung hinh, to vang dong phu de sai, roi gui khach.
+- Builder: shape `{ type: 'but' | 'daquang', pts: [x0, y0, ...] (DIP cuc bo), color }` trong `overlay.js` va `pin.js`. Hang
+  `NET` + 6 ham (`doDayNet`, `veNet`, `hopNet`, `cachNet`, `dichNet`, `themDiemNet`) phai GIONG HET hai file (bai do so tung
+  ky tu). Cho de hong: (1) shape co `pts` KHONG co `x1..y2` hay `x, y` -> moi cho dich / keo shape phai xet `s.pts` TRUOC;
+  (2) `shapeBanDau = { ...shape }` chi chep nong, phai `pts.slice()` khong thi keo la cong don; (3) net phai ve bang MOT lenh
+  stroke, ve tung doan thi cho de nhau cua da quang bi dam; (4) net lam tron goc nen khong cham dung diem gap khuc.
+- MVP (so): `npm run test:butve` 65/65 chay an o 100 / 125 / 150 % (doc diem anh tren canvas + anh xuat, co doi chung).
+  CHUA DAT: anh chua bam tren app that · chuot that / bang ve chua do · do day co dinh · da quang tren nen toi kem noi ·
+  chua len web · Mac chua thu.
+
 XUAT GIF TU KHAY VIDEO (06/10, anh chon trong bang hoi; da nap vao app dang cai, anh CHUA bam thu):
 - Nguoi xai: mo Khay video -> o moi video co cum **Co tieng | Khong tieng | GIF** (video khong tieng: **Video | GIF**) -> bam
   **GIF**: o do chay "GIF 42%" vai giay roi sang len -> keo ca hang tha vao Zalo / Messenger / thu muc la ra file GIF (tu chay
