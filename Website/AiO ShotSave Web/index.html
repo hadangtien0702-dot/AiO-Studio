@@ -1052,6 +1052,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .clip{gap:4px;padding:0 5px 0 6px}.clip .ten{font-size:10.5px}
 @media (max-width:1560px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}   /* 06/10: 17 clip (trước 13) → dưới 1560 px chỉ còn số */
 @media (max-width:640px){.duoi{flex-direction:column;align-items:flex-start;gap:10px}.goi-y .phim-thu{display:none}.tren .nhan-tren{display:none}}
+@media (max-width:480px){.tl-ray{gap:3px}.clip{font-size:9px;letter-spacing:-.03em}}   /* 06/10: 17 clip trên điện thoại ≈ 14–16 px mỗi ô → chữ số 9 px mới không bị cắt */
 @media (hover:none){.goi-y .phim-thu{display:none}}
 /* đồ nghề trên sân khấu — khung chọn / tay nắm / nhãn cỡ / xoè 6 khung chép số đo từ src/overlay/overlay.css của app */
 .chu{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font-weight:800;letter-spacing:-.045em;line-height:1;white-space:nowrap;color:var(--t1);font-size:calc(var(--u)*9);text-align:center}
@@ -1187,6 +1188,8 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .trg .muc i{position:absolute;left:38%;height:9%;border-radius:99px;background:#d9d1c8}
 .anhdai{position:absolute;z-index:26;overflow:hidden;border-radius:6px;background:#fff;box-shadow:0 0 0 1.5px var(--acc),0 20px 40px -16px #000}
 .vdau .chon i.dang{color:var(--acc);font-variant-numeric:tabular-nums}
+.kvd.hep .vdau{gap:6px}.kvd.hep .vdau .chon i{padding:0 6px;font-size:11px}   /* thẻ hẹp: 3 ô chọn phải vừa một hàng trên điện thoại */
+.kvd.rathep .vdau b{display:none}   /* điện thoại 320 px: bỏ tên "Video 01" (đo 06/10: còn tràn 22–24 px) */
 .gifo{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px rgb(0 0 0/10%)}
 .gifo .nhg{position:absolute;left:6px;top:6px;z-index:2;padding:0 5px;border-radius:4px;background:rgb(10 10 10/74%);color:#fff;font:700 10px/1.6 Inter,sans-serif}
 @media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after,.dhq .r{animation:none}}
@@ -3075,7 +3078,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     }
     function nhan(tl, text, at, css) { const n = el(san, "nh", css, "<i></i>" + text); tl.fromTo(n, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: .3 }, at); return n; }
     function flash(tl, at) { const f = el(san, "flash"); tl.to(f, { opacity: .85, duration: .06 }, at).to(f, { opacity: 0, duration: .35 }, at + .06); }
-    function capNhatSz(s) { s.sz.textContent = Math.round(s.offsetWidth * 1.5) + " × " + Math.round(s.offsetHeight * 1.5); s.sz.classList.toggle("trong", s.offsetTop < 28); }
+    // 06/10: đọc cỡ từ style (GSAP ghi px vào đó), KHÔNG đọc offsetWidth: hàm này chạy mỗi khung khi khung chọn giãn, đọc offset* là ép trình duyệt tính lại bố cục mỗi khung
+    function capNhatSz(s) { const c = s.style; s.sz.textContent = Math.round(parseFloat(c.width) * 1.5) + " × " + Math.round(parseFloat(c.height) * 1.5); s.sz.classList.toggle("trong", parseFloat(c.top) < 28); }
     function sel(x, y, w, h) { const s = el(san, "sel", `left:${x}px;top:${y}px;width:${w || 0}px;height:${h || 0}px;opacity:0`); s.sz = el(s, "sz"); capNhatSz(s); return s; }
     function keoSel(tl, s, c, w, h, d, at) {
       tl.to(s, { width: w, height: h, duration: d, ease: "power2.inOut", onUpdate: () => capNhatSz(s) }, at);
@@ -3134,12 +3138,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       let sv = san.querySelector("svg.net"); if (!sv) { sv = document.createElementNS(NS, "svg"); sv.setAttribute("class", "net"); san.append(sv); }
       const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); p.setAttribute("stroke", mau); p.setAttribute("stroke-width", day);
       if (mo != null) p.setAttribute("opacity", mo);
-      sv.append(p); p.dai = p.getTotalLength(); p.style.strokeDasharray = p.dai; p.style.strokeDashoffset = p.dai; p.style.visibility = "hidden"; return p;
+      // khoảng trống dài hơn nét 2 px và lệch thêm 1 px: lúc chưa vẽ không còn đoạn dài 0 ở đầu mút (đầu nét tròn sẽ hiện thành một chấm)
+      sv.append(p); p.dai = p.getTotalLength(); p.style.strokeDasharray = p.dai + " " + (p.dai + 2); p.style.strokeDashoffset = p.dai + 1; p.style.visibility = "hidden"; return p;
     }
     function veNet(tl, p, c, d, at) {
       const o = { t: 0 };
       tl.set(p, { visibility: "visible" }, at).to(o, { t: 1, duration: d, ease: "power1.inOut", onUpdate() {
-        p.style.strokeDashoffset = p.dai * (1 - o.t);
+        p.style.strokeDashoffset = (p.dai + 1) * (1 - o.t);
         if (c) { const q = p.getPointAtLength(p.dai * o.t); gsap.set(c, { x: q.x, y: q.y }); }
       } }, at);
     }
@@ -3318,7 +3323,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           gsap.fromTo(b, { scale: .6, opacity: 0 }, { scale: 1, opacity: 1, duration: .4, ease: "back.out(2)" });
         }, 2.05);
         tl.add(() => { const b = el(cb, "bong trai", null, L("duyet")); gsap.fromTo(b, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3 }); }, 2.9);
-        nhan(tl, L("apps"), 3.1, doc ? "top:3%" : "left:25%");
+        nhan(tl, L("apps"), 3.1, doc || w < 560 ? "top:3%" : "left:25%");   // sân hẹp mà không "dọc" (iPhone: 358×328): nhãn đặt ở 25% bị tràn mép trái 82 px (đo WebKit 06/10)
         return tl.to({}, { duration: 1.6 }, 3.2);
       },
       // 8. Khay nhớ: tắt app, mở lại, ảnh gần nhất tự hiện lại (02/10 anh Tiến: nói rõ số ảnh chỉnh được trong Cài đặt; app có sẵn hàng "Mở lại ảnh gần nhất": Tắt / 5 / 10 / 20)
@@ -3510,7 +3515,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       () => {
         const tl = gsap.timeline(), w = W(), h = H(), b = L("buoc");
         const ch = el(san, "chu trai", "font-size:calc(var(--u)*6.4);line-height:1.42;left:55%;top:46%", b.map((t, i) => '<span class="b' + i + '">' + t + "</span>").join("<br>"));
-        const rs = b.map((_, i) => R(ch.querySelector(".b" + i))), kc = Math.max(1.3, Math.min(2.6, rs[0].h / 34));
+        // huy hiệu (26 px × kc) không được to hơn khoảng cách hai dòng, không thì 1 / 2 / 3 chồng lên nhau trên sân điện thoại
+        const rs = b.map((_, i) => R(ch.querySelector(".b" + i))), kc = Math.max(.8, Math.min(2.6, rs[0].h / 34, (rs[1].y - rs[0].y) * .9 / 26));
         const c = conTro(w * .88, h * .86), p = phim(["6"]);
         hienPhim(tl, p, .15);
         rs.forEach((r, i) => {
@@ -3590,11 +3596,15 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         { const toiDa = (doc ? h * .5 : h * .94) - THEM - (doc ? 0 : 22); if (fh > toiDa) { fh = Math.max(40, toiDa); fw = fh * 2; } }   // sân thấp: thẻ không được tràn sân (đo 06/10: tràn 2 px ở sân 378 px)
         const ky = doc ? h * .03 : Math.max(h * .03, (h - fh - THEM - 22) / 2);
         const vi = LG() === "vi", meta0 = "10:24 · 06/10 · 1280×640 · " + (vi ? "1,2 MB" : "1.2 MB"), meta1 = "10:24 · 06/10 · GIF · " + (vi ? "2,0 MB" : "2.0 MB");
-        const K = el(san, "khay kvd" + (kw - 42 < 380 ? " hep" : ""), `left:${kx}px;top:${ky}px;width:${kw}px`,
+        const K = el(san, "khay kvd" + (kw - 42 < 380 ? " hep" : "") + (kw - 42 < 240 ? " rathep" : ""), `left:${kx}px;top:${ky}px;width:${kw}px`,
           '<div class="kb">' + VID_IC + "<span>" + L("khayVideo") + '</span><span class="sl">1</span></div><div class="vthe"><div class="vdau"><b>' + L("vdTen") +
           '</b><span class="sp"></span><span class="chon"><i class="on">' + L("coTieng") + "</i><i>" + L("khongTieng") + '</i><i>GIF</i></span><span class="nutk">' + L("keo") + "</span></div>" +
           '<div class="vmeta">' + meta0 + '</div><div class="vkhung" style="width:' + fw.toFixed(1) + "px;height:" + fh.toFixed(1) + 'px"></div></div>');
         const khung = K.querySelector(".vkhung"), kq = canh(khung, DAY), vmeta = K.querySelector(".vmeta"), chon = K.querySelector(".chon"), g = chon.children[2];
+        // giữ sẵn bề rộng của "GIF 100%" cho ô GIF: không thì lúc chạy phần trăm cụm chọn nở ra ~28 px, thẻ hẹp trên điện thoại bị tràn hàng đầu
+        // Thẻ hẹp (điện thoại): chỉ hiện "n%" (đo 06/10: "GIF 100%" làm hàng đầu tràn 8–74 px ở 320–390 px).
+        const hepThe = K.classList.contains("hep"), chuPt = v => (hepThe ? "" : "GIF ") + Math.round(v) + "%";
+        g.textContent = chuPt(100); g.style.minWidth = Math.ceil(g.getBoundingClientRect().width) + "px"; g.style.textAlign = "center"; g.textContent = "GIF";
         const gx = doc ? w * .04 : kx + kw + w * .04, gw = doc ? w * .92 : w - gx - w * .04, gy = doc ? h * .55 : h * .1, gh = doc ? h * .36 : h * .72;   // điện thoại: cửa sổ chat dừng ở 91% sân, chừa đáy cho nhãn
         const cs = el(san, "cs", `left:${gx}px;top:${gy}px;width:${gw}px;height:${gh}px`, '<div class="tb"><i></i><i></i><i></i>' + L("zalo") + '</div><div class="bd chat" style="overflow:hidden"><div class="bong trai">' + L("hoi") + "</div></div>");
         const chat = cs.querySelector(".chat"), cr = R(chat), kr = R(khung), gr = R(g);
@@ -3605,7 +3615,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         const c = conTro(w * .5, h * .92);
         di(tl, c, gr.x + gr.w / 2, gr.y + gr.h / 2, .55, .4); bam(tl, c, .98);
         const pr = { v: 0 };
-        tl.add(() => g.classList.add("dang"), 1).to(pr, { v: 100, duration: 1.3, ease: "none", onUpdate() { g.textContent = "GIF " + Math.round(pr.v) + "%"; } }, 1);
+        tl.add(() => g.classList.add("dang"), 1).to(pr, { v: 100, duration: 1.3, ease: "none", onUpdate() { g.textContent = chuPt(pr.v); } }, 1);
         tl.add(() => { g.textContent = "GIF"; g.classList.remove("dang"); chon.children[0].classList.remove("on"); g.classList.add("on"); vmeta.textContent = meta1; }, 2.35);
         di(tl, c, kr.x + kr.w * .5, kr.y + kr.h * .5, .45, 2.65); bam(tl, c, 3.12);
         const a = el(san, "anh", `left:${kr.x}px;top:${kr.y}px;width:${kr.w}px;height:${kr.h}px;opacity:0`); xem.push(canh(a, DAY));
@@ -3636,10 +3646,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       b.addEventListener("click", () => toi(i)); ray.append(b);
     });
     let dang = -1, tl = null, hen = null, dungYen = null, fillTw = null, thay = false;
-    let coSan = [0, 0], chamTay = false, cuonCuoi = 0;   // cỡ sân lúc dựng cảnh · ngón tay đang chạm màn · lần cuộn gần nhất
-    addEventListener("touchstart", () => { chamTay = true; }, { passive: true });
-    addEventListener("touchend", () => { chamTay = false; cuonCuoi = performance.now(); }, { passive: true });
-    addEventListener("touchcancel", () => { chamTay = false; }, { passive: true });
+    /* cỡ sân lúc dựng cảnh · lần chạm / rê ngón tay gần nhất · lần cuộn gần nhất.
+       ☠️ KHÔNG dùng cờ "đang chạm" bật ở touchstart, tắt ở touchend (bản 14:17 làm vậy, ECC soát bắt được): ngón tay chạm lên một
+       phần tử của sân rồi cảnh đổi → phần tử bị gỡ khỏi trang → touchend bắn vào phần tử đã gỡ, không tới window → cờ kẹt mãi,
+       rạp ngừng tự sang cảnh. Dùng MỐC THỜI GIAN: không thể kẹt. */
+    let coSan = [0, 0], chamLuc = 0, cuonCuoi = 0;
+    const chamDay = () => { chamLuc = performance.now(); };
+    addEventListener("touchstart", chamDay, { passive: true }); addEventListener("touchmove", chamDay, { passive: true });
     const tuDong = matchMedia("(prefers-reduced-motion: reduce)");
     function nhanPhimCap(keys) { [...capPhim.children].forEach(k => { if (keys.includes(k.textContent)) { k.classList.add("nhan"); setTimeout(() => k.classList.remove("nhan"), 260); } }); }
     /* 02/10 anh Tiến: "khi chuyển giữa các phần đang bị giật và khựng lại". Đo trên live 1920×950, 12 lần chuyển: chú thích
@@ -3690,11 +3703,11 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (tuDong.matches) { tl.progress(1); fillTw.progress(1); return; }
       /* 02/10 (lần 2) đo trên live: cảnh xong → đứng hình 0,93 giây → trang cuộn mượt 0,33 giây → chữ chú thích đổi → 0,14
          giây sau mới cắt sang cảnh mới = 1,25 giây "khựng" rồi nhảy hai nhịp. Nay: nghỉ 0,5 giây → tuSang() làm MỘT nhịp. */
-      /* 06/10: tự sang cảnh = trang NHẢY vị trí cuộn. Ngón tay còn chạm màn hoặc trang vừa cuộn (đà vuốt chưa hết) mà nhảy
-         thì cắt ngang cú vuốt của người xem → chờ tới khi yên 0,6 giây mới sang. */
+      /* 06/10: tự sang cảnh = trang NHẢY vị trí cuộn. Ngón tay vừa chạm / đang rê, hoặc trang vừa cuộn (đà vuốt chưa hết) mà
+         nhảy thì cắt ngang cú vuốt của người xem → chờ tới khi yên 0,6 giây mới sang. */
       tl.eventCallback("onComplete", () => { const thu = () => {
         if (dang !== i) return;
-        if (chamTay || performance.now() - cuonCuoi < 600) { hen = setTimeout(thu, 300); return; }
+        if (performance.now() - Math.max(cuonCuoi, chamLuc) < 600) { hen = setTimeout(thu, 300); return; }
         if (i < N - 1 && thay && ganGiua()) tuSang(i + 1); else dien(i);
       }; hen = setTimeout(thu, 500); });
       if (!thay) { tl.pause(); fillTw.pause(); }
@@ -3716,8 +3729,10 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     // Chỉ dựng lại cảnh khi SÂN đổi cỡ thật (xoay máy, đổi cỡ cửa sổ). Thanh địa chỉ điện thoại ẩn / hiện: sân cao theo svh nên không đổi → bỏ qua.
     let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => {
       if (dang < 0) return;
-      giuCao(); capNhatCap(dang);
-      if (Math.abs(san.clientWidth - coSan[0]) > 2 || Math.abs(san.clientHeight - coSan[1]) > 2) dien(dang);
+      // ☠️ Sân không đổi thì KHÔNG làm gì cả. Bản 14:17 vẫn gọi capNhatCap() ở đây: nó giết thanh tiến độ của clip đang chạy
+      // (fillTw.kill) mà không dựng lại → trên điện thoại thanh tiến độ đứng lại mỗi lần thanh địa chỉ ẩn / hiện (ECC soát bắt được).
+      if (Math.abs(san.clientWidth - coSan[0]) <= 2 && Math.abs(san.clientHeight - coSan[1]) <= 2) return;
+      giuCao(); capNhatCap(dang); dien(dang);
     }, 200); });
     function toi(i) { window.scrollTo({ top: dinhTren() + i * BUOC() + BUOC() * .35, behavior: "smooth" }); }
     /* Cảnh diễn xong TỰ sang cảnh kế, một nhịp: sân mờ đi 0,18 giây → nhảy vị trí cuộn NGAY (sân ghim nên trên màn không
@@ -3730,7 +3745,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         dien(i);
       } });
     }
-    new IntersectionObserver(es => { thay = es[0].isIntersecting; if (!tl) return; if (thay) { tl.resume(); fillTw && fillTw.resume(); } else { tl.pause(); fillTw && fillTw.pause(); } }, { threshold: .3 }).observe(san);
+    // nhiều bản ghi dồn lại (máy đang nghẹt) thì lấy cái MỚI nhất, không lấy cái đầu
+    new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; if (!tl) return; if (thay) { tl.resume(); fillTw && fillTw.resume(); } else { tl.pause(); fillTw && fillTw.pause(); } }, { threshold: .3 }).observe(san);
     // bấm phím thật khi rạp đang chiếm giữa màn (Ctrl+Shift+S để dành cho demo đầu trang)
     addEventListener("keydown", e => {
       if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "") || e.ctrlKey || e.metaKey || e.altKey) return;
