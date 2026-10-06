@@ -115,6 +115,27 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 27] - 2026-10-06 13:10 - Chup cuon: thanh menu DINH + video cung nam trong vung (luot that 13:03 con 'lac' 19 khung cuoi)
+
+**Boi canh.** Sau ban 13:02 anh thu lai ngay (khong nhan gi them). Run-log 13:03:34: `chup-cuon dung sau 10332 ms: 1293x2233 khung=84
+them=9 dung=55 lac=19 ben=3 chuoi=...TddddddddTddddddd'T'dLT'LLLLLLLLLLLL` -> noi duoc 2.233 px (luot 12:53: 0), duong ben chay 3 khung,
+roi 'lac' het doan cuoi. Cung luot: `pin thu nho cho vua man: 862x1489 -> 783x1352` = ban sua nut tat 12:44 DA chay tren man that
+(12:55:41 cung co: 832x2414 -> 466x1352).
+**Nguyen nhan (anh luu 130334-545.jpg + doc ma + tai hien).** Vung khoanh co ca THANH MENU Facebook dinh tren dau (khong troi theo
+trang) LAN video doc -> HAI khoi khong khop; luat "chi mot khoi lien nhau duoc phep khong khop" cua ban 13:02 tu choi. Muc [13]
+(thanh dinh 90 px co noi dung + video): ban 13:02 'lac' ngay khung cuon dau tien.
+**Da sua** (`src/chup-cuon.js timLechBen`): (1) hang khop khi KHONG troi = hang dung yen (thanh dinh): bo ra khi xet do lech khac 0;
+co do lech khac 0 dat thi lay no, khong co moi xet "dung yen". (2) Sai so tinh tren moi hang ngoai khoi video (khong chi bang tot).
+(3) SOI KY tung hang cho d - 2 .. d + 2 quanh do lech da chon.
+☠️ Bay bai do bat duoc: anh dai thieu 2 / 1330 hang. Vong tim chi so moi 2 hang (`BUOC_HANG`); khoi hinh soc deu 6 px thi lech
+dung 1 px lot qua ke (59 / that 60: diem 79 / 78, sai so 0,477 / 0,460) -> buoc (3).
+**Kiem chung.** `npm run test:chupcuon` 34/34: [13] cao 1330 / 1330, lech 1,38 / 1,27, 0 lac + doi chung ban 13:02 'lac' o khung 4.
+Nap 13:10:23, `app.asar` md5 `bb791bf3`, co `khongBoDinh`; 706 anh + 9 dai + cau hinh giong truoc.
+**CHUA do / gioi han.** Chua co luot that sau 13:10. Khi video (dang chay) chiem HET vung, khong con hang nao cua trang de bam
+-> van 'lac' (video trong bai do doi hinh hoan toan moi khung; video that it doi hon, co bam duoc khong: chua do). Da 'lac' roi
+ma cuon tiep thi phan sau KHONG duoc noi (phai cuon nguoc lai); tren man chua co loi nhac. Video trong anh dai bi ghep tu nhieu
+thoi diem (anh 13:03: video Mudena bi cat khuc). Chua quyet: khi 'lac' thi dung sach nhu hien nay hay noi tiep co vet noi.
+
 ## [0.8.0 nap lan 26] - 2026-10-06 13:02 - Chup cuon: het "lac" khi vung khoanh co VIDEO (bai Facebook), CHO ANH THU LAI
 
 **Boi canh.** Anh: *"scroll không được nữa rồi em"*. Run-log 12:53:36: `chup-cuon dung sau 10483 ms: 1044x1102 khung=82 them=0

@@ -207,6 +207,45 @@ const trang = taoTrang(W, H, 7)
   const r2 = bo.them(khung(taoTrang(W, 1400, 123), W, 1400, h, 500, 4)) // trang khac han
   kiem('[12] co duong "ben": cuon vuot phan chong va trang khac han van "lac", chieu cao khong doi', r1.loai === 'lac' && r2.loai === 'lac' && bo.cao === h + 100, r1.loai + ' ' + r2.loai + ' cao ' + bo.cao)
 }
+// ── 13. CA THAT 06/10 13:03 (luot thu hai cua anh sau ban 13:02; chuoi `...d'T'dLT'LLLLLLLLLLLL`, 19 'lac' cuoi): vung co
+//        THANH MENU DINH co noi dung o tren dau (khong troi) LAN video -> hai khoi khong khop. ──
+{
+  const DINH = 90, vY0 = 230, vY1 = 500, vX0 = 40, vX1 = 860
+  const khD = (tu, hat, i) => {
+    const f = khung(trang, W, H, h, tu, hat)
+    const rnd = ngauNhien(4000 + i * 17)
+    const o = []
+    for (let k = 0; k < 400; k++) o.push(i < 3 ? 0 : 30 + Math.floor(rnd() * 200))
+    const dat = (x, y, v) => { const j = (y * W + x) * 4; f[j] = v; f[j + 1] = v; f[j + 2] = v }
+    for (let y = DINH; y < h; y++) { // video (troi theo trang)
+      const yP = y + tu
+      if (yP < vY0 || yP >= vY1) continue
+      for (let x = vX0; x < vX1; x++) dat(x, y, o[(((yP - vY0) / 30) | 0) * 21 + (((x - vX0) / 40) | 0)])
+    }
+    for (let y = 0; y < DINH; y++) for (let x = 0; x < W; x++) { // thanh menu dinh: 6 bieu tuong + hang nhan + vien duoi
+      const bt = y >= 10 && y < 54 && (x % 150) >= 50 && (x % 150) < 94, nhan = y >= 62 && y < 74 && (x % 150) >= 30 && (x % 150) < 30 + 40 + ((x / 150) | 0) * 9
+      dat(x, y, bt ? 40 : nhan ? 90 : y >= 87 ? 200 : 245)
+    }
+    return f
+  }
+  const buoc = [0, 0, 0, 60, 80, 0, 70, 90, 60, 100, 80, 90, 100]
+  const chayD = (tuyChon) => {
+    const bo = taoBoGhep(W, h, tuyChon)
+    let tu = 0
+    const loai = [bo.them(khD(0, 800, 0)).loai], sai = []
+    buoc.forEach((d, i) => { tu += d; const k = bo.them(khD(tu, 802 + i * 2, i + 1)); loai.push(k.loai); if (k.loai === 'them' && k.d !== d) sai.push('khung ' + (i + 1) + ': do ' + k.d + ' / that ' + d) })
+    return { bo, loai, tu, sai }
+  }
+  const r = chayD()
+  if (r.sai.length) console.log('  [13] do lech do SAI: ' + r.sai.join(' · '))
+  const a = r.bo.layAnh()
+  const dungCao = a.h === r.tu + h
+  const l1 = dungCao ? lech(a.buf, trang, W, DINH, DINH, vY0 - DINH) : 999, l2 = dungCao ? lech(a.buf, trang, W, vY1, vY1, a.h - vY1) : 999
+  kiem('[13] thanh menu DINH co noi dung + video: van noi DUNG chieu cao, khong khung nao "lac"', dungCao && dem(r.loai, 'lac') === 0 && dem(r.loai, 'them') === buoc.filter((d) => d > 0).length, 'cao ' + a.h + ' / ' + (r.tu + h) + ' ' + JSON.stringify(r.bo.dem))
+  kiem('[13] phan ngoai thanh dinh va ngoai video khop trang goc (lech <= 2,5 / kenh)', l1 <= 2.5 && l2 <= 2.5, 'giua ' + l1.toFixed(2) + ', duoi ' + l2.toFixed(2))
+  const c = chayD({ khongBen: 'khong-bo-dinh' })
+  kiem('[DOI CHUNG 13] duong ben ban 13:02 (khong bo hang dung yen): co khung "lac" ngay khi bat dau cuon (nhu luot that 13:03)', dem(c.loai, 'lac') > 0 && c.loai[4] === 'lac', c.bo.dem.chuoi + ' cao ' + c.bo.cao + ' / ' + (r.tu + h))
+}
 // ── 8. Day noi trong app (doc ma) ──
 {
   const fs = require('fs')
