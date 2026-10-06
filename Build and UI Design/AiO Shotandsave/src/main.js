@@ -1511,6 +1511,22 @@ function ketThucKeo(wcId) {
 const PIN_PAD = 12 // le trong suot quanh anh de co bong + goc bo tron
 
 function createPinWindow(image, screenX, screenY, dipW, dipH, filePath) {
+  /* 06/10 anh: "bấm vào xem ảnh nó không có nút tắt" + "1 tấm dài thòng ở desktop". Anh chup cuon 785x2735 DIP: Windows kep
+     cua so con 812x1394 (run-log 12:42) trong khi noi dung cao 2735 -> thanh co nut tat nam NGOAI man, khong dong duoc.
+     Anh lon hon vung lam viec cua man thi HIEN THU NHO cho vua man (anh that khong doi: pin.js xuat theo ti le anh that /
+     kich thuoc hien, da co san) va dat cua so nam tron trong man. */
+  try {
+    const wa = screen.getDisplayNearestPoint({ x: Math.round(screenX), y: Math.round(screenY) }).workArea
+    const maxW = wa.width - PIN_PAD * 2 - 16, maxH = wa.height - PIN_PAD * 2 - 16
+    const k = Math.min(1, maxW / dipW, maxH / dipH)
+    if (k < 1) {
+      const w0 = dipW, h0 = dipH
+      dipW = Math.max(40, Math.round(dipW * k)); dipH = Math.max(40, Math.round(dipH * k))
+      screenX = Math.min(Math.max(screenX, wa.x + PIN_PAD + 8), wa.x + wa.width - dipW - PIN_PAD - 8)
+      screenY = Math.min(Math.max(screenY, wa.y + PIN_PAD + 8), wa.y + wa.height - dipH - PIN_PAD - 8)
+      ghiLog('pin thu nho cho vua man: ' + w0 + 'x' + h0 + ' -> ' + dipW + 'x' + dipH + ' (vung lam viec ' + wa.width + 'x' + wa.height + ')')
+    }
+  } catch (e) { ghiLog('pin tinh co vua man LOI: ' + e.message) }
   const win = new BrowserWindow({
     x: screenX - PIN_PAD,
     y: screenY - PIN_PAD,
