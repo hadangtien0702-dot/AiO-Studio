@@ -1,6 +1,31 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-02 15:48 +0700 (dang lam do, chua /xong)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **Ban dang chay may cong ty: van 0.8.0, nap lan 29 (boot 14:59:08), `app.asar` md5 `a1e5b05b`.** CHUA dong goi lai (bo cai
+>   0.8.0 trong Release la ban 01/10 19:22, thieu moi thu tu 02/10), CHUA tang so phien ban: anh dan *"con ban cai thi khi nao
+>   anh bao moi xuat ra ban moi"*.
+> - **06/10 them 4 tinh nang, tat ca da nap, anh CHUA bao test xong:** xuat GIF tu Khay video · but ve tay (phim 7) + da quang
+>   (phim 8) · chup cuon trang dai (phim 9) · (02/10) danh so buoc (phim 6). Kem: thanh cong cu sap lai (V dau, day so, chu,
+>   day mau), hang nut khay doi 10 px, anh ghim cao hon man tu thu nho, icon nut 9 = Tabler `arrow-autofit-height` (anh chon).
+> - **CHUP CUON: 3 ban sua trong ngay sau khi anh dung that.** 12:42 chay duoc (1178x4103). 12:53 hong tren bai Facebook co
+>   video -> ban 13:02 (duong "ben") -> luot 13:03 noi 2.233 px roi 'lac' 19 khung cuoi (thanh menu dinh + video) -> ban 13:10.
+>   ☠️ **Ban 13:10 va ban ECC 14:59 CHUA co luot chup cuon that nao** (run-log sau 14:59 chi co khay bung / thu).
+>   [CHO ANH] chup cuon lai dung bai Facebook do; phien sau doc dong `chup-cuon ... ben=N chuoi=...` trong run-log.
+>   [CHO ANH QUYET] khi mat dau giua chung: dung sach nhu hien nay, hay noi tiep va chap nhan co vet noi.
+> - **ECC soat 14:59: 8/8 diem that da sua** (muc [0.8.0 nap lan 29]). Diem 1, 2, 3, 8 (xoa video / GIF dua nhau) chua co bai kiem
+>   tu dong, chua tai hien tren app that.
+> - **Bai kiem (chay an):** `test:chupcuon` 38/38 · `test:xuatgif` 58/58 · `test:khovideo` 76/76 · `test:butve` 65/65 ·
+>   `test:sobuoc` 72/72.
+> - **WEB da len live 06/10** (anh bao *"update lên website tính năng mới đi em"* giua luc dang test): 13 -> 17 the / canh
+>   trong rap; toi uu dien thoai 14:17; sua theo ECC 15:18. `origin/main = 39d61cd`, md5 live = blob git. Nhat ky web o
+>   `PROGRESS.md` GOC repo. ☠️ CHUA co so do do muot tren dien thoai that; 3 cho ve nang moi khung (bong 200vmax cua khung chon,
+>   anh dai canh Chup cuon doi `height`, video gia ghi `left`) CHUA sua. [CHO ANH] iPhone hay Android, cho nao chua muot.
+> - **GIT:** viec app nam o nhanh `may-cong-ty` tren GitHub (`main` tren may dang giu, KHONG push `main`: main la ban live +
+>   luat 01/10). Viec web day rieng len `main` bang worktree tach tu `origin/main`.
+> - **POLAR (06/10):** gia da doi $14.99 (doc lai tren trang thanh toan). CON: ma ban quyen van "het han 1 nam" + ten benefit con
+>   "+ 1 year updates" (cho anh gat), to chuc con "test mode" nen nut Pay khoa (cho anh xong xac minh; Claude khong nhap giay to).
+> - (cac dong ben duoi la trang thai 02/10 tro ve truoc, giu de tra)
+> - ~~sua 2026-10-02 15:48 +0700 (dang lam do, chua /xong)~~
 > - **02/10 15:48 DA SUA 5 LOI NHOM A cua luot ECC soat (deu o phan QUAY VIDEO) — nap lan 16.** app.asar md5 `b26fc16e`,
 >   boot 15:47:44. `npm run test:khovideo` 76/76 (chay an). Sau khi nap: so video that 6/6 muc con nguyen, log khong co
 >   dong LOI. CHUA thu tren app that cac tinh huong hong (tat app giua luc quay, dia day, doi ngon ngu luc quay).
@@ -114,6 +139,19 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [/xong] - 2026-10-06 15:51 - Chot so (may cong ty): 4 tinh nang moi + web 17 canh + 2 luot ECC, van 0.8.0, chua dong goi
+
+**Khong sua ma trong muc nay.** Chi chot so. Ma nguon giong lan nap 14:59 (`app.asar` md5 `a1e5b05b`).
+**Da ghi.** Khoi TRANG THAI dau file (viet lai cho 06/10) · `CLAUDE.md` cua app (chup cuon 38/38, ly do `mat-nguon`, 3 cuoc dua
+GIF / xoa video) · `CLAUDE.md` goc repo (dong 12 + viec cho) · brain tong (2 dong) · so bai hoc thiet ke (icon).
+**Run-log sau 14:59.** Anh van dung app: 15:30 bung khay 933 ms (bay 27 khung, bung 25 khung), 15:30 khay tu thu sau 5 giay,
+15:49 an han nut tron. Khong co dong LOI / CANH BAO. KHONG co luot chup cuon, GIF, but ve nao sau 14:59.
+**[CHO ANH]** (1) chup cuon lai bai Facebook co video · (2) bam GIF tren mot video roi keo vao Zalo / Messenger · (3) but 7 / da
+quang 8 / so 6 tren anh that · (4) web tren dien thoai that: may gi, cho nao chua muot · (5) khi chup cuon mat dau: dung sach hay
+noi tiep · (6) bao "test xong het" thi em moi dong goi + tang so phien ban + gop `may-cong-ty` vao `main`.
+**[CHUA LAM, ly do]** 3 cho ve nang tren web (khong co dien thoai that de do, sua mu de hong) · bai kiem tu dong cho 4 cuoc dua
+trong `main.js` (can dung app that co cua so) · font Inter bi chan o man chup / anh ghim (thay tu truoc, chua do goc).
 
 ## [0.8.0 nap lan 29] - 2026-10-06 14:59 - ECC soat lai viec hom nay: sua 8 diem o GIF / xoa video / chup cuon
 

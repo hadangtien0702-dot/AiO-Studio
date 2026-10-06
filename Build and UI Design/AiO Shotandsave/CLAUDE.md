@@ -488,9 +488,11 @@ CHUA co luot that):
   (7b) thanh menu DINH + video cung trong vung (ca that 13:03) = hai khoi khong khop -> hang khop khi khong troi bi bo ra khi
   xet do lech khac 0; ☠️ vong tim chi so moi 2 hang nen phai SOI KY tung hang quanh do lech da chon (muc [13]: thieu 2 hang);
   (8) anh cuon cao hon man: `createPinWindow` thu nho kich thuoc HIEN cho vua vung lam viec, khong thi Windows kep cua so va
-  thanh nut tat nam ngoai man. Doc phien hong: dong `chup-cuon ... ben=N chuoi=...` trong run-log (d dung · T them · u lui ·
-  L lac, dau `'` = khung phai dung duong ben).
-- MVP (so): `npm run test:chupcuon` 34/34 (trang gia co dap an: cuon het 5200 px ra dung 5200 px, lech 1,19 / kenh; co that
+  thanh nut tat nam ngoai man; (9) (ECC 06/10 14:59) `chayPhien` bo qua khung KHAC CO voi khung dau (doi do phan giai giua
+  phien = doc sai be rong); da co anh ma 50 lan lien khong co khung -> dung voi `lyDo: 'mat-nguon'`, van luu phan da ghep +
+  thong bao `cuon.matNguon`; chup cuon nem loi thi PHAI co thong bao (truoc chi ghi log). Doc phien hong: dong
+  `chup-cuon ... ben=N chuoi=...` trong run-log (d dung · T them · u lui · L lac, dau `'` = khung phai dung duong ben).
+- MVP (so): `npm run test:chupcuon` 38/38 (trang gia co dap an: cuon het 5200 px ra dung 5200 px, lech 1,19 / kenh; co that
   2400x1300 mat 15 ms / khung, ca xau nhat 34-47 ms; duong anh JPEG that cua Electron ke ca ca video). Man that 12:42:
   1178x4103 trong 6,2 giay, 0 lac; 13:03 (bai Facebook co video, ban 13:02): 1293x2233, 19 khung cuoi 'lac'. CHUA DAT: ban
   13:10 (thanh dinh + video) chua co luot that · video chiem HET vung khoanh van 'lac', va da 'lac' ma cuon tiep thi phan sau
@@ -526,7 +528,11 @@ XUAT GIF TU KHAY VIDEO (06/10, anh chon trong bang hoi; da nap vao app dang cai,
   Cho de hong: (1) bang mau RIENG tung khung = hinh loang lo du so do dep (da thu, bo; xem dau `gif.js`); (2) gifenc doc ca
   vung nho goc -> phai dua mang dung kich thuoc; che do `auto` + `reset()` ghi lai dau file; (3) tinh thoi gian tu MOC, khong
   cong don; `Math.max(0, floor(...))` khong thi thua khung; (4) o trong suot KHONG duoc nam trong bang dung de doi mau (diem
-  den thanh trong suot); (5) file chi la MP4 H.264 do app quay; (6) them file vao `src/` thi doc muc luc `app.asar` sau khi nap.
+  den thanh trong suot); (5) file chi la MP4 H.264 do app quay; (6) them file vao `src/` thi doc muc luc `app.asar` sau khi nap;
+  (7) (ECC 06/10 14:59) GIF mat vai giay nen nguoi dung kip lam viec khac giua chung: `gifDangTao` / `gifBoChon` trong
+  `main.js`. GIF xong phai kiem lai so + file goc (video da bi xoa thi go GIF vua tao); nguoi dung da bam lai "Co tieng" thi
+  GIF xong CHI ghi `fileGif`, khong gianh lai lua chon; `video:xoa` dua ban dan xuat (khong tieng, GIF) vao Thung rac TRUOC,
+  ban goc SAU; `khoiPhucVideoDo()` go `shotandsave-video-*.gif.tam` cu hon 1 phut. 4 duong nay CHUA co bai kiem tu dong.
 - MVP (so): `npm run test:xuatgif` 58/58 (chay an, doc lai NOI DUNG tung khung bang bo giai ma cua Chromium, 2 doi chung).
   Video that cua anh: 17,4 giay -> 2,0 MB trong 3,8 giay; 9,6 giay noi dung video -> 6,6 MB trong 2,5 giay. CHUA DAT: anh
   chua dung; keo vao Zalo / Messenger chua do; nen chuyen mau min co bac mau; 10 hinh/giay + 800 px + tran 60 giay chua duoc
