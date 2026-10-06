@@ -160,6 +160,53 @@ const trang = taoTrang(W, H, 7)
   kiem('[10] chi MOT cot cuon, phan con lai dung yen, nen toi: van noi dung chieu cao (khong coi la "dung")', a.h === tu + h && loai.filter((v) => v === 'them').length === 8 && loai[3] === 'dung', 'cao ' + a.h + ' / ' + (tu + h) + ' ' + loai.join(' '))
   kiem('[10] cot cuon trong anh ghep khop trang goc (lech <= 2,5 / kenh)', a.h === tu + h && s / n <= 2.5, 'lech ' + (s / Math.max(1, n)).toFixed(2))
 }
+// ── 11. CA THAT 06/10 12:53 (anh: "scroll không được nữa rồi em"): vung khoanh la bai Facebook co VIDEO chiem ~75 % chieu
+//        cao. Anh luu ra: video DEN o khung dau (cua so chup vua dong). Run-log that: 82 khung, dung = 2, lac = 79, them = 0.
+//        Video nam TREN trang (troi theo trang), 3 khung dau den, tu khung thu 4 co hinh va DOI HINH moi khung. ──
+{
+  const vY0 = 130, vY1 = 560, vX0 = 40, vX1 = 860 // video tren trang: 430 / 600 hang = 72 % chieu cao, 91 % be rong
+  const khV = (tu, hat, i) => {
+    const f = khung(trang, W, H, h, tu, hat)
+    const rnd = ngauNhien(9000 + i * 31)
+    const o = []
+    for (let k = 0; k < 400; k++) o.push(i < 3 ? 0 : 30 + Math.floor(rnd() * 200)) // moi khung mot bo o sang toi khac han
+    for (let y = 0; y < h; y++) {
+      const yP = y + tu
+      if (yP < vY0 || yP >= vY1) continue
+      for (let x = vX0; x < vX1; x++) { const v = o[(((yP - vY0) / 30) | 0) * 21 + (((x - vX0) / 40) | 0)]; const j = (y * W + x) * 4; f[j] = v; f[j + 1] = v; f[j + 2] = v }
+    }
+    return f
+  }
+  const buoc = [0, 0, 0, 80, 120, 0, 200, 150, 90, 260, 180, 0, 140, 220]
+  const chayV = (tuyChon) => {
+    const bo = taoBoGhep(W, h, tuyChon)
+    let tu = 0
+    const loai = [bo.them(khV(0, 700, 0)).loai]
+    buoc.forEach((d, i) => { tu += d; loai.push(bo.them(khV(tu, 702 + i * 2, i + 1)).loai) })
+    return { bo, loai, tu }
+  }
+  const r = chayV()
+  const a = r.bo.layAnh()
+  const dungCao = a.h === r.tu + h
+  const lTren = dungCao ? lech(a.buf, trang, W, 0, 0, vY0) : 999, lDuoi = dungCao ? lech(a.buf, trang, W, vY1, vY1, a.h - vY1) : 999
+  kiem('[11] video 72 % chieu cao, den 3 khung dau roi doi hinh moi khung: van noi DUNG chieu cao, khong khung nao "lac"', dungCao && dem(r.loai, 'lac') === 0 && dem(r.loai, 'them') === buoc.filter((d) => d > 0).length, 'cao ' + a.h + ' / ' + (r.tu + h) + ' ' + r.loai.join(' ') + ' ' + JSON.stringify(r.bo.dem))
+  kiem('[11] phan NGOAI video (tren + duoi) khop trang goc (lech <= 2,5 / kenh)', lTren <= 2.5 && lDuoi <= 2.5, 'tren ' + lTren.toFixed(2) + ', duoi ' + lDuoi.toFixed(2))
+  let sang = 0, nS = 0
+  if (dungCao) for (let y = vY0 + 10; y < vY1 - 10; y += 7) for (let x = vX0 + 10; x < vX1 - 10; x += 9) { sang += a.buf[(y * W + x) * 4 + 1]; nS++ }
+  kiem('[11] khung dau duoc thay bang khung moi nhat TRUOC khi cuon: o video trong anh dai khong con den', nS > 0 && sang / nS > 60, 'do sang o video ' + (nS ? (sang / nS).toFixed(0) : '?') + ' (den = 0)')
+  // DOI CHUNG: tat duong "ben" -> phai ra DUNG chuoi cua run-log that: dau, dung, dung, roi lac het, khong noi hang nao
+  const c = chayV({ khongBen: true })
+  kiem('[DOI CHUNG 11] bo ghep CU (khong co duong "ben"): dau, dung, dung roi "lac" het, them = 0 (dung nhu run-log 12:53)', c.loai[1] === 'dung' && c.loai[2] === 'dung' && c.loai.slice(3).every((v) => v === 'lac') && c.bo.cao === h, c.loai.join(' '))
+}
+// ── 12. Duong "ben" KHONG duoc noi bua: cuon vuot phan chong tren trang co video van phai "lac" ──
+{
+  const bo = taoBoGhep(W, h)
+  bo.them(khung(trang, W, H, h, 3300, 1)) // cho nay khong co bang lap (bang lap nam o hang ~2600: hoa tiet lap + cuon vuot
+  bo.them(khung(trang, W, H, h, 3400, 2)) // phan chong thi KHONG cach nao phan biet duoc, ke ca duong chinh)
+  const r1 = bo.them(khung(trang, W, H, h, 3400 + 590, 3)) // vuot 85 %
+  const r2 = bo.them(khung(taoTrang(W, 1400, 123), W, 1400, h, 500, 4)) // trang khac han
+  kiem('[12] co duong "ben": cuon vuot phan chong va trang khac han van "lac", chieu cao khong doi', r1.loai === 'lac' && r2.loai === 'lac' && bo.cao === h + 100, r1.loai + ' ' + r2.loai + ' cao ' + bo.cao)
+}
 // ── 8. Day noi trong app (doc ma) ──
 {
   const fs = require('fs')
@@ -196,6 +243,8 @@ const trang = taoTrang(W, H, 7)
     kiem('[9] duong anh THAT (JPEG q85 cua Electron): ghep dung chieu cao, khong lac', p.lyDo === 'dung' && p.h === p.canCao && p.w === W && p.dem.lac === 0, 'cao ' + p.h + ' / ' + p.canCao + ' ' + JSON.stringify(p.dem))
     kiem('[9] noi dung khop trang goc qua nen JPEG (lech <= 4 / kenh)', p.lech <= 4, 'lech ' + p.lech)
     kiem('[9] anh dai dung duoc thanh anh that va ghi ra PNG / JPEG dung co', u.anh && !u.anh.rong && u.anh.w === W && u.anh.h === p.h && u.anh.png > 1000 && u.anh.jpg > 1000, JSON.stringify(u.anh))
+    const v = u.video || {}
+    kiem('[9] ca video 12:53 qua JPEG q85 THAT: noi dung chieu cao, khong lac, phan ngoai video khop trang goc (lech <= 4)', v.lyDo === 'dung' && v.h === v.canCao && v.dem && v.dem.lac === 0 && v.dem.them === 9 && v.lech <= 4, 'cao ' + v.h + ' / ' + v.canCao + ', lech ' + v.lech + ' ' + JSON.stringify(v.dem))
     kiem('[9] khong ai bam Xong -> phien tu dung o tran thoi gian (400 ms), van tra anh', u.hetGio.lyDo === 'het-gio' && u.hetGio.ms >= 380 && u.hetGio.ms < 1500 && u.hetGio.cao === h, JSON.stringify(u.hetGio))
     kiem('[9] luong chup khong tra khung nao -> bo, khong treo, khong co anh', u.khongKhung.lyDo === 'khong-co-khung' && u.khongKhung.anh === false, JSON.stringify(u.khongKhung))
   }

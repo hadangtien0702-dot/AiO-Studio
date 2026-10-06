@@ -2068,7 +2068,7 @@ async function chupCuon(display, sf, rect) {
   c.vien.dong()
   cuon = null
   const d = kq.dem || {}
-  ghiLog('chup-cuon ' + kq.lyDo + ' sau ' + kq.ms + ' ms: ' + (kq.anh ? kq.anh.w + 'x' + kq.anh.h : 'khong co anh') + ' khung=' + d.khung + ' them=' + d.them + ' dung=' + d.dung + ' lui=' + d.lui + ' lac=' + d.lac)
+  ghiLog('chup-cuon ' + kq.lyDo + ' sau ' + kq.ms + ' ms: ' + (kq.anh ? kq.anh.w + 'x' + kq.anh.h : 'khong co anh') + ' khung=' + d.khung + ' them=' + d.them + ' dung=' + d.dung + ' lui=' + d.lui + ' lac=' + d.lac + ' ben=' + d.ben + ' chuoi=' + d.chuoi)
   if (!kq.anh) {
     if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
     return

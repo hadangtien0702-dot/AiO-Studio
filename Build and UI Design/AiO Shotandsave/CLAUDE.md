@@ -467,7 +467,9 @@ DANH SO BUOC 1-2-3 (02/10 14:44, phim 6 — da nap vao app dang cai, anh CHUA ba
   lam hong 2 ham phai bi bat. CHUA DAT: anh chua bam tren app that · chuot that chua do · huy hieu co dinh 26 px (anh 4K
   co the nho) · vao ve lai anh ghim thi dem lai tu 1 · chua len web · Mac chua thu.
 
-CHUP CUON TRANG DAI (06/10, phim 9 — da nap vao app dang cai, ☠️ CHUA chay lan nao tren man that):
+CHUP CUON TRANG DAI (06/10, phim 9 — da nap vao app dang cai; chay duoc tren man that 12:42: 1178x4103, noi 13 lan; 3 ban sua
+trong ngay sau khi anh dung that: chi mot cot cuon 11:31 · anh ghim cao hon man mat nut tat 12:44 · vung co video 13:02, ban cuoi
+CHUA co luot that):
 - Nguoi xai: khoanh vung noi dung dang cuon (KHONG gom thanh co dinh o day) -> phim **9** hoac nut trang-co-mui-ten -> quanh
   vung hien vien cam + nut **Xong** -> tu lan chuot cuon trang xuong, khong can nhanh -> bam Xong (hoac bam lai phim tat chup)
   -> mot anh dai vao khay. Vi du doi thuong: chup ca mot doan chat dai voi khach, hay ca bang thong so xuat file, thanh MOT
@@ -478,11 +480,20 @@ CHUP CUON TRANG DAI (06/10, phim 9 — da nap vao app dang cai, ☠️ CHUA chay
   `toBitmap()`; anh cuoi `nativeImage.createFromBitmap` -> `kho.luuAnh` + `shelfAdd`. Cho de hong: (1) 3 nguong trong bo
   ghep (`NGUONG`, `CO_NOI_DUNG`, `KHAC_DAI`) da tung sai theo ca hai chieu, doi la chay `npm run test:chupcuon`; (2) "chon chi
   phi nho nhat" va "uu tien troi it" phai la HAI luot; (3) 'lac' thi KHONG cap nhat khung moc; (4) khong cua so nao duoc de
-  len vung (vien + nut nam ngoai, deu setContentProtection); (5) nut Xong dung chung kenh `quay:dung` voi quay video.
-- MVP (so): `npm run test:chupcuon` 23/23 (trang gia co dap an: cuon het 5200 px ra dung 5200 px, lech 1,19 / kenh; co that
-  2400x1300 mat 15 ms / khung; duong anh JPEG that cua Electron). CHUA DAT: chua chay tren man that lan nao (xem PROGRESS
-  06/10 10:59) · thanh co dinh o day vung · khoang trang phang cao hon vung · cuon ngang · chua hien chieu cao da ghep ·
-  cach "nguoi dung tu cuon" la em chon, anh chua duyet · Mac chua thu · chua len web.
+  len vung (vien + nut nam ngoai, deu setContentProtection); (5) nut Xong dung chung kenh `quay:dung` voi quay video;
+  (6) do troi chi tinh tren cac DAI COT DANG CHUYEN DONG (ca that 11:28: vung co 2 khung canh nhau, chi mot cot cuon -> so ca
+  be ngang thi luon ra "dung yen"); (7) vung co VIDEO / hoat hinh lon (ca that 12:53, bai Facebook, video ~75 % chieu cao: 82
+  khung, 79 'lac'): cach trung binh khong khop thi roi xuong duong "BEN" `timLechBen()` — xet tung bang 32 px, cho phep DUNG
+  MOT khoi lien nhau khong khop; ☠️ noi long dieu kien cua duong nay la noi bua trang khac (muc [12] cua bai do bat duoc);
+  (8) anh cuon cao hon man: `createPinWindow` thu nho kich thuoc HIEN cho vua vung lam viec, khong thi Windows kep cua so va
+  thanh nut tat nam ngoai man. Doc phien hong: dong `chup-cuon ... ben=N chuoi=...` trong run-log (d dung · T them · u lui ·
+  L lac, dau `'` = khung phai dung duong ben).
+- MVP (so): `npm run test:chupcuon` 31/31 (trang gia co dap an: cuon het 5200 px ra dung 5200 px, lech 1,19 / kenh; co that
+  2400x1300 mat 15 ms / khung, ca xau nhat 34-47 ms; duong anh JPEG that cua Electron ke ca ca video). Man that 12:42:
+  1178x4103 trong 6,2 giay, 0 lac. CHUA DAT: ban sua video 13:02 chua co luot that · video cao hon ca vung khoanh van 'lac' ·
+  video di vao tu duoi luc dang cuon bi ghep tu nhieu thoi diem · thanh co dinh o day vung · khoang trang phang cao hon vung ·
+  cuon ngang · da 'lac' thi tren man chua co loi nhac "cuon nguoc lai" · cach "nguoi dung tu cuon" la em chon, anh chua
+  duyet · Mac chua thu · chua len web.
 
 BUT VE TAY + BUT DA QUANG (06/10, phim 7 / 8 — da nap vao app dang cai, anh CHUA bam thu):
 - Nguoi xai: khoanh vung (hoac mo anh ghim) -> phim **7** (but) hoac **8** (da quang) -> giu chuot keo de ve; giu Shift ra

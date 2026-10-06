@@ -115,6 +115,31 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 26] - 2026-10-06 13:02 - Chup cuon: het "lac" khi vung khoanh co VIDEO (bai Facebook), CHO ANH THU LAI
+
+**Boi canh.** Anh: *"scroll không được nữa rồi em"*. Run-log 12:53:36: `chup-cuon dung sau 10483 ms: 1044x1102 khung=82 them=0
+dung=2 lui=0 lac=79` (luot 12:42 cung cho tren man phu thi noi 13 lan, 0 lac).
+**Nguyen nhan (anh luu + doc ma + tai hien).** Anh luu `shotandsave-2026-10-06-125336-913.jpg` (khung dau cua phien): bai Facebook co
+VIDEO chiem ~75 % chieu cao, o video DEN. Bo ghep tinh chi phi TRUNG BINH ca khung (moi hang chan tran 10, nguong 3,2): khoi video
+doi hinh (co hinh lai sau khi cua so chup dong / dang chay) chiem > 32 % so hang la vuot nguong voi MOI do lech -> 'lac'; da 'lac'
+thi khung moc khong doi nen lac toi het phien. Bai do muc [11] dung trang gia co video 72 % chieu cao (den 3 khung dau roi doi
+hinh moi khung): bo ghep cu ra DUNG chuoi cua run-log (dau, dung, dung, lac het, them = 0).
+☠️ Phan SUY RA, chua do duoc: video co hinh lai luc nao sau khi cua so chup dong (chi biet o den dung yen thi khong the 'lac').
+**Da sua.** `src/chup-cuon.js`: them duong "BEN" `timLechBen()` chi chay khi cach trung binh khong khop: chia phan chong thanh bang
+32 px, bang "tot" khi >= 85 % hang co noi dung khop (lech <= 2,5 / dai); nhan mot do lech khi co >= 3 bang tot, >= 24 hang khop,
+va BO KHOI KHONG KHOP DAI NHAT ra (video) thi phan con lai khop >= 85 %. Khung dau duoc THAY bang khung moi nhat neu noi dung doi
+truoc khi cuon (o video den -> co hinh). Bo dem them `ben` + `chuoi` (80 khung dau, moi khung 1 chu: d / T / u / L, dau `'` = duong
+ben); `main.js` ghi 2 so nay vao dong `chup-cuon` cua run-log.
+☠️ Ban dau cua duong ben (3 bang tot, nguong 4) KHOP NHAM mot trang khac han (muc [12] bat: mot khoi anh chuyen mau trung do sang)
+-> siet nguong 2,5 + luat "chi mot khoi lien nhau duoc phep khong khop".
+**Kiem chung.** `npm run test:chupcuon` 31/31 (truoc 25): [11] 3 muc + doi chung cach cu; [12] cuon vuot phan chong va trang khac
+van 'lac'; [9] ca video qua JPEG q85 THAT cua Electron: cao 2040 / 2040, lech 1,37, 0 lac. Ca xau nhat (2400x1300, khung nao cung
+la trang khac): 34-47 ms / khung. Nap 13:02:53, `app.asar` md5 `90130822`, co `timLechBen`; 705 anh + 9 dai + cau hinh giong truoc.
+**CHUA do.** Chua co luot nao tren man that sau ban sua (cho dong `chup-cuon ... ben=.. chuoi=..`). Video cao hon ca vung khoanh
+(khong con hang nao ngoai video) van se 'lac'. Video di vao tu duoi trong luc cuon se bi ghep tu nhieu thoi diem (hinh video trong
+anh dai co the bi cat khuc). Trang co hoa tiet lap + cuon vuot phan chong: van khong phan biet duoc (co tu truoc). Da 'lac' that
+thi van phai cuon nguoc lai moi bat lai duoc, tren man CHUA co loi nhac.
+
 ## [0.8.0 nap lan 24-25] - 2026-10-06 12:44 - Anh ghim lon hon man: hien thu nho cho vua man (anh cuon dai khong con mat nut tat)
 
 **Boi canh.** Anh thu lai chup cuon: *"chụp dài được luôn rồi mà khi anh bấm vào xem ảnh nó không có nút tắt em"*, roi *"anh đang

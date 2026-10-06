@@ -25,6 +25,14 @@ const CO_NOI_DUNG = 24 // hang "co noi dung": tong lech K dai voi hang ke > muc 
 const KHAC_DAI = 10    // hang "co noi dung": dai sang nhat - dai toi nhat > muc nay (nhieu chi cho ~2)
 const DUNG_YEN = 1.0   // moi dai lech trung binh < muc nay khi khong troi = trang dung yen (hai khung nhieu doc lap cho ~0,55)
 const IT_NHAT_HANG = 10 // phan chong nhau phai co it nhat tung nay hang co noi dung
+// Duong "BEN" (06/10 12:53, xem timLechBen): chi dung khi cach tinh trung binh o tren khong khop
+const KHOP_HANG = 2.5   // mot hang "khop" khi lech trung binh moi dai <= muc nay (4 la qua long: khop nham, muc [12])
+const CON_LAI_KHOP = 0.85 // bo khoi khong khop dai nhat ra, phan con lai phai khop >= 85 % so hang co noi dung
+const BANG = 16         // mot bang = 16 hang lay mau (32 diem anh)
+const BANG_IT_HANG = 4  // bang phai co it nhat tung nay hang co noi dung moi duoc xet
+const BANG_TOT = 0.85   // bang "tot": >= 85 % hang co noi dung cua no khop
+const IT_NHAT_BANG = 3  // can it nhat 3 bang tot ...
+const IT_NHAT_KHOP = 24 // ... va tong 24 hang khop trong cac bang tot (~48 diem anh noi dung khop lien khoi)
 
 /* Moi hang -> K so do sang (0..255). bgra: Buffer / Uint8Array BGRA w x h. Tra { f: Uint8Array(h * K), co: Uint8Array(h) } */
 function dacTrung(bgra, w, h) {
@@ -76,8 +84,64 @@ function chiPhi(A, B, h, d, tot, dai, co1) {
   return n ? { cp: s / (n * D), co } : null
 }
 
-/* Tim do troi cua B so voi A. Tra { d, cp } hoac null (khong khop). */
-function timLech(A, B, h) {
+/* Duong "BEN". ☠️ 06/10 12:53, ca that cua anh ("scroll không được nữa"): vung khoanh la bai Facebook co VIDEO chiem ~75 %
+   chieu cao. Video doi hinh khong theo do cuon (va den o khung dau vi cua so chup vua dong) -> chi phi TRUNG BINH ca khung
+   vuot nguong voi MOI do lech -> 82 khung: 2 'dung', 79 'lac', khong noi hang nao; da 'lac' thi khung moc khong doi nen
+   lac toi het phien. O day khong tinh trung binh: chia phan chong thanh cac BANG 32 diem anh, bang "tot" khi gan nhu moi
+   hang co noi dung cua no khop (phan trang ngoai video khop LIEN KHOI; o do lech sai chi khop lac dac nen khong bang nao
+   tot). Chon do lech co nhieu hang khop nhat trong cac bang tot. Tra { d, cp: 0, ben: true } hoac null. */
+function timLechBen(A, B, h, dai, co1, xa) {
+  const D = dai.length, nguong = KHOP_HANG * D, buocBang = BANG * BUOC_HANG
+  const ung = []
+  let lon = 0
+  for (let d = -xa; d <= xa; d++) {
+    const r0 = d < 0 ? -d : 0, r1 = d > 0 ? h - d : h
+    let tot = 0, diem = 0, nCo = 0, nKhop = 0, bang = -1
+    let coTong = 0, khopTong = 0           // moi hang co noi dung trong phan chong
+    let xCo = 0, xKhop = 0, coXau = false  // day bang XAU lien nhau dang di qua
+    let pCo = 0, pKhop = 0                 // cac bang it noi dung nam ngay sau day xau (gop vao neu day xau con tiep)
+    let mCo = 0, mKhop = 0                 // day bang xau DAI NHAT (= khoi video / hoat hinh)
+    const dong = () => { // dong mot bang
+      coTong += nCo; khopTong += nKhop
+      if (nCo < BANG_IT_HANG) { if (coXau) { pCo += nCo; pKhop += nKhop } return }
+      if (nKhop >= nCo * BANG_TOT) { // bang tot: ket thuc day xau
+        tot++; diem += nKhop
+        if (xCo > mCo) { mCo = xCo; mKhop = xKhop }
+        xCo = 0; xKhop = 0; pCo = 0; pKhop = 0; coXau = false
+      } else { xCo += nCo + pCo; xKhop += nKhop + pKhop; pCo = 0; pKhop = 0; coXau = true }
+    }
+    for (let r = r0; r < r1; r += BUOC_HANG) {
+      const b = (r / buocBang) | 0
+      if (b !== bang) { if (bang >= 0) dong(); bang = b; nCo = 0; nKhop = 0 }
+      if (!co1[r]) continue
+      nCo++
+      const a = (r + d) * K, o = r * K
+      let t = 0
+      for (let j = 0; j < D && t <= nguong; j++) { const k = dai[j]; const e = A.f[a + k] - B.f[o + k]; t += e < 0 ? -e : e }
+      if (t <= nguong) nKhop++
+    }
+    if (bang >= 0) dong()
+    if (xCo > mCo) { mCo = xCo; mKhop = xKhop }
+    if (tot < IT_NHAT_BANG || diem < IT_NHAT_KHOP) continue
+    /* ☠️ Chi "du 3 bang tot" la CHUA du (bai do muc [12] bat duoc): mot khoi anh chuyen mau cua trang KHAC tinh co khop 3
+       bang -> noi bua. Luat: chi MOT khoi lien nhau duoc phep khong khop (video / hoat hinh); bo khoi do ra thi phan con
+       lai phai khop gan het. */
+    if (khopTong - mKhop < (coTong - mCo) * CON_LAI_KHOP) continue
+    ung.push({ d, diem })
+    if (diem > lon) lon = diem
+  }
+  if (!ung.length) return null
+  let chon = null // nhieu do lech gan bang nhau (hoa tiet lap) -> troi it nhat, nhu duong chinh
+  for (const u of ung) {
+    if (u.diem < lon * 0.98) continue
+    if (!chon || Math.abs(u.d) < Math.abs(chon.d)) chon = u
+  }
+  return { d: chon.d, cp: 0, ben: true }
+}
+
+/* Tim do troi cua B so voi A. Tra { d, cp, doi?, ben? } hoac null (khong khop). doi = noi dung co doi (khong phai dung yen
+   that); ben = tim ra bang duong "ben". khongBen (chi bai do dung): tat duong "ben" de doi chung cach cu. */
+function timLech(A, B, h, khongBen) {
   /* ☠️ 06/10 11:28, luot dau tien cua anh tren man that: vung khoanh la app co 2 khung canh nhau + thanh ben, lan chuot
      chi cuon MOT cot -> phan lon be rong DUNG YEN -> so ca chieu ngang thi d = 0 luon re nhat: 27 khung, 26 'dung', khong noi
      hang nao (bai do luc do chi co trang cuon HET be rong). Nay: tim cac DAI COT dang chuyen dong (khac nhau khi khong
@@ -114,14 +178,14 @@ function timLech(A, B, h) {
     ung.push({ d, cp: c.cp })
     if (c.cp < nho) nho = c.cp
   }
-  if (!ung.length) return null
+  if (!ung.length) return khongBen ? null : timLechBen(A, B, h, dai, co1, xa)
   // Luot 2: chi cac ung vien GAN BANG nho nhat (hoa tiet lap that su: lech <= 2 %) moi duoc xet "troi it hon"
   let tot = null
   for (const u of ung) {
     if (u.cp > nho * 1.02 + 0.01) continue
     if (!tot || Math.abs(u.d) < Math.abs(tot.d)) tot = u
   }
-  return tot
+  return { d: tot.d, cp: tot.cp, doi: true }
 }
 
 /* w, h: co khung (diem anh that). tuyChon.toiDaCao: tran chieu cao anh dai (mac dinh 16.000). */
@@ -133,7 +197,11 @@ function taoBoGhep(w, h, tuyChon) {
   let y = 0            // vi tri dinh cua khung MOC trong anh dai
   let moc = null       // dac trung cua khung moc (khung khop gan nhat)
   let lacLien = 0      // so khung "lac" lien tiep
-  const dem = { khung: 0, them: 0, dung: 0, lui: 0, lac: 0 }
+  // ben = so khung phai dung duong "ben"; chuoi = 80 khung dau, moi khung 1 chu (d dung · T them · u lui · L lac, chu HOA
+  // cuoi cung them dau ' = duong ben) -> run-log doc lai duoc phien hong o khung nao, khong phai doan
+  const dem = { khung: 0, them: 0, dung: 0, lui: 0, lac: 0, ben: 0, chuoi: '' }
+  const khongBen = !!(tuyChon && tuyChon.khongBen)
+  const ghi = (c, ben) => { if (dem.chuoi.length < 80) dem.chuoi += c + (ben ? "'" : '') }
 
   function them(bgra) {
     if (!bgra || bgra.length < w * h * 4) return { loai: 'lac', cao, lacLien }
@@ -144,13 +212,20 @@ function taoBoGhep(w, h, tuyChon) {
       cao = h; y = 0; moc = B
       return { loai: 'dau', cao, lacLien: 0 }
     }
-    const r = timLech(moc, B, h)
-    if (!r) { dem.lac++; lacLien++; return { loai: 'lac', cao, lacLien } }
+    const r = timLech(moc, B, h, khongBen)
+    if (!r) { dem.lac++; lacLien++; ghi('L'); return { loai: 'lac', cao, lacLien } }
     lacLien = 0
-    if (r.d === 0) { dem.dung++; return { loai: 'dung', cao, lacLien } }
+    if (r.ben) dem.ben++
+    if (r.d === 0) {
+      dem.dung++; ghi('d', r.ben)
+      /* Trang chua cuon ma noi dung DOI (video vua co hinh lai sau khi cua so chup dong, video dang chay): CHUA noi hang nao
+         thi thay luon khung dau bang khung nay -> phan dau anh dai la hinh MOI NHAT truoc khi cuon, khong phai o video den. */
+      if ((r.doi || r.ben) && manh.length === 1 && cao === h) { manh[0] = Buffer.from(bgra.subarray(0, h * hang)); moc = B }
+      return { loai: 'dung', cao, lacLien }
+    }
     y += r.d; moc = B
     let n = y + h - cao // so hang MOI nam duoi day anh dai
-    if (n <= 0) { dem.lui++; return { loai: 'lui', d: r.d, cao, lacLien } }
+    if (n <= 0) { dem.lui++; ghi('u', r.ben); return { loai: 'lui', d: r.d, cao, lacLien } }
     let day = false
     if (cao + n > toiDaCao) { n = toiDaCao - cao; day = true }
     if (n > 0) {
@@ -159,7 +234,7 @@ function taoBoGhep(w, h, tuyChon) {
       manh.push(Buffer.from(bgra.subarray(batDau * hang, (batDau + n) * hang)))
       cao += n
     }
-    dem.them++
+    dem.them++; ghi('T', r.ben)
     return { loai: day ? 'day' : 'them', d: r.d, n, cao, lacLien }
   }
 
