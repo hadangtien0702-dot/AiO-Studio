@@ -5,6 +5,39 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-06 15:18 (UTC+7) - ECC soát lại web: sửa 2 lỗi do bản 14:17 gây ra + 7 điểm trên điện thoại - máy công ty
+
+- **Bối cảnh:** anh: *"dùng ecc để test lại đi em"*. Giao `ecc:code-reviewer` soát thay đổi web hôm nay (`d7099eb..origin/main`, chỉ đọc,
+  252 nghìn token, 258 giây) → 10 điểm. Em đọc lại mã xác nhận từng điểm rồi mới sửa; song song em thử trang trên nhân Safari
+  (WebKit 26.6 của Playwright, bộ giả lập iPhone 13).
+- **Hai lỗi do chính bản sửa điện thoại 14:17 gây ra (đã live ~1 giờ):**
+  1. `resize` không đổi cỡ sân vẫn gọi `capNhatCap()` → hàm này giết thanh tiến độ của clip đang chạy mà không dựng lại → trên
+     điện thoại thanh tiến độ đứng mỗi lần thanh địa chỉ ẩn / hiện. Sửa: sân không đổi thì không làm gì.
+  2. Cờ "ngón tay đang chạm" bật ở `touchstart`, tắt ở `touchend`: chạm lên một phần tử của sân rồi cảnh đổi → phần tử bị gỡ →
+     `touchend` không tới `window` → cờ kẹt, rạp ngừng tự sang cảnh. Sửa: dùng MỐC THỜI GIAN lần chạm / rê / cuộn gần nhất (0,6 giây).
+- **Bảy điểm khác đã sửa:** `IntersectionObserver` lấy bản ghi mới nhất · `capNhatSz` đọc cỡ từ style thay vì `offsetWidth` (hết ép
+  tính bố cục mỗi khung khi khung chọn giãn) · chữ số trên 17 clip 9 px ở màn ≤ 480 px · ô GIF trên thẻ hẹp chỉ hiện "n%" + thẻ
+  320 px bỏ tên "Video 01" · huy hiệu số không to hơn khoảng cách dòng · nét bút không còn chấm tròn lúc chưa vẽ · nhãn cảnh 8
+  (Kéo thả) hết tràn mép trái 82 px trên sân iPhone 358×328 (lỗi có sẵn, WebKit bắt được).
+- **Đo sau sửa:**
+  | Mục | Trước | Sau |
+  |---|---|---|
+  | `resize` không đổi sân: thanh tiến độ | đứng | chạy tiếp 0,14 → 0,25 |
+  | Chạm rồi không có `touchend` | (bản 14:17: kẹt) | 04 → 05, không kẹt |
+  | Đang rê ngón tay lúc cảnh xong | nhảy | 0 px; ngừng rê thì sang cảnh |
+  | Hàng đầu thẻ video khi chạy GIF | tràn 8–74 px (320–390 px) | 0 px ở 320 / 360 / 390 / 1280, EN + VI |
+  | Huy hiệu 1-2-3 chồng nhau (điện thoại) | chồng 3–7 px (người soát tính) | hở 5–12 px |
+  | Cảnh 8: nhãn tràn sân (iPhone 13, WebKit) | 82 px | 0 |
+  | 17 cảnh tràn sân / lỗi JS | | 0 / 0 ở 320, 360, 390, 1280 (trình duyệt trong app) và iPhone 13 (WebKit) |
+- **Lỗi do chính lượt sửa này, bắt được trước khi đẩy:** lại chèn ghi chú `//` vào giữa một dòng (dòng `IntersectionObserver`) →
+  cả khối script chết; bộ kiểm báo "rạp không dựng được". Lần thứ HAI trong ngày cùng một bẫy → từ nay ghi chú đặt dòng riêng
+  phía trên, và chạy kiểm cú pháp sau MỖI lần sửa.
+- **Thước hỏng (không dùng số):** nhịp khung trên WebKit chạy ngầm chỉ 13–27 khung / giây kể cả khi trang đứng yên (23) → đó là
+  trần của bộ vẽ phần mềm trên máy này, không phải iPhone. Script kiểm lần 2 của em treo trên WebKit không rõ lý do → bỏ, dùng script
+  lần 1 + đo DOM bằng trình duyệt trong app.
+- **Người soát báo, CHƯA sửa (cần điện thoại thật để đo trước khi đụng):** khung chọn dùng bóng `200vmax` + giãn `width / height` mỗi
+  khung (có ở 6 cảnh, từ trước); ảnh dài của cảnh Chụp cuộn đổi `height` mỗi khung; video giả ghi `style.left` mỗi khung.
+
 ## [web-shotsave] - 2026-10-06 14:17 (UTC+7) - Điện thoại: rạp hết dựng lại cảnh khi thanh địa chỉ ẩn / hiện, không nhảy cảnh khi tay còn vuốt - máy công ty
 
 - (Sửa giờ: mục này lúc đầu ghi 14:22 do em tự ước lượng; giờ đẩy thật theo lệnh date là 14:17.)
