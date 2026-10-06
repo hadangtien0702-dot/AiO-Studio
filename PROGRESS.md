@@ -5,6 +5,28 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-06 14:22 (UTC+7) - Điện thoại: rạp hết dựng lại cảnh khi thanh địa chỉ ẩn / hiện, không nhảy cảnh khi tay còn vuốt - máy công ty
+
+- **Bối cảnh:** anh: *"nhớ tối ưu hóa trải nghiệm trên điện thoại nữa em… ở điện thoại anh thấy không mượt bằng ở trên desktop"*.
+- **Đo trước khi sửa** (Chrome thật qua DevTools, giả lập 390×844 ×3, bóp CPU 4 lần, trang LIVE):
+  - Nhịp khung hình 17 cảnh: **60 khung / giây, 0 khung > 34 ms** ở cả 17 cảnh; bản ghi hiệu năng 5 giai đoạn (cuộn đầu trang, cảnh
+    5, cảnh 16, cuộn qua rạp, cuộn phần dưới): 0–7 khung rơi / 150–270, 1 tác vụ > 50 ms. ☠️ Thước này KHÔNG bắt được thứ anh thấy:
+    máy đo có card rời, và giả lập không có thanh địa chỉ ẩn / hiện như điện thoại thật.
+  - **Nguyên nhân tìm ra bằng đọc mã + đối chứng:** trên điện thoại, vuốt là thanh địa chỉ ẩn / hiện → trình duyệt bắn `resize` →
+    rạp DỰNG LẠI cảnh đang diễn từ đầu (live: 1 `resize` không đổi cỡ sân = cảnh về 0,4 giây). Bước cuộn tính theo `innerHeight`
+    (đổi 60–100 px theo thanh địa chỉ) trong khi chiều cao rạp tính theo `vh` (không đổi) → ranh giới cảnh trôi. Và cảnh diễn
+    xong là trang NHẢY vị trí cuộn kể cả khi ngón tay còn chạm màn (live: đang chạm vẫn nhảy 675 px).
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`):
+  - `BUOC` lấy từ chính chiều cao rạp (`host.offsetHeight * 80 / (N * 80 + 100)`), hết phụ thuộc `innerHeight`.
+  - `resize`: chỉ dựng lại cảnh khi SÂN đổi cỡ quá 2 px (xoay máy, đổi cỡ cửa sổ); sân cao theo `svh` nên thanh địa chỉ không đụng.
+  - Tự sang cảnh: chờ tới khi không còn chạm màn và trang yên 0,6 giây (`chamTay`, `cuonCuoi`).
+  - Màn cảm ứng: thanh trên cùng bỏ lớp làm mờ nền (`backdrop-filter`), dùng nền đặc 96 %. ☠️ Phòng ngừa, CHƯA đo được lợi ích.
+- **Đối chứng live cũ ↔ bản mới** (cùng kịch bản, 390×844): `resize` không đổi sân: dựng lại **có → không** (cảnh chạy tiếp tới 2,0
+  giây); đang chạm mà cảnh xong: nhảy 675 px **→ 0 px**, nhả tay 2,6 giây sau sang cảnh kế; không chạm: vẫn tự sang (04 → 05);
+  máy tính đổi cửa sổ 720 → 600 px: sân 378 → 258, cảnh ĐƯỢC dựng lại và vẫn ở đúng cảnh 06; 17 cảnh dựng 0 lỗi; không cuộn ngang.
+- **CHƯA đo / chưa biết:** chưa có điện thoại thật (iPhone Safari, Android Chrome); `touchstart` trong bài đo là sự kiện giả; lợi ích
+  của việc bỏ lớp mờ; anh chưa nói chỗ nào không mượt (rạp, bản chạy thử đầu trang, hay cuộn cả trang) nên có thể còn nguyên nhân khác.
+
 ## [web-shotsave] - 2026-10-06 14:08 (UTC+7) - Đổi icon nút 9 (chụp cuộn) theo icon anh chọn - máy công ty
 
 - **Bối cảnh:** anh: *"icon số 9 xấu quá em"*. Em vẽ 4 kiểu thay thế, anh: *"cả 4 đều xấu"* (3/4 là em tự ghép nét). Đưa 8 icon có
