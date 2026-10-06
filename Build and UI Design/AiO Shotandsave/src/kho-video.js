@@ -123,8 +123,9 @@ function tim(id) {
   return doc().find((m) => m.id === id) || null
 }
 
-/* Sua vai truong cua 1 muc (01/10: boTieng = nguoi dung chon ban Khong tieng; fileKhongTieng = duong dan ban do).
-   Chi nhan 2 truong nay — id / file / ms... la so do luc quay, khong cho sua. Tra ve muc moi hoac null. */
+/* Sua vai truong cua 1 muc (01/10: boTieng = nguoi dung chon ban Khong tieng; fileKhongTieng = duong dan ban do;
+   06/10: chonGif + fileGif cho ban GIF). Chi nhan 4 truong nay — id / file / ms... la so do luc quay, khong cho sua.
+   Tra ve muc moi hoac null. */
 function sua(id, patch) {
   if (!FILE || !MAU_ID.test(String(id)) || !patch) return null
   const ds = layDeGhi()
@@ -133,6 +134,9 @@ function sua(id, patch) {
   if (!m) return null
   if ('boTieng' in patch) m.boTieng = !!patch.boTieng
   if ('fileKhongTieng' in patch) m.fileKhongTieng = typeof patch.fileKhongTieng === 'string' ? patch.fileKhongTieng : null
+  // 06/10 xuat GIF: chonGif = nguoi dung chon ban GIF (ban duoc keo tha); fileGif = duong dan file .gif da tao
+  if ('chonGif' in patch) m.chonGif = !!patch.chonGif
+  if ('fileGif' in patch) m.fileGif = typeof patch.fileGif === 'string' ? patch.fileGif : null
   try { ghi(ds); return m } catch (e) { ghiLog('kho-video sua LOI: ' + e.message); return null }
 }
 

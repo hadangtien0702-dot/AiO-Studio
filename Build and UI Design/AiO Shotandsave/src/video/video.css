@@ -10,6 +10,8 @@
 .dai-dau .chon-tieng { flex: none; }
 .dai-dau .chon-tieng .chon-nut { min-width: 0; height: 20px; padding: 0 9px; font-size: 11.5px; line-height: 20px; white-space: nowrap; }
 .dai-dau .chon-tieng .chon-nut:disabled { opacity: .5; cursor: default; }
+/* 06/10 o GIF luc dang tao hien "GIF 42%": giu be rong co dinh + so deu nhau de ca hang nut khong nhay theo tung so */
+.dai-dau .chon-tieng .chon-nut.dang-tao { min-width: 64px; opacity: 1; color: var(--text-1); font-variant-numeric: tabular-nums; }
 
 /* Dong thong tin (co + do dam nam o .dai-meta cua storyboard.css, dung chung 2 khay).
    CANH BAO cua so hep: hang dau khong du cho -> truoc do dong nay bi cat con "12:56 · …" (do 01/10: o 560 px con 53 px tren

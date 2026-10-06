@@ -1,0 +1,101 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>bai do xuat GIF</title></head>
+<body>
+<script>
+'use strict'
+/* Trang cua bai do xuat GIF (06/10), nap trong cua so AN boi scripts/test/xuat-gif-main.cjs. Hai viec:
+   taoMau(giay)  = tu QUAY mot video mau bang dung duong cua app (canvas -> captureStream -> MediaRecorder MP4 H.264),
+                   noi dung biet truoc: nua trai DUNG YEN (cac o mau), nua phai co 8 thanh den/trang hien SO DEM nhi phan,
+                   so tang 1 moi 200 ms + mot o doi mau theo so do.
+   soiGif(b64)   = doc file GIF bang bo giai ma cua CHROMIUM (ImageDecoder, khac vat lieu voi bo ma hoa), doc SO DEM
+                   tren tung khung + thoi gian tung khung + do lech cua nua dung yen so voi hinh ve lai. */
+const W = 640, H = 360, NHIP = 200
+const MAU_O = [[220, 60, 50], [40, 160, 90], [50, 90, 210], [240, 200, 40], [150, 60, 180], [30, 30, 30], [245, 245, 245], [250, 130, 30]]
+function veNen(cx) { // nua trai: 8 x 6 o mau co dinh (khong ngau nhien: lan nao cung ra y het)
+  for (let r = 0; r < 6; r++) for (let c = 0; c < 8; c++) {
+    const m = MAU_O[(r * 3 + c * 5) % MAU_O.length]
+    cx.fillStyle = 'rgb(' + m[0] + ',' + m[1] + ',' + m[2] + ')'
+    cx.fillRect(c * 40, r * 60, 40, 60)
+  }
+}
+function veSo(cx, so) { // nua phai: 8 thanh (bit cao ben trai), trang = 1, den = 0; duoi la o doi mau theo so
+  cx.fillStyle = '#404040'; cx.fillRect(320, 0, 320, H)
+  for (let b = 0; b < 8; b++) { cx.fillStyle = (so >> (7 - b)) & 1 ? '#ffffff' : '#000000'; cx.fillRect(320 + b * 40 + 4, 20, 32, 160) }
+  const m = MAU_O[so % 5]; cx.fillStyle = 'rgb(' + m[0] + ',' + m[1] + ',' + m[2] + ')'; cx.fillRect(360, 220, 240, 110)
+}
+const b64 = (u8) => { let s = ''; for (let i = 0; i < u8.length; i += 32768) s += String.fromCharCode.apply(null, u8.subarray(i, i + 32768)); return btoa(s) }
+const tuB64 = (t) => { const s = atob(t); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u }
+
+window.taoMau = async (giay) => {
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H
+  const cx = cv.getContext('2d')
+  veNen(cx); veSo(cx, 0)
+  const mime = ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1.42E01E', 'video/mp4'].find((t) => MediaRecorder.isTypeSupported(t))
+  if (!mime) return { loi: 'may khong ghi duoc MP4' }
+  const rec = new MediaRecorder(cv.captureStream(30), { mimeType: mime, videoBitsPerSecond: 4000000 })
+  const khuc = []
+  rec.ondataavailable = (e) => { if (e.data && e.data.size) khuc.push(e.data) }
+  const xong = new Promise((r) => { rec.onstop = r })
+  rec.start(500)
+  const t0 = performance.now()
+  let soCuoi = -1, nhap = 0
+  await new Promise((r) => {
+    const h = setInterval(() => { // cua so an: requestAnimationFrame dung, dung hen gio
+      const t = performance.now() - t0
+      if (t >= giay * 1000) { clearInterval(h); r(); return }
+      const so = Math.floor(t / NHIP)
+      if (so !== soCuoi) { soCuoi = so; veSo(cx, so) }
+      // 1 diem nhap nhay o goc de luong luon co khung moi (man dung yen thi captureStream khong ra khung)
+      cx.fillStyle = (nhap++ & 1) ? '#404040' : '#414141'; cx.fillRect(W - 2, H - 2, 2, 2)
+    }, 16)
+  })
+  rec.stop(); await xong
+  const u8 = new Uint8Array(await new Blob(khuc).arrayBuffer())
+  return { mime, bytes: u8.length, soCuoi, b64: b64(u8) }
+}
+
+/* -> { soKhung, tongMs, w, h, khung: [{ ms, so, sach }], lechNen (khung cuoi so voi nen ve lai), lechNenDau } */
+window.soiGif = async (chuoi) => {
+  const dec = new ImageDecoder({ data: tuB64(chuoi).buffer, type: 'image/gif' })
+  await dec.tracks.ready; await dec.completed
+  const n = dec.tracks.selectedTrack.frameCount
+  const ra = { soKhung: n, tongMs: 0, khung: [] }
+  const mauCv = document.createElement('canvas'); mauCv.width = W; mauCv.height = H
+  veNen(mauCv.getContext('2d'))
+  let cv = null, cx = null, nenChuan = null
+  const lechNen = () => { // lech trung binh moi kenh cua nua trai (da co ve o co GIF) so voi nen ve lai
+    const a = cx.getImageData(0, 0, Math.floor(cv.width / 2) - 2, cv.height).data
+    let s = 0; for (let i = 0; i < a.length; i += 4) s += Math.abs(a[i] - nenChuan[i]) + Math.abs(a[i + 1] - nenChuan[i + 1]) + Math.abs(a[i + 2] - nenChuan[i + 2])
+    return +(s / (a.length / 4 * 3)).toFixed(2)
+  }
+  for (let i = 0; i < n; i++) {
+    const f = (await dec.decode({ frameIndex: i })).image
+    if (!cv) {
+      cv = document.createElement('canvas'); cv.width = f.displayWidth; cv.height = f.displayHeight
+      cx = cv.getContext('2d', { willReadFrequently: true }); ra.w = cv.width; ra.h = cv.height
+      const t = document.createElement('canvas'); t.width = cv.width; t.height = cv.height
+      const tx = t.getContext('2d'); tx.imageSmoothingQuality = 'high'; tx.drawImage(mauCv, 0, 0, cv.width, cv.height)
+      nenChuan = tx.getImageData(0, 0, Math.floor(cv.width / 2) - 2, cv.height).data
+    }
+    // ☠️ XOA canvas truoc khi ve: ImageDecoder tra khung DA GHEP san. Khong xoa thi chinh thuoc nay ve chong cac khung len
+    // nhau va CHE mat loi "khong giu hinh cu" (doi chung 2 lan dau khong bat duoc: lech van 2,7).
+    cx.clearRect(0, 0, cv.width, cv.height)
+    cx.drawImage(f, 0, 0)
+    const tl = cv.width / W
+    let so = 0, sach = true
+    for (let b = 0; b < 8; b++) { // tam cua tung thanh
+      const p = cx.getImageData(Math.round((320 + b * 40 + 20) * tl), Math.round(100 * tl), 1, 1).data
+      const sang = (p[0] + p[1] + p[2]) / 3
+      if (sang > 60 && sang < 195) sach = false // thanh phai trang ro hoac den ro
+      so = (so << 1) | (sang >= 128 ? 1 : 0)
+    }
+    const ms = Math.round((f.duration || 0) / 1000)
+    ra.khung.push({ ms, so, sach }); ra.tongMs += ms
+    if (i === 0) ra.lechNenDau = lechNen()
+    if (i === n - 1) ra.lechNen = lechNen()
+    f.close()
+  }
+  return ra
+}
+</script>
+</body></html>

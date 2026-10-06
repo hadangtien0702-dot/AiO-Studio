@@ -115,6 +115,104 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 18-19] - 2026-10-06 10:38 - TINH NANG MOI: xuat GIF tu Khay video (o "GIF" trong cum Co tieng | Khong tieng), cho anh bam thu
+
+**Boi canh.** Anh hoi nen lam gi de canh tranh; em dua bang so doi thu (ShareX, CleanShot deu co GIF) va de xuat; anh chon
+trong bang hoi *"Xuất GIF"*, roi chot pham vi luot nay: *"Bút vẽ tay + bút dạ quang / Chụp cuộn trang dài / tiếp theo làm và
+test 3 tính năng này rồi mới push một lần final"* + *"còn bản cài thì khi nào anh bảo mới xuất ra bản mới"*. Day la tinh nang 1/3.
+
+**Da lam.**
+- Bo may (KHONG can FFmpeg): `src/xuat-gif.js` (main: cua so an + ghi file qua `.gif.tam`) · `src/gif/gif.js` (tu tach hop
+  MP4 phan manh + WebCodecs giai ma mot luot + ma hoa) · `src/gif/gifenc.js` (thu vien gifenc 1.0.3, MIT, 24 KB, chep
+  nguyen van + giay phep) · `src/preload-gif.js`. Mac dinh: 10 hinh / giay, canh dai <= 800 px, tran 60 giay.
+- Khay video: cum chon thanh **Co tieng | Khong tieng | GIF** (video khong tieng: **Video | GIF**). Chon GIF = tao file `.gif`
+  canh video (o GIF hien "GIF 42%"), chon ben nao thi ben do duoc keo tha / Mo thu muc; dong thong tin doi thanh
+  "gio · GIF · dung luong"; nut Xoa tinh ca file GIF; doan qua 60 giay thi o GIF mo + noi ly do; video "Bi ngat" (bi cut
+  cuoi) van ra GIF cua phan con lai. So video them 2 truong `chonGif`, `fileGif`.
+
+**So do (may cong ty, RTX 4060 Ti).**
+| Video | GIF | Nang | Tao mat |
+|---|---|---|---|
+| Anh quay that 17,4 giay 2404x1314 (giao dien) | 800x437, 167 khung | 2,0 MB | 3,8 giay |
+| Anh quay that 9,6 giay 1010x1264 (noi dung video) | 639x800, 96 khung | 6,6 MB | 2,5 giay |
+| Doan thu 5 phut 2560x1440, cat o tran 60 giay | 800x450, 411 khung | 0,7 MB | 12,8 giay |
+- Vi sao khong tua `<video>` tung khung: do duoc 92 ms / khung o 2404x1314 (doan 17 giay ~20 giay, doan 5 phut ~6 phut) vi moi
+  lan tua giai ma lai tu khung khoa (khung khoa cach nhau ~100 khung). Giai ma mot luot: nhanh hon ~5 lan.
+
+**☠️ Loi da bat TRUOC khi toi tay anh (so dep ma hinh sai).** Ban dau moi khung mot bang mau rieng (tinh tu cac diem vua doi):
+so khung + thoi luong khop ffprobe, lech trung binh 2-8 don vi mau, 0 % diem lech nang, ma mo anh ra thi HINH LOANG LO (mang
+mau lech 10-20 don vi theo hinh vung thay doi, ro tren nen toi min). Tach 3 tang cung mot thoi diem: khung giai ma SACH · hinh
+ghep LOANG · hinh Chromium doc lai = hinh ghep -> loi o cach chon mau. Sua: MOT bang mau chung cho ca file (luot 1 lay mau mau
+suot doan, luot 2 moi ghi). Phep tu kiem "lech trung binh" KHONG bat duoc loi nay -> bai do phai kem mo anh ra nhin.
+Hai loi nho khac bat duoc bang so: thua 3 khung (floor am khi khung den som 0,5 ms: 99 khung cho 9,61 giay -> 96) · tien do
+dung o 83 % (tinh theo byte) -> tinh theo so doan.
+
+**Kiem chung.** `npm run test:xuatgif` (MOI, chay an): **58/58 DAT**.
+- Phan A bo may: tu quay video mau co SO DEM nhi phan doi moi 200 ms + nua man dung yen, xuat GIF, DOC LAI bang bo giai ma GIF
+  cua Chromium: so dem 0..19 khong lui khong nhay coc; moi so hien 200 ms (19/20 so, 1 so lech 1 moc); tong 4000 ms (nguon
+  4018); nua dung yen lech 2,6 / kenh; so khung bo may = Chromium = cau truc file = ffprobe (28); 2 file app quay that (720p
+  co tieng, 4K); duong loi: file rac, file cut, file khong co, 2 viec cung luc. DOI CHUNG 1: ep bo may khong cap nhat ->
+  thuoc so dem bat (so cuoi 0). DOI CHUNG 2: sua file cho "xoa hinh cu" -> nua dung yen lech 128.
+- Phan B giao dien (trang khay that, VI + EN): chu tren o luc tao chi la "GIF n%"; xong thi sang, tat tieng trinh phat, dong
+  thong tin + nut Xoa cap nhat; bam lai khong tao lan hai; 6 be rong 562-1082 px khong tran / khong de / khong cat chu; o cao
+  20 px, cum 26 px.
+- Thuoc sai gap khi viet bai do: (1) doi "moi khung tang dung 1 so": sai, H.264 lam net dan nen co khung nho cung so -> do
+  thoi gian hien cua tung so; (2) trang soi ve chong cac khung len canvas -> CHE loi "xoa hinh cu", doi chung 2 khong bat
+  (lech 2,7) -> xoa canvas truoc moi khung.
+- Hoi quy chay an: `test:khovideo` 76, `test:botieng` 29, `test:nutkhay` 54, `test:khaynut`, `test:sobuoc` 72: dat.
+- Nap 2 lan: 10:25 (md5 `13e0888d`) va 10:36 (md5 `48b70f66`, boot 10:36:32, anh/video 698 -> 698). Da doc muc luc app.asar
+  dang chay: du `xuat-gif.js`, `preload-gif.js`, `gif/gif.js`, `gif/gifenc.js`, `gif/index.html`.
+
+**☠️ Sai sot cua em luc nap lan 19.** Chuoi lenh noi `&&` nhung moi bai di qua `| tail -1` -> ma thoat cua bai do bi nuot:
+`test:quayvideo` bao TRUOT ma lenh van chay tiep va NAP. Soi lai: 3 muc truot deu la "24-31 khung/giay" (21,5 - 23,6) luc may
+dang ban (chay don 7 bai lien nhau); chay rieng 2 lan: 76/76, 27-29 khung/giay; ma quay video khong doi (git sach). Ban da nap
+la ban lanh, nhung cach chay sai. Tu gio: bai do truoc khi nap chay KHONG qua ong, hoac `set -o pipefail`.
+
+**CHUA do / CHUA lam.**
+- Anh chua bam thu tren app that (run-log tu 10:25 chua co dong `gif`). Keo file GIF vao Zalo / Messenger / Premiere: chua do.
+- Chat luong: nen chuyen mau min (nen mo toi) co BAC mau (256 mau, khong ran mau); chua lam ran mau vi file nang them.
+- 10 hinh / giay, 800 px, tran 60 giay la so em chon, anh chua duyet. Chua co cho chinh trong giao dien.
+- Chi MP4 H.264 do app quay (webm tren may khong co bo nen H.264: o GIF mo). Mac chua thu. May khong co GPU chua do toc do.
+- App tat giua luc tao: con lai file `.gif.tam` canh video (chua co buoc don).
+- Chua len web, chua tang so phien ban, chua dong goi (anh dan).
+
+## [0.8.0 nap lan 17] - 2026-10-06 09:52 - Khay anh: hang nut doi sang trai 10 px, nut "–" het bi vung nam goc tren-phai che
+
+**Boi canh.** Anh gui anh khoanh goc tren-phai Khay anh: *"chỗ này bị trùng hơi khó chịu nè em"*, roi (sau khi em bao
+nguyen nhan) khoanh ca hang nut: *"em có thể dời cái dải này sang trái từ 5 đến 10px là xong rồi em"*.
+
+**Nguyen nhan that (do tren trang khay that, Electron an).** Nut "–" thu khay (`#hide`, them 01/10) nam dung duoi vung nam
+co gian goc tren-phai (`#grip-tr` 20x20, z-index 10, them 15/09): **57,8 % dien tich nut bi che** (240 / 441 diem) o ca khay
+ngang lan khay doc -> re chuot vao nut ra mui ten co gian + vet cam + chu goi y "Keo de doi co", bam la keo co chu khong thu
+khay. 4 nut con lai chi "bi che" ~4 % (4 goc bo tron). Luc them nut 01/10 khong ai do vung nam goc da co san o do.
+
+**Da sua (`src/shelf/shelf.css`).** (1) `#bar` le phai + 10 px -> ca hang 5 nut doi sang trai 10 px (nut "–" cach mep phai
+6,7 -> 16,7 px). (2) `#bar #hide { position: relative; z-index: 11 }` -> phan con chong (18,1 % neu khong co luat nay) thi
+nut nam TREN vung nam. Goc tren-phai van keo co duoc o mep ngoai (319 / 400 diem).
+
+**Kiem chung (so).**
+- Bai do MOI `npm run test:nutkhay` (chay an, 4 kho: 700x150 VI ngang, 420x110 EN ngang, 252x420 EN + VI doc): **54/54 DAT**.
+  Moi nut: goc che <= 2 % (nut "–": 0,9 % = 4 diem goc bo tron), tong <= 10 %; tieu de khay khong bi cat voi so dem 3 chu so
+  ("Khay ảnh" 48,4 / 48,4 px, "Shelf" 26,8 / 26,8 px, ca khay doc 252 px); 4 goc con nam duoc 319-383 / 400 diem.
+  DOI CHUNG: go luat (2) -> nut "–" bi che 18,1 % -> bai do bat.
+- `npm run test:khaynut` (chay an): DAT, khong truot muc nao.
+- Nap bang `cai-tai-cho.mjs` noi `&&` sau 2 bai: app.asar md5 `b26fc16e` -> `2183c0ac`, boot 09:52:53, anh/video 689 -> 689,
+  9 dai, cau hinh khong doi.
+
+**CHUA do / CHUA lam.**
+- Anh chua bam thu nut "–" tren ban vua nap.
+- Goc tren-TRAI cung chong len logo (63,8 % logo bi `#grip` che) — anh khong nhac, em KHONG sua (logo chi la cho cam keo, ca
+  thanh tieu de deu keo duoc; va bai `test:co-khay` nam goc do o giua).
+- `test:khay`, `test:co-khay` (bat cua so len man) chua chay lai.
+- Thuoc sai gap trong luc lam: khung xem truoc cua app Claude nap trang khay KHONG co CSS (0 stylesheet) -> so do vo nghia,
+  bo; bai do an lan dau chet vi dong cua so cua kho truoc lam Electron tu thoat (thieu `window-all-closed`).
+
+**Dang lam do (chua co ma trong `src/`):** anh chot 06/10 lam 3 tinh nang roi moi push MOT lan: xuat GIF tu Khay video ·
+but ve tay + but da quang · chup cuon trang dai. Bo cai: chi dong goi khi anh bao. So do da co cho GIF: tua tung khung
+bang `<video>` cham (video 2404x1314 cua anh: 92 ms / khung, doan 17 giay mat ~20 giay; doan 5 phut ~6 phut) -> se giai ma
+mot luot bang WebCodecs + tu tach hop MP4 (file app quay: 1 `moof` = ~101 khung, `trun` co thoi luong + kich thuoc tung
+khung, khung khoa moi ~3,3 giay, khong co B-frame). Thu vien ma hoa: `gifenc` 1.0.3 (MIT, 22 KB, khong keo theo goi nao).
+
 ## [0.8.0 nap lan 16] - 2026-10-02 15:48 - Sua 5 loi nhom A cua luot ECC soat: quay video hong thi KHONG duoc im lang, KHONG duoc mat video
 
 **Boi canh.** Anh xem danh sach 17 loi ECC bat (muc [soat] ngay duoi) roi nhan *"sửa 5 mục đó đi em"*. So tu log that

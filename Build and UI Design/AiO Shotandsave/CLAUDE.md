@@ -467,6 +467,26 @@ DANH SO BUOC 1-2-3 (02/10 14:44, phim 6 — da nap vao app dang cai, anh CHUA ba
   lam hong 2 ham phai bi bat. CHUA DAT: anh chua bam tren app that · chuot that chua do · huy hieu co dinh 26 px (anh 4K
   co the nho) · vao ve lai anh ghim thi dem lai tu 1 · chua len web · Mac chua thu.
 
+XUAT GIF TU KHAY VIDEO (06/10, anh chon trong bang hoi; da nap vao app dang cai, anh CHUA bam thu):
+- Nguoi xai: mo Khay video -> o moi video co cum **Co tieng | Khong tieng | GIF** (video khong tieng: **Video | GIF**) -> bam
+  **GIF**: o do chay "GIF 42%" vai giay roi sang len -> keo ca hang tha vao Zalo / Messenger / thu muc la ra file GIF (tu chay
+  trong khung chat, khong phai bam mo nhu MP4). Bam lai "Co tieng" la quay ve video; file GIF giu lai, bam GIF lan sau khong
+  phai cho. Doan dai hon 60 giay: o GIF mo, re chuot thay ly do. Vi du doi thuong: quay 8 giay loi nhay hinh tren timeline,
+  bam GIF, tha vao khung chat voi khach: khach thay ngay chuyen dong ma khong phai tai file.
+- Builder: `src/xuat-gif.js` (main, 1 viec moi luc, ghi qua `.gif.tam` roi doi ten) tao cua so AN `src/gif/` (`gif.js` + thu
+  vien `gifenc.js` MIT) voi `preload-gif.js` (chi doc dung file video cua viec). `gif.js` TU TACH hop MP4 phan manh
+  (moov/avcC, moof/tfhd/tfdt/trun) -> WebCodecs VideoDecoder giai ma mot luot, HAI luot: luot 1 lay mau mau -> MOT bang mau
+  chung; luot 2 moi 100 ms mot hinh, chi ghi diem da doi (cho con lai trong suot, giu hinh cu). Kenh `video:chon-gif`,
+  `video:gif-tien-do` trong `main.js`; so video co `chonGif`, `fileGif`; `fileDangChon()` quyet dinh file duoc keo.
+  Cho de hong: (1) bang mau RIENG tung khung = hinh loang lo du so do dep (da thu, bo; xem dau `gif.js`); (2) gifenc doc ca
+  vung nho goc -> phai dua mang dung kich thuoc; che do `auto` + `reset()` ghi lai dau file; (3) tinh thoi gian tu MOC, khong
+  cong don; `Math.max(0, floor(...))` khong thi thua khung; (4) o trong suot KHONG duoc nam trong bang dung de doi mau (diem
+  den thanh trong suot); (5) file chi la MP4 H.264 do app quay; (6) them file vao `src/` thi doc muc luc `app.asar` sau khi nap.
+- MVP (so): `npm run test:xuatgif` 58/58 (chay an, doc lai NOI DUNG tung khung bang bo giai ma cua Chromium, 2 doi chung).
+  Video that cua anh: 17,4 giay -> 2,0 MB trong 3,8 giay; 9,6 giay noi dung video -> 6,6 MB trong 2,5 giay. CHUA DAT: anh
+  chua dung; keo vao Zalo / Messenger chua do; nen chuyen mau min co bac mau; 10 hinh/giay + 800 px + tran 60 giay chua duoc
+  anh duyet; Mac + may khong GPU chua do; chua len web.
+
 ## Chua lam (xem PROGRESS.md)
 
 Cai thu MAY SACH (khong Node/nguon) truoc khi phat ra ngoai · ky so (SmartScreen Windows; mac = Apple

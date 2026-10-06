@@ -14,6 +14,10 @@ contextBridge.exposeInMainWorld('video', {
   /** Chon ban dung khi phat / keo tha: coTieng true|false -> { ok, boTieng, bytesXoa, loi }. Lan dau chon Khong tieng
       main tao file "-khong-tieng.mp4" canh ban goc. */
   chonTieng: (id, coTieng) => ipcRenderer.invoke('video:chon-tieng', id, !!coTieng),
+  /** 06/10 chon (true) / bo chon (false) ban GIF -> { ok, boTieng, chonGif, bytesGif, bytesXoa, cat, loi }. Lan dau chon
+      main tao file ".gif" canh video; trong luc tao bao tien do qua onGifTienDo. */
+  chonGif: (id, chon) => ipcRenderer.invoke('video:chon-gif', id, !!chon),
+  onGifTienDo: (cb) => ipcRenderer.on('video:gif-tien-do', (_e, id, p) => cb(id, p)),
   /** Dua file vao Thung rac + go khoi so -> { ok }. */
   xoa: (id) => ipcRenderer.invoke('video:xoa', id),
 })

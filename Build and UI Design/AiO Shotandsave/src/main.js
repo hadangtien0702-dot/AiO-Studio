@@ -29,6 +29,7 @@ const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien qu
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
+const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
 const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
@@ -339,6 +340,7 @@ app.whenReady().then(() => {
 
   khoDai.khoiTao(app.getPath('userData'))
   khoVideo.khoiTao(app.getPath('userData'), ghiLog)
+  xuatGif.khoiTao(ghiLog)
   setTimeout(khoiPhucVideoDo, 5000) // 02/10: file quay do cua lan truoc (app bi tat giua luc quay) -> dua lai vao khay
   kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
   const ch = kho.docCauHinh()
@@ -2227,9 +2229,14 @@ ipcMain.on('shelf:open-video', () => openVideoWindow())
    tieng thanh 'free', khong nen lai hinh, 90 MB = 27 ms). Tao 1 lan khi nguoi dung chon, GIU tren dia (Premiere noi
    file theo duong dan — xoa di la mat lien ket). Lua chon ghi vao so (boTieng) nen mo lai khay van nho. */
 function banKhongTieng(m) { return m && m.fileKhongTieng && fs.existsSync(m.fileKhongTieng) ? m.fileKhongTieng : null }
+/* 06/10 ban GIF: file `.gif` cung ten nam canh video, tao 1 lan khi nguoi dung chon GIF (src/xuat-gif.js), GIU tren dia. */
+function banGif(m) { return m && m.fileGif && fs.existsSync(m.fileGif) ? m.fileGif : null }
+function bytesGif(m) { const g = banGif(m); if (!g) return 0; try { return fs.statSync(g).size } catch (e) { return 0 } }
 /* File nguoi dung DANG CHON cua 1 video: dung khi keo tha ra ngoai va khi bam Mo thu muc. */
-function fileDangChon(m) { return (m.boTieng && banKhongTieng(m)) || m.file }
-function bytesSeXoa(m) { const k = banKhongTieng(m); let b = m.bytes; if (k) { try { b += fs.statSync(k).size } catch (e) {} } return b }
+function fileDangChon(m) { return (m.chonGif && banGif(m)) || (m.boTieng && banKhongTieng(m)) || m.file }
+function bytesSeXoa(m) { const k = banKhongTieng(m); let b = m.bytes; if (k) { try { b += fs.statSync(k).size } catch (e) {} } return b + bytesGif(m) }
+/* Trang thai lua chon tra ve khay sau moi lan doi ban (Co tieng / Khong tieng / GIF) */
+function trangThaiBan(m) { return { ok: true, boTieng: !!(m.boTieng && banKhongTieng(m)), chonGif: !!(m.chonGif && banGif(m)), bytesGif: bytesGif(m), bytesXoa: bytesSeXoa(m) } }
 
 ipcMain.handle('video:get-data', () => {
   const moiId = videoMoi
@@ -2245,16 +2252,40 @@ ipcMain.handle('video:get-data', () => {
     coNutTieng: !!m.tieng && /\.mp4$/i.test(m.file), // video quay khong tieng (mac) / webm: khong co gi de chon
     boTieng: !!(m.boTieng && banKhongTieng(m)),
     bytesXoa: bytesSeXoa(m),
+    // 06/10 GIF: chi tao duoc tu MP4 (bo tach hop cua src/gif doc H.264 trong MP4 phan manh; webm thi khong)
+    gifDuoc: /\.mp4$/i.test(m.file), chonGif: !!(m.chonGif && banGif(m)), bytesGif: bytesGif(m),
   }))
-  return { ds, moiId, lang, dangQuay: !!ghiHinh }
+  return { ds, moiId, lang, dangQuay: !!ghiHinh, gifToiDaMs: xuatGif.MAC_DINH.toiDaMs }
+})
+
+/* 06/10 chon / bo chon ban GIF cua 1 video. Lan dau chon: tao file `.gif` canh video (bao tien do ve khay qua
+   'video:gif-tien-do'); cac lan sau dung lai file da co. Tra trangThaiBan() hoac { ok: false, loi }. */
+ipcMain.handle('video:chon-gif', async (e, id, chon) => {
+  const m = khoVideo.tim(id)
+  if (!m || !fs.existsSync(m.file)) return { ok: false, loi: 'khong co video' }
+  if (!chon) {
+    const m2 = khoVideo.sua(id, { chonGif: false })
+    return m2 ? trangThaiBan(m2) : { ok: false, loi: 'khong ghi duoc so' }
+  }
+  let f = banGif(m)
+  let cat = false
+  if (!f) {
+    if (!/\.mp4$/i.test(m.file)) return { ok: false, loi: 'khong-ho-tro' }
+    f = m.file.replace(/\.mp4$/i, '') + '.gif'
+    const r = await xuatGif.xuat(m.file, f, null, (p) => { try { if (!e.sender.isDestroyed()) e.sender.send('video:gif-tien-do', id, p) } catch (err) {} })
+    if (!r.ok) return { ok: false, loi: r.loi }
+    cat = r.cat
+  }
+  const m2 = khoVideo.sua(id, { chonGif: true, fileGif: f })
+  return m2 ? Object.assign(trangThaiBan(m2), { cat }) : { ok: false, loi: 'khong ghi duoc so' }
 })
 
 ipcMain.handle('video:chon-tieng', (_e, id, coTieng) => {
   const m = khoVideo.tim(id)
   if (!m || !m.tieng || !fs.existsSync(m.file)) return { ok: false, loi: 'khong co video / video khong co tieng' }
   if (coTieng) {
-    const m2 = khoVideo.sua(id, { boTieng: false })
-    return m2 ? { ok: true, boTieng: false, bytesXoa: bytesSeXoa(m2) } : { ok: false, loi: 'khong ghi duoc so' }
+    const m2 = khoVideo.sua(id, { boTieng: false, chonGif: false })
+    return m2 ? trangThaiBan(m2) : { ok: false, loi: 'khong ghi duoc so' }
   }
   let f = banKhongTieng(m)
   if (!f) {
@@ -2264,8 +2295,8 @@ ipcMain.handle('video:chon-tieng', (_e, id, coTieng) => {
     ghiLog('video bo tieng ' + id + ': ' + (r.ok ? 'xong ' + (Date.now() - t0) + ' ms, ' + r.soTraf + ' doan -> ' + f : 'LOI ' + r.loi))
     if (!r.ok) return { ok: false, loi: r.loi }
   }
-  const m2 = khoVideo.sua(id, { boTieng: true, fileKhongTieng: f })
-  return m2 ? { ok: true, boTieng: true, bytesXoa: bytesSeXoa(m2) } : { ok: false, loi: 'khong ghi duoc so' }
+  const m2 = khoVideo.sua(id, { boTieng: true, fileKhongTieng: f, chonGif: false })
+  return m2 ? trangThaiBan(m2) : { ok: false, loi: 'khong ghi duoc so' }
 })
 
 /* Anh nho lam ICON luc keo (renderer ve khung dau cua video ra canvas). Giu toi da 40. */
@@ -2304,6 +2335,8 @@ ipcMain.handle('video:xoa', async (_e, id) => {
     if (fs.existsSync(m.file)) await shell.trashItem(m.file)
     const k = banKhongTieng(m) // ban khong tieng (neu da tao) di cung ban goc: nut Xoa ghi tong dung luong ca hai
     if (k) await shell.trashItem(k)
+    const g = banGif(m) // 06/10: ban GIF (neu da tao) cung di theo
+    if (g) await shell.trashItem(g)
   } catch (err) {
     ghiLog('video xoa ' + id + ' LOI dua vao thung rac: ' + err.message)
     return { ok: false, loi: err.message }
