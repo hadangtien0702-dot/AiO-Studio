@@ -24,6 +24,10 @@ const ovJs = doc('src/overlay/overlay.js'), pinJs = doc('src/pin/pin.js'), i18n 
 for (const [ten, html] of [['man chup', ovHtml], ['anh ghim', pinHtml]]) {
   kiem(ten + ': co nut but (so 7) va nut da quang (so 8), khong dung emoji', /data-tool="but"[^>]*data-i18n-title="overlay\.but"[\s\S]*?<i class="so">7<\/i>/.test(html) && /data-tool="daquang"[^>]*data-i18n-title="overlay\.daquang"[\s\S]*?<i class="so">8<\/i>/.test(html))
 }
+for (const [ten, html] of [['man chup', ovHtml], ['anh ghim', pinHtml]]) {
+  // 06/10 anh: vach "|" ngan nut V (phim chu) voi day nut danh so
+  kiem(ten + ': co vach ngan ngay sau nut V, truoc nut so 1', /data-tool="select"[\s\S]*?<i class="so">V<\/i>\s*<\/button>\s*(<!--[\s\S]*?-->\s*)?<span class="chia chia-v"><\/span>\s*<button class="cong-cu" data-tool="rect"/.test(html))
+}
 for (const k of ['overlay.but', 'overlay.daquang']) {
   const dong = i18n.split('\n').filter((l) => l.includes("'" + k + "'"))
   kiem("Khoa '" + k + "' co du 2 ngon ngu, khong gach ngang dai", dong.length === 2 && !dong.some((l) => l.includes('—')), dong.length + ' dong')

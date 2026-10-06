@@ -115,6 +115,19 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 22] - 2026-10-06 11:19 - Thanh cong cu: vach "|" ngan nut V (phim chu) voi day nut danh so
+
+**Boi canh.** Anh: *"ở thanh menu khi anh drag xong phím tắt chứ "V" và sẽ thêm dấu | phân vùng với số 1-2-3-4-5-6-7..."*.
+Em hieu: tren thanh cong cu hien sau khi keo chon vung, nut V (phim tat la CHU) dung lien voi nut so 1 nen nhin nhu cung mot
+nhom -> them vach ngan. Nut V da co chu "V" o goc tu truoc (27/09).
+**Da sua.** Them `<span class="chia chia-v">` ngay sau nut V trong `src/overlay/index.html` va `src/pin/index.html` (luat `.chia`
+co san: 1 x 20 px). Anh ghim luc chua vao che do ve van an moi vach nhu cu.
+**Kiem chung.** `test:butve` 67/67 (them 2 muc: vach nam ngay sau nut V, truoc nut so 1, o ca hai trang; thanh van nam tron
+trong man: 100..842 / 1200), `test:sobuoc` 72, `test:chupcuon` 23. Da CHUP thanh cong cu cua man chup that (cua so an, 200 %)
+va mo ra nhin: `V | 1 2 3 4 5 6 7 8 S R 9 | mau | hoan tac | x | v`. Nap 11:19, anh/video 700 -> 700.
+**CHUA lam / cho anh.** Thu tu hien la `... 8 S R 9`: nut 9 (chup cuon) dung SAU hai nut chu S, R. Neu anh muon day so lien nhau
+(`V | 1..9 | S R`) thi doi cho 1 nut + them 1 vach; em chua doi vi anh chi noi vach sau nut V.
+
 ## [0.8.0 nap lan 21] - 2026-10-06 10:59 - TINH NANG MOI: chup cuon trang dai (phim 9), CHUA chay tren man that
 
 **Boi canh.** Tinh nang 3/3 cua luot anh chot 06/10 (*"Chụp cuộn trang dài"*). ROADMAP muc 0 so 5 (em tung ghi "lon, rui ro cao nhat").
