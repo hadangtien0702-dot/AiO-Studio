@@ -465,7 +465,7 @@ DANH SO BUOC 1-2-3 (02/10 14:44, phim 6 — da nap vao app dang cai, anh CHUA ba
 - MVP (so): `npm run test:sobuoc` 72/72 chay an o 100 / 125 / 150% (doc diem anh: mau huy hieu, net chu tung so khac nhau,
   chu lech tam <= 0,5 px, xoa so giua don lai, keo co khung huy hieu dung yen, anh ghim luu 900x600 dung cho) + doi chung
   lam hong 2 ham phai bi bat. CHUA DAT: anh chua bam tren app that · chuot that chua do · huy hieu co dinh 26 px (anh 4K
-  co the nho) · vao ve lai anh ghim thi dem lai tu 1 · chua len web · Mac chua thu.
+  co the nho) · vao ve lai anh ghim thi dem lai tu 1 · DA len web 06/10 (the + canh trong rap, commit a75c8f6) · Mac chua thu.
 
 CHUP CUON TRANG DAI (06/10, phim 9 — da nap vao app dang cai; chay duoc tren man that 12:42: 1178x4103, noi 13 lan; 3 ban sua
 trong ngay sau khi anh dung that: chi mot cot cuon 11:31 · anh ghim cao hon man mat nut tat 12:44 · vung co video 13:02, ban cuoi
@@ -497,7 +497,7 @@ CHUA co luot that):
   khong duoc noi ·
   video di vao tu duoi luc dang cuon bi ghep tu nhieu thoi diem · thanh co dinh o day vung · khoang trang phang cao hon vung ·
   cuon ngang · da 'lac' thi tren man chua co loi nhac "cuon nguoc lai" · cach "nguoi dung tu cuon" la em chon, anh chua
-  duyet · Mac chua thu · chua len web.
+  duyet · Mac chua thu · DA len web 06/10 (the + canh trong rap, commit a75c8f6).
 
 BUT VE TAY + BUT DA QUANG (06/10, phim 7 / 8 — da nap vao app dang cai, anh CHUA bam thu):
 - Nguoi xai: khoanh vung (hoac mo anh ghim) -> phim **7** (but) hoac **8** (da quang) -> giu chuot keo de ve; giu Shift ra
@@ -510,7 +510,7 @@ BUT VE TAY + BUT DA QUANG (06/10, phim 7 / 8 — da nap vao app dang cai, anh CH
   stroke, ve tung doan thi cho de nhau cua da quang bi dam; (4) net lam tron goc nen khong cham dung diem gap khuc.
 - MVP (so): `npm run test:butve` 65/65 chay an o 100 / 125 / 150 % (doc diem anh tren canvas + anh xuat, co doi chung).
   CHUA DAT: anh chua bam tren app that · chuot that / bang ve chua do · do day co dinh · da quang tren nen toi kem noi ·
-  chua len web · Mac chua thu.
+  DA len web 06/10 (the + canh trong rap, commit a75c8f6) · Mac chua thu.
 
 XUAT GIF TU KHAY VIDEO (06/10, anh chon trong bang hoi; da nap vao app dang cai, anh CHUA bam thu):
 - Nguoi xai: mo Khay video -> o moi video co cum **Co tieng | Khong tieng | GIF** (video khong tieng: **Video | GIF**) -> bam
@@ -530,7 +530,7 @@ XUAT GIF TU KHAY VIDEO (06/10, anh chon trong bang hoi; da nap vao app dang cai,
 - MVP (so): `npm run test:xuatgif` 58/58 (chay an, doc lai NOI DUNG tung khung bang bo giai ma cua Chromium, 2 doi chung).
   Video that cua anh: 17,4 giay -> 2,0 MB trong 3,8 giay; 9,6 giay noi dung video -> 6,6 MB trong 2,5 giay. CHUA DAT: anh
   chua dung; keo vao Zalo / Messenger chua do; nen chuyen mau min co bac mau; 10 hinh/giay + 800 px + tran 60 giay chua duoc
-  anh duyet; Mac + may khong GPU chua do; chua len web.
+  anh duyet; Mac + may khong GPU chua do; DA len web 06/10 (the + canh trong rap, commit a75c8f6).
 
 ## Chua lam (xem PROGRESS.md)
 
