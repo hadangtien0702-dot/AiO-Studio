@@ -5,6 +5,16 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-06 14:08 (UTC+7) - Đổi icon nút 9 (chụp cuộn) theo icon anh chọn - máy công ty
+
+- **Bối cảnh:** anh: *"icon số 9 xấu quá em"*. Em vẽ 4 kiểu thay thế, anh: *"cả 4 đều xấu"* (3/4 là em tự ghép nét). Đưa 8 icon có
+  sẵn của bộ Tabler, anh chọn: *"Icon số 9: chọn số 3 (Kéo dài theo chiều cao)"* = Tabler `arrow-autofit-height` (giấy phép MIT).
+- **Đã sửa:** `Website/AiO ShotSave Web/index.html` 2 chỗ (nút 9 trên thanh demo đầu trang, thẻ `f16`); app `src/overlay/index.html`
+  (nạp 14:06, ghi ở `PROGRESS.md` của app). Nét lấy nguyên văn từ `@tabler/icons@3.19.0`, không vẽ lại.
+- **Đo:** trang bản thử: nút 9 có 5 nét, hết thẻ `rect` cũ; 0 chỗ còn icon cũ; cú pháp 2 khối script 0 lỗi; rạp vẫn dựng.
+- **Bài học (đã ghi nhớ):** icon là việc về gu → đừng tự ghép nét rồi đem ra; đưa icon có sẵn của một bộ vẽ chuyên nghiệp, đặt
+  đúng cỡ thật trên thanh công cụ thật cho anh bấm chọn.
+
 ## [web-shotsave] - 2026-10-06 13:42 (UTC+7) - Đưa 4 tính năng mới của app lên web: đánh số bước, bút + dạ quang, chụp cuộn, xuất GIF (13 → 17 thẻ / cảnh) - máy công ty
 
 - **Bối cảnh:** anh: *"update lên website tính năng mới đi em"*. Web đang có 13 thẻ / 13 cảnh (tới quay video + khay tự thu, 01–02/10).
