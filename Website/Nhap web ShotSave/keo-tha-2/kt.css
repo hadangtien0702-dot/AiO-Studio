@@ -1,0 +1,141 @@
+/* ===== Section KHAY bản 2 (06/10, anh: "creative hơn nữa"): MỘT khay ở giữa, 6 app vây quanh; ảnh bay tới từng app rồi toả ra
+   cùng lúc; khách tự kéo ảnh thả vào app nào cũng được. Bản 1 (.kh-grid) giữ làm dự phòng khi không tải được GSAP. ===== */
+.kt{display:none}
+#shelf.kt-on .kh-grid{display:none}
+#shelf.kt-on .kt{display:block}
+.kt-dau{text-align:center;margin:0 auto 38px}
+.kt-dau p{margin:12px auto 0;color:var(--ink-2);font-size:var(--fs-sub);max-width:48ch}
+.kt-san{container-type:inline-size;position:relative;aspect-ratio:16/8.6;user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif}
+/* Dây nối khay ↔ app: nét đứt mờ có sẵn, nét cam liền vẽ ra khi app đã nhận ảnh */
+.kt-day{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.kt-day .n{fill:none;stroke:rgb(122 62 22/32%);stroke-width:1.5;stroke-dasharray:2 7;stroke-linecap:round}
+.kt-day .s{fill:none;stroke:#f86820;stroke-width:2.5;stroke-linecap:round;opacity:0}
+:root[data-theme="dark"] .kt-day .n{stroke:rgb(255 206 170/30%)}
+/* Cửa sổ app: cỡ chữ bên trong theo bề rộng cửa sổ (cqw) nên co theo màn hình mà không vỡ */
+.kt-win{position:absolute;z-index:1;width:22%;aspect-ratio:4/2.9;container-type:inline-size;transform:rotate(var(--r,0deg));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.kt-win.den{transform:rotate(0deg) scale(1.06);z-index:3}
+.kt-win.w0{left:6%;top:1%;--r:-4deg}.kt-win.w1{left:0;top:35.2%;--r:2.5deg}.kt-win.w2{left:6.5%;top:69.4%;--r:-2deg}
+.kt-win.w3{right:6%;top:1%;--r:4deg}.kt-win.w4{right:0;top:35.2%;--r:-2.5deg}.kt-win.w5{right:6.5%;top:69.4%;--r:2deg}
+.kt-in{position:absolute;inset:0;display:flex;flex-direction:column;font-size:4.5cqw;line-height:1.3;border-radius:2.8cqw;overflow:hidden;background:#fff;color:#16110d;
+  box-shadow:0 1.5em 2.8em -1.2em rgb(60 20 0/50%),0 0 0 1px rgb(0 0 0/8%);transition:box-shadow .25s}
+.kt-win.den .kt-in{box-shadow:0 1.8em 3.2em -1em rgb(60 20 0/58%),0 0 0 3px #f86820}
+/* Huy hiệu chữ cái ở góc ngoài: chữ trên màu gợi nhắc, không dùng logo của hãng */
+.kt-ic{position:absolute;z-index:2;left:-3.6cqw;top:-3.6cqw;width:11.5cqw;height:11.5cqw;border-radius:3.2cqw;display:grid;place-items:center;color:#fff;font:800 4.6cqw/1 Inter,sans-serif;letter-spacing:-.02em;
+  box-shadow:0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-win.w3 .kt-ic,.kt-win.w4 .kt-ic,.kt-win.w5 .kt-ic{left:auto;right:-3.6cqw}
+.kt-ic.zalo{background:linear-gradient(145deg,#2f8bff,#0068ff)}
+.kt-ic.lark{background:linear-gradient(145deg,#3d7bff,#1f4fd1)}
+.kt-ic.teams{background:linear-gradient(145deg,#7b83eb,#4b53bc)}
+.kt-ic.pr{background:#1b0f3a;color:#a8a2ff;box-shadow:inset 0 0 0 1.5px #6f63ff,0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-ic.ps{background:#001e36;color:#31a8ff;box-shadow:inset 0 0 0 1.5px #31a8ff,0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-ic.fig{background:#1e1e1e}
+/* Dấu tích xanh: app này đã nhận ảnh */
+.kt-ok{position:absolute;z-index:2;right:-2.8cqw;bottom:-2.8cqw;width:8.5cqw;height:8.5cqw;border-radius:50%;display:grid;place-items:center;background:#22a652;
+  box-shadow:0 0 0 2px #fff,0 .4em .9em -.2em rgb(0 0 0/40%);transform:scale(0);transition:transform .32s cubic-bezier(.3,1.6,.5,1)}
+.kt-ok svg{width:58%;height:58%}
+.kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{right:auto;left:-2.8cqw}
+.kt-win.co .kt-ok{transform:scale(1)}
+/* — thanh tiêu đề chung — */
+.kt-bar{flex:none;display:flex;align-items:center;gap:.6em;height:2.1em;padding:0 .9em;font-size:.84em;font-weight:600;background:#f4f2f0;color:#5a524b;border-bottom:1px solid #ece6e0}
+.kt-bar i{width:.8em;height:.8em;border-radius:.2em;background:var(--acc)}
+/* — dạng CHAT (Zalo, Lark, Teams) — */
+.kt-body{flex:1;min-height:0;display:flex}
+.kt-rail{flex:none;width:2.6em;display:flex;flex-direction:column;align-items:center;gap:.6em;padding-top:.8em;background:#ebebf5}
+.kt-rail i{width:1.3em;height:1.3em;border-radius:.4em;background:#c9c9e6}.kt-rail i:first-child{background:var(--acc)}
+.kt-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.kt-top{flex:none;display:flex;align-items:center;gap:.7em;padding:.5em .8em;border-bottom:1px solid #f0e9e2}
+.kt-top b{display:block;font-size:1em;line-height:1.2}
+.kt-top small{display:block;font-size:.8em;color:#2f7d4f;line-height:1.3}
+.kt-ava{flex:none;display:grid;place-items:center;width:2.1em;height:2.1em;border-radius:50%;background:var(--acc);color:#fff;font-weight:700;font-size:.9em}
+.kt-msgs{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:.4em;padding:.45em .8em;overflow:hidden}
+.kt-b{flex:none;max-width:84%;padding:.45em .8em;border-radius:1em;font-size:.93em;line-height:1.3}
+.kt-b.trai{align-self:flex-start;background:#f3eee9;border-bottom-left-radius:.3em}
+.kt-b.anh{align-self:flex-end;width:33%;max-width:none;padding:.25em;background:#fff;box-shadow:0 0 0 1px #eadfd5;border-radius:.7em}
+/* — dạng DỰNG PHIM (Premiere Pro) — */
+.kt-in.pr{background:#232323;color:#cfcfcf}
+.kt-in.pr .kt-bar{background:#1b1b1b;color:#b8b8b8;border-bottom-color:#2e2e2e}
+.kt-prm{flex:1.25;min-height:0;margin:.6em .6em .45em;border-radius:.3em;background:#0d0d0d;display:grid;place-items:center;overflow:hidden;font-size:.78em;color:#5d5d5d}
+.kt-prm .kt-th{width:auto;height:86%;border-radius:.15em}
+.kt-prt{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;justify-content:center;gap:.35em;padding:.45em .6em .6em;background:#1b1b1b;border-top:1px solid #2e2e2e}
+.kt-tr{display:flex;align-items:center;gap:.5em;height:24%}
+.kt-tr b{flex:none;width:1.7em;font-size:.7em;font-weight:600;color:#8f8f8f}
+.kt-lane{flex:1;height:100%;position:relative;border-radius:.25em;background:#262626}
+.kt-clip{position:absolute;top:0;bottom:0;border-radius:.25em;overflow:hidden}
+.kt-clip.v{background:#6e6fc9}.kt-clip.a{background:#3b8453}
+.kt-clip.g{font-style:normal;background:#c96aa5;display:flex;align-items:center;padding:0 .5em;font-size:.66em;font-weight:600;color:#fff;white-space:nowrap}
+.kt-ph{position:absolute;top:.3em;bottom:.4em;left:calc(.6em + 1.7em + 44%);width:2px;background:#4d8dff;z-index:1}
+/* — dạng THIẾT KẾ (Photoshop, Figma) — */
+.kt-in.ps{background:#323232;color:#ccc}
+.kt-in.ps .kt-bar{background:#262626;color:#bdbdbd;border-bottom-color:#1b1b1b}
+.kt-in.fig{background:#e5e5e5;color:#333}
+.kt-in.fig .kt-bar{background:#2c2c2c;color:#eee;border-bottom-color:#2c2c2c}
+.kt-2c{flex:1;min-height:0;display:flex}
+.kt-can{flex:1;min-width:0;display:grid;place-items:center;position:relative}
+.kt-in.ps .kt-can{margin:.6em;border-radius:.25em;background:#262626}
+.kt-board{width:78%;aspect-ratio:4/3;position:relative;display:grid;place-items:center;background:#fff}
+.kt-in.fig .kt-board{width:70%;box-shadow:0 1px 3px rgb(0 0 0/14%)}
+.kt-in.fig .kt-board::before{content:attr(data-ten);position:absolute;left:0;top:-1.6em;font-size:.74em;color:#777;white-space:nowrap}
+.kt-board .kt-th{width:66%;border-radius:.1em}
+.kt-in.fig .kt-board .kt-th{outline:1.5px solid #0d99ff;outline-offset:2px}
+.kt-lay{flex:none;width:31%;display:flex;flex-direction:column;gap:.35em;padding:.6em .45em;font-size:.74em}
+.kt-in.ps .kt-lay{background:#2b2b2b;border-left:1px solid #1b1b1b}
+.kt-in.fig .kt-lay{order:-1;background:#fff;border-right:1px solid #e0e0e0;color:#555}
+.kt-lay div{flex:none;display:flex;align-items:center;gap:.5em;height:2.1em;padding:0 .5em;border-radius:.3em;white-space:nowrap;overflow:hidden}
+.kt-in.ps .kt-lay div{background:#383838;color:#bdbdbd}
+.kt-lay div i{flex:none;width:1.3em;height:1em;border-radius:1px;background:#777}
+.kt-in.ps .kt-lay div.moi{background:#2d5d8f;color:#fff}
+.kt-in.fig .kt-lay div.moi{background:#e5f4ff;color:#0d6fbf}
+/* Ảnh chụp thu nhỏ. Phần ruột đặt bằng inset % của CHÍNH ô ảnh: đệm % sẽ tính theo khung chứa, bản sao bay ngoài khay bị méo (bẫy 22/09) */
+.kt-th{position:relative;display:block;width:100%;aspect-ratio:4/3;border-radius:.4em;background:#fff;overflow:hidden}
+.kt-thi{position:absolute;inset:14% 10% 0;display:flex;align-items:flex-end;gap:7%}
+.kt-thi i{flex:1;border-radius:2px 2px 0 0;background:#f3b58f}
+.kt-thi i:nth-of-type(2n){background:#f86820}
+.kt-th b{position:absolute;z-index:1;left:8%;top:8%;padding:.05em .4em;border-radius:.3em;background:rgb(0 0 0/72%);color:#34c759;font-weight:700;font-size:.7em;line-height:1.35}
+.kt-th.t3 .kt-thi{inset:16% 14%;flex-direction:column;align-items:stretch;justify-content:center;gap:10%}
+.kt-th.t3 em{height:11%;border-radius:2px;background:#e9e1d8}
+.kt-th.t3 em:first-child{width:60%;background:#16110d}
+.kt-th.t4{background:linear-gradient(140deg,#1d2440,#51306b 58%,#b2562f)}
+.kt-th.t4 .kt-thi{inset:0;display:block}
+.kt-th.t4 u{position:absolute;left:50%;top:44%;width:22%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:rgb(255 255 255/88%)}
+.kt-th.t4 s{position:absolute;left:24%;right:24%;bottom:12%;height:8%;border-radius:99px;background:rgb(255 255 255/92%)}
+.kt-th.an{visibility:hidden}
+/* Khay: cùng giao diện khay thật (src/shelf) */
+.kt-khay{position:absolute;z-index:2;left:39.5%;width:21%;top:50%;transform:translateY(-50%);container-type:inline-size}
+.kt-kin{font-size:5cqw;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:1.1em;overflow:hidden;box-shadow:0 1.7em 3.6em -.9em rgb(0 0 0/55%)}
+.kt-kin .sbar{display:flex;align-items:center;gap:.7em;height:2.5em;padding:0 .9em 0 .4em;background:#141414;border-bottom:1px solid rgb(255 255 255/6%)}
+.kt-kin .slogo{display:flex;color:#f86820;padding:0 .3em 0 .7em}
+.kt-kin .slogo svg{width:1.15em;height:1.05em}
+.kt-kin .stitle{font-size:.95em;font-weight:600;color:#c3c3c8}
+.kt-kin .scount{min-width:1.5em;height:1.35em;padding:0 .45em;display:inline-flex;align-items:center;justify-content:center;font-size:.85em;font-weight:700;color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+.kt-luoi{display:grid;grid-template-columns:1fr 1fr;gap:.7em;padding:.9em}
+.kt-luoi .kt-th{cursor:grab;touch-action:none;box-shadow:0 0 0 1px rgb(255 255 255/10%);transition:transform .15s,opacity .15s,box-shadow .15s}
+.kt-luoi .kt-th:hover{transform:translateY(-2px);box-shadow:0 0 0 2px #f86820}
+.kt-luoi .kt-th.di{opacity:.32}
+/* Bản sao đang bay, con trỏ, vòng sóng, lời gợi ý */
+.kt-bong{position:absolute;z-index:5;aspect-ratio:auto;pointer-events:none;box-shadow:0 22px 40px -8px rgb(0 0 0/45%),0 0 0 2px #f86820}
+.kt-bong.tay{cursor:grabbing}
+.kt-tro{position:absolute;left:0;top:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .25s;filter:drop-shadow(0 2px 3px rgb(0 0 0/35%))}
+.kt-tro.hien{opacity:1}
+.kt-song{position:absolute;z-index:4;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 18px rgb(248 104 32/55%)}
+.kt-goi{position:absolute;z-index:2;left:50%;bottom:1%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;white-space:nowrap;
+  font:600 13px/1.2 Inter,sans-serif;color:#5a3a22;background:rgb(255 255 255/64%);box-shadow:0 0 0 1px rgb(255 255 255/70%),0 8px 20px -10px rgb(60 20 0/35%);transition:opacity .3s}
+.kt-goi svg{flex:none;width:15px;height:15px}
+.kt-goi.an{opacity:0}
+:root[data-theme="dark"] .kt-goi{color:#f6e3d3;background:rgb(20 16 12/60%);box-shadow:0 0 0 1px rgb(255 255 255/12%),0 8px 20px -10px rgb(0 0 0/50%)}
+.kt-moi{animation:kt-vao .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes kt-vao{from{opacity:0;transform:translateY(.5em) scale(.94)}}
+/* Điện thoại: khay ở trên, 6 app xếp 2 cột bên dưới */
+@media (max-width:720px){
+  .kt-dau{margin-bottom:26px}
+  .kt-san{aspect-ratio:10/17.5}
+  .kt-khay{left:25%;width:50%;top:0;transform:none}
+  .kt-win{width:47%}
+  .kt-win.w0{left:1%;top:34%;--r:-2deg}.kt-win.w1{left:1%;top:56.5%;--r:1.5deg}.kt-win.w2{left:1%;top:79%;--r:-1.5deg}
+  .kt-win.w3{right:1%;top:34%;--r:2deg}.kt-win.w4{right:1%;top:56.5%;--r:-1.5deg}.kt-win.w5{right:1%;top:79%;--r:1.5deg}
+  .kt-goi{bottom:auto;top:27.6%;font-size:12px;padding:6px 12px}
+  /* dây nối trên điện thoại chạy xuyên sau 6 cửa sổ và đè lời gợi ý: rối (ảnh thử 06/10). Ẩn bằng visibility để vẫn đo được độ dài nét */
+  .kt-day{visibility:hidden}
+  /* dấu tích ra góc NGOÀI của từng cột, không chụm đôi ở giữa */
+  .kt-win.w0 .kt-ok,.kt-win.w1 .kt-ok,.kt-win.w2 .kt-ok{right:auto;left:-2.8cqw}
+  .kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{left:auto;right:-2.8cqw}
+}

@@ -5,6 +5,30 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-06 16:18 (UTC+7) - NHÁP phần "Kéo thả vào mọi ứng dụng" bản 2 (CHƯA lên live, chờ anh duyệt hướng) - máy công ty
+
+- **Bối cảnh:** anh gửi ảnh phần Khay trên web: *"phần này anh muốn nó Creative hơn nữa được không em"*. Bản đang live: một khung màn
+  hình bên phải, lần lượt từng app một (phải xem hết 7 vòng mới thấy "mọi ứng dụng").
+- **Hướng em chọn dựng một mẫu chạy thật** (bài `5bh`: việc về gu thì một mẫu trước, anh gật mới làm tiếp): bỏ khung màn hình, **một khay
+  ở giữa, 6 cửa sổ app vây quanh** (Zalo, Lark, Teams bên trái; Premiere Pro, Photoshop, Figma bên phải), có dây nối. Tự diễn: con trỏ
+  kéo chậm 2 ảnh (Zalo, Premiere) rồi 4 ảnh **toả ra cùng lúc**; mỗi app nhận theo kiểu của nó (bong bóng chat + lời đáp, clip lên V2 +
+  màn Program, layer mới, frame Figma có viền chọn). **Khách tự kéo được**: nắm ảnh trong khay thả vào app nào cũng được, thả ra ngoài
+  thì ảnh bay về. Điện thoại: khay ở trên, 6 app 2 cột.
+- **File (nháp, NGOÀI thư mục web nên không lên Vercel):** `Website/Nhap web ShotSave/keo-tha-2/` = `kt.css` + `kt.html` + `kt.js` +
+  `chen.cjs`. Ghép vào trang: `node chen.cjs "<thư mục repo đích>"` (luôn bắt đầu từ `HEAD` của thư mục đích, chạy lại bao nhiêu lần
+  cũng ra một kết quả; tự kiểm cú pháp mọi khối script). Chuỗi chữ dùng lại khoá `kh*` có sẵn, thêm 1 khoá `ktGoi` (EN + VI).
+  Bản 1 (`.kh-grid`) GIỮ NGUYÊN trong trang làm dự phòng khi không tải được GSAP.
+- **Đang xem được ở:** `http://localhost:8127/#shelf` (thư mục nháp `E:\2026\_web-shotsave-tam` tách từ `origin/main` `39d61cd`, cấu hình
+  xem trước `web-shotsave-tam`). ☠️ Thư mục nháp này CHƯA gỡ, chưa commit gì trong đó.
+- **Đo (Chromium không cửa sổ của Playwright, 1280 + 390, chuột thật):** tự diễn đủ 6/6 app sau 7,8 giây, 0 lỗi console · khách kéo ảnh 3
+  vào Photoshop: app sáng viền khi rê tới, thả là nhận (ảnh + layer mới) · thả ra ngoài: 0 app nhận thêm, 0 bản sao sót · 0 chữ / ảnh
+  bị cắt trong 6 cửa sổ · 0 px tràn ngang ở cả hai khổ · điện thoại: 0 cặp khối chồng nhau.
+- **Lỗi bài thử bắt được trước khi tới tay anh:** `gsap.to` thời lượng 0 giây gọi `onComplete` ngay lúc chưa trả về → biến chưa khởi tạo,
+  ảnh thứ ba không bay (5/6 app). Đã sửa trong `kt.js` (ghi chú ☠️ tại chỗ).
+- **[CHỜ ANH]** xem rồi nói hướng này đúng ý chưa. Đúng thì em ghép vào trang thật + đẩy `main`. **CHƯA đo:** ngón tay thật trên điện
+  thoại (bài thử dùng chuột), Safari, tiếng Anh, đổi ngôn ngữ giữa chừng, "giảm chuyển động". **Bỏ bớt so với bản live:** Messenger
+  không còn cửa sổ riêng (7 app → 6).
+
 ## [web-shotsave] - 2026-10-06 15:18 (UTC+7) - ECC soát lại web: sửa 2 lỗi do bản 14:17 gây ra + 7 điểm trên điện thoại - máy công ty
 
 - **Bối cảnh:** anh: *"dùng ecc để test lại đi em"*. Giao `ecc:code-reviewer` soát thay đổi web hôm nay (`d7099eb..origin/main`, chỉ đọc,
