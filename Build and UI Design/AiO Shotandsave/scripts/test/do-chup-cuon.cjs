@@ -137,6 +137,29 @@ const trang = taoTrang(W, H, 7)
   kiem('[7] toc do: moi khung <= 200 ms (app chup 5 khung / giay)', max <= 200, 'trung binh ' + tb.toFixed(0) + ' ms, cham nhat ' + max.toFixed(0) + ' ms')
 }
 
+// ── 10. CA THAT 06/10 11:28 (anh: "chụp cuộn không hoạt động"): vung khoanh la app co 2 khung canh nhau + thanh ben, nen
+//        TOI; lan chuot chi cuon MOT cot (53 % be rong), phan con lai DUNG YEN. Run-log that: 27 khung, 26 'dung', them = 0. ──
+{
+  const x0 = 80, x1 = 560 // cot cuon
+  const toi = (b) => { for (let i = 0; i < b.length; i += 4) { b[i] = 28 + ((255 - b[i]) >> 2); b[i + 1] = 28 + ((255 - b[i + 1]) >> 2); b[i + 2] = 30 + ((255 - b[i + 2]) >> 2) } return b }
+  const nen = taoTrang(W, h, 23) // phan dung yen: mot man hinh co chu / khoi (thanh ben + khung thu hai)
+  const kh = (tu, hat) => {
+    const f = khung(nen, W, h, h, 0, hat), p = khung(trang, W, H, h, tu, hat + 1)
+    for (let y = 0; y < h; y++) p.copy(f, (y * W + x0) * 4, (y * W + x0) * 4, (y * W + x1) * 4)
+    return toi(f)
+  }
+  const bo = taoBoGhep(W, h)
+  let tu = 0
+  const loai = [bo.them(kh(0, 500)).loai]
+  ;[60, 140, 0, 220, 90, 300, 180, 40, 260].forEach((d, i) => { tu += d; loai.push(bo.them(kh(tu, 510 + i * 2)).loai) })
+  const a = bo.layAnh()
+  // So RIENG cot cuon cua anh ghep voi trang goc (da doi sang nen toi)
+  const goc = toi(Buffer.from(trang.subarray(0, Math.min(H, a.h) * W * 4)))
+  let s = 0, n = 0
+  for (let y = 0; y < Math.min(H, a.h); y++) for (let x = x0 + 4; x < x1 - 4; x++) { const i = (y * W + x) * 4; s += Math.abs(a.buf[i] - goc[i]) + Math.abs(a.buf[i + 1] - goc[i + 1]) + Math.abs(a.buf[i + 2] - goc[i + 2]); n += 3 }
+  kiem('[10] chi MOT cot cuon, phan con lai dung yen, nen toi: van noi dung chieu cao (khong coi la "dung")', a.h === tu + h && loai.filter((v) => v === 'them').length === 8 && loai[3] === 'dung', 'cao ' + a.h + ' / ' + (tu + h) + ' ' + loai.join(' '))
+  kiem('[10] cot cuon trong anh ghep khop trang goc (lech <= 2,5 / kenh)', a.h === tu + h && s / n <= 2.5, 'lech ' + (s / Math.max(1, n)).toFixed(2))
+}
 // ── 8. Day noi trong app (doc ma) ──
 {
   const fs = require('fs')

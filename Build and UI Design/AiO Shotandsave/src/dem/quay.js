@@ -23,6 +23,12 @@ window.batDau = (o) => {
   if (iv) clearInterval(iv)
   iv = setInterval(ve, 250)
 }
+/* 06/10 CHUP CUON dung chung thuoc nay: main goi datChu('1.240 px') moi khi noi them hang -> thay dong ho bang chieu cao
+   da ghep (nguoi dung thay so tang la biet app dang ghep). */
+window.datChu = (s) => {
+  if (iv) { clearInterval(iv); iv = null }
+  gioEl.textContent = String(s)
+}
 nut.addEventListener('click', () => {
   nut.disabled = true
   if (window.dem) window.dem.dung()

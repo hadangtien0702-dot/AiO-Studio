@@ -115,6 +115,34 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.8.0 nap lan 23] - 2026-10-06 11:31 - Chup cuon: sua loi "khong hoat dong" khi chi MOT cot cua vung khoanh cuon
+
+**Boi canh.** Anh thu lan dau tren man that roi bao: *"chụp cuộn không hoạt động em nha"*.
+
+**Nguyen nhan that (doc run-log + mo anh da luu).** Run-log 11:28:22: vung 1715x904 (2573x1356 diem anh) tren man 4K, phien
+chay 3920 ms, **27 khung: 26 'dung', them = 0**, luu ra dung 1 anh thuong. Mo anh do: vung khoanh la app Claude co HAI khung
+tro chuyen canh nhau + thanh ben, nen toi. Lan chuot chi cuon MOT khung; phan con lai cua be rong dung yen. Bo ghep so ca chieu
+ngang nen do lech d = 0 luon re nhat -> coi la "trang dung yen". Bai do 23/23 luc 10:59 chi co trang cuon HET be rong (mau thu chi
+phu vung em nghi ra).
+
+**Da sua.**
+- `src/chup-cuon.js timLech()`: truoc khi tim do troi, do tung DAI COT xem dai nao khac nhau khi khong troi (dang chuyen dong);
+  chi dung cac dai do de tinh chi phi va de dem "hang co noi dung". Khong dai nao doi (< 1,0) moi la 'dung'.
+- Thuoc canh vien: thay dong ho dem giay bang CHIEU CAO da ghep ("1.240 px", tang moi lan noi them hang) de nguoi dung biet app
+  dang ghep (`src/dem/quay.js datChu`, `main.js moVienQuay().datChu` + `baoTrangThai`).
+
+**Kiem chung.** Dung lai DUNG ca cua anh trong `test:chupcuon` (muc [10]: mot cot 53 % be rong cuon, phan con lai la man hinh co
+chu dung yen, nen toi do tuong phan thap). Tren bo ghep CU: cao 600 / 1890, khong noi hang nao (TRUOT = tai hien dung). Sau khi
+sua: cao 1890 / 1890, cot cuon lech 0,29 / kenh so voi trang goc. **25/25 DAT** (23 muc cu khong doi ket qua; trang trang phang
+gio ra 'dung' thay vi 'lac'). `test:butve` 68, `test:khovideo` 76, `test:vienquay`: dat. Nap 11:31.
+
+**CHUA do.**
+- Anh CHUA thu lai tren man that sau ban sua. Em chi co MOT luot that de doi chieu (11:28); ca do duoc dung lai bang trang gia,
+  khong phai bang chinh app Claude dang cuon.
+- So "px" tren thuoc chua duoc nhin tren man that (chi doc ma + kiem cu phap).
+- Phan dung yen trong vung (khung ben canh, thanh ben) se bi lap lai o cac hang noi them: dung ra chi nen khoanh dung cot can cuon.
+- Cac gioi han cu van con: thanh co dinh o day vung, khoang trang phang cao hon vung, cuon ngang.
+
 ## [0.8.0 nap lan 22] - 2026-10-06 11:19 - Thanh cong cu: vach "|" ngan nut V (phim chu) voi day nut danh so
 
 **Boi canh.** Anh: *"ở thanh menu khi anh drag xong phím tắt chứ "V" và sẽ thêm dấu | phân vùng với số 1-2-3-4-5-6-7..."*.

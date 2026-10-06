@@ -2001,6 +2001,7 @@ function moVienQuay(display, rect, kieu) {
     datSo: (s) => goi('window.datSo && window.datSo(' + s + ')'),
     datKhung: (k) => goi('window.datKhung && window.datKhung(' + k + ')'),
     batDau: (o) => goi('window.batDau && window.batDau(' + JSON.stringify(o || {}) + ')'),
+    datChu: (s) => goi('window.datChu && window.datChu(' + JSON.stringify(String(s)) + ')'), // 06/10 chup cuon: hien chieu cao da ghep
     dong: () => { for (const w of wins) if (!w.isDestroyed()) w.destroy() },
   }
 }
@@ -2045,6 +2046,8 @@ async function chupCuon(display, sf, rect) {
       return { buf: k.image.toBitmap(), w: s.width, h: s.height } // BGRA, diem anh that
     },
     coDung: () => c.dung, nghiMs: 90, toiDaMs: CUON_TOI_DA_MS, toiDaCao: CUON_TOI_DA_CAO,
+    // Thuoc hien CHIEU CAO da ghep (px man hinh), so tang moi lan noi them hang -> nguoi dung biet app dang ghep
+    baoTrangThai: (r) => { if (r.loai === 'dau' || r.loai === 'them' || r.loai === 'day') c.vien.datChu(Math.round(r.cao / (sf || 1)).toLocaleString(lang === 'en' ? 'en-US' : 'vi-VN') + ' px') },
   })
   c.vien.dong()
   cuon = null

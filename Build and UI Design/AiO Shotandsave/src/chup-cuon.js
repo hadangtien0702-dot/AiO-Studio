@@ -23,6 +23,7 @@ const NGUONG = 3.2    // chi phi trung binh / dai <= muc nay moi coi la khop (nh
 const CO_NOI_DUNG = 24 // hang "co noi dung": tong lech K dai voi hang ke > muc nay. ☠️ 6 la SAI (do 06/10): nhieu +-3 cua
                        // anh JPEG tu no da cho ~6,4 -> trang trang phang bi coi la co noi dung va bo ghep BIA ra do cuon.
 const KHAC_DAI = 10    // hang "co noi dung": dai sang nhat - dai toi nhat > muc nay (nhieu chi cho ~2)
+const DUNG_YEN = 1.0   // moi dai lech trung binh < muc nay khi khong troi = trang dung yen (hai khung nhieu doc lap cho ~0,55)
 const IT_NHAT_HANG = 10 // phan chong nhau phai co it nhat tung nay hang co noi dung
 
 /* Moi hang -> K so do sang (0..255). bgra: Buffer / Uint8Array BGRA w x h. Tra { f: Uint8Array(h * K), co: Uint8Array(h) } */
@@ -57,25 +58,50 @@ function dacTrung(bgra, w, h) {
 
 /* Chi phi khi khung moi B lech d hang so voi khung moc A (d > 0: noi dung troi LEN d hang = da cuon xuong).
    B[r] ung voi A[r + d]. Tra { cp (trung binh / dai), co (so hang co noi dung trong phan chong) } hoac null neu vuot `tot`. */
-function chiPhi(A, B, h, d, tot) {
+function chiPhi(A, B, h, d, tot, dai, co1) {
   const r0 = d < 0 ? -d : 0, r1 = d > 0 ? h - d : h
   let s = 0, n = 0, co = 0
-  const tran = TRAN_HANG * K
-  const nguongSom = tot === Infinity ? Infinity : tot * K * Math.ceil((r1 - r0) / BUOC_HANG) * 1.02
+  const D = dai.length
+  const tran = TRAN_HANG * D
+  const nguongSom = tot === Infinity ? Infinity : tot * D * Math.ceil((r1 - r0) / BUOC_HANG) * 1.02
   for (let r = r0; r < r1; r += BUOC_HANG) {
     const a = (r + d) * K, b = r * K
     let t = 0
-    for (let k = 0; k < K; k++) { const e = A.f[a + k] - B.f[b + k]; t += e < 0 ? -e : e }
+    for (let j = 0; j < D; j++) { const k = dai[j]; const e = A.f[a + k] - B.f[b + k]; t += e < 0 ? -e : e }
     s += t > tran ? tran : t
     n++
-    if (B.co[r]) co++
+    if (co1[r]) co++
     if (s > nguongSom) return null // da te hon ung vien tot nhat
   }
-  return n ? { cp: s / (n * K), co } : null
+  return n ? { cp: s / (n * D), co } : null
 }
 
 /* Tim do troi cua B so voi A. Tra { d, cp } hoac null (khong khop). */
 function timLech(A, B, h) {
+  /* ☠️ 06/10 11:28, luot dau tien cua anh tren man that: vung khoanh la app co 2 khung canh nhau + thanh ben, lan chuot
+     chi cuon MOT cot -> phan lon be rong DUNG YEN -> so ca chieu ngang thi d = 0 luon re nhat: 27 khung, 26 'dung', khong noi
+     hang nao (bai do luc do chi co trang cuon HET be rong). Nay: tim cac DAI COT dang chuyen dong (khac nhau khi khong
+     troi) va chi dung cac dai do de tinh do troi; khong dai nao doi = trang dung yen that. */
+  const e = new Float64Array(K)
+  let soHang = 0
+  for (let r = 0; r < h; r += BUOC_HANG) { const o = r * K; for (let k = 0; k < K; k++) { const v = A.f[o + k] - B.f[o + k]; e[k] += v < 0 ? -v : v } soHang++ }
+  let lon = 0
+  for (let k = 0; k < K; k++) { e[k] /= soHang; if (e[k] > lon) lon = e[k] }
+  if (lon < DUNG_YEN) return { d: 0, cp: lon }
+  const dai = []
+  for (let k = 0; k < K; k++) if (e[k] >= Math.max(DUNG_YEN, lon * 0.3)) dai.push(k)
+  // Hang "co noi dung" xet RIENG tren cac dai dang chuyen dong (thanh ben day chu khong duoc tinh ho cho cot cuon)
+  const D = dai.length, co1 = new Uint8Array(h)
+  for (let y = 0; y < h; y++) {
+    let to = 0, nho = 255, s = 0
+    for (let j = 0; j < D; j++) {
+      const v = B.f[y * K + dai[j]]
+      if (v > to) to = v
+      if (v < nho) nho = v
+      if (y + 1 < h) { const a = v - B.f[(y + 1) * K + dai[j]]; s += a < 0 ? -a : a }
+    }
+    co1[y] = to - nho > KHAC_DAI || s > Math.max(6, 2 * D) ? 1 : 0
+  }
   const xa = h - Math.max(24, Math.round(h * 0.15)) // phai con chong nhau it nhat 15 % chieu cao
   // Luot 1: gom moi ung vien dat nguong + tim chi phi NHO NHAT.
   // ☠️ 06/10 ban dau gop "chon nho nhat" voi "uu tien troi it" trong mot vong (cho lech 15 %): khi co thanh co dinh
@@ -83,7 +109,7 @@ function timLech(A, B, h) {
   const ung = []
   let nho = Infinity
   for (let d = -xa; d <= xa; d++) {
-    const c = chiPhi(A, B, h, d, nho)
+    const c = chiPhi(A, B, h, d, nho, dai, co1)
     if (!c || c.cp > NGUONG || c.co < IT_NHAT_HANG) continue
     ung.push({ d, cp: c.cp })
     if (c.cp < nho) nho = c.cp
