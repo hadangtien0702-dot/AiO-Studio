@@ -5,6 +5,25 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [keo-nhanh-mac] - 2026-10-06 09:02 (UTC+7) - Máy công ty nối lên 5 commit của nhánh `mac` (việc anh làm trên Mac 03–04/10) - máy công ty
+
+- **Bối cảnh:** anh: *"em kiểm tra git em có update hay bản mới gì anh làm hôm chủ nhật không"* → *"kéo về đi em"*.
+- **Đo trước khi kéo:** `origin/mac` = `may-cong-ty` (`49e3b6e`, đúng chỗ máy này đang đứng) + 5 commit (`0312c82` → `083cd26`, 03/10 18:10 → 04/10 00:27); máy này hơn `mac` 0 commit. 10 file đang sửa dở: 7 file giống hệt bản trên `mac` (bỏ qua kiểu xuống dòng), `PROGRESS.md` Guide Frame bản `mac` nhiều hơn 17 dòng và máy này không có dòng riêng nào, 2 file gốc chỉ khác đúng phần ghi Polar sáng nay.
+- **Đã làm:** cất bản vá 10 file ra thư mục tạm của phiên → `git checkout HEAD --` đúng 10 file theo danh sách → `git merge --ff-only origin/mac` → ghi lại tay 2 chỗ về Polar. Không gộp tay dòng mã nào.
+- **Kiểm chứng:** `HEAD` = `083cd26`; `mac` hơn máy này 0, máy này hơn `mac` 0; ngay sau khi kéo `git status` sạch (chỉ còn 2 thư mục `.playwright-mcp` chưa theo dõi).
+- **CHƯA làm:** panel đang cài trong Premiere máy công ty vẫn là bản cũ (chưa build / cài lại sau khi kéo 77 file bản Mac); sổ trên Mac cũng ghi "kiểm lại nhánh Windows của 11 panel" là việc chờ. Nhánh trên máy này vẫn tên `main` (hơn `origin/main` 29 commit, chưa push, đúng luật 01/10).
+
+## [web-shotsave] - 2026-10-06 07:46 (UTC+7) - Polar: đổi giá sản phẩm $7.99 → $14.99 cho khớp web (không sửa mã) - máy công ty
+
+- **Bối cảnh:** anh gửi 2 ảnh: web ghi $14.99, bấm "Buy now" ra trang Polar $7.99 + "test mode" + "Payments are currently unavailable". Anh: *"em sửa giá trên Polar đi, nút Mua để nguyên đổi qua giá 14.99"*.
+- **Nguyên nhân:** web không sai (live md5 `aad4eae8` = blob git, nút Mua trỏ `buy.polar.sh/polar_cl_Vllt…`). Sản phẩm trên Polar còn giá 23/09; việc "đổi giá trên Polar" ghi từ 28/09 là việc của anh, chưa ai làm.
+- **Đã làm:** qua Chrome của anh (đang đăng nhập org `aiostudio`): Products → AiO Shot & Save (`547b63d4…`) → Edit → ô giá 7.99 → 14.99 → Update Product. Chỉ đổi ô giá. Sản phẩm có 0 đơn hàng, 0 mã đã cấp.
+- **Kiểm chứng:** trang sản phẩm đọc lại `$14.99`; mở đúng link mua trên web: `AiO Shot & Save | $14.99 | Taxes (included) $1.36 | Total $14.99`. Link Checkout KHÔNG đổi sau khi sửa giá.
+- **CHƯA xong:**
+  - Org vẫn "test mode", nút Pay now vẫn khoá với mọi khách (chờ anh xong xác minh tài khoản trên Polar; Claude không nhập giấy tờ / ngân hàng).
+  - Benefit mã bản quyền còn `Expiration: 1 year after grant` và tên `Shot & Save license key + 1 year updates` (khách thấy tên này), lệch với "cập nhật trọn đời" 28/09. Chưa đụng, chờ anh gật.
+- **Bẫy đo:** cửa sổ Chrome của nhóm tab Claude lại bị ẩn (`visibilityState hidden`, `outerWidth 0`): chỉ `javascript_tool` chạy; ô giá React nhận giá trị qua setter gốc + sự kiện `input`.
+
 ## [mac-do-premiere] - 2026-10-04 00:27 (UTC+7) - Đo 11 panel vừa cài trong Premiere trên Mac: 10/10 mở từ panel tổng, trả lời đúng - máy Mac nhà
 
 - **Bối cảnh:** tối 03/10 Premiere dừng ở một cửa sổ nhỏ nên em chưa đo được. Anh: *"anh mở panel rồi em kiểm tra đi"* (anh mở panel tổng AiO Studio).
