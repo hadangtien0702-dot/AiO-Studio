@@ -5,6 +5,23 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 08:43 (UTC+7) - NHÁP (chưa lên live): anh chốt ĐỊNH VỊ "app lưu lại ý tưởng" + tiêu đề cuối trang mới - máy công ty
+
+- **Bối cảnh:** anh hỏi có nên giữ phần Storyboard ("3 giây, 6 khung hình") trên web. Em đo: rạp đã có cảnh Storyboard diễn khoanh vùng,
+  bấm S, 3 giây, 6 khung, lưu thành dải; 2/3 bước của section riêng trùng cảnh đó, và section còn kiểu cũ (chữ trái, màn hình phải).
+- **Anh chốt định vị:** *"định vị app của mình không phải là một áp chụp hình - mà nó là một app có thể giúp dân media - creative - design -
+  dev,.... lưu lại ý tưởng"*, rồi *"nhấn mạnh là khay và app của chúng ta làm... có thể tương tác được phần mềm chỉnh sửa video - hình ảnh -
+  phần mềm giao tiếp với khách hàng và sếp"*. Đã ghi vào `CLAUDE.md` gốc, bảng mục 3, dòng 07/10.
+- **Đo trang theo định vị mới:** trang tự gọi mình là công cụ chụp màn hình ở 5 chỗ chữ lớn (nhãn trên tiêu đề đầu trang, mô tả trang,
+  câu phụ phần tính năng, tiêu đề cuối trang, chân trang); chữ "ý tưởng" chỉ có 1 chỗ (thẻ f1).
+- **Đã sửa (1/5 chỗ, câu anh chọn):** tiêu đề cuối trang VI "Ý tưởng tiếp theo, / đừng để trôi mất." · EN "Your next idea. / Don't let it
+  slip away." (câu EN em tự dịch). Thêm 2 lệnh `thay` vào `Website/Nhap web ShotSave/keo-tha-2/chen.cjs`, ghép lại vào bản sao trang
+  `E:/2026/_web-shotsave-tam` (375.004 ký tự, 0 lỗi cú pháp).
+- **Kiểm chứng:** `thu-cuoi.cjs` (lăn chuột thật tới cuối trang, 2 ngôn ngữ x 320 / 390 / 1280 px): 6/6 lượt tiêu đề 2 dòng, 0 px tràn,
+  hiện đủ (độ mờ 1), 0 lỗi trong trang. Ảnh `cuoi-vi-1280.png` đã mở xem.
+- **[CHỜ ANH]** 4 chỗ còn lại (em đưa câu đề xuất, chưa sửa) · phần Storyboard giữ, làm lại theo hướng "khay lưu ý tưởng đang chuyển
+  động" (chưa làm, chờ anh gật) · cả bản nháp chưa lên live.
+
 ## [web-shotsave] - 2026-10-07 08:32 (UTC+7) - NHÁP (chưa lên live): đoạn VÀO cho từng section + ẩn tiêu đề lạc quẻ + câu mới đầu trang - máy công ty
 
 - **Anh yêu cầu (3 tin liền nhau, xem bản live vừa đẩy):** (1) *"mỗi section trước khi bắt đầu animation anh cần một cái animation in cho

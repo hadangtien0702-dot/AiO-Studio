@@ -49,6 +49,11 @@ thay('data-i="lede">Press one shortcut, drag a box, and your screenshot is ready
   'data-i="lede">Capture → Save → Send. One tight flow, all in one place.</p>', "cau dau trang EN");
 thay('lede:"Nhấn phím tắt, chọn vùng cần chụp. Ảnh có thể ghim nổi trên màn hình, thêm chú thích, hoặc kéo thẳng vào Premiere, Figma hay khung chat."',
   'lede:"Chụp → Lưu → Gửi. Thao tác siêu gọn trong một không gian."', "cau dau trang VI");
+// 07/10 anh chốt định vị "app lưu lại ý tưởng, không phải app chụp hình" và chọn câu "Ý tưởng tiếp theo, đừng để trôi mất" cho tiêu đề cuối trang
+thay('data-i-html="endTitle">Your next screenshot<br>can be the fast one.</h2>',
+  'data-i-html="endTitle">Your next idea.<br>Don\'t let it slip away.</h2>', "tieu de cuoi trang EN");
+thay('endTitle:"Chụp màn hình nhanh hơn,<br>bắt đầu từ hôm nay."',
+  'endTitle:"Ý tưởng tiếp theo,<br>đừng để trôi mất."', "tieu de cuoi trang VI");
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;
