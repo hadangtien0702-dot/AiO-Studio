@@ -1,6 +1,14 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **07/10 20:28 MAC: DA NAP 0.9.0 vao app dang cai (khong thay .app), anh: *"tao ban update mac tuong tu nhu win khong can
+>   cai dat lai"*.** Truoc do gop `origin/may-cong-ty` (46 commit) vao nhanh `mac` (`61e0f38`), ghep tay `i18n.js` (giu chu
+>   "Danh dau so" cua Mac + 2 khoa but ve / da quang moi) va `do-ban-quyen.mjs` (giu [10-12] cua Mac + [13] ma tron doi).
+>   `node scripts/cai-tai-cho-mac.mjs`: `app.asar` `2df69edd` -> `c73aabb5`, `boot v0.9.0` 20:28:47, quyen Ghi man hinh CON
+>   (CDHash khong doi), 13 anh/video + cau hinh GIONG truoc. Bai kiem thuan node sau gop: `banquyen` 76/0, `quyen` 28/0,
+>   `khaymuc` 16/0, `lammo` 25/0, `storyboard` / `vienquay` / `khodai` dat. CHUA ai bam thu tinh nang 0.9.0 tren Mac (but ve,
+>   da quang, xuat GIF, chup cuon); cac bai kiem bat cua so CHUA chay tren Mac. Ruot cu:
+>   `~/Library/Application Support/AiO-Studio/ban-cai-truoc/shotandsave-ruot-20261007-202846/`.
 > - **Ban dang chay may cong ty: van 0.8.0, nap lan 29 (boot 14:59:08), `app.asar` md5 `a1e5b05b`.** CHUA dong goi lai (bo cai
 >   0.8.0 trong Release la ban 01/10 19:22, thieu moi thu tu 02/10), CHUA tang so phien ban: anh dan *"con ban cai thi khi nao
 >   anh bao moi xuat ra ban moi"*.
