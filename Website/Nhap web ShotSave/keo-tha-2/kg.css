@@ -1,0 +1,68 @@
+/* 07/10 anh: "có một cái ô trắng ở đây khá là khó chịu": dải trắng 120 px giữa rạp tối và nền cam
+   (24 px đệm dưới của #features + 96 px lề trên của #shelf). Chỉ bỏ khi rạp đang bật; lưới thẻ dự phòng vẫn giữ khoảng cách. */
+#features:has(#rap:not([hidden])){padding-bottom:0}
+#features:has(#rap:not([hidden])) + #shelf{margin-top:0}
+
+/* ===== Section KHAY CO GIÃN bản 2 (07/10, anh: "anh muốn creative luôn ở phần này"): một lưới 24 ô ảnh CỐ ĐỊNH trên sân,
+   khay là cái khung phủ lên lưới. Khung phủ tới đâu ảnh hiện tới đó (ảnh giữ nguyên cỡ, đúng luật 14/09 "xem nhiều ảnh hơn,
+   không phóng ảnh"). Khách kéo 4 góc được. Bản 1 (.rs-grid) giữ làm dự phòng khi không tải được GSAP. ===== */
+.kg{display:none}
+#resize.kg-on .rs-grid{display:none}
+#resize.kg-on .kg{display:block}
+.kg-dau{text-align:center;margin:0 auto 22px}
+.kg-dau p{margin:12px auto 0;color:var(--ink-2);font-size:var(--fs-sub);max-width:54ch}
+/* chữ "co giãn" giãn theo bề ngang của khay */
+.kg-gian{display:inline-block;color:#f86820;transition:letter-spacing .28s cubic-bezier(.2,.8,.2,1)}
+.kg-che{display:flex;gap:2px;width:max-content;margin:0 auto 20px;padding:3px;border-radius:10px;background:var(--surface);
+  box-shadow:0 0 0 1px var(--line),0 6px 16px -8px rgb(0 0 0/25%);font:600 12px/1 Inter,sans-serif;user-select:none;-webkit-user-select:none}
+.kg-che > span{padding:7px 14px;border-radius:7px;color:var(--ink-3);cursor:pointer;transition:background-color .25s,color .25s,transform .15s}
+.kg-che > span.on{background:var(--brand-soft);color:var(--brand-ink)}
+.kg-che > span.bam{transform:scale(.93)}
+.kg-san{--c:6;--r:4;--g:10px;--dau:30px;position:relative;max-width:900px;margin:0 auto;aspect-ratio:900/524;border-radius:24px;
+  user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif;
+  background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
+.kg-luoi{position:absolute;left:5%;right:5%;top:64px;bottom:52px;display:grid;grid-template-columns:repeat(var(--c),1fr);grid-template-rows:repeat(var(--r),1fr);gap:var(--g)}
+/* ô chờ: nét đứt mờ, cho thấy "còn ảnh ở đây" */
+.kg-nen{z-index:0}
+.kg-nen i{border-radius:6px;border:1px dashed var(--line-strong);background:rgb(127 127 127/5%)}
+/* ô ảnh: nằm TRÊN khung khay, bật lên khi khung phủ tới */
+.kg-anh{z-index:2;pointer-events:none}
+.kg-o{position:relative;min-width:0;min-height:0;opacity:0;transform:scale(.7);transition:opacity .16s ease,transform .28s cubic-bezier(.3,1.5,.5,1)}
+.kg-o.bat{opacity:1;transform:none}
+.kg-anh .kg-rl{display:block;flex:none;width:100%;height:100%;padding:0;gap:0;overflow:visible}
+.kg-anh .kg-rl .kh-thumb{width:100%;height:100%;aspect-ratio:auto;border-radius:6px;box-sizing:border-box}
+/* khung khay: cùng giao diện khay thật (src/shelf) */
+.kg-khay{position:absolute;z-index:1;left:0;top:0;width:0;height:0;box-sizing:border-box;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:12px;
+  box-shadow:0 18px 40px -12px rgb(0 0 0/55%);transition:box-shadow .2s ease}
+.kg-khay.keo{box-shadow:0 0 0 2px #f86820,0 26px 52px -14px rgb(0 0 0/55%)}
+.kg-khay .sbar{display:flex;align-items:center;gap:8px;height:var(--dau);box-sizing:border-box;padding:0 10px 0 4px;background:#141414;border-bottom:1px solid rgb(255 255 255/6%);
+  border-radius:11px 11px 0 0;overflow:hidden;white-space:nowrap}
+.kg-khay .slogo{display:flex;color:#f86820;padding:0 4px 0 8px}
+.kg-khay .slogo svg{width:13px;height:12px}
+.kg-khay .stitle{font-size:11px;font-weight:600;color:#c3c3c8}
+.kg-khay .scount{min-width:17px;height:15px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
+  color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+/* 4 tay nắm ở 4 góc: vùng bấm 34 px, dấu chữ L cam */
+.kg-goc{position:absolute;z-index:3;width:34px;height:34px;touch-action:none}
+.kg-goc::after{content:"";position:absolute;width:11px;height:11px;border:3px solid #f86820;transition:transform .15s}
+.kg-goc.tl{left:-11px;top:-11px;cursor:nwse-resize}.kg-goc.tl::after{left:7px;top:7px;border-right:0;border-bottom:0;border-radius:7px 0 0 0}
+.kg-goc.tr{right:-11px;top:-11px;cursor:nesw-resize}.kg-goc.tr::after{right:7px;top:7px;border-left:0;border-bottom:0;border-radius:0 7px 0 0}
+.kg-goc.bl{left:-11px;bottom:-11px;cursor:nesw-resize}.kg-goc.bl::after{left:7px;bottom:7px;border-right:0;border-top:0;border-radius:0 0 0 7px}
+.kg-goc.br{right:-11px;bottom:-11px;cursor:nwse-resize}.kg-goc.br::after{right:7px;bottom:7px;border-left:0;border-top:0;border-radius:0 0 7px 0}
+@media (hover:hover){.kg-goc:hover::after{transform:scale(1.25)}}
+/* nhãn cỡ đi theo góc đang kéo, kiểu công cụ thiết kế */
+.kg-nhan{position:absolute;left:0;top:0;z-index:5;padding:4px 8px;border-radius:7px;background:#16110d;color:#fff;font:600 11px/1.2 Inter,sans-serif;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .2s;box-shadow:0 6px 14px -6px rgb(0 0 0/50%)}
+.kg-nhan.hien{opacity:1}
+.kg-san .kt-goi{top:auto;bottom:10px}
+.kg-san .kt-tro{z-index:6}
+@media (min-width:900px){.kg-dau h2{white-space:nowrap}}
+/* dien thoai: xuong dong CO DINH sau chu gian, de chu gian ra khong lam tieu de nhay tu 1 dong sang 2 dong (do 07/10) */
+.kg-xd{display:none}
+/* Điện thoại: lưới 4 cột x 6 hàng */
+@media (max-width:720px){
+  .kg-san{--c:4;--r:6;--g:7px;--dau:26px;aspect-ratio:358/474}
+  .kg-luoi{top:52px;bottom:48px}
+  .kg-xd{display:inline}
+  .kg-san .kt-goi{top:auto;bottom:8px}
+}

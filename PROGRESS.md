@@ -5,6 +5,39 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 07:45 (UTC+7) - Anh duyệt hướng phần Kéo thả ("đẹp quá em ơi"); NHÁP thêm phần "Khay co giãn" bản 2 + bỏ ô trắng (CHƯA lên live) - máy công ty
+
+- **Anh xem bản nháp phần Kéo thả ở localhost:** *"đẹp quá em ơi"* → hướng "một khay ở giữa, 6 app vây quanh, khách tự kéo" ĐƯỢC DUYỆT.
+  Rồi chỉ thêm 2 việc: *"có một cái ô trắng ở đây khá là khó chịu"* (dải trắng giữa rạp và phần kéo thả) và *"anh muốn creative
+  luôn ở phần này"* (phần "Khay co giãn theo ý bạn").
+- **Phần Kéo thả, soát trước khi lên live** (bài học 06/10: đổi hành vi chạm / kéo thì soát TRƯỚC):
+  - Người soát `ecc:code-reviewer` (chỉ đọc, 211 nghìn token, 204 giây): 0 lỗi nặng, 3 vừa + 5 nhẹ. Đọc lại mã thì cả 8 đúng, đã sửa:
+    khách bấm trúng ảnh bản tự diễn đang cầm thì không có phản hồi (chặn nhầm theo class `di`) · chuột phải / ngón tay thứ hai làm
+    bản sao kẹt (nay chỉ nhận nút trái + ngón đầu, mỗi lúc một lần kéo, nghe thêm `lostpointercapture`) · `pointercancel` vẫn thả
+    ảnh vào app (nay bay về) · hẹn giờ tự diễn đặt lại sau khi khách đã kéo lần hai · class `kt-on` ghi sẵn trong HTML (JS hỏng là sân
+    trống; nay JS tự gắn, hỏng thì còn bản 1) · hover dính trên màn cảm ứng · bong bóng chat đo lúc đang chạy hiệu ứng · ảnh bay về
+    chỗ cũ khi màn đã đổi cỡ.
+  - Bài thử mới `thu-kt2.cjs` (phần hôm qua CHƯA đo): 8 khổ màn (320 → 1920) × 2 ngôn ngữ = 16/16 đủ 6 app, 0 px tràn, 0 khối chồng ·
+    đổi ngôn ngữ lúc 6 app đã đầy và sau một lần đặt lại: 0 chữ có dấu tiếng Việt sót · "giảm chuyển động": 6 app đầy sẵn, vẫn kéo
+    được · chặn GSAP: trang về bản 1 · nhân Safari (WebKit 26.6, giả lập iPhone 13): 6/6, kéo bằng sự kiện con trỏ loại touch thả
+    được vào Figma. Lỗi tìm thấy: tiếng Anh, 1 dòng layer trong cửa sổ Photoshop bị cắt 2 px ở 6/8 khổ → đã sửa.
+- **Ô trắng:** là 24 px đệm dưới của `#features` + 96 px lề trên của `#shelf` = 120 px nền trắng kẹp giữa rạp tối và nền cam. Bỏ bằng
+  2 luật CSS chỉ áp khi rạp đang bật (`#features:has(#rap:not([hidden]))`); lưới thẻ dự phòng vẫn giữ khoảng cách. Đo: hở 120 → 0 px
+  ở 1280 và 390. ☠️ Dải này CÓ SẴN trên bản live từ khi có rạp, không phải do bản nháp sinh ra.
+- **Phần "Khay co giãn" bản 2 (mẫu chạy thật, cùng thư mục nháp):** `kg.css` + `kg.html` + `kg.js`. Một lưới 24 ô ảnh CỐ ĐỊNH trên sân
+  (6 × 4, điện thoại 4 × 6), khay là cái khung phủ lên lưới: khung phủ tới đâu ảnh bật lên tới đó, ảnh giữ nguyên cỡ (đúng luật 14/09
+  "xem nhiều ảnh hơn, không phóng ảnh"). Khách kéo được 4 góc (góc đối diện đứng yên, thả tay khung hít về mép ô), bấm Ngang / Dọc.
+  Chữ "co giãn" trên tiêu đề giãn theo bề ngang khay; nhãn "6 × 4 · 24 ảnh" đi theo góc đang kéo. 24 ảnh lấy lại từ bộ ảnh bản 1
+  (`#rsList`) nên không lặp. Bản 1 (`.rs-grid`) giữ làm dự phòng.
+- **Đo phần Khay co giãn (`thu-kg.cjs`, Chromium không cửa sổ, chuột thật):** tự diễn 3 × 2 → 5 × 3 → 6 × 4 → Ngang 6 × 2 → Dọc (điện
+  thoại 2 × 2 → 4 × 5 → 4 × 6 → 4 × 2) · khách kéo góc ra hết cỡ 24 ảnh, kéo nhỏ nhất còn 1 ảnh, bấm Dọc ra 2 × 4 · 0 ảnh lọt khỏi
+  khung khay · 0 px tràn · tiêu đề 1 dòng ở 1280, 2 dòng CỐ ĐỊNH ở 390 (bản đầu nhảy 2 ↔ 1 dòng khi chữ giãn, đã thêm xuống dòng cố
+  định) · 0 lỗi console. **CHƯA đo:** nhân Safari, ngón tay thật, "giảm chuyển động", mất GSAP, nền tối, khổ 721–899 px; CHƯA cho
+  người soát đọc `kg.js` (làm trước khi lên live).
+- **Cách ghép:** `node chen.cjs "<thư mục repo đích>"` nay ghép cả 6 mảnh (kt + kg). Xem ở `http://localhost:8127/` (thư mục nháp
+  `E:\2026\_web-shotsave-tam`, cấu hình xem trước `web-shotsave-tam`).
+- **[CHỜ ANH]** xem phần Khay co giãn; anh gật thì cho soát `kg.js`, đo nốt phần chưa đo rồi đẩy cả hai phần + ô trắng lên `main`.
+
 ## [web-shotsave] - 2026-10-06 16:18 (UTC+7) - NHÁP phần "Kéo thả vào mọi ứng dụng" bản 2 (CHƯA lên live, chờ anh duyệt hướng) - máy công ty
 
 - **Bối cảnh:** anh gửi ảnh phần Khay trên web: *"phần này anh muốn nó Creative hơn nữa được không em"*. Bản đang live: một khung màn

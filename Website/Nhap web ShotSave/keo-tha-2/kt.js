@@ -3,7 +3,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const sec = document.getElementById("shelf"), san = document.getElementById("ktSan");
   if (!sec || !san) return;
-  if (!window.gsap) { sec.classList.remove("kt-on"); return; }
+  if (!window.gsap) return;
+  // Class kt-on do JS gắn (không ghi sẵn trong HTML): JS bị chặn hoặc dựng hỏng giữa chừng thì trang vẫn còn bản 1, không ra sân trống
+  sec.classList.add("kt-on");
+  try { khoiDong(); } catch (e) { sec.classList.remove("kt-on"); throw e; }
+  function khoiDong() {
   const T = k => window.ssT ? window.ssT(k) : k;
   const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hep = matchMedia("(max-width:720px)");
@@ -30,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '<div class="kt-msgs"><div class="kt-b trai" data-k="' + o.m1 + '"></div></div>' + (o.rail ? "</div></div>" : ""),
     nhan(inn, n) {
       const m = inn.querySelector(".kt-msgs"), b = document.createElement("div"), a = anhAn(n);
-      b.className = "kt-b anh kt-moi"; b.append(a); m.append(b);
+      b.className = "kt-b anh"; b.append(a); m.append(b);
       while (m.children.length > 4) m.firstElementChild.remove();
       return { el: a, sau() {
         setTimeout(() => {
@@ -219,12 +223,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---- khách TỰ kéo: nắm một ảnh trong khay, thả vào app nào cũng được ----
+  // Soát 07/10: (1) KHÔNG chặn theo class "di" (bản tự diễn cũng gắn "di" lên ảnh nó đang cầm, khách bấm trúng là không có phản hồi);
+  // (2) chỉ nhận nút chuột trái / ngón tay đầu tiên, mỗi lúc một lần kéo; (3) pointercancel / mất quyền giữ con trỏ = ảnh bay về, không thả.
+  let tay = null;
   luoi.addEventListener("pointerdown", e => {
-    const t = e.target.closest(".kt-th"); if (!t || t.classList.contains("di")) return;
+    const t = e.target.closest(".kt-th");
+    if (!t || tay || e.button || e.isPrimary === false) return;
     e.preventDefault(); dung(); goi.classList.add("an");
-    const n = +t.dataset.n, r = hop(t), b = bong(n, r), s0 = san.getBoundingClientRect();
+    const p0 = phien, n = +t.dataset.n, r = hop(t), b = bong(n, r), s0 = san.getBoundingClientRect();
     const lx = e.clientX - s0.left - r.x, ly = e.clientY - s0.top - r.y;
-    let dich2 = -1;
+    let dich2 = -1, xong = false;
+    tay = b;
     b.classList.add("tay"); t.classList.add("di"); gsap.to(b, { scale: 1.08, rotation: -4, duration: .15 });
     const mv = ev => {
       const s = san.getBoundingClientRect(), px = ev.clientX - s.left, py = ev.clientY - s.top;
@@ -233,16 +242,25 @@ document.addEventListener("DOMContentLoaded", () => {
       wins.forEach((w, i) => { const q = bo(w); if (px > q.x - 10 && px < q.x + q.w + 10 && py > q.y - 10 && py < q.y + q.h + 10) m = i; });
       if (m !== dich2) { if (dich2 >= 0) wins[dich2].classList.remove("den"); if (m >= 0) wins[m].classList.add("den"); dich2 = m; }
     };
-    const up = async () => {
-      t.removeEventListener("pointermove", mv); t.removeEventListener("pointerup", up); t.removeEventListener("pointercancel", up);
+    const SK = ["pointerup", "pointercancel", "lostpointercapture"];
+    const up = async ev => {
+      if (xong) return;
+      xong = true;
+      t.removeEventListener("pointermove", mv); SK.forEach(k => t.removeEventListener(k, up));
       b.classList.remove("tay");
-      if (dich2 >= 0) await tha(b, dich2, n, true);
-      else { await tw(b, { left: r.x, top: r.y, scale: 1, rotation: 0, duration: giam ? 0 : .28, ease: "power2.out" }, true); b.remove(); }
-      t.classList.remove("di");
-      if (!giam) { clearTimeout(hen); hen = setTimeout(() => { const p = phien; xoaHet().then(() => { if (p === phien) dien(); }); }, 7000); }
+      const tha2 = ev.type === "pointerup" && dich2 >= 0;
+      if (tha2) await tha(b, dich2, n, true);
+      else {
+        if (dich2 >= 0) wins[dich2].classList.remove("den");
+        // đo lại chỗ ảnh trong khay: màn hình có thể đã đổi cỡ / xoay trong lúc kéo
+        const r2 = hop(t);
+        await tw(b, { left: r2.x, top: r2.y, width: r2.w, height: r2.h, scale: 1, rotation: 0, duration: giam ? 0 : .28, ease: "power2.out" }, true); b.remove();
+      }
+      t.classList.remove("di"); tay = null;
+      if (!giam && p0 === phien) { clearTimeout(hen); hen = setTimeout(() => { const p = phien; xoaHet().then(() => { if (p === phien) dien(); }); }, 7000); }
     };
     try { t.setPointerCapture(e.pointerId); } catch (err) {}
-    t.addEventListener("pointermove", mv); t.addEventListener("pointerup", up); t.addEventListener("pointercancel", up);
+    t.addEventListener("pointermove", mv); SK.forEach(k => t.addEventListener(k, up));
   });
 
   if (giam) {
@@ -254,4 +272,5 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // tay nắm để đo / thử: ép coi như đang trong màn hình, chạy lại, dừng, thả thẳng ảnh n vào app i
   window.ssKt = { ep(v) { thay = v; capNhat(); }, dien, dung, xoaHet, nhan(i, n) { const r = hop(ths[n]); return tha(bong(n, r), i, n, true); }, wins, dang };
+  }
 });

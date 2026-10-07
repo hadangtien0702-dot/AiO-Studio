@@ -14,15 +14,20 @@ function thay(neo, moi, ten) {
   s = s.replace(neo, () => moi);
 }
 const NEO_CSS = '/* 24/09 anh: "animation peak hơn": vòng sóng cam lan ra chỗ ảnh đáp xuống */';
-thay(NEO_CSS, doc("kt.css") + NEO_CSS, "css");
+thay(NEO_CSS, doc("kt.css") + doc("kg.css") + NEO_CSS, "css");
+// Class kt-on / kg-on do JS gắn lúc dựng xong, KHÔNG ghi sẵn trong HTML (JS hỏng thì trang còn bản 1)
 const NEO_HTML = '  <section class="sec" id="shelf">\n';
-thay(NEO_HTML, '  <section class="sec kt-on" id="shelf">\n' + doc("kt.html"), "html");
+thay(NEO_HTML, NEO_HTML + doc("kt.html"), "html keo tha");
+const NEO_HTML2 = '  <section class="sec" id="resize">\n';
+thay(NEO_HTML2, NEO_HTML2 + doc("kg.html"), "html khay co gian");
 const NEO_LANG = "  if (window.ssKhRelang) window.ssKhRelang();";
-thay(NEO_LANG, NEO_LANG + "\n  if (window.ssKtRelang) window.ssKtRelang();", "doi ngon ngu");
+thay(NEO_LANG, NEO_LANG + "\n  if (window.ssKtRelang) window.ssKtRelang();\n  if (window.ssKgRelang) window.ssKgRelang();", "doi ngon ngu");
 const NEO_JS = "// ===== Section KHAY: kéo cùng một ảnh từ khay vào Lark";
-thay(NEO_JS, doc("kt.js") + "\n" + NEO_JS, "js");
+thay(NEO_JS, doc("kt.js") + "\n" + NEO_JS, "js keo tha");
+const NEO_JS2 = "// ===== Section KHAY CO GIÃN: con trỏ kéo góc khay";
+thay(NEO_JS2, doc("kg.js") + "\n" + NEO_JS2, "js khay co gian");
 const NEO_VI = 'khTitle:"Kéo thả vào mọi ứng dụng", ';
-thay(NEO_VI, NEO_VI + 'ktGoi:"Thử đi: kéo một ảnh thả vào app bất kỳ", ', "chu VI");
+thay(NEO_VI, NEO_VI + 'ktGoi:"Thử đi: kéo một ảnh thả vào app bất kỳ", kgGoi:"Thử đi: kéo một góc của khay", kgAnh:"ảnh", kgTitle:\'Khay <span class="kg-gian">co giãn</span><br class="kg-xd"> theo ý bạn\', ', "chu VI");
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;
