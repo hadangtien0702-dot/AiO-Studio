@@ -5,6 +5,19 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [thanh-toan] - 2026-10-07 15:12 (UTC+7) - Polar: bộ cài 0.9.0 đã gắn vào sản phẩm (cách A), khách mua nhận mã + link tải - máy công ty
+
+- **Anh yêu cầu:** *"em remote chrome làm cho anh đi em"* (gắn bộ cài lên Polar). Không sửa mã nguồn nào.
+- **Em không tự tải file được:** công cụ đưa file của Chrome từ xa giới hạn 10 MB; cắt bộ cài thành 11 mảnh dưới 10 MB thì các công cụ cần chạm vào trang
+  (dò phần tử, chụp màn hình, đưa file) đều treo trong Chrome của anh, kể cả trên tab mới, chỉ lệnh gọi thẳng vào Polar chạy; đường "máy chủ tạm 127.0.0.1"
+  bị lớp bảo vệ của phiên chặn. Đã xoá đúng 12 file mảnh + thư mục `dist/polar-parts/`, tắt máy chủ tạm, bộ cài gốc còn nguyên.
+- **Anh tự kéo file vào Polar** (Benefits → File Downloads, tên "Shot & Save installer (Windows)", tạo lúc 15:11). Em đọc lại bằng lệnh gọi Polar: file
+  `AiO-Shot-and-Save-Setup-0.9.0.exe` 96.182.083 byte, đã tải xong, sha256 `ddab7277...5165a67f` = đúng file trong `Release/` (so cả dung lượng lẫn băm).
+- **Em gắn quyền lợi vào sản phẩm** (`POST /v1/products/<id>/benefits` với 2 mã quyền lợi, trả 200). Đọc lại bằng 2 đường: (1) sản phẩm "AiO Shot & Save"
+  nay có 2 quyền lợi: mã bản quyền + bộ cài, giá vẫn 1499 usd; (2) trang thanh toán công khai (tải bằng curl, không đăng nhập) có tên cả hai quyền lợi.
+- **Chưa làm:** chưa mua thử (mã giảm 100% `THUSYM8FR`: đã dùng 0/2, 0 đơn) nên chưa thấy tận mắt thư + trang khách nhận, chưa kích hoạt app bằng mã thật ·
+  bộ cài Mac chưa có · web chưa có nút Tải / đường dùng thử qua email · `success_url` trống · 0 webhook.
+
 ## [thanh-toan] - 2026-10-07 13:16 (UTC+7) - Polar: rà hiện trạng thanh toán Shot & Save, sửa 3 chỗ lệch với giá $14.99 trọn đời - máy công ty
 
 - **Anh yêu cầu:** *"setup các bước thanh toán còn lại nha em"*. Không sửa mã nguồn nào; chỉ đổi cấu hình trên Polar (qua Chrome của anh, phiên anh đã đăng nhập).
