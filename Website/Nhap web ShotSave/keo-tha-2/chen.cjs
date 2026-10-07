@@ -70,12 +70,14 @@ thay(NEO_FEAT, doc("ld.html") + NEO_FEAT, "html ly do");
 thay(NEO_CSS, doc("ld.css") + NEO_CSS, "css ly do");
 thay(NEO_JS, doc("ld.js") + "\n" + NEO_JS, "js ly do");
 thay(NEO_LANG, NEO_LANG + "\n  if (window.ssLdRelang) window.ssLdRelang();", "doi ngon ngu ly do");
-thay(NEO_VI, NEO_VI + 'ldNhan:"Vì sao có Shot & Save", ldT:"Ý tưởng hay,", ldTa:"rồi lại đi đâu mất", ldTb:"giờ ở một nơi duy nhất", ldPj:"Project mới", '
+thay(NEO_VI, NEO_VI + 'ldNhan:"Vì sao có Shot & Save", ldT:"Ý tưởng hay,", ldTa:"rồi lại đi đâu mất", ldTb:"giờ ở một nơi duy nhất", '
   + 'ldD1:"Thứ 2", ldD2:"Thứ 3", ldD3:"Thứ 4", ldD4:"Thứ 5", ldD5:"Thứ 6", ldY1:"Bảng <wbr>màu", ldY2:"Chuyển <wbr>cảnh", ldY3:"Kiểu <wbr>chữ", ldY4:"Bố <wbr>cục", ldY5:"Đoạn <wbr>code", '
-  + 'ldOff:"Không có khay", ldOn:"Có khay", ldTrong:"Chưa có chỗ nào để giữ", ldGoi:"Thử đi: gạt công tắc", '
-  + 'ld1:"Mỗi lần có project mới, mình lại đi tìm ý tưởng để thực hiện.", ld2:"Mỗi ngày lại phát hiện ra một ý tưởng hay.", '
-  + 'ld3:"Ý tưởng được dùng cho project đang làm, rồi sau đó nó lại “đi đâu mất”.", ld4:"Mỗi ý tưởng là một công tắc kích hoạt não bộ.", '
-  + 'ld5:"Mình làm Media Creative hơn 5 năm. Hãy để mình giúp bạn lưu mọi khoảnh khắc, mọi ý tưởng loé lên trên màn hình vào một nơi duy nhất.", ', "chu VI ly do");
+  + 'ldOff:"Mỗi thứ một nơi", ldOn:"Có khay giữ", ldGoi:"Thử đi: gạt công tắc", '
+  + 'ldN1:"Tab đang mở", ldN2:"Thư mục Downloads", ldN3:"Ảnh màn hình", ldN4:"Ghi chú", ldN5:"Tự nhắn cho mình", '
+  // 07/10 anh: "gom lại thành 03 slide", "bán câu chuyện và nỗi đau của mình chứ không bán hàng": 2 câu nỗi đau + 1 câu cái khay, giữ chữ của anh
+  + 'ld1:"Mỗi lần có project mới, mình lại đi tìm ý tưởng. Mỗi ngày lại gặp một ý tưởng hay.", '
+  + 'ld2:"Dùng xong cho project đang làm, rồi nó lại “đi đâu mất”.", '
+  + 'ld3:"Mỗi ý tưởng là một công tắc kích hoạt não bộ. Mình làm Media Creative hơn 5 năm, hãy để mình giúp bạn giữ hết vào một nơi duy nhất.", ', "chu VI ly do");
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;

@@ -5,6 +5,32 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 10:56 (UTC+7) - NHÁP (chưa lên live): section "LÝ DO" gom 5 câu còn 3 + 5 "nơi tạm" + núm công tắc chờ ảnh anh - máy công ty
+
+- **Anh xem mẫu 09:20, khen đẹp rồi sửa 3 điều:** (1) *"nếu là người lướt web thì lí do gì để họ dừng lại phần này... gom lại thành 03 slide được không...
+  câu chuyện của anh là phần níu giữ họ lại cũng như là lõi sống của app"*, *"mình bán câu chuyện và nỗi đau của mình chứ không bán hàng"*;
+  (2) khoanh hàng công tắc: *"bị vô duyên, thêm hình tròn nhỏ của anh vào đây nhìn cho uy tín"*; (3) khoanh nửa dưới sân ở slide đầu: *"nó trống và bị
+  ngô nghê"*.
+- **Đã sửa:**
+  - 5 câu còn 3: 2 câu nỗi đau (đi tìm ý tưởng, ngày nào cũng gặp · dùng xong rồi "đi đâu mất") + 1 câu cái khay (công tắc kích hoạt não bộ, hơn 5
+    năm Media Creative, giữ hết vào một nơi duy nhất). Giữ chữ của anh, chỉ rút gọn.
+  - 3 câu LUÔN nằm đủ dưới sân (3 cột, điện thoại 3 hàng), câu đang kể đậm màu + vạch tiến độ chạy trên câu đó; bấm câu nào kể lại từ câu đó.
+    Người lướt nhanh đọc hết chuyện trong một cái nhìn, không phải chờ.
+  - Một vòng 22,6 giây còn 13,1 giây. Ý tưởng đầu tiên bật lên sau 0,6 giây kể từ lúc cuộn tới (trước: sân trống 5 giây); khay giữ đủ 5 ý tưởng ở
+    giây 8,5 (trước: giây 18).
+  - Nửa dưới sân lúc chưa bật công tắc: thay ô nét đứt "Chưa có chỗ nào để giữ" bằng 5 NƠI TẠM (Tab đang mở · Thư mục Downloads · Ảnh màn hình ·
+    Ghi chú · Tự nhắn cho mình). Ý tưởng nào bật lên thì nơi tương ứng sáng, mất thì bị gạch; bật công tắc thì 5 nơi gom thành MỘT cái khay.
+  - Nhãn công tắc: "Mỗi thứ một nơi" ↔ "Có khay giữ". Núm công tắc to lên 40 px để chứa ảnh tròn của anh (`img/tac-gia.jpg`).
+    ☠️ CHƯA có ảnh: núm đang hiện logo, trang gọi một file 404. Phải có ảnh (hoặc bỏ thẻ img) trước khi lên live. Cách đặt ảnh làm NÚM là em chọn.
+- **Kiểm chứng (`thu-ld.cjs` viết lại cho 3 cảnh, lăn chuột thật):** tự kể đủ 3 câu rồi lặp ở 1280 và 390 px, chiều cao section không đổi (897 / 860 px);
+  từ nhãn tới hết 3 câu cao 737 px ở máy tính (lọt một màn 900 px) và 700 px ở điện thoại 390; khách gạt công tắc lần 1 ra 5/5 trong khay, lần 2
+  ra 5/5 mất; bấm câu 1 kể lại từ câu 1; 14/14 lượt (2 ngôn ngữ x 320 đến 1920 px) 0 px tràn, 0 nhãn cắt, thẻ lệch ô nhiều nhất 0,9 px; giảm chuyển
+  động: 3 câu cùng đậm, gạt được; rời section thì đồng hồ đứng; nhân Safari (WebKit 26.6, khổ iPhone 13) kể tới cảnh cuối, chạm ăn. 0 lỗi trong trang
+  (ngoài file ảnh 404 nói trên).
+- **Bẫy vấp:** thẻ `button` làm ô lưới thì tự canh GIỮA nội dung theo chiều dọc: 3 vạch tiến độ lệch nhau 12 px (anh thấy trên bản đang dựng dở);
+  phải `align-items:start`. Nhãn tiếng Anh dài làm hàng công tắc tràn ở 320 px: rút còn "Scattered" / "On the shelf".
+- **[CHỜ ANH]** file ảnh chân dung · có ghi tên anh cạnh ảnh không · xem lại ở `http://localhost:8127/#why`.
+
 ## [web-shotsave] - 2026-10-07 09:20 (UTC+7) - NHÁP (chưa lên live): MẪU section "LÝ DO" kiểu kể chuyện (pain point, vì sao anh làm app) - máy công ty
 
 - **Anh yêu cầu:** *"anh một chỗ ghi paint point - một section riêng nêu ra lí do tại sao anh làm cái này. đây chỉ là nội dung - em hãy khai thác

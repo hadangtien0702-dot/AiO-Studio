@@ -14,19 +14,10 @@
 .ld.bat .ld-doi .a{opacity:0;filter:none;transform:translateY(-.25em)}
 .ld.bat .ld-doi .b{opacity:1;transform:none}
 .ld:not(.ld-on) .ld-san{display:none}
-.ld-san{position:relative;max-width:980px;margin:0 auto;padding:12px 5% 20px;box-sizing:border-box;border-radius:24px;display:flex;flex-direction:column;align-items:center;
+.ld-san{position:relative;max-width:980px;margin:0 auto;padding:24px 5% 20px;box-sizing:border-box;border-radius:24px;display:flex;flex-direction:column;align-items:center;
   user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif;
   background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
-/* thanh 5 đoạn kiểu "story": đoạn đang kể chạy dần, bấm vào đoạn nào thì nghe lại từ câu đó */
-.ld-doan{display:flex;gap:6px;width:100%;margin-bottom:10px}
-.ld-doan button{position:relative;flex:1;height:24px;padding:0;border:0;background:none;cursor:pointer}
-.ld-doan button::before,.ld-doan button::after{content:"";position:absolute;left:0;right:0;top:10px;height:4px;border-radius:2px;background:var(--line-strong)}
-.ld-doan button::after{background:#f86820;transform-origin:0 50%;transform:scaleX(var(--k,0));transition:transform .08s linear}
-.ld-doan button:focus-visible{outline:2px solid #f86820;outline-offset:2px;border-radius:4px}
-.ld-pj{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;margin-bottom:12px;padding:6px 10px;border-radius:8px;background:var(--surface);color:var(--ink-2);font:600 12px/1 Inter,sans-serif;
-  box-shadow:0 0 0 1px var(--line),0 6px 14px -8px rgb(0 0 0/30%);opacity:0;transform:translateY(6px) scale(.9);transition:opacity .3s ease,transform .4s cubic-bezier(.3,1.5,.5,1)}
-.ld-pj::before{content:"";width:8px;height:8px;border-radius:2px;background:#f86820}
-.ld-san.pj .ld-pj{opacity:1;transform:none}
+/* (bản 5 câu có thanh 5 đoạn + nhãn "Project mới" ở đây; 07/10 anh bảo gom còn 3 câu cho gọn: thanh tiến độ dời xuống nằm trên từng câu) */
 /* 5 ngày, mỗi ngày một ô chờ */
 .ld-ngay{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;width:100%}
 .ld-o{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
@@ -46,19 +37,33 @@
 .ld-ct .t{color:var(--ink)}
 .ld.bat .ld-ct .t{color:var(--ink-3)}
 .ld.bat .ld-ct .b2{color:var(--brand-ink)}
-.ld-nut{position:relative;flex:none;width:72px;height:40px;padding:0;border:0;border-radius:999px;cursor:pointer;touch-action:manipulation;background:var(--line-strong);
+.ld-nut{position:relative;flex:none;width:92px;height:48px;padding:0;border:0;border-radius:999px;cursor:pointer;touch-action:manipulation;background:var(--line-strong);
   box-shadow:inset 0 0 0 1px rgb(0 0 0/8%);transition:background-color .3s ease,box-shadow .3s ease,transform .15s ease}
-.ld-nut i{position:absolute;left:4px;top:4px;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgb(0 0 0/30%);transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+/* núm = ảnh tròn của anh (40 px); chưa có ảnh thì hiện logo */
+.ld-nut i{position:absolute;left:4px;top:4px;width:40px;height:40px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#fff;color:#f86820;box-shadow:0 2px 6px rgb(0 0 0/30%);transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.ld-nut i svg{width:18px;height:16px}
+.ld-nut i img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ld.bat .ld-nut{background:#f86820;box-shadow:0 0 0 6px rgb(248 104 32/16%),0 0 28px rgb(248 104 32/45%)}
-.ld.bat .ld-nut i{transform:translateX(32px)}
+.ld.bat .ld-nut i{transform:translateX(44px)}
 .ld-nut.bam{transform:scale(.93)}
 .ld-nut.nhay{animation:ld-nhay 1.1s ease-in-out infinite}
 @keyframes ld-nhay{50%{box-shadow:0 0 0 9px rgb(248 104 32/24%)}}
 .ld-nut:focus-visible{outline:2px solid #f86820;outline-offset:4px}
 /* chỗ của khay: chưa bật công tắc thì chỉ là một ô trống */
 .ld-noi{position:relative;width:min(100%,560px)}
-.ld-trong{position:absolute;inset:0;display:grid;place-items:center;border-radius:12px;border:1.5px dashed var(--line-strong);color:var(--ink-3);font:600 13px/1.3 Inter,sans-serif;text-align:center;transition:opacity .3s ease}
-.ld.bat .ld-trong{opacity:0}
+/* 5 nơi tạm (tab đang mở, thư mục Downloads...): nằm đúng chỗ của khay, hơi nghiêng cho ra vẻ "mỗi thứ một nơi" */
+.ld-noicu{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px 14px}
+.ld-n{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;border:1.5px dashed var(--line-strong);color:var(--ink-3);font:600 13.5px/1 Inter,sans-serif;white-space:nowrap;
+  transition:opacity .35s ease,transform .45s cubic-bezier(.3,1.3,.5,1),background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease}
+.ld-n::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--line-strong);transition:background-color .3s ease}
+.ld-n:nth-child(odd){transform:rotate(-2deg)}
+.ld-n:nth-child(even){transform:rotate(1.5deg)}
+.ld-n:nth-child(1){--mau:#f86820}.ld-n:nth-child(2){--mau:#e2557a}.ld-n:nth-child(3){--mau:#b08a3c}.ld-n:nth-child(4){--mau:#7f93ad}.ld-n:nth-child(5){--mau:#4fb866}
+.ld-n.co{border-style:solid;border-color:transparent;background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 8px 18px -10px rgb(0 0 0/35%)}
+.ld-n.co::before{background:var(--mau)}
+.ld-n.mat{text-decoration:line-through;opacity:.5}
+.ld.bat .ld-n{opacity:0;transform:translateY(14px) scale(.8)}
+.ld.bat .ld-n:nth-child(2){transition-delay:.04s}.ld.bat .ld-n:nth-child(3){transition-delay:.08s}.ld.bat .ld-n:nth-child(4){transition-delay:.12s}.ld.bat .ld-n:nth-child(5){transition-delay:.16s}
 .ld-khay{position:relative;box-sizing:border-box;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:12px;box-shadow:0 18px 40px -12px rgb(0 0 0/55%);
   opacity:0;transform:translateY(16px) scale(.96);transition:opacity .35s ease,transform .5s cubic-bezier(.3,1.3,.5,1)}
 .ld.bat .ld-khay{opacity:1;transform:none}
@@ -89,27 +94,39 @@
 .ld-y.y3::before{content:"Aa";inset:0;display:grid;place-items:center;font:800 34cqw/1 Georgia,"Times New Roman",serif;color:#1b1714}
 .ld-y.y4{background:linear-gradient(#c3ccd9,#c3ccd9) 50% 14%/84% 13% no-repeat,linear-gradient(#9fadc0,#9fadc0) 13% 80%/36% 50% no-repeat,linear-gradient(#d3dae5,#d3dae5) 86% 46%/44% 20% no-repeat,linear-gradient(#d3dae5,#d3dae5) 86% 88%/44% 20% no-repeat,#f3f5f8}
 .ld-y.y5{background:linear-gradient(#7fd88a,#7fd88a) 12% 20%/36% 9% no-repeat,linear-gradient(#f6a05a,#f6a05a) 40% 42%/52% 9% no-repeat,linear-gradient(#6fb3ff,#6fb3ff) 26% 64%/30% 9% no-repeat,linear-gradient(#7fd88a,#7fd88a) 12% 86%/18% 9% no-repeat,#14171c}
-/* phụ đề: 5 câu chồng một chỗ (ô cao bằng câu dài nhất nên trang không nhảy), câu đang kể thì hiện */
-.ld-phu{max-width:720px;margin:20px auto 0;text-align:center}
-.ld-phu p{margin:0 0 10px;font-size:var(--fs-sub);line-height:1.5;color:var(--ink-2)}
-.ld.ld-on .ld-phu{display:grid}
-.ld.ld-on .ld-phu p{grid-area:1/1;margin:0;font-size:clamp(18px,2.2vw,22px);line-height:1.4;font-weight:600;color:var(--ink);text-wrap:balance;opacity:0;transform:translateY(8px);transition:opacity .15s ease,transform .15s ease}
-/* cau cu tat nhanh (0,15 giay) roi cau moi moi hien, de hai cau khong de len nhau */
-.ld.ld-on .ld-phu p.on{opacity:1;transform:none;transition:opacity .35s ease .15s,transform .45s cubic-bezier(.2,.8,.2,1) .15s}
-/* "giảm chuyển động": đứng yên ở cảnh cuối (khay đã giữ đủ), 5 câu hiện hết thành đoạn văn, công tắc vẫn gạt được */
-.ld.ld-tinh .ld-doan{display:none}
-.ld.ld-tinh .ld-phu{display:block}
-.ld.ld-tinh .ld-phu p{margin:0 0 10px;font-size:var(--fs-sub);font-weight:400;color:var(--ink-2);opacity:1;transform:none}
+/* 3 câu chuyện LUÔN nằm đủ trên trang (người lướt nhanh đọc hết trong một cái nhìn, không phải chờ): mỗi câu một cột, vạch tiến độ nằm trên
+   câu; câu đang kể thì đậm màu, hai câu kia nhạt. Bấm vào câu nào thì sân kể lại từ câu đó. Cỡ chữ + độ đậm KHÔNG đổi theo trạng thái
+   (đổi là chữ xuống dòng khác đi, trang nhảy). */
+/* align-items:start là bắt buộc: thẻ button tự canh GIỮA nội dung theo chiều dọc, để giãn đều thì 3 vạch lệch nhau (đo 07/10: lệch 12 px) */
+.ld-phu{display:grid;grid-template-columns:repeat(3,1fr);align-items:start;gap:22px;max-width:980px;margin:18px auto 0}
+.ld-cau{display:block;margin:0;padding:0;border:0;background:none;font:inherit;text-align:left;color:var(--ink-2);cursor:default}
+.ld-cau span{display:block;font-size:17px;line-height:1.45;font-weight:600;transition:color .35s ease}
+.ld-vach{display:none}
+.ld.ld-on .ld-cau{cursor:pointer;color:var(--ink-3)}
+.ld.ld-on .ld-cau.on{color:var(--ink)}
+.ld.ld-on .ld-vach{position:relative;display:block;height:4px;margin-bottom:12px;border-radius:2px;background:var(--line-strong);overflow:hidden}
+.ld.ld-on .ld-vach::after{content:"";position:absolute;inset:0;border-radius:2px;background:#f86820;transform-origin:0 50%;transform:scaleX(var(--k,0));transition:transform .08s linear}
+.ld-cau:focus-visible{outline:2px solid #f86820;outline-offset:4px;border-radius:4px}
+@media (hover:hover){.ld.ld-on .ld-cau:not(.on):hover{color:var(--ink-2)}}
+/* "giảm chuyển động": đứng yên ở cảnh cuối (khay đã giữ đủ), 3 câu cùng đậm, không có vạch chạy; công tắc vẫn gạt được */
+.ld.ld-tinh .ld-vach{display:none}
+.ld.ld-tinh .ld-cau{color:var(--ink);cursor:default}
 @media (prefers-reduced-motion:reduce){.ld-y,.ld-khay,.ld-nut i,.ld-doi > span,.ld-san .kt-tro{transition:none}.ld-y.sang,.ld-nut.nhay{animation:none}}
 @media (max-width:720px){
-  .ld-san{padding:8px 12px 16px;border-radius:18px}
+  .ld-san{padding:16px 12px 16px;border-radius:18px}
+  .ld-phu{grid-template-columns:1fr;gap:14px}
+  .ld-cau span{font-size:16px}
+  .ld.ld-on .ld-vach{margin-bottom:8px}
   .ld-ngay{gap:6px}
   .ld-o{gap:6px}
   .ld-o small{font-size:10px}
   .ld-o b{font-size:10px;white-space:normal;text-align:center;min-height:2.4em}
   .ld-cho,.ld-y{border-radius:7px}
   .ld-cho::after{font-size:15px}
-  .ld-ct{gap:10px;margin:14px 0 14px}
+  .ld-ct{gap:10px;margin:14px 0 14px;font-size:12px}
+  .ld-noicu{gap:6px 6px}
+  .ld-n{padding:5px 9px;gap:5px;font-size:10.5px}
+  .ld-n::before{width:6px;height:6px}
   .ld-kl{gap:6px;padding:8px}
   .ld-san .kt-goi{margin-top:12px}
 }
@@ -121,11 +138,11 @@
   .ld.cho .ld-san{opacity:0;transform:translateY(24px) scale(.97)}
   .ld.vao .ld-san{transition:opacity .5s ease .15s,transform .7s cubic-bezier(.2,.8,.2,1) .15s}
   .ld.cho .ld-cho{opacity:0;transform:scale(.6)}
-  .ld.vao .ld-cho{transition:opacity .3s ease calc(.4s + var(--tre,0s)),transform .45s cubic-bezier(.3,1.5,.5,1) calc(.4s + var(--tre,0s))}
+  .ld.vao .ld-cho{transition:opacity .3s ease calc(.25s + var(--tre,0s)),transform .45s cubic-bezier(.3,1.5,.5,1) calc(.25s + var(--tre,0s))}
   .ld.cho .ld-o small,.ld.cho .ld-ct,.ld.cho .ld-noi,.ld.cho .ld-phu{opacity:0}
-  .ld.vao .ld-o small{transition:opacity .3s ease .5s}
-  .ld.vao .ld-ct{transition:opacity .4s ease .8s}
-  .ld.vao .ld-noi{transition:opacity .4s ease .95s}
-  .ld.vao .ld-phu{transition:opacity .4s ease 1.1s}
+  .ld.vao .ld-o small{transition:opacity .3s ease .4s}
+  .ld.vao .ld-ct{transition:opacity .35s ease .5s}
+  .ld.vao .ld-noi{transition:opacity .35s ease .6s}
+  .ld.vao .ld-phu{transition:opacity .4s ease .3s}
 }
 
