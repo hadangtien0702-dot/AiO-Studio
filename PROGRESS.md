@@ -5,6 +5,23 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [thanh-toan] - 2026-10-07 13:16 (UTC+7) - Polar: rà hiện trạng thanh toán Shot & Save, sửa 3 chỗ lệch với giá $14.99 trọn đời - máy công ty
+
+- **Anh yêu cầu:** *"setup các bước thanh toán còn lại nha em"*. Không sửa mã nguồn nào; chỉ đổi cấu hình trên Polar (qua Chrome của anh, phiên anh đã đăng nhập).
+- **Đo trước khi làm (chỉ đọc):** web: 3 nút Mua trỏ `#checkout`, nút trong thẻ giá mở link Polar `buy.polar.sh/polar_cl_Vllt...` (trang trả 200, giá 1499 usd,
+  cổng stripe). App: `banquyen.js` gọi `api.polar.sh` với mã tổ chức công khai; chỗ "mã không có hạn" đã xử đúng từ 28/09 (`settings.js:326`, `bq.tronDoi`),
+  tức dòng "app còn 1 chỗ sai" trong `CLAUDE.md` là ghi cũ. Polar: 1 sản phẩm, 1 quyền lợi (mã bản quyền), 1 link thanh toán "Web chinh", 0 mã giảm giá,
+  0 webhook, 0 đơn; `payment_ready: false`, tổ chức `created`, chưa nộp hồ sơ.
+- **Đã sửa trên Polar (đọc lại bằng đường khác sau mỗi lần ghi):** (1) mã bản quyền: hết hạn "1 year" → không hết hạn, giữ 2 máy + tiền tố `AIOSS`; (2) tên
+  quyền lợi "... + 1 year updates" → "Shot & Save license key + lifetime updates" (tải lại trang thanh toán công khai: 2/2 chỗ hiện tên mới); (3) đoạn mô tả
+  sản phẩm trong hồ sơ xét duyệt còn ghi "một năm cập nhật + gia hạn hằng năm" → viết lại theo $14.99 một lần, 2 máy, cập nhật trọn đời (605 ký tự, tải lại
+  trang đọc ra đúng bản mới).
+- **Bẫy:** cửa sổ Chrome của nhóm tab Claude đang ẩn (`outerWidth 0`) nên không bấm giao diện; sửa quyền lợi bằng đúng lệnh mà trang quản trị gọi
+  (`PATCH /v1/benefits/<id>` kèm phiên đăng nhập) rồi đọc lại. Đồng hồ: Polar trả giờ 06:14Z, em nghi máy lệch 1,5 giờ; đối chiếu Google + Vercel: máy ĐÚNG
+  (13:14), chỉ là anh nhắn sau lượt trước 1,5 giờ.
+- **Chưa làm được / chờ anh:** 3 bước xác minh tài khoản (giấy tờ, tài khoản nhận tiền, nộp xét duyệt) là việc của anh · email hỗ trợ Polar chê Gmail cá nhân ·
+  khách mua xong chưa có chỗ tải bộ cài · chưa có đường tải bản dùng thử qua email · chưa thử kích hoạt bằng mã thật. Chi tiết: bảng việc chờ `CLAUDE.md`.
+
 ## [web-shotsave] - 2026-10-07 11:37 (UTC+7) - ĐÃ LÊN LIVE `4417c5f`: section "Vì sao có Shot & Save" + đoạn vào + câu chữ mới - máy công ty
 
 - **Anh duyệt:** *"đẹp duyệt, đẩy lên live đi em"* (sau khi xem bản nháp ở localhost, kể cả núm công tắc đang là hình người giữ chỗ).
