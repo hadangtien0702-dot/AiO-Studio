@@ -56,7 +56,7 @@ const lech = ['doDayNet', 'veNet', 'hopNet', 'cachNet', 'dichNet', 'themDiemNet'
 kiem('hang NET + 6 ham ve net GIONG HET nhau o overlay.js va pin.js', lech.length === 0 && !!hangNet(ovJs) && hangNet(ovJs) === hangNet(pinJs), lech.join(', '))
 
 // ───────────── [2] Chay that ─────────────
-const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron')
+const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : process.platform === 'darwin' ? path.join('Electron.app', 'Contents', 'MacOS', 'Electron') : 'electron')
 const env = Object.assign({}, process.env)
 delete env.ELECTRON_RUN_AS_NODE
 fs.mkdirSync(RA, { recursive: true })

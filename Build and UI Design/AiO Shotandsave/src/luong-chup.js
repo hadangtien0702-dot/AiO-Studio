@@ -143,10 +143,14 @@ ipcMain.on('luong:khung', (e, d) => {
     if (c.daNhanh === c.can && c.nhanh) { c.nhanh(Array.from(c.list.values())); c.nhanh = null }
   } else if (d.loai === 'jpg') {
     item.jpg = Buffer.from(d.buf)
+    item.doJpg = d.do || null   // 07/10: bam gio tung buoc cua renderer luong (cho lenh · ve · nen)
     c.daJpg++
     if (c.daJpg === c.can && c.jpg) { c.jpg(Array.from(c.list.values())); c.jpg = null }
   } else if (d.loai === 'raw') {
+    const tAnh = Date.now()
     item.image = nativeImage.createFromBitmap(Buffer.from(d.buf), { width: d.w, height: d.h })
+    // 07/10: doc diem · doi mau (renderer) · gui (IPC ~33 MB/man 4K) · tao anh (main)
+    item.doRaw = d.do ? { doc: d.do.doc, doi: d.do.doi, gui: d.do.luc ? Math.max(0, tAnh - d.do.luc) : -1, anh: Date.now() - tAnh } : null
     c.daRaw++
     if (c.daRaw === c.can) { cho.delete(d.gen); c.resolve(Array.from(c.list.values())) }
   }
@@ -163,7 +167,7 @@ function layKhung(onNhanh, onJpg) {
   return new Promise((resolve) => {
     const c = { nhanh: NHANH ? onNhanh : null, jpg: onJpg, resolve, list: new Map(), can: cauHinh.length, daNhanh: 0, daJpg: 0, daRaw: 0 }
     cho.set(g, c)
-    win.webContents.send('luong:lay', { gen: g, nhanh: NHANH })
+    win.webContents.send('luong:lay', { gen: g, nhanh: NHANH, gui: Date.now() })
     // Khong ve du trong 3s -> tra cai da co (co the rong) + khoi dong lai luong
     setTimeout(() => {
       if (!cho.has(g)) return

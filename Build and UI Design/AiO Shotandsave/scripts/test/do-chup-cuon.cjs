@@ -300,7 +300,7 @@ const cho14 = (async () => {
   fs.mkdirSync(RA, { recursive: true })
   const fTrang = path.join(RA, 'trang.bin')
   fs.writeFileSync(fTrang, trang)
-  const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron')
+  const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : process.platform === 'darwin' ? path.join('Electron.app', 'Contents', 'MacOS', 'Electron') : 'electron')
   const env = Object.assign({}, process.env)
   delete env.ELECTRON_RUN_AS_NODE
   const c = spawnSync(electron, [path.join(ROOT, 'scripts', 'test', 'chup-cuon-main.cjs'), fTrang, String(W), String(H), String(h)], { env, encoding: 'utf8', timeout: 120000 })

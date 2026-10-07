@@ -24,7 +24,7 @@ const kiem = (ten, ok, chiTiet = '') => { kq.push((ok ? '  DAT  ' : '  TRUOT ') 
 fs.mkdirSync(RA, { recursive: true })
 for (const f of ['ket-qua.json', 'khay-vi.json', 'khay-en.json']) { try { fs.unlinkSync(path.join(RA, f)) } catch (e) {} } // xoa ket qua cu: script chet thi khong doc nham
 
-const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron')
+const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : process.platform === 'darwin' ? path.join('Electron.app', 'Contents', 'MacOS', 'Electron') : 'electron')
 const env = Object.assign({}, process.env)
 delete env.ELECTRON_RUN_AS_NODE // VS Code / Claude dat =1 -> electron chay nhu Node tran
 
@@ -37,7 +37,9 @@ kiem('[A] Co ket-qua.json, chay het cac luot', !!r && r.xong === true && !r.loi,
 const L = (ten) => ((r && r.luot) || []).find((x) => x.ten === ten) || {}
 
 const ungVien = ['AiO Autocut', 'AiO Asset Manager', 'AiO Transcripts', 'AiO Power Bins', 'AiO Auto Short Viral'].map((p) => path.join(ROOT, '..', p, 'bin', 'win64', 'ffprobe.exe'))
-const FFPROBE = ungVien.find((f) => fs.existsSync(f)) || null
+// 07/10 Mac: file .exe khong chay duoc tren macOS -> dung ffprobe ban Mac o kho chung (neu co).
+const ungVienMac = [path.join(process.env.HOME || '', 'Library', 'Application Support', 'AiO-Studio', 'bin', 'mac', 'ffprobe')]
+const FFPROBE = (process.platform === 'win32' ? ungVien : process.platform === 'darwin' ? ungVienMac : []).find((f) => fs.existsSync(f)) || null
 console.log(FFPROBE ? 'ffprobe: ' + FFPROBE : 'KHONG co ffprobe tren may -> bo qua phan doi chieu ffprobe')
 const probe = (file) => {
   if (!FFPROBE) return null

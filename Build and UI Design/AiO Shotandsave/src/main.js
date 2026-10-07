@@ -895,7 +895,8 @@ function kickGrab() {
       phatFrozen(listNhanh, null, 'luong', true)
     }, (listJpg) => {
       ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms nguon=luong layers=' + listJpg.length + ' [' +
-        listJpg.map((x) => 'jpg ' + Math.round(x.jpg.length / 1024) + 'KB').join(' | ') + ']')
+        listJpg.map((x) => 'jpg ' + Math.round(x.jpg.length / 1024) + 'KB').join(' | ') + ']' +
+        listJpg.map((x) => x.doJpg ? ' (cho ' + x.doJpg.cho + ' ve ' + x.doJpg.ve + ' nen ' + x.doJpg.nen + ')' : '').join(''))
       if (daPhat) capNhatFrozenDayDu(listJpg)
       else { daPhat = true; phatFrozen(listJpg) }
     }).then((list) => {
@@ -915,7 +916,8 @@ function kickGrab() {
         }
       }
       ghiLog('raw-xong ' + (Date.now() - _tg) + 'ms nguon=luong [' +
-        list.map((x) => { const sz = x.image.getSize(); return sz.width + 'x' + sz.height }).join(' | ') + ']')
+        list.map((x) => { const sz = x.image.getSize(); return sz.width + 'x' + sz.height }).join(' | ') + ']' +
+        list.map((x) => x.doRaw ? ' (doc ' + x.doRaw.doc + ' doi ' + x.doRaw.doi + ' gui ' + x.doRaw.gui + ' anh ' + x.doRaw.anh + ')' : '').join(''))
       return list
     }).catch((e) => { if (IS_DEV) console.error('[shotandsave] luong loi', e); return [] })
     return

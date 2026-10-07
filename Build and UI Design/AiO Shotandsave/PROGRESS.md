@@ -1,6 +1,19 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **07/10 20:42 MAC: DO HIEU NANG (anh: *"kiem tra va update hieu nang"*, *"kiem tra tung cu click anh va thao tac xem co muot
+>   khong"*, *"bai test Gif anh con chua test"*). CHUA toi uu gi, moi DO + gan dong ho.** So tu run-log (tay anh bam that, Mac
+>   i9-9980HK, man 3584x2240): phim -> khung chon hien giua 30 ms (49 lan, 90 % duoi 292) · phim -> anh dong bang giua 297 ms (17
+>   lan; Windows ghi 120-200) · anh net day du giua 604 ms · keo chon giua 59 khung/giay, khoang ho giua 37 ms (22 lan, 1 lan 578 ms
+>   luc 20:36:32) · bam nut tron -> khay bung xong giua 941 ms, 24 khung (15 lan) · khay thu giua 1053 ms (25 lan). Nam im: CPU
+>   0,4 % mot loi, RAM 843 MB / 8 tien trinh (chinh 200, gpu 202, 5 trang 69-120).
+>   **Gan dong ho tung buoc** vao dong `grab-xong` (cho · ve · nen) va `raw-xong` (doc · doi · gui · anh): `luong.js`,
+>   `luong-chup.js`, `main.js`; da nap 20:36:59 (`app.asar` `d3e8b40c`). CHO anh chup vai lan de co so tung buoc roi moi sua.
+>   **4 bai kiem viet 06/10 tren Windows KHONG chay duoc tren Mac** (goi `node_modules/electron/dist/electron`, Mac la
+>   `Electron.app/Contents/MacOS/Electron`; bai GIF goi `ffprobe.exe`) -> da sua duong goi. Sau sua tren Mac: `butve` 68/0 ·
+>   `nutkhay` 54/0 · `chupcuon` 38/0 · `xuatgif` 58/0 (GIF: mau 4 giay lam 1,07 giay; file quay that 720p 1,3 giay, 4K 2,5 giay).
+>   Cung luot: `sobuoc`, `chekin` 40/40, `khaynut`, `keo` 36/0, `cauhinh` 22/0, `khayram` 12/0, `khovideo` dat.
+>   Thay doi nay CHUA push (chua tang so phien ban).
 > - **07/10 20:28 MAC: DA NAP 0.9.0 vao app dang cai (khong thay .app), anh: *"tao ban update mac tuong tu nhu win khong can
 >   cai dat lai"*.** Truoc do gop `origin/may-cong-ty` (46 commit) vao nhanh `mac` (`61e0f38`), ghep tay `i18n.js` (giu chu
 >   "Danh dau so" cua Mac + 2 khoa but ve / da quang moi) va `do-ban-quyen.mjs` (giu [10-12] cua Mac + [13] ma tron doi).

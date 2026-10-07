@@ -24,8 +24,11 @@ window.batDauLuong = async function (cfg) {
   }
 }
 
-window.luong.onLay(async ({ gen, nhanh }) => {
+window.luong.onLay(async ({ gen, nhanh, gui }) => {
   // Dot 1: JPEG moi man (hien overlay). Dot 2: raw BGRA (cat luc Xong).
+  // 07/10: bam gio tung buoc (ms) gui kem ve main de run-log noi duoc cham o DAU: cho lenh · ve · nen · doc diem · doi mau.
+  const choLenh = gui ? Math.max(0, Date.now() - gui) : -1
+  const tVe0 = performance.now()
   const khung = []
   for (const { v, c } of vids) {
     const w = v.videoWidth || c.w, h = v.videoHeight || c.h
@@ -44,20 +47,25 @@ window.luong.onLay(async ({ gen, nhanh }) => {
     const buf = await blob.arrayBuffer()
     window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'nhanh', buf })
   }
+  const ve = Math.round(performance.now() - tVe0)
   for (const k of khung) {
+    const tNen = performance.now()
     const blob = await k.cv.convertToBlob({ type: 'image/jpeg', quality: 0.92 })
     const buf = await blob.arrayBuffer()
-    window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'jpg', buf })
+    window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'jpg', buf, do: { cho: choLenh, ve, nen: Math.round(performance.now() - tNen) } })
   }
   for (const k of khung) {
+    const tDoc = performance.now()
     const id = k.ctx.getImageData(0, 0, k.w, k.h)
+    const doc = Math.round(performance.now() - tDoc)
+    const tDoi = performance.now()
     // RGBA -> BGRA (nativeImage.createFromBitmap doc theo toBitmap = BGRA tren Windows).
     const u32 = new Uint32Array(id.data.buffer)
     for (let i = 0; i < u32.length; i++) {
       const p = u32[i] // little-endian: 0xAABBGGRR
       u32[i] = (p & 0xff00ff00) | ((p & 0x00ff0000) >>> 16) | ((p & 0x000000ff) << 16)
     }
-    window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'raw', w: k.w, h: k.h, buf: id.data.buffer })
+    window.luong.guiKhung({ gen, displayId: k.c.displayId, loai: 'raw', w: k.w, h: k.h, buf: id.data.buffer, do: { doc, doi: Math.round(performance.now() - tDoi), luc: Date.now() } })
   }
 })
 

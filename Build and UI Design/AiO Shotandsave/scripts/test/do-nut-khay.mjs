@@ -22,7 +22,7 @@ const kiem = (ten, ok, chiTiet = '') => { kq.push((ok ? '  DAT  ' : '  TRUOT ') 
 fs.mkdirSync(RA, { recursive: true })
 try { fs.unlinkSync(path.join(RA, 'ket-qua.json')) } catch (e) {} // xoa ket qua cu: script chet thi khong doc nham
 
-const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron')
+const electron = path.join(ROOT, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : process.platform === 'darwin' ? path.join('Electron.app', 'Contents', 'MacOS', 'Electron') : 'electron')
 const env = Object.assign({}, process.env)
 delete env.ELECTRON_RUN_AS_NODE // VS Code / Claude dat =1 -> electron chay nhu Node tran
 const chay = spawnSync(electron, [path.join(ROOT, 'scripts', 'test', 'nut-khay-main.cjs')], { env, encoding: 'utf8', timeout: 60000 })
