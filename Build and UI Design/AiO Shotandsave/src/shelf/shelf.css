@@ -31,7 +31,8 @@ body.an #shelf { opacity: 0; pointer-events: none; }
 /* ── Thanh tren: tay cam keo + ten + nut ─────────────────────────────── */
 #bar {
   display: flex; align-items: center; gap: var(--sp-2);
-  height: 30px; padding: 0 var(--sp-2) 0 var(--sp-1);
+  /* 06/10 anh: "doi cai dai nay sang trai tu 5 den 10px" -> le phai +10 px: hang nut roi khoi goc tren-phai (vung nam co gian) */
+  height: 30px; padding: 0 calc(var(--sp-2) + 10px) 0 var(--sp-1);
   background: var(--bg-1);
   border-bottom: 1px solid var(--line-1);
   cursor: grab;
@@ -210,6 +211,11 @@ body.doc #empty {
   width: 20px; height: 20px;
   pointer-events: auto;
 }
+/* 06/10 anh: "cho nay bi trung hoi kho chiu" (anh khoanh goc tren-phai). Nut "–" thu khay (them 01/10) nam dung duoi vung
+   nam goc tren-phai (them 15/09): do tren trang that 57,8% dien tich nut bi #grip-tr che -> re vao nut ra mui ten co
+   gian + vet cam, bam vao la KEO CO chu khong thu khay. Nut noi len TREN vung nam (z 11 > 10); mep ngoai cua goc van
+   keo co duoc. Them nut moi vao #bar thi chay `npm run test:nutkhay` (bat nut bi goc che). */
+#bar #hide { position: relative; z-index: 11; }
 
 .grip-goc::before {
   content: '';

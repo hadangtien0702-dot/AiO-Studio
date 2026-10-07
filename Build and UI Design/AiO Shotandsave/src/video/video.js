@@ -21,6 +21,8 @@ const demEl = document.getElementById('dem-video') // so video, nam tren the Vid
 const toastEl = document.getElementById('toast')
 let ds = []
 let toastTimer = null
+let gifToiDaMs = 60000        // tran thoi luong tao GIF (main gui trong getData)
+const tienDoGif = new Map()   // id video dang tao GIF -> ham nhan tien do 0..1
 
 document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.getAttribute('data-i18n')) })
 document.querySelectorAll('[data-i18n-title]').forEach((el) => {
@@ -91,7 +93,12 @@ function taoHang(m, so) {
   meta.className = 'dai-meta'
   // 01/10 (anh: "dong bo font / text"): thoi luong da nam tren khung video (.vd-gio) -> khong noi lai o day (mot thong diep mot noi)
   // 02/10: muc duoc dua lai vao so (so hong / file quay do) khong co so do luc quay (w = h = ms = 0) -> doc tu chinh video
-  const veMeta = () => { meta.textContent = [gio(m.taoLuc), ...(m.w && m.h ? [m.w + '×' + m.h] : []), dungLuong(m.bytes)].join(' · ') }
+  // 06/10: dang chon ban GIF thi dong nay noi ve FILE GIF (thu se duoc keo di): "GIF · 2,0 MB" thay cho co + dung luong video
+  const veMeta = () => {
+    meta.textContent = (m.chonGif
+      ? [gio(m.taoLuc), 'GIF', dungLuong(m.bytesGif || 0)]
+      : [gio(m.taoLuc), ...(m.w && m.h ? [m.w + '×' + m.h] : []), dungLuong(m.bytes)]).join(' · ')
+  }
   veMeta()
   meta.title = m.ten
   /* 02/10 (ECC soat, muc A3): luot quay ket thuc vi loi giua chung / app bi tat giua luc quay -> noi ro tren hang,
@@ -109,33 +116,75 @@ function taoHang(m, so) {
   /* 01/10 anh chot: quay LUON co tieng, vao khay moi chon. Cum 2 nut (khuon .chon-nhom cua man Cai dat): ban dang chon
      = ban duoc PHAT o day va ban duoc KEO THA / Mo thu muc. Lan dau chon "Khong tieng" main tao file "-khong-tieng.mp4"
      canh ban goc (khong nen lai hinh). Video quay khong co tieng thi khong co cum nay. */
+  /* 06/10 them o GIF vao CUNG cum do (mot mo hinh: chon ben nao thi ben do duoc keo tha). Video co tieng:
+     [Co tieng | Khong tieng | GIF]; video khong tieng: [Video | GIF]. Lan dau chon GIF main tao file ".gif" canh video,
+     o GIF hien "GIF 42%" trong luc tao (khong lo quy trinh, chi so %). GIF khong co tieng -> trinh phat tat tieng. */
   let nhomTieng = null
-  if (m.coNutTieng) {
+  if (m.coNutTieng || m.gifDuoc || m.chonGif) {
     nhomTieng = document.createElement('div')
     nhomTieng.className = 'chon-nhom chon-tieng'
     nhomTieng.setAttribute('role', 'group')
     nhomTieng.title = t('vd.chonTieng')
-    const bCo = nut('chon-nut', t('vd.coTiengNut'))
-    const bKhong = nut('chon-nut', t('vd.khongTieng'))
+    const bCo = m.coNutTieng ? nut('chon-nut', t('vd.coTiengNut')) : nut('chon-nut', t('vd.videoNut'))
+    const bKhong = m.coNutTieng ? nut('chon-nut', t('vd.khongTieng')) : null
+    const bGif = nut('chon-nut chon-gif', t('vd.gifNut'))
+    const cac = [bCo, bKhong, bGif].filter(Boolean)
+    let dangTao = false
+    const dat = (b, bat) => { b.classList.toggle('active', bat); b.setAttribute('aria-pressed', String(bat)) }
     const ve = () => {
-      bCo.classList.toggle('active', !m.boTieng); bKhong.classList.toggle('active', !!m.boTieng)
-      bCo.setAttribute('aria-pressed', String(!m.boTieng)); bKhong.setAttribute('aria-pressed', String(!!m.boTieng))
-      v.muted = !!m.boTieng
+      dat(bCo, !m.chonGif && !m.boTieng)
+      if (bKhong) dat(bKhong, !m.chonGif && !!m.boTieng)
+      dat(bGif, !!m.chonGif)
+      // Qua tran thoi luong / khong phai MP4: o GIF mo va noi ro ly do (tru khi ban GIF da co san)
+      const quaDai = !m.chonGif && m.ms > gifToiDaMs
+      const khongDuoc = !m.gifDuoc && !m.chonGif
+      if (!dangTao) bGif.disabled = quaDai || khongDuoc
+      bGif.title = khongDuoc ? t('vd.gifKhongHoTro') : quaDai ? t('vd.gifQuaDai', { s: Math.round(gifToiDaMs / 1000) }) : t('vd.gifGoiY')
+      v.muted = !!m.boTieng || !!m.chonGif
     }
-    const chon = async (coTieng) => {
-      if (!!m.boTieng === !coTieng) return
-      bCo.disabled = bKhong.disabled = true
-      let r = null
-      try { r = await window.video.chonTieng(m.id, coTieng) } catch (e) {}
-      bCo.disabled = bKhong.disabled = false
-      if (!r || !r.ok) { showToast(t('vd.khongBoDuocTieng')); return }
-      m.boTieng = !!r.boTieng
+    const nhan = (r) => { // trang thai main tra ve sau moi lan doi ban
+      m.boTieng = !!r.boTieng; m.chonGif = !!r.chonGif
+      if (r.bytesGif) m.bytesGif = r.bytesGif
       if (r.bytesXoa) { m.bytesXoa = r.bytesXoa; datTieuDeXoa() }
-      ve()
+      ve(); veMeta()
+    }
+    const khoa = (k) => { cac.forEach((b) => { b.disabled = k }); bXoa.disabled = k; if (!k) ve() }
+    const chon = async (coTieng) => {
+      if (dangTao || (!m.chonGif && !!m.boTieng === !coTieng)) return
+      khoa(true)
+      let r = null
+      try { r = m.coNutTieng ? await window.video.chonTieng(m.id, coTieng) : await window.video.chonGif(m.id, false) } catch (e) {}
+      khoa(false)
+      if (!r || !r.ok) { showToast(t('vd.khongBoDuocTieng')); return }
+      nhan(r)
+    }
+    const chonGif = async () => {
+      if (dangTao || m.chonGif) return
+      dangTao = true
+      khoa(true)
+      bGif.classList.add('dang-tao')
+      const hienPt = (p) => { bGif.textContent = t('vd.gifNut') + ' ' + Math.max(0, Math.min(99, Math.floor(p * 100))) + '%' }
+      if (!m.bytesGif) hienPt(0) // ban GIF da co san thi main tra ngay, khong can hien %
+      tienDoGif.set(m.id, hienPt)
+      let r = null
+      try { r = await window.video.chonGif(m.id, true) } catch (e) {}
+      tienDoGif.delete(m.id)
+      dangTao = false
+      bGif.classList.remove('dang-tao')
+      bGif.textContent = t('vd.gifNut')
+      khoa(false)
+      if (!r || !r.ok) {
+        const loi = r && r.loi
+        showToast(t(loi === 'dang-ban' ? 'vd.gifDangBan' : /^khong-ho-tro/.test(String(loi)) ? 'vd.gifKhongHoTro' : 'vd.gifLoi'))
+        return
+      }
+      nhan(r)
+      if (r.cat) showToast(t('vd.gifCat', { s: Math.round(gifToiDaMs / 1000) }))
     }
     bCo.addEventListener('click', () => chon(true))
-    bKhong.addEventListener('click', () => chon(false))
-    nhomTieng.append(bCo, bKhong)
+    if (bKhong) bKhong.addEventListener('click', () => chon(false))
+    bGif.addEventListener('click', chonGif)
+    nhomTieng.append(...cac)
     nhomTieng.ve = ve
   }
 
@@ -199,7 +248,10 @@ function taoHang(m, so) {
   v.addEventListener('loadedmetadata', () => {
     // So khong co co / thoi luong -> lay tu chinh file (thoi luong cua MP4 phan manh co the la vo han: khi do van an nhan)
     if (!(m.w && m.h) && v.videoWidth && v.videoHeight) { m.w = v.videoWidth; m.h = v.videoHeight; v.style.aspectRatio = m.w + ' / ' + m.h; veMeta() }
-    if (!m.ms && isFinite(v.duration) && v.duration > 0) { m.ms = Math.round(v.duration * 1000); nhanGio.textContent = thoiLuong(m.ms); nhanGio.hidden = false }
+    if (!m.ms && isFinite(v.duration) && v.duration > 0) {
+      m.ms = Math.round(v.duration * 1000); nhanGio.textContent = thoiLuong(m.ms); nhanGio.hidden = false
+      if (nhomTieng) nhomTieng.ve() // vua biet thoi luong: xet lai o GIF (qua tran thi mo di)
+    }
     try { v.currentTime = Math.min(0.1, (v.duration || 1) / 2) } catch (e) {}
   })
   v.addEventListener('seeked', () => {
@@ -248,6 +300,8 @@ async function init() {
   let data = null
   try { data = await window.video.getData() } catch (err) { console.error('Loi nap khay video:', err) }
   ds = (data && data.ds) || []
+  if (data && data.gifToiDaMs > 0) gifToiDaMs = data.gifToiDaMs
+  if (window.video.onGifTienDo) window.video.onGifTienDo((id, p) => { const f = tienDoGif.get(id); if (f) f(p) })
   veDanhSach()
 }
 

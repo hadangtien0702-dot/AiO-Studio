@@ -34,13 +34,13 @@ function polarGia({ han = Date.now() + 365 * NGAY } = {}) {
       if (hetHan) return loi(403, 'License key has expired.')
       if (p.may.size >= 2) return loi(403, 'License key activation limit already reached')
       const id = 'act-' + (++dem); p.may.set(id, b.label)
-      return tra(200, { id, label: b.label, license_key: { display_key: '****-ABCD', status: 'granted', expires_at: new Date(p.han).toISOString() } })
+      return tra(200, { id, label: b.label, license_key: { display_key: '****-ABCD', status: 'granted', expires_at: p.han ? new Date(p.han).toISOString() : null } })
     }
     if (duong === 'validate') {
       if (p.trangThai !== 'granted') return loi(404, 'License key is no longer active.')
       if (hetHan) return loi(404, 'License key has expired.')
       if (b.activation_id && !p.may.has(b.activation_id)) return loi(404, 'Not found')
-      return tra(200, { status: 'granted', display_key: '****-ABCD', expires_at: new Date(p.han).toISOString() })
+      return tra(200, { status: 'granted', display_key: '****-ABCD', expires_at: p.han ? new Date(p.han).toISOString() : null })
     }
     if (duong === 'deactivate') {
       if (!p.may.has(b.activation_id)) return loi(404, 'Not found')
@@ -297,6 +297,22 @@ else {
   }
   try { fs.chmodSync(file, 0o600) } catch (e) {}
   fs.rmSync(tam, { recursive: true, force: true })   // thu muc do bai nay tao (mkdtemp)
+}
+
+// [07/10] Tu hom nay Polar phat ma KHONG co ngay het han (gia $14.99, cap nhat tron doi): Polar tra expires_at = null.
+console.log('\n[13] Ma tron doi (Polar tra expires_at = null)')
+{
+  const p = polarGia({ han: null }), m = mayMoi(p)
+  let r = await m.bq.kichHoat(p.key)
+  kiem('kich hoat ma khong co han -> da kich hoat, cho chup', r.ok && r.trangThai.loai === 'da-kich-hoat' && r.trangThai.choPhepChup, JSON.stringify(r))
+  kiem('khong co ngay het han, KHONG bao het quyen cap nhat', r.trangThai.hetHan === null && r.trangThai.hetQuyenCapNhat === false && !r.trangThai.khongGiuMay, JSON.stringify(r.trangThai))
+  m.dongHo.t += 3 * 365 * NGAY
+  await m.bq.kiemTra()
+  const s = m.bq.trangThai()
+  kiem('3 nam sau, kiem lai voi Polar: van kich hoat, van khong het quyen cap nhat', s.loai === 'da-kich-hoat' && s.choPhepChup && s.hetHan === null && s.hetQuyenCapNhat === false, JSON.stringify(s))
+  kiem('van giu cho 1 may tren Polar (huy duoc de doi may)', p.may.size === 1 && !!m.kho().activationId)
+  r = await m.bq.huyKichHoat()
+  kiem('huy kich hoat: Polar con 0 may', p.may.size === 0, JSON.stringify(r))
 }
 
 console.log(`\nKET QUA: ${dat} DAT / ${truot} TRUOT`)

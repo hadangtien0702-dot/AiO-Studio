@@ -1,5 +1,31 @@
 # PROGRESS — AiO Shot & Save
 
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **Ban dang chay may cong ty: van 0.8.0, nap lan 29 (boot 14:59:08), `app.asar` md5 `a1e5b05b`.** CHUA dong goi lai (bo cai
+>   0.8.0 trong Release la ban 01/10 19:22, thieu moi thu tu 02/10), CHUA tang so phien ban: anh dan *"con ban cai thi khi nao
+>   anh bao moi xuat ra ban moi"*.
+> - **06/10 them 4 tinh nang, tat ca da nap, anh CHUA bao test xong:** xuat GIF tu Khay video · but ve tay (phim 7) + da quang
+>   (phim 8) · chup cuon trang dai (phim 9) · (02/10) danh so buoc (phim 6). Kem: thanh cong cu sap lai (V dau, day so, chu,
+>   day mau), hang nut khay doi 10 px, anh ghim cao hon man tu thu nho, icon nut 9 = Tabler `arrow-autofit-height` (anh chon).
+> - **CHUP CUON: 3 ban sua trong ngay sau khi anh dung that.** 12:42 chay duoc (1178x4103). 12:53 hong tren bai Facebook co
+>   video -> ban 13:02 (duong "ben") -> luot 13:03 noi 2.233 px roi 'lac' 19 khung cuoi (thanh menu dinh + video) -> ban 13:10.
+>   ☠️ **Ban 13:10 va ban ECC 14:59 CHUA co luot chup cuon that nao** (run-log sau 14:59 chi co khay bung / thu).
+>   [CHO ANH] chup cuon lai dung bai Facebook do; phien sau doc dong `chup-cuon ... ben=N chuoi=...` trong run-log.
+>   [CHO ANH QUYET] khi mat dau giua chung: dung sach nhu hien nay, hay noi tiep va chap nhan co vet noi.
+> - **ECC soat 14:59: 8/8 diem that da sua** (muc [0.8.0 nap lan 29]). Diem 1, 2, 3, 8 (xoa video / GIF dua nhau) chua co bai kiem
+>   tu dong, chua tai hien tren app that.
+> - **Bai kiem (chay an):** `test:chupcuon` 38/38 · `test:xuatgif` 58/58 · `test:khovideo` 76/76 · `test:butve` 65/65 ·
+>   `test:sobuoc` 72/72.
+> - **WEB da len live 06/10** (anh bao *"update lên website tính năng mới đi em"* giua luc dang test): 13 -> 17 the / canh
+>   trong rap; toi uu dien thoai 14:17; sua theo ECC 15:18. `origin/main = 39d61cd`, md5 live = blob git. Nhat ky web o
+>   `PROGRESS.md` GOC repo. ☠️ CHUA co so do do muot tren dien thoai that; 3 cho ve nang moi khung (bong 200vmax cua khung chon,
+>   anh dai canh Chup cuon doi `height`, video gia ghi `left`) CHUA sua. [CHO ANH] iPhone hay Android, cho nao chua muot.
+> - **GIT:** viec app nam o nhanh `may-cong-ty` tren GitHub (`main` tren may dang giu, KHONG push `main`: main la ban live +
+>   luat 01/10). Viec web day rieng len `main` bang worktree tach tu `origin/main`.
+> - **POLAR (06/10):** gia da doi $14.99 (doc lai tren trang thanh toan). CON: ma ban quyen van "het han 1 nam" + ten benefit con
+>   "+ 1 year updates" (cho anh gat), to chuc con "test mode" nen nut Pay khoa (cho anh xong xac minh; Claude khong nhap giay to).
+> - (cac dong ben duoi la trang thai 02/10 tro ve truoc, giu de tra)
+> - ~~sua 2026-10-02 15:48 +0700 (dang lam do, chua /xong)~~
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — sua 2026-10-04 13:53 +0700 (may Mac; ban moi DA CAI vao /Applications, CHO anh bat quyen quay man hinh)
 > - **04/10 17:41: THEM KIEU LAM MO THU BA "TO KIN" (thanh den dac che han; anh chon "Them kieu lam mo" trong bang hoi). DA NAP
 >   (`app.asar` `2df69edd`).** `npm run test:chekin` 40/40 (doc diem anh 3 ti le man, co doi chung). Chon o Cai dat > Kieu lam
@@ -191,6 +217,360 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.9.0] - 2026-10-07 14:07 - DONG GOI bo cai 0.9.0 (anh: "xuat ban moi") + bai kiem ma ban quyen TRON DOI - may cong ty
+
+**Boi canh.** Anh chot ban qua Polar da duoc duyet nhan tien (07/10 13:31) va bao: "chon A, xuat ban moi roi tao ma giam 100% di em" (A = gan bo cai
+vao san pham tren Polar). Bo cai gan nhat (0.8.0, 01/10) thieu GIF, but ve, chup cuon, danh so ma web dang quang cao.
+**Da lam.** (1) `package.json` 0.8.0 -> 0.9.0 (ma nguon KHONG doi so voi lan nap 29 ngay 06/10 14:59, chi doi so). (2) `npm run dist` ->
+`dist/AiO-Shot-and-Save-Setup-0.9.0.exe` 96.182.083 byte (96,2 MB), chep vao `Release/AiO Shotandsave/win/` (md5 hai ben `e00d2df034ef`,
+sha256 `ddab7277...165a67f`). (3) `scripts/test/do-ban-quyen.mjs`: Polar gia tra `expires_at: null` khi ma khong co han + nhom [10] "Ma tron doi"
+(kich hoat, khong bao het quyen cap nhat, 3 nam sau kiem lai van kich hoat, huy de doi may). Tu 07/10 moi ma Polar phat ra deu KHONG co ngay het han.
+**Kiem chung.** Truoc khi dong goi, 9 bai kiem chay an deu DAT: banquyen 27/27 (nay 32/32 sau khi them nhom [10]; doi chung: luc Polar gia con tra ngay
+1970 thi bai moi TRUOT dung 1 muc) · khodai 11/11 · khovideo · chupcuon · botieng · sobuoc · butve · khaynut · xuatgif. Ban dong goi: `package.json` trong
+`app.asar` ghi 0.9.0, co du 6 file moi (xuat-gif, chup-cuon, khay-thu, kho-video, banquyen, gif/gif.js); chay khong cua so
+`"dist/win-unpacked/AiO Shot & Save.exe" --thu-ocr <anh> <ra.json>`: tu bao ban 0.9.0, dongGoi true, doc 13 dong chu trong 1,2 giay, khong loi.
+**Bay vap (da go).** `npx asar extract-file <app.asar> package.json` ghi file ra THU MUC DANG DUNG -> de mat `package.json` cua app bang ban rut gon 11
+dong trong goi (mat 28 lenh + cau hinh dong goi). Lay lai bang `git checkout -- package.json` roi doi lai so; `git diff` chi con dung 1 dong so phien ban.
+Bo cai da dung TRUOC luc bi de nen khong anh huong. Lan sau trich file tu asar: `cd` vao thu muc tam truoc. Lan dong goi dau chay khi so chua kip doi
+(hook chan lan sua dau) nen `dist/` co them mot file 0.8.0 moi dung; ban 0.8.0 phat hanh 01/10 trong `Release/` khong bi dung.
+**CHUA lam / chua do.** CHUA cai de ban 0.9.0 len may anh (app dang cai van la 0.8.0 + nap tai cho, cung ma nguon) · CHUA chay bai kiem bat cua so
+(selftest, khay, quay app) vi anh dang ngoi may · CHUA gan bo cai len Polar (cong cu tai file cua Claude gioi han 10 MB, buoc tai 96 MB qua may chu tam
+bi lop bao ve cua phien chan) · CHUA mua thu bang ma giam 100% `THUSYM8FR` (da tao, toi da 2 lan) · ban Mac 0.9.0 chua dung (can GitHub Actions) ·
+ma van o nhanh `may-cong-ty`, CHUA gop `main` · 12 bo cai cu trong Release chua xoa (cho anh gat).
+
+## [/xong] - 2026-10-06 15:51 - Chot so (may cong ty): 4 tinh nang moi + web 17 canh + 2 luot ECC, van 0.8.0, chua dong goi
+
+**Khong sua ma trong muc nay.** Chi chot so. Ma nguon giong lan nap 14:59 (`app.asar` md5 `a1e5b05b`).
+**Da ghi.** Khoi TRANG THAI dau file (viet lai cho 06/10) · `CLAUDE.md` cua app (chup cuon 38/38, ly do `mat-nguon`, 3 cuoc dua
+GIF / xoa video) · `CLAUDE.md` goc repo (dong 12 + viec cho) · brain tong (2 dong) · so bai hoc thiet ke (icon).
+**Run-log sau 14:59.** Anh van dung app: 15:30 bung khay 933 ms (bay 27 khung, bung 25 khung), 15:30 khay tu thu sau 5 giay,
+15:49 an han nut tron. Khong co dong LOI / CANH BAO. KHONG co luot chup cuon, GIF, but ve nao sau 14:59.
+**[CHO ANH]** (1) chup cuon lai bai Facebook co video · (2) bam GIF tren mot video roi keo vao Zalo / Messenger · (3) but 7 / da
+quang 8 / so 6 tren anh that · (4) web tren dien thoai that: may gi, cho nao chua muot · (5) khi chup cuon mat dau: dung sach hay
+noi tiep · (6) bao "test xong het" thi em moi dong goi + tang so phien ban + gop `may-cong-ty` vao `main`.
+**[CHUA LAM, ly do]** 3 cho ve nang tren web (khong co dien thoai that de do, sua mu de hong) · bai kiem tu dong cho 4 cuoc dua
+trong `main.js` (can dung app that co cua so) · font Inter bi chan o man chup / anh ghim (thay tu truoc, chua do goc).
+
+## [0.8.0 nap lan 29] - 2026-10-06 14:59 - ECC soat lai viec hom nay: sua 8 diem o GIF / xoa video / chup cuon
+
+**Boi canh.** Anh: *"dùng ecc để test lại đi em"*. Giao `ecc:silent-failure-hunter` soat moi thay doi cua app tu `083cd26` toi HEAD
+(chi doc, 226 nghin token, 103 giay). No bao 8 diem; em DOC LAI MA xac nhan tung diem roi moi sua (khong diem nao bi bac).
+**Da sua.**
+| # | Loi (kich ban) | Sua o dau |
+|---|---|---|
+| 1 | Xoa video giua luc dang tao GIF -> GIF van ghi ra, so khong con muc -> file `.gif` mo coi | `main.js video:chon-gif`: xong thi kiem lai so + file goc, mat thi go GIF vua tao |
+| 2 | Xoa: ban goc vao Thung rac roi GIF bi khoa -> tra loi, hang bien khoi khay, GIF mo coi | `video:xoa`: ban dan xuat di TRUOC (hong thi ghi log), ban goc di SAU |
+| 3 | Tat app giua luc ghi GIF -> `.gif.tam` nam lai mai | `khoiPhucVideoDo()`: go file dung mau ten `shotandsave-video-*.gif.tam`, cu hon 1 phut |
+| 4 | Chup cuon nem loi -> chi ghi log, nguoi dung khong thay gi | `handleConfirm`: them thong bao |
+| 5 | Khung doi co giua phien cuon (doi do phan giai) -> doc sai be rong, hang rac, khong bao 'lac' | `chup-cuon.js chayPhien`: bo qua khung khac co voi khung dau |
+| 6 | Bam chup cuon luc dang quay / dang cuon -> thoat im lang | `chupCuon`: ghi log ly do |
+| 7 | Da co anh ma nguon khung chet -> lap toi het 3 phut | `chayPhien`: 50 lan lien khong co khung = dung, ly do `mat-nguon`, van luu phan da ghep + thong bao `cuon.matNguon` (VI + EN) |
+| 8 | Dang tao GIF ma chon lai "Co tieng" -> GIF xong gianh lai lua chon | `gifDangTao` / `gifBoChon`: GIF xong chi ghi `fileGif`, khong doi lua chon |
+**Kiem chung.** `test:chupcuon` 38/38 (them [14] 3 muc: khung doi co bi bo qua va anh van khop tung diem anh; nguon chet dung sau 315
+ms thay vi cho het gio; mat khung le te khong dung som + 1 muc day noi), `test:xuatgif` 58/58, `test:khovideo` 76/76. Nap 14:59:08,
+`app.asar` md5 `a1e5b05b`; 724 anh + 9 dai + cau hinh giong truoc.
+**CHUA do.** Diem 1, 2, 3, 8 (cac cuoc dua trong `main.js`) KHONG co bai kiem tu dong: moi kiem bang doc ma + cac bai hoi quy khong
+vo. Chua tai hien tren app that (xoa video luc GIF dang chay, tat app giua luc ghi GIF).
+**Nguoi soat bao SACH:** bo ghep (`them`, `layAnh`), but ve / da quang (ham giong nhau tung byte o 2 file), `createPinWindow`,
+tach MP4 + `VideoDecoder`. No ghi chu: duong "ben" co the nhan do lech sai khi vung video doi hinh (thiet ke, da ghi trong so).
+
+## [0.8.0 nap lan 28] - 2026-10-06 14:06 - Doi icon nut 9 (chup cuon) theo icon anh chon
+
+**Boi canh.** Anh: *"icon số 9 xấu quá em"* (to giay + mui ten). Em ve 4 kieu, anh: *"cả 4 đều xấu"*. Dua 8 icon co san cua bo
+Tabler dat dung co that tren thanh cong cu, anh chon *"số 3 (Kéo dài theo chiều cao)"* = Tabler `arrow-autofit-height` (MIT).
+**Da sua.** `src/overlay/index.html`: net ve cua nut `data-tool="cuon"` lay nguyen van tu `@tabler/icons@3.19.0` (5 net), do day
+1.9 nhu cac nut ben canh. Web cung doi (commit `222d755`, da live).
+**Kiem chung.** `test:chupcuon` 34/34, `test:butve` dat; nap 14:06:00, `app.asar` md5 `56aa49da` co net moi; 717 anh + 9 dai + cau
+hinh giong truoc. CHUA co: anh nhin tren app that.
+**Bai hoc.** Icon la viec ve gu: 3/4 kieu em tu ghep net bi che. Lan sau dua icon co san cua mot bo ve chuyen nghiep (Lucide /
+Tabler), dung co that tren thanh that, cho anh bam chon; khong tu ve.
+
+## [0.8.0 nap lan 27] - 2026-10-06 13:10 - Chup cuon: thanh menu DINH + video cung nam trong vung (luot that 13:03 con 'lac' 19 khung cuoi)
+
+**Boi canh.** Sau ban 13:02 anh thu lai ngay (khong nhan gi them). Run-log 13:03:34: `chup-cuon dung sau 10332 ms: 1293x2233 khung=84
+them=9 dung=55 lac=19 ben=3 chuoi=...TddddddddTddddddd'T'dLT'LLLLLLLLLLLL` -> noi duoc 2.233 px (luot 12:53: 0), duong ben chay 3 khung,
+roi 'lac' het doan cuoi. Cung luot: `pin thu nho cho vua man: 862x1489 -> 783x1352` = ban sua nut tat 12:44 DA chay tren man that
+(12:55:41 cung co: 832x2414 -> 466x1352).
+**Nguyen nhan (anh luu 130334-545.jpg + doc ma + tai hien).** Vung khoanh co ca THANH MENU Facebook dinh tren dau (khong troi theo
+trang) LAN video doc -> HAI khoi khong khop; luat "chi mot khoi lien nhau duoc phep khong khop" cua ban 13:02 tu choi. Muc [13]
+(thanh dinh 90 px co noi dung + video): ban 13:02 'lac' ngay khung cuon dau tien.
+**Da sua** (`src/chup-cuon.js timLechBen`): (1) hang khop khi KHONG troi = hang dung yen (thanh dinh): bo ra khi xet do lech khac 0;
+co do lech khac 0 dat thi lay no, khong co moi xet "dung yen". (2) Sai so tinh tren moi hang ngoai khoi video (khong chi bang tot).
+(3) SOI KY tung hang cho d - 2 .. d + 2 quanh do lech da chon.
+☠️ Bay bai do bat duoc: anh dai thieu 2 / 1330 hang. Vong tim chi so moi 2 hang (`BUOC_HANG`); khoi hinh soc deu 6 px thi lech
+dung 1 px lot qua ke (59 / that 60: diem 79 / 78, sai so 0,477 / 0,460) -> buoc (3).
+**Kiem chung.** `npm run test:chupcuon` 34/34: [13] cao 1330 / 1330, lech 1,38 / 1,27, 0 lac + doi chung ban 13:02 'lac' o khung 4.
+Nap 13:10:23, `app.asar` md5 `bb791bf3`, co `khongBoDinh`; 706 anh + 9 dai + cau hinh giong truoc.
+**CHUA do / gioi han.** Chua co luot that sau 13:10. Khi video (dang chay) chiem HET vung, khong con hang nao cua trang de bam
+-> van 'lac' (video trong bai do doi hinh hoan toan moi khung; video that it doi hon, co bam duoc khong: chua do). Da 'lac' roi
+ma cuon tiep thi phan sau KHONG duoc noi (phai cuon nguoc lai); tren man chua co loi nhac. Video trong anh dai bi ghep tu nhieu
+thoi diem (anh 13:03: video Mudena bi cat khuc). Chua quyet: khi 'lac' thi dung sach nhu hien nay hay noi tiep co vet noi.
+
+## [0.8.0 nap lan 26] - 2026-10-06 13:02 - Chup cuon: het "lac" khi vung khoanh co VIDEO (bai Facebook), CHO ANH THU LAI
+
+**Boi canh.** Anh: *"scroll không được nữa rồi em"*. Run-log 12:53:36: `chup-cuon dung sau 10483 ms: 1044x1102 khung=82 them=0
+dung=2 lui=0 lac=79` (luot 12:42 cung cho tren man phu thi noi 13 lan, 0 lac).
+**Nguyen nhan (anh luu + doc ma + tai hien).** Anh luu `shotandsave-2026-10-06-125336-913.jpg` (khung dau cua phien): bai Facebook co
+VIDEO chiem ~75 % chieu cao, o video DEN. Bo ghep tinh chi phi TRUNG BINH ca khung (moi hang chan tran 10, nguong 3,2): khoi video
+doi hinh (co hinh lai sau khi cua so chup dong / dang chay) chiem > 32 % so hang la vuot nguong voi MOI do lech -> 'lac'; da 'lac'
+thi khung moc khong doi nen lac toi het phien. Bai do muc [11] dung trang gia co video 72 % chieu cao (den 3 khung dau roi doi
+hinh moi khung): bo ghep cu ra DUNG chuoi cua run-log (dau, dung, dung, lac het, them = 0).
+☠️ Phan SUY RA, chua do duoc: video co hinh lai luc nao sau khi cua so chup dong (chi biet o den dung yen thi khong the 'lac').
+**Da sua.** `src/chup-cuon.js`: them duong "BEN" `timLechBen()` chi chay khi cach trung binh khong khop: chia phan chong thanh bang
+32 px, bang "tot" khi >= 85 % hang co noi dung khop (lech <= 2,5 / dai); nhan mot do lech khi co >= 3 bang tot, >= 24 hang khop,
+va BO KHOI KHONG KHOP DAI NHAT ra (video) thi phan con lai khop >= 85 %. Khung dau duoc THAY bang khung moi nhat neu noi dung doi
+truoc khi cuon (o video den -> co hinh). Bo dem them `ben` + `chuoi` (80 khung dau, moi khung 1 chu: d / T / u / L, dau `'` = duong
+ben); `main.js` ghi 2 so nay vao dong `chup-cuon` cua run-log.
+☠️ Ban dau cua duong ben (3 bang tot, nguong 4) KHOP NHAM mot trang khac han (muc [12] bat: mot khoi anh chuyen mau trung do sang)
+-> siet nguong 2,5 + luat "chi mot khoi lien nhau duoc phep khong khop".
+**Kiem chung.** `npm run test:chupcuon` 31/31 (truoc 25): [11] 3 muc + doi chung cach cu; [12] cuon vuot phan chong va trang khac
+van 'lac'; [9] ca video qua JPEG q85 THAT cua Electron: cao 2040 / 2040, lech 1,37, 0 lac. Ca xau nhat (2400x1300, khung nao cung
+la trang khac): 34-47 ms / khung. Nap 13:02:53, `app.asar` md5 `90130822`, co `timLechBen`; 705 anh + 9 dai + cau hinh giong truoc.
+**CHUA do.** Chua co luot nao tren man that sau ban sua (cho dong `chup-cuon ... ben=.. chuoi=..`). Video cao hon ca vung khoanh
+(khong con hang nao ngoai video) van se 'lac'. Video di vao tu duoi trong luc cuon se bi ghep tu nhieu thoi diem (hinh video trong
+anh dai co the bi cat khuc). Trang co hoa tiet lap + cuon vuot phan chong: van khong phan biet duoc (co tu truoc). Da 'lac' that
+thi van phai cuon nguoc lai moi bat lai duoc, tren man CHUA co loi nhac.
+
+## [0.8.0 nap lan 24-25] - 2026-10-06 12:44 - Anh ghim lon hon man: hien thu nho cho vua man (anh cuon dai khong con mat nut tat)
+
+**Boi canh.** Anh thu lai chup cuon: *"chụp dài được luôn rồi mà khi anh bấm vào xem ảnh nó không có nút tắt em"*, roi *"anh đang
+để 1 tấm dài thòng ở desktop nè"*. => ban sua 11:31 CHAY tren man that: run-log 12:42:13 `chup-cuon dung sau 6174 ms: 1178x4103
+khung=52 them=13 dung=38 lac=0`.
+**Nguyen nhan that (run-log).** `[pin 14] data dip=785x2735 DPR=1.5 win=812x1394`: anh can 2735 DIP chieu cao, Windows kep cua so
+con 1394 (bang man) -> noi dung cao gap doi cua so, thanh co nut tat nam ngoai man. `createPinWindow` chua bao gio xet anh lon
+hon man (truoc khi co chup cuon khong co anh nao cao hon man).
+**Da sua.** `main.js createPinWindow()`: anh lon hon vung lam viec cua man (tru le) thi kich thuoc HIEN duoc thu nho cho vua va cua
+so duoc dat nam tron trong man; ghi run-log `pin thu nho cho vua man: ... -> ...`. Anh that khong doi (pin.js da xuat theo ti le
+anh that / kich thuoc hien).
+**Kiem chung.** `node --check`; `test:butve` 68, `test:sobuoc` 72 (anh ghim) dat; doc lai `app.asar` dang chay: CO doan sua. Nap
+12:44 (lan 24 nap nham ban CU vi hook chan lan sua ma chuoi lenh van chay; app khoi dong lai nen tam treo tren man da dong).
+**CHUA do.** Chua co luot nao mo anh cuon tren man that sau ban sua (cho dong `pin thu nho cho vua man` trong run-log + anh xac
+nhan thay nut tat). Anh cuon rat cao hien thu nho thi chu se nho: muon doc ro phai mo file. Chua co bai do tu dong cho
+`createPinWindow` (nam trong main.js, khong tach duoc ra de chay an).
+
+## [0.8.0 nap lan 23] - 2026-10-06 11:31 - Chup cuon: sua loi "khong hoat dong" khi chi MOT cot cua vung khoanh cuon
+
+**Boi canh.** Anh thu lan dau tren man that roi bao: *"chụp cuộn không hoạt động em nha"*.
+
+**Nguyen nhan that (doc run-log + mo anh da luu).** Run-log 11:28:22: vung 1715x904 (2573x1356 diem anh) tren man 4K, phien
+chay 3920 ms, **27 khung: 26 'dung', them = 0**, luu ra dung 1 anh thuong. Mo anh do: vung khoanh la app Claude co HAI khung
+tro chuyen canh nhau + thanh ben, nen toi. Lan chuot chi cuon MOT khung; phan con lai cua be rong dung yen. Bo ghep so ca chieu
+ngang nen do lech d = 0 luon re nhat -> coi la "trang dung yen". Bai do 23/23 luc 10:59 chi co trang cuon HET be rong (mau thu chi
+phu vung em nghi ra).
+
+**Da sua.**
+- `src/chup-cuon.js timLech()`: truoc khi tim do troi, do tung DAI COT xem dai nao khac nhau khi khong troi (dang chuyen dong);
+  chi dung cac dai do de tinh chi phi va de dem "hang co noi dung". Khong dai nao doi (< 1,0) moi la 'dung'.
+- Thuoc canh vien: thay dong ho dem giay bang CHIEU CAO da ghep ("1.240 px", tang moi lan noi them hang) de nguoi dung biet app
+  dang ghep (`src/dem/quay.js datChu`, `main.js moVienQuay().datChu` + `baoTrangThai`).
+
+**Kiem chung.** Dung lai DUNG ca cua anh trong `test:chupcuon` (muc [10]: mot cot 53 % be rong cuon, phan con lai la man hinh co
+chu dung yen, nen toi do tuong phan thap). Tren bo ghep CU: cao 600 / 1890, khong noi hang nao (TRUOT = tai hien dung). Sau khi
+sua: cao 1890 / 1890, cot cuon lech 0,29 / kenh so voi trang goc. **25/25 DAT** (23 muc cu khong doi ket qua; trang trang phang
+gio ra 'dung' thay vi 'lac'). `test:butve` 68, `test:khovideo` 76, `test:vienquay`: dat. Nap 11:31.
+
+**CHUA do.**
+- Anh CHUA thu lai tren man that sau ban sua. Em chi co MOT luot that de doi chieu (11:28); ca do duoc dung lai bang trang gia,
+  khong phai bang chinh app Claude dang cuon.
+- So "px" tren thuoc chua duoc nhin tren man that (chi doc ma + kiem cu phap).
+- Phan dung yen trong vung (khung ben canh, thanh ben) se bi lap lai o cac hang noi them: dung ra chi nen khoanh dung cot can cuon.
+- Cac gioi han cu van con: thanh co dinh o day vung, khoang trang phang cao hon vung, cuon ngang.
+
+## [0.8.0 nap lan 22] - 2026-10-06 11:19 - Thanh cong cu: vach "|" ngan nut V (phim chu) voi day nut danh so
+
+**Boi canh.** Anh: *"ở thanh menu khi anh drag xong phím tắt chứ "V" và sẽ thêm dấu | phân vùng với số 1-2-3-4-5-6-7..."*.
+Em hieu: tren thanh cong cu hien sau khi keo chon vung, nut V (phim tat la CHU) dung lien voi nut so 1 nen nhin nhu cung mot
+nhom -> them vach ngan. Nut V da co chu "V" o goc tu truoc (27/09).
+**Da sua.** Them `<span class="chia chia-v">` ngay sau nut V trong `src/overlay/index.html` va `src/pin/index.html` (luat `.chia`
+co san: 1 x 20 px). Anh ghim luc chua vao che do ve van an moi vach nhu cu.
+**Kiem chung.** `test:butve` 67/67 (them 2 muc: vach nam ngay sau nut V, truoc nut so 1, o ca hai trang; thanh van nam tron
+trong man: 100..842 / 1200), `test:sobuoc` 72, `test:chupcuon` 23. Da CHUP thanh cong cu cua man chup that (cua so an, 200 %)
+va mo ra nhin: `V | 1 2 3 4 5 6 7 8 S R 9 | mau | hoan tac | x | v`. Nap 11:19, anh/video 700 -> 700.
+**11:22 ANH CHOT THU TU:** *"v ở ở đầu - tới dãy số - rồi tới chữ - tới dãy màu"* -> `V | 1 2 3 4 5 6 7 8 9 | S R | mau`. Da doi
+nut 9 (chup cuon) ve lien sau nut 8 va them vach `chia-chu` truoc hai nut chu S, R (`src/overlay/index.html`). `test:butve` 68/68
+(them 1 muc doc thu tu tu chinh file: `V | 1 2 3 4 5 6 7 8 9 | S R | MAU`), `test:sobuoc` 72, `test:chupcuon` 23; da chup lai thanh
+that va mo ra nhin (`.selftest/thanh-cong-cu-06-10.png`); nap 11:22. Anh ghim khong co nut chu nen chi co vach sau nut V.
+Them nut moi vao thanh: dat dung nhom (so / chu) va giu 3 vach ngan.
+
+## [0.8.0 nap lan 21] - 2026-10-06 10:59 - TINH NANG MOI: chup cuon trang dai (phim 9), CHUA chay tren man that
+
+**Boi canh.** Tinh nang 3/3 cua luot anh chot 06/10 (*"Chụp cuộn trang dài"*). ROADMAP muc 0 so 5 (em tung ghi "lon, rui ro cao nhat").
+
+**Da lam.** Khoanh vung -> nut Chup cuon (icon trang + mui ten xuong, so 9) hoac phim **9** -> cua so chup dong, hien vien cam +
+dong ho + nut **Xong** NGOAI vung (dung chung bo vien / dong ho cua quay video) -> nguoi dung TU LAN CHUOT cuon trang xuong
+-> app lay khung cua vung tu luong chup chay san va ghep -> bam Xong (hoac bam lai phim tat chup) -> MOT anh dai vao khay
+nhu anh chup thuong (luu theo dinh dang anh dang cai). Tran: 3 phut, 16.000 diem anh chieu cao. Em chon cach "nguoi dung tu
+cuon" (nhu CleanShot) thay vi "app tu cuon" (nhu ShareX: phai gia lap chuot vao app khac, rieng tung he dieu hanh); bo ghep
+dung chung cho ca hai nen sau them tu cuon khong phai lam lai. Anh CHUA duyet lua chon nay.
+- `src/chup-cuon.js`: bo ghep `taoBoGhep()` (khong phu thuoc Electron) + vong lap mot phien `chayPhien()`.
+- `main.js`: `chupCuon()`, nhanh `payload.cuon` trong `handleConfirm`, `moVienQuay(..., 'cuon')` doi chu nut thanh "Xong",
+  nut `quay:dung` va phim tat chup deu dung duoc phien cuon. `overlay.js` + `index.html`: nut + phim 9. 5 khoa chu VI + EN.
+
+**Bo ghep tim do troi the nao.** Moi hang thu gon thanh 12 so (do sang 12 dai cot). Thu moi do lech d (am = cuon nguoc), lay d
+co chi phi nho nhat, voi 3 dieu kien: chi phi <= nguong · phan chong nhau co >= 10 hang "co noi dung" · chi phi moi hang bi
+chan tran (thanh co dinh khong pha duoc ket qua). Khong khop thi bao 'lac' va KHONG noi gi (cuon nguoc lai mot chut la bat lai).
+
+**3 loi cua chinh bo ghep, bat duoc bang trang gia co dap an truoc khi nap:**
+1. Gop "chon nho nhat" voi "uu tien troi it" trong mot vong (cho lech 15 %) -> co thanh co dinh thi anh dai lech 1 hang (2679
+   thay vi 2680). Tach 2 luot, chi hoa tiet lap that (lech <= 2 %) moi xet "troi it".
+2. Nguong "hang co noi dung" = 6 nam dung muc nhieu JPEG (~6,4) -> trang trang phang bi BIA ra do cuon. Nang len 24.
+3. "Hang co noi dung = khac hang ke" bo sot cac hang giua mot dong chu -> 12 / 42 khung bi tu choi oan. Them dieu kien "cac
+   dai cua hang khac nhau ro".
+
+**Kiem chung.** `npm run test:chupcuon` (MOI, chay an): **23/23 DAT**.
+- Trang gia 900 x 5200 (dong chu, khoi anh, khoang trang 380 px, bang 8 hang giong het), cua so 600 px, nhieu +-3:
+  cuon het trang (buoc 5..410 px, co dung va cuon nguoc, 42 khung) -> anh dai cao DUNG 5200, tung diem anh lech 1,19;
+  buoc 590 px (vuot phan chong) -> 'lac', khong noi bua, cuon nguoc lai thi bat lai; thanh co dinh 50 px; trang trang
+  phang khong noi gi; tran 1500 dung dung 1500. DOI CHUNG: anh ghep lech 1 hang -> lech 1,19 -> 6,12; trang khac -> 'lac'.
+- Co that 2400 x 1300 (man 4K 150 %): ghep dung, 15 ms / khung (cham nhat 23 ms; app lay 5 khung / giay).
+- Trong Electron an: man chup that, phim 9 va bam nut deu gui dung 1 lenh `{ rect, cuon: true }`; khung di qua DUNG duong anh
+  cua app (nativeImage -> JPEG q85 -> toBitmap): ghep dung 3020 / 3020, lech 1,24; anh dai ra PNG 900x3020; khong ai bam
+  Xong thi tu dung o tran thoi gian; luong chup khong tra khung thi bo, khong treo.
+- Hoi quy (ghi ra file rieng, dung o bai truot): `test:butve` 65, `test:sobuoc` 72, `test:xuatgif` 58, `test:khovideo` 76,
+  `test:nutkhay` 54, `test:khaynut` 31, `test:vienquay`: 0 truot. Nap 10:59 (boot 10:59:22, anh/video 698 -> 698).
+
+**☠️ CHUA do / CHUA lam (phan lon nhat cua tinh nang nay con o day).**
+- **CHUA co luot nao tren man THAT**: vien + nut Xong co hien dung khong, lan chuot co toi app ben duoi khong, khung lay tu
+  luong chup that (5 khung / giay) co ghep duoc khi cuon bang banh xe chuot / cuon muot cua Chrome khong. Muon thu phai cuon
+  mot cua so that tren man anh -> can anh bam thu, hoac cho em gio de em mo mot cua so thu.
+- Trang co thanh co dinh o DAY vung (footer dinh): phan do se bi noi lap lai moi lan -> phai khoanh vung khong gom no.
+- Di qua mot khoang trang PHANG cao hon vung khoanh: khong co gi de bam -> ghep dung lai o do.
+- Cuon NGANG khong ho tro. Vung vat 2 man khong co nut. Anh dong / video trong vung lam khung khong khop ('lac').
+- Dong ho tren thuoc hien THOI GIAN, chua hien chieu cao da ghep; chua co chu nhac "cuon cham lai" khi 'lac' lien tuc.
+- Chua len web, chua tang so phien ban, chua dong goi, Mac chua thu.
+
+## [0.8.0 nap lan 20] - 2026-10-06 10:49 - TINH NANG MOI: but ve tay (phim 7) + but da quang (phim 8) o man chup va anh ghim, cho anh bam thu
+
+**Boi canh.** Tinh nang 2/3 cua luot anh chot 06/10 (*"Bút vẽ tay + bút dạ quang"*). ROADMAP muc 0 so 2.
+
+**Da lam.** Hai cong cu moi tren thanh cong cu cua man chup VA anh ghim (icon Lucide pencil / highlighter, so 7 / 8):
+- Giu chuot keo = MOT net theo tay; giu Shift = duong thang tu diem dau (gach chan / to mot dong chu); bam roi tha = mot cham.
+- But: net 3 px dac (bang khung / mui ten). Da quang: net 16 px, trong 40 % (chu ben duoi van doc duoc). Dung bang 7 mau dang co.
+- Net la mot shape nhu cac shape khac: cong cu V chon / keo / Delete, phim mui ten nhich 1 px, Ctrl+Z, keo to khung chup thi
+  net dung yen tren man, ra anh ghep (man chup) va anh luu (anh ghim) dung cho.
+- Ma: shape `{ type: 'but' | 'daquang', pts: [x0, y0, ...] (DIP cuc bo), color }`; hang `NET` + 6 ham (`doDayNet`, `veNet`,
+  `hopNet`, `cachNet`, `dichNet`, `themDiemNet`) GIONG HET trong `overlay.js` va `pin.js`. Net ve bang MOT lenh stroke (cho tu
+  de len chinh no khong dam mau), di qua trung diem cac doan bang duong cong bac 2 (tron, khong gay khuc).
+
+**Kiem chung.** `npm run test:butve` (MOI, chay an, 3 ti le 100 / 125 / 150 %): **65/65 DAT**. Doc DIEM ANH tren canvas va tren
+anh xuat ra: net but (248,104,32) dac, cach tam 6 px la trong; da quang (255,204,0) alpha 102 = 40 %, cach tam 6 px van co mau,
+11 px la het; cho net tu de len chinh no van 40 %; Shift: di ngoan ngoeo ra dung 2 diem dau - cuoi; rung 1 px khong them diem;
+ve tran ra ngoai bi kep trong vung; V keo (+40, +30) moi diem di dung; keo to khung (-30, -20) net +30 +20 cuc bo; anh ghim luu
+900x600 net phong 1,5 lan dung cho, da quang tron voi nen xam 64 ra (140,120,38) dung phep tinh. Thanh cong cu nam tron trong
+man (man chup 697 px; anh ghim 624 va 344 px). DOI CHUNG: lam hong ham them diem + da quang thanh dac -> 10 muc truot.
+- Da MO ANH ra nhin (`.selftest/but-ve/overlay-1.5.png`): net tron, goc bo, da quang deu mau.
+- Thuoc sai gap: (1) diem do o x = 280 tren net di ra roi quay lai: net lam tron goc nen chi vuon toi ~270 (diem thua, dich
+  ve 250); (2) anh ghim o 125 %: toa do 109,4 thay vi 110 (mep canvas le, da biet tu bai so buoc) -> sai so 1 px; (3) doi
+  chung lan dau khong cham duoc vi ban hong lam chinh bai do vang loi (doc khung chon cua net khong con chon duoc).
+- Hoi quy (moi bai ghi ra file rieng, KHONG qua ong, dung o bai truot): `test:sobuoc` 72, `test:xuatgif` 58, `test:khovideo` 76,
+  `test:nutkhay` 54, `test:khaynut` 31: 0 truot. Nap 10:49 (md5 `f27a675f`, boot 10:49:03, anh/video 698 -> 698).
+
+**CHUA do / CHUA lam.**
+- Anh chua bam thu tren app that. Chuot that (toc do keo nhanh, but ve tren man 4K 150 %) chua do; bang ve / but cam ung chua thu.
+- Do day co dinh (but 3 px, da quang 16 px), chua co cho chinh. Da quang tren nen TOI kem noi (trong 40 % mau thuong).
+- Thanh cong cu man chup gio co 11 nut, dai 697 px: vung chon hep sat mep man thi thanh bi day vao trong (da co san co che kep).
+- Loi CO SAN thay lai trong luc do (khong sua): 2 trang `overlay` va `pin` KHONG co `font-src` trong CSP -> font Inter bi chan,
+  chu ghi chu / so buoc dang ve bang font du phong Segoe UI (bai do so buoc 02/10 da loc dong loi nay). Cho anh quyet co sua
+  khong (sua la doi dang chu cua ghi chu tren anh).
+- Chua len web, chua tang so phien ban, chua dong goi (anh dan).
+
+## [0.8.0 nap lan 18-19] - 2026-10-06 10:38 - TINH NANG MOI: xuat GIF tu Khay video (o "GIF" trong cum Co tieng | Khong tieng), cho anh bam thu
+
+**Boi canh.** Anh hoi nen lam gi de canh tranh; em dua bang so doi thu (ShareX, CleanShot deu co GIF) va de xuat; anh chon
+trong bang hoi *"Xuất GIF"*, roi chot pham vi luot nay: *"Bút vẽ tay + bút dạ quang / Chụp cuộn trang dài / tiếp theo làm và
+test 3 tính năng này rồi mới push một lần final"* + *"còn bản cài thì khi nào anh bảo mới xuất ra bản mới"*. Day la tinh nang 1/3.
+
+**Da lam.**
+- Bo may (KHONG can FFmpeg): `src/xuat-gif.js` (main: cua so an + ghi file qua `.gif.tam`) · `src/gif/gif.js` (tu tach hop
+  MP4 phan manh + WebCodecs giai ma mot luot + ma hoa) · `src/gif/gifenc.js` (thu vien gifenc 1.0.3, MIT, 24 KB, chep
+  nguyen van + giay phep) · `src/preload-gif.js`. Mac dinh: 10 hinh / giay, canh dai <= 800 px, tran 60 giay.
+- Khay video: cum chon thanh **Co tieng | Khong tieng | GIF** (video khong tieng: **Video | GIF**). Chon GIF = tao file `.gif`
+  canh video (o GIF hien "GIF 42%"), chon ben nao thi ben do duoc keo tha / Mo thu muc; dong thong tin doi thanh
+  "gio · GIF · dung luong"; nut Xoa tinh ca file GIF; doan qua 60 giay thi o GIF mo + noi ly do; video "Bi ngat" (bi cut
+  cuoi) van ra GIF cua phan con lai. So video them 2 truong `chonGif`, `fileGif`.
+
+**So do (may cong ty, RTX 4060 Ti).**
+| Video | GIF | Nang | Tao mat |
+|---|---|---|---|
+| Anh quay that 17,4 giay 2404x1314 (giao dien) | 800x437, 167 khung | 2,0 MB | 3,8 giay |
+| Anh quay that 9,6 giay 1010x1264 (noi dung video) | 639x800, 96 khung | 6,6 MB | 2,5 giay |
+| Doan thu 5 phut 2560x1440, cat o tran 60 giay | 800x450, 411 khung | 0,7 MB | 12,8 giay |
+- Vi sao khong tua `<video>` tung khung: do duoc 92 ms / khung o 2404x1314 (doan 17 giay ~20 giay, doan 5 phut ~6 phut) vi moi
+  lan tua giai ma lai tu khung khoa (khung khoa cach nhau ~100 khung). Giai ma mot luot: nhanh hon ~5 lan.
+
+**☠️ Loi da bat TRUOC khi toi tay anh (so dep ma hinh sai).** Ban dau moi khung mot bang mau rieng (tinh tu cac diem vua doi):
+so khung + thoi luong khop ffprobe, lech trung binh 2-8 don vi mau, 0 % diem lech nang, ma mo anh ra thi HINH LOANG LO (mang
+mau lech 10-20 don vi theo hinh vung thay doi, ro tren nen toi min). Tach 3 tang cung mot thoi diem: khung giai ma SACH · hinh
+ghep LOANG · hinh Chromium doc lai = hinh ghep -> loi o cach chon mau. Sua: MOT bang mau chung cho ca file (luot 1 lay mau mau
+suot doan, luot 2 moi ghi). Phep tu kiem "lech trung binh" KHONG bat duoc loi nay -> bai do phai kem mo anh ra nhin.
+Hai loi nho khac bat duoc bang so: thua 3 khung (floor am khi khung den som 0,5 ms: 99 khung cho 9,61 giay -> 96) · tien do
+dung o 83 % (tinh theo byte) -> tinh theo so doan.
+
+**Kiem chung.** `npm run test:xuatgif` (MOI, chay an): **58/58 DAT**.
+- Phan A bo may: tu quay video mau co SO DEM nhi phan doi moi 200 ms + nua man dung yen, xuat GIF, DOC LAI bang bo giai ma GIF
+  cua Chromium: so dem 0..19 khong lui khong nhay coc; moi so hien 200 ms (19/20 so, 1 so lech 1 moc); tong 4000 ms (nguon
+  4018); nua dung yen lech 2,6 / kenh; so khung bo may = Chromium = cau truc file = ffprobe (28); 2 file app quay that (720p
+  co tieng, 4K); duong loi: file rac, file cut, file khong co, 2 viec cung luc. DOI CHUNG 1: ep bo may khong cap nhat ->
+  thuoc so dem bat (so cuoi 0). DOI CHUNG 2: sua file cho "xoa hinh cu" -> nua dung yen lech 128.
+- Phan B giao dien (trang khay that, VI + EN): chu tren o luc tao chi la "GIF n%"; xong thi sang, tat tieng trinh phat, dong
+  thong tin + nut Xoa cap nhat; bam lai khong tao lan hai; 6 be rong 562-1082 px khong tran / khong de / khong cat chu; o cao
+  20 px, cum 26 px.
+- Thuoc sai gap khi viet bai do: (1) doi "moi khung tang dung 1 so": sai, H.264 lam net dan nen co khung nho cung so -> do
+  thoi gian hien cua tung so; (2) trang soi ve chong cac khung len canvas -> CHE loi "xoa hinh cu", doi chung 2 khong bat
+  (lech 2,7) -> xoa canvas truoc moi khung.
+- Hoi quy chay an: `test:khovideo` 76, `test:botieng` 29, `test:nutkhay` 54, `test:khaynut`, `test:sobuoc` 72: dat.
+- Nap 2 lan: 10:25 (md5 `13e0888d`) va 10:36 (md5 `48b70f66`, boot 10:36:32, anh/video 698 -> 698). Da doc muc luc app.asar
+  dang chay: du `xuat-gif.js`, `preload-gif.js`, `gif/gif.js`, `gif/gifenc.js`, `gif/index.html`.
+
+**☠️ Sai sot cua em luc nap lan 19.** Chuoi lenh noi `&&` nhung moi bai di qua `| tail -1` -> ma thoat cua bai do bi nuot:
+`test:quayvideo` bao TRUOT ma lenh van chay tiep va NAP. Soi lai: 3 muc truot deu la "24-31 khung/giay" (21,5 - 23,6) luc may
+dang ban (chay don 7 bai lien nhau); chay rieng 2 lan: 76/76, 27-29 khung/giay; ma quay video khong doi (git sach). Ban da nap
+la ban lanh, nhung cach chay sai. Tu gio: bai do truoc khi nap chay KHONG qua ong, hoac `set -o pipefail`.
+
+**CHUA do / CHUA lam.**
+- Anh chua bam thu tren app that (run-log tu 10:25 chua co dong `gif`). Keo file GIF vao Zalo / Messenger / Premiere: chua do.
+- Chat luong: nen chuyen mau min (nen mo toi) co BAC mau (256 mau, khong ran mau); chua lam ran mau vi file nang them.
+- 10 hinh / giay, 800 px, tran 60 giay la so em chon, anh chua duyet. Chua co cho chinh trong giao dien.
+- Chi MP4 H.264 do app quay (webm tren may khong co bo nen H.264: o GIF mo). Mac chua thu. May khong co GPU chua do toc do.
+- App tat giua luc tao: con lai file `.gif.tam` canh video (chua co buoc don).
+- Chua len web, chua tang so phien ban, chua dong goi (anh dan).
+
+## [0.8.0 nap lan 17] - 2026-10-06 09:52 - Khay anh: hang nut doi sang trai 10 px, nut "–" het bi vung nam goc tren-phai che
+
+**Boi canh.** Anh gui anh khoanh goc tren-phai Khay anh: *"chỗ này bị trùng hơi khó chịu nè em"*, roi (sau khi em bao
+nguyen nhan) khoanh ca hang nut: *"em có thể dời cái dải này sang trái từ 5 đến 10px là xong rồi em"*.
+
+**Nguyen nhan that (do tren trang khay that, Electron an).** Nut "–" thu khay (`#hide`, them 01/10) nam dung duoi vung nam
+co gian goc tren-phai (`#grip-tr` 20x20, z-index 10, them 15/09): **57,8 % dien tich nut bi che** (240 / 441 diem) o ca khay
+ngang lan khay doc -> re chuot vao nut ra mui ten co gian + vet cam + chu goi y "Keo de doi co", bam la keo co chu khong thu
+khay. 4 nut con lai chi "bi che" ~4 % (4 goc bo tron). Luc them nut 01/10 khong ai do vung nam goc da co san o do.
+
+**Da sua (`src/shelf/shelf.css`).** (1) `#bar` le phai + 10 px -> ca hang 5 nut doi sang trai 10 px (nut "–" cach mep phai
+6,7 -> 16,7 px). (2) `#bar #hide { position: relative; z-index: 11 }` -> phan con chong (18,1 % neu khong co luat nay) thi
+nut nam TREN vung nam. Goc tren-phai van keo co duoc o mep ngoai (319 / 400 diem).
+
+**Kiem chung (so).**
+- Bai do MOI `npm run test:nutkhay` (chay an, 4 kho: 700x150 VI ngang, 420x110 EN ngang, 252x420 EN + VI doc): **54/54 DAT**.
+  Moi nut: goc che <= 2 % (nut "–": 0,9 % = 4 diem goc bo tron), tong <= 10 %; tieu de khay khong bi cat voi so dem 3 chu so
+  ("Khay ảnh" 48,4 / 48,4 px, "Shelf" 26,8 / 26,8 px, ca khay doc 252 px); 4 goc con nam duoc 319-383 / 400 diem.
+  DOI CHUNG: go luat (2) -> nut "–" bi che 18,1 % -> bai do bat.
+- `npm run test:khaynut` (chay an): DAT, khong truot muc nao.
+- Nap bang `cai-tai-cho.mjs` noi `&&` sau 2 bai: app.asar md5 `b26fc16e` -> `2183c0ac`, boot 09:52:53, anh/video 689 -> 689,
+  9 dai, cau hinh khong doi.
+
+**CHUA do / CHUA lam.**
+- Anh chua bam thu nut "–" tren ban vua nap.
+- Goc tren-TRAI cung chong len logo (63,8 % logo bi `#grip` che) — anh khong nhac, em KHONG sua (logo chi la cho cam keo, ca
+  thanh tieu de deu keo duoc; va bai `test:co-khay` nam goc do o giua).
+- `test:khay`, `test:co-khay` (bat cua so len man) chua chay lai.
+- Thuoc sai gap trong luc lam: khung xem truoc cua app Claude nap trang khay KHONG co CSS (0 stylesheet) -> so do vo nghia,
+  bo; bai do an lan dau chet vi dong cua so cua kho truoc lam Electron tu thoat (thieu `window-all-closed`).
+
+**Dang lam do (chua co ma trong `src/`):** anh chot 06/10 lam 3 tinh nang roi moi push MOT lan: xuat GIF tu Khay video ·
+but ve tay + but da quang · chup cuon trang dai. Bo cai: chi dong goi khi anh bao. So do da co cho GIF: tua tung khung
+bang `<video>` cham (video 2404x1314 cua anh: 92 ms / khung, doan 17 giay mat ~20 giay; doan 5 phut ~6 phut) -> se giai ma
+mot luot bang WebCodecs + tu tach hop MP4 (file app quay: 1 `moof` = ~101 khung, `trun` co thoi luong + kich thuoc tung
+khung, khung khoa moi ~3,3 giay, khong co B-frame). Thu vien ma hoa: `gifenc` 1.0.3 (MIT, 22 KB, khong keo theo goi nao).
 ## [0.8.0 to kin] - 2026-10-04 17:41 - Icon lam mo (phim 4) doi sang KHUNG CO O KHAM (kieu D) + them kieu lam mo thu ba "TO KIN"; da nap, bai do diem anh 40/40
 
 - **Boi canh:** anh: *"icon làm mờ nhìn nó cũng không hiểu gì hết"* -> em ve 4 kieu trong thanh cong cu that, anh: *"chọn D mà em

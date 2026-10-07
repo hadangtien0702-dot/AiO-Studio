@@ -155,6 +155,10 @@ h1 em{font-style:normal;color:var(--brand)}
 .mau[aria-pressed="true"]{box-shadow:0 0 0 2px #161616,0 0 0 3.5px #fff}
 @media (max-width:640px){.mau-nhom .mau:nth-child(n+4){display:none}.cc{width:30px;height:30px}.cc.xem{display:none}}
 @media (pointer:coarse){.cc.xem{display:none}}
+/* 06/10 điện thoại: thanh trên cùng làm mờ nền phía sau (backdrop-filter) phải vẽ lại ở MỌI khung khi trang cuộn. Màn cảm ứng
+   dùng nền gần đặc thay cho lớp mờ. ☠️ Phòng ngừa: CHƯA đo được trên điện thoại thật (máy đo có card rời nên không thấy chênh). */
+@media (pointer:coarse){header{backdrop-filter:none;-webkit-backdrop-filter:none;background:color-mix(in srgb,var(--bg) 96%,transparent)}}
+@media (max-width:780px){.cc.xem{display:none}}   /* 06/10: thanh có 12 nút (671 px) → cửa sổ máy tính hẹp hơn 780 px (khung demo < 730 px) ẩn 8 nút chỉ để xem */
 /* Ô gõ chữ */
 .dtext{position:absolute;min-width:60px;padding:3px 7px;border:1px dashed rgb(255 255 255/50%);border-radius:5px;background:rgb(0 0 0/72%);
   font:600 16px/1.3 Inter,sans-serif;outline:none;cursor:text}
@@ -411,6 +415,397 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .kh-thumb.cam{border-color:#f86820;transform:translateY(-2px)}
 .kh-thumb.di{opacity:.35}
 .kh-ghost{position:absolute;z-index:4;margin:0;pointer-events:none;box-shadow:0 22px 40px -8px rgb(0 0 0/45%),0 0 0 2px #f86820;transition:none}
+/* ===== Section KHAY bản 2 (06/10, anh: "creative hơn nữa"): MỘT khay ở giữa, 6 app vây quanh; ảnh bay tới từng app rồi toả ra
+   cùng lúc; khách tự kéo ảnh thả vào app nào cũng được. Bản 1 (.kh-grid) giữ làm dự phòng khi không tải được GSAP. ===== */
+.kt{display:none}
+#shelf.kt-on .kh-grid{display:none}
+#shelf.kt-on .kt{display:block}
+.kt-dau{text-align:center;margin:0 auto 38px}
+.kt-dau p{margin:12px auto 0;color:var(--ink-2);font-size:var(--fs-sub);max-width:48ch}
+.kt-san{container-type:inline-size;position:relative;aspect-ratio:16/8.6;user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif}
+/* Dây nối khay ↔ app: nét đứt mờ có sẵn, nét cam liền vẽ ra khi app đã nhận ảnh */
+.kt-day{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.kt-day .n{fill:none;stroke:rgb(122 62 22/32%);stroke-width:1.5;stroke-dasharray:2 7;stroke-linecap:round}
+.kt-day .s{fill:none;stroke:#f86820;stroke-width:2.5;stroke-linecap:round;opacity:0}
+:root[data-theme="dark"] .kt-day .n{stroke:rgb(255 206 170/30%)}
+/* Cửa sổ app: cỡ chữ bên trong theo bề rộng cửa sổ (cqw) nên co theo màn hình mà không vỡ */
+.kt-win{position:absolute;z-index:1;width:22%;aspect-ratio:4/2.9;container-type:inline-size;transform:rotate(var(--r,0deg));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.kt-win.den{transform:rotate(0deg) scale(1.06);z-index:3}
+.kt-win.w0{left:6%;top:1%;--r:-4deg}.kt-win.w1{left:0;top:35.2%;--r:2.5deg}.kt-win.w2{left:6.5%;top:69.4%;--r:-2deg}
+.kt-win.w3{right:6%;top:1%;--r:4deg}.kt-win.w4{right:0;top:35.2%;--r:-2.5deg}.kt-win.w5{right:6.5%;top:69.4%;--r:2deg}
+.kt-in{position:absolute;inset:0;display:flex;flex-direction:column;font-size:4.5cqw;line-height:1.3;border-radius:2.8cqw;overflow:hidden;background:#fff;color:#16110d;
+  box-shadow:0 1.5em 2.8em -1.2em rgb(60 20 0/50%),0 0 0 1px rgb(0 0 0/8%);transition:box-shadow .25s}
+.kt-win.den .kt-in{box-shadow:0 1.8em 3.2em -1em rgb(60 20 0/58%),0 0 0 3px #f86820}
+/* Huy hiệu chữ cái ở góc ngoài: chữ trên màu gợi nhắc, không dùng logo của hãng */
+.kt-ic{position:absolute;z-index:2;left:-3.6cqw;top:-3.6cqw;width:11.5cqw;height:11.5cqw;border-radius:3.2cqw;display:grid;place-items:center;color:#fff;font:800 4.6cqw/1 Inter,sans-serif;letter-spacing:-.02em;
+  box-shadow:0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-win.w3 .kt-ic,.kt-win.w4 .kt-ic,.kt-win.w5 .kt-ic{left:auto;right:-3.6cqw}
+.kt-ic.zalo{background:linear-gradient(145deg,#2f8bff,#0068ff)}
+.kt-ic.lark{background:linear-gradient(145deg,#3d7bff,#1f4fd1)}
+.kt-ic.teams{background:linear-gradient(145deg,#7b83eb,#4b53bc)}
+.kt-ic.pr{background:#1b0f3a;color:#a8a2ff;box-shadow:inset 0 0 0 1.5px #6f63ff,0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-ic.ps{background:#001e36;color:#31a8ff;box-shadow:inset 0 0 0 1.5px #31a8ff,0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-ic.fig{background:#1e1e1e}
+/* Dấu tích xanh: app này đã nhận ảnh */
+.kt-ok{position:absolute;z-index:2;right:-2.8cqw;bottom:-2.8cqw;width:8.5cqw;height:8.5cqw;border-radius:50%;display:grid;place-items:center;background:#22a652;
+  box-shadow:0 0 0 2px #fff,0 .4em .9em -.2em rgb(0 0 0/40%);transform:scale(0);transition:transform .32s cubic-bezier(.3,1.6,.5,1)}
+.kt-ok svg{width:58%;height:58%}
+.kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{right:auto;left:-2.8cqw}
+.kt-win.co .kt-ok{transform:scale(1)}
+/* — thanh tiêu đề chung — */
+.kt-bar{flex:none;display:flex;align-items:center;gap:.6em;height:2.1em;padding:0 .9em;font-size:.84em;font-weight:600;background:#f4f2f0;color:#5a524b;border-bottom:1px solid #ece6e0}
+.kt-bar i{width:.8em;height:.8em;border-radius:.2em;background:var(--acc)}
+/* — dạng CHAT (Zalo, Lark, Teams) — */
+.kt-body{flex:1;min-height:0;display:flex}
+.kt-rail{flex:none;width:2.6em;display:flex;flex-direction:column;align-items:center;gap:.6em;padding-top:.8em;background:#ebebf5}
+.kt-rail i{width:1.3em;height:1.3em;border-radius:.4em;background:#c9c9e6}.kt-rail i:first-child{background:var(--acc)}
+.kt-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.kt-top{flex:none;display:flex;align-items:center;gap:.7em;padding:.5em .8em;border-bottom:1px solid #f0e9e2}
+.kt-top b{display:block;font-size:1em;line-height:1.2}
+.kt-top small{display:block;font-size:.8em;color:#2f7d4f;line-height:1.3}
+.kt-ava{flex:none;display:grid;place-items:center;width:2.1em;height:2.1em;border-radius:50%;background:var(--acc);color:#fff;font-weight:700;font-size:.9em}
+.kt-msgs{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:.4em;padding:.45em .8em;overflow:hidden}
+.kt-b{flex:none;max-width:84%;padding:.45em .8em;border-radius:1em;font-size:.93em;line-height:1.3}
+.kt-b.trai{align-self:flex-start;background:#f3eee9;border-bottom-left-radius:.3em}
+.kt-b.anh{align-self:flex-end;width:33%;max-width:none;padding:.25em;background:#fff;box-shadow:0 0 0 1px #eadfd5;border-radius:.7em}
+/* — dạng DỰNG PHIM (Premiere Pro) — */
+.kt-in.pr{background:#232323;color:#cfcfcf}
+.kt-in.pr .kt-bar{background:#1b1b1b;color:#b8b8b8;border-bottom-color:#2e2e2e}
+.kt-prm{flex:1.25;min-height:0;margin:.6em .6em .45em;border-radius:.3em;background:#0d0d0d;display:grid;place-items:center;overflow:hidden;font-size:.78em;color:#5d5d5d}
+.kt-prm .kt-th{width:auto;height:86%;border-radius:.15em}
+.kt-prt{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;justify-content:center;gap:.35em;padding:.45em .6em .6em;background:#1b1b1b;border-top:1px solid #2e2e2e}
+.kt-tr{display:flex;align-items:center;gap:.5em;height:24%}
+.kt-tr b{flex:none;width:1.7em;font-size:.7em;font-weight:600;color:#8f8f8f}
+.kt-lane{flex:1;height:100%;position:relative;border-radius:.25em;background:#262626}
+.kt-clip{position:absolute;top:0;bottom:0;border-radius:.25em;overflow:hidden}
+.kt-clip.v{background:#6e6fc9}.kt-clip.a{background:#3b8453}
+.kt-clip.g{font-style:normal;background:#c96aa5;display:flex;align-items:center;padding:0 .5em;font-size:.66em;font-weight:600;color:#fff;white-space:nowrap}
+.kt-ph{position:absolute;top:.3em;bottom:.4em;left:calc(.6em + 1.7em + 44%);width:2px;background:#4d8dff;z-index:1}
+/* — dạng THIẾT KẾ (Photoshop, Figma) — */
+.kt-in.ps{background:#323232;color:#ccc}
+.kt-in.ps .kt-bar{background:#262626;color:#bdbdbd;border-bottom-color:#1b1b1b}
+.kt-in.fig{background:#e5e5e5;color:#333}
+.kt-in.fig .kt-bar{background:#2c2c2c;color:#eee;border-bottom-color:#2c2c2c}
+.kt-2c{flex:1;min-height:0;display:flex}
+.kt-can{flex:1;min-width:0;display:grid;place-items:center;position:relative}
+.kt-in.ps .kt-can{margin:.6em;border-radius:.25em;background:#262626}
+.kt-board{width:78%;aspect-ratio:4/3;position:relative;display:grid;place-items:center;background:#fff}
+.kt-in.fig .kt-board{width:70%;box-shadow:0 1px 3px rgb(0 0 0/14%)}
+.kt-in.fig .kt-board::before{content:attr(data-ten);position:absolute;left:0;top:-1.6em;font-size:.74em;color:#777;white-space:nowrap}
+.kt-board .kt-th{width:66%;border-radius:.1em}
+.kt-in.fig .kt-board .kt-th{outline:1.5px solid #0d99ff;outline-offset:2px}
+.kt-lay{flex:none;width:31%;display:flex;flex-direction:column;gap:.35em;padding:.6em .4em;font-size:.7em}   /* .74em: tên layer tiếng Anh bị cắt 2 px (đo 07/10) */
+.kt-in.ps .kt-lay{background:#2b2b2b;border-left:1px solid #1b1b1b}
+.kt-in.fig .kt-lay{order:-1;background:#fff;border-right:1px solid #e0e0e0;color:#555}
+.kt-lay div{flex:none;display:flex;align-items:center;gap:.5em;height:2.1em;padding:0 .5em;border-radius:.3em;white-space:nowrap;overflow:hidden}
+.kt-in.ps .kt-lay div{background:#383838;color:#bdbdbd}
+.kt-lay div i{flex:none;width:1.3em;height:1em;border-radius:1px;background:#777}
+.kt-in.ps .kt-lay div.moi{background:#2d5d8f;color:#fff}
+.kt-in.fig .kt-lay div.moi{background:#e5f4ff;color:#0d6fbf}
+/* Ảnh chụp thu nhỏ. Phần ruột đặt bằng inset % của CHÍNH ô ảnh: đệm % sẽ tính theo khung chứa, bản sao bay ngoài khay bị méo (bẫy 22/09) */
+.kt-th{position:relative;display:block;width:100%;aspect-ratio:4/3;border-radius:.4em;background:#fff;overflow:hidden}
+.kt-thi{position:absolute;inset:14% 10% 0;display:flex;align-items:flex-end;gap:7%}
+.kt-thi i{flex:1;border-radius:2px 2px 0 0;background:#f3b58f}
+.kt-thi i:nth-of-type(2n){background:#f86820}
+.kt-th b{position:absolute;z-index:1;left:8%;top:8%;padding:.05em .4em;border-radius:.3em;background:rgb(0 0 0/72%);color:#34c759;font-weight:700;font-size:.7em;line-height:1.35}
+.kt-th.t3 .kt-thi{inset:16% 14%;flex-direction:column;align-items:stretch;justify-content:center;gap:10%}
+.kt-th.t3 em{height:11%;border-radius:2px;background:#e9e1d8}
+.kt-th.t3 em:first-child{width:60%;background:#16110d}
+.kt-th.t4{background:linear-gradient(140deg,#1d2440,#51306b 58%,#b2562f)}
+.kt-th.t4 .kt-thi{inset:0;display:block}
+.kt-th.t4 u{position:absolute;left:50%;top:44%;width:22%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:rgb(255 255 255/88%)}
+.kt-th.t4 s{position:absolute;left:24%;right:24%;bottom:12%;height:8%;border-radius:99px;background:rgb(255 255 255/92%)}
+.kt-th.an{visibility:hidden}
+/* Khay: cùng giao diện khay thật (src/shelf) */
+.kt-khay{position:absolute;z-index:2;left:39.5%;width:21%;top:50%;transform:translateY(-50%);container-type:inline-size}
+.kt-kin{font-size:5cqw;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:1.1em;overflow:hidden;box-shadow:0 1.7em 3.6em -.9em rgb(0 0 0/55%)}
+.kt-kin .sbar{display:flex;align-items:center;gap:.7em;height:2.5em;padding:0 .9em 0 .4em;background:#141414;border-bottom:1px solid rgb(255 255 255/6%)}
+.kt-kin .slogo{display:flex;color:#f86820;padding:0 .3em 0 .7em}
+.kt-kin .slogo svg{width:1.15em;height:1.05em}
+.kt-kin .stitle{font-size:.95em;font-weight:600;color:#c3c3c8}
+.kt-kin .scount{min-width:1.5em;height:1.35em;padding:0 .45em;display:inline-flex;align-items:center;justify-content:center;font-size:.85em;font-weight:700;color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+.kt-luoi{display:grid;grid-template-columns:1fr 1fr;gap:.7em;padding:.9em}
+.kt-luoi .kt-th{cursor:grab;touch-action:none;box-shadow:0 0 0 1px rgb(255 255 255/10%);transition:transform .15s,opacity .15s,box-shadow .15s}
+@media (hover:hover){.kt-luoi .kt-th:hover{transform:translateY(-2px);box-shadow:0 0 0 2px #f86820}}   /* màn cảm ứng: hover dính lại sau khi chạm */
+.kt-luoi .kt-th.di{opacity:.32}
+/* Bản sao đang bay, con trỏ, vòng sóng, lời gợi ý */
+.kt-bong{position:absolute;z-index:5;aspect-ratio:auto;pointer-events:none;box-shadow:0 22px 40px -8px rgb(0 0 0/45%),0 0 0 2px #f86820}
+.kt-bong.tay{cursor:grabbing}
+.kt-tro{position:absolute;left:0;top:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .25s;filter:drop-shadow(0 2px 3px rgb(0 0 0/35%))}
+.kt-tro.hien{opacity:1}
+.kt-song{position:absolute;z-index:4;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 18px rgb(248 104 32/55%)}
+.kt-goi{position:absolute;z-index:2;left:50%;bottom:1%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;white-space:nowrap;
+  font:600 13px/1.2 Inter,sans-serif;color:#5a3a22;background:rgb(255 255 255/64%);box-shadow:0 0 0 1px rgb(255 255 255/70%),0 8px 20px -10px rgb(60 20 0/35%);transition:opacity .3s}
+.kt-goi svg{flex:none;width:15px;height:15px}
+.kt-goi.an{opacity:0}
+:root[data-theme="dark"] .kt-goi{color:#f6e3d3;background:rgb(20 16 12/60%);box-shadow:0 0 0 1px rgb(255 255 255/12%),0 8px 20px -10px rgb(0 0 0/50%)}
+.kt-moi{animation:kt-vao .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes kt-vao{from{opacity:0;transform:translateY(.5em) scale(.94)}}
+/* Điện thoại: khay ở trên, 6 app xếp 2 cột bên dưới */
+@media (max-width:720px){
+  .kt-dau{margin-bottom:26px}
+  .kt-san{aspect-ratio:10/17.5}
+  .kt-khay{left:25%;width:50%;top:0;transform:none}
+  .kt-win{width:47%}
+  .kt-win.w0{left:1%;top:34%;--r:-2deg}.kt-win.w1{left:1%;top:56.5%;--r:1.5deg}.kt-win.w2{left:1%;top:79%;--r:-1.5deg}
+  .kt-win.w3{right:1%;top:34%;--r:2deg}.kt-win.w4{right:1%;top:56.5%;--r:-1.5deg}.kt-win.w5{right:1%;top:79%;--r:1.5deg}
+  .kt-goi{bottom:auto;top:27.6%;font-size:12px;padding:6px 12px}
+  /* dây nối trên điện thoại chạy xuyên sau 6 cửa sổ và đè lời gợi ý: rối (ảnh thử 06/10). Ẩn bằng visibility để vẫn đo được độ dài nét */
+  .kt-day{visibility:hidden}
+  /* dấu tích ra góc NGOÀI của từng cột, không chụm đôi ở giữa */
+  .kt-win.w0 .kt-ok,.kt-win.w1 .kt-ok,.kt-win.w2 .kt-ok{right:auto;left:-2.8cqw}
+  .kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{left:auto;right:-2.8cqw}
+}
+/* Đoạn VÀO của phần Kéo thả (07/10): chờ = .cho, đang vào = .vao (bật transition riêng cho đoạn vào). "Giảm chuyển động": JS không gắn .cho */
+@media (prefers-reduced-motion:no-preference){
+  .kt.cho .kt-dau h2,.kt.cho .kt-dau p{opacity:0;transform:translateY(18px)}
+  .kt.vao .kt-dau h2,.kt.vao .kt-dau p{transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .kt.vao .kt-dau p{transition-delay:.08s}
+  .kt.cho .kt-khay{opacity:0;transform:translateY(-50%) scale(.6)}
+  .kt.vao .kt-khay{transition:opacity .35s ease .12s,transform .6s cubic-bezier(.3,1.5,.5,1) .12s}
+  .kt.cho .kt-win{opacity:0;transform:translate(var(--dx,0px),var(--dy,0px)) rotate(0deg) scale(.5)}
+  .kt.vao .kt-win{transition:opacity .35s ease var(--tre,0s),transform .7s cubic-bezier(.2,.9,.25,1.12) var(--tre,0s)}
+  .kt.cho .kt-day,.kt.cho .kt-goi{opacity:0}
+  .kt.vao .kt-day{transition:opacity .5s ease 1s}
+  .kt.vao .kt-goi{transition:opacity .4s ease 1.2s}
+}
+@media (prefers-reduced-motion:no-preference) and (max-width:720px){.kt.cho .kt-khay{transform:scale(.6)}}
+/* 07/10 anh: "có một cái ô trắng ở đây khá là khó chịu": dải trắng 120 px giữa rạp tối và nền cam
+   (24 px đệm dưới của #features + 96 px lề trên của #shelf). Chỉ bỏ khi rạp đang bật; lưới thẻ dự phòng vẫn giữ khoảng cách. */
+#features:has(#rap:not([hidden])){padding-bottom:0}
+#features:has(#rap:not([hidden])) + #shelf{margin-top:0}
+
+/* ===== Section KHAY CO GIÃN bản 2 (07/10, anh: "anh muốn creative luôn ở phần này"): một lưới 24 ô ảnh CỐ ĐỊNH trên sân,
+   khay là cái khung phủ lên lưới. Khung phủ tới đâu ảnh hiện tới đó (ảnh giữ nguyên cỡ, đúng luật 14/09 "xem nhiều ảnh hơn,
+   không phóng ảnh"). Khách kéo 4 góc được. Bản 1 (.rs-grid) giữ làm dự phòng khi không tải được GSAP. ===== */
+.kg{display:none}
+#resize.kg-on .rs-grid{display:none}
+#resize.kg-on .kg{display:block}
+.kg-dau{text-align:center;margin:0 auto 22px}
+.kg-dau p{margin:12px auto 0;color:var(--ink-2);font-size:var(--fs-sub);max-width:54ch}
+/* chữ "co giãn" giãn theo bề ngang của khay */
+.kg-gian{display:inline-block;color:#f86820;transition:letter-spacing .28s cubic-bezier(.2,.8,.2,1)}
+.kg-che{display:flex;gap:2px;width:max-content;margin:0 auto 20px;padding:3px;border-radius:10px;background:var(--surface);
+  box-shadow:0 0 0 1px var(--line),0 6px 16px -8px rgb(0 0 0/25%);font:600 12px/1 Inter,sans-serif;user-select:none;-webkit-user-select:none}
+.kg-che > span{padding:7px 14px;border-radius:7px;color:var(--ink-3);cursor:pointer;transition:background-color .25s,color .25s,transform .15s}
+.kg-che > span.on{background:var(--brand-soft);color:var(--brand-ink)}
+.kg-che > span.bam{transform:scale(.93)}
+.kg-san{--c:6;--r:4;--g:10px;--dau:30px;position:relative;max-width:900px;margin:0 auto;aspect-ratio:900/524;border-radius:24px;
+  user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif;
+  background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
+.kg-luoi{position:absolute;left:5%;right:5%;top:64px;bottom:52px;display:grid;grid-template-columns:repeat(var(--c),1fr);grid-template-rows:repeat(var(--r),1fr);gap:var(--g)}
+/* ô chờ: nét đứt mờ, cho thấy "còn ảnh ở đây" */
+.kg-nen{z-index:0}
+.kg-nen i{border-radius:6px;border:1px dashed var(--line-strong);background:rgb(127 127 127/5%)}
+/* ô ảnh: nằm TRÊN khung khay, bật lên khi khung phủ tới */
+.kg-anh{z-index:2;pointer-events:none}
+.kg-o{position:relative;min-width:0;min-height:0;opacity:0;transform:scale(.7);transition:opacity .16s ease,transform .28s cubic-bezier(.3,1.5,.5,1)}
+.kg-o.bat{opacity:1;transform:none}
+.kg-anh .kg-rl{display:block;flex:none;width:100%;height:100%;padding:0;gap:0;overflow:visible}
+.kg-anh .kg-rl .kh-thumb{width:100%;height:100%;aspect-ratio:auto;border-radius:6px;box-sizing:border-box}
+/* khung khay: cùng giao diện khay thật (src/shelf) */
+.kg-khay{position:absolute;z-index:1;left:0;top:0;width:0;height:0;box-sizing:border-box;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:12px;
+  box-shadow:0 18px 40px -12px rgb(0 0 0/55%);transition:box-shadow .2s ease}
+.kg-khay.keo{box-shadow:0 0 0 2px #f86820,0 26px 52px -14px rgb(0 0 0/55%)}
+.kg-khay .sbar{display:flex;align-items:center;gap:8px;height:var(--dau);box-sizing:border-box;padding:0 10px 0 4px;background:#141414;border-bottom:1px solid rgb(255 255 255/6%);
+  border-radius:11px 11px 0 0;overflow:hidden;white-space:nowrap}
+.kg-khay .slogo{display:flex;color:#f86820;padding:0 4px 0 8px}
+.kg-khay .slogo svg{width:13px;height:12px}
+.kg-khay .stitle{font-size:11px;font-weight:600;color:#c3c3c8}
+.kg-khay .scount{min-width:17px;height:15px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
+  color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+/* 4 tay nắm ở 4 góc: vùng bấm 34 px, dấu chữ L cam */
+.kg-goc{position:absolute;z-index:3;width:34px;height:34px;touch-action:none}
+.kg-goc::after{content:"";position:absolute;width:11px;height:11px;border:3px solid #f86820;transition:transform .15s}
+.kg-goc.tl{left:-11px;top:-11px;cursor:nwse-resize}.kg-goc.tl::after{left:7px;top:7px;border-right:0;border-bottom:0;border-radius:7px 0 0 0}
+.kg-goc.tr{right:-11px;top:-11px;cursor:nesw-resize}.kg-goc.tr::after{right:7px;top:7px;border-left:0;border-bottom:0;border-radius:0 7px 0 0}
+.kg-goc.bl{left:-11px;bottom:-11px;cursor:nesw-resize}.kg-goc.bl::after{left:7px;bottom:7px;border-right:0;border-top:0;border-radius:0 0 0 7px}
+.kg-goc.br{right:-11px;bottom:-11px;cursor:nwse-resize}.kg-goc.br::after{right:7px;bottom:7px;border-left:0;border-top:0;border-radius:0 0 7px 0}
+@media (hover:hover){.kg-goc:hover::after{transform:scale(1.25)}}
+/* nhãn cỡ đi theo góc đang kéo, kiểu công cụ thiết kế */
+.kg-nhan{position:absolute;left:0;top:0;z-index:5;padding:4px 8px;border-radius:7px;background:#f86820;color:#16110d;font:700 11px/1.2 Inter,sans-serif;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .2s;box-shadow:0 6px 14px -6px rgb(0 0 0/50%)}
+.kg-nhan.hien{opacity:1}
+.kg-san .kt-goi{top:auto;bottom:10px}
+.kg-san .kt-tro{z-index:6}
+@media (min-width:900px){.kg-dau h2{white-space:nowrap}}
+/* dien thoai: xuong dong CO DINH sau chu gian, de chu gian ra khong lam tieu de nhay tu 1 dong sang 2 dong (do 07/10) */
+.kg-xd{display:none}
+/* Điện thoại: lưới 4 cột x 6 hàng */
+@media (max-width:720px){
+  .kg-san{--c:4;--r:6;--g:7px;--dau:26px;aspect-ratio:358/474}
+  .kg-luoi{top:52px;bottom:48px}
+  .kg-xd{display:inline}
+  .kg-san .kt-goi{top:auto;bottom:8px}
+}
+/* Đoạn VÀO của phần Khay co giãn (07/10) */
+@media (prefers-reduced-motion:no-preference){
+  .kg.cho .kg-dau h2,.kg.cho .kg-dau p,.kg.cho .kg-che{opacity:0;transform:translateY(18px)}
+  .kg.vao .kg-dau h2,.kg.vao .kg-dau p,.kg.vao .kg-che{transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .kg.vao .kg-dau p{transition-delay:.08s}
+  .kg.vao .kg-che{transition-delay:.16s}
+  .kg.cho .kg-san{opacity:0;transform:translateY(24px) scale(.97)}
+  .kg.vao .kg-san{transition:opacity .5s ease .1s,transform .7s cubic-bezier(.2,.8,.2,1) .1s}
+  .kg.cho .kg-nen i{opacity:0;transform:scale(.5)}
+  .kg.vao .kg-nen i{transition:opacity .3s ease calc(.3s + var(--tre,0s)),transform .45s cubic-bezier(.3,1.5,.5,1) calc(.3s + var(--tre,0s))}
+  .kg.cho .kg-khay{opacity:0;transform:scale(.8)}
+  .kg.vao .kg-khay{transition:opacity .3s ease .85s,transform .55s cubic-bezier(.3,1.5,.5,1) .85s,box-shadow .2s ease}
+  .kg.cho .kg-anh,.kg.cho .kt-goi{opacity:0}
+  .kg.vao .kg-anh{transition:opacity .3s ease 1.35s}
+  .kg.vao .kt-goi{transition:opacity .4s ease 1.5s}
+}
+/* 07/10 anh: "phần chữ này nó lạc quẻ giữa 2 section": tiêu đề phần tính năng nằm trơ trên nền trắng giữa bản chạy thử đầu trang và rạp tối,
+   mà cảnh 01 của rạp đã diễn đúng câu đó. Rạp bật thì ẩn khối chữ (lưới thẻ dự phòng vẫn giữ tiêu đề). */
+#features:has(#rap:not([hidden])) > .wrap{display:none}
+#features:has(#rap:not([hidden])){padding-top:0}
+/* ===== Section LÝ DO (07/10, anh: "một section riêng nêu ra lí do tại sao anh làm cái này ... UI kể chuyện"):
+   5 câu của anh chạy như phụ đề dưới sân; sân có 5 ngày, mỗi ngày một ý tưởng; công tắc TẮT thì ý tưởng mờ dần rồi mất,
+   BẬT thì khay hiện ra và giữ hết. Không dùng GSAP. Chưa gắn class ld-on (JS hỏng) thì chỉ còn tiêu đề + 5 câu chữ. ===== */
+#why{padding-bottom:64px}
+.ld-dau{text-align:center;margin:0 auto 26px}
+.ld-nhan{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;padding:6px 12px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-weight:600;font-size:14px}
+.ld-nhan::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.ld-dau h2{margin:0}
+/* nửa sau tiêu đề có hai bản chồng lên nhau: "rồi lại đi đâu mất" mờ dần theo số ý tưởng đã mất, bật công tắc thì đổi sang bản cam */
+.ld-doi{display:grid;justify-items:center}
+.ld-doi > span{grid-area:1/1;transition:opacity .45s ease,filter .45s ease,transform .5s cubic-bezier(.2,.8,.2,1),letter-spacing .45s ease}
+.ld-doi .a{opacity:calc(1 - var(--mat,0)*.11);filter:blur(calc(var(--mat,0)*.32px));letter-spacing:calc(-.028em + var(--mat,0)*.012em)}
+.ld-doi .b{color:#f86820;opacity:0;transform:translateY(.25em)}
+.ld.bat .ld-doi .a{opacity:0;filter:none;transform:translateY(-.25em)}
+.ld.bat .ld-doi .b{opacity:1;transform:none}
+.ld:not(.ld-on) .ld-san{display:none}
+.ld-san{position:relative;max-width:980px;margin:0 auto;padding:24px 5% 20px;box-sizing:border-box;border-radius:24px;display:flex;flex-direction:column;align-items:center;
+  user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif;
+  background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
+/* (bản 5 câu có thanh 5 đoạn + nhãn "Project mới" ở đây; 07/10 anh bảo gom còn 3 câu cho gọn: thanh tiến độ dời xuống nằm trên từng câu) */
+/* 5 ngày, mỗi ngày một ô chờ */
+.ld-ngay{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;width:100%}
+.ld-o{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.ld-o small{font:600 11px/1 Inter,sans-serif;color:var(--ink-3);letter-spacing:.02em}
+.ld-cho{position:relative;display:block;width:100%;aspect-ratio:16/10;box-sizing:border-box;border-radius:10px;border:1.5px dashed var(--line-strong);background:rgb(127 127 127/5%);transition:border-color .25s ease,box-shadow .25s ease}
+.ld-cho.do{border-color:#f86820;box-shadow:0 0 0 3px rgb(248 104 32/14%)}
+.ld-cho::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;font:700 20px/1 Inter,sans-serif;color:var(--ink-3);opacity:0;transition:opacity .4s ease .25s}
+.ld-o.mat .ld-cho::after{opacity:.55}
+/* y tuong da nam trong khay: o cua ngay do hien dau tich cam */
+.ld-o.luu .ld-cho::after{content:"✓";color:#f86820;opacity:.9}
+.ld-o b{font:600 12.5px/1.2 Inter,sans-serif;color:var(--ink-2);white-space:nowrap;opacity:0;transition:opacity .3s ease}
+.ld-o.co b{opacity:1}
+.ld-o.mat b{opacity:.4;text-decoration:line-through}
+/* công tắc */
+.ld-ct{display:flex;align-items:center;gap:14px;margin:22px 0 18px;font:600 13px/1.2 Inter,sans-serif;color:var(--ink-3)}
+.ld-ct span{transition:color .3s ease}
+.ld-ct .t{color:var(--ink)}
+.ld.bat .ld-ct .t{color:var(--ink-3)}
+.ld.bat .ld-ct .b2{color:var(--brand-ink)}
+.ld-nut{position:relative;flex:none;width:92px;height:48px;padding:0;border:0;border-radius:999px;cursor:pointer;touch-action:manipulation;background:var(--line-strong);
+  box-shadow:inset 0 0 0 1px rgb(0 0 0/8%);transition:background-color .3s ease,box-shadow .3s ease,transform .15s ease}
+/* núm = ảnh tròn của anh (40 px, viền trắng 2 px); chưa có ảnh thì hiện hình người mặc định (chỗ để ảnh) */
+.ld-nut i{position:absolute;left:4px;top:4px;width:40px;height:40px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#f1e9e1;color:#bcae9f;box-shadow:0 0 0 2px #fff,0 2px 6px 2px rgb(0 0 0/28%);transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.ld-nut i svg{width:100%;height:100%}
+.ld-nut i img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ld.bat .ld-nut{background:#f86820;box-shadow:0 0 0 6px rgb(248 104 32/16%),0 0 28px rgb(248 104 32/45%)}
+.ld.bat .ld-nut i{transform:translateX(44px)}
+.ld-nut.bam{transform:scale(.93)}
+.ld-nut.nhay{animation:ld-nhay 1.1s ease-in-out infinite}
+@keyframes ld-nhay{50%{box-shadow:0 0 0 9px rgb(248 104 32/24%)}}
+.ld-nut:focus-visible{outline:2px solid #f86820;outline-offset:4px}
+/* chỗ của khay: chưa bật công tắc thì chỉ là một ô trống */
+.ld-noi{position:relative;width:min(100%,560px)}
+/* 5 nơi tạm (tab đang mở, thư mục Downloads...): nằm đúng chỗ của khay, hơi nghiêng cho ra vẻ "mỗi thứ một nơi" */
+.ld-noicu{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px 14px}
+.ld-n{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;border:1.5px dashed var(--line-strong);color:var(--ink-3);font:600 13.5px/1 Inter,sans-serif;white-space:nowrap;
+  transition:opacity .35s ease,transform .45s cubic-bezier(.3,1.3,.5,1),background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease}
+.ld-n::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--line-strong);transition:background-color .3s ease}
+.ld-n:nth-child(odd){transform:rotate(-2deg)}
+.ld-n:nth-child(even){transform:rotate(1.5deg)}
+.ld-n:nth-child(1){--mau:#f86820}.ld-n:nth-child(2){--mau:#e2557a}.ld-n:nth-child(3){--mau:#b08a3c}.ld-n:nth-child(4){--mau:#7f93ad}.ld-n:nth-child(5){--mau:#4fb866}
+.ld-n.co{border-style:solid;border-color:transparent;background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 8px 18px -10px rgb(0 0 0/35%)}
+.ld-n.co::before{background:var(--mau)}
+.ld-n.mat{text-decoration:line-through;opacity:.5}
+.ld.bat .ld-n{opacity:0;transform:translateY(14px) scale(.8)}
+.ld.bat .ld-n:nth-child(2){transition-delay:.04s}.ld.bat .ld-n:nth-child(3){transition-delay:.08s}.ld.bat .ld-n:nth-child(4){transition-delay:.12s}.ld.bat .ld-n:nth-child(5){transition-delay:.16s}
+.ld-khay{position:relative;box-sizing:border-box;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:12px;box-shadow:0 18px 40px -12px rgb(0 0 0/55%);
+  opacity:0;transform:translateY(16px) scale(.96);transition:opacity .35s ease,transform .5s cubic-bezier(.3,1.3,.5,1)}
+.ld.bat .ld-khay{opacity:1;transform:none}
+.ld-khay .sbar{display:flex;align-items:center;gap:8px;height:30px;box-sizing:border-box;padding:0 10px 0 4px;background:#141414;border-bottom:1px solid rgb(255 255 255/6%);border-radius:11px 11px 0 0;white-space:nowrap}
+.ld-khay .slogo{display:flex;color:#f86820;padding:0 4px 0 8px}
+.ld-khay .slogo svg{width:13px;height:12px}
+.ld-khay .stitle{font-size:11px;font-weight:600;color:#c3c3c8}
+.ld-khay .scount{min-width:17px;height:15px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+.ld-kl{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:10px}
+.ld-kl i{display:block;aspect-ratio:16/10;border-radius:6px;background:rgb(255 255 255/5%)}
+.ld-san .kt-goi{position:static;transform:none;margin-top:14px;transition:opacity .3s ease}
+.ld-san .kt-tro{transition:opacity .25s,transform .8s cubic-bezier(.7,0,.2,1)}
+/* thẻ ý tưởng: bay giữa ô của ngày và ô trong khay; chấm sáng ở góc là "công tắc" của ý tưởng đó */
+.ld-the{position:absolute;left:0;top:0;width:0;height:0;z-index:3;pointer-events:none}
+.ld-y{position:absolute;left:0;top:0;border-radius:10px;overflow:hidden;container-type:inline-size;opacity:0;transform:scale(.6);box-shadow:0 10px 22px -10px rgb(0 0 0/45%),0 0 0 1px rgb(0 0 0/8%);
+  transition-property:left,top,width,height,opacity,transform,filter,border-radius;transition-duration:.62s,.62s,.62s,.62s,.3s,.45s,.5s,.5s;
+  transition-timing-function:cubic-bezier(.5,0,.2,1),cubic-bezier(.5,0,.2,1),cubic-bezier(.5,0,.2,1),cubic-bezier(.5,0,.2,1),ease,cubic-bezier(.3,1.5,.5,1),ease,ease}
+.ld-y.sang{opacity:1;transform:none;animation:ld-loe .7s ease-out}
+.ld-y.mat{opacity:0;transform:translateY(16px) rotate(var(--xoay,3deg)) scale(.9);filter:blur(5px);transition-duration:.62s,.62s,.62s,.62s,.7s,.8s,.7s,.5s}
+.ld-y.luu{border-radius:6px}
+@keyframes ld-loe{0%{box-shadow:0 0 0 0 rgb(248 104 32/60%)}100%{box-shadow:0 0 0 16px rgb(248 104 32/0%)}}
+.ld-y::after{content:"";position:absolute;right:6cqw;top:6cqw;width:8cqw;height:8cqw;border-radius:50%;background:#ffe2bd;box-shadow:0 0 0 2cqw rgb(248 104 32/40%),0 0 9cqw 3cqw rgb(255 170 90/85%)}
+.ld-y::before{content:"";position:absolute}
+.ld-y.y1{background:linear-gradient(90deg,#f86820 0 25%,#ffb347 25% 50%,#2b6f77 50% 75%,#16323a 75%)}
+.ld-y.y2{background:linear-gradient(115deg,#3b2a6b 0 48.5%,#fff 48.5% 51.5%,#e2557a 51.5%)}
+.ld-y.y2::before{left:50%;top:50%;transform:translate(-35%,-50%);border-left:11cqw solid #fff;border-top:7cqw solid transparent;border-bottom:7cqw solid transparent;filter:drop-shadow(0 1px 2px rgb(0 0 0/50%))}
+.ld-y.y3{background:#f4efe6}
+.ld-y.y3::before{content:"Aa";inset:0;display:grid;place-items:center;font:800 34cqw/1 Georgia,"Times New Roman",serif;color:#1b1714}
+.ld-y.y4{background:linear-gradient(#c3ccd9,#c3ccd9) 50% 14%/84% 13% no-repeat,linear-gradient(#9fadc0,#9fadc0) 13% 80%/36% 50% no-repeat,linear-gradient(#d3dae5,#d3dae5) 86% 46%/44% 20% no-repeat,linear-gradient(#d3dae5,#d3dae5) 86% 88%/44% 20% no-repeat,#f3f5f8}
+.ld-y.y5{background:linear-gradient(#7fd88a,#7fd88a) 12% 20%/36% 9% no-repeat,linear-gradient(#f6a05a,#f6a05a) 40% 42%/52% 9% no-repeat,linear-gradient(#6fb3ff,#6fb3ff) 26% 64%/30% 9% no-repeat,linear-gradient(#7fd88a,#7fd88a) 12% 86%/18% 9% no-repeat,#14171c}
+/* 3 câu chuyện LUÔN nằm đủ trên trang (người lướt nhanh đọc hết trong một cái nhìn, không phải chờ): mỗi câu một cột, vạch tiến độ nằm trên
+   câu; câu đang kể thì đậm màu, hai câu kia nhạt. Bấm vào câu nào thì sân kể lại từ câu đó. Cỡ chữ + độ đậm KHÔNG đổi theo trạng thái
+   (đổi là chữ xuống dòng khác đi, trang nhảy). */
+/* align-items:start là bắt buộc: thẻ button tự canh GIỮA nội dung theo chiều dọc, để giãn đều thì 3 vạch lệch nhau (đo 07/10: lệch 12 px) */
+.ld-phu{display:grid;grid-template-columns:repeat(3,1fr);align-items:start;gap:22px;max-width:980px;margin:18px auto 0}
+.ld-cau{display:block;margin:0;padding:0;border:0;background:none;font:inherit;text-align:left;color:var(--ink-2);cursor:default}
+.ld-cau span{display:block;font-size:17px;line-height:1.45;font-weight:600;transition:color .35s ease}
+.ld-vach{display:none}
+.ld.ld-on .ld-cau{cursor:pointer;color:var(--ink-3)}
+.ld.ld-on .ld-cau.on{color:var(--ink)}
+.ld.ld-on .ld-vach{position:relative;display:block;height:4px;margin-bottom:12px;border-radius:2px;background:var(--line-strong);overflow:hidden}
+.ld.ld-on .ld-vach::after{content:"";position:absolute;inset:0;border-radius:2px;background:#f86820;transform-origin:0 50%;transform:scaleX(var(--k,0));transition:transform .08s linear}
+.ld-cau:focus-visible{outline:2px solid #f86820;outline-offset:4px;border-radius:4px}
+@media (hover:hover){.ld.ld-on .ld-cau:not(.on):hover{color:var(--ink-2)}}
+/* "giảm chuyển động": đứng yên ở cảnh cuối (khay đã giữ đủ), 3 câu cùng đậm, không có vạch chạy; công tắc vẫn gạt được */
+.ld.ld-tinh .ld-vach{display:none}
+.ld.ld-tinh .ld-cau{color:var(--ink);cursor:default}
+@media (prefers-reduced-motion:reduce){.ld-y,.ld-khay,.ld-nut i,.ld-doi > span,.ld-san .kt-tro{transition:none}.ld-y.sang,.ld-nut.nhay{animation:none}}
+@media (max-width:720px){
+  .ld-san{padding:16px 12px 16px;border-radius:18px}
+  .ld-phu{grid-template-columns:1fr;gap:14px}
+  .ld-cau span{font-size:16px}
+  .ld.ld-on .ld-vach{margin-bottom:8px}
+  .ld-ngay{gap:6px}
+  .ld-o{gap:6px}
+  .ld-o small{font-size:10px}
+  .ld-o b{font-size:10px;white-space:normal;text-align:center;min-height:2.4em}
+  .ld-cho,.ld-y{border-radius:7px}
+  .ld-cho::after{font-size:15px}
+  .ld-ct{gap:10px;margin:14px 0 14px;font-size:12px}
+  .ld-noicu{gap:6px 6px}
+  .ld-n{padding:5px 9px;gap:5px;font-size:10.5px}
+  .ld-n::before{width:6px;height:6px}
+  .ld-kl{gap:6px;padding:8px}
+  .ld-san .kt-goi{margin-top:12px}
+}
+/* Đoạn VÀO (cùng kiểu hai phần Kéo thả, Khay co giãn) */
+@media (prefers-reduced-motion:no-preference){
+  .ld.cho .ld-nhan,.ld.cho .ld-dau h2{opacity:0;transform:translateY(18px)}
+  .ld.vao .ld-nhan,.ld.vao .ld-dau h2{transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .ld.vao .ld-dau h2{transition-delay:.08s}
+  .ld.cho .ld-san{opacity:0;transform:translateY(24px) scale(.97)}
+  .ld.vao .ld-san{transition:opacity .5s ease .15s,transform .7s cubic-bezier(.2,.8,.2,1) .15s}
+  .ld.cho .ld-cho{opacity:0;transform:scale(.6)}
+  .ld.vao .ld-cho{transition:opacity .3s ease calc(.25s + var(--tre,0s)),transform .45s cubic-bezier(.3,1.5,.5,1) calc(.25s + var(--tre,0s))}
+  .ld.cho .ld-o small,.ld.cho .ld-ct,.ld.cho .ld-noi,.ld.cho .ld-phu{opacity:0}
+  .ld.vao .ld-o small{transition:opacity .3s ease .4s}
+  .ld.vao .ld-ct{transition:opacity .35s ease .5s}
+  .ld.vao .ld-noi{transition:opacity .35s ease .6s}
+  .ld.vao .ld-phu{transition:opacity .4s ease .3s}
+}
+
 /* 24/09 anh: "animation peak hơn": vòng sóng cam lan ra chỗ ảnh đáp xuống */
 .kh-song{position:absolute;z-index:3;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 18px rgb(248 104 32/55%)}
 .kh-cursor{position:absolute;left:0;top:0;z-index:5;margin:-2px 0 0 -4px;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(0 0 0/45%))}
@@ -708,6 +1103,8 @@ details p{margin:0;padding:0 20px 18px;color:var(--ink-2)}
 /* ===== Cuối trang ===== */
 .end{padding:96px 0;text-align:center}
 .end h2{margin-bottom:24px}
+.end h2:has(+ .end-sub){margin-bottom:14px}
+.end .end-sub{margin:0 auto 26px;max-width:32em;padding:0 8px;color:var(--ink-2);font-size:17px;line-height:1.5;text-wrap:balance}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--ink-3);font-size:14px}
 .foot-links{display:flex;gap:16px}.foot-links a{color:var(--ink-2);text-decoration:none}.foot-links a:hover{color:var(--ink);text-decoration:underline}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
@@ -841,7 +1238,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
     <div class="wrap">
       <span class="eyebrow"><i></i><span data-i="eyebrow">Screenshots for people who make things</span></span>
       <h1 data-i-html="h1"><span class="h1a">Capture it. Pin it.</span><br><em>Drop it anywhere.</em></h1>
-      <p class="lede" data-i="lede">Press one shortcut, drag a box, and your screenshot is ready to pin on top, mark up, or drag straight into Premiere, Figma, or a chat.</p>
+      <p class="lede" data-i="lede">Capture → Save → Send. One tight flow, all in one place.</p>
       <div class="hero-cta">
         <a class="btn btn-main" href="#checkout" data-i="heroBuy">Get Shot &amp; Save</a>
         <a class="btn btn-ghost" href="#features" data-i="heroSee">See what it does</a>
@@ -863,6 +1260,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
             <button type="button" class="cc" data-tool="text" aria-pressed="false" aria-label="Text (3)" data-i-aria="aText"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg><i class="so">3</i></button>
             <button type="button" class="cc" data-tool="blur" aria-pressed="false" aria-label="Blur (4)" data-i-aria="aBlur"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="5" height="5" rx="1"/><rect x="9.5" y="4" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="4" width="5" height="5" rx="1"/><rect x="4" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="15" y="9.5" width="5" height="5" rx="1" opacity=".45"/><rect x="4" y="15" width="5" height="5" rx="1"/><rect x="9.5" y="15" width="5" height="5" rx="1" opacity=".45"/><rect x="15" y="15" width="5" height="5" rx="1"/></svg><i class="so">4</i></button>
             <button type="button" class="cc xem" data-xem="9" aria-label="Grab text in the area (5), see it below" data-i-aria="aOcr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8h8M7 12h10M7 16h6"/></svg><i class="so">5</i></button>
+            <!-- 06/10: app co them 6 (danh so) · 7 (but) · 8 (da quang) · 9 (chup cuon); thu tu anh chot: V | day so | S R | mau. Deu la nut .xem. -->
+            <button type="button" class="cc xem" data-xem="13" aria-label="Step numbers 1, 2, 3 (6), see it below" data-i-aria="aSo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10.2 9.7 12.6 8v8.2"/></svg><i class="so">6</i></button>
+            <button type="button" class="cc xem" data-xem="14" aria-label="Pen (7), see it below" data-i-aria="aBut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg><i class="so">7</i></button>
+            <button type="button" class="cc xem" data-xem="14" aria-label="Highlighter (8), see it below" data-i-aria="aDaQuang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><i class="so">8</i></button>
+            <button type="button" class="cc xem" data-xem="15" aria-label="Scrolling capture (9), see it below" data-i-aria="aCuon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h-6a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h6"/><path d="M18 14v7"/><path d="M18 3v7"/><path d="M15 18l3 3l3 -3"/><path d="M15 6l3 -3l3 3"/></svg><i class="so">9</i></button>
             <button type="button" class="cc xem" data-xem="10" aria-label="Storyboard Strip (S), see it below" data-i-aria="aSb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><i class="so">S</i></button>
             <button type="button" class="cc xem" data-xem="11" aria-label="Record this area as video (R), see it below" data-i-aria="aRec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg><i class="so">R</i></button>
             <span class="chia"></span>
@@ -897,11 +1299,58 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
     </div>
   </section>
 
+  <!-- Section LÝ DO (07/10, anh: "một section riêng nêu ra lí do tại sao anh làm cái này ... khai thác nó thành UI kể chuyện").
+       Câu chuyện của anh kể thành 3 câu (bản đầu 5 câu, anh: "gom lại thành 03 slide", "bán câu chuyện và nỗi đau của mình chứ không bán hàng"):
+       2 câu đầu là nỗi đau, câu 3 mới tới cái khay. 3 câu LUÔN nằm đủ dưới sân; sân diễn theo từng câu; công tắc gạt được.
+       Không chạy được JS thì còn tiêu đề + 3 câu chữ. Thẻ ý tưởng do JS dựng (khối "Section LÝ DO"). -->
+  <section class="sec" id="why">
+    <div class="wrap ld" id="ld">
+      <div class="ld-dau">
+        <span class="ld-nhan" data-i="ldNhan">Why Shot &amp; Save exists</span>
+        <h2><span data-i="ldT">Good ideas,</span><span class="ld-doi"><span class="a" data-i="ldTa">gone again</span><span class="b" data-i="ldTb" aria-hidden="true">now kept in one place</span></span></h2>
+      </div>
+      <div class="ld-san" id="ldSan">
+        <div class="ld-ngay" aria-hidden="true">
+          <!-- nhãn 2 chữ có <wbr>: hàm chống chữ mồ côi của trang dán chữ cuối bằng dấu cách cứng, không có <wbr> thì ở 320 px nhãn không xuống dòng được và tràn ô (đo 07/10) -->
+          <div class="ld-o"><small data-i="ldD1">Mon</small><i class="ld-cho"></i><b data-i-html="ldY1">Color <wbr>palette</b></div>
+          <div class="ld-o"><small data-i="ldD2">Tue</small><i class="ld-cho"></i><b data-i-html="ldY2">Transition</b></div>
+          <div class="ld-o"><small data-i="ldD3">Wed</small><i class="ld-cho"></i><b data-i-html="ldY3">Typeface</b></div>
+          <div class="ld-o"><small data-i="ldD4">Thu</small><i class="ld-cho"></i><b data-i-html="ldY4">Layout</b></div>
+          <div class="ld-o"><small data-i="ldD5">Fri</small><i class="ld-cho"></i><b data-i-html="ldY5">Code <wbr>snippet</b></div>
+        </div>
+        <!-- Núm công tắc là ẢNH TRÒN của anh (anh 07/10: "thêm hình tròn nhỏ của anh vào đây nhìn cho uy tín"). File ảnh: img/tac-gia.jpg.
+             CHỖ ĐỂ ẢNH: bỏ file `tac-gia.jpg` (hoặc .png / .webp, ảnh vuông) vào thư mục nháp này rồi chạy lại chen.cjs: script chép ảnh sang img/ của trang.
+             Chưa có file thì chen.cjs GỠ thẻ img (trang không gọi file 404) và núm hiện hình người mặc định. -->
+        <div class="ld-ct"><span class="t" data-i="ldOff">Scattered</span><button type="button" class="ld-nut" id="ldNut" role="switch" aria-checked="false" aria-labelledby="ldOnNhan"><i><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15.5" r="7" fill="currentColor"/><path fill="currentColor" d="M5.5 40c0-8.6 6.2-14 14.5-14s14.5 5.4 14.5 14z"/></svg></i></button><span class="b2" id="ldOnNhan" data-i="ldOn">On the shelf</span></div>
+        <div class="ld-noi" aria-hidden="true">
+          <!-- Chưa bật công tắc: chỗ của khay là 5 NƠI TẠM mà ý tưởng hay bị bỏ lại (anh 07/10: "slide đầu tiên chỗ này nó trống và bị ngô nghê").
+               Ý tưởng nào bật lên thì nơi tạm tương ứng sáng; ý tưởng mất thì nơi đó bị gạch. Bật công tắc: 5 nơi gom lại thành MỘT cái khay. -->
+          <div class="ld-noicu" id="ldNoiCu"><span class="ld-n" data-i="ldN1">An open tab</span><span class="ld-n" data-i="ldN2">Downloads folder</span><span class="ld-n" data-i="ldN3">Screenshots</span><span class="ld-n" data-i="ldN4">Notes app</span><span class="ld-n" data-i="ldN5">A text to myself</span></div>
+          <div class="ld-khay">
+            <div class="sbar">
+              <span class="slogo"><svg viewBox="0 0 386 352"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+              <span class="stitle" data-i="demoShelf">Shelf</span><span class="scount" id="ldDem">0</span>
+            </div>
+            <div class="ld-kl" id="ldKl"><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+        <div class="kt-goi an" id="ldGoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 1 1 3 0v2.5"/><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5"/><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"/></svg><span data-i="ldGoi">Try it: flip the switch</span></div>
+        <div class="ld-the" id="ldThe" aria-hidden="true"></div>
+        <div class="kt-tro" id="ldTro" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="ld-phu" id="ldPhu">
+        <button type="button" class="ld-cau"><i class="ld-vach"></i><span data-i="ld1">Every new project sends me hunting for ideas. Every day I find a good one.</span></button>
+        <button type="button" class="ld-cau"><i class="ld-vach"></i><span data-i="ld2">It goes into the project I'm on, and then it's “gone somewhere”.</span></button>
+        <button type="button" class="ld-cau"><i class="ld-vach"></i><span data-i="ld3">Every idea is a switch that turns your brain on. After 5+ years in media and creative, let me help you keep them all in one place.</span></button>
+      </div>
+    </div>
+  </section>
+
   <section class="sec" id="features">
     <div class="wrap">
       <div class="sec-head">
         <h2 data-i="featTitle">Everything you need. Nothing you don't.</h2>
-        <p data-i="featSub">Built by a video editor who takes hundreds of screenshots a week.</p>
+        <p data-i="featSub">Built by a video editor who saves hundreds of ideas a week.</p>
       </div>
       <div class="grid" id="featGrid">
         <article class="card" data-hien>
@@ -976,6 +1425,28 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f13t">A shelf that tucks itself away</h3>
           <p data-i="f13p">Leave the shelf alone for 5 seconds and it folds into a small round button in the corner, showing your latest shot and how many are waiting. Click the button and the shelf opens right where it was.</p>
         </article>
+        <!-- 06/10: 4 tinh nang moi cua app (danh so 02/10, but ve + da quang, chup cuon, xuat GIF 06/10). Chi hua thu CO trong ma:
+             phim 6 / 7 / 8 / 9, Shift ra duong thang, nut Xong, GIF cho doan quay duoi 60 giay. Icon chep tu src/overlay/index.html (nut 9: Tabler arrow-autofit-height, MIT, anh chon 06/10). -->
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10.2 9.7 12.6 8v8.2"/></svg></div>
+          <h3 data-i="f14t">Number your steps</h3>
+          <p data-i-html="f14p">Press <kbd>6</kbd> and click on the shot: a badge with 1, then 2, then 3. Delete one in the middle and the rest renumber themselves.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></div>
+          <h3 data-i="f15t">Pen and highlighter</h3>
+          <p data-i-html="f15p">Press <kbd>7</kbd> to draw freehand, <kbd>8</kbd> to highlight what matters. Hold Shift for a straight line.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h-6a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h6"/><path d="M18 14v7"/><path d="M18 3v7"/><path d="M15 18l3 3l3 -3"/><path d="M15 6l3 -3l3 3"/></svg></div>
+          <h3 data-i="f16t">Scrolling capture</h3>
+          <p data-i-html="f16p">Box the part of the page that scrolls and press <kbd>9</kbd>. Scroll down with your mouse and the app stitches what passes by into one long image. Click Done to save it.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5H8.5a1.5 1.5 0 0 0-1.5 1.5v2a1.5 1.5 0 0 0 1.5 1.5H10V12.5H9M12.5 9.5v5M15 14.5v-5h2.5M15 12h2"/></svg></div>
+          <h3 data-i="f17t">Turn a recording into a GIF</h3>
+          <p data-i="f17p">In the Video shelf, click GIF on any recording under 60 seconds. A few seconds later the GIF is ready to drag into a chat or any other app, just like the video.</p>
+        </article>
       </div>
     </div>
     <!-- 29/09 NHAP "Rap chieu" (anh: 2 huong A/B "chua du Creative"): 11 canh dien thang len CHU tren san khau, dinh giua man,
@@ -1019,8 +1490,9 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .goi-y kbd{font-size:11px}
 /* 01/10: 13 clip (trước 11) -> clip hẹp lại: bớt đệm + chữ tên 10.5px; dưới 1180px ẩn tên, chỉ còn số (đo: "Storyboard", "Quay video" bị cắt ở 1280) */
 .clip{gap:4px;padding:0 5px 0 6px}.clip .ten{font-size:10.5px}
-@media (max-width:1180px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}
+@media (max-width:1560px){.clip .ten{display:none}.clip{justify-content:center;padding:0}}   /* 06/10: 17 clip (trước 13) → dưới 1560 px chỉ còn số */
 @media (max-width:640px){.duoi{flex-direction:column;align-items:flex-start;gap:10px}.goi-y .phim-thu{display:none}.tren .nhan-tren{display:none}}
+@media (max-width:480px){.tl-ray{gap:3px}.clip{font-size:9px;letter-spacing:-.03em}}   /* 06/10: 17 clip trên điện thoại ≈ 14–16 px mỗi ô → chữ số 9 px mới không bị cắt */
 @media (hover:none){.goi-y .phim-thu{display:none}}
 /* đồ nghề trên sân khấu — khung chọn / tay nắm / nhãn cỡ / xoè 6 khung chép số đo từ src/overlay/overlay.css của app */
 .chu{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font-weight:800;letter-spacing:-.045em;line-height:1;white-space:nowrap;color:var(--t1);font-size:calc(var(--u)*9);text-align:center}
@@ -1143,15 +1615,32 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .ntr .so:empty{display:none}
 .song{position:absolute;z-index:31;width:52px;height:52px;border-radius:26px;border:2px solid var(--acc);opacity:0;pointer-events:none}
 .chop{position:absolute;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none}
+/* 06/10 · 4 cảnh mới. ĐÁNH SỐ: huy hiệu chép veSo() của app (tròn 26 px, viền 2 px màu chữ, bóng đổ). BÚT / DẠ QUANG: nét tròn đầu,
+   dạ quang mờ 0,4 như NET trong overlay.js. CHỤP CUỘN: thước + nút Xong dùng chung khuôn đồng hồ quay (.dhq) như app. GIF: ô thứ ba
+   của cụm chọn trong thẻ video. */
+.hh{position:absolute;z-index:15;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--acc);box-shadow:0 1px 4px rgb(0 0 0/45%),inset 0 0 0 2px #fff;color:#fff;font:700 14px/26px Inter,sans-serif;text-align:center}
+.net{position:absolute;left:0;top:0;z-index:14;width:100%;height:100%;overflow:visible;pointer-events:none}
+.net path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.chu .a{margin:0 .22em}   /* chừa chỗ cho vòng khoanh của bút, không đè chữ bên cạnh */
+.trg{position:absolute;left:0;top:0;width:100%;background:#fff}
+.trg .muc{position:absolute;left:6%;right:6%;border-radius:8px;background:#f4f1ed;overflow:hidden}
+.trg .muc b{position:absolute;left:5%;top:50%;transform:translateY(-50%);font:800 calc(var(--u)*5)/1 Inter,sans-serif;letter-spacing:-.04em;color:#16110d}
+.trg .muc i{position:absolute;left:38%;height:9%;border-radius:99px;background:#d9d1c8}
+.anhdai{position:absolute;z-index:26;overflow:hidden;border-radius:6px;background:#fff;box-shadow:0 0 0 1.5px var(--acc),0 20px 40px -16px #000}
+.vdau .chon i.dang{color:var(--acc);font-variant-numeric:tabular-nums}
+.kvd.hep .vdau{gap:6px}.kvd.hep .vdau .chon i{padding:0 6px;font-size:11px}   /* thẻ hẹp: 3 ô chọn phải vừa một hàng trên điện thoại */
+.kvd.rathep .vdau b{display:none}   /* điện thoại 320 px: bỏ tên "Video 01" (đo 06/10: còn tràn 22–24 px) */
+.gifo{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px rgb(0 0 0/10%)}
+.gifo .nhg{position:absolute;left:6px;top:6px;z-index:2;padding:0 5px;border-radius:4px;background:rgb(10 10 10/74%);color:#fff;font:700 10px/1.6 Inter,sans-serif}
 @media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after,.dhq .r{animation:none}}
 </style>
 <div class="dinh">
-  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / 13</span></div>
+  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / <span id="soTong">17</span></span></div>
   <div class="san-khung le"><div class="san" id="san"></div></div>
   <div class="duoi le"><div class="cap"><h3 id="capTen"></h3><p id="capMo"></p></div><div class="phim-cap" id="capPhim"></div></div>
   <div class="tl le">
     <div class="tl-ray" id="ray"></div>
-    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>V</kbd> <kbd>S</kbd> <kbd>R</kbd></span></div>
+    <div class="goi-y"><span data-r="goiY"></span><span class="phim-thu"><span data-r="thu"></span> <kbd>V</kbd> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>S</kbd> <kbd>R</kbd></span></div>
   </div>
 </div>
     </template>
@@ -1160,6 +1649,26 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
   <!-- Section KHAY (anh 22/09): kéo ảnh từ khay vào NHIỀU app — Lark → Teams → Premiere Pro, lặp.
        Chỉ ghi TÊN app, vẽ giao diện gợi tả, KHÔNG dùng logo / chép giao diện của họ (tránh vấn đề thương hiệu). -->
   <section class="sec" id="shelf">
+    <!-- Bản 2 (06/10, anh: "creative hơn nữa"): một khay ở giữa, 6 app vây quanh, khách tự kéo được.
+         Chỉ ghi TÊN app + giao diện gợi tả, không dùng logo / chép giao diện của hãng. Cửa sổ app do JS dựng (khối "Section KHAY bản 2"). -->
+    <div class="wrap kt" id="kt">
+      <div class="kt-dau">
+        <h2 data-i="khTitle">One drag away</h2>
+        <p data-i="khSub">Every shot waits on your shelf. Drag it straight into Zalo, Teams, Premiere or Figma. No hunting through folders, no lost focus.</p>
+      </div>
+      <div class="kt-san" id="ktSan" aria-hidden="true">
+        <svg class="kt-day" id="ktDay"></svg>
+        <div class="kt-khay" id="ktKhay"><div class="kt-kin">
+          <div class="sbar">
+            <span class="slogo"><svg viewBox="0 0 386 352"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+            <span class="stitle" data-i="demoShelf">Shelf</span><span class="scount">4</span>
+          </div>
+          <div class="kt-luoi" id="ktLuoi"></div>
+        </div></div>
+        <div class="kt-goi" id="ktGoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 1 1 3 0v2.5"/><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5"/><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"/></svg><span data-i="ktGoi">Try it: drag a shot onto any app</span></div>
+        <div class="kt-tro" id="ktTro"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
     <div class="wrap kh-grid">
       <div class="kh-text">
         <h2 data-i="khTitle">One drag away</h2>
@@ -1192,6 +1701,29 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
        Đúng tính năng thật: kéo góc khay → thêm hàng/cột, ẢNH GIỮ NGUYÊN CỠ (anh chốt 14/09 "xem nhiều ảnh hơn, không phóng ảnh");
        có khay ngang và khay dọc. Cảnh trái, chữ phải (đảo chiều so với section trên). -->
   <section class="sec" id="resize">
+    <!-- Bản 2 (07/10, anh: "anh muốn creative luôn ở phần này"): lưới 24 ô ảnh cố định, khay là khung phủ lên; khách kéo 4 góc,
+         khung phủ tới đâu ảnh hiện tới đó. Ô ảnh do JS dựng (khối "Section KHAY CO GIÃN bản 2"), lấy lại 24 ảnh mẫu của bản 1. -->
+    <div class="wrap kg" id="kg">
+      <div class="kg-dau">
+        <h2 data-i-html="kgTitle"><span class="kg-gian">Stretch</span><br class="kg-xd"> to see more</h2>
+        <p data-i="rsSub">Drag any corner of the shelf. Bigger means more rows and columns, never blurry zoomed shots. Keep it along the bottom or stand it up on the side.</p>
+      </div>
+      <div class="kg-che" id="kgChe" aria-hidden="true"><span data-che="ngang" data-i="rsNgang">Horizontal</span><span data-che="doc" data-i="rsDoc">Vertical</span></div>
+      <div class="kg-san" id="kgSan" aria-hidden="true">
+        <div class="kg-luoi kg-nen" id="kgNen"></div>
+        <div class="kg-khay" id="kgKhay">
+          <div class="sbar">
+            <span class="slogo"><svg viewBox="0 0 386 352"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+            <span class="stitle" data-i="demoShelf">Shelf</span><span class="scount" id="kgDem">6</span>
+          </div>
+          <i class="kg-goc tl" data-g="tl"></i><i class="kg-goc tr" data-g="tr"></i><i class="kg-goc bl" data-g="bl"></i><i class="kg-goc br" data-g="br"></i>
+        </div>
+        <div class="kg-luoi kg-anh" id="kgAnh"></div>
+        <div class="kg-nhan" id="kgNhan"></div>
+        <div class="kt-goi" id="kgGoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 1 1 3 0v2.5"/><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5"/><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"/></svg><span data-i="kgGoi">Try it: drag any corner of the shelf</span></div>
+        <div class="kt-tro" id="kgTro"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
     <div class="wrap rs-grid">
       <div class="rs-visual" id="rsVisual" aria-hidden="true">
         <div class="rs-mode"><span class="on" data-i="rsNgang">Horizontal</span><span data-i="rsDoc">Vertical</span></div>
@@ -1219,7 +1751,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
        (khảo sát 29/09 không thấy app nào làm vậy, nhưng chưa rà hết App Store / Microsoft Store). -->
   <section class="sec" id="storyboard">
     <div class="wrap kh-grid">
-      <div class="kh-text sb-text">
+      <div class="kh-text sb-text" data-hien>
         <h2 data-i="sbTitle">Three seconds. Six shots.</h2>
         <p data-i="sbSub">Box any moving area and press S. Shot &amp; Save records 3 seconds as six numbered frames in one strip. Every strip waits in the Storyboard shelf, even after a restart.</p>
         <ol class="sb-buoc">
@@ -1228,7 +1760,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
           <li><b>3</b><span data-i="sbS3">Drag the whole strip into Premiere Pro, Zalo or Messenger</span></li>
         </ol>
       </div>
-      <div class="kh-right">
+      <div class="kh-right" data-hien style="--tre:120ms">
         <div class="kh-mon"><div class="sb-visual" id="sbVisual">
           <div class="sb-vid" id="sbVid"><div class="sb-canh" id="sbCanh"><i class="sb-nui"></i><i class="sb-bong"></i><i class="sb-dat"></i><span class="sb-tc">00:00:00:00</span></div></div>
           <div class="sb-chon" id="sbChon" hidden>
@@ -1263,7 +1795,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
        vì phim đổi ngôn ngữ CỬA SỔ, không đổi ngôn ngữ trang. -->
   <section class="sec" id="settings">
     <div class="wrap st-grid">
-      <div class="st-text">
+      <div class="st-text" data-hien>
         <h2 data-i="stTitle">Set it once, forget it</h2>
         <p data-i="stSub">Every option lives in one small window. No nested menus, no manual to read.</p>
         <ol class="st-ds" id="stDs">
@@ -1275,7 +1807,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
           <li><span class="st-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><div><b data-i="stP4">Vietnamese or English</b><small data-i="stP4m">Switch the language in one click.</small></div><i class="st-tien"></i></li>
         </ol>
       </div>
-      <div class="st-visual" id="stVisual" aria-hidden="true">
+      <div class="st-visual" id="stVisual" aria-hidden="true" data-hien style="--tre:120ms">
         <div class="st-win" id="stWin">
           <div class="st-top">
             <span class="st-hieu"><svg viewBox="0 0 385.89 351.31" width="18" height="16"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg><b data-w="tieuDe"></b></span>
@@ -1326,7 +1858,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 
   <section class="sec" id="pricing">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head" data-hien>
         <h2 data-i="priceTitle">One price. Pay once.</h2>
         <p data-i="priceSub">No subscription, no renewal. Every future update is included.</p>
       </div>
@@ -1362,8 +1894,8 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 
   <section class="sec" id="faq">
     <div class="wrap">
-      <div class="sec-head"><h2 data-i="faqTitle">Questions</h2></div>
-      <div class="faq">
+      <div class="sec-head" data-hien><h2 data-i="faqTitle">Questions</h2></div>
+      <div class="faq" data-hien style="--tre:100ms">
         <details><summary data-i="q1">What exactly do I pay?</summary><p data-i="a1">$14.99, once. That covers every feature and every update we release after, with nothing to renew.</p></details>
         <details><summary data-i="q2">Do I pay again for new versions?</summary><p data-i="a2">No. Every new version is free for the license you already own.</p></details>
         <details><summary data-i="q3">How many computers can I use it on?</summary><p data-i="a3">Two, for example one at work and one at home. Changing computers? Press Deactivate on this computer in Settings on the old one, then activate on the new one.</p></details>
@@ -1373,8 +1905,9 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
   </section>
 
   <section class="end">
-    <div class="wrap">
-      <h2 data-i-html="endTitle">Your next screenshot<br>can be the fast one.</h2>
+    <div class="wrap" data-hien>
+      <h2 data-i-html="endTitle">Your next idea.<br>Don't let it slip away.</h2>
+      <p class="end-sub" data-i="featSub">Built by a video editor who saves hundreds of ideas a week.</p>
       <a class="btn btn-main" href="#checkout" data-i="endBtn">Get Shot &amp; Save</a>
     </div>
   </section>
@@ -1400,9 +1933,9 @@ const T = {
     skip:"Bỏ qua tới nội dung", navFeatures:"Tính năng", navPricing:"Giá", navFaq:"Hỏi đáp", navBuy:"Mua",
     eyebrow:"Công cụ chụp màn hình cho người làm sáng tạo",
     h1:"<span class=\"h1a\">Chụp. Ghim.</span><br><em>Kéo thả đi bất cứ đâu.</em>",
-    lede:"Nhấn phím tắt, chọn vùng cần chụp. Ảnh có thể ghim nổi trên màn hình, thêm chú thích, hoặc kéo thẳng vào Premiere, Figma hay khung chat.",
+    lede:"Chụp → Lưu → Gửi. Thao tác siêu gọn trong một không gian.",
     heroBuy:"Mua Shot & Save", heroSee:"Xem cách hoạt động",
-    featTitle:"Gọn nhẹ, đủ những gì bạn cần", featSub:"Được làm bởi một editor dựng phim, người chụp màn hình hàng trăm lần mỗi tuần.",
+    featTitle:"Gọn nhẹ, đủ những gì bạn cần", featSub:"Được làm bởi một editor dựng phim, người lưu hàng trăm ý tưởng mỗi tuần.",
     f1t:"Chụp tức thì",
     f1p:"Một phím tắt là có ảnh.<br>Kịp lưu lại mọi ý tưởng.",
     f2t:"Kéo và thả", f2p:"Kéo ảnh thả thẳng vào ứng dụng bạn đang dùng.",
@@ -1417,6 +1950,10 @@ const T = {
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, những ảnh chụp gần nhất tự hiện sẵn trong khay. Số ảnh chọn trong Cài đặt: Tắt, 5, 10 hoặc 20.",
     f12t:"Quay video vùng màn hình", f12p:"Khoanh vùng rồi bấm <kbd>R</kbd>. App quay tới khi bạn bấm Dừng, tối đa 5 phút. File MP4 nằm sẵn trong Khay video: chọn bản Có tiếng hoặc Không tiếng rồi kéo cả hàng thả vào khung chat hay ứng dụng khác. Trên Windows quay được cả tiếng đang phát trên máy.",
     f13t:"Khay tự thu gọn", f13p:"Không dùng tới 5 giây, khay tự thu về một nút tròn nhỏ ở góc màn hình, hiện ảnh mới nhất và số ảnh đang có. Bấm nút, khay mở lại đúng chỗ cũ.",
+    f14t:"Đánh số từng bước", f14p:"Bấm <kbd>6</kbd> rồi bấm lên ảnh: hiện huy hiệu số 1, rồi 2, rồi 3. Xoá một số ở giữa, các số còn lại tự dồn cho liền.",
+    f15t:"Bút vẽ tay và bút dạ quang", f15p:"Bấm <kbd>7</kbd> để vẽ tay, <kbd>8</kbd> để tô lên chỗ cần chú ý. Giữ Shift ra đường thẳng.",
+    f16t:"Chụp cuộn trang dài", f16p:"Khoanh phần trang đang cuộn rồi bấm <kbd>9</kbd>. Bạn lăn chuột cuộn xuống, app ghép những gì đi qua thành một ảnh dài. Bấm Xong để lưu.",
+    f17t:"Xuất GIF từ đoạn quay", f17p:"Trong Khay video, bấm GIF ở đoạn quay dưới 60 giây. Vài giây sau GIF đã sẵn để kéo thả vào khung chat hay ứng dụng khác, như với video.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
     b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Các bản cập nhật sau", b2s:"Tính năng mới và bản sửa lỗi", b2n:"Miễn phí",
@@ -1427,7 +1964,7 @@ const T = {
     q2:"Có bản mới tôi có phải trả thêm không?", a2:"Không. Mọi phiên bản mới đều miễn phí với bản quyền bạn đã mua.",
     q3:"Dùng được trên mấy máy?", a3:"Hai máy, ví dụ máy công ty và máy ở nhà. Đổi máy thì ở máy cũ bấm Huỷ kích hoạt trên máy này trong Cài đặt, rồi kích hoạt ở máy mới.",
     q4:"Có chạy trên Mac không?", a4:"Có. Bản thử nghiệm chạy trên Mac chip Apple và Intel. Lần đầu mở, macOS có thể yêu cầu bạn xác nhận tại Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở.",
-    endTitle:"Chụp màn hình nhanh hơn,<br>bắt đầu từ hôm nay.", endBtn:"Mua Shot & Save",
+    endTitle:"Ý tưởng tiếp theo,<br>đừng để trôi mất.", endBtn:"Mua Shot & Save",
     footRight:"Dành cho editor, designer và bất kỳ ai thường xuyên chụp màn hình.", fRefund:"Hoàn tiền", fTerms:"Điều khoản", fPrivacy:"Quyền riêng tư",
     toast:"Sắp mở bán. Chúng tôi đang hoàn tất cổng thanh toán.",
     demoTry:"Thử ngay tại đây", demoChart:"Doanh thu theo tuần", demoShelf:"Khay ảnh", demoEmpty:"Ảnh chụp sẽ nằm ở đây",
@@ -1440,10 +1977,11 @@ const T = {
 document.querySelectorAll("[data-i]").forEach(el => T.en[el.dataset.i] = el.textContent);
 document.querySelectorAll("[data-i-html]").forEach(el => T.en[el.dataset.iHtml] = el.innerHTML);
 document.querySelectorAll("[data-i-aria]").forEach(el => T.en[el.dataset.iAria] = el.getAttribute("aria-label"));
-Object.assign(T.vi, { aSelect:"Chọn và di chuyển nét vẽ (V), xem bên dưới", aOcr:"Lấy chữ trong vùng (5), xem bên dưới", aSb:"Dải phân cảnh Storyboard (S), xem bên dưới", aRec:"Quay video vùng này (R), xem bên dưới",
+Object.assign(T.vi, { aSo:"Đánh số bước 1, 2, 3 (6), xem bên dưới", aBut:"Bút vẽ tay (7), xem bên dưới", aDaQuang:"Bút dạ quang (8), xem bên dưới", aCuon:"Chụp cuộn trang dài (9), xem bên dưới",
+  aSelect:"Chọn và di chuyển nét vẽ (V), xem bên dưới", aOcr:"Lấy chữ trong vùng (5), xem bên dưới", aSb:"Dải phân cảnh Storyboard (S), xem bên dưới", aRec:"Quay video vùng này (R), xem bên dưới",
   demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)", aBlur:"Làm mờ (4)",
   aUndo:"Hoàn tác (Ctrl+Z)", aCancel:"Huỷ (Esc)", aExit:"Thoát (Esc)", aDone:"Xong (Enter)", aClear:"Dọn khay",
-  themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
+  themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", ldNhan:"Vì sao có Shot & Save", ldT:"Ý tưởng hay,", ldTa:"rồi lại đi đâu mất", ldTb:"giờ ở một nơi duy nhất", ldD1:"Thứ 2", ldD2:"Thứ 3", ldD3:"Thứ 4", ldD4:"Thứ 5", ldD5:"Thứ 6", ldY1:"Bảng <wbr>màu", ldY2:"Chuyển <wbr>cảnh", ldY3:"Kiểu <wbr>chữ", ldY4:"Bố <wbr>cục", ldY5:"Đoạn <wbr>code", ldOff:"Mỗi thứ một nơi", ldOn:"Có khay giữ", ldGoi:"Thử đi: gạt công tắc", ldN1:"Tab đang mở", ldN2:"Thư mục Downloads", ldN3:"Ảnh màn hình", ldN4:"Ghi chú", ldN5:"Tự nhắn cho mình", ld1:"Mỗi lần có project mới, mình lại đi tìm ý tưởng. Mỗi ngày lại gặp một ý tưởng hay.", ld2:"Dùng xong cho project đang làm, rồi nó lại “đi đâu mất”.", ld3:"Mỗi ý tưởng là một công tắc kích hoạt não bộ. Mình làm Media Creative hơn 5 năm, hãy để mình giúp bạn giữ hết vào một nơi duy nhất.", ktGoi:"Thử đi: kéo một ảnh thả vào app bất kỳ", kgGoi:"Thử đi: kéo một góc của khay", kgAnh:"ảnh", kgTitle:'Khay <span class="kg-gian">co giãn</span><br class="kg-xd"> theo ý bạn', khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
 T.en.themeToLight = "Switch to light mode";
 T.en.toast = "Coming soon. Checkout is being set up.";
 Object.assign(T.en, { khReply:"Got it, thanks!", khName:"Edit team", khOnline:"Online", khM1:"Can you send this week's chart?", khM2:"One sec", khType:"Message", khTeam:"Post team", khT1:"Can you show me the color issue?", khT2:"Here you go", khTReply:"Got it, fixing now", khClip:"shot.png", khZName:"Client", khZ1:"Can you send the thumbnail draft?", khZ2:"Sending now", khZReply:"Looks good, approved!", khMName:"Linh", khMs1:"Where does the error show up?", khMs2:"Right here", khMsReply:"Ah, I see it. Thanks!", khLayer:"shot", khPsL1:"Title", khPsL2:"Background", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Title", demoAuto:"Auto demo · Click to try it yourself", demoChart:"Revenue by week", demoSaved:"Saved to the shelf. Click it to pin it on screen.", demoPinIt:"Pin this shot", demoPinned:"Pinned shot",
@@ -1487,6 +2025,9 @@ function setLang(l){
   if (window.ssDemoRelang) window.ssDemoRelang();
   if (window.ssStRelang) window.ssStRelang();
   if (window.ssKhRelang) window.ssKhRelang();
+  if (window.ssLdRelang) window.ssLdRelang();
+  if (window.ssKtRelang) window.ssKtRelang();
+  if (window.ssKgRelang) window.ssKgRelang();
   if (window.ssSbRelang) window.ssSbRelang();
   if (window.ssRapRelang) window.ssRapRelang();
 }
@@ -2041,6 +2582,434 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   window.ssDemoRelang = () => { veKhay(); if (W) drawScene(); };
 })();
 
+// ===== Section KHAY bản 2 (06/10): một khay ở giữa, 6 app vây quanh; ảnh bay tới từng app rồi toả ra cùng lúc; khách tự kéo được =====
+// Không có GSAP (CDN hỏng) thì gỡ class kt-on, trang dùng lại bản 1 ngay bên dưới. "Giảm chuyển động": hiện sẵn 6 app đã nhận ảnh.
+document.addEventListener("DOMContentLoaded", () => {
+  const sec = document.getElementById("shelf"), san = document.getElementById("ktSan");
+  if (!sec || !san) return;
+  if (!window.gsap) return;
+  // Class kt-on do JS gắn (không ghi sẵn trong HTML): JS bị chặn hoặc dựng hỏng giữa chừng thì trang vẫn còn bản 1, không ra sân trống
+  sec.classList.add("kt-on");
+  try { khoiDong(); } catch (e) { sec.classList.remove("kt-on"); throw e; }
+  function khoiDong() {
+  const T = k => window.ssT ? window.ssT(k) : k;
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hep = matchMedia("(max-width:720px)");
+  const khoi = document.getElementById("kt");
+  const khay = document.getElementById("ktKhay"), luoi = document.getElementById("ktLuoi"), day = document.getElementById("ktDay");
+  const tro = document.getElementById("ktTro"), goi = document.getElementById("ktGoi");
+
+  // ---- 4 ảnh trong khay ----
+  const MAU = [
+    '<span class="kt-thi"><i style="height:40%"></i><i style="height:75%"></i><i style="height:55%"></i></span>',
+    '<b>+18%</b><span class="kt-thi"><i style="height:45%"></i><i style="height:90%"></i><i style="height:60%"></i><i style="height:70%"></i></span>',
+    '<span class="kt-thi"><em></em><em></em><em></em></span>',
+    '<span class="kt-thi"><u></u><s></s></span>'
+  ];
+  const anh = n => { const d = document.createElement("div"); d.className = "kt-th t" + (n + 1); d.dataset.n = n; d.innerHTML = MAU[n]; return d; };
+  for (let n = 0; n < 4; n++) luoi.append(anh(n));
+  const ths = [...luoi.children];
+  const anhAn = n => { const a = anh(n); a.classList.add("an"); return a; };
+
+  // ---- 6 app: mỗi app tự biết nhận ảnh theo kiểu của nó ----
+  const chat = o => Object.assign(o, {
+    lop: "chat",
+    html: '<div class="kt-bar"><i></i>' + o.ten + "</div>" + (o.rail ? '<div class="kt-body"><div class="kt-rail"><i></i><i></i><i></i></div><div class="kt-main">' : "") +
+      '<div class="kt-top"><span class="kt-ava">' + o.ava + '</span><span><b data-k="' + o.nhom + '"></b><small data-k="khOnline"></small></span></div>' +
+      '<div class="kt-msgs"><div class="kt-b trai" data-k="' + o.m1 + '"></div></div>' + (o.rail ? "</div></div>" : ""),
+    nhan(inn, n) {
+      const m = inn.querySelector(".kt-msgs"), b = document.createElement("div"), a = anhAn(n);
+      b.className = "kt-b anh"; b.append(a); m.append(b);
+      while (m.children.length > 4) m.firstElementChild.remove();
+      return { el: a, sau() {
+        setTimeout(() => {
+          if (!m.isConnected) return;
+          const r = document.createElement("div"); r.className = "kt-b trai kt-moi"; r.dataset.k = o.reply; r.textContent = T(o.reply); m.append(r);
+          while (m.children.length > 4) m.firstElementChild.remove();
+        }, 520);
+      } };
+    }
+  });
+  const thietKe = o => Object.assign(o, {
+    html: '<div class="kt-bar"><i></i>' + o.ten + '</div><div class="kt-2c"><div class="kt-can"><div class="kt-board"' + (o.frame ? ' data-kten="' + o.frame + '"' : "") + "></div></div>" +
+      '<div class="kt-lay">' + o.lops.map(k => '<div><i></i><span data-k="' + k + '"></span></div>').join("") + "</div></div>",
+    nhan(inn, n) {
+      const a = anhAn(n); inn.querySelector(".kt-board").replaceChildren(a);
+      return { el: a, sau() {
+        const lay = inn.querySelector(".kt-lay");
+        if (lay.querySelector(".moi")) return;
+        const d = document.createElement("div"); d.className = "moi kt-moi"; d.innerHTML = '<i></i><span data-k="khLayer">' + T("khLayer") + "</span>"; lay.prepend(d);
+      } };
+    }
+  });
+  const APP = [
+    chat({ ten: "Zalo", ic: "zalo", chu: "Z", acc: "#0068ff", ava: "K", nhom: "khZName", m1: "khZ1", reply: "khZReply" }),
+    chat({ ten: "Lark", ic: "lark", chu: "L", acc: "#245bdb", ava: "E", nhom: "khName", m1: "khM1", reply: "khReply" }),
+    chat({ ten: "Microsoft Teams", ic: "teams", chu: "T", acc: "#5b5fc7", ava: "H", nhom: "khTeam", m1: "khT1", reply: "khTReply", rail: true }),
+    { ten: "Premiere Pro", ic: "pr", chu: "Pr", lop: "pr", acc: "#9999ff",
+      html: '<div class="kt-bar"><i></i>Premiere Pro</div><div class="kt-prm"><span>Program</span></div><div class="kt-prt"><div class="kt-ph"></div>' +
+        '<div class="kt-tr"><b>V2</b><span class="kt-lane v2"></span></div>' +
+        '<div class="kt-tr"><b>V1</b><span class="kt-lane"><i class="kt-clip v" style="left:0;width:38%"></i><i class="kt-clip v" style="left:40%;width:56%"></i></span></div>' +
+        '<div class="kt-tr"><b>A1</b><span class="kt-lane"><i class="kt-clip a" style="left:0;width:38%"></i><i class="kt-clip a" style="left:40%;width:56%"></i></span></div></div>',
+      nhan(inn, n) {
+        const a = anhAn(n); inn.querySelector(".kt-prm").replaceChildren(a);
+        return { el: a, sau() { inn.querySelector(".v2").innerHTML = '<i class="kt-clip g kt-moi" style="left:49%;width:32%" data-k="khClip">' + T("khClip") + "</i>"; } };
+      } },
+    thietKe({ ten: "Photoshop", ic: "ps", chu: "Ps", lop: "ps", acc: "#31a8ff", lops: ["khPsL1", "khPsL2"] }),
+    thietKe({ ten: "Figma", ic: "fig", chu: "F", lop: "fig", acc: "#0d99ff", lops: ["khFigL1", "khFigL2"], frame: "khFigFrame" })
+  ];
+  const wins = APP.map((o, i) => {
+    const w = document.createElement("div"); w.className = "kt-win w" + i;
+    w.innerHTML = '<span class="kt-ic ' + o.ic + '">' + o.chu + '</span><div class="kt-in ' + o.lop + '" style="--acc:' + o.acc + '">' + o.html + "</div>" +
+      '<span class="kt-ok"><svg viewBox="0 0 12 12"><path d="M2.5 6.4 5 8.8 9.6 3.6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    san.insertBefore(w, khay); return w;
+  });
+  const ins = wins.map(w => w.querySelector(".kt-in"));
+  const dich = () => {
+    san.querySelectorAll("[data-k]").forEach(e => { e.textContent = T(e.dataset.k); });
+    san.querySelectorAll("[data-kten]").forEach(e => { e.dataset.ten = T(e.dataset.kten); });
+  };
+  dich(); window.ssKtRelang = dich;
+  const goc = ins.map(e => e.innerHTML);
+
+  // ---- đo: hop = hình chữ nhật thật trên màn (đã xoay), bo = theo bố cục (chưa xoay) ----
+  const hop = el => { const r = el.getBoundingClientRect(), s = san.getBoundingClientRect(); return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height }; };
+  const bo = el => ({ x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
+  const tam = i => { const d = bo(wins[i]); return { x: d.x + d.w / 2, y: d.y + d.h / 2 }; };
+  const lam = v => Math.round(v * 10) / 10;
+  // khay đo theo bố cục (không theo hình đang co lại lúc chờ vào); máy tính khay lệch lên nửa chiều cao bằng transform
+  const hopKhay = () => ({ x: khay.offsetLeft, y: khay.offsetTop - (hep.matches ? 0 : khay.offsetHeight / 2), w: khay.offsetWidth, h: khay.offsetHeight });
+
+  // ---- dây nối khay ↔ app ----
+  const NS = "http://www.w3.org/2000/svg", dayS = [], dayN = [];
+  wins.forEach(() => {
+    const a = document.createElementNS(NS, "path"), b = document.createElementNS(NS, "path");
+    a.setAttribute("class", "n"); b.setAttribute("class", "s"); day.append(a, b); dayN.push(a); dayS.push(b);
+  });
+  function veDay() {
+    const W = san.clientWidth, H = san.clientHeight, S = hopKhay();
+    if (!W || !H) return;
+    day.setAttribute("viewBox", "0 0 " + W + " " + H);
+    wins.forEach((w, i) => {
+      const r = bo(w); let d;
+      if (hep.matches) {
+        const ax = S.x + S.w * (i < 3 ? .3 : .7), ay = S.y + S.h, bx = r.x + r.w / 2, by = r.y, my = (ay + by) / 2;
+        d = "M" + lam(ax) + "," + lam(ay) + " C" + lam(ax) + "," + lam(my) + " " + lam(bx) + "," + lam(my) + " " + lam(bx) + "," + lam(by);
+      } else {
+        const trai = i < 3, ax = trai ? S.x : S.x + S.w, ay = S.y + S.h * (.28 + .22 * (i % 3)), bx = trai ? r.x + r.w : r.x, by = r.y + r.h / 2, mx = (ax + bx) / 2;
+        d = "M" + lam(ax) + "," + lam(ay) + " C" + lam(mx) + "," + lam(ay) + " " + lam(mx) + "," + lam(by) + " " + lam(bx) + "," + lam(by);
+      }
+      dayN[i].setAttribute("d", d); dayS[i].setAttribute("d", d);
+      const L = dayS[i].getTotalLength(); dayS[i].dataset.l = L;
+      dayS[i].style.strokeDasharray = L + " " + (L + 2);
+      dayS[i].style.strokeDashoffset = w.classList.contains("co") ? 0 : L + 1;
+    });
+  }
+  new ResizeObserver(veDay).observe(san);
+  veDay();
+
+  // ---- chuyển động: mọi tween tự chạy đều tạm dừng khi section ra khỏi màn hình ----
+  let thay = false, phien = 0, hen = 0, daVao = giam;
+  const dang = new Set(), chay = () => thay && !document.hidden;
+  const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); if (thay) vao(); }, { threshold: .25 }).observe(san);
+  document.addEventListener("visibilitychange", capNhat);
+  // luon = true: tween của thao tác do khách kéo, không tạm dừng, không bị huỷ theo phiên tự chạy
+  // ☠️ tween 0 giây gọi onComplete NGAY trong lúc gsap.to chưa trả về: x phải khai báo trước, và tween đã xong thì không đưa vào sổ
+  const tw = (t, v, luon) => new Promise(res => {
+    let x = null;
+    x = gsap.to(t, Object.assign({}, v, { onComplete() { if (x) dang.delete(x); res(); } }));
+    if (!luon && x.progress() < 1) { dang.add(x); if (!chay()) x.pause(); }
+  });
+  const ngu = s => tw({}, { duration: s });
+  let tx = 0, ty = 0;
+  const datTro = (x, y) => { tx = x; ty = y; tro.style.transform = "translate3d(" + x + "px," + y + "px,0)"; };
+  const diTro = (x, y, giay) => { const x0 = tx, y0 = ty, o = { k: 0 }; return tw(o, { k: 1, duration: giay, ease: "power2.inOut", onUpdate() { datTro(x0 + (x - x0) * o.k, y0 + (y - y0) * o.k); } }); };
+  function bong(n, r) {
+    const b = anh(n); b.classList.add("kt-bong");
+    b.style.cssText = "left:" + r.x + "px;top:" + r.y + "px;width:" + r.w + "px;height:" + r.h + "px;font-size:" + getComputedStyle(ths[n]).fontSize;
+    san.append(b); return b;
+  }
+  // bay theo đường vồng (cong px) từ ô ảnh r0 tới tâm đích
+  function bay(b, r0, den, giay, cong, coTro) {
+    const x0 = r0.x + r0.w / 2, y0 = r0.y + r0.h / 2, o = { k: 0 };
+    return tw(o, { k: 1, duration: giay, ease: "power2.inOut", onUpdate() {
+      const x = x0 + (den.x - x0) * o.k, y = y0 + (den.y - y0) * o.k - cong * Math.sin(Math.PI * o.k);
+      b.style.left = (x - r0.w / 2) + "px"; b.style.top = (y - r0.h / 2) + "px";
+      if (coTro) datTro(x + r0.w * .12, y + r0.h * .1);
+    } });
+  }
+  function song(x, y) {
+    for (let k = 0; k < 2; k++) {
+      const r = document.createElement("i"); r.className = "kt-song"; r.style.left = x + "px"; r.style.top = y + "px"; san.append(r);
+      gsap.fromTo(r, { scale: .3, opacity: .95 }, { scale: 2.4 + k, opacity: 0, duration: .7 + k * .15, delay: k * .1, ease: "power2.out", onComplete: () => r.remove() });
+    }
+  }
+  // Ảnh đáp vào app i: app tự dựng chỗ nhận, bản sao thu về đúng chỗ đó rồi nhường cho ảnh thật
+  async function tha(b, i, n, luon) {
+    const k = APP[i].nhan(ins[i], n), r = hop(k.el);
+    await tw(b, { left: r.x, top: r.y, width: r.w, height: r.h, rotation: 0, scale: 1, duration: giam ? 0 : .22, ease: "power2.out" }, luon);
+    k.el.classList.remove("an"); b.remove(); k.sau();
+    if (!giam) song(r.x + r.w / 2, r.y + r.h / 2);
+    wins[i].classList.add("co"); wins[i].classList.remove("den");
+    gsap.to(dayS[i], { opacity: 1, strokeDashoffset: 0, duration: giam ? 0 : .45, ease: "power2.out" });
+  }
+  async function xoaHet() {
+    await tw(ins, { opacity: .25, duration: .28 });
+    ins.forEach((e, i) => { e.innerHTML = goc[i]; wins[i].classList.remove("co", "den"); });
+    dich();
+    dayS.forEach(s => gsap.set(s, { opacity: 0, strokeDashoffset: +s.dataset.l + 1 }));
+    await tw(ins, { opacity: 1, duration: .3 });
+  }
+
+  // ---- tự diễn: 2 lần kéo chậm bằng con trỏ cho dễ hiểu, rồi 4 ảnh toả ra cùng lúc ----
+  const HUY = {};
+  async function keo(c, n, i, nhip) {
+    const t = ths[n], r = hop(t);
+    tro.classList.add("hien");
+    await c(diTro(r.x + r.w * .62, r.y + r.h * .6, .55 * nhip));
+    t.classList.add("di");
+    const b = bong(n, r); gsap.to(b, { scale: 1.1, rotation: i < 3 ? -5 : 5, duration: .18 });
+    await c(ngu(.16));
+    wins[i].classList.add("den");
+    await c(bay(b, r, tam(i), .95 * nhip, 46, true));
+    await c(tha(b, i, n));
+    t.classList.remove("di");
+  }
+  async function phong(c, n, i, tre) {
+    await c(ngu(tre));
+    const r = hop(ths[n]), b = bong(n, r);
+    wins[i].classList.add("den");
+    await c(bay(b, r, tam(i), .72, 30 + 14 * (i % 3), false));
+    await c(tha(b, i, n));
+  }
+  async function dien() {
+    const p = ++phien, c = pr => pr.then(() => { if (p !== phien) throw HUY; });
+    try {
+      for (;;) {
+        await c(ngu(.7));
+        await c(keo(c, 1, 0, 1));
+        await c(ngu(.45));
+        await c(keo(c, 3, 3, .85));
+        await c(ngu(.35));
+        tro.classList.remove("hien");
+        await c(Promise.all([[0, 1], [2, 2], [1, 4], [0, 5]].map((x, k) => phong(c, x[0], x[1], k * .16))));
+        await c(ngu(3.2));
+        await c(xoaHet());
+      }
+    } catch (e) { if (e !== HUY) throw e; }
+  }
+  function dung() {
+    phien++; clearTimeout(hen);
+    dang.forEach(t => t.kill()); dang.clear();
+    san.querySelectorAll(".kt-bong:not(.tay)").forEach(e => e.remove());
+    san.querySelectorAll(".kt-th.an").forEach(e => e.classList.remove("an"));
+    ths.forEach(t => t.classList.remove("di"));
+    wins.forEach(w => w.classList.remove("den"));
+    tro.classList.remove("hien"); gsap.set(ins, { opacity: 1 });
+  }
+
+  // ---- khách TỰ kéo: nắm một ảnh trong khay, thả vào app nào cũng được ----
+  // Soát 07/10: (1) KHÔNG chặn theo class "di" (bản tự diễn cũng gắn "di" lên ảnh nó đang cầm, khách bấm trúng là không có phản hồi);
+  // (2) chỉ nhận nút chuột trái / ngón tay đầu tiên, mỗi lúc một lần kéo; (3) pointercancel / mất quyền giữ con trỏ = ảnh bay về, không thả.
+  let tay = null;
+  luoi.addEventListener("pointerdown", e => {
+    const t = e.target.closest(".kt-th");
+    if (!t || tay || e.button || e.isPrimary === false) return;
+    e.preventDefault(); dung(); goi.classList.add("an");
+    const p0 = phien, n = +t.dataset.n, r = hop(t), b = bong(n, r), s0 = san.getBoundingClientRect();
+    const lx = e.clientX - s0.left - r.x, ly = e.clientY - s0.top - r.y;
+    let dich2 = -1, xong = false;
+    tay = b;
+    b.classList.add("tay"); t.classList.add("di"); gsap.to(b, { scale: 1.08, rotation: -4, duration: .15 });
+    const mv = ev => {
+      const s = san.getBoundingClientRect(), px = ev.clientX - s.left, py = ev.clientY - s.top;
+      b.style.left = (px - lx) + "px"; b.style.top = (py - ly) + "px";
+      let m = -1;
+      wins.forEach((w, i) => { const q = bo(w); if (px > q.x - 10 && px < q.x + q.w + 10 && py > q.y - 10 && py < q.y + q.h + 10) m = i; });
+      if (m !== dich2) { if (dich2 >= 0) wins[dich2].classList.remove("den"); if (m >= 0) wins[m].classList.add("den"); dich2 = m; }
+    };
+    const SK = ["pointerup", "pointercancel", "lostpointercapture"];
+    const up = async ev => {
+      if (xong) return;
+      xong = true;
+      t.removeEventListener("pointermove", mv); SK.forEach(k => t.removeEventListener(k, up));
+      b.classList.remove("tay");
+      const tha2 = ev.type === "pointerup" && dich2 >= 0;
+      if (tha2) await tha(b, dich2, n, true);
+      else {
+        if (dich2 >= 0) wins[dich2].classList.remove("den");
+        // đo lại chỗ ảnh trong khay: màn hình có thể đã đổi cỡ / xoay trong lúc kéo
+        const r2 = hop(t);
+        await tw(b, { left: r2.x, top: r2.y, width: r2.w, height: r2.h, scale: 1, rotation: 0, duration: giam ? 0 : .28, ease: "power2.out" }, true); b.remove();
+      }
+      t.classList.remove("di"); tay = null;
+      if (!giam && p0 === phien) { clearTimeout(hen); hen = setTimeout(() => { const p = phien; xoaHet().then(() => { if (p === phien) dien(); }); }, 7000); }
+    };
+    try { t.setPointerCapture(e.pointerId); } catch (err) {}
+    t.addEventListener("pointermove", mv); SK.forEach(k => t.addEventListener(k, up));
+  });
+
+  if (giam) {
+    APP.forEach((o, i) => { const k = o.nhan(ins[i], i % 4); k.el.classList.remove("an"); k.sau(); wins[i].classList.add("co"); });
+    veDay(); dayS.forEach(s => { s.style.opacity = 1; });
+  } else {
+    datTro(san.clientWidth * .5, san.clientHeight * .92);
+    khoi.classList.add("cho");
+    datHuongVao();
+  }
+  // ---- đoạn VÀO (anh 07/10: "mỗi section trước khi bắt đầu animation cần một animation in"): chữ trồi lên, khay bật ra giữa sân,
+  // 6 app toả ra TỪ khay về chỗ của nó, dây nối hiện, rồi mới tự diễn. Chạy một lần khi sân vào màn hình. Không có đoạn ra.
+  function datHuongVao() {
+    const S = hopKhay(), sx = S.x + S.w / 2, sy = S.y + S.h / 2;
+    [0, 3, 1, 4, 2, 5].forEach((i, k) => {
+      const d = bo(wins[i]), st = wins[i].style;
+      st.setProperty("--dx", lam((sx - d.x - d.w / 2) * .6) + "px"); st.setProperty("--dy", lam((sy - d.y - d.h / 2) * .6) + "px");
+      st.setProperty("--tre", (.3 + k * .07).toFixed(2) + "s");
+    });
+  }
+  function vao() {
+    if (daVao) return;
+    daVao = true;
+    datHuongVao();
+    const p0 = phien;
+    khoi.classList.add("vao");
+    void khoi.offsetWidth;
+    khoi.classList.remove("cho");
+    setTimeout(() => { khoi.classList.remove("vao"); if (!tay && p0 === phien) dien(); }, 1700);
+  }
+  // tay nắm để đo / thử: ép coi như đang trong màn hình, chạy lại, dừng, thả thẳng ảnh n vào app i
+  window.ssKt = { ep(v) { thay = v; capNhat(); }, dien, dung, xoaHet, nhan(i, n) { const r = hop(ths[n]); return tha(bong(n, r), i, n, true); }, wins, dang };
+  }
+});
+
+// ===== Section LÝ DO (07/10): câu chuyện của anh kể thành 3 câu (anh: "gom lại thành 03 slide", "bán câu chuyện và nỗi đau, không bán hàng").
+// 3 câu luôn nằm đủ dưới sân, câu đang kể thì đậm màu + vạch tiến độ chạy; sân diễn theo từng câu.
+// Câu 1 (nỗi đau): mỗi ngày một ý tưởng bật lên. Câu 2 (nỗi đau): ý tưởng lần lượt mờ rồi mất, chữ "đi đâu mất" trên tiêu đề mờ theo.
+// Câu 3 (cái khay): con trỏ gạt công tắc, khay hiện ra, 5 ý tưởng bay vào khay. Khách tự gạt công tắc được, bấm vào câu nào thì kể lại từ câu đó.
+// Không dùng GSAP: trạng thái đổi bằng class + transition CSS; đồng hồ chỉ trôi khi section đang trong màn hình.
+document.addEventListener("DOMContentLoaded", () => {
+  const khoi = document.getElementById("ld"), san = document.getElementById("ldSan");
+  if (!khoi || !san) return;
+  khoi.classList.add("ld-on");
+  try { khoiDong(); } catch (e) { khoi.classList.remove("ld-on", "cho", "vao", "ld-tinh"); throw e; }
+  function khoiDong() {
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lay = id => document.getElementById(id);
+  const nut = lay("ldNut"), dem = lay("ldDem"), goi = lay("ldGoi"), tro = lay("ldTro"), lop = lay("ldThe");
+  const os = [...san.querySelectorAll(".ld-o")], chos = os.map(o => o.querySelector(".ld-cho")), khe = [...lay("ldKl").children];
+  const phu = [...lay("ldPhu").querySelectorAll(".ld-cau")], doan = phu.map(q => q.querySelector(".ld-vach"));
+  const noiCu = [...lay("ldNoiCu").children];
+  const N = os.length;
+  const the = os.map((o, i) => { const e = document.createElement("div"); e.className = "ld-y y" + (i + 1); e.style.setProperty("--xoay", (i % 2 ? -4 : 4) + "deg"); lop.append(e); return e; });
+  chos.forEach((c, i) => c.style.setProperty("--tre", (i * .07).toFixed(2) + "s"));
+
+  // ---- trạng thái: mỗi ý tưởng là an (chưa có) | sang (đang ở ô ngày) | mat (đã mất) | luu (nằm trong khay) ----
+  const tt = the.map(() => "an");
+  let bat = false;
+  // vị trí một ô so với sân, cộng theo chuỗi offsetParent nên không bị transform (đoạn vào, khay đang trồi) làm lệch
+  // (offsetLeft tính từ mép TRONG viền của offsetParent nên phải cộng thêm viền của từng tầng: khay có viền 1 px, đo 07/10 thẻ lệch 1 px)
+  const choCua = e => { let x = 0, y = 0, n = e; while (n && n !== san) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; if (n && n !== san) { x += n.clientLeft; y += n.clientTop; } } return { l: x, t: y, w: e.offsetWidth, h: e.offsetHeight }; };
+  function xep(i) { const r = choCua(tt[i] === "luu" ? khe[i] : chos[i]), st = the[i].style; st.left = r.l + "px"; st.top = r.t + "px"; st.width = r.w + "px"; st.height = r.h + "px"; }
+  function soLai() { dem.textContent = tt.filter(s => s === "luu").length; khoi.style.setProperty("--mat", bat ? 0 : tt.filter(s => s === "mat").length); }
+  function dat(i, s) {
+    tt[i] = s;
+    the[i].classList.toggle("sang", s === "sang" || s === "luu"); the[i].classList.toggle("mat", s === "mat"); the[i].classList.toggle("luu", s === "luu");
+    os[i].classList.toggle("co", s !== "an"); os[i].classList.toggle("mat", s === "mat"); os[i].classList.toggle("luu", s === "luu");
+    if (noiCu[i]) { noiCu[i].classList.toggle("co", s === "sang"); noiCu[i].classList.toggle("mat", s === "mat"); }   // nơi tạm của ý tưởng đó
+    xep(i); soLai();
+  }
+  function datBat(v) { bat = v; khoi.classList.toggle("bat", v); nut.setAttribute("aria-checked", v ? "true" : "false"); soLai(); }
+  const datTro = (x, y) => { tro.style.transform = "translate3d(" + (x - 3) + "px," + (y - 2) + "px,0)"; };
+  const troToiNut = () => { const r = choCua(nut); datTro(r.l + r.w * .5, r.t + r.h * .55); };
+
+  // ---- đồng hồ: chỉ trôi khi section trong màn hình; đẩy luôn thanh tiến độ của đoạn đang kể ----
+  let thay = false, phien = 0, hen = 0, daVao = giam, doanDang = -1, tong = 1, qua = 0;
+  const HUY = {};
+  const chay = () => thay && !document.hidden;
+  const ngu = (ms, p) => giam ? Promise.resolve() : new Promise((res, rej) => {
+    let con = ms, truoc = performance.now();
+    const id = setInterval(() => {
+      const gio = performance.now(), d = Math.min(gio - truoc, 100); truoc = gio;
+      if (p !== phien) { clearInterval(id); rej(HUY); return; }
+      if (!chay()) return;
+      con -= d; qua += d;
+      if (doanDang >= 0) doan[doanDang].style.setProperty("--k", Math.min(1, qua / tong).toFixed(3));
+      if (con <= 0) { clearInterval(id); res(); }
+    }, 40);
+  });
+  function vaoDoan(i, ms) { doanDang = i; tong = ms; qua = 0; doan.forEach((b, j) => b.style.setProperty("--k", j < i ? 1 : 0)); phu.forEach((q, j) => q.classList.toggle("on", j === i)); }
+  // trạng thái ngay TRƯỚC đoạn `tu` (để bấm vào đoạn nào cũng kể lại được từ đó)
+  function nen(tu) {
+    datBat(false);
+    nut.classList.remove("nhay", "bam"); tro.classList.remove("hien");
+    datTro(san.clientWidth * .84, san.clientHeight * .86);
+    for (let i = 0; i < N; i++) dat(i, tu <= 0 ? "an" : tu === 1 ? "sang" : "mat");
+  }
+  async function luuHet(p) {           // bật công tắc: ý tưởng hiện lại ở ô ngày rồi lần lượt bay vào khay (1,85 giây)
+    datBat(true);
+    for (let i = 0; i < N; i++) { if (tt[i] !== "luu") dat(i, "sang"); await ngu(70, p); }
+    await ngu(250, p);
+    for (let i = 0; i < N; i++) { dat(i, "luu"); await ngu(150, p); }
+    await ngu(500, p);
+  }
+  async function boHet(p) {            // tắt công tắc: khay biến mất, ý tưởng về ô ngày rồi lần lượt mất
+    datBat(false);
+    for (let i = 0; i < N; i++) { if (tt[i] !== "mat") dat(i, "sang"); await ngu(70, p); }
+    await ngu(400, p);
+    for (let i = 0; i < N; i++) { dat(i, "mat"); await ngu(200, p); }
+  }
+  // 3 cảnh (07/10 anh: "gom lại thành 03 slide"; bản đầu 5 cảnh, 22,6 giây một vòng): 3,2 + 2,8 + 6,5 = 12,5 giây.
+  // Cảnh 1 có hình NGAY (ý tưởng bật lên từ 0,25 giây), không còn đoạn "đi tìm" với sân trống.
+  const D = [3200, 2800, 6500];
+  const KE = [
+    async p => { await ngu(250, p); for (let i = 0; i < N; i++) { dat(i, "sang"); await ngu(300, p); } await ngu(1450, p); },
+    async p => { await ngu(250, p); for (let i = 0; i < N; i++) { dat(i, "mat"); await ngu(240, p); }
+      await ngu(350, p); nut.classList.add("nhay"); tro.classList.add("hien"); troToiNut(); await ngu(1000, p); },
+    async p => { nut.classList.remove("nhay"); nut.classList.add("bam"); await ngu(150, p); nut.classList.remove("bam");
+      await luuHet(p); await ngu(300, p); tro.classList.remove("hien"); goi.classList.remove("an"); await ngu(4200, p); },
+  ];
+  async function dien(tu) {
+    const p = ++phien; clearTimeout(hen);
+    try {
+      let d = tu || 0;
+      for (;;) { nen(d); for (; d < KE.length; d++) { vaoDoan(d, D[d]); await KE[d](p); } d = 0; }
+    } catch (e) { if (e !== HUY) throw e; }
+  }
+  const henLai = p0 => { if (giam) return; clearTimeout(hen); hen = setTimeout(() => { if (p0 === phien) dien(0); }, 9000); };
+
+  // ---- khách tự gạt công tắc / bấm thanh đoạn ----
+  nut.addEventListener("click", () => {
+    const p = ++phien, moi = !bat; clearTimeout(hen);
+    goi.classList.add("an"); tro.classList.remove("hien"); nut.classList.remove("nhay", "bam");
+    doanDang = -1; doan.forEach((b, j) => b.style.setProperty("--k", j < (moi ? 3 : 2) ? 1 : 0)); phu.forEach((q, j) => q.classList.toggle("on", j === (moi ? 2 : 1)));
+    (moi ? luuHet(p) : boHet(p)).then(() => henLai(p), e => { if (e !== HUY) throw e; });
+  });
+  phu.forEach((q, i) => q.addEventListener("click", () => { if (giam) return; goi.classList.add("an"); dien(i); }));
+
+  // ---- khởi động ----
+  if (giam) { khoi.classList.add("ld-tinh"); datBat(true); for (let i = 0; i < N; i++) dat(i, "luu"); goi.classList.remove("an"); }
+  else { nen(0); khoi.classList.add("cho"); }
+  const xepHet = () => { for (let i = 0; i < N; i++) xep(i); };
+  new ResizeObserver(xepHet).observe(san);
+  window.ssLdRelang = xepHet;
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(xepHet);
+  // đoạn VÀO: nhãn + tiêu đề trồi lên, sân hiện, 5 ô ngày nổi lần lượt, rồi mới bắt đầu kể
+  function vao() {
+    if (daVao) return;
+    daVao = true;
+    const p0 = phien;
+    khoi.classList.add("vao");
+    void khoi.offsetWidth;
+    khoi.classList.remove("cho");
+    setTimeout(() => { khoi.classList.remove("vao"); if (p0 === phien) dien(0); }, 1000);
+  }
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; if (thay) vao(); }, { threshold: .25 }).observe(san);
+  // tay nắm để đo / thử
+  window.ssLd = { ep(v) { thay = v; }, dien, trangThai: () => ({ tt: tt.slice(), bat, phien, doanDang, thay, daVao, dem: dem.textContent, phuDang: phu.findIndex(q => q.classList.contains("on")) }) };
+  }
+});
+
 // ===== Section KHAY: kéo cùng một ảnh từ khay vào Lark → Teams → Premiere Pro, lặp =====
 // Anh 22/09: "show cho họ thấy mình drag and drop được nhiều nền tảng". Đồng hồ setTimeout (rAF đứng khi đo ngầm).
 // Chỉ chạy khi section trong màn hình; "giảm chuyển động" → hiện sẵn cảnh Premiere đã có clip, không chạy.
@@ -2305,6 +3274,241 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   } else { vis.classList.add("cho-app", "cho-dock", "cho-khay", "cho-tro"); vongLap(); }
   window.ssKhay = { epChay: () => { epChay = true; } };   // chỉ để đo
 })();
+
+// ===== Section KHAY CO GIÃN bản 2 (07/10): lưới 24 ô ảnh cố định, khay là khung phủ lên lưới; khung phủ tới đâu ảnh hiện tới đó.
+// Khách kéo 4 góc được (góc đối diện đứng yên, thả tay thì khung hít về mép ô). Tự diễn khi không ai đụng.
+// Không có GSAP thì không gắn class kg-on, trang dùng bản 1 ngay bên dưới. "Giảm chuyển động": đứng yên ở cỡ vừa, vẫn kéo được.
+document.addEventListener("DOMContentLoaded", () => {
+  const sec = document.getElementById("resize"), san = document.getElementById("kgSan");
+  if (!sec || !san || !window.gsap) return;
+  sec.classList.add("kg-on");
+  try { khoiDong(); } catch (e) { sec.classList.remove("kg-on"); throw e; }
+  function khoiDong() {
+  const T = k => window.ssT ? window.ssT(k) : "";
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hep = matchMedia("(max-width:720px)");
+  const lay = id => document.getElementById(id);
+  const khoi = lay("kg");
+  const nen = lay("kgNen"), lop = lay("kgAnh"), khay = lay("kgKhay"), dem = lay("kgDem"), nhan = lay("kgNhan"), goi = lay("kgGoi"), tro = lay("kgTro"), che = lay("kgChe");
+  // 24 ảnh mẫu khác nhau: lấy lại đúng bộ ảnh bản 1 đã dựng trong #rsList (không lặp ảnh, anh nhắc 22/09)
+  const mau = [...document.querySelectorAll("#rsList .kh-thumb")].map(e => { const c = e.cloneNode(true); c.classList.remove("cam", "di"); c.removeAttribute("style"); return c.outerHTML; });
+
+  // ---- lưới ô ----
+  let C = 0, R = 0, os = [], X = [], Y = [], g = 10, dau = 30;
+  function dungLuoi() {
+    C = hep.matches ? 4 : 6; R = hep.matches ? 6 : 4; nen.textContent = ""; lop.textContent = ""; os = [];
+    for (let i = 0; i < C * R; i++) {
+      const cho = document.createElement("i"); cho.style.setProperty("--tre", (((i % C) + Math.floor(i / C)) * .035).toFixed(3) + "s"); nen.append(cho);
+      const o = document.createElement("div"); o.className = "kg-o";
+      o.innerHTML = '<div class="rs-list kg-rl">' + (mau.length ? mau[i % mau.length] : '<div class="kh-thumb"></div>') + "</div>";
+      lop.append(o); os.push(o);
+    }
+  }
+  function doLuoi() {
+    const cs = getComputedStyle(san);
+    g = parseFloat(cs.getPropertyValue("--g")) || 10; dau = parseFloat(cs.getPropertyValue("--dau")) || 30;
+    X = []; Y = [];
+    for (let c = 0; c < C; c++) { const e = nen.children[c], l = nen.offsetLeft + e.offsetLeft; X.push({ l, r: l + e.offsetWidth }); }
+    for (let r = 0; r < R; r++) { const e = nen.children[r * C], t = nen.offsetTop + e.offsetTop; Y.push({ t, b: t + e.offsetHeight }); }
+  }
+  const DAU = () => hep.matches ? { c0: 0, c1: 1, r0: 1, r1: 2 } : { c0: 1, c1: 3, r0: 1, r1: 2 };
+  const VUA = () => hep.matches ? { c0: 0, c1: 2, r0: 1, r1: 3 } : { c0: 1, c1: 4, r0: 0, r1: 2 };
+  const KIEU = ten => hep.matches
+    ? (ten === "ngang" ? { c0: 0, c1: 3, r0: 4, r1: 5 } : { c0: 2, c1: 3, r0: 0, r1: 5 })
+    : (ten === "ngang" ? { c0: 0, c1: 5, r0: 2, r1: 3 } : { c0: 4, c1: 5, r0: 0, r1: 3 });
+  const giong = (a, b) => a.c0 === b.c0 && a.c1 === b.c1 && a.r0 === b.r0 && a.r1 === b.r1;
+  // khung khay (mép ngoài) ứng với một vùng ô
+  const khungCua = o => ({ l: X[o.c0].l - g, r: X[o.c1].r + g, t: Y[o.r0].t - g - dau, b: Y[o.r1].b + g });
+
+  // ---- vẽ: đặt khung, bật các ô nằm trong khung (lọt 65% là bật, cho cảm giác "hít") ----
+  let o = DAU(), hien = o, kh = { l: 0, t: 0, r: 0, b: 0 };
+  function ve(k) {
+    kh = { l: k.l, t: k.t, r: k.r, b: k.b };
+    khay.style.left = kh.l + "px"; khay.style.top = kh.t + "px"; khay.style.width = (kh.r - kh.l) + "px"; khay.style.height = (kh.b - kh.t) + "px";
+    const il = kh.l + g, ir = kh.r - g, it = kh.t + g + dau, ib = kh.b - g;
+    let n = 0, c0 = C, c1 = -1, r0 = R, r1 = -1;
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+      const tx = (X[c].r - X[c].l) * .35, ty = (Y[r].b - Y[r].t) * .35;
+      const bat = X[c].l >= il - tx && X[c].r <= ir + tx && Y[r].t >= it - ty && Y[r].b <= ib + ty;
+      os[r * C + c].classList.toggle("bat", bat);
+      if (bat) { n++; if (c < c0) c0 = c; if (c > c1) c1 = c; if (r < r0) r0 = r; if (r > r1) r1 = r; }
+    }
+    hien = n ? { c0, c1, r0, r1 } : null;
+    chu();
+  }
+  // chữ đi theo khay: số ảnh trên thanh khay, nhãn cỡ, chữ "co giãn" trên tiêu đề giãn theo số cột, đèn Ngang / Dọc
+  function chu() {
+    const h = hien || o, cot = h.c1 - h.c0 + 1, hang = h.r1 - h.r0 + 1, n = cot * hang;
+    dem.textContent = n;
+    nhan.textContent = cot + " × " + hang + " · " + n + " " + (T("kgAnh") || "shots");
+    const gian = sec.querySelector(".kg-gian");
+    if (gian) gian.style.letterSpacing = (-.02 + .24 * (cot - 1) / (C - 1)).toFixed(3) + "em";
+    che.querySelectorAll("span").forEach(s => s.classList.toggle("on", giong(h, KIEU(s.dataset.che))));
+  }
+  window.ssKgRelang = chu;
+
+  // ---- chuyển động (tween tự chạy tạm dừng khi section ra khỏi màn hình) ----
+  let thay = false, phien = 0, hen = 0, daVao = giam;
+  const dang = new Set(), dangTay = new Set(), chay = () => thay && !document.hidden;
+  const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); if (thay) vao(); }, { threshold: .25 }).observe(san);
+  document.addEventListener("visibilitychange", capNhat);
+  // tween 0 giây gọi onComplete NGAY lúc gsap.to chưa trả về: x khai báo trước; luon = true là tween theo tay khách, không tạm dừng
+  const tw = (t, v, luon) => new Promise(res => {
+    let x = null;
+    x = gsap.to(t, Object.assign({}, v, { onComplete() { if (x) { dang.delete(x); dangTay.delete(x); } res(); } }));
+    if (x.progress() >= 1) return;
+    if (luon) dangTay.add(x);
+    else { dang.add(x); if (!chay()) x.pause(); }
+  });
+  const ngu = s => tw({}, { duration: s });
+  const veToi = (k2, giay, ease, luon) => { const a = { l: kh.l, t: kh.t, r: kh.r, b: kh.b }; return tw(a, { l: k2.l, t: k2.t, r: k2.r, b: k2.b, duration: giam ? 0 : giay, ease: ease || "power3.out", onUpdate() { ve(a); } }, luon).then(() => ve(k2)); };
+  let tx = 0, ty = 0;
+  const datTro = (x, y) => { tx = x; ty = y; tro.style.transform = "translate3d(" + (x - 3) + "px," + (y - 2) + "px,0)"; };
+  const diTro = (x, y, giay, ease) => { const x0 = tx, y0 = ty, a = { k: 0 }; return tw(a, { k: 1, duration: giay, ease: ease || "expo.inOut", onUpdate() { datTro(x0 + (x - x0) * a.k, y0 + (y - y0) * a.k); } }); };
+  function datNhan(x, y) {
+    const w = nhan.offsetWidth, h = nhan.offsetHeight;
+    const nx = Math.max(4, Math.min(san.clientWidth - w - 4, x + 14)), ny = Math.max(4, Math.min(san.clientHeight - h - 4, y + 16));
+    nhan.style.transform = "translate3d(" + nx + "px," + ny + "px,0)";
+  }
+
+  // ---- kéo một góc (dùng chung cho khách và bản tự diễn): góc đối diện là neo ----
+  let neo = null, goc = "";
+  const diemGoc = (k, gg) => ({ x: gg[1] === "l" ? k.l : k.r, y: gg[0] === "t" ? k.t : k.b });
+  function batDauKeo(gg) {
+    const k = khungCua(o); goc = gg;
+    neo = { x: gg[1] === "l" ? k.r : k.l, y: gg[0] === "t" ? k.b : k.t };
+    khay.classList.add("keo"); nhan.classList.add("hien");
+  }
+  function keoToi(x, y) {
+    const bl = X[0].l - g, br = X[C - 1].r + g, bt = Y[0].t - g - dau, bb = Y[R - 1].b + g;
+    const nhoW = X[0].r - X[0].l + 2 * g, nhoH = Y[0].b - Y[0].t + 2 * g + dau;
+    x = Math.max(bl, Math.min(br, x)); y = Math.max(bt, Math.min(bb, y));
+    let l, r, t, b;
+    if (goc[1] === "l") { r = neo.x; l = Math.min(x, r - nhoW); } else { l = neo.x; r = Math.max(x, l + nhoW); }
+    if (goc[0] === "t") { b = neo.y; t = Math.min(y, b - nhoH); } else { t = neo.y; b = Math.max(y, t + nhoH); }
+    ve({ l, t, r, b }); datNhan(x, y);
+  }
+  function thaKeo(luon) {
+    khay.classList.remove("keo"); nhan.classList.remove("hien");
+    if (hien) o = hien;
+    return veToi(khungCua(o), .24, "power3.out", luon);
+  }
+  function datKieu(ten, luon) { o = KIEU(ten); return veToi(khungCua(o), .55, "power3.inOut", luon); }
+
+  // ---- tự diễn ----
+  const HUY = {};
+  async function keoBangTro(c, gg, cot, hang) {
+    const d0 = diemGoc(khungCua(o), gg);
+    const dich = { x: gg[1] === "l" ? X[cot].l - g : X[cot].r + g, y: gg[0] === "t" ? Y[hang].t - g - dau : Y[hang].b + g };
+    tro.classList.add("hien");
+    await c(diTro(d0.x, d0.y, .7));
+    batDauKeo(gg); datNhan(d0.x, d0.y);
+    await c(ngu(.22));
+    const a = { k: 0 };
+    await c(tw(a, { k: 1, duration: 1.15, ease: "power2.inOut", onUpdate() { const x = d0.x + (dich.x - d0.x) * a.k, y = d0.y + (dich.y - d0.y) * a.k; keoToi(x, y); datTro(x, y); } }));
+    await c(ngu(.12));
+    await c(thaKeo());
+  }
+  async function bamChe(c, ten) {
+    const s = che.querySelector('[data-che="' + ten + '"]'), r = s.getBoundingClientRect(), q = san.getBoundingClientRect();
+    tro.classList.add("hien");
+    await c(diTro(r.left - q.left + r.width / 2, r.top - q.top + r.height / 2, .65));
+    s.classList.add("bam");
+    await c(ngu(.14));
+    s.classList.remove("bam");
+    await c(datKieu(ten));
+  }
+  async function dien() {
+    const p = ++phien, c = pr => pr.then(() => { if (p !== phien) throw HUY; });
+    try {
+      for (;;) {
+        await c(ngu(.9));
+        await c(keoBangTro(c, "br", C - 1, R - 1));
+        await c(ngu(.55));
+        await c(keoBangTro(c, "tl", 0, 0));
+        await c(ngu(1.3));
+        await c(bamChe(c, "ngang"));
+        await c(ngu(1.1));
+        await c(bamChe(c, "doc"));
+        await c(ngu(1.2));
+        tro.classList.remove("hien");
+        o = DAU();
+        await c(veToi(khungCua(o), .6, "power3.inOut"));
+      }
+    } catch (e) { if (e !== HUY) throw e; }
+  }
+  function dung() {
+    phien++; clearTimeout(hen);
+    dang.forEach(t => t.kill()); dang.clear();
+    dangTay.forEach(t => t.kill()); dangTay.clear();
+    che.querySelectorAll(".bam").forEach(e => e.classList.remove("bam"));
+    tro.classList.remove("hien"); khay.classList.remove("keo"); nhan.classList.remove("hien");
+    if (hien) o = hien;
+    ve(khungCua(o));
+  }
+  const henLai = p0 => { if (giam || p0 !== phien) return; clearTimeout(hen); hen = setTimeout(() => { if (p0 === phien) dien(); }, 7000); };
+
+  // ---- khách TỰ kéo góc (chỉ nút trái / ngón đầu tiên, mỗi lúc một lần kéo; huỷ thì khung hít về như thả) ----
+  let tay = false, choDoi = false;
+  khay.addEventListener("pointerdown", e => {
+    const t = e.target.closest(".kg-goc");
+    if (!t || tay || e.button || e.isPrimary === false) return;
+    e.preventDefault(); dung(); goi.classList.add("an");
+    const p0 = phien, gg = t.dataset.g, q0 = san.getBoundingClientRect(), d0 = diemGoc(khungCua(o), gg);
+    const lx = e.clientX - q0.left - d0.x, ly = e.clientY - q0.top - d0.y;
+    let xong = false;
+    tay = true; batDauKeo(gg); datNhan(d0.x, d0.y);
+    const mv = ev => { const q = san.getBoundingClientRect(); keoToi(ev.clientX - q.left - lx, ev.clientY - q.top - ly); };
+    const SK = ["pointerup", "pointercancel", "lostpointercapture"];
+    const up = () => {
+      if (xong) return;
+      xong = true;
+      t.removeEventListener("pointermove", mv); SK.forEach(k => t.removeEventListener(k, up));
+      const hit = thaKeo(true);
+      tay = false;
+      hit.then(() => henLai(p0));
+      if (choDoi) doiCo();
+    };
+    try { t.setPointerCapture(e.pointerId); } catch (err) {}
+    t.addEventListener("pointermove", mv); SK.forEach(k => t.addEventListener(k, up));
+  });
+  che.addEventListener("click", e => {
+    const s = e.target.closest("[data-che]"); if (!s || tay) return;
+    dung(); goi.classList.add("an");
+    const p0 = phien; datKieu(s.dataset.che, true).then(() => henLai(p0));
+  });
+
+  // ---- khởi động + đổi cỡ màn hình ----
+  dungLuoi(); doLuoi(); ve(khungCua(o));
+  let rongCu = san.clientWidth;
+  function doiCo() {
+    if (tay) { choDoi = true; return; }
+    choDoi = false;
+    if (Math.abs(san.clientWidth - rongCu) < 1) return;
+    rongCu = san.clientWidth;
+    const doiKho = (hep.matches ? 4 : 6) !== C;
+    if (doiKho) { dung(); dungLuoi(); o = giam ? VUA() : DAU(); }
+    doLuoi(); ve(khungCua(o));
+    if (doiKho && !giam && daVao) dien();
+  }
+  new ResizeObserver(doiCo).observe(san);
+  if (giam) { o = VUA(); ve(khungCua(o)); }
+  else { datTro(san.clientWidth * .5, san.clientHeight * .9); khoi.classList.add("cho"); }
+  // ---- đoạn VÀO (anh 07/10): chữ + nút Ngang / Dọc trồi lên, sân hiện, 24 ô chờ nổi lên theo sóng chéo, khay bật ra, rồi mới tự diễn.
+  function vao() {
+    if (daVao) return;
+    daVao = true;
+    const p0 = phien;
+    khoi.classList.add("vao");
+    void khoi.offsetWidth;
+    khoi.classList.remove("cho");
+    setTimeout(() => { khoi.classList.remove("vao"); if (!tay && p0 === phien) dien(); }, 1950);
+  }
+  // tay nắm để đo / thử
+  window.ssKg = { ep(v) { thay = v; capNhat(); }, dien, dung, datKieu: t => datKieu(t, true), trangThai: () => ({ o, hien, kh, C, R, tay, phien, thay, dangChay: dang.size, dangTay: dangTay.size, soBat: os.filter(e => e.classList.contains("bat")).length }) };
+  }
+});
 
 // ===== Section KHAY CO GIÃN: con trỏ kéo góc khay → thêm hàng / thêm cột (ảnh giữ nguyên cỡ); rồi chuyển khay dọc =====
 // Đồng hồ setTimeout (rAF đứng khi đo ngầm). Chỉ chạy khi trong màn hình; "giảm chuyển động" → hiện sẵn khay ngang 3 hàng.
@@ -2987,10 +4191,19 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     quayNh: "The MP4 waits in the Video shelf", nghi1: "Not using it?", nghi2: "The shelf <em>tucks away.</em>", nghi3: "One click, <em>it's back.</em>",
     thuNh: "Collapses after 5, 10 or 15 seconds. Pick one in Settings" });
   RT.vi.ngan.push("Quay video", "Tự thu"); RT.en.ngan.push("Record", "Tuck away");
+  // 06/10: thêm 4 cảnh (đánh số · bút + dạ quang · chụp cuộn · xuất GIF) -> 17 cảnh. Chữ nút lấy đúng src/i18n.js (cuon.xong, vd.gifNut, vd.gifGoiY).
+  Object.assign(RT.vi, { tren: "Shot & Save · 17 tính năng", buoc: ["Đổi màu", "Cắt ngắn", "Đổi nhạc"], soNh: "Mỗi lần bấm, số tự tăng",
+    butChu: 'Bản <span class="a">nháp 3</span><br><span class="b">gửi trước 5 giờ</span>', butNh: "Giữ Shift ra đường thẳng",
+    xong: "Xong", cuonNh: "Một ảnh dài, vào thẳng khay", gifNh: "Kéo thả GIF như với video" });
+  Object.assign(RT.en, { tren: "Shot & Save · 17 features", buoc: ["Fix the color", "Trim it", "Swap the music"], soNh: "Every click, the number counts up",
+    butChu: 'Draft <span class="a">number 3</span><br><span class="b">send before 5 pm</span>', butNh: "Hold Shift for a straight line",
+    xong: "Done", cuonNh: "One long image, straight to the shelf", gifNh: "Drag the GIF like the video" });
+  RT.vi.ngan.push("Đánh số", "Bút vẽ", "Chụp cuộn", "GIF"); RT.en.ngan.push("Steps", "Pen", "Scroll", "GIF");
   const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = k => RT[LG()][k];
   // canh i -> khoa chu cua the (f?t/f?p) + phim
   const TN = [{ k: 1, phim: ["Ctrl", "Shift", "S"] }, { k: 5 }, { k: 4, phim: ["1", "2", "3"] }, { k: 7, phim: ["4"] }, { k: 8, phim: ["V"] },
-    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }, { k: 12, phim: ["R"] }, { k: 13 }];
+    { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }, { k: 12, phim: ["R"] }, { k: 13 },
+    { k: 14, phim: ["6"] }, { k: 15, phim: ["7", "8"] }, { k: 16, phim: ["9"] }, { k: 17 }];
 
   function batDau() {
     if (!window.gsap) return;                       // CDN hong -> giu luoi the
@@ -3015,7 +4228,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     }
     function nhan(tl, text, at, css) { const n = el(san, "nh", css, "<i></i>" + text); tl.fromTo(n, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: .3 }, at); return n; }
     function flash(tl, at) { const f = el(san, "flash"); tl.to(f, { opacity: .85, duration: .06 }, at).to(f, { opacity: 0, duration: .35 }, at + .06); }
-    function capNhatSz(s) { s.sz.textContent = Math.round(s.offsetWidth * 1.5) + " × " + Math.round(s.offsetHeight * 1.5); s.sz.classList.toggle("trong", s.offsetTop < 28); }
+    // 06/10: đọc cỡ từ style (GSAP ghi px vào đó), KHÔNG đọc offsetWidth: hàm này chạy mỗi khung khi khung chọn giãn, đọc offset* là ép trình duyệt tính lại bố cục mỗi khung
+    function capNhatSz(s) { const c = s.style; s.sz.textContent = Math.round(parseFloat(c.width) * 1.5) + " × " + Math.round(parseFloat(c.height) * 1.5); s.sz.classList.toggle("trong", parseFloat(c.top) < 28); }
     function sel(x, y, w, h) { const s = el(san, "sel", `left:${x}px;top:${y}px;width:${w || 0}px;height:${h || 0}px;opacity:0`); s.sz = el(s, "sz"); capNhatSz(s); return s; }
     function keoSel(tl, s, c, w, h, d, at) {
       tl.to(s, { width: w, height: h, duration: d, ease: "power2.inOut", onUpdate: () => capNhatSz(s) }, at);
@@ -3068,6 +4282,22 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
     const LOGO = '<svg viewBox="0 0 385.89 351.31" width="21" height="19"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>';
     const ONG = '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m14.31 8 5.74 9.94"/><path d="M9.69 8h11.48"/><path d="m7.38 12 5.74-9.94"/><path d="M9.69 16 3.95 6.06"/><path d="M14.31 16H2.83"/><path d="m16.62 12-5.74 9.94"/></svg>';
+    // 06/10 đồ nghề cho cảnh Bút / Dạ quang: một nét trên lớp SVG phủ sân, vẽ dần theo con trỏ
+    const NS = "http://www.w3.org/2000/svg";
+    function netVe(d, mau, day, mo) {
+      let sv = san.querySelector("svg.net"); if (!sv) { sv = document.createElementNS(NS, "svg"); sv.setAttribute("class", "net"); san.append(sv); }
+      const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); p.setAttribute("stroke", mau); p.setAttribute("stroke-width", day);
+      if (mo != null) p.setAttribute("opacity", mo);
+      // khoảng trống dài hơn nét 2 px và lệch thêm 1 px: lúc chưa vẽ không còn đoạn dài 0 ở đầu mút (đầu nét tròn sẽ hiện thành một chấm)
+      sv.append(p); p.dai = p.getTotalLength(); p.style.strokeDasharray = p.dai + " " + (p.dai + 2); p.style.strokeDashoffset = p.dai + 1; p.style.visibility = "hidden"; return p;
+    }
+    function veNet(tl, p, c, d, at) {
+      const o = { t: 0 };
+      tl.set(p, { visibility: "visible" }, at).to(o, { t: 1, duration: d, ease: "power1.inOut", onUpdate() {
+        p.style.strokeDashoffset = (p.dai + 1) * (1 - o.t);
+        if (c) { const q = p.getPointAtLength(p.dai * o.t); gsap.set(c, { x: q.x, y: q.y }); }
+      } }, at);
+    }
     const eIO = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);          // đường bay của app (dien.js)
     const eLo = t => 1 - Math.exp(-6.5 * t) * Math.cos(9.5 * t);                            // lò xo của app: vượt ~6% rồi về
 
@@ -3243,7 +4473,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
           gsap.fromTo(b, { scale: .6, opacity: 0 }, { scale: 1, opacity: 1, duration: .4, ease: "back.out(2)" });
         }, 2.05);
         tl.add(() => { const b = el(cb, "bong trai", null, L("duyet")); gsap.fromTo(b, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3 }); }, 2.9);
-        nhan(tl, L("apps"), 3.1, doc ? "top:3%" : "left:25%");
+        nhan(tl, L("apps"), 3.1, doc || w < 560 ? "top:3%" : "left:25%");   // sân hẹp mà không "dọc" (iPhone: 358×328): nhãn đặt ở 25% bị tràn mép trái 82 px (đo WebKit 06/10)
         return tl.to({}, { duration: 1.6 }, 3.2);
       },
       // 8. Khay nhớ: tắt app, mở lại, ảnh gần nhất tự hiện lại (02/10 anh Tiến: nói rõ số ảnh chỉnh được trong Cài đặt; app có sẵn hàng "Mở lại ảnh gần nhất": Tắt / 5 / 10 / 20)
@@ -3431,10 +4661,134 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         nhan(tl, L("thuNh"), T3 + 1, "top:auto;bottom:4%");
         return tl.to({}, { duration: 2 }, T3 + 1.1);
       },
+      // 13. Đánh số bước (app 02/10, phím 6): bấm lên ảnh -> huy hiệu 1, 2, 3 tự tăng. Huy hiệu phóng theo cỡ chữ sân khấu.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), b = L("buoc");
+        const ch = el(san, "chu trai", "font-size:calc(var(--u)*6.4);line-height:1.42;left:55%;top:46%", b.map((t, i) => '<span class="b' + i + '">' + t + "</span>").join("<br>"));
+        // huy hiệu (26 px × kc) không được to hơn khoảng cách hai dòng, không thì 1 / 2 / 3 chồng lên nhau trên sân điện thoại
+        const rs = b.map((_, i) => R(ch.querySelector(".b" + i))), kc = Math.max(.8, Math.min(2.6, rs[0].h / 34, (rs[1].y - rs[0].y) * .9 / 26));
+        const c = conTro(w * .88, h * .86), p = phim(["6"]);
+        hienPhim(tl, p, .15);
+        rs.forEach((r, i) => {
+          const x = r.x - 13 * kc - Math.max(10, w * .014), y = r.y + r.h / 2, at = .75 + i;
+          const hh = el(san, "hh", `left:${x}px;top:${y}px`, String(i + 1)); gsap.set(hh, { scale: 0 });
+          di(tl, c, x, y, .5, at); bam(tl, c, at + .52);
+          tl.to(hh, { scale: kc, duration: .32, ease: "back.out(2.2)" }, at + .55);
+        });
+        tl.to(c, { opacity: 0, duration: .2 }, 3.75);
+        nhan(tl, L("soNh"), 3.8);
+        return tl.to({}, { duration: 1.7 }, 3.9);
+      },
+      // 14. Bút vẽ tay (7) + bút dạ quang (8) (app 06/10): bút khoanh tay quanh chữ, dạ quang tô ngang dòng dưới (mờ 0,4 như app).
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu", "font-size:calc(var(--u)*6.6);line-height:1.5;top:45%", L("butChu"));
+        const a = R(ch.querySelector(".a")), b = R(ch.querySelector(".b"));
+        const c = conTro(w * .9, h * .9), p7 = phim(["7"]), p8 = phim(["8"]);
+        const cx = a.x + a.w / 2, cy = a.y + a.h / 2, rx = a.w / 2 + Math.max(14, w * .016), ry = a.h / 2 + Math.max(5, h * .01);
+        let d = "";   // vòng khoanh hơi méo, điểm cuối chờm qua điểm đầu như nét tay thật
+        for (let i = 0; i <= 56; i++) { const t = i / 56, g = (-200 + t * 395) * Math.PI / 180, k = 1 + .05 * Math.sin(t * 9) + .035 * t;
+          d += (i ? "L" : "M") + (cx + rx * k * Math.cos(g)).toFixed(1) + " " + (cy + ry * k * Math.sin(g)).toFixed(1); }
+        const n1 = netVe(d, "#F86820", Math.max(3, w * .0035)), q0 = n1.getPointAtLength(0);
+        hienPhim(tl, p7, .15); di(tl, c, q0.x, q0.y, .5, .35);
+        veNet(tl, n1, c, 1, .95);
+        const y2 = b.y + b.h * .54, pad = Math.max(8, w * .008);
+        const n2 = netVe("M" + (b.x - pad).toFixed(1) + " " + y2.toFixed(1) + "L" + (b.x + b.w + pad).toFixed(1) + " " + (y2 - b.h * .03).toFixed(1), "#ffcc00", b.h * .66, .4);
+        hienPhim(tl, p8, 2.15); di(tl, c, b.x - pad, y2, .45, 2.3);
+        veNet(tl, n2, c, .9, 2.85);
+        tl.to(c, { opacity: 0, duration: .2 }, 3.85);
+        nhan(tl, L("butNh"), 3.9);
+        return tl.to({}, { duration: 1.7 }, 4);
+      },
+      // 15. Chụp cuộn trang dài (app 06/10, phím 9): khoanh phần trang đang cuộn -> 9 -> viền cam + thước chiều cao + nút Xong
+      //     NGOÀI vùng -> người dùng tự lăn chuột, ảnh dài mọc dần bên phải -> bấm Xong. Số trên thước = chiều cao đã ghép.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), hep = w < h * .9;
+        const cw = hep ? w * .6 : w * .5, ch = h * .8, cx = w * .05, cy = h * .05;
+        const cs = el(san, "cs", `left:${cx}px;top:${cy}px;width:${cw}px;height:${ch}px`, '<div class="tb"><i></i><i></i><i></i>' + L("trinh") + '</div><div class="bd" style="padding:0;overflow:hidden"></div>');
+        const bd = cs.querySelector(".bd"), br = R(bd), SO = 6, mh = br.h * .42, trH = SO * mh * 1.12 + mh * .12;
+        const taoTrang = p => { const t = el(p, "trg", `width:${br.w}px;height:${trH}px`);
+          for (let i = 0; i < SO; i++) el(t, "muc", `top:${mh * .12 + i * mh * 1.12}px;height:${mh}px`, "<b>0" + (i + 1) + "</b>" +
+            [[24, 34 + (i * 13) % 20], [45, 48 - (i * 7) % 18], [66, 28 + (i * 11) % 24]].map(([tp, ww]) => '<i style="top:' + tp + "%;width:" + ww + '%"></i>').join(""));
+          return t; };
+        const tr = taoTrang(bd), x0 = br.x, y0 = br.y, sw = br.w, sh = br.h;
+        const c = conTro(x0 - 30, y0 - 30), p = phim(["9"]), s = sel(x0, y0);
+        di(tl, c, x0, y0, .4, .1); tl.to(s, { opacity: 1, duration: .12 }, .5); keoSel(tl, s, c, sw, sh, .6, .55);
+        hienPhim(tl, p, 1.15);
+        const vqs = [[x0 - 4, y0 - 4, sw + 8, 2], [x0 - 4, y0 + sh + 2, sw + 8, 2], [x0 - 4, y0 - 4, 2, sh + 8], [x0 + sw + 2, y0 - 4, 2, sh + 8]]
+          .map(([l, t, ww, hh]) => el(san, "vq", `left:${l}px;top:${t}px;width:${ww}px;height:${hh}px;opacity:0`));
+        const dh = el(san, "dhq", `left:${x0}px;top:${y0 + sh + 10}px;opacity:0`, '<span class="r"></span><b class="gio"></b><span class="chia"></span><span class="dung"><i></i>' + L("xong") + "</span>");
+        const gio = dh.querySelector(".gio"), nutXong = dh.querySelector(".dung");
+        // ảnh dài: bản thu nhỏ của CHÍNH trang đó, cao dần theo phần đã cuộn qua
+        const cho = w - (cx + cw) - w * .04, tw = Math.min(cho * .7, w * .22, h * .88 * sw / trH), k = tw / sw, tx = cx + cw + (cho - tw) / 2 + w * .02, ty = h * .05;
+        const ad = el(san, "anhdai", `left:${tx}px;top:${ty}px;width:${tw}px;height:${sh * k}px;opacity:0`), tr2 = taoTrang(ad);
+        gsap.set(tr2, { scale: k, transformOrigin: "0 0" });
+        const o = { y: 0 }, toiDa = trH - sh, soPx = n => Math.round(n).toLocaleString(LG() === "vi" ? "vi-VN" : "en-US") + " px";
+        const ve = () => { tr.style.transform = "translateY(" + (-o.y).toFixed(1) + "px)"; ad.style.height = ((sh + o.y) * k).toFixed(1) + "px"; gio.textContent = soPx((sh + o.y) * 1.5); };
+        ve();
+        tl.set(s, { opacity: 0 }, 1.45).set(vqs, { opacity: 1 }, 1.45).set(dh, { opacity: 1 }, 1.45).to(ad, { opacity: 1, duration: .25 }, 1.5);
+        di(tl, c, x0 + sw * .5, y0 + sh * .55, .35, 1.5);
+        [.34, .68, 1].forEach((q, i) => tl.to(o, { y: toiDa * q, duration: .7, ease: "power2.inOut", onUpdate: ve }, 1.95 + i * .9));
+        tl.add(() => { const nd = R(nutXong); gsap.to(c, { x: nd.x + nd.w / 2, y: nd.y + nd.h / 2, duration: .5, ease: "power2.inOut" }); }, 4.6);
+        bam(tl, c, 5.12); tl.add(() => nutXong.classList.add("bam"), 5.12);
+        tl.to([...vqs, dh, c], { opacity: 0, duration: .2 }, 5.27).to(cs, { opacity: .3, duration: .3 }, 5.27);
+        nhan(tl, L("cuonNh"), 5.4, "top:auto;bottom:3%");
+        return tl.to({}, { duration: 1.8 }, 5.5);
+      },
+      // 16. Xuất GIF từ Khay video (app 06/10): cụm chọn [Có tiếng | Không tiếng | GIF] -> bấm GIF, ô chạy "GIF n%" -> kéo thả vào khung chat.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < 880 || w < h * .9;
+        const canh = (p, css) => { const v = video(p, css, 0), mt = v.querySelector(".mt"), chu = el(v, "vw", "left:0%", "TAKE 2");
+          v.ve = t => { mt.style.left = (12 + t * 70) + "%"; chu.style.left = (26 + t * 48) + "%"; }; v.ve(0); return v; };
+        const DAY = "left:0;top:0;width:100%;height:100%;border-radius:0";
+        const THEM = 104, kx = w * .04, kw = doc ? w * .92 : w * .46;
+        let fw = kw - 42, fh = fw * .5;
+        { const toiDa = (doc ? h * .5 : h * .94) - THEM - (doc ? 0 : 22); if (fh > toiDa) { fh = Math.max(40, toiDa); fw = fh * 2; } }   // sân thấp: thẻ không được tràn sân (đo 06/10: tràn 2 px ở sân 378 px)
+        const ky = doc ? h * .03 : Math.max(h * .03, (h - fh - THEM - 22) / 2);
+        const vi = LG() === "vi", meta0 = "10:24 · 06/10 · 1280×640 · " + (vi ? "1,2 MB" : "1.2 MB"), meta1 = "10:24 · 06/10 · GIF · " + (vi ? "2,0 MB" : "2.0 MB");
+        const K = el(san, "khay kvd" + (kw - 42 < 380 ? " hep" : "") + (kw - 42 < 240 ? " rathep" : ""), `left:${kx}px;top:${ky}px;width:${kw}px`,
+          '<div class="kb">' + VID_IC + "<span>" + L("khayVideo") + '</span><span class="sl">1</span></div><div class="vthe"><div class="vdau"><b>' + L("vdTen") +
+          '</b><span class="sp"></span><span class="chon"><i class="on">' + L("coTieng") + "</i><i>" + L("khongTieng") + '</i><i>GIF</i></span><span class="nutk">' + L("keo") + "</span></div>" +
+          '<div class="vmeta">' + meta0 + '</div><div class="vkhung" style="width:' + fw.toFixed(1) + "px;height:" + fh.toFixed(1) + 'px"></div></div>');
+        const khung = K.querySelector(".vkhung"), kq = canh(khung, DAY), vmeta = K.querySelector(".vmeta"), chon = K.querySelector(".chon"), g = chon.children[2];
+        // giữ sẵn bề rộng của "GIF 100%" cho ô GIF: không thì lúc chạy phần trăm cụm chọn nở ra ~28 px, thẻ hẹp trên điện thoại bị tràn hàng đầu
+        // Thẻ hẹp (điện thoại): chỉ hiện "n%" (đo 06/10: "GIF 100%" làm hàng đầu tràn 8–74 px ở 320–390 px).
+        const hepThe = K.classList.contains("hep"), chuPt = v => (hepThe ? "" : "GIF ") + Math.round(v) + "%";
+        g.textContent = chuPt(100); g.style.minWidth = Math.ceil(g.getBoundingClientRect().width) + "px"; g.style.textAlign = "center"; g.textContent = "GIF";
+        const gx = doc ? w * .04 : kx + kw + w * .04, gw = doc ? w * .92 : w - gx - w * .04, gy = doc ? h * .55 : h * .1, gh = doc ? h * .36 : h * .72;   // điện thoại: cửa sổ chat dừng ở 91% sân, chừa đáy cho nhãn
+        const cs = el(san, "cs", `left:${gx}px;top:${gy}px;width:${gw}px;height:${gh}px`, '<div class="tb"><i></i><i></i><i></i>' + L("zalo") + '</div><div class="bd chat" style="overflow:hidden"><div class="bong trai">' + L("hoi") + "</div></div>");
+        const chat = cs.querySelector(".chat"), cr = R(chat), kr = R(khung), gr = R(g);
+        // chừa chỗ cho 2 bong bóng chữ trên + dưới (đo 06/10: bong bóng đầu bị đẩy đè thanh tiêu đề)
+        const dw = Math.min(cr.w * .66, kr.w, Math.max(56, (cr.h - (doc ? 84 : 126)) * 2)), dhh = dw / 2, dx = cr.x + cr.w - 12 - dw, dy = cr.y + cr.h - 12 - dhh;
+        const xem = [kq], o = { t: 0 };
+        tl.to(o, { t: 1, duration: 7.4, ease: "none", onUpdate() { const q = (o.t * 3) % 1; xem.forEach(v => v.ve(q)); } }, 0);
+        const c = conTro(w * .5, h * .92);
+        di(tl, c, gr.x + gr.w / 2, gr.y + gr.h / 2, .55, .4); bam(tl, c, .98);
+        const pr = { v: 0 };
+        tl.add(() => g.classList.add("dang"), 1).to(pr, { v: 100, duration: 1.3, ease: "none", onUpdate() { g.textContent = chuPt(pr.v); } }, 1);
+        tl.add(() => { g.textContent = "GIF"; g.classList.remove("dang"); chon.children[0].classList.remove("on"); g.classList.add("on"); vmeta.textContent = meta1; }, 2.35);
+        di(tl, c, kr.x + kr.w * .5, kr.y + kr.h * .5, .45, 2.65); bam(tl, c, 3.12);
+        const a = el(san, "anh", `left:${kr.x}px;top:${kr.y}px;width:${kr.w}px;height:${kr.h}px;opacity:0`); xem.push(canh(a, DAY));
+        tl.set(a, { opacity: 1 }, 3.2).to(a, { x: dx - kr.x, y: dy - kr.y, scale: dw / kr.w, transformOrigin: "0 0", duration: .8, ease: "power2.inOut" }, 3.25);
+        di(tl, c, dx + dw * .5, dy + dhh * .5, .8, 3.25);
+        tl.add(() => {
+          const o2 = el(chat, "gifo", `align-self:flex-end;flex:none;width:${dw}px;height:${dhh}px`, '<span class="nhg">GIF</span>'); xem.push(canh(o2, DAY));
+          a.style.opacity = 0; gsap.fromTo(o2, { scale: .94 }, { scale: 1, duration: .25, ease: "back.out(2)" });
+        }, 4.08);
+        tl.to(c, { opacity: 0, duration: .2 }, 4.15);
+        if (!doc) tl.add(() => { const b2 = el(chat, "bong trai", null, L("duyet")); gsap.fromTo(b2, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3 }); }, 4.9);   // điện thoại: cửa sổ chat thấp, không đủ chỗ cho bong bóng trả lời
+        nhan(tl, L("gifNh"), 4.4, "top:auto;bottom:1.5%");
+        return tl.to({}, { duration: 2.2 }, 5.2);
+      },
     ];
 
     /* cuộn tới đâu, diễn cảnh đó */
-    const N = TN.length, BUOC = () => innerHeight * .8;
+    /* 06/10 anh Tiến: "ở điện thoại anh thấy không mượt bằng ở trên desktop". Trên điện thoại thanh địa chỉ ẩn / hiện khi vuốt
+       → innerHeight đổi 60–100 px → (1) bước cuộn tính theo innerHeight lệch khỏi chiều cao rạp (tính theo vh, KHÔNG đổi) nên
+       ranh giới giữa các cảnh trôi; (2) sự kiện resize bắn → cảnh đang diễn bị DỰNG LẠI TỪ ĐẦU (đo giả lập 844 → 760 px: 1
+       resize = 1 lần dựng lại). Nay bước cuộn lấy từ chính chiều cao rạp, và chỉ dựng lại khi SÂN thật sự đổi cỡ. */
+    const N = TN.length, BUOC = () => host.offsetHeight * 80 / (N * 80 + 100);
+    $("soTong").textContent = String(N).padStart(2, "0");
     host.style.height = `calc(${N} * 80vh + 100vh)`;
     TN.forEach((f, i) => {
       const b = document.createElement("button"); b.className = "clip"; b.type = "button";
@@ -3442,6 +4796,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       b.addEventListener("click", () => toi(i)); ray.append(b);
     });
     let dang = -1, tl = null, hen = null, dungYen = null, fillTw = null, thay = false;
+    /* cỡ sân lúc dựng cảnh · lần chạm / rê ngón tay gần nhất · lần cuộn gần nhất.
+       ☠️ KHÔNG dùng cờ "đang chạm" bật ở touchstart, tắt ở touchend (bản 14:17 làm vậy, ECC soát bắt được): ngón tay chạm lên một
+       phần tử của sân rồi cảnh đổi → phần tử bị gỡ khỏi trang → touchend bắn vào phần tử đã gỡ, không tới window → cờ kẹt mãi,
+       rạp ngừng tự sang cảnh. Dùng MỐC THỜI GIAN: không thể kẹt. */
+    let coSan = [0, 0], chamLuc = 0, cuonCuoi = 0;
+    const chamDay = () => { chamLuc = performance.now(); };
+    addEventListener("touchstart", chamDay, { passive: true }); addEventListener("touchmove", chamDay, { passive: true });
     const tuDong = matchMedia("(prefers-reduced-motion: reduce)");
     function nhanPhimCap(keys) { [...capPhim.children].forEach(k => { if (keys.includes(k.textContent)) { k.classList.add("nhan"); setTimeout(() => k.classList.remove("nhan"), 260); } }); }
     /* 02/10 anh Tiến: "khi chuyển giữa các phần đang bị giật và khựng lại". Đo trên live 1920×950, 12 lần chuyển: chú thích
@@ -3480,6 +4841,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       // cảnh mới HIỆN DẦN 0,22 giây (trước: cắt thẳng). Sân đã được làm mờ ở khiCuon / tuSang trước khi tới đây.
       gsap.killTweensOf(san);
       if (tuDong.matches) gsap.set(san, { opacity: 1 }); else gsap.fromTo(san, { opacity: 0 }, { opacity: 1, duration: .22, ease: "power1.out" });
+      coSan = [san.clientWidth, san.clientHeight];
       tl = CANH[i]();
       fillTw = gsap.fromTo(ray.children[i].querySelector(".fill"), { scaleX: 0 }, { scaleX: 1, duration: tl.duration(), ease: "none" });
       /* 02/10 anh Tiến: "chạy xong cái số 1 nó tự nhảy qua chạy cái số 2… hiện tại mình không bấm next nó sẽ loop lại cái số 1".
@@ -3491,10 +4853,13 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       if (tuDong.matches) { tl.progress(1); fillTw.progress(1); return; }
       /* 02/10 (lần 2) đo trên live: cảnh xong → đứng hình 0,93 giây → trang cuộn mượt 0,33 giây → chữ chú thích đổi → 0,14
          giây sau mới cắt sang cảnh mới = 1,25 giây "khựng" rồi nhảy hai nhịp. Nay: nghỉ 0,5 giây → tuSang() làm MỘT nhịp. */
-      tl.eventCallback("onComplete", () => { hen = setTimeout(() => {
+      /* 06/10: tự sang cảnh = trang NHẢY vị trí cuộn. Ngón tay vừa chạm / đang rê, hoặc trang vừa cuộn (đà vuốt chưa hết) mà
+         nhảy thì cắt ngang cú vuốt của người xem → chờ tới khi yên 0,6 giây mới sang. */
+      tl.eventCallback("onComplete", () => { const thu = () => {
         if (dang !== i) return;
+        if (performance.now() - Math.max(cuonCuoi, chamLuc) < 600) { hen = setTimeout(thu, 300); return; }
         if (i < N - 1 && thay && ganGiua()) tuSang(i + 1); else dien(i);
-      }, 500); });
+      }; hen = setTimeout(thu, 500); });
       if (!thay) { tl.pause(); fillTw.pause(); }
     }
     const dinhTren = () => host.getBoundingClientRect().top + scrollY;
@@ -3510,8 +4875,15 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
       dungYen = setTimeout(() => dien(i), 140);      // cuộn nhanh qua nhiều cảnh: chỉ dựng cảnh nơi dừng lại
     }
     let cho = false;
-    addEventListener("scroll", () => { if (cho) return; cho = true; requestAnimationFrame(() => { cho = false; khiCuon(); }); }, { passive: true });
-    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => { if (dang >= 0) { giuCao(); capNhatCap(dang); dien(dang); } }, 200); });
+    addEventListener("scroll", () => { cuonCuoi = performance.now(); if (cho) return; cho = true; requestAnimationFrame(() => { cho = false; khiCuon(); }); }, { passive: true });
+    // Chỉ dựng lại cảnh khi SÂN đổi cỡ thật (xoay máy, đổi cỡ cửa sổ). Thanh địa chỉ điện thoại ẩn / hiện: sân cao theo svh nên không đổi → bỏ qua.
+    let hr = null; addEventListener("resize", () => { clearTimeout(hr); hr = setTimeout(() => {
+      if (dang < 0) return;
+      // ☠️ Sân không đổi thì KHÔNG làm gì cả. Bản 14:17 vẫn gọi capNhatCap() ở đây: nó giết thanh tiến độ của clip đang chạy
+      // (fillTw.kill) mà không dựng lại → trên điện thoại thanh tiến độ đứng lại mỗi lần thanh địa chỉ ẩn / hiện (ECC soát bắt được).
+      if (Math.abs(san.clientWidth - coSan[0]) <= 2 && Math.abs(san.clientHeight - coSan[1]) <= 2) return;
+      giuCao(); capNhatCap(dang); dien(dang);
+    }, 200); });
     function toi(i) { window.scrollTo({ top: dinhTren() + i * BUOC() + BUOC() * .35, behavior: "smooth" }); }
     /* Cảnh diễn xong TỰ sang cảnh kế, một nhịp: sân mờ đi 0,18 giây → nhảy vị trí cuộn NGAY (sân ghim nên trên màn không
        có gì trượt; cuộn mượt 0,33 giây chỉ làm chậm) → đổi chú thích + dựng cảnh mới cùng lúc → dien() cho sân hiện dần. */
@@ -3523,12 +4895,14 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
         dien(i);
       } });
     }
-    new IntersectionObserver(es => { thay = es[0].isIntersecting; if (!tl) return; if (thay) { tl.resume(); fillTw && fillTw.resume(); } else { tl.pause(); fillTw && fillTw.pause(); } }, { threshold: .3 }).observe(san);
+    // nhiều bản ghi dồn lại (máy đang nghẹt) thì lấy cái MỚI nhất, không lấy cái đầu
+    new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; if (!tl) return; if (thay) { tl.resume(); fillTw && fillTw.resume(); } else { tl.pause(); fillTw && fillTw.pause(); } }, { threshold: .3 }).observe(san);
     // bấm phím thật khi rạp đang chiếm giữa màn (Ctrl+Shift+S để dành cho demo đầu trang)
     addEventListener("keydown", e => {
       if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "") || e.ctrlKey || e.metaKey || e.altKey) return;
       const r = host.getBoundingClientRect(); if (r.top > innerHeight * .5 || r.bottom < innerHeight * .5) return;
-      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10, KeyR: 11 }[e.code];
+      const i = { Digit1: 2, Digit2: 2, Digit3: 2, Numpad1: 2, Numpad2: 2, Numpad3: 2, Digit4: 3, Numpad4: 3, KeyV: 4, Digit5: 9, Numpad5: 9, KeyS: 10, KeyR: 11,
+        Digit6: 13, Numpad6: 13, Digit7: 14, Numpad7: 14, Digit8: 14, Numpad8: 14, Digit9: 15, Numpad9: 15 }[e.code];
       if (i == null) return;
       e.preventDefault();
       if (i === dang) dien(i); else toi(i);

@@ -5,6 +5,360 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [thanh-toan] - 2026-10-07 15:12 (UTC+7) - Polar: bộ cài 0.9.0 đã gắn vào sản phẩm (cách A), khách mua nhận mã + link tải - máy công ty
+
+- **Anh yêu cầu:** *"em remote chrome làm cho anh đi em"* (gắn bộ cài lên Polar). Không sửa mã nguồn nào.
+- **Em không tự tải file được:** công cụ đưa file của Chrome từ xa giới hạn 10 MB; cắt bộ cài thành 11 mảnh dưới 10 MB thì các công cụ cần chạm vào trang
+  (dò phần tử, chụp màn hình, đưa file) đều treo trong Chrome của anh, kể cả trên tab mới, chỉ lệnh gọi thẳng vào Polar chạy; đường "máy chủ tạm 127.0.0.1"
+  bị lớp bảo vệ của phiên chặn. Đã xoá đúng 12 file mảnh + thư mục `dist/polar-parts/`, tắt máy chủ tạm, bộ cài gốc còn nguyên.
+- **Anh tự kéo file vào Polar** (Benefits → File Downloads, tên "Shot & Save installer (Windows)", tạo lúc 15:11). Em đọc lại bằng lệnh gọi Polar: file
+  `AiO-Shot-and-Save-Setup-0.9.0.exe` 96.182.083 byte, đã tải xong, sha256 `ddab7277...5165a67f` = đúng file trong `Release/` (so cả dung lượng lẫn băm).
+- **Em gắn quyền lợi vào sản phẩm** (`POST /v1/products/<id>/benefits` với 2 mã quyền lợi, trả 200). Đọc lại bằng 2 đường: (1) sản phẩm "AiO Shot & Save"
+  nay có 2 quyền lợi: mã bản quyền + bộ cài, giá vẫn 1499 usd; (2) trang thanh toán công khai (tải bằng curl, không đăng nhập) có tên cả hai quyền lợi.
+- **Chưa làm:** chưa mua thử (mã giảm 100% `THUSYM8FR`: đã dùng 0/2, 0 đơn) nên chưa thấy tận mắt thư + trang khách nhận, chưa kích hoạt app bằng mã thật ·
+  bộ cài Mac chưa có · web chưa có nút Tải / đường dùng thử qua email · `success_url` trống · 0 webhook.
+
+## [thanh-toan] - 2026-10-07 13:16 (UTC+7) - Polar: rà hiện trạng thanh toán Shot & Save, sửa 3 chỗ lệch với giá $14.99 trọn đời - máy công ty
+
+- **Anh yêu cầu:** *"setup các bước thanh toán còn lại nha em"*. Không sửa mã nguồn nào; chỉ đổi cấu hình trên Polar (qua Chrome của anh, phiên anh đã đăng nhập).
+- **Đo trước khi làm (chỉ đọc):** web: 3 nút Mua trỏ `#checkout`, nút trong thẻ giá mở link Polar `buy.polar.sh/polar_cl_Vllt...` (trang trả 200, giá 1499 usd,
+  cổng stripe). App: `banquyen.js` gọi `api.polar.sh` với mã tổ chức công khai; chỗ "mã không có hạn" đã xử đúng từ 28/09 (`settings.js:326`, `bq.tronDoi`),
+  tức dòng "app còn 1 chỗ sai" trong `CLAUDE.md` là ghi cũ. Polar: 1 sản phẩm, 1 quyền lợi (mã bản quyền), 1 link thanh toán "Web chinh", 0 mã giảm giá,
+  0 webhook, 0 đơn; `payment_ready: false`, tổ chức `created`, chưa nộp hồ sơ.
+- **Đã sửa trên Polar (đọc lại bằng đường khác sau mỗi lần ghi):** (1) mã bản quyền: hết hạn "1 year" → không hết hạn, giữ 2 máy + tiền tố `AIOSS`; (2) tên
+  quyền lợi "... + 1 year updates" → "Shot & Save license key + lifetime updates" (tải lại trang thanh toán công khai: 2/2 chỗ hiện tên mới); (3) đoạn mô tả
+  sản phẩm trong hồ sơ xét duyệt còn ghi "một năm cập nhật + gia hạn hằng năm" → viết lại theo $14.99 một lần, 2 máy, cập nhật trọn đời (605 ký tự, tải lại
+  trang đọc ra đúng bản mới).
+- **Bẫy:** cửa sổ Chrome của nhóm tab Claude đang ẩn (`outerWidth 0`) nên không bấm giao diện; sửa quyền lợi bằng đúng lệnh mà trang quản trị gọi
+  (`PATCH /v1/benefits/<id>` kèm phiên đăng nhập) rồi đọc lại. Đồng hồ: Polar trả giờ 06:14Z, em nghi máy lệch 1,5 giờ; đối chiếu Google + Vercel: máy ĐÚNG
+  (13:14), chỉ là anh nhắn sau lượt trước 1,5 giờ.
+- **13:26 → 13:31, anh tự làm 3 bước xác minh (em chỉ mở link + đọc lại sau mỗi lần anh báo "xong"):** lần đọc 13:26 mới xong danh tính, tài khoản nhận
+  tiền còn `incomplete`, nút Submit khoá; lần đọc 13:31: tài khoản nhận tiền `ready`, hồ sơ nộp 13:31:03, tổ chức `active`, `payment_ready: true`, xét
+  duyệt `PASS` ("Your organization has been approved to sell on Polar"). Đối chiếu đường thứ hai: trang thanh toán công khai trả tổ chức `active`.
+  → Nút trả tiền trên Polar đã mở. CHƯA có đơn nào, chưa thử trả tiền thật.
+- **Chưa làm được / chờ anh (ghi lúc 13:16, mục xác minh đã xong ở dòng trên):** 3 bước xác minh tài khoản (giấy tờ, tài khoản nhận tiền, nộp xét duyệt) là việc của anh · email hỗ trợ Polar chê Gmail cá nhân ·
+  khách mua xong chưa có chỗ tải bộ cài · chưa có đường tải bản dùng thử qua email · chưa thử kích hoạt bằng mã thật. Chi tiết: bảng việc chờ `CLAUDE.md`.
+
+## [web-shotsave] - 2026-10-07 11:37 (UTC+7) - ĐÃ LÊN LIVE `4417c5f`: section "Vì sao có Shot & Save" + đoạn vào + câu chữ mới - máy công ty
+
+- **Anh duyệt:** *"đẹp duyệt, đẩy lên live đi em"* (sau khi xem bản nháp ở localhost, kể cả núm công tắc đang là hình người giữ chỗ).
+- **Lên live trong một commit (chỉ `Website/AiO ShotSave Web/index.html`, +419 / −24 dòng):** section `#why` (chuyện 3 câu, 5 nơi tạm, công tắc, khay) ·
+  đoạn VÀO cho từng section · ẩn tiêu đề lặp trước rạp · câu đầu trang "Chụp → Lưu → Gửi..." · cuối trang "Ý tưởng tiếp theo, đừng để trôi mất" +
+  câu editor. Cách đẩy: commit trong thư mục tách `E:/2026/_web-shotsave-tam` (đứng đúng trên `origin/main` 23d9fa3, đọc 24 dòng bị thay trước khi
+  commit), `git push origin HEAD:main`, gộp về `main` trên máy (`b5ad920`, đi trước `origin/main` 62 commit, chậm 0).
+- **Kiểm chứng:** trước khi đẩy, `thu-trang.cjs` trên bản nháp; sau khi đẩy, đúng bài đó trên https://aio-shotsave.vercel.app/ (md5 live `d6acacb09017` =
+  blob git, khớp sau 52 giây). Cả 3 lượt trên live (Chromium 1280, Chromium 390, nhân Safari khổ iPhone 13), lăn hết trang: 0 lỗi, 0 file 404, 0 px
+  tràn, 0 khối kẹt ẩn; section Lý do kể tới 5/5 ý tưởng trong khay; Kéo thả 6/6 app nhận ảnh; Khay co giãn đang chạy; câu đầu trang + cuối trang đúng chữ mới.
+- **CHƯA làm / chưa đo:** ảnh chân dung thật (núm đang là hình người giữ chỗ, ĐANG HIỆN TRÊN LIVE) · ngón tay thật, Safari máy Mac thật · chưa cho
+  người soát (ECC) đọc mã phần `ld.*` và đoạn vào: anh bảo đẩy ngay, em chưa chạy lượt soát ~200 nghìn token · 3 câu còn tự gọi là "chụp màn hình"
+  (nhãn trên tiêu đề đầu trang, mô tả trang, chân trang) · tên nhóm trên phần Kéo thả · phần Storyboard chưa làm lại.
+- Thư mục tách `E:/2026/_web-shotsave-tam` + máy chủ xem thử cổng 8127 GIỮ LẠI (còn việc nháp tiếp: ảnh anh, Storyboard).
+
+## [web-shotsave] - 2026-10-07 10:56 (UTC+7) - NHÁP (chưa lên live): section "LÝ DO" gom 5 câu còn 3 + 5 "nơi tạm" + núm công tắc chờ ảnh anh - máy công ty
+
+- **Anh xem mẫu 09:20, khen đẹp rồi sửa 3 điều:** (1) *"nếu là người lướt web thì lí do gì để họ dừng lại phần này... gom lại thành 03 slide được không...
+  câu chuyện của anh là phần níu giữ họ lại cũng như là lõi sống của app"*, *"mình bán câu chuyện và nỗi đau của mình chứ không bán hàng"*;
+  (2) khoanh hàng công tắc: *"bị vô duyên, thêm hình tròn nhỏ của anh vào đây nhìn cho uy tín"*; (3) khoanh nửa dưới sân ở slide đầu: *"nó trống và bị
+  ngô nghê"*.
+- **Đã sửa:**
+  - 5 câu còn 3: 2 câu nỗi đau (đi tìm ý tưởng, ngày nào cũng gặp · dùng xong rồi "đi đâu mất") + 1 câu cái khay (công tắc kích hoạt não bộ, hơn 5
+    năm Media Creative, giữ hết vào một nơi duy nhất). Giữ chữ của anh, chỉ rút gọn.
+  - 3 câu LUÔN nằm đủ dưới sân (3 cột, điện thoại 3 hàng), câu đang kể đậm màu + vạch tiến độ chạy trên câu đó; bấm câu nào kể lại từ câu đó.
+    Người lướt nhanh đọc hết chuyện trong một cái nhìn, không phải chờ.
+  - Một vòng 22,6 giây còn 13,1 giây. Ý tưởng đầu tiên bật lên sau 0,6 giây kể từ lúc cuộn tới (trước: sân trống 5 giây); khay giữ đủ 5 ý tưởng ở
+    giây 8,5 (trước: giây 18).
+  - Nửa dưới sân lúc chưa bật công tắc: thay ô nét đứt "Chưa có chỗ nào để giữ" bằng 5 NƠI TẠM (Tab đang mở · Thư mục Downloads · Ảnh màn hình ·
+    Ghi chú · Tự nhắn cho mình). Ý tưởng nào bật lên thì nơi tương ứng sáng, mất thì bị gạch; bật công tắc thì 5 nơi gom thành MỘT cái khay.
+  - Nhãn công tắc: "Mỗi thứ một nơi" ↔ "Có khay giữ". Núm công tắc to lên 40 px để chứa ảnh tròn của anh (`img/tac-gia.jpg`).
+    ☠️ CHƯA có ảnh: núm đang hiện logo, trang gọi một file 404. Phải có ảnh (hoặc bỏ thẻ img) trước khi lên live. Cách đặt ảnh làm NÚM là em chọn.
+- **Kiểm chứng (`thu-ld.cjs` viết lại cho 3 cảnh, lăn chuột thật):** tự kể đủ 3 câu rồi lặp ở 1280 và 390 px, chiều cao section không đổi (897 / 860 px);
+  từ nhãn tới hết 3 câu cao 737 px ở máy tính (lọt một màn 900 px) và 700 px ở điện thoại 390; khách gạt công tắc lần 1 ra 5/5 trong khay, lần 2
+  ra 5/5 mất; bấm câu 1 kể lại từ câu 1; 14/14 lượt (2 ngôn ngữ x 320 đến 1920 px) 0 px tràn, 0 nhãn cắt, thẻ lệch ô nhiều nhất 0,9 px; giảm chuyển
+  động: 3 câu cùng đậm, gạt được; rời section thì đồng hồ đứng; nhân Safari (WebKit 26.6, khổ iPhone 13) kể tới cảnh cuối, chạm ăn. 0 lỗi trong trang
+  (ngoài file ảnh 404 nói trên).
+- **Bẫy vấp:** thẻ `button` làm ô lưới thì tự canh GIỮA nội dung theo chiều dọc: 3 vạch tiến độ lệch nhau 12 px (anh thấy trên bản đang dựng dở);
+  phải `align-items:start`. Nhãn tiếng Anh dài làm hàng công tắc tràn ở 320 px: rút còn "Scattered" / "On the shelf".
+- **Bổ sung (anh: *"tạo trước chỗ để hình ảnh anh vào đi em"*):** núm công tắc là CHỖ ĐỂ ẢNH, chưa có ảnh thì hiện hình người mặc định (thay
+  logo). Cách đưa ảnh vào: bỏ file `tac-gia.jpg` (hoặc .png / .webp, ảnh vuông) vào `Website/Nhap web ShotSave/keo-tha-2/` rồi chạy lại `chen.cjs`:
+  script chép ảnh sang `img/` của trang và trỏ thẻ img tới nó; chưa có file thì script GỠ thẻ img nên trang không còn gọi file 404 (dòng ☠️ ở trên
+  hết hiệu lực). Thử cả hai đường (`thu-nut.cjs`): chưa có ảnh: 0 file 404, núm 40 x 40 px hiện hình người; có ảnh thử 96 x 96 px: ảnh tải được, phủ
+  kín núm tròn. Đã xoá đúng 2 file ảnh thử em tạo (đếm lại: 0 / 0).
+- **[CHỜ ANH]** file ảnh chân dung · có ghi tên anh cạnh ảnh không · xem lại ở `http://localhost:8127/#why`.
+
+## [web-shotsave] - 2026-10-07 09:20 (UTC+7) - NHÁP (chưa lên live): MẪU section "LÝ DO" kiểu kể chuyện (pain point, vì sao anh làm app) - máy công ty
+
+- **Anh yêu cầu:** *"anh một chỗ ghi paint point - một section riêng nêu ra lí do tại sao anh làm cái này. đây chỉ là nội dung - em hãy khai thác
+  nó thành UI kể chuyện"*, kèm đoạn văn 5 ý (project mới đi tìm ý tưởng · mỗi ngày một ý tưởng hay · dùng xong rồi "đi đâu mất" · mỗi ý
+  tưởng là một công tắc kích hoạt não bộ · hơn 5 năm làm Media Creative, giúp lưu mọi khoảnh khắc vào một nơi duy nhất).
+- **Đã dựng (một mẫu, em tự làm, theo bài `5bh`):** section `#why` đặt GIỮA đầu trang và rạp (vị trí là em chọn, anh chưa duyệt).
+  - 5 câu của anh chạy như PHỤ ĐỀ dưới sân (chữ "tôi" đổi thành "mình" cho một giọng, sửa "thử hiện" thành "thực hiện"); thanh 5 đoạn
+    kiểu story ở đầu sân, bấm đoạn nào kể lại từ câu đó.
+  - Sân: 5 ngày Thứ 2 đến Thứ 6, mỗi ngày một ý tưởng (bảng màu, chuyển cảnh, kiểu chữ, bố cục, đoạn code = media, creative, design, dev).
+    Câu 3: ý tưởng mờ rồi mất, ô còn dấu "?", chữ "rồi lại đi đâu mất" trên tiêu đề mờ theo. Câu 4 + 5: con trỏ gạt CÔNG TẮC, khay thật
+    hiện ra, 5 ý tưởng bay vào khay, số trên khay đếm 1 đến 5, tiêu đề đổi thành "giờ ở một nơi duy nhất" màu cam.
+  - Khách tự gạt công tắc được (chuột, chạm, phím). Không dùng GSAP (class + transition CSS), đồng hồ chỉ trôi khi section trong màn hình.
+    "Giảm chuyển động": đứng ở cảnh cuối, 5 câu hiện hết. JS hỏng: còn tiêu đề + 5 câu chữ.
+  - File: `Website/Nhap web ShotSave/keo-tha-2/ld.css`, `ld.html`, `ld.js`; `chen.cjs` ghép (neo trước `#features`). Bản ghép: 401.140 ký tự.
+- **Kiểm chứng (`thu-ld.cjs`, lăn chuột thật tới nơi):** trước khi cuộn tới: ẩn, chưa chạy. Tự kể đủ 5 câu trong 22,6 giây rồi lặp, ở 1280 và
+  390 px; chiều cao section không đổi suốt vòng (927 / 790 px). Khách gạt: bật ra 5/5 trong khay, tắt ra 5/5 mất; bấm đoạn 2 kể lại từ
+  câu 2. 14/14 lượt (2 ngôn ngữ x 320, 360, 390, 721, 1024, 1280, 1920 px): 0 px tràn, 0 nhãn bị cắt, thẻ lệch ô nhiều nhất 0,9 px. Rời
+  khỏi section thì đồng hồ đứng. Giảm chuyển động: 5/5 câu hiện, gạt được. Nhân Safari (WebKit 26.6, khổ iPhone 13): kể tới cảnh cuối,
+  chạm công tắc ăn. 0 lỗi trong trang. Ảnh từng cảnh đã mở xem (nền sáng, nền tối, điện thoại).
+- **Bẫy vấp trong lượt này:** (1) `p.evaluate(() => ssLd.dien(4))` treo 7 phút: `dien()` là vòng lặp không dứt, trả promise của nó về là
+  evaluate chờ mãi; (2) viết `\\2713` trong `node -e` qua Bash thành "¹3" (bài `5ax`), phải sửa bằng công cụ Edit; (3) hàm chống chữ mồ
+  côi của trang dán chữ cuối bằng dấu cách cứng nên nhãn 2 chữ không xuống dòng được ở 320 px: thêm `<wbr>`; (4) `offsetLeft` không tính
+  viền của offsetParent nên thẻ lệch 1 px trong khay: cộng `clientLeft / clientTop`.
+- **Chưa làm / chưa đo:** ngón tay thật, Safari máy Mac thật; chưa cho người soát đọc mã; câu tiếng Anh em tự dịch; câu "tôi/mình", vị trí
+  section, 5 loại ý tưởng mẫu đều là em chọn. **[CHỜ ANH]** xem ở `http://localhost:8127/#why`.
+
+## [web-shotsave] - 2026-10-07 08:43 (UTC+7) - NHÁP (chưa lên live): anh chốt ĐỊNH VỊ "app lưu lại ý tưởng" + tiêu đề cuối trang mới - máy công ty
+
+- **Bối cảnh:** anh hỏi có nên giữ phần Storyboard ("3 giây, 6 khung hình") trên web. Em đo: rạp đã có cảnh Storyboard diễn khoanh vùng,
+  bấm S, 3 giây, 6 khung, lưu thành dải; 2/3 bước của section riêng trùng cảnh đó, và section còn kiểu cũ (chữ trái, màn hình phải).
+- **Anh chốt định vị:** *"định vị app của mình không phải là một áp chụp hình - mà nó là một app có thể giúp dân media - creative - design -
+  dev,.... lưu lại ý tưởng"*, rồi *"nhấn mạnh là khay và app của chúng ta làm... có thể tương tác được phần mềm chỉnh sửa video - hình ảnh -
+  phần mềm giao tiếp với khách hàng và sếp"*. Đã ghi vào `CLAUDE.md` gốc, bảng mục 3, dòng 07/10.
+- **Đo trang theo định vị mới:** trang tự gọi mình là công cụ chụp màn hình ở 5 chỗ chữ lớn (nhãn trên tiêu đề đầu trang, mô tả trang,
+  câu phụ phần tính năng, tiêu đề cuối trang, chân trang); chữ "ý tưởng" chỉ có 1 chỗ (thẻ f1).
+- **Đã sửa (1/5 chỗ, câu anh chọn):** tiêu đề cuối trang VI "Ý tưởng tiếp theo, / đừng để trôi mất." · EN "Your next idea. / Don't let it
+  slip away." (câu EN em tự dịch). Thêm 2 lệnh `thay` vào `Website/Nhap web ShotSave/keo-tha-2/chen.cjs`, ghép lại vào bản sao trang
+  `E:/2026/_web-shotsave-tam` (375.004 ký tự, 0 lỗi cú pháp).
+- **Kiểm chứng:** `thu-cuoi.cjs` (lăn chuột thật tới cuối trang, 2 ngôn ngữ x 320 / 390 / 1280 px): 6/6 lượt tiêu đề 2 dòng, 0 px tràn,
+  hiện đủ (độ mờ 1), 0 lỗi trong trang. Ảnh `cuoi-vi-1280.png` đã mở xem.
+- **08:47, anh chọn thêm câu thứ hai (2/5):** *"Được làm bởi một editor dựng phim, người lưu hàng trăm ý tưởng mỗi tuần"* · EN (em tự dịch) "Built
+  by a video editor who saves hundreds of ideas a week." Chỗ cũ của câu này (dưới tiêu đề phần tính năng) đang ẩn khi rạp bật, nên ngoài
+  đổi chữ ở chỗ cũ, em ĐẶT THÊM một dòng dưới tiêu đề cuối trang (`.end-sub`, cùng khoá `featSub`); vị trí này là em chọn, anh chưa duyệt.
+  Đo (`thu-cuoi.cjs`, 2 ngôn ngữ x 320 / 390 / 1280 px): câu hiện 1 đến 3 dòng, 0 px tràn, cách tiêu đề 14 px, cách nút 26 px, bấm đổi
+  ngôn ngữ thì cả hai chỗ đổi theo, 0 lỗi trong trang; ảnh nền sáng + nền tối đã mở xem. Bản ghép: 375.273 ký tự, 0 lỗi cú pháp.
+- **[CHỜ ANH]** 3 chỗ còn lại (nhãn trên tiêu đề đầu trang, mô tả trang, chân trang; em đưa câu đề xuất, chưa sửa) · phần Storyboard giữ, làm lại theo hướng "khay lưu ý tưởng đang chuyển
+  động" (chưa làm, chờ anh gật) · cả bản nháp chưa lên live.
+
+## [web-shotsave] - 2026-10-07 08:32 (UTC+7) - NHÁP (chưa lên live): đoạn VÀO cho từng section + ẩn tiêu đề lạc quẻ + câu mới đầu trang - máy công ty
+
+- **Anh yêu cầu (3 tin liền nhau, xem bản live vừa đẩy):** (1) *"mỗi section trước khi bắt đầu animation anh cần một cái animation in cho
+  mỗi section, out thì không cần, người dùng sẽ scroll"*; (2) khoanh tiêu đề "Gọn nhẹ, đủ những gì bạn cần": *"phần chữ này nó lạc quẻ
+  giữa 2 section"*; (3) khoanh câu dưới tiêu đề đầu trang: *"viết lại như sau: Chụp -> lưu -> gửi. thao tác siêu gọn trong một không
+  gian, kiểu như thế này"*.
+- **Đoạn VÀO, hai khối mới** (class `cho` = đang chờ, `vao` = đang vào; JS gắn `cho` lúc dựng, gỡ khi sân vào màn hình lần đầu; tự diễn
+  chỉ bắt đầu SAU khi vào xong; "giảm chuyển động" không gắn `cho`):
+  - Kéo thả (1,7 giây): chữ trồi lên → khay bật ra giữa sân → 6 app toả ra TỪ khay về chỗ của nó (so le 0,07 giây) → dây nối → gợi ý.
+  - Khay co giãn (1,95 giây): chữ + nút Ngang / Dọc trồi lên → sân hiện → 24 ô chờ nổi theo sóng chéo → khung khay bật ra → ảnh hiện.
+- **Đoạn VÀO, các section còn lại:** dùng cơ chế `[data-hien]` CÓ SẴN của trang (trồi 18 px + hiện dần, một lần), gắn thêm cho 8 khối:
+  Storyboard (chữ, hình), Cài đặt (chữ, hình), tiêu đề Giá, tiêu đề + danh sách Hỏi đáp, khối cuối trang. KHÔNG gắn cho: đầu trang (28/09
+  đã bỏ hiệu ứng hiện dần vì làm Google chấm LCP 6 giây) và rạp (khối cao hơn 5 lần màn hình, ngưỡng 20% của bộ quan sát không bao giờ
+  đạt → sẽ ẩn mãi; cảnh 01 của rạp vốn đã là đoạn mở).
+- **Tiêu đề lạc quẻ:** cảnh 01 của rạp đã diễn đúng câu "Gọn nhẹ, đủ những gì bạn cần" nên khối chữ trắng phía trên là lặp. Rạp bật thì ẩn
+  `#features > .wrap` + bỏ đệm trên (CSS `:has`); lưới thẻ dự phòng vẫn giữ tiêu đề. Hở trắng giữa bản chạy thử đầu trang và rạp: 48 px.
+  ☠️ MẤT khi rạp bật: câu phụ *"Được làm bởi một editor dựng phim, người chụp màn hình hàng trăm lần mỗi tuần"* (chưa có chỗ mới, hỏi anh).
+- **Câu đầu trang (khoá `lede`):** VI *"Chụp → Lưu → Gửi. Thao tác siêu gọn trong một không gian."* · EN *"Capture → Save → Send. One tight
+  flow, all in one place."* (chữ do em chốt theo kiểu anh đưa, chờ anh duyệt).
+- **Cách ghép:** `node chen.cjs "<thư mục đích>" 39d61cd` (tham số thứ 3 = commit GỐC chưa có 6 mảnh; có tham số này thì chốt chặn "đã
+  ghép" không chặn). ☠️ Chỉ đúng khi `index.html` trên `main` chưa có sửa nào khác ngoài các mảnh này kể từ `39d61cd`.
+- **Đo (Chromium không cửa sổ, 1280 + 390; `thu-vao.cjs`):** trước khi cuộn tới cả hai khối đều `cho`, độ mờ 0 · tới nơi: vào xong rồi
+  con trỏ tự diễn mới hiện ở giây 2,4–3,0 · 8/8 khối `[data-hien]` hiện sau khi cuộn tới ở cả hai khổ · lăn bánh xe thật hết trang
+  (18.597 px): 0 khối kẹt ẩn · "giảm chuyển động": không có `cho`, mọi thứ hiện sẵn · nhân Safari (WebKit 26.6, iPhone 13) cuộn hết
+  trang: 0 khối kẹt ẩn, 0 px tràn · 0 lỗi console. Chạy lại 4 bộ cũ: Kéo thả 16/16 khổ, Khay co giãn 18/18 khổ, kéo chuột, mất GSAP đều đạt.
+- ☠️ **Bẫy thước:** bộ 18 khổ báo trượt 18/18 ("ảnh lọt khỏi khung") vì đo ở giây 0,8 lúc khung khay còn đang vào (đang co 80%). Sửa
+  bài thử chờ 2,4 giây; và cho ảnh hiện SAU khi khung vào xong (1,35 giây) để mắt cũng không thấy ảnh thò ra.
+- **[CHỜ ANH]** xem ở `http://localhost:8127/` rồi duyệt để đẩy `main`. CHƯA cho người soát đọc phần này (thay đổi nhỏ: 2 hàm `vao()` +
+  CSS + 8 thuộc tính); CHƯA đo trên điện thoại thật.
+
+## [web-shotsave] - 2026-10-07 08:00 (UTC+7) - LÊN LIVE: phần Kéo thả bản 2 + phần Khay co giãn bản 2 + bỏ ô trắng (`23d9fa3`) - máy công ty
+
+- **Anh duyệt:** phần Kéo thả *"đẹp quá em ơi"*, phần Khay co giãn *"sáng tạo luôn đó em"*, *"đẹp duyệt"* → đẩy `main` `39d61cd..23d9fa3`
+  (đúng 1 file `Website/AiO ShotSave Web/index.html`, +756 dòng). md5 live = blob git `4bc97a004434` lúc 07:59:31 (65 giây sau push).
+- **Soát `kg.js` trước khi đẩy** (`ecc:code-reviewer`, chỉ đọc, 214 nghìn token, 200 giây): 0 nặng, 2 vừa + 3 nhẹ; đọc lại mã, sửa 4:
+  bấm Ngang / Dọc rồi nắm góc trong 0,55 giây thì tween của chip không huỷ được, giành khung với tay khách (nay có sổ tween theo
+  tay, `dung()` huỷ cả hai) · đổi khổ màn lúc khách đang giữ góc thì bản tự diễn chen vào (nay hoãn tới khi thả) · chip kẹt ở trạng
+  thái nhấn khi khách chen vào lúc con trỏ giả đang bấm · "giảm chuyển động" đổi khổ màn thì về cỡ nhỏ thay vì cỡ vừa.
+- **Đo thêm trước khi đẩy (`thu-kg2.cjs`):** 9 khổ màn (320 → 1920) × 2 ngôn ngữ = 18/18 đạt (0 px tràn, 0 ảnh lọt khỏi khung, tiêu đề
+  không nhảy dòng) · "giảm chuyển động" đứng yên 12 ảnh, kéo ra 20 · chặn GSAP: về bản 1 · nhân Safari (WebKit 26.6, iPhone 13):
+  tự diễn tới 24 ảnh, kéo góc bằng sự kiện con trỏ loại touch ra 24, hở trắng 0 px. Sửa thêm: nhãn cỡ chữ tối trên nền tối → nền cam.
+- **Đo TRÊN LIVE (`thu-live.cjs`, chuột thật):** cả hai khối đều bật (`kt-on`, `kg-on`) · Kéo thả tự diễn 6/6 app sau 6,1–6,2 giây,
+  khách kéo ảnh vào Photoshop nhận đúng, 0 bản sao sót · Khay co giãn tự diễn 6 → 8 → 12 → 15 → 24 (điện thoại 4 → 9 → 12 → 20 → 24) ·
+  hở trắng giữa rạp và phần kéo thả 0 px · 0 px tràn ngang · 0 lỗi console, ở cả 1280 và 390.
+- ☠️ **Bẫy THƯỚC ĐO lần này (suýt đi sửa mã lành):** bài thử "bấm chip rồi nắm góc ngay" báo khung chạy dưới tay + bản tự diễn không bao
+  giờ chạy lại. Thật ra (1) chuột bấm TRƯỢT góc cả 4 lần vì góc đang trượt theo khung, vị trí đo cũ đi vài chục ms; (2) trang đang
+  CUỘN MƯỢT (`scroll-behavior:smooth`) nên trôi tiếp, khối ra khỏi màn hình và bản tự diễn tạm dừng ĐÚNG thiết kế. Tìm ra nhờ in
+  trạng thái bên trong (`ssKg.trangThai()`: `thay false`, `phien` đã tăng). Bài thử đúng: đo vị trí và phát sự kiện trong CÙNG một
+  nhịp; tắt cuộn mượt + chờ `scrollY` đứng yên 3 lần đo rồi mới thao tác → 3/3 khung đứng yên khi giữ, tự diễn chạy lại sau 7,8 giây.
+- **CHƯA đo:** ngón tay thật trên điện thoại thật (mới có giả lập + sự kiện tổng hợp), Safari trên máy Mac thật. Messenger không còn
+  cửa sổ riêng ở phần Kéo thả (7 app → 6).
+- Thư mục nháp `E:\2026\_web-shotsave-tam` đã gỡ sau khi đẩy; mã nguồn 6 mảnh + `chen.cjs` ở `Website/Nhap web ShotSave/keo-tha-2/`.
+- ☠️ **Từ `23d9fa3` trang trên `main` ĐÃ chứa 6 mảnh.** Sửa hai phần này từ nay = sửa THẲNG trong `index.html` (và sửa mảnh cho khớp);
+  KHÔNG chạy lại `chen.cjs` trên bản đã ghép (sẽ chèn trùng). Đã lắp chốt chặn trong script: thấy `id="ktSan"` / `id="kgSan"` là dừng,
+  mã thoát 3 (thử trên repo chính: dừng đúng, `index.html` không đổi).
+
+## [web-shotsave] - 2026-10-07 07:45 (UTC+7) - Anh duyệt hướng phần Kéo thả ("đẹp quá em ơi"); NHÁP thêm phần "Khay co giãn" bản 2 + bỏ ô trắng (CHƯA lên live) - máy công ty
+
+- **Anh xem bản nháp phần Kéo thả ở localhost:** *"đẹp quá em ơi"* → hướng "một khay ở giữa, 6 app vây quanh, khách tự kéo" ĐƯỢC DUYỆT.
+  Rồi chỉ thêm 2 việc: *"có một cái ô trắng ở đây khá là khó chịu"* (dải trắng giữa rạp và phần kéo thả) và *"anh muốn creative
+  luôn ở phần này"* (phần "Khay co giãn theo ý bạn").
+- **Phần Kéo thả, soát trước khi lên live** (bài học 06/10: đổi hành vi chạm / kéo thì soát TRƯỚC):
+  - Người soát `ecc:code-reviewer` (chỉ đọc, 211 nghìn token, 204 giây): 0 lỗi nặng, 3 vừa + 5 nhẹ. Đọc lại mã thì cả 8 đúng, đã sửa:
+    khách bấm trúng ảnh bản tự diễn đang cầm thì không có phản hồi (chặn nhầm theo class `di`) · chuột phải / ngón tay thứ hai làm
+    bản sao kẹt (nay chỉ nhận nút trái + ngón đầu, mỗi lúc một lần kéo, nghe thêm `lostpointercapture`) · `pointercancel` vẫn thả
+    ảnh vào app (nay bay về) · hẹn giờ tự diễn đặt lại sau khi khách đã kéo lần hai · class `kt-on` ghi sẵn trong HTML (JS hỏng là sân
+    trống; nay JS tự gắn, hỏng thì còn bản 1) · hover dính trên màn cảm ứng · bong bóng chat đo lúc đang chạy hiệu ứng · ảnh bay về
+    chỗ cũ khi màn đã đổi cỡ.
+  - Bài thử mới `thu-kt2.cjs` (phần hôm qua CHƯA đo): 8 khổ màn (320 → 1920) × 2 ngôn ngữ = 16/16 đủ 6 app, 0 px tràn, 0 khối chồng ·
+    đổi ngôn ngữ lúc 6 app đã đầy và sau một lần đặt lại: 0 chữ có dấu tiếng Việt sót · "giảm chuyển động": 6 app đầy sẵn, vẫn kéo
+    được · chặn GSAP: trang về bản 1 · nhân Safari (WebKit 26.6, giả lập iPhone 13): 6/6, kéo bằng sự kiện con trỏ loại touch thả
+    được vào Figma. Lỗi tìm thấy: tiếng Anh, 1 dòng layer trong cửa sổ Photoshop bị cắt 2 px ở 6/8 khổ → đã sửa.
+- **Ô trắng:** là 24 px đệm dưới của `#features` + 96 px lề trên của `#shelf` = 120 px nền trắng kẹp giữa rạp tối và nền cam. Bỏ bằng
+  2 luật CSS chỉ áp khi rạp đang bật (`#features:has(#rap:not([hidden]))`); lưới thẻ dự phòng vẫn giữ khoảng cách. Đo: hở 120 → 0 px
+  ở 1280 và 390. ☠️ Dải này CÓ SẴN trên bản live từ khi có rạp, không phải do bản nháp sinh ra.
+- **Phần "Khay co giãn" bản 2 (mẫu chạy thật, cùng thư mục nháp):** `kg.css` + `kg.html` + `kg.js`. Một lưới 24 ô ảnh CỐ ĐỊNH trên sân
+  (6 × 4, điện thoại 4 × 6), khay là cái khung phủ lên lưới: khung phủ tới đâu ảnh bật lên tới đó, ảnh giữ nguyên cỡ (đúng luật 14/09
+  "xem nhiều ảnh hơn, không phóng ảnh"). Khách kéo được 4 góc (góc đối diện đứng yên, thả tay khung hít về mép ô), bấm Ngang / Dọc.
+  Chữ "co giãn" trên tiêu đề giãn theo bề ngang khay; nhãn "6 × 4 · 24 ảnh" đi theo góc đang kéo. 24 ảnh lấy lại từ bộ ảnh bản 1
+  (`#rsList`) nên không lặp. Bản 1 (`.rs-grid`) giữ làm dự phòng.
+- **Đo phần Khay co giãn (`thu-kg.cjs`, Chromium không cửa sổ, chuột thật):** tự diễn 3 × 2 → 5 × 3 → 6 × 4 → Ngang 6 × 2 → Dọc (điện
+  thoại 2 × 2 → 4 × 5 → 4 × 6 → 4 × 2) · khách kéo góc ra hết cỡ 24 ảnh, kéo nhỏ nhất còn 1 ảnh, bấm Dọc ra 2 × 4 · 0 ảnh lọt khỏi
+  khung khay · 0 px tràn · tiêu đề 1 dòng ở 1280, 2 dòng CỐ ĐỊNH ở 390 (bản đầu nhảy 2 ↔ 1 dòng khi chữ giãn, đã thêm xuống dòng cố
+  định) · 0 lỗi console. **CHƯA đo:** nhân Safari, ngón tay thật, "giảm chuyển động", mất GSAP, nền tối, khổ 721–899 px; CHƯA cho
+  người soát đọc `kg.js` (làm trước khi lên live).
+- **Cách ghép:** `node chen.cjs "<thư mục repo đích>"` nay ghép cả 6 mảnh (kt + kg). Xem ở `http://localhost:8127/` (thư mục nháp
+  `E:\2026\_web-shotsave-tam`, cấu hình xem trước `web-shotsave-tam`).
+- **[CHỜ ANH]** xem phần Khay co giãn; anh gật thì cho soát `kg.js`, đo nốt phần chưa đo rồi đẩy cả hai phần + ô trắng lên `main`.
+
+## [web-shotsave] - 2026-10-06 16:18 (UTC+7) - NHÁP phần "Kéo thả vào mọi ứng dụng" bản 2 (CHƯA lên live, chờ anh duyệt hướng) - máy công ty
+
+- **Bối cảnh:** anh gửi ảnh phần Khay trên web: *"phần này anh muốn nó Creative hơn nữa được không em"*. Bản đang live: một khung màn
+  hình bên phải, lần lượt từng app một (phải xem hết 7 vòng mới thấy "mọi ứng dụng").
+- **Hướng em chọn dựng một mẫu chạy thật** (bài `5bh`: việc về gu thì một mẫu trước, anh gật mới làm tiếp): bỏ khung màn hình, **một khay
+  ở giữa, 6 cửa sổ app vây quanh** (Zalo, Lark, Teams bên trái; Premiere Pro, Photoshop, Figma bên phải), có dây nối. Tự diễn: con trỏ
+  kéo chậm 2 ảnh (Zalo, Premiere) rồi 4 ảnh **toả ra cùng lúc**; mỗi app nhận theo kiểu của nó (bong bóng chat + lời đáp, clip lên V2 +
+  màn Program, layer mới, frame Figma có viền chọn). **Khách tự kéo được**: nắm ảnh trong khay thả vào app nào cũng được, thả ra ngoài
+  thì ảnh bay về. Điện thoại: khay ở trên, 6 app 2 cột.
+- **File (nháp, NGOÀI thư mục web nên không lên Vercel):** `Website/Nhap web ShotSave/keo-tha-2/` = `kt.css` + `kt.html` + `kt.js` +
+  `chen.cjs`. Ghép vào trang: `node chen.cjs "<thư mục repo đích>"` (luôn bắt đầu từ `HEAD` của thư mục đích, chạy lại bao nhiêu lần
+  cũng ra một kết quả; tự kiểm cú pháp mọi khối script). Chuỗi chữ dùng lại khoá `kh*` có sẵn, thêm 1 khoá `ktGoi` (EN + VI).
+  Bản 1 (`.kh-grid`) GIỮ NGUYÊN trong trang làm dự phòng khi không tải được GSAP.
+- **Đang xem được ở:** `http://localhost:8127/#shelf` (thư mục nháp `E:\2026\_web-shotsave-tam` tách từ `origin/main` `39d61cd`, cấu hình
+  xem trước `web-shotsave-tam`). ☠️ Thư mục nháp này CHƯA gỡ, chưa commit gì trong đó.
+- **Đo (Chromium không cửa sổ của Playwright, 1280 + 390, chuột thật):** tự diễn đủ 6/6 app sau 7,8 giây, 0 lỗi console · khách kéo ảnh 3
+  vào Photoshop: app sáng viền khi rê tới, thả là nhận (ảnh + layer mới) · thả ra ngoài: 0 app nhận thêm, 0 bản sao sót · 0 chữ / ảnh
+  bị cắt trong 6 cửa sổ · 0 px tràn ngang ở cả hai khổ · điện thoại: 0 cặp khối chồng nhau.
+- **Lỗi bài thử bắt được trước khi tới tay anh:** `gsap.to` thời lượng 0 giây gọi `onComplete` ngay lúc chưa trả về → biến chưa khởi tạo,
+  ảnh thứ ba không bay (5/6 app). Đã sửa trong `kt.js` (ghi chú ☠️ tại chỗ).
+- **[CHỜ ANH]** xem rồi nói hướng này đúng ý chưa. Đúng thì em ghép vào trang thật + đẩy `main`. **CHƯA đo:** ngón tay thật trên điện
+  thoại (bài thử dùng chuột), Safari, tiếng Anh, đổi ngôn ngữ giữa chừng, "giảm chuyển động". **Bỏ bớt so với bản live:** Messenger
+  không còn cửa sổ riêng (7 app → 6).
+
+## [web-shotsave] - 2026-10-06 15:18 (UTC+7) - ECC soát lại web: sửa 2 lỗi do bản 14:17 gây ra + 7 điểm trên điện thoại - máy công ty
+
+- **Bối cảnh:** anh: *"dùng ecc để test lại đi em"*. Giao `ecc:code-reviewer` soát thay đổi web hôm nay (`d7099eb..origin/main`, chỉ đọc,
+  252 nghìn token, 258 giây) → 10 điểm. Em đọc lại mã xác nhận từng điểm rồi mới sửa; song song em thử trang trên nhân Safari
+  (WebKit 26.6 của Playwright, bộ giả lập iPhone 13).
+- **Hai lỗi do chính bản sửa điện thoại 14:17 gây ra (đã live ~1 giờ):**
+  1. `resize` không đổi cỡ sân vẫn gọi `capNhatCap()` → hàm này giết thanh tiến độ của clip đang chạy mà không dựng lại → trên
+     điện thoại thanh tiến độ đứng mỗi lần thanh địa chỉ ẩn / hiện. Sửa: sân không đổi thì không làm gì.
+  2. Cờ "ngón tay đang chạm" bật ở `touchstart`, tắt ở `touchend`: chạm lên một phần tử của sân rồi cảnh đổi → phần tử bị gỡ →
+     `touchend` không tới `window` → cờ kẹt, rạp ngừng tự sang cảnh. Sửa: dùng MỐC THỜI GIAN lần chạm / rê / cuộn gần nhất (0,6 giây).
+- **Bảy điểm khác đã sửa:** `IntersectionObserver` lấy bản ghi mới nhất · `capNhatSz` đọc cỡ từ style thay vì `offsetWidth` (hết ép
+  tính bố cục mỗi khung khi khung chọn giãn) · chữ số trên 17 clip 9 px ở màn ≤ 480 px · ô GIF trên thẻ hẹp chỉ hiện "n%" + thẻ
+  320 px bỏ tên "Video 01" · huy hiệu số không to hơn khoảng cách dòng · nét bút không còn chấm tròn lúc chưa vẽ · nhãn cảnh 8
+  (Kéo thả) hết tràn mép trái 82 px trên sân iPhone 358×328 (lỗi có sẵn, WebKit bắt được).
+- **Đo sau sửa:**
+  | Mục | Trước | Sau |
+  |---|---|---|
+  | `resize` không đổi sân: thanh tiến độ | đứng | chạy tiếp 0,14 → 0,25 |
+  | Chạm rồi không có `touchend` | (bản 14:17: kẹt) | 04 → 05, không kẹt |
+  | Đang rê ngón tay lúc cảnh xong | nhảy | 0 px; ngừng rê thì sang cảnh |
+  | Hàng đầu thẻ video khi chạy GIF | tràn 8–74 px (320–390 px) | 0 px ở 320 / 360 / 390 / 1280, EN + VI |
+  | Huy hiệu 1-2-3 chồng nhau (điện thoại) | chồng 3–7 px (người soát tính) | hở 5–12 px |
+  | Cảnh 8: nhãn tràn sân (iPhone 13, WebKit) | 82 px | 0 |
+  | 17 cảnh tràn sân / lỗi JS | | 0 / 0 ở 320, 360, 390, 1280 (trình duyệt trong app) và iPhone 13 (WebKit) |
+- **Lỗi do chính lượt sửa này, bắt được trước khi đẩy:** lại chèn ghi chú `//` vào giữa một dòng (dòng `IntersectionObserver`) →
+  cả khối script chết; bộ kiểm báo "rạp không dựng được". Lần thứ HAI trong ngày cùng một bẫy → từ nay ghi chú đặt dòng riêng
+  phía trên, và chạy kiểm cú pháp sau MỖI lần sửa.
+- **Thước hỏng (không dùng số):** nhịp khung trên WebKit chạy ngầm chỉ 13–27 khung / giây kể cả khi trang đứng yên (23) → đó là
+  trần của bộ vẽ phần mềm trên máy này, không phải iPhone. Script kiểm lần 2 của em treo trên WebKit không rõ lý do → bỏ, dùng script
+  lần 1 + đo DOM bằng trình duyệt trong app.
+- **Người soát báo, CHƯA sửa (cần điện thoại thật để đo trước khi đụng):** khung chọn dùng bóng `200vmax` + giãn `width / height` mỗi
+  khung (có ở 6 cảnh, từ trước); ảnh dài của cảnh Chụp cuộn đổi `height` mỗi khung; video giả ghi `style.left` mỗi khung.
+
+## [web-shotsave] - 2026-10-06 14:17 (UTC+7) - Điện thoại: rạp hết dựng lại cảnh khi thanh địa chỉ ẩn / hiện, không nhảy cảnh khi tay còn vuốt - máy công ty
+
+- (Sửa giờ: mục này lúc đầu ghi 14:22 do em tự ước lượng; giờ đẩy thật theo lệnh date là 14:17.)
+- **Bối cảnh:** anh: *"nhớ tối ưu hóa trải nghiệm trên điện thoại nữa em… ở điện thoại anh thấy không mượt bằng ở trên desktop"*.
+- **Đo trước khi sửa** (Chrome thật qua DevTools, giả lập 390×844 ×3, bóp CPU 4 lần, trang LIVE):
+  - Nhịp khung hình 17 cảnh: **60 khung / giây, 0 khung > 34 ms** ở cả 17 cảnh; bản ghi hiệu năng 5 giai đoạn (cuộn đầu trang, cảnh
+    5, cảnh 16, cuộn qua rạp, cuộn phần dưới): 0–7 khung rơi / 150–270, 1 tác vụ > 50 ms. ☠️ Thước này KHÔNG bắt được thứ anh thấy:
+    máy đo có card rời, và giả lập không có thanh địa chỉ ẩn / hiện như điện thoại thật.
+  - **Nguyên nhân tìm ra bằng đọc mã + đối chứng:** trên điện thoại, vuốt là thanh địa chỉ ẩn / hiện → trình duyệt bắn `resize` →
+    rạp DỰNG LẠI cảnh đang diễn từ đầu (live: 1 `resize` không đổi cỡ sân = cảnh về 0,4 giây). Bước cuộn tính theo `innerHeight`
+    (đổi 60–100 px theo thanh địa chỉ) trong khi chiều cao rạp tính theo `vh` (không đổi) → ranh giới cảnh trôi. Và cảnh diễn
+    xong là trang NHẢY vị trí cuộn kể cả khi ngón tay còn chạm màn (live: đang chạm vẫn nhảy 675 px).
+- **Đã sửa** (`Website/AiO ShotSave Web/index.html`):
+  - `BUOC` lấy từ chính chiều cao rạp (`host.offsetHeight * 80 / (N * 80 + 100)`), hết phụ thuộc `innerHeight`.
+  - `resize`: chỉ dựng lại cảnh khi SÂN đổi cỡ quá 2 px (xoay máy, đổi cỡ cửa sổ); sân cao theo `svh` nên thanh địa chỉ không đụng.
+  - Tự sang cảnh: chờ tới khi không còn chạm màn và trang yên 0,6 giây (`chamTay`, `cuonCuoi`).
+  - Màn cảm ứng: thanh trên cùng bỏ lớp làm mờ nền (`backdrop-filter`), dùng nền đặc 96 %. ☠️ Phòng ngừa, CHƯA đo được lợi ích.
+- **Đối chứng live cũ ↔ bản mới** (cùng kịch bản, 390×844): `resize` không đổi sân: dựng lại **có → không** (cảnh chạy tiếp tới 2,0
+  giây); đang chạm mà cảnh xong: nhảy 675 px **→ 0 px**, nhả tay 2,6 giây sau sang cảnh kế; không chạm: vẫn tự sang (04 → 05);
+  máy tính đổi cửa sổ 720 → 600 px: sân 378 → 258, cảnh ĐƯỢC dựng lại và vẫn ở đúng cảnh 06; 17 cảnh dựng 0 lỗi; không cuộn ngang.
+- **CHƯA đo / chưa biết:** chưa có điện thoại thật (iPhone Safari, Android Chrome); `touchstart` trong bài đo là sự kiện giả; lợi ích
+  của việc bỏ lớp mờ; anh chưa nói chỗ nào không mượt (rạp, bản chạy thử đầu trang, hay cuộn cả trang) nên có thể còn nguyên nhân khác.
+
+## [web-shotsave] - 2026-10-06 14:08 (UTC+7) - Đổi icon nút 9 (chụp cuộn) theo icon anh chọn - máy công ty
+
+- **Bối cảnh:** anh: *"icon số 9 xấu quá em"*. Em vẽ 4 kiểu thay thế, anh: *"cả 4 đều xấu"* (3/4 là em tự ghép nét). Đưa 8 icon có
+  sẵn của bộ Tabler, anh chọn: *"Icon số 9: chọn số 3 (Kéo dài theo chiều cao)"* = Tabler `arrow-autofit-height` (giấy phép MIT).
+- **Đã sửa:** `Website/AiO ShotSave Web/index.html` 2 chỗ (nút 9 trên thanh demo đầu trang, thẻ `f16`); app `src/overlay/index.html`
+  (nạp 14:06, ghi ở `PROGRESS.md` của app). Nét lấy nguyên văn từ `@tabler/icons@3.19.0`, không vẽ lại.
+- **Đo:** trang bản thử: nút 9 có 5 nét, hết thẻ `rect` cũ; 0 chỗ còn icon cũ; cú pháp 2 khối script 0 lỗi; rạp vẫn dựng.
+- **Bài học (đã ghi nhớ):** icon là việc về gu → đừng tự ghép nét rồi đem ra; đưa icon có sẵn của một bộ vẽ chuyên nghiệp, đặt
+  đúng cỡ thật trên thanh công cụ thật cho anh bấm chọn.
+
+## [web-shotsave] - 2026-10-06 13:42 (UTC+7) - Đưa 4 tính năng mới của app lên web: đánh số bước, bút + dạ quang, chụp cuộn, xuất GIF (13 → 17 thẻ / cảnh) - máy công ty
+
+- **Bối cảnh:** anh: *"update lên website tính năng mới đi em"*. Web đang có 13 thẻ / 13 cảnh (tới quay video + khay tự thu, 01–02/10).
+  App từ đó thêm: đánh số bước phím 6 (02/10), bút vẽ tay 7 + dạ quang 8, chụp cuộn 9, xuất GIF trong Khay video (06/10).
+- **Đã làm** (`Website/AiO ShotSave Web/index.html`, EN + VI, không gạch ngang dài):
+  - 4 thẻ `f14`–`f17` trong lưới dự phòng; icon chép từ `src/overlay/index.html` của app.
+  - 4 cảnh mới trong rạp (số 14–17): huy hiệu số chép `veSo()` (tròn, viền trắng); bút khoanh tay + dạ quang mờ 0,4 (lớp SVG,
+    `netVe` / `veNet`); chụp cuộn (trang cuộn trong cửa sổ, thước chiều cao + nút Xong ngoài vùng, ảnh dài mọc dần); GIF (ô thứ ba
+    của cụm chọn chạy "GIF n%", rồi kéo thả vào khung chat). Chữ nút lấy từ `src/i18n.js` (`cuon.xong`, `vd.gifNut`).
+  - Thanh công cụ demo đầu trang: thêm 4 nút 6 / 7 / 8 / 9 (bấm là nhảy tới cảnh), đúng thứ tự anh chốt 06/10: V, dãy số, S R, màu.
+  - Số cảnh trên rạp lấy theo `TN.length` (hết ghi cứng "/ 13"); phím 6 / 7 / 8 / 9 nhảy tới cảnh; tên clip ẩn dưới 1560 px (17 clip).
+- **Lỗi do chính bản sửa, bắt được trước khi đẩy:** (1) chèn ghi chú `//` vào GIỮA một dòng khai báo nhiều biến → cả khối script
+  thứ hai chết, rạp không hiện (bài kiểm cú pháp chạy TRƯỚC lần sửa đó nên báo sạch; mở trang mới thấy); (2) cảnh GIF trên sân
+  thấp: thẻ tràn 2 px, bong bóng chat bị đẩy đè thanh tiêu đề; (3) thanh demo 12 nút rộng 671 px → ẩn nút chỉ-để-xem dưới 780 px.
+- **Đo trước khi đẩy** (trình duyệt trong app Claude, máy chủ tĩnh trên bản làm việc; mỗi cảnh tua 11 mốc, đo phần tử có tràn sân không):
+  | Cỡ màn | Ngôn ngữ | Cảnh đo | Tràn / lỗi |
+  |---|---|---|---|
+  | 1920×950 | EN + VI | 17 + 4 | 0 |
+  | 1280×720 | VI | 17 | 0 |
+  | 1000×700 | VI | 17 | 0 |
+  | 375×812 | VI + EN | 17 + 4 | 0, không cuộn ngang |
+  Bấm phím THẬT 9 và 6 → nhảy đúng cảnh 16 và 14; bấm clip 17, bấm nút bút trên thanh demo → đúng cảnh; cảnh 13 diễn xong tự
+  sang 14 rồi 15. Thanh demo 671 px trong khung 960 / 801 px, một hàng. Cú pháp 2 khối script: 0 lỗi.
+- **Thước có giới hạn (khung xem trước chỉ vẽ ~2 khung / giây):** không đo được độ mượt; ảnh chụp giữa chừng có lúc còn hình cũ
+  (ô GIF đã sáng trong DOM mà ảnh chưa đổi) nên trạng thái cuối lấy từ DOM, không lấy từ ảnh.
+- **CHƯA làm / lưu ý:** web quảng cáo 4 tính năng mà anh mới bấm thử chụp cuộn (bút, đánh số, GIF đã nạp vào app nhưng anh chưa
+  xác nhận). Thẻ Chụp cuộn không ghi giới hạn (video chiếm hết vùng thì mất dấu; trần 3 phút / 16.000 px). Chưa đo Safari / iPhone
+  thật, nền sáng, giảm chuyển động. Chưa có bộ cài mới chứa các tính năng này (anh dặn chờ).
+## [keo-nhanh-mac] - 2026-10-06 09:02 (UTC+7) - Máy công ty nối lên 5 commit của nhánh `mac` (việc anh làm trên Mac 03–04/10) - máy công ty
+
+- **Bối cảnh:** anh: *"em kiểm tra git em có update hay bản mới gì anh làm hôm chủ nhật không"* → *"kéo về đi em"*.
+- **Đo trước khi kéo:** `origin/mac` = `may-cong-ty` (`49e3b6e`, đúng chỗ máy này đang đứng) + 5 commit (`0312c82` → `083cd26`, 03/10 18:10 → 04/10 00:27); máy này hơn `mac` 0 commit. 10 file đang sửa dở: 7 file giống hệt bản trên `mac` (bỏ qua kiểu xuống dòng), `PROGRESS.md` Guide Frame bản `mac` nhiều hơn 17 dòng và máy này không có dòng riêng nào, 2 file gốc chỉ khác đúng phần ghi Polar sáng nay.
+- **Đã làm:** cất bản vá 10 file ra thư mục tạm của phiên → `git checkout HEAD --` đúng 10 file theo danh sách → `git merge --ff-only origin/mac` → ghi lại tay 2 chỗ về Polar. Không gộp tay dòng mã nào.
+- **Kiểm chứng:** `HEAD` = `083cd26`; `mac` hơn máy này 0, máy này hơn `mac` 0; ngay sau khi kéo `git status` sạch (chỉ còn 2 thư mục `.playwright-mcp` chưa theo dõi).
+- **CHƯA làm:** panel đang cài trong Premiere máy công ty vẫn là bản cũ (chưa build / cài lại sau khi kéo 77 file bản Mac); sổ trên Mac cũng ghi "kiểm lại nhánh Windows của 11 panel" là việc chờ. Nhánh trên máy này vẫn tên `main` (hơn `origin/main` 29 commit, chưa push, đúng luật 01/10).
+
+## [web-shotsave] - 2026-10-06 07:46 (UTC+7) - Polar: đổi giá sản phẩm $7.99 → $14.99 cho khớp web (không sửa mã) - máy công ty
+
+- **Bối cảnh:** anh gửi 2 ảnh: web ghi $14.99, bấm "Buy now" ra trang Polar $7.99 + "test mode" + "Payments are currently unavailable". Anh: *"em sửa giá trên Polar đi, nút Mua để nguyên đổi qua giá 14.99"*.
+- **Nguyên nhân:** web không sai (live md5 `aad4eae8` = blob git, nút Mua trỏ `buy.polar.sh/polar_cl_Vllt…`). Sản phẩm trên Polar còn giá 23/09; việc "đổi giá trên Polar" ghi từ 28/09 là việc của anh, chưa ai làm.
+- **Đã làm:** qua Chrome của anh (đang đăng nhập org `aiostudio`): Products → AiO Shot & Save (`547b63d4…`) → Edit → ô giá 7.99 → 14.99 → Update Product. Chỉ đổi ô giá. Sản phẩm có 0 đơn hàng, 0 mã đã cấp.
+- **Kiểm chứng:** trang sản phẩm đọc lại `$14.99`; mở đúng link mua trên web: `AiO Shot & Save | $14.99 | Taxes (included) $1.36 | Total $14.99`. Link Checkout KHÔNG đổi sau khi sửa giá.
+- **CHƯA xong:**
+  - Org vẫn "test mode", nút Pay now vẫn khoá với mọi khách (chờ anh xong xác minh tài khoản trên Polar; Claude không nhập giấy tờ / ngân hàng).
+  - Benefit mã bản quyền còn `Expiration: 1 year after grant` và tên `Shot & Save license key + 1 year updates` (khách thấy tên này), lệch với "cập nhật trọn đời" 28/09. Chưa đụng, chờ anh gật.
+- **Bẫy đo:** cửa sổ Chrome của nhóm tab Claude lại bị ẩn (`visibilityState hidden`, `outerWidth 0`): chỉ `javascript_tool` chạy; ô giá React nhận giá trị qua setter gốc + sự kiện `input`.
+
 ## [mac-thu-that] - 2026-10-04 01:56 (UTC+7) - Thử VIỆC THẬT của 11 panel trong Premiere trên Mac + cài Shot & Save 0.8.0 - máy Mac nhà
 
 - **Bối cảnh:** anh: *"em test toàn bộ cho anh luôn nha em"* rồi *"cài luôn cho anh AiO Studio nha em"*. So bản đang chạy với repo
