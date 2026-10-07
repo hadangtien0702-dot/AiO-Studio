@@ -19,7 +19,11 @@
 - **Bẫy:** cửa sổ Chrome của nhóm tab Claude đang ẩn (`outerWidth 0`) nên không bấm giao diện; sửa quyền lợi bằng đúng lệnh mà trang quản trị gọi
   (`PATCH /v1/benefits/<id>` kèm phiên đăng nhập) rồi đọc lại. Đồng hồ: Polar trả giờ 06:14Z, em nghi máy lệch 1,5 giờ; đối chiếu Google + Vercel: máy ĐÚNG
   (13:14), chỉ là anh nhắn sau lượt trước 1,5 giờ.
-- **Chưa làm được / chờ anh:** 3 bước xác minh tài khoản (giấy tờ, tài khoản nhận tiền, nộp xét duyệt) là việc của anh · email hỗ trợ Polar chê Gmail cá nhân ·
+- **13:26 → 13:31, anh tự làm 3 bước xác minh (em chỉ mở link + đọc lại sau mỗi lần anh báo "xong"):** lần đọc 13:26 mới xong danh tính, tài khoản nhận
+  tiền còn `incomplete`, nút Submit khoá; lần đọc 13:31: tài khoản nhận tiền `ready`, hồ sơ nộp 13:31:03, tổ chức `active`, `payment_ready: true`, xét
+  duyệt `PASS` ("Your organization has been approved to sell on Polar"). Đối chiếu đường thứ hai: trang thanh toán công khai trả tổ chức `active`.
+  → Nút trả tiền trên Polar đã mở. CHƯA có đơn nào, chưa thử trả tiền thật.
+- **Chưa làm được / chờ anh (ghi lúc 13:16, mục xác minh đã xong ở dòng trên):** 3 bước xác minh tài khoản (giấy tờ, tài khoản nhận tiền, nộp xét duyệt) là việc của anh · email hỗ trợ Polar chê Gmail cá nhân ·
   khách mua xong chưa có chỗ tải bộ cài · chưa có đường tải bản dùng thử qua email · chưa thử kích hoạt bằng mã thật. Chi tiết: bảng việc chờ `CLAUDE.md`.
 
 ## [web-shotsave] - 2026-10-07 11:37 (UTC+7) - ĐÃ LÊN LIVE `4417c5f`: section "Vì sao có Shot & Save" + đoạn vào + câu chữ mới - máy công ty
