@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let r = 0; r < R; r++) { const e = nen.children[r * C], t = nen.offsetTop + e.offsetTop; Y.push({ t, b: t + e.offsetHeight }); }
   }
   const DAU = () => hep.matches ? { c0: 0, c1: 1, r0: 1, r1: 2 } : { c0: 1, c1: 3, r0: 1, r1: 2 };
+  const VUA = () => hep.matches ? { c0: 0, c1: 2, r0: 1, r1: 3 } : { c0: 1, c1: 4, r0: 0, r1: 2 };
   const KIEU = ten => hep.matches
     ? (ten === "ngang" ? { c0: 0, c1: 3, r0: 4, r1: 5 } : { c0: 2, c1: 3, r0: 0, r1: 5 })
     : (ten === "ngang" ? { c0: 0, c1: 5, r0: 2, r1: 3 } : { c0: 4, c1: 5, r0: 0, r1: 3 });
@@ -70,15 +71,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- chuyển động (tween tự chạy tạm dừng khi section ra khỏi màn hình) ----
   let thay = false, phien = 0, hen = 0;
-  const dang = new Set(), chay = () => thay && !document.hidden;
+  const dang = new Set(), dangTay = new Set(), chay = () => thay && !document.hidden;
   const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
   new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); }, { threshold: .25 }).observe(san);
   document.addEventListener("visibilitychange", capNhat);
   // tween 0 giây gọi onComplete NGAY lúc gsap.to chưa trả về: x khai báo trước; luon = true là tween theo tay khách, không tạm dừng
   const tw = (t, v, luon) => new Promise(res => {
     let x = null;
-    x = gsap.to(t, Object.assign({}, v, { onComplete() { if (x) dang.delete(x); res(); } }));
-    if (!luon && x.progress() < 1) { dang.add(x); if (!chay()) x.pause(); }
+    x = gsap.to(t, Object.assign({}, v, { onComplete() { if (x) { dang.delete(x); dangTay.delete(x); } res(); } }));
+    if (x.progress() >= 1) return;
+    if (luon) dangTay.add(x);
+    else { dang.add(x); if (!chay()) x.pause(); }
   });
   const ngu = s => tw({}, { duration: s });
   const veToi = (k2, giay, ease, luon) => { const a = { l: kh.l, t: kh.t, r: kh.r, b: kh.b }; return tw(a, { l: k2.l, t: k2.t, r: k2.r, b: k2.b, duration: giam ? 0 : giay, ease: ease || "power3.out", onUpdate() { ve(a); } }, luon).then(() => ve(k2)); };
@@ -160,6 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function dung() {
     phien++; clearTimeout(hen);
     dang.forEach(t => t.kill()); dang.clear();
+    dangTay.forEach(t => t.kill()); dangTay.clear();
+    che.querySelectorAll(".bam").forEach(e => e.classList.remove("bam"));
     tro.classList.remove("hien"); khay.classList.remove("keo"); nhan.classList.remove("hien");
     if (hien) o = hien;
     ve(khungCua(o));
@@ -167,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const henLai = p0 => { if (giam || p0 !== phien) return; clearTimeout(hen); hen = setTimeout(() => { if (p0 === phien) dien(); }, 7000); };
 
   // ---- khách TỰ kéo góc (chỉ nút trái / ngón đầu tiên, mỗi lúc một lần kéo; huỷ thì khung hít về như thả) ----
-  let tay = false;
+  let tay = false, choDoi = false;
   khay.addEventListener("pointerdown", e => {
     const t = e.target.closest(".kg-goc");
     if (!t || tay || e.button || e.isPrimary === false) return;
@@ -178,12 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
     tay = true; batDauKeo(gg); datNhan(d0.x, d0.y);
     const mv = ev => { const q = san.getBoundingClientRect(); keoToi(ev.clientX - q.left - lx, ev.clientY - q.top - ly); };
     const SK = ["pointerup", "pointercancel", "lostpointercapture"];
-    const up = async () => {
+    const up = () => {
       if (xong) return;
       xong = true;
       t.removeEventListener("pointermove", mv); SK.forEach(k => t.removeEventListener(k, up));
-      await thaKeo(true);
-      tay = false; henLai(p0);
+      const hit = thaKeo(true);
+      tay = false;
+      hit.then(() => henLai(p0));
+      if (choDoi) doiCo();
     };
     try { t.setPointerCapture(e.pointerId); } catch (err) {}
     t.addEventListener("pointermove", mv); SK.forEach(k => t.addEventListener(k, up));
@@ -197,17 +204,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---- khởi động + đổi cỡ màn hình ----
   dungLuoi(); doLuoi(); ve(khungCua(o));
   let rongCu = san.clientWidth;
-  new ResizeObserver(() => {
+  function doiCo() {
+    if (tay) { choDoi = true; return; }
+    choDoi = false;
     if (Math.abs(san.clientWidth - rongCu) < 1) return;
     rongCu = san.clientWidth;
     const doiKho = (hep.matches ? 4 : 6) !== C;
-    if (doiKho) { dung(); dungLuoi(); o = DAU(); }
+    if (doiKho) { dung(); dungLuoi(); o = giam ? VUA() : DAU(); }
     doLuoi(); ve(khungCua(o));
     if (doiKho && !giam) dien();
-  }).observe(san);
-  if (giam) { o = hep.matches ? { c0: 0, c1: 2, r0: 1, r1: 3 } : { c0: 1, c1: 4, r0: 0, r1: 2 }; ve(khungCua(o)); }
+  }
+  new ResizeObserver(doiCo).observe(san);
+  if (giam) { o = VUA(); ve(khungCua(o)); }
   else { datTro(san.clientWidth * .5, san.clientHeight * .9); dien(); }
   // tay nắm để đo / thử
-  window.ssKg = { ep(v) { thay = v; capNhat(); }, dien, dung, datKieu: t => datKieu(t, true), trangThai: () => ({ o, hien, kh, C, R, soBat: os.filter(e => e.classList.contains("bat")).length }) };
+  window.ssKg = { ep(v) { thay = v; capNhat(); }, dien, dung, datKieu: t => datKieu(t, true), trangThai: () => ({ o, hien, kh, C, R, tay, phien, thay, dangChay: dang.size, dangTay: dangTay.size, soBat: os.filter(e => e.classList.contains("bat")).length }) };
   }
 });

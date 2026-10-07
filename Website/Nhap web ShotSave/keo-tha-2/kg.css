@@ -51,7 +51,7 @@
 .kg-goc.br{right:-11px;bottom:-11px;cursor:nwse-resize}.kg-goc.br::after{right:7px;bottom:7px;border-left:0;border-top:0;border-radius:0 0 7px 0}
 @media (hover:hover){.kg-goc:hover::after{transform:scale(1.25)}}
 /* nhãn cỡ đi theo góc đang kéo, kiểu công cụ thiết kế */
-.kg-nhan{position:absolute;left:0;top:0;z-index:5;padding:4px 8px;border-radius:7px;background:#16110d;color:#fff;font:600 11px/1.2 Inter,sans-serif;white-space:nowrap;
+.kg-nhan{position:absolute;left:0;top:0;z-index:5;padding:4px 8px;border-radius:7px;background:#f86820;color:#16110d;font:700 11px/1.2 Inter,sans-serif;white-space:nowrap;
   pointer-events:none;opacity:0;transition:opacity .2s;box-shadow:0 6px 14px -6px rgb(0 0 0/50%)}
 .kg-nhan.hien{opacity:1}
 .kg-san .kt-goi{top:auto;bottom:10px}

@@ -5,6 +5,29 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 08:00 (UTC+7) - LÊN LIVE: phần Kéo thả bản 2 + phần Khay co giãn bản 2 + bỏ ô trắng (`23d9fa3`) - máy công ty
+
+- **Anh duyệt:** phần Kéo thả *"đẹp quá em ơi"*, phần Khay co giãn *"sáng tạo luôn đó em"*, *"đẹp duyệt"* → đẩy `main` `39d61cd..23d9fa3`
+  (đúng 1 file `Website/AiO ShotSave Web/index.html`, +756 dòng). md5 live = blob git `4bc97a004434` lúc 07:59:31 (65 giây sau push).
+- **Soát `kg.js` trước khi đẩy** (`ecc:code-reviewer`, chỉ đọc, 214 nghìn token, 200 giây): 0 nặng, 2 vừa + 3 nhẹ; đọc lại mã, sửa 4:
+  bấm Ngang / Dọc rồi nắm góc trong 0,55 giây thì tween của chip không huỷ được, giành khung với tay khách (nay có sổ tween theo
+  tay, `dung()` huỷ cả hai) · đổi khổ màn lúc khách đang giữ góc thì bản tự diễn chen vào (nay hoãn tới khi thả) · chip kẹt ở trạng
+  thái nhấn khi khách chen vào lúc con trỏ giả đang bấm · "giảm chuyển động" đổi khổ màn thì về cỡ nhỏ thay vì cỡ vừa.
+- **Đo thêm trước khi đẩy (`thu-kg2.cjs`):** 9 khổ màn (320 → 1920) × 2 ngôn ngữ = 18/18 đạt (0 px tràn, 0 ảnh lọt khỏi khung, tiêu đề
+  không nhảy dòng) · "giảm chuyển động" đứng yên 12 ảnh, kéo ra 20 · chặn GSAP: về bản 1 · nhân Safari (WebKit 26.6, iPhone 13):
+  tự diễn tới 24 ảnh, kéo góc bằng sự kiện con trỏ loại touch ra 24, hở trắng 0 px. Sửa thêm: nhãn cỡ chữ tối trên nền tối → nền cam.
+- **Đo TRÊN LIVE (`thu-live.cjs`, chuột thật):** cả hai khối đều bật (`kt-on`, `kg-on`) · Kéo thả tự diễn 6/6 app sau 6,1–6,2 giây,
+  khách kéo ảnh vào Photoshop nhận đúng, 0 bản sao sót · Khay co giãn tự diễn 6 → 8 → 12 → 15 → 24 (điện thoại 4 → 9 → 12 → 20 → 24) ·
+  hở trắng giữa rạp và phần kéo thả 0 px · 0 px tràn ngang · 0 lỗi console, ở cả 1280 và 390.
+- ☠️ **Bẫy THƯỚC ĐO lần này (suýt đi sửa mã lành):** bài thử "bấm chip rồi nắm góc ngay" báo khung chạy dưới tay + bản tự diễn không bao
+  giờ chạy lại. Thật ra (1) chuột bấm TRƯỢT góc cả 4 lần vì góc đang trượt theo khung, vị trí đo cũ đi vài chục ms; (2) trang đang
+  CUỘN MƯỢT (`scroll-behavior:smooth`) nên trôi tiếp, khối ra khỏi màn hình và bản tự diễn tạm dừng ĐÚNG thiết kế. Tìm ra nhờ in
+  trạng thái bên trong (`ssKg.trangThai()`: `thay false`, `phien` đã tăng). Bài thử đúng: đo vị trí và phát sự kiện trong CÙNG một
+  nhịp; tắt cuộn mượt + chờ `scrollY` đứng yên 3 lần đo rồi mới thao tác → 3/3 khung đứng yên khi giữ, tự diễn chạy lại sau 7,8 giây.
+- **CHƯA đo:** ngón tay thật trên điện thoại thật (mới có giả lập + sự kiện tổng hợp), Safari trên máy Mac thật. Messenger không còn
+  cửa sổ riêng ở phần Kéo thả (7 app → 6).
+- Thư mục nháp `E:\2026\_web-shotsave-tam` đã gỡ sau khi đẩy; mã nguồn 6 mảnh + `chen.cjs` ở `Website/Nhap web ShotSave/keo-tha-2/`.
+
 ## [web-shotsave] - 2026-10-07 07:45 (UTC+7) - Anh duyệt hướng phần Kéo thả ("đẹp quá em ơi"); NHÁP thêm phần "Khay co giãn" bản 2 + bỏ ô trắng (CHƯA lên live) - máy công ty
 
 - **Anh xem bản nháp phần Kéo thả ở localhost:** *"đẹp quá em ơi"* → hướng "một khay ở giữa, 6 app vây quanh, khách tự kéo" ĐƯỢC DUYỆT.
