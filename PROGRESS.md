@@ -5,6 +5,31 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [mac-dem-lai + gop-cong-ty] - 2026-10-07 20:24 (UTC+7) - Đem bản cũ ra khỏi Thùng rác, Production giống máy công ty, gộp 46 commit công ty vào nhánh mac - máy Mac nhà
+
+- **Bối cảnh:** 04/10 anh mở `~/Downloads/Production` (chỗ anh giải nén) thấy còn 1 mục, mở Thùng rác thấy cả thư mục Production cũ:
+  *"trời ơi anh không vào kiểm tra là tá hỏa rồi"*, *"má ơi em ẩu tả"*, *"đem lại và kiểm tra"*. 07/10: *"thư mục production giông như ở
+  công ty"*, *"mở production là lấy 28 mục cho anh"*, *"xong rồi thì cập nhật git mới về đi, kiểm tra đi"*, *"anh mới tạo một repo mới tên claw"*.
+- **Gốc:** 03/10 em dời 26 mục khỏi Downloads sang `~/Production` và bỏ 4 thư mục "thừa" vào Thùng rác theo lựa chọn có chữ
+  "(Recommended)" trong bảng hỏi, không để gì ở chỗ cũ chỉ sang chỗ mới. Bản Production tải 30/09 thì Finder bỏ vào Thùng rác lúc
+  16:35 ngày 03/10 (bản ghi `ptbL` trong `~/.Trash/.DS_Store`), 78 phút trước phiên của em, nhưng em thấy mà để nguyên.
+- **Đã làm 04/10 17:43:** đem 5 thư mục ra khỏi Thùng rác (đổi chỗ cùng ổ, không chép): 4 cái vào `~/Production - BAN CU (giu lai
+  04-10)/`, `AiO Studio - Gemini` về lại `~/Production` (đủ 28 mục cấp một như file nén công ty).
+- **Đã làm 07/10:** `~/Downloads/Production` thành lối tắt trỏ vào `~/Production`; 19 mục cấu hình (204 file) sang thư mục cất ·
+  chép 1.888 file bản công ty còn thiếu vào repo này (`rsync --ignore-existing`, bỏ `.git` / `node_modules` / `.env*` / `certs`;
+  chạy thử lại còn 0 file) · kho `Claw` mới (223 file, `b7b0a38`) kéo về `~/Production/Claw`, bản cũ 72 file cất sang thư mục cất ·
+  brain `ad9f94b` → `0fa55b9` (ghép 18 dòng vào `~/.claude/CLAUDE.md`, giữ 6 dòng Mac sửa riêng; `LESSONS.md` không ghép được, để nguyên) ·
+  **gộp `origin/may-cong-ty` vào `mac`** (`61e0f38`, 47 file, Shot & Save 0.8.0 → 0.9.0), ghép tay 5 file hai máy cùng sửa.
+- **Kiểm:** so với danh sách file nén công ty 03/10 (`7zz l -ba`, 170.560 dòng): 24/25 mục ngoài AiO Studio thiếu 0 file (tên + cỡ);
+  AiO Studio còn thiếu 207 file riêng tư (chứng chỉ, `.env`, `.claude`, ảnh chụp: lớp bảo vệ không cho chép vào repo public). Bản 30/09:
+  0 file là việc của anh mà chỉ còn ở đó (ảnh dự án Cha 17/17 có bản trùng băm, 9 file md còn trong lịch sử git, còn lại là bản dựng /
+  bộ đệm / skill tự tải). Sau gộp: `test:banquyen` 76/0 · `quyen` 28/0 · `khaymuc` 16/0 · `lammo` 25/0 · `storyboard`, `vienquay`,
+  `khodai` đạt · 67 file js cú pháp đạt. `test:botieng` không chạy được trên Mac (gọi `ffprobe.exe` bản Windows).
+- **Thước sai gặp:** lọc `.DS_Store` ở một phía → "thiếu 19 file" giả · `echo $?` sau ống `| head` · biến tên có dấu trong zsh.
+- **CHƯA làm:** Shot & Save 0.9.0 chưa chạy trên app thật, chưa cài vào Mac (anh dặn chỉ cài khi anh kêu) · 75 commit nhánh `mac`
+  chưa đẩy lên GitHub · `thinksmart-operations-dashboard` (GitHub hơn 179 commit) và portfolio `Pored/V3.2/V3` (hơn 4 commit) chưa kéo
+  vì có file sửa dở sẽ bị đè · bài học chung `5bk` chưa vào `~/.claude/CLAUDE.md` (cổng GateGuard chặn 4 lần ngày 04/10).
+
 ## [thanh-toan] - 2026-10-07 15:12 (UTC+7) - Polar: bộ cài 0.9.0 đã gắn vào sản phẩm (cách A), khách mua nhận mã + link tải - máy công ty
 
 - **Anh yêu cầu:** *"em remote chrome làm cho anh đi em"* (gắn bộ cài lên Polar). Không sửa mã nguồn nào.
