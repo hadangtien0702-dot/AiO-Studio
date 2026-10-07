@@ -19,7 +19,12 @@
   `E:/2026/_web-shotsave-tam` (375.004 ký tự, 0 lỗi cú pháp).
 - **Kiểm chứng:** `thu-cuoi.cjs` (lăn chuột thật tới cuối trang, 2 ngôn ngữ x 320 / 390 / 1280 px): 6/6 lượt tiêu đề 2 dòng, 0 px tràn,
   hiện đủ (độ mờ 1), 0 lỗi trong trang. Ảnh `cuoi-vi-1280.png` đã mở xem.
-- **[CHỜ ANH]** 4 chỗ còn lại (em đưa câu đề xuất, chưa sửa) · phần Storyboard giữ, làm lại theo hướng "khay lưu ý tưởng đang chuyển
+- **08:47, anh chọn thêm câu thứ hai (2/5):** *"Được làm bởi một editor dựng phim, người lưu hàng trăm ý tưởng mỗi tuần"* · EN (em tự dịch) "Built
+  by a video editor who saves hundreds of ideas a week." Chỗ cũ của câu này (dưới tiêu đề phần tính năng) đang ẩn khi rạp bật, nên ngoài
+  đổi chữ ở chỗ cũ, em ĐẶT THÊM một dòng dưới tiêu đề cuối trang (`.end-sub`, cùng khoá `featSub`); vị trí này là em chọn, anh chưa duyệt.
+  Đo (`thu-cuoi.cjs`, 2 ngôn ngữ x 320 / 390 / 1280 px): câu hiện 1 đến 3 dòng, 0 px tràn, cách tiêu đề 14 px, cách nút 26 px, bấm đổi
+  ngôn ngữ thì cả hai chỗ đổi theo, 0 lỗi trong trang; ảnh nền sáng + nền tối đã mở xem. Bản ghép: 375.273 ký tự, 0 lỗi cú pháp.
+- **[CHỜ ANH]** 3 chỗ còn lại (nhãn trên tiêu đề đầu trang, mô tả trang, chân trang; em đưa câu đề xuất, chưa sửa) · phần Storyboard giữ, làm lại theo hướng "khay lưu ý tưởng đang chuyển
   động" (chưa làm, chờ anh gật) · cả bản nháp chưa lên live.
 
 ## [web-shotsave] - 2026-10-07 08:32 (UTC+7) - NHÁP (chưa lên live): đoạn VÀO cho từng section + ẩn tiêu đề lạc quẻ + câu mới đầu trang - máy công ty

@@ -54,6 +54,16 @@ thay('data-i-html="endTitle">Your next screenshot<br>can be the fast one.</h2>',
   'data-i-html="endTitle">Your next idea.<br>Don\'t let it slip away.</h2>', "tieu de cuoi trang EN");
 thay('endTitle:"Chụp màn hình nhanh hơn,<br>bắt đầu từ hôm nay."',
   'endTitle:"Ý tưởng tiếp theo,<br>đừng để trôi mất."', "tieu de cuoi trang VI");
+// 07/10 anh chọn câu "Được làm bởi một editor dựng phim, người lưu hàng trăm ý tưởng mỗi tuần". Chỗ cũ của câu này (dưới tiêu đề phần
+// tính năng) đang ẩn khi rạp bật, nên ngoài việc đổi chữ ở chỗ cũ còn đặt thêm một dòng dưới tiêu đề cuối trang (cùng khoá featSub).
+thay('data-i="featSub">Built by a video editor who takes hundreds of screenshots a week.</p>',
+  'data-i="featSub">Built by a video editor who saves hundreds of ideas a week.</p>', "cau editor EN");
+thay('featSub:"Được làm bởi một editor dựng phim, người chụp màn hình hàng trăm lần mỗi tuần."',
+  'featSub:"Được làm bởi một editor dựng phim, người lưu hàng trăm ý tưởng mỗi tuần."', "cau editor VI");
+thay('Don\'t let it slip away.</h2>\n      <a class="btn btn-main" href="#checkout" data-i="endBtn">',
+  'Don\'t let it slip away.</h2>\n      <p class="end-sub" data-i="featSub">Built by a video editor who saves hundreds of ideas a week.</p>\n      <a class="btn btn-main" href="#checkout" data-i="endBtn">', "cau editor o cuoi trang");
+thay('.end h2{margin-bottom:24px}',
+  '.end h2{margin-bottom:24px}\n.end h2:has(+ .end-sub){margin-bottom:14px}\n.end .end-sub{margin:0 auto 26px;max-width:32em;padding:0 8px;color:var(--ink-2);font-size:17px;line-height:1.5;text-wrap:balance}', "css cau editor");
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;
