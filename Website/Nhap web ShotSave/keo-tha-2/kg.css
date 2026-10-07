@@ -66,3 +66,23 @@
   .kg-xd{display:inline}
   .kg-san .kt-goi{top:auto;bottom:8px}
 }
+/* Đoạn VÀO của phần Khay co giãn (07/10) */
+@media (prefers-reduced-motion:no-preference){
+  .kg.cho .kg-dau h2,.kg.cho .kg-dau p,.kg.cho .kg-che{opacity:0;transform:translateY(18px)}
+  .kg.vao .kg-dau h2,.kg.vao .kg-dau p,.kg.vao .kg-che{transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .kg.vao .kg-dau p{transition-delay:.08s}
+  .kg.vao .kg-che{transition-delay:.16s}
+  .kg.cho .kg-san{opacity:0;transform:translateY(24px) scale(.97)}
+  .kg.vao .kg-san{transition:opacity .5s ease .1s,transform .7s cubic-bezier(.2,.8,.2,1) .1s}
+  .kg.cho .kg-nen i{opacity:0;transform:scale(.5)}
+  .kg.vao .kg-nen i{transition:opacity .3s ease calc(.3s + var(--tre,0s)),transform .45s cubic-bezier(.3,1.5,.5,1) calc(.3s + var(--tre,0s))}
+  .kg.cho .kg-khay{opacity:0;transform:scale(.8)}
+  .kg.vao .kg-khay{transition:opacity .3s ease .85s,transform .55s cubic-bezier(.3,1.5,.5,1) .85s,box-shadow .2s ease}
+  .kg.cho .kg-anh,.kg.cho .kt-goi{opacity:0}
+  .kg.vao .kg-anh{transition:opacity .3s ease 1.35s}
+  .kg.vao .kt-goi{transition:opacity .4s ease 1.5s}
+}
+/* 07/10 anh: "phần chữ này nó lạc quẻ giữa 2 section": tiêu đề phần tính năng nằm trơ trên nền trắng giữa bản chạy thử đầu trang và rạp tối,
+   mà cảnh 01 của rạp đã diễn đúng câu đó. Rạp bật thì ẩn khối chữ (lưới thẻ dự phòng vẫn giữ tiêu đề). */
+#features:has(#rap:not([hidden])) > .wrap{display:none}
+#features:has(#rap:not([hidden])){padding-top:0}

@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const T = k => window.ssT ? window.ssT(k) : k;
   const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hep = matchMedia("(max-width:720px)");
+  const khoi = document.getElementById("kt");
   const khay = document.getElementById("ktKhay"), luoi = document.getElementById("ktLuoi"), day = document.getElementById("ktDay");
   const tro = document.getElementById("ktTro"), goi = document.getElementById("ktGoi");
 
@@ -92,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const bo = el => ({ x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
   const tam = i => { const d = bo(wins[i]); return { x: d.x + d.w / 2, y: d.y + d.h / 2 }; };
   const lam = v => Math.round(v * 10) / 10;
+  // khay đo theo bố cục (không theo hình đang co lại lúc chờ vào); máy tính khay lệch lên nửa chiều cao bằng transform
+  const hopKhay = () => ({ x: khay.offsetLeft, y: khay.offsetTop - (hep.matches ? 0 : khay.offsetHeight / 2), w: khay.offsetWidth, h: khay.offsetHeight });
 
   // ---- dây nối khay ↔ app ----
   const NS = "http://www.w3.org/2000/svg", dayS = [], dayN = [];
@@ -100,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     a.setAttribute("class", "n"); b.setAttribute("class", "s"); day.append(a, b); dayN.push(a); dayS.push(b);
   });
   function veDay() {
-    const W = san.clientWidth, H = san.clientHeight, S = hop(khay);
+    const W = san.clientWidth, H = san.clientHeight, S = hopKhay();
     if (!W || !H) return;
     day.setAttribute("viewBox", "0 0 " + W + " " + H);
     wins.forEach((w, i) => {
@@ -122,10 +125,10 @@ document.addEventListener("DOMContentLoaded", () => {
   veDay();
 
   // ---- chuyển động: mọi tween tự chạy đều tạm dừng khi section ra khỏi màn hình ----
-  let thay = false, phien = 0, hen = 0;
+  let thay = false, phien = 0, hen = 0, daVao = giam;
   const dang = new Set(), chay = () => thay && !document.hidden;
   const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
-  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); }, { threshold: .25 }).observe(san);
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); if (thay) vao(); }, { threshold: .25 }).observe(san);
   document.addEventListener("visibilitychange", capNhat);
   // luon = true: tween của thao tác do khách kéo, không tạm dừng, không bị huỷ theo phiên tự chạy
   // ☠️ tween 0 giây gọi onComplete NGAY trong lúc gsap.to chưa trả về: x phải khai báo trước, và tween đã xong thì không đưa vào sổ
@@ -268,7 +271,28 @@ document.addEventListener("DOMContentLoaded", () => {
     veDay(); dayS.forEach(s => { s.style.opacity = 1; });
   } else {
     datTro(san.clientWidth * .5, san.clientHeight * .92);
-    dien();
+    khoi.classList.add("cho");
+    datHuongVao();
+  }
+  // ---- đoạn VÀO (anh 07/10: "mỗi section trước khi bắt đầu animation cần một animation in"): chữ trồi lên, khay bật ra giữa sân,
+  // 6 app toả ra TỪ khay về chỗ của nó, dây nối hiện, rồi mới tự diễn. Chạy một lần khi sân vào màn hình. Không có đoạn ra.
+  function datHuongVao() {
+    const S = hopKhay(), sx = S.x + S.w / 2, sy = S.y + S.h / 2;
+    [0, 3, 1, 4, 2, 5].forEach((i, k) => {
+      const d = bo(wins[i]), st = wins[i].style;
+      st.setProperty("--dx", lam((sx - d.x - d.w / 2) * .6) + "px"); st.setProperty("--dy", lam((sy - d.y - d.h / 2) * .6) + "px");
+      st.setProperty("--tre", (.3 + k * .07).toFixed(2) + "s");
+    });
+  }
+  function vao() {
+    if (daVao) return;
+    daVao = true;
+    datHuongVao();
+    const p0 = phien;
+    khoi.classList.add("vao");
+    void khoi.offsetWidth;
+    khoi.classList.remove("cho");
+    setTimeout(() => { khoi.classList.remove("vao"); if (!tay && p0 === phien) dien(); }, 1700);
   }
   // tay nắm để đo / thử: ép coi như đang trong màn hình, chạy lại, dừng, thả thẳng ảnh n vào app i
   window.ssKt = { ep(v) { thay = v; capNhat(); }, dien, dung, xoaHet, nhan(i, n) { const r = hop(ths[n]); return tha(bong(n, r), i, n, true); }, wins, dang };

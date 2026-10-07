@@ -139,3 +139,17 @@
   .kt-win.w0 .kt-ok,.kt-win.w1 .kt-ok,.kt-win.w2 .kt-ok{right:auto;left:-2.8cqw}
   .kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{left:auto;right:-2.8cqw}
 }
+/* Đoạn VÀO của phần Kéo thả (07/10): chờ = .cho, đang vào = .vao (bật transition riêng cho đoạn vào). "Giảm chuyển động": JS không gắn .cho */
+@media (prefers-reduced-motion:no-preference){
+  .kt.cho .kt-dau h2,.kt.cho .kt-dau p{opacity:0;transform:translateY(18px)}
+  .kt.vao .kt-dau h2,.kt.vao .kt-dau p{transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .kt.vao .kt-dau p{transition-delay:.08s}
+  .kt.cho .kt-khay{opacity:0;transform:translateY(-50%) scale(.6)}
+  .kt.vao .kt-khay{transition:opacity .35s ease .12s,transform .6s cubic-bezier(.3,1.5,.5,1) .12s}
+  .kt.cho .kt-win{opacity:0;transform:translate(var(--dx,0px),var(--dy,0px)) rotate(0deg) scale(.5)}
+  .kt.vao .kt-win{transition:opacity .35s ease var(--tre,0s),transform .7s cubic-bezier(.2,.9,.25,1.12) var(--tre,0s)}
+  .kt.cho .kt-day,.kt.cho .kt-goi{opacity:0}
+  .kt.vao .kt-day{transition:opacity .5s ease 1s}
+  .kt.vao .kt-goi{transition:opacity .4s ease 1.2s}
+}
+@media (prefers-reduced-motion:no-preference) and (max-width:720px){.kt.cho .kt-khay{transform:scale(.6)}}

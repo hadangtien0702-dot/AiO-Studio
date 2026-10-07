@@ -6,11 +6,12 @@ const goc = process.argv[2];
 if (!goc) { console.error("Thieu thu muc dich"); process.exit(2); }
 const REL = "Website/AiO ShotSave Web/index.html";
 const doc = f => fs.readFileSync(path.join(__dirname, f), "utf8").replace(/\r\n/g, "\n");
-let s = execFileSync("git", ["show", "HEAD:" + REL], { cwd: goc, maxBuffer: 64 * 1024 * 1024 }).toString("utf8");
+const GOC_GIT = process.argv[3] || "HEAD";
+let s = execFileSync("git", ["show", GOC_GIT + ":" + REL], { cwd: goc, maxBuffer: 64 * 1024 * 1024 }).toString("utf8");
 const dem = (a) => s.split(a).length - 1;
 // Chốt chặn (07/10): từ commit 23d9fa3 trang trên main ĐÃ chứa 6 mảnh này. Ghép lần nữa là chèn trùng.
 // Sửa hai phần này từ nay: sửa THẲNG trong index.html (và sửa mảnh ở đây cho khớp), không chạy lại script này trên bản đã ghép.
-if (s.includes('id="ktSan"') || s.includes('id="kgSan"')) { console.error("DUNG: trang dich da co khoi keo tha / khay co gian ban 2, khong ghep lan nua"); process.exit(3); }
+if (!process.argv[3] && (s.includes('id="ktSan"') || s.includes('id="kgSan"'))) { console.error("DUNG: trang dich da co khoi keo tha / khay co gian ban 2, khong ghep lan nua"); process.exit(3); }
 function thay(neo, moi, ten) {
   const n = dem(neo);
   if (n !== 1) { console.error("NEO '" + ten + "' xuat hien " + n + " lan (can dung 1)"); process.exit(1); }
@@ -31,6 +32,23 @@ const NEO_JS2 = "// ===== Section KHAY CO GIÃN: con trỏ kéo góc khay";
 thay(NEO_JS2, doc("kg.js") + "\n" + NEO_JS2, "js khay co gian");
 const NEO_VI = 'khTitle:"Kéo thả vào mọi ứng dụng", ';
 thay(NEO_VI, NEO_VI + 'ktGoi:"Thử đi: kéo một ảnh thả vào app bất kỳ", kgGoi:"Thử đi: kéo một góc của khay", kgAnh:"ảnh", kgTitle:\'Khay <span class="kg-gian">co giãn</span><br class="kg-xd"> theo ý bạn\', ', "chu VI");
+// 07/10 anh: "mỗi section ... cần một animation in": các section còn lại dùng cơ chế [data-hien] có sẵn của trang (trồi lên + hiện dần, một lần)
+const HIEN = [
+  ["      <div class=\"kh-text sb-text\">", "      <div class=\"kh-text sb-text\" data-hien>"],
+  ["      <div class=\"kh-right\">\n        <div class=\"kh-mon\"><div class=\"sb-visual\" id=\"sbVisual\">", "      <div class=\"kh-right\" data-hien style=\"--tre:120ms\">\n        <div class=\"kh-mon\"><div class=\"sb-visual\" id=\"sbVisual\">"],
+  ["      <div class=\"st-text\">", "      <div class=\"st-text\" data-hien>"],
+  ["      <div class=\"st-visual\" id=\"stVisual\" aria-hidden=\"true\">", "      <div class=\"st-visual\" id=\"stVisual\" aria-hidden=\"true\" data-hien style=\"--tre:120ms\">"],
+  ["      <div class=\"sec-head\">\n        <h2 data-i=\"priceTitle\">", "      <div class=\"sec-head\" data-hien>\n        <h2 data-i=\"priceTitle\">"],
+  ["      <div class=\"sec-head\"><h2 data-i=\"faqTitle\">", "      <div class=\"sec-head\" data-hien><h2 data-i=\"faqTitle\">"],
+  ["      <div class=\"faq\">", "      <div class=\"faq\" data-hien style=\"--tre:100ms\">"],
+  ["  <section class=\"end\">\n    <div class=\"wrap\">", "  <section class=\"end\">\n    <div class=\"wrap\" data-hien>"],
+];
+HIEN.forEach((c, i) => thay(c[0], c[1], "data-hien " + i));
+// 07/10 anh: câu dưới tiêu đề đầu trang viết lại kiểu "Chụp -> lưu -> gửi. thao tác siêu gọn trong một không gian"
+thay('data-i="lede">Press one shortcut, drag a box, and your screenshot is ready to pin on top, mark up, or drag straight into Premiere, Figma, or a chat.</p>',
+  'data-i="lede">Capture → Save → Send. One tight flow, all in one place.</p>', "cau dau trang EN");
+thay('lede:"Nhấn phím tắt, chọn vùng cần chụp. Ảnh có thể ghim nổi trên màn hình, thêm chú thích, hoặc kéo thẳng vào Premiere, Figma hay khung chat."',
+  'lede:"Chụp → Lưu → Gửi. Thao tác siêu gọn trong một không gian."', "cau dau trang VI");
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;

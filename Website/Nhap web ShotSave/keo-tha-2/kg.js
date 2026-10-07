@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hep = matchMedia("(max-width:720px)");
   const lay = id => document.getElementById(id);
+  const khoi = lay("kg");
   const nen = lay("kgNen"), lop = lay("kgAnh"), khay = lay("kgKhay"), dem = lay("kgDem"), nhan = lay("kgNhan"), goi = lay("kgGoi"), tro = lay("kgTro"), che = lay("kgChe");
   // 24 ảnh mẫu khác nhau: lấy lại đúng bộ ảnh bản 1 đã dựng trong #rsList (không lặp ảnh, anh nhắc 22/09)
   const mau = [...document.querySelectorAll("#rsList .kh-thumb")].map(e => { const c = e.cloneNode(true); c.classList.remove("cam", "di"); c.removeAttribute("style"); return c.outerHTML; });
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function dungLuoi() {
     C = hep.matches ? 4 : 6; R = hep.matches ? 6 : 4; nen.textContent = ""; lop.textContent = ""; os = [];
     for (let i = 0; i < C * R; i++) {
-      nen.append(document.createElement("i"));
+      const cho = document.createElement("i"); cho.style.setProperty("--tre", (((i % C) + Math.floor(i / C)) * .035).toFixed(3) + "s"); nen.append(cho);
       const o = document.createElement("div"); o.className = "kg-o";
       o.innerHTML = '<div class="rs-list kg-rl">' + (mau.length ? mau[i % mau.length] : '<div class="kh-thumb"></div>') + "</div>";
       lop.append(o); os.push(o);
@@ -70,10 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.ssKgRelang = chu;
 
   // ---- chuyển động (tween tự chạy tạm dừng khi section ra khỏi màn hình) ----
-  let thay = false, phien = 0, hen = 0;
+  let thay = false, phien = 0, hen = 0, daVao = giam;
   const dang = new Set(), dangTay = new Set(), chay = () => thay && !document.hidden;
   const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
-  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); }, { threshold: .25 }).observe(san);
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); if (thay) vao(); }, { threshold: .25 }).observe(san);
   document.addEventListener("visibilitychange", capNhat);
   // tween 0 giây gọi onComplete NGAY lúc gsap.to chưa trả về: x khai báo trước; luon = true là tween theo tay khách, không tạm dừng
   const tw = (t, v, luon) => new Promise(res => {
@@ -212,11 +213,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const doiKho = (hep.matches ? 4 : 6) !== C;
     if (doiKho) { dung(); dungLuoi(); o = giam ? VUA() : DAU(); }
     doLuoi(); ve(khungCua(o));
-    if (doiKho && !giam) dien();
+    if (doiKho && !giam && daVao) dien();
   }
   new ResizeObserver(doiCo).observe(san);
   if (giam) { o = VUA(); ve(khungCua(o)); }
-  else { datTro(san.clientWidth * .5, san.clientHeight * .9); dien(); }
+  else { datTro(san.clientWidth * .5, san.clientHeight * .9); khoi.classList.add("cho"); }
+  // ---- đoạn VÀO (anh 07/10): chữ + nút Ngang / Dọc trồi lên, sân hiện, 24 ô chờ nổi lên theo sóng chéo, khay bật ra, rồi mới tự diễn.
+  function vao() {
+    if (daVao) return;
+    daVao = true;
+    const p0 = phien;
+    khoi.classList.add("vao");
+    void khoi.offsetWidth;
+    khoi.classList.remove("cho");
+    setTimeout(() => { khoi.classList.remove("vao"); if (!tay && p0 === phien) dien(); }, 1950);
+  }
   // tay nắm để đo / thử
   window.ssKg = { ep(v) { thay = v; capNhat(); }, dien, dung, datKieu: t => datKieu(t, true), trangThai: () => ({ o, hien, kh, C, R, tay, phien, thay, dangChay: dang.size, dangTay: dangTay.size, soBat: os.filter(e => e.classList.contains("bat")).length }) };
   }

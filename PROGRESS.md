@@ -5,6 +5,36 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 08:32 (UTC+7) - NHÁP (chưa lên live): đoạn VÀO cho từng section + ẩn tiêu đề lạc quẻ + câu mới đầu trang - máy công ty
+
+- **Anh yêu cầu (3 tin liền nhau, xem bản live vừa đẩy):** (1) *"mỗi section trước khi bắt đầu animation anh cần một cái animation in cho
+  mỗi section, out thì không cần, người dùng sẽ scroll"*; (2) khoanh tiêu đề "Gọn nhẹ, đủ những gì bạn cần": *"phần chữ này nó lạc quẻ
+  giữa 2 section"*; (3) khoanh câu dưới tiêu đề đầu trang: *"viết lại như sau: Chụp -> lưu -> gửi. thao tác siêu gọn trong một không
+  gian, kiểu như thế này"*.
+- **Đoạn VÀO, hai khối mới** (class `cho` = đang chờ, `vao` = đang vào; JS gắn `cho` lúc dựng, gỡ khi sân vào màn hình lần đầu; tự diễn
+  chỉ bắt đầu SAU khi vào xong; "giảm chuyển động" không gắn `cho`):
+  - Kéo thả (1,7 giây): chữ trồi lên → khay bật ra giữa sân → 6 app toả ra TỪ khay về chỗ của nó (so le 0,07 giây) → dây nối → gợi ý.
+  - Khay co giãn (1,95 giây): chữ + nút Ngang / Dọc trồi lên → sân hiện → 24 ô chờ nổi theo sóng chéo → khung khay bật ra → ảnh hiện.
+- **Đoạn VÀO, các section còn lại:** dùng cơ chế `[data-hien]` CÓ SẴN của trang (trồi 18 px + hiện dần, một lần), gắn thêm cho 8 khối:
+  Storyboard (chữ, hình), Cài đặt (chữ, hình), tiêu đề Giá, tiêu đề + danh sách Hỏi đáp, khối cuối trang. KHÔNG gắn cho: đầu trang (28/09
+  đã bỏ hiệu ứng hiện dần vì làm Google chấm LCP 6 giây) và rạp (khối cao hơn 5 lần màn hình, ngưỡng 20% của bộ quan sát không bao giờ
+  đạt → sẽ ẩn mãi; cảnh 01 của rạp vốn đã là đoạn mở).
+- **Tiêu đề lạc quẻ:** cảnh 01 của rạp đã diễn đúng câu "Gọn nhẹ, đủ những gì bạn cần" nên khối chữ trắng phía trên là lặp. Rạp bật thì ẩn
+  `#features > .wrap` + bỏ đệm trên (CSS `:has`); lưới thẻ dự phòng vẫn giữ tiêu đề. Hở trắng giữa bản chạy thử đầu trang và rạp: 48 px.
+  ☠️ MẤT khi rạp bật: câu phụ *"Được làm bởi một editor dựng phim, người chụp màn hình hàng trăm lần mỗi tuần"* (chưa có chỗ mới, hỏi anh).
+- **Câu đầu trang (khoá `lede`):** VI *"Chụp → Lưu → Gửi. Thao tác siêu gọn trong một không gian."* · EN *"Capture → Save → Send. One tight
+  flow, all in one place."* (chữ do em chốt theo kiểu anh đưa, chờ anh duyệt).
+- **Cách ghép:** `node chen.cjs "<thư mục đích>" 39d61cd` (tham số thứ 3 = commit GỐC chưa có 6 mảnh; có tham số này thì chốt chặn "đã
+  ghép" không chặn). ☠️ Chỉ đúng khi `index.html` trên `main` chưa có sửa nào khác ngoài các mảnh này kể từ `39d61cd`.
+- **Đo (Chromium không cửa sổ, 1280 + 390; `thu-vao.cjs`):** trước khi cuộn tới cả hai khối đều `cho`, độ mờ 0 · tới nơi: vào xong rồi
+  con trỏ tự diễn mới hiện ở giây 2,4–3,0 · 8/8 khối `[data-hien]` hiện sau khi cuộn tới ở cả hai khổ · lăn bánh xe thật hết trang
+  (18.597 px): 0 khối kẹt ẩn · "giảm chuyển động": không có `cho`, mọi thứ hiện sẵn · nhân Safari (WebKit 26.6, iPhone 13) cuộn hết
+  trang: 0 khối kẹt ẩn, 0 px tràn · 0 lỗi console. Chạy lại 4 bộ cũ: Kéo thả 16/16 khổ, Khay co giãn 18/18 khổ, kéo chuột, mất GSAP đều đạt.
+- ☠️ **Bẫy thước:** bộ 18 khổ báo trượt 18/18 ("ảnh lọt khỏi khung") vì đo ở giây 0,8 lúc khung khay còn đang vào (đang co 80%). Sửa
+  bài thử chờ 2,4 giây; và cho ảnh hiện SAU khi khung vào xong (1,35 giây) để mắt cũng không thấy ảnh thò ra.
+- **[CHỜ ANH]** xem ở `http://localhost:8127/` rồi duyệt để đẩy `main`. CHƯA cho người soát đọc phần này (thay đổi nhỏ: 2 hàm `vao()` +
+  CSS + 8 thuộc tính); CHƯA đo trên điện thoại thật.
+
 ## [web-shotsave] - 2026-10-07 08:00 (UTC+7) - LÊN LIVE: phần Kéo thả bản 2 + phần Khay co giãn bản 2 + bỏ ô trắng (`23d9fa3`) - máy công ty
 
 - **Anh duyệt:** phần Kéo thả *"đẹp quá em ơi"*, phần Khay co giãn *"sáng tạo luôn đó em"*, *"đẹp duyệt"* → đẩy `main` `39d61cd..23d9fa3`
