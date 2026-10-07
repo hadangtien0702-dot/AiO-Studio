@@ -150,6 +150,13 @@ duong DU PHONG, van dung khi luong chua san sang.
 
 ## Verify — KHONG tin "build sach"
 
+☠️ **Bai kiem MOI phai chay duoc tren CA Windows lan Mac (07/10).** 4 bai viet 06/10 tren Windows (`butve`, `nutkhay`,
+`chupcuon`, `xuatgif`) goi thang `node_modules/electron/dist/electron` -> tren Mac ma thoat `null`, bao TRUOT du app
+khong sai (Mac: `dist/Electron.app/Contents/MacOS/Electron`). Goi Electron bang `require('electron')` (tra dung duong dan
+moi he dieu hanh, nhu `do-so-buoc.mjs`), dung ghep duong dan tay. Cong cu ngoai (`ffprobe`): Windows lay `bin/win64/*.exe`
+cua panel, Mac lay `~/Library/Application Support/AiO-Studio/bin/mac/`. Bai nao truot trong 0 giay = nghi BAI KIEM truoc.
+**Do cham o dau luc chup:** dong `grab-xong` trong run-log co `(cho · ve · nen)`, `raw-xong` co `(doc · doi · gui · anh)` (ms).
+
 Windows che den (mask) app la khi chup bang cong cu ngoai, nen dung co
 `--selftest`: app tu chup -> tu chon vung giua -> tu ghim -> `capturePage()` luu
 `.selftest/*.png` (app tu chup chinh no, vuot mask) -> tu thoat.

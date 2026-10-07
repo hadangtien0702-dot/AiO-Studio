@@ -13,7 +13,9 @@
 >   `Electron.app/Contents/MacOS/Electron`; bai GIF goi `ffprobe.exe`) -> da sua duong goi. Sau sua tren Mac: `butve` 68/0 ·
 >   `nutkhay` 54/0 · `chupcuon` 38/0 · `xuatgif` 58/0 (GIF: mau 4 giay lam 1,07 giay; file quay that 720p 1,3 giay, 4K 2,5 giay).
 >   Cung luot: `sobuoc`, `chekin` 40/40, `khaynut`, `keo` 36/0, `cauhinh` 22/0, `khayram` 12/0, `khovideo` dat.
->   Thay doi nay CHUA push (chua tang so phien ban).
+>   **21:12 /xong tren Mac: tang len 0.9.1, nap lai vao app Mac, day len GitHub (`mac` + `may-cong-ty`).**
+>   [CHO] toi uu buoc cham luc chup tren Mac: dung vi CHUA co so tung buoc (anh chua chup lan nao sau khi gan dong ho).
+>   Viec ke tiep: anh chup 3-4 lan -> doc `(cho · ve · nen)` trong dong `grab-xong` -> sua dung buoc lon nhat.
 > - **07/10 20:28 MAC: DA NAP 0.9.0 vao app dang cai (khong thay .app), anh: *"tao ban update mac tuong tu nhu win khong can
 >   cai dat lai"*.** Truoc do gop `origin/may-cong-ty` (46 commit) vao nhanh `mac` (`61e0f38`), ghep tay `i18n.js` (giu chu
 >   "Danh dau so" cua Mac + 2 khoa but ve / da quang moi) va `do-ban-quyen.mjs` (giu [10-12] cua Mac + [13] ma tron doi).

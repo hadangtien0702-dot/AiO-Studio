@@ -26,8 +26,12 @@
   bộ đệm / skill tự tải). Sau gộp: `test:banquyen` 76/0 · `quyen` 28/0 · `khaymuc` 16/0 · `lammo` 25/0 · `storyboard`, `vienquay`,
   `khodai` đạt · 67 file js cú pháp đạt. `test:botieng` không chạy được trên Mac (gọi `ffprobe.exe` bản Windows).
 - **Thước sai gặp:** lọc `.DS_Store` ở một phía → "thiếu 19 file" giả · `echo $?` sau ống `| head` · biến tên có dấu trong zsh.
-- **CHƯA làm:** Shot & Save 0.9.0 chưa chạy trên app thật, chưa cài vào Mac (anh dặn chỉ cài khi anh kêu) · 75 commit nhánh `mac`
-  chưa đẩy lên GitHub · `thinksmart-operations-dashboard` (GitHub hơn 179 commit) và portfolio `Pored/V3.2/V3` (hơn 4 commit) chưa kéo
+- **Sau đó cùng tối 07/10 (anh: *"đồng bộ AiO Studio code đi em - tạo bản update mac tương tự như win không cần cài đặt lại"*):**
+  nạp 0.9.0 vào app Mac đang cài lúc 20:28 (quyền Ghi màn hình còn, 13 ảnh + cấu hình giữ nguyên; anh thử: *"bình thường"*), đẩy
+  `mac` + `may-cong-ty` lên GitHub (`main` không đụng). 21:12 `/xong`: Shot & Save 0.9.1 (đồng hồ bấm giờ từng bước + 4 bài kiểm
+  chạy được trên Mac), bài học `5bk` đã vào `~/.claude/CLAUDE.md`. Chi tiết Shot & Save: `PROGRESS.md` của app.
+- **CHƯA làm:** [CHO] tối ưu bước chậm lúc chụp trên Mac (ảnh đóng băng về sau ~0,3 giây), dừng vì chưa có số từng bước ·
+  [CHO] `thinksmart-operations-dashboard` (GitHub hơn 179 commit) và portfolio `Pored/V3.2/V3` (hơn 4 commit) chưa kéo
   vì có file sửa dở sẽ bị đè · bài học chung `5bk` chưa vào `~/.claude/CLAUDE.md` (cổng GateGuard chặn 4 lần ngày 04/10).
 
 ## [thanh-toan] - 2026-10-07 15:12 (UTC+7) - Polar: bộ cài 0.9.0 đã gắn vào sản phẩm (cách A), khách mua nhận mã + link tải - máy công ty
