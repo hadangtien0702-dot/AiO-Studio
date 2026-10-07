@@ -8,6 +8,9 @@ const REL = "Website/AiO ShotSave Web/index.html";
 const doc = f => fs.readFileSync(path.join(__dirname, f), "utf8").replace(/\r\n/g, "\n");
 let s = execFileSync("git", ["show", "HEAD:" + REL], { cwd: goc, maxBuffer: 64 * 1024 * 1024 }).toString("utf8");
 const dem = (a) => s.split(a).length - 1;
+// Chốt chặn (07/10): từ commit 23d9fa3 trang trên main ĐÃ chứa 6 mảnh này. Ghép lần nữa là chèn trùng.
+// Sửa hai phần này từ nay: sửa THẲNG trong index.html (và sửa mảnh ở đây cho khớp), không chạy lại script này trên bản đã ghép.
+if (s.includes('id="ktSan"') || s.includes('id="kgSan"')) { console.error("DUNG: trang dich da co khoi keo tha / khay co gian ban 2, khong ghep lan nua"); process.exit(3); }
 function thay(neo, moi, ten) {
   const n = dem(neo);
   if (n !== 1) { console.error("NEO '" + ten + "' xuat hien " + n + " lan (can dung 1)"); process.exit(1); }

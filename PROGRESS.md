@@ -27,6 +27,9 @@
 - **CHƯA đo:** ngón tay thật trên điện thoại thật (mới có giả lập + sự kiện tổng hợp), Safari trên máy Mac thật. Messenger không còn
   cửa sổ riêng ở phần Kéo thả (7 app → 6).
 - Thư mục nháp `E:\2026\_web-shotsave-tam` đã gỡ sau khi đẩy; mã nguồn 6 mảnh + `chen.cjs` ở `Website/Nhap web ShotSave/keo-tha-2/`.
+- ☠️ **Từ `23d9fa3` trang trên `main` ĐÃ chứa 6 mảnh.** Sửa hai phần này từ nay = sửa THẲNG trong `index.html` (và sửa mảnh cho khớp);
+  KHÔNG chạy lại `chen.cjs` trên bản đã ghép (sẽ chèn trùng). Đã lắp chốt chặn trong script: thấy `id="ktSan"` / `id="kgSan"` là dừng,
+  mã thoát 3 (thử trên repo chính: dừng đúng, `index.html` không đổi).
 
 ## [web-shotsave] - 2026-10-07 07:45 (UTC+7) - Anh duyệt hướng phần Kéo thả ("đẹp quá em ơi"); NHÁP thêm phần "Khay co giãn" bản 2 + bỏ ô trắng (CHƯA lên live) - máy công ty
 
