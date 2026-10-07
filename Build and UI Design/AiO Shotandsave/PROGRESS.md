@@ -9,6 +9,8 @@
 >   `khaymuc` 16/0, `lammo` 25/0, `storyboard` / `vienquay` / `khodai` dat. CHUA ai bam thu tinh nang 0.9.0 tren Mac (but ve,
 >   da quang, xuat GIF, chup cuon); cac bai kiem bat cua so CHUA chay tren Mac. Ruot cu:
 >   `~/Library/Application Support/AiO-Studio/ban-cai-truoc/shotandsave-ruot-20261007-202846/`.
+>   **20:30 ANH THU, BAO: *"anh mới thử thấy nó bình thường em"*.** Run-log tu `boot v0.9.0`: 0 dong LOI / CANH BAO / Failed,
+>   4 dong chup. Anh khong noi da thu tinh nang nao -> but ve, da quang, xuat GIF, chup cuon tren Mac van coi la CHUA do rieng.
 > - **Ban dang chay may cong ty: van 0.8.0, nap lan 29 (boot 14:59:08), `app.asar` md5 `a1e5b05b`.** CHUA dong goi lai (bo cai
 >   0.8.0 trong Release la ban 01/10 19:22, thieu moi thu tu 02/10), CHUA tang so phien ban: anh dan *"con ban cai thi khi nao
 >   anh bao moi xuat ra ban moi"*.
