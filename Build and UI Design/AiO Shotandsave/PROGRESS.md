@@ -140,6 +140,27 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
+## [0.9.0] - 2026-10-07 14:07 - DONG GOI bo cai 0.9.0 (anh: "xuat ban moi") + bai kiem ma ban quyen TRON DOI - may cong ty
+
+**Boi canh.** Anh chot ban qua Polar da duoc duyet nhan tien (07/10 13:31) va bao: "chon A, xuat ban moi roi tao ma giam 100% di em" (A = gan bo cai
+vao san pham tren Polar). Bo cai gan nhat (0.8.0, 01/10) thieu GIF, but ve, chup cuon, danh so ma web dang quang cao.
+**Da lam.** (1) `package.json` 0.8.0 -> 0.9.0 (ma nguon KHONG doi so voi lan nap 29 ngay 06/10 14:59, chi doi so). (2) `npm run dist` ->
+`dist/AiO-Shot-and-Save-Setup-0.9.0.exe` 96.182.083 byte (96,2 MB), chep vao `Release/AiO Shotandsave/win/` (md5 hai ben `e00d2df034ef`,
+sha256 `ddab7277...165a67f`). (3) `scripts/test/do-ban-quyen.mjs`: Polar gia tra `expires_at: null` khi ma khong co han + nhom [10] "Ma tron doi"
+(kich hoat, khong bao het quyen cap nhat, 3 nam sau kiem lai van kich hoat, huy de doi may). Tu 07/10 moi ma Polar phat ra deu KHONG co ngay het han.
+**Kiem chung.** Truoc khi dong goi, 9 bai kiem chay an deu DAT: banquyen 27/27 (nay 32/32 sau khi them nhom [10]; doi chung: luc Polar gia con tra ngay
+1970 thi bai moi TRUOT dung 1 muc) · khodai 11/11 · khovideo · chupcuon · botieng · sobuoc · butve · khaynut · xuatgif. Ban dong goi: `package.json` trong
+`app.asar` ghi 0.9.0, co du 6 file moi (xuat-gif, chup-cuon, khay-thu, kho-video, banquyen, gif/gif.js); chay khong cua so
+`"dist/win-unpacked/AiO Shot & Save.exe" --thu-ocr <anh> <ra.json>`: tu bao ban 0.9.0, dongGoi true, doc 13 dong chu trong 1,2 giay, khong loi.
+**Bay vap (da go).** `npx asar extract-file <app.asar> package.json` ghi file ra THU MUC DANG DUNG -> de mat `package.json` cua app bang ban rut gon 11
+dong trong goi (mat 28 lenh + cau hinh dong goi). Lay lai bang `git checkout -- package.json` roi doi lai so; `git diff` chi con dung 1 dong so phien ban.
+Bo cai da dung TRUOC luc bi de nen khong anh huong. Lan sau trich file tu asar: `cd` vao thu muc tam truoc. Lan dong goi dau chay khi so chua kip doi
+(hook chan lan sua dau) nen `dist/` co them mot file 0.8.0 moi dung; ban 0.8.0 phat hanh 01/10 trong `Release/` khong bi dung.
+**CHUA lam / chua do.** CHUA cai de ban 0.9.0 len may anh (app dang cai van la 0.8.0 + nap tai cho, cung ma nguon) · CHUA chay bai kiem bat cua so
+(selftest, khay, quay app) vi anh dang ngoi may · CHUA gan bo cai len Polar (cong cu tai file cua Claude gioi han 10 MB, buoc tai 96 MB qua may chu tam
+bi lop bao ve cua phien chan) · CHUA mua thu bang ma giam 100% `THUSYM8FR` (da tao, toi da 2 lan) · ban Mac 0.9.0 chua dung (can GitHub Actions) ·
+ma van o nhanh `may-cong-ty`, CHUA gop `main` · 12 bo cai cu trong Release chua xoa (cho anh gat).
+
 ## [/xong] - 2026-10-06 15:51 - Chot so (may cong ty): 4 tinh nang moi + web 17 canh + 2 luot ECC, van 0.8.0, chua dong goi
 
 **Khong sua ma trong muc nay.** Chi chot so. Ma nguon giong lan nap 14:59 (`app.asar` md5 `a1e5b05b`).
