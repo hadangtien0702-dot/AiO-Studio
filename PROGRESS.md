@@ -5,6 +5,32 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 09:20 (UTC+7) - NHÁP (chưa lên live): MẪU section "LÝ DO" kiểu kể chuyện (pain point, vì sao anh làm app) - máy công ty
+
+- **Anh yêu cầu:** *"anh một chỗ ghi paint point - một section riêng nêu ra lí do tại sao anh làm cái này. đây chỉ là nội dung - em hãy khai thác
+  nó thành UI kể chuyện"*, kèm đoạn văn 5 ý (project mới đi tìm ý tưởng · mỗi ngày một ý tưởng hay · dùng xong rồi "đi đâu mất" · mỗi ý
+  tưởng là một công tắc kích hoạt não bộ · hơn 5 năm làm Media Creative, giúp lưu mọi khoảnh khắc vào một nơi duy nhất).
+- **Đã dựng (một mẫu, em tự làm, theo bài `5bh`):** section `#why` đặt GIỮA đầu trang và rạp (vị trí là em chọn, anh chưa duyệt).
+  - 5 câu của anh chạy như PHỤ ĐỀ dưới sân (chữ "tôi" đổi thành "mình" cho một giọng, sửa "thử hiện" thành "thực hiện"); thanh 5 đoạn
+    kiểu story ở đầu sân, bấm đoạn nào kể lại từ câu đó.
+  - Sân: 5 ngày Thứ 2 đến Thứ 6, mỗi ngày một ý tưởng (bảng màu, chuyển cảnh, kiểu chữ, bố cục, đoạn code = media, creative, design, dev).
+    Câu 3: ý tưởng mờ rồi mất, ô còn dấu "?", chữ "rồi lại đi đâu mất" trên tiêu đề mờ theo. Câu 4 + 5: con trỏ gạt CÔNG TẮC, khay thật
+    hiện ra, 5 ý tưởng bay vào khay, số trên khay đếm 1 đến 5, tiêu đề đổi thành "giờ ở một nơi duy nhất" màu cam.
+  - Khách tự gạt công tắc được (chuột, chạm, phím). Không dùng GSAP (class + transition CSS), đồng hồ chỉ trôi khi section trong màn hình.
+    "Giảm chuyển động": đứng ở cảnh cuối, 5 câu hiện hết. JS hỏng: còn tiêu đề + 5 câu chữ.
+  - File: `Website/Nhap web ShotSave/keo-tha-2/ld.css`, `ld.html`, `ld.js`; `chen.cjs` ghép (neo trước `#features`). Bản ghép: 401.140 ký tự.
+- **Kiểm chứng (`thu-ld.cjs`, lăn chuột thật tới nơi):** trước khi cuộn tới: ẩn, chưa chạy. Tự kể đủ 5 câu trong 22,6 giây rồi lặp, ở 1280 và
+  390 px; chiều cao section không đổi suốt vòng (927 / 790 px). Khách gạt: bật ra 5/5 trong khay, tắt ra 5/5 mất; bấm đoạn 2 kể lại từ
+  câu 2. 14/14 lượt (2 ngôn ngữ x 320, 360, 390, 721, 1024, 1280, 1920 px): 0 px tràn, 0 nhãn bị cắt, thẻ lệch ô nhiều nhất 0,9 px. Rời
+  khỏi section thì đồng hồ đứng. Giảm chuyển động: 5/5 câu hiện, gạt được. Nhân Safari (WebKit 26.6, khổ iPhone 13): kể tới cảnh cuối,
+  chạm công tắc ăn. 0 lỗi trong trang. Ảnh từng cảnh đã mở xem (nền sáng, nền tối, điện thoại).
+- **Bẫy vấp trong lượt này:** (1) `p.evaluate(() => ssLd.dien(4))` treo 7 phút: `dien()` là vòng lặp không dứt, trả promise của nó về là
+  evaluate chờ mãi; (2) viết `\\2713` trong `node -e` qua Bash thành "¹3" (bài `5ax`), phải sửa bằng công cụ Edit; (3) hàm chống chữ mồ
+  côi của trang dán chữ cuối bằng dấu cách cứng nên nhãn 2 chữ không xuống dòng được ở 320 px: thêm `<wbr>`; (4) `offsetLeft` không tính
+  viền của offsetParent nên thẻ lệch 1 px trong khay: cộng `clientLeft / clientTop`.
+- **Chưa làm / chưa đo:** ngón tay thật, Safari máy Mac thật; chưa cho người soát đọc mã; câu tiếng Anh em tự dịch; câu "tôi/mình", vị trí
+  section, 5 loại ý tưởng mẫu đều là em chọn. **[CHỜ ANH]** xem ở `http://localhost:8127/#why`.
+
 ## [web-shotsave] - 2026-10-07 08:43 (UTC+7) - NHÁP (chưa lên live): anh chốt ĐỊNH VỊ "app lưu lại ý tưởng" + tiêu đề cuối trang mới - máy công ty
 
 - **Bối cảnh:** anh hỏi có nên giữ phần Storyboard ("3 giây, 6 khung hình") trên web. Em đo: rạp đã có cảnh Storyboard diễn khoanh vùng,

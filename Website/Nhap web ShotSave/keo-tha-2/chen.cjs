@@ -64,6 +64,18 @@ thay('Don\'t let it slip away.</h2>\n      <a class="btn btn-main" href="#checko
   'Don\'t let it slip away.</h2>\n      <p class="end-sub" data-i="featSub">Built by a video editor who saves hundreds of ideas a week.</p>\n      <a class="btn btn-main" href="#checkout" data-i="endBtn">', "cau editor o cuoi trang");
 thay('.end h2{margin-bottom:24px}',
   '.end h2{margin-bottom:24px}\n.end h2:has(+ .end-sub){margin-bottom:14px}\n.end .end-sub{margin:0 auto 26px;max-width:32em;padding:0 8px;color:var(--ink-2);font-size:17px;line-height:1.5;text-wrap:balance}', "css cau editor");
+// 07/10 anh: "một section riêng nêu ra lí do tại sao anh làm cái này ... khai thác nó thành UI kể chuyện": section LÝ DO, đặt giữa đầu trang và rạp
+const NEO_FEAT = '  <section class="sec" id="features"';
+thay(NEO_FEAT, doc("ld.html") + NEO_FEAT, "html ly do");
+thay(NEO_CSS, doc("ld.css") + NEO_CSS, "css ly do");
+thay(NEO_JS, doc("ld.js") + "\n" + NEO_JS, "js ly do");
+thay(NEO_LANG, NEO_LANG + "\n  if (window.ssLdRelang) window.ssLdRelang();", "doi ngon ngu ly do");
+thay(NEO_VI, NEO_VI + 'ldNhan:"Vì sao có Shot & Save", ldT:"Ý tưởng hay,", ldTa:"rồi lại đi đâu mất", ldTb:"giờ ở một nơi duy nhất", ldPj:"Project mới", '
+  + 'ldD1:"Thứ 2", ldD2:"Thứ 3", ldD3:"Thứ 4", ldD4:"Thứ 5", ldD5:"Thứ 6", ldY1:"Bảng <wbr>màu", ldY2:"Chuyển <wbr>cảnh", ldY3:"Kiểu <wbr>chữ", ldY4:"Bố <wbr>cục", ldY5:"Đoạn <wbr>code", '
+  + 'ldOff:"Không có khay", ldOn:"Có khay", ldTrong:"Chưa có chỗ nào để giữ", ldGoi:"Thử đi: gạt công tắc", '
+  + 'ld1:"Mỗi lần có project mới, mình lại đi tìm ý tưởng để thực hiện.", ld2:"Mỗi ngày lại phát hiện ra một ý tưởng hay.", '
+  + 'ld3:"Ý tưởng được dùng cho project đang làm, rồi sau đó nó lại “đi đâu mất”.", ld4:"Mỗi ý tưởng là một công tắc kích hoạt não bộ.", '
+  + 'ld5:"Mình làm Media Creative hơn 5 năm. Hãy để mình giúp bạn lưu mọi khoảnh khắc, mọi ý tưởng loé lên trên màn hình vào một nơi duy nhất.", ', "chu VI ly do");
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;
