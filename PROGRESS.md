@@ -5,6 +5,21 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web-shotsave] - 2026-10-07 11:37 (UTC+7) - ĐÃ LÊN LIVE `4417c5f`: section "Vì sao có Shot & Save" + đoạn vào + câu chữ mới - máy công ty
+
+- **Anh duyệt:** *"đẹp duyệt, đẩy lên live đi em"* (sau khi xem bản nháp ở localhost, kể cả núm công tắc đang là hình người giữ chỗ).
+- **Lên live trong một commit (chỉ `Website/AiO ShotSave Web/index.html`, +419 / −24 dòng):** section `#why` (chuyện 3 câu, 5 nơi tạm, công tắc, khay) ·
+  đoạn VÀO cho từng section · ẩn tiêu đề lặp trước rạp · câu đầu trang "Chụp → Lưu → Gửi..." · cuối trang "Ý tưởng tiếp theo, đừng để trôi mất" +
+  câu editor. Cách đẩy: commit trong thư mục tách `E:/2026/_web-shotsave-tam` (đứng đúng trên `origin/main` 23d9fa3, đọc 24 dòng bị thay trước khi
+  commit), `git push origin HEAD:main`, gộp về `main` trên máy (`b5ad920`, đi trước `origin/main` 62 commit, chậm 0).
+- **Kiểm chứng:** trước khi đẩy, `thu-trang.cjs` trên bản nháp; sau khi đẩy, đúng bài đó trên https://aio-shotsave.vercel.app/ (md5 live `d6acacb09017` =
+  blob git, khớp sau 52 giây). Cả 3 lượt trên live (Chromium 1280, Chromium 390, nhân Safari khổ iPhone 13), lăn hết trang: 0 lỗi, 0 file 404, 0 px
+  tràn, 0 khối kẹt ẩn; section Lý do kể tới 5/5 ý tưởng trong khay; Kéo thả 6/6 app nhận ảnh; Khay co giãn đang chạy; câu đầu trang + cuối trang đúng chữ mới.
+- **CHƯA làm / chưa đo:** ảnh chân dung thật (núm đang là hình người giữ chỗ, ĐANG HIỆN TRÊN LIVE) · ngón tay thật, Safari máy Mac thật · chưa cho
+  người soát (ECC) đọc mã phần `ld.*` và đoạn vào: anh bảo đẩy ngay, em chưa chạy lượt soát ~200 nghìn token · 3 câu còn tự gọi là "chụp màn hình"
+  (nhãn trên tiêu đề đầu trang, mô tả trang, chân trang) · tên nhóm trên phần Kéo thả · phần Storyboard chưa làm lại.
+- Thư mục tách `E:/2026/_web-shotsave-tam` + máy chủ xem thử cổng 8127 GIỮ LẠI (còn việc nháp tiếp: ảnh anh, Storyboard).
+
 ## [web-shotsave] - 2026-10-07 10:56 (UTC+7) - NHÁP (chưa lên live): section "LÝ DO" gom 5 câu còn 3 + 5 "nơi tạm" + núm công tắc chờ ảnh anh - máy công ty
 
 - **Anh xem mẫu 09:20, khen đẹp rồi sửa 3 điều:** (1) *"nếu là người lướt web thì lí do gì để họ dừng lại phần này... gom lại thành 03 slide được không...
