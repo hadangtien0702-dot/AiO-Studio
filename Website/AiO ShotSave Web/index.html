@@ -415,6 +415,215 @@ kbd{display:inline-block;min-width:24px;padding:1px 7px;border-radius:6px;backgr
 .kh-thumb.cam{border-color:#f86820;transform:translateY(-2px)}
 .kh-thumb.di{opacity:.35}
 .kh-ghost{position:absolute;z-index:4;margin:0;pointer-events:none;box-shadow:0 22px 40px -8px rgb(0 0 0/45%),0 0 0 2px #f86820;transition:none}
+/* ===== Section KHAY bản 2 (06/10, anh: "creative hơn nữa"): MỘT khay ở giữa, 6 app vây quanh; ảnh bay tới từng app rồi toả ra
+   cùng lúc; khách tự kéo ảnh thả vào app nào cũng được. Bản 1 (.kh-grid) giữ làm dự phòng khi không tải được GSAP. ===== */
+.kt{display:none}
+#shelf.kt-on .kh-grid{display:none}
+#shelf.kt-on .kt{display:block}
+.kt-dau{text-align:center;margin:0 auto 38px}
+.kt-dau p{margin:12px auto 0;color:var(--ink-2);font-size:var(--fs-sub);max-width:48ch}
+.kt-san{container-type:inline-size;position:relative;aspect-ratio:16/8.6;user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif}
+/* Dây nối khay ↔ app: nét đứt mờ có sẵn, nét cam liền vẽ ra khi app đã nhận ảnh */
+.kt-day{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.kt-day .n{fill:none;stroke:rgb(122 62 22/32%);stroke-width:1.5;stroke-dasharray:2 7;stroke-linecap:round}
+.kt-day .s{fill:none;stroke:#f86820;stroke-width:2.5;stroke-linecap:round;opacity:0}
+:root[data-theme="dark"] .kt-day .n{stroke:rgb(255 206 170/30%)}
+/* Cửa sổ app: cỡ chữ bên trong theo bề rộng cửa sổ (cqw) nên co theo màn hình mà không vỡ */
+.kt-win{position:absolute;z-index:1;width:22%;aspect-ratio:4/2.9;container-type:inline-size;transform:rotate(var(--r,0deg));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.kt-win.den{transform:rotate(0deg) scale(1.06);z-index:3}
+.kt-win.w0{left:6%;top:1%;--r:-4deg}.kt-win.w1{left:0;top:35.2%;--r:2.5deg}.kt-win.w2{left:6.5%;top:69.4%;--r:-2deg}
+.kt-win.w3{right:6%;top:1%;--r:4deg}.kt-win.w4{right:0;top:35.2%;--r:-2.5deg}.kt-win.w5{right:6.5%;top:69.4%;--r:2deg}
+.kt-in{position:absolute;inset:0;display:flex;flex-direction:column;font-size:4.5cqw;line-height:1.3;border-radius:2.8cqw;overflow:hidden;background:#fff;color:#16110d;
+  box-shadow:0 1.5em 2.8em -1.2em rgb(60 20 0/50%),0 0 0 1px rgb(0 0 0/8%);transition:box-shadow .25s}
+.kt-win.den .kt-in{box-shadow:0 1.8em 3.2em -1em rgb(60 20 0/58%),0 0 0 3px #f86820}
+/* Huy hiệu chữ cái ở góc ngoài: chữ trên màu gợi nhắc, không dùng logo của hãng */
+.kt-ic{position:absolute;z-index:2;left:-3.6cqw;top:-3.6cqw;width:11.5cqw;height:11.5cqw;border-radius:3.2cqw;display:grid;place-items:center;color:#fff;font:800 4.6cqw/1 Inter,sans-serif;letter-spacing:-.02em;
+  box-shadow:0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-win.w3 .kt-ic,.kt-win.w4 .kt-ic,.kt-win.w5 .kt-ic{left:auto;right:-3.6cqw}
+.kt-ic.zalo{background:linear-gradient(145deg,#2f8bff,#0068ff)}
+.kt-ic.lark{background:linear-gradient(145deg,#3d7bff,#1f4fd1)}
+.kt-ic.teams{background:linear-gradient(145deg,#7b83eb,#4b53bc)}
+.kt-ic.pr{background:#1b0f3a;color:#a8a2ff;box-shadow:inset 0 0 0 1.5px #6f63ff,0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-ic.ps{background:#001e36;color:#31a8ff;box-shadow:inset 0 0 0 1.5px #31a8ff,0 .5em 1.1em -.3em rgb(0 0 0/45%),0 0 0 2px rgb(255 255 255/88%)}
+.kt-ic.fig{background:#1e1e1e}
+/* Dấu tích xanh: app này đã nhận ảnh */
+.kt-ok{position:absolute;z-index:2;right:-2.8cqw;bottom:-2.8cqw;width:8.5cqw;height:8.5cqw;border-radius:50%;display:grid;place-items:center;background:#22a652;
+  box-shadow:0 0 0 2px #fff,0 .4em .9em -.2em rgb(0 0 0/40%);transform:scale(0);transition:transform .32s cubic-bezier(.3,1.6,.5,1)}
+.kt-ok svg{width:58%;height:58%}
+.kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{right:auto;left:-2.8cqw}
+.kt-win.co .kt-ok{transform:scale(1)}
+/* — thanh tiêu đề chung — */
+.kt-bar{flex:none;display:flex;align-items:center;gap:.6em;height:2.1em;padding:0 .9em;font-size:.84em;font-weight:600;background:#f4f2f0;color:#5a524b;border-bottom:1px solid #ece6e0}
+.kt-bar i{width:.8em;height:.8em;border-radius:.2em;background:var(--acc)}
+/* — dạng CHAT (Zalo, Lark, Teams) — */
+.kt-body{flex:1;min-height:0;display:flex}
+.kt-rail{flex:none;width:2.6em;display:flex;flex-direction:column;align-items:center;gap:.6em;padding-top:.8em;background:#ebebf5}
+.kt-rail i{width:1.3em;height:1.3em;border-radius:.4em;background:#c9c9e6}.kt-rail i:first-child{background:var(--acc)}
+.kt-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.kt-top{flex:none;display:flex;align-items:center;gap:.7em;padding:.5em .8em;border-bottom:1px solid #f0e9e2}
+.kt-top b{display:block;font-size:1em;line-height:1.2}
+.kt-top small{display:block;font-size:.8em;color:#2f7d4f;line-height:1.3}
+.kt-ava{flex:none;display:grid;place-items:center;width:2.1em;height:2.1em;border-radius:50%;background:var(--acc);color:#fff;font-weight:700;font-size:.9em}
+.kt-msgs{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:.4em;padding:.45em .8em;overflow:hidden}
+.kt-b{flex:none;max-width:84%;padding:.45em .8em;border-radius:1em;font-size:.93em;line-height:1.3}
+.kt-b.trai{align-self:flex-start;background:#f3eee9;border-bottom-left-radius:.3em}
+.kt-b.anh{align-self:flex-end;width:33%;max-width:none;padding:.25em;background:#fff;box-shadow:0 0 0 1px #eadfd5;border-radius:.7em}
+/* — dạng DỰNG PHIM (Premiere Pro) — */
+.kt-in.pr{background:#232323;color:#cfcfcf}
+.kt-in.pr .kt-bar{background:#1b1b1b;color:#b8b8b8;border-bottom-color:#2e2e2e}
+.kt-prm{flex:1.25;min-height:0;margin:.6em .6em .45em;border-radius:.3em;background:#0d0d0d;display:grid;place-items:center;overflow:hidden;font-size:.78em;color:#5d5d5d}
+.kt-prm .kt-th{width:auto;height:86%;border-radius:.15em}
+.kt-prt{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;justify-content:center;gap:.35em;padding:.45em .6em .6em;background:#1b1b1b;border-top:1px solid #2e2e2e}
+.kt-tr{display:flex;align-items:center;gap:.5em;height:24%}
+.kt-tr b{flex:none;width:1.7em;font-size:.7em;font-weight:600;color:#8f8f8f}
+.kt-lane{flex:1;height:100%;position:relative;border-radius:.25em;background:#262626}
+.kt-clip{position:absolute;top:0;bottom:0;border-radius:.25em;overflow:hidden}
+.kt-clip.v{background:#6e6fc9}.kt-clip.a{background:#3b8453}
+.kt-clip.g{font-style:normal;background:#c96aa5;display:flex;align-items:center;padding:0 .5em;font-size:.66em;font-weight:600;color:#fff;white-space:nowrap}
+.kt-ph{position:absolute;top:.3em;bottom:.4em;left:calc(.6em + 1.7em + 44%);width:2px;background:#4d8dff;z-index:1}
+/* — dạng THIẾT KẾ (Photoshop, Figma) — */
+.kt-in.ps{background:#323232;color:#ccc}
+.kt-in.ps .kt-bar{background:#262626;color:#bdbdbd;border-bottom-color:#1b1b1b}
+.kt-in.fig{background:#e5e5e5;color:#333}
+.kt-in.fig .kt-bar{background:#2c2c2c;color:#eee;border-bottom-color:#2c2c2c}
+.kt-2c{flex:1;min-height:0;display:flex}
+.kt-can{flex:1;min-width:0;display:grid;place-items:center;position:relative}
+.kt-in.ps .kt-can{margin:.6em;border-radius:.25em;background:#262626}
+.kt-board{width:78%;aspect-ratio:4/3;position:relative;display:grid;place-items:center;background:#fff}
+.kt-in.fig .kt-board{width:70%;box-shadow:0 1px 3px rgb(0 0 0/14%)}
+.kt-in.fig .kt-board::before{content:attr(data-ten);position:absolute;left:0;top:-1.6em;font-size:.74em;color:#777;white-space:nowrap}
+.kt-board .kt-th{width:66%;border-radius:.1em}
+.kt-in.fig .kt-board .kt-th{outline:1.5px solid #0d99ff;outline-offset:2px}
+.kt-lay{flex:none;width:31%;display:flex;flex-direction:column;gap:.35em;padding:.6em .4em;font-size:.7em}   /* .74em: tên layer tiếng Anh bị cắt 2 px (đo 07/10) */
+.kt-in.ps .kt-lay{background:#2b2b2b;border-left:1px solid #1b1b1b}
+.kt-in.fig .kt-lay{order:-1;background:#fff;border-right:1px solid #e0e0e0;color:#555}
+.kt-lay div{flex:none;display:flex;align-items:center;gap:.5em;height:2.1em;padding:0 .5em;border-radius:.3em;white-space:nowrap;overflow:hidden}
+.kt-in.ps .kt-lay div{background:#383838;color:#bdbdbd}
+.kt-lay div i{flex:none;width:1.3em;height:1em;border-radius:1px;background:#777}
+.kt-in.ps .kt-lay div.moi{background:#2d5d8f;color:#fff}
+.kt-in.fig .kt-lay div.moi{background:#e5f4ff;color:#0d6fbf}
+/* Ảnh chụp thu nhỏ. Phần ruột đặt bằng inset % của CHÍNH ô ảnh: đệm % sẽ tính theo khung chứa, bản sao bay ngoài khay bị méo (bẫy 22/09) */
+.kt-th{position:relative;display:block;width:100%;aspect-ratio:4/3;border-radius:.4em;background:#fff;overflow:hidden}
+.kt-thi{position:absolute;inset:14% 10% 0;display:flex;align-items:flex-end;gap:7%}
+.kt-thi i{flex:1;border-radius:2px 2px 0 0;background:#f3b58f}
+.kt-thi i:nth-of-type(2n){background:#f86820}
+.kt-th b{position:absolute;z-index:1;left:8%;top:8%;padding:.05em .4em;border-radius:.3em;background:rgb(0 0 0/72%);color:#34c759;font-weight:700;font-size:.7em;line-height:1.35}
+.kt-th.t3 .kt-thi{inset:16% 14%;flex-direction:column;align-items:stretch;justify-content:center;gap:10%}
+.kt-th.t3 em{height:11%;border-radius:2px;background:#e9e1d8}
+.kt-th.t3 em:first-child{width:60%;background:#16110d}
+.kt-th.t4{background:linear-gradient(140deg,#1d2440,#51306b 58%,#b2562f)}
+.kt-th.t4 .kt-thi{inset:0;display:block}
+.kt-th.t4 u{position:absolute;left:50%;top:44%;width:22%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:rgb(255 255 255/88%)}
+.kt-th.t4 s{position:absolute;left:24%;right:24%;bottom:12%;height:8%;border-radius:99px;background:rgb(255 255 255/92%)}
+.kt-th.an{visibility:hidden}
+/* Khay: cùng giao diện khay thật (src/shelf) */
+.kt-khay{position:absolute;z-index:2;left:39.5%;width:21%;top:50%;transform:translateY(-50%);container-type:inline-size}
+.kt-kin{font-size:5cqw;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:1.1em;overflow:hidden;box-shadow:0 1.7em 3.6em -.9em rgb(0 0 0/55%)}
+.kt-kin .sbar{display:flex;align-items:center;gap:.7em;height:2.5em;padding:0 .9em 0 .4em;background:#141414;border-bottom:1px solid rgb(255 255 255/6%)}
+.kt-kin .slogo{display:flex;color:#f86820;padding:0 .3em 0 .7em}
+.kt-kin .slogo svg{width:1.15em;height:1.05em}
+.kt-kin .stitle{font-size:.95em;font-weight:600;color:#c3c3c8}
+.kt-kin .scount{min-width:1.5em;height:1.35em;padding:0 .45em;display:inline-flex;align-items:center;justify-content:center;font-size:.85em;font-weight:700;color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+.kt-luoi{display:grid;grid-template-columns:1fr 1fr;gap:.7em;padding:.9em}
+.kt-luoi .kt-th{cursor:grab;touch-action:none;box-shadow:0 0 0 1px rgb(255 255 255/10%);transition:transform .15s,opacity .15s,box-shadow .15s}
+@media (hover:hover){.kt-luoi .kt-th:hover{transform:translateY(-2px);box-shadow:0 0 0 2px #f86820}}   /* màn cảm ứng: hover dính lại sau khi chạm */
+.kt-luoi .kt-th.di{opacity:.32}
+/* Bản sao đang bay, con trỏ, vòng sóng, lời gợi ý */
+.kt-bong{position:absolute;z-index:5;aspect-ratio:auto;pointer-events:none;box-shadow:0 22px 40px -8px rgb(0 0 0/45%),0 0 0 2px #f86820}
+.kt-bong.tay{cursor:grabbing}
+.kt-tro{position:absolute;left:0;top:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .25s;filter:drop-shadow(0 2px 3px rgb(0 0 0/35%))}
+.kt-tro.hien{opacity:1}
+.kt-song{position:absolute;z-index:4;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 18px rgb(248 104 32/55%)}
+.kt-goi{position:absolute;z-index:2;left:50%;bottom:1%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;white-space:nowrap;
+  font:600 13px/1.2 Inter,sans-serif;color:#5a3a22;background:rgb(255 255 255/64%);box-shadow:0 0 0 1px rgb(255 255 255/70%),0 8px 20px -10px rgb(60 20 0/35%);transition:opacity .3s}
+.kt-goi svg{flex:none;width:15px;height:15px}
+.kt-goi.an{opacity:0}
+:root[data-theme="dark"] .kt-goi{color:#f6e3d3;background:rgb(20 16 12/60%);box-shadow:0 0 0 1px rgb(255 255 255/12%),0 8px 20px -10px rgb(0 0 0/50%)}
+.kt-moi{animation:kt-vao .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes kt-vao{from{opacity:0;transform:translateY(.5em) scale(.94)}}
+/* Điện thoại: khay ở trên, 6 app xếp 2 cột bên dưới */
+@media (max-width:720px){
+  .kt-dau{margin-bottom:26px}
+  .kt-san{aspect-ratio:10/17.5}
+  .kt-khay{left:25%;width:50%;top:0;transform:none}
+  .kt-win{width:47%}
+  .kt-win.w0{left:1%;top:34%;--r:-2deg}.kt-win.w1{left:1%;top:56.5%;--r:1.5deg}.kt-win.w2{left:1%;top:79%;--r:-1.5deg}
+  .kt-win.w3{right:1%;top:34%;--r:2deg}.kt-win.w4{right:1%;top:56.5%;--r:-1.5deg}.kt-win.w5{right:1%;top:79%;--r:1.5deg}
+  .kt-goi{bottom:auto;top:27.6%;font-size:12px;padding:6px 12px}
+  /* dây nối trên điện thoại chạy xuyên sau 6 cửa sổ và đè lời gợi ý: rối (ảnh thử 06/10). Ẩn bằng visibility để vẫn đo được độ dài nét */
+  .kt-day{visibility:hidden}
+  /* dấu tích ra góc NGOÀI của từng cột, không chụm đôi ở giữa */
+  .kt-win.w0 .kt-ok,.kt-win.w1 .kt-ok,.kt-win.w2 .kt-ok{right:auto;left:-2.8cqw}
+  .kt-win.w3 .kt-ok,.kt-win.w4 .kt-ok,.kt-win.w5 .kt-ok{left:auto;right:-2.8cqw}
+}
+/* 07/10 anh: "có một cái ô trắng ở đây khá là khó chịu": dải trắng 120 px giữa rạp tối và nền cam
+   (24 px đệm dưới của #features + 96 px lề trên của #shelf). Chỉ bỏ khi rạp đang bật; lưới thẻ dự phòng vẫn giữ khoảng cách. */
+#features:has(#rap:not([hidden])){padding-bottom:0}
+#features:has(#rap:not([hidden])) + #shelf{margin-top:0}
+
+/* ===== Section KHAY CO GIÃN bản 2 (07/10, anh: "anh muốn creative luôn ở phần này"): một lưới 24 ô ảnh CỐ ĐỊNH trên sân,
+   khay là cái khung phủ lên lưới. Khung phủ tới đâu ảnh hiện tới đó (ảnh giữ nguyên cỡ, đúng luật 14/09 "xem nhiều ảnh hơn,
+   không phóng ảnh"). Khách kéo 4 góc được. Bản 1 (.rs-grid) giữ làm dự phòng khi không tải được GSAP. ===== */
+.kg{display:none}
+#resize.kg-on .rs-grid{display:none}
+#resize.kg-on .kg{display:block}
+.kg-dau{text-align:center;margin:0 auto 22px}
+.kg-dau p{margin:12px auto 0;color:var(--ink-2);font-size:var(--fs-sub);max-width:54ch}
+/* chữ "co giãn" giãn theo bề ngang của khay */
+.kg-gian{display:inline-block;color:#f86820;transition:letter-spacing .28s cubic-bezier(.2,.8,.2,1)}
+.kg-che{display:flex;gap:2px;width:max-content;margin:0 auto 20px;padding:3px;border-radius:10px;background:var(--surface);
+  box-shadow:0 0 0 1px var(--line),0 6px 16px -8px rgb(0 0 0/25%);font:600 12px/1 Inter,sans-serif;user-select:none;-webkit-user-select:none}
+.kg-che > span{padding:7px 14px;border-radius:7px;color:var(--ink-3);cursor:pointer;transition:background-color .25s,color .25s,transform .15s}
+.kg-che > span.on{background:var(--brand-soft);color:var(--brand-ink)}
+.kg-che > span.bam{transform:scale(.93)}
+.kg-san{--c:6;--r:4;--g:10px;--dau:30px;position:relative;max-width:900px;margin:0 auto;aspect-ratio:900/524;border-radius:24px;
+  user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif;
+  background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
+.kg-luoi{position:absolute;left:5%;right:5%;top:64px;bottom:52px;display:grid;grid-template-columns:repeat(var(--c),1fr);grid-template-rows:repeat(var(--r),1fr);gap:var(--g)}
+/* ô chờ: nét đứt mờ, cho thấy "còn ảnh ở đây" */
+.kg-nen{z-index:0}
+.kg-nen i{border-radius:6px;border:1px dashed var(--line-strong);background:rgb(127 127 127/5%)}
+/* ô ảnh: nằm TRÊN khung khay, bật lên khi khung phủ tới */
+.kg-anh{z-index:2;pointer-events:none}
+.kg-o{position:relative;min-width:0;min-height:0;opacity:0;transform:scale(.7);transition:opacity .16s ease,transform .28s cubic-bezier(.3,1.5,.5,1)}
+.kg-o.bat{opacity:1;transform:none}
+.kg-anh .kg-rl{display:block;flex:none;width:100%;height:100%;padding:0;gap:0;overflow:visible}
+.kg-anh .kg-rl .kh-thumb{width:100%;height:100%;aspect-ratio:auto;border-radius:6px;box-sizing:border-box}
+/* khung khay: cùng giao diện khay thật (src/shelf) */
+.kg-khay{position:absolute;z-index:1;left:0;top:0;width:0;height:0;box-sizing:border-box;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:12px;
+  box-shadow:0 18px 40px -12px rgb(0 0 0/55%);transition:box-shadow .2s ease}
+.kg-khay.keo{box-shadow:0 0 0 2px #f86820,0 26px 52px -14px rgb(0 0 0/55%)}
+.kg-khay .sbar{display:flex;align-items:center;gap:8px;height:var(--dau);box-sizing:border-box;padding:0 10px 0 4px;background:#141414;border-bottom:1px solid rgb(255 255 255/6%);
+  border-radius:11px 11px 0 0;overflow:hidden;white-space:nowrap}
+.kg-khay .slogo{display:flex;color:#f86820;padding:0 4px 0 8px}
+.kg-khay .slogo svg{width:13px;height:12px}
+.kg-khay .stitle{font-size:11px;font-weight:600;color:#c3c3c8}
+.kg-khay .scount{min-width:17px;height:15px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
+  color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+/* 4 tay nắm ở 4 góc: vùng bấm 34 px, dấu chữ L cam */
+.kg-goc{position:absolute;z-index:3;width:34px;height:34px;touch-action:none}
+.kg-goc::after{content:"";position:absolute;width:11px;height:11px;border:3px solid #f86820;transition:transform .15s}
+.kg-goc.tl{left:-11px;top:-11px;cursor:nwse-resize}.kg-goc.tl::after{left:7px;top:7px;border-right:0;border-bottom:0;border-radius:7px 0 0 0}
+.kg-goc.tr{right:-11px;top:-11px;cursor:nesw-resize}.kg-goc.tr::after{right:7px;top:7px;border-left:0;border-bottom:0;border-radius:0 7px 0 0}
+.kg-goc.bl{left:-11px;bottom:-11px;cursor:nesw-resize}.kg-goc.bl::after{left:7px;bottom:7px;border-right:0;border-top:0;border-radius:0 0 0 7px}
+.kg-goc.br{right:-11px;bottom:-11px;cursor:nwse-resize}.kg-goc.br::after{right:7px;bottom:7px;border-left:0;border-top:0;border-radius:0 0 7px 0}
+@media (hover:hover){.kg-goc:hover::after{transform:scale(1.25)}}
+/* nhãn cỡ đi theo góc đang kéo, kiểu công cụ thiết kế */
+.kg-nhan{position:absolute;left:0;top:0;z-index:5;padding:4px 8px;border-radius:7px;background:#f86820;color:#16110d;font:700 11px/1.2 Inter,sans-serif;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .2s;box-shadow:0 6px 14px -6px rgb(0 0 0/50%)}
+.kg-nhan.hien{opacity:1}
+.kg-san .kt-goi{top:auto;bottom:10px}
+.kg-san .kt-tro{z-index:6}
+@media (min-width:900px){.kg-dau h2{white-space:nowrap}}
+/* dien thoai: xuong dong CO DINH sau chu gian, de chu gian ra khong lam tieu de nhay tu 1 dong sang 2 dong (do 07/10) */
+.kg-xd{display:none}
+/* Điện thoại: lưới 4 cột x 6 hàng */
+@media (max-width:720px){
+  .kg-san{--c:4;--r:6;--g:7px;--dau:26px;aspect-ratio:358/474}
+  .kg-luoi{top:52px;bottom:48px}
+  .kg-xd{display:inline}
+  .kg-san .kt-goi{top:auto;bottom:8px}
+}
 /* 24/09 anh: "animation peak hơn": vòng sóng cam lan ra chỗ ảnh đáp xuống */
 .kh-song{position:absolute;z-index:3;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #f86820;pointer-events:none;box-shadow:0 0 18px rgb(248 104 32/55%)}
 .kh-cursor{position:absolute;left:0;top:0;z-index:5;margin:-2px 0 0 -4px;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(0 0 0/45%))}
@@ -1209,6 +1418,26 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
   <!-- Section KHAY (anh 22/09): kéo ảnh từ khay vào NHIỀU app — Lark → Teams → Premiere Pro, lặp.
        Chỉ ghi TÊN app, vẽ giao diện gợi tả, KHÔNG dùng logo / chép giao diện của họ (tránh vấn đề thương hiệu). -->
   <section class="sec" id="shelf">
+    <!-- Bản 2 (06/10, anh: "creative hơn nữa"): một khay ở giữa, 6 app vây quanh, khách tự kéo được.
+         Chỉ ghi TÊN app + giao diện gợi tả, không dùng logo / chép giao diện của hãng. Cửa sổ app do JS dựng (khối "Section KHAY bản 2"). -->
+    <div class="wrap kt" id="kt">
+      <div class="kt-dau">
+        <h2 data-i="khTitle">One drag away</h2>
+        <p data-i="khSub">Every shot waits on your shelf. Drag it straight into Zalo, Teams, Premiere or Figma. No hunting through folders, no lost focus.</p>
+      </div>
+      <div class="kt-san" id="ktSan" aria-hidden="true">
+        <svg class="kt-day" id="ktDay"></svg>
+        <div class="kt-khay" id="ktKhay"><div class="kt-kin">
+          <div class="sbar">
+            <span class="slogo"><svg viewBox="0 0 386 352"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+            <span class="stitle" data-i="demoShelf">Shelf</span><span class="scount">4</span>
+          </div>
+          <div class="kt-luoi" id="ktLuoi"></div>
+        </div></div>
+        <div class="kt-goi" id="ktGoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 1 1 3 0v2.5"/><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5"/><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"/></svg><span data-i="ktGoi">Try it: drag a shot onto any app</span></div>
+        <div class="kt-tro" id="ktTro"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
     <div class="wrap kh-grid">
       <div class="kh-text">
         <h2 data-i="khTitle">One drag away</h2>
@@ -1241,6 +1470,29 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
        Đúng tính năng thật: kéo góc khay → thêm hàng/cột, ẢNH GIỮ NGUYÊN CỠ (anh chốt 14/09 "xem nhiều ảnh hơn, không phóng ảnh");
        có khay ngang và khay dọc. Cảnh trái, chữ phải (đảo chiều so với section trên). -->
   <section class="sec" id="resize">
+    <!-- Bản 2 (07/10, anh: "anh muốn creative luôn ở phần này"): lưới 24 ô ảnh cố định, khay là khung phủ lên; khách kéo 4 góc,
+         khung phủ tới đâu ảnh hiện tới đó. Ô ảnh do JS dựng (khối "Section KHAY CO GIÃN bản 2"), lấy lại 24 ảnh mẫu của bản 1. -->
+    <div class="wrap kg" id="kg">
+      <div class="kg-dau">
+        <h2 data-i-html="kgTitle"><span class="kg-gian">Stretch</span><br class="kg-xd"> to see more</h2>
+        <p data-i="rsSub">Drag any corner of the shelf. Bigger means more rows and columns, never blurry zoomed shots. Keep it along the bottom or stand it up on the side.</p>
+      </div>
+      <div class="kg-che" id="kgChe" aria-hidden="true"><span data-che="ngang" data-i="rsNgang">Horizontal</span><span data-che="doc" data-i="rsDoc">Vertical</span></div>
+      <div class="kg-san" id="kgSan" aria-hidden="true">
+        <div class="kg-luoi kg-nen" id="kgNen"></div>
+        <div class="kg-khay" id="kgKhay">
+          <div class="sbar">
+            <span class="slogo"><svg viewBox="0 0 386 352"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+            <span class="stitle" data-i="demoShelf">Shelf</span><span class="scount" id="kgDem">6</span>
+          </div>
+          <i class="kg-goc tl" data-g="tl"></i><i class="kg-goc tr" data-g="tr"></i><i class="kg-goc bl" data-g="bl"></i><i class="kg-goc br" data-g="br"></i>
+        </div>
+        <div class="kg-luoi kg-anh" id="kgAnh"></div>
+        <div class="kg-nhan" id="kgNhan"></div>
+        <div class="kt-goi" id="kgGoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 1 1 3 0v2.5"/><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5"/><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"/></svg><span data-i="kgGoi">Try it: drag any corner of the shelf</span></div>
+        <div class="kt-tro" id="kgTro"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
     <div class="wrap rs-grid">
       <div class="rs-visual" id="rsVisual" aria-hidden="true">
         <div class="rs-mode"><span class="on" data-i="rsNgang">Horizontal</span><span data-i="rsDoc">Vertical</span></div>
@@ -1497,7 +1749,7 @@ Object.assign(T.vi, { aSo:"Đánh số bước 1, 2, 3 (6), xem bên dưới", a
   aSelect:"Chọn và di chuyển nét vẽ (V), xem bên dưới", aOcr:"Lấy chữ trong vùng (5), xem bên dưới", aSb:"Dải phân cảnh Storyboard (S), xem bên dưới", aRec:"Quay video vùng này (R), xem bên dưới",
   demoAria:"Bản chạy thử", aTools:"Công cụ vẽ", aBox:"Khung (1)", aArrow:"Mũi tên (2)", aText:"Chữ (3)", aBlur:"Làm mờ (4)",
   aUndo:"Hoàn tác (Ctrl+Z)", aCancel:"Huỷ (Esc)", aExit:"Thoát (Esc)", aDone:"Xong (Enter)", aClear:"Dọn khay",
-  themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
+  themeToDark:"Chuyển sang nền tối", khTitle:"Kéo thả vào mọi ứng dụng", ktGoi:"Thử đi: kéo một ảnh thả vào app bất kỳ", kgGoi:"Thử đi: kéo một góc của khay", kgAnh:"ảnh", kgTitle:'Khay <span class="kg-gian">co giãn</span><br class="kg-xd"> theo ý bạn', khSub:"Ảnh vừa chụp nằm sẵn trong khay. Bạn kéo thẳng vào Zalo, Teams, Premiere hay Figma, không cần mở thư mục tìm file.", khTeam:"Nhóm hậu kỳ", khT1:"Em gửi anh chỗ bị lệch màu nhé?", khT2:"Đây anh", khTReply:"Thấy rồi, để anh sửa", khClip:"anh-chup.png", rsNgang:"Ngang", rsDoc:"Dọc", rsTitle:"Khay co giãn theo ý bạn", rsSub:"Kéo góc bất kỳ để mở rộng khay: thêm hàng, thêm cột, ảnh vẫn sắc nét. Bạn có thể đặt khay nằm ngang dưới màn hình hoặc dựng dọc bên cạnh.", khZName:"Khách hàng", khZ1:"Em gửi bản nháp thumbnail nhé?", khZ2:"Gửi anh đây", khZReply:"Ổn rồi, duyệt nhé!", khMName:"Chị Linh", khMs1:"Lỗi hiện ở chỗ nào em?", khMs2:"Chỗ này chị", khMsReply:"À thấy rồi, cảm ơn em", khLayer:"anh-chup", khPsL1:"Tiêu đề", khPsL2:"Nền", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Tiêu đề", khName:"Nhóm dựng phim", khOnline:"Đang hoạt động", khM1:"Gửi anh biểu đồ tuần này nhé?", khM2:"Em gửi liền", khType:"Nhắn tin", khReply:"Nhận rồi, cảm ơn em!", demoAuto:"Đang tự chạy · Bấm để tự thử", themeToLight:"Chuyển sang nền sáng" });
 T.en.themeToLight = "Switch to light mode";
 T.en.toast = "Coming soon. Checkout is being set up.";
 Object.assign(T.en, { khReply:"Got it, thanks!", khName:"Edit team", khOnline:"Online", khM1:"Can you send this week's chart?", khM2:"One sec", khType:"Message", khTeam:"Post team", khT1:"Can you show me the color issue?", khT2:"Here you go", khTReply:"Got it, fixing now", khClip:"shot.png", khZName:"Client", khZ1:"Can you send the thumbnail draft?", khZ2:"Sending now", khZReply:"Looks good, approved!", khMName:"Linh", khMs1:"Where does the error show up?", khMs2:"Right here", khMsReply:"Ah, I see it. Thanks!", khLayer:"shot", khPsL1:"Title", khPsL2:"Background", khFigFrame:"Thumbnail", khFigL1:"Thumbnail", khFigL2:"Title", demoAuto:"Auto demo · Click to try it yourself", demoChart:"Revenue by week", demoSaved:"Saved to the shelf. Click it to pin it on screen.", demoPinIt:"Pin this shot", demoPinned:"Pinned shot",
@@ -1541,6 +1793,8 @@ function setLang(l){
   if (window.ssDemoRelang) window.ssDemoRelang();
   if (window.ssStRelang) window.ssStRelang();
   if (window.ssKhRelang) window.ssKhRelang();
+  if (window.ssKtRelang) window.ssKtRelang();
+  if (window.ssKgRelang) window.ssKgRelang();
   if (window.ssSbRelang) window.ssSbRelang();
   if (window.ssRapRelang) window.ssRapRelang();
 }
@@ -2095,6 +2349,283 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   window.ssDemoRelang = () => { veKhay(); if (W) drawScene(); };
 })();
 
+// ===== Section KHAY bản 2 (06/10): một khay ở giữa, 6 app vây quanh; ảnh bay tới từng app rồi toả ra cùng lúc; khách tự kéo được =====
+// Không có GSAP (CDN hỏng) thì gỡ class kt-on, trang dùng lại bản 1 ngay bên dưới. "Giảm chuyển động": hiện sẵn 6 app đã nhận ảnh.
+document.addEventListener("DOMContentLoaded", () => {
+  const sec = document.getElementById("shelf"), san = document.getElementById("ktSan");
+  if (!sec || !san) return;
+  if (!window.gsap) return;
+  // Class kt-on do JS gắn (không ghi sẵn trong HTML): JS bị chặn hoặc dựng hỏng giữa chừng thì trang vẫn còn bản 1, không ra sân trống
+  sec.classList.add("kt-on");
+  try { khoiDong(); } catch (e) { sec.classList.remove("kt-on"); throw e; }
+  function khoiDong() {
+  const T = k => window.ssT ? window.ssT(k) : k;
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hep = matchMedia("(max-width:720px)");
+  const khay = document.getElementById("ktKhay"), luoi = document.getElementById("ktLuoi"), day = document.getElementById("ktDay");
+  const tro = document.getElementById("ktTro"), goi = document.getElementById("ktGoi");
+
+  // ---- 4 ảnh trong khay ----
+  const MAU = [
+    '<span class="kt-thi"><i style="height:40%"></i><i style="height:75%"></i><i style="height:55%"></i></span>',
+    '<b>+18%</b><span class="kt-thi"><i style="height:45%"></i><i style="height:90%"></i><i style="height:60%"></i><i style="height:70%"></i></span>',
+    '<span class="kt-thi"><em></em><em></em><em></em></span>',
+    '<span class="kt-thi"><u></u><s></s></span>'
+  ];
+  const anh = n => { const d = document.createElement("div"); d.className = "kt-th t" + (n + 1); d.dataset.n = n; d.innerHTML = MAU[n]; return d; };
+  for (let n = 0; n < 4; n++) luoi.append(anh(n));
+  const ths = [...luoi.children];
+  const anhAn = n => { const a = anh(n); a.classList.add("an"); return a; };
+
+  // ---- 6 app: mỗi app tự biết nhận ảnh theo kiểu của nó ----
+  const chat = o => Object.assign(o, {
+    lop: "chat",
+    html: '<div class="kt-bar"><i></i>' + o.ten + "</div>" + (o.rail ? '<div class="kt-body"><div class="kt-rail"><i></i><i></i><i></i></div><div class="kt-main">' : "") +
+      '<div class="kt-top"><span class="kt-ava">' + o.ava + '</span><span><b data-k="' + o.nhom + '"></b><small data-k="khOnline"></small></span></div>' +
+      '<div class="kt-msgs"><div class="kt-b trai" data-k="' + o.m1 + '"></div></div>' + (o.rail ? "</div></div>" : ""),
+    nhan(inn, n) {
+      const m = inn.querySelector(".kt-msgs"), b = document.createElement("div"), a = anhAn(n);
+      b.className = "kt-b anh"; b.append(a); m.append(b);
+      while (m.children.length > 4) m.firstElementChild.remove();
+      return { el: a, sau() {
+        setTimeout(() => {
+          if (!m.isConnected) return;
+          const r = document.createElement("div"); r.className = "kt-b trai kt-moi"; r.dataset.k = o.reply; r.textContent = T(o.reply); m.append(r);
+          while (m.children.length > 4) m.firstElementChild.remove();
+        }, 520);
+      } };
+    }
+  });
+  const thietKe = o => Object.assign(o, {
+    html: '<div class="kt-bar"><i></i>' + o.ten + '</div><div class="kt-2c"><div class="kt-can"><div class="kt-board"' + (o.frame ? ' data-kten="' + o.frame + '"' : "") + "></div></div>" +
+      '<div class="kt-lay">' + o.lops.map(k => '<div><i></i><span data-k="' + k + '"></span></div>').join("") + "</div></div>",
+    nhan(inn, n) {
+      const a = anhAn(n); inn.querySelector(".kt-board").replaceChildren(a);
+      return { el: a, sau() {
+        const lay = inn.querySelector(".kt-lay");
+        if (lay.querySelector(".moi")) return;
+        const d = document.createElement("div"); d.className = "moi kt-moi"; d.innerHTML = '<i></i><span data-k="khLayer">' + T("khLayer") + "</span>"; lay.prepend(d);
+      } };
+    }
+  });
+  const APP = [
+    chat({ ten: "Zalo", ic: "zalo", chu: "Z", acc: "#0068ff", ava: "K", nhom: "khZName", m1: "khZ1", reply: "khZReply" }),
+    chat({ ten: "Lark", ic: "lark", chu: "L", acc: "#245bdb", ava: "E", nhom: "khName", m1: "khM1", reply: "khReply" }),
+    chat({ ten: "Microsoft Teams", ic: "teams", chu: "T", acc: "#5b5fc7", ava: "H", nhom: "khTeam", m1: "khT1", reply: "khTReply", rail: true }),
+    { ten: "Premiere Pro", ic: "pr", chu: "Pr", lop: "pr", acc: "#9999ff",
+      html: '<div class="kt-bar"><i></i>Premiere Pro</div><div class="kt-prm"><span>Program</span></div><div class="kt-prt"><div class="kt-ph"></div>' +
+        '<div class="kt-tr"><b>V2</b><span class="kt-lane v2"></span></div>' +
+        '<div class="kt-tr"><b>V1</b><span class="kt-lane"><i class="kt-clip v" style="left:0;width:38%"></i><i class="kt-clip v" style="left:40%;width:56%"></i></span></div>' +
+        '<div class="kt-tr"><b>A1</b><span class="kt-lane"><i class="kt-clip a" style="left:0;width:38%"></i><i class="kt-clip a" style="left:40%;width:56%"></i></span></div></div>',
+      nhan(inn, n) {
+        const a = anhAn(n); inn.querySelector(".kt-prm").replaceChildren(a);
+        return { el: a, sau() { inn.querySelector(".v2").innerHTML = '<i class="kt-clip g kt-moi" style="left:49%;width:32%" data-k="khClip">' + T("khClip") + "</i>"; } };
+      } },
+    thietKe({ ten: "Photoshop", ic: "ps", chu: "Ps", lop: "ps", acc: "#31a8ff", lops: ["khPsL1", "khPsL2"] }),
+    thietKe({ ten: "Figma", ic: "fig", chu: "F", lop: "fig", acc: "#0d99ff", lops: ["khFigL1", "khFigL2"], frame: "khFigFrame" })
+  ];
+  const wins = APP.map((o, i) => {
+    const w = document.createElement("div"); w.className = "kt-win w" + i;
+    w.innerHTML = '<span class="kt-ic ' + o.ic + '">' + o.chu + '</span><div class="kt-in ' + o.lop + '" style="--acc:' + o.acc + '">' + o.html + "</div>" +
+      '<span class="kt-ok"><svg viewBox="0 0 12 12"><path d="M2.5 6.4 5 8.8 9.6 3.6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    san.insertBefore(w, khay); return w;
+  });
+  const ins = wins.map(w => w.querySelector(".kt-in"));
+  const dich = () => {
+    san.querySelectorAll("[data-k]").forEach(e => { e.textContent = T(e.dataset.k); });
+    san.querySelectorAll("[data-kten]").forEach(e => { e.dataset.ten = T(e.dataset.kten); });
+  };
+  dich(); window.ssKtRelang = dich;
+  const goc = ins.map(e => e.innerHTML);
+
+  // ---- đo: hop = hình chữ nhật thật trên màn (đã xoay), bo = theo bố cục (chưa xoay) ----
+  const hop = el => { const r = el.getBoundingClientRect(), s = san.getBoundingClientRect(); return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height }; };
+  const bo = el => ({ x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
+  const tam = i => { const d = bo(wins[i]); return { x: d.x + d.w / 2, y: d.y + d.h / 2 }; };
+  const lam = v => Math.round(v * 10) / 10;
+
+  // ---- dây nối khay ↔ app ----
+  const NS = "http://www.w3.org/2000/svg", dayS = [], dayN = [];
+  wins.forEach(() => {
+    const a = document.createElementNS(NS, "path"), b = document.createElementNS(NS, "path");
+    a.setAttribute("class", "n"); b.setAttribute("class", "s"); day.append(a, b); dayN.push(a); dayS.push(b);
+  });
+  function veDay() {
+    const W = san.clientWidth, H = san.clientHeight, S = hop(khay);
+    if (!W || !H) return;
+    day.setAttribute("viewBox", "0 0 " + W + " " + H);
+    wins.forEach((w, i) => {
+      const r = bo(w); let d;
+      if (hep.matches) {
+        const ax = S.x + S.w * (i < 3 ? .3 : .7), ay = S.y + S.h, bx = r.x + r.w / 2, by = r.y, my = (ay + by) / 2;
+        d = "M" + lam(ax) + "," + lam(ay) + " C" + lam(ax) + "," + lam(my) + " " + lam(bx) + "," + lam(my) + " " + lam(bx) + "," + lam(by);
+      } else {
+        const trai = i < 3, ax = trai ? S.x : S.x + S.w, ay = S.y + S.h * (.28 + .22 * (i % 3)), bx = trai ? r.x + r.w : r.x, by = r.y + r.h / 2, mx = (ax + bx) / 2;
+        d = "M" + lam(ax) + "," + lam(ay) + " C" + lam(mx) + "," + lam(ay) + " " + lam(mx) + "," + lam(by) + " " + lam(bx) + "," + lam(by);
+      }
+      dayN[i].setAttribute("d", d); dayS[i].setAttribute("d", d);
+      const L = dayS[i].getTotalLength(); dayS[i].dataset.l = L;
+      dayS[i].style.strokeDasharray = L + " " + (L + 2);
+      dayS[i].style.strokeDashoffset = w.classList.contains("co") ? 0 : L + 1;
+    });
+  }
+  new ResizeObserver(veDay).observe(san);
+  veDay();
+
+  // ---- chuyển động: mọi tween tự chạy đều tạm dừng khi section ra khỏi màn hình ----
+  let thay = false, phien = 0, hen = 0;
+  const dang = new Set(), chay = () => thay && !document.hidden;
+  const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); }, { threshold: .25 }).observe(san);
+  document.addEventListener("visibilitychange", capNhat);
+  // luon = true: tween của thao tác do khách kéo, không tạm dừng, không bị huỷ theo phiên tự chạy
+  // ☠️ tween 0 giây gọi onComplete NGAY trong lúc gsap.to chưa trả về: x phải khai báo trước, và tween đã xong thì không đưa vào sổ
+  const tw = (t, v, luon) => new Promise(res => {
+    let x = null;
+    x = gsap.to(t, Object.assign({}, v, { onComplete() { if (x) dang.delete(x); res(); } }));
+    if (!luon && x.progress() < 1) { dang.add(x); if (!chay()) x.pause(); }
+  });
+  const ngu = s => tw({}, { duration: s });
+  let tx = 0, ty = 0;
+  const datTro = (x, y) => { tx = x; ty = y; tro.style.transform = "translate3d(" + x + "px," + y + "px,0)"; };
+  const diTro = (x, y, giay) => { const x0 = tx, y0 = ty, o = { k: 0 }; return tw(o, { k: 1, duration: giay, ease: "power2.inOut", onUpdate() { datTro(x0 + (x - x0) * o.k, y0 + (y - y0) * o.k); } }); };
+  function bong(n, r) {
+    const b = anh(n); b.classList.add("kt-bong");
+    b.style.cssText = "left:" + r.x + "px;top:" + r.y + "px;width:" + r.w + "px;height:" + r.h + "px;font-size:" + getComputedStyle(ths[n]).fontSize;
+    san.append(b); return b;
+  }
+  // bay theo đường vồng (cong px) từ ô ảnh r0 tới tâm đích
+  function bay(b, r0, den, giay, cong, coTro) {
+    const x0 = r0.x + r0.w / 2, y0 = r0.y + r0.h / 2, o = { k: 0 };
+    return tw(o, { k: 1, duration: giay, ease: "power2.inOut", onUpdate() {
+      const x = x0 + (den.x - x0) * o.k, y = y0 + (den.y - y0) * o.k - cong * Math.sin(Math.PI * o.k);
+      b.style.left = (x - r0.w / 2) + "px"; b.style.top = (y - r0.h / 2) + "px";
+      if (coTro) datTro(x + r0.w * .12, y + r0.h * .1);
+    } });
+  }
+  function song(x, y) {
+    for (let k = 0; k < 2; k++) {
+      const r = document.createElement("i"); r.className = "kt-song"; r.style.left = x + "px"; r.style.top = y + "px"; san.append(r);
+      gsap.fromTo(r, { scale: .3, opacity: .95 }, { scale: 2.4 + k, opacity: 0, duration: .7 + k * .15, delay: k * .1, ease: "power2.out", onComplete: () => r.remove() });
+    }
+  }
+  // Ảnh đáp vào app i: app tự dựng chỗ nhận, bản sao thu về đúng chỗ đó rồi nhường cho ảnh thật
+  async function tha(b, i, n, luon) {
+    const k = APP[i].nhan(ins[i], n), r = hop(k.el);
+    await tw(b, { left: r.x, top: r.y, width: r.w, height: r.h, rotation: 0, scale: 1, duration: giam ? 0 : .22, ease: "power2.out" }, luon);
+    k.el.classList.remove("an"); b.remove(); k.sau();
+    if (!giam) song(r.x + r.w / 2, r.y + r.h / 2);
+    wins[i].classList.add("co"); wins[i].classList.remove("den");
+    gsap.to(dayS[i], { opacity: 1, strokeDashoffset: 0, duration: giam ? 0 : .45, ease: "power2.out" });
+  }
+  async function xoaHet() {
+    await tw(ins, { opacity: .25, duration: .28 });
+    ins.forEach((e, i) => { e.innerHTML = goc[i]; wins[i].classList.remove("co", "den"); });
+    dich();
+    dayS.forEach(s => gsap.set(s, { opacity: 0, strokeDashoffset: +s.dataset.l + 1 }));
+    await tw(ins, { opacity: 1, duration: .3 });
+  }
+
+  // ---- tự diễn: 2 lần kéo chậm bằng con trỏ cho dễ hiểu, rồi 4 ảnh toả ra cùng lúc ----
+  const HUY = {};
+  async function keo(c, n, i, nhip) {
+    const t = ths[n], r = hop(t);
+    tro.classList.add("hien");
+    await c(diTro(r.x + r.w * .62, r.y + r.h * .6, .55 * nhip));
+    t.classList.add("di");
+    const b = bong(n, r); gsap.to(b, { scale: 1.1, rotation: i < 3 ? -5 : 5, duration: .18 });
+    await c(ngu(.16));
+    wins[i].classList.add("den");
+    await c(bay(b, r, tam(i), .95 * nhip, 46, true));
+    await c(tha(b, i, n));
+    t.classList.remove("di");
+  }
+  async function phong(c, n, i, tre) {
+    await c(ngu(tre));
+    const r = hop(ths[n]), b = bong(n, r);
+    wins[i].classList.add("den");
+    await c(bay(b, r, tam(i), .72, 30 + 14 * (i % 3), false));
+    await c(tha(b, i, n));
+  }
+  async function dien() {
+    const p = ++phien, c = pr => pr.then(() => { if (p !== phien) throw HUY; });
+    try {
+      for (;;) {
+        await c(ngu(.7));
+        await c(keo(c, 1, 0, 1));
+        await c(ngu(.45));
+        await c(keo(c, 3, 3, .85));
+        await c(ngu(.35));
+        tro.classList.remove("hien");
+        await c(Promise.all([[0, 1], [2, 2], [1, 4], [0, 5]].map((x, k) => phong(c, x[0], x[1], k * .16))));
+        await c(ngu(3.2));
+        await c(xoaHet());
+      }
+    } catch (e) { if (e !== HUY) throw e; }
+  }
+  function dung() {
+    phien++; clearTimeout(hen);
+    dang.forEach(t => t.kill()); dang.clear();
+    san.querySelectorAll(".kt-bong:not(.tay)").forEach(e => e.remove());
+    san.querySelectorAll(".kt-th.an").forEach(e => e.classList.remove("an"));
+    ths.forEach(t => t.classList.remove("di"));
+    wins.forEach(w => w.classList.remove("den"));
+    tro.classList.remove("hien"); gsap.set(ins, { opacity: 1 });
+  }
+
+  // ---- khách TỰ kéo: nắm một ảnh trong khay, thả vào app nào cũng được ----
+  // Soát 07/10: (1) KHÔNG chặn theo class "di" (bản tự diễn cũng gắn "di" lên ảnh nó đang cầm, khách bấm trúng là không có phản hồi);
+  // (2) chỉ nhận nút chuột trái / ngón tay đầu tiên, mỗi lúc một lần kéo; (3) pointercancel / mất quyền giữ con trỏ = ảnh bay về, không thả.
+  let tay = null;
+  luoi.addEventListener("pointerdown", e => {
+    const t = e.target.closest(".kt-th");
+    if (!t || tay || e.button || e.isPrimary === false) return;
+    e.preventDefault(); dung(); goi.classList.add("an");
+    const p0 = phien, n = +t.dataset.n, r = hop(t), b = bong(n, r), s0 = san.getBoundingClientRect();
+    const lx = e.clientX - s0.left - r.x, ly = e.clientY - s0.top - r.y;
+    let dich2 = -1, xong = false;
+    tay = b;
+    b.classList.add("tay"); t.classList.add("di"); gsap.to(b, { scale: 1.08, rotation: -4, duration: .15 });
+    const mv = ev => {
+      const s = san.getBoundingClientRect(), px = ev.clientX - s.left, py = ev.clientY - s.top;
+      b.style.left = (px - lx) + "px"; b.style.top = (py - ly) + "px";
+      let m = -1;
+      wins.forEach((w, i) => { const q = bo(w); if (px > q.x - 10 && px < q.x + q.w + 10 && py > q.y - 10 && py < q.y + q.h + 10) m = i; });
+      if (m !== dich2) { if (dich2 >= 0) wins[dich2].classList.remove("den"); if (m >= 0) wins[m].classList.add("den"); dich2 = m; }
+    };
+    const SK = ["pointerup", "pointercancel", "lostpointercapture"];
+    const up = async ev => {
+      if (xong) return;
+      xong = true;
+      t.removeEventListener("pointermove", mv); SK.forEach(k => t.removeEventListener(k, up));
+      b.classList.remove("tay");
+      const tha2 = ev.type === "pointerup" && dich2 >= 0;
+      if (tha2) await tha(b, dich2, n, true);
+      else {
+        if (dich2 >= 0) wins[dich2].classList.remove("den");
+        // đo lại chỗ ảnh trong khay: màn hình có thể đã đổi cỡ / xoay trong lúc kéo
+        const r2 = hop(t);
+        await tw(b, { left: r2.x, top: r2.y, width: r2.w, height: r2.h, scale: 1, rotation: 0, duration: giam ? 0 : .28, ease: "power2.out" }, true); b.remove();
+      }
+      t.classList.remove("di"); tay = null;
+      if (!giam && p0 === phien) { clearTimeout(hen); hen = setTimeout(() => { const p = phien; xoaHet().then(() => { if (p === phien) dien(); }); }, 7000); }
+    };
+    try { t.setPointerCapture(e.pointerId); } catch (err) {}
+    t.addEventListener("pointermove", mv); SK.forEach(k => t.addEventListener(k, up));
+  });
+
+  if (giam) {
+    APP.forEach((o, i) => { const k = o.nhan(ins[i], i % 4); k.el.classList.remove("an"); k.sau(); wins[i].classList.add("co"); });
+    veDay(); dayS.forEach(s => { s.style.opacity = 1; });
+  } else {
+    datTro(san.clientWidth * .5, san.clientHeight * .92);
+    dien();
+  }
+  // tay nắm để đo / thử: ép coi như đang trong màn hình, chạy lại, dừng, thả thẳng ảnh n vào app i
+  window.ssKt = { ep(v) { thay = v; capNhat(); }, dien, dung, xoaHet, nhan(i, n) { const r = hop(ths[n]); return tha(bong(n, r), i, n, true); }, wins, dang };
+  }
+});
+
 // ===== Section KHAY: kéo cùng một ảnh từ khay vào Lark → Teams → Premiere Pro, lặp =====
 // Anh 22/09: "show cho họ thấy mình drag and drop được nhiều nền tảng". Đồng hồ setTimeout (rAF đứng khi đo ngầm).
 // Chỉ chạy khi section trong màn hình; "giảm chuyển động" → hiện sẵn cảnh Premiere đã có clip, không chạy.
@@ -2359,6 +2890,230 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   } else { vis.classList.add("cho-app", "cho-dock", "cho-khay", "cho-tro"); vongLap(); }
   window.ssKhay = { epChay: () => { epChay = true; } };   // chỉ để đo
 })();
+
+// ===== Section KHAY CO GIÃN bản 2 (07/10): lưới 24 ô ảnh cố định, khay là khung phủ lên lưới; khung phủ tới đâu ảnh hiện tới đó.
+// Khách kéo 4 góc được (góc đối diện đứng yên, thả tay thì khung hít về mép ô). Tự diễn khi không ai đụng.
+// Không có GSAP thì không gắn class kg-on, trang dùng bản 1 ngay bên dưới. "Giảm chuyển động": đứng yên ở cỡ vừa, vẫn kéo được.
+document.addEventListener("DOMContentLoaded", () => {
+  const sec = document.getElementById("resize"), san = document.getElementById("kgSan");
+  if (!sec || !san || !window.gsap) return;
+  sec.classList.add("kg-on");
+  try { khoiDong(); } catch (e) { sec.classList.remove("kg-on"); throw e; }
+  function khoiDong() {
+  const T = k => window.ssT ? window.ssT(k) : "";
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hep = matchMedia("(max-width:720px)");
+  const lay = id => document.getElementById(id);
+  const nen = lay("kgNen"), lop = lay("kgAnh"), khay = lay("kgKhay"), dem = lay("kgDem"), nhan = lay("kgNhan"), goi = lay("kgGoi"), tro = lay("kgTro"), che = lay("kgChe");
+  // 24 ảnh mẫu khác nhau: lấy lại đúng bộ ảnh bản 1 đã dựng trong #rsList (không lặp ảnh, anh nhắc 22/09)
+  const mau = [...document.querySelectorAll("#rsList .kh-thumb")].map(e => { const c = e.cloneNode(true); c.classList.remove("cam", "di"); c.removeAttribute("style"); return c.outerHTML; });
+
+  // ---- lưới ô ----
+  let C = 0, R = 0, os = [], X = [], Y = [], g = 10, dau = 30;
+  function dungLuoi() {
+    C = hep.matches ? 4 : 6; R = hep.matches ? 6 : 4; nen.textContent = ""; lop.textContent = ""; os = [];
+    for (let i = 0; i < C * R; i++) {
+      nen.append(document.createElement("i"));
+      const o = document.createElement("div"); o.className = "kg-o";
+      o.innerHTML = '<div class="rs-list kg-rl">' + (mau.length ? mau[i % mau.length] : '<div class="kh-thumb"></div>') + "</div>";
+      lop.append(o); os.push(o);
+    }
+  }
+  function doLuoi() {
+    const cs = getComputedStyle(san);
+    g = parseFloat(cs.getPropertyValue("--g")) || 10; dau = parseFloat(cs.getPropertyValue("--dau")) || 30;
+    X = []; Y = [];
+    for (let c = 0; c < C; c++) { const e = nen.children[c], l = nen.offsetLeft + e.offsetLeft; X.push({ l, r: l + e.offsetWidth }); }
+    for (let r = 0; r < R; r++) { const e = nen.children[r * C], t = nen.offsetTop + e.offsetTop; Y.push({ t, b: t + e.offsetHeight }); }
+  }
+  const DAU = () => hep.matches ? { c0: 0, c1: 1, r0: 1, r1: 2 } : { c0: 1, c1: 3, r0: 1, r1: 2 };
+  const VUA = () => hep.matches ? { c0: 0, c1: 2, r0: 1, r1: 3 } : { c0: 1, c1: 4, r0: 0, r1: 2 };
+  const KIEU = ten => hep.matches
+    ? (ten === "ngang" ? { c0: 0, c1: 3, r0: 4, r1: 5 } : { c0: 2, c1: 3, r0: 0, r1: 5 })
+    : (ten === "ngang" ? { c0: 0, c1: 5, r0: 2, r1: 3 } : { c0: 4, c1: 5, r0: 0, r1: 3 });
+  const giong = (a, b) => a.c0 === b.c0 && a.c1 === b.c1 && a.r0 === b.r0 && a.r1 === b.r1;
+  // khung khay (mép ngoài) ứng với một vùng ô
+  const khungCua = o => ({ l: X[o.c0].l - g, r: X[o.c1].r + g, t: Y[o.r0].t - g - dau, b: Y[o.r1].b + g });
+
+  // ---- vẽ: đặt khung, bật các ô nằm trong khung (lọt 65% là bật, cho cảm giác "hít") ----
+  let o = DAU(), hien = o, kh = { l: 0, t: 0, r: 0, b: 0 };
+  function ve(k) {
+    kh = { l: k.l, t: k.t, r: k.r, b: k.b };
+    khay.style.left = kh.l + "px"; khay.style.top = kh.t + "px"; khay.style.width = (kh.r - kh.l) + "px"; khay.style.height = (kh.b - kh.t) + "px";
+    const il = kh.l + g, ir = kh.r - g, it = kh.t + g + dau, ib = kh.b - g;
+    let n = 0, c0 = C, c1 = -1, r0 = R, r1 = -1;
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+      const tx = (X[c].r - X[c].l) * .35, ty = (Y[r].b - Y[r].t) * .35;
+      const bat = X[c].l >= il - tx && X[c].r <= ir + tx && Y[r].t >= it - ty && Y[r].b <= ib + ty;
+      os[r * C + c].classList.toggle("bat", bat);
+      if (bat) { n++; if (c < c0) c0 = c; if (c > c1) c1 = c; if (r < r0) r0 = r; if (r > r1) r1 = r; }
+    }
+    hien = n ? { c0, c1, r0, r1 } : null;
+    chu();
+  }
+  // chữ đi theo khay: số ảnh trên thanh khay, nhãn cỡ, chữ "co giãn" trên tiêu đề giãn theo số cột, đèn Ngang / Dọc
+  function chu() {
+    const h = hien || o, cot = h.c1 - h.c0 + 1, hang = h.r1 - h.r0 + 1, n = cot * hang;
+    dem.textContent = n;
+    nhan.textContent = cot + " × " + hang + " · " + n + " " + (T("kgAnh") || "shots");
+    const gian = sec.querySelector(".kg-gian");
+    if (gian) gian.style.letterSpacing = (-.02 + .24 * (cot - 1) / (C - 1)).toFixed(3) + "em";
+    che.querySelectorAll("span").forEach(s => s.classList.toggle("on", giong(h, KIEU(s.dataset.che))));
+  }
+  window.ssKgRelang = chu;
+
+  // ---- chuyển động (tween tự chạy tạm dừng khi section ra khỏi màn hình) ----
+  let thay = false, phien = 0, hen = 0;
+  const dang = new Set(), dangTay = new Set(), chay = () => thay && !document.hidden;
+  const capNhat = () => dang.forEach(t => chay() ? t.resume() : t.pause());
+  new IntersectionObserver(es => { thay = es[es.length - 1].isIntersecting; capNhat(); }, { threshold: .25 }).observe(san);
+  document.addEventListener("visibilitychange", capNhat);
+  // tween 0 giây gọi onComplete NGAY lúc gsap.to chưa trả về: x khai báo trước; luon = true là tween theo tay khách, không tạm dừng
+  const tw = (t, v, luon) => new Promise(res => {
+    let x = null;
+    x = gsap.to(t, Object.assign({}, v, { onComplete() { if (x) { dang.delete(x); dangTay.delete(x); } res(); } }));
+    if (x.progress() >= 1) return;
+    if (luon) dangTay.add(x);
+    else { dang.add(x); if (!chay()) x.pause(); }
+  });
+  const ngu = s => tw({}, { duration: s });
+  const veToi = (k2, giay, ease, luon) => { const a = { l: kh.l, t: kh.t, r: kh.r, b: kh.b }; return tw(a, { l: k2.l, t: k2.t, r: k2.r, b: k2.b, duration: giam ? 0 : giay, ease: ease || "power3.out", onUpdate() { ve(a); } }, luon).then(() => ve(k2)); };
+  let tx = 0, ty = 0;
+  const datTro = (x, y) => { tx = x; ty = y; tro.style.transform = "translate3d(" + (x - 3) + "px," + (y - 2) + "px,0)"; };
+  const diTro = (x, y, giay, ease) => { const x0 = tx, y0 = ty, a = { k: 0 }; return tw(a, { k: 1, duration: giay, ease: ease || "expo.inOut", onUpdate() { datTro(x0 + (x - x0) * a.k, y0 + (y - y0) * a.k); } }); };
+  function datNhan(x, y) {
+    const w = nhan.offsetWidth, h = nhan.offsetHeight;
+    const nx = Math.max(4, Math.min(san.clientWidth - w - 4, x + 14)), ny = Math.max(4, Math.min(san.clientHeight - h - 4, y + 16));
+    nhan.style.transform = "translate3d(" + nx + "px," + ny + "px,0)";
+  }
+
+  // ---- kéo một góc (dùng chung cho khách và bản tự diễn): góc đối diện là neo ----
+  let neo = null, goc = "";
+  const diemGoc = (k, gg) => ({ x: gg[1] === "l" ? k.l : k.r, y: gg[0] === "t" ? k.t : k.b });
+  function batDauKeo(gg) {
+    const k = khungCua(o); goc = gg;
+    neo = { x: gg[1] === "l" ? k.r : k.l, y: gg[0] === "t" ? k.b : k.t };
+    khay.classList.add("keo"); nhan.classList.add("hien");
+  }
+  function keoToi(x, y) {
+    const bl = X[0].l - g, br = X[C - 1].r + g, bt = Y[0].t - g - dau, bb = Y[R - 1].b + g;
+    const nhoW = X[0].r - X[0].l + 2 * g, nhoH = Y[0].b - Y[0].t + 2 * g + dau;
+    x = Math.max(bl, Math.min(br, x)); y = Math.max(bt, Math.min(bb, y));
+    let l, r, t, b;
+    if (goc[1] === "l") { r = neo.x; l = Math.min(x, r - nhoW); } else { l = neo.x; r = Math.max(x, l + nhoW); }
+    if (goc[0] === "t") { b = neo.y; t = Math.min(y, b - nhoH); } else { t = neo.y; b = Math.max(y, t + nhoH); }
+    ve({ l, t, r, b }); datNhan(x, y);
+  }
+  function thaKeo(luon) {
+    khay.classList.remove("keo"); nhan.classList.remove("hien");
+    if (hien) o = hien;
+    return veToi(khungCua(o), .24, "power3.out", luon);
+  }
+  function datKieu(ten, luon) { o = KIEU(ten); return veToi(khungCua(o), .55, "power3.inOut", luon); }
+
+  // ---- tự diễn ----
+  const HUY = {};
+  async function keoBangTro(c, gg, cot, hang) {
+    const d0 = diemGoc(khungCua(o), gg);
+    const dich = { x: gg[1] === "l" ? X[cot].l - g : X[cot].r + g, y: gg[0] === "t" ? Y[hang].t - g - dau : Y[hang].b + g };
+    tro.classList.add("hien");
+    await c(diTro(d0.x, d0.y, .7));
+    batDauKeo(gg); datNhan(d0.x, d0.y);
+    await c(ngu(.22));
+    const a = { k: 0 };
+    await c(tw(a, { k: 1, duration: 1.15, ease: "power2.inOut", onUpdate() { const x = d0.x + (dich.x - d0.x) * a.k, y = d0.y + (dich.y - d0.y) * a.k; keoToi(x, y); datTro(x, y); } }));
+    await c(ngu(.12));
+    await c(thaKeo());
+  }
+  async function bamChe(c, ten) {
+    const s = che.querySelector('[data-che="' + ten + '"]'), r = s.getBoundingClientRect(), q = san.getBoundingClientRect();
+    tro.classList.add("hien");
+    await c(diTro(r.left - q.left + r.width / 2, r.top - q.top + r.height / 2, .65));
+    s.classList.add("bam");
+    await c(ngu(.14));
+    s.classList.remove("bam");
+    await c(datKieu(ten));
+  }
+  async function dien() {
+    const p = ++phien, c = pr => pr.then(() => { if (p !== phien) throw HUY; });
+    try {
+      for (;;) {
+        await c(ngu(.9));
+        await c(keoBangTro(c, "br", C - 1, R - 1));
+        await c(ngu(.55));
+        await c(keoBangTro(c, "tl", 0, 0));
+        await c(ngu(1.3));
+        await c(bamChe(c, "ngang"));
+        await c(ngu(1.1));
+        await c(bamChe(c, "doc"));
+        await c(ngu(1.2));
+        tro.classList.remove("hien");
+        o = DAU();
+        await c(veToi(khungCua(o), .6, "power3.inOut"));
+      }
+    } catch (e) { if (e !== HUY) throw e; }
+  }
+  function dung() {
+    phien++; clearTimeout(hen);
+    dang.forEach(t => t.kill()); dang.clear();
+    dangTay.forEach(t => t.kill()); dangTay.clear();
+    che.querySelectorAll(".bam").forEach(e => e.classList.remove("bam"));
+    tro.classList.remove("hien"); khay.classList.remove("keo"); nhan.classList.remove("hien");
+    if (hien) o = hien;
+    ve(khungCua(o));
+  }
+  const henLai = p0 => { if (giam || p0 !== phien) return; clearTimeout(hen); hen = setTimeout(() => { if (p0 === phien) dien(); }, 7000); };
+
+  // ---- khách TỰ kéo góc (chỉ nút trái / ngón đầu tiên, mỗi lúc một lần kéo; huỷ thì khung hít về như thả) ----
+  let tay = false, choDoi = false;
+  khay.addEventListener("pointerdown", e => {
+    const t = e.target.closest(".kg-goc");
+    if (!t || tay || e.button || e.isPrimary === false) return;
+    e.preventDefault(); dung(); goi.classList.add("an");
+    const p0 = phien, gg = t.dataset.g, q0 = san.getBoundingClientRect(), d0 = diemGoc(khungCua(o), gg);
+    const lx = e.clientX - q0.left - d0.x, ly = e.clientY - q0.top - d0.y;
+    let xong = false;
+    tay = true; batDauKeo(gg); datNhan(d0.x, d0.y);
+    const mv = ev => { const q = san.getBoundingClientRect(); keoToi(ev.clientX - q.left - lx, ev.clientY - q.top - ly); };
+    const SK = ["pointerup", "pointercancel", "lostpointercapture"];
+    const up = () => {
+      if (xong) return;
+      xong = true;
+      t.removeEventListener("pointermove", mv); SK.forEach(k => t.removeEventListener(k, up));
+      const hit = thaKeo(true);
+      tay = false;
+      hit.then(() => henLai(p0));
+      if (choDoi) doiCo();
+    };
+    try { t.setPointerCapture(e.pointerId); } catch (err) {}
+    t.addEventListener("pointermove", mv); SK.forEach(k => t.addEventListener(k, up));
+  });
+  che.addEventListener("click", e => {
+    const s = e.target.closest("[data-che]"); if (!s || tay) return;
+    dung(); goi.classList.add("an");
+    const p0 = phien; datKieu(s.dataset.che, true).then(() => henLai(p0));
+  });
+
+  // ---- khởi động + đổi cỡ màn hình ----
+  dungLuoi(); doLuoi(); ve(khungCua(o));
+  let rongCu = san.clientWidth;
+  function doiCo() {
+    if (tay) { choDoi = true; return; }
+    choDoi = false;
+    if (Math.abs(san.clientWidth - rongCu) < 1) return;
+    rongCu = san.clientWidth;
+    const doiKho = (hep.matches ? 4 : 6) !== C;
+    if (doiKho) { dung(); dungLuoi(); o = giam ? VUA() : DAU(); }
+    doLuoi(); ve(khungCua(o));
+    if (doiKho && !giam) dien();
+  }
+  new ResizeObserver(doiCo).observe(san);
+  if (giam) { o = VUA(); ve(khungCua(o)); }
+  else { datTro(san.clientWidth * .5, san.clientHeight * .9); dien(); }
+  // tay nắm để đo / thử
+  window.ssKg = { ep(v) { thay = v; capNhat(); }, dien, dung, datKieu: t => datKieu(t, true), trangThai: () => ({ o, hien, kh, C, R, tay, phien, thay, dangChay: dang.size, dangTay: dangTay.size, soBat: os.filter(e => e.classList.contains("bat")).length }) };
+  }
+});
 
 // ===== Section KHAY CO GIÃN: con trỏ kéo góc khay → thêm hàng / thêm cột (ảnh giữ nguyên cỡ); rồi chuyển khay dọc =====
 // Đồng hồ setTimeout (rAF đứng khi đo ngầm). Chỉ chạy khi trong màn hình; "giảm chuyển động" → hiện sẵn khay ngang 3 hàng.
