@@ -78,6 +78,17 @@ thay(NEO_VI, NEO_VI + 'ldNhan:"Vì sao có Shot & Save", ldT:"Ý tưởng hay,",
   + 'ld1:"Mỗi lần có project mới, mình lại đi tìm ý tưởng. Mỗi ngày lại gặp một ý tưởng hay.", '
   + 'ld2:"Dùng xong cho project đang làm, rồi nó lại “đi đâu mất”.", '
   + 'ld3:"Mỗi ý tưởng là một công tắc kích hoạt não bộ. Mình làm Media Creative hơn 5 năm, hãy để mình giúp bạn giữ hết vào một nơi duy nhất.", ', "chu VI ly do");
+// Ảnh tròn của anh ở núm công tắc (section LÝ DO): có file tac-gia.* trong thư mục nháp này thì chép sang img/ của trang và trỏ thẻ img tới nó;
+// chưa có thì GỠ thẻ img để trang không gọi một file 404 (núm hiện hình người mặc định).
+const THE_ANH = '<img src="img/tac-gia.jpg" alt="" onerror="this.remove()">';
+const anhTacGia = ["jpg", "jpeg", "png", "webp"].map(d => "tac-gia." + d).find(f => fs.existsSync(path.join(__dirname, f)));
+if (anhTacGia) {
+  const thuMucAnh = path.join(goc, path.dirname(REL), "img");
+  fs.mkdirSync(thuMucAnh, { recursive: true });
+  fs.copyFileSync(path.join(__dirname, anhTacGia), path.join(thuMucAnh, anhTacGia));
+  thay(THE_ANH, THE_ANH.replace("tac-gia.jpg", anhTacGia), "anh tac gia");
+  console.log("anh tac gia: da chep " + anhTacGia + " (" + fs.statSync(path.join(__dirname, anhTacGia)).size + " byte)");
+} else { thay(THE_ANH, "", "anh tac gia"); console.log("anh tac gia: CHUA CO file tac-gia.jpg trong thu muc nhap, num hien hinh nguoi mac dinh"); }
 fs.writeFileSync(path.join(goc, REL), s);
 // Kiểm cú pháp mọi khối script nhúng (bẫy 06/10: một ghi chú giữa dòng làm chết cả khối)
 let khoi = 0, loi = 0;

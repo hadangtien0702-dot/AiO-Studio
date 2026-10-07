@@ -29,6 +29,11 @@
   (ngoài file ảnh 404 nói trên).
 - **Bẫy vấp:** thẻ `button` làm ô lưới thì tự canh GIỮA nội dung theo chiều dọc: 3 vạch tiến độ lệch nhau 12 px (anh thấy trên bản đang dựng dở);
   phải `align-items:start`. Nhãn tiếng Anh dài làm hàng công tắc tràn ở 320 px: rút còn "Scattered" / "On the shelf".
+- **Bổ sung (anh: *"tạo trước chỗ để hình ảnh anh vào đi em"*):** núm công tắc là CHỖ ĐỂ ẢNH, chưa có ảnh thì hiện hình người mặc định (thay
+  logo). Cách đưa ảnh vào: bỏ file `tac-gia.jpg` (hoặc .png / .webp, ảnh vuông) vào `Website/Nhap web ShotSave/keo-tha-2/` rồi chạy lại `chen.cjs`:
+  script chép ảnh sang `img/` của trang và trỏ thẻ img tới nó; chưa có file thì script GỠ thẻ img nên trang không còn gọi file 404 (dòng ☠️ ở trên
+  hết hiệu lực). Thử cả hai đường (`thu-nut.cjs`): chưa có ảnh: 0 file 404, núm 40 x 40 px hiện hình người; có ảnh thử 96 x 96 px: ảnh tải được, phủ
+  kín núm tròn. Đã xoá đúng 2 file ảnh thử em tạo (đếm lại: 0 / 0).
 - **[CHỜ ANH]** file ảnh chân dung · có ghi tên anh cạnh ảnh không · xem lại ở `http://localhost:8127/#why`.
 
 ## [web-shotsave] - 2026-10-07 09:20 (UTC+7) - NHÁP (chưa lên live): MẪU section "LÝ DO" kiểu kể chuyện (pain point, vì sao anh làm app) - máy công ty
