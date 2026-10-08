@@ -1,6 +1,12 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **08/10 07:41 MAY CONG TY: da keo 34 commit cua Mac ve (ma nguon tren may nay = 0.9.1, `093e269`). KHONG sua dong ma nao.**
+>   ☠️ Bo cai Windows 0.9.0 dang gan tren Polar (dong goi 07/10 14:04 tu `4ea5b90`) THIEU 4 ban sua Mac lam 04/10: `1f4abb7`
+>   (khach da tra tien khong con mat ma, cau-hinh co BOM), `565b446` + `17cc661` (keo-tha giu file tam, sua anh ghim ghi an toan),
+>   `f36f968` (lam mo "To kin"). App dang cai tren may cong ty van la 0.8.0 + lan nap 29 (ma 06/10), CHUA nap 0.9.1.
+>   Ma 0.9.1 CHUA chay bai kiem nao tren Windows (moi `node --check` 7 file chinh: 0 loi). [CHO anh gat] chay bai kiem an tren
+>   Windows -> dong goi 0.9.1 -> anh keo file moi len Polar thay 0.9.0, lam TRUOC khi mua thu.
 > - **07/10 20:42 MAC: DO HIEU NANG (anh: *"kiem tra va update hieu nang"*, *"kiem tra tung cu click anh va thao tac xem co muot
 >   khong"*, *"bai test Gif anh con chua test"*). CHUA toi uu gi, moi DO + gan dong ho.** So tu run-log (tay anh bam that, Mac
 >   i9-9980HK, man 3584x2240): phim -> khung chon hien giua 30 ms (49 lan, 90 % duoi 292) · phim -> anh dong bang giua 297 ms (17
@@ -241,6 +247,19 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [git] - 2026-10-08 07:41 - May cong ty keo 34 commit cua Mac ve (0.9.1); bo cai 0.9.0 tren Polar thieu 4 ban sua 04/10 - may cong ty
+
+**Boi canh.** Anh: "kiem tra git moi nhat nha em". Toi 07/10 Mac day len `may-cong-ty` + `mac` 34 commit (04/10 -> 07/10 21:14, `093e269`).
+**Nguyen nhan that (vi sao bo cai dang ban thieu ban sua).** Chieu 07/10 may cong ty dong goi 0.9.0 tu `4ea5b90`; luc do 4 ban sua loi Mac lam 04/10
+moi nam o nhanh `mac`, chua ai gop ve `may-cong-ty` (Mac gop luc 20:24, sau khi bo cai da len Polar 15:11). Do: `git merge-base --is-ancestor` cho
+`1f4abb7`, `565b446`, `17cc661`, `f36f968` so voi `4ea5b90` deu tra KHONG.
+**Thay doi.** Chi `git fetch` + `git merge --ff-only origin/may-cong-ty` (`e09050e` -> `093e269`, may nay khong co commit rieng nen khong ghep tay).
+KHONG sua dong ma nao tren may cong ty.
+**File anh huong.** 71 file do 34 commit mang ve (36 file cua app nay; `src/` doi 16 file so voi ban 0.9.0, +707 / -112 dong). Hook nhac "file ma nguon
+moi hon PROGRESS.md" la do lenh keo ve ghi tat ca file cung giay 07:40:31, khong phai do co sua.
+**Kiem chung bang so.** `git status` thu muc app: 0 file doi. `node --check` 7 file chinh (main, banquyen, kho, overlay, pin, shelf, khay-thu): 0 loi.
+`package.json` ghi 0.9.1. CHUA chay bai kiem nao tren Windows, CHUA nap vao app dang cai, CHUA dong goi lai, CHUA thay file tren Polar (cho anh gat).
 
 ## [0.9.0] - 2026-10-07 14:07 - DONG GOI bo cai 0.9.0 (anh: "xuat ban moi") + bai kiem ma ban quyen TRON DOI - may cong ty
 
