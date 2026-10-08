@@ -49,6 +49,20 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0d. 08/10/2026 anh hoi "tiep theo la tinh nang gi" — Claude tra loi, anh CHUA chot muc nao
+Con lai trong bang muc 0 (chua lam): 3 hut mau + bang 5 mau · 6 khung an toan MXH · 7 Storyboard ban duyet co o ghi chu ·
+thu tieng micro · app tu cuon khi chup cuon · mot khay 3 the (0c) · kieu C cua nut tron. Muc 8 (Mac chay that) da co ban
+0.9.1 chay tren Mac cua anh tu 04/10.
+De xuat MOI cua Claude (khong co trong bang cu, viet sau khi anh chot dinh vi 07/10 "app luu lai y tuong" va cau chuyen
+"y tuong hay roi lai di dau mat", "loay hoay kiem di kiem lai trong cac folder"):
+- **TIM LAI Y TUONG**: mot o tim trong khay, go chu la ra anh cu (tim theo chu DOC DUOC TRONG ANH bang bo doc chu san co cua
+  phim 5, theo ngay, theo ghi chu ngan nguoi dung go luc luu). Ly do: khay chi nap 5 anh gan nhat luc mo app
+  (`khaySoAnh` mac dinh 5), con lai nam trong thu muc — may anh dang co 778 file o do, muon tim lai phai mo thu muc lat tung
+  tam = dung noi dau web dang ke. Cong suc: UOC LUONG vua den lon (2-4 buoi), CHUA do: doc chu 778 anh mat bao lau, chay nen
+  co lam cham may khong (luat tai nguyen), luu chi muc o dau.
+Thu tu Claude de xuat: (1) xong viec ban hang dang do (xac nhan nut tron, dong goi lai Windows 0.9.1, 2 bo cai len web,
+mua thu) -> (2) Tim lai y tuong -> (3) muc 3 hut mau (nho, hop designer) -> (4) mot khay 3 the.
+
 ### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
 > 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
 > Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.
