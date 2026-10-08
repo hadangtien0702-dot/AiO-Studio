@@ -1,6 +1,11 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **08/10 08:45 MAY CONG TY: DA NAP 0.9.1 vao app dang cai (anh: *"icon cho so 6 chua giong voi ban o mac"*).** Goc: app dang cai
+>   con chay ma 06/10 (lan nap 29), icon ghim vi tri cua phim 6 nam trong commit Mac `9eba8b4` (04/10) chua tung nap tren may nay.
+>   Truoc khi nap: 15 bai kiem chay an tren Windows deu ma thoat 0 (xuatgif truot 3 muc o lan dau ngay sau 14 bai khac, chay lai
+>   2 lan deu 58/58; ma GIF khong doi tu ban 0.9.0). Sau khi nap: run-log `08:45:18 boot v0.9.1`, 0 dong loi, 764 anh/video + 9 dai +
+>   cau hinh giong truoc. CHUA co anh xac nhan bang mat; CHUA dong goi 0.9.1; bo cai tren Polar van la 0.9.0.
 > - **08/10 07:41 MAY CONG TY: da keo 34 commit cua Mac ve (ma nguon tren may nay = 0.9.1, `093e269`). KHONG sua dong ma nao.**
 >   ☠️ Bo cai Windows 0.9.0 dang gan tren Polar (dong goi 07/10 14:04 tu `4ea5b90`) THIEU 4 ban sua Mac lam 04/10: `1f4abb7`
 >   (khach da tra tien khong con mat ma, cau-hinh co BOM), `565b446` + `17cc661` (keo-tha giu file tam, sua anh ghim ghi an toan),
@@ -247,6 +252,23 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.9.1 nap tai cho] - 2026-10-08 08:45 - May cong ty: nap 0.9.1 vao app dang cai de icon phim 6 giong ban Mac - may cong ty
+
+**Boi canh.** Anh: "icon cho so 6 chua giong voi ban o mac nha em".
+**Nguyen nhan that.** Khong phai loi ma: icon moi (ghim vi tri, anh chon kieu A ngay 04/10 tren Mac, commit `9eba8b4`) da co trong ma nguon sau khi
+keo ve sang nay, nhung app dang cai tren may cong ty van chay `app.asar` cua lan nap 29 ngay 06/10 (md5 `a1e5b05b`).
+**Thay doi.** KHONG sua dong ma nao. `node scripts/cai-tai-cho.mjs`: dung 28 giay, `app.asar` moi md5 `03c318d3`, ban cu cat vao
+`.selftest/ban-cai-truoc/`. App nay co them ca cac thay doi khac cua Mac 04-07/10: icon lam mo moi (phim 4), kieu lam mo "To kin", khach da tra tien
+khong mat ma, keo-tha giu file tam, sua anh ghim ghi an toan, khay khong giu anh goc trong RAM, dong ho bam gio tung buoc trong run-log.
+**File anh huong.** Chi ban cai (`resources/app.asar` + `app.asar.unpacked`); repo khong doi ngoai file so nay.
+**Kiem chung bang so.** Truoc khi nap, 15 bai chay an tren Windows, ma thoat tung bai: sobuoc DAT · chekin 40/40 · butve DAT · banquyen 73/0 ·
+cauhinh 15/0 · quyen 28/0 · keo 34/0 · khaymuc 16/0 · khayram 12/0 · khodai 11/11 · khovideo DAT · botieng DAT (137 giay) · chupcuon DAT · khaynut DAT ·
+xuatgif: lan 1 TRUOT 3 muc (mau quay thu nhay coc so 1 -> 3 o khung 3, chay ngay sau 14 bai khac), lan 2 va 3 deu 58/58; `src/gif`, `xuat-gif.js`
+khong doi tu `4ea5b90` -> coi la mau quay thu rot khung luc may ban, CHUA tim goc. Sau khi nap: run-log that `08:45:18.182 boot v0.9.1 ... dang-ky=OK`,
+luong chup san sang 2 man, 0 dong LOI / CANH BAO; 764 anh/video, 9 dai Storyboard, cau hinh `fb6fabd5` giong truoc.
+**CHUA lam / chua do.** Anh chua xac nhan bang mat icon phim 6 · chua bam thu cong cu nao tren ban nay · bai kiem bat cua so (selftest, khay, quay app)
+chua chay · chua dong goi 0.9.1, bo cai tren Polar van la 0.9.0 (thieu cac ban sua tren).
 
 ## [git] - 2026-10-08 07:41 - May cong ty keo 34 commit cua Mac ve (0.9.1); bo cai 0.9.0 tren Polar thieu 4 ban sua 04/10 - may cong ty
 
