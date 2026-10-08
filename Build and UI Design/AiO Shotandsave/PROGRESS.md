@@ -1,6 +1,18 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **08/10 09:54 DANG SUA DO (phien khac, chua ghi so do): `src/khay-thu.js`, nut tron bam khong mo khay tren Windows 0.9.1.** Ban sua
+>   (tra `backgroundThrottling` cua cua so nut ve mac dinh tren Windows) da nap vao app dang cai 09:49 + 09:51; CHUA co bang chung bam nut mo
+>   duoc khay, CHUA commit. Xem muc `[ghi nhan]` 09:54 ben duoi.
+> - **08/10 09:59 MAY CONG TY: SUA "khay thu ve goc, bam khong mo ra" (anh bao 09:44, loi cua ban 0.9.1 tren Windows). DA NAP.**
+>   Goc DA DO: `backgroundThrottling: false` (Mac them 04/10) lam cua so nut tron + khay tren Windows khong nhan cu bam nao
+>   (2 cua so that canh nhau: tat ham 0/2 cu bam, mac dinh 2/2). Sua: chi tat ham tren macOS. So loi #21, `npm run test:bamnut`.
+>   ☠️ CHUA xac nhan tren app that: sau khi nap 09:59 anh chua chup tam nao nen nut tron chua hien de bam thu.
+>   ☠️ DANG DUNG LAI theo loi anh ("a khoan"): dua 2 bo cai Win + Mac len web (anh chon: tai thang khong can email, file dat o
+>   GitHub Releases). Bo cai Windows 0.9.1 dong goi 09:38 (96.192.753 byte, trong `dist/`) CO LOI NAY -> phai dong goi lai sau
+>   khi anh xac nhan. Ban Mac 0.9.1 (GitHub Actions run 37718811015, tu `eee7b87`) khong dinh loi nay (duong macOS khong doi);
+>   4 file da tai ve thu muc nhap `mac-091/`. CHUA tao Release, CHUA dung toi web, CHUA thay file tren Polar.
+>   Ghi them: run-log 09:49 `ban-quyen: dung-thu con 4 ngay` = app tren may cong ty con 4 ngay dung thu (chua nhap ma).
 > - **08/10 08:45 MAY CONG TY: DA NAP 0.9.1 vao app dang cai (anh: *"icon cho so 6 chua giong voi ban o mac"*).** Goc: app dang cai
 >   con chay ma 06/10 (lan nap 29), icon ghim vi tri cua phim 6 nam trong commit Mac `9eba8b4` (04/10) chua tung nap tren may nay.
 >   Truoc khi nap: 15 bai kiem chay an tren Windows deu ma thoat 0 (xuatgif truot 3 muc o lan dau ngay sau 14 bai khac, chay lai
@@ -252,6 +264,43 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [ghi nhan, KHONG phai viec cua phien ghi] - 2026-10-08 09:54 - `src/khay-thu.js` dang duoc MOT PHIEN KHAC sua do (nut tron bam khong mo khay tren Windows) - may cong ty
+
+**Boi canh.** Phien lam web (them chu cau 2 section "Vi sao co Shot & Save", so o `PROGRESS.md` goc repo muc `[web] 09:52`) bi hook Stop chan vi
+`src/khay-thu.js` moi hon so nay. Phien do KHONG sua file nay: luc phien mo (09:49) git status da co `M src/khay-thu.js`, gio sua cuoi 09:48:37.
+**Nguyen nhan that (chep tu ghi chu trong chinh ban sua, phien ghi KHONG tu do).** Anh bao tren ban 0.9.1: *"khi khay thu ve vi tri o goc, bam no khong mo
+khay ra"*. Ghi chu trong ma: 4/4 lan thu ve khong mo duoc bang nut; cua so nut dang hien, nam tren cung, cu bam khong toi `nut:mo`; khac biet duy nhat so
+voi ban 06/10 la `backgroundThrottling: false` cua cua so nut (them 04/10 cho Mac).
+**Thay doi (doc tu `git diff`, 7 dong them, 1 dong bo).** Them hang `KHONG_HAM` (mac dinh chi `true` tren macOS, `deps.khongHam` de ep); cua so nut / san dien
+dung `backgroundThrottling: KHONG_HAM ? false : true` -> Windows quay ve mac dinh nhu ban anh dung tu 01/10.
+**File anh huong.** `src/khay-thu.js` (chua commit). Ban dang cai da duoc nap lai: `resources/app.asar` gio 09:51.
+**Kiem chung bang so.** Phien ghi CHI doc: run-log that co `09:49:12 boot v0.9.1` va `09:51:27 boot v0.9.1` (2 lan nap), sau do CHUA co dong `khay thu` /
+`khay bung` nao -> CHUA co bang chung nut tron bam da mo duoc khay. Khong chay bai kiem nao.
+**CHUA lam / chua do.** Phien dang sua loi nay PHAI tu ghi muc rieng kem so do (bam nut that, `npm run test:khaynut`, Mac khong hoi quy). Muc nay chi de
+phien sau khong tuong file sua do la vo chu.
+
+## [0.9.1 sua] - 2026-10-08 09:59 - Windows: khay thu ve nut tron bam khong mo (cua so khong nhan cu bam vi tat ham ve) - may cong ty
+
+**Boi canh.** 09:44 anh: "a khoan, khi khay thu ve vi tri o goc - bam no khong mo khay ra" (luc em dang chuan bi dua 2 bo cai len web). Ban 0.9.1 vua
+nap 08:45 sang nay; ban 06/10 (toi 08:38 sang nay) bam van mo.
+**Nguyen nhan that (da do, co doi chung).** Ngay 04/10 Mac them `backgroundThrottling: false` cho cua so nut tron + san dien (`khay-thu.js taoCuaSo`)
+va cua so khay (`main.js ensureShelf`) de nut bung khay het giat tren Mac. Tren Windows, cua so trong suot hien bang `showInactive()` ma tat ham ve thi
+KHONG cu bam nao toi trang. Duong tim: (1) run-log ban loi 08:45-09:51: 9 lan `khay thu`, 0 lan `khay bung (bam nut)` (ban cu: 41 lan), 0 thao tac
+khay anh; (2) soi cua so that: nut tron dang hien, tren cung, `WindowFromPoint` tai tam = chinh no; (3) bam chuot gia lap dung tam: run-log khong them
+dong nao (tai hien duoc loi); (4) 2 cua so that canh nhau, cung bo tuy chon cua `taoCuaSo`, trang + preload that cua nut: tat ham 0/2 cu bam, mac dinh
+2/2; lap lai voi kieu cua so nhan focus (nhu khay): 0/2 va 2/2.
+**Thay doi.** `src/khay-thu.js`: hang `KHONG_HAM` (mac dinh chi macOS; `deps.khongHam` de ep) -> `backgroundThrottling: KHONG_HAM ? false : true`.
+`src/main.js ensureShelf`: `backgroundThrottling: process.platform !== 'darwin'`. Duong macOS khong doi. Them bai do cua so that
+`scripts/test/do-bam-nut.cjs` + `bam-xy.ps1` (`npm run test:bamnut`, ☠️ hien 2 o vuong + cuop con tro ~10 giay). So loi #21 trong `CLAUDE.md`.
+**File anh huong.** `src/khay-thu.js`, `src/main.js`, `scripts/test/do-bam-nut.cjs` (moi), `scripts/test/bam-xy.ps1` (moi), `package.json` (1 dong lenh),
+`CLAUDE.md`.
+**Kiem chung bang so.** Doi chung cua so that: nhu tren (0/2 vs 2/2, hai kieu cua so). `test:khaynut` sau sua: ma thoat 0 (lan chay giua chung truot muc
+"thu ve duoi 1,3 giay" = 1645 ms luc may dang tai 4 file Mac ~500 MB, 3 lan sau deu dat 1058-1075 ms). Nap 09:59: run-log `09:59:11 boot v0.9.1`,
+778 anh/video + 9 dai + cau hinh giong truoc.
+**CHUA lam / chua do.** ☠️ CHUA co cu bam nao tren APP THAT sau khi sua (can khay hien roi thu ve; anh chua chup tam nao tu 09:59) · khay anh (ghim, keo,
+nut) tren app that chua thu · chua tim hieu vi sao overlay chup cung tat ham ve ma van nhan chuot · bo cai Windows 0.9.1 dong goi 09:38 co loi nay, phai
+dong goi lai · viec dua bo cai len web DANG DUNG cho anh xac nhan.
 
 ## [0.9.1 nap tai cho] - 2026-10-08 08:45 - May cong ty: nap 0.9.1 vao app dang cai de icon phim 6 giong ban Mac - may cong ty
 

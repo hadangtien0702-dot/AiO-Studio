@@ -79,6 +79,12 @@ function taoKhayThu(deps) {
      ☠️ GIA THUYET, CHUA DO duoc tren man hinh (khong co thuoc nao nhin duoc man that) -> chi bat tren macOS, Windows giu
      nguyen duong anh da duyet. deps.hienSom = true / false de ep (bai do an). Thuoc: mat anh + dong `som N` cuoi run-log. */
   const HIEN_SOM = deps.hienSom != null ? !!deps.hienSom : (process.platform === 'darwin' && !TN)
+  /* 08/10 Windows — anh: "khi khay thu ve vi tri o goc, bam no khong mo khay ra" (ban 0.9.1, 4/4 lan thu ve khong lan nao mo
+     duoc bang nut; ban 06/10 bam van mo). Do: cua so nut tron DANG HIEN, nam tren cung, WindowFromPoint tai tam nut = chinh no,
+     bam chuot gia lap dung tam -> run-log KHONG co dong nao (cu bam khong toi `nut:mo`). Khac biet duy nhat cua cua so nut so
+     voi ban cu la `backgroundThrottling: false` (them 04/10 cho Mac). -> chi tat ham ve tren macOS; Windows giu mac dinh nhu
+     ban anh da dung tu 01/10. deps.khongHam = true / false de ep (bai do). */
+  const KHONG_HAM = deps.khongHam != null ? !!deps.khongHam : process.platform === 'darwin'
 
   let tt = 'mo'            // 'mo' = khay la khay · 'thu' = dang la nut tron · 'an' = nguoi dung an han nut
   let dangChay = false, viecMoi = false
@@ -134,7 +140,7 @@ function taoKhayThu(deps) {
       resizable: false, movable: false, minimizable: false, maximizable: false, fullscreenable: false,
       focusable: false, skipTaskbar: true, hasShadow: false, show: false, enableLargerThanScreen: true,
       // 04/10 Mac: nut tron + san dien cung an / hien lien tuc -> khong de trang bi ham ve luc vua hien lai (xem ensureShelf)
-      webPreferences: { preload: path.join(__dirname, preload), contextIsolation: true, sandbox: false, offscreen: TN, backgroundThrottling: false },
+      webPreferences: { preload: path.join(__dirname, preload), contextIsolation: true, sandbox: false, offscreen: TN, backgroundThrottling: KHONG_HAM ? false : true },
     })
     if (!TN) {
       w.setAlwaysOnTop(true, 'screen-saver')

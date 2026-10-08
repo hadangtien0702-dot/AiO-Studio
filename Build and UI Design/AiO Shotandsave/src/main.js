@@ -1860,8 +1860,11 @@ function ensureShelf() {
       /* 04/10 Mac (anh: "animation o goc khi bam mo ra bi giat, khong muot nhu ban Windows"): cua so khay vua duoc HIEN lai
          sau khi an thi trang bi ham ve — do bang khay-bung-that.cjs: hien roi bung ngay = 3 / 6 / 13 khung trong ~0,5 giay;
          cua so van hien = 25 / 25 / 24; tat ham = 24 / 23 / 24 / 24. Trang khay khong co vong ve nao chay lien tuc nen
-         tat ham khong ton CPU luc khay an. */
-      backgroundThrottling: false,
+         tat ham khong ton CPU luc khay an.
+         ☠️ 08/10 CHI macOS. Tren Windows, cua so trong suot hien bang showInactive() ma tat ham ve thi KHONG NHAN CU BAM NAO
+         (do bang 2 cua so that canh nhau, cung bo tuy chon, bam chuot gia lap dung tam: tat ham 0/2 cu bam, de mac dinh 2/2;
+         anh bao "khay thu ve goc, bam khong mo ra"). Windows giu mac dinh nhu ban anh dung tu 01/10. Xem them src/khay-thu.js. */
+      backgroundThrottling: process.platform !== 'darwin',
     },
   })
   shelfWin.setAlwaysOnTop(true, 'screen-saver')
