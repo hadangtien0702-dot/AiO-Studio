@@ -5,6 +5,18 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [git] - 2026-10-08 07:39 (UTC+7) - Máy công ty kéo 34 commit của Mac về; bộ cài 0.9.0 đang nằm trên Polar THIẾU các bản sửa 04/10 - máy công ty
+
+- **Anh yêu cầu:** *"kiểm tra git mới nhất nha em"*. Không sửa mã nguồn; chỉ `git fetch` + tiến thẳng `main` máy này lên `origin/may-cong-ty`
+  (`e09050e` → `093e269`, 34 commit, 71 file, không phải ghép tay vì máy này không có commit riêng). Kiểm cú pháp 7 file chính của Shot & Save: không lỗi.
+- **Trên GitHub lúc 07:39:** `may-cong-ty` = `mac` = `093e269` (Mac đẩy 07/10 21:14, Shot & Save 0.9.1); `main` (bản live web) vẫn `4417c5f` từ 07/10 11:34.
+  `main` máy này đi trước `origin/main` 102 commit, cố ý chưa đẩy.
+- **☠️ Điều đáng lo:** bộ cài Windows 0.9.0 (đóng gói 07/10 14:04 từ `4ea5b90`, đang gắn trên Polar) KHÔNG chứa 4 commit sửa lỗi Mac làm ngày 04/10, vì lúc
+  đóng gói các commit đó mới chỉ nằm ở nhánh `mac`: `1f4abb7` (khách đã trả tiền không còn mất mã khi máy chủ trả 400/401/403/407, `cau-hinh.json` có BOM),
+  `565b446` + `17cc661` (kéo thả giữ file tạm, sửa ảnh ghim ghi an toàn), `f36f968` (kiểu làm mờ "Tô kín"). Mã nguồn app từ bản 0.9.0 tới nay đổi 16 file.
+- **Chưa làm:** chưa chạy bài kiểm nào trên Windows với mã 0.9.1 · chưa nạp 0.9.1 vào app đang cài máy công ty · chưa đóng gói lại, chưa thay file trên Polar
+  (chờ anh gật: đây là bản khách sẽ tải).
+
 ## [mac-dem-lai + gop-cong-ty] - 2026-10-07 20:24 (UTC+7) - Đem bản cũ ra khỏi Thùng rác, Production giống máy công ty, gộp 46 commit công ty vào nhánh mac - máy Mac nhà
 
 - **Bối cảnh:** 04/10 anh mở `~/Downloads/Production` (chỗ anh giải nén) thấy còn 1 mục, mở Thùng rác thấy cả thư mục Production cũ:
