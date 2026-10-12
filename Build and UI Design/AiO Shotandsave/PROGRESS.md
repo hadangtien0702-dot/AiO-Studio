@@ -1,7 +1,7 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-12 15:55 +0700 (/xong, may Mac)
-> - **12/10 15:32 MAC: 0.10.1 DA NAP. Anh dan: KHONG dong bo cai, KHONG release, tap trung phat trien san pham; khi nao anh keu moi dong goi.**
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-12 15:47 +0700 (/xong, may Mac)
+> - **12/10 15:24 MAC: 0.10.1 DA NAP. Anh dan: KHONG dong bo cai, KHONG release, tap trung phat trien san pham; khi nao anh keu moi dong goi.**
 >   0.10.1 = 0.10.0 + sua Ctrl + mot nac lan chuot phong 3,3 lan (nay 15%). Bai thu dung moi `npm run thu:canvas -- <so anh>`. Ket qua thu dung, bang
 >   doi thu (CleanShot X khong co canvas) va 12 de xuat cho Canvas nam o `ROADMAP.md` muc 0g, anh CHUA chot muc nao. Web da co section Canvas rieng
 >   (`#canvas`, live `b8d2ad3`). Anh van CHUA mo Canvas lan nao tren app that.
@@ -284,7 +284,7 @@
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
 
-## [0.10.1 sua + thu dung, nap tai cho] - 2026-10-12 15:32 - Canvas: bai THU DUNG, sua "mot nac lan chuot phong 3,3 lan", tra doi thu - may Mac
+## [0.10.1 sua + thu dung, nap tai cho] - 2026-10-12 15:24 - Canvas: bai THU DUNG, sua "mot nac lan chuot phong 3,3 lan", tra doi thu - may Mac
 
 - **Anh dan:** *"khong dong bo cai, khi nao anh keu thi moi lam"*, *"cai tren may Mac xong em hay kiem tra va thao tac xem nguoi dung co de su dung khong"*,
   *"trong canvas co can them nhung tinh nang nao khong"*, *"xem cac doi thu nhu CleanShot X"*, *"tap trung phat trien san pham, khong release"*.
@@ -302,6 +302,7 @@
 - **Doi thu:** CleanShot X KHONG co bang / canvas xep anh (trang tinh nang chinh thuc: Capture History toi 1 thang, loc theo loai; anh ghim; Cloud tim theo
   noi dung + the). Snagit: Library co the + loc. Eagle (plugin Canvas), PureRef, Milanote co bang nhung khong phai app chup man hinh. Chua ra het moi app.
 - **Nap:** `cai-tai-cho-mac.mjs` 15:22:36 `boot v0.10.1`, asar `3f4c0be4`, CDHash khong doi, quyen Ghi man hinh con, 17 anh / video + cau hinh giong truoc.
+- **Sua gio (15:47):** muc nay va dong trang thai tung ghi 15:32, dong chot tung ghi 15:55, muc [web] o so goc tung ghi 15:01: em uoc luong chu khong chay lenh. Gio that theo commit: 15:24, 15:47, 14:59.
 - **CHUA:** anh chua mo Canvas lan nao (run-log khong co dong `canvas mo`); ban di chuot that, do muot, video, Windows chua do; khong dong bo cai (anh dan).
 
 ## [0.10.0 tinh nang, nap tai cho] - 2026-10-12 14:13 - CANVAS Y TUONG ban dau: bang tu do kieu Miro, khung = thu muc con cung ten - may Mac

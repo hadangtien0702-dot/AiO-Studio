@@ -5,7 +5,7 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
-## [web] - 2026-10-12 15:01 (UTC+7) - Web Shot & Save: SECTION RIÊNG cho Canvas ý tưởng (`#canvas`), đã LIVE - máy Mac
+## [web] - 2026-10-12 14:59 (UTC+7) - Web Shot & Save: SECTION RIÊNG cho Canvas ý tưởng (`#canvas`), đã LIVE - máy Mac
 
 - **Anh yêu cầu:** *"ok rồi thêm vào website và build đi em"* (sau khi duyệt bản mẫu Canvas), rồi *"gửi link web mới"*. Em định thêm thành cảnh thứ 18
   của rạp tính năng; anh chặn giữa chừng: *"canvas là phần riêng"*, *"em hãy tạo cho nó một section mới"*. Chưa sửa gì vào rạp nên không phải gỡ.

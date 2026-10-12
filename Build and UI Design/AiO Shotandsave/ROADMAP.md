@@ -102,7 +102,7 @@ file vao thu muc con. He qua phai noi truoc: (1) anh da keo vao Premiere / Photo
 **Viec phai co truoc khi viet ma that (chua lam):** khao sat app cung loai (Eagle, PureRef, Milanote...) theo luat 2d · chot cau "chuyen file
 hay ban noi" · chot Canvas la cua so moi hay thay cua so Khay hien co · ban Windows.
 
-### 0g. CANVAS: KET QUA THU DUNG + DOI THU + VIEC NEN LAM TIEP (12/10/2026 15:3x) — anh CHUA chot muc nao
+### 0g. CANVAS: KET QUA THU DUNG + DOI THU + VIEC NEN LAM TIEP (12/10/2026 15:2x) — anh CHUA chot muc nao
 
 Anh dan 12/10 15:1x: *"khong dong bo cai, khi nao anh keu thi moi lam"*, *"cai tren may Mac xong em hay kiem tra va thao tac xem nguoi dung co de su dung khong"*,
 *"trong canvas co can them nhung tinh nang nao khong"*, *"xem cac doi thu nhu CleanShot X ho co dang lam cai nay khong"*, *"tap trung phat trien san pham, khong release"*.
