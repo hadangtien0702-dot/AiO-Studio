@@ -1423,7 +1423,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
         <article class="card rong" data-hien>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="14" height="9" rx="2"/><circle cx="18" cy="17.5" r="3.5"/><path d="m10 15.5 3 2-3 2"/></svg></div>
           <h3 data-i="f13t">A shelf that tucks itself away</h3>
-          <p data-i="f13p">Leave the shelf alone for 5 seconds and it folds into a small round button in the corner, showing your latest shot and how many are waiting. Click the button and the shelf opens right where it was.</p>
+          <p data-i="f13p">Leave the shelf alone for 5 seconds and it folds into a small round button in the corner, showing your latest shot and how many are waiting. Click the button and the shelf opens right where it was. On Mac, drag the button anywhere and it stays there, and it follows you across every desktop.</p>
         </article>
         <!-- 06/10: 4 tinh nang moi cua app (danh so 02/10, but ve + da quang, chup cuon, xuat GIF 06/10). Chi hua thu CO trong ma:
              phim 6 / 7 / 8 / 9, Shift ra duong thang, nut Xong, GIF cho doan quay duoi 60 giay. Icon chep tu src/overlay/index.html (nut 9: Tabler arrow-autofit-height, MIT, anh chon 06/10). -->
@@ -1949,7 +1949,7 @@ const T = {
     f10t:"Dải phân cảnh trong 3 giây", f10p:"Khoanh vùng đang chuyển động rồi bấm <kbd>S</kbd>. 3 giây sau bạn có 6 khung đánh số trong một dải, nằm sẵn trong khay Storyboard. Bỏ bớt khung thừa, rồi kéo cả dải thả vào ứng dụng nào cũng được.",
     f9t:"Khay nhớ ảnh gần nhất", f9p:"Ảnh được đánh số #1, #2… Mở lại ứng dụng, những ảnh chụp gần nhất tự hiện sẵn trong khay. Số ảnh chọn trong Cài đặt: Tắt, 5, 10 hoặc 20.",
     f12t:"Quay video vùng màn hình", f12p:"Khoanh vùng rồi bấm <kbd>R</kbd>. App quay tới khi bạn bấm Dừng, tối đa 5 phút. File MP4 nằm sẵn trong Khay video: chọn bản Có tiếng hoặc Không tiếng rồi kéo cả hàng thả vào khung chat hay ứng dụng khác. Trên Windows quay được cả tiếng đang phát trên máy.",
-    f13t:"Khay tự thu gọn", f13p:"Không dùng tới 5 giây, khay tự thu về một nút tròn nhỏ ở góc màn hình, hiện ảnh mới nhất và số ảnh đang có. Bấm nút, khay mở lại đúng chỗ cũ.",
+    f13t:"Khay tự thu gọn", f13p:"Không dùng tới 5 giây, khay tự thu về một nút tròn nhỏ ở góc màn hình, hiện ảnh mới nhất và số ảnh đang có. Bấm nút, khay mở lại đúng chỗ cũ. Trên Mac, kéo nút tới đâu nó nằm ở đó, và nó theo bạn qua mọi desktop.",
     f14t:"Đánh số từng bước", f14p:"Bấm <kbd>6</kbd> rồi bấm lên ảnh: hiện huy hiệu số 1, rồi 2, rồi 3. Xoá một số ở giữa, các số còn lại tự dồn cho liền.",
     f15t:"Bút vẽ tay và bút dạ quang", f15p:"Bấm <kbd>7</kbd> để vẽ tay, <kbd>8</kbd> để tô lên chỗ cần chú ý. Giữ Shift ra đường thẳng.",
     f16t:"Chụp cuộn trang dài", f16p:"Khoanh phần trang đang cuộn rồi bấm <kbd>9</kbd>. Bạn lăn chuột cuộn xuống, app ghép những gì đi qua thành một ảnh dài. Bấm Xong để lưu.",
@@ -4185,10 +4185,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   // 01/10 (app 0.8.0): thêm 2 cảnh Quay video (phím R) + Khay tự thu về nút tròn -> 13 cảnh. Chữ nút lấy đúng src/i18n.js (quay.dung, vd.*).
   Object.assign(RT.vi, { tren: "Shot & Save · 13 tính năng", dung: "Dừng", khayVideo: "Khay video", vdTen: "Video 01", coTieng: "Có tiếng", khongTieng: "Không tiếng", keo: "Kéo",
-    quayNh: "MP4 nằm sẵn trong Khay video", nghi1: "Không dùng tới?", nghi2: "Khay <em>tự thu gọn.</em>", nghi3: "Bấm là <em>mở lại.</em>",
+    quayNh: "MP4 nằm sẵn trong Khay video", nghi1: "Không dùng tới?", nghi2: "Khay <em>tự thu gọn.</em>", nghi2k: "Kéo nút tới <em>chỗ bạn muốn.</em>", keoNh: "Trên Mac: nút nhớ chỗ và theo bạn qua mọi desktop", nghi3: "Bấm là <em>mở lại.</em>",
     thuNh: "Tự thu sau 5, 10 hoặc 15 giây, chọn trong Cài đặt" });
   Object.assign(RT.en, { tren: "Shot & Save · 13 features", dung: "Stop", khayVideo: "Video shelf", vdTen: "Video 01", coTieng: "With sound", khongTieng: "No sound", keo: "Drag",
-    quayNh: "The MP4 waits in the Video shelf", nghi1: "Not using it?", nghi2: "The shelf <em>tucks away.</em>", nghi3: "One click, <em>it's back.</em>",
+    quayNh: "The MP4 waits in the Video shelf", nghi1: "Not using it?", nghi2: "The shelf <em>tucks away.</em>", nghi2k: "Drag it <em>where you like.</em>", keoNh: "On Mac: it remembers the spot and follows you across every desktop", nghi3: "One click, <em>it's back.</em>",
     thuNh: "Collapses after 5, 10 or 15 seconds. Pick one in Settings" });
   RT.vi.ngan.push("Quay video", "Tự thu"); RT.en.ngan.push("Record", "Tuck away");
   // 06/10: thêm 4 cảnh (đánh số · bút + dạ quang · chụp cuộn · xuất GIF) -> 17 cảnh. Chữ nút lấy đúng src/i18n.js (cuon.xong, vd.gifNut, vd.gifGoiY).
@@ -4644,13 +4644,23 @@ document.addEventListener("DOMContentLoaded", () => {
         tl.set(song, { opacity: .8, scale: 1 }, T1).to(song, { opacity: 0, scale: 1.9, duration: ms(480), ease: "power2.out" }, T1);
         tl.to(mLogo, { opacity: 0, duration: ms(140) }, T1).fromTo(mAnh, { opacity: 0, scale: .3, rotation: -25 }, { opacity: 1, scale: 1, rotation: 0, duration: ms(260), ease: eLo }, T1);
         doi(L("nghi2"), T1 + .4);
-        // --- MỞ RA: bấm nút tròn ---
-        const T2 = T1 + 2.1, dich = { x: kx + kw / 2, y: ky + kh / 2 }, lech = { x: dich.x - tam.x, y: dich.y - tam.y }, xa = Math.hypot(lech.x, lech.y);
+        // --- KÉO NÚT (app 0.9.2, 12/10; trong app hiện CHỈ bật trên macOS nên dòng chú thích ghi rõ "Trên Mac"): giữ chuột trên
+        //     nút tròn rồi kéo sang chỗ khác, thả ra nút nằm lại đó. Khay sau đó bung ra từ ĐÚNG chỗ nút mới (app: oTronNut(wa, viTri())).
+        const TK = T1 + 2.1, keo = { x: -w * .56, y: -h * .3 } /* thả cao: dòng chú thích nằm đáy sân, trên điện thoại nó dài 2 dòng và đè lên nút nếu thả thấp */, tam2 = { x: tam.x + keo.x, y: tam.y + keo.y };
+        tl.set(c, { x: w * .62, y: h * .34 }, TK - .95).to(c, { opacity: 1, duration: .2 }, TK - .95);
+        di(tl, c, tam.x + 3, tam.y + 5, .6, TK - .8);
+        tl.add(() => c.classList.add("bam"), TK - .12);
+        doi(L("nghi2k"), TK);
+        tl.to(nut, { x: keo.x, y: keo.y, duration: 1.05, ease: "power2.inOut" }, TK).to(c, { x: tam2.x + 3, y: tam2.y + 5, duration: 1.05, ease: "power2.inOut" }, TK);
+        tl.add(() => c.classList.remove("bam"), TK + 1.12);
+        const nhKeo = nhan(tl, L("keoNh"), TK + .35, "top:auto;bottom:4%");
+        // --- MỞ RA: bấm nút tròn (con trỏ đang nằm sẵn trên nút vừa thả) ---
+        const T2 = TK + 2.5, dich = { x: kx + kw / 2, y: ky + kh / 2 }, lech = { x: dich.x - tam2.x, y: dich.y - tam2.y }, xa = Math.hypot(lech.x, lech.y);
         const tBay = ms(240 + Math.min(200, xa * .35)), vong = Math.min(70, xa * .2), o = { p: 0 };
-        tl.set(c, { x: w * .5, y: h * .24 }, T2 - 1).to(c, { opacity: 1, duration: .2 }, T2 - 1);
-        di(tl, c, tam.x + 3, tam.y + 5, .65, T2 - .85); bam(tl, c, T2 - .12);
+        tl.to(nhKeo, { opacity: 0, duration: .2 }, T2 - .35);
+        bam(tl, c, T2 - .12);
         tl.to([mAnh, so], { opacity: 0, duration: ms(120) }, T2).fromTo(mOng, { opacity: 0, rotation: 90, scale: .5 }, { opacity: 1, rotation: 0, scale: 1, duration: ms(180) }, T2);
-        tl.to(o, { p: 1, duration: tBay, ease: "none", onUpdate() { const q = eIO(o.p); gsap.set(nut, { x: lech.x * q, y: lech.y * q - vong * Math.sin(Math.PI * q), scale: 1 - .14 * Math.sin(Math.PI * o.p) }); } }, T2);
+        tl.to(o, { p: 1, duration: tBay, ease: "none", onUpdate() { const q = eIO(o.p); gsap.set(nut, { x: keo.x + lech.x * q, y: keo.y + lech.y * q - vong * Math.sin(Math.PI * q), scale: 1 - .14 * Math.sin(Math.PI * o.p) }); } }, T2);
         tl.to(c, { opacity: 0, duration: .2 }, T2 + .15);
         const T3 = T2 + tBay, r0 = (Math.hypot(kw, kh) / 2 + 6).toFixed(1);
         tl.set(K, { opacity: 1, clipPath: "circle(26px at 50% 50%)" }, T3).to(K, { clipPath: `circle(${r0}px at 50% 50%)`, duration: ms(400), ease: "power3.out" }, T3).set(K, { clipPath: "none" }, T3 + ms(400) + .02);
