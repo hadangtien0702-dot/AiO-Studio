@@ -70,7 +70,17 @@ ve tinh nang ma chua bo cai nao co · (2) TIM LAI Y TUONG (o tim trong khay, xem
 that o may cong ty) · (4) hut mau + bang 5 mau · (5) mot khay 3 the. Viec nho con treo cua hom nay: khung chup khi app khac dang toan
 man hinh tren Mac (overlay chua khai di theo moi desktop).
 
-### 0f. CANVAS GUONG THU MUC (anh neu 12/10/2026 12:4x, y MOI cua anh, de len thu tu o 0e) — moi co BAN NHAP, cho anh duyet huong
+### 0f. CANVAS KIEU MIRO, KHUNG = THU MUC CUNG TEN (anh neu 12/10/2026 12:4x, y MOI cua anh, de len thu tu o 0e) — moi co BAN NHAP, cho anh duyet huong
+> **SUA 12/10 13:0x — Claude HIEU SAI chu "mirror".** Anh go *"canvas giong mirror"* = app **MIRO** (bang trang gom y tuong), KHONG phai
+> "tam guong". Nhap 1 `nhap/canvas-guong.html` (khoi luoi + cot thu muc) lam theo nghia sai; anh nhac *"canvas nhu mirror ma em"*, hoi lai
+> mot cau thi anh chon **"Giong app Miro"**. Vi vay lua chon "khoi nhom tu xep luoi" ben duoi KHONG con dung: canvas la BANG TU DO.
+> **Nhap 2 dung y: `nhap/canvas-miro.html`** — bang rong co luoi cham, keo nen de di chuyen, Ctrl / Cmd + lan de phong, nut - / + / "Vua man
+> hinh"; anh, video, dai Storyboard dat dau cung duoc; KHUNG co ten (keo thanh ten de doi cho ca khung va thu ben trong, keo goc de doi co);
+> tha mot o vao khung la no thuoc khung do; cot phai "Thu muc tren may": moi khung = mot thu muc cung ten, doi ten o ben nao ben kia doi theo.
+> Do bang Chrome chay ngam (chuot + banh xe gia lap): keo 1 anh vao khung -> goc 3 -> 2, khung 2 -> 3; keo khung 60 px -> anh ben trong di
+> theo 60 px; doi ten o khung -> thu muc doi, doi ten o thu muc -> khung doi; phong 0,957 -> 1,292; "Khung moi" them 1 thu muc; 0 loi console;
+> khong tran ngang o 1440 va 700 px. CHUA co anh xem bang mat. Phan duoi day (viet luc con hieu la "guong") giu lai de biet duong di; ba he qua
+> cua viec CHUYEN FILE va danh sach viec phai co truoc khi viet ma that VAN DUNG.
 Anh (go trong bang hoi, nguyen van): *"Canvas hinh anh thu thap va group o canvas folder se group theo va dat ten y chang"* ·
 *"canvas giong mirror - mot canvas tong hop y tuong"* · *"tat ca hinh anh chup - video - story se duoc mo trong canvas"*.
 Anh CHON trong bang hoi: kieu **khoi nhom tu xep luoi** (khong phai bang tu do nhu Figma) · dong bo **HAI chieu** (sua o canvas hay sua
