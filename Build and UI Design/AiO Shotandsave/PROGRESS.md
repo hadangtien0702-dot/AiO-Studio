@@ -4,7 +4,8 @@
 > - **12/10 11:34 MAC: SUA "mo AIO o desktop nao thi khong xem duoc o desktop khac" (anh bao 12/10). DA NAP vao app dang cai, van 0.9.1.**
 >   Goc DA DO: khong cua so nao khai "di theo moi desktop" -> nut tron / khay / san dien moi cai chi nam o 1 trong 7 desktop. Sua: `moiDesktop()`
 >   trong `main.js` + `khay-thu.js`, chi macOS. Thuoc: `swift scripts/test/do-moi-desktop-mac.swift` (co `--doi-chung`).
->   CHUA co so tren cua so cua app that sau khi nap (cho anh chup 1 tam roi do lai); overlay chup CHUA ap; CHUA commit.
+>   Do tren app that 11:39 sau khi anh chup + luot 7 desktop: nut tron, khay anh, san dien deu 7/7 desktop (truoc: 1/7); bam nut tron van mo khay
+>   (run-log 11:38:38). CHUA do: anh ghim, cua so Khay, vien quay (anh chua mo). Overlay chup CHUA ap. Commit `ed8b9e2` tren may, CHUA day.
 > - **08/10 09:54 DANG SUA DO (phien khac, chua ghi so do): `src/khay-thu.js`, nut tron bam khong mo khay tren Windows 0.9.1.** Ban sua
 >   (tra `backgroundThrottling` cua cua so nut ve mac dinh tren Windows) da nap vao app dang cai 09:49 + 09:51; CHUA co bang chung bam nut mo
 >   duoc khay, CHUA commit. Xem muc `[ghi nhan]` 09:54 ben duoi.
@@ -295,10 +296,13 @@ dinh ra 1 -> thuoc phan biet duoc.
 - Nap tai cho 11:33:35 (`node scripts/cai-tai-cho-mac.mjs`): `boot v0.9.1`, `app.asar` md5 `e8e5d902`, CDHash khong doi, quyen Ghi man hinh con,
   15 anh/video + cau hinh giong truoc; ruot app dang cai co 2 dong lenh moi (ruot cu cat di: 0). Ruot cu:
   `~/Library/Application Support/AiO-Studio/ban-cai-truoc/shotandsave-ruot-20261012-113334/`.
-**CHUA kiem.** Tren APP THAT sau khi nap: luc do 11:34 app moi mo lai, chua co khay / nut tron nao (chung chi duoc tao sau lan chup dau) -> chua co
-so "7/7" cua chinh cua so app. Can anh chup 1 tam roi chay lai thuoc. Chua kiem: bam nut tron / keo khay / keo anh ghim o desktop khac co nhan chuot
-khong; app khac dang toan man hinh; may 2 man; Windows khong doi (nhanh `darwin` khong chay) nhung chua chay lai bai nao tren Windows.
-Chua tang so phien ban, chua commit len GitHub.
+**Do tren APP THAT 11:39:06** (anh: *"chup roi em, do lai di"*, *"anh da chup va luot qua 7 desktop khac nhau roi"*): nut tron 80x80 = 7/7 desktop,
+khay anh 380x128 = 7/7, san dien 1792x1034 = 7/7 (truoc khi sua: 1/7 ca ba). Run-log tu luc nap (18 dong): 0 dong `CANH BAO` / `LOI`; 11:38:00 chup
+(`grab-xong 224ms`), 11:38:05 luu anh, 11:38:12 khay thu ve nut, **11:38:38 `khay bung (bam nut)` 789 ms** = cu bam vao nut tron van an sau khi sua,
+11:38:45 tu thu sau 5 giay.
+**CHUA kiem.** Anh ghim, cua so Khay, vien quay + nut Dung (anh chua mo cai nao sau khi nap nen chua co cua so de do); app khac dang toan man hinh;
+may 2 man; anh chua noi bang loi la "thay roi"; Windows khong doi (nhanh `darwin` khong chay) nhung chua chay lai bai nao tren Windows.
+Chua tang so phien ban, chua day len GitHub.
 
 ## [ghi nhan, KHONG phai viec cua phien ghi] - 2026-10-08 09:54 - `src/khay-thu.js` dang duoc MOT PHIEN KHAC sua do (nut tron bam khong mo khay tren Windows) - may cong ty
 
