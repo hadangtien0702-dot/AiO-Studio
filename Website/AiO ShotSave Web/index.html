@@ -1203,6 +1203,100 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 .sb-goi.hien{opacity:1}
 @media (max-width:520px){.sb-dau .nut.an-nho{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* ===== Section CANVAS (12/10, app 0.10.0). Anh: "canvas là phần riêng, em hãy tạo cho nó một section mới".
+   Bảng CHÉP dáng src/canvas/index.html của app (bản mẫu nhap/canvas-miro.html anh đã duyệt): khung = thư mục có tai màu,
+   ảnh = tấm in viền trắng nằm nghiêng, rê chuột hiện 4 góc cam, ý tưởng chia ra từ nút tròn. Bảng luôn tối như trong app.
+   Mọi thứ trên bảng nằm trong một lớp có toạ độ thiết kế cố định (.cx-the), JS phóng theo bề rộng thật. Tên lớp có tiền tố cx-. */
+#canvas .sec-head{max-width:940px;margin-bottom:32px}
+#canvas .sec-head p{max-width:640px;margin-left:auto;margin-right:auto}
+#canvas .cx-rong{max-width:1320px}
+#canvas h2 em{font-style:normal;color:var(--brand)}
+.cx-buoc{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 10px;margin:22px 0 0;padding:0}
+.cx-buoc li{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--bg-soft);border:1px solid var(--line);font-weight:600;font-size:14.5px;line-height:1.3;color:var(--ink-2);text-align:left}
+.cx-buoc b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-ink);font-size:13px}
+.cx-bang{position:relative;overflow:hidden;aspect-ratio:1200/600;border-radius:var(--radius);background-color:#0c0c0d;background-image:radial-gradient(rgb(255 255 255/11%) 1.1px,transparent 1.1px);background-size:22px 22px;box-shadow:var(--shadow),0 0 0 1px rgb(255 255 255/7%);color:#f5f5f7;font-family:Inter,system-ui,sans-serif;user-select:none;-webkit-user-select:none}
+.cx-bang.hep{aspect-ratio:360/640;max-width:440px;margin-left:auto;margin-right:auto}
+.cx-the{position:absolute;left:0;top:0;width:1200px;height:600px;transform-origin:0 0}
+.cx-bang.hep .cx-the{width:360px;height:640px}
+.cx-k{position:absolute;border:1.5px solid color-mix(in srgb,var(--m) 55%,transparent);border-radius:4px 18px 18px 18px;background:color-mix(in srgb,var(--m) 7%,transparent);transition:background .2s,box-shadow .2s}
+.cx-k.vao{background:color-mix(in srgb,var(--m) 16%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--m) 35%,transparent)}
+.cx-tai{position:absolute;left:-1.5px;top:-33px;height:33px;display:flex;align-items:center;gap:6px;padding:0 10px 0 9px;border-radius:11px 14px 0 0;background:var(--m);color:#17120d}
+.cx-tai::after{content:"";position:absolute;right:-13px;bottom:0;width:14px;height:14px;background:radial-gradient(circle at 100% 0,transparent 13px,var(--m) 13.5px)}
+.cx-tai svg{flex:none}
+.cx-tai input,.cx-do{font:800 13px/1.3 Inter,system-ui,sans-serif;letter-spacing:0}
+.cx-tai input{width:96px;min-width:40px;margin:0;padding:1px 4px;border:1px solid transparent;border-radius:6px;background:transparent;color:#17120d;user-select:text;-webkit-user-select:text}
+.cx-tai input:hover{border-color:rgb(0 0 0/25%)}
+.cx-tai input:focus,.cx-tai.go input{outline:none;border-color:rgb(0 0 0/55%);background:rgb(255 255 255/35%)}
+.cx-do{position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;white-space:pre}
+.cx-tai b{flex:none;min-width:22px;height:20px;padding:0 6px;border-radius:10px;background:rgb(0 0 0/78%);color:#fff;font:700 11px/20px Inter,sans-serif;text-align:center;font-variant-numeric:tabular-nums}
+.cx-tai b.nay{animation:cx-nay .38s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cx-nay{40%{transform:scale(1.45)}}
+.cx-o{position:absolute;padding:6px 6px 20px;border-radius:4px;background:#f4f1ea;box-shadow:0 3px 10px rgb(0 0 0/45%);cursor:grab;touch-action:none;transform:rotate(var(--r,0deg));transition:transform .55s cubic-bezier(.2,.9,.25,1.12),opacity .3s,box-shadow .2s}
+.cx-o .a{position:relative;display:block;width:100%;height:100%;border-radius:2px;overflow:hidden;pointer-events:none}
+.cx-o .n{position:absolute;left:8px;right:44px;bottom:3px;overflow:hidden;font:600 12px/1.25 Noteworthy,"Segoe Print","Bradley Hand",Inter,cursive;color:#3a342b;white-space:nowrap;pointer-events:none}
+.cx-o .l{position:absolute;right:7px;bottom:5px;font:700 10px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#8a8275;pointer-events:none}
+.cx-o.vd{background:#16161a;padding-top:14px}
+.cx-o.vd::before{content:"";position:absolute;left:6px;right:6px;top:4px;height:6px;background:repeating-linear-gradient(90deg,#f4f1ea 0 7px,transparent 7px 14px);opacity:.75}
+.cx-o.vd .n{color:#f4f1ea}.cx-o.vd .l{color:#9a9aa3}
+.cx-o .phat{position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgb(0 0 0/62%);display:grid;place-items:center;color:#fff}
+.cx-o i.g{position:absolute;width:14px;height:14px;border:3px solid #F86820;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none}
+.cx-o i.g1{left:-7px;top:-7px;border-right:0;border-bottom:0;transform:translate(5px,5px)}
+.cx-o i.g2{right:-7px;top:-7px;border-left:0;border-bottom:0;transform:translate(-5px,5px)}
+.cx-o i.g3{left:-7px;bottom:-7px;border-right:0;border-top:0;transform:translate(5px,-5px)}
+.cx-o i.g4{right:-7px;bottom:-7px;border-left:0;border-top:0;transform:translate(-5px,-5px)}
+.cx-o.nang i.g{opacity:1;transform:none}
+.cx-o.nang{cursor:grabbing;transform:rotate(0deg) scale(1.06);box-shadow:0 18px 40px rgb(0 0 0/60%)}
+.cx-o.tudi{transition:left .7s cubic-bezier(.45,0,.2,1),top .7s cubic-bezier(.45,0,.2,1),transform .3s,box-shadow .2s}
+.cx-o.bay{transform:translate(var(--ix,0px),var(--iy,0px)) scale(.12) rotate(50deg);opacity:0}
+@media (hover:hover){.cx-o:hover i.g{opacity:1;transform:none}.cx-o:hover:not(.nang):not(.bay){transform:rotate(0deg) scale(1.03);box-shadow:0 10px 26px rgb(0 0 0/55%)}}
+.cx-bang.hep .cx-o{padding:4px 4px 18px}
+.cx-bang.hep .cx-o.vd{padding-top:11px}
+.cx-bang.hep .cx-o.vd::before{left:4px;right:4px;top:3px;height:5px}
+.cx-bang.hep .cx-o .n{left:6px;right:6px;font-size:11px}
+.cx-bang.hep .cx-o .l{display:none}
+.cx-bang.hep .cx-o .phat{width:24px;height:24px;margin:-12px 0 0 -12px}
+/* sáu "tấm ảnh" vẽ bằng CSS, dùng chung cho tấm in trên bảng và ô nhỏ trong cửa sổ thư mục */
+.cx-a1{background:radial-gradient(circle at 76% 36%,#F86820 0 13%,transparent 14%),linear-gradient(#2b2620,#2b2620) 14% 28%/40% 8% no-repeat,linear-gradient(#b9ae9d,#b9ae9d) 16% 52%/34% 6% no-repeat,linear-gradient(#b9ae9d,#b9ae9d) 20% 72%/48% 6% no-repeat,#fdf7e8}
+.cx-a2{background:#141414}
+.cx-a2 svg{position:absolute;left:50%;top:50%;width:38%;transform:translate(-50%,-50%);color:#F86820}
+.cx-a3{background:linear-gradient(90deg,#1f2a44 0 20%,#3f6fb5 20% 40%,#f2c48d 40% 60%,#F86820 60% 80%,#7a2e12 80%)}
+.cx-a4{background:radial-gradient(circle at 72% 30%,#fff4d6 0 6%,#ffb454 7% 10%,transparent 11%),linear-gradient(172deg,#17224a,#4a63c4 56%,#f1b58a)}
+.cx-a4::after,.cx-a6::after{content:"";position:absolute;left:-5%;right:-5%;bottom:0;height:42%;background:#2a1f3d;clip-path:polygon(0 100%,0 55%,15% 25%,30% 55%,45% 15%,60% 50%,75% 28%,90% 55%,100% 35%,100% 100%)}
+.cx-a5{background:linear-gradient(90deg,transparent calc(33.3% - 1px),rgb(255 255 255/38%) calc(33.3% - 1px) 33.3%,transparent 33.3% calc(66.6% - 1px),rgb(255 255 255/38%) calc(66.6% - 1px) 66.6%,transparent 66.6%),linear-gradient(0deg,transparent calc(33.3% - 1px),rgb(255 255 255/38%) calc(33.3% - 1px) 33.3%,transparent 33.3% calc(66.6% - 1px),rgb(255 255 255/38%) calc(66.6% - 1px) 66.6%,transparent 66.6%),linear-gradient(135deg,#3b4350,#262b33)}
+.cx-a5::after{content:"";position:absolute;inset:14%;border:1.5px solid #F86820;border-radius:2px}
+.cx-a6{background:radial-gradient(circle at 30% 34%,#fff4d6 0 6%,#ffb454 7% 11%,transparent 12%),linear-gradient(180deg,#27305a,#6a5bd0 68%,#f6b37e)}
+.cx-mini{flex:none;position:relative;width:20px;height:14px;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgb(0 0 0/14%)}
+.cx-mini.cx-a2{background:radial-gradient(circle,#F86820 0 26%,#141414 28%)}
+.cx-mini.cx-a5::after{border-width:1px}
+.cx-cs{position:absolute;display:flex;flex-direction:column;overflow:hidden;border-radius:10px;background:#fff;color:#2b2620;box-shadow:0 30px 60px -24px #000,0 0 0 1px rgb(255 255 255/8%)}
+.cx-cs .tb{flex:none;height:28px;display:flex;align-items:center;gap:6px;padding:0 10px;background:#f4f2f0;border-bottom:1px solid #ece6e0;font:600 11.5px/1 Inter,sans-serif;color:#5a524b;white-space:nowrap}
+.cx-cs .tb i{flex:none;width:8px;height:8px;border-radius:50%;background:#ddd4cb}
+.cx-cs .tb span{margin-left:4px;overflow:hidden;text-overflow:ellipsis}
+.cx-cay,.cx-cay ul{list-style:none;margin:0;padding:0}
+.cx-cay{padding:8px;overflow:hidden}
+.cx-cay>li+li{margin-top:4px}
+.cx-cay .h{display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;border-radius:7px;font:700 12.5px/1 Inter,sans-serif;transition:background .6s}
+.cx-cay .h.nhay{background:color-mix(in srgb,var(--m) 26%,#fff);transition:none}
+.cx-cay .h svg{flex:none;color:var(--m)}
+.cx-cay .h .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cx-cay .h em{flex:none;font-style:normal;font-weight:500;color:#6f665e;font-variant-numeric:tabular-nums}
+.cx-cay .f{display:flex;align-items:center;gap:8px;height:24px;padding:0 8px 0 30px;font:500 12px/1 Inter,sans-serif;color:#4f4740;white-space:nowrap}
+.cx-cay .f span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.cx-cay .f.moi{animation:cx-vao .5s ease}
+@keyframes cx-vao{from{opacity:0;transform:translateX(-8px)}}
+.cx-bang.hep .cx-cs .tb{height:26px}
+.cx-bang.hep .cx-cay{padding:6px}
+.cx-bang.hep .cx-cay .h{height:25px;gap:6px;padding:0 6px;font-size:12px}
+.cx-bang.hep .cx-cay .f{height:22px;gap:6px;padding:0 6px 0 26px;font-size:11.5px}
+.cx-ntr{position:absolute;border-radius:50%;background:radial-gradient(circle at 34% 28%,#3a3a42,#19191c 62%);box-shadow:0 6px 16px rgb(0 0 0/60%),0 0 0 2px rgb(248 104 32/75%);display:grid;place-items:center;color:#F86820}
+.cx-ntr b{position:absolute;right:-5px;top:-5px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#F86820;color:#fff;font:700 11px/22px Inter,sans-serif;text-align:center;box-shadow:0 0 0 2px #0c0c0d}
+.cx-cur{position:absolute;z-index:60;width:22px;height:22px;margin:-2px 0 0 -4px;opacity:0;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(0 0 0/55%));transition:left .6s cubic-bezier(.45,0,.2,1),top .6s cubic-bezier(.45,0,.2,1),opacity .25s}
+.cx-cur svg{display:block;width:100%;height:100%}
+.cx-duoi{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px;margin:16px 4px 0;color:var(--ink-3);font-size:14.5px;line-height:1.45}
+.cx-duoi p{margin:0}
+.cx-goi i{display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#35c46a;vertical-align:1px}
+@media (pointer:coarse){.cx-tai input,.cx-do{font-size:16px}}   /* iPhone tự phóng trang khi chạm ô nhập có chữ dưới 16 px */
+@media (prefers-reduced-motion:reduce){.cx-o,.cx-o.tudi,.cx-cur{transition:none}.cx-tai b.nay,.cx-cay .f.moi{animation:none}}
 </style>
 </head>
 <body>
@@ -1788,6 +1882,32 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
     </div>
   </section>
 
+  <!-- Section CANVAS (12/10, app 0.10.0). Anh: "canvas là phần riêng, em hãy tạo cho nó một section mới".
+       Bảng bên dưới là bản thu nhỏ CHẠY ĐƯỢC của Canvas trong app: khách tự kéo tấm in vào khung và sửa tên khung, cửa sổ
+       "Thư mục ảnh" đổi theo ngay. Lần đầu cuộn tới, bảng tự diễn một lượt (chia ảnh từ nút tròn → kéo một tấm vào khung → đổi tên
+       khung), khách chạm vào là phần tự diễn dừng. Chỉ ghi thứ có thật trong mã 0.10.0: khung = thư mục con cùng tên, hai chiều.
+       Dải Storyboard có trên bảng thật nhưng KHÔNG vẽ ở đây (trong 0.10.0 dải vào khung chưa vào thư mục). -->
+  <section class="sec" id="canvas">
+    <div class="wrap">
+      <div class="sec-head" data-hien>
+        <h2 data-i-html="cvTitle">Every <em>idea</em>, one board.</h2>
+        <p data-i="cvSub">Every screenshot, recording and storyboard strip you take lands on one wide board. Group them into frames, and each frame is a real folder with the same name.</p>
+        <ol class="cx-buoc">
+          <li><b>1</b><span data-i="cvS1">Drag a shot into a frame</span></li>
+          <li><b>2</b><span data-i="cvS2">The folder with that name gets it</span></li>
+          <li><b>3</b><span data-i="cvS3">Rename the frame, the folder follows</span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="wrap cx-rong">
+      <div class="cx-bang" id="cxBang" role="group" data-i-aria="cvAria" aria-label="A small working copy of the idea Canvas" data-hien style="--tre:120ms"><div class="cx-the" id="cxThe"></div></div>
+      <div class="cx-duoi" data-hien style="--tre:180ms">
+        <p class="cx-goi"><i></i><span data-i="cvGoi">Try it: drag a shot into a frame, or rename a frame.</span></p>
+        <p data-i="cvHai">It works both ways: make or rename a folder on disk and the board follows.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- Section CÀI ĐẶT (anh 23/09: "làm thêm animation và thông tin cho phần setting", tách section riêng để không che khay
        ở section Kéo to). Cửa sổ bên phải CHÉP ĐÚNG màn Cài đặt thật của app (src/settings: 4 thẻ, cỡ chữ + màu token thật),
        phim GSAP diễn đúng hành vi app: ghi phím (viền cam nhấp nháy → phím loé xanh), PNG làm mờ hàng Chất lượng,
@@ -1997,6 +2117,17 @@ Object.assign(T.en, { stTitle:"Set it once, forget it", stSub:"Every option live
   stP3:"Save where you want", stP3m:"Pick the folder, open it in one click.", stP4:"Vietnamese or English", stP4m:"Switch the language in one click.", stP5:"Your kind of blur", stP5m:"Pixel blocks or a smooth blur to hide private info." });
 Object.assign(T.vi, { priceWhat:"Chụp, quay, vẽ, ghim, kéo thả", aPay:"Số tiền bạn trả" });
 // 29/09 section Storyboard (app 0.7.8). Chữ theo i18n.js của app: "Khay Storyboard", "khung", phím S, quay 3 giây.
+/* 12/10 section Canvas (app 0.10.0): chữ của phần tiêu đề + dòng dưới bảng. Chữ TRÊN bảng có từ điển riêng (CV) trong khối script cuối trang. */
+Object.assign(T.en, { cvTitle:'Every <em>idea</em>, one board.',
+  cvSub:"Every screenshot, recording and storyboard strip you take lands on one wide board. Group them into frames, and each frame is a real folder with the same name.",
+  cvS1:"Drag a shot into a frame", cvS2:"The folder with that name gets it", cvS3:"Rename the frame, the folder follows",
+  cvGoi:"Try it: drag a shot into a frame, or rename a frame.", cvHai:"It works both ways: make or rename a folder on disk and the board follows.",
+  cvAria:"A small working copy of the idea Canvas" });
+Object.assign(T.vi, { cvTitle:'Mọi <em>ý tưởng</em>, một bảng.',
+  cvSub:"Mọi ảnh, video và dải Storyboard bạn chụp đều nằm trên một bảng rộng. Gom chúng vào khung, mỗi khung là một thư mục thật mang đúng tên đó.",
+  cvS1:"Kéo một tấm vào khung", cvS2:"Thư mục cùng tên nhận đúng tấm đó", cvS3:"Đổi tên khung, thư mục đổi theo",
+  cvGoi:"Thử ngay: kéo một tấm vào khung, hoặc sửa tên khung.", cvHai:"Hai chiều: tạo hay đổi tên thư mục trên máy, bảng cũng đổi theo.",
+  cvAria:"Bản thu nhỏ chạy được của Canvas ý tưởng" });
 Object.assign(T.vi, { sbTitle:"3 giây, 6 khung hình",
   sbSub:"Khoanh vùng đang chuyển động rồi bấm S. Shot & Save quay 3 giây thành 6 khung có đánh số trong một dải. Mọi dải nằm sẵn trong khay Storyboard, tắt app mở lại vẫn còn.",
   sbS1:"Khoanh vùng, bấm <kbd>S</kbd>", sbS2:"3 giây, 6 khung", sbS3:"Kéo cả dải thả vào Premiere Pro, Zalo hay Messenger" });
@@ -2029,6 +2160,7 @@ function setLang(l){
   if (window.ssKtRelang) window.ssKtRelang();
   if (window.ssKgRelang) window.ssKgRelang();
   if (window.ssSbRelang) window.ssSbRelang();
+  if (window.ssCvRelang) window.ssCvRelang();
   if (window.ssRapRelang) window.ssRapRelang();
 }
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
@@ -4924,6 +5056,224 @@ document.addEventListener("DOMContentLoaded", () => {
     document.fonts.ready.then(() => { giuCao(); dang = -1; khiCuon(); });   // font về thì chữ đổi bề rộng → đo lại chỗ giữ cho chú thích
   }
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", batDau); else batDau();
+})();
+</script>
+<script>
+/* ===== Section CANVAS (12/10, app 0.10.0) =====
+   Bản thu nhỏ CHẠY ĐƯỢC của Canvas trong app. Trạng thái nằm trong S (tấm nào thuộc khung nào, tên khung); cửa sổ "Thư mục ảnh"
+   luôn vẽ lại từ S nên không thể lệch với bảng. Toạ độ là toạ độ THIẾT KẾ (BO.rong 1200 x 600, BO.hep 360 x 640), lớp .cx-the
+   được phóng theo bề rộng thật; kéo thả đổi toạ độ chuột về toạ độ thiết kế bằng cách chia cho k.
+   Tấm thuộc khung nào = TÂM của tấm nằm trong khung đó (đúng cách app tính ở xepTheoViTri).
+   Không dùng GSAP: chuyển động là transition CSS như trong app, nên CDN hỏng section này vẫn chạy. */
+(() => {
+  const bang = document.getElementById("cxBang"), the = document.getElementById("cxThe");
+  if (!bang || !the) return;
+  const CV = {
+    vi: { tm: "Thư mục ảnh", muc: n => n + " mục", a: "Ý tưởng intro", b: "Tham khảo màu", b2: "Màu phim", anh: "ảnh", video: "video",
+      tenKhung: "Tên khung, cũng là tên thư mục", ten: ["Ý tưởng", "Logo", "Màu sắc", "Tham khảo", "Khung hình", "Cảnh quay"] },
+    en: { tm: "Shots folder", muc: n => n + (n === 1 ? " item" : " items"), a: "Intro ideas", b: "Color refs", b2: "Film look", anh: "shot", video: "video",
+      tenKhung: "Frame name, also the folder name", ten: ["Ideas", "Logo", "Colors", "Reference", "Framing", "Take 2"] }
+  };
+  const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = () => CV[LG()];
+  const MAU = { a: "#f86820", b: "#2dd4bf" }, IDS = ["a", "b"];
+  const BO = {
+    rong: { W: 1200, H: 600, pw: 150, ph: 116, k: { a: [40, 66, 370, 266], b: [40, 394, 370, 170] },
+      o: { a: [[60, 82], [232, 82], [60, 206], [232, 206]], b: [[60, 412], [232, 412]] },
+      roi: [[480, 56], [655, 150], [488, 296], [660, 400], [470, 440], [640, 30]], cs: [860, 50, 300, 292], nut: [1110, 512, 58] },
+    hep: { W: 360, H: 640, pw: 96, ph: 80, k: { a: [12, 40, 216, 188], b: [12, 270, 216, 100] },
+      o: { a: [[20, 50], [124, 50], [20, 138], [124, 138]], b: [[20, 280], [124, 280]] },
+      roi: [[250, 30], [256, 125], [248, 220], [254, 315], [250, 410], [252, 500]], cs: [12, 396, 228, 232], nut: [292, 574, 52] }
+  };
+  const GOC = [-4, 3, 2.5, -3.5, 4, -2.5], DUOI = [".png", ".png", ".png", ".png", ".png", ".mp4"];
+  const LOGO = '<svg viewBox="0 0 386 352" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>';
+  const DUONG_TM = '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+  const TM_DAC = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">' + DUONG_TM;
+  const TM_NET = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + DUONG_TM;
+  const PHAT = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+  const CON_TRO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  const tinh = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const S = { ten: { a: null, b: null }, doi: false, o: [0, 1, 2, 3, 4, 5].map(i => ({ i, k: i < 2 ? "a" : i === 2 ? "b" : null, t: i, x: 0, y: 0, el: null })) };
+  let mode = "", k = 1, z = 10, thu = 10, phien = 0, tuDien = true, daVao = false, dangGo = null;
+  const tao = (cls, html) => { const e = document.createElement("div"); e.className = cls; if (html != null) e.innerHTML = html; the.append(e); return e; };
+  const tenK = id => S.ten[id] != null ? S.ten[id] : (id === "b" && S.doi ? L().b2 : L()[id]);
+  const cuaKhung = id => S.o.filter(o => o.k === id).sort((p, q) => p.t - q.t);
+
+  const K = {};
+  IDS.forEach(id => {
+    const e = tao("cx-k", '<div class="cx-tai">' + TM_NET + '<input type="text" maxlength="22" spellcheck="false" autocomplete="off"><b>0</b></div>');
+    e.style.setProperty("--m", MAU[id]);
+    const inp = e.querySelector("input");
+    inp.addEventListener("focus", () => { tuDien = false; huyDien(); });
+    inp.addEventListener("input", () => { S.ten[id] = inp.value; rongO(id); tenCay(id); });
+    inp.addEventListener("blur", () => {
+      const v = inp.value.trim();
+      S.ten[id] = v || null; inp.value = tenK(id); rongO(id); tenCay(id);
+    });
+    inp.addEventListener("keydown", ev => { if (ev.key === "Enter") inp.blur(); });
+    K[id] = { e, inp, tai: e.querySelector(".cx-tai"), dem: e.querySelector("b"), cayT: null, cayH: null };
+  });
+  const doEl = tao("cx-do");
+  S.o.forEach(o => {
+    const vd = o.i === 5;
+    const e = tao("cx-o" + (vd ? " vd" : ""), '<span class="a cx-a' + (o.i + 1) + '">' + (o.i === 1 ? LOGO : "") + (vd ? '<span class="phat">' + PHAT + "</span>" : "") +
+      '</span><span class="n"></span><span class="l"></span><i class="g g1"></i><i class="g g2"></i><i class="g g3"></i><i class="g g4"></i>');
+    e.style.setProperty("--r", GOC[o.i] + "deg"); e.style.zIndex = 2;
+    e.addEventListener("pointerdown", ev => nam(ev, o));
+    o.el = e;
+  });
+  const cs = tao("cx-cs", '<div class="tb"><i></i><i></i><i></i><span></span></div><ul class="cx-cay"></ul>');
+  cs.style.zIndex = 8;
+  const cay = cs.querySelector(".cx-cay"), csTen = cs.querySelector(".tb span");
+  const nut = tao("cx-ntr", LOGO + "<b>6</b>");
+  nut.style.zIndex = 9; nut.setAttribute("aria-hidden", "true");
+  const cur = tao("cx-cur", CON_TRO);
+  cur.setAttribute("aria-hidden", "true");
+
+  function dat(o) { o.el.style.left = o.x + "px"; o.el.style.top = o.y + "px"; }
+  function sang(id) { IDS.forEach(q => K[q].e.classList.toggle("vao", q === id)); }
+  function khungTai(o) {
+    const B = BO[mode], cx = o.x + B.pw / 2, cy = o.y + B.ph / 2;
+    return IDS.find(id => { const r = B.k[id]; return cx >= r[0] && cx <= r[0] + r[2] && cy >= r[1] && cy <= r[1] + r[3]; }) || null;
+  }
+  function rongO(id) {
+    const inp = K[id].inp;
+    doEl.textContent = inp.value || " ";
+    inp.style.width = Math.max(40, Math.min(BO[mode].k[id][2] - 84, Math.ceil(doEl.offsetWidth) + 12)) + "px";
+  }
+  function tenCay(id) { if (K[id].cayT) K[id].cayT.textContent = K[id].inp.value; }
+  function veCay(moi) {
+    cay.textContent = "";
+    IDS.forEach(id => {
+      const ds = cuaKhung(id), li = document.createElement("li");
+      li.style.setProperty("--m", MAU[id]);
+      li.innerHTML = '<div class="h">' + TM_DAC + '<span class="t"></span><em></em></div><ul></ul>';
+      li.querySelector(".t").textContent = K[id].inp.value; li.querySelector("em").textContent = L().muc(ds.length);
+      const ul = li.querySelector("ul");
+      ds.forEach(o => {
+        const f = document.createElement("li"); f.className = "f" + (o === moi ? " moi" : "");
+        f.innerHTML = '<i class="cx-mini cx-a' + (o.i + 1) + '"></i><span></span>';
+        f.querySelector("span").textContent = L().ten[o.i] + DUOI[o.i]; ul.append(f);
+      });
+      cay.append(li); K[id].cayT = li.querySelector(".t"); K[id].cayH = li.querySelector(".h"); K[id].dem.textContent = ds.length;
+    });
+  }
+  function nhay(id) {
+    const b = K[id].dem, h = K[id].cayH;
+    b.classList.remove("nay"); void b.offsetWidth; b.classList.add("nay");
+    h.classList.add("nhay"); setTimeout(() => h.classList.remove("nhay"), 80);
+  }
+  function doiKhung(o, id) {
+    if (o.k === id) return;
+    o.k = id; o.t = ++thu; veCay(id ? o : null);
+    if (id) nhay(id);
+  }
+  function veChu() {
+    S.o.forEach(o => { o.el.querySelector(".n").textContent = L().ten[o.i]; o.el.querySelector(".l").textContent = o.i === 5 ? L().video : L().anh; });
+    csTen.textContent = L().tm;
+    IDS.forEach(id => { K[id].inp.value = tenK(id); K[id].inp.setAttribute("aria-label", L().tenKhung); if (mode) rongO(id); });
+    veCay();
+  }
+  function xep() {
+    const B = BO[mode], roi = S.o.filter(o => !o.k).sort((p, q) => p.t - q.t);
+    IDS.forEach(id => cuaKhung(id).forEach((o, j) => { const p = B.o[id][Math.min(j, B.o[id].length - 1)]; o.x = p[0]; o.y = p[1]; dat(o); }));
+    roi.forEach((o, j) => { const p = B.roi[Math.min(j, B.roi.length - 1)]; o.x = p[0]; o.y = p[1]; dat(o); });
+  }
+  function boTri() {
+    const B = BO[mode];
+    IDS.forEach(id => { const r = B.k[id], s = K[id].e.style; s.left = r[0] + "px"; s.top = r[1] + "px"; s.width = r[2] + "px"; s.height = r[3] + "px"; });
+    S.o.forEach(o => { o.el.style.width = B.pw + "px"; o.el.style.height = B.ph + "px"; });
+    cs.style.cssText += ";left:" + B.cs[0] + "px;top:" + B.cs[1] + "px;width:" + B.cs[2] + "px;height:" + B.cs[3] + "px";
+    nut.style.cssText += ";left:" + B.nut[0] + "px;top:" + B.nut[1] + "px;width:" + B.nut[2] + "px;height:" + B.nut[2] + "px";
+    nut.querySelector("svg").style.width = Math.round(B.nut[2] * .42) + "px";
+    xep(); IDS.forEach(rongO);
+  }
+  function co() {
+    // dưới 1000 px bố cục rộng bị thu còn dưới 0,8 lần, chữ nhỏ nhất tụt dưới 8 px (đo 12/10 ở 912 px: 7,1 px) nên chuyển sang bố cục dọc
+    const m = bang.parentElement.clientWidth < 1000 ? "hep" : "rong";
+    if (m !== mode) { if (mode) huyDien(); mode = m; bang.classList.toggle("hep", m === "hep"); boTri(); }
+    k = bang.clientWidth / BO[mode].W; the.style.transform = "scale(" + k + ")";
+  }
+
+  /* khách nắm một tấm */
+  function nam(ev, o) {
+    if (ev.button) return;
+    tuDien = false; huyDien(); ev.preventDefault();
+    if (document.activeElement && document.activeElement.closest && document.activeElement.closest(".cx-tai")) document.activeElement.blur();
+    const e = o.el, B = BO[mode], r0 = bang.getBoundingClientRect();
+    const dx = (ev.clientX - r0.left) / k - o.x, dy = (ev.clientY - r0.top) / k - o.y;
+    e.classList.add("nang"); e.style.zIndex = ++z;
+    try { e.setPointerCapture(ev.pointerId); } catch (x) {}
+    const di = m => {
+      const r = bang.getBoundingClientRect();
+      o.x = Math.max(0, Math.min(B.W - B.pw, (m.clientX - r.left) / k - dx)); o.y = Math.max(0, Math.min(B.H - B.ph, (m.clientY - r.top) / k - dy));
+      dat(o); sang(khungTai(o));
+    };
+    const tha = () => {
+      e.removeEventListener("pointermove", di); e.removeEventListener("pointerup", tha); e.removeEventListener("pointercancel", tha);
+      e.classList.remove("nang"); sang(null); doiKhung(o, khungTai(o));
+    };
+    e.addEventListener("pointermove", di); e.addEventListener("pointerup", tha); e.addEventListener("pointercancel", tha);
+  }
+
+  /* phần tự diễn: dừng ở đâu thì chốt trạng thái đúng ở đó (tấm đang bay thuộc khung nó đang nằm, tên đang gõ dở được giữ) */
+  function huyDien() {
+    phien++; cur.style.opacity = 0; cur.style.transitionDuration = ""; sang(null);
+    S.o.forEach(o => { o.el.classList.remove("nang", "tudi", "bay"); if (mode) doiKhung(o, khungTai(o)); });
+    if (dangGo) {
+      const id = dangGo; dangGo = null; K[id].tai.classList.remove("go");
+      const v = K[id].inp.value.trim(); S.ten[id] = v || null; K[id].inp.value = tenK(id); rongO(id); tenCay(id);
+    }
+  }
+  const cho = ms => new Promise(r => setTimeout(r, ms));
+  function conTroToi(x, y) { cur.style.left = x + "px"; cur.style.top = y + "px"; }
+  function datTen(id, s) { K[id].inp.value = s; rongO(id); tenCay(id); }
+  async function dienThu() {
+    const o = S.o[3];
+    if (!tuDien || o.k) return;
+    const p = ++phien, con = () => p === phien, B = BO[mode];
+    cur.style.transition = "none"; conTroToi(B.nut[0] + B.nut[2] / 2, B.nut[1] + B.nut[2] / 2); void cur.offsetWidth; cur.style.transition = ""; cur.style.opacity = 1;
+    await cho(80); if (!con()) return;
+    conTroToi(o.x + B.pw * .5, o.y + B.ph * .55);
+    await cho(720); if (!con()) return;
+    o.el.classList.add("nang", "tudi"); o.el.style.zIndex = ++z;
+    await cho(200); if (!con()) return;
+    const cho2 = B.o.a[Math.min(cuaKhung("a").length, B.o.a.length - 1)];
+    o.x = cho2[0]; o.y = cho2[1]; dat(o); sang("a");
+    cur.style.transitionDuration = ".7s"; conTroToi(o.x + B.pw * .5, o.y + B.ph * .55);
+    await cho(800); if (!con()) return;
+    cur.style.transitionDuration = ""; o.el.classList.remove("nang"); sang(null); doiKhung(o, "a");
+    await cho(320); if (!con()) return;
+    o.el.classList.remove("tudi");
+    await cho(520); if (!con()) return;
+    conTroToi(B.k.b[0] + 56, B.k.b[1] - 14);
+    await cho(740); if (!con()) return;
+    dangGo = "b"; K.b.tai.classList.add("go");
+    let s = K.b.inp.value;
+    while (s.length) { s = s.slice(0, -1); datTen("b", s); await cho(26); if (!con()) return; }
+    for (const c of L().b2) { s += c; datTen("b", s); await cho(75); if (!con()) return; }
+    dangGo = null; K.b.tai.classList.remove("go"); S.doi = true;
+    await cho(520); if (!con()) return;
+    cur.style.opacity = 0;
+  }
+  function vao() {
+    if (daVao) return;
+    daVao = true;
+    S.o.forEach((o, j) => setTimeout(() => o.el.classList.remove("bay"), 140 + j * 80));
+    setTimeout(dienThu, 140 + 6 * 80 + 950);
+  }
+
+  veChu(); co();
+  if (window.ResizeObserver) new ResizeObserver(co).observe(bang.parentElement); else addEventListener("resize", co);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => IDS.forEach(rongO));
+  if (!tinh && "IntersectionObserver" in window) {
+    const B = BO[mode], nx = B.nut[0] + B.nut[2] / 2, ny = B.nut[1] + B.nut[2] / 2;
+    S.o.forEach(o => { o.el.style.setProperty("--ix", (nx - o.x - B.pw / 2) + "px"); o.el.style.setProperty("--iy", (ny - o.y - B.ph / 2) + "px"); o.el.classList.add("bay"); });
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); vao(); } }, { threshold: .35 });
+    io.observe(bang);
+  } else { daVao = true; tuDien = false; }
+  window.ssCvRelang = () => { huyDien(); veChu(); };
+  // chỉ để đo
+  window.ssCv = { S, BO, mode: () => mode, k: () => k, vao, dienThu, huyDien };
 })();
 </script>
 </body>
