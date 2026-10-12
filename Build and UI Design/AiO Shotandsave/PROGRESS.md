@@ -295,8 +295,15 @@ nut ve dung cho da keo. Bam khong keo (nhich duoi 5 px) van mo khay nhu cu. Khay
 - DOI CHUNG `AIO_KEO_NUT=0 npm run test:khaynut`: 2 muc KEO + muc "thu lai" TRUOT (nut dung yen 1514,814), muc bam van DAT -> bai do bat duoc khi keo hong.
 - Nap tai cho 11:46:53: `boot v0.9.1`, `app.asar` md5 `83324376`, CDHash khong doi, quyen Ghi man hinh con, 16 anh/video + cau hinh giong truoc.
   Ruot cu: `.../ban-cai-truoc/shotandsave-ruot-20261012-114651/`.
-**CHUA kiem.** Chuot THAT tren man that (em khong keo duoc chuot tren Mac cua anh): keo co muot khong, tha ra co mo nham khay khong, nut x co bi bam
-nham khong; may 2 man (nut bi kep trong man no dang nam, chua cho keo sang man khac); Windows chua bat. Chua tang so phien ban, chua day len GitHub.
+**Chuot THAT cua anh 11:55:02 - 11:55:35** (anh: *"anh keo thu roi em, do lai di"*), doc tu run-log + cau-hinh.json + may chu cua so macOS:
+- 15 luot keo-tha, 0 dong `LOI` / `CANH BAO`. Khong luot tha nao lam khay mo nham: lan `khay bung (bam nut)` duy nhat (11:55:32.873, chay 741 ms) bat dau
+  ~3,5 giay SAU luot tha gan nhat (11:55:28.611) = anh chu dong bam.
+- Kep mep: luot dau tha o `1597,998`, ti le doc = 1 = dung mep duoi cho phep (30 + 1034 - 52 - 14 = 998).
+- Chuyen dong bay tu dung cho nut: luot bung do ghi `xa 76` = dung khoang cach tam nut (1605,986) -> tam khay (1529,994).
+- Nho vi tri: 3 lan do lien 11:55:40-42, cua so nut that o `1625,879` = dung o tinh tu `viTriNut {0.949182, 0.889937}` trong cau-hinh.json = dong run-log cuoi.
+  Nut van nam o 7/7 desktop.
+**CHUA kiem.** Do muot luc keo (khong co thuoc, cho loi anh); mo lai app nut co ve dung cho da keo khong (chua tat mo app sau khi keo); may 2 man (nut bi kep
+trong man no dang nam, chua cho keo sang man khac); Windows chua bat. Chua tang so phien ban, chua day len GitHub.
 
 ## [0.9.1 sua, nap tai cho] - 2026-10-12 11:34 - Mac: khay / nut tron / anh ghim chi nam o MOT desktop, sang desktop khac khong thay - may Mac
 
