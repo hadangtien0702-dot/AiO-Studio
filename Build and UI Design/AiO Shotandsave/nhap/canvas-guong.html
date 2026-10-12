@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shot &amp; Save · Canvas gương thư mục (nháp 1)</title>
+<!-- NHAP 12/10/2026. Anh Tien: "Canvas hinh anh thu thap va group o canvas, folder se group theo va dat ten y chang",
+     "canvas giong mirror - mot canvas tong hop y tuong", "tat ca hinh anh chup - video - story se duoc mo trong canvas",
+     chon: khoi nhom tu xep luoi + dong bo HAI chieu. Ban thu bam duoc de DUYET HUONG, KHONG phai ma cua app, khong dung file that.
+     Thu: keo mot o sang nhom khac · bam ten nhom de doi ten · "Nhom moi" · o cot phai bam ten thu muc de doi ten (gia lap Finder). -->
+<style>
+@font-face{font-family:Inter;src:url(../assets/fonts/Inter.woff2) format("woff2");font-weight:100 900}
+:root{--bg0:#0e0e0e;--bg2:#181818;--bg3:#1f1f1f;--bg4:#282828;--bg5:#333;--line:rgba(255,255,255,.09);--t1:#f5f5f7;--t2:#c3c3c8;--t3:#8d8d95;--cam:#f86820}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg0);color:var(--t1);font:13px/1.45 Inter,system-ui,sans-serif}
+button,input{font-family:inherit;font-size:inherit;color:inherit}
+.cs{display:flex;flex-direction:column;height:100%;max-width:1280px;margin:0 auto;background:var(--bg2);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.dau{height:46px;flex:none;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--line)}
+.dau b{font-size:13px;font-weight:700}
+.dau .dem{color:var(--t3)}
+.dau .gian{flex:1}
+.nut{height:28px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg4);cursor:pointer}
+.nut:hover{background:var(--bg5)}
+.nut.chinh{background:var(--cam);border-color:transparent;color:#fff;font-weight:700}
+.bao{flex:none;padding:8px 16px;background:var(--bg3);color:var(--t3);border-bottom:1px solid var(--line)}
+.than{flex:1;display:flex;min-height:0}
+.canvas{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.khoi{border:1px solid var(--line);border-radius:12px;background:var(--bg3);padding:12px}
+.khoi.moi{border-style:dashed;background:transparent}
+.khoi.vao{border-color:var(--cam)}
+.khoi h3{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin-bottom:10px}
+.khoi h3 input{background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 6px;margin-left:-7px;font-weight:700;min-width:60px;width:240px;max-width:60%}
+.khoi h3 input:hover{border-color:var(--line)}
+.khoi h3 input:focus{outline:none;border-color:var(--cam);background:var(--bg2)}
+.khoi h3 span{color:var(--t3);font-weight:400}
+.luoi{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;min-height:40px}
+.o{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;cursor:grab;border:1px solid var(--line)}
+.o:active{cursor:grabbing}
+.o.dai{grid-column:span 2;aspect-ratio:8/3;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:2px;background:var(--bg0)}
+.o.dai i{border-radius:3px}
+.o .nhan{position:absolute;left:6px;bottom:5px;font-size:11px;color:#fff;background:rgba(0,0,0,.55);padding:1px 6px;border-radius:6px}
+.o .phat{position:absolute;inset:0;margin:auto;width:26px;height:26px;border-radius:13px;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+.trong{color:var(--t3);padding:10px 0}
+.cay{width:270px;flex:none;border-left:1px solid var(--line);padding:16px;overflow:auto}
+.cay h4{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.hang{display:flex;align-items:center;gap:8px;height:30px;border-bottom:1px solid var(--line)}
+.hang.con{padding-left:18px}
+.hang input{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 5px}
+.hang input:hover{border-color:var(--line)}
+.hang input:focus{outline:none;border-color:var(--cam);background:var(--bg3)}
+.hang span{color:var(--t3);flex:none}
+.hang svg{flex:none;color:var(--t3)}
+.ghi{color:var(--t3);margin-top:12px}
+.cay .nut{margin-top:12px;width:100%}
+@media(max-width:760px){.than{flex-direction:column}.cay{width:auto;border-left:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="cs">
+  <div class="dau"><b>Canvas</b><span class="dem" id="dem"></span><span class="gian"></span><button class="nut chinh" id="them">Nhóm mới</button></div>
+  <div class="bao">Bản nháp để duyệt hướng, chưa phải app, không đụng file thật. Kéo một ô sang nhóm khác, bấm tên nhóm để đổi tên, rồi nhìn cột bên phải đổi theo. Đổi tên ở cột phải thì canvas cũng đổi theo.</div>
+  <div class="than">
+    <div class="canvas" id="canvas"></div>
+    <div class="cay">
+      <h4>Thư mục trên máy</h4>
+      <div id="cay"></div>
+      <button class="nut" id="themTM">Tạo thư mục trong Finder (giả lập)</button>
+      <p class="ghi">Canvas là tấm gương của thư mục này: mỗi nhóm là một thư mục con cùng tên, ảnh chưa xếp nằm ở thư mục gốc.</p>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const MAU = ["#7a4a2b", "#2b5876", "#614385", "#134e5e", "#8e2d4f", "#3f7a63", "#5a4d7a", "#b7791f"];
+  let dem = 0;
+  const muc = (kieu, ten) => ({ id: ++dem, kieu, ten, mau: MAU[dem % MAU.length] });
+  // nhom[0] luon la thu muc goc = "Moi chup, chua xep nhom"
+  const nhom = [
+    { id: "goc", ten: "", muc: [muc("anh", "11:54"), muc("anh", "11:38"), muc("video", "0:12"), muc("anh", "Hôm qua")] },
+    { id: "n1", ten: "Tham khảo màu", muc: [muc("anh", "07/10"), muc("anh", "07/10"), muc("anh", "06/10")] },
+    { id: "n2", ten: "Brief khách Thinksmart", muc: [muc("anh", "04/10"), muc("dai", "Storyboard 04"), muc("video", "0:48"), muc("anh", "02/10")] },
+    { id: "n3", ten: "Bố cục thumbnail", muc: [muc("anh", "30/09"), muc("anh", "29/09")] },
+  ];
+  const canvas = document.getElementById("canvas"), cay = document.getElementById("cay");
+  const TM = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+  const PHAT = '<span class="phat"><svg width="11" height="11" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg></span>';
+  const tenHopLe = (s, bo) => { s = String(s || "").replace(/[\\/:*?"<>|]/g, "").trim().slice(0, 60); if (!s) return null; return nhom.some(n => n !== bo && n.ten.toLowerCase() === s.toLowerCase()) ? null : s; };
+  const dem1 = n => { const a = n.muc.filter(m => m.kieu === "anh").length, v = n.muc.filter(m => m.kieu === "video").length, d = n.muc.filter(m => m.kieu === "dai").length; return [a && a + " ảnh", v && v + " video", d && d + " dải"].filter(Boolean).join(" · ") || "trống"; };
+  function oHtml(m) {
+    if (m.kieu === "dai") return '<div class="o dai" draggable="true" data-id="' + m.id + '">' + MAU.slice(0, 6).map(c => '<i style="background:' + c + '"></i>').join("") + '<span class="nhan">' + m.ten + "</span></div>";
+    return '<div class="o" draggable="true" data-id="' + m.id + '" style="background:' + m.mau + '">' + (m.kieu === "video" ? PHAT : "") + '<span class="nhan">' + m.ten + "</span></div>";
+  }
+  function ve() {
+    canvas.innerHTML = nhom.map((n, i) => '<section class="khoi' + (i ? "" : " moi") + '" data-n="' + n.id + '"><h3>' + (i ? '<input value="' + n.ten.replace(/"/g, "&quot;") + '" aria-label="Tên nhóm" data-ten="' + n.id + '" style="width:' + Math.min(360, Math.max(70, Math.round(n.ten.length * 8.2 + 22))) + 'px">' : "Mới chụp, chưa xếp nhóm") + "<span>" + dem1(n) + '</span></h3><div class="luoi">' + (n.muc.map(oHtml).join("") || '<p class="trong">Kéo ảnh vào đây</p>') + "</div></section>").join("");
+    cay.innerHTML = '<div class="hang">' + TM + "<input value=\"shotandsave\" disabled><span>" + nhom[0].muc.length + "</span></div>" + nhom.slice(1).map(n => '<div class="hang con">' + TM + '<input value="' + n.ten.replace(/"/g, "&quot;") + '" aria-label="Tên thư mục" data-ten="' + n.id + '"><span>' + n.muc.length + "</span></div>").join("");
+    document.getElementById("dem").textContent = nhom.reduce((s, n) => s + n.muc.length, 0) + " mục · " + (nhom.length - 1) + " nhóm";
+  }
+  // doi ten o BEN NAO thi ben kia doi theo (cung mot trang thai) = guong hai chieu
+  document.addEventListener("change", e => {
+    const id = e.target.dataset && e.target.dataset.ten; if (!id) return;
+    const n = nhom.find(x => x.id === id), moi = tenHopLe(e.target.value, n);
+    if (moi) n.ten = moi;
+    ve();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.dataset && e.target.dataset.ten) e.target.blur(); });
+  const them = () => { let k = 1, ten; do { ten = "Nhóm mới" + (k > 1 ? " " + k : ""); k++; } while (!tenHopLe(ten)); nhom.push({ id: "n" + Date.now(), ten, muc: [] }); ve(); };
+  document.getElementById("them").addEventListener("click", () => { them(); const o = canvas.querySelector("section:last-child input"); if (o) { o.focus(); o.select(); } });
+  document.getElementById("themTM").addEventListener("click", them);
+  let dangKeo = null;
+  canvas.addEventListener("dragstart", e => { const o = e.target.closest(".o"); if (!o) return; dangKeo = Number(o.dataset.id); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(dangKeo)); });
+  canvas.addEventListener("dragover", e => { const k = e.target.closest(".khoi"); if (!k || dangKeo == null) return; e.preventDefault(); canvas.querySelectorAll(".khoi.vao").forEach(x => x !== k && x.classList.remove("vao")); k.classList.add("vao"); });
+  canvas.addEventListener("dragleave", e => { const k = e.target.closest(".khoi"); if (k && !k.contains(e.relatedTarget)) k.classList.remove("vao"); });
+  canvas.addEventListener("drop", e => {
+    const k = e.target.closest(".khoi"); if (!k || dangKeo == null) return; e.preventDefault();
+    const dich = nhom.find(n => n.id === k.dataset.n), nguon = nhom.find(n => n.muc.some(m => m.id === dangKeo));
+    if (dich && nguon && dich !== nguon) { const i = nguon.muc.findIndex(m => m.id === dangKeo); dich.muc.unshift(nguon.muc.splice(i, 1)[0]); }
+    dangKeo = null; ve();
+  });
+  canvas.addEventListener("dragend", () => { dangKeo = null; canvas.querySelectorAll(".khoi.vao").forEach(x => x.classList.remove("vao")); });
+  window.__cv = { nhom, ve, them }; // cho bai chup / do
+  ve();
+})();
+</script>
+</body>
+</html>

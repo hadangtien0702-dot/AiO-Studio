@@ -70,6 +70,23 @@ ve tinh nang ma chua bo cai nao co · (2) TIM LAI Y TUONG (o tim trong khay, xem
 that o may cong ty) · (4) hut mau + bang 5 mau · (5) mot khay 3 the. Viec nho con treo cua hom nay: khung chup khi app khac dang toan
 man hinh tren Mac (overlay chua khai di theo moi desktop).
 
+### 0f. CANVAS GUONG THU MUC (anh neu 12/10/2026 12:4x, y MOI cua anh, de len thu tu o 0e) — moi co BAN NHAP, cho anh duyet huong
+Anh (go trong bang hoi, nguyen van): *"Canvas hinh anh thu thap va group o canvas folder se group theo va dat ten y chang"* ·
+*"canvas giong mirror - mot canvas tong hop y tuong"* · *"tat ca hinh anh chup - video - story se duoc mo trong canvas"*.
+Anh CHON trong bang hoi: kieu **khoi nhom tu xep luoi** (khong phai bang tu do nhu Figma) · dong bo **HAI chieu** (sua o canvas hay sua
+thu muc trong Finder thi ben kia doi theo).
+Claude hieu: mot man Canvas bay MOI thu da thu thap (anh + video + dai Storyboard); moi nhom tren canvas = mot thu muc con cung ten trong
+thu muc anh; thu chua xep nam o thu muc goc ("Moi chup, chua xep nhom"). Day cung la huong "mot khay 3 the" (0b / 0c) duoi dang khac.
+**Ban nhap bam duoc (KHONG phai ma app, khong dung file that): `nhap/canvas-guong.html`** — keo o giua cac nhom, doi ten nhom, doi ten o cot
+"Thu muc tren may" (gia lap Finder), tao nhom / thu muc. Do 12/10 bang Chrome chay ngam: keo 1 o -> so dem hai ben doi (4/3 -> 3/4); doi ten o
+canvas -> cot thu muc doi; doi ten o cot thu muc -> canvas doi; ten trung bi tu choi; 0 loi console; khong tran ngang o 1280 va 700 px.
+**CHUA chot (anh tra loi sang y khac o cau nay):** keo vao nhom thi file tren dia xu ly the nao. "Guong hai chieu" dung nghia = CHUYEN han
+file vao thu muc con. He qua phai noi truoc: (1) anh da keo vao Premiere / Photoshop truoc do se bao mat file (so loi #18, bai 5bi);
+(2) video va dai Storyboard co SO rieng (`kho-video.js` danh-sach, so dai) ghi duong dan -> chuyen file phai sua so cung luc, khong thi
+"video bien khoi khay" (so loi #16); (3) phai theo doi thu muc (nguoi dung doi ten / xoa / them trong Finder luc app dang mo va luc app tat).
+**Viec phai co truoc khi viet ma that (chua lam):** khao sat app cung loai (Eagle, PureRef, Milanote...) theo luat 2d · chot cau "chuyen file
+hay ban noi" · chot Canvas la cua so moi hay thay cua so Khay hien co · ban Windows.
+
 ### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
 > 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
 > Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.
