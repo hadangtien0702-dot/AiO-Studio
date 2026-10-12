@@ -283,6 +283,10 @@ DUNG go):
   Dung vao cach xep (`dongBo` muc 3) -> chay lai khoi "800 anh" cua `test:canvas`: bo 6 anh KHONG thay loi khung de nhau.
   Xong ban dau = `npm run test:canvas` 30 muc + `npm run test:canvasapp` 14 muc (app that, cua so an). CHUA dat: anh chua dung that; Windows chua chay;
   chua theo doi thu muc tuc thoi; chua co ghi chu dan, xoa khung, keo ra app khac; 778 anh o may cong ty chua do.
+  TREN WEB (12/10, anh: "canvas la phan rieng", "tao cho no mot section moi"): Canvas co SECTION RIENG `#canvas` trong `Website/AiO ShotSave Web/index.html`,
+  KHONG nam trong rap 17 tinh nang. Bang tren web la ban thu nho chay duoc (khach keo tam vao khung, sua ten khung, cua so "Thu muc anh" doi theo), dang
+  chep tu `src/canvas/index.html`. Doi dang / hanh vi Canvas trong app thi sua ca section do. Web chi ve anh + video (dai Storyboard vao khung chua vao
+  thu muc). Chua bo cai nao co Canvas trong khi web da gioi thieu. Nhat ky: `PROGRESS.md` goc repo, muc [web] 12/10 15:01.
 - **NUT TRON KEO DUOC (12/10, chi macOS).** Nguoi xai: giu chuot tren nut tron roi keo, tha ra nut nam lai cho do va nho qua cac lan mo app; bam khong
   keo van mo khay. Builder: vi tri luu dang ti le `viTriNut { rx, ry }` trong `cau-hinh.json`; MOI cho tinh o nut phai goi `oTronNut(wa, viTri())` (thu,
   bung, damBaoNut) — them cho moi ma quen `viTri()` la khay bay ve goc cu trong khi nut nam cho khac. Keo = cong TONG do lech vao o luc bat dau, khong

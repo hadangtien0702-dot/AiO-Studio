@@ -5,6 +5,33 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-10-12 15:01 (UTC+7) - Web Shot & Save: SECTION RIÊNG cho Canvas ý tưởng (`#canvas`), đã LIVE - máy Mac
+
+- **Anh yêu cầu:** *"ok rồi thêm vào website và build đi em"* (sau khi duyệt bản mẫu Canvas), rồi *"gửi link web mới"*. Em định thêm thành cảnh thứ 18
+  của rạp tính năng; anh chặn giữa chừng: *"canvas là phần riêng"*, *"em hãy tạo cho nó một section mới"*. Chưa sửa gì vào rạp nên không phải gỡ.
+- **Đã thêm vào `Website/AiO ShotSave Web/index.html`** (+350 dòng, rạp 17 cảnh giữ nguyên): section `#canvas` nằm giữa Storyboard và Cài đặt.
+  Tiêu đề lấy đúng chữ của app (`cv.tieu`): "Mọi ý tưởng, một bảng." + 3 bước. Bên dưới là bảng tối rộng tới 1.256 px (rộng hơn khổ 1.088 px của các
+  section khác), là bản thu nhỏ CHẠY ĐƯỢC của Canvas: 2 khung có tai thư mục màu, 6 tấm in vẽ bằng CSS (5 ảnh + 1 video), cửa sổ "Thư mục ảnh", nút tròn.
+  Khách tự kéo tấm vào / ra khung và gõ sửa tên khung; cửa sổ thư mục vẽ lại từ cùng một trạng thái nên luôn khớp. Lần đầu cuộn tới, bảng tự diễn một
+  lượt (chia ảnh từ nút tròn, con trỏ kéo một tấm vào khung, gõ đổi tên khung thứ hai); khách nắm tấm hoặc bấm ô tên là phần tự diễn dừng và chốt đúng
+  trạng thái đang có. Hai bố cục: rộng 1200 x 600 (khổ chứa từ 1000 px) và dọc 360 x 640 (điện thoại, tablet; tối đa 440 px, nằm giữa).
+  Không dùng GSAP (transition CSS như trong app), nên CDN hỏng section vẫn chạy. Chữ EN + VI (8 khoá `cv*` trong `T`, từ điển `CV` cho chữ trên bảng).
+  Dải Storyboard KHÔNG vẽ trên bảng web vì trong 0.10.0 dải vào khung chưa vào thư mục.
+- **Kiểm (Chrome chạy ngầm; kéo bằng `Input.dispatchMouseEvent` / `dispatchTouchEvent` và gõ bằng `Input.insertText`, tức sự kiện thật của trình duyệt):**
+  diễn biến tự diễn đọc mỗi 0,3 giây: chia ảnh 1,3 đến 1,8 s, tấm vào khung 4,8 s, gõ xong tên 7,2 s, con trỏ ẩn 8,1 s. Máy tính 1440: kéo video vào
+  khung B thì thư mục B từ 1 lên 2 mục và có "Take 2.mp4"; kéo một tấm ra khỏi khung A thì A từ 3 còn 2; bấm 3 lần vào tên khung rồi gõ "Client A pitch"
+  thì tai khung và cửa sổ thư mục cùng đổi; đổi sang VI thì chữ đổi, tên khách tự gõ giữ nguyên. Điện thoại 390: chạm kéo một tấm vào khung B ăn, trang
+  KHÔNG cuộn theo (vị trí cuộn 17.063 trước và sau). 7 cỡ màn (320 / 390 / 820 / 960 / 1024 / 1440 / 1920): 0 phần tử tràn bảng, 0 chữ bị cắt, 0 tràn
+  ngang trang, 0 lỗi console; chữ nhỏ nhất 8,0 px (nhãn "SHOT" ở 1024) tới 13,4 px. 3 khối script nhúng 0 lỗi cú pháp; 0 gạch ngang dài trong chữ khách thấy.
+  Ảnh chụp đã mở ra nhìn ở 1440 và 390. Bẫy thước gặp trong buổi: ảnh chụp có khoanh vùng nằm ngoài màn làm section "được nhìn thấy" sớm nên ảnh giữa
+  chừng lệch giờ (trang đúng, đọc bằng mốc thời gian trong trang mới thấy); `scrollBy` gọi ngay sau `scrollIntoView` mượt làm trang đứng yên, báo giả
+  "tiêu đề không hiện".
+- **Đưa lên live:** commit `4a49d6d` trên `mac`, đặt lên `origin/main` thành `b8d2ad3` (chỉ khác đúng 1 file), đẩy 14:53; 14:57:59 md5 live = md5 bản
+  trong git (`7d85925b`); chạy lại bài đo trên https://aio-shotsave.vercel.app: cùng kết quả, 0 lỗi console.
+- **CHƯA:** anh chưa xem bằng mắt (việc về gu); Safari và điện thoại thật chưa đo; chưa cho người soát khác đọc mã; **chưa bộ cài nào có Canvas**
+  (Windows trong Release 0.9.0, Mac dmg 0.9.1) và bản Windows của Canvas chưa chạy lần nào, trong khi web đã giới thiệu; câu "Hai chiều" trên web đúng
+  theo mã 0.10.0 (đồng bộ lúc mở Canvas và lúc cửa sổ được chọn lại), chưa theo dõi tức thời.
+
 ## [web] - 2026-10-12 12:14 (UTC+7) - Web Shot & Save: cảnh "Khay tự thu gọn" thêm đoạn KÉO NÚT TRÒN, đã LIVE - máy Mac
 
 - **Anh yêu cầu:** *"push code lên git đi em"* rồi *"thêm tính năng này lên web luôn nha em"* (tính năng app 0.9.2 làm sáng 12/10: nút tròn kéo được,
