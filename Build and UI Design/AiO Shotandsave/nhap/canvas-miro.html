@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shot &amp; Save · Canvas kiểu Miro (nháp 2)</title>
+<!-- NHAP 2, 12/10/2026. Anh Tien: "Canvas hinh anh thu thap va group o canvas, folder se group theo va dat ten y chang",
+     "canvas giong mirror - mot canvas tong hop y tuong" (mirror = app MIRO; nhap 1 `canvas-guong.html` hieu nham thanh "tam guong"),
+     "tat ca hinh anh chup - video - story se duoc mo trong canvas", dong bo HAI chieu voi thu muc.
+     Ban thu bam duoc de DUYET HUONG, KHONG phai ma cua app, khong dung file that.
+     Thu: keo nen de di chuyen bang · lan chuot / vuot hai ngon de truot, Ctrl hoac Cmd + lan (hoac chum hai ngon) de phong ·
+     keo anh di dau cung duoc · tha anh vao mot KHUNG la no thuoc khung do · keo thanh ten de doi cho ca khung · keo goc de doi co ·
+     bam ten khung de doi ten · cot phai la thu muc tren may, doi ten o do thi khung doi theo. -->
+<style>
+@font-face{font-family:Inter;src:url(../assets/fonts/Inter.woff2) format("woff2");font-weight:100 900}
+:root{--bg0:#0e0e0e;--bg2:#181818;--bg3:#1f1f1f;--bg4:#282828;--bg5:#333;--line:rgba(255,255,255,.09);--t1:#f5f5f7;--t3:#8d8d95;--cam:#f86820}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font:13px/1.45 Inter,system-ui,sans-serif}
+button,input{font-family:inherit;font-size:inherit;color:inherit}
+.cs{display:flex;flex-direction:column;height:100%}
+.dau{height:46px;flex:none;display:flex;align-items:center;gap:10px;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.dau b{font-size:13px;font-weight:700}
+.dau .dem{color:var(--t3)}
+.dau .gian{flex:1}
+.nut{height:28px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg4);cursor:pointer;white-space:nowrap}
+.nut:hover{background:var(--bg5)}
+.nut.chinh{background:var(--cam);border-color:transparent;color:#fff;font-weight:700}
+.nut.vuong{width:28px;padding:0}
+.ti{min-width:44px;text-align:center;color:var(--t3);font-variant-numeric:tabular-nums}
+.than{flex:1;display:flex;min-height:0}
+.bang{flex:1;position:relative;overflow:hidden;cursor:grab;touch-action:none;background-color:var(--bg0);background-image:radial-gradient(rgba(255,255,255,.10) 1px,transparent 1px)}
+.bang.keo{cursor:grabbing}
+.the{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.khung{position:absolute;border:1.5px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.035)}
+.khung.vao{border-color:var(--cam);background:rgba(248,104,32,.07)}
+.khung .thanh{position:absolute;left:-1.5px;top:-31px;height:28px;display:flex;align-items:center;gap:4px;padding:0 6px;border-radius:8px;background:var(--bg4);cursor:grab;max-width:calc(100% + 3px)}
+.khung .thanh svg{flex:none;color:var(--t3)}
+.khung .thanh input{background:transparent;border:1px solid transparent;border-radius:6px;padding:1px 5px;font-weight:700;min-width:40px}
+.khung .thanh input:hover{border-color:var(--line)}
+.khung .thanh input:focus{outline:none;border-color:var(--cam);background:var(--bg2)}
+.khung .thanh span{color:var(--t3);padding-right:4px;flex:none}
+.khung .goc{position:absolute;right:-6px;bottom:-6px;width:16px;height:16px;border-radius:4px;background:var(--bg5);border:1px solid rgba(255,255,255,.25);cursor:nwse-resize}
+.o{position:absolute;border-radius:8px;overflow:hidden;cursor:grab;border:1px solid rgba(255,255,255,.14);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.o.nang{cursor:grabbing;box-shadow:0 10px 26px rgba(0,0,0,.55);z-index:5}
+.o.dai{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:2px;background:#000}
+.o.dai i{border-radius:3px}
+.o .nhan{position:absolute;left:6px;bottom:5px;font-size:11px;color:#fff;background:rgba(0,0,0,.55);padding:1px 6px;border-radius:6px;pointer-events:none}
+.o .phat{position:absolute;inset:0;margin:auto;width:28px;height:28px;border-radius:14px;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;pointer-events:none}
+.goiy{position:absolute;left:12px;bottom:12px;max-width:min(560px,calc(100% - 24px));padding:8px 12px;border-radius:10px;background:rgba(24,24,24,.92);border:1px solid var(--line);color:var(--t3);pointer-events:none}
+.cay{width:250px;flex:none;background:var(--bg2);border-left:1px solid var(--line);padding:16px;overflow:auto}
+.cay h4{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.hang{display:flex;align-items:center;gap:8px;height:30px;border-bottom:1px solid var(--line)}
+.hang.con{padding-left:18px}
+.hang input{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 5px}
+.hang input:hover:not(:disabled){border-color:var(--line)}
+.hang input:focus{outline:none;border-color:var(--cam);background:var(--bg3)}
+.hang span{color:var(--t3);flex:none}
+.hang svg{flex:none;color:var(--t3)}
+.ghi{color:var(--t3);margin-top:12px}
+@media(max-width:760px){.cay{display:none}}
+</style>
+</head>
+<body>
+<div class="cs">
+  <div class="dau"><b>Canvas</b><span class="dem" id="dem"></span><span class="gian"></span>
+    <button class="nut vuong" id="nho" aria-label="Thu nhỏ">−</button><span class="ti" id="ti">100%</span><button class="nut vuong" id="to" aria-label="Phóng to">+</button>
+    <button class="nut" id="vua">Vừa màn hình</button><button class="nut chinh" id="them">Khung mới</button></div>
+  <div class="than">
+    <div class="bang" id="bang"><div class="the" id="the"></div>
+      <div class="goiy">Bản nháp để duyệt hướng, chưa phải app, không đụng file thật. Kéo nền để di chuyển bảng, Ctrl hoặc Cmd + lăn chuột để phóng. Kéo ảnh vào một khung là nó thuộc thư mục cùng tên.</div></div>
+    <div class="cay"><h4>Thư mục trên máy</h4><div id="cay"></div>
+      <p class="ghi">Mỗi khung trên bảng là một thư mục cùng tên. Thứ nằm ngoài mọi khung ở thư mục gốc. Đổi tên ở đây thì khung đổi theo.</p></div>
+  </div>
+</div>
+<script>
+(() => {
+  const MAU = ["#7a4a2b", "#2b5876", "#614385", "#134e5e", "#8e2d4f", "#3f7a63", "#5a4d7a", "#b7791f"];
+  let so = 0;
+  const muc = (kieu, ten, x, y) => ({ id: ++so, kieu, ten, mau: MAU[so % MAU.length], x, y, w: kieu === "dai" ? 300 : 150, h: 112 });
+  const khung = [
+    { id: "k1", ten: "Tham khảo màu", x: 60, y: 90, w: 520, h: 290 },
+    { id: "k2", ten: "Brief khách Thinksmart", x: 660, y: 90, w: 560, h: 420 },
+    { id: "k3", ten: "Bố cục thumbnail", x: 60, y: 480, w: 520, h: 250 },
+  ];
+  const mucs = [
+    muc("anh", "07/10", 84, 116), muc("anh", "07/10", 250, 140), muc("anh", "06/10", 410, 112), muc("anh", "06/10", 170, 248),
+    muc("anh", "04/10", 690, 120), muc("dai", "Storyboard 04", 870, 130), muc("video", "0:48", 700, 270), muc("anh", "02/10", 880, 280), muc("anh", "02/10", 1040, 360),
+    muc("anh", "30/09", 90, 510), muc("anh", "29/09", 270, 540),
+    muc("anh", "11:54", 700, 590), muc("anh", "11:38", 880, 620), muc("video", "0:12", 1060, 580),
+  ];
+  const bang = document.getElementById("bang"), the = document.getElementById("the"), cay = document.getElementById("cay");
+  const TM = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+  const NAM = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>';
+  const PHAT = '<span class="phat"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg></span>';
+  const V = { x: 0, y: 0, s: 1 }; // goc nhin: bang = the * s + (x, y)
+  const elK = new Map(), elO = new Map();
+  const cuaKhung = (m) => khung.find(k => m.x + m.w / 2 >= k.x && m.x + m.w / 2 <= k.x + k.w && m.y + m.h / 2 >= k.y && m.y + m.h / 2 <= k.y + k.h) || null;
+  const tenHopLe = (s, bo) => { s = String(s || "").replace(/[\\/:*?"<>|]/g, "").trim().slice(0, 60); if (!s) return null; return khung.some(k => k !== bo && k.ten.toLowerCase() === s.toLowerCase()) ? null : s; };
+  function datNhin() {
+    the.style.transform = "translate(" + V.x + "px," + V.y + "px) scale(" + V.s + ")";
+    const o = 24 * V.s; bang.style.backgroundSize = o + "px " + o + "px"; bang.style.backgroundPosition = V.x + "px " + V.y + "px";
+    document.getElementById("ti").textContent = Math.round(V.s * 100) + "%";
+  }
+  function dungKhung(k) {
+    const e = document.createElement("div"); e.className = "khung"; e.dataset.k = k.id;
+    e.innerHTML = '<div class="thanh">' + NAM + '<input aria-label="Tên khung" data-ten="' + k.id + '"><span></span></div><div class="goc" aria-hidden="true"></div>';
+    the.prepend(e); elK.set(k.id, e); return e;
+  }
+  function dungO(m) {
+    const e = document.createElement("div"); e.className = "o" + (m.kieu === "dai" ? " dai" : ""); e.dataset.id = m.id;
+    if (m.kieu === "dai") e.innerHTML = MAU.slice(0, 6).map(c => '<i style="background:' + c + '"></i>').join("") + '<span class="nhan">' + m.ten + "</span>";
+    else { e.style.background = m.mau; e.innerHTML = (m.kieu === "video" ? PHAT : "") + '<span class="nhan">' + m.ten + "</span>"; }
+    the.append(e); elO.set(m.id, e); return e;
+  }
+  function capNhat() {
+    for (const k of khung) {
+      const e = elK.get(k.id) || dungKhung(k); e.style.cssText = "left:" + k.x + "px;top:" + k.y + "px;width:" + k.w + "px;height:" + k.h + "px";
+      const i = e.querySelector("input"); if (document.activeElement !== i) { i.value = k.ten; i.style.width = Math.min(300, Math.max(60, Math.round(k.ten.length * 8.2 + 20))) + "px"; }
+      e.querySelector("span").textContent = mucs.filter(m => cuaKhung(m) === k).length;
+    }
+    for (const m of mucs) { const e = elO.get(m.id) || dungO(m); e.style.left = m.x + "px"; e.style.top = m.y + "px"; e.style.width = m.w + "px"; e.style.height = m.h + "px"; }
+    const ngoai = mucs.filter(m => !cuaKhung(m)).length, tr = document.activeElement && document.activeElement.closest && document.activeElement.closest("#cay");
+    if (!tr) cay.innerHTML = '<div class="hang">' + TM + '<input value="shotandsave" disabled><span>' + ngoai + "</span></div>" + khung.map(k => '<div class="hang con">' + TM + '<input value="' + k.ten.replace(/"/g, "&quot;") + '" aria-label="Tên thư mục" data-ten="' + k.id + '"><span>' + mucs.filter(m => cuaKhung(m) === k).length + "</span></div>").join("");
+    document.getElementById("dem").textContent = mucs.length + " mục · " + khung.length + " khung";
+  }
+  // --- doi ten: o khung hay o cot thu muc deu sua CUNG mot ten ---
+  document.addEventListener("change", e => {
+    const id = e.target.dataset && e.target.dataset.ten; if (!id) return;
+    const k = khung.find(x => x.id === id), moi = tenHopLe(e.target.value, k);
+    if (moi) k.ten = moi;
+    e.target.blur(); capNhat();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.dataset && e.target.dataset.ten) e.target.blur(); });
+  // --- keo: anh / khung / goc khung / nen ---
+  let keo = null;
+  const batDau = (e, loai, them) => { keo = Object.assign({ loai, x0: e.clientX, y0: e.clientY }, them); try { bang.setPointerCapture(e.pointerId); } catch (err) {} };
+  bang.addEventListener("pointerdown", e => {
+    if (e.button !== 0 || e.target.closest("input")) return;
+    const o = e.target.closest(".o"), goc = e.target.closest(".goc"), thanh = e.target.closest(".thanh");
+    if (o) { const m = mucs.find(x => x.id === Number(o.dataset.id)); the.append(o); o.classList.add("nang"); batDau(e, "o", { m, gx: m.x, gy: m.y, el: o }); }
+    else if (goc) { const k = khung.find(x => x.id === goc.parentElement.dataset.k); batDau(e, "co", { k, gw: k.w, gh: k.h }); }
+    else if (thanh) { const k = khung.find(x => x.id === thanh.parentElement.dataset.k); batDau(e, "khung", { k, gx: k.x, gy: k.y, trong: mucs.filter(m => cuaKhung(m) === k).map(m => ({ m, x: m.x, y: m.y })) }); }
+    else { bang.classList.add("keo"); batDau(e, "nen", { gx: V.x, gy: V.y }); }
+    e.preventDefault();
+  });
+  bang.addEventListener("pointermove", e => {
+    if (!keo) return;
+    const dx = e.clientX - keo.x0, dy = e.clientY - keo.y0, s = V.s;
+    if (keo.loai === "nen") { V.x = keo.gx + dx; V.y = keo.gy + dy; datNhin(); return; }
+    if (keo.loai === "o") { keo.m.x = keo.gx + dx / s; keo.m.y = keo.gy + dy / s; const k = cuaKhung(keo.m); elK.forEach((el, id) => el.classList.toggle("vao", !!k && k.id === id)); }
+    if (keo.loai === "khung") { keo.k.x = keo.gx + dx / s; keo.k.y = keo.gy + dy / s; keo.trong.forEach(t => { t.m.x = t.x + dx / s; t.m.y = t.y + dy / s; }); }
+    if (keo.loai === "co") { keo.k.w = Math.max(200, keo.gw + dx / s); keo.k.h = Math.max(140, keo.gh + dy / s); }
+    capNhat();
+  });
+  const tha = () => { if (!keo) return; if (keo.el) keo.el.classList.remove("nang"); bang.classList.remove("keo"); elK.forEach(el => el.classList.remove("vao")); keo = null; capNhat(); };
+  bang.addEventListener("pointerup", tha); bang.addEventListener("pointercancel", tha);
+  // --- lan chuot: truot bang; Ctrl / Cmd + lan (hoac chum 2 ngon tren ban di chuot) = phong quanh con tro ---
+  function phong(k, cx, cy) { const s2 = Math.min(3, Math.max(.2, V.s * k)), r = bang.getBoundingClientRect(), px = cx - r.left, py = cy - r.top; V.x = px - (px - V.x) * (s2 / V.s); V.y = py - (py - V.y) * (s2 / V.s); V.s = s2; datNhin(); }
+  bang.addEventListener("wheel", e => { e.preventDefault(); if (e.ctrlKey || e.metaKey) phong(Math.exp(-e.deltaY * .01), e.clientX, e.clientY); else { V.x -= e.deltaX; V.y -= e.deltaY; datNhin(); } }, { passive: false });
+  const giua = () => { const r = bang.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+  document.getElementById("to").addEventListener("click", () => phong(1.25, ...giua()));
+  document.getElementById("nho").addEventListener("click", () => phong(.8, ...giua()));
+  function vua() {
+    const tat = [...khung.map(k => ({ x: k.x, y: k.y - 34, w: k.w, h: k.h + 34 })), ...mucs]; if (!tat.length) return;
+    const x0 = Math.min(...tat.map(a => a.x)), y0 = Math.min(...tat.map(a => a.y)), x1 = Math.max(...tat.map(a => a.x + a.w)), y1 = Math.max(...tat.map(a => a.y + a.h));
+    const r = bang.getBoundingClientRect(), le = 40; V.s = Math.min(1.5, Math.max(.2, Math.min((r.width - le * 2) / (x1 - x0), (r.height - le * 2) / (y1 - y0))));
+    V.x = (r.width - (x1 - x0) * V.s) / 2 - x0 * V.s; V.y = (r.height - (y1 - y0) * V.s) / 2 - y0 * V.s; datNhin();
+  }
+  document.getElementById("vua").addEventListener("click", vua);
+  document.getElementById("them").addEventListener("click", () => {
+    let n = 1, ten; do { ten = "Khung mới" + (n > 1 ? " " + n : ""); n++; } while (!tenHopLe(ten));
+    const r = bang.getBoundingClientRect(), k = { id: "k" + Date.now(), ten, x: (r.width / 2 - V.x) / V.s - 160, y: (r.height / 2 - V.y) / V.s - 100, w: 320, h: 200 };
+    khung.push(k); capNhat(); const i = elK.get(k.id).querySelector("input"); i.focus(); i.select();
+  });
+  window.__cv = { khung, mucs, V, capNhat, cuaKhung, vua }; // cho bai chup / do
+  capNhat(); vua();
+})();
+</script>
+</body>
+</html>
