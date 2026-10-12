@@ -63,6 +63,13 @@ De xuat MOI cua Claude (khong co trong bang cu, viet sau khi anh chot dinh vi 07
 Thu tu Claude de xuat: (1) xong viec ban hang dang do (xac nhan nut tron, dong goi lai Windows 0.9.1, 2 bo cai len web,
 mua thu) -> (2) Tim lai y tuong -> (3) muc 3 hut mau (nho, hop designer) -> (4) mot khay 3 the.
 
+### 0e. 12/10/2026 anh hoi lai "tiep theo la them cong cu hay tinh nang gi" — Claude tra loi, anh CHUA chot muc nao
+Da xong tu 0d: nut tron da xac nhan + keo duoc + di theo moi desktop (0.9.2, chi macOS), web da co canh keo nut.
+Claude de xuat theo thu tu: (1) DONG GOI 0.9.2 (Mac + Windows) va dua nut tai len web, roi mua thu bang ma `THUSYM8FR`: web dang noi
+ve tinh nang ma chua bo cai nao co · (2) TIM LAI Y TUONG (o tim trong khay, xem 0d) · (3) bat keo nut tron tren Windows (can do cu bam
+that o may cong ty) · (4) hut mau + bang 5 mau · (5) mot khay 3 the. Viec nho con treo cua hom nay: khung chup khi app khac dang toan
+man hinh tren Mac (overlay chua khai di theo moi desktop).
+
 ### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
 > 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
 > Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.

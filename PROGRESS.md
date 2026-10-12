@@ -5,6 +5,24 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-10-12 12:14 (UTC+7) - Web Shot & Save: cảnh "Khay tự thu gọn" thêm đoạn KÉO NÚT TRÒN, đã LIVE - máy Mac
+
+- **Anh yêu cầu:** *"push code lên git đi em"* rồi *"thêm tính năng này lên web luôn nha em"* (tính năng app 0.9.2 làm sáng 12/10: nút tròn kéo được,
+  cửa sổ nổi đi theo mọi desktop; trong app hiện CHỈ bật trên macOS).
+- **Đã sửa `Website/AiO ShotSave Web/index.html`:** cảnh 13/17 của rạp (mã cảnh số 12) thêm một nhịp giữa "thu về" và "bấm mở": con trỏ giữ nút tròn,
+  kéo sang trái-lên (56% bề rộng sân, 30% chiều cao), thả, tiêu đề đổi "Kéo nút tới chỗ bạn muốn." / "Drag it where you like.", chú thích đáy sân
+  "Trên Mac: nút nhớ chỗ và theo bạn qua mọi desktop"; khay bung ra từ ĐÚNG chỗ nút mới. Câu mô tả dưới rạp (`f13p`, EN + VI) thêm một câu "Trên Mac...".
+  Cảnh dài thêm ~2,5 giây. Chữ ghi rõ "Trên Mac" vì bản Windows chưa bật kéo nút.
+- **Kiểm (Chrome chạy ngầm, bấm clip 13 trong rạp, đọc vị trí nút + chữ ở 5 thời điểm, 1440x900 EN và 390x844 VI):** nút từ (1272,474) tới (519,310) trên
+  sân 1344x546 = đúng -56% / -30%; chú thích hiện rồi ẩn trước chú thích cuối; khay bung từ chỗ mới; 0 lỗi console; không tràn ngang trên điện thoại.
+  Mở ảnh ra nhìn: bản đầu (thả thấp 7%) chú thích 2 dòng ĐÈ lên nút trên điện thoại, số đo không thấy, sửa thành thả cao 30%, chụp lại sạch.
+  2 khối script nhúng: 0 lỗi cú pháp.
+- **Đưa lên live:** commit web riêng `b72dc1e` trên `mac`, đặt lên `origin/main` thành `5c7b120` (bản main tạm, chỉ khác đúng 1 file), đẩy `main`
+  12:11; 12:13:19 md5 live = md5 bản trong git (`677caf3e`); chạy lại bài chụp trên https://aio-shotsave.vercel.app: cùng số, 0 lỗi console.
+  Sau đó gộp `main` về `mac`.
+- **CHƯA:** chưa bộ cài nào có tính năng này (Windows trong Release 0.9.0, Mac dmg 0.9.1) trong khi web đã nói tới; Safari / điện thoại thật chưa đo;
+  chưa cho người soát đọc mã cảnh; anh chưa xem bằng mắt.
+
 ## [git] - 2026-10-08 07:39 (UTC+7) - Máy công ty kéo 34 commit của Mac về; bộ cài 0.9.0 đang nằm trên Polar THIẾU các bản sửa 04/10 - máy công ty
 
 - **Anh yêu cầu:** *"kiểm tra git mới nhất nha em"*. Không sửa mã nguồn; chỉ `git fetch` + tiến thẳng `main` máy này lên `origin/may-cong-ty`
