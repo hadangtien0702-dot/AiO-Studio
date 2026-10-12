@@ -1,6 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **12/10 12:03 TANG SO 0.9.1 -> 0.9.2 + DAY LEN GITHUB (anh: *"push code len git di em"*).** Nhanh `mac` -> `origin/mac` va `origin/may-cong-ty`
+>   (may cong ty keo ve bang `git merge origin/may-cong-ty`); `main` (ban live cua web) KHONG day. 0.9.2 = 0.9.1 + hai viec 12/10 ben duoi (chi macOS).
+>   Chua dong goi bo cai nao cho 0.9.2 (Windows trong Release van 0.9.0, Mac dmg 0.9.1). Hai dong duoi ghi "van 0.9.1 / CHUA day" la truoc luc nay.
 > - **12/10 11:47 MAC: KEO duoc nut tron (anh: *"khi khay thu ve anh muon di chuyen duoc cai icon do nua"*). DA NAP, van 0.9.1.** Giu chuot keo = nut di
 >   theo, tha ra nam lai + nho vi tri (`viTriNut` trong cau-hinh.json); bam khong keo van mo khay. Chi bat tren macOS. Bai an `test:khaynut` 5 muc moi dat
 >   + doi chung tat keo thi truot. CHUA co anh keo bang chuot that; Windows chua bat; CHUA day.
