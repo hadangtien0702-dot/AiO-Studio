@@ -1,6 +1,6 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-12 15:55 +0700 (/xong, may Mac)
 > - **12/10 15:32 MAC: 0.10.1 DA NAP. Anh dan: KHONG dong bo cai, KHONG release, tap trung phat trien san pham; khi nao anh keu moi dong goi.**
 >   0.10.1 = 0.10.0 + sua Ctrl + mot nac lan chuot phong 3,3 lan (nay 15%). Bai thu dung moi `npm run thu:canvas -- <so anh>`. Ket qua thu dung, bang
 >   doi thu (CleanShot X khong co canvas) va 12 de xuat cho Canvas nam o `ROADMAP.md` muc 0g, anh CHUA chot muc nao. Web da co section Canvas rieng
