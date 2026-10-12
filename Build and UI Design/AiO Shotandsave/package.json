@@ -1,7 +1,7 @@
 {
   "name": "aio-shot-and-save",
   "productName": "AiO Shot & Save",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "AiO Shot & Save — chup vung chon + ghim noi (sticky) len man hinh, cho he thong AiO Studio.",
   "author": "AiO Studio",
   "license": "UNLICENSED",
@@ -43,6 +43,7 @@
     "test:dongbotieng": "node scripts/test/do-dong-bo-tieng.mjs",
     "test:canvas": "node scripts/test/do-canvas.cjs",
     "test:canvasapp": "node scripts/test/do-canvas-app.cjs",
+    "thu:canvas": "node scripts/test/thu-dung-canvas.cjs",
     "dist:mac": "electron-builder --mac --x64 --arm64 --publish never"
   },
   "devDependencies": {

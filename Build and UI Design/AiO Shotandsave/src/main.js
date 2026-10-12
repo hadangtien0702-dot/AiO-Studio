@@ -2573,13 +2573,14 @@ ipcMain.on('canvas:chup', (e) => { if (laCanvas(e) && !THU_CANVAS) startCapture(
 async function thuCanvas() {
   const kq = { ban: app.getVersion(), loiTrang: [], buoc: {} }
   const cho = (ms) => new Promise((r) => setTimeout(r, ms))
-  setTimeout(() => app.exit(2), 60000)
+  setTimeout(() => app.exit(2), Number(process.env.AIO_THU_HAN) || 60000)
   try {
     kho.ghiCauHinh({ thuMucAnh: THU_CANVAS.anh })
     openCanvasWindow()
     const w = canvasWin
     w.webContents.on('console-message', (e, level, msg) => { if (typeof level === 'number' ? level >= 3 : e.level === 'error') kq.loiTrang.push(String(msg || e.message).slice(0, 200)) })
     await new Promise((r) => w.webContents.once('did-finish-load', r))
+    const tTai = Date.now()
     await cho(1800)
     const js = (s) => w.webContents.executeJavaScript(s, true)
     await js(`window.__thu = {
@@ -2595,6 +2596,11 @@ async function thuCanvas() {
       doiTen(id, ten) { const i = document.querySelector('.khung[data-k="' + id + '"] input'); i.value = ten; i.dispatchEvent(new Event('change', { bubbles: true })) },
     }; true`)
     const tt = () => js('window.__thu.tt()')
+    // 12/10 bai THU DUNG (scripts/test/thu-dung-canvas.cjs): kich ban rieng thay kich ban co san, van cua so an + userData rieng
+    if (process.env.AIO_THU_KICHBAN) {
+      await require(process.env.AIO_THU_KICHBAN)({ w, js, cho, kq, tt, tTai, ra: THU_CANVAS.ra, anh: THU_CANVAS.anh })
+      fs.writeFileSync(path.join(THU_CANVAS.ra, 'ket-qua.json'), JSON.stringify(kq, null, 1)); app.exit(0); return
+    }
     kq.buoc.dau = await tt()
     await js(`document.getElementById('them').click(); true`); await cho(700)
     await js(`document.activeElement && document.activeElement.blur(); true`)

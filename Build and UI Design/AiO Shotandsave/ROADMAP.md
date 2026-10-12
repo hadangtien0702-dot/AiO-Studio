@@ -102,6 +102,55 @@ file vao thu muc con. He qua phai noi truoc: (1) anh da keo vao Premiere / Photo
 **Viec phai co truoc khi viet ma that (chua lam):** khao sat app cung loai (Eagle, PureRef, Milanote...) theo luat 2d · chot cau "chuyen file
 hay ban noi" · chot Canvas la cua so moi hay thay cua so Khay hien co · ban Windows.
 
+### 0g. CANVAS: KET QUA THU DUNG + DOI THU + VIEC NEN LAM TIEP (12/10/2026 15:3x) — anh CHUA chot muc nao
+
+Anh dan 12/10 15:1x: *"khong dong bo cai, khi nao anh keu thi moi lam"*, *"cai tren may Mac xong em hay kiem tra va thao tac xem nguoi dung co de su dung khong"*,
+*"trong canvas co can them nhung tinh nang nao khong"*, *"xem cac doi thu nhu CleanShot X ho co dang lam cai nay khong"*, *"tap trung phat trien san pham, khong release"*.
+
+**Thu dung (`npm run thu:canvas -- <so anh>`, app that cua so an, anh 2560x1440, bam / go / keo / lan bang sendInputEvent):**
+
+| Do | 17 anh | 200 anh |
+|---|---|---|
+| Moi tam hien du anh sau khi mo | duoi 1,8 s | tam dau 2,0 s, du het 13,3 s (56 ms moi anh; 778 anh uoc 44 s, CHUA do) |
+| "Vua man hinh" cho ra tam rong bao nhieu tren man 1500 px | 161 px (ti le 0,87) | 30 px (ti le 0,16): khong doc duoc |
+| Bam "Khung moi" | khung hien giua man, o ten san sang go, chu duoc chon het | khung de mep 4 tam |
+| Go ten roi Enter | thu muc tren dia doi ten theo, khong con thu muc ten cu | nhu ben |
+| Keo mot tam vao khung | thu muc co ban noi cua dung anh goc, anh goc con nguyen | nhu ben |
+| Ctrl + mot nac lan chuot | TRUOC SUA: 0,87 -> 2,90 (3,3 lan mot nac). DA SUA 0.10.1: 0,87 -> 1,00 (15% mot nac) | |
+
+**Cho nguoi dung se vap (do duoc hoac doc tu ma), xep theo muc anh huong:**
+1. Chi mo duoc Canvas tu menu tren thanh menu he thong. Khay va nut tron khong co loi vao, khong co phim tat.
+2. Tam tren bang KHONG keo ra app khac duoc (Premiere, Zalo...). Day la loi hua chinh cua ca app ma bang lai thieu.
+3. Khong chon duoc nhieu tam (bam mot tam khong co dau "dang chon"); xep 17 tam la keo 17 lan. Backspace, Delete, Cmd+Z, Cmd+A, Space, Esc: khong lam gi.
+4. Khong xoa duoc khung, khong doi mau khung. Tao khung moi thi cac tam roi nam duoi no bi day di cho khac (bo cuc nguoi dung vua xep bi doi).
+5. Thu vien lon: "vua man hinh" thu nho het ve 30 px; khong co tim, loc theo ngay / loai, khong co "nhay toi tam moi nhat".
+6. Tren tam chi co gio hoac ngay, khong co ten file (ten nam trong tooltip). Khong co chu thich.
+7. Mo lan dau voi thu vien lon phai cho anh nho (13,3 s cho 200 anh). Chua tao san anh nho luc chup.
+8. Khung moi de len dong chu phu cua tieu de lon.
+CHUA do duoc bang bai nay: ban di chuot that, do muot khi keo, cua so that tren man that, video, Windows.
+
+**Doi thu (tra 12/10, nguon: trang tinh nang chinh thuc cua CleanShot + ket qua tim kiem; CHUA ra het moi app):**
+
+| App | Co bang / canvas de xep nhieu anh chup? | Cach ho giu va tim lai anh |
+|---|---|---|
+| CleanShot X (Mac, 29 USD) | KHONG | Capture History giu toi 1 thang, loc theo loai; anh ghim noi; Cloud tim theo noi dung anh + the |
+| Snagit | KHONG | Library: the, tim theo ten, loc theo ngay / app nguon / trang web nguon |
+| Shottr, Xnapper | KHONG (chi co nen cho MOT anh) | Shottr ghim anh; lich su chua xac nhan duoc tu trang chinh thuc |
+| Eagle (quan ly tu lieu) | CO, qua plugin Canvas | thu muc, the, thu muc thong minh theo luat; tu luu URL nguon |
+| PureRef (bang tham khao) | CO | keo anh vao, ghi chu, nhom, tu xep luoi, ve len anh, noi tren app khac |
+| Milanote (bang y tuong) | CO | the anh co chu thich, ghi chu, mui ten noi, cot |
+Khong thay app CHUP MAN HINH nao co bang ma nhom tren bang = thu muc that cung ten. Day la diem rieng, nhung chua ra het App Store / Microsoft Store nen
+KHONG viet "dau tien" len web.
+
+**Viec nen lam tiep cho Canvas (em de xuat, anh chon):**
+- Nhom A, go cho vap (nho, lam truoc): (A1) nut mo Canvas ngay tren khay + nut tron, them phim tat · (A2) keo tam tu bang ra app khac · (A3) chon nhieu
+  tam (keo khoanh vung, Shift bam) + Delete bo khoi khung + Cmd+Z · (A4) xoa khung (thu muc chi con ban noi thi moi xoa) · (A5) mo ra dung o tam moi
+  nhat voi co doc duoc, them nut "Moi nhat" · (A6) tao anh nho ngay luc chup.
+- Nhom B, tinh nang moi lay tu doi thu: (B1) ghi chu dan + mui ten (Milanote, PureRef; da co trong ban mau anh duyet) · (B2) tim va loc theo ngay /
+  loai, sau do tim theo CHU trong anh (CleanShot Cloud, Snagit) · (B3) nut "Xep gon" tu xep luoi (PureRef) · (B4) dan / tha anh tu ngoai vao bang
+  (PureRef, Milanote) · (B5) xuat mot khung thanh mot anh hoac PDF de gui khach · (B6) chu thich duoi tung tam (Milanote).
+- Con treo tu 0f: chuyen han file vao thu muc hay giu anh goc + ban noi (dang la ban noi); dai Storyboard vao khung chua vao thu muc; Windows chua chay.
+
 ### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
 > 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
 > Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.

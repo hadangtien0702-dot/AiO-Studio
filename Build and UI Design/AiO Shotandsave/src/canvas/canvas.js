@@ -192,7 +192,15 @@
 
   // ---------- goc nhin ----------
   function phong(k, cx, cy) { const s2 = Math.min(3, Math.max(.08, V.s * k)); V.x = cx - (cx - V.x) * (s2 / V.s); V.y = cy - (cy - V.y) * (s2 / V.s); V.s = s2; datNhin() }
-  bang.addEventListener('wheel', (e) => { e.preventDefault(); if (e.ctrlKey || e.metaKey) phong(Math.exp(-e.deltaY * .01), e.clientX, e.clientY); else { V.x -= e.deltaX; V.y -= e.deltaY; datNhin() } }, { passive: false })
+  /* 12/10 bai thu dung do duoc: mot nac lan chuot (deltaY = 120) phong 0,87 -> 2,90 = 3,3 lan, vi cong thuc exp(-deltaY * 0,01) chi hop
+     voi ban di chuot (chum hai ngon gui nhieu su kien delta nho). Chuot co nac (delta tu 50 tro len, hoac tinh theo dong): moi nac 15%. */
+  bang.addEventListener('wheel', (e) => {
+    e.preventDefault()
+    if (e.ctrlKey || e.metaKey) {
+      const d = e.deltaY, nac = e.deltaMode === 1 || Math.abs(d) >= 50
+      phong(nac ? (d < 0 ? 1.15 : 1 / 1.15) : Math.exp(-d * .01), e.clientX, e.clientY)
+    } else { V.x -= e.deltaX; V.y -= e.deltaY; datNhin() }
+  }, { passive: false })
   function vua() {
     const tat = [{ x: 40, y: 60, w: 900, h: 180 }, ...khung.map((k) => ({ x: k.x, y: k.y - 36, w: k.w, h: k.h + 36 })), ...mucs]
     const x0 = Math.min(...tat.map((a) => a.x)), y0 = Math.min(...tat.map((a) => a.y)), x1 = Math.max(...tat.map((a) => a.x + a.w)), y1 = Math.max(...tat.map((a) => a.y + a.h))
