@@ -145,6 +145,12 @@ function taoKhayThu(deps) {
     if (!TN) {
       w.setAlwaysOnTop(true, 'screen-saver')
       w.setContentProtection(true) // nut tron + san dien khong bao gio lot vao anh chup / video quay
+      /* 12/10 Mac (anh: "mo AIO o desktop nao thi khong xem duoc o desktop khac"): nut tron + san dien di theo MOI desktop,
+         cung luat voi khay anh (main.js moiDesktop). Goi 1 lan luc tao, khong goi trong luc chuyen dong. CHI macOS. */
+      if (process.platform === 'darwin') {
+        try { w.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true }) }
+        catch (e) { log('moi-desktop LOI ' + ten + ': ' + e.message) }
+      }
     }
     datO(w, b, ten)
     w.webContents.on('console-message', (e, level, msg) => {

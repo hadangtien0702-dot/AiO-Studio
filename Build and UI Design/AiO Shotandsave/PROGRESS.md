@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **12/10 11:34 MAC: SUA "mo AIO o desktop nao thi khong xem duoc o desktop khac" (anh bao 12/10). DA NAP vao app dang cai, van 0.9.1.**
+>   Goc DA DO: khong cua so nao khai "di theo moi desktop" -> nut tron / khay / san dien moi cai chi nam o 1 trong 7 desktop. Sua: `moiDesktop()`
+>   trong `main.js` + `khay-thu.js`, chi macOS. Thuoc: `swift scripts/test/do-moi-desktop-mac.swift` (co `--doi-chung`).
+>   CHUA co so tren cua so cua app that sau khi nap (cho anh chup 1 tam roi do lai); overlay chup CHUA ap; CHUA commit.
 > - **08/10 09:54 DANG SUA DO (phien khac, chua ghi so do): `src/khay-thu.js`, nut tron bam khong mo khay tren Windows 0.9.1.** Ban sua
 >   (tra `backgroundThrottling` cua cua so nut ve mac dinh tren Windows) da nap vao app dang cai 09:49 + 09:51; CHUA co bang chung bam nut mo
 >   duoc khay, CHUA commit. Xem muc `[ghi nhan]` 09:54 ben duoi.
@@ -264,6 +268,37 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.9.1 sua, nap tai cho] - 2026-10-12 11:34 - Mac: khay / nut tron / anh ghim chi nam o MOT desktop, sang desktop khac khong thay - may Mac
+
+**Boi canh.** Anh: *"hom nay anh dung mac chia ra nhieu man hinh desktop, AIO shot and save moi thay ra mot nhuoc diem la anh mo AIO o desktop nao
+thi khong xem duoc o desktop khac"*.
+**Nguyen nhan that (DA DO).** macOS gan moi cua so vao dung mot desktop (Space) luc no hien, tru khi cua so khai "di theo moi desktop". Ca `src/`
+khong co lenh `setVisibleOnAllWorkspaces` nao (grep: 0 dong). Do bang thuoc moi `scripts/test/do-moi-desktop-mac.swift` (hoi thang may chu cua so cua
+macOS qua CGSCopySpacesForWindows, khong hoi Electron) tren app dang chay 11:2x, may anh co 6-7 desktop: nut tron 80x80 = 1 desktop, khay anh 380x128
+= 1, san dien 1792x1034 = 1 (deu la desktop so 3).
+**Thuoc co doi chung.** `swift scripts/test/do-moi-desktop-mac.swift --doi-chung` tu mo 2 cua so thu 4x4 diem anh: cai khai moi desktop ra 7/7, cai mac
+dinh ra 1 -> thuoc phan biet duoc.
+**Da sua (chi macOS, rao bang `process.platform`, so loi #21).**
+- `src/main.js`: ham moi `moiDesktop(w, ten)` = `setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })`, goi
+  1 lan ngay sau khi tao: cua so Khay (Storyboard + Video), anh ghim, khay anh, vien quay, thuoc dem / nut Dung. Khong nhan thi ghi `CANH BAO moi-desktop`
+  vao run-log.
+- `src/khay-thu.js` `taoCuaSo`: nut tron + san dien, cung lenh.
+- KHONG ap: overlay chup (vung keo-chon, so loi #8, chua do), cua so Cai dat (cua so thuong), 2 cua so an (luong chup, xuat GIF).
+- `skipTransformProcessType`: mac dinh Electron doi kieu tien trinh moi lan goi, lam Dock + cua so chop mot nhip. App da an Dock san (`anDock`).
+**Kiem chung.**
+- `node --check` 2 file: 0 loi. `grep`: 6 dong `moiDesktop(` trong main.js (1 dinh nghia + 5 cho goi), 2 dong `setVisibleOnAllWorkspaces(` ca `src/`.
+- Thu DUNG lenh do bang Electron 43.4.1 cua du an tren 2 cua so trong suot 80x80 cung bo tuy chon voi nut tron: co goi = 7/7 desktop, khong goi = 1;
+  Dock van an (script nhap, khong vao repo).
+- `npm run test:vienquay`: DAT. `npm run test:khaynut`: 30 dat, TRUOT 1 muc thoi gian "thu ve duoi 1,3 giay" (2345 / 2033 / 1484 ms, 3 lan). Doi
+  chung: ban CHUA sua cung truot dung muc do (1400 ms). May dang ban (tai 12,2); bai nay chay che do an, khong di qua nhanh ma moi them (`if (!TN)`).
+- Nap tai cho 11:33:35 (`node scripts/cai-tai-cho-mac.mjs`): `boot v0.9.1`, `app.asar` md5 `e8e5d902`, CDHash khong doi, quyen Ghi man hinh con,
+  15 anh/video + cau hinh giong truoc; ruot app dang cai co 2 dong lenh moi (ruot cu cat di: 0). Ruot cu:
+  `~/Library/Application Support/AiO-Studio/ban-cai-truoc/shotandsave-ruot-20261012-113334/`.
+**CHUA kiem.** Tren APP THAT sau khi nap: luc do 11:34 app moi mo lai, chua co khay / nut tron nao (chung chi duoc tao sau lan chup dau) -> chua co
+so "7/7" cua chinh cua so app. Can anh chup 1 tam roi chay lai thuoc. Chua kiem: bam nut tron / keo khay / keo anh ghim o desktop khac co nhan chuot
+khong; app khac dang toan man hinh; may 2 man; Windows khong doi (nhanh `darwin` khong chay) nhung chua chay lai bai nao tren Windows.
+Chua tang so phien ban, chua commit len GitHub.
 
 ## [ghi nhan, KHONG phai viec cua phien ghi] - 2026-10-08 09:54 - `src/khay-thu.js` dang duoc MOT PHIEN KHAC sua do (nut tron bam khong mo khay tren Windows) - may cong ty
 

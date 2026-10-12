@@ -315,6 +315,21 @@ const AN_DOCK = process.platform === 'darwin' && !(IS_SELFTEST || IS_DRAGTEST ||
 const anDock = () => { if (AN_DOCK && app.dock) { try { app.dock.hide() } catch (e) {} } }
 anDock()
 
+/* 12/10 Mac (anh: "anh mo AIO o desktop nao thi khong xem duoc o desktop khac"): macOS gan moi cua so vao DUNG MOT desktop
+   (Space) luc no hien, tru khi cua so khai "di theo moi desktop". Do truoc khi sua bang scripts/test/do-moi-desktop-mac.swift
+   (hoi thang may chu cua so cua macOS): may anh 7 desktop, nut tron / khay / san dien moi cai chi nam o 1.
+   Goi ham nay MOT LAN ngay sau khi tao cua so noi (khong goi trong luc chuyen dong dang chay, xem so loi "khung luc bung khay").
+   - visibleOnFullScreen: noi ca tren app dang toan man hinh (can app la tien ich khong co Dock: da co nho anDock).
+   - skipTransformProcessType: Electron mac dinh se doi kieu tien trinh, lam Dock + cua so chop mot nhip moi lan goi.
+   CHI macOS (so loi #21: doi tuy chon cua so noi thi rao theo he dieu hanh ngay tu dau). Overlay chup KHONG ap (chua do). */
+function moiDesktop(w, ten) {
+  if (process.platform !== 'darwin' || !w || w.isDestroyed()) return
+  try {
+    w.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
+    if (!w.isVisibleOnAllWorkspaces()) ghiLog('CANH BAO moi-desktop: ' + ten + ' khong nhan')
+  } catch (e) { ghiLog('moi-desktop LOI ' + ten + ': ' + e.message) }
+}
+
 app.whenReady().then(() => {
   if (THU_OCR) { thuOcr(); return } // che do do: khong tray, khong phim tat, khong luong chup
   if (THU_QUAY) { thuQuay(); return } // che do do quay video: khong tray, khong phim tat
@@ -658,6 +673,7 @@ function moKhay(tab) {
     const nang = typeof level === 'number' ? level >= 3 : e.level === 'error'
     if (nang) ghiLog('khay LOI trang: ' + String(msg || e.message).slice(0, 300))
   })
+  moiDesktop(khayWin, 'cua so Khay')
   khayWin.webContents.on('preload-error', (_e, p, err) => ghiLog('khay LOI preload ' + path.basename(p) + ': ' + (err && err.message)))
   khayWin.loadFile(trang, { query: { tab } })
   // che do do --thu-quay: hien nhung KHONG cuop tieu diem cua nguoi dang lam viec
@@ -1591,6 +1607,7 @@ function createPinWindow(image, screenX, screenY, dipW, dipH, filePath) {
     },
   })
   win.setAlwaysOnTop(true, 'screen-saver')
+  moiDesktop(win, 'anh ghim')
 
   const dataUrl = image.toDataURL()
 
@@ -1868,6 +1885,7 @@ function ensureShelf() {
     },
   })
   shelfWin.setAlwaysOnTop(true, 'screen-saver')
+  moiDesktop(shelfWin, 'khay anh')
   shelfWin.loadFile(path.join(__dirname, 'shelf', 'index.html'))
   shelfWin.webContents.once('did-finish-load', () => {
     if (shelfItems.size && shelfWin && !shelfWin.isDestroyed()) {
@@ -2061,6 +2079,7 @@ function moVienQuay(display, rect, kieu) {
     w.setBounds(c.bounds) // thoat kep workArea luc tao (so loi #1)
     w.setContentProtection(true)
     w.setAlwaysOnTop(true, 'screen-saver')
+    moiDesktop(w, 'vien quay') // dang quay ma doi desktop: vien + nut Dung phai di theo (bo quay man hinh, khong quay desktop)
     w.setIgnoreMouseEvents(true)
     w.loadFile(path.join(__dirname, 'dem', 'vien.html'), { query: { s: JSON.stringify(c.shapes.map((s) => [s.x, s.y, s.width, s.height])) } })
     w.once('ready-to-show', () => { if (!w.isDestroyed()) w.showInactive() })
@@ -2091,6 +2110,7 @@ function moVienQuay(display, rect, kieu) {
     })
     thuoc.setContentProtection(true)
     thuoc.setAlwaysOnTop(true, 'screen-saver')
+    moiDesktop(thuoc, 'thuoc dem / nut Dung')
     if (!laVideo) thuoc.setIgnoreMouseEvents(true) // quay video: nut Dung phai bam duoc (cua so nam NGOAI vung)
     thuoc.loadFile(path.join(__dirname, 'dem', laVideo ? 'quay.html' : 'index.html'), {
       query: laVideo ? { lang, dung: T(laCuon ? 'cuon.xong' : 'quay.dung'), dungTitle: T(laCuon ? 'cuon.xongTitle' : 'quay.dungTitle') } : { lang, vi: thY < n.y ? 'tren' : 'duoi' },
