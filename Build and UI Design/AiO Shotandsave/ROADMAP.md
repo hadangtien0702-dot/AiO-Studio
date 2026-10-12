@@ -71,6 +71,11 @@ that o may cong ty) · (4) hut mau + bang 5 mau · (5) mot khay 3 the. Viec nho 
 man hinh tren Mac (overlay chua khai di theo moi desktop).
 
 ### 0f. CANVAS KIEU MIRO, KHUNG = THU MUC CUNG TEN (anh neu 12/10/2026 12:4x, y MOI cua anh, de len thu tu o 0e) — moi co BAN NHAP, cho anh duyet huong
+> **12/10 14:13 — DA DUNG BAN DAU VAO APP (0.10.0), nap tai cho tren Mac.** Anh xem nhap 2: *"xau qua creative hon di em"* -> nhap 3 (khung la thu
+> muc co tai mau, anh la tam in nam nghieng voi 4 goc cam, y tuong chia ra tu nut tron, ghi chu dan + mui ten) -> anh: *"ok roi them vao website va
+> build di em"*. Trong app: `src/canvas-kho.js`, `src/canvas/`, mo tu menu khay he thong. Cau "chuyen han file hay de nguyen" anh chua tra loi -> em
+> chon de nguyen anh goc + ban noi trong thu muc khung (doi duoc sau). Chua vao app so voi ban mau: ghi chu dan, mui ten. Chua lam: theo doi thu muc
+> tuc thoi, xoa khung, keo ra app khac, Windows, web, khao sat app cung loai. Chi tiet: `PROGRESS.md` muc `[0.10.0]`.
 > **SUA 12/10 13:0x — Claude HIEU SAI chu "mirror".** Anh go *"canvas giong mirror"* = app **MIRO** (bang trang gom y tuong), KHONG phai
 > "tam guong". Nhap 1 `nhap/canvas-guong.html` (khoi luoi + cot thu muc) lam theo nghia sai; anh nhac *"canvas nhu mirror ma em"*, hoi lai
 > mot cau thi anh chon **"Giong app Miro"**. Vi vay lua chon "khoi nhom tu xep luoi" ben duoi KHONG con dung: canvas la BANG TU DO.

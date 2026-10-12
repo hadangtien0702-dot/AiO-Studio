@@ -1,6 +1,10 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **12/10 14:13 MAC: 0.10.0 = CANVAS Y TUONG ban dau, DA NAP vao app dang cai (anh: *"ok roi them vao website va build di em"*).** Menu khay he
+>   thong -> "Mo Canvas y tuong". Bang tu do kieu Miro, khung = thu muc con cung ten, hai chieu; anh goc nam yen, vao khung = ban noi (em tu chon cach
+>   an toan vi anh chua tra loi cau "chuyen han file hay de nguyen"). `test:canvas` 30 + `test:canvasapp` 14 dat. ANH CHUA MO LAN NAO; Windows chua
+>   chay; web chua co; chua co bo cai. Chi tiet + danh sach chua lam: muc `[0.10.0]` ben duoi va `ROADMAP.md` 0f.
 > - **12/10 12:03 TANG SO 0.9.1 -> 0.9.2 + DAY LEN GITHUB (anh: *"push code len git di em"*).** Nhanh `mac` -> `origin/mac` va `origin/may-cong-ty`
 >   (may cong ty keo ve bang `git merge origin/may-cong-ty`); `main` (ban live cua web) KHONG day. 0.9.2 = 0.9.1 + hai viec 12/10 ben duoi (chi macOS).
 >   Chua dong goi bo cai nao cho 0.9.2 (Windows trong Release van 0.9.0, Mac dmg 0.9.1). Hai dong duoi ghi "van 0.9.1 / CHUA day" la truoc luc nay.
@@ -275,6 +279,45 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.10.0 tinh nang, nap tai cho] - 2026-10-12 14:13 - CANVAS Y TUONG ban dau: bang tu do kieu Miro, khung = thu muc con cung ten - may Mac
+
+**Boi canh.** Anh, khi duoc hoi lam tinh nang nao tiep: *"Canvas hinh anh thu thap va group o canvas folder se group theo va dat ten y chang"*,
+*"canvas giong mirror - mot canvas tong hop y tuong"* (mirror = app MIRO; em hieu nham thanh "tam guong" mat mot ban mau), *"tat ca hinh anh chup -
+video - story se duoc mo trong canvas"*, chon dong bo HAI chieu. Nhap 2 (o mau phang): *"xau qua creative hon di em"*. Nhap 3
+(`nhap/canvas-miro.html`): *"ok roi them vao website va build di em"*.
+**Nguoi dung thay gi.** Menu khay he thong co muc "Mo Canvas y tuong". Mot bang toi rong, tieu de lon "Moi y tuong, mot bang."; moi anh / video / dai
+Storyboard la mot tam in vien trang nam hoi nghieng, re chuot hien 4 goc cam; luc mo cac tam chia ra tu nut tron o goc. Keo nen de di chuyen, Ctrl / Cmd
++ lan de phong, "Vua man hinh". "Khung moi" tao mot KHUNG co tai thu muc mau rieng = mot thu muc con cung ten trong thu muc anh; go ten tren tai la doi
+ten thu muc; tha mot tam vao khung la no co mat trong thu muc do, so dem tren tai nay len. Tao / doi ten / xoa thu muc trong Finder thi lan mo sau (hoac
+luc quay lai cua so) bang doi theo. Bam dup mot tam = mo file; bam dup tai = mo thu muc; nut tron = chup them, tam moi bay vao bang.
+**Quyet dinh em tu chon vi anh chua tra loi (hoi 3 lan): file xu ly the nao khi vao khung.** Chon cach KHONG pha gi: anh goc nam yen, thu muc cua khung
+chua BAN NOI (hard link) toi no (mo thu muc van thay anh that, khong ton them dia, anh da keo vao Premiere khong mat). App khong chuyen, khong xoa anh
+goc; ra khoi khung chi bo ban noi khi chac no cung ma file voi anh goc (hoac la ban chep app da ghi so); file khac trung ten thi de nguyen.
+**Da lam.**
+- `src/canvas-kho.js` (moi, khong goi electron): so `<userData>/canvas/bo-cuc.json` doc 3 nghia (chua co / khong doc duoc = cam ghi de / hong = cat
+  sang `.hong-<gio>.json`), quet thu muc, `dongBo` (thu muc la su that ve "tam nao thuoc khung nao", so giu vi tri + mau; nhan ra thu muc bi doi ten
+  trong Finder bang ma thu muc; so ten bang NFC + chu thuong), tao khung / doi ten / dat thanh vien.
+- `src/main.js`: `openCanvasWindow`, 8 kenh `canvas:*`, anh nho `aioshot://cv/<hex>.jpg` (rong 400 px, cat vao `<userData>/canvas/anh-nho`, tao LAN
+  LUOT tung tam, nhuong luong chinh, dung khi dang chup / quay; chi phuc vu file nam trong thu muc anh), muc menu `tray.canvas`, bao Canvas khi co anh
+  moi, che do do `--thu-canvas`. `src/preload-canvas.js`, `src/canvas/index.html` + `canvas.js` (moi), `src/i18n.js` (21 khoa VI + EN).
+**Kiem chung.**
+- `npm run test:canvas` (an, thu muc tam): 30 / 30. Gom: ban noi cung ma file voi anh goc; keo sang khung khac / ra ngoai; KHONG xoa file chi co
+  trong thu muc con va file khac trung ten (doi chung); doi ten tu app va tu Finder (giu cho + co khung); tao / xoa thu muc trong Finder; so lech voi
+  thu muc thi thu muc thang (doi chung); so hong / khong doc duoc khong mat, khong ghi de (doi chung); anh goc y nguyen tu dau toi cuoi.
+- QUY MO THAT (luat 2b) da bat 2 loi ma bo 6 anh khong thay: 800 anh + 5 thu muc x 40 anh -> khung tu cao len roi DE len khung duoi, moi lan mo lai xep
+  lai. Sua thu tu xep (tam trong khung truoc, day cac khung khoi nhau, roi moi xep tam ngoai). Sau sua: 800 tam lan dau 137 ms, lan sau 16 ms, 0 tam de
+  nhau, lan mo thu hai khong xe dich tam nao.
+- `npm run test:canvasapp` (main.js that + trang that, cua so AN, thu muc tam): 14 / 14. Bam "Khung moi", keo a.png vao khung, go ten moi (thu muc tren
+  dia doi theo), ten "///" bi tu choi kem cau bao loi, thu nho khung, keo ra ngoai; doi chieu dia sau khi app thoat; 6 / 6 anh nho tai duoc; 0 loi
+  console. Anh chup cua so an: bang ve dung nhu ban mau. Bai nay dau tien bao truot 1 muc do THUOC sai (tim thu muc theo ten cu sau khi da doi ten).
+- Khong hoi quy: `test:cauhinh` 22, `test:keo` 36, `test:khaynut` 36 / 36.
+- Nap tai cho 14:12:24: `boot v0.10.0`, `app.asar` md5 `510dc62f`, CDHash khong doi, quyen Ghi man hinh con, 17 anh/video + cau hinh giong truoc.
+**CHUA kiem / CHUA lam.** Anh CHUA mo Canvas lan nao (chuot that, ban di chuot, do muot, 17 anh that + video that tren may nay); thu muc anh 778 file o
+may cong ty (lan dau phai tao 778 anh nho, uoc 40-60 giay, chua do); video hien bang the `<video>` nap khung dau (nhieu video co the nang, chua do);
+theo doi thu muc tuc thoi (hien dong bo luc mo + luc quay lai cua so); ghi chu dan + mui ten (co trong ban mau, chua vao app); keo tam tu Canvas tha
+sang app khac; xoa khung; dai Storyboard vao khung chi ghi trong so (dai khong nam trong thu muc anh); don anh nho cu; WINDOWS chua chay lan nao (ban noi
+tren NTFS, ten thu muc, bai kiem); chua khao sat app cung loai (Eagle, PureRef, Milanote: luat 2d); web chua co; chua co bo cai.
 
 ## [0.9.1 tinh nang, nap tai cho] - 2026-10-12 11:47 - Mac: KEO duoc nut tron (khay da thu ve) toi cho khac, nho vi tri - may Mac
 

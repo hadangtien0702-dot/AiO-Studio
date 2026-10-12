@@ -27,6 +27,7 @@ const i18n = require('./i18n')
 const { taoKhayThu, giayHopLe } = require('./khay-thu') // 01/10: khay tu thu ve nut tron o goc
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
+const canvasKho = require('./canvas-kho') // 12/10: Canvas y tuong — khung tren bang = thu muc con cung ten
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
@@ -110,6 +111,12 @@ else if (process.env.AIO_USERDATA) app.setPath('userData', process.env.AIO_USERD
 const iThuOcr = process.argv.indexOf('--thu-ocr')
 const THU_OCR = iThuOcr > 0 ? { anh: process.argv[iThuOcr + 1], ra: process.argv[iThuOcr + 2] } : null
 if (THU_OCR) app.setPath('userData', path.join(require('os').tmpdir(), 'aio-thu-ocr'))
+// [do 12/10] --thu-canvas <thu muc anh thu> <thu muc ra>: mo cua so Canvas AN (khong hien len man), bam + keo bang su kien that cua
+// trang, ghi ket-qua.json + anh chup cua so roi THOAT. userData rieng nam trong thu muc ra (khong danh thuc ban dang chay, so loi #12).
+// Chay: npm run test:canvasapp
+const iThuCanvas = process.argv.indexOf('--thu-canvas')
+const THU_CANVAS = iThuCanvas > 0 ? { anh: process.argv[iThuCanvas + 1], ra: process.argv[iThuCanvas + 2] } : null
+if (THU_CANVAS) app.setPath('userData', path.join(THU_CANVAS.ra, 'userData'))
 async function thuOcr() {
   const kq = { ban: app.getVersion(), dongGoi: app.isPackaged }
   try {
@@ -369,11 +376,20 @@ app.whenReady().then(() => {
       if (!f) return new Response('', { status: 404 })
       return new Response(fs.readFileSync(f), { headers: Object.assign({ 'Content-Type': 'image/jpeg' }, headers) })
     }
+    // aioshot://cv/<hex duong dan>.jpg — anh nho cho Canvas (12/10), tao lan luot (xem anhNhoCanvasLanLuot)
+    m = /^aioshot:\/\/cv\/([0-9a-f]+)\.jpg/.exec(req.url)
+    if (m) {
+      return anhNhoCanvasLanLuot(Buffer.from(m[1], 'hex').toString('utf8')).then((buf) => (buf
+        ? new Response(buf, { headers: Object.assign({ 'Content-Type': 'image/jpeg', 'Cache-Control': 'max-age=31536000' }, headers) })
+        : new Response('', { status: 404 })))
+    }
     return new Response('', { status: 404 })
   })
 
   khoDai.khoiTao(app.getPath('userData'))
   khoVideo.khoiTao(app.getPath('userData'), ghiLog)
+  canvasKho.khoiTao(app.getPath('userData'), ghiLog)
+  if (THU_CANVAS) { thuCanvas(); return } // che do do: khong tray, khong phim tat, khong luong chup
   xuatGif.khoiTao(ghiLog)
   setTimeout(khoiPhucVideoDo, 5000) // 02/10: file quay do cua lan truoc (app bi tat giua luc quay) -> dua lai vao khay
   { // 04/10 (anh chot huong A): KHONG xoa sach .keo nua — file da dua cho Premiere bi mat sau khi mo lai app.
@@ -538,6 +554,7 @@ function rebuildTrayMenu() {
     { label: T('tray.khay'), click: () => showShelf() },
     { label: T('tray.storyboard'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
     { label: T('tray.video'), click: () => openVideoWindow() },
+    { label: T('tray.canvas'), click: () => openCanvasWindow() }, // 12/10: bang y tuong kieu Miro, khung = thu muc cung ten
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
@@ -1940,6 +1957,7 @@ function shelfAdd(image, filePath) {
     send()
   }
   showShelf()
+  canvasLamMoi() // 12/10: Canvas dang mo thi tam vua chup bay vao bang
 }
 
 ipcMain.on('shelf:pin', (e, id) => {
@@ -2425,6 +2443,182 @@ ipcMain.on('quay:dung', () => { if (cuon) { cuon.dung = true; return } dungGhiHi
 
 /* --- KHAY VIDEO (01/10) = the "Video" cua cua so khay gop (moKhay o tren). Moi doan quay 1 hang. --- */
 function openVideoWindow() { moKhay('video') }
+
+/* ── CANVAS Y TUONG (12/10) ─────────────────────────────────────────────────────────────────────────────────────────
+   Anh: "canvas giong Miro - mot canvas tong hop y tuong", "group o canvas, folder se group theo va dat ten y chang", "tat ca hinh
+   anh chup - video - story se duoc mo trong canvas", dong bo hai chieu. Mot bang tu do bay moi thu da thu thap; KHUNG tren bang
+   = THU MUC CON cung ten trong thu muc anh. Toan bo phan thu muc + so bo cuc + luat an toan (khong dung anh goc, khong xoa file
+   khong phai cua minh) nam o src/canvas-kho.js; o day chi co cua so, kenh noi va anh nho. Trang: src/canvas. */
+let canvasWin = null
+const laCanvas = (e) => !!canvasWin && !canvasWin.isDestroyed() && e.sender === canvasWin.webContents
+function canvasLamMoi() { if (canvasWin && !canvasWin.isDestroyed()) { try { canvasWin.webContents.send('canvas:lam-moi') } catch (e) {} } }
+function openCanvasWindow() {
+  if (canvasWin && !canvasWin.isDestroyed()) { canvasWin.show(); canvasWin.focus(); canvasLamMoi(); return }
+  const wa = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
+  const w = Math.min(1500, Math.round(wa.width * 0.88)), h = Math.min(980, Math.round(wa.height * 0.88))
+  canvasWin = new BrowserWindow({
+    x: wa.x + Math.round((wa.width - w) / 2), y: wa.y + Math.round((wa.height - h) / 2), width: w, height: h,
+    minWidth: 720, minHeight: 480, title: 'AiO Shot & Save · Canvas', backgroundColor: '#0c0c0d', show: false,
+    icon: path.join(__dirname, '..', 'assets', 'app.ico'),
+    webPreferences: { preload: path.join(__dirname, 'preload-canvas.js'), contextIsolation: true, sandbox: false },
+  })
+  canvasWin.setMenuBarVisibility(false)
+  canvasWin.webContents.on('console-message', (e, level, msg) => {
+    const nang = typeof level === 'number' ? level >= 3 : e.level === 'error'
+    if (nang) ghiLog('canvas LOI trang: ' + String(msg || e.message).slice(0, 300))
+  })
+  canvasWin.webContents.on('preload-error', (_e, p, err) => ghiLog('canvas LOI preload ' + path.basename(p) + ': ' + (err && err.message)))
+  canvasWin.loadFile(path.join(__dirname, 'canvas', 'index.html'))
+  canvasWin.once('ready-to-show', () => { if (canvasWin && !canvasWin.isDestroyed() && !THU_CANVAS) canvasWin.show() })
+  canvasWin.on('closed', () => { canvasWin = null })
+  ghiLog('canvas mo')
+}
+/** Trang thai cho trang ve: khop so voi dia (canvas-kho.nap) roi gan duong dan anh nho / video / khung dai. */
+function canvasNap() {
+  const goc = kho.thuMucAnh()
+  let dais = []
+  try { dais = khoDai.danhSach().map((m) => ({ id: m.id, mtime: Date.parse(m.taoLuc) || 0, khung: (m.khung || []).map((k) => k.seq) })) } catch (e) { ghiLog('canvas: doc dai LOI ' + e.message) }
+  const t0 = Date.now()
+  const r = canvasKho.nap(goc, dais)
+  for (const m of r.tt.muc) {
+    if (m.kieu === 'dai') { m.anh = m.seq.slice(0, 6).map((s) => 'aioshot://dai/' + m.dai + '/' + s + '.jpg'); continue }
+    const p = path.join(goc, ...m.tep)
+    m.ten = m.tep[m.tep.length - 1]
+    if (m.kieu === 'anh') m.anh = 'aioshot://cv/' + Buffer.from(p, 'utf8').toString('hex') + '.jpg?m=' + Math.round(m.mtime)
+    else m.video = require('url').pathToFileURL(p).href
+    delete m.tep
+  }
+  const ms = Date.now() - t0
+  if (ms > 400) ghiLog('canvas nap ' + r.tt.muc.length + ' tam, ' + r.tt.khung.length + ' khung: ' + ms + ' ms')
+  return { tt: r.tt, loiSo: r.loiSo }
+}
+/* Anh nho cho Canvas (rong 400 px, JPEG): tao khi trang xin lan dau, cat vao <userData>/canvas/anh-nho, lan sau doc lai.
+   CHI phuc vu file anh nam TRONG thu muc anh (duong dan do trang gui len -> khong tin). Tao lan luot tung tam, nhuong luong chinh
+   giua cac tam va dung han khi dang chup (createFromPath chay o luong chinh, moi tam vai chuc ms; 800 anh ma lam lien la treo phim tat). */
+const anhNhoCanvas = new Map()
+let hangAnhNho = Promise.resolve()
+function taoAnhNhoCanvas(p) {
+  try {
+    const goc = path.resolve(kho.thuMucAnh()), f = path.resolve(p)
+    if (!f.startsWith(goc + path.sep) || !/\.(png|jpe?g)$/i.test(f)) return null
+    const st = fs.statSync(f), khoa = f + '|' + st.mtimeMs + '|' + st.size
+    let buf = anhNhoCanvas.get(khoa)
+    if (buf) return buf
+    const dir = path.join(app.getPath('userData'), 'canvas', 'anh-nho')
+    const tep = path.join(dir, require('crypto').createHash('sha1').update(khoa).digest('hex') + '.jpg')
+    try { buf = fs.readFileSync(tep) } catch (e) {
+      const img = nativeImage.createFromPath(f)
+      if (!img || img.isEmpty()) return null
+      const sz = img.getSize(), k = Math.min(1, 400 / Math.max(1, sz.width))
+      buf = img.resize({ width: Math.max(1, Math.round(sz.width * k)), height: Math.max(1, Math.round(sz.height * k)), quality: 'good' }).toJPEG(80)
+      try { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(tep, buf) } catch (e2) { ghiLog('canvas: ghi anh nho LOI ' + e2.code) }
+    }
+    if (anhNhoCanvas.size >= 500) anhNhoCanvas.delete(anhNhoCanvas.keys().next().value)
+    anhNhoCanvas.set(khoa, buf)
+    return buf
+  } catch (e) { return null }
+}
+function anhNhoCanvasLanLuot(p) {
+  const viec = hangAnhNho.then(() => new Promise((res) => {
+    const lam = () => { if (overlayWins.length > 0 || ghiHinh) { setTimeout(lam, 250); return } setImmediate(() => res(taoAnhNhoCanvas(p))) }
+    lam()
+  }))
+  hangAnhNho = viec.catch(() => null)
+  return viec
+}
+ipcMain.handle('canvas:nap', (e) => (laCanvas(e) ? canvasNap() : null))
+ipcMain.on('canvas:luu', (e, p) => { if (laCanvas(e)) canvasKho.luuViTri(p) })
+ipcMain.handle('canvas:tao-khung', (e, x, y) => {
+  if (!laCanvas(e)) return null
+  const kq = canvasKho.taoKhung(kho.baoDamThuMuc(kho.thuMucAnh()), T('cv.tenMoi'), Number(x), Number(y))
+  ghiLog('canvas: tao khung ' + (kq.ok ? 'xong' : 'LOI ' + kq.loi + ' ' + (kq.ct || '')))
+  return Object.assign({ kq: kq.ok ? { ok: true, id: kq.khung.id } : kq }, canvasNap())
+})
+ipcMain.handle('canvas:doi-ten', (e, id, ten) => {
+  if (!laCanvas(e)) return null
+  const kq = canvasKho.doiTenKhung(kho.thuMucAnh(), String(id), String(ten == null ? '' : ten))
+  if (!kq.ok) ghiLog('canvas: doi ten khung khong duoc (' + kq.loi + (kq.ct ? ' ' + kq.ct : '') + ')')
+  return Object.assign({ kq }, canvasNap())
+})
+ipcMain.handle('canvas:xep', (e, ds) => {
+  if (!laCanvas(e)) return null
+  const goc = kho.thuMucAnh(), kq = []
+  for (const g of (Array.isArray(ds) ? ds : []).slice(0, 2000)) {
+    const r = canvasKho.datThanhVien(goc, g && g.khoa, (g && g.khung) || null)
+    if (!r.ok && r.loi === 'he-thong') ghiLog('canvas: xep vao thu muc LOI ' + (r.ct || ''))
+    kq.push(Object.assign({ khoa: g && g.khoa }, r))
+  }
+  return Object.assign({ kq }, canvasNap())
+})
+ipcMain.on('canvas:mo', (e, khoa) => {
+  if (!laCanvas(e)) return
+  khoa = String(khoa || '')
+  if (khoa.startsWith('dai:')) { openStoryboardWindow(); return }
+  const goc = kho.thuMucAnh()
+  let p = null
+  if (khoa.startsWith('k:')) {
+    const i = khoa.indexOf('/'), k = canvasKho.boCucHienTai().khung.find((x) => x.id === khoa.slice(2, i)), ten = khoa.slice(i + 1)
+    if (k && ten === path.basename(ten)) p = path.join(goc, k.ten, ten)
+  } else if (khoa === path.basename(khoa) && !khoa.startsWith('.')) p = path.join(goc, khoa)
+  if (p && fs.existsSync(p)) shell.openPath(p)
+})
+ipcMain.on('canvas:mo-thu-muc', (e, id) => {
+  if (!laCanvas(e)) return
+  const goc = kho.baoDamThuMuc(kho.thuMucAnh()), k = id ? canvasKho.boCucHienTai().khung.find((x) => x.id === id) : null
+  shell.openPath(k ? path.join(goc, k.ten) : goc)
+})
+ipcMain.on('canvas:chup', (e) => { if (laCanvas(e) && !THU_CANVAS) startCapture() })
+/* [do] --thu-canvas: chay TRANG that + MAIN that tren mot thu muc anh thu, cua so khong hien. Keo / bam bang su kien con tro cua
+   chinh trang (cung duong voi tay nguoi dung, tru cai chuot that). Ben chay bai (scripts/test/do-canvas-app.cjs) doi chieu voi dia. */
+async function thuCanvas() {
+  const kq = { ban: app.getVersion(), loiTrang: [], buoc: {} }
+  const cho = (ms) => new Promise((r) => setTimeout(r, ms))
+  setTimeout(() => app.exit(2), 60000)
+  try {
+    kho.ghiCauHinh({ thuMucAnh: THU_CANVAS.anh })
+    openCanvasWindow()
+    const w = canvasWin
+    w.webContents.on('console-message', (e, level, msg) => { if (typeof level === 'number' ? level >= 3 : e.level === 'error') kq.loiTrang.push(String(msg || e.message).slice(0, 200)) })
+    await new Promise((r) => w.webContents.once('did-finish-load', r))
+    await cho(1800)
+    const js = (s) => w.webContents.executeJavaScript(s, true)
+    await js(`window.__thu = {
+      tt() { const t = window.__cv.trangThai(), q = (s) => [...document.querySelectorAll(s)], b = document.getElementById('bao')
+        return { khung: t.khung.map((k) => ({ id: k.id, ten: k.ten, n: Number(document.querySelector('.khung[data-k="' + k.id + '"] b').textContent), o: document.querySelector('.khung[data-k="' + k.id + '"] input').value })),
+          muc: t.mucs.map((m) => [m.khoa, m.khung || '']), o: q('.o').length, dem: document.getElementById('dem').textContent, tieu: document.getElementById('tieu').textContent,
+          anhXong: q('img.anh').filter((i) => i.complete && i.naturalWidth > 0).length, anhTong: q('img.anh').length, conBay: q('.bay').length, bao: b.classList.contains('hien') ? b.textContent : '', ti: document.getElementById('ti').textContent } },
+      keo(sel, selDich, dx, dy) { const a = document.querySelector(sel), b = selDich ? document.querySelector(selDich) : null, bang = document.getElementById('bang'), ra = a.getBoundingClientRect()
+        const x0 = ra.left + ra.width / 2, y0 = ra.top + ra.height / 2; let x1 = x0 + (dx || 0), y1 = y0 + (dy || 0)
+        if (b) { const rb = b.getBoundingClientRect(); x1 = rb.left + rb.width / 2 + (dx || 0); y1 = rb.top + rb.height / 2 + (dy || 0) }
+        const pe = (el, t, x, y) => el.dispatchEvent(new PointerEvent(t, { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0, pointerId: 1, isPrimary: true }))
+        pe(a, 'pointerdown', x0, y0); for (let i = 1; i <= 6; i++) pe(bang, 'pointermove', x0 + (x1 - x0) * i / 6, y0 + (y1 - y0) * i / 6); pe(bang, 'pointerup', x1, y1) },
+      doiTen(id, ten) { const i = document.querySelector('.khung[data-k="' + id + '"] input'); i.value = ten; i.dispatchEvent(new Event('change', { bubbles: true })) },
+    }; true`)
+    const tt = () => js('window.__thu.tt()')
+    kq.buoc.dau = await tt()
+    await js(`document.getElementById('them').click(); true`); await cho(700)
+    await js(`document.activeElement && document.activeElement.blur(); true`)
+    kq.buoc.sauTao = await tt()
+    const moi = kq.buoc.sauTao.khung.find((k) => !kq.buoc.dau.khung.some((c) => c.id === k.id))
+    kq.idMoi = moi ? moi.id : null
+    if (moi) {
+      await js(`window.__thu.keo('.o[data-khoa="a.png"]', '.khung[data-k="${moi.id}"]'); true`); await cho(900)
+      kq.buoc.sauKeoVao = await tt()
+      await js(`window.__thu.doiTen('${moi.id}', 'Ý tưởng Tết'); true`); await cho(800)
+      kq.buoc.sauDoiTen = await tt()
+      await js(`window.__thu.doiTen('${moi.id}', '///'); true`); await cho(700)
+      kq.buoc.sauTenSai = await tt()
+      await js(`window.__thu.keo('.khung[data-k="${moi.id}"] .goc', null, -60, -40); true`); await cho(800)   // thu nho khung: tam a.png van phai nam trong
+      kq.buoc.sauDoiCo = await tt()
+      await js(`window.__thu.keo('.o[data-khoa="a.png"]', '#tieu', 0, 60); true`); await cho(900)
+      kq.buoc.sauKeoRa = await tt()
+    }
+    await js(`window.__cv.vua(); true`); await cho(300)
+    try { fs.writeFileSync(path.join(THU_CANVAS.ra, 'canvas.png'), (await w.webContents.capturePage()).toPNG()) } catch (e) { kq.loiChup = e.message }
+  } catch (e) { kq.loi = e.message }
+  try { fs.writeFileSync(path.join(THU_CANVAS.ra, 'ket-qua.json'), JSON.stringify(kq, null, 1)) } catch (e) {}
+  app.exit(0)
+}
 ipcMain.on('shelf:open-video', () => openVideoWindow())
 
 /* 01/10 10:4x anh chot: quay LUON co tieng; vao khay moi chon "Co tieng / Khong tieng" cho tung video.

@@ -273,6 +273,16 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
 DUNG go):
+- **CANVAS Y TUONG (0.10.0, 12/10; anh: "canvas giong Miro - mot canvas tong hop y tuong", "group o canvas, folder se group theo va dat ten y chang").**
+  Nguoi xai: menu khay he thong -> "Mo Canvas y tuong": bang tu do bay moi anh / video / dai Storyboard; khung co tai thu muc mau = thu muc con cung ten
+  trong thu muc anh; tha tam vao khung la no co mat trong thu muc; sua trong Finder thi lan mo sau bang doi theo. Vi du doi thuong: cai ban lam viec trai
+  day anh in, moi xap anh co mot bia ho so ghi ten, va tu ho so ngoai doi tu sap theo dung nhu vay.
+  Builder: THU MUC la su that ve "tam nao thuoc khung nao" (`canvas-kho.js dongBo`), so `canvas/bo-cuc.json` chi giu vi tri + mau. ANH GOC KHONG BAO GIO
+  bi chuyen / xoa: vao khung = ban noi (hard link), ra khung = bo ban noi CHI khi cung ma file voi anh goc. Them thao tac moi tren thu muc thi giu dung
+  luat do va them muc vao `test:canvas` (co doi chung). Trang chi ve trang thai main tra ve; sau moi thao tac doi thu muc thi lay trang thai moi.
+  Dung vao cach xep (`dongBo` muc 3) -> chay lai khoi "800 anh" cua `test:canvas`: bo 6 anh KHONG thay loi khung de nhau.
+  Xong ban dau = `npm run test:canvas` 30 muc + `npm run test:canvasapp` 14 muc (app that, cua so an). CHUA dat: anh chua dung that; Windows chua chay;
+  chua theo doi thu muc tuc thoi; chua co ghi chu dan, xoa khung, keo ra app khac; 778 anh o may cong ty chua do.
 - **NUT TRON KEO DUOC (12/10, chi macOS).** Nguoi xai: giu chuot tren nut tron roi keo, tha ra nut nam lai cho do va nho qua cac lan mo app; bam khong
   keo van mo khay. Builder: vi tri luu dang ti le `viTriNut { rx, ry }` trong `cau-hinh.json`; MOI cho tinh o nut phai goi `oTronNut(wa, viTri())` (thu,
   bung, damBaoNut) — them cho moi ma quen `viTri()` la khay bay ve goc cu trong khi nut nam cho khac. Keo = cong TONG do lech vao o luc bat dau, khong
