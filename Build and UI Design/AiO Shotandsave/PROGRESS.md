@@ -1,6 +1,9 @@
 # PROGRESS — AiO Shot & Save
 
 > **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-06 15:51 +0700 (/xong, may cong ty)
+> - **12/10 11:47 MAC: KEO duoc nut tron (anh: *"khi khay thu ve anh muon di chuyen duoc cai icon do nua"*). DA NAP, van 0.9.1.** Giu chuot keo = nut di
+>   theo, tha ra nam lai + nho vi tri (`viTriNut` trong cau-hinh.json); bam khong keo van mo khay. Chi bat tren macOS. Bai an `test:khaynut` 5 muc moi dat
+>   + doi chung tat keo thi truot. CHUA co anh keo bang chuot that; Windows chua bat; CHUA day.
 > - **12/10 11:34 MAC: SUA "mo AIO o desktop nao thi khong xem duoc o desktop khac" (anh bao 12/10). DA NAP vao app dang cai, van 0.9.1.**
 >   Goc DA DO: khong cua so nao khai "di theo moi desktop" -> nut tron / khay / san dien moi cai chi nam o 1 trong 7 desktop. Sua: `moiDesktop()`
 >   trong `main.js` + `khay-thu.js`, chi macOS. Thuoc: `swift scripts/test/do-moi-desktop-mac.swift` (co `--doi-chung`).
@@ -269,6 +272,31 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [0.9.1 tinh nang, nap tai cho] - 2026-10-12 11:47 - Mac: KEO duoc nut tron (khay da thu ve) toi cho khac, nho vi tri - may Mac
+
+**Boi canh.** Anh, ngay sau khi xac nhan nut tron da di theo moi desktop: *"a khi khay thu ve anh muon di chuyen duoc cai icon do nua em"*.
+Truoc do (chot 01/10) nut luon nam goc duoi-phai vung lam viec cua man hinh co khay.
+**Nguoi dung thay gi.** Giu chuot tren nut tron roi keo: nut di theo con tro, khong ra khoi man; tha ra thi nam lai cho do. Lan sau khay thu ve / app mo lai,
+nut ve dung cho da keo. Bam khong keo (nhich duoi 5 px) van mo khay nhu cu. Khay bung ra / thu ve bay tu / toi dung cho nut dang nam.
+**Da lam.**
+- `src/khay-thu.js`: `oTronNut(wa, vt)` / `oCuaSoNut(wa, vt)` nhan vi tri da keo (`vt = { rx, ry }`, ti le 0..1 trong vung duoc phep; khong co thi ve goc
+  nhu cu); ham moi `kepTron`, `viTriTuTron`, `viTriHopLe`; 3 kenh `nut:keo-bat-dau` / `nut:keo-den` / `nut:keo-xong`: cong TONG do lech vao o cua so luc bat
+  dau keo, dat lai ca rong / cao (cung luat voi keo khay, khong cong don); tha chuot thi nho (`vtNho` trong RAM + `deps.luuViTriNut`); `bung()` chot vi tri
+  truoc khi bay neu tay con dang keo. Mot dong run-log moi lan tha: `nut tron: keo toi x,y (ti le ...)`.
+- `src/nut/nut.js` + `preload-nut.js` + `nut/index.html`: pointerdown / pointermove / pointerup tren nut, nguong 5 px, chan cu "click" di lien sau luot keo.
+- `src/main.js`: `docViTriNut` / `luuViTriNut` doc ghi khoa MOI `viTriNut` trong `cau-hinh.json` (khong doi khoa nao co san).
+- **CHI bat tren macOS** (`KEO_NUT`, so loi #21: doi cach cua so noi nhan chuot thi phai do cu bam that tren Windows truoc). Windows: nut van o goc, bam van mo.
+**Kiem chung.**
+- `npm run test:khaynut` (chay an, chuot gia lap `sendInputEvent` vao chinh trang nut): 35 dat / 1 truot. 5 muc moi deu DAT: luu ti le roi doc lai ra dung o
+  cu (3 man x 5 cho, ti le hong ve goc) · keo -300,-200 -> cua so di dung (1514,814 -> 1214,614), van la nut, co nho `{rx 0.798684, ry 0.74878}` · keo qua
+  khoi man -> kep ve (0,0) · nhich 3 px roi tha = bam, khay mo · thu lai nut ve dung cho da keo. Muc truot la muc thoi gian cu ("thu ve duoi 1,3 giay":
+  1976 ms; ban chua sua cung truot 1400 ms, may dang ban).
+- DOI CHUNG `AIO_KEO_NUT=0 npm run test:khaynut`: 2 muc KEO + muc "thu lai" TRUOT (nut dung yen 1514,814), muc bam van DAT -> bai do bat duoc khi keo hong.
+- Nap tai cho 11:46:53: `boot v0.9.1`, `app.asar` md5 `83324376`, CDHash khong doi, quyen Ghi man hinh con, 16 anh/video + cau hinh giong truoc.
+  Ruot cu: `.../ban-cai-truoc/shotandsave-ruot-20261012-114651/`.
+**CHUA kiem.** Chuot THAT tren man that (em khong keo duoc chuot tren Mac cua anh): keo co muot khong, tha ra co mo nham khay khong, nut x co bi bam
+nham khong; may 2 man (nut bi kep trong man no dang nam, chua cho keo sang man khac); Windows chua bat. Chua tang so phien ban, chua day len GitHub.
 
 ## [0.9.1 sua, nap tai cho] - 2026-10-12 11:34 - Mac: khay / nut tron / anh ghim chi nam o MOT desktop, sang desktop khac khong thay - may Mac
 

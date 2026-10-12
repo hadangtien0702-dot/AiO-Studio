@@ -29,14 +29,33 @@ const NUT = { CUA_SO: 80, TRON: 52, LE: 20 } // DIP: cua so nut, vong tron, khoa
 const GIAY = [5, 10, 15]
 const giayHopLe = (v) => (GIAY.includes(Number(v)) ? Number(v) : GIAY[0])
 
-/** O vong tron (toan cuc DIP) o goc duoi-phai workArea. */
-function oTronNut(wa) {
+/* 12/10 (anh: "khi khay thu ve anh muon di chuyen duoc cai icon do nua"): nguoi dung KEO nut tron toi cho khac.
+   Vi tri luu dang TI LE 0..1 trong vung duoc phep cua workArea (doi man / doi do phan giai van con dung), khoa `viTriNut`
+   trong cau-hinh.json. KEP = vong tron cach mep workArea it nhat 14 px -> CA cua so nut 80x80 luon nam trong workArea. */
+const KEP = (NUT.CUA_SO - NUT.TRON) / 2
+const viTriHopLe = (vt) => !!vt && Number.isFinite(vt.rx) && Number.isFinite(vt.ry) && vt.rx >= 0 && vt.rx <= 1 && vt.ry >= 0 && vt.ry <= 1
+const kepSo = (v, a, b) => Math.min(Math.max(v, a), Math.max(a, b))
+/** Kep o vong tron vao trong workArea (cach mep >= KEP). */
+function kepTron(t, wa) {
+  return { x: kepSo(Math.round(t.x), wa.x + KEP, wa.x + wa.width - NUT.TRON - KEP), y: kepSo(Math.round(t.y), wa.y + KEP, wa.y + wa.height - NUT.TRON - KEP), width: NUT.TRON, height: NUT.TRON }
+}
+/** O vong tron -> ti le { rx, ry } de luu. */
+function viTriTuTron(t, wa) {
+  const k = kepTron(t, wa), dx = wa.width - NUT.TRON - 2 * KEP, dy = wa.height - NUT.TRON - 2 * KEP
+  const tron4 = (v) => Math.round(v * 1e6) / 1e6
+  return { rx: dx > 0 ? tron4((k.x - wa.x - KEP) / dx) : 1, ry: dy > 0 ? tron4((k.y - wa.y - KEP) / dy) : 1 }
+}
+/** O vong tron (toan cuc DIP). Khong co vi tri da keo (vt) -> goc duoi-phai workArea nhu truoc 12/10. */
+function oTronNut(wa, vt) {
+  if (viTriHopLe(vt)) {
+    return kepTron({ x: wa.x + KEP + vt.rx * (wa.width - NUT.TRON - 2 * KEP), y: wa.y + KEP + vt.ry * (wa.height - NUT.TRON - 2 * KEP) }, wa)
+  }
   return { x: wa.x + wa.width - NUT.LE - NUT.TRON, y: wa.y + wa.height - NUT.LE - NUT.TRON, width: NUT.TRON, height: NUT.TRON }
 }
 /** O CUA SO chua nut (toan cuc DIP): vong tron nam chinh giua, le deu (CUA_SO - TRON) / 2 cho bong + so dem. */
-function oCuaSoNut(wa) {
-  const t = oTronNut(wa), le = (NUT.CUA_SO - NUT.TRON) / 2
-  return { x: t.x - le, y: t.y - le, width: NUT.CUA_SO, height: NUT.CUA_SO }
+function oCuaSoNut(wa, vt) {
+  const t = oTronNut(wa, vt)
+  return { x: t.x - KEP, y: t.y - KEP, width: NUT.CUA_SO, height: NUT.CUA_SO }
 }
 /** Doi o toan cuc sang toa do trong san dien (goc san = goc workArea). */
 const tuongDoi = (b, wa) => ({ x: b.x - wa.x, y: b.y - wa.y, w: b.width, h: b.height })
@@ -85,6 +104,15 @@ function taoKhayThu(deps) {
      voi ban cu la `backgroundThrottling: false` (them 04/10 cho Mac). -> chi tat ham ve tren macOS; Windows giu mac dinh nhu
      ban anh da dung tu 01/10. deps.khongHam = true / false de ep (bai do). */
   const KHONG_HAM = deps.khongHam != null ? !!deps.khongHam : process.platform === 'darwin'
+  /* 12/10 KEO nut tron: giu chuot tren nut roi keo = nut di theo, tha ra thi nam lai + nho vi tri; bam khong keo van mo khay.
+     CHI bat tren macOS (so loi #21: thay doi cach cua so noi nhan chuot thi phai do cu bam THAT tren Windows truoc khi bat o do).
+     deps.keoNut = true / false de ep (bai do an chay duoc tren ca hai he). deps.docViTriNut() / luuViTriNut(vt): cau-hinh.json. */
+  const KEO_NUT = deps.keoNut != null ? !!deps.keoNut : process.platform === 'darwin'
+  let vtNho = null // vi tri vua keo, giu trong RAM: ghi cau hinh hong thi nut van nam dung cho toi khi tat app
+  const viTri = () => {
+    if (vtNho) return vtNho
+    try { const v = deps.docViTriNut ? deps.docViTriNut() : null; return viTriHopLe(v) ? v : null } catch (e) { return null }
+  }
 
   let tt = 'mo'            // 'mo' = khay la khay · 'thu' = dang la nut tron · 'an' = nguoi dung an han nut
   let dangChay = false, viecMoi = false
@@ -125,6 +153,34 @@ function taoKhayThu(deps) {
   })
   ipcMain.on('nut:mo', (e) => { if (nut && !nut.isDestroyed() && e.sender === nut.webContents) bung('bam nut') })
   ipcMain.on('nut:an', (e) => { if (nut && !nut.isDestroyed() && e.sender === nut.webContents) anHan() })
+
+  /* KEO nut (12/10). Trang gui TONG do lech tu diem bam (toa do man hinh); o day cong vao o cua so LUC BAT DAU keo va dat
+     lai ca rong / cao (cung luat voi keo khay: khong doc lai getBounds giua chung, khong cong don — so loi "khay phinh 24/08"). */
+  let keoNeo = null // { b: o cua so luc bat dau keo, wa: workArea cua man do, t: o vong tron moi nhat }
+  const laNut = (e) => !!nut && !nut.isDestroyed() && e.sender === nut.webContents
+  ipcMain.on('nut:keo-bat-dau', (e) => {
+    if (!KEO_NUT || !laNut(e) || dangChay || tt !== 'thu') return
+    const b = nut.getBounds()
+    keoNeo = { b, wa: manCua(b).workArea, t: null }
+  })
+  ipcMain.on('nut:keo-den', (e, dx, dy) => {
+    if (!keoNeo || !laNut(e)) return
+    dx = Number(dx); dy = Number(dy)
+    if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+    const t = kepTron({ x: keoNeo.b.x + KEP + dx, y: keoNeo.b.y + KEP + dy }, keoNeo.wa)
+    keoNeo.t = t
+    nut.setBounds({ x: t.x - KEP, y: t.y - KEP, width: keoNeo.b.width, height: keoNeo.b.height })
+  })
+  /** Tha chuot (hoac sap bung khay giua luc dang keo): nho vi tri moi. */
+  function chotKeo() {
+    const k = keoNeo
+    keoNeo = null
+    if (!k || !k.t) return
+    vtNho = viTriTuTron(k.t, k.wa)
+    try { if (deps.luuViTriNut) deps.luuViTriNut(vtNho) } catch (e) { log('nut tron: khong luu duoc vi tri (' + (e && e.message) + '), van giu toi khi tat app') }
+    log('nut tron: keo toi ' + k.t.x + ',' + k.t.y + ' (ti le ' + vtNho.rx + ' / ' + vtNho.ry + ')')
+  }
+  ipcMain.on('nut:keo-xong', (e) => { if (laNut(e)) chotKeo() })
 
   function datO(w, b, ten) {
     w.setBounds(b)
@@ -174,7 +230,7 @@ function taoKhayThu(deps) {
     return dien
   }
   async function damBaoNut(wa) {
-    const b = oCuaSoNut(wa)
+    const b = oCuaSoNut(wa, viTri())
     if (!nut || nut.isDestroyed()) {
       nut = taoCuaSo(b, 'preload-nut.js', path.join('nut', 'index.html'), 'nut tron')
       nut.on('closed', () => { nut = null })
@@ -182,7 +238,7 @@ function taoKhayThu(deps) {
     if (!(await nut.__xong)) throw new Error('nut tron khong nap xong')
     return nut
   }
-  const goiNut = () => ({ mat: deps.anhMoiNhat() || '', so: deps.soAnh() || 0 })
+  const goiNut = () => ({ mat: deps.anhMoiNhat() || '', so: deps.soAnh() || 0, keo: KEO_NUT })
   const manCua = (b) => (deps.manCua ? deps.manCua(b) : screen.getDisplayMatching(b))
   /** Xoa het hinh tren san roi moi an: lan hien sau khong lo khung cu (cua so an thi khong ve lai). */
   async function donDien() {
@@ -220,7 +276,7 @@ function taoKhayThu(deps) {
       soO = o.length
       const san = choBao('san-sang', 1800)
       hien(d, true)
-      d.webContents.send('dien:lenh', Object.assign({ viec: 'thu', khay: tuongDoi(b, wa), anh: anh.toDataURL(), o, nut: tuongDoi(oTronNut(wa), wa) }, goiNut()))
+      d.webContents.send('dien:lenh', Object.assign({ viec: 'thu', khay: tuongDoi(b, wa), anh: anh.toDataURL(), o, nut: tuongDoi(oTronNut(wa, viTri()), wa) }, goiNut()))
       if (!(await san)) throw new Error('san dien khong san sang')
       const daAn = await js(khay, 'window.__khayAn && window.__khayAn(true)', 400) // bong da de len -> an noi dung khay that
       const xong = choBao('xong', 4000)
@@ -285,6 +341,7 @@ function taoKhayThu(deps) {
     const khay = deps.damBaoKhay()
     if (!khay || khay.isDestroyed()) return false
     if (tt !== 'thu' || !dangHien(nut)) { hienThang(khay); return true }
+    chotKeo() // co anh moi dung luc tay con dang keo nut: nho cho dang dung roi moi bay ra tu do
     dangChay = true
     const t0 = Date.now()
     let henMain = null
@@ -304,7 +361,7 @@ function taoKhayThu(deps) {
       if (somDuoc) { const tS = Date.now(); hien(khay, true); m.som = Date.now() - tS }
       hien(d, true)
       m.hienDien = Date.now()
-      d.webContents.send('dien:lenh', Object.assign({ viec: 'mo', nut: tuongDoi(oTronNut(wa), wa), dich: { x: b.x - wa.x + b.width / 2, y: b.y - wa.y + b.height / 2 } }, goiNut()))
+      d.webContents.send('dien:lenh', Object.assign({ viec: 'mo', nut: tuongDoi(oTronNut(wa, viTri()), wa), dich: { x: b.x - wa.x + b.width / 2, y: b.y - wa.y + b.height / 2 } }, goiNut()))
       const kSan = await san
       if (!kSan) throw new Error('san dien khong san sang')
       m.san = Date.now()
@@ -381,4 +438,4 @@ function taoKhayThu(deps) {
   }
 }
 
-module.exports = { taoKhayThu, NUT, GIAY, giayHopLe, oTronNut, oCuaSoNut, tuongDoi, chonO, trongO, lechDang }
+module.exports = { taoKhayThu, NUT, GIAY, giayHopLe, oTronNut, oCuaSoNut, kepTron, viTriTuTron, viTriHopLe, tuongDoi, chonO, trongO, lechDang }

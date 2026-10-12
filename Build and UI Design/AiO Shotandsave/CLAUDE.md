@@ -273,6 +273,11 @@ tai lieu cho khop ngay trong buoi (CLAUDE.md repo muc 2/3/5/8/9 da sua).
 
 **Bay 1-lan nhung se can lai khi them tinh nang** (deu da co chot trong code —
 DUNG go):
+- **NUT TRON KEO DUOC (12/10, chi macOS).** Nguoi xai: giu chuot tren nut tron roi keo, tha ra nut nam lai cho do va nho qua cac lan mo app; bam khong
+  keo van mo khay. Builder: vi tri luu dang ti le `viTriNut { rx, ry }` trong `cau-hinh.json`; MOI cho tinh o nut phai goi `oTronNut(wa, viTri())` (thu,
+  bung, damBaoNut) — them cho moi ma quen `viTri()` la khay bay ve goc cu trong khi nut nam cho khac. Keo = cong TONG do lech vao o luc bat dau, khong
+  doc lai `getBounds` giua chung. Xong = `npm run test:khaynut` 5 muc KEO dat + `AIO_KEO_NUT=0` phai truot. CHUA dat: Windows chua bat (so loi #21: phai
+  do cu bam that), chua keo sang man hinh khac, chua co so do voi chuot that.
 - ☠️ **KHAY BUNG RA MA "BI AN O DUOI" KHI DANG DUNG PREMIERE (02/10, sua lai 13:30 — ban ghi 11:5x SAI nguyen nhan):** run-log
   luc co Premiere: trang khay `an 1` 5/5 lan (Chromium bao cua so bi che), man trap 12-13 khung roi "bup" ra; khong co Premiere:
   `an 0` 10/10. Em TUONG Chromium tinh nham, tat `CalculateNativeWinOcclusion` -> log dep (`an 0`, du 24 khung, 8/8 lan) ma anh

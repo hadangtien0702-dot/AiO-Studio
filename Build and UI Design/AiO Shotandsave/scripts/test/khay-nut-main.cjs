@@ -18,6 +18,7 @@ const WA = { x: 0, y: 0, width: 1600, height: 900 }
 const KHAY = { x: 300, y: 200, width: 425, height: 129 }
 const log = []
 let giay = 5, ban = false, tuDong = false, conTro = { x: 5, y: 5 }, soAnh = 6
+let vtLuu = null // vi tri nut nguoi dung keo toi (thay cho cau-hinh.json)
 const mau = ['#2b5876', '#614385', '#134e5e', '#8e2d4f', '#b7791f', '#3f7a63', '#5a4d7a', '#7a4d4d']
 const anh = (i, w, h) => 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"><rect width="100%" height="100%" fill="' + mau[i % mau.length] + '"/></svg>')
 
@@ -44,6 +45,8 @@ app.whenReady().then(async () => {
     anhMoiNhat: () => (soAnh ? anh(soAnh - 1, 200, 100) : ''), soAnh: () => soAnh,
     docGiay: () => giay, banKhac: () => ban, tuDong: () => tuDong,
     conTro: () => conTro, manCua: () => ({ id: 1, workArea: WA }),
+    // 12/10: ep bat keo nut tren moi he dieu hanh. Doi chung: AIO_KEO_NUT=0 npm run test:khaynut -> 2 muc KEO + muc "Thu lai" phai TRUOT
+    keoNut: process.env.AIO_KEO_NUT !== '0', docViTriNut: () => vtLuu, luuViTriNut: (v) => { vtLuu = v },
     ghiLog: (s) => log.push(s),
   })
   const trangKhay = () => js(khay, '({ an: document.body.classList.contains("an"), clip: getComputedStyle(document.getElementById("shelf")).clipPath, mo: getComputedStyle(document.getElementById("shelf")).opacity, anim: document.getAnimations().length, o: document.querySelectorAll(".item").length })')
@@ -102,6 +105,31 @@ app.whenReady().then(async () => {
   await kt.bung('khay trong'); soAnh = 6
   for (let i = 0; i < soAnh; i++) khay.webContents.send('shelf:add', { id: 20 + i, seq: 20 + i, thumb: anh(i, 180, 100), filePath: 'y' + i, w: 1600, h: 1000, kb: 100 })
   await cho(300)
+
+  // [8b] KEO nut tron (12/10): chuot gia lap vao chinh trang nut (pointerdown -> pointermove -> pointerup that cua trang)
+  await kt.thu('truoc khi keo')
+  {
+    const n = kt._cuaSo().nut
+    const chuot = (type, gx, gy, them) => n.webContents.sendInputEvent(Object.assign({ type, x: 40, y: 40, globalX: Math.round(gx), globalY: Math.round(gy), button: 'left', clickCount: 1 }, them || {}))
+    const keo = async (dx, dy) => {
+      const b = n.getBounds(), gx = b.x + 40, gy = b.y + 40
+      chuot('mouseDown', gx, gy); await cho(40)
+      for (let i = 1; i <= 8; i++) { chuot('mouseMove', gx + dx * i / 8, gy + dy * i / 8, { modifiers: ['leftButtonDown'] }); await cho(16) }
+      chuot('mouseUp', gx + dx, gy + dy); await cho(150)
+    }
+    const b0 = n.getBounds()
+    await keo(-300, -200)
+    kq.keo = { truoc: b0, sau: n.getBounds(), tt: kt.trangThai(), luu: vtLuu && Object.assign({}, vtLuu) }
+    await keo(-5000, -5000) // keo qua khoi man: phai bi kep lai trong vung lam viec
+    kq.keo.kep = n.getBounds(); kq.keo.ttKep = kt.trangThai()
+    await keo(3, 2)         // nhich duoi 5 px roi tha = BAM -> mo khay
+    t0 = Date.now(); while ((kt.trangThai() !== 'mo' || kt.dangChay()) && Date.now() - t0 < 4000) await cho(50)
+    kq.keo.bam = kt.trangThai()
+    await kt.thu('sau khi keo') // thu lai: nut phai ve DUNG cho vua keo toi, khong ve goc
+    kq.keo.lai = kt._cuaSo().nut.getBounds(); kq.keo.nut = await trangNut()
+    await kt.bung('sau khi keo')
+    kq.keo.cuoi = kt.trangThai()
+  }
 
   // [9] DOI CHUNG HONG: san dien khong tra loi -> van phai ket thuc o trang thai dung (khong ket nua chung)
   await kt._cuaSo().dien.loadURL('about:blank')

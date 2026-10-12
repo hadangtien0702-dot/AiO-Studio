@@ -14,7 +14,43 @@
     matAnh.classList.toggle('hien', coAnh)
     matLogo.classList.toggle('hien', !coAnh)
     so.textContent = g && g.so > 0 ? String(g.so) : ''
+    keoDuoc = !!(g && g.keo)
   })
-  nut.addEventListener('click', () => window.nut.mo())
+
+  /* 12/10 KEO nut (anh: "khi khay thu ve anh muon di chuyen duoc cai icon do nua"): giu chuot tren nut roi keo qua 5 px =
+     KEO (cua so di theo, main kep trong man); tha ra thi nam lai. Nhich duoi 5 px roi tha = BAM, van mo khay nhu cu.
+     Gui TONG do lech tu diem bam theo toa do man hinh (khong cong don). keoDuoc do main bao (hien chi bat tren macOS). */
+  const NGUONG = 5
+  let keoDuoc = false, goc = null, dangKeo = false, vuaKeo = false
+  nut.addEventListener('pointerdown', (e) => {
+    vuaKeo = false
+    if (!keoDuoc || e.button !== 0) return
+    goc = { x: e.screenX, y: e.screenY }
+    dangKeo = false
+    try { nut.setPointerCapture(e.pointerId) } catch (err) {}
+  })
+  nut.addEventListener('pointermove', (e) => {
+    if (!goc) return
+    const dx = e.screenX - goc.x, dy = e.screenY - goc.y
+    if (!dangKeo) {
+      if (Math.hypot(dx, dy) < NGUONG) return
+      dangKeo = true
+      document.body.classList.add('keo')
+      window.nut.keoBatDau()
+    }
+    window.nut.keoDen(dx, dy)
+  })
+  const tha = () => {
+    if (!goc) return
+    goc = null
+    if (!dangKeo) return
+    dangKeo = false
+    vuaKeo = true // cu "click" di lien sau lan tha nay la cua luot keo, khong phai bam mo khay
+    document.body.classList.remove('keo')
+    window.nut.keoXong()
+  }
+  nut.addEventListener('pointerup', tha)
+  nut.addEventListener('pointercancel', tha)
+  nut.addEventListener('click', () => { if (vuaKeo) { vuaKeo = false; return } window.nut.mo() })
   an.addEventListener('click', (e) => { e.stopPropagation(); window.nut.an() })
 })()

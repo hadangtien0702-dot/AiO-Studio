@@ -23,6 +23,9 @@
     }
     body:hover #an { opacity: 1; }
     #an:hover { background: var(--danger-strong); color: #fff; }
+    /* 12/10 dang KEO nut: con tro nam tay, an nut x (khong bam nham luc dang keo) */
+    body.keo #nut { cursor: grabbing; }
+    body.keo #an { opacity: 0; pointer-events: none; }
   </style>
 </head>
 <body>

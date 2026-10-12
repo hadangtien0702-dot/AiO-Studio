@@ -13,4 +13,8 @@ contextBridge.exposeInMainWorld('nut', {
   mo: () => ipcRenderer.send('nut:mo'),
   /** Bam x: an han nut tron. */
   an: () => ipcRenderer.send('nut:an'),
+  /** 12/10 KEO nut: bat dau · tong do lech tu diem bam (toa do man hinh) · tha chuot. Main: src/khay-thu.js. */
+  keoBatDau: () => ipcRenderer.send('nut:keo-bat-dau'),
+  keoDen: (dx, dy) => ipcRenderer.send('nut:keo-den', dx, dy),
+  keoXong: () => ipcRenderer.send('nut:keo-xong'),
 })

@@ -2015,6 +2015,9 @@ const khayThu = taoKhayThu({
   anhMoiNhat: () => { const it = [...shelfItems.values()].pop(); return (it && it.thumb) || '' }, // 04/10: anh nho da tao san
   soAnh: () => shelfItems.size,
   docGiay: () => giayHopLe(kho.docCauHinh().khayTuThu),
+  // 12/10: nguoi dung keo nut tron toi cho khac -> nho vi tri (ti le trong vung lam viec) qua cac lan mo app
+  docViTriNut: () => kho.docCauHinh().viTriNut,
+  luuViTriNut: (vt) => { kho.ghiCauHinh({ viTriNut: vt }) },
   // dang keo / doi co khay, dang chon vung, dang quay video, dang quay Storyboard 3 giay: KHONG thu (san dien la cua so
   // trong suot phu ca man ~1 giay; phu len video luc dang quay la khung video den — so loi 0.4.15)
   banKhac: () => dragAnchors.size > 0 || resizeAnchors.size > 0 || overlayWins.length > 0 || !!ghiHinh || dangQuay,

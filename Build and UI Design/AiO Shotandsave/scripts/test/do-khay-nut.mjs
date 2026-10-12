@@ -34,6 +34,19 @@ for (const wa of [{ x: 0, y: 0, width: 2560, height: 1392 }, { x: -2048, y: 474,
   if (td.x !== wa.width - K.NUT.LE - K.NUT.TRON || td.y !== wa.height - K.NUT.LE - K.NUT.TRON) loiHH.push('toa do tren san dien sai')
 }
 kiem('Nut o goc duoi-phai, cua so ' + K.NUT.CUA_SO + ' px >= ' + MIN_WIN + ', nam trong workArea (4 man, co man toa do am)', loiHH.length === 0, [...new Set(loiHH)].join('; '))
+// 12/10 vi tri nguoi dung keo toi: luu dang ti le, doc lai phai ra dung o cu; keo ra ngoai thi kep; ti le hong thi ve goc
+let loiVT = []
+for (const wa of [{ x: 0, y: 0, width: 2560, height: 1392 }, { x: -2048, y: 474, width: 2048, height: 1104 }, { x: 0, y: 30, width: 1792, height: 1034 }]) {
+  for (const [px, py] of [[0, 0], [0.5, 0.5], [0.13, 0.87], [1, 1], [0.999, 0.001]]) {
+    const t = K.kepTron({ x: wa.x + px * wa.width, y: wa.y + py * wa.height }, wa)
+    const lai = K.oTronNut(wa, K.viTriTuTron(t, wa)), cs = K.oCuaSoNut(wa, K.viTriTuTron(t, wa))
+    if (lai.x !== t.x || lai.y !== t.y) loiVT.push('luu roi doc lai lech ' + (lai.x - t.x) + ',' + (lai.y - t.y))
+    if (cs.x < wa.x || cs.y < wa.y || cs.x + cs.width > wa.x + wa.width || cs.y + cs.height > wa.y + wa.height) loiVT.push('cua so nut tran khoi workArea')
+  }
+  const goc = K.oTronNut(wa)
+  for (const hong of [null, {}, { rx: 2, ry: 0.5 }, { rx: NaN, ry: 0 }, { rx: '0.5', ry: 0.5 }]) { const o = K.oTronNut(wa, hong); if (o.x !== goc.x || o.y !== goc.y) loiVT.push('ti le hong khong ve goc: ' + JSON.stringify(hong)) }
+}
+kiem('Vi tri nut da keo: luu ti le roi doc lai ra dung o cu (3 man x 5 cho), cua so luon trong workArea, ti le hong thi ve goc', loiVT.length === 0, [...new Set(loiVT)].join('; '))
 kiem('DOI CHUNG: cua so nut 52 px (bang vong tron) bi Windows ep ' + MIN_WIN + ' px', K.NUT.TRON < MIN_WIN && K.NUT.CUA_SO >= MIN_WIN, 'tron ' + K.NUT.TRON + ', cua so ' + K.NUT.CUA_SO)
 const cssNut = doc('src', 'nut', 'nut.css')
 const bong = /\.nut\s*\{[^}]*box-shadow:\s*0\s+(\d+)px\s+(\d+)px/.exec(cssNut)
@@ -96,6 +109,13 @@ if (kq) {
   kiem('Co anh moi dung luc dang thu -> thu xong tu bung lai, khay sach', kq.anhMoiGiuaChung.tt === 'mo' && sach(kq.anhMoiGiuaChung.khay))
   kiem('Bam x tren nut -> an han; goi hien khay -> hien thang, khay sach', kq.anHan.tt === 'an' && kq.anHan.sau === 'mo' && sach(kq.anHan.khay))
   kiem('Khay TRONG: van thu duoc, nut la logo, khong hien so', kq.trong.ok && kq.trong.tt === 'thu' && kq.trong.nut.matLogo && !kq.trong.nut.matAnh && kq.trong.nut.so === '')
+  // 12/10 KEO nut: man gia 1600x900, nut mac dinh o cua so (1514,814); keo -300,-200 -> (1214,614)
+  const kx = kq.keo || {}
+  const oo = (b) => (b ? b.x + ',' + b.y : '?')
+  kiem('KEO nut: giu chuot keo -300,-200 -> cua so nut di dung -300,-200, van la nut (khong mo khay), co nho vi tri', !!kx.truoc && kx.sau.x - kx.truoc.x === -300 && kx.sau.y - kx.truoc.y === -200 && kx.tt === 'thu' && K.viTriHopLe(kx.luu), oo(kx.truoc) + ' -> ' + oo(kx.sau) + ', ' + kx.tt + ', luu ' + JSON.stringify(kx.luu))
+  kiem('KEO nut qua khoi man -> bi kep lai, cua so nut nam tron trong vung lam viec', !!kx.kep && kx.kep.x === 0 && kx.kep.y === 0 && kx.ttKep === 'thu', oo(kx.kep) + ', ' + kx.ttKep)
+  kiem('DOI CHUNG: nhich duoi 5 px roi tha = BAM, khay van mo ra', kx.bam === 'mo', String(kx.bam))
+  kiem('Thu lai sau khi keo: nut ve DUNG cho vua keo toi (khong ve goc), vong tron van o (14,14)', !!kx.lai && kx.lai.x === 0 && kx.lai.y === 0 && kx.nut && kx.nut.tron.join() === '14,14,52,52' && kx.cuoi === 'mo', oo(kx.lai) + ', ' + kx.cuoi)
   kiem('DOI CHUNG HONG: san dien khong tra loi -> van thu (an thang) va van hien lai, khay sach, co ghi run-log', kq.hongThu.tt === 'thu' && kq.hongMo.tt === 'mo' && sach(kq.hongMo.khay) && kq.log.some((l) => l.includes('LOI thu')) && kq.log.some((l) => l.includes('LOI bung')), kq.hongThu.ms + ' / ' + kq.hongMo.ms + ' ms')
   kiem('Khong loi console tren trang khay', kq.loiTrang.length === 0, kq.loiTrang.join(' ; ').slice(0, 200))
   kiem('Run-log khong co dong LOI nao ngoai 2 dong cua doi chung hong', kq.log.filter((l) => /LOI|CANH BAO/.test(l)).length === 2, kq.log.filter((l) => /LOI|CANH BAO/.test(l)).join(' | '))
