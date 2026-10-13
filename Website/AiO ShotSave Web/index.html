@@ -1199,12 +1199,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 .cx-ntr b{position:absolute;right:-5px;top:-5px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#F86820;color:#fff;font:700 11px/22px Inter,sans-serif;text-align:center;box-shadow:0 0 0 2px #0c0c0d}
 .cx-cur{position:absolute;z-index:60;width:22px;height:22px;margin:-2px 0 0 -4px;opacity:0;pointer-events:none;filter:drop-shadow(0 2px 3px rgb(0 0 0/55%));transition:left .6s cubic-bezier(.45,0,.2,1),top .6s cubic-bezier(.45,0,.2,1),opacity .25s}
 .cx-cur svg{display:block;width:100%;height:100%}
-.cx-st{position:absolute;padding:12px;border-radius:3px;color:#3a342b;font:600 13.5px/1.3 Inter,system-ui,sans-serif;box-shadow:0 8px 18px rgb(0 0 0/45%);transform:rotate(var(--r,0deg));pointer-events:none;transition:opacity .5s ease,transform .5s ease}
+.cx-st{position:absolute;padding:12px;border-radius:3px;color:#3a342b;font:600 13.5px/1.3 Inter,system-ui,sans-serif;box-shadow:0 8px 18px rgb(0 0 0/45%);transform:rotate(var(--r,0deg));pointer-events:none;transition:opacity .3s ease,transform .5s cubic-bezier(.3,1.6,.5,1)}
 .cx-st1{left:850px;top:372px;width:132px;height:98px;background:#ffe27a;--r:-2deg}
 .cx-st2{left:1030px;top:404px;width:122px;height:88px;background:#ffb7cc;--r:3deg}
-.cx-mui{position:absolute;left:0;top:0;width:1200px;height:600px;pointer-events:none;transition:opacity .5s ease}
-.cx-st.bay2,.cx-mui.bay2{opacity:0}
-.cx-st.bay2{transform:rotate(var(--r,0deg)) scale(.85)}
+.cx-mui{position:absolute;left:0;top:0;width:1200px;height:600px;pointer-events:none}
+.cx-st.bay2{opacity:0;transform:rotate(var(--r,0deg)) scale(.4)}
+.cx-mui path{stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset .5s ease}
+.cx-mui path+path{transition:opacity .15s ease .45s}
+.cx-mui.bay2 path{stroke-dashoffset:1}
+.cx-mui.bay2 path+path{opacity:0}
 .cx-bang.hep .cx-st,.cx-bang.hep .cx-mui{display:none}
 @media (pointer:coarse){.cx-tai input,.cx-do{font-size:16px}}   /* iPhone tự phóng trang khi chạm ô nhập có chữ dưới 16 px */
 @media (prefers-reduced-motion:reduce){.cx-o,.cx-o.tudi,.cx-cur{transition:none}.cx-tai b.nay,.cx-cay .f.moi{animation:none}}
@@ -4784,7 +4787,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cur.setAttribute("aria-hidden", "true");
   // 13/10 (app 0.10.1): hai ghi chú dán + mũi tên nối, chỉ để trang trí bảng (bố cục dọc ẩn bằng CSS)
   const st1 = tao("cx-st cx-st1", "<span></span>"), st2 = tao("cx-st cx-st2", "<span></span>");
-  const mui = tao("cx-mui", '<svg viewBox="0 0 1200 600" width="1200" height="600" aria-hidden="true"><path d="M984 428 C1008 426 1012 442 1028 446" fill="none" stroke="#F86820" stroke-width="2.5" stroke-linecap="round"/><path d="M1018 438 L1030 447 L1016 452" fill="none" stroke="#F86820" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  const mui = tao("cx-mui", '<svg viewBox="0 0 1200 600" width="1200" height="600" aria-hidden="true"><path pathLength="1" d="M984 428 C1008 426 1012 442 1028 446" fill="none" stroke="#F86820" stroke-width="2.5" stroke-linecap="round"/><path pathLength="1" d="M1018 438 L1030 447 L1016 452" fill="none" stroke="#F86820" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
   const decor = [st1, st2, mui];
   decor.forEach(e => e.setAttribute("aria-hidden", "true"));
 
@@ -4876,8 +4879,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* phần tự diễn: dừng ở đâu thì chốt trạng thái đúng ở đó (tấm đang bay thuộc khung nó đang nằm, tên đang gõ dở được giữ) */
+  // 13/10: ghi chú dán + mũi tên hiện trọn (khi khách chạm vào giữa chừng, khi đổi ngôn ngữ, hoặc phần tự diễn xong)
+  function hienDecor() {
+    decor.forEach(e => e.classList.remove("bay2"));
+    st1.firstChild.textContent = L().st1; st2.firstChild.textContent = L().st2;
+  }
   function huyDien() {
-    phien++; cur.style.opacity = 0; cur.style.transitionDuration = ""; sang(null);
+    phien++; cur.style.opacity = 0; cur.style.transitionDuration = ""; sang(null); hienDecor();
     S.o.forEach(o => { o.el.classList.remove("nang", "tudi", "bay"); if (mode) doiKhung(o, khungTai(o)); });
     if (dangGo) {
       const id = dangGo; dangGo = null; K[id].tai.classList.remove("go");
@@ -4913,13 +4921,36 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const c of L().b2) { s += c; datTen("b", s); await cho(75); if (!con()) return; }
     dangGo = null; K.b.tai.classList.remove("go"); S.doi = true;
     await cho(520); if (!con()) return;
+    await dienGhiChu(p); if (!con()) return;
     cur.style.opacity = 0;
+  }
+  // 13/10: cảnh thứ hai của phần tự diễn: con trỏ tới chỗ trống, ghi chú dán nảy ra, gõ chữ; ghi chú thứ hai; mũi tên được vẽ nối hai ghi chú
+  async function dienGhiChu(p) {
+    const con = () => p === phien;
+    if (mode !== "rong") return;
+    const goChu = async (el, t) => {
+      for (let i = 1; i <= t.length; i++) { el.firstChild.textContent = t.slice(0, i); await cho(34); if (!con()) return false; }
+      return true;
+    };
+    conTroToi(884, 396);
+    await cho(760); if (!con()) return;
+    st1.classList.remove("bay2");
+    await cho(420); if (!con()) return;
+    if (!await goChu(st1, L().st1)) return;
+    await cho(300); if (!con()) return;
+    conTroToi(1064, 428);
+    await cho(760); if (!con()) return;
+    st2.classList.remove("bay2");
+    await cho(420); if (!con()) return;
+    if (!await goChu(st2, L().st2)) return;
+    await cho(260); if (!con()) return;
+    mui.classList.remove("bay2");
+    await cho(1000); if (!con()) return;
   }
   function vao() {
     if (daVao) return;
     daVao = true;
     S.o.forEach((o, j) => setTimeout(() => o.el.classList.remove("bay"), 140 + j * 80));
-    setTimeout(() => decor.forEach(e => e.classList.remove("bay2")), 140 + 6 * 80 + 250);
     setTimeout(dienThu, 140 + 6 * 80 + 950);
   }
 
@@ -4930,6 +4961,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const B = BO[mode], nx = B.nut[0] + B.nut[2] / 2, ny = B.nut[1] + B.nut[2] / 2;
     S.o.forEach(o => { o.el.style.setProperty("--ix", (nx - o.x - B.pw / 2) + "px"); o.el.style.setProperty("--iy", (ny - o.y - B.ph / 2) + "px"); o.el.classList.add("bay"); });
     decor.forEach(e => e.classList.add("bay2"));
+    st1.firstChild.textContent = ""; st2.firstChild.textContent = "";
     const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); vao(); } }, { threshold: .35 });
     io.observe(bang);
   } else { daVao = true; tuDien = false; }
