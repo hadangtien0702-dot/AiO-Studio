@@ -19,6 +19,11 @@
   Ma tra ve: 200 xu ly xong hoac bo qua (khong phai order.paid); 401 sai chu ky; 405 khong phai POST;
   500 loi TAM THOI (chua thay ma, Gmail loi, thieu cau hinh) de Polar thu lai (toi da 10 lan, sau do tat endpoint).
   Polar cho toi da 10 giay -> ngan sach cho tim ma ~6 giay.
+
+  ☠️ NHA CUA HAM NAY: thu muc `Website/aio-mail/` la MOT DU AN VERCEL RIENG (ten du an dat khi tao, root directory = Website/aio-mail).
+  KHONG dat ham vao `Website/AiO ShotSave Web/`: Vercel dat ten ham theo duong dan tu goc repo, ten co dau cach bi tu choi
+  (loi invalid_function_name, do 16/10/2026: "Website/AiO ShotSave Web/api/polar-webhook.js ... must not contain any space"),
+  va lan do loi LAM HONG CA TRANG BAN HANG (moi lan dung sau do deu loi). Thu muc co ham phai KHONG co dau cach.
 */
 'use strict'
 const crypto = require('node:crypto')
