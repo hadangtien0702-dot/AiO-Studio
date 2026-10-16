@@ -91,6 +91,12 @@ const mauMa = (o = {}) => Object.assign({ customer_id: 'cus-1', key: KHOA, statu
   k = await chay({ type: 'order.paid', data: order({ customer: { email: 'a"<b>@x.com' } }) })
   t('email la co dau nhay / < > duoc thoat trong HTML', k.gui[0] && !k.gui[0].thu.html.includes('a"<b>@x.com') && k.gui[0].thu.html.includes('a&quot;&lt;b&gt;@x.com'))
 
+  k = await chay({ type: 'order.paid', data: order({ product: { name: 'AiO Shot & Save Tester' } }) })
+  t('don san pham Tester -> thu ghi 1 may (HTML + ban chu), khong con 2 may', k.gui[0] && k.gui[0].thu.html.includes('Dùng trên 1 máy') && !k.gui[0].thu.html.includes('2 máy') && k.gui[0].thu.text.includes('1 máy') && !k.gui[0].thu.text.includes('2 máy'))
+  k = await chay({ type: 'order.paid', data: order({ product: { name: 'AiO Shot & Save' }, billing_address: { country: 'US' } }) })
+  t('don san pham ban that -> van ghi 2 may', k.gui[0] && k.gui[0].thu.html.includes('Works on 2 computers') && !k.gui[0].thu.html.includes('1 computer'))
+  k = await chay({ type: 'order.paid', data: order({ product: { name: 'aio shot & save TESTER' }, billing_address: { country: 'US' } }) })
+  t('Tester tieng Anh -> Works on 1 computer', k.gui[0] && k.gui[0].thu.html.includes('Works on 1 computer') && !k.gui[0].thu.html.includes('2 computers'))
   k = await chay({ type: 'order.created', data: order() })
   t('su kien khac order.paid -> 200, khong goi API, khong gui', k.code === 200 && k.gui.length === 0 && k.lanFetch === 0)
   k = await chay({ type: 'order.paid', data: order() }, { secret: 'whsec_' + crypto.randomBytes(32).toString('base64') })
