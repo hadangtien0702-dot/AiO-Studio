@@ -427,13 +427,14 @@ app.whenReady().then(() => {
   // va WGC phai khoi tao phien lan dau. Goi mot getSources 1x1 vo hai luc mo
   // app -> so khoi tao WGC/driver da tra truoc, lan chup THAT dau tien khong
   // con cong-tac lanh. Fire-and-forget, khong chan gi.
-  desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1, height: 1 }, fetchWindowIcons: false })
+  // 12/10: bo qua tren Mac (ham nong chi de cho WGC cua Windows; tren Mac no nhoang len cham tim luc mo app)
+  if (process.platform !== 'darwin') desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1, height: 1 }, fetchWindowIcons: false })
     .then(() => ghiLog('ham-nong xong')).catch(() => {})
   // 0.5.0: LUONG CHUP CHAY SAN (xem src/luong-chup.js) — bam phim la co khung ngay.
   luong.theoDoiMoiTruong()
   lenLichPool(1500)
   for (const ev of ['display-added', 'display-removed', 'display-metrics-changed']) screen.on(ev, () => { huyPool(); lenLichPool(1500) })
-  setTimeout(() => luong.khoiDong({ ghiLog }), 800)
+  if (luong.CHAY_SAN) setTimeout(() => luong.khoiDong({ ghiLog }), 800) // Mac: khong giu luong o nen (cham tim)
 
   // ☠️ CHAN DOAN GPU (--gpucheck): kiem render con chay sau khi cat shader
   // WebGPU (dxcompiler/dxil, 0.3.14 giam dung luong). Ghi ket qua ra userData
@@ -551,19 +552,19 @@ function rebuildTrayMenu() {
     ...(ghiHinh ? [{ label: T('tray.dungQuay'), accelerator: currentHotkey, click: () => dungGhiHinh('tray') }, { type: 'separator' }] : []),
     { label: T('tray.chup'), accelerator: ghiHinh ? undefined : currentHotkey, enabled: !ghiHinh, click: () => startCapture() },
     { type: 'separator' },
-    { label: T('tray.khay'), click: () => showShelf() },
-    { label: T('tray.storyboard'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
-    { label: T('tray.video'), click: () => openVideoWindow() },
+    // 12/10 (anh: "cai settings nay em lam gon lai duoc khong"): 3 khay gop vao MOT muc con -> menu tu 11 xuong 6 dong
+    { label: T('tray.cacKhay'), submenu: [
+      { label: T('tray.khayAnh'), click: () => showShelf() },
+      { label: T('tray.khayStory'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
+      { label: T('tray.khayVideo'), click: () => openVideoWindow() },
+    ] },
     { label: T('tray.canvas'), click: () => openCanvasWindow() }, // 12/10: bang y tuong kieu Miro, khung = thu muc cung ten
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
-    { type: 'separator' },
-    /* ☠️ Menu Windows coi '&' la dau gach chan phim tat -> 'AiO Shot  Save' (anh
-       thay 14/09 tren 0.4.6). Viet '&&' de ra dau '&' that. */
-    { label: 'AiO Shot && Save  v' + app.getVersion(), enabled: false },
-    { type: 'separator' },
-    { label: T('tray.thoat'), click: () => { forceQuit() } },
+    /* So phien ban nam canh chu Thoat (truoc la mot dong rieng): kiem ban dang chay van nhin thay o menu khay.
+       Tren menu khong con dong 'AiO Shot && Save' rieng nen khong con chuyen '&' thanh gach chan phim tat (14/09). */
+    { label: T('tray.thoat') + '  ·  v' + app.getVersion(), click: () => { forceQuit() } },
   ])
   tray.setContextMenu(menu)
 }
@@ -2469,8 +2470,14 @@ function openCanvasWindow() {
   })
   canvasWin.webContents.on('preload-error', (_e, p, err) => ghiLog('canvas LOI preload ' + path.basename(p) + ': ' + (err && err.message)))
   canvasWin.loadFile(path.join(__dirname, 'canvas', 'index.html'))
-  canvasWin.once('ready-to-show', () => { if (canvasWin && !canvasWin.isDestroyed() && !THU_CANVAS) canvasWin.show() })
-  canvasWin.on('closed', () => { canvasWin = null })
+  // [do] AIO_THU_HIEN=1: che do do van HIEN cua so (co tieu diem that: su kien focus / blur nhu nguoi dung) nhung dat ra ngoai rim man hinh
+  canvasWin.once('ready-to-show', () => {
+    if (!canvasWin || canvasWin.isDestroyed()) return
+    if (!THU_CANVAS) { canvasWin.show(); return }
+    if (process.env.AIO_THU_HIEN) { try { canvasWin.setPosition(-3000, 40) } catch (e) {} canvasWin.show(); canvasWin.focus() }
+  })
+  canvasWin.on('focus', () => { qlTat() })   // Quick Look dong -> Canvas lay lai tieu diem: nha phim mui ten
+  canvasWin.on('closed', () => { qlTat(); canvasWin = null })
   ghiLog('canvas mo')
 }
 /** Trang thai cho trang ve: khop so voi dia (canvas-kho.nap) roi gan duong dan anh nho / video / khung dai. */
@@ -2484,7 +2491,7 @@ function canvasNap() {
     if (m.kieu === 'dai') { m.anh = m.seq.slice(0, 6).map((s) => 'aioshot://dai/' + m.dai + '/' + s + '.jpg'); continue }
     const p = path.join(goc, ...m.tep)
     m.ten = m.tep[m.tep.length - 1]
-    if (m.kieu === 'anh') m.anh = 'aioshot://cv/' + Buffer.from(p, 'utf8').toString('hex') + '.jpg?m=' + Math.round(m.mtime)
+    if (m.kieu === 'anh') { m.anh = 'aioshot://cv/' + Buffer.from(p, 'utf8').toString('hex') + '.jpg?m=' + Math.round(m.mtime); m.goc = require('url').pathToFileURL(p).href }
     else m.video = require('url').pathToFileURL(p).href
     delete m.tep
   }
@@ -2550,17 +2557,157 @@ ipcMain.handle('canvas:xep', (e, ds) => {
   }
   return Object.assign({ kq }, canvasNap())
 })
-ipcMain.on('canvas:mo', (e, khoa) => {
-  if (!laCanvas(e)) return
+/** Khoa mot tam anh / video tren bang -> duong dan file that (hoac null). Khoa 'dai:' khong co file. */
+function canvasFile(khoa) {
   khoa = String(khoa || '')
-  if (khoa.startsWith('dai:')) { openStoryboardWindow(); return }
   const goc = kho.thuMucAnh()
   let p = null
   if (khoa.startsWith('k:')) {
     const i = khoa.indexOf('/'), k = canvasKho.boCucHienTai().khung.find((x) => x.id === khoa.slice(2, i)), ten = khoa.slice(i + 1)
     if (k && ten === path.basename(ten)) p = path.join(goc, k.ten, ten)
-  } else if (khoa === path.basename(khoa) && !khoa.startsWith('.')) p = path.join(goc, khoa)
-  if (p && fs.existsSync(p)) shell.openPath(p)
+  } else if (khoa && khoa === path.basename(khoa) && !khoa.startsWith('.') && !khoa.startsWith('dai:')) p = path.join(goc, khoa)
+  return p && fs.existsSync(p) ? p : null
+}
+ipcMain.on('canvas:mo', (e, khoa) => {
+  if (!laCanvas(e)) return
+  khoa = String(khoa || '')
+  if (khoa.startsWith('dai:')) { openStoryboardWindow(); return }
+  const p = canvasFile(khoa)
+  if (p) shell.openPath(p)
+})
+/* ---- 12/10 (anh: "mirro - figjam co gi lam tuong tu di em"): vat tren bang (ghi chu, chu, hinh, link, mui ten, net ve), xoa khung,
+   dan / tha anh tu ngoai vao, nhan doi, keo ra app khac, xuat khung ra PNG / PDF. Luat an toan nam o src/canvas-kho.js. ---- */
+ipcMain.on('canvas:luu-vat', (e, p) => { if (laCanvas(e)) canvasKho.luuVat(p) })
+ipcMain.handle('canvas:xoa-khung', (e, id) => {
+  if (!laCanvas(e)) return null
+  const kq = canvasKho.xoaKhung(kho.thuMucAnh(), String(id))
+  ghiLog('canvas: xoa khung ' + (kq.ok ? 'xong' : 'KHONG DUOC ' + kq.loi + (kq.giu ? ' (con ' + kq.giu + ' file khac)' : '')))
+  return Object.assign({ kq }, canvasNap())
+})
+/** nguon: [duong dan file] (tha tu Finder) — chep vao thu muc anh. buf: [{ ten, bytes }] (anh keo tu trinh duyet, khong co duong dan). */
+ipcMain.handle('canvas:nhap', (e, nguon, buf) => {
+  if (!laCanvas(e)) return null
+  const goc = kho.baoDamThuMuc(kho.thuMucAnh())
+  const kq = canvasKho.nhapFile(goc, Array.isArray(nguon) ? nguon : [])
+  for (const b of (Array.isArray(buf) ? buf : []).slice(0, 20)) {
+    if (!b || !b.bytes || b.bytes.byteLength > 40 * 1048576) continue
+    const r = canvasKho.nhapBuf(goc, b.ten, Buffer.from(b.bytes))
+    kq.push(Object.assign({ nguon: b.ten }, r))
+  }
+  ghiLog('canvas: nhap ' + kq.filter((x) => x.ok).length + '/' + kq.length + ' file tu ngoai')
+  return Object.assign({ kq }, canvasNap())
+})
+ipcMain.handle('canvas:nhan-doi', (e, khoas) => {
+  if (!laCanvas(e)) return null
+  const goc = kho.thuMucAnh(), kq = []
+  for (const kh of (Array.isArray(khoas) ? khoas : []).slice(0, 100)) kq.push(Object.assign({ tu: kh }, canvasKho.nhanDoiAnh(goc, kh)))
+  return Object.assign({ kq }, canvasNap())
+})
+/** Cmd+V: anh trong clipboard -> luu thanh file moi; con lai tra chu de trang xu ly (thu cua Canvas / link / chu thuong). */
+ipcMain.handle('canvas:dan', (e) => {
+  if (!laCanvas(e)) return null
+  const img = clipboard.readImage()
+  if (img && !img.isEmpty()) {
+    const d = new Date(), p2 = (n) => String(n).padStart(2, '0')
+    const r = canvasKho.nhapBuf(kho.baoDamThuMuc(kho.thuMucAnh()), 'dan-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds()), img.toPNG())
+    return Object.assign({ kieu: 'anh', kq: [r] }, canvasNap())
+  }
+  return { kieu: 'text', text: String(clipboard.readText() || '').slice(0, 60000) }
+})
+ipcMain.on('canvas:chep', (e, p) => {
+  if (!laCanvas(e) || !p) return
+  try {
+    if (typeof p.text === 'string' && p.text) clipboard.writeText(p.text.slice(0, 200000))
+    else if (p.anh) { const f = canvasFile(p.anh); if (f && canvasKho.kieuCua(f) === 'anh') { const im = nativeImage.createFromPath(f); if (!im.isEmpty()) clipboard.writeImage(im) } }
+  } catch (err) { ghiLog('canvas: chep LOI ' + err.message) }
+})
+/* XEM NHANH (anh 12/10: "bam dau cach anh se duoc phong to len giong native cua mac os"): macOS -> Quick Look that cua he dieu hanh
+   (BrowserWindow.previewFile); noi khac / dai Storyboard / che do do -> tra native:false de trang tu hien lop phong to. */
+const canvasXemThu = []
+/* MUI TEN TRAI / PHAI trong Quick Look that: Quick Look la cua so cua HE DIEU HANH, trang Canvas khong nhan duoc phim. Nen trong luc no mo,
+   dang ky phim tat TOAN HE THONG Left / Right va chuyen cho trang ("canvas:xem-tiep"). GO NGAY khi: Canvas lay lai tieu diem (Quick Look da dong),
+   app mat tieu diem (anh sang app khac), cua so dong, hoac sau 2 phut. Chi macOS. */
+let qlBat = false, qlHen = null
+function qlTat() {
+  if (!qlBat) return
+  qlBat = false; clearTimeout(qlHen)
+  try { globalShortcut.unregister('Left'); globalShortcut.unregister('Right') } catch (e) {}
+}
+function qlBatDau() {
+  qlTat()
+  const dk = (phim, h) => {
+    try {
+      globalShortcut.register(phim, () => {
+        if (!canvasWin || canvasWin.isDestroyed() || canvasWin.isFocused()) { qlTat(); return }   // Quick Look khong con mo: nha phim lai
+        clearTimeout(qlHen); qlHen = setTimeout(qlTat, 120000)
+        canvasWin.webContents.send('canvas:xem-tiep', h)
+      })
+    } catch (e) { ghiLog('canvas xem-nhanh: dang ky phim ' + phim + ' LOI ' + e.message) }
+  }
+  dk('Left', -1); dk('Right', 1)
+  qlBat = globalShortcut.isRegistered('Left') && globalShortcut.isRegistered('Right')
+  if (!qlBat) { try { globalShortcut.unregister('Left'); globalShortcut.unregister('Right') } catch (e) {} ghiLog('canvas xem-nhanh: khong dang ky duoc phim mui ten (Quick Look van xem duoc, khong luot) ') ; return }
+  qlHen = setTimeout(qlTat, 120000)
+}
+app.on('did-resign-active', qlTat)
+ipcMain.handle('canvas:xem-nhanh', (e, khoa) => {
+  if (!laCanvas(e)) return { ok: false }
+  const f = canvasFile(khoa)
+  if (!f) return { ok: false }
+  if (THU_CANVAS) { canvasXemThu.push(f); return { ok: true, native: false } }
+  if (process.platform === 'darwin') {
+    try {
+      try { canvasWin.closePreviewFile() } catch (err) {}
+      canvasWin.previewFile(f, path.basename(f))
+      qlBatDau()
+      return { ok: true, native: true }
+    } catch (err) { ghiLog('canvas xem-nhanh LOI: ' + err.message) }
+  }
+  return { ok: true, native: false }
+})
+ipcMain.on('canvas:mo-link', (e, url) => {
+  if (!laCanvas(e)) return
+  let u = null
+  try { u = new URL(String(url || '').trim()) } catch (err) { u = null }
+  if (u && (u.protocol === 'http:' || u.protocol === 'https:')) shell.openExternal(u.href)
+})
+/* KEO RA app khac tu Canvas (A2): trang goi trong nhip dragstart that cua nguoi dung (giu Alt + keo tam, hoac keo nut o goc tam).
+   Giong shelf:start-drag: file di qua duongDanKeoAnToan (duong dan la / ky tu la -> lien ket an toan). Dai Storyboard khong co file. */
+const canvasKeoRaThu = []
+ipcMain.on('canvas:keo-ra', (e, khoas) => {
+  if (!laCanvas(e)) return
+  const files = []
+  for (const kh of (Array.isArray(khoas) ? khoas : []).slice(0, 50)) { const f = canvasFile(kh); if (f) files.push(kho.duongDanKeoAnToan(f)) }
+  if (!files.length) return
+  let icon = null
+  try {
+    const buf = /\.(png|jpe?g)$/i.test(files[0]) ? taoAnhNhoCanvas(files[0]) : null
+    icon = buf ? nativeImage.createFromBuffer(buf) : null
+    if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'tray.png'))
+    icon = icon.resize({ height: 96 })
+  } catch (err) { icon = null }
+  if (!icon || icon.isEmpty()) { ghiLog('canvas keo-ra LOI: khong tao duoc bieu tuong'); return }
+  if (THU_CANVAS) { canvasKeoRaThu.push(files); return }   // do: KHONG bat chuot that
+  try { e.sender.startDrag(files.length > 1 ? { file: files[0], files, icon } : { file: files[0], icon }) } catch (err) { ghiLog('canvas keo-ra LOI: ' + err.message) }
+})
+ipcMain.handle('canvas:xuat', async (e, loai, bytes, ten, w, h) => {
+  if (!laCanvas(e) || !bytes) return null
+  const buf = Buffer.from(bytes)
+  if (buf.length < 100 || buf.length > 120 * 1048576) return { ok: false, loi: 'kich-thuoc' }
+  const ext = loai === 'pdf' ? 'pdf' : 'png', base = (canvasKho.tenHopLe(ten) || 'canvas') + ' canvas'
+  let dich
+  if (THU_CANVAS) dich = path.join(THU_CANVAS.ra, base + '.' + ext)
+  else {
+    const r = await dialog.showSaveDialog(canvasWin, { defaultPath: path.join(kho.baoDamThuMuc(kho.thuMucAnh()), base + '.' + ext), filters: [{ name: ext.toUpperCase(), extensions: [ext] }] })
+    if (r.canceled || !r.filePath) return { ok: false, huy: true }
+    dich = r.filePath
+  }
+  try {
+    fs.writeFileSync(dich, ext === 'pdf' ? require('./pdf-anh').taoPdf(buf, Number(w), Number(h)) : buf)
+    ghiLog('canvas: xuat ' + ext + ' ' + Math.round(buf.length / 1024) + ' KB')
+    if (!THU_CANVAS) shell.showItemInFolder(dich)
+    return { ok: true, ten: path.basename(dich) }
+  } catch (err) { ghiLog('canvas: xuat LOI ' + (err && err.code)); return { ok: false, loi: 'he-thong', ct: err && err.code } }
 })
 ipcMain.on('canvas:mo-thu-muc', (e, id) => {
   if (!laCanvas(e)) return
@@ -2598,7 +2745,8 @@ async function thuCanvas() {
     const tt = () => js('window.__thu.tt()')
     // 12/10 bai THU DUNG (scripts/test/thu-dung-canvas.cjs): kich ban rieng thay kich ban co san, van cua so an + userData rieng
     if (process.env.AIO_THU_KICHBAN) {
-      await require(process.env.AIO_THU_KICHBAN)({ w, js, cho, kq, tt, tTai, ra: THU_CANVAS.ra, anh: THU_CANVAS.anh })
+      await require(process.env.AIO_THU_KICHBAN)({ w, js, cho, kq, tt, tTai, ra: THU_CANVAS.ra, anh: THU_CANVAS.anh, keoRa: canvasKeoRaThu })
+      kq.keoRa = canvasKeoRaThu; kq.xemNhanh = canvasXemThu
       fs.writeFileSync(path.join(THU_CANVAS.ra, 'ket-qua.json'), JSON.stringify(kq, null, 1)); app.exit(0); return
     }
     kq.buoc.dau = await tt()
@@ -2622,6 +2770,7 @@ async function thuCanvas() {
     await js(`window.__cv.vua(); true`); await cho(300)
     try { fs.writeFileSync(path.join(THU_CANVAS.ra, 'canvas.png'), (await w.webContents.capturePage()).toPNG()) } catch (e) { kq.loiChup = e.message }
   } catch (e) { kq.loi = e.message }
+  kq.keoRa = canvasKeoRaThu
   try { fs.writeFileSync(path.join(THU_CANVAS.ra, 'ket-qua.json'), JSON.stringify(kq, null, 1)) } catch (e) {}
   app.exit(0)
 }

@@ -89,6 +89,15 @@ app.whenReady().then(async () => {
   await cho(6300); kq.dangBan = kt.trangThai()
   ban = false; tuDong = false
 
+  // [5b] "Khong thu" (giay = 0, anh 12/10): con tro o ngoai, khay mo, cho > 6 giay -> VAN mo; dat lai 5 thi thu nhu cu
+  await kt.bung('khong thu'); giay = 0; tuDong = true; conTro = { x: 5, y: 5 }; kt.chamVao()
+  await cho(6500); kq.khongThu = kt.trangThai()
+  giay = 5; kt.chamVao()
+  t0 = Date.now(); while (kt.trangThai() !== 'thu' && Date.now() - t0 < 9000) await cho(100)
+  while (kt.dangChay()) await cho(50)
+  kq.khongThuRoiBat = kt.trangThai()
+  tuDong = false; await kt.bung('sau khong thu')
+
   // [6] co anh moi DUNG LUC dang thu -> thu xong tu bung lai
   const p6 = kt.thu('anh moi giua chung'); await cho(200); kt.chamVao(); await p6
   t0 = Date.now(); while ((kt.trangThai() !== 'mo' || kt.dangChay()) && Date.now() - t0 < 4000) await cho(50)

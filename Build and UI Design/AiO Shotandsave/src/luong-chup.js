@@ -26,6 +26,11 @@ const path = require('path')
 
 const LUONG_FPS = Number(process.env.AIO_LUONG_FPS) > 0 ? Number(process.env.AIO_LUONG_FPS) : 5
 const TAT = process.env.AIO_LUONG === '0' // doi chung: ep di duong grab cu
+/* 12/10: TREN MAC KHONG GIU LUONG O NEN. macOS hien bang "Currently Sharing" + cham tim tren thanh menu cho MOI
+   app dang giu mot luong getDisplayMedia; anh Tien: "app khac khong co nhu vay". Mac: chup anh di duong grab (mot
+   nhat roi buong); cua so luong chi mo luc QUAY VIDEO va dong khi quay xong. Windows khong co chi bao nen giu nguyen.
+   AIO_LUONG=1 de ep chay san tren Mac (doi chung do toc do). */
+const CHAY_SAN = !TAT && (process.platform !== 'darwin' || process.env.AIO_LUONG === '1')
 /* 16/09: JPEG NHANH (0.5.2) TAT mac dinh — anh: "co mot cai gi no chop len rat nhanh... rat kho chiu";
    doi mo -> net sau ~100 ms chinh la cu chop. AIO_NHANH=1 de bat lai khi can doi chung. */
 const NHANH = process.env.AIO_NHANH === '1'
@@ -101,7 +106,7 @@ async function khoiDong(opts) {
 }
 
 function lenLichLai(ms, laLoi) {
-  if (TAT) return
+  if (TAT || !CHAY_SAN) return // Mac: luong chi mo luc quay, khong tu bat lai
   if (laLoi) { soLoiLienTiep++; if (soLoiLienTiep > 3) { ghiLog('LUONG: loi 3 lan lien tiep -> ngung thu, dung duong grab cu'); sanSangLuc = 0; return } }
   sanSangLuc = 0
   if (timerLai) clearTimeout(timerLai)
@@ -219,6 +224,12 @@ function ketQuay(loi, info) {
   if (!q) return
   quay = null
   try { q.onXong(Object.assign({ loi: loi || null }, info || {})) } catch (e) { ghiLog('LUONG quay onXong loi: ' + e.message) }
+  if (!CHAY_SAN) dongLuong() // Mac: quay xong thi buong luong, cham tim tat theo
+}
+function dongLuong() {
+  const w = win
+  win = null; sanSangLuc = 0; cauHinh = []
+  if (w && !w.isDestroyed()) { try { w.destroy() } catch (e) {} ; ghiLog('LUONG: dong cua so luong (khong chay san)') }
 }
 
 ipcMain.on('luong:quay-khuc', (e, d) => {
@@ -233,6 +244,12 @@ ipcMain.on('luong:quay-xong', (e, d) => {
 /* Bat dau quay vung `rect` (DIP cuc bo cua man `display`). opts: { tieng, onKhuc, onXong }.
    Tra ve { ok, w, h, mime, duoi, tieng, msMo } hoac { ok: false, loi }. */
 async function batDauQuay(display, rect, opts) {
+  if (!sanSang() && !CHAY_SAN && !TAT) {
+    // Mac: luong chua mo -> mo luc nay (mat ~1-2 s), doi toi da 8 s
+    await khoiDong()
+    const han = Date.now() + 8000
+    while (!sanSang() && Date.now() < han) await new Promise((r) => setTimeout(r, 100))
+  }
   if (!sanSang()) return { ok: false, loi: 'luong chua san sang' }
   if (quay) return { ok: false, loi: 'dang quay' }
   const cfg = cauHinh.find((c) => String(c.displayId) === String(display.id))
@@ -279,6 +296,7 @@ const QUAY_TOI_DA = { w: 2560, h: 1440 }
 function theoDoiMoiTruong() {
   if (TAT) return
   const lai = (ly) => {
+    if (!CHAY_SAN) return // Mac: khong co luong nen de khoi dong lai
     // Dang quay video thi KHONG pha cua so luong (doan quay se dut): doi quay xong roi moi khoi dong lai.
     if (quay) { ghiLog('LUONG: ' + ly + ' nhung dang quay video -> hoan khoi dong lai'); setTimeout(() => lai(ly), 3000); return }
     soLoiLienTiep = 0; ghiLog('LUONG: ' + ly + ' -> khoi dong lai'); lenLichLai(1200)
@@ -292,4 +310,4 @@ function theoDoiMoiTruong() {
   } catch (e) {}
 }
 
-module.exports = { khoiDong, sanSang, layKhung, catVung, batDauQuay, dungQuay, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH }
+module.exports = { khoiDong, sanSang, layKhung, catVung, batDauQuay, dungQuay, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH, CHAY_SAN }

@@ -376,12 +376,19 @@ function xuLyChinhKhung(e) {
    luan duoc ve nghen main thread, khong thay lag ghep man. */
 let doKeo = null
 function batDauDoKeo() {
-  doKeo = { raf: 0, last: performance.now(), max: 0, n: 0 }
+  doKeo = { raf: 0, last: performance.now(), t0: performance.now(), max: 0, n: 0, to: [], lt: [] }
+  /* 12/10: ghi VI TRI cac khung roi (> 24 ms) + cac "long task" cua renderer de biet khung khung o DAU keo hay giua chung,
+     do renderer ban (decode anh dong bang) hay do main / compositor. */
+  try {
+    doKeo.po = new PerformanceObserver((l) => { for (const e of l.getEntries()) doKeo && doKeo.lt.push(Math.round(e.startTime - doKeo.t0) + ':' + Math.round(e.duration)) })
+    doKeo.po.observe({ entryTypes: ['longtask'] })
+  } catch (e) {}
   const tick = () => {
     if (!doKeo) return
     const now = performance.now()
     const gap = now - doKeo.last
     if (gap > doKeo.max) doKeo.max = gap
+    if (gap > 24 && doKeo.to.length < 12) doKeo.to.push(Math.round(now - doKeo.t0) + ':' + Math.round(gap))
     doKeo.last = now
     doKeo.n++
     doKeo.raf = requestAnimationFrame(tick)
@@ -391,7 +398,9 @@ function batDauDoKeo() {
 function ketThucDoKeo() {
   if (!doKeo) return
   cancelAnimationFrame(doKeo.raf)
-  window.overlay.log('keo ' + doKeo.n + ' khung, gap-max=' + Math.round(doKeo.max) + 'ms')
+  try { doKeo.po && doKeo.po.disconnect() } catch (e) {}
+  window.overlay.log('keo ' + doKeo.n + ' khung, gap-max=' + Math.round(doKeo.max) + 'ms' +
+    (doKeo.to.length ? ' roi[t:gap]=' + doKeo.to.join(',') : '') + (doKeo.lt.length ? ' longtask[t:ms]=' + doKeo.lt.join(',') : ''))
   doKeo = null
 }
 
