@@ -74,6 +74,10 @@ kiem('main.js: nut "–" thu ve nut tron, showShelf bung tu nut, khoi chup go sa
   /ipcMain\.on\('shelf:hide', \(\) => \{ khayThu\.thu\(/.test(main) && /khayThu\.trangThai\(\) === 'thu'\) \{ khayThu\.bung\(/.test(main) && main.includes('khayThu.huy()') && main.includes('khayThu.dongHet()'))
 kiem('Cai dat: hang chon 5 / 10 / 15 giay noi du (trang -> preload -> main -> cau hinh khayTuThu)',
   /id="khay-tu-thu"[\s\S]*data-v="5"[\s\S]*data-v="10"[\s\S]*data-v="15"/.test(doc('src', 'settings', 'index.html')) && doc('src', 'settings', 'settings.js').includes('setKhayTuThu(') && doc('src', 'preload-settings.js').includes("'settings:set-khay-tu-thu'") && main.includes("ipcMain.handle('settings:set-khay-tu-thu'") && main.includes('khayTuThu: giayHopLe(c.khayTuThu)'))
+kiem('"Khong thu": giayHopLe(0) va ("0") giu 0 (khong ve 5), cac so khac nhu cu; nut Khong thu co o trang Cai dat + khoa chu VI / EN',
+  K.giayHopLe(0) === 0 && K.giayHopLe('0') === 0 && K.giayHopLe(5) === 5 && K.giayHopLe(null) === 5 && K.giayHopLe(7) === 5 && /data-v="0"[^>]*data-i18n="set\.khay\.khongThu"/.test(doc('src', 'settings', 'index.html')) &&
+  !!require(path.join(ROOT, 'src', 'i18n.js')).DICH.vi['set.khay.khongThu'] && !!require(path.join(ROOT, 'src', 'i18n.js')).DICH.en['set.khay.khongThu'])
+kiem('Bo hen gio: giay = 0 thi KHONG tu thu (nhip thoat truoc khi goi thu)', /if \(g === 0\) return/.test(doc('src', 'khay-thu.js')))
 const { DICH } = require(path.join(ROOT, 'src', 'i18n.js'))
 const khoa = ['khay.an', 'nut.mo', 'nut.an', 'set.khay.tuThu']
 kiem(khoa.length + ' khoa chu co du VI + EN, khong gach ngang dai', khoa.every((k) => DICH.vi[k] && DICH.en[k] && !/[—–]/.test(DICH.vi[k] + DICH.en[k])), khoa.filter((k) => !DICH.vi[k] || !DICH.en[k]).join(', '))
@@ -106,6 +110,7 @@ if (kq) {
   kiem('TU THU sau 5 giay khi con tro o ngoai khay (5,0 - 7,0 giay ke ca chuyen dong)', kq.tuThu.tt === 'thu' && kq.tuThu.ms >= 5000 && kq.tuThu.ms <= 7000, kq.tuThu.ms + ' ms')
   kiem('DOI CHUNG: con tro nam trong khay 6,3 giay -> KHONG thu', kq.conTroTrong === 'mo', kq.conTroTrong)
   kiem('DOI CHUNG: dang keo / chup / quay 6,3 giay -> KHONG thu', kq.dangBan === 'mo', kq.dangBan)
+  kiem('"Khong thu" (giay = 0): con tro o ngoai, khay mo 6,5 giay -> VAN mo; doi lai 5 giay thi thu nhu cu', kq.khongThu === 'mo' && kq.khongThuRoiBat === 'thu', kq.khongThu + ' / ' + kq.khongThuRoiBat)
   kiem('Co anh moi dung luc dang thu -> thu xong tu bung lai, khay sach', kq.anhMoiGiuaChung.tt === 'mo' && sach(kq.anhMoiGiuaChung.khay))
   kiem('Bam x tren nut -> an han; goi hien khay -> hien thang, khay sach', kq.anHan.tt === 'an' && kq.anHan.sau === 'mo' && sach(kq.anHan.khay))
   kiem('Khay TRONG: van thu duoc, nut la logo, khong hien so', kq.trong.ok && kq.trong.tt === 'thu' && kq.trong.nut.matLogo && !kq.trong.nut.matAnh && kq.trong.nut.so === '')

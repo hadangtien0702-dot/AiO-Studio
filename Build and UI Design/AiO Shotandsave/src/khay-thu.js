@@ -27,7 +27,8 @@ const path = require('path')
 
 const NUT = { CUA_SO: 80, TRON: 52, LE: 20 } // DIP: cua so nut, vong tron, khoang cach vong tron toi mep workArea
 const GIAY = [5, 10, 15]
-const giayHopLe = (v) => (GIAY.includes(Number(v)) ? Number(v) : GIAY[0])
+/* 0 = KHONG tu thu (anh 12/10: "co nguoi se khong muon tat"): khay ngoi do toi khi nguoi dung tu bam "–". Chua dat / sai thi ve 5. */
+const giayHopLe = (v) => (v === 0 || v === '0' ? 0 : GIAY.includes(Number(v)) ? Number(v) : GIAY[0])
 
 /* 12/10 (anh: "khi khay thu ve anh muon di chuyen duoc cai icon do nua"): nguoi dung KEO nut tron toi cho khac.
    Vi tri luu dang TI LE 0..1 trong vung duoc phep cua workArea (doi man / doi do phan giai van con dung), khoa `viTriNut`
@@ -416,6 +417,7 @@ function taoKhayThu(deps) {
     const p = deps.conTro ? deps.conTro() : screen.getCursorScreenPoint()
     if ((deps.banKhac && deps.banKhac()) || trongO(p, k.getBounds(), 8)) { lanCuoi = bay; return }
     const g = giayHopLe(deps.docGiay())
+    if (g === 0) return                                  // nguoi dung chon "Khong thu"
     if (bay - lanCuoi >= g * 1000) thu('tu dong sau ' + g + ' giay')
   }
   const henDo = setInterval(nhip, 400)

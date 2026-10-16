@@ -140,7 +140,7 @@ async function load() {
   datAnh(s.anhLoai, s.anhChatLuong)
   chonPill(khayBox, s.khayKieu)
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
-  if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu || 5))
+  if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu === 0 ? 0 : (s.khayTuThu || 5)))   // 0 = Khong thu
   if (lamMoBox) chonPill(lamMoBox, s.lamMoKieu || 'mosaic')
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
@@ -192,7 +192,8 @@ if (khayTuThuBox) {
     const b = e.target.closest('.chon-nut')
     if (!b || b.classList.contains('chon')) return
     chonPill(khayTuThuBox, b.dataset.v)
-    await window.settings.setKhayTuThu(Number(b.dataset.v) || 5)
+    const g = Number(b.dataset.v)
+    await window.settings.setKhayTuThu(Number.isFinite(g) ? g : 5)
   })
 }
 
