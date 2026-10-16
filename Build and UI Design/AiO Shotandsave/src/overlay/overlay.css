@@ -242,6 +242,12 @@ html, body {
 .cong-cu.xong { color: var(--ok, #35c46a); }
 .cong-cu.xong:hover { background: var(--ok, #35c46a); color: #fff; }
 .cong-cu.huy:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+/* 01/10 QUAY VIDEO: nut Quay re chuot = do (mau "dang ghi" ai cung hieu).
+   ☠️ .cong-cu{display:flex} (luat tac gia) DE LEN [hidden] cua trinh duyet -> phai co luat an rieng (so loi: CSS de
+   len co che AN). */
+.cong-cu[hidden] { display: none !important; }
+.cong-cu.quay:hover { background: #ff3b30; color: #fff; }
+.cong-cu.quay:hover .so { color: #fff; }
 .chia { width: 1px; height: 20px; background: var(--line-2); margin: 0 3px; }
 
 /* Bang chon mau */

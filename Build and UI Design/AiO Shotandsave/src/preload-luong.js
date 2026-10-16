@@ -10,4 +10,8 @@ contextBridge.exposeInMainWorld('luong', {
   /* 28/09 Quay 3s: cat DUNG vung (khong gui ca man raw ~33MB). */
   onCat: (cb) => ipcRenderer.on('luong:cat', (_e, d) => cb(d)),
   guiCat: (d) => ipcRenderer.send('luong:cat-xong', d),
+  /* 01/10 Quay video: gui tung khuc MP4 (~1 s) ve main ghi noi vao dia; bao xong; nhan lenh dung. */
+  guiKhucQuay: (d) => ipcRenderer.send('luong:quay-khuc', d),
+  quayXong: (d) => ipcRenderer.send('luong:quay-xong', d),
+  onDungQuay: (cb) => ipcRenderer.on('luong:quay-dung', (_e, d) => cb(d)),
 })

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiO Studio · nháp thẻ cảnh diễn</title>
+<!-- NHÁP 04/10/2026 (anh chê bản mẫu gắn dải sóng âm vào 1 thẻ: "sao nó xấu dữ vậy"). KHÔNG nằm trong bản cài (script cài chỉ
+     chép CSXS + dist). Ý: mỗi thẻ là một tấm áp phích nhỏ — nửa trên là SÂN KHẤU mang màu riêng của tool, tool diễn việc
+     nó làm ngay trên đó; nửa dưới là tên + một dòng. Cả 12 thẻ cùng một khuôn nên lưới đều hàng. Mới 3 thẻ đầu có cảnh.
+     Rê chuột để xem diễn. Thêm ?dien=1 vào địa chỉ = cho diễn sẵn (để chụp ảnh). Chỉ dùng CSS mà Chromium 99 của CEP có. -->
+<style>
+:root { --bg:#141210; --surface:#1f1b18; --surface-hv:#26211d; --line:#2e2925; --line-strong:#3b352f; --ink:#f6f1ec; --ink-2:#cfc6bd; --ink-3:#a89e94;
+  --ease:cubic-bezier(.2,.8,.2,1); --font:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.45 var(--font); -webkit-font-smoothing: antialiased; }
+.khung { max-width: 664px; margin: 0 auto; padding: 12px 12px 20px; }
+.dau { display: flex; align-items: baseline; gap: 10px; padding: 4px 4px 12px; }
+.dau b { font-size: 16px; letter-spacing: -.01em; }
+.dau span { font-size: 11px; color: var(--ink-3); }
+.luoi { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+/* ── THẺ ÁP PHÍCH ── */
+.the { position: relative; display: flex; flex-direction: column; min-width: 0; margin: 0; padding: 7px 7px 12px; border: 0; border-radius: 18px; background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform .28s var(--ease), box-shadow .28s, background-color .2s; }
+.the:hover, .the:focus-visible { outline: 0; transform: translateY(-3px); background: var(--surface-hv); box-shadow: inset 0 0 0 1px var(--line-strong), 0 20px 30px -22px var(--c); }
+.the:active { transform: translateY(-1px) scale(.985); }
+.san { position: relative; display: block; height: 104px; border-radius: 12px; overflow: hidden; background: linear-gradient(150deg, rgba(255,255,255,.18), rgba(0,0,0,.30)), var(--c); }
+.san::before { content: ""; position: absolute; left: 0; top: 0; right: 0; bottom: 0; opacity: .5; background-image: radial-gradient(rgba(255,255,255,.22) 1px, transparent 1.4px); background-size: 12px 12px; }
+.huy { position: absolute; left: 8px; top: 8px; z-index: 3; display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; color: #fff;
+  background: rgba(0,0,0,.24); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); }
+.ten { display: block; margin: 10px 5px 0; font-size: 13px; font-weight: 700; line-height: 1.25; letter-spacing: -.005em; }
+.viec { display: block; margin: 2px 5px 0; min-height: 30px; font-size: 11px; line-height: 1.35; color: var(--ink-3); }
+.nhan { position: absolute; right: 14px; top: 14px; z-index: 3; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; color: #fff; background: rgba(0,0,0,.36); }
+.the.sap { cursor: default; }
+.the.sap .san { filter: saturate(.35) brightness(.8); }
+.the.sap:hover { transform: none; box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); }
+
+/* Thẻ CHƯA có cảnh: icon lớn giữa hai vòng tròn — giữ đúng khuôn để lưới đều */
+.c-cho { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; display: flex; align-items: center; justify-content: center; color: #fff; }
+.c-cho::before, .c-cho::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.26); left: -14px; top: -14px; right: -14px; bottom: -14px; }
+.c-cho::after { left: -34px; top: -34px; right: -34px; bottom: -34px; border-color: rgba(255,255,255,.13); }
+.the:hover .c-cho svg { transform: scale(1.12); } .c-cho svg { transition: transform .3s var(--ease); }
+
+/* ── CẢNH 1 · AUTOCUT: 4 đoạn có tiếng xen 3 khoảng lặng. Diễn: đầu đọc quét, khoảng lặng tối lại rồi biến mất, các đoạn dồn sát ── */
+.c-cat .ray { position: absolute; left: 12px; right: 12px; top: 47px; height: 40px; display: flex; align-items: stretch; padding: 5px; border-radius: 11px; background: rgba(0,0,0,.30); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+.c-cat .cl { flex: 0 0 calc(var(--w) * 1%); min-width: 0; border-radius: 5px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='26' preserveAspectRatio='none' viewBox='0 0 30 26'%3E%3Cg fill='%23f86820'%3E%3Crect x='3' y='9' width='2.4' height='8' rx='1.2'/%3E%3Crect x='8' y='4' width='2.4' height='18' rx='1.2'/%3E%3Crect x='13' y='8' width='2.4' height='10' rx='1.2'/%3E%3Crect x='18' y='5' width='2.4' height='16' rx='1.2'/%3E%3Crect x='23' y='10' width='2.4' height='6' rx='1.2'/%3E%3C/g%3E%3C/svg%3E") center / 30px 100% repeat-x; }
+.c-cat .lg { flex: 0 0 calc(6.66% - 2px); min-width: 0; margin: 0 1px; border-radius: 4px; background-color: transparent; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.55) 0 2px, transparent 2px 5px); }
+.c-cat .ph { position: absolute; left: 17px; top: 41px; width: 2px; height: 52px; margin-left: -1px; border-radius: 2px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.28); opacity: 0; }
+.c-cat .ph::before { content: ""; position: absolute; left: -4px; top: -2px; border: 5px solid transparent; border-top: 6px solid #fff; border-bottom: 0; }
+.the:hover .c-cat .ph, .dien .c-cat .ph { animation: cat-quet 3.6s linear infinite; }
+.the:hover .c-cat .ray, .dien .c-cat .ray { animation: cat-vong 3.6s linear infinite; }
+.the:hover .c-cat .g0, .dien .c-cat .g0 { animation: cat-g0 3.6s var(--ease) infinite; }
+.the:hover .c-cat .g1, .dien .c-cat .g1 { animation: cat-g1 3.6s var(--ease) infinite; }
+.the:hover .c-cat .g2, .dien .c-cat .g2 { animation: cat-g2 3.6s var(--ease) infinite; }
+@keyframes cat-quet { 0% { left: 17px; opacity: 1; } 39% { left: calc(100% - 17px); opacity: 1; } 43%, 100% { left: calc(100% - 17px); opacity: 0; } }
+@keyframes cat-vong { 0%, 88% { opacity: 1; } 93%, 96% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes cat-g0 { 0%, 10% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } 12%, 46% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: rgba(0,0,0,.6); } 54%, 94% { flex-basis: 0%; margin: 0; opacity: 0; } 95%, 100% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } }
+@keyframes cat-g1 { 0%, 18% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } 20%, 49% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: rgba(0,0,0,.6); } 57%, 94% { flex-basis: 0%; margin: 0; opacity: 0; } 95%, 100% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } }
+@keyframes cat-g2 { 0%, 31% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } 33%, 52% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: rgba(0,0,0,.6); } 60%, 94% { flex-basis: 0%; margin: 0; opacity: 0; } 95%, 100% { flex-basis: calc(6.66% - 2px); margin: 0 1px; opacity: 1; background-color: transparent; } }
+
+/* ── CẢNH 2 · AUTO PODCAST: hai người, khung máy quay (chấm đỏ REC) nhảy sang người đang nói ── */
+.c-pod .ng { position: absolute; top: 37px; width: 44px; height: 44px; margin-left: -22px; border-radius: 50%; background: rgba(255,255,255,.96); overflow: hidden; }
+.c-pod .ng::before { content: ""; position: absolute; left: 50%; top: 9px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #1e3a8a; }
+.c-pod .ng::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 30px; height: 22px; margin-left: -15px; border-radius: 14px 14px 0 0; background: #1e3a8a; }
+.c-pod .a { left: 32%; } .c-pod .b { left: 70%; }
+.c-pod .kh { position: absolute; top: 30px; left: 32%; width: 58px; height: 58px; margin-left: -29px; border: 2px solid #fff; border-radius: 17px; box-shadow: 0 0 0 4px rgba(255,255,255,.18); }
+.c-pod .kh::after { content: ""; position: absolute; right: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 2px #fff; }
+.c-pod .sg { position: absolute; top: 49px; width: 15px; height: 20px; margin-left: -7px; background: linear-gradient(#fff, #fff) 0 50% / 3px 8px no-repeat, linear-gradient(#fff, #fff) 6px 50% / 3px 18px no-repeat, linear-gradient(#fff, #fff) 12px 50% / 3px 11px no-repeat; }
+.c-pod .sa { left: 11%; } .c-pod .sb { left: 91%; opacity: .22; }
+.the:hover .c-pod .kh, .dien .c-pod .kh { animation: pod-kh 2.8s var(--ease) infinite; }
+.the:hover .c-pod .sa, .dien .c-pod .sa { animation: pod-sa 2.8s linear infinite; }
+.the:hover .c-pod .sb, .dien .c-pod .sb { animation: pod-sb 2.8s linear infinite; }
+@keyframes pod-kh { 0%, 40% { left: 32%; } 50%, 90% { left: 70%; } 100% { left: 32%; } }
+@keyframes pod-sa { 0%, 40% { opacity: 1; transform: scaleY(1); } 10%, 30% { transform: scaleY(.6); } 20% { transform: scaleY(1.1); } 48%, 92% { opacity: .22; transform: scaleY(.7); } 100% { opacity: 1; transform: scaleY(1); } }
+@keyframes pod-sb { 0%, 42% { opacity: .22; transform: scaleY(.7); } 50%, 90% { opacity: 1; transform: scaleY(1); } 60%, 80% { transform: scaleY(.6); } 70% { transform: scaleY(1.1); } 100% { opacity: .22; transform: scaleY(.7); } }
+
+/* ── CẢNH 3 · AUTO SHORT VIRAL: một bài dài có 3 đoạn hỏi–đáp đáng lấy → rơi xuống thành 3 video dọc ── */
+.c-sv .dai { position: absolute; left: 44px; right: 12px; top: 15px; height: 12px; border-radius: 6px; background: rgba(0,0,0,.30); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.c-sv .d { position: absolute; top: 2px; bottom: 2px; width: 18%; border-radius: 4px; background: #fff; transition: transform .45s var(--ease), opacity .45s; }
+.c-sv .d0 { left: 5%; } .c-sv .d1 { left: 41%; } .c-sv .d2 { left: 77%; }
+.c-sv .sh { position: absolute; top: 41px; width: 31px; height: 54px; margin-left: -15px; border-radius: 7px; background: #fff; box-shadow: 0 8px 14px -8px rgba(0,0,0,.6); opacity: .42; transform: translateY(7px) scale(.88); transition: transform .5s var(--ease), opacity .4s; }
+.c-sv .sh::before { content: ""; position: absolute; left: 50%; top: 9px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #059669; }
+.c-sv .sh::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 9px; height: 3px; border-radius: 2px; background: #059669; box-shadow: 0 -7px 0 rgba(5,150,105,.45); }
+.c-sv .s0 { left: 26%; } .c-sv .s1 { left: 52%; } .c-sv .s2 { left: 78%; }
+.c-sv .d1, .c-sv .s1 { transition-delay: .1s; } .c-sv .d2, .c-sv .s2 { transition-delay: .2s; }
+.the:hover .c-sv .d, .dien .c-sv .d { transform: translateY(16px) scaleX(.6); opacity: 0; }
+.the:hover .c-sv .sh, .dien .c-sv .sh { opacity: 1; }
+.the:hover .c-sv .s0, .dien .c-sv .s0 { transform: translateY(0) rotate(-7deg); }
+.the:hover .c-sv .s1, .dien .c-sv .s1 { transform: translateY(-3px); }
+.the:hover .c-sv .s2, .dien .c-sv .s2 { transform: translateY(0) rotate(7deg); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="khung">
+  <div class="dau"><b>AiO Studio</b><span>Bản nháp thẻ "cảnh diễn". Ba thẻ đầu có cảnh, rê chuột lên để xem. Chín thẻ còn lại mới giữ khuôn.</span></div>
+  <div class="luoi" id="luoi"></div>
+</div>
+<script>
+(function () {
+  var P = {
+    scissors: '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+    captions: '<rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/>',
+    messages: '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>',
+    mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
+    crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
+    frame: '<line x1="22" x2="2" y1="6" y2="6"/><line x1="22" x2="2" y1="18" y2="18"/><line x1="6" x2="6" y1="2" y2="22"/><line x1="18" x2="18" y1="2" y2="22"/>',
+    layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+    backpack: '<path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M8 10h8"/><path d="M8 18h8"/><path d="M8 22v-6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+    music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+    folders: '<path d="M20 17a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3.9a2 2 0 0 1-1.69-.9l-.81-1.2a2 2 0 0 0-1.67-.9H8a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2Z"/><path d="M2 8v11a2 2 0 0 0 2 2h14"/>'
+  };
+  function ic(ten, s, w) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + P[ten] + '</svg>'; }
+  var CANH = {
+    cat: '<span class="c-cat"><i class="ray"><i class="cl" style="--w:24"></i><i class="lg g0"></i><i class="cl" style="--w:16"></i><i class="lg g1"></i><i class="cl" style="--w:28"></i><i class="lg g2"></i><i class="cl" style="--w:12"></i></i><i class="ph"></i></span>',
+    pod: '<span class="c-pod"><i class="sg sa"></i><i class="ng a"></i><i class="ng b"></i><i class="sg sb"></i><i class="kh"></i></span>',
+    sv: '<span class="c-sv"><i class="dai"><i class="d d0"></i><i class="d d1"></i><i class="d d2"></i></i><i class="sh s0"></i><i class="sh s1"></i><i class="sh s2"></i></span>'
+  };
+  var TOOLS = [
+    { ten: 'Autocut', icon: 'scissors', c: '#f86820', viec: 'Cắt khoảng lặng', canh: 'cat' },
+    { ten: 'Auto Podcast', icon: 'mic', c: '#2563eb', viec: 'Cắt theo người đang nói', canh: 'pod' },
+    { ten: 'Auto Short Viral', icon: 'messages', c: '#059669', viec: 'Chia hỏi–đáp thành short', canh: 'sv' },
+    { ten: 'Auto Re-Frames', icon: 'crop', c: '#7c3aed', viec: 'Dựng dọc 9:16 bám chủ thể' },
+    { ten: 'Transcripts', icon: 'captions', c: '#0284c7', viec: 'Làm phụ đề từ giọng nói' },
+    { ten: 'Auto Guideline Frame', icon: 'frame', c: '#d97706', viec: 'Đặt vùng an toàn mạng xã hội' },
+    { ten: 'Asset Manager', icon: 'layers', c: '#db2777', viec: 'Kho nhạc, logo, hiệu ứng' },
+    { ten: 'Power Bins', icon: 'backpack', c: '#0d9488', viec: 'Brand kit hiện ở mọi project' },
+    { ten: 'Video Download', icon: 'download', c: '#4f46e5', viec: 'Tải video từ link vào bin' },
+    { ten: 'Music & SFX', icon: 'music', c: '#c026d3', viec: 'Nhạc nền và hiệu ứng âm thanh' },
+    { ten: 'Shot & Save', icon: 'camera', c: '#65a30d', viec: 'Chụp màn hình, ghim, vẽ', nhan: 'App' },
+    { ten: 'Auto Organize Folder', icon: 'folders', c: '#52525b', viec: 'Tự xếp thư mục dự án', sap: true, nhan: 'Sắp có' }
+  ];
+  document.getElementById('luoi').innerHTML = TOOLS.map(function (t) {
+    return '<button type="button" class="the' + (t.sap ? ' sap' : '') + '" style="--c:' + t.c + '">' +
+      '<span class="san">' + (t.canh ? '<span class="huy">' + ic(t.icon, 14, 2.2) + '</span>' + CANH[t.canh] : '<span class="c-cho">' + ic(t.icon, 30, 1.9) + '</span>') + '</span>' +
+      (t.nhan ? '<span class="nhan">' + t.nhan + '</span>' : '') +
+      '<span class="ten">' + t.ten + '</span><span class="viec">' + t.viec + '</span></button>';
+  }).join('');
+  if (/[?&]dien=1/.test(location.search)) document.body.classList.add('dien');
+})();
+</script>
+</body>
+</html>

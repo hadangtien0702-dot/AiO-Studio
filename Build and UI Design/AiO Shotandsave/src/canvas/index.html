@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; media-src file:; img-src data: aioshot:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save · Canvas</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <!-- 12/10 CANVAS Y TUONG (main: src/main.js khoi "CANVAS Y TUONG" + src/canvas-kho.js). Anh duyet ban mau nhap/canvas-miro.html
+       ("ok roi ... build di em") sau khi che ban o mau phang "xau qua creative hon di em". Giu dung 4 y cua ban mau:
+       KHUNG la THU MUC (tai thu muc mau rieng mang ten, so dem nay khi tha anh vao) · ANH la TAM IN (vien trang, nam hoi nghieng,
+       re chuot hien 4 GOC CAM = khung chon cua app) · y tuong BAY RA TU NUT TRON · tieu de chu lon nam tren bang.
+       Day la be mat rieng (bang y tuong), KHONG theo khuon man Cai dat; mau nen / chu / cam van lay tu tokens.css, khong khai :root. -->
+  <style>
+    @font-face { font-family: Inter; src: url(../../assets/fonts/Inter.woff2) format("woff2"); font-weight: 100 900; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: #0c0c0d; color: var(--text-1); font: 13px/1.45 Inter, system-ui, sans-serif; user-select: none; }
+    button, input { font-family: inherit; font-size: inherit; color: inherit; }
+    .bang { position: fixed; inset: 0; overflow: hidden; cursor: grab; touch-action: none; background-color: #0c0c0d; background-image: radial-gradient(rgb(255 255 255 / 11%) 1.1px, transparent 1.1px); }
+    .bang.keo { cursor: grabbing; }
+    .the { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+    .tieu { position: absolute; left: 40px; top: 64px; font-weight: 800; font-size: 92px; line-height: .95; letter-spacing: -.045em; white-space: nowrap; pointer-events: none; }
+    .tieu em { font-style: normal; color: var(--accent); }
+    .tieu small { display: block; margin-top: 26px; font: italic 500 26px/1 Inter, sans-serif; letter-spacing: -.01em; color: var(--text-3); }
+    .khung { position: absolute; border: 1.5px solid color-mix(in srgb, var(--m) 55%, transparent); border-radius: 4px 18px 18px 18px; background: color-mix(in srgb, var(--m) 7%, transparent); transition: background .2s, box-shadow .2s; }
+    .khung.vao { background: color-mix(in srgb, var(--m) 16%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m) 35%, transparent); }
+    .khung .tai { position: absolute; left: -1.5px; top: -33px; height: 33px; display: flex; align-items: center; gap: 6px; padding: 0 10px 0 9px; border-radius: 11px 14px 0 0; background: var(--m); color: #17120d; cursor: grab; max-width: calc(100% + 3px); }
+    .khung .tai::after { content: ""; position: absolute; right: -13px; bottom: 0; width: 14px; height: 14px; background: radial-gradient(circle at 100% 0, transparent 13px, var(--m) 13.5px); }
+    .khung .tai svg { flex: none; }
+    .khung .tai input { background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 1px 4px; font-weight: 800; color: #17120d; min-width: 40px; user-select: text; }
+    .khung .tai input:hover { border-color: rgb(0 0 0 / 25%); }
+    .khung .tai input:focus { outline: none; border-color: rgb(0 0 0 / 55%); background: rgb(255 255 255 / 35%); }
+    .khung .tai b { flex: none; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 10px; background: rgb(0 0 0 / 78%); color: #fff; font: 700 11px/20px Inter, sans-serif; text-align: center; font-variant-numeric: tabular-nums; }
+    .khung .tai b.nay { animation: nay .38s cubic-bezier(.3, 1.6, .5, 1); }
+    @keyframes nay { 40% { transform: scale(1.45); } }
+    .khung .goc { position: absolute; right: -7px; bottom: -7px; width: 18px; height: 18px; border-radius: 6px; background: var(--m); opacity: .85; cursor: nwse-resize; }
+    .o { position: absolute; padding: 6px 6px 22px; background: #f4f1ea; border-radius: 4px; cursor: grab; box-shadow: 0 3px 10px rgb(0 0 0 / 45%); transform: rotate(var(--r, 0deg)); transition: transform .55s cubic-bezier(.2, .9, .25, 1.12), opacity .3s, box-shadow .2s; }
+    .o img.anh, .o video { display: block; width: 100%; height: 100%; border-radius: 2px; object-fit: cover; object-position: 50% 0; background: #1b1b1f; pointer-events: none; }
+    .o .ngay { position: absolute; left: 8px; bottom: 4px; font: 600 12px/1 Noteworthy, "Segoe Print", "Bradley Hand", Inter, cursive; color: #3a342b; }
+    .o .loai { position: absolute; right: 7px; bottom: 5px; font: 700 9px/1 Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: #8a8275; }
+    .o.video { background: #16161a; padding: 14px 6px 22px; }
+    .o.video::before { content: ""; position: absolute; left: 6px; right: 6px; top: 4px; height: 6px; background: repeating-linear-gradient(90deg, #f4f1ea 0 7px, transparent 7px 14px); opacity: .75; }
+    .o.video .ngay, .o.dai .ngay { color: #f4f1ea; }
+    .o.video .loai, .o.dai .loai { color: #9a9aa3; }
+    .o .phat { position: absolute; left: 0; right: 0; top: 0; bottom: 16px; margin: auto; width: 34px; height: 34px; border-radius: 17px; background: rgb(0 0 0 / 62%); display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .o.dai { background: #16161a; }
+    .o.dai .dayk { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; height: 100%; }
+    .o.dai .dayk img { width: 100%; height: 100%; border-radius: 2px; display: block; object-fit: cover; background: #1b1b1f; pointer-events: none; }
+    .o i.g { position: absolute; width: 14px; height: 14px; border: 3px solid var(--accent); opacity: 0; transition: opacity .15s, transform .15s; pointer-events: none; }
+    .o i.g1 { left: -7px; top: -7px; border-right: 0; border-bottom: 0; transform: translate(5px, 5px); }
+    .o i.g2 { right: -7px; top: -7px; border-left: 0; border-bottom: 0; transform: translate(-5px, 5px); }
+    .o i.g3 { left: -7px; bottom: -7px; border-right: 0; border-top: 0; transform: translate(5px, -5px); }
+    .o i.g4 { right: -7px; bottom: -7px; border-left: 0; border-top: 0; transform: translate(-5px, -5px); }
+    .o:hover i.g, .o.nang i.g { opacity: 1; transform: none; }
+    .o:hover { transform: rotate(0deg) scale(1.03); box-shadow: 0 10px 26px rgb(0 0 0 / 55%); z-index: 4; }
+    .o.nang { cursor: grabbing; transition: none; transform: rotate(0deg) scale(1.06); box-shadow: 0 18px 40px rgb(0 0 0 / 60%); z-index: 6; }
+    .o.bay { transform: translate(var(--ix, 0px), var(--iy, 0px)) scale(.12) rotate(50deg); opacity: 0; }
+    .noi { position: fixed; z-index: 20; background: rgb(24 24 24 / 90%); border: 1px solid rgb(255 255 255 / 10%); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgb(0 0 0 / 45%); }
+    .ten { left: 16px; top: 16px; height: 40px; border-radius: 12px; display: flex; align-items: center; gap: 9px; padding: 0 14px 0 11px; }
+    .ten b { font-size: 14px; font-weight: 800; }
+    .ten span { color: var(--text-3); }
+    .thanh { left: 50%; bottom: 18px; transform: translateX(-50%); height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+    .thanh button { height: 32px; padding: 0 12px; border-radius: 16px; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 7px; font-weight: 600; white-space: nowrap; }
+    .thanh button:hover { background: var(--bg-5); }
+    .thanh .vach { width: 1px; height: 20px; background: rgb(255 255 255 / 10%); margin: 0 4px; }
+    .thanh .ti { min-width: 46px; text-align: center; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .ntr { position: fixed; z-index: 21; right: 22px; bottom: 20px; width: 58px; height: 58px; border-radius: 29px; border: 0; cursor: pointer; background: radial-gradient(circle at 34% 28%, #3a3a42, #19191c 62%); box-shadow: 0 6px 16px rgb(0 0 0 / 60%), 0 0 0 2px rgb(248 104 32 / 75%); display: flex; align-items: center; justify-content: center; color: var(--accent); transition: transform .15s; }
+    .ntr:hover { transform: scale(1.07); }
+    .ntr:active { transform: scale(.93); }
+    .ntr b { position: absolute; right: -5px; top: -5px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--accent); color: #fff; font: 700 11px/22px Inter, sans-serif; box-shadow: 0 0 0 2px #0c0c0d; }
+    .ntr b:empty { display: none; }
+    .trong { position: fixed; left: 0; right: 0; top: 50%; text-align: center; color: var(--text-3); font-size: 15px; pointer-events: none; }
+    .bao { position: fixed; z-index: 25; left: 50%; bottom: 78px; transform: translateX(-50%) translateY(8px); max-width: min(560px, calc(100% - 32px)); padding: 9px 14px; border-radius: 12px; background: #2a1512; border: 1px solid rgb(255 95 109 / 45%); color: #ffd9dc; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+    .bao.hien { opacity: 1; transform: translateX(-50%); }
+    @media (max-width: 820px) { .thanh .chu { display: none; } }
+    @media (prefers-reduced-motion: reduce) { .o { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="bang" id="bang"><div class="the" id="the"><div class="tieu" id="tieu"></div><i id="moc" hidden></i></div></div>
+  <p class="trong" id="trong" hidden></p>
+  <div class="noi ten"><svg width="20" height="18" viewBox="0 0 385.89 351.31" aria-hidden="true"><path fill="#f86820" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15c0-39.55,32.11-71.66,71.66-71.66Z"/><path fill="#f86820" d="M385.89,351.31h-104.2c-32.9,0-62.6-19.73-75.36-50.06L79.21,0h104.2c32.9,0,62.6,19.73,75.36,50.06l127.12,301.25Z"/></svg><b>Canvas</b><span id="dem"></span></div>
+  <div class="noi thanh">
+    <button id="them"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/></svg><span class="chu" id="chuThem"></span></button>
+    <button id="moTM"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="chu" id="chuMo"></span></button>
+    <span class="vach"></span>
+    <button id="nho" aria-label="−">−</button><span class="ti" id="ti">100%</span><button id="to" aria-label="+">+</button>
+    <span class="vach"></span>
+    <button id="vua"><span id="chuVua"></span></button>
+  </div>
+  <button class="ntr" id="chup"><svg width="24" height="22" viewBox="0 0 385.89 351.31" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15c0-39.55,32.11-71.66,71.66-71.66Z"/><path fill="currentColor" d="M385.89,351.31h-104.2c-32.9,0-62.6-19.73-75.36-50.06L79.21,0h104.2c32.9,0,62.6,19.73,75.36,50.06l127.12,301.25Z"/></svg><b id="soNut"></b></button>
+  <div class="bao" id="bao" role="status"></div>
+  <script src="canvas.js"></script>
+</body>
+</html>

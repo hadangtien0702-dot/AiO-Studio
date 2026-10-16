@@ -8,7 +8,7 @@
 
 import { dich } from '../ngonngu'
 import { extensionPath } from '../lib/cep'
-import { getFs, getPath, nodeRequire } from '../lib/node'
+import { getFs, getPath, laMac, nodeRequire, timCongCuMac } from '../lib/node'
 import { parseSilenceLog, parseDuration, parseVideoFps, type Silence } from './silencelog'
 
 export type { Silence }
@@ -66,6 +66,14 @@ let cachedFFmpeg: string | null = null
 /** Đường dẫn tuyệt đối tới ffmpeg.exe ('' nếu không tìm thấy). */
 export function getFFmpegPath(): string {
   if (cachedFFmpeg) return cachedFFmpeg
+
+  // macOS: file `ffmpeg` không đuôi, dò theo luật chung của cả bộ (xem
+  // `timCongCuMac` trong lib/node.ts). Nhánh Windows bên dưới giữ nguyên.
+  if (laMac()) {
+    const mac = timCongCuMac('ffmpeg', extensionPath())
+    if (mac) cachedFFmpeg = mac
+    return mac
+  }
 
   const fs = getFs()
   const path = getPath()

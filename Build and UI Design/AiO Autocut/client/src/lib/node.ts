@@ -34,3 +34,45 @@ export function getPath(): any {
   const r = nodeRequire()
   return r ? r('path') : null
 }
+
+let _laMac: boolean | null = null
+
+/**
+ * Đang chạy trên macOS không (`process.platform === 'darwin'`).
+ *
+ * Đọc `process` của Node LÚC CHẠY qua `window.cep_node` (hoặc module
+ * 'process'), không viết chữ `process.` trần cho bundler thấy — cùng lý do với
+ * `bienMT()` trong `services/ffmpeg.ts`. Không đọc được thì hỏi `os.platform()`.
+ * Mọi đường đều hỏng thì coi là KHÔNG phải Mac, tức đi đúng nhánh Windows cũ.
+ */
+export function laMac(): boolean {
+  if (_laMac !== null) return _laMac
+  let pf = ''
+  const w = window as any
+  const req = nodeRequire()
+  try {
+    const p = w?.cep_node?.process
+    if (p && typeof p['platform'] === 'string') pf = p['platform']
+  } catch {
+    /* thử đường sau */
+  }
+  if (!pf) {
+    try {
+      const p = req ? req('process') : null
+      if (p && typeof p['platform'] === 'string') pf = p['platform']
+    } catch {
+      /* thử đường sau */
+    }
+  }
+  if (!pf) {
+    try {
+      const os = req ? req('os') : null
+      if (os && typeof os.platform === 'function') pf = String(os.platform())
+    } catch {
+      /* chịu — coi như Windows */
+    }
+  }
+  // Chỉ nhớ khi đã đọc được — chạy ngoài CEP (trình duyệt) thì lần sau hỏi lại.
+  if (pf) _laMac = pf === 'darwin'
+  return pf === 'darwin'
+}

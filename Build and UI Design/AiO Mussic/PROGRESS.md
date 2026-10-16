@@ -1,5 +1,21 @@
 # PROGRESS — AiO Music (BGM & Sound Effects Manager)
 
+## [mac-port] - 2026-09-30 19:27 (UTC+7) - Chay duoc tren Mac (CHUA do trong Premiere tren Mac)
+
+- **Boi canh:** anh: *"ok em lam het 8 panel cho mac luon di"* (cai AiO len Mac Intel, Premiere Pro Beta 26.5).
+  Music ngoai danh sach 8 nhung soi thay 3 cho chi chay Windows.
+- **Goc + da sua (chi THEM nhanh Mac, nhanh Windows giu nguyen):**
+  - `CSInterface.js`: bo ca `file:///` -> tren Mac ra `Users/...` (mat "/" dau) -> moi duong dan tuong doi sai.
+    Nay chi bo `file:///` khi sau no la o dia (`C:`), con lai bo `file://`. Windows ra y nhu cu.
+  - `nen.js timBin`: chi tim `bin/win64/*.exe`. Them nhanh Mac: `bin/mac` cua panel -> `bin/mac` cua Asset Manager
+    -> `~/Library/Application Support/AiO-Studio/bin/mac` -> `/opt/homebrew/bin` -> `/usr/local/bin`, duong dan tuyet doi.
+  - `ung-dung.js` o tha nhac: `file:///Users/a.mp3` bi bo ca 3 gach -> `Users/a.mp3` -> tra ''. Nay giu "/" dau tren Mac.
+- **Kiem (Node chay THANG cau-noi.js + nen.js + CSInterface.js, gia CEP):** ext = `/Users/.../com.aiostudio.music`;
+  ffprobe/ffmpeg = kho chung `AiO-Studio/bin/mac`; `docMetadata` tren mp3 tao bang ffmpeg co tag
+  TBPM=128 TKEY=Cm -> `{"duration":3,"bpm":128,"key":"Cm","nguon":"tag"}`. Tha: `file:///C:/Nhac/bai%201.mp3` ->
+  `C:/Nhac/bai 1.mp3` (nhu cu), `file:///Users/u/Music/bai%201.mp3` -> `/Users/u/Music/bai 1.mp3`. `node --check` 4 file dat.
+- **Chua kiem:** trong Premiere tren Mac (quet thu muc, phat nhac qua may chu noi bo, keo clip tu timeline vao do key).
+
 ## [1.0.1 · UI v2.1] - 2026-09-27 20:34 (UTC+7) — Tăng số phiên bản
 
 - manifest 1.0.0 -> 1.0.1, nhãn topbar v2.0 -> v2.1 (bộ đo key mới + ô thả, mục ngay dưới). Luật /xong 2b.

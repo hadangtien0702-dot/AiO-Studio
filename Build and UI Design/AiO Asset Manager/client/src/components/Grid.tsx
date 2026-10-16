@@ -3,6 +3,7 @@ import { useLibrary } from '../state/store'
 import { filesFromDropEvent } from '../services/timelineImport'
 import { setQueuePriorityIds } from '../services/jobQueue'
 import { dich } from '../ngonngu'
+import { isMac } from '../lib/platform'
 import AssetCard from './AssetCard'
 import {
   IconFile,
@@ -588,9 +589,14 @@ export default function Grid() {
             nhắc thêm ở đây là lặp lại. */}
         {activeMasterTab === 'powerbin' && canDrop && (
           <div className="dropzone-hint">
-            {dich(
-              'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
-            )}
+            {/* [2026-09-30] Trên Mac trình quản lý file là Finder, không phải Explorer. */}
+            {isMac()
+              ? dich(
+                  'Kéo file từ Finder vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
+                )
+              : dich(
+                  'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
+                )}
           </div>
         )}
 

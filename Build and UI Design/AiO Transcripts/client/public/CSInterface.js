@@ -108,8 +108,10 @@ CSInterface.prototype.getSystemPath = function (pathType) {
   if (!this.isInHost()) return '';
   var path = window.__adobe_cep__.getSystemPath(pathType);
   try { path = decodeURI(path); } catch (e) {}
-  // Chuẩn hoá "file:///C:/..." -> "C:/..." trên Windows
-  if (path.indexOf('file:///') === 0) {
+  // Chuẩn hoá "file:///C:/..." -> "C:/..." trên Windows.
+  // Mac: "file:///Users/..." -> "/Users/..." (chỉ bỏ "file://", GIỮ dấu "/" đầu;
+  // bỏ cả "file:///" thì ra "Users/..." -> mọi đường dẫn tương đối sai trên Mac).
+  if (/^file:\/\/\/[A-Za-z]:/.test(path)) {
     path = path.replace('file:///', '');
   } else if (path.indexOf('file://') === 0) {
     path = path.replace('file://', '');

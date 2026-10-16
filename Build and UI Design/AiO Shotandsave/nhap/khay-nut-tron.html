@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shot &amp; Save · Khay thu về nút tròn (nháp 2)</title>
+<!-- NHAP 01/10/2026 (anh Tien: "3 option animation nay chua du dep va creative"). Ban thu chay that, KHONG phai ma cua app.
+     3 y tuong, moi cai ke dung mot viec app lam: A ong kinh (chup) · B xap anh (khay) · C khoanh vung (khung cam 4 goc).
+     Keo thanh tren cua khay de doi cho: thu lai thi nut luon ve goc duoi-phai, mo ra thi khay ve dung cho cu. -->
+<style>
+@font-face{font-family:Inter;src:url(../assets/fonts/Inter.woff2) format("woff2");font-weight:100 900}
+:root{--bg2:#181818;--bg3:#232327;--line:rgba(255,255,255,.09);--t1:#f5f5f7;--t3:#8d8d95;--cam:#F86820}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0b0c;color:var(--t1);font-family:Inter,system-ui,"Segoe UI",sans-serif;padding:18px;min-height:100vh;user-select:none}
+button{font-family:inherit}
+#tren{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.cum{display:flex;padding:3px;background:#0e0e0e;border:1px solid var(--line);border-radius:10px}
+.cum button{border:0;background:transparent;color:var(--t3);font:600 13px/1 Inter,sans-serif;padding:8px 14px;border-radius:7px;cursor:pointer}
+.cum button.mo{background:#3a3a40;color:var(--t1);box-shadow:0 1px 2px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.06)}
+.phu{border:1px solid var(--line);background:var(--bg3);color:var(--t1);font:600 12.5px/1 Inter,sans-serif;padding:9px 13px;border-radius:8px;cursor:pointer}
+.phu:hover{background:#2c2c31}
+label.chon{font-size:12.5px;color:var(--t3);display:flex;align-items:center;gap:6px;cursor:pointer}
+#ta{font-size:13px;color:var(--t3);margin:0 0 12px;min-height:20px}
+#ta b{color:var(--t1);font-weight:600}
+
+#san{position:relative;height:560px;border-radius:14px;overflow:hidden;background:radial-gradient(1200px 600px at 20% 0%,#1b1d24,#0d0e11 70%)}
+/* nen: mot cua so dung phim mo de khay co cho "noi" len */
+.pr{position:absolute;inset:26px 26px 26px 26px;border-radius:10px;background:#131417;border:1px solid rgba(255,255,255,.05);opacity:.9}
+.pr .man{position:absolute;left:18px;top:18px;width:46%;height:52%;border-radius:6px;background:linear-gradient(160deg,#20242d,#15171c)}
+.pr .ben{position:absolute;right:18px;top:18px;width:calc(54% - 54px);height:52%;border-radius:6px;background:#17181c;border:1px solid rgba(255,255,255,.04)}
+.pr .tl{position:absolute;left:18px;right:18px;bottom:18px;top:calc(52% + 34px);border-radius:6px;background:#111215;border:1px solid rgba(255,255,255,.04);padding:14px 12px;display:flex;flex-direction:column;gap:9px}
+.pr .tl i{display:block;height:20px;border-radius:4px;opacity:.5}
+
+#khay{position:absolute;width:452px;height:150px;z-index:2;will-change:transform,clip-path}
+#khay .nen{position:absolute;inset:0;border-radius:12px;background:var(--bg2);border:1px solid var(--line);box-shadow:0 22px 60px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.4)}
+#khay .dau{position:relative;height:32px;display:flex;align-items:center;gap:8px;padding:0 8px 0 11px;cursor:grab;color:var(--t3);font-size:11.5px;font-weight:600}
+#khay .dau:active{cursor:grabbing}
+#khay .dau .dem{color:#ffb891;font-weight:700}
+#khay .dau .gian{flex:1}
+#thu{width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--t3);cursor:pointer;font-size:16px;line-height:1}
+#thu:hover{background:#2c2c31;color:var(--cam)}
+#khay .than{position:relative;display:flex;gap:8px;padding:4px 10px 10px}
+.o{position:relative;flex:1;height:104px;border-radius:7px;border:1px solid rgba(255,255,255,.1);overflow:hidden;will-change:transform}
+.o::before{content:"";position:absolute;left:10%;right:38%;top:58%;height:5px;border-radius:3px;background:rgba(255,255,255,.34);box-shadow:0 11px 0 rgba(255,255,255,.18)}
+.o b{position:absolute;left:5px;top:5px;font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:4px;background:rgba(9,10,13,.8);color:var(--cam)}
+#chop{position:absolute;inset:0;border-radius:12px;background:#fff;opacity:0;pointer-events:none}
+
+#nut{position:absolute;width:52px;height:52px;border-radius:26px;border:0;padding:0;z-index:3;cursor:pointer;
+  background:radial-gradient(circle at 34% 28%,#34343b,#19191c 62%);
+  box-shadow:0 10px 28px rgba(0,0,0,.6),0 0 0 1.5px rgba(248,104,32,.55),inset 0 1px 0 rgba(255,255,255,.12);overflow:visible;will-change:transform}
+#nut:hover{box-shadow:0 10px 28px rgba(0,0,0,.6),0 0 0 2px var(--cam),inset 0 1px 0 rgba(255,255,255,.12)}
+#nut .mat{position:absolute;right:0;top:0;width:52px;height:52px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none}
+#nut .mat.anh{border-radius:26px;overflow:hidden}
+#nut .mat.anh i{display:block;width:44px;height:44px;border-radius:22px;background-size:cover}
+#nut .so{position:absolute;right:-5px;top:-5px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--cam);color:#fff;font:700 11px/20px Inter,sans-serif;font-style:normal;text-align:center;box-shadow:0 0 0 2px #0d0e11}
+#nut .ghe{position:absolute;left:8px;top:8px;right:56px;height:36px;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;white-space:nowrap;overflow:hidden;color:var(--t1);font-size:12px;font-weight:600}
+#nut .ghe i{flex:none;width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.14)}
+#song{position:absolute;width:52px;height:52px;border-radius:26px;border:2px solid var(--cam);opacity:0;pointer-events:none;z-index:2}
+
+#khung{position:absolute;z-index:4;border:1.5px solid rgba(248,104,32,.9);border-radius:12px;background:rgba(248,104,32,.07);opacity:0;pointer-events:none}
+#khung i{position:absolute;width:15px;height:15px;border:3.5px solid var(--cam)}
+#khung i:nth-child(1){left:-5px;top:-5px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+#khung i:nth-child(2){right:-5px;top:-5px;border-left:0;border-bottom:0;border-radius:0 6px 0 0}
+#khung i:nth-child(3){left:-5px;bottom:-5px;border-right:0;border-top:0;border-radius:0 0 0 6px}
+#khung i:nth-child(4){right:-5px;bottom:-5px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+#ghi{position:absolute;left:18px;bottom:14px;font-size:12px;color:rgba(255,255,255,.34);z-index:1}
+</style>
+</head>
+<body>
+<div id="tren">
+  <div class="cum" id="chon">
+    <button data-y="A" class="mo">A · Ống kính</button>
+    <button data-y="B">B · Xấp ảnh</button>
+    <button data-y="C">C · Khoanh vùng</button>
+    <button data-y="D">Anh chốt · mở A, thu B</button>
+  </div>
+  <button class="phu" id="doi">Thu lại / mở ra</button>
+  <button class="phu" id="chup">Giả lập chụp ảnh mới</button>
+  <label class="chon"><input type="checkbox" id="cham"> Xem chậm</label>
+  <label class="chon"><input type="checkbox" id="tu" checked> Tự thu sau 3 giây</label>
+</div>
+<p id="ta"></p>
+
+<div id="san">
+  <div class="pr"><div class="man"></div><div class="ben"></div>
+    <div class="tl"><i style="width:62%;background:#3d5a80"></i><i style="width:84%;background:#5a4d7a;margin-left:6%"></i><i style="width:48%;background:#3f7a63;margin-left:20%"></i></div>
+  </div>
+
+  <div id="khay">
+    <div class="nen"></div>
+    <div class="dau">
+      <svg viewBox="0 0 385.89 351.31" width="13" height="12" aria-hidden="true"><path fill="#F86820" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="#F86820" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>
+      <span>Khay ảnh</span><span class="dem" id="dem">12</span><span class="gian"></span>
+      <button id="thu" title="Thu khay về nút tròn" aria-label="Thu khay">–</button>
+    </div>
+    <div class="than" id="than"></div>
+    <div id="chop"></div>
+  </div>
+
+  <div id="song"></div>
+  <button id="nut" aria-label="Mở khay">
+    <span class="mat logo"><svg viewBox="0 0 385.89 351.31" width="21" height="19" aria-hidden="true"><path fill="#F86820" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="#F86820" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+    <span class="mat ong"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#F86820" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m14.31 8 5.74 9.94"/><path d="M9.69 8h11.48"/><path d="m7.38 12 5.74-9.94"/><path d="M9.69 16 3.95 6.06"/><path d="M14.31 16H2.83"/><path d="m16.62 12-5.74 9.94"/></svg></span>
+    <span class="mat anh"><i></i></span>
+    <span class="ghe"><i></i><span>Ảnh mới đã lưu</span></span>
+    <i class="so" id="so">12</i>
+  </button>
+
+  <div id="khung"><i></i><i></i><i></i><i></i></div>
+  <div id="ghi">Kéo thanh trên của khay để đổi chỗ. Bấm nút tròn để mở lại.</div>
+</div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s)
+  const san = $('#san'), khay = $('#khay'), nen = $('#khay .nen'), dau = $('#khay .dau'), than = $('#than'), chop = $('#chop')
+  const nut = $('#nut'), song = $('#song'), khung = $('#khung'), so = $('#so'), dem = $('#dem'), ta = $('#ta')
+  const mat = { logo: $('#nut .logo'), ong: $('#nut .ong'), anh: $('#nut .anh') }, ghe = $('#nut .ghe')
+  const MAU = ['linear-gradient(160deg,#2b5876,#4e4376)', 'linear-gradient(160deg,#614385,#516395)', 'linear-gradient(160deg,#134e5e,#71b280)', 'linear-gradient(160deg,#8e2d4f,#3a1c71)', 'linear-gradient(160deg,#b7791f,#7b3fa0)']
+  const TA = {
+    A: '<b>A · Ống kính.</b> Khay khép lại như màn trập máy ảnh, còn lại một ống kính rồi lướt về góc. Mở ra thì màn trập bung, kèm một nháy sáng như vừa chụp.',
+    B: '<b>B · Xấp ảnh.</b> Từng tấm ảnh bay về chui vào nút, nút đếm lên theo từng tấm. Lúc nghỉ, nút hiện luôn tấm ảnh mới nhất. Mở ra thì ảnh được chia ra như chia bài.',
+    D: '<b>Anh chốt 01/10 · xuất hiện kiểu A, thu về kiểu B.</b> Mở ra: ống kính lướt từ góc tới chỗ khay, màn trập bung kèm một nháy sáng. Thu về: từng tấm ảnh bay vào nút, nút đếm lên rồi hiện tấm mới nhất.',
+    C: '<b>C · Khoanh vùng.</b> Khung cam 4 góc (đúng cái khung lúc anh khoanh để chụp) ôm lấy khay, chụp nó lại rồi thu nhỏ về góc. Mở ra thì 4 góc bung ra trước, nội dung hiện dần bên trong.',
+  }
+  let y = 'A', tt = 'mo', ban = false, tong = 12, hen = null
+  const W = 452, H = 150, D = 52
+  let vt = { x: 0, y: 0 }, goc = { x: 0, y: 0 }
+
+  const he = () => ($('#cham').checked ? 3.4 : 1)
+  const ngu = (ms) => new Promise((r) => setTimeout(r, ms * he()))
+  // Chay 1 animation, luon ket thuc du trang dang chay nen (cho finished khong toi): dua voi hen gio
+  function chay(el, kf, o) {
+    const dur = (o.duration || 300) * he(), delay = (o.delay || 0) * he()
+    const a = el.animate(kf, { duration: dur, delay, easing: o.easing || 'linear', fill: 'both' })
+    return Promise.race([a.finished.catch(() => {}), new Promise((r) => setTimeout(r, dur + delay + 150))])
+  }
+  const eIO = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+  const eRa = (t) => 1 - Math.pow(1 - t, 3)
+  const eLo = (t) => 1 - Math.exp(-6.5 * t) * Math.cos(9.5 * t)          // lo xo: vuot ~6% roi ve
+  const cssLo = 'linear(' + Array.from({ length: 41 }, (_, i) => (i === 40 ? 1 : eLo(i / 40)).toFixed(4)).join(',') + ')'
+  // Duong bay cong: tu -> den (do lech px), "nang" = do vong len; them(q, p) tra phan transform noi them
+  function duong(tu, den, nang, e, them) {
+    const kf = [], n = 26
+    for (let i = 0; i <= n; i++) {
+      const p = i / n, q = e(p)
+      const x = tu.x + (den.x - tu.x) * q, yy = tu.y + (den.y - tu.y) * q - nang * Math.sin(Math.PI * Math.min(1, Math.max(0, q)))
+      kf.push({ offset: p, transform: 'translate(' + x.toFixed(2) + 'px,' + yy.toFixed(2) + 'px)' + (them ? them(q, p) : '') })
+    }
+    return kf
+  }
+  const tamKhay = () => ({ x: vt.x + W / 2, y: vt.y + H / 2 })
+  const tamNut = () => ({ x: goc.x + D / 2, y: goc.y + D / 2 })
+  const xoaAnim = () => [khay, nen, dau, than, chop, nut, song, khung, ghe, so, ...Object.values(mat), ...than.children, ...nut.querySelectorAll('svg')].forEach((el) => el.getAnimations().forEach((a) => a.cancel()))
+  const matNghi = () => (y === 'B' || y === 'D' ? 'anh' : 'logo')
+  function hienMat(ten) { for (const k in mat) mat[k].style.opacity = k === ten ? 1 : 0 }
+
+  // Trang thai NGHI (khong con animation nao): moi lan chay xong deu ve day -> khong don trang thai le
+  function dat(moi) {
+    xoaAnim()
+    tt = moi
+    khay.style.left = vt.x + 'px'; khay.style.top = vt.y + 'px'
+    nut.style.left = goc.x + 'px'; nut.style.top = goc.y + 'px'; nut.style.width = D + 'px'
+    song.style.left = goc.x + 'px'; song.style.top = goc.y + 'px'
+    khung.style.opacity = 0
+    khay.style.visibility = moi === 'mo' ? 'visible' : 'hidden'
+    nut.style.visibility = moi === 'thu' ? 'visible' : 'hidden'
+    hienMat(matNghi())
+    mat.anh.firstElementChild.style.backgroundImage = than.firstElementChild ? than.firstElementChild.style.backgroundImage : ''
+    so.textContent = tong; dem.textContent = tong
+    ghe.style.opacity = 0
+    clearTimeout(hen)
+    if (moi === 'mo' && $('#tu').checked) hen = setTimeout(() => doi('thu'), 3000)
+  }
+  function nhun() { chay(nut, [{ transform: 'scale(1)' }, { transform: 'scale(1.13)' }, { transform: 'scale(1)' }], { duration: 170, easing: 'ease-out' }) }
+  function lanSong() { chay(song, [{ opacity: .8, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.9)' }], { duration: 520, easing: 'cubic-bezier(.2,.7,.2,1)' }) }
+
+  // ── A · ONG KINH ─────────────────────────────────────────────────────────
+  async function thuA() {
+    const c = tamKhay(), g = tamNut(), lech = { x: c.x - g.x, y: c.y - g.y }, r0 = Math.hypot(W, H) / 2 + 6
+    hienMat('ong'); nut.style.visibility = 'visible'
+    const xoay = chay(mat.ong.firstElementChild, [{ transform: 'rotate(-150deg)' }, { transform: 'rotate(0deg)' }], { duration: 360, easing: 'cubic-bezier(.65,0,.25,1)' })
+    chay(than, [{ filter: 'brightness(1)' }, { filter: 'brightness(.35)' }], { duration: 340 })
+    chay(nut, [{ opacity: 0, transform: 'translate(' + lech.x + 'px,' + lech.y + 'px) scale(1.7)' }, { opacity: 1, transform: 'translate(' + lech.x + 'px,' + lech.y + 'px) scale(1)' }], { duration: 200, delay: 160, easing: 'ease-out' })
+    await chay(khay, [{ clipPath: 'circle(' + r0 + 'px at 50% 50%)' }, { clipPath: 'circle(26px at 50% 50%)' }], { duration: 360, easing: 'cubic-bezier(.65,0,.25,1)' })
+    await xoay
+    khay.style.visibility = 'hidden'
+    const xa = Math.hypot(lech.x, lech.y)
+    await chay(nut, duong(lech, { x: 0, y: 0 }, Math.min(70, xa * .2), eIO, (q, p) => ' scale(' + (1 - .14 * Math.sin(Math.PI * p)).toFixed(3) + ')'), { duration: 300 + Math.min(260, xa * .45) })
+    lanSong()
+    chay(mat.ong, [{ opacity: 1, transform: 'rotate(0deg) scale(1)' }, { opacity: 0, transform: 'rotate(90deg) scale(.5)' }], { duration: 240, easing: 'ease-in' })
+    await chay(mat[matNghi()], [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 380, delay: 90, easing: cssLo })
+  }
+  async function moA() {
+    const c = tamKhay(), g = tamNut(), lech = { x: c.x - g.x, y: c.y - g.y }, r0 = Math.hypot(W, H) / 2 + 6, xa = Math.hypot(lech.x, lech.y)
+    chay(mat[matNghi()], [{ opacity: 1 }, { opacity: 0 }], { duration: 140 })
+    chay(mat.ong, [{ opacity: 0, transform: 'rotate(90deg) scale(.5)' }, { opacity: 1, transform: 'rotate(0deg) scale(1)' }], { duration: 200 })
+    await chay(nut, duong({ x: 0, y: 0 }, lech, Math.min(70, xa * .2), eIO, (q, p) => ' scale(' + (1 - .14 * Math.sin(Math.PI * p)).toFixed(3) + ')'), { duration: 260 + Math.min(220, xa * .4) })
+    khay.style.visibility = 'visible'
+    chay(mat.ong.firstElementChild, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(150deg)' }], { duration: 420, easing: 'cubic-bezier(.2,.7,.2,1)' })
+    chay(nut, [{ opacity: 1, transform: 'translate(' + lech.x + 'px,' + lech.y + 'px) scale(1)' }, { opacity: 0, transform: 'translate(' + lech.x + 'px,' + lech.y + 'px) scale(2.2)' }], { duration: 260, easing: 'ease-out' })
+    chay(chop, [{ opacity: .5 }, { opacity: 0 }], { duration: 320, delay: 60, easing: 'ease-out' })
+    chay(than, [{ filter: 'brightness(.35)' }, { filter: 'brightness(1)' }], { duration: 300 })
+    await chay(khay, [{ clipPath: 'circle(26px at 50% 50%)' }, { clipPath: 'circle(' + r0 + 'px at 50% 50%)' }], { duration: 460, easing: 'cubic-bezier(.2,.8,.2,1)' })
+  }
+
+  // ── B · XAP ANH ──────────────────────────────────────────────────────────
+  const lechO = (o) => { const g = tamNut(); return { x: g.x - (vt.x + o.offsetLeft + o.offsetWidth / 2), y: g.y - (vt.y + o.offsetTop + o.offsetHeight / 2) } }
+  const gocO = (i) => [9, -7, 5, -11, 8][i % 5]
+  async function thuB() {
+    const os = [...than.children]
+    hienMat('logo'); nut.style.visibility = 'visible'
+    so.textContent = tong - os.length
+    chay(nut, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 420, easing: cssLo })
+    chay(nen, [{ opacity: 1 }, { opacity: 0 }], { duration: 260, delay: 80 })
+    chay(dau, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 })
+    const viec = os.map((o, i) => {
+      const thu = os.length - 1 - i, d = lechO(o), s = 40 / o.offsetWidth
+      o.style.zIndex = 10 + thu
+      return chay(o, duong({ x: 0, y: 0 }, d, 46 + thu * 6, eIO, (q) => ' rotate(' + (gocO(i) * q * 2.2).toFixed(2) + 'deg) scale(' + (1 + (s - 1) * q).toFixed(3) + ')'), { duration: 470, delay: 90 + thu * 75 })
+        .then(() => { o.style.opacity = 0; so.textContent = Number(so.textContent) + 1; nhun() })
+    })
+    await Promise.all(viec)
+    os.forEach((o) => { o.style.opacity = ''; o.style.zIndex = '' })
+    lanSong()
+    khay.style.visibility = 'hidden'
+    chay(mat.logo, [{ opacity: 1 }, { opacity: 0 }], { duration: 160 })
+    await chay(mat.anh, [{ opacity: 0, transform: 'scale(.3) rotate(-25deg)' }, { opacity: 1, transform: 'scale(1) rotate(0deg)' }], { duration: 420, easing: cssLo })
+  }
+  async function moB() {
+    const os = [...than.children]
+    khay.style.visibility = 'visible'
+    nhun()
+    chay(nen, [{ opacity: 0, transform: 'scale(.96)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' })
+    chay(dau, [{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 160 })
+    const viec = os.map((o, i) => {
+      const d = lechO(o), s = 40 / o.offsetWidth
+      o.style.zIndex = 10 + i
+      return chay(o, duong(d, { x: 0, y: 0 }, 40, eLo, (q) => ' rotate(' + (gocO(i) * 2.2 * (1 - q)).toFixed(2) + 'deg) scale(' + (s + (1 - s) * Math.min(1.04, q)).toFixed(3) + ')'), { duration: 620, delay: i * 65 })
+    })
+    chay(nut, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.2)', opacity: 0 }], { duration: 260, delay: 260, easing: 'ease-in' })
+    await Promise.all(viec)
+    os.forEach((o) => { o.style.zIndex = '' })
+  }
+
+  // ── C · KHOANH VUNG ──────────────────────────────────────────────────────
+  const oKhay = () => ({ left: vt.x - 7 + 'px', top: vt.y - 7 + 'px', width: W + 14 + 'px', height: H + 14 + 'px', borderRadius: '14px' })
+  const oNut = () => ({ left: goc.x + 'px', top: goc.y + 'px', width: D + 'px', height: D + 'px', borderRadius: '26px' })
+  async function thuC() {
+    Object.assign(khung.style, oKhay()); khung.style.opacity = 1
+    await chay(khung, [{ clipPath: 'inset(-8px 100% 100% -8px)' }, { clipPath: 'inset(-8px -8px -8px -8px)' }], { duration: 260, easing: 'cubic-bezier(.3,.8,.3,1)' })
+    chay(chop, [{ opacity: .6 }, { opacity: 0 }], { duration: 240, easing: 'ease-out' })
+    await chay(khay, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.97)' }], { duration: 200, delay: 40 })
+    khay.style.visibility = 'hidden'
+    await chay(khung, [Object.assign({ offset: 0 }, oKhay()), Object.assign({ offset: 1 }, oNut())], { duration: 480, easing: 'cubic-bezier(.6,0,.15,1)' })
+    hienMat('logo'); nut.style.visibility = 'visible'
+    lanSong()
+    chay(khung, [Object.assign({ opacity: 1, transform: 'rotate(0deg) scale(1)' }, oNut()), Object.assign({ opacity: 0, transform: 'rotate(90deg) scale(.8)' }, oNut())], { duration: 300, easing: 'ease-in' })
+    await chay(nut, [{ opacity: 0, transform: 'scale(.5)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 420, easing: cssLo })
+  }
+  async function moC() {
+    Object.assign(khung.style, oNut()); khung.style.opacity = 1
+    chay(nut, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.5)' }], { duration: 180, easing: 'ease-in' })
+    await chay(khung, [Object.assign({ offset: 0, opacity: 1 }, oNut()), Object.assign({ offset: 1, opacity: 1 }, oKhay())], { duration: 560, easing: cssLo })
+    khay.style.visibility = 'visible'
+    chay(khung, [Object.assign({ opacity: 1 }, oKhay()), Object.assign({ opacity: 0 }, oKhay())], { duration: 320, delay: 140 })
+    await chay(khay, [{ opacity: 0, filter: 'blur(7px)', transform: 'scale(.985)' }, { opacity: 1, filter: 'blur(0px)', transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' })
+    await ngu(160)
+  }
+
+  const THU = { A: thuA, B: thuB, C: thuC, D: thuB }, MO = { A: moA, B: moB, C: moC, D: moA }
+  async function doi(dich) {
+    if (ban) return
+    dich = dich || (tt === 'mo' ? 'thu' : 'mo')
+    if (dich === tt) return
+    ban = true; clearTimeout(hen)
+    try { await (dich === 'thu' ? THU[y]() : MO[y]()) } finally { ban = false; dat(dich) }
+  }
+
+  // Chup anh moi luc khay dang thu: nut GIAN ra thanh vien thuoc, hien anh vua luu ~1,6 giay roi co lai (khong can mo khay)
+  async function chupMoi() {
+    if (ban) return
+    ban = true; clearTimeout(hen)
+    const mau = MAU[tong % MAU.length]
+    tong++
+    try {
+      if (tt === 'thu') {
+        ghe.firstElementChild.style.background = mau
+        lanSong()
+        const rong = 196
+        chay(mat[matNghi()], [{ opacity: 1 }, { opacity: 0 }], { duration: 120 })
+        chay(ghe, [{ opacity: 0, transform: 'translateX(14px)' }, { opacity: 1, transform: 'translateX(0)' }], { duration: 260, delay: 160, easing: 'ease-out' })
+        await chay(nut, [{ left: goc.x + 'px', width: D + 'px' }, { left: goc.x - (rong - D) + 'px', width: rong + 'px' }], { duration: 520, easing: cssLo })
+        so.textContent = tong; chay(so, [{ transform: 'scale(1)' }, { transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' })
+        await ngu(1500)
+        chay(ghe, [{ opacity: 1 }, { opacity: 0 }], { duration: 140 })
+        await chay(nut, [{ left: goc.x - (rong - D) + 'px', width: rong + 'px' }, { left: goc.x + 'px', width: D + 'px' }], { duration: 380, easing: 'cubic-bezier(.5,0,.2,1)' })
+      }
+      themO(mau, true)
+      if (tt === 'mo') await chay(than.firstElementChild, [{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 460, easing: cssLo })
+    } finally { ban = false; dat(tt) }
+  }
+  function themO(mau, dau_) {
+    const o = document.createElement('div'); o.className = 'o'; o.style.backgroundImage = mau
+    const b = document.createElement('b'); b.textContent = '#' + (dau_ ? tong : tong - than.children.length); o.appendChild(b)
+    if (dau_) { than.prepend(o); if (than.children.length > 5) than.lastElementChild.remove() } else than.appendChild(o)
+  }
+
+  function tinhGoc() { goc = { x: san.clientWidth - 22 - D, y: san.clientHeight - 22 - D } }
+  function kep() { vt.x = Math.max(8, Math.min(san.clientWidth - W - 8, vt.x)); vt.y = Math.max(8, Math.min(san.clientHeight - H - 8, vt.y)) }
+
+  // Keo khay bang thanh tren
+  dau.addEventListener('pointerdown', (e) => {
+    if (e.target.id === 'thu' || ban || tt !== 'mo') return
+    const neo = { x: e.clientX - vt.x, y: e.clientY - vt.y }
+    dau.setPointerCapture(e.pointerId); clearTimeout(hen)
+    const di = (ev) => { vt = { x: ev.clientX - neo.x, y: ev.clientY - neo.y }; kep(); khay.style.left = vt.x + 'px'; khay.style.top = vt.y + 'px' }
+    const tha = () => { dau.removeEventListener('pointermove', di); dau.removeEventListener('pointerup', tha); dat('mo') }
+    dau.addEventListener('pointermove', di); dau.addEventListener('pointerup', tha)
+  })
+  khay.addEventListener('pointerenter', () => clearTimeout(hen))
+  khay.addEventListener('pointerleave', () => { if (!ban && tt === 'mo') dat('mo') })
+  $('#thu').addEventListener('click', () => doi('thu'))
+  nut.addEventListener('click', () => doi('mo'))
+  $('#doi').addEventListener('click', () => doi())
+  $('#chup').addEventListener('click', chupMoi)
+  $('#tu').addEventListener('change', () => { if (!ban) dat(tt) })
+  document.querySelectorAll('#chon button').forEach((b) => b.addEventListener('click', async () => {
+    if (ban) return
+    y = b.dataset.y
+    document.querySelectorAll('#chon button').forEach((x) => x.classList.toggle('mo', x === b))
+    ta.innerHTML = TA[y]
+    dat(tt)
+    // doi y tuong la dien luon mot vong de anh thay ngay
+    await doi(tt === 'mo' ? 'thu' : 'mo'); await ngu(500); await doi()
+  }))
+  window.addEventListener('resize', () => { tinhGoc(); kep(); if (!ban) dat(tt) })
+
+  for (let i = 0; i < 5; i++) themO(MAU[i], false)
+  tinhGoc(); vt = { x: Math.round(san.clientWidth * .2), y: 96 }; kep()
+  ta.innerHTML = TA[y]
+  dat('mo')
+  // cho bai chup tu dong: doi y tuong / doi cho khay ma khong dien vong nao
+  window.__nhap = { doi, chupMoi, trangThai: () => ({ y, tt, ban, tong, vt, goc }),
+    datY: (v) => { y = v; document.querySelectorAll('#chon button').forEach((x) => x.classList.toggle('mo', x.dataset.y === v)); ta.innerHTML = TA[y]; dat(tt) },
+    datCho: (x, yy) => { vt = { x, y: yy }; kep(); dat(tt) } }
+})()
+</script>
+</body>
+</html>

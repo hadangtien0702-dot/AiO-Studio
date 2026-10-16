@@ -12,6 +12,7 @@
  */
 import { userDataPath } from '../lib/cep'
 import { getFs, getPath } from '../lib/node'
+import { isMac, macAppSupportDir } from '../lib/platform'
 
 /** Khoá lưu lựa chọn của người dùng. localStorage của panel sống qua mọi lần mở. */
 const STORAGE_KEY = 'aio.cacheRoot'
@@ -57,7 +58,10 @@ let memoProxies: string | null = null
 export function defaultCacheRoot(): string {
   const path = getPath()
   if (!path) return ''
-  const base = userDataPath() || bienMT('APPDATA') || ''
+  // [2026-09-30] Mac không có %APPDATA%: lùi về ~/Library/Application Support
+  // (cũng là giá trị CEP trả cho USER_DATA trên Mac).
+  const base =
+    userDataPath() || bienMT('APPDATA') || (isMac() ? macAppSupportDir() : '') || ''
   return base ? path.join(base, 'AiOStudio') : ''
 }
 

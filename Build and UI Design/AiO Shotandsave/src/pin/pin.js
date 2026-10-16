@@ -21,7 +21,7 @@ document.querySelectorAll('[data-i18n-title]').forEach((el) => {
 let opacity = 1
 const PLOG = (m) => { try { window.pin.log(m) } catch (e) {} }
 let dip = { w: 0, h: 0 } // kich thuoc hien thi (DIP) tu main
-let curBlurType = 'mosaic' // 'mosaic' | 'blur'
+let curBlurType = 'mosaic' // 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10)
 
 window.pin.onData((data) => {
   img.src = data.dataUrl
@@ -116,7 +116,9 @@ window.addEventListener('keydown', (e) => {
     const step = e.shiftKey ? 10 : 1
     const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
     const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
-    if (selectedShape.type === 'text') {
+    if (selectedShape.pts) {
+      dichNet(selectedShape, dx, dy)
+    } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
       selectedShape.x += dx; selectedShape.y += dy
     } else {
       selectedShape.x1 += dx; selectedShape.x2 += dx
@@ -127,14 +129,14 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Enter' && mode === 've') { luuVe(); return }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { window.pin.copy(); return }
-  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09)
+  // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09); 6 = danh so buoc (02/10)
   if (!e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
       'v': 'select', 'V': 'select', 'KeyV': 'select',
-      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur',
+      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so', '7': 'but', '8': 'daquang',
       'b': 'blur', 'B': 'blur', 'KeyB': 'blur',
-      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur',
-      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur'
+      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so', 'Digit7': 'but', 'Digit8': 'daquang',
+      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so', 'Numpad7': 'but', 'Numpad8': 'daquang'
     }
     const t = keyMap[e.key] || keyMap[e.code]
     if (t) { if (mode !== 've') vaoCheDoVe(); chonCongCu(t) }
@@ -191,6 +193,8 @@ function thoatVe() {
   frame.classList.remove('dang-ve')
   shapes = []
   veStart = null
+  soDangDat = null
+  netDangVe = null
   selectedShape = null
   dangKeoShape = false
   shapeBanDau = null
@@ -271,13 +275,22 @@ function layHopBaoShape(s) {
     const b = tinhHopBaoChu(s)
     return { x: b.x - 2, y: b.y - 2, w: b.w + 4, h: b.h + 4 }
   }
+  if (s.type === 'so') {
+    const r = R_SO + 4
+    return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 }
+  }
+  if (s.pts) return hopNet(s)
   return null
 }
 
 function timShapeTaiDiem(lx, ly) {
   for (let i = shapes.length - 1; i >= 0; i--) {
     const s = shapes[i]
-    if (s.type === 'rect' || s.type === 'blur') {
+    if (s.pts) {
+      if (cachNet(s, lx, ly) <= doDayNet(s) / 2 + 6) return { shape: s, index: i }
+    } else if (s.type === 'so') {
+      if (Math.hypot(lx - s.x, ly - s.y) <= R_SO + 4) return { shape: s, index: i }
+    } else if (s.type === 'rect' || s.type === 'blur') {
       const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
       const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2)
       const pad = 6
@@ -339,6 +352,7 @@ veEl.addEventListener('mousedown', (e) => {
       dangKeoShape = true
       keoShapeStart = { x: lx, y: ly }
       shapeBanDau = { ...hit.shape }
+      if (hit.shape.pts) shapeBanDau.pts = hit.shape.pts.slice() // ban sao RIENG cua mang diem (khong thi keo la cong don)
     } else {
       selectedShape = null
     }
@@ -347,6 +361,20 @@ veEl.addEventListener('mousedown', (e) => {
   }
   if (tool === 'text') { moOGoChu(frame, lx, ly, veEl.offsetLeft, veEl.offsetTop); return }
   chotOGoChu()
+  if (tool === 'so') {
+    // Bam = dong so ngay; con giu chuot thi keo chinh cho, tha ra la xong.
+    soDangDat = { type: 'so', ...kepTamSo(lx, ly, dip.w, dip.h), color: curColor }
+    shapes.push(soDangDat)
+    redraw()
+    return
+  }
+  if (tool === 'but' || tool === 'daquang') {
+    // Giu chuot keo = ve net theo tay; giu Shift = duong THANG tu diem dau. Bam roi tha ngay = mot cham.
+    netDangVe = { type: tool, pts: [lx, ly], color: curColor }
+    shapes.push(netDangVe)
+    redraw()
+    return
+  }
   veStart = { x: lx, y: ly }
 })
 
@@ -364,15 +392,27 @@ window.addEventListener('mousemove', (e) => {
         selectedShape.y1 = shapeBanDau.y1 + dy
         selectedShape.x2 = shapeBanDau.x2 + dx
         selectedShape.y2 = shapeBanDau.y2 + dy
-      } else if (selectedShape.type === 'text') {
+      } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
         selectedShape.x = shapeBanDau.x + dx
         selectedShape.y = shapeBanDau.y + dy
+      } else if (selectedShape.pts && shapeBanDau.pts) {
+        for (let i = 0; i < selectedShape.pts.length; i += 2) { selectedShape.pts[i] = shapeBanDau.pts[i] + dx; selectedShape.pts[i + 1] = shapeBanDau.pts[i + 1] + dy }
       }
       redraw()
     } else {
       const hit = timShapeTaiDiem(lx, ly)
       veEl.style.cursor = hit ? 'move' : 'default'
     }
+    return
+  }
+  if (soDangDat) {
+    Object.assign(soDangDat, kepTamSo(lx, ly, dip.w, dip.h))
+    redraw()
+    return
+  }
+  if (netDangVe) {
+    themDiemNet(netDangVe, lx, ly, e.shiftKey)
+    redraw()
     return
   }
   if (!veStart) return
@@ -389,6 +429,8 @@ window.addEventListener('mouseup', (e) => {
     }
     return
   }
+  if (soDangDat) { soDangDat = null; return }
+  if (netDangVe) { netDangVe = null; redraw(); return }
   if (!veStart) return
   const r = veEl.getBoundingClientRect()
   const lx = clamp(e.clientX - r.left, 0, dip.w)
@@ -402,13 +444,117 @@ window.addEventListener('mouseup', (e) => {
 
 function hoanTac() {
   if (oGoChu) { huyOGoChu(); return }
+  soDangDat = null
+  netDangVe = null
   shapes.pop()
   redraw()
+}
+
+/* ── BUT VE TAY (phim 7) + BUT DA QUANG (phim 8) — 06/10. CUNG ham voi overlay.js (xem ghi chu day du o do):
+   6 ham + hang NET duoi day phai GIONG HET hai file, bai do `npm run test:butve` so tung ky tu. */
+const NET = { but: { day: 3, mo: 1 }, daquang: { day: 16, mo: 0.4 } }
+let netDangVe = null // net dang ve do (chuot con giu)
+function doDayNet(s) { return (NET[s.type] || NET.but).day }
+/* k = he so phong (1 khi ve tren man; anh that / kich thuoc hien thi khi xuat). */
+function veNet(ctx, s, k) {
+  const p = s.pts, n = p.length >> 1
+  if (!n) return
+  const c = NET[s.type] || NET.but
+  ctx.save()
+  ctx.globalAlpha = c.mo
+  ctx.strokeStyle = s.color; ctx.fillStyle = s.color
+  ctx.lineWidth = c.day * k; ctx.lineJoin = 'round'; ctx.lineCap = 'round'
+  ctx.beginPath()
+  if (n === 1) { // bam roi tha ngay: mot cham tron
+    ctx.arc(p[0] * k, p[1] * k, c.day * k / 2, 0, Math.PI * 2); ctx.fill(); ctx.restore(); return
+  }
+  ctx.moveTo(p[0] * k, p[1] * k)
+  for (let i = 1; i < n - 1; i++) {
+    ctx.quadraticCurveTo(p[i * 2] * k, p[i * 2 + 1] * k, (p[i * 2] + p[i * 2 + 2]) / 2 * k, (p[i * 2 + 1] + p[i * 2 + 3]) / 2 * k)
+  }
+  ctx.lineTo(p[n * 2 - 2] * k, p[n * 2 - 1] * k)
+  ctx.stroke()
+  ctx.restore()
+}
+/* Hop bao (da tinh do day net + 3 px le) — khung chon cua cong cu V */
+function hopNet(s) {
+  const p = s.pts
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
+  for (let i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1] }
+  const le = doDayNet(s) / 2 + 3
+  return { x: x0 - le, y: y0 - le, w: x1 - x0 + le * 2, h: y1 - y0 + le * 2 }
+}
+/* Khoang cach tu diem (lx, ly) toi net (gan nhat trong cac doan) */
+function cachNet(s, lx, ly) {
+  const p = s.pts
+  if (p.length === 2) return Math.hypot(lx - p[0], ly - p[1])
+  let tot = Infinity
+  for (let i = 0; i + 3 < p.length; i += 2) {
+    const dx = p[i + 2] - p[i], dy = p[i + 3] - p[i + 1], l2 = dx * dx + dy * dy
+    let t = l2 ? ((lx - p[i]) * dx + (ly - p[i + 1]) * dy) / l2 : 0
+    t = t < 0 ? 0 : t > 1 ? 1 : t
+    const d = Math.hypot(lx - (p[i] + t * dx), ly - (p[i + 1] + t * dy))
+    if (d < tot) tot = d
+  }
+  return tot
+}
+function dichNet(s, dx, dy) { for (let i = 0; i < s.pts.length; i += 2) { s.pts[i] += dx; s.pts[i + 1] += dy } }
+/* Them diem luc dang ve. thang = dang giu Shift: net chi con 2 diem dau - cuoi. Bo diem cach diem truoc duoi 2 px
+   (chuot rung) de net khong nang va khong rang cua. */
+function themDiemNet(s, x, y, thang) {
+  const p = s.pts
+  if (thang) { s.pts = [p[0], p[1], x, y]; return }
+  const n = p.length
+  if (Math.hypot(x - p[n - 2], y - p[n - 1]) < 2) return
+  p.push(x, y)
+}
+
+/* ── Cong cu DANH SO BUOC (phim 6, 02/10) — CUNG ham voi overlay.js, sua ben nay thi sua ca ben do ─────────
+   Bam len anh = huy hieu tron co so, bam tiep la 2, 3, 4... Shape {type:'so', x, y (TAM, DIP), n, color}. So dem lai
+   theo thu tu trong shapes moi lan ve -> hoan tac / xoa mot so o giua thi cac so con lai tu don lai lien nhau.
+   ☠️ Dem lai tu 1 moi lan VAO che do ve: so da luu vao anh o luot truoc la diem anh, app khong con biet. */
+const R_SO = 13 // ban kinh huy hieu, px DIP
+let soDangDat = null // huy hieu vua bam, con dang giu chuot de chinh cho
+function danhSoLai() { let n = 0; for (const s of shapes) if (s.type === 'so') s.n = ++n }
+function kepTamSo(lx, ly, w, h) {
+  const le = R_SO + 3
+  return {
+    x: w > le * 2 ? clamp(Math.round(lx), le, w - le) : Math.round(w / 2),
+    y: h > le * 2 ? clamp(Math.round(ly), le, h - le) : Math.round(h / 2)
+  }
+}
+/* Mau chu so: trang, tru khi nen sang (vang, xanh la, trang) thi den — do tuong phan WCAG voi chu trang, nguong 2,6. */
+function chuTrenMau(mau) {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(mau || ''))
+  if (!m) return '#ffffff'
+  const k = [1, 2, 3].map((i) => { const v = parseInt(m[i], 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) })
+  const L = 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2]
+  return 1.05 / (L + 0.05) >= 2.6 ? '#ffffff' : '#111111'
+}
+/* k = he so phong (1 khi ve tren man; anh that / kich thuoc hien thi khi xuat). */
+function veSo(ctx, s, k) {
+  const cx = s.x * k, cy = s.y * k, r = R_SO * k
+  const chu = chuTrenMau(s.color)
+  const so = String(s.n || 1)
+  const kb = k * (ctx.getTransform ? ctx.getTransform().a : 1) // bong do KHONG theo he so phong cua canvas
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 4 * kb; ctx.shadowOffsetY = 1 * kb
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.fillStyle = s.color; ctx.fill()
+  ctx.shadowColor = 'transparent'
+  ctx.lineWidth = 2 * k; ctx.strokeStyle = chu; ctx.stroke()
+  ctx.font = '700 ' + ((so.length > 2 ? 10 : so.length > 1 ? 12 : 14) * k) + 'px Inter, "Segoe UI", sans-serif'
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'
+  const m = ctx.measureText(so)
+  ctx.fillStyle = chu
+  ctx.fillText(so, cx + (m.actualBoundingBoxLeft - m.actualBoundingBoxRight) / 2, cy + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2) // can theo NET chu, khong theo o chu
+  ctx.restore()
 }
 
 function redraw(preview) {
   if (!veCtx) return
   veCtx.clearRect(0, 0, dip.w, dip.h)
+  danhSoLai()
   const ds = preview ? shapes.concat(preview) : shapes
   for (const s of ds) veShape(veCtx, s, 1)
   if (selectedShape && tool === 'select') {
@@ -501,6 +647,21 @@ function veBlurSmooth(ctx, x, y, w, h, k) {
 }
 
 /* k = he so phong (1 khi xem truoc; naturalW/dipW khi xuat ra anh that). */
+/* 04/10 KIEU THU BA "TO KIN": thanh DAC che han, khong lay diem anh nao cua anh goc (xem src/overlay/overlay.js veCheKin).
+   Cung cach ve voi ban ben do, chi khac he so k (anh ghim xuat ra co to hon co hien). Bai do: npm run test:chekin. */
+function veCheKin(ctx, x, y, w, h, k) {
+  if (w <= 0 || h <= 0) return
+  ctx.save()
+  ctx.globalAlpha = 1
+  ctx.filter = 'none'
+  ctx.fillStyle = '#000'
+  ctx.fillRect(x * k, y * k, w * k, h * k)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+  ctx.lineWidth = 1 * k
+  ctx.strokeRect(x * k, y * k, w * k, h * k)
+  ctx.restore()
+}
+
 function veShape(ctx, s, k) {
   ctx.strokeStyle = s.color
   ctx.fillStyle = s.color
@@ -514,12 +675,18 @@ function veShape(ctx, s, k) {
     veMuiTen(ctx, s.x1 * k, s.y1 * k, s.x2 * k, s.y2 * k, 13 * k)
   } else if (s.type === 'text') {
     veChu(ctx, s, k)
+  } else if (s.type === 'so') {
+    veSo(ctx, s, k)
+  } else if (s.pts) {
+    veNet(ctx, s, k)
   } else if (s.type === 'blur') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
     const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
     const bType = s.blurType || curBlurType
     if (bType === 'blur') {
       veBlurSmooth(ctx, x, y, w, h, k)
+    } else if (bType === 'kin') {
+      veCheKin(ctx, x, y, w, h, k)
     } else {
       veBlurPixelate(ctx, x, y, w, h, k)
     }
@@ -566,6 +733,7 @@ function luuVe() {
     out.height = nh
     const ctx = out.getContext('2d')
     ctx.drawImage(img, 0, 0, nw, nh)
+    danhSoLai()
     for (const s of shapes) veShape(ctx, s, k)
     const dataUrl = out.toDataURL('image/png')
     img.src = dataUrl            // cua so ghim hien ban da ve ngay

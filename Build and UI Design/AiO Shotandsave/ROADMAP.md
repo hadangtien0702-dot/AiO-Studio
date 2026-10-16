@@ -2,7 +2,195 @@
 
 > Tai lieu dinh huong cac tinh nang sang tao danh rieng cho Editor, Filmmaker va Content Creator.
 > Bien AiO Shot & Save tu mot cong cu chup man hinh don thuan thanh tro ly visual khong the thieu ben canh Premiere Pro, After Effects va DaVinci Resolve.
-> Cap nhat: 2026-09-27.
+> Cap nhat: 2026-09-27 (Gemini) · 2026-10-01 (Claude: muc 0 duoi day).
+
+---
+
+## 0. DANH SACH TINH NANG CO THE LAM TIEP (Claude viet lai 01/10/2026, anh Tien yeu cau)
+
+Nguon: danh gia thi truong 29/09 (PROGRESS.md muc [web] 29/09 13:3x) + muc 2 cua file nay + "Chua lam" trong CLAUDE.md.
+Cong suc la UOC LUONG (nho = ~1 buoi, vua = 2-3 buoi, lon = 1 tuan tro len), CHUA do.
+
+DA XONG, khong con trong danh sach: Storyboard quay 3 giay (0.7.4-0.7.8) · Doc chu phim 5 (0.7.9) · Lam mo 2 kieu
+(0.6.6) · cong cu chon V + co gian khung (0.5.7-0.6.x).
+**01/10 anh chon muc 4 (quay vung man hinh) -> da lam o 0.8.0: MP4 + nut tieng may + khay video rieng (xem CLAUDE.md).
+Con lai cua muc 4: xuat GIF (anh chot "lam sau") · thu tieng micro.**
+
+**02/10 14:44 muc 1 (danh so buoc) DA LAM, phim 6, nap vao app dang cai, cho anh bam thu (xem CLAUDE.md + PROGRESS.md).
+Anh nhan "thêm tính năng đi em" sau khi em de xuat thu tu 1 -> GIF -> 3 -> 2; anh khong chi dich danh muc nao.**
+
+**06/10 anh chot lam 3 muc trong MOT luot roi moi push: xuat GIF (phan con lai cua muc 4) · muc 2 (but ve tay + da quang,
+phim 7 / 8) · muc 5 (chup cuon, phim 9). Ca 3 DA LAM va nap vao app dang cai (10:36 / 10:49 / 10:59), cho anh bam thu; chup
+cuon CHUA chay tren man that. Con lai trong danh sach: muc 3 (hut mau), 6, 7, 8; thu tieng micro; app tu cuon khi chup cuon.**
+
+Nhom 1 - re, hop editor, lam ngay duoc:
+| # | Tinh nang | Nguoi dung duoc gi | Cong suc + luu y |
+|---|---|---|---|
+| 1 | Danh so buoc 1-2-3 | Bam len anh la ra huy hieu so tu tang: ghi chu sua cho khach ("1 doi mau, 2 cat ngan"), lam huong dan | Nho. Phim 5 da la Doc chu -> dung phim 6 |
+| 2 | But ve tu do + but da quang | Khoanh tay, to sang mot dong chu | Nho. Di chung duong canvas voi khung/mui ten |
+| 3 | Hut mau + bang 5 mau chu dao | Bam o mau la chep ma HEX; colorist lay bang mau cua mot canh tham chieu | Nho den vua |
+
+Nhom 2 - lo hong so voi doi thu (ShareX, CleanShot, Snagit deu co):
+| # | Tinh nang | Nguoi dung duoc gi | Cong suc + luu y |
+|---|---|---|---|
+| 4 | Quay vung man hinh ra GIF / MP4 | Gui khach 1 doan chuyen dong thay vi 6 khung tinh | Vua. Nen da co: luong chup chay san + vien quay + dem nguoc cua Storyboard. Ra MP4/GIF can FFmpeg LGPL -> bo cai nang them (chua do) |
+| 5 | Chup cuon trang dai | Chup ca trang web / doan chat dai thanh 1 anh | Lon, rui ro cao nhat: ghep nhieu khung khi cuon de lech; Electron khong dieu khien cuon app khac -> nguoi dung tu cuon, app ghep |
+| 6 | Khung an toan MXH + luoi 1/3 + ti le 9:16, 2.39:1 | Khoanh vung thay ngay cho bi nut TikTok/Reels che | Vua. PHAI dung chung `safe-zones.json` cua AiO Guide Frame (so da do tu anh app that), khong lam bo so thu hai |
+| 7 | Storyboard: ban duyet co o ghi chu duoi moi khung + chon so khung / so giay | Gui dao dien 1 to duyet co cho ghi "sua mau shot nay" | Vua. Lam SAU khi do xong loi khung 1 den tren video |
+| 8 | Ban Mac chay that | Ban duoc cho editor dung Mac | Bo cai Mac da dung duoc qua GitHub Actions nhung CHUA chay tren Mac that lan nao (doc chu Apple Vision, quay 3 giay chua do) |
+
+Nhom 3 - Claude khuyen CHUA lam:
+| # | Tinh nang | Vi sao chua |
+|---|---|---|
+| 9 | Link chia se nhanh | Can may chu + tien luu tru hang thang, trai mo hinh ban 14,99 USD mot lan; anh cua khach nam tren may chu minh = trach nhiem rieng tu |
+| 10 | Dong dau ngay gio / ten sequence len anh | Ten sequence KHONG lay duoc (app nam ngoai Premiere); ngay gio anh da bo o Storyboard 28/09 |
+| 11 | Ky so bo cai, tu cap nhat tren Mac | Anh da chot khong mua chung chi (14/08, 21/09) |
+
+De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
+0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
+
+### 0d. 08/10/2026 anh hoi "tiep theo la tinh nang gi" — Claude tra loi, anh CHUA chot muc nao
+Con lai trong bang muc 0 (chua lam): 3 hut mau + bang 5 mau · 6 khung an toan MXH · 7 Storyboard ban duyet co o ghi chu ·
+thu tieng micro · app tu cuon khi chup cuon · mot khay 3 the (0c) · kieu C cua nut tron. Muc 8 (Mac chay that) da co ban
+0.9.1 chay tren Mac cua anh tu 04/10.
+De xuat MOI cua Claude (khong co trong bang cu, viet sau khi anh chot dinh vi 07/10 "app luu lai y tuong" va cau chuyen
+"y tuong hay roi lai di dau mat", "loay hoay kiem di kiem lai trong cac folder"):
+- **TIM LAI Y TUONG**: mot o tim trong khay, go chu la ra anh cu (tim theo chu DOC DUOC TRONG ANH bang bo doc chu san co cua
+  phim 5, theo ngay, theo ghi chu ngan nguoi dung go luc luu). Ly do: khay chi nap 5 anh gan nhat luc mo app
+  (`khaySoAnh` mac dinh 5), con lai nam trong thu muc — may anh dang co 778 file o do, muon tim lai phai mo thu muc lat tung
+  tam = dung noi dau web dang ke. Cong suc: UOC LUONG vua den lon (2-4 buoi), CHUA do: doc chu 778 anh mat bao lau, chay nen
+  co lam cham may khong (luat tai nguyen), luu chi muc o dau.
+Thu tu Claude de xuat: (1) xong viec ban hang dang do (xac nhan nut tron, dong goi lai Windows 0.9.1, 2 bo cai len web,
+mua thu) -> (2) Tim lai y tuong -> (3) muc 3 hut mau (nho, hop designer) -> (4) mot khay 3 the.
+
+### 0e. 12/10/2026 anh hoi lai "tiep theo la them cong cu hay tinh nang gi" — Claude tra loi, anh CHUA chot muc nao
+Da xong tu 0d: nut tron da xac nhan + keo duoc + di theo moi desktop (0.9.2, chi macOS), web da co canh keo nut.
+Claude de xuat theo thu tu: (1) DONG GOI 0.9.2 (Mac + Windows) va dua nut tai len web, roi mua thu bang ma `THUSYM8FR`: web dang noi
+ve tinh nang ma chua bo cai nao co · (2) TIM LAI Y TUONG (o tim trong khay, xem 0d) · (3) bat keo nut tron tren Windows (can do cu bam
+that o may cong ty) · (4) hut mau + bang 5 mau · (5) mot khay 3 the. Viec nho con treo cua hom nay: khung chup khi app khac dang toan
+man hinh tren Mac (overlay chua khai di theo moi desktop).
+
+### 0f. CANVAS KIEU MIRO, KHUNG = THU MUC CUNG TEN (anh neu 12/10/2026 12:4x, y MOI cua anh, de len thu tu o 0e) — moi co BAN NHAP, cho anh duyet huong
+> **12/10 14:13 — DA DUNG BAN DAU VAO APP (0.10.0), nap tai cho tren Mac.** Anh xem nhap 2: *"xau qua creative hon di em"* -> nhap 3 (khung la thu
+> muc co tai mau, anh la tam in nam nghieng voi 4 goc cam, y tuong chia ra tu nut tron, ghi chu dan + mui ten) -> anh: *"ok roi them vao website va
+> build di em"*. Trong app: `src/canvas-kho.js`, `src/canvas/`, mo tu menu khay he thong. Cau "chuyen han file hay de nguyen" anh chua tra loi -> em
+> chon de nguyen anh goc + ban noi trong thu muc khung (doi duoc sau). Chua vao app so voi ban mau: ghi chu dan, mui ten. Chua lam: theo doi thu muc
+> tuc thoi, xoa khung, keo ra app khac, Windows, web, khao sat app cung loai. Chi tiet: `PROGRESS.md` muc `[0.10.0]`.
+> **SUA 12/10 13:0x — Claude HIEU SAI chu "mirror".** Anh go *"canvas giong mirror"* = app **MIRO** (bang trang gom y tuong), KHONG phai
+> "tam guong". Nhap 1 `nhap/canvas-guong.html` (khoi luoi + cot thu muc) lam theo nghia sai; anh nhac *"canvas nhu mirror ma em"*, hoi lai
+> mot cau thi anh chon **"Giong app Miro"**. Vi vay lua chon "khoi nhom tu xep luoi" ben duoi KHONG con dung: canvas la BANG TU DO.
+> **Nhap 2 dung y: `nhap/canvas-miro.html`** — bang rong co luoi cham, keo nen de di chuyen, Ctrl / Cmd + lan de phong, nut - / + / "Vua man
+> hinh"; anh, video, dai Storyboard dat dau cung duoc; KHUNG co ten (keo thanh ten de doi cho ca khung va thu ben trong, keo goc de doi co);
+> tha mot o vao khung la no thuoc khung do; cot phai "Thu muc tren may": moi khung = mot thu muc cung ten, doi ten o ben nao ben kia doi theo.
+> Do bang Chrome chay ngam (chuot + banh xe gia lap): keo 1 anh vao khung -> goc 3 -> 2, khung 2 -> 3; keo khung 60 px -> anh ben trong di
+> theo 60 px; doi ten o khung -> thu muc doi, doi ten o thu muc -> khung doi; phong 0,957 -> 1,292; "Khung moi" them 1 thu muc; 0 loi console;
+> khong tran ngang o 1440 va 700 px. CHUA co anh xem bang mat. Phan duoi day (viet luc con hieu la "guong") giu lai de biet duong di; ba he qua
+> cua viec CHUYEN FILE va danh sach viec phai co truoc khi viet ma that VAN DUNG.
+Anh (go trong bang hoi, nguyen van): *"Canvas hinh anh thu thap va group o canvas folder se group theo va dat ten y chang"* ·
+*"canvas giong mirror - mot canvas tong hop y tuong"* · *"tat ca hinh anh chup - video - story se duoc mo trong canvas"*.
+Anh CHON trong bang hoi: kieu **khoi nhom tu xep luoi** (khong phai bang tu do nhu Figma) · dong bo **HAI chieu** (sua o canvas hay sua
+thu muc trong Finder thi ben kia doi theo).
+Claude hieu: mot man Canvas bay MOI thu da thu thap (anh + video + dai Storyboard); moi nhom tren canvas = mot thu muc con cung ten trong
+thu muc anh; thu chua xep nam o thu muc goc ("Moi chup, chua xep nhom"). Day cung la huong "mot khay 3 the" (0b / 0c) duoi dang khac.
+**Ban nhap bam duoc (KHONG phai ma app, khong dung file that): `nhap/canvas-guong.html`** — keo o giua cac nhom, doi ten nhom, doi ten o cot
+"Thu muc tren may" (gia lap Finder), tao nhom / thu muc. Do 12/10 bang Chrome chay ngam: keo 1 o -> so dem hai ben doi (4/3 -> 3/4); doi ten o
+canvas -> cot thu muc doi; doi ten o cot thu muc -> canvas doi; ten trung bi tu choi; 0 loi console; khong tran ngang o 1280 va 700 px.
+**CHUA chot (anh tra loi sang y khac o cau nay):** keo vao nhom thi file tren dia xu ly the nao. "Guong hai chieu" dung nghia = CHUYEN han
+file vao thu muc con. He qua phai noi truoc: (1) anh da keo vao Premiere / Photoshop truoc do se bao mat file (so loi #18, bai 5bi);
+(2) video va dai Storyboard co SO rieng (`kho-video.js` danh-sach, so dai) ghi duong dan -> chuyen file phai sua so cung luc, khong thi
+"video bien khoi khay" (so loi #16); (3) phai theo doi thu muc (nguoi dung doi ten / xoa / them trong Finder luc app dang mo va luc app tat).
+**Viec phai co truoc khi viet ma that (chua lam):** khao sat app cung loai (Eagle, PureRef, Milanote...) theo luat 2d · chot cau "chuyen file
+hay ban noi" · chot Canvas la cua so moi hay thay cua so Khay hien co · ban Windows.
+
+### 0g. CANVAS: KET QUA THU DUNG + DOI THU + VIEC NEN LAM TIEP (12/10/2026 15:2x) — anh CHUA chot muc nao
+
+Anh dan 12/10 15:1x: *"khong dong bo cai, khi nao anh keu thi moi lam"*, *"cai tren may Mac xong em hay kiem tra va thao tac xem nguoi dung co de su dung khong"*,
+*"trong canvas co can them nhung tinh nang nao khong"*, *"xem cac doi thu nhu CleanShot X ho co dang lam cai nay khong"*, *"tap trung phat trien san pham, khong release"*.
+
+**Thu dung (`npm run thu:canvas -- <so anh>`, app that cua so an, anh 2560x1440, bam / go / keo / lan bang sendInputEvent):**
+
+| Do | 17 anh | 200 anh |
+|---|---|---|
+| Moi tam hien du anh sau khi mo | duoi 1,8 s | tam dau 2,0 s, du het 13,3 s (56 ms moi anh; 778 anh uoc 44 s, CHUA do) |
+| "Vua man hinh" cho ra tam rong bao nhieu tren man 1500 px | 161 px (ti le 0,87) | 30 px (ti le 0,16): khong doc duoc |
+| Bam "Khung moi" | khung hien giua man, o ten san sang go, chu duoc chon het | khung de mep 4 tam |
+| Go ten roi Enter | thu muc tren dia doi ten theo, khong con thu muc ten cu | nhu ben |
+| Keo mot tam vao khung | thu muc co ban noi cua dung anh goc, anh goc con nguyen | nhu ben |
+| Ctrl + mot nac lan chuot | TRUOC SUA: 0,87 -> 2,90 (3,3 lan mot nac). DA SUA 0.10.1: 0,87 -> 1,00 (15% mot nac) | |
+
+**Cho nguoi dung se vap (do duoc hoac doc tu ma), xep theo muc anh huong:**
+1. Chi mo duoc Canvas tu menu tren thanh menu he thong. Khay va nut tron khong co loi vao, khong co phim tat.
+2. Tam tren bang KHONG keo ra app khac duoc (Premiere, Zalo...). Day la loi hua chinh cua ca app ma bang lai thieu.
+3. Khong chon duoc nhieu tam (bam mot tam khong co dau "dang chon"); xep 17 tam la keo 17 lan. Backspace, Delete, Cmd+Z, Cmd+A, Space, Esc: khong lam gi.
+4. Khong xoa duoc khung, khong doi mau khung. Tao khung moi thi cac tam roi nam duoi no bi day di cho khac (bo cuc nguoi dung vua xep bi doi).
+5. Thu vien lon: "vua man hinh" thu nho het ve 30 px; khong co tim, loc theo ngay / loai, khong co "nhay toi tam moi nhat".
+6. Tren tam chi co gio hoac ngay, khong co ten file (ten nam trong tooltip). Khong co chu thich.
+7. Mo lan dau voi thu vien lon phai cho anh nho (13,3 s cho 200 anh). Chua tao san anh nho luc chup.
+8. Khung moi de len dong chu phu cua tieu de lon.
+CHUA do duoc bang bai nay: ban di chuot that, do muot khi keo, cua so that tren man that, video, Windows.
+
+**Doi thu (tra 12/10, nguon: trang tinh nang chinh thuc cua CleanShot + ket qua tim kiem; CHUA ra het moi app):**
+
+| App | Co bang / canvas de xep nhieu anh chup? | Cach ho giu va tim lai anh |
+|---|---|---|
+| CleanShot X (Mac, 29 USD) | KHONG | Capture History giu toi 1 thang, loc theo loai; anh ghim noi; Cloud tim theo noi dung anh + the |
+| Snagit | KHONG | Library: the, tim theo ten, loc theo ngay / app nguon / trang web nguon |
+| Shottr, Xnapper | KHONG (chi co nen cho MOT anh) | Shottr ghim anh; lich su chua xac nhan duoc tu trang chinh thuc |
+| Eagle (quan ly tu lieu) | CO, qua plugin Canvas | thu muc, the, thu muc thong minh theo luat; tu luu URL nguon |
+| PureRef (bang tham khao) | CO | keo anh vao, ghi chu, nhom, tu xep luoi, ve len anh, noi tren app khac |
+| Milanote (bang y tuong) | CO | the anh co chu thich, ghi chu, mui ten noi, cot |
+Khong thay app CHUP MAN HINH nao co bang ma nhom tren bang = thu muc that cung ten. Day la diem rieng, nhung chua ra het App Store / Microsoft Store nen
+KHONG viet "dau tien" len web.
+
+**Viec nen lam tiep cho Canvas (em de xuat, anh chon):**
+- Nhom A, go cho vap (nho, lam truoc): (A1) nut mo Canvas ngay tren khay + nut tron, them phim tat · (A2) keo tam tu bang ra app khac · (A3) chon nhieu
+  tam (keo khoanh vung, Shift bam) + Delete bo khoi khung + Cmd+Z · (A4) xoa khung (thu muc chi con ban noi thi moi xoa) · (A5) mo ra dung o tam moi
+  nhat voi co doc duoc, them nut "Moi nhat" · (A6) tao anh nho ngay luc chup.
+- Nhom B, tinh nang moi lay tu doi thu: (B1) ghi chu dan + mui ten (Milanote, PureRef; da co trong ban mau anh duyet) · (B2) tim va loc theo ngay /
+  loai, sau do tim theo CHU trong anh (CleanShot Cloud, Snagit) · (B3) nut "Xep gon" tu xep luoi (PureRef) · (B4) dan / tha anh tu ngoai vao bang
+  (PureRef, Milanote) · (B5) xuat mot khung thanh mot anh hoac PDF de gui khach · (B6) chu thich duoi tung tam (Milanote).
+- Con treo tu 0f: chuyen han file vao thu muc hay giu anh goc + ban noi (dang la ban noi); dai Storyboard vao khung chua vao thu muc; Windows chua chay.
+
+### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
+> 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
+> Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.
+> 01/10 15:18 anh mo that tren app (run-log: `khay mo the=dai`, `khay mo the=video`, khong co `khay LOI`), roi hoi
+> *"cach nao tien hon nua khong"*.
+
+### 0c. KHAY TU THU VE NUT TRON O GOC MAN HINH (anh neu 01/10/2026 15:2x) — anh CHUA chot chi tiet
+Anh: *"khi khong dung toi chup anh khay se tu thu ve thanh mot nut tron o goc man hinh de do ton dien tich ...
+animation phai dep"*. Claude tra loi + dua ban thu bam duoc trong chat (3 kieu chuyen dong: co mem / hut anh vao nut /
+nhanh gon; nut tron 48 px o goc duoi-phai; tu thu sau 3 giay khong re chuot; bam nut de mo).
+- Lam duoc: cua so Khay anh von TRONG SUOT (`main.js ensureShelf`) nen chuyen dong chay ben trong cua so, khong phai
+  keo cua so tung khung. Nut tron phai nam trong cua so >= 64 px (Windows khong cho cua so nho hon ~58 px diem anh that,
+  so loi #13) -> vong tron ve 44-48 px giua cua so trong suot.
+- "Tien hon nua" Claude de xuat: MOT khay noi co 3 the Anh · Video · Storyboard (the Anh = luoi dang co, khong sua),
+  thu ve thanh MOT nut tron -> tren man chi con 1 thu; cua so khay gop 13:59 thanh phan than cua 2 the kia.
+- Cho anh chon: kieu chuyen dong (1/2/3) · khi nao thu (sau N giay / chi khi bam) · goc nao · mo bang bam hay re chuot
+  · co lam "mot khay 3 the" luon hay chi lam nut tron truoc.
+- 01/10 15:5x anh che 3 kieu dau: *"3 option animation nay chua du dep va creative"*. => NHAP 2 (chay that, keo khay duoc,
+  co "xem cham"): `nhap/khay-nut-tron.html` (KHONG phai ma cua app, khong dong goi). 3 y tuong, moi cai ke mot viec app
+  lam: **A Ong kinh** (khay khep nhu man trap, con ong kinh luot ve goc, mo ra co nhay sang) · **B Xap anh** (tung tam bay
+  vao nut, nut dem len, luc nghi nut hien anh moi nhat, mo ra chia nhu chia bai) · **C Khoanh vung** (khung cam 4 goc om
+  khay, chup lai, thu ve goc; mo ra 4 goc bung truoc). Them cho ca 3: chup anh moi luc khay dang thu thi nut GIAN thanh
+  vien thuoc hien anh vua luu ~1,5 giay. Do toc do that: thu ve mat ~1,4 giay (A) — con cham cho viec lap lai ca ngay,
+  chot y tuong roi moi ep nhip. Anh CHUA chon.
+- **01/10 16:07 ANH CHOT + DA LAM, nap vao app dang cai:** xuat hien kieu A (ong kinh), thu ve kieu B (xap anh), tu thu 5
+  giay + Cai dat 5s / 10s / 15s, bam nut de mo. Ma: `src/khay-thu.js`, `src/nut/`, `src/dien/`. Bai do `npm run
+  test:khaynut` 30/30 (offscreen). CHUA xem tren man that. Con lai chua lam: kieu C, mot khay 3 the.
+- 01/10 15:3x anh hoi: *"khi anh drag cai khay di tum lum cho, khi thu ve no van nam o goc dung khong?"* => anh muon nut
+  tron LUON ve goc, khong phu thuoc khay dang nam dau. Claude tra loi: dung; de xuat goc duoi-phai cua MAN khay dang
+  nam, bam nut thi khay mo lai DUNG CHO CU. Anh chua xac nhan goc nao + mo lai o dau.
+Hien co 3 cho: Khay anh (noi, nho, luon tren cung) · cua so Khay Storyboard · cua so Khay video (sang 01/10 anh chon
+"khay rieng" trong bang hoi; Claude luc do de xuat chung Khay anh). Hai cua so sau da dung chung mot khuon CSS
+(`storyboard.css`, do 01/10 13:08: 14 luot dat). Claude tra loi anh 2 huong:
+- **A. Gop 2 cua so (Storyboard + Video) thanh MOT cua so co 2 the, Khay anh noi giu nguyen.** 3 cho -> 2 cho, tren Khay
+  anh 2 nut -> 1 nut. It rui ro: khong dung vao Khay anh (phan da chinh nhieu nhat: cuon, keo to, keo tha).
+- **B. Gop ca ba vao Khay anh noi:** anh / video / dai nam chung mot luoi theo thoi gian, co hang loc Tat ca · Anh ·
+  Video · Storyboard; video la o co nut phat + thoi luong, dai la o co so khung; bam vao moi mo phan chi tiet (phat, chon
+  Co tieng / Khong tieng, bo khung, Luu / Sao chep). Mot cho duy nhat, keo tha thang tu khay. Rui ro: dung vao Khay anh.
+- De xuat cua Claude: lam A truoc (cung la phan "chi tiet" ma B can), anh dung thu roi moi lam buoc dua o video / dai
+  vao Khay anh. Loai moi sau nay (GIF) khong sinh them khay thu tu.
 
 ---
 
