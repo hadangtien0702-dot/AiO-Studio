@@ -151,6 +151,33 @@ KHONG viet "dau tien" len web.
   (PureRef, Milanote) · (B5) xuat mot khung thanh mot anh hoac PDF de gui khach · (B6) chu thich duoi tung tam (Milanote).
 - Con treo tu 0f: chuyen han file vao thu muc hay giu anh goc + ban noi (dang la ban noi); dai Storyboard vao khung chua vao thu muc; Windows chua chay.
 
+### 0h. CANVAS: LAM GIONG MIRO / FIGJAM — bang so sanh (anh neu 12/10/2026 19:2x: "mirro - figjam co gi lam tuong tu di em") — anh CHUA chot muc nao
+Danh sach theo hieu biet chung ve FigJam / Miro, CHUA tra lai trang chinh thuc tung app (nguon: Claude, 12/10). Cot Canvas = doc tu ROADMAP 0g + CLAUDE.md app.
+
+| # | FigJam / Miro co | Canvas hien tai | De xuat |
+|---|---|---|---|
+| 1 | Ghi chu dan (sticky), nhieu mau, go chu nhanh | Chua (0g B1) | LAM dot 1 |
+| 2 | O chu tu do tren bang | Chua | LAM dot 1 |
+| 3 | Mui ten / duong noi BAM theo vat khi keo | Chua (0g B1) | LAM dot 1 |
+| 4 | Chon nhieu: keo khoanh, Shift bam, Cmd+A | Chua (0g A3) | LAM dot 1 |
+| 5 | Undo / Redo, Delete, nhan doi, copy / dan | Chua (0g A3) | LAM dot 1 |
+| 6 | Dan anh tu clipboard / keo tu ngoai vao bang | Chua (0g B4) | LAM dot 1 |
+| 7 | Khung nhom co ten + mau (Section / Frame) | CO (khung = thu muc cung ten); thieu xoa khung, doi mau (0g A4) | Bo sung dot 1 |
+| 8 | Keo vat tu bang ra app khac | Chua (0g A2) — loi hua chinh cua app | LAM dot 1 |
+| 9 | Xep gon tu dong, duong giong khi keo, can hang | Chua (0g B3) | Dot 2 |
+| 10 | Ban do nho (minimap) + "Vua man" + nhay toi tam moi nhat | "Vua man" co, ra 30 px khi 200 anh (0g muc 5) | Dot 2 |
+| 11 | Tim kiem tren bang, loc theo ngay / loai | Chua (0g B2) | Dot 2 |
+| 12 | Xuat 1 khung ra PNG / PDF | Chua (0g B5) | Dot 2 |
+| 13 | But ve tay + da quang tren bang | Co o Anh ghim (phim 7, 8), bang thi chua | Dot 2 |
+| 14 | Khoa vat, doi lop truoc / sau | Chua | Dot 3 |
+| 15 | Hinh khoi (vuong, tron, thoi) | Chua | Dot 3, hoi anh co can |
+| 16 | Dan link thanh the xem truoc | Chua | Dot 3, hoi anh co can |
+| 17 | Binh luan, tem cam xuc, con tro nguoi khac, bo phieu, hen gio, mind map, bang bieu, mau co san | Khong co | BO: app 1 nguoi dung, khong co may chu |
+
+Dot 1 = "dung duoc nhu bang that" (muc 1-8). Dot 1 chi them thu KHONG phai anh (ghi chu, chu, mui ten) nen luu vao `canvas/bo-cuc.json`,
+KHONG tao file trong thu muc anh (thu muc van chi chua anh + video). Truoc khi viet ma app: lam 1 ban nhap bam duoc `nhap/canvas-miro-2.html`
+cho anh xem (luat 5bh: 1 mau, anh gat huong, roi moi nhan ra).
+
 ### 0b. GOP KHAY THANH MOT (anh neu 01/10/2026 13:2x: "phan khay minh toi uu hoa thanh 1 khay?") — anh CHUA chot
 > 01/10 13:59: anh bao *"gop cho anh xem truoc"* -> huong A DA DUNG va nap vao app dang cai (cua so `src/khay`, 2 the).
 > Anh dang xem, chua chot giu hay bo. Chua lam: gop 2 nut tren Khay anh thanh 1; huong B.

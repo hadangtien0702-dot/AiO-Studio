@@ -1,6 +1,22 @@
 # PROGRESS — AiO Shot & Save
 
-> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-12 15:47 +0700 (/xong, may Mac)
+> **TRANG THAI HIEN TAI (phien sau doc dau tien)** — chot 2026-10-12 21:22 +0700 (/xong, may Mac)
+> - **CHOT PHIEN 12/10 toi (Mac, DA NAP vao app dang cai 21:18, VAN so 0.10.1, CHUA commit / push / dong goi / len web):** Canvas kieu Miro / FigJam
+>   (thanh cong cu, ghi chu, chu, hinh, mui ten noi, but, chon nhieu, hoan tac, tim, ban do nho, xuat khung, dan / tha, keo ra app khac) · xem nhanh Space (Quick Look that
+>   tren Mac + mui ten luot; lop phong to tren Windows) · menu khay gon 11 -> 6 dong · "Khong thu" cho tu thu khay. `test:canvas` 42 · `test:canvasapp` 14 ·
+>   `test:canvasfigjam` (MOI, an + co tieu diem that) · `test:khaynut` DAT. Code chua commit nam o working tree nhanh `mac` (xem `git status`).
+>   **VIEC KE:** anh CHUA bao "test xong" nen KHONG push / dong goi; khi anh bao thi: tang so (0.10.2), commit tung cum, doi web section Canvas theo ban moi.
+>   `[CHO]` anh thu: mui ten luot trong Quick Look (phim toan he thong, chua do that), "do" anh bao luc dau chua tai hien, bo cuc nut "Khong thu".
+>   `package-lock.json` bi npm tu doi 0.7.8 -> 0.7.9 (khong phai viec cua phien, vo hai).
+> - **13/10 15:04 WEB DA LEN main (2d0158b): bo section Storyboard rieng, Canvas them ghi chu dan + mui ten + animation, bo 3 buoc / chip. Code app van CHUA commit.**
+> - **22:00 MAC (DA NAP, van 0.10.1, chua commit): bo luong chup chay san tren Mac -> het cham tim "Currently Sharing" cua macOS; chup anh di duong grab ~230-380 ms (truoc 184 ms), anh danh gia "khong cham lam". Quay video tu mo luong luc quay, quay xong dong. Keo vung con khung roi nhe (gap-max 33-60 ms 3/5 lan); anh bao DUNG, ung vien neu lam tiep: doi 4 lop toi sang transform (so do 5/5/4 -> 2/0/1 khung roi). `[CHO]` quay video that sau thay doi (chua thu).**
+> - (cu) 20:32:
+> - **12/10 20:31 MAC: CANVAS XEM NHANH bang Space (Quick Look that tren macOS; lop phong to tren Windows / dai Storyboard). DA NAP, van 0.10.1.** Chon tam + Space; khong chon thi Space van la giu de keo bang.
+> - **12/10 20:24 MAC: thanh ngu canh Canvas tu tranh thanh cong cu / ban do / nut tron / o tim (da nap, van 0.10.1).** Anh xac nhan ban do nho het bi de. Chi tiet muc dau ben duoi.
+> - **12/10 20:21 MAC: 0.10.1 DA NAP (van so 0.10.1). CANVAS KIEU MIRO / FIGJAM (ghi chu, chu, hinh, mui ten, but, chon nhieu, hoan tac, tim, ban do nho, xuat khung...)
+>   + sua go chu bi cat, ban do nho khong con bi thanh nut de, tuong phan UI.** `test:canvas` 42 + `test:canvasapp` 14 + `test:canvasfigjam` MOI (an + co tieu diem that) DAT.
+>   Anh bao "do" chua tai hien. Chi tiet: hai muc dau ben duoi. Chua tang so, chua push, chua len web. Anh CHUA dung that tren bai that.
+> - (cu) chot 2026-10-12 15:47 +0700 (/xong, may Mac)
 > - **12/10 15:24 MAC: 0.10.1 DA NAP. Anh dan: KHONG dong bo cai, KHONG release, tap trung phat trien san pham; khi nao anh keu moi dong goi.**
 >   0.10.1 = 0.10.0 + sua Ctrl + mot nac lan chuot phong 3,3 lan (nay 15%). Bai thu dung moi `npm run thu:canvas -- <so anh>`. Ket qua thu dung, bang
 >   doi thu (CleanShot X khong co canvas) va 12 de xuat cho Canvas nam o `ROADMAP.md` muc 0g, anh CHUA chot muc nao. Web da co section Canvas rieng
@@ -283,6 +299,151 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [web, DA LEN main] - 2026-10-13 15:04 - Web Shot and Save: bo section Storyboard rieng, Canvas them ghi chu dan + mui ten + animation - may Mac
+
+- **Anh bao:** "push code len website, cap nhat tinh nang moi, Canvas la section rieng, section storyboard dang trung voi phan o tren, xoa di thay bang canvas"; sau do "remove" (hang 3 buoc va hang chip tinh nang), "remove" (dong chu duoi bang), "lam animation cho canvas".
+- **Da lam (chi `Website/AiO ShotSave Web/index.html`, commit tren `origin/main`: 092d7ee -> 804b8cb -> efc26fb -> 2d0158b; mac f23bfa1):**
+  xoa section `#storyboard` (HTML 44 dong + CSS 90 + JS 197 + chu i18n; khong con tham chieu `sb-` / `ssSb` nao ngoai; canh "Dai phan canh trong 3 giay" o khoi tinh nang van con);
+  Canvas o vi tri do, them 2 ghi chu dan + mui ten tren bang (bo cuc rong; bo cuc doc an), bo 3 buoc, bo hang chip, bo dong "Thu ngay / Hai chieu";
+  animation: sau canh doi ten khung, con tro toi cho trong, ghi chu 1 nay ra + go chu, ghi chu 2, mui ten duoc ve noi hai ghi chu (~11,5 s); khach cham giua chung / doi ngon ngu thi hien tron.
+- **Do:** 3 script cua trang qua `new Function`; bang chay duoc (`ssCv`); 0 loi console; 1018 px va 375 px khong tran ngang; sau moi lan day live md5 = blob git (4ececbd6) tren aio-shotsave.vercel.app.
+- **Cach day:** dung commit tren `origin/main` chi gom file web (index tam), khong keo ma app dang cho; sau do `git commit -- <file>` tren `mac` cho hai nhanh cung noi dung.
+- **CHUA do:** bang Canvas tren dien thoai that; animation voi `prefers-reduced-motion` (nhanh nay khong chay phan tu dien, ghi chu hien tron); Windows chua chay app.
+
+## [0.10.1 do, nap tai cho] - 2026-10-12 22:00 - Chot phien: ket qua do keo vung + quyet dinh DUNG (anh: "cung duoc roi, khong can chinh tiep") - may Mac
+
+- **Log 5 lan keo that (21:54-21:56):** 3/5 lan co chuoi khung roi 27-60 ms nam o 318-545 ms sau mousedown; 2 lan cuoi (chup lien tiep 3-4 s) khong roi (gap-max 20 ms).
+  KHONG co longtask nao cua renderer -> khong phai JS nghen; roi o tang ve / ghep hinh. May nay MacBookPro16,1 (Intel UHD 630 + AMD Radeon Pro 5500M), man co 3584x2240.
+- **Bai do ngoai app (scratchpad, cua so trong suot full man + 4 lop toi 42 % + anh 3584x2240, 4 giay):** mac dinh roi 2-7 khung > 24 ms ngay giay dau; ep GPU roi
+  (`force_high_performance_gpu`) het roi nhung co 1 lan dung 1,3 s luc khoi dong va ton pin -> LOAI. 4 cach ve lop toi, 3 lan moi cach, so khung > 24 ms:
+  V0 (left/top/width/height, dang dung) 5 · 5 · 4 | V1 (4 lop dung `transform: translate + scale`, `will-change: transform`) 2 · 0 · 1 | V2 (mot lop box-shadow) 3 · 4 · 4 | V3 (`will-change` left/top) 5 · 4 · 5.
+- **Chua lam:** doi `datPx` cua overlay sang transform (V1) nhu so do tren. Anh noi "cung duoc roi, khong can chinh tiep" nen DUNG; muon tot hon thi V1 la ung vien dau
+  (mau nho, 3 lan/cach, chua do trong app that).
+- **Tinh trang cuoi:** DA NAP (21:54), van 0.10.1, CHUA commit / push / dong goi. `luong-chup.js` + `main.js` + `overlay.js` (bo ghi nhip chi tiet van con, vo hai).
+
+## [0.10.1 do, nap tai cho] - 2026-10-12 21:55 - Overlay: ghi vi tri khung roi + longtask luc keo vung (tra loi "keo khung hoi khung") - may Mac
+
+- **Anh bao:** sau khi bo luong chup chay san, luc keo tao vung chon "hoi khung mot ti". Log: gap-max truoc doi 18-20 ms, 4 lan sau doi 33-66 ms (1-2 khung roi).
+- **Do chup (khong sua code):** `getSources` Electron 289-298 ms (full 3584x2240) · 275-297 (0,75) · 246-262 (0,5) · 233-238 (0,25) -> ha co anh KHONG cuu duoc; `toJPEG(92)` 60 ms
+  o full. ScreenCaptureKit chay san (mot nhat/lan) 160 ms, chay lai moi lan 630-650 ms; khong hien cham tim giua cac lan chup. Chua lam (anh chon: hien tai khong cham lam).
+- **Da sua (`src/overlay/overlay.js` batDauDoKeo/ketThucDoKeo):** run-log nay ghi them `roi[t:gap]` (khung > 24 ms o giay thu may cua lan keo) + `longtask[t:ms]` cua renderer overlay.
+- **[CHO]:** anh keo 3-4 lan de doc nguyen nhan; chua biet khung roi o dau keo hay giua chung, do renderer hay do main.
+
+## [0.10.1 sua, nap tai cho] - 2026-10-12 21:48 - Mac: KHONG giu luong chup o nen nua (het cham tim "Currently Sharing") - may Mac
+
+- **Anh bao:** menu thanh tren cung cua macOS cu tu hien "AiO Shot & Save - Currently Sharing" (kem nut Stop Sharing), "app khac khong co nhu vay".
+- **Nguyen nhan that:** luong chup chay san 5 fps (0.5.0, 15/09, de bam phim ra overlay 7-20 ms) la mot luong getDisplayMedia mo suot luc app chay. macOS cho
+  MOI luong nhu vay mot chi bao chia se man hinh; Windows khong co chi bao nen luc do khong ai thay.
+- **Da sua (`src/luong-chup.js`, `src/main.js`):** hang `CHAY_SAN` = Windows hoac `AIO_LUONG=1`. Mac: khong `khoiDong` luc boot, khong tu bat lai khi doi man / ngu day
+  (`lenLichLai`, `theoDoiMoiTruong`), bo ham nong getSources luc mo app; chup anh di duong grab (`nguon=grab`). QUAY VIDEO tren Mac: `batDauQuay` tu mo cua so luong
+  (doi toi da 8 s) va `ketQuay` dong lai -> cham tim chi hien luc dang quay.
+- **Do:** sau nap, log khoi dong 21:47:50 KHONG co dong `LUONG: bat dau` (truoc do 113 dong trong run-log); anh chup thanh menu: het bieu tuong tim.
+  Gia: chup anh tren Mac cham hon (screencapture CLI do duoc ~300 ms, getSources ~400 ms; truoc 7-20 ms).
+- **CHUA do:** do tre phim chup that tren Mac sau thay doi (can bam Alt+1 that, log `grab-xong ... nguon=grab`), quay video that sau khi luong mo theo yeu cau,
+  va chip tim co chop nhanh luc chup (getSources co the nhoang len chi bao 0,4 s moi lan chup).
+- **[CHO]:** anh thu chup + quay; neu thay cham thi can lam duong chup nhanh khac (helper native ScreenCaptureKit, da bi cam 14/09 nen phai hoi anh).
+
+## [0.10.1 tinh nang, nap tai cho] - 2026-10-12 21:18 - Cai dat: them lua chon "Khong thu" cho "Tu thu khay ve goc sau" - may Mac
+
+- **Boi canh:** anh gui anh man Cai dat: *"o cai tu thu khay ve em them 1 option nua la khong thu ve - co nguoi se khong muon tat"*.
+- **Thay doi:** hang "Tu thu khay ve goc sau" co them nut **Khong thu** (EN: Never) canh 5s / 10s / 15s. Chon thi khay ngoi do toi khi anh tu bam "–"; mac dinh van 5s.
+  Gia tri 0 trong `cau-hinh.json` (`khayTuThu: 0`). Trap da tranh: `0` la falsy nen cho hien thi + luu deu doi tu `|| 5` sang so sanh ro rang.
+- **File:** `src/khay-thu.js` (`giayHopLe` nhan 0, `nhip` thoat khi 0), `src/settings/index.html`, `src/settings/settings.js`, `src/i18n.js` (`set.khay.khongThu`),
+  `scripts/test/do-khay-nut.mjs` + `khay-nut-main.cjs` (+2 muc).
+- **Kiem chung:** `test:khaynut` TAT CA DAT, gom muc hanh vi that: giay = 0, con tro o ngoai, khay mo 6,5 giay -> VAN mo; dat lai 5 giay -> thu nhu cu. Da nap 21:18.
+- **CHUA:** chua nhin nut moi tren man Cai dat that (kiem bo cuc bang mat).
+
+## [0.10.1 giao dien, nap tai cho] - 2026-10-12 21:00 - Menu khay he thong gon lai: 11 dong -> 6 - may Mac
+
+- **Boi canh:** anh gui anh menu khay (Dung thu, Chup, 3 khay, Canvas, thu muc anh, Cai dat, dong phien ban, Thoat) va hoi *"cai settings nay em lam gon lai duoc khong"*.
+- **Thay doi:** 3 muc khay (anh / Storyboard / video) gop vao MOT muc con "Mo khay ▸"; dong "AiO Shot & Save v0.10.1" rieng bo, so phien ban dat canh "Thoat · v0.10.1"
+  (van nhin thay ban dang chay o menu khay); bo 2 duong ke thua. Con lai: Chup man hinh · Mo khay ▸ · Mo Canvas y tuong · Mo thu muc anh · Cai dat · Thoat (+ dong dung thu / dung quay khi co).
+- **File:** `src/main.js` (`rebuildTrayMenu`), `src/i18n.js` (4 khoa `tray.cacKhay / khayAnh / khayStory / khayVideo`, VI + EN).
+- **Kiem chung:** cu phap sach, app nap + mo lai 21:00:05 khong co dong loi; quyen ghi man hinh con. CHUA do bang chuot that tren thanh menu (em khong bam duoc menu he thong).
+
+## [0.10.1 tinh nang, nap tai cho] - 2026-10-12 20:58 - Canvas: mui ten trai / phai TRONG Quick Look that cua macOS - may Mac
+
+- **Boi canh:** anh xac nhan Space hien Quick Look roi, nhac *"em them mui ten luot nua di"*.
+- **Nguyen nhan:** Quick Look la cua so cua HE DIEU HANH (`previewFile` chi nhan 1 file), trang Canvas khong nhan duoc phim luc no dang mo.
+- **Thay doi:** luc Quick Look mo, main dang ky phim tat TOAN HE THONG Left / Right (`globalShortcut`), chuyen cho trang bang `canvas:xem-tiep`; trang chon tam ke
+  (bo qua dai Storyboard) va goi lai `xemNhanh` -> main `closePreviewFile` + `previewFile` tam moi. GO phim khi: Canvas lay lai tieu diem (Quick Look dong),
+  app mat tieu diem (`did-resign-active`), cua so dong, 2 phut khong luot, hoac phim bam luc Canvas dang co tieu diem.
+- **File:** `src/main.js` (`qlBatDau / qlTat`), `src/preload-canvas.js` (`onXemTiep`), `src/canvas/canvas-tien.js`, `scripts/test/kich-ban-canvas-figjam.cjs` (+1 muc).
+- **Kiem chung:** `test:canvasfigjam` TAT CA DAT, muc moi do chuoi main -> trang -> chon tam ke -> quay lai. Da nap 20:58.
+- **CHUA DO (ghi thang):** phan `globalShortcut` that: bai thu rieng can quyen Tro nang de gia lap phim nen treo, em dung lai. Chua biet chac (1) `focus` cua Canvas co ban
+  dung luc Quick Look dong khong (neu khong, phim chi nha sau 2 phut hoac khi anh sang app khac), (2) phim Left / Right co bi nuot khi Canvas dang co tieu diem
+  (da xu ly: nha phim, mat 1 lan bam). Neu mui ten khong chay hoac bi ket sau khi dong Quick Look: bao em, doi sang lop xem nhanh trong Canvas (co san mui ten).
+
+## [0.10.1 tinh nang, nap tai cho] - 2026-10-12 20:33 - Canvas: xem nhanh co mui ten trai / phai (dung cho Windows) - may Mac
+
+- **Boi canh:** anh hoi *"anh muon tren win cung vay duoc khong em"*. Windows khong co Quick Look san (PowerToys Peek la phan mem rieng) nen Windows dung lop xem nhanh
+  ngay trong Canvas (da co tu 20:32, cung phim Space); them dieu huong de gan cam giac Quick Look hon.
+- **Thay doi:** khi lop xem nhanh dang mo: mui ten phai / trai sang tam ke (dang chon nhieu tam thi trong phan chon, khong thi theo thoi gian cua ca bang), tam do duoc chon,
+  ten + so thu tu hien o duoi. Co ca tren Mac cho dai Storyboard; Mac anh / video van la Quick Look that (mui ten do chinh macOS lo).
+- **File:** `src/canvas/canvas-tien.js` (`X.xemTiep`, `veXem`), `src/canvas/canvas.js` (phim), `scripts/test/kich-ban-canvas-figjam.cjs` (+2 muc).
+- **Kiem chung:** `test:canvasfigjam` TAT CA DAT (mui ten phai doi tam + chon + dem "n / tong", mui ten trai quay lai). Da nap 20:33. Windows CHUA chay that.
+
+## [0.10.1 tinh nang, nap tai cho] - 2026-10-12 20:32 - Canvas: XEM NHANH bang Space (nhu Quick Look cua macOS) - may Mac
+
+- **Boi canh:** anh: *"vi du anh muon bam vao tam anh thi anh bam dau cach anh se duoc phong to len giong native cua mac os"*.
+- **Nguoi xai:** chon mot tam anh / video / dai Storyboard roi bam Space. Mac: mo Quick Look THAT cua macOS (`BrowserWindow.previewFile`), bam Space lan nua de dong
+  (do chinh macOS lo). Cho khac (Windows, dai Storyboard): lop phong to trong Canvas (anh goc, video co thanh dieu khien, dai hien 6 khung), Space / Esc / bam de dong.
+  Khong chon tam nao thi Space van la giu de keo bang nhu truoc. Dang chon nhieu tam: xem tam dang duoi con tro (neu dang chon) khong thi tam dau tien.
+- **Builder:** kenh `canvas:xem-nhanh` (main.js; che do do tra native:false va ghi `kq.xemNhanh`); `canvasNap` them `m.goc` (file://) cho anh; CSP them `file:` o img-src;
+  `X.xemNhanh` / `X.dongXem` trong canvas-tien.js; Space va Esc xu ly o canvas.js.
+- **File anh huong:** `src/main.js`, `src/preload-canvas.js`, `src/canvas/{index.html,canvas.js,canvas-tien.js}`, `scripts/test/kich-ban-canvas-figjam.cjs`.
+- **Kiem chung bang so:** `test:canvasfigjam` TAT CA DAT, them 4 muc: Space mo lop phong to dung file a.png · Space lan hai dong · Esc dong · khong chon tam nao thi Space khong mo.
+  `test:canvasapp` 14 DAT. Da nap vao app dang cai 20:31 (quyen ghi man hinh con, 20 anh / video giong truoc).
+- **CHUA:** Quick Look that cua macOS chua bam tren man that (che do do khong goi `previewFile`, chi do duoc nhanh du phong); chua co dieu huong trai / phai giua cac tam trong luc xem; Windows chua chay.
+
+## [0.10.1 sua, nap tai cho] - 2026-10-12 20:25 - Canvas: thanh ngu canh tu tranh cac lop noi khac - may Mac
+
+- **Boi canh:** anh bao ban do nho bi thanh nut de (da sua 20:21) roi hoi *"con cho nao nua khong"*. Em tu soat cac lop noi dong (thanh ngu canh tren phan chon, thong bao, chip loc).
+- **Nguyen nhan that:** `capNhatNgu` chi kep theo mep cua so (trai >= 8, tren >= 64), khong biet thanh cong cu trai (left 16, rong 48), ban do nho, o tim + chip loc, nut tron
+  -> chon vat sat mep trai / goc phai-duoi la thanh ngu canh de len cac lop do.
+- **Thay doi:** thu lan luot 7 vi tri (tren, duoi, ben phai, ben trai, trong phan chon, giua tren, giua duoi) va lay vi tri dau tien khong cham lop nao (chua 6 px);
+  neu khong co thi lay vi tri it cham nhat.
+- **File anh huong:** `src/canvas/canvas-tien.js` (ham `capNhatNgu`), `scripts/test/kich-ban-canvas-figjam.cjs` (them muc do).
+- **Kiem chung bang so:** muc moi "thanh ngu canh + thong bao khong de len cac lop noi o 5 vi tri cua vat chon, rong 1500 va 1000 px" DAT; `test:canvasfigjam` TAT CA DAT
+  (an). Da nap vao app dang cai 20:24 (boot v0.10.1, 20 anh/video, cau hinh giong truoc). CHUA do tren man that cua anh; chua tang so, chua push.
+
+## [0.10.1 sua sau khi anh thu, nap tai cho] - 2026-10-12 20:22 - Canvas: go chu bi cat, ban do nho bi de, tuong phan - may Mac
+
+- **Boi canh:** anh mo thu Canvas moi roi bao *"do"*, gui anh chup *"Bi de UI"*, dan *"luu y phan contrast UI"*. Run-log 20:11 khong loi; do tren 17 anh that cua
+  anh (cua so an): 0 tac vu nghen, khung 16 ms -> khong tai hien duoc "do". Em dung cua so CO TIEU DIEM THAT (`AIO_THU_HIEN=1`, dat ngoai rim man hinh).
+- **Nguyen nhan that:** (1) cua so mat tieu diem lam o chu nhan `blur` -> ghi chu chot som, chi luu chu dau ("Y" thay vi "Y tuong dau tien"); bai do an khong thay
+  vi cua so an khong phat blur. (2) `.thanh` (nut giua) de len ban do nho dat o goc duoi-trai. (3) Tuong phan: chu trang 12 px tren nut loc cam 3,0:1;
+  chu goi y ghi chu pastel 2,8-2,9:1; chu trang trong hinh thoi 3,1-4,1:1 voi vai mau.
+- **Thay doi:** blur chi chot khi `document.hasFocus()`; ban do nho chuyen sang goc duoi-phai, tren nut tron (`bottom: 92px`); `.cp.dang` chu toi #17120d (6,2:1);
+  goi y ghi chu opacity .62 (3,9-4,6:1); hinh thoi nen 32% (>= 6,9:1); placeholder o tim dung text-3 (5,4:1). Them che do do `AIO_THU_HIEN=1` o main.js
+  (chi trong --thu-canvas).
+- **File anh huong:** `src/canvas/canvas-vat.js`, `src/canvas/index.html`, `src/main.js` (chi nhanh --thu-canvas), `scripts/test/kich-ban-canvas-figjam.cjs`.
+- **Kiem chung bang so:** `test:canvasfigjam` DAT o ca che do an va che do co tieu diem that; them muc moi "6 lop noi khong de nhau o 1500/1200/1000/900/760 px" DAT;
+  `test:canvasapp` 14 DAT; tinh tuong phan bang cong thuc WCAG tu gia tri mau (khong do bang mat tren man that). Da nap vao app dang cai 20:21, quyen ghi man hinh con.
+- **CHUA:** "do" cua anh chua tai hien (can biet anh bam / keo gi); chua do tuong phan tren man that; chua tang so, chua push, chua len web.
+
+## [0.10.1 tinh nang, nap tai cho] - 2026-10-12 20:00 - Canvas LAM GIONG MIRO / FIGJAM: ghi chu dan, chu, hinh, mui ten, but ve, chon nhieu, hoan tac... - may Mac
+
+- **Anh dan:** *"mirro - figjam co gi lam tuong tu di em"* (em dua bang 17 muc, ROADMAP 0h) roi *"vao viec di em lam het roi kiem tra"*. Lam dot 1 + 2 + 3
+  (bo muc 17: binh luan / tem / bo phieu... vi app 1 nguoi). Van so 0.10.1, DA NAP vao app dang cai (khong dong goi, khong push).
+- **Nguoi xai:** thanh cong cu doc ben trai (V chon · H keo bang hoac giu Space · N ghi chu dan · T chu · R / O / D hinh · A mui ten · P but · L da quang ·
+  K the link); nhap dup bang trong = ghi chu moi. Chon nhieu (khoanh vung, Shift, Cmd+A), thanh ngu canh tren phan chon (mau, can hang, chia deu, xep gon,
+  len / xuong, khoa, nhan doi, xoa, PNG / PDF cho khung). Cmd+Z / Shift+Cmd+Z, Cmd+C / V / D, Cmd+L khoa, `[` `]` lop, phim mui ten nhich 1 / 10 px,
+  duong gong hut khi keo. Dan anh / chu / link tu clipboard, tha file tu Finder / trinh duyet vao bang. Keo tam ra app khac: nut o goc tam hoac giu Alt.
+  Tim (Cmd+F, loc loai + ngay), nut "Moi nhat", ban do nho, xoa khung (bam hai lan, chi khi thu muc chi con ban noi cua anh goc).
+- **Builder:** ghi chu / chu / hinh / link / mui ten / net ve CHI nam trong `canvas/bo-cuc.json` (`vat noi net z khoa`, `canvas-kho.js luuVat`), khong tao
+  file. Trang chia 3 file dung chung `window.CVX`: `canvas.js` (loi) · `canvas-vat.js` · `canvas-tien.js`. Moi thao tac co lich su qua `X.chup()/X.day()`.
+  Main: kenh `canvas:luu-vat / xoa-khung / nhap / nhan-doi / dan / chep / keo-ra / xuat / mo-link`; `src/pdf-anh.js` (PDF 1 trang nhung JPEG).
+- **Da do (so):** `test:canvas` 42 muc (them [10] vat, [11] xoa khung, [12] nhap + nhan doi) DAT · `test:canvasapp` 14 DAT (khong hoi quy) ·
+  `test:canvasfigjam` MOI, app that cua so an, chuot / phim that cua Chromium: pha 1 ~70 muc + pha 2 mo lai app, TAT CA DAT. Anh goc 6/6 nguyen.
+- **Bay da vap (ghi de khoi lap):** (1) cua so AN / chua nhan phim khong phat su kien `blur` -> chu go dang do khong duoc chot; nay chot tuong minh
+  (`X.chotSua`) o Esc va khi bam ra ngoai. (2) Du lieu tu main ve truoc khi `canvas-vat.js` kip chay -> mo lai app 0 ghi chu tren man (state co 12):
+  nap lan dau doi `DOMContentLoaded`. (3) Bang tra `X.mV/mS/mN` chi dung lai khi nap tu main -> vat vua tao "chua co": dung lai moi lan ve.
+- **CHUA:** anh CHUA mo / dung that; chuot that (di chuot, do muot, 800 anh), Windows chua chay; keo that ra Zalo / Premiere chi do duoc "main nhan dung
+  duong dan" (startDrag that khong bat duoc o cua so an; `files[]` nhieu tam chua thu tren app dich); xuat PNG / PDF dung anh nho 400 px (video ve khung
+  tuong trung); dai Storyboard khong keo ra / nhan doi duoc; chua tim theo CHU TRONG ANH (OCR ca thu vien nang, can nut bam + dung duoc); khoa khung chua
+  tac dung len noi dung trong no; chua cho nguoi khac soat code. Chua len web (section Canvas tren web van la ban cu).
 
 ## [0.10.1 sua + thu dung, nap tai cho] - 2026-10-12 15:24 - Canvas: bai THU DUNG, sua "mot nac lan chuot phong 3,3 lan", tra doi thu - may Mac
 
