@@ -8,6 +8,7 @@
 >   **VIEC KE:** anh CHUA bao "test xong" nen KHONG push / dong goi; khi anh bao thi: tang so (0.10.2), commit tung cum, doi web section Canvas theo ban moi.
 >   `[CHO]` anh thu: mui ten luot trong Quick Look (phim toan he thong, chua do that), "do" anh bao luc dau chua tai hien, bo cuc nut "Khong thu".
 >   `package-lock.json` bi npm tu doi 0.7.8 -> 0.7.9 (khong phai viec cua phien, vo hai).
+> - **16/10 10:55: MA DA COMMIT + LEN NHANH `mac` (e7d9e0d) cho may Win phat trien tiep; chua len main, chua dong goi, van 0.10.1.**
 > - **13/10 15:04 WEB DA LEN main (2d0158b): bo section Storyboard rieng, Canvas them ghi chu dan + mui ten + animation, bo 3 buoc / chip. Code app van CHUA commit.**
 > - **22:00 MAC (DA NAP, van 0.10.1, chua commit): bo luong chup chay san tren Mac -> het cham tim "Currently Sharing" cua macOS; chup anh di duong grab ~230-380 ms (truoc 184 ms), anh danh gia "khong cham lam". Quay video tu mo luong luc quay, quay xong dong. Keo vung con khung roi nhe (gap-max 33-60 ms 3/5 lan); anh bao DUNG, ung vien neu lam tiep: doi 4 lop toi sang transform (so do 5/5/4 -> 2/0/1 khung roi). `[CHO]` quay video that sau thay doi (chua thu).**
 > - (cu) 20:32:
@@ -299,6 +300,16 @@
 >   sat mep anh lo chu goc.
 > - **WEB (28/09 11:3x, Claude, commit `49b5057` tren main):** dua kieu lam mo Kham khoi / Mo min (0.6.6-0.6.7) len https://aio-shotsave.vercel.app.
 > - **BAN DANG DUNG TREN MAY:** may nha 0.6.5 (cai de 27/09 20:45) · may cong ty **0.7.4.0** (tien trinh dang chay, do 29/09 08:04).
+
+## [dong bo may Windows] - 2026-10-16 10:55 - Ma Canvas FigJam + khay + Mac luong chup DA COMMIT va DA LEN nhanh `mac` (khong phai main) - may Mac
+
+- **Anh hoi:** tinh nang Canvas update len ban nao, may Win khong co. **Tra loi:** truoc do ma chi nam trong working tree Mac (chua commit), bo cai moi nhat Win la 0.7.3, Mac 0.7.9.
+  Anh chot: se phat trien tiep tren may Win.
+- **Da lam:** 4 commit tren `mac` (1d8e601 Canvas FigJam, f52c7d7 Khong thu khay, 6857429 Mac bo luong chup o nen, e7d9e0d so) + f23bfa1 (web); `git push origin mac` -> `e7d9e0d`;
+  `main` van o 2d0158b (chi web). KHONG tang so (van 0.10.1), KHONG dong goi, KHONG dung `package-lock.json` (npm tu doi 0.7.8 -> 0.7.9) va `.playwright-mcp/`.
+- **May Win lam gi:** `git fetch origin` -> `git checkout mac` -> `git pull` (hoac `scripts\dong-bo-may.ps1`) -> `npm install` trong `Build and UI Design/AiO Shotandsave` -> `npm start`.
+- **CHUA chay tren Windows that:** Canvas (ca khung 0.10.0 lan phan FigJam), Space xem nhanh (Windows dung lop phong to `.xn`, khong co Quick Look), keo ra app khac, xuat PDF.
+  `src/luong-chup.js` giu luong chup chay san tren Windows (`CHAY_SAN`), khong doi hanh vi.
 
 ## [web, DA LEN main] - 2026-10-13 15:04 - Web Shot and Save: bo section Storyboard rieng, Canvas them ghi chu dan + mui ten + animation - may Mac
 
