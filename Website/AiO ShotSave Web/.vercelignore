@@ -2,4 +2,5 @@
 .vercel
 .gitignore
 .vercelignore
-email/
+# chi thu muc email o GOC (mau thu); KHONG chan img/email (anh trong thu phai len web)
+/email/
