@@ -49,6 +49,24 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0i. GOP Y NGUOI DUNG THU 04/11/2026 (anh chuyen tiep, 10 y + 1 dong cua anh) — anh CHUA chot muc nao
+Doi chieu voi ma 0.10.1 ngay 04/11. "Mo cung Windows" da lam cung ngay (xem PROGRESS). Con lai:
+
+| # | Gop y | Hien trang trong ma | Co mat gi | De xuat |
+|---|---|---|---|---|
+| 1 | Chup full man: thanh cong cu day len goc | DUNG, la loi: `datViTriThanhCongCu` overlay.js, vung kin man thi top = 10, left = 10 | Nho | Khong du cho ngoai vung thi dat GIUA, sat day ben trong vung; cho keo thanh cong cu la buoc sau |
+| 2 | AI giai thich truc tiep | Chua co. Co doc chu (phim 5) lam dau vao | Ton tien moi lan goi, app ban 1 lan $14.99 | Can anh quyet ai tra tien AI truoc khi lam |
+| 3 | Dich sang nhieu thu tieng | Chua co. Noi tiep bang doc chu duoc | Cung cau hoi voi #2 | Gop chung #2 thanh mot nut tren bang chu |
+| 4 | Icon nho, can to | Nut 34 px, icon 16 px, cham mau 18 px | Thanh da 15 nut + 7 mau, to len la dai hon | Lam SAU #5 + #9 vi hai muc do thu chieu ngang |
+| 5 | But ve + but da xo doc khi re chuot | Dang 2 nut rieng (phim 7, 8) | Vua, dung vung overlay | Gom thanh 1 nut, re chuot xo menu; phim 7, 8 giu nguyen |
+| 6 | Chon icon nao hien | Chua co, thanh co dinh | Vua | Them nhom trong Cai dat, an nut nhung phim tat van chay |
+| 7 | Undo co Redo, 2 icon xanh + do | Co Undo + Ctrl+Z, chua co Redo, ca overlay lan anh ghim | Vua | Lam Redo. Mau do / xanh trung nghia voi nut Huy (do) va Xong (xanh) ngay canh: de bam nham, can anh chon |
+| 8 | Chu, icon, mui ten keo tu do, khung xoay + co gian + xoa | Mot phan: phim V keo duoc, Delete xoa. Chua co khung, co gian, xoay | Lon nhat, dung ca overlay.js lan pin.js | Lam rieng, can mau cho anh xem truoc |
+| 9 | Bo mau xo xuong | Dang bay 7 cham mau tren thanh | Nho | 1 cham mau dang chon, bam xo bang mau; tiet kiem ~120 px cho #4 |
+| 10 | Cap nhat phan mem | Chua co gi, khach khong biet co ban moi | Vua, can noi dat bo cai cong khai | Windows tu tai + cai duoc khi co GitHub Releases; Mac chi bao + nut tai (quyet dinh 21/09) |
+
+Thu tu em de xuat: dot 1 = #1, #7 (phan Redo), #9, #5, #4 (mot lan sua thanh cong cu) · dot 2 = #8 · dot 3 = #10, #6 · #2, #3 cho anh quyet chuyen tien AI.
+
 ### 0d. 08/10/2026 anh hoi "tiep theo la tinh nang gi" — Claude tra loi, anh CHUA chot muc nao
 Con lai trong bang muc 0 (chua lam): 3 hut mau + bang 5 mau · 6 khung an toan MXH · 7 Storyboard ban duyet co o ghi chu ·
 thu tieng micro · app tu cuon khi chup cuon · mot khay 3 the (0c) · kieu C cua nut tron. Muc 8 (Mac chay that) da co ban

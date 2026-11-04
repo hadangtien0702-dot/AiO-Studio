@@ -28,6 +28,7 @@ const { taoKhayThu, giayHopLe } = require('./khay-thu') // 01/10: khay tu thu ve
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const canvasKho = require('./canvas-kho') // 12/10: Canvas y tuong — khung tren bang = thu muc con cung ten
+const moCungMay = require('./mo-cung-may') // 04/11: tu mo cung Windows, tat duoc trong Cai dat
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
@@ -420,6 +421,10 @@ app.whenReady().then(() => {
       body: T('app.phimBiGiu').replace('{phim}', formatAccel(currentHotkey)),
     }).show()
   }
+  // 04/11: dang ky tu mo cung Windows (chi ban dong goi). Bo qua khi chay do de ban do khong dung vao registry cua anh.
+  if (!(IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || process.env.AIO_USERDATA)) {
+    try { moCungMay.khoiDong(app, kho, ghiLog) } catch (e) { ghiLog('mo-cung-may LOI: ' + e.message) }
+  }
   // Khong tu mo cua so nao — day la app song o khay he thong.
 
   // ☠️ HAM NONG duong chup (anh Tien 31/08 "chup video giat mot cai moi chup
@@ -711,11 +716,15 @@ ipcMain.handle('settings:get', () => {
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
     khayTuThu: giayHopLe(c.khayTuThu),
     lamMoKieu: kieuLamMo(c.lamMoKieu),
+    moCung: moCungMay.trangThai(app),
   }
 })
 
 /** Kieu lam mo hop le: 'mosaic' (Kham o, mac dinh) | 'blur' (Mo min) | 'kin' (To kin, 04/10). Gia tri la -> mac dinh. */
 function kieuLamMo(v) { return v === 'blur' || v === 'kin' ? v : 'mosaic' }
+
+// 04/11: cong tac Mo cung Windows trong Cai dat. Tra trang thai doc lai tu Windows, khong tra gia tri vua bam.
+ipcMain.handle('settings:set-mo-cung', (_e, bat) => moCungMay.dat(app, kho, ghiLog, !!bat))
 
 ipcMain.handle('settings:set-lam-mo', (_e, kieu) => {
   const val = kieuLamMo(kieu)

@@ -575,6 +575,11 @@ BUT VE TAY + BUT DA QUANG (06/10, phim 7 / 8 — da nap vao app dang cai, anh CH
   CHUA DAT: anh chua bam tren app that · chuot that / bang ve chua do · do day co dinh · da quang tren nen toi kem noi ·
   DA len web 06/10 (the + canh trong rap, commit a75c8f6) · Mac chua thu.
 
+MO CUNG WINDOWS (04/11, da nap vao app dang cai, chua khoi dong lai may de xem):
+- Nguoi xai: mo may la app da nam o khay he thong, phim tat chup dung duoc ngay. Mac dinh Bat; Cai dat > Ung dung > Mo cung Windows de tat. Vi du doi thuong: nhu Zalo, bat may la co san, khong phai nho mo truoc khi can chup.
+- Builder: `src/mo-cung-may.js`. Dong Run mang ten AppUserModelID `com.aiostudio.shotandsave`. Cho de hong: (1) truyen `name` vao setLoginItemSettings thi doc lai luon false; (2) `executableWillLaunchAtLogin` luon false, nguoi dung tat trong Task Manager phai doc `StartupApproved\Run` (byte dau le = tat); (3) luc boot khong ghi lai khi da co dong, ghi lai la de len lua chon cua nguoi dung; (4) chi ban dong goi, khong thi Windows mo electron.exe tran; che do do va `AIO_USERDATA` bo qua.
+- MVP (so): `npm run test:mocungmay` 30/30. CHUA DAT: chua khoi dong lai may that · go app con de lai dong Run · Mac chua bat (ky ad-hoc, chua do).
+
 XUAT GIF TU KHAY VIDEO (06/10, anh chon trong bang hoi; da nap vao app dang cai, anh CHUA bam thu):
 - Nguoi xai: mo Khay video -> o moi video co cum **Co tieng | Khong tieng | GIF** (video khong tieng: **Video | GIF**) -> bam
   **GIF**: o do chay "GIF 42%" vai giay roi sang len -> keo ca hang tha vao Zalo / Messenger / thu muc la ra file GIF (tu chay
