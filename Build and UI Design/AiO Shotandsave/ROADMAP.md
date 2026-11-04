@@ -65,6 +65,7 @@ Doi chieu voi ma 0.10.1 ngay 04/11. "Mo cung Windows" da lam cung ngay (xem PROG
 | 9 | Bo mau xo xuong | Dang bay 7 cham mau tren thanh | Nho | 1 cham mau dang chon, bam xo bang mau; tiet kiem ~120 px cho #4 |
 | 10 | Cap nhat phan mem | Chua co gi, khach khong biet co ban moi | Vua, can noi dat bo cai cong khai | Windows tu tai + cai duoc khi co GitHub Releases; Mac chi bao + nut tai (quyet dinh 21/09) |
 
+**04/11 21:35 DOT 1 DA LAM + NAP (anh: "goi agent sonnet ra lam va kiem"): #1, #7 phan Redo (mau van trung tinh, cho anh chon), #9, #5, #4. Anh chua dung that. Con lai: #8, #10, #6, #2, #3.**
 Thu tu em de xuat: dot 1 = #1, #7 (phan Redo), #9, #5, #4 (mot lan sua thanh cong cu) · dot 2 = #8 · dot 3 = #10, #6 · #2, #3 cho anh quyet chuyen tien AI.
 
 ### 0d. 08/10/2026 anh hoi "tiep theo la tinh nang gi" — Claude tra loi, anh CHUA chot muc nao

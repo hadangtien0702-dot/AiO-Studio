@@ -37,7 +37,7 @@ window.__t = {
     for (let i = 1; i < ds.length; i++) __t.chuot('mousemove', r.left + ds[i][0], r.top + ds[i][1], null, shift)
     const c = ds[ds.length - 1]; __t.chuot('mouseup', r.left + c[0], r.top + c[1], null, shift) },
   ds: () => shapes.map((s) => ({ type: s.type, n: s.pts ? s.pts.length / 2 : 0, pts: s.pts ? s.pts.slice() : null, color: s.color })),
-  thanh: () => { const b = toolbarEl.getBoundingClientRect(); const nut = [...toolbarEl.querySelectorAll('.cong-cu[data-tool]')].map((x) => x.dataset.tool)
+  thanh: () => { const b = toolbarEl.getBoundingClientRect(); const nut = [...toolbarEl.querySelectorAll('[data-tool]')].map((x) => x.dataset.tool) /* 12/11: but + da quang gop 1 nut, da quang nam trong menu */
     return { trai: Math.round(b.left), phai: Math.round(b.right), rong: Math.round(b.width), cuaSo: innerWidth, nut } },
 }
 true`

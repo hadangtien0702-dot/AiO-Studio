@@ -64,6 +64,81 @@ let dragging = false
 let startX = 0, startY = 0
 let curRect = { x: 0, y: 0, w: 0, h: 0 }
 let shapes = []           // { type, x1, y1, x2, y2 } — toa do CUC BO trong vung chon
+
+/* ── 12/11 BANG MAU XO + MENU BUT (nhom 7 / 8) + LAM LAI ─────────────────────────────────────────────
+   Thanh chi con MOT cham mau; bam thi xo bang 7 mau xuong duoi, gan mep duoi thi xo len tren. Nut but gop but + da quang:
+   re chuot vao xo menu doc 2 lua chon. Dong: chon xong / bam ra ngoai / Esc (Esc dong bang truoc, chua huy chup). */
+const mauHienEl = document.getElementById('mau-hien')
+const mauPopEl = document.getElementById('mau-pop')
+const butNhomEl = document.getElementById('but-nhom')
+const butChinhEl = document.getElementById('but-chinh')
+const butMenuEl = document.getElementById('but-menu')
+const nutRedoEl = document.getElementById('redo')
+const gioiHanXo = () => ({ top: 0, bottom: window.innerHeight, left: 0, right: window.innerWidth })
+const LAM_LAI_DUOC = () => mode === 'annotate'
+/* Dat pop canh nut: xuong duoi neu du cho, khong thi len tren (cho nao rong hon); keo ngang cho khong tran gioi han. */
+function xepXo(nut, pop) {
+  const gh = gioiHanXo(), gap = 10
+  pop.classList.remove('len', 'ngang'); pop.style.removeProperty('--dx')
+  const r = nut.getBoundingClientRect()
+  let cao = pop.offsetHeight
+  let duoi = gh.bottom - r.bottom, tren = r.top - gh.top
+  if (duoi < cao + gap && tren < cao + gap && pop.id === 'mau-pop') { // ca hai phia deu hep: bang mau xep ngang
+    pop.classList.add('ngang'); cao = pop.offsetHeight
+  }
+  const xuong = duoi >= cao + gap || (tren < cao + gap && duoi >= tren)
+  pop.classList.toggle('len', !xuong)
+  const p = pop.getBoundingClientRect()
+  let dx = 0
+  if (p.left < gh.left + 4) dx = gh.left + 4 - p.left
+  else if (p.right > gh.right - 4) dx = gh.right - 4 - p.right
+  if (dx) pop.style.setProperty('--dx', Math.round(dx) + 'px')
+}
+function bangMauMo() { return !mauPopEl.hidden }
+function menuButMo() { return !butMenuEl.hidden }
+function dongBangMau() { if (mauPopEl.hidden) return; mauPopEl.hidden = true; mauHienEl.setAttribute('aria-expanded', 'false') }
+function dongMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) butMenuEl.hidden = true }
+function dongPopups() { dongBangMau(); dongMenuBut() }
+function moBangMau() { dongMenuBut(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
+function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+let butDong = 0
+butNhomEl.addEventListener('mouseenter', moMenuBut)
+butNhomEl.addEventListener('mouseleave', () => { clearTimeout(butDong); butDong = setTimeout(dongMenuBut, 160) })
+// bam ra ngoai bang mau = dong (bat o pha capture: thanh cong cu chan noi bot mousedown)
+window.addEventListener('mousedown', (e) => {
+  if (bangMauMo() && !mauHienEl.parentNode.contains(e.target)) dongBangMau()
+  if (menuButMo() && !butNhomEl.contains(e.target)) dongMenuBut()
+}, true)
+
+/* Nut but hien icon + so phim + goi y cua loai dang dung (but = 7, da quang = 8). */
+const LOAI_BUT = { but: { so: '7', khoa: 'overlay.but' }, daquang: { so: '8', khoa: 'overlay.daquang' } }
+function capNhatNutBut(x) {
+  const l = LOAI_BUT[x]
+  if (l) {
+    butChinhEl.dataset.tool = x; butChinhEl.dataset.so = l.so
+    butChinhEl.setAttribute('data-i18n-title', l.khoa)
+    butChinhEl.title = window.i18n.t(l.khoa); butChinhEl.setAttribute('aria-label', butChinhEl.title)
+    butNhomEl.classList.toggle('dq', x === 'daquang')
+  }
+  butMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
+}
+
+/* LAM LAI: net bi hoan tac vao redoStack; ve net moi / doi vung = xoa hang doi. */
+let redoStack = []
+function capNhatRedo() { nutRedoEl.disabled = redoStack.length === 0 }
+function themNet(s) { shapes.push(s); redoStack.length = 0; capNhatRedo() }
+function xoaRedo() { redoStack.length = 0; capNhatRedo() }
+function lamLai() {
+  if (!LAM_LAI_DUOC()) return
+  if (oGoChu) return // dang go chu: bo qua (Ctrl+Z luc nay chi bo o go)
+  soDangDat = null
+  netDangVe = null
+  if (!redoStack.length) return
+  shapes.push(redoStack.pop())
+  danhSoLai() // so buoc luon lien nhau theo thu tu hien co
+  capNhatRedo()
+  redraw()
+}
 let veCtx = null
 let frozenImg = null      // anh dong bang cua CHINH man nay (de ghep shape)
 let origin = { x: 0, y: 0 } // goc DIP toan cuc cua man nay
@@ -350,10 +425,10 @@ function xuLyChinhKhung(e) {
 
   nx = Math.round(nx); ny = Math.round(ny); nw = Math.round(nw); nh = Math.round(nh)
 
-  if (shapes.length > 0 && (nx !== curRect.x || ny !== curRect.y)) {
+  if ((shapes.length > 0 || redoStack.length > 0) && (nx !== curRect.x || ny !== curRect.y)) {
     const shiftX = nx - curRect.x
     const shiftY = ny - curRect.y
-    for (const s of shapes) {
+    for (const s of shapes.concat(redoStack)) { // net cho Lam lai cung phai dich, khong thi hien lai lech cho
       if (s.pts) {
         dichNet(s, -shiftX, -shiftY) // net ve tay / da quang: doi tung diem
       } else if (s.type === 'text' || s.type === 'so') {
@@ -465,12 +540,16 @@ window.addEventListener('mouseup', (e) => {
 })
 
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { window.overlay.cancel(); return }
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { hoanTac(); return }
+  if (e.key === 'Escape') {
+    if (bangMauMo() || menuButMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
+    window.overlay.cancel(); return
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { if (e.shiftKey) lamLai(); else hoanTac(); return }
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'y') { e.preventDefault(); lamLai(); return }
   // Xoa shape dang chon (Delete / Backspace)
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShape && !oGoChu && mode === 'annotate') {
     const idx = shapes.indexOf(selectedShape)
-    if (idx >= 0) shapes.splice(idx, 1)
+    if (idx >= 0) { shapes.splice(idx, 1); xoaRedo() }
     selectedShape = null
     redraw()
     return
@@ -539,6 +618,8 @@ function vaoCheDoVe() {
   capNhatGiaoDienKhung()
   // Thanh cong cu: duoi vung chon, hoac tren neu khong du cho.
   toolbarEl.hidden = false
+  dongPopups()
+  xoaRedo()
   datViTriThanhCongCu()
   chonCongCu('rect')
   chonMau(curColor) // danh dau mau dang chon (mac dinh cam)
@@ -554,22 +635,34 @@ function chonMau(mau) {
   toolbarEl.querySelectorAll('.mau').forEach((b) => {
     b.classList.toggle('chon', b.dataset.color.toLowerCase() === mau.toLowerCase())
   })
+  mauHienEl.firstElementChild.style.background = mau // cham mau tren thanh = mau dang chon
 }
 
+/* Thanh nam DUOI vung; khong du cho thi nam TREN vung; khong du ca hai (vung kin man hinh) thi nam GIUA vung theo chieu ngang,
+   sat day BEN TRONG vung. Chieu cao do that (12/11: icon to len, hang so 44 cu khong con dung). */
 function datViTriThanhCongCu() {
   const gap = 10
-  const tbH = 44
-  let top = curRect.y + curRect.h + gap
-  if (top + tbH > window.innerHeight) top = Math.max(gap, curRect.y - tbH - gap)
-  toolbarEl.style.top = top + 'px'
-  let left = curRect.x
-  left = Math.max(gap, Math.min(left, window.innerWidth - toolbarEl.offsetWidth - gap))
-  toolbarEl.style.left = left + 'px'
+  const W = window.innerWidth, H = window.innerHeight
+  const tbH = toolbarEl.offsetHeight || 52, tbW = toolbarEl.offsetWidth
+  const duoi = curRect.y + curRect.h + gap
+  const tren = curRect.y - tbH - gap
+  let top, left = curRect.x
+  if (duoi + tbH <= H) top = duoi
+  else if (tren >= 0) top = Math.max(gap, tren)
+  else {
+    top = curRect.y + curRect.h - tbH - gap
+    left = curRect.x + (curRect.w - tbW) / 2
+  }
+  top = Math.max(gap, Math.min(top, H - tbH - gap))
+  left = Math.max(gap, Math.min(left, W - tbW - gap))
+  toolbarEl.style.top = Math.round(top) + 'px'
+  toolbarEl.style.left = Math.round(left) + 'px'
 }
 
 function chonCongCu(x) {
   if (x !== tool) chotOGoChu()
   tool = x
+  capNhatNutBut(x)
   if (tool !== 'select') {
     selectedShape = null
     veEl.style.cursor = 'crosshair'
@@ -727,14 +820,14 @@ function batDauVe(e) {
   if (tool === 'so') {
     // Bam = dong so ngay; con giu chuot thi keo chinh cho, tha ra la xong.
     soDangDat = { type: 'so', ...kepTamSo(lx, ly, curRect.w, curRect.h), color: curColor }
-    shapes.push(soDangDat)
+    themNet(soDangDat)
     redraw()
     return
   }
   if (tool === 'but' || tool === 'daquang') {
     // Giu chuot keo = ve net theo tay; giu Shift = duong THANG tu diem dau (gach chan chu). Bam roi tha ngay = mot cham.
     netDangVe = { type: tool, pts: [lx, ly], color: curColor }
-    shapes.push(netDangVe)
+    themNet(netDangVe)
     redraw()
     return
   }
@@ -748,6 +841,8 @@ function chonLaiTuDau(e) {
   dangKeoShape = false
   mode = 'select'
   shapes = []
+  xoaRedo()
+  dongPopups()
   veStart = null
   soDangDat = null
   netDangVe = null
@@ -825,7 +920,7 @@ function ketThucVe(e) {
   veStart = null
   // bo qua neu qua nho (bam nham)
   if (Math.abs(s.x2 - s.x1) < 3 && Math.abs(s.y2 - s.y1) < 3) { redraw(); return }
-  shapes.push(s)
+  themNet(s)
   redraw()
 }
 
@@ -1005,7 +1100,10 @@ function hoanTac() {
   if (oGoChu) { huyOGoChu(); return } // dang go thi Ctrl+Z = bo o go
   soDangDat = null
   netDangVe = null
-  shapes.pop()
+  const bo = shapes.pop()
+  if (bo) redoStack.push(bo)
+  if (selectedShape && !shapes.includes(selectedShape)) selectedShape = null
+  capNhatRedo()
   redraw()
 }
 
@@ -1122,9 +1220,11 @@ function veSo(ctx, s, k) {
 toolbarEl.addEventListener('mousedown', (e) => e.stopPropagation()) // khoi ve khi bam nut
 toolbarEl.addEventListener('click', (e) => {
   const mau = e.target.closest('.mau')
-  if (mau) { chonMau(mau.dataset.color); return }
+  if (mau) { chonMau(mau.dataset.color); dongBangMau(); return }
+  if (e.target.closest('#mau-hien')) { if (bangMauMo()) dongBangMau(); else moBangMau(); return }
   const b = e.target.closest('button')
   if (!b) return
+  dongPopups() // bam bat cu nut nao khac = dong bang mau / menu but
   if (b.dataset.tool) {
     if (b.dataset.tool === 'storyboard') {
       toggleStoryboardMode()
@@ -1135,6 +1235,7 @@ toolbarEl.addEventListener('click', (e) => {
     if (b.dataset.tool === 'cuon') { chupCuon(); return }
     chonCongCu(b.dataset.tool)
   }  else if (b.id === 'undo') hoanTac()
+  else if (b.id === 'redo') lamLai()
   else if (b.id === 'huy') window.overlay.cancel()
   else if (b.id === 'xong') xong()
 })
@@ -1315,7 +1416,7 @@ function chotOGoChu() {
   const s = { type: 'text', x: +oGoChu.dataset.lx, y: +oGoChu.dataset.ly, text, color: oGoChu.style.color || curColor, size: CO_CHU }
   huyOGoChu()
   if (!text) return
-  shapes.push(s)
+  themNet(s)
   redraw()
 }
 /* Ve chu: dam, tren HOP NEN toi bo goc (anh Tien 14/09: "cần thêm nền chữ" —
@@ -1352,7 +1453,7 @@ function autoSelftest() {
      aioshot://raw (cat anh goc PNG + shape). File luu phai co diem cam. */
   if (cheDoTest.testShape) {
     vaoCheDoVe()
-    shapes.push({ type: 'rect', x1: 20, y1: 20, x2: w - 20, y2: h - 20, color: '#f86820' })
+    themNet({ type: 'rect', x1: 20, y1: 20, x2: w - 20, y2: h - 20, color: '#f86820' })
     redraw()
     window.overlay.log('[selftest] shape rect ' + w + 'x' + h)
     setTimeout(() => xong(false), 150)

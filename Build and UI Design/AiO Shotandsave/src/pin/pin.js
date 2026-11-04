@@ -27,6 +27,7 @@ window.pin.onData((data) => {
   img.src = data.dataUrl
   frame.style.width = data.w + 'px'
   frame.style.height = data.h + 'px'
+  vuaThanh()
   dip = { w: data.w, h: data.h }
   if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
   PLOG('data dip=' + data.w + 'x' + data.h + ' DPR=' + DPR + ' win=' + window.innerWidth + 'x' + window.innerHeight + ' blur=' + curBlurType)
@@ -95,17 +96,20 @@ img.addEventListener('dblclick', () => window.pin.copy())
 window.addEventListener('keydown', (e) => {
   PLOG('key ' + e.key + ' mode=' + mode + ' tool=' + tool)
   if (e.key === 'Escape') {
+    if (bangMauMo() || menuButMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc
     if (mode === 've') { thoatVe(); return } // dang ve: Esc chi bo ve, khong dong
     window.pin.close()
     return
   }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && mode === 've') {
-    hoanTac(); return
+    if (e.shiftKey) lamLai(); else hoanTac()
+    return
   }
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'y' && mode === 've') { e.preventDefault(); lamLai(); return }
   // Xoa shape dang chon (Delete / Backspace)
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShape && !oGoChu && mode === 've') {
     const idx = shapes.indexOf(selectedShape)
-    if (idx >= 0) shapes.splice(idx, 1)
+    if (idx >= 0) { shapes.splice(idx, 1); xoaRedo() }
     selectedShape = null
     redraw()
     return
@@ -161,6 +165,91 @@ let mode = 'view'          // 'view' | 've'
 let tool = 'rect'
 let curColor = '#f86820'   // mac dinh CAM (accent)
 let shapes = []            // { type, x1, y1, x2, y2, color } — toa do DIP cuc bo
+
+/* ── 12/11 BANG MAU XO + MENU BUT (nhom 7 / 8) + LAM LAI ─────────────────────────────────────────────
+   Thanh chi con MOT cham mau; bam thi xo bang 7 mau xuong duoi, gan mep duoi thi xo len tren. Nut but gop but + da quang:
+   re chuot vao xo menu doc 2 lua chon. Dong: chon xong / bam ra ngoai / Esc (Esc dong bang truoc, chua huy chup). */
+const mauHienEl = document.getElementById('mau-hien')
+const mauPopEl = document.getElementById('mau-pop')
+const butNhomEl = document.getElementById('but-nhom')
+const butChinhEl = document.getElementById('but-chinh')
+const butMenuEl = document.getElementById('but-menu')
+const nutRedoEl = document.getElementById('redo')
+/* 04/11 Anh ghim NHO: thanh xuong hang cao hon anh thi nut nam ngoai khung, khong bam duoc (do 160x100: thanh cao 220 px).
+   Thu nho ca thanh tung nac toi khi vua, san 0,5 (nut 20 px). Goi khi doi che do va khi co anh. */
+function vuaThanh() {
+  const caoKhung = frame.getBoundingClientRect().height - 12
+  for (const z of [1, 0.85, 0.7, 0.6, 0.5]) {
+    toolbarEl.style.zoom = z === 1 ? '' : String(z)
+    if (toolbarEl.getBoundingClientRect().height <= caoKhung) return
+  }
+}
+/* Pin: toolbar nam TRONG #frame (overflow: hidden) -> gioi han xo = khung anh, khong phai cua so. */
+const gioiHanXo = () => { const r = frame.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, left: r.left, right: r.right } }
+const LAM_LAI_DUOC = () => mode === 've'
+/* Dat pop canh nut: xuong duoi neu du cho, khong thi len tren (cho nao rong hon); keo ngang cho khong tran gioi han. */
+function xepXo(nut, pop) {
+  const gh = gioiHanXo(), gap = 10
+  pop.classList.remove('len', 'ngang'); pop.style.removeProperty('--dx')
+  const r = nut.getBoundingClientRect()
+  let cao = pop.offsetHeight
+  let duoi = gh.bottom - r.bottom, tren = r.top - gh.top
+  if (duoi < cao + gap && tren < cao + gap && pop.id === 'mau-pop') { // ca hai phia deu hep: bang mau xep ngang
+    pop.classList.add('ngang'); cao = pop.offsetHeight
+  }
+  const xuong = duoi >= cao + gap || (tren < cao + gap && duoi >= tren)
+  pop.classList.toggle('len', !xuong)
+  const p = pop.getBoundingClientRect()
+  let dx = 0
+  if (p.left < gh.left + 4) dx = gh.left + 4 - p.left
+  else if (p.right > gh.right - 4) dx = gh.right - 4 - p.right
+  if (dx) pop.style.setProperty('--dx', Math.round(dx) + 'px')
+}
+function bangMauMo() { return !mauPopEl.hidden }
+function menuButMo() { return !butMenuEl.hidden }
+function dongBangMau() { if (mauPopEl.hidden) return; mauPopEl.hidden = true; mauHienEl.setAttribute('aria-expanded', 'false') }
+function dongMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) butMenuEl.hidden = true }
+function dongPopups() { dongBangMau(); dongMenuBut() }
+function moBangMau() { dongMenuBut(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
+function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+let butDong = 0
+butNhomEl.addEventListener('mouseenter', moMenuBut)
+butNhomEl.addEventListener('mouseleave', () => { clearTimeout(butDong); butDong = setTimeout(dongMenuBut, 160) })
+// bam ra ngoai bang mau = dong (bat o pha capture: thanh cong cu chan noi bot mousedown)
+window.addEventListener('mousedown', (e) => {
+  if (bangMauMo() && !mauHienEl.parentNode.contains(e.target)) dongBangMau()
+  if (menuButMo() && !butNhomEl.contains(e.target)) dongMenuBut()
+}, true)
+
+/* Nut but hien icon + so phim + goi y cua loai dang dung (but = 7, da quang = 8). */
+const LOAI_BUT = { but: { so: '7', khoa: 'overlay.but' }, daquang: { so: '8', khoa: 'overlay.daquang' } }
+function capNhatNutBut(x) {
+  const l = LOAI_BUT[x]
+  if (l) {
+    butChinhEl.dataset.tool = x; butChinhEl.dataset.so = l.so
+    butChinhEl.setAttribute('data-i18n-title', l.khoa)
+    butChinhEl.title = window.i18n.t(l.khoa); butChinhEl.setAttribute('aria-label', butChinhEl.title)
+    butNhomEl.classList.toggle('dq', x === 'daquang')
+  }
+  butMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
+}
+
+/* LAM LAI: net bi hoan tac vao redoStack; ve net moi / doi vung = xoa hang doi. */
+let redoStack = []
+function capNhatRedo() { nutRedoEl.disabled = redoStack.length === 0 }
+function themNet(s) { shapes.push(s); redoStack.length = 0; capNhatRedo() }
+function xoaRedo() { redoStack.length = 0; capNhatRedo() }
+function lamLai() {
+  if (!LAM_LAI_DUOC()) return
+  if (oGoChu) return // dang go chu: bo qua (Ctrl+Z luc nay chi bo o go)
+  soDangDat = null
+  netDangVe = null
+  if (!redoStack.length) return
+  shapes.push(redoStack.pop())
+  danhSoLai() // so buoc luon lien nhau theo thu tu hien co
+  capNhatRedo()
+  redraw()
+}
 let veCtx = null
 let veStart = null
 let selectedShape = null
@@ -171,7 +260,10 @@ let shapeBanDau = null
 function vaoCheDoVe() {
   mode = 've'
   frame.classList.add('dang-ve')
+  vuaThanh()
   shapes = []
+  xoaRedo()
+  dongPopups()
   veEl.hidden = false
   // Canvas do phan giai THAT (device px) cho net, ve bang toa do DIP.
   veEl.width = Math.max(1, Math.round(dip.w * DPR))
@@ -191,7 +283,10 @@ function thoatVe() {
   huyOGoChu()
   mode = 'view'
   frame.classList.remove('dang-ve')
+  vuaThanh()
   shapes = []
+  xoaRedo()
+  dongPopups()
   veStart = null
   soDangDat = null
   netDangVe = null
@@ -213,11 +308,13 @@ function chonMau(mau) {
   toolbarEl.querySelectorAll('.mau').forEach((b) => {
     b.classList.toggle('chon', b.dataset.color.toLowerCase() === mau.toLowerCase())
   })
+  mauHienEl.firstElementChild.style.background = mau // cham mau tren thanh = mau dang chon
 }
 
 function chonCongCu(x) {
   if (x !== tool) chotOGoChu()
   tool = x
+  capNhatNutBut(x)
   if (tool !== 'select') {
     selectedShape = null
     veEl.style.cursor = 'crosshair'
@@ -364,14 +461,14 @@ veEl.addEventListener('mousedown', (e) => {
   if (tool === 'so') {
     // Bam = dong so ngay; con giu chuot thi keo chinh cho, tha ra la xong.
     soDangDat = { type: 'so', ...kepTamSo(lx, ly, dip.w, dip.h), color: curColor }
-    shapes.push(soDangDat)
+    themNet(soDangDat)
     redraw()
     return
   }
   if (tool === 'but' || tool === 'daquang') {
     // Giu chuot keo = ve net theo tay; giu Shift = duong THANG tu diem dau. Bam roi tha ngay = mot cham.
     netDangVe = { type: tool, pts: [lx, ly], color: curColor }
-    shapes.push(netDangVe)
+    themNet(netDangVe)
     redraw()
     return
   }
@@ -438,7 +535,7 @@ window.addEventListener('mouseup', (e) => {
   const s = { type: tool, x1: veStart.x, y1: veStart.y, x2: lx, y2: ly, color: curColor, blurType: curBlurType }
   veStart = null
   if (Math.abs(s.x2 - s.x1) < 3 && Math.abs(s.y2 - s.y1) < 3) { redraw(); return }
-  shapes.push(s)
+  themNet(s)
   redraw()
 })
 
@@ -446,7 +543,10 @@ function hoanTac() {
   if (oGoChu) { huyOGoChu(); return }
   soDangDat = null
   netDangVe = null
-  shapes.pop()
+  const bo = shapes.pop()
+  if (bo) redoStack.push(bo)
+  if (selectedShape && !shapes.includes(selectedShape)) selectedShape = null
+  capNhatRedo()
   redraw()
 }
 
@@ -710,11 +810,14 @@ function veMuiTen(ctx, x1, y1, x2, y2, canh) {
 toolbarEl.addEventListener('mousedown', (e) => e.stopPropagation())
 toolbarEl.addEventListener('click', (e) => {
   const mau = e.target.closest('.mau')
-  if (mau) { chonMau(mau.dataset.color); return }
+  if (mau) { chonMau(mau.dataset.color); dongBangMau(); return }
+  if (e.target.closest('#mau-hien')) { if (bangMauMo()) dongBangMau(); else moBangMau(); return }
   const b = e.target.closest('button')
   if (!b) return
+  dongPopups() // bam bat cu nut nao khac = dong bang mau / menu but
   if (b.dataset.tool) { if (mode !== 've') vaoCheDoVe(); chonCongCu(b.dataset.tool) } // 14/09: bam chuot cung vao ve duoc
   else if (b.id === 'undo') hoanTac()
+  else if (b.id === 'redo') lamLai()
   else if (b.id === 'huy') thoatVe()
   else if (b.id === 'xong') luuVe()
 })
@@ -785,7 +888,7 @@ function chotOGoChu() {
   const s = { type: 'text', x: +oGoChu.dataset.lx, y: +oGoChu.dataset.ly, text, color: oGoChu.style.color || curColor, size: CO_CHU }
   huyOGoChu()
   if (!text) return
-  shapes.push(s)
+  themNet(s)
   redraw()
 }
 /* Ve chu: dam, tren HOP NEN toi bo goc (anh Tien 14/09: "cần thêm nền chữ" —
