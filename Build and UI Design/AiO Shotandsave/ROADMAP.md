@@ -68,6 +68,8 @@ Da ngang hoac hon: khoanh vung, ve, lam mo, danh so, but, ghim, doc chu, chup cu
 Khuyen CHUA lam: link chia se + cloud (can may chu, trai gia ban mot lan; muc 9 bang 0) · AI giai thich / dich (#2, #3 o 0i, cho anh quyet ai tra tien).
 Thu tu Claude de xuat: dot sua (2) -> 3 -> 1 -> 5 -> 4. Ly do: 2 + 3 la thu dung moi lan chup; 1 la cho doi thu yeu nhat (CleanShot chi co tren Cloud) va dung dinh vi 07/10 "luu y tuong".
 
+**Anh xin "list 10 muc" (05/11), Claude gom bang tren + Canvas 0g + #6 o 0i, theo thu tu nen lam, anh CHUA chot:** 1 sua net da ve · 2 chup dung cua so + chup lai vung cu · 3 tim lai anh cu · 4 Canvas dung hang ngay (0g nhom A) · 5 hut mau + thuoc do · 6 lam dep anh · 7 che thong minh · 8 quay: micro, hien cu bam, tu zoom · 9 tu cap nhat · 10 goi viec nho: QR, hen gio, kinh lup, spotlight, chon icon tren thanh.
+
 ### 0i. GOP Y NGUOI DUNG THU 04/11/2026 (anh chuyen tiep, 10 y + 1 dong cua anh) — anh CHUA chot muc nao
 Doi chieu voi ma 0.10.1 ngay 04/11. "Mo cung Windows" da lam cung ngay (xem PROGRESS). Con lai:
 
