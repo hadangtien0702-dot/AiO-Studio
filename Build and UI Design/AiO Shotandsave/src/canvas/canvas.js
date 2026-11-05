@@ -480,27 +480,35 @@
     } else { V.x -= e.deltaX; V.y -= e.deltaY; datNhin() }
   }, { passive: false })
   /** Dua mot hinh chu nhat (toa do bang) vao giua man hinh, vua khit (toi da maxS). */
+  const heSoVua = (r, maxS) => Math.min(maxS, Math.max(.05, Math.min((innerWidth - 80) / Math.max(1, r.w), (innerHeight - 154) / Math.max(1, r.h))))
   function chieuVao(r, maxS) {
     const leX = 40, tren = 70, duoi = 84
-    V.s = Math.min(maxS, Math.max(.05, Math.min((innerWidth - leX * 2) / Math.max(1, r.w), (innerHeight - tren - duoi) / Math.max(1, r.h))))
+    V.s = heSoVua(r, maxS)
     V.x = (innerWidth - r.w * V.s) / 2 - r.x * V.s; V.y = tren + (innerHeight - tren - duoi - r.h * V.s) / 2 - r.y * V.s
     datNhin()
   }
   X.chieuVao = chieuVao
-  function vua() {
-    const tat = [{ x: 40, y: 60, w: 900, h: 180 }, ...X.khung.map((k) => ({ x: k.x, y: k.y - 36, w: k.w, h: k.h + 36 })), ...X.mucs, ...X.vat]
-    chieuVao(hopTong(tat), 1.25)
-  }
+  const tatCa = () => [{ x: 40, y: 60, w: 900, h: 180 }, ...X.khung.map((k) => ({ x: k.x, y: k.y - 36, w: k.w, h: k.h + 36 })), ...X.mucs, ...X.vat]
+  function vua() { chieuVao(hopTong(tatCa()), 1.25) }
   X.vua = vua
+  /* A5 (ROADMAP 0g, 05/11): thu vien lon thi "Vua man hinh" thu cac tam xuong vai chuc px (do 12/10: 200 anh = 30 px, khong doc duoc). Luc MO bang:
+     vua man hinh nho van doc duoc (>= DOC_DUOC) thi giu nhu cu; khong thi nhay toi tam moi nhat, phong 1,0. */
+  const DOC_DUOC = .6
+  const tamMoiNhat = () => { let t = null; for (const m of X.mucs) if (!t || m.mtime > t.mtime) t = m; return t }
+  X.tamMoiNhat = tamMoiNhat
+  X.moBang = () => {
+    const t = tamMoiNhat()
+    if (t && heSoVua(hopTong(tatCa()), 1.25) < DOC_DUOC) X.nhayToi('o:' + t.khoa, { sMin: 1, chon: false, r: t }); else vua()
+  }
   X.vuaChon = () => {
     const rs = [...X.sel].map(rectOf).filter(Boolean)
     if (rs.length) chieuVao(hopTong(rs), 1.6)
   }
   /** Nhay toi mot vat, chon no (dung cho Moi nhat va Tim). */
-  X.nhayToi = (key) => {
-    const r = rectOf(key); if (!r) return
-    X.chon([key])
-    V.s = Math.min(1.2, Math.max(V.s, .45))
+  X.nhayToi = (key, tuy) => {
+    const r = (tuy && tuy.r) || rectOf(key); if (!r) return
+    if (!tuy || tuy.chon !== false) X.chon([key])
+    V.s = Math.min(1.2, Math.max(V.s, (tuy && tuy.sMin) || .45))
     V.x = innerWidth / 2 - (r.x + r.w / 2) * V.s; V.y = innerHeight / 2 - (r.y + r.h / 2) * V.s
     datNhin()
     const e = elOf(key); if (e) { e.classList.remove('nhay'); void e.offsetWidth; e.classList.add('nhay') }
@@ -511,9 +519,8 @@
   el('moTM').addEventListener('click', () => cv.moThuMuc(null))
   el('chup').addEventListener('click', () => cv.chup())
   el('moiNhat').addEventListener('click', () => {
-    if (!X.mucs.length) return
-    let t = X.mucs[0]; for (const m of X.mucs) if (m.mtime > t.mtime) t = m
-    X.nhayToi('o:' + t.khoa)
+    const t = tamMoiNhat(); if (!t) return
+    X.nhayToi('o:' + t.khoa, { sMin: 1 })
   })
   async function taoKhungMoi() {
     if (X.dangCho) return
@@ -638,9 +645,9 @@
      luc do ghi chu / mui ten khong duoc ve (do 12/10: mo lai app thay 0 vat tren man trong khi trang thai co 12). */
   const napLanDau = () => cv.nap().then((r) => {
     if (!r || !r.tt) return
-    X.khung = r.tt.khung; X.mucs = r.tt.muc; X.vat = r.tt.vat || []; vua()   // dat goc nhin TRUOC khi ve de luot chia bai bay dung cho
+    X.khung = r.tt.khung; X.mucs = r.tt.muc; X.vat = r.tt.vat || []; X.moBang()   // dat goc nhin TRUOC khi ve de luot chia bai bay dung cho
     nhanKetQua(r)
-    vua()
+    X.moBang()
   })
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', napLanDau); else napLanDau()
 })()
