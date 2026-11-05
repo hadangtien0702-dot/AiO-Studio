@@ -22,6 +22,9 @@ const MOD = path.join(ROOT, 'src', 'overlay', 'chon-cua-so.js')
 /* ──────────────────────────────── DRIVER (chay trong Electron) ──────────────────────────────── */
 if (process.argv.includes('--driver')) {
   const { app, BrowserWindow, ipcMain } = require('electron')
+  // Luat 05/11: dau ra bi dong (EPIPE) khong duoc bung hop loi Electron len man anh Tien
+  process.stdout.on('error', () => {}); process.stderr.on('error', () => {})
+  process.on('uncaughtException', (e) => { try { console.error(e) } catch (x) {} app.exit(1) })
   const hong = (process.argv.find((a) => a.startsWith('--hong=')) || '').slice(7)
   const tam = fs.mkdtempSync(path.join(os.tmpdir(), 'aio-thu-cuaso-'))
   app.setPath('userData', tam)
@@ -46,9 +49,9 @@ if (process.argv.includes('--driver')) {
       win.loadFile(path.join(ROOT, 'src', 'overlay', 'index.html'))
       await xong
       await cho(120)
-      if (hong === 'laBam') await win.webContents.executeJavaScript('window.chonCuaSo.laBam = () => true')
-      if (hong === 'thuTu') await win.webContents.executeJavaScript('(() => { const g = window.chonCuaSo.cuaSoTaiDiem; window.chonCuaSo.cuaSoTaiDiem = (ds, p) => g(ds.slice().reverse(), p) })()')
-      if (hong === 'tat') await win.webContents.executeJavaScript('window.chonCuaSo.cuaSoTaiDiem = () => null')
+      if (hong === 'laBam') await win.webContents.executeJavaScript('window.chonCuaSo.laBam = () => true; 0')
+      if (hong === 'thuTu') await win.webContents.executeJavaScript('(() => { const g = window.chonCuaSo.cuaSoTaiDiem; window.chonCuaSo.cuaSoTaiDiem = (ds, p) => g(ds.slice().reverse(), p); return 0 })()')
+      if (hong === 'tat') await win.webContents.executeJavaScript('window.chonCuaSo.cuaSoTaiDiem = () => null; 0')
       ipc = []
     }
     const gui = async (d) => { win.webContents.send('overlay:cua-so', d); await cho(80) }
@@ -89,7 +92,7 @@ if (process.argv.includes('--driver')) {
     await ev('mousemove', 1100, 650)
     g = await doiGuong()
     kiem('B7 C chong len B, nua nam ngoai man: C thang (z-order) va vien CAT theo man (1000..1280 = 278 rong)', g.hien && g.l === 1000 && g.w === 278 && g.size === '900 × 600', JSON.stringify(g))
-    await ev('mousemove', 1250, 700)
+    await ev('mousemove', 1270, 20)
     kiem('B8 re ra ngoai moi cua so: vien tat', (await doiGuong()).hien === false)
 
     ipc = []; await bam(250, 250)
@@ -107,9 +110,9 @@ if (process.argv.includes('--driver')) {
     kiem('B13 keo ngan 7 DIP (qua nguong 4) van la KEO', loai('chon-cua-so').length === 0 && loai('drag-end').length === 1, loai().join(','))
     ipc = []; await ev('mousedown', 250, 250); await ev('mousemove', 300, 300); await ev('mousemove', 250, 250); await ev('mouseup', 250, 250); await cho(60)
     kiem('B14 keo ra xa roi quay ve diem dau: van la KEO, khong bien thanh bam', loai('chon-cua-so').length === 0 && loai('drag-end').length === 1, loai().join(','))
-    ipc = []; await bam(1250, 700)
+    ipc = []; await bam(1270, 20)
     kiem('B15 bam ra ngoai moi cua so: duong cu (drag-end)', loai('chon-cua-so').length === 0 && loai('drag-end').length === 1, loai().join(','))
-    ipc = []; await ev('mousedown', 1250, 700); await ev('mousemove', 1200, 650); await ev('mousemove', 250, 250); await ev('mouseup', 250, 250); await cho(60)
+    ipc = []; await ev('mousedown', 1270, 20); await ev('mousemove', 1200, 650); await ev('mousemove', 250, 250); await ev('mouseup', 250, 250); await cho(60)
     kiem('B16 bat dau keo o NGOAI cua so roi tha tren cua so: la keo, khong chon cua so', loai('chon-cua-so').length === 0 && loai('drag-end').length === 1, loai().join(','))
 
     /* man phu o toa do AM (nam tren man chinh), 100%: local (100,100) = phys (-2460,-1340) */
@@ -299,14 +302,16 @@ function chayDriver(hong) {
     const dat = (ten, ok, ct) => { console.log('  ' + (ok ? 'DAT   ' : 'TRUOT ') + ten + (ct ? '  (' + ct + ')' : '')); if (!ok) tongTruot++ }
     dat('C1 lay duoc it nhat 1 cua so, moi cua so >= 20 px', ds.length >= 1 && ds.every((c) => c.w >= 20 && c.h >= 20))
     dat('C2 thoi gian trung vi duoi 1500 ms (chay nen, khong chan viec hien overlay)', trungVi < 1500, trungVi + ' ms')
-    // doi chung loc cua so cua chinh app: dung PID cua mot tien trinh dang co cua so -> so cua so phai GIAM
-    const pidR = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', '(Get-Process | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1).Id'], { encoding: 'utf8', windowsHide: true })
-    const pid = parseInt(String(pidR.stdout).trim(), 10)
-    if (pid > 0) {
-      const co = M.docDanhSach((await lay.layDanhSach({ pid: 0 })).text).length
+    // doi chung loc cua so cua chinh app: tim mot PID ma bo qua no lam danh sach NGAN di (PID co cua so that trong danh sach)
+    const pidR = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', '(Get-Process | Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle } | Select-Object -First 12).Id -join ","'], { encoding: 'utf8', windowsHide: true })
+    const pids = String(pidR.stdout).trim().split(',').map((x) => parseInt(x, 10)).filter((x) => x > 0)
+    const co = M.docDanhSach((await lay.layDanhSach({ pid: 0 })).text).length
+    let thay = null
+    for (const pid of pids) {
       const loc = M.docDanhSach((await lay.layDanhSach({ pid })).text).length
-      dat('C3 doi chung: bo qua PID ' + pid + ' (tien trinh dang co cua so) thi danh sach ngan di', loc < co, co + ' -> ' + loc)
-    } else console.log('  (C3 bo qua: khong tim duoc tien trinh co cua so)')
+      if (loc < co) { thay = pid + ': ' + co + ' -> ' + loc; break }
+    }
+    dat('C3 doi chung: bo qua PID cua mot tien trinh dang co cua so thi danh sach ngan di', !!thay, thay || ('khong PID nao trong ' + pids.length + ' lam danh sach doi (' + co + ')'))
   } else {
     console.log('  chua do tren ' + process.platform + ' (script osascript chua co may Mac de chay thu)')
   }
