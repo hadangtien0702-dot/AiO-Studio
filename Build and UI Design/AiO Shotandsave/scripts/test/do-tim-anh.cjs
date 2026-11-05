@@ -377,7 +377,7 @@ async function chinh() {
   console.log('\n' + kq.join('\n'))
   console.log(dat ? `\nKet qua: TAT CA DAT (${kq.length}/${kq.length})` : '\nKet qua: CO MUC TRUOT')
   ocr.tatHost()
-  fs.rmSync(TAM, { recursive: true, force: true })
+  try { fs.rmSync(TAM, { recursive: true, force: true, maxRetries: 8, retryDelay: 250 }) } catch (e) { /* file con bi giu trong thu muc tam, khong phai ket qua bai */ }
   app.exit(dat ? 0 : 1)
 }
 

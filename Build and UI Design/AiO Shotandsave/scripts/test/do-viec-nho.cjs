@@ -157,9 +157,9 @@ async function phanAnNut() {
   const ov = await moOverlay(1280, 800)
   const o = (s) => js(ov, s)
   const hien = (k) => o(`(() => { const el = PT_NUT['${k}'](); const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 })()`)
-  const tatCa = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon', 'storyboard', 'quay']
+  const tatCa = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon', 'storyboard', 'quay', 'do']
   const w0 = await o('toolbarEl.getBoundingClientRect().width')
-  kiem('An nut: mac dinh hien du ca 10 nut, thanh khong rong hon 731 px', (await Promise.all(tatCa.map(hien))).every(Boolean) && w0 <= 731.5, 'rong ' + w0.toFixed(1) + ' px')
+  kiem('An nut: mac dinh hien du ca 11 nut, thanh khong rong hon 774 px (731 + nut Hut mau)', (await Promise.all(tatCa.map(hien))).every(Boolean) && w0 <= 774, 'rong ' + w0.toFixed(1) + ' px')
   // chong chong len nhau: nut chinh va menu xo khong lam thanh rong them (menu nam ngoai luong)
   kiem('An nut: 2 nhom xo moi nam TRONG thanh (nut chinh 40x40, menu an luc dau)', await o(`(() => ['blur', 'ocr'].every((k) => { const n = document.getElementById(k + '-chinh').getBoundingClientRect(); return Math.round(n.width) === 40 && Math.round(n.height) === 40 && document.getElementById(k + '-menu').hidden }))()`))
 
@@ -168,7 +168,7 @@ async function phanAnNut() {
   for (const k of tatCa) sau[k] = await hien(k)
   const w1 = await o('toolbarEl.getBoundingClientRect().width')
   kiem('An nut: an ocr / cuon / quay -> 3 nut do bien mat, 7 nut con lai van hien', !sau.ocr && !sau.cuon && !sau.quay && ['rect', 'arrow', 'text', 'blur', 'so', 'but', 'storyboard'].every((k) => sau[k]), JSON.stringify(sau))
-  kiem('An nut: thanh THU HEP lai (khong bao gio rong hon luc dau)', w1 < w0 - 100 && w1 <= 731.5, w0.toFixed(0) + ' -> ' + w1.toFixed(0) + ' px')
+  kiem('An nut: thanh THU HEP lai (khong bao gio rong hon luc dau)', w1 < w0 - 100 && w1 <= 774, w0.toFixed(0) + ' -> ' + w1.toFixed(0) + ' px')
   // phim tat van chay du nut bi an
   const n0 = ghiNhan.confirm.length
   await o('__t.phim("9", "Digit9")')
@@ -190,7 +190,7 @@ async function phanAnNut() {
   // an het: vach ngan khong de thua
   await capCauHinh(ov, { anNut: tatCa })
   const chia = await o(`({ v: document.querySelector('.chia-v').hidden, chu: document.querySelector('.chia-chu').hidden, thanhRong: toolbarEl.getBoundingClientRect().width })`)
-  kiem('An nut: an het 10 nut -> 2 vach ngan thua cung an, thanh con V + mau + hoan tac + huy + xong', chia.v === true && chia.chu === true && chia.thanhRong < 330, JSON.stringify(chia))
+  kiem('An nut: an het 11 nut -> 2 vach ngan thua cung an, thanh con V + mau + hoan tac + huy + xong', chia.v === true && chia.chu === true && chia.thanhRong < 330, JSON.stringify(chia))
   // chi con nhom S R: van con vach sau V, khong con vach giua nhom
   await capCauHinh(ov, { anNut: tatCa.filter((k) => k !== 'quay') })
   const chia2 = await o(`({ v: document.querySelector('.chia-v').hidden, chu: document.querySelector('.chia-chu').hidden })`)
@@ -241,7 +241,7 @@ async function phanCaiDat() {
   const w = await mo('vi')
   const o = (s) => js(w, s)
   const t0 = await o(`(() => { const ch = [...document.querySelectorAll('#thanh-nut .nut-chip')]; return { n: ch.length, tat: ch.filter((b) => !b.classList.contains('chon')).map((b) => b.dataset.k).sort(), ten: ch.map((b) => b.textContent.trim()).every(Boolean), kl: document.querySelector('#kinh-lup-bat .chon-nut.chon').dataset.v } })()`)
-  kiem('Cai dat: nhom Thanh cong cu co 10 nut chon, hien dung trang thai luu (ocr + quay tat), kinh lup Tat', t0.n === 10 && t0.tat.join() === 'ocr,quay' && t0.ten && t0.kl === '0', JSON.stringify(t0))
+  kiem('Cai dat: nhom Thanh cong cu co 11 nut chon, hien dung trang thai luu (ocr + quay tat), kinh lup Tat', t0.n === 11 && t0.tat.join() === 'ocr,quay' && t0.ten && t0.kl === '0', JSON.stringify(t0))
   await o(`document.querySelector('#thanh-nut .nut-chip[data-k="rect"]').click()`)
   await cho(120)
   kiem('Cai dat: bam nut Khung -> luu danh sach an gom ca Khung (ocr, quay, rect)', ghiNhan.anNutLuu && [...ghiNhan.anNutLuu].sort().join() === 'ocr,quay,rect', JSON.stringify(ghiNhan.anNutLuu))
@@ -256,7 +256,7 @@ async function phanCaiDat() {
   w.destroy()
   const we = await mo('en')
   const ten = await js(we, `[...document.querySelectorAll('#thanh-nut .nut-chip span'), document.querySelector('[data-i18n="set.nhom.thanh"]'), document.querySelector('[data-i18n="set.kinhLup.nhan"]')].map((e) => e.textContent.trim())`)
-  kiem('Cai dat: ban EN co du chu (khong con chu tieng Viet co dau)', ten.length === 12 && ten.every((s) => s && !/[\u00C0-\u1EF9]/.test(s)), ten.join(' | '))
+  kiem('Cai dat: ban EN co du chu (khong con chu tieng Viet co dau)', ten.length === 13 && ten.every((s) => s && !/[\u00C0-\u1EF9]/.test(s)), ten.join(' | '))
   we.destroy()
 }
 
@@ -407,7 +407,7 @@ async function phanLamNoi() {
   const menu = await o(`(() => { const m = document.getElementById('blur-menu'); const r = __t.hcn(m); return { hidden: m.hidden, soMuc: m.querySelectorAll('.muc-xo').length, trongMan: r.l >= 0 && r.r <= innerWidth && r.b <= innerHeight } })()`)
   await o('document.querySelector("#blur-menu .muc-xo[data-tool=\\"blur\\"]").click()')
   const sauMenu = await o(`({ tool, dt: document.getElementById('blur-chinh').dataset.tool, so: document.getElementById('blur-chinh').dataset.so, menuAn: document.getElementById('blur-menu').hidden })`)
-  kiem('Lam noi vung: re chuot vao nut Lam mo xo menu 2 muc, chon Lam mo -> nut doi lai icon + so 4, menu dong', !menu.hidden && menu.soMuc === 2 && menu.trongMan && sauMenu.tool === 'blur' && sauMenu.dt === 'blur' && sauMenu.so === '4' && sauMenu.menuAn, JSON.stringify([menu, sauMenu]))
+  kiem('Lam noi vung: re chuot vao nut Lam mo xo menu 3 muc, chon Lam mo -> nut doi lai icon + so 4, menu dong', !menu.hidden && menu.soMuc === 3 && menu.trongMan && sauMenu.tool === 'blur' && sauMenu.dt === 'blur' && sauMenu.so === '4' && sauMenu.menuAn, JSON.stringify([menu, sauMenu]))
   ov.destroy()
 }
 
@@ -471,7 +471,7 @@ async function phanQR() {
   const menu = await q(`(() => { const m = document.getElementById('ocr-menu'); const r = __t.hcn(m); return { hidden: m.hidden, soMuc: m.querySelectorAll('.muc-xo').length, trongMan: r.l >= 0 && r.r <= innerWidth && r.b <= innerHeight, rongThanh: toolbarEl.getBoundingClientRect().width } })()`)
   await q('__qr.loi = false; __qr.tra = [{ rawValue: "abc" }]; document.querySelector("#ocr-menu .muc-xo[data-tool=\\"qr\\"]").click()'); await cho(250)
   const sauMenu = await q(`({ bang: !document.getElementById('ocr-bang').hidden, menuAn: document.getElementById('ocr-menu').hidden, dong: [...document.querySelectorAll('#ocr-ds .dong')].map((d) => d.textContent).join() })`)
-  kiem('Ma QR: re chuot vao nut Doc chu xo menu 2 muc (Doc chu / Doc ma QR), bam muc QR mo bang, menu dong', !menu.hidden && menu.soMuc === 2 && menu.trongMan && menu.rongThanh <= 731.5 && sauMenu.bang && sauMenu.menuAn && sauMenu.dong === 'abc', JSON.stringify([menu, sauMenu]))
+  kiem('Ma QR: re chuot vao nut Doc chu xo menu 2 muc (Doc chu / Doc ma QR), bam muc QR mo bang, menu dong', !menu.hidden && menu.soMuc === 2 && menu.trongMan && menu.rongThanh <= 774 && sauMenu.bang && sauMenu.menuAn && sauMenu.dong === 'abc', JSON.stringify([menu, sauMenu]))
   ov2.destroy()
 }
 
@@ -559,7 +559,7 @@ async function phanHenGio() {
   const khoa = ['tray.henGio', 'tray.henGiay', 'tray.huyHen']
   const coChu = ['vi', 'en'].every((l) => khoa.every((k) => i18n.t(l, k) && i18n.t(l, k) !== k))
   kiem('Hen gio: menu khay co muc Hen gio chup > 3 / 5 / 10 giay + Huy hen gio; chu VI + EN day du, khong gach dai', /submenu: \[3, 5, 10\]\.map/.test(mainSrc) && /henGio\.huy\(\)/.test(mainSrc) && coChu && ['vi', 'en'].every((l) => khoa.every((k) => !/\u2014/.test(i18n.t(l, k)))), '')
-  kiem('Hen gio: bam phim tat chup luc dang hen -> bo hen (startCapture huy hen truoc)', /overlayWins\.length\) return[^\n]*\n\s*henGio\.huy\(\)/.test(mainSrc))
+  kiem('Hen gio: bam phim tat chup luc dang hen -> bo hen (startCapture huy hen truoc)', /chupChac\.overlayKet[\s\S]{0,400}?closeOverlay\(\)\s*\}\s*henGio\.huy\(\)/.test(mainSrc))
 }
 
 app.whenReady().then(async () => {

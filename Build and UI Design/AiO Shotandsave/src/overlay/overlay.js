@@ -164,12 +164,13 @@ const PT_NUT = {
   cuon: () => toolbarEl.querySelector('.cong-cu[data-tool="cuon"]'),
   storyboard: () => toolbarEl.querySelector('.cong-cu[data-tool="storyboard"]'),
   quay: () => toolbarEl.querySelector('.cong-cu[data-tool="quay"]'),
+  do: () => doNhomEl, // nut gop Hut mau + Thuoc do
   blur: () => blurNhomEl,
   ocr: () => document.getElementById('ocr-nhom'),
   but: () => butNhomEl,
 }
 const NHOM_SO = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon']
-const NHOM_SR = ['storyboard', 'quay']
+const NHOM_SR = ['storyboard', 'quay', 'do']
 let anNutHienTai = []
 function capNhatAnNut(ds) {
   anNutHienTai = Array.isArray(ds) ? ds.slice() : []

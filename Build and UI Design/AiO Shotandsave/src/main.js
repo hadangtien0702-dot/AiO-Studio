@@ -828,7 +828,7 @@ function kieuLamMo(v) { return v === 'blur' || v === 'kin' ? v : 'mosaic' }
 
 /* 05/11: nut nguoi dung chon AN tren thanh cong cu man chup (phim tat van chay). Chi nhung nut o danh sach nay moi an duoc;
    V, mau, hoan tac / lam lai, huy, xong luon hien. Gia tri la bi bo, trung lap bi gop. */
-const NUT_AN_DUOC = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon', 'storyboard', 'quay']
+const NUT_AN_DUOC = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon', 'storyboard', 'quay', 'do']
 function anNutHopLe(v) { return Array.isArray(v) ? NUT_AN_DUOC.filter((k) => v.includes(k)) : [] }
 /* Cau hinh gui cho man chup moi lan mo (overlay:init) va khi doi trong Cai dat (overlay:update-config). */
 function cauHinhOverlay() {
