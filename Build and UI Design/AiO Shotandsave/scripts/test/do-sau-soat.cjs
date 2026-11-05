@@ -31,6 +31,7 @@ if (!process.versions.electron) {
     kiem('B3 hai so dien thoai canh nhau: che ca hai', ra('0912345678 0987654321') === 'dienthoai:0912345678 | dienthoai:0987654321', ra('0912345678 0987654321'))
     kiem('B3 hai so viet tach cum: che ca hai', ra('0912 345 678 0987 654 321') === 'dienthoai:0912 345 678 | dienthoai:0987 654 321', ra('0912 345 678 0987 654 321'))
     kiem('Giu nguyen: the + dien thoai tren mot dong van che ca hai', ra('4111 1111 1111 1111 0912345678') === 'the:4111 1111 1111 1111 | dienthoai:0912345678', ra('4111 1111 1111 1111 0912345678'))
+    kiem('Giu nguyen: 84 khong dau + van nhan la dau so', ra('84 912 345 678 0912345678') === 'dienthoai:84 912 345 678 | dienthoai:0912345678', ra('84 912 345 678 0912345678'))
     kiem('Giu nguyen: hang so thu tu "01 02 03 04 05 06 07" khong bi che nham', ra('01 02 03 04 05 06 07') === '', ra('01 02 03 04 05 06 07'))
     kiem('Giu nguyen: ma don 8 so khong bi che, ngay khong bi che', ra('don 12345678 90123456') === '' && ra('05/11/2026') === '', ra('don 12345678 90123456'))
 
@@ -203,6 +204,15 @@ app.whenReady().then(async () => {
         const giu = xacNhan; xacNhan = null
         await d2.o(NEN_XAM); await cho(500)
         const ok = !giu && !xacNhan; xacNhan = giu; w2.destroy(); return ok
+      })())
+      kiem('A1 chon lai khi anh goc dang nap: khong gui vung cu mat net Che', await (async () => {
+        const w2 = await moManChup(), d2 = dieuKhien(w2)
+        await d2.phim('1'); await cho(120); await d2.keo([200, 200], [320, 280])
+        await d2.o(`layers = [{ x: 0, y: 0, px: 0, py: 0, pw: 1200, ph: 800, key: 'k' }]; true`)
+        const giu = xacNhan; xacNhan = null
+        await d2.o('document.getElementById("xong").click(); chonLaiTuDau({ clientX: 10, clientY: 10, button: 0, preventDefault() {} }); true').catch(() => {})
+        await cho(600)
+        const ok = !xacNhan; xacNhan = giu; w2.destroy(); return ok
       })())
       kiem('A1 anh nen ve trong luc cho: anh luu co DU nen + net ve', diem && diem[0] === 40 && diem[1] === 90 && diem[2] === 200, 'diem nen ' + diem)
       w.destroy()

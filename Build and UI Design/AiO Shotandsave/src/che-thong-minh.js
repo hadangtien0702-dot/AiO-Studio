@@ -77,8 +77,8 @@
       const doan = str.slice(s, e)
       while ((c = re.exec(doan))) cum.push({ s: s + c.index, e: s + c.index + c[0].length })
       for (let i = 0; i < cum.length;) {
-        // cum dau phai dang dau so (>= 3 chu so, hoac +): "01 02 03 04 05 06" la so thu tu, khong phai dien thoai
-        if (!/^\+|\d{3}/.test(str.slice(cum[i].s, cum[i].e))) { i++; continue }
+        // cum dau phai dang dau so (>= 3 chu so, + hoac 84): "01 02 03 04 05 06" la so thu tu, khong phai dien thoai
+        if (!/^\+|^84$|\d{3}/.test(str.slice(cum[i].s, cum[i].e))) { i++; continue }
         let het = 0
         for (let j = i + 1; j <= Math.min(cum.length, i + 6); j++) {
           const loai = phanLoaiSo(str.slice(cum[i].s, cum[j - 1].e))

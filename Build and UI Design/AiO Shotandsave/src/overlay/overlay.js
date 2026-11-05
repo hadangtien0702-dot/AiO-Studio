@@ -262,7 +262,7 @@ let daVuotNguong = false    // da keo qua nguong bam -> la KEO, khong con la BAM
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
 let cheDoTest = {}
 window.overlay.onInit((data) => {
-  clearTimeout(choNenHen); choNenHen = null; hetChoNen = false // man chup dung lai cho luot moi: bo viec cho cua luot truoc
+  clearTimeout(choNenHen); choNenHen = null; hetChoNen = false; theXong++ // man chup dung lai cho luot moi: bo viec cho cua luot truoc
   if (data && data.origin) origin = data.origin
   if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
   if (data) { cheDoTest = data; ganCauHinh(data) }
@@ -1024,7 +1024,7 @@ function batDauVe(e) {
 
 /* Bo vung chon + shape dang co, quay ve che do quet vung — bat dau keo ngay. */
 function chonLaiTuDau(e) {
-  clearTimeout(choNenHen); choNenHen = null; hetChoNen = false // dang cho nen ma chon lai: khong duoc tu luu khung cu
+  clearTimeout(choNenHen); choNenHen = null; hetChoNen = false; theXong++ // dang cho nen ma chon lai: khong duoc tu luu khung cu
   huyOGoChu()
   doDon()
   selectedShape = null
@@ -1516,6 +1516,7 @@ function napAnh(url) {
 
 /* ── Xong: ghep anh + shape roi gui ───────────────────────────────────── */
 let choNenHen = null, hetChoNen = false
+let theXong = 0 // tang khi bo luot Xong dang do (chon lai / luot moi): anh goc ve muon khong duoc gui, net Che da bi xoa khoi canvas
 function coNenGhep() {
   const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
   return !!(own && own.key) || !!(frozenImg && frozenImg.complete && frozenImg.naturalWidth)
@@ -1554,13 +1555,16 @@ function xong(copy) {
   out.width = Math.max(1, Math.round(curRect.w * DPR))
   out.height = Math.max(1, Math.round(curRect.h * DPR))
   const ctx = out.getContext('2d')
+  const the = theXong
   const ghepVaGui = (nen, nguon) => {
+    if (the !== theXong) return
     if (nen) ctx.drawImage(nen, 0, 0, out.width, out.height)
     ctx.drawImage(veEl, 0, 0) // shape da o device res
     window.overlay.log('xong shape nen=' + nguon + ' ' + out.width + 'x' + out.height)
     window.overlay.confirm({ dataUrl: out.toDataURL('image/png'), copy: !!copy })
   }
   const roiVeJpeg = (ly) => {
+    if (the !== theXong) return
     try {
       if (frozenImg && frozenImg.complete && frozenImg.naturalWidth) {
         ctx.drawImage(frozenImg,
