@@ -88,6 +88,7 @@ window.addEventListener('mouseup', () => {
 
 /* --- Nut --- */
 btnCopy.addEventListener('click', () => window.pin.copy())
+document.getElementById('lam-dep').addEventListener('click', () => window.pin.lamDep())
 btnClose.addEventListener('click', () => window.pin.close())
 img.addEventListener('dblclick', () => window.pin.copy())
 

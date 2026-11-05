@@ -1475,6 +1475,18 @@ ipcMain.on('pin:save-edit', (e, dataUrl) => {
   }
 })
 
+/* 05/11: LAM DEP ANH — cua so rieng (src/lamdep/), luu FILE MOI canh anh goc, khong ghi de. */
+const lamDep = require('./lamdep-main').khoiTao({
+  ipcMain, BrowserWindow, nativeImage, clipboard, screen,
+  thuMucAnh: () => kho.baoDamThuMuc(kho.thuMucAnh()),
+  ghiLog: (m) => ghiLog(m),
+  icon: path.join(__dirname, '..', 'assets', 'app.ico'),
+})
+ipcMain.on('pin:lam-dep', (e) => {
+  const rec = pins.get(e.sender.id)
+  if (rec && rec.image) lamDep.mo({ image: rec.image, filePath: rec.filePath })
+})
+
 ipcMain.on('pin:opacity', (e, value) => {
   const w = BrowserWindow.fromWebContents(e.sender)
   if (w) w.setOpacity(Math.max(0.2, Math.min(1, value)))
