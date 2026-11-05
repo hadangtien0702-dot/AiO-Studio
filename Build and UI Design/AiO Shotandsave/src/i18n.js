@@ -6,6 +6,7 @@
 const DICH = {
   vi: {
     // App
+    'app.chupLaiKhongCo': 'Chưa có vùng nào để chụp lại (hoặc vùng cũ nằm ngoài màn hình hiện tại). Hãy chụp một lần trước.',
     'app.phimBiGiu': 'Phím tắt chụp {phim} đang bị ứng dụng khác giữ — bấm sẽ không ăn. Mở Cài đặt để đổi phím.',
     'app.khongLuuDuoc': 'Không lưu được ảnh vào {thuMuc} (ổ đầy hoặc mất quyền). Ảnh đã chép vào clipboard — mở Cài đặt để đổi thư mục lưu.',
     'khay.khongThemDuoc': 'Ảnh đã lưu vào thư mục nhưng chưa hiện được trong khay. Mở lại app để thấy ảnh.',
@@ -23,6 +24,7 @@ const DICH = {
     'app.khongQuayDuoc': 'Không quay được video vùng này. Thử lại sau vài giây hoặc khởi động lại ứng dụng.',
     // Tray
     'tray.chup': 'Chụp màn hình',
+    'tray.chupLai': 'Chụp lại vùng lần trước',
     'tray.khay': 'Mở khay ảnh',
     'tray.storyboard': 'Mở khay Storyboard',
     'tray.timAnh': 'Tìm lại ảnh cũ',
@@ -102,6 +104,7 @@ const DICH = {
     'tray.thoat': 'Thoát',
     // Overlay
     'overlay.hint': 'Kéo để chọn vùng',
+    'overlay.hintCuaSo': 'Bấm để chọn cả cửa sổ',
     'overlay.esc': 'Esc',
     'overlay.huy': 'để huỷ',
     'overlay.select': 'Chọn & di chuyển nét vẽ (phím V)',
@@ -334,6 +337,7 @@ const DICH = {
     'cn.baoMoi': 'Có bản mới {v}. Mở menu ở khay hệ thống hoặc Cài đặt để tải về.',
   },
   en: {
+    'app.chupLaiKhongCo': 'There is no previous area to capture again (or it lies outside the current screens). Take one capture first.',
     'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
     'app.khongLuuDuoc': 'Could not save the image to {thuMuc} (disk full or no permission). It was copied to the clipboard — open Settings to change the save folder.',
     'khay.khongThemDuoc': 'The image was saved to your folder but could not be shown in the tray. Reopen the app to see it.',
@@ -348,6 +352,7 @@ const DICH = {
     'khay.anhKhongCon': 'This image is no longer in the image folder (deleted or moved), so it was removed from the tray.',
     'app.khongQuayDuoc': 'Could not record this area. Try again in a few seconds or restart the app.',
     'tray.chup': 'Take screenshot',
+    'tray.chupLai': 'Capture last area again',
     'tray.khay': 'Open shelf',
     'tray.storyboard': 'Open Storyboard shelf',
     'tray.timAnh': 'Find past shots',
@@ -425,6 +430,7 @@ const DICH = {
     'tray.caiDat': 'Settings…',
     'tray.thoat': 'Quit',
     'overlay.hint': 'Drag to select',
+    'overlay.hintCuaSo': 'Click to pick a window',
     'overlay.esc': 'Esc',
     'overlay.huy': 'to cancel',
     'overlay.select': 'Select & move shape (key V)',
