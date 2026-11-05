@@ -105,21 +105,94 @@ function dongBangMau() { if (mauPopEl.hidden) return; mauPopEl.hidden = true; ma
 function dongMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) butMenuEl.hidden = true }
 function menuDoMo() { return !doMenuEl.hidden }
 function dongMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) doMenuEl.hidden = true }
-function dongPopups() { dongBangMau(); dongMenuBut(); dongMenuDo(); if (cheMenu) cheMenu.dong() }
-function moBangMau() { dongMenuBut(); dongMenuDo(); if (cheMenu) cheMenu.dong(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
-function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); dongMenuDo(); if (cheMenu) cheMenu.dong(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
-function moMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) return; dongBangMau(); dongMenuBut(); if (cheMenu) cheMenu.dong(); doMenuEl.hidden = false; xepXo(doChinhEl, doMenuEl) }
+function dongPopups() { dongBangMau(); dongMenuBut(); dongMenuDo(); dongMenuPhu() }
+function moBangMau() { dongMenuBut(); dongMenuDo(); dongMenuPhu(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
+function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); dongMenuDo(); dongMenuPhu(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+function moMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) return; dongBangMau(); dongMenuBut(); dongMenuPhu(); doMenuEl.hidden = false; xepXo(doChinhEl, doMenuEl) }
 let butDong = 0
 let doDong = 0
 doNhomEl.addEventListener('mouseenter', moMenuDo)
 doNhomEl.addEventListener('mouseleave', () => { clearTimeout(doDong); doDong = setTimeout(dongMenuDo, 160) })
 butNhomEl.addEventListener('mouseenter', moMenuBut)
 butNhomEl.addEventListener('mouseleave', () => { clearTimeout(butDong); butDong = setTimeout(dongMenuBut, 160) })
+/* 05/11 HAI NHOM XO MOI cung khuon voi nut but: Lam mo (4) / Lam noi vung (0) va Doc chu (5) / Doc ma QR (Q).
+   Re chuot vao nut: tre 140 ms roi xo menu (tranh nhay menu khi chuot lia qua thanh); roi ra: dong sau 160 ms.
+   Nut chinh cua nhom Lam mo hien icon + so phim + goi y cua loai dang dung (giong nut but). Menu Doc chu CHI mo duoc khi
+   Chromium cua may co BarcodeDetector (CO_QR) — khong thi nut Doc chu chay nhu cu. */
+const NHOM_PHU = [
+  { nhom: document.getElementById('blur-nhom'), chinh: document.getElementById('blur-chinh'), menu: document.getElementById('blur-menu'), mo: 0, dong: 0, duoc: () => true },
+  { nhom: document.getElementById('ocr-nhom'), chinh: document.getElementById('ocr-chinh'), menu: document.getElementById('ocr-menu'), mo: 0, dong: 0, duoc: () => CO_QR },
+]
+let CO_QR = false
+const menuPhuMo = () => NHOM_PHU.some((n) => !n.menu.hidden)
+function dongNhomPhu(n) { clearTimeout(n.mo); clearTimeout(n.dong); if (!n.menu.hidden) n.menu.hidden = true }
+function dongMenuPhu() { for (const n of NHOM_PHU) dongNhomPhu(n) }
+function moNhomPhu(n) {
+  clearTimeout(n.dong)
+  if (!n.menu.hidden || !n.duoc()) return
+  dongBangMau(); dongMenuBut(); dongMenuDo()
+  for (const k of NHOM_PHU) if (k !== n) dongNhomPhu(k)
+  n.menu.hidden = false
+  xepXo(n.chinh, n.menu)
+}
+for (const n of NHOM_PHU) {
+  n.nhom.addEventListener('mouseenter', () => { clearTimeout(n.dong); clearTimeout(n.mo); n.mo = setTimeout(() => moNhomPhu(n), 140) })
+  n.nhom.addEventListener('mouseleave', () => { clearTimeout(n.mo); clearTimeout(n.dong); n.dong = setTimeout(() => dongNhomPhu(n), 160) })
+}
+const blurNhomEl = NHOM_PHU[0].nhom, blurChinhEl = NHOM_PHU[0].chinh, blurMenuEl = NHOM_PHU[0].menu
+const LOAI_BLUR = { blur: { so: '4', khoa: 'overlay.blur' }, spot: { so: '0', khoa: 'overlay.spot' } }
+function capNhatNutBlur(x) {
+  const l = LOAI_BLUR[x]
+  if (l) {
+    blurChinhEl.dataset.tool = x; blurChinhEl.dataset.so = l.so
+    blurChinhEl.setAttribute('data-i18n-title', l.khoa)
+    blurChinhEl.title = window.i18n.t(l.khoa); blurChinhEl.setAttribute('aria-label', blurChinhEl.title)
+    blurNhomEl.classList.toggle('sp', x === 'spot')
+  }
+  blurMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
+}
+if (typeof BarcodeDetector !== 'undefined') {
+  try { BarcodeDetector.getSupportedFormats().then((f) => { CO_QR = f.includes('qr_code') }).catch(() => {}) } catch (e) {}
+}
+
+/* 05/11 AN NUT tren thanh cong cu theo Cai dat (phim tat van chay). ds = danh sach khoa nut bi an. */
+const PT_NUT = {
+  rect: () => toolbarEl.querySelector('.cong-cu[data-tool="rect"]'),
+  arrow: () => toolbarEl.querySelector('.cong-cu[data-tool="arrow"]'),
+  text: () => toolbarEl.querySelector('.cong-cu[data-tool="text"]'),
+  so: () => toolbarEl.querySelector('.cong-cu[data-tool="so"]'),
+  cuon: () => toolbarEl.querySelector('.cong-cu[data-tool="cuon"]'),
+  storyboard: () => toolbarEl.querySelector('.cong-cu[data-tool="storyboard"]'),
+  quay: () => toolbarEl.querySelector('.cong-cu[data-tool="quay"]'),
+  blur: () => blurNhomEl,
+  ocr: () => document.getElementById('ocr-nhom'),
+  but: () => butNhomEl,
+}
+const NHOM_SO = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon']
+const NHOM_SR = ['storyboard', 'quay']
+let anNutHienTai = []
+function capNhatAnNut(ds) {
+  anNutHienTai = Array.isArray(ds) ? ds.slice() : []
+  for (const k of Object.keys(PT_NUT)) { const el = PT_NUT[k](); if (el) el.hidden = anNutHienTai.includes(k) }
+  const coSo = NHOM_SO.some((k) => !anNutHienTai.includes(k)), coSR = NHOM_SR.some((k) => !anNutHienTai.includes(k))
+  const chiaV = toolbarEl.querySelector('.chia-v'), chiaChu = toolbarEl.querySelector('.chia-chu')
+  if (chiaV) chiaV.hidden = !(coSo || coSR)
+  if (chiaChu) chiaChu.hidden = !(coSo && coSR)
+  dongPopups()
+  if (!toolbarEl.hidden) datViTriThanhCongCu()
+}
+function ganCauHinh(d) {
+  if (!d) return
+  if (Array.isArray(d.anNut)) capNhatAnNut(d.anNut)
+  if (typeof d.kinhLup === 'boolean') { kinhLupBat = d.kinhLup; if (!kinhLupBat) klAn() }
+}
+
 // bam ra ngoai bang mau = dong (bat o pha capture: thanh cong cu chan noi bot mousedown)
 window.addEventListener('mousedown', (e) => {
   if (bangMauMo() && !mauHienEl.parentNode.contains(e.target)) dongBangMau()
   if (menuButMo() && !butNhomEl.contains(e.target)) dongMenuBut()
   if (menuDoMo() && !doNhomEl.contains(e.target)) dongMenuDo()
+  for (const n of NHOM_PHU) if (!n.menu.hidden && !n.nhom.contains(e.target)) dongNhomPhu(n)
 }, true)
 
 /* Nut but hien icon + so phim + goi y cua loai dang dung (but = 7, da quang = 8). */
@@ -190,7 +263,7 @@ let cheDoTest = {}
 window.overlay.onInit((data) => {
   if (data && data.origin) origin = data.origin
   if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
-  if (data) cheDoTest = data
+  if (data) { cheDoTest = data; ganCauHinh(data) }
   if (data && data.selftest) setTimeout(autoSelftest, 1600)
 })
 
@@ -216,6 +289,7 @@ if (window.overlay.onUpdateConfig) {
       curBlurType = data.lamMoKieu
       redraw()
     }
+    ganCauHinh(data)
   })
 }
 // ☠️ DAO QUYET DINH 25/08 ("khong dan anh dong bang" vi lech/taskbar 2 lan):
@@ -572,6 +646,7 @@ window.addEventListener('mousedown', (e) => {
 window.addEventListener('mousemove', (e) => {
   if (isAdjusting) { xuLyChinhKhung(e); return }
   if (mode === 'annotate') { veDangKeo(e); return }
+  if (kinhLupBat) klCapNhat(e.clientX, e.clientY) // 05/11: chi gan toa do + hen mot lan ve moi khung hinh
   /* ☠️ MAN CHU ve khung NGAY tai day, khong doi vong chuot->main->IPC->ve.
      Truoc 31/08 khung CHI ve khi main phat 'sel-rect' (interval 16ms) — ma
      main hay ban (getSources chan ~1s ngay luc moi mo overlay, dung luc
@@ -616,6 +691,7 @@ window.addEventListener('mouseup', (e) => {
   if (mode === 'annotate') { ketThucVe(e); return }
   if (!dragging) return
   dragging = false
+  klAn()
   ketThucDoKeo()
   /* 05/11 BAM (khong keo) len mot cua so -> chon dung khung cua so do. Chi khi nhan LUC DAU nam tren cua so, chua vuot
      nguong bam, va luc nha van trong nguong. Khong thoa -> duong keo cu (dragEnd), khong doi mot dong nao. */
@@ -632,7 +708,7 @@ window.addEventListener('mouseup', (e) => {
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (bangMauMo() || menuButMo() || menuDoMo() || (cheMenu && cheMenu.dangMo())) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
+    if (bangMauMo() || menuButMo() || menuDoMo() || menuPhuMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
     if (cheTM && cheTM.xuLyPhim(e)) return // dang o che do Che thong minh: Esc chi dong che do do, chua huy chup
     window.overlay.cancel(); return
   }
@@ -696,6 +772,11 @@ window.addEventListener('keydown', (e) => {
       (e.key === '9' || e.code === 'Digit9' || e.code === 'Numpad9')) {
     e.preventDefault(); chupCuon(); return
   }
+  // Phim Q = doc ma QR trong vung (05/11) — chi khi Chromium co BarcodeDetector
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
+      (e.key === 'q' || e.key === 'Q' || e.code === 'KeyQ')) {
+    e.preventDefault(); if (CO_QR) docMaQR(); return
+  }
   // Phim 5 = doc chu trong vung (29/09 anh Tien) — mo bang chu, khong phai cong cu ve
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
       (e.key === '5' || e.code === 'Digit5' || e.code === 'Numpad5')) {
@@ -705,10 +786,10 @@ window.addEventListener('keydown', (e) => {
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
       'v': 'select', 'V': 'select', 'KeyV': 'select',
-      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so', '7': 'but', '8': 'daquang',
+      '1': 'rect', '2': 'arrow', '3': 'text', '4': 'blur', '6': 'so', '7': 'but', '8': 'daquang', '0': 'spot',
       'b': 'blur', 'B': 'blur', 'KeyB': 'blur',
-      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so', 'Digit7': 'but', 'Digit8': 'daquang',
-      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so', 'Numpad7': 'but', 'Numpad8': 'daquang'
+      'Digit1': 'rect', 'Digit2': 'arrow', 'Digit3': 'text', 'Digit4': 'blur', 'Digit6': 'so', 'Digit7': 'but', 'Digit8': 'daquang', 'Digit0': 'spot',
+      'Numpad1': 'rect', 'Numpad2': 'arrow', 'Numpad3': 'text', 'Numpad4': 'blur', 'Numpad6': 'so', 'Numpad7': 'but', 'Numpad8': 'daquang', 'Numpad0': 'spot'
     }
     const t = keyMap[e.key] || keyMap[e.code]
     if (t) chonCongCu(t)
@@ -718,6 +799,7 @@ window.addEventListener('keydown', (e) => {
 /* ── Vao che do VE ────────────────────────────────────────────────────── */
 function vaoCheDoVe() {
   mode = 'annotate'
+  klAn()
   veEl.hidden = false
   capNhatGiaoDienKhung()
   // Thanh cong cu: duoi vung chon, hoac tren neu khong du cho.
@@ -771,6 +853,7 @@ function chonCongCu(x) {
   tool = x
   capNhatNutBut(x)
   capNhatNutDo(x)
+  capNhatNutBlur(x)
   if (tool !== 'select') {
     selectedShape = null
     veEl.style.cursor = 'crosshair'
@@ -825,7 +908,7 @@ function tinhHopBaoChu(s) {
 }
 
 function layHopBaoShape(s) {
-  if (s.type === 'rect' || s.type === 'blur') {
+  if (s.type === 'rect' || s.type === 'blur' || s.type === 'spot') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2)
     const w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
     return { x: x - 4, y: y - 4, w: w + 8, h: h + 8 }
@@ -855,7 +938,7 @@ function timShapeTaiDiem(px, py) {
       if (cachNet(s, lx, ly) <= doDayNet(s) / 2 + 6) return { shape: s, index: i }
     } else if (s.type === 'so') {
       if (Math.hypot(lx - s.x, ly - s.y) <= R_SO + 4) return { shape: s, index: i }
-    } else if (s.type === 'rect' || s.type === 'blur') {
+    } else if (s.type === 'rect' || s.type === 'blur' || s.type === 'spot') {
       const minX = Math.min(s.x1, s.x2), maxX = Math.max(s.x1, s.x2)
       const minY = Math.min(s.y1, s.y2), maxY = Math.max(s.y1, s.y2)
       const pad = 6
@@ -968,7 +1051,7 @@ function veDangKeo(e) {
     if (dangKeoShape && selectedShape && shapeBanDau) {
       const dx = Math.round(lx - keoShapeStart.x)
       const dy = Math.round(ly - keoShapeStart.y)
-      if (selectedShape.type === 'rect' || selectedShape.type === 'arrow' || selectedShape.type === 'blur') {
+      if (selectedShape.type === 'rect' || selectedShape.type === 'arrow' || selectedShape.type === 'blur' || selectedShape.type === 'spot') {
         selectedShape.x1 = shapeBanDau.x1 + dx
         selectedShape.y1 = shapeBanDau.y1 + dy
         selectedShape.x2 = shapeBanDau.x2 + dx
@@ -1034,11 +1117,60 @@ function redraw(preview) {
   veCtx.clearRect(0, 0, curRect.w, curRect.h)
   danhSoLai()
   const ds = preview ? shapes.concat(preview) : shapes
+  toiSpot = taoLopToi(ds)
+  if (toiSpot) veCtx.drawImage(toiSpot, 0, 0, toiSpot.width, toiSpot.height, 0, 0, curRect.w, curRect.h)
   for (const s of ds) veShape(veCtx, s)
   if (selectedShape && tool === 'select') {
     veKhungChonShape(veCtx, selectedShape)
   }
   if (cheTM) cheTM.lamMoi() // Hoan tac / Lam lai / xoa net: khung "da che" theo kip
+}
+
+/* ── 05/11 LAM NOI VUNG / SPOTLIGHT (phim 0) ────────────────────────────────────────────────────────────────────
+   Keo mot khung: NGOAI khung toi di (den 60 %), TRONG khung giu nguyen. Nhieu khung = nhieu "lo sang" tren cung MOT lop toi
+   (khoet bang destination-out nen hai khung de nhau van sang, khong bi dem hai lan). Lop toi ve vao canvas ve (#ve) nen
+   anh xuat = dung nhu thay: xong() ghep chinh canvas nay. Lop toi ve TRUOC moi net khac (mui ten / chu ben ngoai khung
+   khong bi toi); rieng Lam mo ve ra anh goc nen phai phu lai lop toi len dung vung cua no (veToiLaiTrongVung). */
+const DO_TOI_SPOT = 0.6
+let toiSpot = null // canvas lop toi cua lan redraw gan nhat (hoac null neu khong co khung nao)
+let toiCv = null
+function taoLopToi(ds) {
+  let co = false
+  for (const s of ds) if (s.type === 'spot') { co = true; break }
+  if (!co) return null
+  const w = Math.max(1, Math.round(curRect.w * DPR)), h = Math.max(1, Math.round(curRect.h * DPR))
+  if (!toiCv) toiCv = document.createElement('canvas')
+  if (toiCv.width !== w || toiCv.height !== h) { toiCv.width = w; toiCv.height = h }
+  const c = toiCv.getContext('2d')
+  c.setTransform(1, 0, 0, 1, 0, 0)
+  c.globalCompositeOperation = 'source-over'
+  c.clearRect(0, 0, w, h)
+  c.fillStyle = 'rgba(0,0,0,' + DO_TOI_SPOT + ')'
+  c.fillRect(0, 0, w, h)
+  c.setTransform(DPR, 0, 0, DPR, 0, 0)
+  c.globalCompositeOperation = 'destination-out'
+  c.fillStyle = '#000'
+  for (const s of ds) {
+    if (s.type !== 'spot') continue
+    const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2), ww = Math.abs(s.x2 - s.x1), hh = Math.abs(s.y2 - s.y1)
+    c.beginPath(); c.roundRect(x, y, ww, hh, Math.min(6, ww / 2, hh / 2)); c.fill()
+  }
+  c.globalCompositeOperation = 'source-over'
+  return toiCv
+}
+function veToiLaiTrongVung(ctx, x, y, w, h) {
+  if (!toiSpot || w <= 0 || h <= 0) return
+  const x0 = Math.max(0, x), y0 = Math.max(0, y), x1 = Math.min(curRect.w, x + w), y1 = Math.min(curRect.h, y + h)
+  if (x1 <= x0 || y1 <= y0) return
+  ctx.drawImage(toiSpot, x0 * DPR, y0 * DPR, (x1 - x0) * DPR, (y1 - y0) * DPR, x0, y0, x1 - x0, y1 - y0)
+}
+function veKhungSpot(ctx, s) {
+  const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2), w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
+  ctx.save()
+  ctx.strokeStyle = s.color || MAU
+  ctx.lineWidth = 2
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, Math.min(6, w / 2, h / 2)); ctx.stroke()
+  ctx.restore()
 }
 
 let offscreenBlurCanvas = null
@@ -1166,6 +1298,8 @@ function veShape(ctx, s) {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2), w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
     if (s.rot) { ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(s.rot); ctx.strokeRect(-w / 2, -h / 2, w, h); ctx.restore() }
     else ctx.strokeRect(x, y, w, h)
+  } else if (s.type === 'spot') {
+    veKhungSpot(ctx, s)
   } else if (s.type === 'arrow') {
     veMuiTen(ctx, s.x1, s.y1, s.x2, s.y2)
   } else if (s.type === 'text') {
@@ -1185,6 +1319,7 @@ function veShape(ctx, s) {
     } else {
       veBlurPixelate(ctx, x, y, w, h)
     }
+    veToiLaiTrongVung(ctx, x, y, w, h) // co khung Lam noi vung thi phan Lam mo nam ngoai khung cung toi nhu anh xung quanh
   }
 }
 
@@ -1339,6 +1474,7 @@ toolbarEl.addEventListener('click', (e) => {
     }
     if (b.dataset.tool === 'che') { chuyenChe(); return }
     if (b.dataset.tool === 'ocr') { if (ocrMo()) dongBangChu(); else docChuVung(); return }
+    if (b.dataset.tool === 'qr') { docMaQR(); return }
     if (b.dataset.tool === 'quay') { quayVideo(); return }
     if (b.dataset.tool === 'cuon') { chupCuon(); return }
     chonCongCu(b.dataset.tool)
@@ -1602,6 +1738,7 @@ const ocrDem = document.getElementById('ocr-dem')
 const ocrGhichu = document.getElementById('ocr-ghichu')
 const ocrChep = document.getElementById('ocr-chep')
 const ocrChepChu = ocrChep.querySelector('span')
+const ocrTieuDeEl = document.getElementById('ocr-tieu-de')
 let ocrDong = []
 let ocrLuot = 0
 const ocrMo = () => !ocrBang.hidden
@@ -1640,6 +1777,7 @@ async function docChuVung(cach) {
   if (cheTM) cheTM.dong()
   const luot = ++ocrLuot
   ocrDong = []
+  ocrTieuDeEl.textContent = t('ocr.tieuDe')
   ocrDem.textContent = ''
   ocrGhichu.hidden = true
   ocrDoi.hidden = true
@@ -2041,7 +2179,100 @@ cheTM = window.CheTMUI.tao({
   them: themNhomChe, xoaRedo, doc: docChuChe, datThanh: datThanhChe, t, log: (m) => window.overlay.log(m),
   nut: document.getElementById('che-muc'),
 })
-cheMenu = window.CheTMUI.ganMenuXo({
-  nhom: document.getElementById('lam-mo-nhom'), chinh: document.getElementById('lam-mo-chinh'), menu: document.getElementById('lam-mo-menu'),
-  xep: xepXo, dongKhac: () => { dongBangMau(); dongMenuBut(); dongMenuDo() },
-})
+// Tren man chup, muc Che thong minh nam trong menu #blur-menu (NHOM_PHU), khong can menu rieng; cheMenu chi dung o anh ghim
+/* ── 05/11 KINH LUP khi chon vung ──────────────────────────────────────────────────────────────────────────────
+   O phong to 8 lan (16 x 16 DIP quanh con tro) lay tu CHINH anh dong bang, kem toa do bang px that. Chi hien o che do chon
+   vung (truoc va trong luc keo); vao che do ve / tha chuot / chuot ra khoi man thi an. Chi phi: moi mousemove chi gan 2 so +
+   hen MOT lan ve trong requestAnimationFrame; ve = 1 drawImage vung nho + dich bang transform (khong gay layout).
+   Bat / tat trong Cai dat (kinhLup). */
+const klEl = document.getElementById('kinh-lup')
+const klCv = document.getElementById('kl-cv')
+const klTo = document.getElementById('kl-to')
+const KL_CO = 128, KL_ZOOM = 8
+let kinhLupBat = true
+let klCtx = null, klCho = 0, klX = 0, klY = 0
+function klAn() { if (klCho) { cancelAnimationFrame(klCho); klCho = 0 } if (!klEl.hidden) klEl.hidden = true }
+function klCapNhat(x, y) {
+  klX = x; klY = y
+  if (!klCho) klCho = requestAnimationFrame(klVe)
+}
+function klVe() {
+  klCho = 0
+  if (!kinhLupBat || mode !== 'select' || !frozenImg || !frozenImg.naturalWidth) { klAn(); return }
+  const W = window.innerWidth, H = window.innerHeight
+  const px = Math.round(KL_CO * DPR)
+  if (klCv.width !== px || !klCtx) { klCv.width = px; klCv.height = px; klCtx = klCv.getContext('2d') }
+  /* he so anh -> DIP theo kich thuoc anh DANG HIEN (anh nhanh nua do phan giai van dung vi tri) */
+  const rongHien = parseFloat(frozenImg.style.width) || W
+  const k = frozenImg.naturalWidth / rongHien
+  const nguon = KL_CO / KL_ZOOM
+  const sw = nguon * k
+  klCtx.imageSmoothingEnabled = false
+  klCtx.fillStyle = '#000'
+  klCtx.fillRect(0, 0, px, px)
+  klCtx.drawImage(frozenImg, (klX - nguon / 2) * k, (klY - nguon / 2) * k, sw, sw, 0, 0, px, px)
+  // o ngam chinh giua = diem anh dang tro
+  const o = px / (nguon * DPR) * DPR // = KL_ZOOM * DPR : 1 DIP tren anh = KL_ZOOM DIP tren o
+  klCtx.lineWidth = Math.max(1, DPR)
+  klCtx.strokeStyle = 'rgba(0,0,0,.85)'; klCtx.strokeRect(px / 2 - o / 2 - 1, px / 2 - o / 2 - 1, o + 2, o + 2)
+  klCtx.strokeStyle = 'rgba(255,255,255,.95)'; klCtx.strokeRect(px / 2 - o / 2, px / 2 - o / 2, o, o)
+  klTo.textContent = Math.round(klX * DPR) + ' , ' + Math.round(klY * DPR)
+  const gap = 22, cao = KL_CO + 26
+  let tx = klX + gap, ty = klY + gap
+  if (tx + KL_CO + 8 > W) tx = klX - gap - KL_CO
+  if (ty + cao + 8 > H) ty = klY - gap - cao
+  tx = Math.max(4, tx); ty = Math.max(4, ty)
+  klEl.style.transform = 'translate3d(' + Math.round(tx) + 'px,' + Math.round(ty) + 'px,0)'
+  if (klEl.hidden) klEl.hidden = false
+}
+document.documentElement.addEventListener('mouseleave', klAn)
+
+/* ── 05/11 DOC MA QR (phim Q / menu "Doc ma QR") ─────────────────────────────────────────────────────────────
+   Dung BarcodeDetector cua Chromium (khong them thu vien). Windows Electron 43 KHONG co (do 05/11) nen o do CO_QR = false:
+   menu va phim Q tu tat, Doc chu chay nhu cu. Ket qua hien trong bang Doc chu: moi ma mot dong, Sao chep; app KHONG BAO GIO
+   tu mo lien ket (noi dung chi la chu de chep). */
+async function layAnhVungChoQR() {
+  const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  if (own && own.key) {
+    try { return await napAnh(urlRaw(own.key, curRect.x * DPR, curRect.y * DPR, curRect.w * DPR, curRect.h * DPR)) } catch (e) { /* roi ve anh dong bang */ }
+  }
+  if (!frozenImg || !frozenImg.naturalWidth) throw new Error('chua co anh')
+  const cv = document.createElement('canvas')
+  cv.width = Math.max(1, Math.round(curRect.w * DPR)); cv.height = Math.max(1, Math.round(curRect.h * DPR))
+  const k = frozenImg.naturalWidth / (parseFloat(frozenImg.style.width) || window.innerWidth)
+  cv.getContext('2d').drawImage(frozenImg, curRect.x * k, curRect.y * k, curRect.w * k, curRect.h * k, 0, 0, cv.width, cv.height)
+  return cv
+}
+async function docMaQR() {
+  if (!CO_QR || mode !== 'annotate' || !curRect.w || !curRect.h) return
+  chotOGoChu()
+  const luot = ++ocrLuot
+  ocrDong = []
+  ocrTieuDeEl.textContent = t('ocr.qrTieuDe')
+  ocrDem.textContent = ''
+  ocrDoi.hidden = true
+  ocrGhichu.textContent = t('ocr.qrGhiChu'); ocrGhichu.hidden = false
+  ocrChep.disabled = true; ocrChep.classList.remove('xong'); ocrChepChu.textContent = t('ocr.chep')
+  veBangChu('dang-doc', t('ocr.qrDangDoc'))
+  ocrBang.hidden = false
+  const nb = nutOcr(); if (nb) nb.classList.add('chon')
+  datViTriBangChu()
+  let ds = null, loi = null
+  try {
+    const nguon = await layAnhVungChoQR()
+    const det = new BarcodeDetector({ formats: ['qr_code'] })
+    ds = (await det.detect(nguon)).map((d) => String(d.rawValue || '').trim()).filter(Boolean)
+    ds = ds.filter((v, i) => ds.indexOf(v) === i)
+  } catch (e) { loi = e }
+  if (luot !== ocrLuot || !ocrMo()) return
+  if (loi) { window.overlay.log('qr LOI: ' + (loi && loi.message)); veBangChu('rong', t('ocr.qrLoi')) }
+  else if (!ds.length) veBangChu('rong', t('ocr.qrKhongCo'))
+  else {
+    ocrDong = ds
+    veBangChu('dong')
+    ocrDem.textContent = '· ' + t('ocr.qrDem').replace('{n}', String(ds.length))
+    ocrChep.disabled = false
+    ocrDs.focus()
+  }
+  datViTriBangChu()
+}

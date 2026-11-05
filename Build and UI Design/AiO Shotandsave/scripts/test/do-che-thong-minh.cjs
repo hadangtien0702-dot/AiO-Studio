@@ -390,7 +390,7 @@ const dem = (ds, loai) => ds.filter((m) => m.loai === loai).length
     win.webContents.send('overlay:annotate', { x: 60, y: 40, w: X.w / s, h: X.h / s })
     await cho(win, `mode === 'annotate'`)
     kiem('man chup: thanh cong cu hien, nut Che thong minh trong menu xo cua nut Lam mo',
-      await chay(win, `!!document.querySelector('#lam-mo-nhom #lam-mo-menu #che-muc') && document.querySelectorAll('#toolbar > .cong-cu[data-tool="che"]').length === 0`))
+      await chay(win, `!!document.querySelector('#blur-nhom #blur-menu #che-muc') && document.querySelectorAll('#toolbar > .cong-cu[data-tool="che"]').length === 0`))
     await click(win, '#che-muc')
     kiem('bam nut: doc chu vung khoanh xong (san-sang)', await cho(win, `document.querySelector('.che-strip').dataset.trangThai === 'san-sang'`, 40000), await trangThai(win))
     kiem('thanh bao tim thay 6 muc', (await chay(win, `document.querySelector('.che-strip').dataset.soMuc`)) === '6')

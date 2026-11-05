@@ -89,7 +89,7 @@ const SuaNet = (() => {
       for (let i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1] }
       return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0, rot: 0, le: doDayNet(s) / 2 + 3, x0, y0, x1, y1 }
     }
-    if (s.type === 'rect' || s.type === 'blur') {
+    if (s.type === 'rect' || s.type === 'blur' || s.type === 'spot') {
       const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2), w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
       return { cx: x + w / 2, cy: y + h / 2, w, h, rot: s.type === 'rect' ? (s.rot || 0) : 0, le: 4 }
     }
@@ -106,7 +106,7 @@ const SuaNet = (() => {
 
   /* Dua diem man hinh ve khung toa do CUA SHAPE chua xoay (de thu trung bang hop thang). */
   function vaoKhung(s, x, y) {
-    if (!s.rot || s.pts || s.type === 'arrow' || s.type === 'blur') return { x, y }
+    if (!s.rot || s.pts || s.type === 'arrow' || s.type === 'blur' || s.type === 'spot') return { x, y }
     const h = hop(s)
     if (!h) return { x, y }
     const q = vaoCuc(h.rot, x - h.cx, y - h.cy)
@@ -123,7 +123,7 @@ const SuaNet = (() => {
     if (s.type !== 'so') {
       for (const [k, sx, sy] of [['nw', -1, -1], ['ne', 1, -1], ['se', 1, 1], ['sw', -1, 1]]) out.push(Object.assign({ k, loai: 'goc', sx, sy }, ra(h, sx * hw, sy * hh)))
     }
-    if (s.type !== 'blur' && !s.pts) {
+    if (s.type !== 'blur' && s.type !== 'spot' && !s.pts) {
       let dir = -1
       if (ra(h, 0, -hh - KC_XOAY).y < 12) dir = 1 // sat mep tren cua canvas: dat tay xoay phia DUOI
       out.push(Object.assign({ k: 'xoay', loai: 'xoay', dir }, ra(h, 0, dir * (hh + KC_XOAY))))
