@@ -28,6 +28,7 @@ window.pin.onData((data) => {
   frame.style.width = data.w + 'px'
   frame.style.height = data.h + 'px'
   vuaThanh()
+  vuaBar()
   dip = { w: data.w, h: data.h }
   if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
   PLOG('data dip=' + data.w + 'x' + data.h + ' DPR=' + DPR + ' win=' + window.innerWidth + 'x' + window.innerHeight + ' blur=' + curBlurType)
@@ -183,6 +184,23 @@ function vuaThanh() {
   for (const z of [1, 0.85, 0.7, 0.6, 0.5]) {
     toolbarEl.style.zoom = z === 1 ? '' : String(z)
     if (toolbarEl.getBoundingClientRect().height <= caoKhung) return
+  }
+}
+/* 05/11 Thanh tren-phai (#bar: keo file, Lam dep, Sao chep, Dong) them 1 nut nen rong ra ~30 px. Anh ghim NHO: thu nho tung nac
+   cho vua be rong khung; nho toi muc 0,5 van khong vua thi giau rieng nut Lam dep (mo duoc o anh lon), khong de thanh tran khoi khung. */
+function vuaBar() {
+  const bar = document.getElementById('bar'), nut = document.getElementById('lam-dep')
+  nut.style.display = ''
+  const rong = frame.getBoundingClientRect().width - 12
+  const vua = () => bar.getBoundingClientRect().width <= rong
+  for (const z of [1, 0.85, 0.7, 0.6, 0.5]) {
+    bar.style.zoom = z === 1 ? '' : String(z)
+    if (vua()) return
+  }
+  nut.style.display = 'none'
+  for (const z of [1, 0.85, 0.7, 0.6, 0.5]) {
+    bar.style.zoom = z === 1 ? '' : String(z)
+    if (vua()) return
   }
 }
 /* Pin: toolbar nam TRONG #frame (overflow: hidden) -> gioi han xo = khung anh, khong phai cua so. */

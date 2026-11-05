@@ -30,6 +30,10 @@ if (!process.versions.electron) {
 
 /* ---- Vai Electron (main) ---- */
 const { app, BrowserWindow, ipcMain, nativeImage, clipboard, screen } = require('electron')
+/* Dau ra bi dong (EPIPE) hay loi bat ngo KHONG duoc hien hop thoai loi Electron len man hinh nguoi dung. */
+process.stdout.on('error', () => {})
+process.stderr.on('error', () => {})
+process.on('uncaughtException', (e) => { try { console.error(e) } catch (x) {} app.exit(1) })
 const TAM = path.join(os.tmpdir(), 'aio-lamdep-do-' + process.pid)
 const ANH = path.join(TAM, 'anh')
 const MAU_DIR = process.env.AIO_MAU_DIR || path.join(TAM, 'mau')
@@ -285,9 +289,7 @@ async function chay() {
   kiem('ten file moi khac nhau het', new Set(moiFile).size === moiFile.length)
   kiem('moi file moi la PNG hop le', moiFile.every((f) => { const b = fs.readFileSync(path.join(ANH, f)); return b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) }))
   // bo loc khay: copy dung bieu thuc trong main.js layDanhSachAnhGanNhat
-  const mainSrc = fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8').replace(/
-/g, '
-')
+  const mainSrc = fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8').split(String.fromCharCode(13)).join('')
   const locKhay = (f) => /\.(png|jpe?g)$/i.test(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-')
   kiem('main.js van dung bo loc nay (tranh do bang ban sao cu)', mainSrc.includes("/\\.(png|jpe?g)$/i.test(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-')"))
   kiem('khay nap lai duoc moi file moi', moiFile.every(locKhay))
@@ -372,6 +374,36 @@ async function chay() {
     kiem('xuat ' + ds.length + ' anh mau ra ' + MAU_DIR, ds.length === 5)
   } catch (e) { kiem('xuat anh mau', false, e.message) }
 
+  console.log('\n[9] Nut Lam dep tren thanh cua ANH GHIM: khong tran khoi khung o anh nho, bam la gui IPC')
+  let nhanIpc = 0
+  const dem = () => { nhanIpc++ }
+  ipcMain.on('pin:lam-dep', dem)
+  const doBar = async (w, h, hong) => {
+    const pw = new BrowserWindow({ show: false, width: w + 24, height: h + 24, webPreferences: { preload: path.join(ROOT, 'src', 'preload-pin.js'), contextIsolation: true, sandbox: false, backgroundThrottling: false } })
+    await pw.loadFile(path.join(ROOT, 'src', 'pin', 'index.html'))
+    pw.webContents.send('pin:data', { dataUrl: anhMau(w, h).toDataURL(), pad: 12, w, h, lamMoKieu: 'mosaic' })
+    await cho(300)
+    if (hong) await pw.webContents.executeJavaScript("(() => { const b = document.getElementById('bar'); b.style.zoom = ''; document.getElementById('lam-dep').style.display = ''; 0 })()")
+    const kqBar = await pw.webContents.executeJavaScript(`(() => {
+      const f = document.getElementById('frame').getBoundingClientRect(), b = document.getElementById('bar').getBoundingClientRect()
+      const n = document.getElementById('lam-dep'), hien = getComputedStyle(n).display !== 'none'
+      return { frame: [f.left, f.right], bar: [b.left, b.right], trong: b.left >= f.left - 0.5 && b.right <= f.right + 0.5, hien, z: document.getElementById('bar').style.zoom || '1' }
+    })()`)
+    const truoc = nhanIpc
+    if (kqBar.hien && !hong) { await pw.webContents.executeJavaScript("document.getElementById('lam-dep').click(); 0"); await cho(200) }
+    const guiDuoc = nhanIpc - truoc
+    pw.destroy()
+    return Object.assign(kqBar, { guiDuoc })
+  }
+  for (const [w, h] of [[640, 400], [320, 200], [160, 100], [120, 80]]) {
+    const k = await doBar(w, h)
+    kiem('anh ghim ' + w + 'x' + h + ': thanh nam TRONG khung (zoom ' + k.z + ', nut Lam dep ' + (k.hien ? 'con' : 'an') + ')', k.trong)
+    kiem('  ' + (k.hien ? 'bam nut Lam dep gui IPC pin:lam-dep (' + k.guiDuoc + ' lan)' : 'nut an dung luc thanh khong vua'), k.hien ? k.guiDuoc === 1 : (w <= 160))
+  }
+  const kh = await doBar(90, 60, true)
+  kiem('doi chung: bo vuaBar (ep zoom 1) o anh 90x60 thi thanh tran khung va bi bat', kh.trong === false)
+  ipcMain.removeListener('pin:lam-dep', dem)
+
   // dong cua so, tra clipboard
   try { if (ld.cuaSo()) ld.cuaSo().destroy() } catch (e) {}
   if (clipText) clipboard.writeText(clipText); else if (!clipImg.isEmpty()) clipboard.writeImage(clipImg); else clipboard.clear()
@@ -435,7 +467,9 @@ app.whenReady().then(async () => {
   console.log('\n' + kq.join('\n'))
   const nDat = kq.filter((x) => x.startsWith('  DAT')).length
   console.log('\nKet qua: ' + (dat ? 'TAT CA DAT' : 'CO MUC TRUOT') + ' (' + nDat + '/' + kq.length + ')')
-  if (!process.env.AIO_MAU_DIR) fs.rmSync(TAM, { recursive: true, force: true })
+  for (const w of BrowserWindow.getAllWindows()) { try { w.destroy() } catch (e) {} }
+  await cho(400) // Windows con giu thu muc userData vai tram ms sau khi dong cua so
+  if (!process.env.AIO_MAU_DIR) { try { fs.rmSync(TAM, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }) } catch (e) { console.log('(chua don het thu muc tam: ' + TAM + ')') } }
   else { try { fs.rmSync(ANH, { recursive: true, force: true }); fs.rmSync(path.join(TAM, 'userData'), { recursive: true, force: true }) } catch (e) {} }
   app.exit(dat ? 0 : 1)
 })
