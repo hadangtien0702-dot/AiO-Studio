@@ -7,6 +7,17 @@
 const { app, BrowserWindow, nativeImage } = require('electron')
 const fs = require('fs'), path = require('path'), os = require('os')
 
+/* Electron tren Windows la app "GUI": stdout khong ra cua so lenh. Dat AIO_DO_LOG=<file> de ghi log ra file (cung noi dung console). */
+/* KHONG BAO GIO ghi ra stdout/stderr khi co AIO_DO_LOG (ong dong -> EPIPE -> hop loi Electron hien len man anh Tien, 05/11).
+   Moi dong log chi di vao FILE; loi khong bat duoc cung chi vao file roi thoat, khong hop thoai. */
+const FILE_LOG = process.env.AIO_DO_LOG || path.join(os.tmpdir(), 'aio-do-tim-anh-' + process.pid + '.log')
+process.stdout.on('error', () => {}); process.stderr.on('error', () => {})
+console.log = (...a) => { try { fs.appendFileSync(FILE_LOG, a.join(' ') + '\n') } catch (e) {} }
+console.error = console.log
+process.on('uncaughtException', (e) => { try { fs.appendFileSync(FILE_LOG, 'UNCAUGHT ' + String(e && e.stack) + '\n') } catch (x) {} try { app.exit(1) } catch (y) { process.exit(1) } })
+process.on('unhandledRejection', (e) => { try { fs.appendFileSync(FILE_LOG, 'REJECT ' + String(e && e.stack) + '\n') } catch (x) {} })
+// Electron khong tu doc NODE_PATH: nap lai (worktree khong co node_modules, xem luat chung)
+if (process.env.NODE_PATH) require('module').Module._initPaths()
 const ROOT = path.resolve(__dirname, '..', '..')
 const TAM = path.join(os.tmpdir(), 'aio-do-tim-anh-' + process.pid)
 const ANH = path.join(TAM, 'anh'), UD = path.join(TAM, 'userData')
@@ -22,9 +33,6 @@ async function cho(dk, ms, buoc) { const t0 = Date.now(); while (Date.now() - t0
 
 /* ---- Tu gia: tu khoa DUY NHAT moi anh (khong tu nao chua tu nao) ---- */
 const HOA = ['b', 'c', 'd', 'đ', 'g', 'h', 'k', 'l', 'm', 'n', 'nh', 't', 'v', 'x']
-const VAN = ['ạn', 'ốc', 'ềm', 'ữa', 'ặp', 'ỉnh', 'ướt', 'ấu', 'ẻo', 'ỳ', 'ơi', 'ắng', 'ọc', 'úm', 'ểu', 'ễn']
-const AHEAD = ['bar', 'cor', 'dem', 'fil', 'gan', 'hol', 'jun', 'kep', 'lum', 'nov', 'pir', 'qua', 'ros', 'sed', 'tav', 'vel', 'wix', 'zor']
-const ATAIL = ['ton', 'mex', 'dra', 'fix', 'lab', 'nor', 'pas', 'rix', 'sol', 'tek']
 const { chuanHoa } = require(path.join(ROOT, 'src', 'tim-anh.js'))
 function rng(seed) { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296 }
 function layTuDuyNhat(ds, soLuong, seed) {
@@ -37,12 +45,12 @@ function layTuDuyNhat(ds, soLuong, seed) {
   }
   return ra
 }
-const dsVi = []; for (const a of HOA) for (const b of VAN) for (const c of ['b', 'm', 'l', 'k']) dsVi.push(a + b.slice(0, 1) + b.slice(1) + c + 'a'.repeat(0) + a + VAN[(a.length + b.length + c.length) % VAN.length].slice(0, 2))
-const dsViDon = []; for (const a of HOA) for (const b of VAN) dsViDon.push(a + b)
-const tuVi = []; { const t1 = layTuDuyNhat(dsViDon, 224, 7); for (let i = 0; i + 1 < t1.length; i += 2) tuVi.push(t1[i] + t1[i + 1]) }
-const dsAnh = []; for (const a of AHEAD) for (const b of ATAIL) dsAnh.push(a + b)
-const tuAnh = layTuDuyNhat(dsAnh, 110, 11)
-const TU_VI = layTuDuyNhat(tuVi, 100, 3), TU_EN = tuAnh.slice(0, 100)
+const VAN_THANH = ['ạ', 'ế', 'ồ', 'ữ', 'ặ', 'ỉ', 'ướ', 'ẩ', 'ẻ', 'ỳ', 'ơ', 'ắ', 'ọ', 'ú']
+const CODA = ['', 'n', 'm', 't', 'c', 'ng', 'nh']
+const sinh = (r, hoa, van, coda) => hoa[Math.floor(r() * hoa.length)] + van[Math.floor(r() * van.length)] + coda[Math.floor(r() * coda.length)]
+const dsVi = []; { const r = rng(5); for (let i = 0; i < 4000; i++) dsVi.push(sinh(r, HOA, VAN_THANH, CODA) + sinh(r, HOA, VAN_THANH, CODA)) }
+const dsAnh = []; { const r = rng(9); const H = ['b', 'c', 'd', 'f', 'g', 'k', 'l', 'm', 'n', 'p', 'r', 's', 't', 'v', 'z'], V = ['a', 'e', 'i', 'o', 'u'], C = ['', 'n', 'r', 'l', 'x', 'm']; for (let i = 0; i < 4000; i++) dsAnh.push(sinh(r, H, V, C) + sinh(r, H, V, C) + sinh(r, H, V, ['n', 'r', 'x'])) }
+const TU_VI = layTuDuyNhat(dsVi, 100, 3), TU_EN = layTuDuyNhat(dsAnh, 100, 4)
 
 const SO_ANH = 200, SO_DAI = 12, SO_VIDEO = 5
 const meta = [] // { ten, tu, ngonNgu, loai }
@@ -142,7 +150,7 @@ async function chinh() {
   cm.batDau()
   await ngu(3500)
   let st = cm.trangThai()
-  kiem('B1. dang chup (dangBan) thi KHONG doc chu ảnh nao trong 3,5 giay', st.daDoc === SO_VIDEO && st.tong === meta.length, `daDoc=${st.daDoc} (chi ${SO_VIDEO} video, khong can doc), tong=${st.tong}`)
+  kiem('B1. dang chup (dangBan) thi KHONG doc chu ảnh nao trong 3,5 giay', st.daDoc === 0 && st.tong === meta.length, `daDoc=${st.daDoc}, tong=${st.tong}`)
   dangBan = false
   const tDoc0 = Date.now()
   const hetHan = Date.now() + 15 * 60 * 1000
@@ -251,7 +259,6 @@ async function chinh() {
   kiem('H2. mo lai: KHONG doc lai anh nao (0 lan goi bo doc chu)', lanDoc === 0, `${lanDoc} lan`)
   kiem('H3. mo lai: tim van ra dung anh', cm2.tim({ chu: m5.tu }).ds.some((r) => r.ten === m5.ten))
   console.log(`   chi-muc.json ${(kich / 1024).toFixed(0)} KB cho ${s1.tong} muc; nap + quet lai ${msNap} ms`)
-  fs.writeFileSync(path.join(ANH, 'dung-doi-gio.txt'), 'x'); fs.unlinkSync(path.join(ANH, 'dung-doi-gio.txt'))
   // anh bi SUA (doi gio/dung luong) thi doc lai
   const suaF = path.join(ANH, meta.find((m) => m.loai === 'anh' && m.vi && !xoa.includes(m) && m !== m5).ten)
   const bSua = fs.readFileSync(suaF); fs.appendFileSync(suaF, Buffer.alloc(16))
