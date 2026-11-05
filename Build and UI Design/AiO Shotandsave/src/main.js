@@ -28,6 +28,7 @@ const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien qu
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const os = require('os')
+const { taoCapNhat } = require('./cap-nhat') // 05/11: bao co ban moi (xem dau src/cap-nhat.js)
 const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
@@ -132,6 +133,28 @@ function khoiTaoBanQuyen() {
   const s = bq.trangThai()
   ghiLog('ban-quyen: ' + s.loai + (s.loai === 'da-kich-hoat' ? ' ' + s.maHienThi + (s.hetQuyenCapNhat ? ' het-cap-nhat' : '') : ' con ' + s.ngayConLai + ' ngay'))
 }
+/* ── Cap nhat phan mem (05/11, gop y #10): hoi file JSON cong khai moi 24 gio, CHI BAO + nut Tai ve ── */
+let capNhat = null
+function khoiTaoCapNhat() {
+  const file = path.join(app.getPath('userData'), 'cap-nhat.json')
+  capNhat = taoCapNhat({
+    fetch: (url, opt) => net.fetch(url, opt),
+    phienBan: app.getVersion(), nenTang: process.platform, ghiLog,
+    doc: () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { return null } },
+    ghi: (st) => { fs.writeFileSync(file + '.tmp', JSON.stringify(st, null, 2)); fs.renameSync(file + '.tmp', file) },
+    dangBan: () => overlayWins.length > 0 || dangQuay,
+    khiDoi: () => rebuildTrayMenu(),
+    baoMot: (tt) => {
+      if (!Notification.isSupported()) return
+      const n = new Notification({ title: 'AiO Shot & Save', body: T('cn.baoMoi').replace('{v}', tt.phienBan) })
+      n.on('click', () => moTrangTai(tt.link))
+      n.show()
+    },
+  })
+  if (!IS_SELFTEST && !IS_DRAGTEST && !IS_SHELFTEST) capNhat.batDau()
+}
+/** Chi mo link https (da loc trong cap-nhat.js). Khong co link cho he dieu hanh nay thi thoi. */
+function moTrangTai(link) { if (typeof link === 'string' && /^https:/i.test(link)) shell.openExternal(link) }
 const BO_QUA_BAN_QUYEN = IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST
 async function kiemBanQuyenNen() {
   if (!bq) return
@@ -255,6 +278,7 @@ app.whenReady().then(() => {
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
   lang = ch.lang || 'vi'
   khoiTaoBanQuyen()
+  khoiTaoCapNhat()
   createTray()
   setTimeout(kiemBanQuyenNen, 15000)                    // hoi lai Polar sau khi boot yen (toi da 3 ngay/lan, xem banquyen.js)
   setInterval(kiemBanQuyenNen, 6 * 60 * 60 * 1000)
@@ -394,10 +418,17 @@ function dongBanQuyenTray() {
   return [{ label: nhan, click: () => openSettings() }, { type: 'separator' }]
 }
 
+function dongCapNhatTray() {
+  const tt = capNhat && capNhat.trangThai()
+  if (!tt || !tt.coBanMoi) return []
+  return [{ label: T('cn.tray').replace('{v}', tt.phienBan), click: () => (tt.link ? moTrangTai(tt.link) : openSettings()) }, { type: 'separator' }]
+}
+
 function rebuildTrayMenu() {
   if (!tray) return
   const menu = Menu.buildFromTemplate([
     ...dongBanQuyenTray(),
+    ...dongCapNhatTray(),
     { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
@@ -669,6 +700,14 @@ ipcMain.handle('bq:huy', async () => {
   rebuildTrayMenu()
   return r
 })
+/* Cap nhat phan mem: trang thai / kiem tra tay / mo trang tai */
+ipcMain.handle('capnhat:get', () => (capNhat ? capNhat.trangThai() : null))
+ipcMain.handle('capnhat:kiem-ngay', async () => {
+  if (!capNhat) return { ketQua: 'loi', trangThai: null }
+  const r = await capNhat.kiemTra({ ep: true, imLang: true })
+  return { ketQua: r.ketQua, trangThai: r.trangThai }
+})
+ipcMain.handle('capnhat:tai', () => { const tt = capNhat && capNhat.trangThai(); if (tt && tt.link) moTrangTai(tt.link) })
 ipcMain.handle('bq:mua', () => shell.openExternal(WEB_MUA))
 
 /* ---------------------------------------------------------------------- */

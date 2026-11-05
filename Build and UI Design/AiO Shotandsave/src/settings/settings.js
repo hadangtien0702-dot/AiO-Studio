@@ -362,3 +362,35 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
     if (s && s.loai === 'het-han-thu') o.focus()   // vua bi khoa chup -> dat con tro san vao o nhap ma
   })
 })()
+
+/* ── Cap nhat phan mem (05/11) ───────────────────────────────────────────
+   Tu chay ngam (main.js); o day chi hien dong trang thai + nut Tai ve (khi co ban moi) + Kiem tra ngay.
+   Loi mang / JSON hong KHONG hien nhu loi: chi noi 'chua kiem tra duoc' khi nguoi dung tu bam nut. */
+;(() => {
+  const dong = document.getElementById('cn-dong'), ghiChu = document.getElementById('cn-ghi-chu')
+  const nutTai = document.getElementById('cn-tai'), nutKiem = document.getElementById('cn-kiem')
+  if (!dong || !window.capNhat) return
+  const lop = window.i18n.lang === 'en' ? 'en' : 'vi'
+  const ve = (s, thongBao) => {
+    if (s && s.coBanMoi) {
+      dong.textContent = t('cn.coBanMoi').replace('{v}', s.phienBan)
+      ghiChu.textContent = (s.ghiChu && (s.ghiChu[lop] || s.ghiChu[lop === 'en' ? 'vi' : 'en'])) || ''
+      nutTai.hidden = !s.link
+    } else {
+      dong.textContent = thongBao || t('cn.dangDung').replace('{v}', s ? s.hienTai : '')
+      ghiChu.textContent = ''
+      nutTai.hidden = true
+    }
+  }
+  window.capNhat.get().then((s) => ve(s))
+  nutTai.addEventListener('click', () => window.capNhat.taiVe())
+  nutKiem.addEventListener('click', async () => {
+    nutKiem.disabled = true; dong.textContent = t('cn.dangKiem'); ghiChu.textContent = ''; nutTai.hidden = true
+    try {
+      const r = await window.capNhat.kiemNgay()
+      const s = r.trangThai
+      ve(s, r.ketQua === 'moi-nhat' ? t('cn.moiNhat').replace('{v}', s.hienTai) : r.ketQua === 'ban' ? t('cn.dangBan') : r.ketQua === 'loi' ? t('cn.khongKiem') : null)
+    } catch (e) { dong.textContent = t('cn.khongKiem') }
+    nutKiem.disabled = false
+  })
+})()
