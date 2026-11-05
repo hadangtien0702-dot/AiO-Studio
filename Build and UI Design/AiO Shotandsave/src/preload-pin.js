@@ -10,6 +10,8 @@ contextBridge.exposeInMainWorld('pin', {
   onData: (cb) => ipcRenderer.on('pin:data', (_e, data) => cb(data)),
   copy: () => ipcRenderer.send('pin:copy'),
   close: () => ipcRenderer.send('pin:close'),
+  /** 05/11: mo cua so Lam dep anh voi anh dang ghim (luu FILE MOI, khong ghi de). */
+  lamDep: () => ipcRenderer.send('pin:lam-dep'),
   /** Keo file .png that ra app khac (Premiere/Zalo/Mess). */
   startDrag: () => ipcRenderer.send('pin:start-drag'),
   /** Da ve khung/mui ten -> ghi de file + cap nhat thumbnail khay. */

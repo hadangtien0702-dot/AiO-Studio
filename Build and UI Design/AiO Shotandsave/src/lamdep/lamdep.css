@@ -1,0 +1,163 @@
+/* Cua so Lam dep anh — CUNG ngon ngu voi man Cai dat / Storyboard (header 46px, pill, nut .nut / .nut.chinh).
+   Khong khai :root rieng: moi token lay tu assets/tokens.css. */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg-1);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  user-select: none;
+}
+body { display: flex; flex-direction: column; border: 1px solid var(--line-strong); }
+button, input { font-family: inherit; }
+
+#tieu-de {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 46px; padding: 0 var(--sp-3) 0 var(--sp-4);
+  border-bottom: 1px solid var(--line-1);
+  flex: none;
+  -webkit-app-region: drag;
+}
+.hieu { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; }
+.hieu .logo { color: var(--accent); flex: none; }
+#title { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; white-space: nowrap; }
+#kich-thuoc {
+  height: 18px; padding: 0 8px; flex: none;
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+  color: var(--accent-text); background: var(--accent-soft);
+  border: 1px solid var(--accent-line); border-radius: var(--r-pill);
+  font-variant-numeric: tabular-nums;
+}
+#kich-thuoc:empty { display: none; }
+
+.dieu-khien { display: flex; align-items: center; -webkit-app-region: no-drag; }
+.dong {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border: none; border-radius: 50%;
+  background: transparent; color: var(--icon-dim, var(--text-3)); cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.dong:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+
+#than { flex: 1; min-height: 0; display: flex; }
+
+/* ── Xem truoc ─────────────────────────────────────────────── */
+#xem {
+  flex: 1; min-width: 0;
+  margin: var(--sp-4) 0 var(--sp-4) var(--sp-4);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--sp-5);
+  background: var(--bg-2);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+/* o ca-ro cho nen trong suot */
+#ban-co {
+  line-height: 0;
+  border-radius: 2px;
+  background-color: #2a2a2a;
+  background-image:
+    linear-gradient(45deg, #353535 25%, transparent 25%, transparent 75%, #353535 75%),
+    linear-gradient(45deg, #353535 25%, transparent 25%, transparent 75%, #353535 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  box-shadow: 0 0 0 1px var(--line-2);
+}
+#cv { display: block; }
+
+/* ── Bang dieu khien ───────────────────────────────────────── */
+#bang {
+  width: 336px; flex: none;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+#cuon {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-5);
+}
+#cuon::-webkit-scrollbar { width: 6px; }
+#cuon::-webkit-scrollbar-track { background: transparent; }
+#cuon::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--r-pill); }
+
+.nhom { display: flex; flex-direction: column; gap: var(--sp-3); }
+.nhan { font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
+
+.chon-nhom {
+  display: flex; padding: 2px;
+  background: var(--bg-0);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-md);
+}
+.chon-nhom.luoi2 { display: grid; grid-template-columns: 1fr 1fr; }
+.chon-nut {
+  flex: 1; min-width: 0; padding: 5px 4px;
+  border: none; border-radius: var(--r-sm); background: transparent; cursor: pointer;
+  font: 600 12px/1.35 var(--font-ui); color: var(--text-3);
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chon-nut:hover { color: var(--text-1); }
+.chon-nut.active {
+  background: var(--bg-5); color: var(--text-1);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 45%), inset 0 0 0 1px rgb(255 255 255 / 6%);
+}
+
+#mau-hang { display: flex; flex-wrap: wrap; gap: var(--sp-3); min-height: 24px; align-items: center; }
+#mau-hang[hidden] { display: flex; visibility: hidden; }
+.o-mau {
+  width: 24px; height: 24px; flex: none; padding: 0;
+  border: none; border-radius: 50%; cursor: pointer;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  transition: transform var(--dur) var(--ease);
+}
+.o-mau:hover { transform: scale(1.1); }
+.o-mau.active { box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 4px var(--accent); }
+#o-mau-tu {
+  width: 24px; height: 24px; padding: 0; flex: none;
+  border: none; border-radius: 50%; background: none; cursor: pointer;
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+#o-mau-tu::-webkit-color-swatch-wrapper { padding: 0; }
+#o-mau-tu::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+.hang { display: flex; align-items: center; gap: var(--sp-3); }
+.nhan-hang { width: 64px; flex: none; font-size: 12.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; }
+.hang input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent); cursor: pointer; }
+.hang output { width: 34px; flex: none; text-align: right; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Chan: trang thai + nut ───────────────────────────────── */
+#chan {
+  flex: none;
+  padding: var(--sp-4);
+  border-top: 1px solid var(--line-1);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+#tt { display: flex; gap: var(--sp-2); min-height: 16px; font-size: 11.5px; min-width: 0; }
+#tt-nhan { color: var(--ok); font-weight: 600; white-space: nowrap; flex: none; }
+#tt-nhan.loi { color: var(--danger); }
+#tt-ten { color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.nut-hang { display: flex; gap: var(--sp-3); }
+.nut {
+  flex: 1; min-width: 0;
+  height: 32px; padding: 0 var(--sp-3);
+  border: 1px solid var(--line-2); border-radius: var(--r-md);
+  background: var(--bg-3); color: var(--text-1);
+  font: 600 12px/1 var(--font-ui); cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.nut:hover { background: var(--bg-hover); }
+.nut.chinh {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--accent-on, #fff);
+  font-size: 13px; font-weight: 700;
+}
+.nut.chinh:hover { filter: brightness(1.08); }
+.nut:disabled { opacity: 0.55; cursor: default; filter: none; }

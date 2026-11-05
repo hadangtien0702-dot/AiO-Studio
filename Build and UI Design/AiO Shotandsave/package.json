@@ -40,6 +40,7 @@
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
     "test:timanh": "electron scripts/test/do-tim-anh.cjs",
     "test:cuaso": "node scripts/test/do-chup-cua-so.cjs",
+    "test:lamdep": "node scripts/test/do-lam-dep.cjs",
     "test:khovideo": "node scripts/test/do-kho-video.cjs",
     "test:quayvideo": "node scripts/test/do-quay-video.mjs",
     "test:quayapp": "node scripts/test/do-quay-app.mjs",
