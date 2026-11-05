@@ -76,7 +76,7 @@ import {
   type KieuCaption,
   type MoTaKieuCaption,
 } from './services/caption-kieu'
-import { nodeRequire } from './lib/node'
+import { laMac, nodeRequire, thuMucAppSupportMac } from './lib/node'
 import MinhHoa from './MinhHoa'
 import { NutDoiNgonNgu, dich } from './ngonngu'
 
@@ -202,7 +202,8 @@ function thuMucKieuRieng(): string {
     const req = nodeRequire()
     if (!req) return ''
     const env = req('process')['env'] as Record<string, string | undefined>
-    const appdata = env['APPDATA']
+    // macOS không có %APPDATA% — chỗ tương đương là `~/Library/Application Support`.
+    const appdata = laMac() ? thuMucAppSupportMac() : env['APPDATA']
     if (!appdata) return ''
     const fs = req('fs')
     const p = appdata.replace(/\\/g, '/') + '/AiOStudio/caption-styles'
@@ -233,6 +234,11 @@ function moThuMucKieuRieng(): void {
   const p = thuMucKieuRieng()
   if (!req || !p) return
   try {
+    // macOS: Finder qua `/usr/bin/open` (đường dẫn tuyệt đối, không dựa PATH).
+    if (laMac()) {
+      req('child_process').execFile('/usr/bin/open', [p])
+      return
+    }
     req('child_process').exec(`explorer "${p.replace(/\//g, '\\')}"`)
   } catch {
     /* không mở được thì thôi — đường dẫn vẫn hiện trong tooltip */
@@ -249,6 +255,11 @@ function moThuMucChuaFile(duongDan: string): void {
   const req = nodeRequire()
   if (!req || !duongDan) return
   try {
+    // macOS: `open -R` = mở Finder tại thư mục và chọn sẵn file, như `/select,`.
+    if (laMac()) {
+      req('child_process').execFile('/usr/bin/open', ['-R', duongDan])
+      return
+    }
     req('child_process').exec(`explorer /select,"${duongDan.replace(/\//g, '\\')}"`)
   } catch {
     /* không mở được thì thôi — đường dẫn đầy đủ vẫn nằm trong tooltip */

@@ -1,4 +1,5 @@
 import { dich } from '../ngonngu'
+import { laMac } from './node'
 
 /**
  * cep.ts — lớp bọc CSInterface (đã nạp global qua <script> trong index.html).
@@ -238,9 +239,12 @@ export function dichLoi(raw: string): HostLoi {
         canLam: false,
         message:
           dich('Premiere không đọc được file phụ đề:\n{x}\n').replace('{x}', () => tham) +
-          dich(
-            'Nếu file nằm trong %APPDATA% thì Premiere Beta không thấy — phải để cạnh video gốc.',
-          ),
+          // Gợi ý %APPDATA% chỉ đúng trên Windows — Mac không có bẫy ảo hoá này.
+          (laMac()
+            ? ''
+            : dich(
+                'Nếu file nằm trong %APPDATA% thì Premiere Beta không thấy — phải để cạnh video gốc.',
+              )),
       }
     case 'NHAP_SRT_LOI':
       return {

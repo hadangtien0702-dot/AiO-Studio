@@ -231,7 +231,7 @@ html, body {
   animation: mo-vao 140ms ease both;
 }
 .cong-cu {
-  width: 34px; height: 34px;
+  width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
   border: none; border-radius: var(--r-sm);
   background: transparent; color: var(--text-2); cursor: pointer;
@@ -242,10 +242,16 @@ html, body {
 .cong-cu.xong { color: var(--ok, #35c46a); }
 .cong-cu.xong:hover { background: var(--ok, #35c46a); color: #fff; }
 .cong-cu.huy:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
-.chia { width: 1px; height: 20px; background: var(--line-2); margin: 0 3px; }
+/* 01/10 QUAY VIDEO: nut Quay re chuot = do (mau "dang ghi" ai cung hieu).
+   ☠️ .cong-cu{display:flex} (luat tac gia) DE LEN [hidden] cua trinh duyet -> phai co luat an rieng (so loi: CSS de
+   len co che AN). */
+.cong-cu[hidden] { display: none !important; }
+.cong-cu.quay:hover { background: #ff3b30; color: #fff; }
+.cong-cu.quay:hover .so { color: #fff; }
+.chia { width: 1px; height: 24px; background: var(--line-2); margin: 0 3px; }
 
 /* Bang chon mau */
-#mau-nhom { display: flex; align-items: center; gap: 4px; padding: 0 2px; }
+#mau-nhom { display: flex; align-items: center; gap: 4px; padding: 0 2px; }  /* position:relative o khoi 12/11 duoi */
 .mau {
   width: 18px; height: 18px; padding: 0;
   border: 2px solid transparent; border-radius: 50%;
@@ -281,8 +287,8 @@ html, body {
 /* So nho goc tren nut = phim tat 1/2/3 (anh Tien 10/09). */
 .cong-cu { position: relative; }
 .cong-cu .so {
-  position: absolute; top: 2px; right: 3px;
-  font: 600 8px/1 Inter, "Segoe UI", sans-serif; font-style: normal;
+  position: absolute; top: 3px; right: 4px;
+  font: 600 9px/1 Inter, "Segoe UI", sans-serif; font-style: normal;
   color: var(--text-3); pointer-events: none;
 }
 .cong-cu.chon .so { color: var(--accent-text); }
@@ -347,3 +353,68 @@ html, body {
 .ocr-nut:disabled { opacity: .45; cursor: default; filter: none; }
 .ocr-nut kbd { font: 600 10.5px/1 var(--font-ui); padding: 3px 5px; border-radius: 4px; background: rgb(0 0 0 / 22%); color: #fff; }
 .ocr-nut.xong { background: var(--ok, #35c46a); }
+
+/* ── 12/11 THANH CONG CU: icon to hon (nut 40 px, icon 20 px), 1 cham mau xo bang 7 mau, 1 nut but xo menu, Lam lai ──
+   ☠️ .cong-cu{display:flex} (luat tac gia) de len [hidden] cua trinh duyet -> moi phan tu moi co an/hien deu co luat [hidden] rieng. */
+.cong-cu svg { width: 20px; height: 20px; flex: none; }
+.cong-cu:disabled { opacity: .35; cursor: default; }
+.cong-cu:disabled:hover { background: transparent; color: var(--text-2); }
+.nhom-xo, #mau-nhom { position: relative; }
+#but-nhom.dq .ic-but, #but-nhom:not(.dq) .ic-dq { display: none; }
+/* so phim cua nut but doi theo loai dang dung (7 / 8) */
+.cong-cu[data-so]::after {
+  content: attr(data-so); position: absolute; top: 3px; right: 4px;
+  font: 600 9px/1 Inter, "Segoe UI", sans-serif; color: var(--text-3); pointer-events: none;
+}
+.cong-cu.chon[data-so]::after { color: var(--accent-text); }
+
+.mau-hien {
+  width: 40px; height: 40px; padding: 0;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+  border: none; border-radius: var(--r-sm); background: transparent; cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+.mau-hien:hover, .mau-hien[aria-expanded="true"] { background: var(--bg-hover); }
+.mau-hien .cham {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #f86820; border: 2px solid #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%);
+}
+.mau-hien::after { content: ''; border: 3.5px solid transparent; border-top-color: var(--text-3); margin-top: 3px; }
+
+#mau-pop, .menu-xo {
+  position: absolute; z-index: 20;
+  padding: 6px;
+  background: rgb(22 22 22 / 98%);
+  border: 1px solid var(--line-2); border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  animation: mo-vao 120ms ease both;
+}
+#mau-pop[hidden], .menu-xo[hidden] { display: none !important; }
+#mau-pop {
+  left: 50%; top: calc(100% + 8px);
+  transform: translateX(calc(-50% + var(--dx, 0px)));
+  display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 8px;
+}
+#mau-pop.len { top: auto; bottom: calc(100% + 8px); }
+#mau-pop.ngang { flex-direction: row; }
+#mau-pop .mau { width: 24px; height: 24px; flex: none; }
+.menu-xo {
+  left: 0; top: calc(100% + 8px);
+  transform: translateX(var(--dx, 0px));
+  min-width: 160px; display: flex; flex-direction: column; gap: 2px;
+}
+.menu-xo.len { top: auto; bottom: calc(100% + 8px); }
+/* cau noi trong suot: re chuot tu nut xuong menu khong qua vung "ngoai nhom" nen menu khong dong */
+.menu-xo::before { content: ''; position: absolute; left: 0; right: 0; top: -10px; height: 10px; }
+.menu-xo.len::before { top: auto; bottom: -10px; }
+.muc-xo {
+  height: 36px; padding: 0 10px; display: flex; align-items: center; gap: 10px;
+  border: none; border-radius: var(--r-sm); background: transparent; color: var(--text-2);
+  font: 600 13px/1 var(--font-ui); white-space: nowrap; text-align: left; cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.muc-xo svg { width: 20px; height: 20px; flex: none; }
+.muc-xo .so { margin-left: auto; padding-left: 14px; font: 600 10px/1 Inter, "Segoe UI", sans-serif; font-style: normal; color: var(--text-3); }
+.muc-xo:hover { background: var(--bg-hover); color: var(--text-1); }
+.muc-xo.chon { background: var(--accent-soft); color: var(--accent-text); }
+.muc-xo.chon .so { color: var(--accent-text); }

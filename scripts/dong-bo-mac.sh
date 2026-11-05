@@ -53,9 +53,11 @@ echo "Repo: $REPO"
 vang "[1/5] Keo code moi ve..."
 if git -C "$REPO" pull --ff-only; then
   git -C "$REPO" fetch -q origin
-  lech="$(git -C "$REPO" rev-list --left-right --count HEAD...origin/main 2>/dev/null)"
+  # So voi nhanh tren GitHub cua CHINH nhanh dang dung (Mac lam o nhanh mac, khong phai main; sua 03/10/2026).
+  nhanh="$(git -C "$REPO" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)"; [ -n "$nhanh" ] || nhanh="origin/main"
+  lech="$(git -C "$REPO" rev-list --left-right --count "HEAD...$nhanh" 2>/dev/null)"
   truoc="$(echo "$lech" | awk '{print $1}')"; sau="$(echo "$lech" | awk '{print $2}')"
-  if [ "$truoc" = "0" ] && [ "$sau" = "0" ]; then xanh "  DAT: khop GitHub ($(git -C "$REPO" log -1 --format='%h %cd' --date=format:'%d/%m %H:%M'))"
+  if [ "$truoc" = "0" ] && [ "$sau" = "0" ]; then xanh "  DAT: khop GitHub $nhanh ($(git -C "$REPO" log -1 --format='%h %cd' --date=format:'%d/%m %H:%M'))"
   else do_ "  LECH GitHub: may nay hon $truoc commit, kem $sau commit"; fi
 else
   do_ "  git pull LOI - doc thong bao tren (hay gap: sua file chua commit, hoac 'dubious ownership')."
@@ -87,9 +89,13 @@ while IFS= read -r pj; do
   else do_ "  THIEU node_modules: $ten (them --cai-them de tu cai)"; fi
 done < <(find "$REPO" \( -name node_modules -o -name .next -o -name dist -o -name out -o -name .claude \
            -o -name .wrangler -o -name .git \) -prune -o -name package.json -type f -print)
-vang "  LUU Y MAC: FFmpeg + whisper trong bin/ cua cac panel la ban .exe Windows (khong qua git)."
-vang "  Autocut, Transcripts, Asset Manager, Power Bins, Podcast, Short Viral, Video Download"
-vang "  CHUA chay duoc tren Mac cho toi khi co ban Mac cua cac binary do."
+# Mac KHONG dung bin/ trong panel (do la .exe Windows). Ban Mac nam o kho chung, panel tu tim o day (do 03/10/2026).
+KHO="$HOME/Library/Application Support/AiO-Studio"
+for b in bin/mac/ffmpeg bin/mac/ffprobe bin/mac/yt-dlp whisper/bin/whisper-cli; do
+  if [ -x "$KHO/$b" ]; then xanh "  DAT: kho chung co $b"
+  else do_ "  THIEU: $KHO/$b - panel xu ly video / nghe loi / tai video se khong chay viec that"; fi
+done
+vang "  Cai panel vao Premiere tren Mac: node scripts/cai-panel-mac.mjs tat-ca   (them --thu de chi so, khong ghi)"
 
 # ---------- 4. LENH /xong /batdau + SCRIPT batdau ----------
 vang "[4/5] Dong bo lenh /xong, /batdau, /congty ve may nay..."
