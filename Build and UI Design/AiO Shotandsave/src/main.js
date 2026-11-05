@@ -35,6 +35,8 @@ const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua s
 const chupCuonLib = require('./chup-cuon') // 06/10: chup cuon trang dai (bo ghep + vong lap mot phien)
 const { pathToFileURL } = require('url')
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
+const timAnhMod = require('./tim-anh') // 05/11: Tim lai anh cu (chi muc chu trong userData)
+let timAnh = null
 const os = require('os')
 const { taoCapNhat } = require('./cap-nhat') // 05/11: bao co ban moi (xem dau src/cap-nhat.js)
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
@@ -443,6 +445,9 @@ app.whenReady().then(() => {
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
   lang = ch.lang || 'vi'
+  timAnh = timAnhMod.dangKy({ app, ipcMain, BrowserWindow, screen, shell, nativeImage, ocr, daoNeuNenToi, createPinWindow, ghiLog, kho,
+    thuMucDuLieu: path.join(app.getPath('userData'), 'tim-anh'), dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh, tieuDe: T('tray.timAnh') })
+  setTimeout(() => { if (timAnh) timAnh.batDau() }, 45000) // doc chu nen bat dau sau khi app yen (45 s)
   khoiTaoBanQuyen()
   khoiTaoCapNhat()
   createTray()
@@ -567,6 +572,7 @@ app.on('window-all-closed', (e) => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
   ocr.tatHost() // tien trinh PowerShell doc chu (neu dang giu san)
+  if (timAnh) timAnh.luuVaDung()
   khayThu.dongHet() // nut tron + san dien cua khay
 })
 
@@ -624,6 +630,7 @@ function rebuildTrayMenu() {
       { label: T('tray.khayVideo'), click: () => openVideoWindow() },
     ] },
     { label: T('tray.canvas'), click: () => openCanvasWindow() }, // 12/10: bang y tuong kieu Miro, khung = thu muc cung ten
+    { label: T('tray.timAnh'), click: () => { if (timAnh) timAnh.moCuaSo() } }, // 05/11: tim lai anh cu theo chu trong anh
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },

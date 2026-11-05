@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data: blob: file:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="tim-anh.css" />
+</head>
+<body>
+  <header id="tieu-de">
+    <div class="hieu">
+      <svg class="logo" viewBox="0 0 385.89 351.31" width="18" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+        <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+      </svg>
+      <span id="title" data-i18n="ta.tieuDe">Tìm lại ảnh cũ</span>
+      <span id="dem-kq">0</span>
+    </div>
+    <div class="dieu-khien">
+      <button id="btn-close" class="dong" data-i18n-title="ta.dong">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="toolbar">
+    <input id="o-tim" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="ta.timGoiY" />
+    <div class="hang-chon">
+      <div class="chon-nhom" id="nhom-loai">
+        <button class="chon-nut active" data-loai="tat-ca" data-i18n="ta.loaiTatCa">Tất cả</button>
+        <button class="chon-nut" data-loai="anh" data-i18n="ta.loaiAnh">Ảnh</button>
+        <button class="chon-nut" data-loai="video" data-i18n="ta.loaiVideo">Video</button>
+        <button class="chon-nut" data-loai="dai" data-i18n="ta.loaiDai">Dải Storyboard</button>
+      </div>
+      <div class="chon-nhom" id="nhom-ngay">
+        <button class="chon-nut active" data-ngay="moi" data-i18n="ta.ngayMoi">Mọi lúc</button>
+        <button class="chon-nut" data-ngay="homnay" data-i18n="ta.ngayHomNay">Hôm nay</button>
+        <button class="chon-nut" data-ngay="7" data-i18n="ta.ngay7">7 ngày</button>
+        <button class="chon-nut" data-ngay="30" data-i18n="ta.ngay30">30 ngày</button>
+        <button class="chon-nut" data-ngay="chon" data-i18n="ta.ngayChon">Chọn ngày</button>
+      </div>
+      <span id="khoang-ngay" hidden>
+        <label data-i18n="ta.tu">Từ</label><input id="ngay-tu" type="date" />
+        <label data-i18n="ta.den">Đến</label><input id="ngay-den" type="date" />
+      </span>
+    </div>
+  </div>
+
+  <div id="trang-thai">
+    <span id="tt-chu"></span>
+    <span class="spacer"></span>
+    <button id="nut-tam-dung" class="nut" data-i18n="ta.tamDung">Tạm dừng đọc chữ</button>
+  </div>
+
+  <main id="viewport">
+    <div id="luoi"></div>
+    <p id="trong" class="trong" hidden></p>
+  </main>
+  <script src="tim-anh.js"></script>
+</body>
+</html>
