@@ -30,6 +30,8 @@ contextBridge.exposeInMainWorld('settings', {
   setKhayTuThu: (n) => ipcRenderer.invoke('settings:set-khay-tu-thu', n),
   /** Doi kieu lam mo: 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10). */
   setLamMo: (kieu) => ipcRenderer.invoke('settings:set-lam-mo', kieu),
+  /** Bat / tat mo cung Windows. Tra { hoTro, bat, biChan } doc lai tu Windows. */
+  setMoCung: (bat) => ipcRenderer.invoke('settings:set-mo-cung', bat),
   /** Doi ngon ngu 'vi' | 'en' — main nap lai cua so de dich. */
   setLang: (l) => ipcRenderer.invoke('settings:set-lang', l),
   /** Dong cua so cai dat (frameless nen phai tu goi). */

@@ -49,6 +49,46 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0j. 05/11/2026 anh hoi "vua app chup hinh thi minh can them tinh nang nao" — Claude tra loi, anh CHUA chot muc nao
+So voi doi thu: doc trang tinh nang CleanShot X ngay 05/11 + lich su phien ban Snagit 2026 + bai review Shottr, Xnapper (review la nguon yeu, khong co so lieu nguoi dung uu tien gi). Ma 0.10.1 doc 05/11.
+Da ngang hoac hon: khoanh vung, ve, lam mo, danh so, but, ghim, doc chu, chup cuon, quay MP4 + GIF, khay keo tha. Rieng minh: Storyboard, Canvas. Windows chua co app nao ngang CleanShot (CleanShot chi Mac, ShareX manh nhung kho dung).
+
+| # | Tinh nang | Doi thu nao co | Nguoi dung duoc gi | Cong suc (UOC LUONG, chua do) |
+|---|---|---|---|---|
+| 1 | Tim lai anh cu: lich su + tim theo chu trong anh (= "Tim lai y tuong" o 0d) | CleanShot lich su 1 thang, tim theo noi dung chi tren Cloud; Snagit Library | Go mot chu la ra tam chup tu thang truoc, khong can may chu | Lon, 2-4 buoi; chua do doc chu 778 anh mat bao lau |
+| 2 | Sua lai net da ve (khung xoay, keo to, xoa) = #8 o 0i | Co o moi app tra tien | Chup xong sua duoc, khong phai ve lai | Lon, dung overlay + pin |
+| 3 | Bam vao cua so la chup dung cua so do; chup kin man mot phim; chup lai vung lan truoc | CleanShot | Bot mot nhat keo moi lan chup | Vua, dung vung keo chon (so loi #8) |
+| 4 | Lam dep anh: nen, le, bo goc, ti le cho MXH | CleanShot, Xnapper, Shottr | Anh dang MXH / gui khach dep ngay | Vua |
+| 5 | Hut mau + thuoc do pixel (muc 3 cu them thuoc do) | Shottr, mien phi | Designer, dev lay ma mau, do khoang cach | Nho den vua |
+| 6 | Che thong minh: bam dong chu la che, che moi cho trung | Snagit Smart Redact | Che email, so dien thoai nhanh, tan dung bo doc chu san co | Vua |
+| 7 | Quay: tieng micro, hien cu bam chuot + phim, tu zoom | CleanShot | Quay huong dan co loi noi | Vua den lon |
+| 8 | Tu cap nhat = #10 o 0i | Hau het | Khach co ban moi; dieu kien de ban duoc lau dai | Vua, can noi dat bo cai cong khai |
+| 9 | Viec nho: doc ma QR, hen gio chup, kinh lup luc chon vung, lam noi mot vung (spotlight) | CleanShot | Moi cai mot tinh huong nho | Moi cai nho |
+
+Khuyen CHUA lam: link chia se + cloud (can may chu, trai gia ban mot lan; muc 9 bang 0) · AI giai thich / dich (#2, #3 o 0i, cho anh quyet ai tra tien).
+Thu tu Claude de xuat: dot sua (2) -> 3 -> 1 -> 5 -> 4. Ly do: 2 + 3 la thu dung moi lan chup; 1 la cho doi thu yeu nhat (CleanShot chi co tren Cloud) va dung dinh vi 07/10 "luu y tuong".
+
+**Anh xin "list 10 muc" (05/11), Claude gom bang tren + Canvas 0g + #6 o 0i, theo thu tu nen lam, anh CHUA chot:** 1 sua net da ve · 2 chup dung cua so + chup lai vung cu · 3 tim lai anh cu · 4 Canvas dung hang ngay (0g nhom A) · 5 hut mau + thuoc do · 6 lam dep anh · 7 che thong minh · 8 quay: micro, hien cu bam, tu zoom · 9 tu cap nhat · 10 goi viec nho: QR, hen gio, kinh lup, spotlight, chon icon tren thanh.
+
+### 0i. GOP Y NGUOI DUNG THU 04/11/2026 (anh chuyen tiep, 10 y + 1 dong cua anh) — anh CHUA chot muc nao
+Doi chieu voi ma 0.10.1 ngay 04/11. "Mo cung Windows" da lam cung ngay (xem PROGRESS). Con lai:
+
+| # | Gop y | Hien trang trong ma | Co mat gi | De xuat |
+|---|---|---|---|---|
+| 1 | Chup full man: thanh cong cu day len goc | DUNG, la loi: `datViTriThanhCongCu` overlay.js, vung kin man thi top = 10, left = 10 | Nho | Khong du cho ngoai vung thi dat GIUA, sat day ben trong vung; cho keo thanh cong cu la buoc sau |
+| 2 | AI giai thich truc tiep | Chua co. Co doc chu (phim 5) lam dau vao | Ton tien moi lan goi, app ban 1 lan $14.99 | Can anh quyet ai tra tien AI truoc khi lam |
+| 3 | Dich sang nhieu thu tieng | Chua co. Noi tiep bang doc chu duoc | Cung cau hoi voi #2 | Gop chung #2 thanh mot nut tren bang chu |
+| 4 | Icon nho, can to | Nut 34 px, icon 16 px, cham mau 18 px | Thanh da 15 nut + 7 mau, to len la dai hon | Lam SAU #5 + #9 vi hai muc do thu chieu ngang |
+| 5 | But ve + but da xo doc khi re chuot | Dang 2 nut rieng (phim 7, 8) | Vua, dung vung overlay | Gom thanh 1 nut, re chuot xo menu; phim 7, 8 giu nguyen |
+| 6 | Chon icon nao hien | Chua co, thanh co dinh | Vua | Them nhom trong Cai dat, an nut nhung phim tat van chay |
+| 7 | Undo co Redo, 2 icon xanh + do | Co Undo + Ctrl+Z, chua co Redo, ca overlay lan anh ghim | Vua | Lam Redo. Mau do / xanh trung nghia voi nut Huy (do) va Xong (xanh) ngay canh: de bam nham, can anh chon |
+| 8 | Chu, icon, mui ten keo tu do, khung xoay + co gian + xoa | Mot phan: phim V keo duoc, Delete xoa. Chua co khung, co gian, xoay | Lon nhat, dung ca overlay.js lan pin.js | Lam rieng, can mau cho anh xem truoc |
+| 9 | Bo mau xo xuong | Dang bay 7 cham mau tren thanh | Nho | 1 cham mau dang chon, bam xo bang mau; tiet kiem ~120 px cho #4 |
+| 10 | Cap nhat phan mem | Chua co gi, khach khong biet co ban moi | Vua, can noi dat bo cai cong khai | Windows tu tai + cai duoc khi co GitHub Releases; Mac chi bao + nut tai (quyet dinh 21/09) |
+
+**04/11 21:35 DOT 1 DA LAM + NAP (anh: "goi agent sonnet ra lam va kiem"): #1, #7 phan Redo (mau van trung tinh, cho anh chon), #9, #5, #4. Anh chua dung that. Con lai: #8, #10, #6, #2, #3.**
+Thu tu em de xuat: dot 1 = #1, #7 (phan Redo), #9, #5, #4 (mot lan sua thanh cong cu) · dot 2 = #8 · dot 3 = #10, #6 · #2, #3 cho anh quyet chuyen tien AI.
+
 ### 0d. 08/10/2026 anh hoi "tiep theo la tinh nang gi" — Claude tra loi, anh CHUA chot muc nao
 Con lai trong bang muc 0 (chua lam): 3 hut mau + bang 5 mau · 6 khung an toan MXH · 7 Storyboard ban duyet co o ghi chu ·
 thu tieng micro · app tu cuon khi chup cuon · mot khay 3 the (0c) · kieu C cua nut tron. Muc 8 (Mac chay that) da co ban

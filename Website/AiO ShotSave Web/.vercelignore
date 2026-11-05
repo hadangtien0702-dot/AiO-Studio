@@ -2,4 +2,4 @@
 .vercel
 .gitignore
 .vercelignore
-email/
+# KHONG chan thu muc email: .vercelignore ap cho ca deploy tu git va dong email/ khop MOI thu muc ten email o moi cap, ke ca img/email (anh thu cam on phai len web). Mau thu chi co cho trong, de cong khai cung khong sao.

@@ -28,6 +28,7 @@ const { taoKhayThu, giayHopLe } = require('./khay-thu') // 01/10: khay tu thu ve
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const canvasKho = require('./canvas-kho') // 12/10: Canvas y tuong — khung tren bang = thu muc con cung ten
+const moCungMay = require('./mo-cung-may') // 04/11: tu mo cung Windows, tat duoc trong Cai dat
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
@@ -79,6 +80,9 @@ const frozenStore = new Map() // 'gen/displayId' -> Buffer JPEG q92 (nen ANH DON
    nho -> vai chuc ms) -> file luu van lossless nhu truoc. */
 const rawStore = new Map()
 let grabGen = 0
+let luotGrab = 0        // 05/11: luot grab moi nhat; grab cu ve muon khong duoc de len luot moi
+let overlayCham = false // 05/11: nguoi dung da bam / keo tren man chup chua (chua = phim chup lan nua duoc mo lai)
+let overlayMoLuc = 0
 
 const IS_DEV = process.argv.includes('--dev')
 const IS_SELFTEST = process.argv.includes('--selftest')
@@ -280,6 +284,20 @@ kho.noiNhatKy(ghiLog) // 04/10: cau-hinh.json khong doc / khong ghi duoc thi pha
 /* 04/10 macOS: chua co quyen Ghi man hinh thi hien HOP THOAI noi ro + nut mo dung trang quyen (anh bam chup 35 lan chi
    thay overlay chop roi mat; Notification khong hien tren may anh). Windows: khong lam gi. Xem src/quyen-man-hinh.js. */
 const kiemQuyen = taoKiemQuyen({ systemPreferences, dialog, shell, T, ghiLog, app })
+const chupChac = require('./chup-chac')
+/* 05/11: bao loi cho nguoi dung. Mac: Notification KHONG hien tren may anh (so loi #20) nen moi loi mat anh deu im lang -> hop thoai that. */
+let dangBaoLoi = false
+function baoNguoiDung(body) {
+  if (process.platform !== 'darwin') {
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body }).show()
+    return
+  }
+  if (dangBaoLoi) return
+  dangBaoLoi = true
+  try { app.focus({ steal: true }) } catch (e) {}
+  dialog.showMessageBox({ type: 'warning', title: 'AiO Shot & Save', message: body, buttons: ['OK'], noLink: true })
+    .catch((e) => ghiLog('LOI hop thoai: ' + e.message)).finally(() => { dangBaoLoi = false })
+}
 
 /** Con tro app: tray + cac cua so dang song. */
 let tray = null
@@ -415,6 +433,18 @@ app.whenReady().then(() => {
   ghiLog('boot v' + app.getVersion() + ' hotkey=' + currentHotkey +
     (ch.hotkey ? '(config)' : '(default)') + ' dang-ky=' + (okPhim ? 'OK' : 'FAIL') +
     ' lang=' + lang)
+  /* 05/11: run-log may Windows dang-ky=FAIL 4/7 lan boot gan day (app khac giu luc may vua mo) ma khong ai thu lai: phim chet toi lan
+     mo app sau. Nay thu lai moi 5 giay trong 2 phut. */
+  if (!okPhim) {
+    let lanPhim = 0
+    const henPhim = setInterval(() => {
+      lanPhim++
+      if (globalShortcut.isRegistered(currentHotkey) || registerHotkey()) {
+        clearInterval(henPhim); ghiLog('phim tat: dang ky duoc sau ' + lanPhim + ' lan thu lai')
+      } else if (lanPhim >= 24) { clearInterval(henPhim); ghiLog('phim tat: thu lai 24 lan van bi giu') }
+    }, 5000)
+    if (henPhim.unref) henPhim.unref()
+  }
   /* Phim bi app khac giu -> bao HAN ra man hinh, dung chet im lang: nguoi
      dung bam khong an se tuong "phim tu doi" (chi bao khi THAT BAI). */
   if (!okPhim && Notification.isSupported()) {
@@ -422,6 +452,10 @@ app.whenReady().then(() => {
       title: 'AiO Shot & Save',
       body: T('app.phimBiGiu').replace('{phim}', formatAccel(currentHotkey)),
     }).show()
+  }
+  // 04/11: dang ky tu mo cung Windows (chi ban dong goi). Bo qua khi chay do de ban do khong dung vao registry cua anh.
+  if (!(IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || process.env.AIO_USERDATA)) {
+    try { moCungMay.khoiDong(app, kho, ghiLog) } catch (e) { ghiLog('mo-cung-may LOI: ' + e.message) }
   }
   // Khong tu mo cua so nao — day la app song o khay he thong.
 
@@ -716,11 +750,15 @@ ipcMain.handle('settings:get', () => {
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
     khayTuThu: giayHopLe(c.khayTuThu),
     lamMoKieu: kieuLamMo(c.lamMoKieu),
+    moCung: moCungMay.trangThai(app),
   }
 })
 
 /** Kieu lam mo hop le: 'mosaic' (Kham o, mac dinh) | 'blur' (Mo min) | 'kin' (To kin, 04/10). Gia tri la -> mac dinh. */
 function kieuLamMo(v) { return v === 'blur' || v === 'kin' ? v : 'mosaic' }
+
+// 04/11: cong tac Mo cung Windows trong Cai dat. Tra trang thai doc lai tu Windows, khong tra gia tri vua bam.
+ipcMain.handle('settings:set-mo-cung', (_e, bat) => moCungMay.dat(app, kho, ghiLog, !!bat))
 
 ipcMain.handle('settings:set-lam-mo', (_e, kieu) => {
   const val = kieuLamMo(kieu)
@@ -884,7 +922,13 @@ async function startCapture() {
   // khong con cho dat nut Dung). Khong mo overlay luc dang quay: anh dong bang se lot vao video.
   if (ghiHinh) { dungGhiHinh('phim tat'); return }
   if (cuon) { cuon.dung = true; return } // 06/10: dang chup cuon -> phim tat chup = Xong (duong dung luon co)
-  if (overlayWins.length) return // dang chon vung, bo qua
+  if (overlayWins.length) {
+    // 05/11: man chup hien o cho nguoi dung khong thay (desktop khac, sau app toan man hinh) thi truoc day MOI lan bam phim sau
+    // deu bi bo qua toi khi tat app. Chua ai cham vao no -> dong, mo lai. Dang chon vung that thi bo qua nhu cu.
+    if (!chupChac.overlayKet({ coCuaSo: true, coTuongTac: overlayCham, moLuc: overlayMoLuc, bayGio: Date.now() })) return
+    ghiLog('CANH BAO man chup ket ' + (Date.now() - overlayMoLuc) + ' ms, chua ai cham -> dong, mo lai')
+    closeOverlay()
+  }
   khayThu.huy() // 01/10: khay dang bay ve nut / bung ra thi go san dien ngay (cua so trong suot phu video lau = video den)
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
   if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
@@ -906,6 +950,8 @@ async function startCapture() {
   grabStarted = false
   grabPromise = null
   layersSanSang = null
+  overlayCham = false
+  overlayMoLuc = Date.now()
   napManCache()
   ghiLog('capture-start displays=' + displays.length + ' ' +
     manCache.map((m) => m.px + ',' + m.py + ' ' + m.pw + 'x' + m.ph + '@' + m.sf).join(' | ') +
@@ -920,6 +966,7 @@ async function startCapture() {
 function kickGrab() {
   if (grabStarted) return
   grabStarted = true
+  const luot = ++luotGrab
   const _tg = Date.now() // TAM do gio
   nguonGrab = luong.sanSang() ? 'luong' : 'grab'
   if (nguonGrab === 'luong') {
@@ -961,11 +1008,17 @@ function kickGrab() {
     }).catch((e) => { if (IS_DEV) console.error('[shotandsave] luong loi', e); return [] })
     return
   }
-  grabPromise = grabDisplaysList().catch((e) => {
-    if (IS_DEV) console.error('[shotandsave] grab loi', e)
+  // 05/11: Mac khong co luong chay san, moi lan chup la mot lan getSources: hong mot lan thi thu lai, khong bo luot chup.
+  grabPromise = chupChac.thuLai(grabDisplaysList, {
+    lan: 3, tre: 150, du: (l) => !!l && l.length >= screen.getAllDisplays().length, ghiLog, ten: 'grab',
+  }).catch((e) => {
+    ghiLog('LOI grab: ' + ((e && e.message) || e))
     return []
   })
-  grabPromise.then((list) => phatFrozen(list, _tg, 'grab'))
+  grabPromise.then((list) => {
+    if (luot === luotGrab) phatFrozen(list, _tg, 'grab')
+    else ghiLog('grab cu ve sau khi luot moi da bat dau: bo qua')
+  })
 }
 
 /* Phat anh dong bang cho moi overlay. list = [{display, image|null, jpg, sf}]. Goi 1 lan
@@ -1003,7 +1056,7 @@ function phatFrozen(list, _tg, nguon, nhanh) {
     ghiLog('LOI grab: 0/' + screen.getAllDisplays().length + ' man chup duoc — dong overlay')
     closeOverlay()
     // 04/10 macOS thieu quyen: hop thoai (kiemQuyen); con lai (Windows, hoac co quyen ma van hong): thong bao nhu cu
-    if (!kiemQuyen.baoKhiChupHong() && Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+    if (!kiemQuyen.baoKhiChupHong()) baoNguoiDung(T('app.khongChupDuoc'))
     return
   }
   // Gui anh dong bang cua MOI man (kem toa do DIP toan cuc) cho TUNG overlay —
@@ -1059,6 +1112,7 @@ function phatFrozen(list, _tg, nguon, nhanh) {
    bo qua chuot (het canh 2 man cung chon -> 2 anh). Reset moi lan capture (cua so
    moi). Renderer cung gui log su kien qua day. */
 ipcMain.on('overlay:lock', (e) => {
+  overlayCham = true
   for (const w of overlayWins) {
     if (!w.isDestroyed() && w.webContents.id !== e.sender.id) {
       w.webContents.send('overlay:locked')
@@ -1130,6 +1184,7 @@ function rectHienTai() {
 }
 
 ipcMain.on('overlay:drag-start', (e, diemNeo) => {
+  overlayCham = true
   dragOwnerId = e.sender.id
   const lucNhan = raPhys(screen.getCursorScreenPoint())
   /* ☠️ NEO = DIEM MOUSEDOWN renderer gui kem (global DIP -> phys), KHONG hoi
@@ -1292,6 +1347,7 @@ function taoCuaSoOverlay(disp) {
      do lam tron DPI (du = tran ra ngoai mep, vo hai; HUT moi nen anh). */
   win.setBounds(b)
   win.setAlwaysOnTop(true, 'screen-saver')
+  moiDesktop(win, 'man chup') // 05/11: thieu dong nay thi man chup co the hien o desktop khac / sau app toan man hinh (so loi #22)
   // ☠️ LOAI overlay khoi anh chup (WDA_EXCLUDEFROMCAPTURE): grab chay SAU khi
   // overlay da hien -> khong co dong nay thi LOP MO 42% bi nuong vao anh ->
   // "ket qua hinh bi toi" (anh Tien 26/08). Co dong nay grab ra man hinh SACH.
@@ -1439,7 +1495,11 @@ ipcMain.on('overlay:confirm', (e, payload) => {
   ghiLog('confirm tu display=' + (shot && shot.display ? shot.display.id : '?') +
     ' kieu=' + (payload && payload.dataUrl ? 'dataUrl(' + payload.dataUrl.length + ')' : 'rect') +
     (payload && payload.rect ? ' rect=' + JSON.stringify(payload.rect) : ''))
-  handleConfirm(e.sender.id, payload)
+  // 05/11: ham async goi khong await: loi nem ben trong truoc day bien mat, anh mat im lang
+  handleConfirm(e.sender.id, payload).catch((err) => {
+    ghiLog('LOI confirm: ' + ((err && err.stack) || err))
+    baoNguoiDung(T('app.khongChupDuoc'))
+  })
 })
 
 /* 04/10 (ECC soat): handleConfirm tung co 5 loi thoat IM LANG sau khi da dong man chup — nguoi dung bam Xong, man
@@ -1448,7 +1508,7 @@ ipcMain.on('overlay:confirm', (e, payload) => {
    Xong hai lan (Enter dup), lenh thu hai den sau khi luot dau da luu anh ma bao thi la BAO NHAM. */
 function boLuotChup(lyDo, chiGhiLog) {
   ghiLog('LOI confirm: ' + lyDo + ' — bo luot chup')
-  if (!chiGhiLog && Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+  if (!chiGhiLog) baoNguoiDung(T('app.khongChupDuoc'))
 }
 
 async function handleConfirm(wcId, payload) {
@@ -1494,7 +1554,7 @@ async function handleConfirm(wcId, payload) {
     if (!image) {
       // ☠️ 10/09: man nay khong co anh (grab man do loi) -> bao, dung return trang.
       ghiLog('LOI confirm: man ' + display.id + ' khong co anh grab — bo luot chup')
-      if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongChupDuoc') }).show()
+      baoNguoiDung(T('app.khongChupDuoc'))
       return
     }
     // ☠️ Quy doi theo kich thuoc anh THAT (desktopCapturer co the tra anh khong
@@ -1532,16 +1592,21 @@ async function handleConfirm(wcId, payload) {
     //    ra ngoai tu khoa vi khong co filePath).
     ghiLog('LOI luu anh: khong ghi duoc vao ' + kho.thuMucAnh() + ' ' + _sz.width + 'x' + _sz.height)
     try { clipboard.writeImage(cropped) } catch (e) {}
-    if (Notification.isSupported()) {
-      new Notification({ title: 'AiO Shot & Save', body: T('app.khongLuuDuoc').replace('{thuMuc}', kho.thuMucAnh()) }).show()
-    }
+    baoNguoiDung(T('app.khongLuuDuoc').replace('{thuMuc}', kho.thuMucAnh()))
   } else {
     ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height)
   }
   // 2) Vao khay (cho gom moi tam da chup). Khay tu hien len.
   //    ☠️ Anh Tien chot 25/08: chup xong CHI vao khay, KHONG bung anh ghim noi.
   //    Muon ghim len man hinh thi bam thumbnail trong khay (shelf:pin van con).
-  shelfAdd(cropped, filePath)
+  try { shelfAdd(cropped, filePath) } catch (err) {
+    // 05/11: file da luu ma khay hong (vd tao anh nho loi) -> thu lai bang anh doc tu file; van hong thi BAO, khong im lang
+    ghiLog('LOI khay: them anh loi: ' + ((err && err.stack) || err))
+    try { shelfAdd(filePath ? nativeImage.createFromPath(filePath) : cropped, filePath) } catch (e2) {
+      ghiLog('LOI khay: thu lai van loi: ' + ((e2 && e2.message) || e2))
+      baoNguoiDung(T('khay.khongThemDuoc'))
+    }
+  }
 
   // [selftest] Van chay duong GHIM de kiem (that: bam thumbnail se goi ham nay).
   // Khoi selftest o day cung lo chup selftest-pin/shelf.png + thoat app.
@@ -1938,10 +2003,22 @@ function showShelf() {
   khayThu.chamVao()
 }
 
+/* 05/11: gui anh sang trang khay co XAC NHAN: trang chua bao da ve thi gui lai (src/chup-chac.js). Trang dang nap thi bo qua lan
+   nay: did-finish-load trong ensureShelf gui lai ca danh sach. Muc nguoi dung da xoa thi thoi. */
+const khayGui = chupChac.taoGuiChac({
+  ghiLog,
+  gui: (m) => {
+    if (!shelfItems.has(m.id)) { khayGui.bo(m.id); return }
+    const k = ensureShelf()
+    if (!k.webContents.isLoading()) k.webContents.send('shelf:add', m)
+  },
+})
+ipcMain.on('shelf:da-them', (_e, id) => khayGui.daNhan(id))
+
 /** Them mot anh vao khay (goi sau khi da luu file). */
 function shelfAdd(image, filePath) {
   napAnhGanNhatVaoKhay(filePath)   // truoc ensureShelf: nap anh cu, TRU anh vua chup (0.6.5)
-  const w = ensureShelf()
+  ensureShelf()
   const id = ++shelfSeq
   /* 04/10 (ECC soat, DA DO): khay KHONG giu anh goc nua. `image` la manh cat cua khung man hinh; giu no la ghim ca
      khung ~32 MB (20 anh trong khay = 705 MB RAM). Muc chi giu anh nho + kich thuoc; bam ghim thi doc lai tu file.
@@ -1956,12 +2033,8 @@ function shelfAdd(image, filePath) {
   let kb = 0
   try { kb = Math.round(fs.statSync(filePath).size / 1024) } catch (e) {}
 
-  const send = () => w.webContents.send('shelf:add', { id, seq: id, thumb, filePath, w: sz.width, h: sz.height, kb })
-  if (w.webContents.isLoading()) {
-    w.webContents.once('did-finish-load', send)
-  } else {
-    send()
-  }
+  ghiLog('khay them #' + id + ' ' + (filePath ? path.basename(filePath) : '(chua luu)') + ', khay co ' + shelfItems.size)
+  khayGui.gui({ id, seq: id, thumb, filePath, w: sz.width, h: sz.height, kb })
   showShelf()
   canvasLamMoi() // 12/10: Canvas dang mo thi tam vua chup bay vao bang
 }

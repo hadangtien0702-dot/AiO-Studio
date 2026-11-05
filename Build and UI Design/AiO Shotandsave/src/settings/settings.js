@@ -44,6 +44,8 @@ const khayBox = document.getElementById('khay-kieu')
 const khaySoAnhBox = document.getElementById('khay-so-anh')
 const khayTuThuBox = document.getElementById('khay-tu-thu')
 const lamMoBox = document.getElementById('lam-mo-kieu')
+const moCungBox = document.getElementById('mo-cung')
+const msgMoCung = document.getElementById('msg-mo-cung')
 const loaiBox = document.getElementById('anh-loai')
 const clBox = document.getElementById('anh-chat-luong')
 const hangCL = document.getElementById('hang-chat-luong')
@@ -131,6 +133,15 @@ function datAnh(loai, chatLuong) {
   hangCL.classList.toggle('mo', loai === 'png')
 }
 
+/* 04/11: ve cong tac Mo cung Windows theo trang thai THAT doc tu Windows. Khong ho tro (ban nguon, Mac) thi an ca nhom. */
+function datMoCung(m) {
+  if (!moCungBox || !m) return
+  document.getElementById('nhom-ung-dung').hidden = !m.hoTro
+  document.getElementById('nhom-ung-dung-ten').hidden = !m.hoTro
+  chonPill(moCungBox, m.bat && !m.biChan ? '1' : '0')
+  msgMoCung.textContent = m.biChan ? window.i18n.t('set.moCung.biChan') : ''
+}
+
 async function load() {
   dichGiaoDien()
   const s = await window.settings.get()
@@ -142,6 +153,7 @@ async function load() {
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
   if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu === 0 ? 0 : (s.khayTuThu || 5)))   // 0 = Khong thu
   if (lamMoBox) chonPill(lamMoBox, s.lamMoKieu || 'mosaic')
+  datMoCung(s.moCung)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
@@ -204,6 +216,15 @@ if (lamMoBox) {
     if (!b || b.classList.contains('chon')) return
     chonPill(lamMoBox, b.dataset.v)
     await window.settings.setLamMo(b.dataset.v)
+  })
+}
+
+/* ── Mo cung Windows ──────────────────────────────────────────────────── */
+if (moCungBox) {
+  moCungBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    datMoCung(await window.settings.setMoCung(b.dataset.v === '1'))
   })
 }
 
