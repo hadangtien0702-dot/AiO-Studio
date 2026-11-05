@@ -182,12 +182,13 @@ function taoChiMuc(opts) {
         if (!m) break
         const duong = path.join(goc, m.ten)
         if (m.loai === 'video') { m.da = true; m.chu = ''; m.n = ''; luuSau(); continue } // video: chua doc chu (chi loc theo ngay / loai)
-        const t0 = Date.now()
+        const t0 = Date.now(), mt0 = m.mt, kt0 = m.kt
         let kq
         try { kq = await opts.docAnh(duong, m.loai) } catch (e) { kq = { ok: false, loi: e.message } }
         const ms = Date.now() - t0
         if (dung) break
         if (!muc.has(duong)) continue // bi xoa luc dang doc
+        if (m.mt !== mt0 || m.kt !== kt0) continue // file doi luc dang doc: chu vua doc la cua ban cu, de luot sau doc lai
         if (kq && kq.ok) {
           m.da = true; m.chu = String(kq.chu || '').replace(/\s+/g, ' ').trim(); m.n = chuanHoa(m.chu); m.loi = ''
           thongKe.daDoc++; thongKe.tongMs += ms

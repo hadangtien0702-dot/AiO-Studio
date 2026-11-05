@@ -89,10 +89,16 @@ window.addEventListener('mouseup', () => {
 })
 
 /* --- Nut --- */
-btnCopy.addEventListener('click', () => window.pin.copy())
+/* 05/11 soat: dang ve / che ma sao chep thi clipboard nhan anh GOC chua che. Luu net vao anh truoc; hai lenh di cung mot
+   kenh, main xu ly dung thu tu nen pin:copy lay anh da ve. */
+function chepAnh() {
+  if (mode === 've' && shapes.length) luuVe()
+  window.pin.copy()
+}
+btnCopy.addEventListener('click', chepAnh)
 document.getElementById('lam-dep').addEventListener('click', () => window.pin.lamDep())
 btnClose.addEventListener('click', () => window.pin.close())
-img.addEventListener('dblclick', () => window.pin.copy())
+img.addEventListener('dblclick', chepAnh)
 
 /* --- Ban phim --- */
 window.addEventListener('keydown', (e) => {
@@ -137,7 +143,7 @@ window.addEventListener('keydown', (e) => {
     return
   }
   if (e.key === 'Enter' && mode === 've') { luuVe(); return }
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { window.pin.copy(); return }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { chepAnh(); return }
   // Phim V = Select tool, 1/2/3/4 = khung/mui ten/chu/blur (giong PR — anh Tien 27/09); 6 = danh so buoc (02/10)
   if (!e.ctrlKey && !e.altKey && !e.metaKey) {
     const keyMap = {
@@ -536,7 +542,7 @@ window.addEventListener('mousemove', (e) => {
 
 window.addEventListener('mouseup', (e) => {
   if (mode !== 've') return
-  if (tool === 'select') {
+  if (tool === 'select' || suaDangKeo || dangKeoShape) { // doi cong cu bang phim giua luc keo van phai ket thuc cu keo
     if (suaDangKeo) { SuaNet.xong(suaDangKeo); suaDangKeo = null; redraw(); return }
     if (dangKeoShape) {
       dangKeoShape = false
@@ -963,7 +969,7 @@ function chuyenChe() {
 }
 cheTM = window.CheTMUI.tao({
   goc: frame, rect: () => ({ x: 0, y: 0, w: dip.w, h: dip.h }), heSo: heSoAnh, shapes: () => shapes, veLai: () => redraw(),
-  them: themNhomChe, xoaRedo, doc: () => window.pin.ocrTu(), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
+  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx }) }, doc: () => window.pin.ocrTu(), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
   nut: document.getElementById('che-muc'),
 })
 cheMenu = window.CheTMUI.ganMenuXo({

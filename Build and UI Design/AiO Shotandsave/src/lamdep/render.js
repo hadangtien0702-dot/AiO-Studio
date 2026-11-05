@@ -68,6 +68,9 @@
 
   function duongBo(ctx, x, y, w, h, r) {
     ctx.beginPath()
+    themDuong(ctx, x, y, w, h, r)
+  }
+  function themDuong(ctx, x, y, w, h, r) {
     if (r <= 0) { ctx.rect(x, y, w, h); return }
     ctx.moveTo(x + r, y)
     ctx.arcTo(x + w, y, x + w, y + h, r)
@@ -115,17 +118,17 @@
     if (o.bong > 0) {
       const t = o.bong / 100
       const mo = t * 0.06 * Math.max(iw, ih)
+      /* bong chi la hieu ung nen: chi ve ngoai khung anh, de anh co vung trong suot van thay nen da chon ben duoi.
+         05/11 soat: truoc day ve roi xoa bang destination-out, xoa luon ca nen duoi anh. */
       ctx.save()
+      ctx.beginPath()
+      ctx.rect(0, 0, cw, ch)
+      themDuong(ctx, x, y, iw, ih, r)
+      ctx.clip('evenodd')
       ctx.shadowColor = 'rgb(0 0 0 / ' + Math.round(18 + 52 * t) + '%)'
       ctx.shadowBlur = mo
       ctx.shadowOffsetY = mo * 0.4
       ctx.fillStyle = '#000'
-      duongBo(ctx, x, y, iw, ih, r)
-      ctx.fill()
-      ctx.restore()
-      /* bong chi la hieu ung nen: xoa phan den duoi anh de anh co alpha khong lo mau den. */
-      ctx.save()
-      ctx.globalCompositeOperation = 'destination-out'
       duongBo(ctx, x, y, iw, ih, r)
       ctx.fill()
       ctx.restore()

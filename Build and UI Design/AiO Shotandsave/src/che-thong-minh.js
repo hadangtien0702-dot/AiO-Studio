@@ -22,7 +22,7 @@
   const RE_LINK_RO = /(?:https?:\/\/|www\.)[^\s<>"')\]]+/gi
   const RE_LINK_TRAN = /[A-Za-z0-9][A-Za-z0-9\-]*(?:\.[A-Za-z0-9\-]+)*\.(?:com|net|org|vn|io|app|dev|me|co|info|biz|edu|gov|ly|xyz)(?:\/[^\s<>"')\]]*)?/gi
   // chuoi chu so co the la dien thoai / the: bat dau bang so hoac +, ( ; chua so, khoang trang, ( ) . -
-  const RE_SO = /(?<![\w@./\-])(?:\+\s?)?\(?\d[\d\s().\-]{6,24}\d(?![\w@])/g
+  const RE_SO = /(?<![\w@./\-])(?:\+\s?)?\(?\d[\d\s().\-]{6,60}\d(?![\w@])/g
 
   function luhn(d) {
     let s = 0, dao = false
@@ -69,6 +69,22 @@
       while (e > s && /[.,;:!?)\]]/.test(str[e - 1])) e--
       return e
     }
+    /* Chuoi so khong nhan duoc thi xet tung cum cach nhau boi khoang trang, gop dan tu cum dau toi khi ra mot so (so viet tach "0912 345 678"). */
+    const tachCum = (s, e) => {
+      const cum = []
+      const re = /\S+/g
+      let c
+      const doan = str.slice(s, e)
+      while ((c = re.exec(doan))) cum.push({ s: s + c.index, e: s + c.index + c[0].length })
+      for (let i = 0; i < cum.length;) {
+        let het = 0
+        for (let j = i + 1; j <= Math.min(cum.length, i + 6); j++) {
+          const loai = phanLoaiSo(str.slice(cum[i].s, cum[j - 1].e))
+          if (loai) { dat(loai, cum[i].s, cum[j - 1].e); het = j; break }
+        }
+        i = het || i + 1
+      }
+    }
     let m
     RE_EMAIL.lastIndex = 0
     while ((m = RE_EMAIL.exec(str))) dat('email', m.index, cat(m.index, m.index + m[0].length))
@@ -85,6 +101,7 @@
       const e = s + m[0].replace(/[\s.\-]+$/, '').length
       const loai = phanLoaiSo(str.slice(s, e))
       if (loai) dat(loai, s, e)
+      else tachCum(s, e) // 05/11 soat: "0912345678 0987654321" dinh thanh mot chuoi 20 so, khong loai nao nhan
     }
     kq.sort((a, b) => a.s - b.s)
     return kq

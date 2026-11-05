@@ -23,6 +23,7 @@
 
 const { BrowserWindow, desktopCapturer, screen, ipcMain, nativeImage, powerMonitor, systemPreferences } = require('electron')
 const path = require('path')
+const fs = require('fs')
 const nhapQuay = require('./nhap-quay') // 05/11: nguon su kien chuot + phim cho 'hien cu bam' luc quay
 
 const LUONG_FPS = Number(process.env.AIO_LUONG_FPS) > 0 ? Number(process.env.AIO_LUONG_FPS) : 5
@@ -261,6 +262,7 @@ async function batDauQuay(display, rect, opts) {
   /* 05/11 MICRO: xin quyen TRUOC (Mac hien hop thoai he thong lan dau; Windows bao 'denied' khi tat trong Privacy).
      Thieu quyen / khong co micro thi VAN QUAY (chi khong co tieng micro) va tra micLoi de main bao mot dong. */
   let mic = !!(opts && opts.mic), micLoi = null
+  if (mic && !(opts && opts.micGia) && !coKhaiBaoMic()) { mic = false; micLoi = 'quyen' }
   if (mic && !(opts && opts.micGia)) { // micGia chi bai do dat: nguon am tao trong trang, khong dung thiet bi that
     try {
       const tt = systemPreferences.getMediaAccessStatus('microphone')
@@ -342,6 +344,13 @@ function theoDoiMoiTruong() {
     powerMonitor.on('resume', () => lai('may day'))
     powerMonitor.on('unlock-screen', () => lai('mo khoa'))
   } catch (e) {}
+}
+
+/* macOS ket thuc app neu xin micro ma Info.plist khong khai NSMicrophoneUsageDescription. Nap tai cho chi doi app.asar, khong doi
+   Info.plist, nen ban .app cu co the chua co dong nay (05/11 soat). Khong doc duoc file thi coi nhu co. */
+function coKhaiBaoMic() {
+  if (process.platform !== 'darwin') return true
+  try { return fs.readFileSync(path.join(process.resourcesPath, '..', 'Info.plist'), 'latin1').includes('NSMicrophoneUsageDescription') } catch (e) { return true }
 }
 
 module.exports = { nhapQuay, khoiDong, sanSang, layKhung, catVung, batDauQuay, dungQuay, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH, CHAY_SAN }

@@ -87,6 +87,7 @@ app.whenReady().then(async () => {
   await o(NET("'kin'"))
   kq.a5 = { kieuHienTai: await o('curBlurType'), quet: await o(QUET) }
   // A6 bam Xong -> anh ghep gui ve main: vung do den dac trong ANH XUAT
+  await o(`(async () => { const c = document.createElement('canvas'); c.width = Math.round(innerWidth * DPR); c.height = Math.round(innerHeight * DPR); const im = new Image(); im.src = c.toDataURL(); await im.decode(); frozenImg = im; return true })()`) // nen trong suot: bam Xong phai co anh nen moi ghep (05/11 soat), anh xuat van chi co net ve de do
   await o('document.getElementById("xong").click()')
   await cho(500)
   if (xacNhan && xacNhan.dataUrl) {

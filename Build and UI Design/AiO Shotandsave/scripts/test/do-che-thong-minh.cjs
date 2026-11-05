@@ -265,6 +265,17 @@ const dem = (ds, loai) => ds.filter((m) => m.loai === loai).length
     await chay(win, `document.querySelector('.che-hop.da-che').click()`)
     kiem('bam lai: bo che (0 shape)', (await soChe(win)) === 0)
 
+    // 05/11 soat: bo che = mot buoc trong lich su, khong xoa cac thao tac truoc do
+    await chay(win, `(() => { themNet({ type: 'rect', x1: 5, y1: 5, x2: 40, y2: 30, color: '#f00' }); const s = shapes[shapes.length - 1], t = SuaNet.sao(s); s.x1 += 20; s.x2 += 20; SuaNet.ghiSua(s, t); redraw(); return true })()`)
+    await chay(win, `[...document.querySelectorAll('.che-hop')].find((q) => q.dataset.text === 'Văn').click()`)
+    await chay(win, `document.querySelector('.che-hop.da-che').click()`)
+    await chay(win, `hoanTac(); true`)
+    kiem('bo che roi Ctrl+Z: che lai dung cho do', (await soChe(win)) === 1)
+    await chay(win, `hoanTac(); true`)
+    await chay(win, `hoanTac(); true`)
+    kiem('Ctrl+Z tiep: lui tung buoc toi lan keo khung ve truoc, khung khong bi mat', await chay(win, `shapes.length === 1 && shapes[0].x1 === 5`), await chay(win, `JSON.stringify(shapes)`))
+    await chay(win, `shapes.length = 0; SuaNet.lichSu.length = 0; SuaNet.redo.length = 0; redraw(); lamMoiCheThu && 0; true`.replace(' lamMoiCheThu && 0;', ''))
+
     // Tu che
     await click(win, '.che-hang > .che-nut:nth-of-type(1)')
     await ngu(150)

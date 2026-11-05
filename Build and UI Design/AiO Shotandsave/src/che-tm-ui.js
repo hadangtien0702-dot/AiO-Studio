@@ -107,11 +107,16 @@
       const nhom = 'che' + (++demNhom) + '_' + Date.now()
       opt.them(ms.map((m) => { const x = CT.taoShape(m, he, r.w * he, r.h * he); x.nhom = nhom; return x }))
     }
-    /* Bo che bang cach bam lai: go khoi mang nen khong nam trong Hoan tac (Hoan tac chi lui cac lan che); hang doi Lam lai
-       bi xoa de khong hien lai net cu tren cho vua bo. */
+    /* Bo che bang cach bam lai = mot thao tac XOA trong lich su (Ctrl+Z che lai). 05/11 soat: truoc day xoa ca lich su,
+       Ctrl+Z ke tiep bo nham net ve tu truoc. Ghi tu chi so lon ve nho de hoan tac chen lai dung cho. */
     function boDs(m) {
+      const truoc = shapes().slice()
       const n = CT.boChe(shapes(), m)
-      if (n && opt.xoaRedo) opt.xoaRedo()
+      if (n && opt.daBo) {
+        const con = shapes(), ds = []
+        for (let i = truoc.length - 1; i >= 0; i--) if (con.indexOf(truoc[i]) < 0) ds.push({ s: truoc[i], idx: i })
+        opt.daBo(ds)
+      }
       return n
     }
 
@@ -120,7 +125,7 @@
       else { themDs([m]); cuoi = m }
       opt.veLai()
       lamMoi()
-      if (opt.log) opt.log('che bam ' + m.id + ' "' + m.text.slice(0, 20) + '" -> ' + (CT.daChe(shapes(), m) ? 'che' : 'bo'))
+      if (opt.log) opt.log('che bam ' + m.id + ' -> ' + (CT.daChe(shapes(), m) ? 'che' : 'bo')) // khong ghi chu: run-log khong duoc chua thu nguoi dung vua che
     }
 
     function doiKieu(k) { kieu = k; cuoi = null; veHop() }

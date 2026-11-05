@@ -689,10 +689,17 @@ function registerHotkey() {
 /* 05/11: phim tat "chup lai vung lan truoc". Mac dinh Ctrl/Cmd+Shift+Alt+S (them Alt vao phim chup chinh, it dung voi app khac);
    doi bang cau-hinh.json "hotkeyLai" (chuoi rong "" = tat). Dang ky loi chi ghi log — khong lam hong phim chup chinh. */
 const DEFAULT_HOTKEY_LAI = 'CommandOrControl+Shift+Alt+S'
+/* 05/11 soat: 'Ctrl+Alt+Shift+C' va 'CommandOrControl+Alt+Shift+C' la MOT to hop tren Windows; so chuoi thi khong thay trung. */
+function chuanPhim(a) {
+  const doi = { commandorcontrol: process.platform === 'darwin' ? 'cmd' : 'ctrl', cmdorctrl: process.platform === 'darwin' ? 'cmd' : 'ctrl',
+    control: 'ctrl', command: 'cmd', option: 'alt' }
+  return String(a || '').toLowerCase().split('+').map((x) => doi[x.trim()] || x.trim()).sort().join('+')
+}
+const cungPhim = (a, b) => !!a && !!b && chuanPhim(a) === chuanPhim(b)
 function registerHotkeyLai() {
   const ch = kho.docCauHinh()
   const accel = typeof ch.hotkeyLai === 'string' ? ch.hotkeyLai : DEFAULT_HOTKEY_LAI
-  if (!accel || accel === currentHotkey) return false
+  if (!accel || cungPhim(accel, currentHotkey)) return false
   let ok = false
   try { ok = globalShortcut.register(accel, () => chupLaiVungCuoi()) } catch (e) { ok = false }
   ghiLog('phim chup-lai-vung ' + accel + ' dang-ky=' + (ok ? 'OK' : 'FAIL'))
@@ -704,6 +711,7 @@ function registerHotkeyLai() {
 function setHotkey(accel) {
   const old = currentHotkey
   globalShortcut.unregisterAll()
+  phimCanvasDangKy = '' // da go o dong tren; giu ten cu thi dangKyPhimCanvas se go nham phim chup vua dang ky neu trung to hop
   let ok = false
   try { ok = globalShortcut.register(accel, () => startCapture()) } catch (e) { ok = false }
   if (!ok) {
@@ -1071,6 +1079,7 @@ async function startCapture(opts) {
   layersSanSang = null
   overlayCham = false
   overlayMoLuc = Date.now()
+  winGiuFocus = null
   napManCache()
   ghiLog('capture-start displays=' + displays.length + ' ' +
     manCache.map((m) => m.px + ',' + m.py + ' ' + m.pw + 'x' + m.ph + '@' + m.sf).join(' | ') +
@@ -1093,19 +1102,24 @@ function kickGrab() {
     /* 0.5.0: khung tu LUONG CHAY SAN — JPEG ve truoc (hien overlay), raw ve sau (cat luc Xong).
        Truoc khi tin list: rong = luong hong -> roi ve grab cu ngay trong luot nay. */
     let daPhat = false
+    // 05/11 soat: huy luot A roi mo luot B, khung cua A ve muon khong duoc dien vao B (B se luu noi dung cua A).
+    const cu = () => luot !== luotGrab
     grabPromise = luong.layKhung((listNhanh) => {
+      if (cu()) return
       // Dot 0 (0.5.2): nen NHANH nua do phan giai -> overlay co nen ngay, khong con nhin xuyen ra video den.
       daPhat = true
       ghiLog('nhanh-xong ' + (Date.now() - _tg) + 'ms nguon=luong layers=' + listNhanh.length + ' [' +
         listNhanh.map((x) => 'jpg ' + Math.round(x.jpgNhanh.length / 1024) + 'KB').join(' | ') + ']')
       phatFrozen(listNhanh, null, 'luong', true)
     }, (listJpg) => {
+      if (cu()) return
       ghiLog('grab-xong ' + (Date.now() - _tg) + 'ms nguon=luong layers=' + listJpg.length + ' [' +
         listJpg.map((x) => 'jpg ' + Math.round(x.jpg.length / 1024) + 'KB').join(' | ') + ']' +
         listJpg.map((x) => x.doJpg ? ' (cho ' + x.doJpg.cho + ' ve ' + x.doJpg.ve + ' nen ' + x.doJpg.nen + ')' : '').join(''))
       if (daPhat) capNhatFrozenDayDu(listJpg)
       else { daPhat = true; phatFrozen(listJpg) }
     }).then((list) => {
+      if (cu()) { ghiLog('luong: khung cua luot cu ve sau khi luot moi da bat dau: bo qua'); return list }
       if (!list.length) {
         ghiLog('LUONG: khong ra khung -> roi ve grab cu')
         return grabDisplaysList().then((l2) => { phatFrozen(l2, _tg, 'grab'); return l2 })
@@ -1361,7 +1375,9 @@ function chotVung(rect, chuId) {
   // Vat ngang nhieu man -> chu ghep theo PIXEL VAT LY (1:1 tung man, khong meo)
   const owner = overlayWins.find((w) => !w.isDestroyed() && w.webContents.id === chuId)
   ghiLog('composite (vat ngang, phys)')
-  if (owner) owner.webContents.send('overlay:composite', rect)
+  // manGiao: so man vung nay cat qua. Renderer chi biet cac man DA co anh, nen tu no khong thay man nao bi thieu (05/11 soat).
+  const manGiao = manCache.filter((m) => rect.x < m.px + m.pw && rect.x + rect.w > m.px && rect.y < m.py + m.ph && rect.y + rect.h > m.py).length
+  if (owner) owner.webContents.send('overlay:composite', Object.assign({}, rect, { manGiao }))
   else closeOverlay()
 }
 
@@ -1374,6 +1390,7 @@ const CHON_CUA_SO_BAT = process.env.AIO_CUA_SO !== '0' // doi chung / cong tat k
 let cuaSoGen = 0              // the he lay danh sach (moi luot chup +1; ket qua cu bi bo)
 let danhSachCuaSo = null      // [{x,y,w,h}] PHYS toan cuc, tren cung truoc; null = chua ve / khong co
 let vungNapSan = null         // {x,y,w,h} phys — chup lai vung lan truoc: ap vao overlay ngay khi no hien
+let winGiuFocus = null        // man dang chua vung nap san: overlay man khac hien sau khong duoc cuop phim
 
 /** Lay danh sach cua so NEN (khong chan viec hien overlay). Xong thi gui cho moi overlay. */
 function layCuaSoNen() {
@@ -1384,10 +1401,12 @@ function layCuaSoNen() {
     if (gen !== cuaSoGen) return // luot chup khac / da dong
     let ds = chonCuaSo.docDanhSach(r.text)
     if (process.platform === 'darwin') {
-      // Mac tra DIP: doi sang phys cung he voi raPhys (tren Mac = nhan sf man chua diem)
+      // Mac tra DIP: doi sang phys cung he voi raPhys (tren Mac = nhan sf man chua diem).
+      // 05/11 soat: hai goc o hai man khac ti le thi rong ra so am -> quy doi ca cua so theo MOT man (man chua tam).
       ds = ds.map((c) => {
-        const a = raPhys({ x: c.x, y: c.y }), b = raPhys({ x: c.x + c.w, y: c.y + c.h })
-        return { x: a.x, y: a.y, w: b.x - a.x, h: b.y - a.y }
+        const d = screen.getDisplayNearestPoint({ x: Math.round(c.x + c.w / 2), y: Math.round(c.y + c.h / 2) })
+        const sf = d.scaleFactor || 1
+        return { x: Math.round(c.x * sf), y: Math.round(c.y * sf), w: Math.round(c.w * sf), h: Math.round(c.h * sf) }
       })
     }
     ghiLog('cua-so: ' + (r.ok ? ds.length + ' cua so' : 'LOI lay danh sach') + ' trong ' + r.ms + 'ms')
@@ -1437,6 +1456,7 @@ function thuApDungVungNapSan() {
   const win = chua ? overlayWins.find((w) => !w.isDestroyed() && w._displayId === chua.id) : overlayWins.find((w) => !w.isDestroyed())
   if (!win || !win._daKichHoat) return // chua toi luot cua so do — kichHoatOverlay sau se goi lai
   vungNapSan = null
+  winGiuFocus = win
   ghiLog('chup-lai-vung ' + JSON.stringify(r))
   chotVung(r, win.webContents.id)
 }
@@ -1589,7 +1609,7 @@ function kichHoatOverlay(win, disp, idx, sanSang) {
     ...cauHinhOverlay(), // lamMoKieu + anNut (nut an tren thanh cong cu) + kinhLup
   })
   // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
-  if (!win.isVisible()) { win.show(); win.focus() }
+  if (!win.isVisible()) { win.show(); (winGiuFocus && !winGiuFocus.isDestroyed() ? winGiuFocus : win).focus() }
   ghiLog('overlay hien ' + disp.id + (sanSang ? ' (san)' : ''))
   win._daKichHoat = true
   guiCuaSoChoOverlay(win)  // 05/11: danh sach cua so da ve truoc overlay nay -> gui ngay
@@ -1755,6 +1775,7 @@ async function handleConfirm(wcId, payload) {
   closeOverlay()
   if (!display) { boLuotChup('khong con ban ghi cua man chup ' + wcId + ' (lenh Xong thu hai sau khi man chup da dong?)', true); return }
   if (!payload) { boLuotChup('khong co du lieu vung chon'); return }
+  if (payload.thieuMan) baoNguoiDung(T('app.thieuMan')) // vung vat nhieu man ma mot man khong co anh: chi con phan man nay
 
   // 28/09: dang bat Multi-Shot Storyboard (nut/phim S tren khung chon) -> QUAY 3 GIAY vung nay thay vi chup 1 tam.
   if (payload.storyboard && payload.rect) { quay3Giay(display, sf, payload.rect); return }
@@ -2238,7 +2259,8 @@ function ensureShelf() {
   shelfWin.setAlwaysOnTop(true, 'screen-saver')
   moiDesktop(shelfWin, 'khay anh')
   shelfWin.loadFile(path.join(__dirname, 'shelf', 'index.html'))
-  shelfWin.webContents.once('did-finish-load', () => {
+  // on, khong once: doi ngon ngu nap lai trang khay, danh sach phai gui lai (05/11 soat: truoc day khay trang tron)
+  shelfWin.webContents.on('did-finish-load', () => {
     if (shelfItems.size && shelfWin && !shelfWin.isDestroyed()) {
       for (const it of shelfItems.values()) {
         let kb = 0
@@ -2811,7 +2833,7 @@ function dangKyPhimCanvas(accel) {
   if (phimCanvasDangKy) { try { globalShortcut.unregister(phimCanvasDangKy) } catch (e) {} }
   phimCanvasDangKy = ''
   const p = accel === undefined ? phimCanvasCauHinh() : accel
-  if (!p || p === currentHotkey) return false
+  if (!p || cungPhim(p, currentHotkey)) return false
   let ok = false
   try { ok = globalShortcut.register(p, () => openCanvasWindow()) } catch (e) { ok = false }
   if (ok) phimCanvasDangKy = p; else ghiLog('canvas: khong dang ky duoc phim ' + p + ' (app khac dang giu), mo bang menu khay')
@@ -3116,15 +3138,16 @@ ipcMain.on('canvas:chup', (e) => { if (laCanvas(e) && !THU_CANVAS) startCapture(
    chinh trang (cung duong voi tay nguoi dung, tru cai chuot that). Ben chay bai (scripts/test/do-canvas-app.cjs) doi chieu voi dia. */
 /** [do] A1: phim tat Canvas + lenh --mo-canvas, KHONG bat Canvas len man (chi dang ky roi go ngay). */
 async function thuPhimCanvas() {
-  const kq = { accel: PHIM_CANVAS_MAC_DINH }
+  const PHIM = process.env.AIO_THU_PHIM_CANVAS || PHIM_CANVAS_MAC_DINH // ban cai dang chay giu phim mac dinh toan he thong: bai do dung phim rieng
+  const kq = { accel: PHIM }
   const qua = (f) => { try { return f() } catch (e) { return 'LOI ' + e.message } }
-  kq.macDinhDangKy = dangKyPhimCanvas(PHIM_CANVAS_MAC_DINH) && globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH)
+  kq.macDinhDangKy = dangKyPhimCanvas(PHIM) && globalShortcut.isRegistered(PHIM)
   globalShortcut.unregisterAll()                                  // giong setHotkey()
-  kq.saoUnregister = globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH)
-  kq.sauDoiPhimChup = dangKyPhimCanvas(PHIM_CANVAS_MAC_DINH) && globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH)
+  kq.saoUnregister = globalShortcut.isRegistered(PHIM)
+  kq.sauDoiPhimChup = dangKyPhimCanvas(PHIM) && globalShortcut.isRegistered(PHIM)
   kq.nhanMenu = T('tray.canvas') + (phimCanvasDangKy ? '    ' + formatAccel(phimCanvasDangKy) : '')
   kq.nhanMenuCoPhim = phimCanvasDangKy !== '' && kq.nhanMenu.length > T('tray.canvas').length
-  kq.tat = dangKyPhimCanvas('') === false && phimCanvasDangKy === '' && !globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH) ? false : 'van dang ky'
+  kq.tat = dangKyPhimCanvas('') === false && phimCanvasDangKy === '' && !globalShortcut.isRegistered(PHIM) ? false : 'van dang ky'
   kq.lenhCanvas = qua(() => hanhDongLan2(['app.exe', '--mo-canvas']))
   kq.lenhThuong = qua(() => hanhDongLan2(['app.exe']))
   globalShortcut.unregisterAll()

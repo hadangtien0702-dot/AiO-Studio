@@ -262,6 +262,7 @@ let daVuotNguong = false    // da keo qua nguong bam -> la KEO, khong con la BAM
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
 let cheDoTest = {}
 window.overlay.onInit((data) => {
+  clearTimeout(choNenHen); choNenHen = null; hetChoNen = false // man chup dung lai cho luot moi: bo viec cho cua luot truoc
   if (data && data.origin) origin = data.origin
   if (data && data.lamMoKieu) curBlurType = data.lamMoKieu
   if (data) { cheDoTest = data; ganCauHinh(data) }
@@ -571,7 +572,7 @@ function xuLyChinhKhung(e) {
 
   nx = Math.round(nx); ny = Math.round(ny); nw = Math.round(nw); nh = Math.round(nh)
 
-  if ((shapes.length > 0 || redoStack.length > 0) && (nx !== curRect.x || ny !== curRect.y)) {
+  if ((shapes.length > 0 || redoStack.length > 0 || SuaNet.lichSu.length > 0) && (nx !== curRect.x || ny !== curRect.y)) {
     const shiftX = nx - curRect.x
     const shiftY = ny - curRect.y
     for (const s of SuaNet.moiToaDo(shapes)) { // net trong lich su / hang doi Lam lai cung phai dich, khong thi hien lai lech cho
@@ -745,6 +746,11 @@ window.addEventListener('keydown', (e) => {
   // Ctrl+C: xong + COPY vao clipboard (them, khong bo Enter / nut check).
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && mode === 'annotate') {
     e.preventDefault(); xong(true); return
+  }
+  // Enter = Xong (nhu chu tren nut Xong). Dang dung tren nut / o nhap thi Enter la cua nut, o do; bang Che dang mo thi chua xong.
+  if (e.key === 'Enter' && mode === 'annotate' && !oGoChu && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey &&
+      !(cheTM && cheTM.dangMo()) && !/^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '')) {
+    e.preventDefault(); xong(false); return
   }
   // Phim S = bat/tat Storyboard Strip
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu) {
@@ -1088,9 +1094,10 @@ function veDangKeo(e) {
 }
 
 function ketThucVe(e) {
-  if (tool === 'hut') return
-  if (tool === 'thuoc') { thuocKet(); return }
-  if (tool === 'select') {
+  const dangKeo = !!suaDangKeo || dangKeoShape // doi cong cu bang phim giua luc keo: van phai ket thuc cu keo, khong net chay theo chuot sau khi tha
+  if (tool === 'hut' && !dangKeo) return
+  if (tool === 'thuoc' && !dangKeo) { thuocKet(); return }
+  if (tool === 'select' || dangKeo) {
     if (suaDangKeo) { SuaNet.xong(suaDangKeo); suaDangKeo = null; redraw(); return }
     if (dangKeoShape) {
       dangKeoShape = false
@@ -1504,6 +1511,11 @@ function napAnh(url) {
 }
 
 /* ── Xong: ghep anh + shape roi gui ───────────────────────────────────── */
+let choNenHen = null, hetChoNen = false
+function coNenGhep() {
+  const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  return !!(own && own.key) || !!(frozenImg && frozenImg.complete && frozenImg.naturalWidth)
+}
 function xong(copy) {
   chotOGoChu()
   window.overlay.nhoVung({ x: curRect.x, y: curRect.y, w: curRect.w, h: curRect.h }) // 05/11: nho vung cuoi cho 'chup lai vung lan truoc'
@@ -1517,6 +1529,22 @@ function xong(copy) {
   selectedShape = null
   redraw()
   if (!shapes.length) { window.overlay.confirm({ rect: curRect, copy: !!copy }); return }
+  /* 05/11 soat: bam Xong truoc khi anh nen ve thi anh luu ra CHI CON NET VE, mat noi dung man hinh.
+     Cho toi 3 giay; van khong co thi cat thuong (main cho grab, khong co anh thi bao): mat net ve con hon mat anh. */
+  if (choNenHen) return
+  if (!coNenGhep()) {
+    if (hetChoNen) { hetChoNen = false; window.overlay.log('xong: het cho anh nen, cat thuong'); window.overlay.confirm({ rect: curRect, copy: !!copy }); return }
+    let n = 0
+    const thu = () => {
+      choNenHen = null
+      if (coNenGhep()) { xong(copy); return }
+      if (++n >= 15) { hetChoNen = true; xong(copy); return }
+      choNenHen = setTimeout(thu, 200)
+    }
+    window.overlay.log('xong: cho anh nen')
+    choNenHen = setTimeout(thu, 200)
+    return
+  }
   // Co shape: ghep anh GOC (cat dung vung, PNG) + shape roi gui dataURL.
   const out = document.createElement('canvas')
   out.width = Math.max(1, Math.round(curRect.w * DPR))
@@ -1535,7 +1563,7 @@ function xong(copy) {
           curRect.x * DPR, curRect.y * DPR, curRect.w * DPR, curRect.h * DPR,
           0, 0, out.width, out.height)
         ghepVaGui(null, 'jpeg-du-phong(' + ly + ')')
-      } else ghepVaGui(null, 'khong-nen(' + ly + ')')
+      } else window.overlay.confirm({ rect: curRect, copy: !!copy }) // khong co nen thi khong ghep: cat thuong, dung luu anh chi co net ve
     } catch (err) {
       window.overlay.confirm({ rect: curRect, copy: !!copy }) // ghep loi thi cat thuong
     }
@@ -1555,7 +1583,7 @@ function confirmComposite(g) {
   // "xong" (onerror cung dem) -> drawImage im lang khong ve gi -> anh TRANG
   // TRON 590 byte (anh Tien 26/08). Chua san sang: thu lai 200ms, toi da 15 lan.
   const giao = layers.filter((L) => giaoNhau(g, { x: L.px, y: L.py, w: L.pw, h: L.ph }))
-  const sanSang = layersReady && giao.length > 0 &&
+  const sanSang = layersReady && giao.length > 0 && giao.length >= (g.manGiao || 1) &&
     giao.every((L) => L.img && L.img.complete && L.img.naturalWidth > 0)
   if (!sanSang) {
     if (!layersReady) { pendingComposite = g; window.overlay.log('composite CHO grab'); return }
@@ -1573,7 +1601,7 @@ function confirmComposite(g) {
     const lx = Math.max(0, (g.x - opx) / DPR), ly = Math.max(0, (g.y - opy) / DPR)
     const lw = Math.min(window.innerWidth, (g.x + g.w - opx) / DPR) - lx
     const lh = Math.min(window.innerHeight, (g.y + g.h - opy) / DPR) - ly
-    window.overlay.confirm({ rect: { x: lx, y: ly, w: Math.max(1, lw), h: Math.max(1, lh) } })
+    window.overlay.confirm({ rect: { x: lx, y: ly, w: Math.max(1, lw), h: Math.max(1, lh) }, thieuMan: true })
     return
   }
   // ☠️ GHEP THEO PIXEL VAT LY, moi man dan 1:1 anh goc (nhu Snipping Tool).
@@ -2177,7 +2205,7 @@ function chuyenChe() {
 }
 cheTM = window.CheTMUI.tao({
   goc: document.body, rect: () => curRect, heSo: () => DPR, shapes: () => shapes, veLai: () => redraw(),
-  them: themNhomChe, xoaRedo, doc: docChuChe, datThanh: datThanhChe, t, log: (m) => window.overlay.log(m),
+  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx }) }, doc: docChuChe, datThanh: datThanhChe, t, log: (m) => window.overlay.log(m),
   nut: document.getElementById('che-muc'),
 })
 // Tren man chup, muc Che thong minh nam trong menu #blur-menu (NHOM_PHU), khong can menu rieng; cheMenu chi dung o anh ghim

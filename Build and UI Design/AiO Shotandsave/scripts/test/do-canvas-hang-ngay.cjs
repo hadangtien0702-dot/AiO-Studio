@@ -1,4 +1,5 @@
 'use strict'
+process.env.AIO_THU_PHIM_CANVAS = process.env.AIO_THU_PHIM_CANVAS || 'CommandOrControl+Alt+Shift+F10' // ban cai dang chay giu phim mac dinh
 /* Do CANVAS "dung duoc hang ngay" (ROADMAP 0g nhom A) tren APP THAT, cua so AN — chay: npm run test:canvashangngay [so anh, mac dinh 200]
    Tao N anh PNG 2560x1440 trong thu muc tam (os.tmpdir()/aio-canvashn-*), mo `electron . --thu-canvas` voi userData rieng, kich ban
    scripts/test/kich-ban-canvas-hang-ngay.cjs thao tac bang sendInputEvent (chuot / phim / lan). Hai pha tren CUNG userData:

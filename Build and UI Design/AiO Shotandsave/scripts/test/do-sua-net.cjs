@@ -348,7 +348,7 @@ app.whenReady().then(async () => {
     await chayKichBan({
       ten: 'man chup', loai: 'overlay', win: ov,
       heSo: () => js(ov, 'DPR'),
-      xuat: async () => { xacNhan = null; await js(ov, 'document.getElementById("xong").click()'); for (let i = 0; i < 40 && !xacNhan; i++) await cho(50); return xacNhan && xacNhan.dataUrl }
+      xuat: async () => { xacNhan = null; await js(ov, `(async () => { const c = document.createElement('canvas'); c.width = Math.round(innerWidth * DPR); c.height = Math.round(innerHeight * DPR); const im = new Image(); im.src = c.toDataURL(); await im.decode(); frozenImg = im; return true })()`); await js(ov, 'document.getElementById("xong").click()'); for (let i = 0; i < 40 && !xacNhan; i++) await cho(50); return xacNhan && xacNhan.dataUrl }
     })
     ov.destroy()
 

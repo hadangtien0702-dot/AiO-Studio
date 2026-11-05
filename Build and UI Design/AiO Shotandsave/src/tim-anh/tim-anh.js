@@ -39,12 +39,13 @@ const io = new IntersectionObserver((es) => {
 async function napThumb(the) {
   const duong = the.dataset.duong
   const img = the.querySelector('img')
-  let url = urls.get(duong)
+  const khoa = duong + '|' + the.dataset.mt // anh sua lai (che, ve) phai hien ban moi, khong dung thumbnail cu
+  let url = urls.get(khoa)
   if (!url) {
     const u8 = await window.timAnh.thumb(duong)
     if (!u8) { the.classList.add('khong-anh'); return }
     url = URL.createObjectURL(new Blob([u8], { type: 'image/jpeg' }))
-    urls.set(duong, url)
+    urls.set(khoa, url)
   }
   img.src = url
 }
@@ -58,7 +59,7 @@ function dinhDangGio(ms) {
 function veThe(r) {
   const the = document.createElement('div')
   the.className = 'the'; the.tabIndex = 0; the.draggable = true
-  the.dataset.duong = r.duong; the.dataset.loai = r.loai
+  the.dataset.duong = r.duong; the.dataset.loai = r.loai; the.dataset.mt = String(r.mt)
   const anh = document.createElement('div'); anh.className = 'anh'
   const img = document.createElement('img'); img.alt = ''
   anh.appendChild(img)

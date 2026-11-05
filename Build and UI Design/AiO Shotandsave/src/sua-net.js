@@ -28,16 +28,19 @@ const SuaNet = (() => {
   /* Da doi `s` so voi anh chup `truoc` thi ghi op "sua". Tra true neu co doi. */
   function ghiSua(s, truoc) {
     if (!khac(truoc, s)) return false
+    // Khung Che da bi nguoi dung keo / doi: no khong con chac phu chu cu. Bo danh dau de "Tu che" che lai cho do, khong coi la da che.
+    if (s.che && s.phu && s.phu.length) s.phu = []
     ghi({ k: 'sua', s, truoc: sao(truoc), sau: sao(s) })
     return true
   }
   /* 05/11: shape co `nhom` (Che thong minh: "Tu che", "Che moi cho trung") = MOT buoc Hoan tac / Lam lai cho ca nhom. */
-  const cungNhom = (op, nhom) => !!op && !!op.s && op.s.nhom === nhom
+  /* Chi gop cac op CUNG LOAI: xoa mot khung trong nhom roi Ctrl+Z la tra dung khung do, khong go ca nhom da them truoc do. */
+  const cungNhom = (op, nhom, k) => !!op && !!op.s && op.s.nhom === nhom && op.k === k
   function hoanTac() {
     const op = luiMot()
     if (!op) return false
     const nhom = op.s && op.s.nhom
-    if (nhom) while (cungNhom(lichSu[lichSu.length - 1], nhom)) luiMot()
+    if (nhom) while (cungNhom(lichSu[lichSu.length - 1], nhom, op.k)) luiMot()
     capNhat()
     return true
   }
@@ -58,7 +61,7 @@ const SuaNet = (() => {
     const op = toiMot()
     if (!op) return false
     const nhom = op.s && op.s.nhom
-    if (nhom) while (cungNhom(redo[redo.length - 1], nhom)) toiMot()
+    if (nhom) while (cungNhom(redo[redo.length - 1], nhom, op.k)) toiMot()
     capNhat()
     return true
   }
