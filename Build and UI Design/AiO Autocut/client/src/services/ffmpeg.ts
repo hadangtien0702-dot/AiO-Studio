@@ -1,6 +1,7 @@
 import { dich } from '../ngonngu'
 /**
  * ffmpeg.ts — gọi FFmpeg đã đóng gói sẵn trong `bin/win64/`.
+ * (macOS: không có `.exe`, dò theo `timCongCuMac()` bên dưới.)
  *
  * Vì sao bundle chứ không bắt người dùng cài: dự án anh em AiO Sub nằm im từ
  * 2026-05-06 đúng vì "máy chưa có ffmpeg/whisper". AiO Editing đã giải xong
@@ -8,7 +9,7 @@ import { dich } from '../ngonngu'
  */
 
 import { extensionPath } from '../lib/cep'
-import { getFs, getPath, nodeRequire } from '../lib/node'
+import { getFs, getPath, laMac, nodeRequire } from '../lib/node'
 import { parseSilenceLog, parseDuration, parseVideoFps, type Silence } from './silencelog'
 
 export type { Silence }
@@ -61,13 +62,82 @@ const EXT_ID = 'com.aiostudio.autocut'
 
 let cachedFFmpeg: string | null = null
 
-/** Đường dẫn tuyệt đối tới ffmpeg.exe ('' nếu không tìm thấy). */
+/**
+ * [macOS] Bảo đảm file có quyền chạy. Giải nén ZXP hay chép qua ổ khác dễ làm
+ * rơi bit `x` — lúc đó `execFile` báo EACCES dù file nằm đúng chỗ. Không chmod
+ * được (file của hệ thống, không có quyền ghi) thì để nguyên, `execFile` sẽ
+ * báo lỗi thật.
+ */
+export function choChay(p: string): void {
+  const fs = getFs()
+  if (!fs) return
+  try {
+    fs.accessSync(p, fs.constants.X_OK)
+  } catch {
+    try {
+      fs.chmodSync(p, 0o755)
+    } catch {
+      /* không sửa được thì thôi */
+    }
+  }
+}
+
+/**
+ * [macOS] Tìm một công cụ dòng lệnh (tên KHÔNG có `.exe`). Luật chung của cả bộ
+ * AiO Studio trên Mac, cái nào có trước thì thắng:
+ *   1. `<thư mục extension>/bin/mac/<tên>`                      — bản đóng gói kèm panel
+ *   2. `~/Library/Application Support/AiO-Studio/bin/mac/<tên>` — kho dùng chung cả bộ
+ *   3. `/opt/homebrew/bin/<tên>`, rồi `/usr/local/bin/<tên>`   — Homebrew
+ * Luôn trả đường dẫn TUYỆT ĐỐI: Node của CEP trên Mac không có Homebrew trong
+ * PATH, gọi trần `ffmpeg` là hỏng. Trả '' nếu không thấy ở đâu cả.
+ */
+export function timCongCuMac(ten: string): string {
+  const fs = getFs()
+  const path = getPath()
+  if (!fs || !path) return ''
+
+  const ungVien: string[] = []
+  const extDir = extensionPath()
+  if (extDir) ungVien.push(path.join(extDir, 'bin', 'mac', ten))
+  try {
+    const req = nodeRequire()
+    const nha = req ? String(req('os').homedir() || '') : ''
+    if (nha) {
+      ungVien.push(path.join(nha, 'Library', 'Application Support', 'AiO-Studio', 'bin', 'mac', ten))
+    }
+  } catch {
+    /* không có thư mục nhà thì bỏ qua ứng viên này */
+  }
+  ungVien.push(path.join('/opt/homebrew/bin', ten), path.join('/usr/local/bin', ten))
+
+  for (const c of ungVien) {
+    try {
+      if (fs.existsSync(c)) {
+        choChay(c)
+        return c
+      }
+    } catch {
+      /* bỏ qua */
+    }
+  }
+  return ''
+}
+
+/** Đường dẫn tuyệt đối tới ffmpeg.exe (macOS: `ffmpeg`) — '' nếu không tìm thấy. */
 export function getFFmpegPath(): string {
   if (cachedFFmpeg) return cachedFFmpeg
 
   const fs = getFs()
   const path = getPath()
   if (!fs || !path) return ''
+
+  // macOS: không có `.exe` và không có %APPDATA% — dò theo luật chung của Mac.
+  // Nhánh Windows bên dưới giữ nguyên như cũ.
+  if (laMac()) {
+    const c = timCongCuMac('ffmpeg')
+    if (c) cachedFFmpeg = c
+    return c
+  }
 
   const candidates: string[] = []
   const extDir = extensionPath()

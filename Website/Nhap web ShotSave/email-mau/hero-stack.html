@@ -1,0 +1,145 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff}
+  #s{position:relative;width:528px;height:336px;background:#fff;overflow:hidden;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  #s div,#s svg{position:absolute;box-sizing:border-box}
+  .card{border-radius:12px;overflow:hidden;box-shadow:0 8px 18px rgba(24,24,40,.17),0 1px 3px rgba(24,24,40,.12)}
+  .bar{left:0;top:0;right:0;height:18px;background:rgba(0,0,0,.06)}
+  .dot{top:7px;width:5px;height:5px;border-radius:50%;background:rgba(0,0,0,.22)}
+</style></head>
+<body>
+<div id="s">
+  <!-- thẻ sau cùng: trang web -->
+  <div id="c0" class="card" style="background:#eef0ff">
+    <div class="bar"></div><div class="dot" style="left:9px"></div><div class="dot" style="left:19px"></div><div class="dot" style="left:29px"></div>
+    <div style="left:16px;top:30px;width:120px;height:7px;border-radius:4px;background:#c9d0f5"></div>
+    <div style="left:16px;top:44px;width:190px;height:7px;border-radius:4px;background:#d6dbf8"></div>
+    <div style="left:16px;top:58px;right:16px;height:30px;border-radius:7px;background:linear-gradient(135deg,#c9d2ff,#8a9bff)"></div>
+  </div>
+  <!-- thẻ giữa: thiết kế -->
+  <div id="c1" class="card" style="background:#fff2ea">
+    <div class="bar"></div><div class="dot" style="left:9px"></div><div class="dot" style="left:19px"></div><div class="dot" style="left:29px"></div>
+    <div style="left:18px;top:30px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#ffd0b8,#ff7a3d)"></div>
+    <div style="left:64px;top:38px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#ffb6c9,#ff6b9a);opacity:.9"></div>
+    <div style="left:128px;top:34px;width:130px;height:8px;border-radius:4px;background:#ffd9c6"></div>
+    <div style="left:128px;top:50px;width:100px;height:8px;border-radius:4px;background:#ffe3d4"></div>
+    <div style="left:128px;top:66px;width:70px;height:8px;border-radius:4px;background:#ffe9dd"></div>
+  </div>
+  <!-- thẻ trước: tin nhắn -->
+  <div id="c2" class="card" style="background:#f6f6f8">
+    <div class="bar"></div><div class="dot" style="left:9px"></div><div class="dot" style="left:19px"></div><div class="dot" style="left:29px"></div>
+    <div style="left:16px;top:28px;width:128px;height:22px;border-radius:11px;background:#e3e3e8"></div>
+    <div style="right:16px;top:56px;width:150px;height:22px;border-radius:11px;background:#f86820"></div>
+    <div style="left:16px;top:84px;width:92px;height:22px;border-radius:11px;background:#e3e3e8"></div>
+  </div>
+  <div id="sel" style="border:2px solid #f86820;border-radius:6px"></div>
+  <div id="flash" style="background:#fff;opacity:0;border-radius:12px"></div>
+  <div id="h1" style="width:8px;height:8px;background:#fff;border:2px solid #f86820;border-radius:2px"></div>
+  <div id="h2" style="width:8px;height:8px;background:#fff;border:2px solid #f86820;border-radius:2px"></div>
+  <div id="h3" style="width:8px;height:8px;background:#fff;border:2px solid #f86820;border-radius:2px"></div>
+  <div id="h4" style="width:8px;height:8px;background:#fff;border:2px solid #f86820;border-radius:2px"></div>
+  <div id="lab" style="height:19px;border-radius:8px;background:#f86820;color:#fff;font-weight:700;font-size:11.5px;line-height:19px;text-align:center;white-space:nowrap;padding:0 9px"></div>
+  <!-- khay -->
+  <div id="tray" style="left:153px;top:270px;width:222px;height:48px;border-radius:17px;background:#2c2c2e;box-shadow:0 8px 16px rgba(24,24,40,.22)">
+    <div style="left:7px;top:8px;width:46px;height:32px;border-radius:7px;background:linear-gradient(135deg,#f1f1f3,#d3d3d8)"></div>
+    <div id="th2" style="left:61px;top:8px;width:46px;height:32px;border-radius:7px;background:linear-gradient(135deg,#ffd7c3,#f86820)"></div>
+    <div style="left:115px;top:8px;width:46px;height:32px;border-radius:7px;background:linear-gradient(135deg,#e1e8ff,#8a9bff)"></div>
+    <div style="left:169px;top:8px;width:46px;height:32px;border-radius:7px;background:linear-gradient(135deg,#f1f1f3,#d3d3d8)"></div>
+  </div>
+  <div id="fly" style="border-radius:7px;opacity:0;background:#f6f6f8;border:2px solid #f86820"></div>
+  <!-- ảnh ghim -->
+  <div id="pin" style="left:374px;top:22px;width:128px;height:92px;border-radius:10px;background:#fff;box-shadow:0 6px 14px rgba(24,24,40,.3);transform:rotate(4deg)">
+    <div class="dot" style="left:9px;top:9px;background:#cfcfd3"></div><div class="dot" style="left:19px;top:9px;background:#cfcfd3"></div><div class="dot" style="left:29px;top:9px;background:#cfcfd3"></div>
+    <div style="left:8px;top:22px;width:112px;height:62px;border-radius:6px;background:linear-gradient(135deg,#ffd7c3,#f86820)"></div>
+    <div style="left:32px;top:35px;width:64px;height:36px;border-radius:4px;border:2px solid #fff"></div>
+  </div>
+  <svg id="cur" width="22" height="26" viewBox="0 0 22 26" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))"><path d="M1 1 L1 20 L6 15.5 L9.6 24 L13 22.6 L9.4 14.2 L16.5 14 Z" fill="#1d1d1f" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  out: x => 1 - Math.pow(1 - x, 3),
+  io: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  back: x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); }
+};
+const lerp = (a, b, k) => a + (b - a) * k;
+// hình học đích của 3 thẻ (x giữa = 264)
+const CARD = [
+  { w: 250, h: 100, top: 30 },
+  { w: 276, h: 108, top: 76 },
+  { w: 304, h: 118, top: 126 }
+];
+CARD.forEach((c, i) => { c.left = 264 - c.w / 2; const e = $('c' + i); e.style.width = c.w + 'px'; e.style.height = c.h + 'px'; });
+const SX = CARD[2].left - 4, SY = CARD[2].top - 4, SW = CARD[2].w + 8, SH = CARD[2].h + 8;   // khung chọn bao thẻ trước
+const TH2 = { x: 153 + 61, y: 270 + 8, w: 46, h: 32 };
+// thời điểm vào/ra của từng thẻ (sau -> trước)
+const OUT = [[1.5, 1.85], [1.4, 1.75], [1.3, 1.65]];
+const IN = [[1.95, 2.45], [2.1, 2.6], [2.25, 2.75]];
+function render(t) {
+  for (let i = 0; i < 3; i++) {
+    const c = CARD[i], e = $('c' + i);
+    let dy = 0, op = 1, sc = 1;
+    if (t >= OUT[i][0] && t < IN[i][0]) {
+      const k = E.io(seg(t, OUT[i][0], OUT[i][1])); dy = 44 * k; op = 1 - k; sc = 1 - .04 * k;
+      if (t >= OUT[i][1]) { dy = 44; op = 0; sc = .96; }
+    } else if (t >= IN[i][0] && t < IN[i][1]) {
+      const k = E.back(seg(t, IN[i][0], IN[i][1])); const kk = E.out(seg(t, IN[i][0], IN[i][0] + .25));
+      dy = lerp(-70, 0, k); op = kk; sc = lerp(.96, 1, k);
+    }
+    e.style.left = c.left + 'px'; e.style.top = (c.top + dy) + 'px';
+    e.style.opacity = op; e.style.transform = 'scale(' + sc + ')';
+  }
+  // khung chọn quanh thẻ trước: 0 -> 1 -> mờ đi
+  let P = 0;
+  if (t >= 2.85) P = E.out(seg(t, 2.85, 3.45));
+  const w = SW * P, h = SH * P;
+  const sel = $('sel');
+  sel.style.left = SX + 'px'; sel.style.top = SY + 'px'; sel.style.width = Math.max(w, .01) + 'px'; sel.style.height = Math.max(h, .01) + 'px';
+  const selA = t < 2.85 ? 0 : (t < 3.7 ? 1 : 1 - seg(t, 3.7, 3.95));
+  sel.style.opacity = P < .01 ? 0 : selA;
+  const hp = [[SX - 4, SY - 4], [SX + w - 4, SY - 4], [SX - 4, SY + h - 4], [SX + w - 4, SY + h - 4]];
+  ['h1', 'h2', 'h3', 'h4'].forEach((id, i) => { const e = $(id); e.style.left = hp[i][0] + 'px'; e.style.top = hp[i][1] + 'px'; e.style.opacity = P > .12 ? selA : 0; });
+  const lab = $('lab');
+  lab.style.opacity = P > .08 ? selA : 0;
+  lab.textContent = Math.round(1280 * P) + ' × ' + Math.round(720 * P);
+  lab.style.left = (SX - 3) + 'px'; lab.style.top = (SY - 25) + 'px';
+  const cur = $('cur');
+  cur.style.left = (SX + w - 1) + 'px'; cur.style.top = (SY + h - 1) + 'px';
+  cur.style.opacity = P < .01 ? 0 : selA;
+  // chớp sáng
+  const f = $('flash');
+  f.style.left = CARD[2].left + 'px'; f.style.top = CARD[2].top + 'px'; f.style.width = CARD[2].w + 'px'; f.style.height = CARD[2].h + 'px';
+  f.style.opacity = t >= 3.45 && t < 3.65 ? .6 * (1 - seg(t, 3.45, 3.65)) : 0;
+  // ô thứ 2 của khay
+  let k2 = 1;
+  if (t >= 1.3 && t < 1.65) k2 = 1 - E.io(seg(t, 1.3, 1.65));
+  else if (t >= 1.65 && t < 4.2) k2 = 0;
+  else if (t >= 4.2) k2 = clamp(E.back(seg(t, 4.2, 4.55)), 0, 1.15);
+  $('th2').style.transform = 'scale(' + k2 + ')';
+  $('th2').style.opacity = k2 <= .001 ? 0 : 1;
+  // ảnh bay xuống khay
+  const fly = $('fly');
+  if (t >= 3.6 && t < 4.2) {
+    const k = E.io(seg(t, 3.6, 4.15));
+    fly.style.opacity = 1;
+    fly.style.left = lerp(CARD[2].left, TH2.x, k) + 'px'; fly.style.top = lerp(CARD[2].top, TH2.y, k) + 'px';
+    fly.style.width = lerp(CARD[2].w, TH2.w, k) + 'px'; fly.style.height = lerp(CARD[2].h, TH2.h, k) + 'px';
+    fly.style.background = 'linear-gradient(135deg,' + (k > .5 ? '#ffd7c3,#f86820' : '#f6f6f8,#e8eaff') + ')';
+    fly.style.borderColor = k > .85 ? 'transparent' : '#f86820';
+  } else fly.style.opacity = 0;
+  // ảnh ghim
+  let ks = 1;
+  if (t >= 1.3 && t < 1.7) ks = 1 - E.io(seg(t, 1.3, 1.7));
+  else if (t >= 1.7 && t < 4.3) ks = 0;
+  else if (t >= 4.3) ks = clamp(E.back(seg(t, 4.3, 4.9)), 0, 1.12);
+  const pin = $('pin');
+  pin.style.opacity = ks <= .001 ? 0 : 1;
+  const rot = t >= 4.3 && t < 5.1 ? 4 + 5 * (1 - E.out(seg(t, 4.3, 5.1))) : 4;
+  pin.style.transform = 'rotate(' + rot + 'deg) scale(' + ks + ')';
+}
+render(0);
+</script>
+</body></html>

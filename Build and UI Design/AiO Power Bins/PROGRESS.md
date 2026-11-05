@@ -1,5 +1,70 @@
 # AiO Power Bins - Nhat ky
 
+## [mac] - 2026-09-30 19:27 (UTC+7) - CHAY DUOC TREN macOS (NHANH THEM, WINDOWS GIU NGUYEN)
+
+### Trang thai hien tai
+Ma nguon co nhanh macOS cho FFmpeg/ffprobe va dong rac macOS. Build
+`build:release` + `build` sach tren Intel Mac. Kiem bang Node thuan 19/19 dat.
+**CHUA KIEM TRONG PREMIERE TREN MAC** (chua cai, chua mo panel, chua do cong
+8090). Nhanh Windows: chua kiem lai tren Windows (doc ma: chi them nhanh Mac; regex turbo nay khop ca `ffmpeg.exe` nhu cu).
+
+### Boi canh
+Anh Tien yeu cau moi panel chay duoc tren Mac (Intel Mac, macOS 26, Premiere
+Pro Beta 26.5). Panel truoc day chi goi `bin/win64/ffmpeg.exe`, `ffprobe.exe`,
+`powershell.exe`.
+
+### Cho chi chay Windows tim thay (grep client/src + host)
+1. `services/ffmpeg.ts` getFFmpegPath/getFFprobePath: chi do `bin/win64/*.exe`
+   va `%APPDATA%` -> tren Mac tra '' -> khong thumbnail/song am/proxy/probe.
+2. `services/ffmpeg.ts` execFileAsync: turbo `-threads` chi khop `ffmpeg.exe`.
+3. `services/macJunk.ts` moveToRecycleBin: goi `powershell.exe` (.NET Recycle Bin).
+4. `services/cachePaths.ts` duong lui `%APPDATA%` (Mac khong co bien nay).
+5. Chu hien thi: "Explorer", "Thung rac Windows" (Grid.tsx, SettingsModal.tsx).
+6. `host/*.jsx`: KHONG co gi rieng Windows (khong `$.os`, `\\`, `.exe`,
+   `callSystem`) -> khong sua host, khong can tat Premiere.
+
+### Da sua
+- MOI `client/src/lib/platform.ts` - chep NGUYEN VAN tu Asset Manager (hai panel
+  dung chung ~90% ma): `isMac()`, `macAppSupportDir()`, `findMacTool()`. Thu tu
+  do: `<ext>/bin/mac/<ten>` -> `~/Library/Application Support/AiO-Studio/bin/mac/<ten>`
+  -> `/opt/homebrew/bin` -> `/usr/local/bin`. Luon tra duong dan tuyet doi.
+- `services/ffmpeg.ts`: nhanh `isMac()` o dau hai ham tim duong dan; regex
+  turbo `ffmpeg(\.exe)?$`.
+- `services/macJunk.ts`: nhanh Mac chuyen vao Thung rac cua Mac bang
+  `osascript -l JavaScript` + `NSFileManager.trashItemAtURL` (khong unlink, khong
+  can Finder). Doc duong dan tu CUNG file tam UTF-8. Giong het Asset Manager.
+- `services/cachePaths.ts`: duong lui `~/Library/Application Support` khi Mac.
+- `Grid.tsx`, `SettingsModal.tsx`, `chu.ts`: cau rieng cho Mac (Finder, Thung
+  rac cua Mac), du VI + EN, khong dau gach dai. Khoa dich trung Asset Manager.
+- `client/public/CSInterface.js`: sua o cap bo (agent cha), KHONG phai lan nay.
+
+### Kiem chung (do that tren Intel Mac)
+- `npm ci` + `npm run build:release`: dat, `dist/index.html` 274,88 kB.
+  `npm run build`: dat, 275,24 kB. `tsc -b` 0 loi.
+- Bo kiem Node thuan (bundle esbuild CHINH cac service that, gia lap CSInterface):
+  **19/19 dat**. Trong do:
+  - getFFmpegPath/getFFprobePath -> `~/Library/Application Support/AiO-Studio/bin/mac/`.
+    Dat file vao `<ext>/bin/mac` thi file do thang (dung thu tu).
+  - Media thu: testsrc 3s 1280x720 + sine 3s, ten file co dau + ngoac.
+  - probeMedia video: 3s, 1280x720, mpeg4, 25 fps. Audio: 3s pcm_s16le.
+  - Thumbnail WebP 2710 B; song am WebP 1814 B; proxy libopenh264 640x360
+    h264 177745 B trong 149 ms.
+  - Turbo: ffmpeg nhan `-threads 2` (doc log debug).
+  - Rac macOS: tim 2 file / 6144 B, chuyen 2/0 loi, file that khong bi dung,
+    file khong ton tai -> 0/1, file tam da xoa. Hai file thu nam trong ~/.Trash.
+
+### CHUA kiem / con ton
+- Chua kiem trong Premiere tren Mac: import timeline, keo tha tu Finder
+  (`File.path`), may chu media, auto-reload.
+- `ngonngu.tsx` (ban dong bo tu design-system): tren Mac `layAppData()` lui ve
+  `~/AppData/Roaming` -> file ngon ngu chung nam sai cho. Agent cha xu ly o
+  design-system, KHONG sua o day.
+- FFmpeg Mac o kho chung la ban **GPL** (`--enable-gpl`, co libx264) - trai luat
+  LGPL cua san pham neu dong goi ban ra. Chua xu ly (khong thuoc panel nay).
+- `scripts/*.ps1` (build/ky/dong goi) van chi chay Windows.
+
+---
+
 ## 2026-08-24 23:17 - Dong bo token cam #f86820 (lenh anh Tien, ca bo AiO)
 
 - `_tokens.scss` nhan ban moi tu design-system (`dong-bo-tokens.ps1`), chep
