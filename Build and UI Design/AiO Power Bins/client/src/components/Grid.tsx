@@ -2,6 +2,7 @@ import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, use
 import { dich } from '../ngonngu'
 import { useLibrary } from '../state/store'
 import { filesFromDropEvent } from '../services/timelineImport'
+import { isMac } from '../lib/platform'
 import { setQueuePriorityIds } from '../services/jobQueue'
 import AssetCard from './AssetCard'
 import {
@@ -488,7 +489,10 @@ export default function Grid() {
         <p className="state__hint">
           {dich('Tạo brand và khay ở menu bên trái, rồi bấm')}{' '}
           <b>{dich('Thêm từ timeline')}</b>{' '}
-          {dich('ở thanh trên — hoặc kéo thẳng file từ Explorer vào đây.')}
+          {/* [mac] Trên macOS kéo từ Finder chứ không phải Explorer. */}
+          {isMac()
+            ? dich('ở thanh trên, hoặc kéo thẳng file từ Finder vào đây.')
+            : dich('ở thanh trên — hoặc kéo thẳng file từ Explorer vào đây.')}
         </p>
       </div>
     )
@@ -578,9 +582,13 @@ export default function Grid() {
             nhắc thêm ở đây là lặp lại. */}
         {activeMasterTab === 'powerbin' && canDrop && (
           <div className="dropzone-hint">
-            {dich(
-              'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
-            )}
+            {isMac()
+              ? dich(
+                  'Kéo file từ Finder vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
+                )
+              : dich(
+                  'Kéo file từ Explorer vào đây, hoặc chọn clip trên timeline rồi bấm “Thêm từ timeline”.',
+                )}
           </div>
         )}
 

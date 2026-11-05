@@ -30,7 +30,11 @@
   bằng `scripts/do-anh-that/`). Spec/tài liệu quảng cáo chỉ là **biên trên/dưới**, KHÔNG dùng để chốt
   cạnh phải, mép cắt hay vị trí icon giả. "Rà soát" mà không có ảnh mới thì ghi *"chưa kiểm được"*,
   không ghi *"không đổi"*. (Anh 26/09: *"em đã lấy thông số ảo để áp vào"* — bài brain `5bf`.)
-  Trạng thái: YouTube Shorts đã đo ảnh thật 25/09; 12 định dạng còn lại **chưa**.
+  Trạng thái 26/09 18:38: **10/11 định dạng dọc 9:16 đã đo từ ảnh app thật** (YouTube từ máy anh; 9 app còn
+  lại từ App Store / Google Play / bài viết có ảnh máy thật, bảng ở `nghien-cuu` mục 18), 9 bảng `MOCK_DO`, 59 vùng.
+  **Chưa:** Pinterest (không tìm được ảnh video toàn màn, cần ảnh máy anh) · 6 định dạng ngang/vuông/lưới ·
+  ảnh từ máy anh cho 9 app kia. Áp số mới bằng `scripts/do-anh-that/ap-ket-qua.mjs` (gộp theo id, sau mỗi
+  `--ap` đếm `grep -o "MOCK_DO\['" dist/ve-guide.js` = số app đã đo).
 - `nghien-cuu-safe-zone.md` — nghiên cứu gốc kèm nguồn + ngày tra. Số nào trong
   JSON cũng phải chỉ được về một dòng trong file này.
 - `dist/ve-guide.js` — bộ vẽ DÙNG CHUNG cho panel và bàn xem trước. Một nguồn vẽ.
@@ -179,7 +183,8 @@
   độc lập khớp; `nghien-cuu` 2a): vùng **top 13 / bottom 25 / right 18 / left 7 crop**; mock cột phải +
   hàng trên theo toạ độ đo (tâm icon lệch ≤ 13 px màn), khối dưới-trái theo góc NGƯỜI XEM neo đáy (ước).
   ⬜ Cần 3 ảnh để khoá: góc người xem · iPhone 15/16 hoặc Android · máy anh sau khi tắt "Zoom to fill".
-  ⬜ TikTok / Reels / Snap… mock vẫn "minh hoạ", chưa đo ảnh thật.
+  ✅ **26/09: 9 app còn lại đo từ ảnh app thật** (FB Reels/Stories, TikTok, LinkedIn, IG Reels/Stories, Zalo,
+  Snapchat, X) — mock theo toạ độ đo, kiểm ghép chồng; ⬜ Pinterest chưa có ảnh.
 
 ## ☠️ SỔ LỖI TÁI DIỄN (luật 31/08: lỗi / gốc ĐÃ ĐO / chốt chặn)
 
@@ -188,6 +193,7 @@
 | Gỡ guide ở sequence B → guide ở sequence A **biến mất** (25/09/2026, xảy ra thật trên "Tập 2" của anh: 11→10 clip, 13→12 item) | `gf_tatOverlay` đếm guide chỉ trên sequence ĐANG MỞ, = 0 là `deleteBin` cả bin "AiO Guide Frame" → item của A mất → Premiere xoá clip A. Kèm panel `donFileCu()` quét xoá mọi PNG guide trên đĩa (file của A chỉ được OS giữ tạm) | `gf_tenGuideDangDung_()` gom tên guide trên MỌI sequence; `gf_donBinGuide_()` chỉ xoá item không còn ai dùng, xoá file SAU khi xoá bin tạm; panel không quét đĩa nữa. Bài test `thu-them-track.js` chụp cả project trước/sau và có ca A+B |
 | Timeline đầy track → "No empty video track" (25/09, anh: *"add không được em à"*) | Thiết kế v0.1 không dùng QE; và `gf_trackTrong_` hỏi cả sequence thay vì vùng In/Out | Thêm 1 track bằng đúng chữ ký `addTracks(1,n,0,0)` + đọc lại số track + tìm lại track trống; hỏi trống theo [a,b) |
 | Khung YouTube Shorts "chưa đúng" (anh, 25/09 tối): icon giả lệch icon thật, cột icon thật nằm ngoài vùng đỏ | Mock UI vẽ theo cảm tính (cột phải ~94%W từ 46%H, hàng trên 4,5%H, chữ từ 4,5%W) và vùng phải 10% là số ADS; đo ảnh chụp iPhone của anh: iPhone phủ kín chiều cao + cắt 5% mỗi mép, cột icon lấn 16%, hàng trên hết 10,8% | Vùng top 13 / right 18 / left 7 crop (sau 3 phản biện: iPhone nhỏ hơn Pro Max chiếm nhiều % hơn, Android cắt thêm); mock cột phải theo toạ độ đo, khối dưới theo góc NGƯỜI XEM neo đáy (ước — ảnh anh là góc chủ kênh) (`nghien-cuu` 2a). **Mock UI của mọi app phải đo từ ảnh chụp thật**, kiểm bằng ghép chồng (`scripts/do-anh-that/`) |
+| Áp lô 3 số đo xong, 4 bảng `MOCK_DO` của lô 2 **biến mất** mà `node --check` vẫn xanh (26/09) | `ap-ket-qua.mjs` ghi ĐÈ trọn đoạn giữa 2 dòng đánh dấu bằng đúng lô đang áp | Gộp theo khoá id (giữ bảng của id ngoài lô), `nguon` cắt đoạn cũ trước khi nối; sau mỗi lần `--ap` **đếm** `grep -o "MOCK_DO\['" dist/ve-guide.js` phải = số app đã đo (26/09: 7) |
 | Bấm lần hai cùng khung → `EBUSY` (26/08) | Tên PNG cố định, Premiere giữ file cũ | Tên file có `Date.now()` |
 | Panel mới nói chuyện host cũ | Premiere nạp `.jsx` một lần | `napHost()` evalFile trước mỗi lệnh + so `PHIEN_BAN` |
 

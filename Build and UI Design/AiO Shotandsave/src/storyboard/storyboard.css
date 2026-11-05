@@ -190,13 +190,15 @@ img, canvas { -webkit-user-drag: none; }
 #viewport::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 14%); background-clip: padding-box; border: 3px solid transparent; border-radius: var(--r-pill); }
 #viewport::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 .goi-y { font-size: 11px; color: var(--text-3); white-space: nowrap; }
-.trong { margin: 48px auto; max-width: 420px; text-align: center; font-size: 12.5px; line-height: 1.5; color: var(--text-3); }
+/* 01/10: text-wrap balance — truoc do cau "…bam nut Quay (phim R)." rot rieng chu "R)." xuong dong 2 */
+.trong { margin: 48px auto; max-width: 420px; text-align: center; text-wrap: balance; font-size: 12.5px; line-height: 1.5; color: var(--text-3); }
 .trong[hidden] { display: none; }
 .dai { background: var(--bg-2); border: 1px solid var(--line-1); border-radius: var(--r-lg); padding: 10px 12px 12px; }
 .dai + .dai { margin-top: var(--sp-4); }
 .dai-dau { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: 9px; min-width: 0; }
 .dai-ten { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-.dai-meta { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* 01/10: do dam 500 + so deu cot = chu phu .goi-y cua man Cai dat (truoc de 400). Dung cho CA khay Storyboard lan khay video. */
+.dai-meta { font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .dai-dau .spacer { flex: 1; }
 .dai-dau .nut { height: 26px; padding: 0 11px; font-size: 11.5px; flex: none; }
 .dai-dau .nut.chinh { font-size: 12px; }

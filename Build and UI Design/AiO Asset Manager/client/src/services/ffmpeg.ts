@@ -1,5 +1,6 @@
 import { extensionPath } from '../lib/cep'
 import { getFs, getPath, nodeRequire } from '../lib/node'
+import { findMacTool, isMac } from '../lib/platform'
 
 /**
  * ☠️ [13/08/2026] LẤY BIẾN MÔI TRƯỜNG — TUYỆT ĐỐI KHÔNG VIẾT `process.env`.
@@ -42,6 +43,14 @@ let cachedFFprobePath: string | null = null
  */
 export function getFFmpegPath(): string {
   if (cachedFFmpegPath) return cachedFFmpegPath
+
+  // [2026-09-30] macOS: không có `.exe`, tìm theo quy ước chung của bộ AiO
+  // (xem `lib/platform.ts`). Nhánh Windows bên dưới giữ nguyên.
+  if (isMac()) {
+    const mac = findMacTool('ffmpeg')
+    if (mac) cachedFFmpegPath = mac
+    return mac
+  }
 
   const fs = getFs()
   const path = getPath()
@@ -105,6 +114,13 @@ export function getFFmpegPath(): string {
  */
 export function getFFprobePath(): string {
   if (cachedFFprobePath) return cachedFFprobePath
+
+  // [2026-09-30] macOS — xem getFFmpegPath().
+  if (isMac()) {
+    const mac = findMacTool('ffprobe')
+    if (mac) cachedFFprobePath = mac
+    return mac
+  }
 
   const fs = getFs()
   const path = getPath()
@@ -231,9 +247,10 @@ export function execFileAsync(
      *
      * `-threads` là tuỳ chọn toàn cục nên phải đứng TRƯỚC `-i`. Chỉ áp cho
      * ffmpeg; ffprobe chỉ đọc metadata, không đáng chặn.
+     * [2026-09-30] Trên Mac file tên `ffmpeg` (không `.exe`) nên đuôi là tuỳ chọn.
      */
     const finalArgs =
-      turboThreads > 0 && /ffmpeg\.exe$/i.test(file)
+      turboThreads > 0 && /ffmpeg(\.exe)?$/i.test(file)
         ? ['-threads', String(turboThreads), ...args]
         : args
 

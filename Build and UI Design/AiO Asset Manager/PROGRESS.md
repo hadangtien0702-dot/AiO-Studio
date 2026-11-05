@@ -1,5 +1,82 @@
 # AiO Asset Manager - Nhat ky
 
+## [mac] - 2026-09-30 06:51 (UTC+7) - CHAY DUOC TREN macOS (nhanh Mac, Windows giu nguyen)
+
+### Trang thai hien tai
+Van DONG BANG tinh nang. Lan nay CHI them duong chay macOS theo lenh anh Tien
+30/09 (moi panel phai chay duoc tren Mac). KHONG tang phien ban, KHONG commit.
+Tren Mac: build sach, cac ham FFmpeg/ffprobe/Thung rac chay that bang Node.
+CHUA mo panel trong Premiere tren Mac (chua kiem).
+
+### Boi canh
+Anh Tien 30/09: tat ca panel phai chay duoc tren Mac. Panel nay truoc chi goi
+`bin/win64/ffmpeg.exe`, `ffprobe.exe` va `powershell.exe` -> tren Mac khong
+tim thay FFmpeg (khong thumbnail / song am / proxy / metadata) va nut don rac
+macOS goi powershell.exe (khong ton tai).
+
+### Khai bao sua file KHOA (RULES C.1 / C.2)
+`services/ffmpeg.ts` (khoa cung), `services/macJunk.ts`, `SettingsModal.tsx`,
+`Grid.tsx` (khoa mem). Chi THEM nhanh `if (isMac())`; moi dong Windows giu
+nguyen. `macJunk.ts` luat (2) "Thung rac Windows" -> tren Mac la Thung rac
+cua Mac (Trash, khoi phuc bang Put Back); van KHONG `unlink`, van doc duong
+dan tu file tam UTF-8, van bam hai lan.
+
+### Thay doi
+- MOI `client/src/lib/platform.ts`: `isMac()` (doc `process.platform` luc
+  chay qua cep_node, lui ve `os.platform()`), `macAppSupportDir()`,
+  `macToolCandidates()` / `findMacTool()` theo quy uoc chung ca bo:
+  `<ext>/bin/mac/<ten>` -> `~/Library/Application Support/AiO-Studio/bin/mac/<ten>`
+  -> `/opt/homebrew/bin` -> `/usr/local/bin`. Luon tra duong dan tuyet doi.
+- `services/ffmpeg.ts`: `getFFmpegPath()` / `getFFprobePath()` them nhanh Mac
+  o dau ham. Regex turbo `-threads` doi `ffmpeg\.exe$` -> `ffmpeg(\.exe)?$`
+  (Windows khop y nhu cu, ffprobe van khong khop).
+- `services/cachePaths.ts`: `defaultCacheRoot()` them duong lui Mac
+  `~/Library/Application Support` sau userData/APPDATA.
+- `services/macJunk.ts`: `moveToRecycleBin()` tren Mac goi
+  `/usr/bin/osascript -l JavaScript` -> `NSFileManager.trashItemAtURL`
+  (khong can Finder, khong can quyen Automation).
+- `SettingsModal.tsx`, `Grid.tsx`, `chu.ts`: 6 cau moi cho Mac (Thung rac cua
+  Mac / Trash, Finder thay Explorer, mo ta rac macOS dung voi Mac), du VI+EN,
+  khong dau gach dai.
+- `host/*.jsx`: da soat, khong co gi rieng Windows -> khong sua.
+
+### File anh huong
+client/src/lib/platform.ts (moi) - client/src/services/ffmpeg.ts -
+client/src/services/cachePaths.ts - client/src/services/macJunk.ts -
+client/src/components/SettingsModal.tsx - client/src/components/Grid.tsx -
+client/src/chu.ts - client/tsconfig.tsbuildinfo (build tu cap nhat)
+
+### Kiem chung (Mac Intel x86_64, macOS 26, Node v24)
+- `npm ci` roi `npm run build:release`: exit 0, tsc 0 loi,
+  dist/index.html 279.877 byte, 0 lan `startAutoReload`. `npm run build`
+  (dev): exit 0.
+- Bundle MA THAT (lib/platform + ffmpeg + cachePaths + thumbnailer + waveform
+  + proxy + probe + macJunk) bang esbuild, chay Node voi CSInterface gia:
+  **12/12 dat**.
+  - ffmpeg/ffprobe -> `~/Library/Application Support/AiO-Studio/bin/mac/`
+    (ffmpeg 9.0.2-tessus, x86_64).
+  - Clip test 1280x720 25fps 6s: probe ra dung 1280x720 / 25 / 6s; wav 4s
+    pcm_s16le ra dung 4s.
+  - Thumbnail webp 2.780 byte (954 ms) · song am webp 1.674 byte (229 ms) ·
+    proxy libopenh264 640x360 h264 299.922 byte (1.343 ms).
+  - Don rac: 2 file rac (ten co dau + dau cach, mot file trong __MACOSX)
+    -> Trash, moved 2 / failed 1 (file khong ton tai), file that giu nguyen.
+- Gia lap `platform = win32`: van ra `bin/win64/ffmpeg.exe` va
+  `bin/win64/ffprobe.exe` nhu cu.
+
+### CHUA kiem / con ton
+- Chua kiem: mo panel trong Premiere tren Mac (chen timeline, keo tha, xem
+  truoc qua mediaServer, cache that, nut don rac trong giao dien).
+- `ngonngu.tsx` la ban chep tu `design-system/ngonngu.tsx` (khong sua o day):
+  tren Mac khong co APPDATA nen file ngon ngu chung roi vao
+  `~/AppData/Roaming/AiOStudio/ngonngu.json`. Chay duoc nhung sai cho; can
+  sua o nguon chung roi dong bo.
+- FFmpeg Mac dang cai trong kho chung la ban `--enable-gpl` (co libx264).
+  Ban ra ngoai can ban LGPL nhu Windows. Chua co `bin/mac/` trong goi panel;
+  `package-release.ps1` chi dong goi Windows.
+
+---
+
 ## 2026-09-14 14:40 - BO CAI 2.0.0 KEM FFMPEG (anh: "xai on dinh roi sao khong tao ban cai")
 
 ### Boi canh

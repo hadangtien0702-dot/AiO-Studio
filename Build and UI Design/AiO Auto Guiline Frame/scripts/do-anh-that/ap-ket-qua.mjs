@@ -37,7 +37,8 @@ for (const d of ds) {
   if (d.mockDo && d.mockDo.length) {
     const rows = d.mockDo.map(e => {
       const o = {};
-      for (const k of ['t', 'x', 'y', 'w', 'h', 's', 'nhan', 'mo', 'doc', 'cong', 'n', 'dam', 'can']) if (e[k] !== undefined && e[k] !== null && e[k] !== '') o[k] = typeof e[k] === 'number' ? Math.round(e[k] * 100) / 100 : e[k];
+      // 'mau' / 'pt' / 'mauChu' / 'vien' cung phai chep (agent ig-reels bat: thieu 'mau' thi pill thanh tab ve TRANG)
+      for (const k of ['t', 'x', 'y', 'w', 'h', 's', 'nhan', 'mo', 'doc', 'cong', 'n', 'dam', 'can', 'mau', 'pt', 'mauChu', 'vien']) if (e[k] !== undefined && e[k] !== null && e[k] !== '') o[k] = typeof e[k] === 'number' ? Math.round(e[k] * 100) / 100 : e[k];
       return '      ' + JSON.stringify(o).replace(/"([a-zA-Z]+)":/g, '$1: ').replace(/,/g, ', ').replace(/"/g, "'");
     });
     dong.push(`  MOCK_DO['${d.id}'] = [ // ${(d.anhNguon || '').replace(/\n/g, ' ').slice(0, 110)} | tin cay: ${String(d.doTinCay).slice(0, 40)}\n${rows.join(',\n')}\n  ];`);
@@ -53,25 +54,39 @@ const D1 = '// ==== BAT DAU MOCK_DO SINH TU KET QUA DO', D2 = '// ==== KET THUC 
 const i1 = js.indexOf(D1), i2 = js.indexOf(D2);
 if (i1 < 0 || i2 < 0) throw new Error('khong thay dau danh dau MOCK_DO trong ve-guide.js');
 const dauDong = js.slice(i1, js.indexOf('\n', i1) + 1);
-js = js.slice(0, i1) + dauDong + dong.join('\n') + '\n  ' + js.slice(i2);
+// GOP, khong ghi de: bang cua id KHONG thuoc lot nay giu nguyen (26/09 lot 3 tung xoa mat 4 bang cua lot 2)
+const khoiCu = js.slice(i1 + dauDong.length, i2);
+const idLot = new Set(ds.map(d => d.id));
+const giuLai = [];
+const reBang = /  MOCK_DO\['([a-z0-9-]+)'\] = \[[\s\S]*?\n  \];/g; let mBang;
+while ((mBang = reBang.exec(khoiCu))) if (!idLot.has(mBang[1])) giuLai.push(mBang[0]);
+const tatCa = giuLai.concat(dong);
+js = js.slice(0, i1) + dauDong + tatCa.join('\n') + '\n  ' + js.slice(i2);
 fs.writeFileSync(vg, js, 'utf8');
-console.log(`ve-guide.js: ghi ${dong.length} bang MOCK_DO`);
+console.log(`ve-guide.js: ghi ${dong.length} bang MOCK_DO moi + giu ${giuLai.length} bang cu = ${tatCa.length}`);
 // --- ghi vung vao JSON ---
 let soDoi = 0;
 for (const d of ds) {
   const f = tim(d.id); const dx = d.deXuatVung; if (!f || !dx) continue;
   const q = d.quyDoi1080x1920 || {};
   for (const canh of ['top', 'bottom', 'right', 'left']) {
-    if (dx[canh] == null) continue;
+    if (dx[canh] == null || dx[canh] <= 0) continue; // 0 = khong co vung canh do (bat bien JSON doi 0 < pt < 50)
     let pt = dx[canh];
-    const doThatPt = canh === 'top' ? q.topPx / 19.2 : canh === 'bottom' ? q.bottomPx / 19.2 : canh === 'right' ? q.rightPx / 10.8 : q.leftPx / 10.8;
+    // do that: canh left loai crop thi so voi phan bi cat (cropMoiMepPx), khong phai mep chu
+    // canh left/right loai crop (x-vertical 26/09: cot icon doc khong con, chi con phan bi cat mep)
+    const laCrop = (canh === 'left' && dx.leftLoai === 'crop') || (canh === 'right' && dx.rightLoai === 'crop');
+    const doThatPt = canh === 'top' ? q.topPx / 19.2 : canh === 'bottom' ? q.bottomPx / 19.2 : (laCrop ? (q.cropMoiMepPx || 0) : (canh === 'right' ? q.rightPx : q.leftPx)) / 10.8;
     if (Number.isFinite(doThatPt) && pt < doThatPt) pt = Math.ceil(doThatPt); // khong bao gio nho hon do that
-    const px = Math.round(pt / 100 * (canh === 'top' || canh === 'bottom' ? 1920 : 1080));
     let v = f.vung.find(x => x.canh === canh);
-    if (!v) { v = { canh, pt, px1080: px, loai: canh === 'left' && dx.leftLoai === 'crop' ? 'crop' : 'ui', trangThai: 'ben_thu_3', ui: { vi: 'Đo từ ảnh app thật 26/09/2026', en: 'Measured from a real app screenshot 26/09/2026' } }; f.vung.push(v); }
-    if (v.pt !== pt) { soDoi++; v.pt = pt; v.px1080 = px; v.trangThai = 'ben_thu_3'; if (canh === 'left' && dx.leftLoai === 'crop') v.loai = 'crop'; }
+    // so CHINH THUC (spec ads) lon hon so do -> giu lam bien tren (nhu YouTube bottom 25%): khong ha
+    if (v && v.trangThai === 'chinh_thuc' && v.pt > pt && v.loai === 'ui') { console.log(`  giu ${d.id}/${canh} = ${v.pt}% (chinh thuc, > de xuat ${pt}%)`); continue; }
+    if (v && v.pt > pt) console.log(`  HA ${d.id}/${canh}: ${v.pt}% (${v.trangThai}) -> ${pt}% ${laCrop ? 'crop' : 'ui'} (do that ${Number.isFinite(doThatPt) ? doThatPt.toFixed(1) : '-'}%)`);
+    const px = Math.round(pt / 100 * (canh === 'top' || canh === 'bottom' ? 1920 : 1080));
+    if (!v) { v = { canh, pt, px1080: px, loai: laCrop ? 'crop' : 'ui', trangThai: 'ben_thu_3', ui: { vi: 'Đo từ ảnh app thật 26/09/2026', en: 'Measured from a real app screenshot 26/09/2026' } }; f.vung.push(v); }
+    if (v.pt !== pt || (laCrop && v.loai !== 'crop')) { soDoi++; v.pt = pt; v.px1080 = px; v.trangThai = 'ben_thu_3'; if (laCrop) v.loai = 'crop'; }
   }
-  f.nguon = (f.nguon || '') + ` | DO ANH APP THAT 26/09/2026 (${(d.anhNguon || '').replace(/\|/g, '/').slice(0, 90)}): top ${(q.topPx / 19.2).toFixed(1)}% / bottom ${(q.bottomPx / 19.2).toFixed(1)}% / right ${(q.rightPx / 10.8).toFixed(1)}% / left ${(q.leftPx / 10.8).toFixed(1)}%, mapping ${d.vungVideo ? d.vungVideo.mapping : '?'}; tin cay: ${String(d.doTinCay).slice(0, 60)}`;
+  // idempotent: cat doan da noi lan truoc roi noi lai (chay lai cung lot khong nhan doi)
+  f.nguon = String(f.nguon || '').replace(/ \| DO ANH APP THAT [\s\S]*$/, '') + ` | DO ANH APP THAT 26/09/2026 (${(d.anhNguon || '').replace(/\|/g, '/').slice(0, 90)}): top ${(q.topPx / 19.2).toFixed(1)}% / bottom ${(q.bottomPx / 19.2).toFixed(1)}% / right ${(q.rightPx / 10.8).toFixed(1)}% / left ${(q.leftPx / 10.8).toFixed(1)}%, mapping ${d.vungVideo ? d.vungVideo.mapping : '?'}; tin cay: ${String(d.doTinCay).slice(0, 60)}`;
 }
 fs.writeFileSync(path.join(GOC, 'safe-zones.json'), JSON.stringify(json, null, 2) + '\n', 'utf8');
 console.log(`safe-zones.json: ${soDoi} canh doi so`);

@@ -1,0 +1,28 @@
+/* NUT TRON cua khay (01/10) — dung CHUNG cho cua so nut (src/nut) va san dien (src/dien): hai noi ve cung mot hinh thi
+   luc doi tu ban ve tren san sang nut that moi khong nhay. Khong khai token rieng.
+   CANH BAO (so loi app, "hieu ung CSS lan rong hon le cua so trong suot bi CHAT CANH"): cua so nut 80x80, vong tron 52
+   -> le 14 px. Bong = lech 4 + nhoe 10 = 14 px, khong duoc hon. */
+.nut {
+  position: absolute; width: 52px; height: 52px; border-radius: 26px;
+  background: radial-gradient(circle at 34% 28%, #34343b, #19191c 62%);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 55%), 0 0 0 1.5px rgb(248 104 32 / 60%), inset 0 1px 0 rgb(255 255 255 / 12%);
+}
+.nut .mat {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+}
+.nut .mat.hien { opacity: 1; }
+.nut .mat.logo { color: var(--accent); }
+.nut .mat.ong { color: var(--accent); }
+.nut .mat.anh img { display: block; width: 44px; height: 44px; border-radius: 22px; object-fit: cover; }
+/* So anh trong khay: vien thuoc cam, chu trang dam (luat: chu tren cam dac phai dam) */
+.nut .so {
+  position: absolute; right: -5px; top: -5px;
+  min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: 10px; background: var(--accent); color: #fff;
+  font: 700 11px/20px var(--font-ui); font-style: normal; text-align: center;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px rgb(14 14 14 / 92%);
+}
+.nut .so:empty { display: none; }

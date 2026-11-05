@@ -44,6 +44,7 @@ export const CHU: BangChu = {
     'Xoá link': 'Clear link',
     'Dán link': 'Paste link',
     'Dán link (Ctrl+V)': 'Paste link (Ctrl+V)',
+    'Dán link (Cmd+V)': 'Paste link (Cmd+V)',
     'Chưa thấy đường link trong chữ vừa dán.': 'No link found in the pasted text.',
     'Đang dùng cookie của {b}': 'Using {b} cookies',
     'Đang đọc link…': 'Reading link…',
@@ -98,6 +99,8 @@ export const CHU: BangChu = {
     'Không kết nối được. Kiểm tra mạng rồi thử lại.': 'Could not connect. Check your network and retry.',
     'Windows chặn engine tải (phần mềm diệt virus?). Cho phép trong Windows Security rồi thử lại.':
       'Windows blocked the download engine (antivirus?). Allow it in Windows Security, then retry.',
+    'macOS chặn engine tải. Mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật, cho phép rồi thử lại.':
+      'macOS blocked the download engine. Open System Settings > Privacy & Security, allow it, then retry.',
     'Không đọc được cookie của {b}. Đóng hẳn {b} (kể cả chạy nền), hoặc chọn Firefox / Không trong Cài đặt.':
       'Could not read {b} cookies. Fully close {b} (including background), or pick Firefox / None in Settings.',
     'Không ghi được vào thư mục lưu (ổ đã rút, hết chỗ hoặc không có quyền). Bấm "Đổi" để chọn chỗ khác.':

@@ -1,0 +1,13 @@
+/* KHAY GOP (01/10) — phan THEM tren storyboard.css + video.css: chi co 2 the tren thanh tieu de.
+   Khong khai token rieng. Cum the dung nguyen .chon-nhom / .chon-nut (khuon man Cai dat). */
+
+/* Thanh tieu de la vung KEO cua so (-webkit-app-region: drag) -> cum the phai tu khai no-drag, khong thi bam khong an */
+#tab { -webkit-app-region: no-drag; margin-left: var(--sp-2); }
+#tab .chon-nut { display: inline-flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
+
+/* So muc cua tung the: cung co / do dam voi so dem cu (#shot-badge 11 px / 700). The dang mo = mau cam chu, the kia = xam. */
+.tab-dem { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-3); }
+#tab .chon-nut.active .tab-dem { color: var(--accent-text); }
+
+/* CANH BAO (so loi app "CSS de len co che AN"): the dang an phai an that, ke ca khi sau nay co luat display theo id */
+.tab-than[hidden] { display: none !important; }

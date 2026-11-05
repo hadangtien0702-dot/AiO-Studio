@@ -33,6 +33,16 @@ for (const p of ['AiO Transcripts', 'AiO Autocut']) {
   const c = join(suite, p, 'bin', 'win64', 'ffmpeg.exe')
   if (existsSync(c)) { ffmpeg = c; break }
 }
+if (process.platform === 'darwin') {
+  // Mac: khong co .exe — cung thu tu tim nhu panel (dist/index.html timFfmpeg).
+  // ffmpeg.exe trong repo (chep tu Windows) co ton tai nhung khong chay duoc tren Mac.
+  ffmpeg = null
+  const home = (await import('node:os')).homedir()
+  for (const c of [
+    join(home, 'Library', 'Application Support', 'AiO-Studio', 'bin', 'mac', 'ffmpeg'),
+    '/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg',
+  ]) { if (existsSync(c)) { ffmpeg = c; break } }
+}
 if (!ffmpeg) { console.error('KHONG THAY ffmpeg o panel anh em'); process.exit(1) }
 
 // ── Cùng kịch bản với kiem-nao.mjs — đây là ĐÁP ÁN ─────────────────────────
