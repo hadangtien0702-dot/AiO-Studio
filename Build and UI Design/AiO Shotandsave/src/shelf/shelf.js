@@ -172,6 +172,8 @@ document.getElementById('storyboard')?.addEventListener('click', () => {
   if (listEl.children.length === 0) return
   window.shelf.openStoryboard()
 })
+// 01/10: mo Khay video (cac doan quay vung man hinh nam o khay rieng, khong chung khay anh)
+document.getElementById('video')?.addEventListener('click', () => window.shelf.openVideo())
 document.getElementById('folder').addEventListener('click', () => window.shelf.openFolder())
 document.getElementById('clear').addEventListener('click', () => window.shelf.clear())
 document.getElementById('hide').addEventListener('click', () => window.shelf.hide())
@@ -243,5 +245,64 @@ window.addEventListener('mouseup', () => {
   gripDangKeo = null
   window.shelf.resizeEnd()
 })
+
+/* ── 01/10 KHAY THU VE NUT TRON (main: src/khay-thu.js) ───────────────────────
+   Main goi 3 ham nay bang executeJavaScript (khong them kenh IPC):
+   - __khayThongTin(): cac o anh DANG THAY (toa do DIP trong cua so) de san dien cat tu anh chup cua so ma cho bay.
+   - __khayAn(true|false): an / hien noi dung khay (cua so van o do). Luc thu ve: "bong" tren san dien da de len roi
+     moi an, nen khong thay nhay. Cho 2 khung de khung TRONG kip ve truoc khi main an cua so (cua so an thi khong ve
+     lai -> lan hien sau khong lo khay cu).
+   - __khayBung(): xuat hien kieu "ong kinh": man trap bung tu tam ra + mot nhay sang.
+   Moi cho doi deu dua voi hen gio: cua so dang an thi requestAnimationFrame dung, khong duoc treo main. */
+const choNgan = (ms) => new Promise((r) => setTimeout(r, ms))
+window.__khayThongTin = () => {
+  const kv = listEl.getBoundingClientRect()
+  const o = []
+  for (const el of listEl.children) {
+    const r = el.getBoundingClientRect()
+    const x0 = Math.max(r.left, kv.left), y0 = Math.max(r.top, kv.top)
+    const w = Math.min(r.right, kv.right) - x0, h = Math.min(r.bottom, kv.bottom) - y0
+    // chi lay o con thay it nhat mot nua (khay cuon / nhieu hang); o lo ra mot phan thi chi lay phan dang thay
+    if (w < r.width * .5 || h < r.height * .5) continue
+    o.push({ x: Math.round(x0), y: Math.round(y0), w: Math.round(w), h: Math.round(h) })
+  }
+  return { o, tong: listEl.children.length, w: window.innerWidth, h: window.innerHeight }
+}
+window.__khayAn = (an) => {
+  document.body.classList.toggle('an', !!an)
+  return Promise.race([new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(true)))), choNgan(120).then(() => true)])
+}
+window.__khayBung = () => {
+  const khay = document.getElementById('shelf'), chop = document.getElementById('chop')
+  const r = Math.hypot(window.innerWidth, window.innerHeight) / 2 + 6
+  const chay = (el, kf, o) => {
+    const a = el.animate(kf, Object.assign({ fill: 'both' }, o))
+    return Promise.race([a.finished.catch(() => {}), choNgan(o.duration + (o.delay || 0) + 150)]).then(() => { a.cancel(); return true })
+  }
+  /* 02/10 do do muot: dau = khung dau toi sau bao lau ke tu luc ham nay bat dau chay, n / max = so khung + khoang cach
+     lon nhat giua 2 khung trong luc man trap bung, ms = ca ham chay bao lau. Main (khay-thu.js ghiDo) ghi vao run-log. */
+  const t0 = performance.now()
+  let truoc = 0, n = 0, max = 0, dau = -1, dung = false
+  const buoc = (t) => {
+    if (dung) return
+    if (truoc) max = Math.max(max, t - truoc); else dau = performance.now() - t0
+    truoc = t; n++
+    requestAnimationFrame(buoc)
+  }
+  requestAnimationFrame(buoc)
+  // hen = do tre lon nhat cua hen gio 8 ms (luong chinh trang nay co ban khong); an = so lan trang bi coi la AN trong luc bung
+  let hTruoc = t0, hen = 0, an = document.hidden ? 1 : 0
+  const dem = setInterval(() => { const b = performance.now(); hen = Math.max(hen, b - hTruoc); hTruoc = b }, 8)
+  const khiAn = () => { if (document.hidden) an++ }
+  document.addEventListener('visibilitychange', khiAn)
+  document.body.classList.remove('an')
+  if (chop) chay(chop, [{ opacity: .5 }, { opacity: 0 }], { duration: 300, delay: 40, easing: 'ease-out' })
+  chay(listEl, [{ filter: 'brightness(.35)' }, { filter: 'brightness(1)' }], { duration: 280 })
+  return chay(khay, [{ clipPath: 'circle(26px at 50% 50%)' }, { clipPath: 'circle(' + r.toFixed(1) + 'px at 50% 50%)' }], { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)' })
+    .then(() => {
+      dung = true; clearInterval(dem); document.removeEventListener('visibilitychange', khiAn)
+      return { dau: Math.round(dau), n, max: Math.round(max), ms: Math.round(performance.now() - t0), hen: Math.round(hen), an }
+    })
+}
 
 capNhatSoLuong()

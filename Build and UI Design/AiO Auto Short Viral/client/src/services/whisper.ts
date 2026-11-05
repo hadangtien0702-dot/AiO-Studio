@@ -19,13 +19,48 @@
  * 28/07, xem ghi chú ở `NOI_DE`).
  * [Short Viral] Bản Transcripts ghi dòng này là `%APPDATA%\AiO Studio\whisper\`
  * — SAI với chính hằng `NOI_DE` của nó. Đã sửa ở đây; Transcripts vẫn còn sai.
+ * [Mac 30/09/2026] Trên macOS bộ máy ở `~/Library/Application Support/AiO-Studio/whisper/`
+ * (`noiDeMac`), file chạy `bin/whisper-cli` — xem `duongExe`.
  */
 
 import { dich } from '../ngonngu'
-import { getFs, getPath, nodeRequire } from '../lib/node'
-import { execFileAsync, getFFmpegPath, soLuongCpu, type CoHuy } from './ffmpeg'
+import { getFs, getPath, laMac, nodeRequire } from '../lib/node'
+import { chayDuocMac, execFileAsync, getFFmpegPath, soLuongCpu, type CoHuy } from './ffmpeg'
 import { parseDuration, parseVideoFps } from './silencelog'
 import type { Cau, KetQuaNghe, NguonNghe, TuTinCay } from './kieu'
+
+/**
+ * Mac chip Intel: bắt whisper chạy CPU (`-ng`). Đo 30/09/2026 trên i9-9980HK + Radeon Pro 5500M,
+ * câu 14 s, mô hình turbo: GPU (Metal) 18,7 s, CPU 11,4 s, chữ ra y hệt; trong Premiere GPU còn bị
+ * Premiere giành nên Autocut đo 59 s. Chip M (arm64) giữ GPU. Windows không đổi (trả mảng rỗng).
+ */
+function chiChayCpu(): string[] {
+  if (!laMac()) return []
+  try {
+    const r = nodeRequire()
+    return r && r('os').arch() === 'x64' ? ['-ng'] : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Số luồng cho whisper. Mac: theo NHÂN THẬT (hw.physicalcpu) trừ 2. Đo 30/09/2026 trong Premiere Beta
+ * trên i9-9980HK (8 nhân thật / 16 luồng), câu 14 s, turbo, CPU: 6 luồng 12,0 s · 8 luồng 14,6 s ·
+ * 9 luồng 54,3 s · 10 luồng 78,0 s · 11 luồng ~100 s (ngoài Premiere 11 luồng vẫn 11,4 s): vượt số nhân
+ * thật là các luồng của ggml chờ nhau vì Premiere cũng giành CPU. Windows giữ nguyên soLuongCpu().
+ */
+function soLuongWhisper(): number {
+  if (!laMac()) return soLuongCpu()
+  try {
+    const r = nodeRequire()
+    const n = r ? parseInt(String(r('child_process').execFileSync('/usr/sbin/sysctl', ['-n', 'hw.physicalcpu'])).trim(), 10) : 0
+    if (n > 0) return Math.max(2, Math.min(soLuongCpu(), n - 2))
+  } catch {
+    /* lùi về nửa số luồng */
+  }
+  return Math.max(2, Math.floor(soLuongCpu() / 2))
+}
 
 export type { Cau, KetQuaNghe, TuTinCay }
 
@@ -103,19 +138,44 @@ export interface BoMayWhisper {
  */
 const NOI_DE = ['C:/AiO-Studio/whisper']
 
+/**
+ * [Mac 30/09/2026] Nơi để bộ máy trên macOS — quy ước chung cả bộ:
+ * `~/Library/Application Support/AiO-Studio/whisper`, file chạy `bin/whisper-cli`
+ * (không có thư mục `Release`, không đuôi `.exe`), mô hình trong `models/`.
+ * macOS không có chuyện ảo hoá AppData như Premiere Beta trên Windows.
+ */
+function noiDeMac(): string[] {
+  const req = nodeRequire()
+  const path = getPath()
+  try {
+    const nha = req ? req('os').homedir() : ''
+    if (nha && path) return [path.join(nha, 'Library', 'Application Support', 'AiO-Studio', 'whisper')]
+  } catch {
+    /* rơi xuống chuỗi rỗng */
+  }
+  return []
+}
+
+/** Đường dẫn file chạy whisper-cli bên trong thư mục gốc `goc`, đúng theo hệ điều hành. */
+function duongExe(path: any, goc: string): string {
+  // [Mac] `bin/whisper-cli`; Windows giữ nguyên `bin/Release/whisper-cli.exe`.
+  return laMac() ? path.join(goc, 'bin', 'whisper-cli') : path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
+}
+
 /** Thư mục gốc của bộ máy Whisper ('' nếu không tìm thấy chỗ nào). */
 function thuMucWhisper(): string {
   const fs = getFs()
   const path = getPath()
   if (!fs || !path) return ''
-  for (const d of NOI_DE) {
+  const noiDe = laMac() ? noiDeMac() : NOI_DE
+  for (const d of noiDe) {
     try {
       if (fs.existsSync(d)) return d
     } catch {
       /* thử chỗ tiếp theo */
     }
   }
-  return NOI_DE[0] // trả về chỗ mặc định để thông báo lỗi chỉ đúng đường dẫn
+  return noiDe[0] || '' // trả về chỗ mặc định để thông báo lỗi chỉ đúng đường dẫn
 }
 
 /**
@@ -130,9 +190,10 @@ export function timBoMay(ma: MaMoHinh = 'turbo'): BoMayWhisper | null {
   const goc = thuMucWhisper()
   if (!fs || !path || !goc) return null
 
-  const exe = path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
+  const exe = duongExe(path, goc)
   try {
-    if (!fs.existsSync(exe)) return null
+    // [Mac] còn phải có bit thực thi (`chayDuocMac` tự cấp lại nếu rụng).
+    if (laMac() ? !chayDuocMac(exe) : !fs.existsSync(exe)) return null
     // Mô hình được xin trước, rồi mới tới cái còn lại — thiếu đúng cái được
     // chọn thì lùi sang cái kia, còn hơn không chạy. Mã trả về là mã của file
     // THẬT tìm thấy (xem `BoMayWhisper.ma`).
@@ -161,13 +222,13 @@ export function thieuGi(): string {
   const goc = thuMucWhisper()
   if (!fs || !path) return dich('Panel không dùng được Node.js.')
   if (!goc) return dich('Không xác định được thư mục cài đặt của bộ nghe hiểu.')
-  const exe = path.join(goc, 'bin', 'Release', 'whisper-cli.exe')
+  const exe = duongExe(path, goc)
   const thieu: string[] = []
   try {
     // ☠️ BẢN THƯƠNG MẠI: không nêu tên công cụ nền. Anh Tiến 30/07:
     // *"bản thương mại không để người dùng biết mình dùng gì và làm gì"*.
     // Khách biết panel bọc một công cụ mã nguồn mở là tự chạy được, khỏi mua.
-    if (!fs.existsSync(exe)) thieu.push(dich('bộ nghe hiểu'))
+    if (laMac() ? !chayDuocMac(exe) : !fs.existsSync(exe)) thieu.push(dich('bộ nghe hiểu'))
     const coMoHinh = MO_HINH.some((m) => fs.existsSync(path.join(goc, 'models', m.file)))
     // Cỡ của bản MẶC ĐỊNH turbo: 1.624.555.275 byte (đo 19/09 trên máy anh).
     if (!coMoHinh) thieu.push(dich('dữ liệu nghe hiểu (khoảng 1,5 GB)'))
@@ -432,8 +493,8 @@ export async function nghe(
       // ⚠️ PHẢI NÓI RÕ GIỚI HẠN: `-mc 0` và mọi ngưỡng đo trên giọng Việt đang
       // dùng chung cho mọi thứ tiếng. Mỗi ngôn ngữ cần MỘT FILE THẬT để đo lại.
       // Chưa đo thì chưa được hứa.
-      ['-m', boMay.model, '-f', wavPath, '-l', 'auto', '-t', String(soLuongCpu()),
-       '-mc', '0', '-np', '-pp', '-ojf', '-of', goc],
+      ['-m', boMay.model, '-f', wavPath, '-l', 'auto', '-t', String(soLuongWhisper()),
+       '-mc', '0', '-np', '-pp', '-ojf', '-of', goc, ...chiChayCpu()],
       {
         uuTienThap: false, // người dùng đang ngồi đợi — đừng nhường CPU cho ai
         huy: tuyChon.huy,

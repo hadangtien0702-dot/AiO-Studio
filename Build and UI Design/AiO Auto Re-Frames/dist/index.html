@@ -641,6 +641,7 @@
       xuat_xong: 'Đã xuất {ten} ({giay}s · {mb} MB) — nằm cạnh video gốc.',
       xuat_nhieu_clip: 'Sequence này có {n} clip — bản check hiện chỉ xuất sequence 1 clip (các short).',
       xuat_thieu_ffmpeg: 'Không tìm thấy bộ xử lý media — cần cài kèm AiO Transcripts hoặc Autocut.',
+      xuat_thieu_ffmpeg_mac: 'Không tìm thấy bộ xử lý media (ffmpeg). Trên Mac: đặt ffmpeg vào ~/Library/Application Support/AiO-Studio/bin/mac/ hoặc cài kèm AiO Transcripts / Autocut.',
       xuat_loi: 'Xuất lỗi: ',
       vung_nhan: 'Đoạn đang chọn',
       vung_nut: 'Bám chủ thể đoạn này · {ten}',
@@ -718,6 +719,7 @@
       xuat_xong: 'Exported {ten} ({giay}s · {mb} MB) — next to the source video.',
       xuat_nhieu_clip: 'This sequence has {n} clips — draft export currently handles 1-clip sequences (the shorts).',
       xuat_thieu_ffmpeg: 'Media engine not found — install AiO Transcripts or Autocut alongside this panel.',
+      xuat_thieu_ffmpeg_mac: 'Media engine (ffmpeg) not found. On Mac: put ffmpeg in ~/Library/Application Support/AiO-Studio/bin/mac/ or install AiO Transcripts / Autocut alongside this panel.',
       xuat_loi: 'Export failed: ',
       vung_nhan: 'Selected range',
       vung_nut: 'Track subject in this range · {ten}',
@@ -942,8 +944,27 @@
 
   window.addEventListener('resize', function () { capNhatKhungCua() })
 
+  /* ═══ macOS (30/09/2026) ═══ Nhánh Mac THÊM VÀO, nhánh Windows giữ nguyên. */
+  function napNode(ten) {
+    try { if (window.cep_node && window.cep_node.require) return window.cep_node.require(ten) } catch (e) {}
+    try { if (typeof require === 'function') return require(ten) } catch (e) {}
+    return null
+  }
+  function laMac() {
+    try { if (window.cep_node && window.cep_node.process) return window.cep_node.process.platform === 'darwin' } catch (e) {}
+    try { if (typeof process !== 'undefined' && process.platform) return process.platform === 'darwin' } catch (e) {}
+    return false
+  }
+  /** Thư mục extension, dấu '/'. ☠️ CSInterface.js (bản chép chung) cắt cả 'file:///'
+   *  → trên Mac ra 'Users/...' mất '/' đầu. Trả lại '/' cho Mac; Windows y như cũ. */
+  function duongExt() {
+    var p = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/')
+    if (laMac() && p && p.charAt(0) !== '/') p = '/' + p
+    return p
+  }
+
   function napLaiHost(xong) {
-    var ext = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/')
+    var ext = duongExt()
     var lenh = 'var __n="OK"; try { $.evalFile("' + ext + '/host/index.jsx") } catch(e) { __n="ERR:"+e } __n'
     cs.evalScript(lenh, function (kq) { xong(String(kq).indexOf('OK') === 0) })
   }
@@ -1249,11 +1270,30 @@
   var dangXuat = false
 
   function timFfmpeg(fs) {
-    var goc = cs.getSystemPath(SystemPath.EXTENSION).replace(/\\/g, '/')
+    var goc = duongExt()
     var ung = ['com.aiostudio.transcript', 'com.aiostudio.autocut']
+    if (laMac()) return timFfmpegMac(fs, goc, ung)
     for (var i = 0; i < ung.length; i++) {
       var p = goc.replace(/com\.aiostudio\.[a-z]+$/, ung[i]) + '/bin/win64/ffmpeg.exe'
       try { if (fs.existsSync(p)) return p } catch (e) {}
+    }
+    return null
+  }
+
+  /** macOS: không đuôi .exe; PATH của Node trong CEP KHÔNG có Homebrew → luôn trả đường tuyệt đối.
+   *  Thứ tự: bin/mac của chính panel → AiO-Studio/bin/mac chung → panel anh em → Homebrew → /usr/local. */
+  function timFfmpegMac(fs, goc, ung) {
+    var nha = ''
+    try { nha = napNode('os').homedir() } catch (e) {}
+    var ds = [goc + '/bin/mac/ffmpeg']
+    if (nha) ds.push(nha + '/Library/Application Support/AiO-Studio/bin/mac/ffmpeg')
+    for (var i = 0; i < ung.length; i++) {
+      ds.push(goc.replace(/com\.aiostudio\.[a-z]+$/, ung[i]) + '/bin/mac/ffmpeg')
+      if (nha) ds.push(nha + '/Library/Application Support/Adobe/CEP/extensions/' + ung[i] + '/bin/mac/ffmpeg')
+    }
+    ds.push('/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg')
+    for (var j = 0; j < ds.length; j++) {
+      try { if (fs.statSync(ds[j]).isFile()) return ds[j] } catch (e) {}
     }
     return null
   }
@@ -1293,7 +1333,7 @@
         var fs = layFs()
         if (!fs) { xongXuat(null, t('thieu_node')); return }
         var ffmpeg = timFfmpeg(fs)
-        if (!ffmpeg) { xongXuat(t('xuat_thieu_ffmpeg'), null); return }
+        if (!ffmpeg) { xongXuat(t(laMac() ? 'xuat_thieu_ffmpeg_mac' : 'xuat_thieu_ffmpeg'), null); return }
 
         var goc = String(kv.duong).replace(/\\/g, '/')
         var tu = parseFloat(kv.tuGiay)

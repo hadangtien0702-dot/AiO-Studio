@@ -42,7 +42,10 @@ const langBox = document.getElementById('lang')
 const btnClose = document.getElementById('close')
 const khayBox = document.getElementById('khay-kieu')
 const khaySoAnhBox = document.getElementById('khay-so-anh')
+const khayTuThuBox = document.getElementById('khay-tu-thu')
 const lamMoBox = document.getElementById('lam-mo-kieu')
+const moCungBox = document.getElementById('mo-cung')
+const msgMoCung = document.getElementById('msg-mo-cung')
 const loaiBox = document.getElementById('anh-loai')
 const clBox = document.getElementById('anh-chat-luong')
 const hangCL = document.getElementById('hang-chat-luong')
@@ -130,6 +133,14 @@ function datAnh(loai, chatLuong) {
   hangCL.classList.toggle('mo', loai === 'png')
 }
 
+/* 04/11: ve cong tac Mo cung Windows theo trang thai THAT doc tu Windows. Khong ho tro (ban nguon, Mac) thi an ca nhom. */
+function datMoCung(m) {
+  if (!moCungBox || !m) return
+  document.getElementById('hang-mo-cung').hidden = !m.hoTro // chi an hang nay; nhom Ung dung con hang Cap nhat
+  chonPill(moCungBox, m.bat && !m.biChan ? '1' : '0')
+  msgMoCung.textContent = m.biChan ? window.i18n.t('set.moCung.biChan') : ''
+}
+
 async function load() {
   dichGiaoDien()
   const s = await window.settings.get()
@@ -139,7 +150,9 @@ async function load() {
   datAnh(s.anhLoai, s.anhChatLuong)
   chonPill(khayBox, s.khayKieu)
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
+  if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu === 0 ? 0 : (s.khayTuThu || 5)))   // 0 = Khong thu
   if (lamMoBox) chonPill(lamMoBox, s.lamMoKieu || 'mosaic')
+  datMoCung(s.moCung)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
     b.classList.toggle('chon', b.dataset.lang === s.lang)
@@ -184,6 +197,16 @@ khaySoAnhBox.addEventListener('click', async (e) => {
   chonPill(khaySoAnhBox, b.dataset.v)
   await window.settings.setKhaySoAnh(Number(b.dataset.v) || 0)
 })
+// 01/10: so giay khay cho roi tu thu ve nut tron o goc (5 / 10 / 15)
+if (khayTuThuBox) {
+  khayTuThuBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    chonPill(khayTuThuBox, b.dataset.v)
+    const g = Number(b.dataset.v)
+    await window.settings.setKhayTuThu(Number.isFinite(g) ? g : 5)
+  })
+}
 
 /* ── Kieu lam mo ──────────────────────────────────────────────────────── */
 if (lamMoBox) {
@@ -192,6 +215,15 @@ if (lamMoBox) {
     if (!b || b.classList.contains('chon')) return
     chonPill(lamMoBox, b.dataset.v)
     await window.settings.setLamMo(b.dataset.v)
+  })
+}
+
+/* ── Mo cung Windows ──────────────────────────────────────────────────── */
+if (moCungBox) {
+  moCungBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    datMoCung(await window.settings.setMoCung(b.dataset.v === '1'))
   })
 }
 

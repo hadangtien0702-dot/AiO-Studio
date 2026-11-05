@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save · Quay video</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <style>
+    /* 01/10 DONG HO QUAY VIDEO: cung vien thuoc voi thuoc quay 3 giay (index.html) — "● 0:07 | ■ Dung".
+       Cua so trong suot 240x40 nam NGOAI vung dang quay, bam duoc (main khong setIgnoreMouseEvents), khong lay focus.
+       Chua bat dau (luong dang mo) -> cham xam + "0:00"; main goi window.batDau() -> cham do nhay + dem len. */
+    html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: var(--font-ui); user-select: none; }
+    button { font-family: inherit; }
+    #thuoc {
+      position: absolute; left: 6px; top: 6px; height: 28px; box-sizing: border-box;
+      display: inline-flex; align-items: center; gap: 8px; padding: 0 3px 0 10px;
+      background: rgb(20 20 20 / 94%); border: 1px solid rgb(255 255 255 / 12%); border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(0 0 0 / 45%);
+      font-size: 12px; font-weight: 600; color: var(--text-1); white-space: nowrap;
+    }
+    #rec { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 30%); flex: none; }
+    body.chay #rec { background: #ff3b30; box-shadow: 0 0 0 3px rgb(255 59 48 / 22%); animation: nhay 1s ease-in-out infinite; }
+    @keyframes nhay { 50% { opacity: .4; } }
+    #gio { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 30px; }
+    #loa { display: none; color: var(--text-3); flex: none; }
+    body.tieng #loa { display: block; }
+    .chia { width: 1px; height: 14px; background: rgb(255 255 255 / 14%); flex: none; }
+    #dung {
+      height: 22px; padding: 0 10px 0 8px; border: none; border-radius: 999px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgb(255 255 255 / 10%); color: var(--text-1); font-size: 12px; font-weight: 700;
+      transition: background 120ms;
+    }
+    #dung:hover { background: #ff3b30; color: #fff; }
+    #dung i { width: 8px; height: 8px; border-radius: 2px; background: currentColor; flex: none; }
+    #dung:disabled { opacity: .5; cursor: default; }
+  </style>
+</head>
+<body>
+  <div id="thuoc">
+    <span id="rec"></span><span id="gio">0:00</span>
+    <svg id="loa" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+    <span class="chia"></span>
+    <button id="dung" type="button"><i></i><span id="dung-chu">Dừng</span></button>
+  </div>
+  <script src="quay.js"></script>
+</body>
+</html>

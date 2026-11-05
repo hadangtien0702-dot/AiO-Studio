@@ -1,0 +1,148 @@
+/* ===== Section LÝ DO (07/10, anh: "một section riêng nêu ra lí do tại sao anh làm cái này ... UI kể chuyện"):
+   5 câu của anh chạy như phụ đề dưới sân; sân có 5 ngày, mỗi ngày một ý tưởng; công tắc TẮT thì ý tưởng mờ dần rồi mất,
+   BẬT thì khay hiện ra và giữ hết. Không dùng GSAP. Chưa gắn class ld-on (JS hỏng) thì chỉ còn tiêu đề + 5 câu chữ. ===== */
+#why{padding-bottom:64px}
+.ld-dau{text-align:center;margin:0 auto 26px}
+.ld-nhan{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;padding:6px 12px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-weight:600;font-size:14px}
+.ld-nhan::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.ld-dau h2{margin:0}
+/* nửa sau tiêu đề có hai bản chồng lên nhau: "rồi lại đi đâu mất" mờ dần theo số ý tưởng đã mất, bật công tắc thì đổi sang bản cam */
+.ld-doi{display:grid;justify-items:center}
+.ld-doi > span{grid-area:1/1;transition:opacity .45s ease,filter .45s ease,transform .5s cubic-bezier(.2,.8,.2,1),letter-spacing .45s ease}
+.ld-doi .a{opacity:calc(1 - var(--mat,0)*.11);filter:blur(calc(var(--mat,0)*.32px));letter-spacing:calc(-.028em + var(--mat,0)*.012em)}
+.ld-doi .b{color:#f86820;opacity:0;transform:translateY(.25em)}
+.ld.bat .ld-doi .a{opacity:0;filter:none;transform:translateY(-.25em)}
+.ld.bat .ld-doi .b{opacity:1;transform:none}
+.ld:not(.ld-on) .ld-san{display:none}
+.ld-san{position:relative;max-width:980px;margin:0 auto;padding:24px 5% 20px;box-sizing:border-box;border-radius:24px;display:flex;flex-direction:column;align-items:center;
+  user-select:none;-webkit-user-select:none;font-family:Inter,system-ui,sans-serif;
+  background:radial-gradient(circle,var(--line-strong) 1px,transparent 1.3px) 0 0/22px 22px,var(--bg-soft);box-shadow:inset 0 0 0 1px var(--line)}
+/* (bản 5 câu có thanh 5 đoạn + nhãn "Project mới" ở đây; 07/10 anh bảo gom còn 3 câu cho gọn: thanh tiến độ dời xuống nằm trên từng câu) */
+/* 5 ngày, mỗi ngày một ô chờ */
+.ld-ngay{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;width:100%}
+.ld-o{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.ld-o small{font:600 11px/1 Inter,sans-serif;color:var(--ink-3);letter-spacing:.02em}
+.ld-cho{position:relative;display:block;width:100%;aspect-ratio:16/10;box-sizing:border-box;border-radius:10px;border:1.5px dashed var(--line-strong);background:rgb(127 127 127/5%);transition:border-color .25s ease,box-shadow .25s ease}
+.ld-cho.do{border-color:#f86820;box-shadow:0 0 0 3px rgb(248 104 32/14%)}
+.ld-cho::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;font:700 20px/1 Inter,sans-serif;color:var(--ink-3);opacity:0;transition:opacity .4s ease .25s}
+.ld-o.mat .ld-cho::after{opacity:.55}
+/* y tuong da nam trong khay: o cua ngay do hien dau tich cam */
+.ld-o.luu .ld-cho::after{content:"✓";color:#f86820;opacity:.9}
+.ld-o b{font:600 12.5px/1.2 Inter,sans-serif;color:var(--ink-2);white-space:nowrap;opacity:0;transition:opacity .3s ease}
+.ld-o.co b{opacity:1}
+.ld-o.mat b{opacity:.4;text-decoration:line-through}
+/* công tắc */
+.ld-ct{display:flex;align-items:center;gap:14px;margin:22px 0 18px;font:600 13px/1.2 Inter,sans-serif;color:var(--ink-3)}
+.ld-ct span{transition:color .3s ease}
+.ld-ct .t{color:var(--ink)}
+.ld.bat .ld-ct .t{color:var(--ink-3)}
+.ld.bat .ld-ct .b2{color:var(--brand-ink)}
+.ld-nut{position:relative;flex:none;width:92px;height:48px;padding:0;border:0;border-radius:999px;cursor:pointer;touch-action:manipulation;background:var(--line-strong);
+  box-shadow:inset 0 0 0 1px rgb(0 0 0/8%);transition:background-color .3s ease,box-shadow .3s ease,transform .15s ease}
+/* núm = ảnh tròn của anh (40 px, viền trắng 2 px); chưa có ảnh thì hiện hình người mặc định (chỗ để ảnh) */
+.ld-nut i{position:absolute;left:4px;top:4px;width:40px;height:40px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#f1e9e1;color:#bcae9f;box-shadow:0 0 0 2px #fff,0 2px 6px 2px rgb(0 0 0/28%);transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.ld-nut i svg{width:100%;height:100%}
+.ld-nut i img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ld.bat .ld-nut{background:#f86820;box-shadow:0 0 0 6px rgb(248 104 32/16%),0 0 28px rgb(248 104 32/45%)}
+.ld.bat .ld-nut i{transform:translateX(44px)}
+.ld-nut.bam{transform:scale(.93)}
+.ld-nut.nhay{animation:ld-nhay 1.1s ease-in-out infinite}
+@keyframes ld-nhay{50%{box-shadow:0 0 0 9px rgb(248 104 32/24%)}}
+.ld-nut:focus-visible{outline:2px solid #f86820;outline-offset:4px}
+/* chỗ của khay: chưa bật công tắc thì chỉ là một ô trống */
+.ld-noi{position:relative;width:min(100%,560px)}
+/* 5 nơi tạm (tab đang mở, thư mục Downloads...): nằm đúng chỗ của khay, hơi nghiêng cho ra vẻ "mỗi thứ một nơi" */
+.ld-noicu{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px 14px}
+.ld-n{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;border:1.5px dashed var(--line-strong);color:var(--ink-3);font:600 13.5px/1 Inter,sans-serif;white-space:nowrap;
+  transition:opacity .35s ease,transform .45s cubic-bezier(.3,1.3,.5,1),background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease}
+.ld-n::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--line-strong);transition:background-color .3s ease}
+.ld-n:nth-child(odd){transform:rotate(-2deg)}
+.ld-n:nth-child(even){transform:rotate(1.5deg)}
+.ld-n:nth-child(1){--mau:#f86820}.ld-n:nth-child(2){--mau:#e2557a}.ld-n:nth-child(3){--mau:#b08a3c}.ld-n:nth-child(4){--mau:#7f93ad}.ld-n:nth-child(5){--mau:#4fb866}
+.ld-n.co{border-style:solid;border-color:transparent;background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 8px 18px -10px rgb(0 0 0/35%)}
+.ld-n.co::before{background:var(--mau)}
+.ld-n.mat{text-decoration:line-through;opacity:.5}
+.ld.bat .ld-n{opacity:0;transform:translateY(14px) scale(.8)}
+.ld.bat .ld-n:nth-child(2){transition-delay:.04s}.ld.bat .ld-n:nth-child(3){transition-delay:.08s}.ld.bat .ld-n:nth-child(4){transition-delay:.12s}.ld.bat .ld-n:nth-child(5){transition-delay:.16s}
+.ld-khay{position:relative;box-sizing:border-box;background:#181818;border:1px solid rgb(255 255 255/16%);border-radius:12px;box-shadow:0 18px 40px -12px rgb(0 0 0/55%);
+  opacity:0;transform:translateY(16px) scale(.96);transition:opacity .35s ease,transform .5s cubic-bezier(.3,1.3,.5,1)}
+.ld.bat .ld-khay{opacity:1;transform:none}
+.ld-khay .sbar{display:flex;align-items:center;gap:8px;height:30px;box-sizing:border-box;padding:0 10px 0 4px;background:#141414;border-bottom:1px solid rgb(255 255 255/6%);border-radius:11px 11px 0 0;white-space:nowrap}
+.ld-khay .slogo{display:flex;color:#f86820;padding:0 4px 0 8px}
+.ld-khay .slogo svg{width:13px;height:12px}
+.ld-khay .stitle{font-size:11px;font-weight:600;color:#c3c3c8}
+.ld-khay .scount{min-width:17px;height:15px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ffb891;background:rgb(248 104 32/16%);border:1px solid rgb(248 104 32/40%);border-radius:999px}
+.ld-kl{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:10px}
+.ld-kl i{display:block;aspect-ratio:16/10;border-radius:6px;background:rgb(255 255 255/5%)}
+.ld-san .kt-goi{position:static;transform:none;margin-top:14px;transition:opacity .3s ease}
+.ld-san .kt-tro{transition:opacity .25s,transform .8s cubic-bezier(.7,0,.2,1)}
+/* thẻ ý tưởng: bay giữa ô của ngày và ô trong khay; chấm sáng ở góc là "công tắc" của ý tưởng đó */
+.ld-the{position:absolute;left:0;top:0;width:0;height:0;z-index:3;pointer-events:none}
+.ld-y{position:absolute;left:0;top:0;border-radius:10px;overflow:hidden;container-type:inline-size;opacity:0;transform:scale(.6);box-shadow:0 10px 22px -10px rgb(0 0 0/45%),0 0 0 1px rgb(0 0 0/8%);
+  transition-property:left,top,width,height,opacity,transform,filter,border-radius;transition-duration:.62s,.62s,.62s,.62s,.3s,.45s,.5s,.5s;
+  transition-timing-function:cubic-bezier(.5,0,.2,1),cubic-bezier(.5,0,.2,1),cubic-bezier(.5,0,.2,1),cubic-bezier(.5,0,.2,1),ease,cubic-bezier(.3,1.5,.5,1),ease,ease}
+.ld-y.sang{opacity:1;transform:none;animation:ld-loe .7s ease-out}
+.ld-y.mat{opacity:0;transform:translateY(16px) rotate(var(--xoay,3deg)) scale(.9);filter:blur(5px);transition-duration:.62s,.62s,.62s,.62s,.7s,.8s,.7s,.5s}
+.ld-y.luu{border-radius:6px}
+@keyframes ld-loe{0%{box-shadow:0 0 0 0 rgb(248 104 32/60%)}100%{box-shadow:0 0 0 16px rgb(248 104 32/0%)}}
+.ld-y::after{content:"";position:absolute;right:6cqw;top:6cqw;width:8cqw;height:8cqw;border-radius:50%;background:#ffe2bd;box-shadow:0 0 0 2cqw rgb(248 104 32/40%),0 0 9cqw 3cqw rgb(255 170 90/85%)}
+.ld-y::before{content:"";position:absolute}
+.ld-y.y1{background:linear-gradient(90deg,#f86820 0 25%,#ffb347 25% 50%,#2b6f77 50% 75%,#16323a 75%)}
+.ld-y.y2{background:linear-gradient(115deg,#3b2a6b 0 48.5%,#fff 48.5% 51.5%,#e2557a 51.5%)}
+.ld-y.y2::before{left:50%;top:50%;transform:translate(-35%,-50%);border-left:11cqw solid #fff;border-top:7cqw solid transparent;border-bottom:7cqw solid transparent;filter:drop-shadow(0 1px 2px rgb(0 0 0/50%))}
+.ld-y.y3{background:#f4efe6}
+.ld-y.y3::before{content:"Aa";inset:0;display:grid;place-items:center;font:800 34cqw/1 Georgia,"Times New Roman",serif;color:#1b1714}
+.ld-y.y4{background:linear-gradient(#c3ccd9,#c3ccd9) 50% 14%/84% 13% no-repeat,linear-gradient(#9fadc0,#9fadc0) 13% 80%/36% 50% no-repeat,linear-gradient(#d3dae5,#d3dae5) 86% 46%/44% 20% no-repeat,linear-gradient(#d3dae5,#d3dae5) 86% 88%/44% 20% no-repeat,#f3f5f8}
+.ld-y.y5{background:linear-gradient(#7fd88a,#7fd88a) 12% 20%/36% 9% no-repeat,linear-gradient(#f6a05a,#f6a05a) 40% 42%/52% 9% no-repeat,linear-gradient(#6fb3ff,#6fb3ff) 26% 64%/30% 9% no-repeat,linear-gradient(#7fd88a,#7fd88a) 12% 86%/18% 9% no-repeat,#14171c}
+/* 3 câu chuyện LUÔN nằm đủ trên trang (người lướt nhanh đọc hết trong một cái nhìn, không phải chờ): mỗi câu một cột, vạch tiến độ nằm trên
+   câu; câu đang kể thì đậm màu, hai câu kia nhạt. Bấm vào câu nào thì sân kể lại từ câu đó. Cỡ chữ + độ đậm KHÔNG đổi theo trạng thái
+   (đổi là chữ xuống dòng khác đi, trang nhảy). */
+/* align-items:start là bắt buộc: thẻ button tự canh GIỮA nội dung theo chiều dọc, để giãn đều thì 3 vạch lệch nhau (đo 07/10: lệch 12 px) */
+.ld-phu{display:grid;grid-template-columns:repeat(3,1fr);align-items:start;gap:22px;max-width:980px;margin:18px auto 0}
+.ld-cau{display:block;margin:0;padding:0;border:0;background:none;font:inherit;text-align:left;color:var(--ink-2);cursor:default}
+.ld-cau span{display:block;font-size:17px;line-height:1.45;font-weight:600;transition:color .35s ease}
+.ld-vach{display:none}
+.ld.ld-on .ld-cau{cursor:pointer;color:var(--ink-3)}
+.ld.ld-on .ld-cau.on{color:var(--ink)}
+.ld.ld-on .ld-vach{position:relative;display:block;height:4px;margin-bottom:12px;border-radius:2px;background:var(--line-strong);overflow:hidden}
+.ld.ld-on .ld-vach::after{content:"";position:absolute;inset:0;border-radius:2px;background:#f86820;transform-origin:0 50%;transform:scaleX(var(--k,0));transition:transform .08s linear}
+.ld-cau:focus-visible{outline:2px solid #f86820;outline-offset:4px;border-radius:4px}
+@media (hover:hover){.ld.ld-on .ld-cau:not(.on):hover{color:var(--ink-2)}}
+/* "giảm chuyển động": đứng yên ở cảnh cuối (khay đã giữ đủ), 3 câu cùng đậm, không có vạch chạy; công tắc vẫn gạt được */
+.ld.ld-tinh .ld-vach{display:none}
+.ld.ld-tinh .ld-cau{color:var(--ink);cursor:default}
+@media (prefers-reduced-motion:reduce){.ld-y,.ld-khay,.ld-nut i,.ld-doi > span,.ld-san .kt-tro{transition:none}.ld-y.sang,.ld-nut.nhay{animation:none}}
+@media (max-width:720px){
+  .ld-san{padding:16px 12px 16px;border-radius:18px}
+  .ld-phu{grid-template-columns:1fr;gap:14px}
+  .ld-cau span{font-size:16px}
+  .ld.ld-on .ld-vach{margin-bottom:8px}
+  .ld-ngay{gap:6px}
+  .ld-o{gap:6px}
+  .ld-o small{font-size:10px}
+  .ld-o b{font-size:10px;white-space:normal;text-align:center;min-height:2.4em}
+  .ld-cho,.ld-y{border-radius:7px}
+  .ld-cho::after{font-size:15px}
+  .ld-ct{gap:10px;margin:14px 0 14px;font-size:12px}
+  .ld-noicu{gap:6px 6px}
+  .ld-n{padding:5px 9px;gap:5px;font-size:10.5px}
+  .ld-n::before{width:6px;height:6px}
+  .ld-kl{gap:6px;padding:8px}
+  .ld-san .kt-goi{margin-top:12px}
+}
+/* Đoạn VÀO (cùng kiểu hai phần Kéo thả, Khay co giãn) */
+@media (prefers-reduced-motion:no-preference){
+  .ld.cho .ld-nhan,.ld.cho .ld-dau h2{opacity:0;transform:translateY(18px)}
+  .ld.vao .ld-nhan,.ld.vao .ld-dau h2{transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .ld.vao .ld-dau h2{transition-delay:.08s}
+  .ld.cho .ld-san{opacity:0;transform:translateY(24px) scale(.97)}
+  .ld.vao .ld-san{transition:opacity .5s ease .15s,transform .7s cubic-bezier(.2,.8,.2,1) .15s}
+  .ld.cho .ld-cho{opacity:0;transform:scale(.6)}
+  .ld.vao .ld-cho{transition:opacity .3s ease calc(.25s + var(--tre,0s)),transform .45s cubic-bezier(.3,1.5,.5,1) calc(.25s + var(--tre,0s))}
+  .ld.cho .ld-o small,.ld.cho .ld-ct,.ld.cho .ld-noi,.ld.cho .ld-phu{opacity:0}
+  .ld.vao .ld-o small{transition:opacity .3s ease .4s}
+  .ld.vao .ld-ct{transition:opacity .35s ease .5s}
+  .ld.vao .ld-noi{transition:opacity .35s ease .6s}
+  .ld.vao .ld-phu{transition:opacity .4s ease .3s}
+}
+

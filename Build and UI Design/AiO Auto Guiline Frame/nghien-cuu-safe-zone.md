@@ -470,3 +470,29 @@ buffer.com/resources/instagram-image-size · socialk.it/en/sizes/x-video-size ·
 ads.zalo.me/business/quy-dinh-ve-su-dung-quang-cao-video.
 
 *(Mục biến thiên thiết bị: đang chờ research, sẽ bổ sung bên dưới.)*
+
+## 18. ĐO TỪ ẢNH APP THẬT — 26/09/2026 (đường B anh chốt sau khi bác mục 17: *"em lấy thông số ảo để áp vào"*)
+
+Mục 17 chỉ đọc lại **văn bản** nên kết luận "không đổi" trong khi khung YouTube Shorts sai thật
+(mục 2a). Từ 26/09, số của mỗi định dạng dọc lấy bằng cách **đo pixel trên ảnh chụp app thật**
+(App Store / Google Play / bài viết có ảnh máy thật), quy về 1080×1920 theo mapping đo được,
+rồi **ghép guide lên chính ảnh đó** để soi (`scripts/do-anh-that/`, kết quả từng app trong
+`ket-qua.json`, tóm tắt cách đo nối vào `nguon` của JSON). Luật: không bao giờ ghi số nhỏ hơn số
+đo; số CHÍNH THỨC đang lớn hơn số đo thì giữ làm biên trên.
+
+| Định dạng | Ảnh dùng (góc nhìn) | Mapping | Đo thật top/bottom/right/left | Áp vào JSON | Tin cậy |
+|---|---|---|---|---|---|
+| yt-shorts | ảnh iPhone của anh (chủ kênh) | fill, cắt 5%/mép | 10,8 / (25 chính thức) / 16 / 5 crop | 13 / 25 / 18 / 7c | khá; thiếu góc người xem |
+| fb-reels | App Store 2026 + Meta 2023 (người xem) | fill | 9,6 / 20,4 / 14,6 / 7 crop | 14 / 35 / 17 / 7c | cao |
+| fb-stories | iPhone 1206 px, SocialBee 07/2026 | khít 9:16 | 15 / 5 (thanh trả lời ngoài thẻ) / 8 / – | 15 / 20 / 8 / – | trung bình-khá |
+| tiktok-video | App Store US, khung iPhone XS Max | fill, cắt 8,9% | 11 / 22 / 19 / 10 crop | 11 / 25,21 / 19 / 10c | trung bình (ảnh marketing) |
+| li-vertical | blog Loomly 636 px + LinkedIn Help 260/560/210/112 | fill | 13,5 / 29 / 19,4 / 10,4 | 14 / 30 / 20 / 11 | trung bình-thấp |
+| ig-reels | App Store US ảnh 1/5, iPhone Pro Max (người xem) | fill, cắt 8,9% | 10,2 / 20,5 / 18,1 / 8,9 crop | 14 / 35 / 19 / 9c | khá; bottom đo với caption 1 dòng |
+| ig-stories | App Store "Close Friends" + Android thật piunika | khít 9:16 | 8,0 / 0 (thanh trả lời ngoài thẻ) / 0 / 0 | giữ 13,02 / 13,02 | trung bình-khá; chưa có máy 16:9 |
+| zalo-916 | quantrimang 300 px (bố cục 2022) + ads.zalo.me 07/2025 | fill | 5 (Android status bar đen) ~9,3 (iPhone) / 15,4 / 15,6 / 8,6 | 10 / 20 / 17 / 10 | THẤP-trung bình |
+| pin-916 | không tìm được ảnh video toàn màn hợp lệ | — | — | giữ số Idea Ads | chưa đo, cần ảnh máy anh |
+| snap-916 | Google Play ảnh 5 "Spotlight" (màn đầy đủ, 5 tab) + App Store tile + 9to5 "Simple Snapchat" 3 tab 09/2024 | khít (ảnh marketing 9:16 giả; máy thật fill cắt bên) | 13,9 / 11,0 (5 tab; bố cục 3 tab ước 20,5–21,6) / 14,8 / – | 14 / 25 / 20 / 7c | trung bình; spec ads 150/330 CẮT NGANG hàng icon trên |
+| x-vertical | 2 ảnh chụp iPhone thật player mới X 02/2026 (piunikaweb + bài X) | fill cắt 4,6% (X tuyên bố 17/02/2026 sẽ bỏ crop, chưa có ảnh sau) | 14,5 / 19,2 (chữ 1 dòng; 2 dòng ước 21,9) / 0 / 0 | 15 / 23 / 7c / 7c | trung bình-khá; cột icon dọc KHÔNG còn, số cũ 12,96 tả UI không tồn tại |
+
+Bài học ghi brain (`5bf`): tài liệu ghi "an toàn" là lời nói về ADS; người dùng nhìn thấy
+UI thật của app trên máy thật, nên thước duy nhất hợp lệ là **ảnh chụp app thật**.

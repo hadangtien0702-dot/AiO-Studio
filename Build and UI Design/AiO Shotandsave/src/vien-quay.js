@@ -4,7 +4,7 @@
    ☠️ Windows KHONG cho cua so nho hon ~30 px (do 29/09 man 150%: xin 300x3 -> duoc 301x31; thu 7 cau hinh —
    thickFrame false, transparent, minWidth/minHeight 1, setMinimumSize(1,1), type toolbar — cai nao cung bi ep
    30-38 px). Ban 0.7.4 xin thanh 3 px -> thanh phinh 31 px, LAN VAO vung quay, 3/6 khung dinh cam 31 px.
-   Cach dung: moi canh = 1 cua so DAI >= 40 px nam HOAN TOAN NGOAI vung, roi setShape() chi giu lai net manh sat
+   Cach dung: moi canh = 1 cua so DAI px (xem hang DAI ben duoi) nam HOAN TOAN NGOAI vung, roi setShape() chi giu lai net manh sat
    mep vung. Cua so co bi ep to hon thi chi phinh RA XA vung (neo o goc tren-trai, dai phia ngoai), khong lan vao.
 
    Ham nay chi tinh hinh hoc (khong dung Electron) -> kiem duoc bang node (scripts/test/do-vien-quay.mjs). */
@@ -13,7 +13,11 @@ const G = 3      // khe tu mep vung toi vien (DIP)
 const L = 2      // do day vien
 const CT = 4     // do day goc chu L
 const ARM = 18   // do dai moi canh goc
-const DAI = 40   // be day cua so moi canh (>= co toi thieu Windows ~38)
+/* ☠️ 01/10 (anh quay tren man phu 125%): xin cao 40 duoc 46 -> cua so "tren" lan 4 px vao vung -> bi huy, vien mat
+   canh tren (run-log 12:56:23). Co toi thieu cua Windows tinh theo DIEM ANH THAT (~57-58 px), khong theo DIP:
+   150% -> 38 DIP (do 29/09), 125% -> 46 DIP (do 01/10), suy ra 100% -> ~58 DIP (CHUA do tren man 100%).
+   DAI phai >= muc cua man ti le THAP nhat. */
+const DAI = 64   // be day cua so moi canh (>= co toi thieu Windows o moi ti le man: 58 DIP o 100%)
 const KE = 2     // khe giua cua so va vung: man 150% Windows tra cua so TO THEM 1 px phai/duoi (do 29/09: 40 -> 41)
 
 function giao(a, b) {
