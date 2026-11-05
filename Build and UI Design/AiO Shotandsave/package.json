@@ -37,6 +37,7 @@
     "test:sobuoc": "node scripts/test/do-so-buoc.mjs",
     "test:chupchac": "electron scripts/test/do-chup-chac.cjs",
     "test:thanhcu": "node scripts/test/do-thanh-cong-cu.cjs",
+    "test:hutmau": "node scripts/test/do-hut-mau.cjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
     "test:timanh": "electron scripts/test/do-tim-anh.cjs",
     "test:cuaso": "node scripts/test/do-chup-cua-so.cjs",

@@ -366,7 +366,7 @@ app.whenReady().then(async () => {
     const day = [...thanh.matchAll(/<i class="so">([^<]+)<\/i>|<span class="(chia[^"]*)">|id="(mau-nhom|undo|redo|huy|xong)"/g)].map((m) => m[1] || (m[2] ? '|' : m[3]))
     const chuoi = day.slice(0, day.indexOf('xong') + 1).join(' ')
     kiem('Thu tu thanh: V | 1..9 | S R | mau | undo redo | huy, xong', chuoi === 'V | 1 2 3 4 5 6 7 8 9 | S R | | mau-nhom | undo redo | huy xong'.replace('| | mau-nhom |', '| mau-nhom |') || true, chuoi)
-    const okThuTu = /^V \| 1 2 3 4 5 6 7 8 9 \| S R \| mau-nhom \| undo redo \| huy xong$/.test(chuoi.replace(/ \| \|/g, ' |')) || /^V \| 1 2 3 4 5 6 7 8 9 \| S R \| mau-nhom \| undo redo \| huy xong$/.test(chuoi)
+    const okThuTu = /^V \| 1 2 3 4 5 6 7 8 9 \| S R I M \| mau-nhom \| undo redo \| huy xong$/.test(chuoi.replace(/ \| \|/g, ' |')) || /^V \| 1 2 3 4 5 6 7 8 9 \| S R I M \| mau-nhom \| undo redo \| huy xong$/.test(chuoi)
     kq.pop(); kiem('Thu tu thanh: V | 1..9 | S R | mau | undo redo | huy, xong', okThuTu, chuoi)
   }
   { // 04/11 nguoi soat bat: net cho Lam lai phai dich theo khi doi khung, khong thi hien lai lech cho
