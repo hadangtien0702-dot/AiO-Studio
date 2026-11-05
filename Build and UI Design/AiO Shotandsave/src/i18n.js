@@ -8,6 +8,7 @@ const DICH = {
     // App
     'app.phimBiGiu': 'Phím tắt chụp {phim} đang bị ứng dụng khác giữ — bấm sẽ không ăn. Mở Cài đặt để đổi phím.',
     'app.khongLuuDuoc': 'Không lưu được ảnh vào {thuMuc} (ổ đầy hoặc mất quyền). Ảnh đã chép vào clipboard — mở Cài đặt để đổi thư mục lưu.',
+    'khay.khongThemDuoc': 'Ảnh đã lưu vào thư mục nhưng chưa hiện được trong khay. Mở lại app để thấy ảnh.',
     'app.khongChupDuoc': 'Không chụp được màn hình (hệ thống chưa cấp quyền hoặc lỗi hiển thị). Trên macOS: mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Ghi màn hình. Thử lại sau vài giây hoặc khởi động lại ứng dụng.',
     // 04/10: macOS chua cap quyen Ghi man hinh -> hop thoai that (src/quyen-man-hinh.js), khong chi Notification
     'quyen.tieuDe': 'Shot & Save chưa được phép chụp màn hình',
@@ -298,6 +299,7 @@ const DICH = {
   en: {
     'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
     'app.khongLuuDuoc': 'Could not save the image to {thuMuc} (disk full or no permission). It was copied to the clipboard — open Settings to change the save folder.',
+    'khay.khongThemDuoc': 'The image was saved to your folder but could not be shown in the tray. Reopen the app to see it.',
     'app.khongChupDuoc': 'Could not capture screen (permission denied or display error). On macOS: open System Settings > Privacy & Security > Screen Recording. Try again in a few seconds or restart the app.',
     'quyen.tieuDe': 'Shot & Save is not allowed to capture the screen yet',
     'quyen.noiDung': 'macOS has not granted Screen Recording to the running build, so the capture frame only flashes and closes.\n\n1. Open System Settings > Privacy & Security > Screen & System Audio Recording.\n2. If AiO Shot & Save is already listed, select it and click the minus button to remove it (the old entry belongs to an older build and does not apply).\n3. Click the plus button, pick AiO Shot & Save in Applications, turn the switch on.\n4. Quit and reopen the app.\n\nYou need to repeat these steps after installing a new build.',

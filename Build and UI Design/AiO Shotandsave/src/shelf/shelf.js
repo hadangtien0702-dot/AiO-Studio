@@ -98,6 +98,7 @@ function capNhatSoLuong() {
 window.shelf.onAdd((item) => {
   themO(item)
   capNhatSoLuong()
+  window.shelf.daThem(item.id)
   cuonDich = null; cuonDangChay = false
   listEl.scrollLeft = 0; listEl.scrollTop = 0
 })

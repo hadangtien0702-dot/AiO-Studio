@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('i18n', {
 
 contextBridge.exposeInMainWorld('shelf', {
   onAdd: (cb) => ipcRenderer.on('shelf:add', (_e, item) => cb(item)),
+  /** 05/11: bao main da ve xong o anh; main chua nghe thay thi gui lai. */
+  daThem: (id) => ipcRenderer.send('shelf:da-them', id),
   onRemove: (cb) => ipcRenderer.on('shelf:removed', (_e, id) => cb(id)),
   onClear: (cb) => ipcRenderer.on('shelf:cleared', () => cb()),
   /** Anh ghim vua duoc VE them -> lam moi thumbnail cua dung o do. */

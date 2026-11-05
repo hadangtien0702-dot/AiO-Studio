@@ -35,6 +35,7 @@
     "test:butve": "node scripts/test/do-but-ve.mjs",
     "test:chupcuon": "node scripts/test/do-chup-cuon.cjs",
     "test:sobuoc": "node scripts/test/do-so-buoc.mjs",
+    "test:chupchac": "electron scripts/test/do-chup-chac.cjs",
     "test:thanhcu": "node scripts/test/do-thanh-cong-cu.cjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
     "test:khovideo": "node scripts/test/do-kho-video.cjs",
