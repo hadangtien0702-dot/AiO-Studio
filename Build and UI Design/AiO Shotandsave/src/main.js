@@ -27,6 +27,8 @@ const i18n = require('./i18n')
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
+const timAnhMod = require('./tim-anh') // 05/11: Tim lai anh cu (chi muc chu trong userData)
+let timAnh = null
 const os = require('os')
 const { taoBanQuyen } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
@@ -250,6 +252,9 @@ app.whenReady().then(() => {
   })
 
   khoDai.khoiTao(app.getPath('userData'))
+  timAnh = timAnhMod.dangKy({ app, ipcMain, BrowserWindow, screen, shell, nativeImage, ocr, daoNeuNenToi, createPinWindow, ghiLog, kho,
+    thuMucDuLieu: path.join(app.getPath('userData'), 'tim-anh'), dangBan: () => overlayWins.length > 0 || dangQuay, tieuDe: T('tray.timAnh') })
+  setTimeout(() => { if (timAnh) timAnh.batDau() }, 45000) // doc chu nen bat dau sau khi app yen (45 s)
   kho.donKeoAnToan() // 14/09: don lien ket keo-tha cua lan truoc
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
@@ -360,6 +365,7 @@ app.on('window-all-closed', (e) => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
   ocr.tatHost() // tien trinh PowerShell doc chu (neu dang giu san)
+  if (timAnh) timAnh.luuVaDung()
 })
 
 /* ---------------------------------------------------------------------- */
@@ -402,6 +408,7 @@ function rebuildTrayMenu() {
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
     { label: T('tray.storyboard'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
+    { label: T('tray.timAnh'), click: () => { if (timAnh) timAnh.moCuaSo() } },
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },

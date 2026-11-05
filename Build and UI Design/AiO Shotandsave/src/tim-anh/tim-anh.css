@@ -1,0 +1,59 @@
+/* Tim lai anh cu: CUNG ngon ngu voi man Cai dat / Storyboard (header 46px, pill nen --bg-0, lua chon XAM NOI, cam chi cho nut chinh).
+   KHONG khai token rieng. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg-1); color: var(--text-1); font-family: var(--font-ui); user-select: none; }
+body { display: flex; flex-direction: column; border: 1px solid var(--line-strong); }
+button, input { font-family: inherit; }
+img { -webkit-user-drag: none; }
+
+#tieu-de { display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 var(--sp-3) 0 var(--sp-4); border-bottom: 1px solid var(--line-1); flex: none; -webkit-app-region: drag; }
+.hieu { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; }
+.hieu .logo { color: var(--accent); flex: none; }
+#title { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; white-space: nowrap; }
+#dem-kq { min-width: 20px; height: 18px; padding: 0 6px; flex: none; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent-text); background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: var(--r-pill); }
+.dieu-khien { display: flex; align-items: center; gap: var(--sp-1); -webkit-app-region: no-drag; }
+.dong { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 50%; background: transparent; color: var(--icon-dim, var(--text-3)); cursor: pointer; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+.dong:hover { background: var(--danger-strong, #ff5a5a); color: #fff; }
+
+#toolbar { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line-1); flex: none; }
+#o-tim { width: 100%; height: 36px; padding: 0 var(--sp-4); background: var(--bg-0); color: var(--text-1); border: 1px solid var(--line-2); border-radius: var(--r-md); font-size: 13.5px; user-select: text; outline: none; }
+#o-tim:focus { border-color: var(--accent); }
+#o-tim::placeholder { color: var(--text-3); }
+.hang-chon { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.chon-nhom { display: flex; flex: none; padding: 2px; background: var(--bg-0); border: 1px solid var(--line-1); border-radius: var(--r-md); }
+.chon-nut { min-width: 58px; padding: 4px 10px; border: none; border-radius: var(--r-sm); background: transparent; cursor: pointer; font: 600 12px/1.35 var(--font-ui); color: var(--text-3); white-space: nowrap; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+.chon-nut:hover { color: var(--text-1); }
+.chon-nut.active { background: var(--bg-5); color: var(--text-1); box-shadow: 0 1px 2px rgb(0 0 0 / 45%), inset 0 0 0 1px rgb(255 255 255 / 6%); }
+#khoang-ngay { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: 12px; color: var(--text-3); }
+#khoang-ngay[hidden] { display: none; }
+#khoang-ngay input { height: 28px; padding: 0 var(--sp-2); background: var(--bg-0); color: var(--text-1); border: 1px solid var(--line-2); border-radius: var(--r-md); font-size: 12px; color-scheme: dark; }
+
+.nut { height: 28px; padding: 0 var(--sp-4); border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--bg-3); color: var(--text-1); font: 600 12px/1 var(--font-ui); cursor: pointer; white-space: nowrap; transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+.nut:hover { background: var(--bg-hover); }
+.nut.chinh { background: var(--accent); border-color: var(--accent); color: var(--accent-on, #fff); font-size: 12.5px; font-weight: 700; }
+.nut.chinh:hover { filter: brightness(1.08); }
+.nut.nho { height: 26px; padding: 0 var(--sp-3); font-size: 11.5px; }
+
+#trang-thai { display: flex; align-items: center; gap: var(--sp-3); padding: 6px var(--sp-4); font-size: 11.5px; color: var(--text-3); flex: none; }
+#trang-thai .spacer { flex: 1; }
+
+#viewport { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: var(--sp-2) var(--sp-4) var(--sp-4); }
+#viewport::-webkit-scrollbar { width: 12px; }
+#viewport::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 14%); background-clip: padding-box; border: 3px solid transparent; border-radius: var(--r-pill); }
+#viewport::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.trong { margin: 56px auto; max-width: 420px; text-align: center; font-size: 12.5px; line-height: 1.5; color: var(--text-3); }
+.trong[hidden] { display: none; }
+
+#luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--sp-3); }
+.the { background: var(--bg-2); border: 1px solid var(--line-1); border-radius: var(--r-lg); overflow: hidden; cursor: pointer; transition: border-color var(--dur) var(--ease); outline: none; }
+.the:hover, .the:focus-visible { border-color: var(--accent); }
+.the .anh { position: relative; aspect-ratio: 16 / 10; background: var(--bg-0); display: flex; align-items: center; justify-content: center; }
+.the .anh img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.the .loai { position: absolute; left: 6px; top: 6px; padding: 1px 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; color: var(--text-2); background: rgb(10 10 10 / 74%); border-radius: var(--r-pill); }
+.the .nut-the { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: var(--sp-2); justify-content: center; padding: 8px; background: linear-gradient(transparent, rgb(0 0 0 / 70%)); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.the:hover .nut-the, .the:focus-visible .nut-the { opacity: 1; }
+.the .tin { padding: 8px 10px 10px; min-height: 56px; }
+.the .gio { font-size: 11px; font-weight: 700; color: var(--text-2); }
+.the .cho-doc { font-size: 10.5px; color: var(--text-3); margin-left: 6px; font-weight: 500; }
+.the .doan { margin-top: 3px; font-size: 11px; line-height: 1.4; color: var(--text-3); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; }
+.the .doan mark { background: var(--accent-soft); color: var(--accent-text); border-radius: 3px; padding: 0 2px; }
