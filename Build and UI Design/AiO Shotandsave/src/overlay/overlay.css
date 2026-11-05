@@ -418,3 +418,56 @@ html, body {
 .muc-xo:hover { background: var(--bg-hover); color: var(--text-1); }
 .muc-xo.chon { background: var(--accent-soft); color: var(--accent-text); }
 .muc-xo.chon .so { color: var(--accent-text); }
+
+/* ── 05/11 HUT MAU + THUOC DO ───────────────────────────────────────────────────────────────────────
+   Nut gop: icon doi theo loai dang dung (hut / thuoc). Moi phan tu moi co luat [hidden] rieng (CSS id de len [hidden]). */
+#do-nhom.dm .ic-hut, #do-nhom:not(.dm) .ic-thuoc { display: none; }
+#hut-kinh[hidden], #hut-bao[hidden], #hut-bang[hidden], #thuoc-lop[hidden] { display: none !important; }
+#hut-kinh {
+  position: fixed; z-index: 15; pointer-events: none;
+  padding: 5px; border-radius: var(--r-md);
+  background: rgb(22 22 22 / 97%); border: 1px solid var(--line-2); box-shadow: var(--shadow-md);
+}
+#hut-cv { display: block; width: 121px; height: 121px; border-radius: 6px; image-rendering: pixelated; background: #181818; }
+#hut-ma { display: flex; align-items: center; gap: 8px; padding: 6px 2px 1px; }
+#hut-mau { width: 16px; height: 16px; border-radius: 50%; flex: none; border: 2px solid #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%); }
+#hut-hex { font: 700 13px/1 var(--font-ui); color: var(--text-1); letter-spacing: .02em; }
+#hut-bao {
+  position: fixed; z-index: 30; top: 22px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+  background: rgb(20 20 20 / 94%); border: 1px solid var(--line-2); border-radius: var(--r-pill);
+  box-shadow: var(--shadow-md); pointer-events: none;
+  font: 700 13px/1 var(--font-ui); color: var(--text-1);
+}
+#hut-bao-mau { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 40%); }
+#hut-bang {
+  position: fixed; z-index: 12; width: 210px;
+  background: rgb(22 22 22 / 98%); border: 1px solid var(--line-2); border-radius: var(--r-md); box-shadow: var(--shadow-md);
+  animation: mo-vao 120ms ease both;
+}
+.hut-dau { padding: 10px 14px 8px; font-size: 12px; font-weight: 700; color: var(--text-1); border-bottom: 1px solid var(--line-1); }
+#hut-ds { padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+#hut-ds .hang {
+  display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 8px;
+  border: none; border-radius: var(--r-sm); background: transparent; color: var(--text-2); cursor: pointer;
+  font: 600 13px/1 var(--font-ui); text-align: left;
+}
+#hut-ds .hang:hover { background: var(--bg-hover); color: var(--text-1); }
+#hut-ds .hang .o { width: 20px; height: 20px; border-radius: 5px; flex: none; box-shadow: 0 0 0 1px rgb(255 255 255 / 25%) inset; }
+#hut-ds .hang .m { letter-spacing: .02em; }
+#hut-ds .hang .p { margin-left: auto; font-size: 11px; color: var(--text-3); }
+#hut-ds .rong { padding: 10px 8px; font-size: 12px; color: var(--text-3); }
+#thuoc-lop { position: fixed; inset: 0; z-index: 9; pointer-events: none; }
+#thuoc-svg { position: absolute; inset: 0; overflow: visible; }
+#thuoc-vien { stroke: rgb(0 0 0 / 75%); stroke-width: 4; stroke-linecap: round; }
+#thuoc-duong { stroke: #fff; stroke-width: 1.5; stroke-linecap: round; }
+#thuoc-chan { stroke: rgb(255 255 255 / 85%); stroke-width: 1; stroke-dasharray: 4 3; }
+#thuoc-d1, #thuoc-d2 { fill: #fff; stroke: rgb(0 0 0 / 75%); stroke-width: 1.5; }
+#thuoc-nhan {
+  position: absolute; padding: 5px 9px; white-space: nowrap; text-align: center;
+  background: rgb(20 20 20 / 94%); border: 1px solid var(--line-2); border-radius: var(--r-sm); box-shadow: var(--shadow-md);
+  font: 600 12px/1.25 var(--font-ui); color: var(--text-1);
+}
+#thuoc-so { display: block; font-size: 14px; }
+#thuoc-kt { display: block; font-size: 11px; color: var(--text-3); }
+#thuoc-kt:empty { display: none; }

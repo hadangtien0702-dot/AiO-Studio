@@ -124,6 +124,20 @@
     <button class="cong-cu quay" data-tool="quay" data-i18n-title="overlay.quay" aria-label="record">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg><i class="so">R</i>
     </button>
+    <!-- 05/11 HUT MAU (phim I) + THUOC DO (phim M) gop MOT nut, re chuot xo menu (cung khuon nut but). Nut hien icon loai dang dung. -->
+    <div id="do-nhom" class="nhom-xo">
+      <button id="do-chinh" class="cong-cu" data-tool="hut" data-i18n-title="overlay.hut" data-so="I" aria-haspopup="true" aria-label="eyedropper">
+        <svg class="ic-hut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3z"/></svg><svg class="ic-thuoc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+      </button>
+      <div id="do-menu" class="menu-xo" role="menu" hidden>
+        <button class="muc-xo" type="button" role="menuitem" data-tool="hut" data-i18n-title="overlay.hut" aria-label="eyedropper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3z"/></svg><span data-i18n="overlay.hutTen">Hút màu</span><i class="so">I</i>
+        </button>
+        <button class="muc-xo" type="button" role="menuitem" data-tool="thuoc" data-i18n-title="overlay.thuoc" aria-label="ruler">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg><span data-i18n="overlay.thuocTen">Thước đo</span><i class="so">M</i>
+        </button>
+      </div>
+    </div>
     <span class="chia"></span>
     <!-- Bảng chọn màu, mặc định cam (accent) -->
     <div id="mau-nhom" role="group" aria-label="color">
@@ -170,6 +184,25 @@
       <button id="ocr-doi" class="ocr-doi" type="button" hidden></button>
       <button id="ocr-chep" class="ocr-nut" type="button"><span data-i18n="ocr.chep">Sao chép</span><kbd>Enter</kbd></button>
     </div>
+  </div>
+  <!-- 05/11 HUT MAU: kinh phong to + ma HEX bam theo con tro · dong bao da chep · bang 5 mau chu dao. THUOC DO: lop duong do + nhan so pixel that.
+       Tat ca nam NGOAI canvas ve (#ve) nen KHONG vao anh xuat. -->
+  <div id="hut-kinh" hidden aria-hidden="true">
+    <canvas id="hut-cv" width="121" height="121"></canvas>
+    <div id="hut-ma"><span id="hut-mau"></span><b id="hut-hex"></b></div>
+  </div>
+  <div id="hut-bao" role="status" hidden><span id="hut-bao-mau"></span><span id="hut-bao-chu"></span></div>
+  <div id="hut-bang" role="group" aria-labelledby="hut-bang-td" hidden>
+    <div class="hut-dau"><span id="hut-bang-td" data-i18n="hut.chuDao">Màu chủ đạo của vùng chọn</span></div>
+    <div id="hut-ds"></div>
+  </div>
+  <div id="thuoc-lop" hidden aria-hidden="true">
+    <svg id="thuoc-svg" width="100%" height="100%">
+      <path id="thuoc-chan" fill="none"/>
+      <line id="thuoc-vien"/><line id="thuoc-duong"/>
+      <circle id="thuoc-d1" r="3.5"/><circle id="thuoc-d2" r="3.5"/>
+    </svg>
+    <div id="thuoc-nhan"><b id="thuoc-so"></b><span id="thuoc-kt"></span></div>
   </div>
   <div id="hint">
     <svg class="logo" viewBox="0 0 385.89 351.31" width="13" height="12" aria-hidden="true">

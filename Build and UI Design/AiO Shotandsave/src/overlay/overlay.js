@@ -74,6 +74,9 @@ const butNhomEl = document.getElementById('but-nhom')
 const butChinhEl = document.getElementById('but-chinh')
 const butMenuEl = document.getElementById('but-menu')
 const nutRedoEl = document.getElementById('redo')
+const doNhomEl = document.getElementById('do-nhom') // 05/11 nut gop Hut mau + Thuoc do
+const doChinhEl = document.getElementById('do-chinh')
+const doMenuEl = document.getElementById('do-menu')
 const gioiHanXo = () => ({ top: 0, bottom: window.innerHeight, left: 0, right: window.innerWidth })
 const LAM_LAI_DUOC = () => mode === 'annotate'
 /* Dat pop canh nut: xuong duoi neu du cho, khong thi len tren (cho nao rong hon); keo ngang cho khong tran gioi han. */
@@ -98,20 +101,39 @@ function bangMauMo() { return !mauPopEl.hidden }
 function menuButMo() { return !butMenuEl.hidden }
 function dongBangMau() { if (mauPopEl.hidden) return; mauPopEl.hidden = true; mauHienEl.setAttribute('aria-expanded', 'false') }
 function dongMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) butMenuEl.hidden = true }
-function dongPopups() { dongBangMau(); dongMenuBut() }
-function moBangMau() { dongMenuBut(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
-function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+function menuDoMo() { return !doMenuEl.hidden }
+function dongMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) doMenuEl.hidden = true }
+function dongPopups() { dongBangMau(); dongMenuBut(); dongMenuDo() }
+function moBangMau() { dongMenuBut(); dongMenuDo(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
+function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); dongMenuDo(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+function moMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) return; dongBangMau(); dongMenuBut(); doMenuEl.hidden = false; xepXo(doChinhEl, doMenuEl) }
 let butDong = 0
+let doDong = 0
+doNhomEl.addEventListener('mouseenter', moMenuDo)
+doNhomEl.addEventListener('mouseleave', () => { clearTimeout(doDong); doDong = setTimeout(dongMenuDo, 160) })
 butNhomEl.addEventListener('mouseenter', moMenuBut)
 butNhomEl.addEventListener('mouseleave', () => { clearTimeout(butDong); butDong = setTimeout(dongMenuBut, 160) })
 // bam ra ngoai bang mau = dong (bat o pha capture: thanh cong cu chan noi bot mousedown)
 window.addEventListener('mousedown', (e) => {
   if (bangMauMo() && !mauHienEl.parentNode.contains(e.target)) dongBangMau()
   if (menuButMo() && !butNhomEl.contains(e.target)) dongMenuBut()
+  if (menuDoMo() && !doNhomEl.contains(e.target)) dongMenuDo()
 }, true)
 
 /* Nut but hien icon + so phim + goi y cua loai dang dung (but = 7, da quang = 8). */
 const LOAI_BUT = { but: { so: '7', khoa: 'overlay.but' }, daquang: { so: '8', khoa: 'overlay.daquang' } }
+/* 05/11 Nut gop Hut mau / Thuoc do: icon + so phim + goi y theo loai dang dung (hut = I, thuoc = M). */
+const LOAI_DO = { hut: { so: 'I', khoa: 'overlay.hut' }, thuoc: { so: 'M', khoa: 'overlay.thuoc' } }
+function capNhatNutDo(x) {
+  const l = LOAI_DO[x]
+  if (l) {
+    doChinhEl.dataset.tool = x; doChinhEl.dataset.so = l.so
+    doChinhEl.setAttribute('data-i18n-title', l.khoa)
+    doChinhEl.title = window.i18n.t(l.khoa); doChinhEl.setAttribute('aria-label', doChinhEl.title)
+    doNhomEl.classList.toggle('dm', x === 'thuoc')
+  }
+  doMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
+}
 function capNhatNutBut(x) {
   const l = LOAI_BUT[x]
   if (l) {
@@ -356,6 +378,7 @@ selEl.addEventListener('mousedown', (e) => {
 })
 
 function capNhatGiaoDienKhung() {
+  doVungDoi()
   selEl.style.left = curRect.x + 'px'
   selEl.style.top = curRect.y + 'px'
   selEl.style.width = curRect.w + 'px'
@@ -541,7 +564,7 @@ window.addEventListener('mouseup', (e) => {
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (bangMauMo() || menuButMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
+    if (bangMauMo() || menuButMo() || menuDoMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
     window.overlay.cancel(); return
   }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { if (e.shiftKey) lamLai(); else hoanTac(); return }
@@ -586,6 +609,11 @@ window.addEventListener('keydown', (e) => {
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
       (e.key === 'r' || e.key === 'R' || e.code === 'KeyR')) {
     e.preventDefault(); quayVideo(); return
+  }
+  // Phim I = hut mau, M = thuoc do (05/11): chon cong cu
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu) {
+    if (e.key === 'i' || e.key === 'I' || e.code === 'KeyI') { e.preventDefault(); chonCongCu('hut'); return }
+    if (e.key === 'm' || e.key === 'M' || e.code === 'KeyM') { e.preventDefault(); chonCongCu('thuoc'); return }
   }
   // Phim 9 = chup cuon trang dai vung dang chon (06/10)
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
@@ -660,9 +688,10 @@ function datViTriThanhCongCu() {
 }
 
 function chonCongCu(x) {
-  if (x !== tool) chotOGoChu()
+  if (x !== tool) { chotOGoChu(); doDon() }
   tool = x
   capNhatNutBut(x)
+  capNhatNutDo(x)
   if (tool !== 'select') {
     selectedShape = null
     veEl.style.cursor = 'crosshair'
@@ -675,6 +704,7 @@ function chonCongCu(x) {
     b.classList.toggle('chon', b.dataset.tool === x)
   })
   redraw()
+  if (x === 'hut') hutBatDau()
 }
 
 /* ── Ve shape & Select tool (phim V) ─────────────────────────────────── */
@@ -800,6 +830,8 @@ function batDauVe(e) {
     chonLaiTuDau(e)
     return
   }
+  if (tool === 'hut') { hutBam(e); return }
+  if (tool === 'thuoc') { thuocBatDau(e); return }
   if (tool === 'select') {
     chotOGoChu()
     const hit = timShapeTaiDiem(lx, ly)
@@ -837,6 +869,7 @@ function batDauVe(e) {
 /* Bo vung chon + shape dang co, quay ve che do quet vung — bat dau keo ngay. */
 function chonLaiTuDau(e) {
   huyOGoChu()
+  doDon()
   selectedShape = null
   dangKeoShape = false
   mode = 'select'
@@ -863,6 +896,8 @@ function chonLaiTuDau(e) {
 }
 
 function veDangKeo(e) {
+  if (tool === 'hut') { hutDiChuyen(e); return }
+  if (tool === 'thuoc') { thuocDiChuyen(e); return }
   if (tool === 'select') {
     const lx = e.clientX - curRect.x, ly = e.clientY - curRect.y
     if (dangKeoShape && selectedShape && shapeBanDau) {
@@ -903,6 +938,8 @@ function veDangKeo(e) {
 }
 
 function ketThucVe(e) {
+  if (tool === 'hut') return
+  if (tool === 'thuoc') { thuocKet(); return }
   if (tool === 'select') {
     if (dangKeoShape) {
       dangKeoShape = false
@@ -1609,3 +1646,286 @@ window.addEventListener('keydown', (e) => {
     const s = window.getSelection(); s.removeAllRanges(); s.addRange(r)
   }
 }, true)
+
+/* ── 05/11 HUT MAU (phim I) + THUOC DO (phim M) — gop MOT nut tren thanh cong cu ────────────────────────
+   HUT MAU: re chuot trong vung chon thay kinh phong to 11x11 diem anh + ma HEX; bam = chep ma vao clipboard + dong bao;
+   bang "Mau chu dao cua vung chon" liet ke 5 mau, bam tung dong de chep. MAU DOC TU ANH GOC khong nen: xin main cat
+   vung chon qua aioshot://raw (PNG, lossless) — anh dong bang dang nhin la JPEG, mau o mep khoi mau bi lech nen chi dung
+   lam du phong khi raw loi. Diem anh duoi con tro = floor(toa do man x ti le man).
+   THUOC DO: keo giua hai diem, hien so PIXEL THAT cua anh (DIP x ti le man, bam vao VACH LUOI diem anh gan nhat, nen do
+   do rong mot khoi = dung so diem anh cua khoi do). Giu Shift = do thang. Lop do nam NGOAI canvas ve (#ve) nen KHONG vao
+   anh xuat. Bai do: scripts/test/do-hut-mau.cjs */
+const hutKinhEl = document.getElementById('hut-kinh')
+const hutCvEl = document.getElementById('hut-cv')
+const hutMauEl = document.getElementById('hut-mau')
+const hutHexEl = document.getElementById('hut-hex')
+const hutBaoEl = document.getElementById('hut-bao')
+const hutBaoMauEl = document.getElementById('hut-bao-mau')
+const hutBaoChuEl = document.getElementById('hut-bao-chu')
+const hutBangEl = document.getElementById('hut-bang')
+const hutDsEl = document.getElementById('hut-ds')
+const thuocLopEl = document.getElementById('thuoc-lop')
+const thuocChanEl = document.getElementById('thuoc-chan')
+const thuocVienEl = document.getElementById('thuoc-vien')
+const thuocDuongEl = document.getElementById('thuoc-duong')
+const thuocD1El = document.getElementById('thuoc-d1')
+const thuocD2El = document.getElementById('thuoc-d2')
+const thuocNhanEl = document.getElementById('thuoc-nhan')
+const thuocSoEl = document.getElementById('thuoc-so')
+const thuocKtEl = document.getElementById('thuoc-kt')
+
+const HUT_O = 11, HUT_CO = 11 // kinh: 11 x 11 diem anh, moi diem phong 11 lan -> 121 px
+const hex2 = (n) => n.toString(16).toUpperCase().padStart(2, '0')
+const hexMau = (r, g, b) => '#' + hex2(r) + hex2(g) + hex2(b)
+const diemAnh = (v) => Math.floor(v * DPR + 1e-6) // diem anh nam duoi toa do man v (DIP)
+
+let hutNguon = null   // { k, ctx, w, h, rx, ry, nguon } pixel cua vung chon (canvas doc duoc)
+let hutNap = null     // { k, p } dang nap
+let hutMauDao = null  // { k, ds } 5 mau chu dao cua vung
+let hutViTri = null   // { x, y } toa do man cua con tro lan cuoi
+let hutBaoHen = 0
+let thuoc = null      // { ax, ay, bx, by (vach luoi diem anh, px thiet bi, toan man), dang }
+
+function hutKhoa() { return [curRect.x, curRect.y, curRect.w, curRect.h].map((v) => Math.round(v * DPR)).join('_') }
+
+/* Nap pixel vung chon: raw PNG (chuan) -> du phong JPEG dong bang. Tra ve null neu khong co gi. */
+function hutNapNguon() {
+  const k = hutKhoa()
+  if (hutNguon && hutNguon.k === k) return Promise.resolve(hutNguon)
+  if (hutNap && hutNap.k === k) return hutNap.p
+  const rx = Math.round(curRect.x * DPR), ry = Math.round(curRect.y * DPR)
+  const rw = Math.max(1, Math.round(curRect.w * DPR)), rh = Math.max(1, Math.round(curRect.h * DPR))
+  const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  const p = (async () => {
+    let im = null
+    if (own && own.key) { try { im = await napAnh(urlRaw(own.key, rx, ry, rw, rh)) } catch (e) { im = null } }
+    let cv = document.createElement('canvas'), ctx, nguon = 'raw-png'
+    if (im && im.naturalWidth) {
+      cv.width = im.naturalWidth; cv.height = im.naturalHeight
+      ctx = cv.getContext('2d', { willReadFrequently: true })
+      ctx.drawImage(im, 0, 0)
+    } else if (frozenImg && frozenImg.naturalWidth) {
+      nguon = 'jpeg'
+      cv.width = rw; cv.height = rh
+      ctx = cv.getContext('2d', { willReadFrequently: true })
+      ctx.drawImage(frozenImg, rx, ry, rw, rh, 0, 0, rw, rh)
+    } else return null
+    const n = { k, ctx, w: cv.width, h: cv.height, rx, ry, nguon }
+    if (hutKhoa() === k) hutNguon = n
+    window.overlay.log('hut mau nguon=' + nguon + ' ' + n.w + 'x' + n.h)
+    return n
+  })().then((n) => { if (!n && hutNap && hutNap.k === k) hutNap = null; return n })
+  hutNap = { k, p }
+  return p
+}
+
+function hutDoc(n, cx, cy) {
+  const px = clamp(diemAnh(cx) - n.rx, 0, n.w - 1), py = clamp(diemAnh(cy) - n.ry, 0, n.h - 1)
+  const d = n.ctx.getImageData(px, py, 1, 1).data
+  return { r: d[0], g: d[1], b: d[2], px, py }
+}
+
+function hutBao(mau, chu) {
+  hutBaoMauEl.style.background = mau || 'transparent'
+  hutBaoMauEl.hidden = !mau
+  hutBaoChuEl.textContent = chu
+  hutBaoEl.hidden = false
+  clearTimeout(hutBaoHen)
+  hutBaoHen = setTimeout(() => { hutBaoEl.hidden = true }, 1800)
+}
+function hutChep(hex) {
+  window.overlay.copyText(hex)
+  window.overlay.log('hut mau chep ' + hex)
+  hutBao(hex, t('hut.daChep').replace('{ma}', hex))
+}
+
+function hutDatKinh(cx, cy) {
+  const w = hutKinhEl.offsetWidth, h = hutKinhEl.offsetHeight, gap = 22, le = 8
+  let x = cx + gap, y = cy + gap
+  if (x + w > window.innerWidth - le) x = cx - gap - w
+  if (y + h > window.innerHeight - le) y = cy - gap - h
+  hutKinhEl.style.left = Math.max(le, Math.round(x)) + 'px'
+  hutKinhEl.style.top = Math.max(le, Math.round(y)) + 'px'
+}
+
+function hutVe(cx, cy) {
+  const n = hutNguon && hutNguon.k === hutKhoa() ? hutNguon : null
+  hutKinhEl.hidden = false
+  if (!n) { hutHexEl.textContent = '···'; hutMauEl.style.background = 'transparent'; hutDatKinh(cx, cy); return }
+  const c = hutDoc(n, cx, cy), hex = hexMau(c.r, c.g, c.b)
+  const g = hutCvEl.getContext('2d')
+  g.imageSmoothingEnabled = false
+  g.fillStyle = '#181818'; g.fillRect(0, 0, HUT_O * HUT_CO, HUT_O * HUT_CO)
+  const m = (HUT_O - 1) / 2
+  g.drawImage(n.ctx.canvas, c.px - m, c.py - m, HUT_O, HUT_O, 0, 0, HUT_O * HUT_CO, HUT_O * HUT_CO)
+  g.lineWidth = 1
+  g.strokeStyle = '#000'; g.strokeRect(m * HUT_CO + 0.5, m * HUT_CO + 0.5, HUT_CO - 1, HUT_CO - 1)
+  g.strokeStyle = '#fff'; g.strokeRect(m * HUT_CO + 1.5, m * HUT_CO + 1.5, HUT_CO - 3, HUT_CO - 3)
+  hutHexEl.textContent = hex
+  hutMauEl.style.background = hex
+  hutDatKinh(cx, cy)
+}
+
+function hutDiChuyen(e) {
+  const lx = e.clientX - curRect.x, ly = e.clientY - curRect.y
+  const tren = e.target && e.target.closest ? e.target.closest('#toolbar, #hut-bang, #ocr-bang') : null
+  if (tren || lx < 0 || ly < 0 || lx >= curRect.w || ly >= curRect.h) { hutKinhEl.hidden = true; hutViTri = null; return }
+  hutViTri = { x: e.clientX, y: e.clientY }
+  if (hutBangEl.hidden) hutBatDau(); else if (!hutNguon || hutNguon.k !== hutKhoa()) hutNapNguon()
+  hutVe(e.clientX, e.clientY)
+}
+
+async function hutBam(e) {
+  const cx = e.clientX, cy = e.clientY
+  const n = await hutNapNguon()
+  if (!n) { hutBao(null, t('hut.khongCo')); return }
+  const c = hutDoc(n, cx, cy)
+  hutChep(hexMau(c.r, c.g, c.b))
+}
+
+/* 5 mau chu dao: gom diem theo 4 bit moi kenh, trong moi nhom lay mau NGUYEN GOC hay gap nhat (anh chup man hinh co
+   nhieu khoi mau phang nen ra dung ma mau cua khoi, khong phai mau trung binh), nhom gan nhau (< 32 trong RGB) nhap lam
+   mot. Lay mau toi da ~500 nghin diem. */
+function mauChuDao(n, soMau) {
+  const max = soMau || 5, NGUONG = 32
+  const img = n.ctx.getImageData(0, 0, n.w, n.h).data
+  const buoc = Math.max(1, Math.floor(Math.sqrt((n.w * n.h) / 500000)))
+  const dem = new Map()
+  let tong = 0
+  for (let y = 0; y < n.h; y += buoc) {
+    for (let x = 0; x < n.w; x += buoc) {
+      const i = (y * n.w + x) * 4
+      if (img[i + 3] < 128) continue
+      const k = (img[i] << 16) | (img[i + 1] << 8) | img[i + 2]
+      dem.set(k, (dem.get(k) || 0) + 1); tong++
+    }
+  }
+  if (!tong) return []
+  const xo = new Map()
+  for (const [k, c] of dem) {
+    const b = (((k >> 20) & 15) << 8) | (((k >> 12) & 15) << 4) | ((k >> 4) & 15)
+    let o = xo.get(b)
+    if (!o) { o = { n: 0, k, nk: 0 }; xo.set(b, o) }
+    o.n += c
+    if (c > o.nk) { o.nk = c; o.k = k }
+  }
+  const ds = [...xo.values()].sort((a, b) => b.n - a.n)
+  const nhom = []
+  for (const o of ds) {
+    const r = o.k >> 16, g = (o.k >> 8) & 255, b = o.k & 255
+    const gan = nhom.find((q) => Math.hypot(q.r - r, q.g - g, q.b - b) < NGUONG)
+    if (gan) gan.n += o.n
+    else if (nhom.length < max) nhom.push({ r, g, b, n: o.n })
+  }
+  nhom.sort((a, b) => b.n - a.n)
+  return nhom.map((q) => ({ hex: hexMau(q.r, q.g, q.b), pct: q.n / tong }))
+}
+
+function veBangMau(ds) {
+  hutDsEl.textContent = ''
+  if (!ds.length) { const d = document.createElement('div'); d.className = 'rong'; d.textContent = t('hut.khongCo'); hutDsEl.appendChild(d); return }
+  for (const q of ds) {
+    const b = document.createElement('button')
+    b.type = 'button'; b.className = 'hang'; b.dataset.hex = q.hex; b.title = t('hut.bamChep')
+    const o = document.createElement('span'); o.className = 'o'; o.style.background = q.hex
+    const m = document.createElement('span'); m.className = 'm'; m.textContent = q.hex
+    const p = document.createElement('span'); p.className = 'p'; p.textContent = q.pct < 0.01 ? '<1%' : Math.round(q.pct * 100) + '%'
+    b.append(o, m, p)
+    hutDsEl.appendChild(b)
+  }
+}
+hutDsEl.addEventListener('click', (e) => { const b = e.target.closest('.hang'); if (b) hutChep(b.dataset.hex) })
+hutBangEl.addEventListener('mousedown', (e) => e.stopPropagation()) // khong ve / khong keo vung khi bam trong bang
+
+function datViTriBangMau() {
+  const gap = 12, rong = hutBangEl.offsetWidth || 210, cao = hutBangEl.offsetHeight || 220
+  let x = curRect.x + curRect.w + gap
+  if (x + rong > window.innerWidth - gap) x = curRect.x - gap - rong
+  if (x < gap) x = Math.max(gap, Math.min(curRect.x, window.innerWidth - rong - gap))
+  let y = Math.max(gap, Math.min(curRect.y, window.innerHeight - cao - gap))
+  const tb = toolbarEl.hidden ? null : toolbarEl.getBoundingClientRect()
+  if (tb && x < tb.right && x + rong > tb.left && y < tb.bottom && y + cao > tb.top) y = Math.max(gap, tb.top - cao - gap)
+  hutBangEl.style.left = Math.round(x) + 'px'
+  hutBangEl.style.top = Math.round(y) + 'px'
+}
+
+/* Chon cong cu Hut mau: mo bang 5 mau, nap pixel nen (lan dau ~vai chuc ms, vung 4K ~0,6 s). */
+function hutBatDau() {
+  const k = hutKhoa()
+  if (!(hutMauDao && hutMauDao.k === k)) {
+    hutDsEl.textContent = ''
+    const d = document.createElement('div'); d.className = 'rong'; d.textContent = t('hut.dangTinh'); hutDsEl.appendChild(d)
+  } else veBangMau(hutMauDao.ds)
+  hutBangEl.hidden = false
+  datViTriBangMau()
+  hutNapNguon().then((n) => {
+    if (tool !== 'hut' || hutKhoa() !== k) return
+    if (!n) { veBangMau([]); datViTriBangMau(); return }
+    if (!(hutMauDao && hutMauDao.k === k)) hutMauDao = { k, ds: mauChuDao(n) }
+    veBangMau(hutMauDao.ds)
+    datViTriBangMau()
+    if (hutViTri && !hutKinhEl.hidden) hutVe(hutViTri.x, hutViTri.y)
+  })
+}
+
+/* ── Thuoc do ── */
+function thuocDiem(e) {
+  const x = clamp(e.clientX, curRect.x, curRect.x + curRect.w), y = clamp(e.clientY, curRect.y, curRect.y + curRect.h)
+  return { x: Math.round(x * DPR), y: Math.round(y * DPR) } // vach luoi diem anh gan nhat
+}
+function thuocBatDau(e) {
+  const p = thuocDiem(e)
+  thuoc = { ax: p.x, ay: p.y, bx: p.x, by: p.y, dang: true }
+  thuocVe()
+}
+function thuocDiChuyen(e) {
+  if (!thuoc || !thuoc.dang) return
+  const p = thuocDiem(e)
+  let bx = p.x, by = p.y
+  if (e.shiftKey) { if (Math.abs(bx - thuoc.ax) >= Math.abs(by - thuoc.ay)) by = thuoc.ay; else bx = thuoc.ax }
+  thuoc.bx = bx; thuoc.by = by
+  thuocVe()
+}
+function thuocKet() {
+  if (!thuoc) return
+  thuoc.dang = false
+  if (thuoc.ax === thuoc.bx && thuoc.ay === thuoc.by) thuocAn()
+}
+function thuocAn() { thuoc = null; thuocLopEl.hidden = true }
+const fmtPx = (v) => String(Math.round(v * 10) / 10)
+function thuocVe() {
+  const { ax, ay, bx, by } = thuoc
+  const dx = Math.abs(bx - ax), dy = Math.abs(by - ay), len = Math.hypot(dx, dy)
+  const x1 = ax / DPR, y1 = ay / DPR, x2 = bx / DPR, y2 = by / DPR
+  thuocLopEl.hidden = false
+  for (const l of [thuocVienEl, thuocDuongEl]) { l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2) }
+  thuocD1El.setAttribute('cx', x1); thuocD1El.setAttribute('cy', y1)
+  thuocD2El.setAttribute('cx', x2); thuocD2El.setAttribute('cy', y2)
+  thuocChanEl.setAttribute('d', dx && dy ? 'M' + x1 + ' ' + y1 + 'L' + x2 + ' ' + y1 + 'L' + x2 + ' ' + y2 : '')
+  thuocSoEl.textContent = (dx && dy ? fmtPx(len) : String(dx || dy)) + ' px'
+  thuocKtEl.textContent = dx && dy ? dx + ' × ' + dy : ''
+  const w = thuocNhanEl.offsetWidth, h = thuocNhanEl.offsetHeight
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2
+  let nx, ny
+  if (dx === 0 && dy !== 0) { nx = mx + 14; ny = my - h / 2 } else { nx = mx - w / 2; ny = my - h - 14; if (ny < 4) ny = my + 14 }
+  if (nx + w > window.innerWidth - 4) nx = Math.min(mx - w - 14, window.innerWidth - w - 4)
+  thuocNhanEl.style.left = Math.max(4, Math.round(nx)) + 'px'
+  thuocNhanEl.style.top = Math.max(4, Math.round(ny)) + 'px'
+}
+
+/* Doi cong cu / bo vung: tat het cai cua Hut mau + Thuoc do. */
+function doDon() {
+  hutKinhEl.hidden = true; hutBangEl.hidden = true; hutBaoEl.hidden = true; clearTimeout(hutBaoHen)
+  hutViTri = null
+  thuocAn()
+}
+/* Vung chon doi (keo goc, doi cho): bo pixel + mau da nap, bang + thuoc khong con dung cho. */
+let doKhoaCu = ''
+function doVungDoi() {
+  const k = hutKhoa()
+  if (k === doKhoaCu) return
+  doKhoaCu = k
+  hutNguon = null; hutNap = null; hutMauDao = null
+  hutBangEl.hidden = true; hutKinhEl.hidden = true
+  thuocAn()
+}

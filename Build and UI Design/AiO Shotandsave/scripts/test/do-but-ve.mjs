@@ -33,7 +33,7 @@ for (const [ten, html] of [['man chup', ovHtml], ['anh ghim', pinHtml]]) {
   const thanh = ovHtml.slice(ovHtml.indexOf('id="toolbar"'))
   const day = [...thanh.matchAll(/<i class="so">([^<]+)<\/i>|<span class="(chia[^"]*)">|id="(mau-nhom)"/g)].map((m) => m[1] || (m[2] ? '|' : 'MAU'))
   const chuoi = day.slice(0, day.indexOf('MAU') + 1).join(' ')
-  kiem('man chup: thu tu thanh cong cu la V | 1..9 | S R | mau', chuoi === 'V | 1 2 3 4 5 6 7 8 9 | S R | MAU', chuoi)
+  kiem('man chup: thu tu thanh cong cu la V | 1..9 | S R I M | mau', chuoi === 'V | 1 2 3 4 5 6 7 8 9 | S R I M | MAU', chuoi)
 }
 for (const k of ['overlay.but', 'overlay.daquang']) {
   const dong = i18n.split('\n').filter((l) => l.includes("'" + k + "'"))
