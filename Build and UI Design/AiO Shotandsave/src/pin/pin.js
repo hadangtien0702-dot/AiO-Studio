@@ -111,7 +111,7 @@ window.addEventListener('keydown', (e) => {
   // Xoa shape dang chon (Delete / Backspace)
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShape && !oGoChu && mode === 've') {
     const idx = shapes.indexOf(selectedShape)
-    if (idx >= 0) { shapes.splice(idx, 1); xoaRedo() }
+    if (idx >= 0) { shapes.splice(idx, 1); SuaNet.ghi({ k: 'xoa', s: selectedShape, idx }) }
     selectedShape = null
     redraw()
     return
@@ -122,6 +122,7 @@ window.addEventListener('keydown', (e) => {
     const step = e.shiftKey ? 10 : 1
     const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
     const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
+    const truocNudge = SuaNet.sao(selectedShape)
     if (selectedShape.pts) {
       dichNet(selectedShape, dx, dy)
     } else if (selectedShape.type === 'text' || selectedShape.type === 'so') {
@@ -130,6 +131,7 @@ window.addEventListener('keydown', (e) => {
       selectedShape.x1 += dx; selectedShape.x2 += dx
       selectedShape.y1 += dy; selectedShape.y2 += dy
     }
+    SuaNet.ghiSua(selectedShape, truocNudge)
     redraw()
     return
   }
@@ -254,17 +256,18 @@ function capNhatNutBut(x) {
 }
 
 /* LAM LAI: net bi hoan tac vao redoStack; ve net moi / doi vung = xoa hang doi. */
-let redoStack = []
+const redoStack = SuaNet.redo // mang DUNG CHUNG voi sua-net.js (lich su op: them / xoa / sua), chi doi do dai, khong gan lai
 function capNhatRedo() { nutRedoEl.disabled = redoStack.length === 0 }
-function themNet(s) { shapes.push(s); redoStack.length = 0; capNhatRedo() }
-function xoaRedo() { redoStack.length = 0; capNhatRedo() }
+function themNet(s) { shapes.push(s); SuaNet.ghi({ k: 'them', s }) }
+function xoaRedo() { redoStack.length = 0; SuaNet.lichSu.length = 0; capNhatRedo() }
 function lamLai() {
   if (!LAM_LAI_DUOC()) return
   if (oGoChu) return // dang go chu: bo qua (Ctrl+Z luc nay chi bo o go)
   soDangDat = null
   netDangVe = null
   if (!redoStack.length) return
-  shapes.push(redoStack.pop())
+  SuaNet.lamLai()
+  if (selectedShape && !shapes.includes(selectedShape)) selectedShape = null
   danhSoLai() // so buoc luon lien nhau theo thu tu hien co
   capNhatRedo()
   redraw()
@@ -275,6 +278,7 @@ let selectedShape = null
 let dangKeoShape = false
 let keoShapeStart = { x: 0, y: 0 }
 let shapeBanDau = null
+let suaDangKeo = null // dang keo MOT tay nam (co gian / xoay / dau mui ten) cua shape dang chon, xem sua-net.js
 
 function vaoCheDoVe() {
   mode = 've'
@@ -310,6 +314,7 @@ function thoatVe() {
   soDangDat = null
   netDangVe = null
   selectedShape = null
+  suaDangKeo = null
   dangKeoShape = false
   shapeBanDau = null
   if (veCtx) veCtx.clearRect(0, 0, dip.w, dip.h)
@@ -321,7 +326,9 @@ function chonMau(mau) {
   curColor = mau
   if (oGoChu) oGoChu.style.color = mau
   if (selectedShape && tool === 'select') {
+    const truocMau = SuaNet.sao(selectedShape)
     selectedShape.color = mau
+    SuaNet.ghiSua(selectedShape, truocMau)
     redraw()
   }
   toolbarEl.querySelectorAll('.mau').forEach((b) => {
@@ -399,9 +406,10 @@ function layHopBaoShape(s) {
   return null
 }
 
-function timShapeTaiDiem(lx, ly) {
+function timShapeTaiDiem(px, py) {
   for (let i = shapes.length - 1; i >= 0; i--) {
     const s = shapes[i]
+    const q = SuaNet.vaoKhung(s, px, py), lx = q.x, ly = q.y // shape da xoay: thu trung trong khung chua xoay cua no
     if (s.pts) {
       if (cachNet(s, lx, ly) <= doDayNet(s) / 2 + 6) return { shape: s, index: i }
     } else if (s.type === 'so') {
@@ -429,29 +437,7 @@ function timShapeTaiDiem(lx, ly) {
 }
 
 function veKhungChonShape(ctx, s) {
-  const b = layHopBaoShape(s)
-  if (!b) return
-  ctx.save()
-  ctx.strokeStyle = '#00e5ff'
-  ctx.lineWidth = 1.5
-  ctx.setLineDash([4, 3])
-  ctx.strokeRect(b.x, b.y, b.w, b.h)
-  ctx.setLineDash([])
-  ctx.fillStyle = '#ffffff'
-  ctx.strokeStyle = '#00e5ff'
-  ctx.lineWidth = 1.5
-  const r = 3
-  const corners = [
-    [b.x, b.y],
-    [b.x + b.w, b.y],
-    [b.x + b.w, b.y + b.h],
-    [b.x, b.y + b.h]
-  ]
-  for (const [cx, cy] of corners) {
-    ctx.fillRect(cx - r, cy - r, r * 2, r * 2)
-    ctx.strokeRect(cx - r, cy - r, r * 2, r * 2)
-  }
-  ctx.restore()
+  SuaNet.ve(ctx, s) // khung chon + tay nam (co gian / xoay / dau mui ten): src/sua-net.js
 }
 
 /* Ve tren canvas — toa do cuc bo trong anh. */
@@ -462,6 +448,10 @@ veEl.addEventListener('mousedown', (e) => {
   e.preventDefault()
   if (tool === 'select') {
     chotOGoChu()
+    if (selectedShape) {
+      const th = SuaNet.trungTay(selectedShape, lx, ly)
+      if (th) { suaDangKeo = SuaNet.bat(selectedShape, th, lx, ly); return }
+    }
     const hit = timShapeTaiDiem(lx, ly)
     if (hit) {
       selectedShape = hit.shape
@@ -500,10 +490,11 @@ window.addEventListener('mousemove', (e) => {
   const lx = clamp(e.clientX - r.left, 0, dip.w)
   const ly = clamp(e.clientY - r.top, 0, dip.h)
   if (tool === 'select') {
+    if (suaDangKeo) { SuaNet.keo(suaDangKeo, lx, ly, e.shiftKey); redraw(); return }
     if (dangKeoShape && selectedShape && shapeBanDau) {
       const dx = Math.round(lx - keoShapeStart.x)
       const dy = Math.round(ly - keoShapeStart.y)
-      if (selectedShape.type === 'rect' || selectedShape.type === 'arrow') {
+      if (selectedShape.type === 'rect' || selectedShape.type === 'arrow' || selectedShape.type === 'blur') {
         selectedShape.x1 = shapeBanDau.x1 + dx
         selectedShape.y1 = shapeBanDau.y1 + dy
         selectedShape.x2 = shapeBanDau.x2 + dx
@@ -516,8 +507,9 @@ window.addEventListener('mousemove', (e) => {
       }
       redraw()
     } else {
-      const hit = timShapeTaiDiem(lx, ly)
-      veEl.style.cursor = hit ? 'move' : 'default'
+      const th = selectedShape ? SuaNet.trungTay(selectedShape, lx, ly) : null
+      const hit = th ? null : timShapeTaiDiem(lx, ly)
+      veEl.style.cursor = th ? SuaNet.conTro(th) : hit ? 'move' : 'default'
     }
     return
   }
@@ -538,8 +530,10 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('mouseup', (e) => {
   if (mode !== 've') return
   if (tool === 'select') {
+    if (suaDangKeo) { SuaNet.xong(suaDangKeo); suaDangKeo = null; redraw(); return }
     if (dangKeoShape) {
       dangKeoShape = false
+      if (selectedShape && shapeBanDau) SuaNet.ghiSua(selectedShape, shapeBanDau)
       shapeBanDau = null
       redraw()
     }
@@ -562,8 +556,7 @@ function hoanTac() {
   if (oGoChu) { huyOGoChu(); return }
   soDangDat = null
   netDangVe = null
-  const bo = shapes.pop()
-  if (bo) redoStack.push(bo)
+  SuaNet.hoanTac()
   if (selectedShape && !shapes.includes(selectedShape)) selectedShape = null
   capNhatRedo()
   redraw()
@@ -657,6 +650,7 @@ function veSo(ctx, s, k) {
   const so = String(s.n || 1)
   const kb = k * (ctx.getTransform ? ctx.getTransform().a : 1) // bong do KHONG theo he so phong cua canvas
   ctx.save()
+  if (s.rot) { ctx.translate(cx, cy); ctx.rotate(s.rot); ctx.translate(-cx, -cy) }
   ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 4 * kb; ctx.shadowOffsetY = 1 * kb
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
   ctx.fillStyle = s.color; ctx.fill()
@@ -788,8 +782,9 @@ function veShape(ctx, s, k) {
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
   if (s.type === 'rect') {
-    const x = Math.min(s.x1, s.x2) * k, y = Math.min(s.y1, s.y2) * k
-    ctx.strokeRect(x, y, Math.abs(s.x2 - s.x1) * k, Math.abs(s.y2 - s.y1) * k)
+    const x = Math.min(s.x1, s.x2) * k, y = Math.min(s.y1, s.y2) * k, w = Math.abs(s.x2 - s.x1) * k, h = Math.abs(s.y2 - s.y1) * k
+    if (s.rot) { ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(s.rot); ctx.strokeRect(-w / 2, -h / 2, w, h); ctx.restore() }
+    else ctx.strokeRect(x, y, w, h)
   } else if (s.type === 'arrow') {
     veMuiTen(ctx, s.x1 * k, s.y1 * k, s.x2 * k, s.y2 * k, 13 * k)
   } else if (s.type === 'text') {
@@ -865,6 +860,7 @@ function luuVe() {
 }
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
+function kichThuocVe() { return { w: dip.w, h: dip.h } } // cho sua-net.js: gioi han keo dau mui ten
 
 /* ── Cong cu CHU (phim 3, anh Tien 10/09) ──────────────────────────────
    Bam vao anh -> hien o go (textarea trong suot) dung cho do; Enter = chot
@@ -924,6 +920,8 @@ function veChu(ctx, s, k) {
   let w = 0
   for (const d of dong) w = Math.max(w, ctx.measureText(d).width)
   const bx = s.x * k, by = s.y * k, bw = w + px * 2, bh = dong.length * lh + py * 2
+  ctx.save()
+  if (s.rot) { ctx.translate(bx + bw / 2, by + bh / 2); ctx.rotate(s.rot); ctx.translate(-(bx + bw / 2), -(by + bh / 2)) }
   ctx.fillStyle = NEN_CHU
   ctx.beginPath()
   if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r); else ctx.rect(bx, by, bw, bh)
@@ -932,5 +930,6 @@ function veChu(ctx, s, k) {
   for (let i = 0; i < dong.length; i++) {
     ctx.fillText(dong[i], bx + px, by + py + i * lh)
   }
+  ctx.restore()
 }
 
