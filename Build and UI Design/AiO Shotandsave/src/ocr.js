@@ -211,6 +211,38 @@ async function docChu(png, cach) {
   }
 }
 
+/* CHE THONG MINH (05/11/2026): doc chu KEM TOA DO tung tu / tung dong (cung Tesseract o tren, KHONG them bo doc moi).
+   Tra ve { ok, dong: [{ text, x0, y0, x1, y1, tu: [{ t, x0, y0, x1, y1, conf }] }], boDoc, ms, loi? } — toa do la PIXEL cua anh png
+   dua vao. Ben goi tu quy ve toa do vung goc (xem src/che-tm-main.js). Windows + Mac deu dung Tesseract (WASM). */
+async function docChuTu(png) {
+  const t0 = Date.now()
+  if (process.platform !== 'win32' && process.platform !== 'darwin') return { ok: false, loi: 'he dieu hanh chua ho tro' }
+  try {
+    const w = await layTess()
+    const { data } = await w.recognize(png)
+    const dong = []
+    for (const l of (data.lines || [])) {
+      const tu = []
+      for (const k of (l.words || [])) {
+        const t = String(k.text || '').trim()
+        if (!t || !k.bbox) continue
+        tu.push({ t, x0: k.bbox.x0, y0: k.bbox.y0, x1: k.bbox.x1, y1: k.bbox.y1, conf: k.confidence })
+      }
+      if (!tu.length) continue
+      dong.push({
+        text: tu.map((q) => q.t).join(' '),
+        x0: Math.min(...tu.map((q) => q.x0)), y0: Math.min(...tu.map((q) => q.y0)),
+        x1: Math.max(...tu.map((q) => q.x1)), y1: Math.max(...tu.map((q) => q.y1)),
+        tu,
+      })
+    }
+    return { ok: true, dong, boDoc: 'tesseract', cach: 'tesseract', ms: Date.now() - t0 }
+  } catch (e) {
+    tatTess()
+    return { ok: false, cach: 'tesseract', loi: 'tesseract: ' + (e && e.message ? e.message : e), ms: Date.now() - t0 }
+  }
+}
+
 function tatHet() { tatHost(); tatTess() }
 
-module.exports = { docChu, tatHost: tatHet }
+module.exports = { docChu, docChuTu, tatHost: tatHet }

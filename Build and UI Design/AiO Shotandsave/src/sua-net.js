@@ -31,29 +31,45 @@ const SuaNet = (() => {
     ghi({ k: 'sua', s, truoc: sao(truoc), sau: sao(s) })
     return true
   }
+  /* 05/11: shape co `nhom` (Che thong minh: "Tu che", "Che moi cho trung") = MOT buoc Hoan tac / Lam lai cho ca nhom. */
+  const cungNhom = (op, nhom) => !!op && !!op.s && op.s.nhom === nhom
   function hoanTac() {
+    const op = luiMot()
+    if (!op) return false
+    const nhom = op.s && op.s.nhom
+    if (nhom) while (cungNhom(lichSu[lichSu.length - 1], nhom)) luiMot()
+    capNhat()
+    return true
+  }
+  function luiMot() {
     let op = lichSu.pop()
     if (!op) { // shape them bang duong khac (khong ghi op): van bo duoc net cuoi nhu cu
       const s = shapes[shapes.length - 1]
-      if (!s) return false
+      if (!s) return null
       op = { k: 'them', s }
     }
     if (op.k === 'them') { op.idx = shapes.indexOf(op.s); if (op.idx >= 0) shapes.splice(op.idx, 1) }
     else if (op.k === 'xoa') shapes.splice(Math.min(op.idx, shapes.length), 0, op.s)
     else if (op.k === 'sua') datLai(op.s, op.truoc)
     redo.push(op)
+    return op
+  }
+  function lamLai() {
+    const op = toiMot()
+    if (!op) return false
+    const nhom = op.s && op.s.nhom
+    if (nhom) while (cungNhom(redo[redo.length - 1], nhom)) toiMot()
     capNhat()
     return true
   }
-  function lamLai() {
+  function toiMot() {
     const op = redo.pop()
-    if (!op) return false
+    if (!op) return null
     if (op.k === 'them') shapes.splice(op.idx >= 0 ? Math.min(op.idx, shapes.length) : shapes.length, 0, op.s)
     else if (op.k === 'xoa') { const i = shapes.indexOf(op.s); if (i >= 0) shapes.splice(i, 1) }
     else if (op.k === 'sua') datLai(op.s, op.sau)
     lichSu.push(op)
-    capNhat()
-    return true
+    return op
   }
 
   /* Moi doi tuong mang toa do can dich khi nguoi dung doi vi tri khung chon: shape dang co + shape / anh chup trong lich su

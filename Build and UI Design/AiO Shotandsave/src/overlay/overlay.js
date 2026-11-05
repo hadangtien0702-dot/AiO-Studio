@@ -64,6 +64,8 @@ let dragging = false
 let startX = 0, startY = 0
 let curRect = { x: 0, y: 0, w: 0, h: 0 }
 let shapes = []           // { type, x1, y1, x2, y2 } — toa do CUC BO trong vung chon
+let cheTM = null          // 05/11 CHE THONG MINH (phim C): dieu khien tao o cuoi file
+let cheMenu = null        // menu xo cua nut Lam mo (Lam mo | Che thong minh)
 
 /* ── 12/11 BANG MAU XO + MENU BUT (nhom 7 / 8) + LAM LAI ─────────────────────────────────────────────
    Thanh chi con MOT cham mau; bam thi xo bang 7 mau xuong duoi, gan mep duoi thi xo len tren. Nut but gop but + da quang:
@@ -103,10 +105,10 @@ function dongBangMau() { if (mauPopEl.hidden) return; mauPopEl.hidden = true; ma
 function dongMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) butMenuEl.hidden = true }
 function menuDoMo() { return !doMenuEl.hidden }
 function dongMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) doMenuEl.hidden = true }
-function dongPopups() { dongBangMau(); dongMenuBut(); dongMenuDo() }
-function moBangMau() { dongMenuBut(); dongMenuDo(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
-function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); dongMenuDo(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
-function moMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) return; dongBangMau(); dongMenuBut(); doMenuEl.hidden = false; xepXo(doChinhEl, doMenuEl) }
+function dongPopups() { dongBangMau(); dongMenuBut(); dongMenuDo(); if (cheMenu) cheMenu.dong() }
+function moBangMau() { dongMenuBut(); dongMenuDo(); if (cheMenu) cheMenu.dong(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
+function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); dongMenuDo(); if (cheMenu) cheMenu.dong(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+function moMenuDo() { clearTimeout(doDong); if (!doMenuEl.hidden) return; dongBangMau(); dongMenuBut(); if (cheMenu) cheMenu.dong(); doMenuEl.hidden = false; xepXo(doChinhEl, doMenuEl) }
 let butDong = 0
 let doDong = 0
 doNhomEl.addEventListener('mouseenter', moMenuDo)
@@ -409,6 +411,7 @@ selEl.addEventListener('mousedown', (e) => {
   e.preventDefault()
   chotOGoChu()
   isAdjusting = true
+  if (cheTM) cheTM.dong()
   if (handle) {
     adjustType = handle.dataset.handle
   } else if (edge) {
@@ -629,7 +632,8 @@ window.addEventListener('mouseup', (e) => {
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (bangMauMo() || menuButMo() || menuDoMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
+    if (bangMauMo() || menuButMo() || menuDoMo() || (cheMenu && cheMenu.dangMo())) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc, chua huy chup
+    if (cheTM && cheTM.xuLyPhim(e)) return // dang o che do Che thong minh: Esc chi dong che do do, chua huy chup
     window.overlay.cancel(); return
   }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { if (e.shiftKey) lamLai(); else hoanTac(); return }
@@ -671,6 +675,11 @@ window.addEventListener('keydown', (e) => {
       toggleStoryboardMode()
       return
     }
+  }
+  // Phim C = Che thong minh (05/11): doc chu, khung tung tu, Tu che email / so dien thoai / so the / link
+  if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
+      (e.key === 'c' || e.key === 'C' || e.code === 'KeyC')) {
+    e.preventDefault(); chuyenChe(); return
   }
   // Phim R = quay video vung dang chon (01/10)
   if (mode === 'annotate' && !e.ctrlKey && !e.altKey && !e.metaKey && !oGoChu &&
@@ -758,6 +767,7 @@ function datViTriThanhCongCu() {
 
 function chonCongCu(x) {
   if (x !== tool) { chotOGoChu(); doDon() }
+  if (cheTM && cheTM.dangMo()) cheTM.dong()
   tool = x
   capNhatNutBut(x)
   capNhatNutDo(x)
@@ -1028,6 +1038,7 @@ function redraw(preview) {
   if (selectedShape && tool === 'select') {
     veKhungChonShape(veCtx, selectedShape)
   }
+  if (cheTM) cheTM.lamMoi() // Hoan tac / Lam lai / xoa net: khung "da che" theo kip
 }
 
 let offscreenBlurCanvas = null
@@ -1326,6 +1337,7 @@ toolbarEl.addEventListener('click', (e) => {
       toggleStoryboardMode()
       return
     }
+    if (b.dataset.tool === 'che') { chuyenChe(); return }
     if (b.dataset.tool === 'ocr') { if (ocrMo()) dongBangChu(); else docChuVung(); return }
     if (b.dataset.tool === 'quay') { quayVideo(); return }
     if (b.dataset.tool === 'cuon') { chupCuon(); return }
@@ -1625,6 +1637,7 @@ let ocrCachVua = null
 async function docChuVung(cach) {
   if (mode !== 'annotate' || !curRect.w || !curRect.h) return
   chotOGoChu()
+  if (cheTM) cheTM.dong()
   const luot = ++ocrLuot
   ocrDong = []
   ocrDem.textContent = ''
@@ -1993,3 +2006,42 @@ function doVungDoi() {
   hutBangEl.hidden = true; hutKinhEl.hidden = true
   thuocAn()
 }
+/* ── 05/11 CHE THONG MINH (phim C, menu xo cua nut Lam mo) ─────────────────────────────────────────────
+   Doc chu cua vung bang Tesseract (main: overlay:ocr-tu, KEM toa do), hien khung tung tu / dong; bam chu = che (to kin,
+   blurType 'kin' - di qua dung duong lam mo co san), bam lai = bo; Tu che = email / so dien thoai / so the / link;
+   Che moi cho trung. Logic: src/che-thong-minh.js, giao dien: src/che-tm-ui.js. Moi lan che = 1 buoc trong Hoan tac / Lam lai. */
+async function docChuChe() {
+  const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  if (!own || !own.key) return { ok: false, loi: 'chua co anh (grab chua xong)' }
+  return window.overlay.ocrTu({ key: own.key, x: curRect.x * DPR, y: curRect.y * DPR, w: curRect.w * DPR, h: curRect.h * DPR, sf: DPR })
+}
+function themNhomChe(ds) {
+  for (const x of ds) themNet(x) // 05/11: ghi vao lich su; cung `nhom` = mot buoc Hoan tac (src/sua-net.js)
+  redraw()
+}
+function datThanhChe(strip) {
+  strip.style.position = 'fixed'; strip.style.transform = 'none'; strip.style.bottom = 'auto'; strip.style.right = 'auto'
+  const gap = 8, tb = toolbarEl.getBoundingClientRect()
+  const w = strip.offsetWidth || 360, h = strip.offsetHeight || 80
+  let top = tb.bottom + gap
+  if (top + h > window.innerHeight - 4) top = tb.top - h - gap
+  if (top < 4) top = Math.max(4, Math.min(curRect.y + curRect.h - h - gap, window.innerHeight - h - 4)) // khong con cho: nam trong vung, sat day
+  strip.style.top = Math.round(top) + 'px'
+  strip.style.left = Math.round(clamp(tb.left, 4, window.innerWidth - w - 4)) + 'px'
+}
+function chuyenChe() {
+  if (mode !== 'annotate') return
+  if (cheTM.dangMo()) { cheTM.dong(); return }
+  chotOGoChu()
+  if (ocrMo()) dongBangChu()
+  cheTM.mo()
+}
+cheTM = window.CheTMUI.tao({
+  goc: document.body, rect: () => curRect, heSo: () => DPR, shapes: () => shapes, veLai: () => redraw(),
+  them: themNhomChe, xoaRedo, doc: docChuChe, datThanh: datThanhChe, t, log: (m) => window.overlay.log(m),
+  nut: document.getElementById('che-muc'),
+})
+cheMenu = window.CheTMUI.ganMenuXo({
+  nhom: document.getElementById('lam-mo-nhom'), chinh: document.getElementById('lam-mo-chinh'), menu: document.getElementById('lam-mo-menu'),
+  xep: xepXo, dongKhac: () => { dongBangMau(); dongMenuBut(); dongMenuDo() },
+})

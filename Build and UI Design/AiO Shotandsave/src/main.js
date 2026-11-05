@@ -34,6 +34,7 @@ const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: b
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
 const chupCuonLib = require('./chup-cuon') // 06/10: chup cuon trang dai (bo ghep + vong lap mot phien)
 const { pathToFileURL } = require('url')
+const cheTM = require('./che-tm-main') // 05/11: che thong minh - doc chu kem toa do (cung Tesseract)
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const timAnhMod = require('./tim-anh') // 05/11: Tim lai anh cu (chi muc chu trong userData)
 let timAnh = null
@@ -1665,6 +1666,21 @@ ipcMain.handle('overlay:ocr', async (_e, q) => {
     return { ok: false, loi: err.message }
   }
 })
+/* 05/11 CHE THONG MINH: cung nguon anh goc (rawStore) nhu phim 5, nhung tra TOA DO tung tu / dong (src/che-tm-main.js, Tesseract). */
+ipcMain.handle('overlay:ocr-tu', async (_e, q) => {
+  try {
+    let img = rawStore.get(q.key)
+    for (let i = 0; (!img || img.isEmpty()) && i < 15; i++) { await new Promise((r) => setTimeout(r, 100)); img = rawStore.get(q.key) }
+    if ((!img || img.isEmpty()) && frozenStore.get(q.key)) img = nativeImage.createFromBuffer(frozenStore.get(q.key))
+    if (!img || img.isEmpty()) return { ok: false, loi: 'chua co anh goc' }
+    const kq = await cheTM.docVungTu(nativeImage, ocr, img, q)
+    ghiLog('che-tm doc ' + Math.round(q.w) + 'x' + Math.round(q.h) + ': ' + (kq.ok ? kq.dong.length + ' dong' : 'LOI ' + kq.loi) + ' ' + kq.ms + ' ms')
+    return kq
+  } catch (err) {
+    ghiLog('che-tm LOI: ' + err.message)
+    return { ok: false, loi: err.message }
+  }
+})
 ipcMain.on('overlay:copy-text', (_e, s) => { if (typeof s === 'string') clipboard.writeText(s) })
 
 ipcMain.on('overlay:confirm', (e, payload) => {
@@ -1945,6 +1961,20 @@ function hoanTacSuaPin(rec, lyDo) {
   }).catch((err) => ghiLog('pin hop thoai LOI: ' + err.message))
 }
 
+/* 05/11 CHE THONG MINH tren anh ghim: doc chu CA ANH hien tai (rec.image) kem toa do pixel anh that. */
+ipcMain.handle('pin:ocr-tu', async (e) => {
+  const rec = pins.get(e.sender.id)
+  try {
+    if (!rec || !rec.image || rec.image.isEmpty()) return { ok: false, loi: 'khong co anh' }
+    const sz = rec.image.getSize()
+    const kq = await cheTM.docAnhGhim(nativeImage, ocr, rec.image, rec.dipW)
+    ghiLog('che-tm ghim ' + sz.width + 'x' + sz.height + ': ' + (kq.ok ? kq.dong.length + ' dong' : 'LOI ' + kq.loi) + ' ' + kq.ms + ' ms')
+    return kq
+  } catch (err) {
+    ghiLog('che-tm ghim LOI: ' + err.message)
+    return { ok: false, loi: err.message }
+  }
+})
 ipcMain.on('pin:save-edit', (e, dataUrl) => {
   const rec = pins.get(e.sender.id)
   if (!rec || !dataUrl) return
