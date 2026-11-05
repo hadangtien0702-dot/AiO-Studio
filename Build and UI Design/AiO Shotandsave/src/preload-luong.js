@@ -13,5 +13,7 @@ contextBridge.exposeInMainWorld('luong', {
   /* 01/10 Quay video: gui tung khuc MP4 (~1 s) ve main ghi noi vao dia; bao xong; nhan lenh dung. */
   guiKhucQuay: (d) => ipcRenderer.send('luong:quay-khuc', d),
   quayXong: (d) => ipcRenderer.send('luong:quay-xong', d),
+  /* 05/11 su kien chuot / phim de VE VAO KHUNG HINH luc quay */
+  onNhap: (cb) => ipcRenderer.on('luong:nhap', (_e, d) => cb(d)),
   onDungQuay: (cb) => ipcRenderer.on('luong:quay-dung', (_e, d) => cb(d)),
 })

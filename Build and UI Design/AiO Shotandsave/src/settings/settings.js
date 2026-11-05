@@ -43,6 +43,7 @@ const btnClose = document.getElementById('close')
 const khayBox = document.getElementById('khay-kieu')
 const khaySoAnhBox = document.getElementById('khay-so-anh')
 const khayTuThuBox = document.getElementById('khay-tu-thu')
+const quayBox = { quayMic: document.getElementById('quay-mic'), quayHienChuot: document.getElementById('quay-chuot'), quayHienPhim: document.getElementById('quay-phim') }
 const lamMoBox = document.getElementById('lam-mo-kieu')
 const moCungBox = document.getElementById('mo-cung')
 const msgMoCung = document.getElementById('msg-mo-cung')
@@ -152,6 +153,7 @@ async function load() {
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
   if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu === 0 ? 0 : (s.khayTuThu || 5)))   // 0 = Khong thu
   if (lamMoBox) chonPill(lamMoBox, s.lamMoKieu || 'mosaic')
+  for (const k of Object.keys(quayBox)) if (quayBox[k]) chonPill(quayBox[k], s[k] ? '1' : '0')
   datMoCung(s.moCung)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
@@ -205,6 +207,18 @@ if (khayTuThuBox) {
     chonPill(khayTuThuBox, b.dataset.v)
     const g = Number(b.dataset.v)
     await window.settings.setKhayTuThu(Number.isFinite(g) ? g : 5)
+  })
+}
+
+/* ── Quay video (05/11): micro + hien cu bam chuot / phim ─────────────── */
+for (const k of Object.keys(quayBox)) {
+  const box = quayBox[k]
+  if (!box) continue
+  box.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    chonPill(box, b.dataset.v)
+    await window.settings.setQuay({ [k]: b.dataset.v === '1' })
   })
 }
 

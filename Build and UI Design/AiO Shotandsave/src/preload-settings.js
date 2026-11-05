@@ -28,6 +28,8 @@ contextBridge.exposeInMainWorld('settings', {
   setKhaySoAnh: (n) => ipcRenderer.invoke('settings:set-khay-so-anh', n),
   /** So giay cho roi khay tu thu ve nut tron: 5 | 10 | 15. */
   setKhayTuThu: (n) => ipcRenderer.invoke('settings:set-khay-tu-thu', n),
+  /** Quay video (05/11): { quayMic?, quayHienChuot?, quayHienPhim? } deu boolean. */
+  setQuay: (d) => ipcRenderer.invoke('settings:set-quay', d),
   /** Doi kieu lam mo: 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10). */
   setLamMo: (kieu) => ipcRenderer.invoke('settings:set-lam-mo', kieu),
   /** Bat / tat mo cung Windows. Tra { hoTro, bat, biChan } doc lai tu Windows. */

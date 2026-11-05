@@ -48,6 +48,7 @@
     "test:botieng": "node scripts/test/do-mp4-bo-tieng.cjs",
     "test:nhipquay": "node scripts/test/do-nhip-quay.mjs",
     "test:dongbotieng": "node scripts/test/do-dong-bo-tieng.mjs",
+    "test:quaymic": "node scripts/test/do-quay-mic.cjs",
     "test:canvas": "node scripts/test/do-canvas.cjs",
     "test:canvasapp": "node scripts/test/do-canvas-app.cjs",
     "test:canvasfigjam": "node scripts/test/do-canvas-figjam.cjs",
@@ -56,6 +57,9 @@
     "test:capnhat": "node scripts/test/do-cap-nhat.cjs",
     "test:capnhat-gd": "node scripts/test/do-cap-nhat-giao-dien.cjs",
     "dist:mac": "electron-builder --mac --x64 --arm64 --publish never"
+  },
+  "optionalDependencies": {
+    "uiohook-napi": "^1.5.5"
   },
   "devDependencies": {
     "electron": "43.4.1",
@@ -121,7 +125,8 @@
       "artifactName": "AiO-Shot-and-Save-${version}-mac-${arch}.${ext}",
       "extendInfo": {
         "LSUIElement": true,
-        "NSScreenCaptureUsageDescription": "AiO Shot & Save can chup man hinh de ban chon vung va ghim anh."
+        "NSScreenCaptureUsageDescription": "AiO Shot & Save can chup man hinh de ban chon vung va ghim anh.",
+        "NSMicrophoneUsageDescription": "AiO Shot & Save can micro de thu giong noi cua ban vao video quay man hinh."
       }
     },
     "dmg": {

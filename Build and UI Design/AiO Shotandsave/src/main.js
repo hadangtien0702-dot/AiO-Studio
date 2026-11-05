@@ -805,6 +805,7 @@ ipcMain.handle('settings:get', () => {
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
     khayTuThu: giayHopLe(c.khayTuThu),
     lamMoKieu: kieuLamMo(c.lamMoKieu),
+    quayMic: c.quayMic !== false, quayHienChuot: c.quayHienChuot === true, quayHienPhim: c.quayHienPhim === true,
     moCung: moCungMay.trangThai(app),
   }
 })
@@ -828,6 +829,14 @@ ipcMain.handle('settings:set-lam-mo', (_e, kieu) => {
     }
   }
   return { lamMoKieu: val }
+})
+
+// 05/11: quay video — micro (mac dinh bat) + hien cu bam chuot / phim (mac dinh tat). Chi nhan dung 3 khoa, chi gia tri true/false.
+ipcMain.handle('settings:set-quay', (_e, d) => {
+  const patch = {}
+  for (const k of ['quayMic', 'quayHienChuot', 'quayHienPhim']) if (d && typeof d[k] === 'boolean') patch[k] = d[k]
+  if (Object.keys(patch).length) { kho.ghiCauHinh(patch); ghiLog('doi cai dat quay: ' + JSON.stringify(patch)) }
+  return patch
 })
 
 ipcMain.handle('settings:set-khay-so-anh', (_e, n) => {
@@ -2561,8 +2570,12 @@ async function batDauGhiHinh(display, rect, tieng) {
   rebuildTrayMenu()
   g.vien = moVienQuay(display, rect, 'video')
   await cho(QUAY_CHO_MS) // overlay (anh dong bang) vua dong -> doi man that hien lai
+  // 05/11: micro + hien cu bam chuot / phim lay tu Cai dat (micro mac dinh BAT = thu du, cu bam mac dinh TAT)
+  const cauQuay = kho.docCauHinh()
   const r = await luong.batDauQuay(display, rect, {
     tieng,
+    mic: cauQuay.quayMic !== false,
+    hienNhap: { chuot: cauQuay.quayHienChuot === true, phim: cauQuay.quayHienPhim === true },
     onKhuc: (buf) => {
       try { fs.writeSync(g.fd, buf); g.bytes += buf.length; g.khuc++ } catch (e) {
         // O day day / mat quyen giua chung: dung ngay, giu phan da ghi
@@ -2581,6 +2594,11 @@ async function batDauGhiHinh(display, rect, tieng) {
     return
   }
   g.batDau = Date.now(); g.w = r.w; g.h = r.h; g.tieng = !!r.tieng
+  if (cauQuay.quayMic !== false && !r.mic) { // thieu quyen / khong co micro: van quay, bao mot dong
+    ghiLog('quay-video: khong thu micro (' + (r.micLoi || 'khong ro') + ')')
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T(r.micLoi === 'quyen' || r.micLoi === 'NotAllowedError' ? 'quay.micQuyen' : 'quay.micKhong') }).show()
+  }
+  if (r.nhap && !r.nhap.ok && Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('quay.nhapKhong') }).show()
   if (r.duoi && r.duoi !== 'mp4') g.duong = g.duong.replace(/\.mp4$/, '.' + r.duoi) // may khong co H.264 -> webm
   ghiLog('quay-video bat dau ' + r.w + 'x' + r.h + ' ' + r.mime + (g.tieng ? ' +tieng' : '') + ' (mo luong ' + r.msMo + ' ms) rect=' + JSON.stringify(rect))
   g.vien.batDau({ tieng: g.tieng })
