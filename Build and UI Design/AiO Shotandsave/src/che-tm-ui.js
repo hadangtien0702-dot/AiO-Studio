@@ -113,8 +113,8 @@
       const truoc = shapes().slice()
       const n = CT.boChe(shapes(), m)
       if (n && opt.daBo) {
-        const con = shapes(), ds = []
-        for (let i = truoc.length - 1; i >= 0; i--) if (con.indexOf(truoc[i]) < 0) ds.push({ s: truoc[i], idx: i })
+        const con = shapes(), ds = [], nhom = 'bo' + (++demNhom) + '_' + Date.now() // mot lan bam = mot buoc Hoan tac
+        for (let i = truoc.length - 1; i >= 0; i--) if (con.indexOf(truoc[i]) < 0) ds.push({ s: truoc[i], idx: i, nhom })
         opt.daBo(ds)
       }
       return n

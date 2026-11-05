@@ -31,6 +31,7 @@ if (!process.versions.electron) {
     kiem('B3 hai so dien thoai canh nhau: che ca hai', ra('0912345678 0987654321') === 'dienthoai:0912345678 | dienthoai:0987654321', ra('0912345678 0987654321'))
     kiem('B3 hai so viet tach cum: che ca hai', ra('0912 345 678 0987 654 321') === 'dienthoai:0912 345 678 | dienthoai:0987 654 321', ra('0912 345 678 0987 654 321'))
     kiem('Giu nguyen: the + dien thoai tren mot dong van che ca hai', ra('4111 1111 1111 1111 0912345678') === 'the:4111 1111 1111 1111 | dienthoai:0912345678', ra('4111 1111 1111 1111 0912345678'))
+    kiem('Giu nguyen: hang so thu tu "01 02 03 04 05 06 07" khong bi che nham', ra('01 02 03 04 05 06 07') === '', ra('01 02 03 04 05 06 07'))
     kiem('Giu nguyen: ma don 8 so khong bi che, ngay khong bi che', ra('don 12345678 90123456') === '' && ra('05/11/2026') === '', ra('don 12345678 90123456'))
 
     // C3 file doi luc dang doc
@@ -66,7 +67,7 @@ if (!process.versions.electron) {
     kiem('A5 phim chup trung phim Canvas viet khac chu: nhan ra la mot to hop', ok5, ct5)
     kiem('A5 doi phim chup: quen ten phim Canvas da go (khong go nham phim chup vua dang ky)', /globalShortcut\.unregisterAll\(\)\n\s*phimCanvasDangKy = ''/.test(main))
     // Co mat trong ma (chua dung lai duoc o day)
-    kiem('A2 khung cua luot cu bi bo o ca 3 cho (co mat trong ma)', (main.match(/if \(cu\(\)\)/g) || []).length === 3)
+    kiem('A2 khung cua luot cu bi bo o ca 4 cho (co mat trong ma)', (main.match(/if \(!?cu\(\)\)/g) || []).length === 4)
     kiem('A4 khay gui lai danh sach moi lan nap trang (co mat trong ma)', /shelfWin\.webContents\.on\('did-finish-load'/.test(main))
     kiem('A6 overlay hien sau khong cuop phim cua man co vung (co mat trong ma)', /winGiuFocus && !winGiuFocus\.isDestroyed\(\) \? winGiuFocus : win/.test(main))
     kiem('Mac: khong xin micro khi Info.plist chua khai bao (co mat trong ma)', /coKhaiBaoMic\(\)/.test(doc('luong-chup.js')))
@@ -138,7 +139,7 @@ let xacNhan = null
 const thuTu = []
 ipcMain.on('i18n:lang', (e) => { e.returnValue = 'vi' })
 ipcMain.on('overlay:confirm', (_e, p) => { xacNhan = p })
-ipcMain.on('pin:save-edit', () => { thuTu.push('luu') })
+ipcMain.on('pin:save-edit', (_e, _d, chep) => { thuTu.push(chep ? 'luu-kem-chep' : 'luu') })
 ipcMain.on('pin:copy', () => { thuTu.push('chep') })
 
 const kq = []
@@ -184,7 +185,7 @@ app.whenReady().then(async () => {
       await cho(300)
       const som = xacNhan
       await cho(3300)
-      kiem('A1 chua co anh nen: khong gui anh chi co net ve', !som && xacNhan && xacNhan.rect && !xacNhan.dataUrl, 'luc 0,3 s: ' + (som ? Object.keys(som) : 'cho') + '; cuoi: ' + (xacNhan ? Object.keys(xacNhan) : 'khong'))
+      kiem('A1 chua co anh nen: khong gui anh chi co net ve, cung khong cat thuong lam mat net (bo luot + bao)', !som && xacNhan && xacNhan.khongCoNen && !xacNhan.rect && !xacNhan.dataUrl, 'luc 0,3 s: ' + (som ? Object.keys(som) : 'cho') + '; cuoi: ' + (xacNhan ? Object.keys(xacNhan) : 'khong'))
       w.destroy()
       w = await moManChup(); d = dieuKhien(w)
       await d.phim('1'); await cho(120)
@@ -195,6 +196,14 @@ app.whenReady().then(async () => {
       for (let i = 0; i < 30 && !xacNhan; i++) await cho(50)
       let diem = null
       if (xacNhan && xacNhan.dataUrl) { const im = nativeImage.createFromDataURL(xacNhan.dataUrl), b = im.toBitmap(), kt = im.getSize(), i = (300 * kt.width + 500) * 4; diem = [b[i + 2], b[i + 1], b[i]] }
+      kiem('A1 chon lai trong luc cho anh nen: khong tu luu khung cu', await (async () => {
+        const w2 = await moManChup(), d2 = dieuKhien(w2)
+        await d2.phim('1'); await cho(120); await d2.keo([200, 200], [320, 280])
+        await d2.o('document.getElementById("xong").click(); chonLaiTuDau({ clientX: 10, clientY: 10, button: 0, preventDefault() {} }); true').catch(() => {})
+        const giu = xacNhan; xacNhan = null
+        await d2.o(NEN_XAM); await cho(500)
+        const ok = !giu && !xacNhan; xacNhan = giu; w2.destroy(); return ok
+      })())
       kiem('A1 anh nen ve trong luc cho: anh luu co DU nen + net ve', diem && diem[0] === 40 && diem[1] === 90 && diem[2] === 200, 'diem nen ' + diem)
       w.destroy()
     }
@@ -246,6 +255,20 @@ app.whenReady().then(async () => {
       kiem('B8 doi cong cu giua luc keo roi tha chuot: net khong chay theo chuot nua', truoc === sau, truoc === sau ? '' : 'net van doi')
       w.destroy()
     }
+    { // B2 keo than khung Che, nhan phim doi cong cu truoc khi tha
+      const w = await moManChup(), d = dieuKhien(w)
+      await d.o(`themNet({ type: 'blur', blurType: 'kin', che: true, phu: ['a'], color: '#000', x1: 100, y1: 100, x2: 220, y2: 160 }); redraw(); true`)
+      await d.phim('V')
+      const vt = await d.o(`(() => { const r = veEl.getBoundingClientRect(); return { l: r.left, t: r.top } })()`)
+      const p = [Math.round(vt.l + 160), Math.round(vt.t + 130)]
+      await d.m('mouseMove', p[0], p[1]); await d.m('mouseDown', p[0], p[1]); await d.m('mouseUp', p[0], p[1])
+      await d.m('mouseMove', p[0], p[1]); await d.m('mouseDown', p[0], p[1]); await d.m('mouseMove', p[0] + 150, p[1] + 90)
+      await d.phim('1')
+      await d.m('mouseUp', p[0] + 150, p[1] + 90)
+      const r = await d.o('({ x1: shapes[0].x1, phu: shapes[0].phu.length, ls: SuaNet.lichSu.length })')
+      kiem('B2 keo khung Che roi doi cong cu truoc khi tha: van ghi la da roi cho cu', r.x1 > 150 && r.phu === 0, JSON.stringify(r))
+      w.destroy()
+    }
     { // B5 + B2
       const w = await moManChup(), d = dieuKhien(w)
       const r = await d.o(`(() => {
@@ -257,13 +280,22 @@ app.whenReady().then(async () => {
         hoanTac()
         const b5b = shapes.length
         SuaNet.lamLai()
+        if (shapes.length < 2) return { b5, b5b, b5c: -1 }
+        const a0 = shapes[0], a1 = shapes[1]
+        shapes.splice(1, 1); SuaNet.ghi({ k: 'xoa', s: a1, idx: 1, nhom: 'bo1' })
+        shapes.splice(0, 1); SuaNet.ghi({ k: 'xoa', s: a0, idx: 0, nhom: 'bo2' })
+        hoanTac()
+        const b5c = shapes.length
+        hoanTac()
+        if (!shapes[0]) return { b5, b5b, b5c }
         const s0 = shapes[0], t = SuaNet.sao(s0); s0.x1 += 300; s0.x2 += 300; SuaNet.ghiSua(s0, t)
         const b2 = CheTM.daChe(shapes, { phu: ['a'] })
         hoanTac()
         const b2b = CheTM.daChe(shapes, { phu: ['a'] })
-        return { b5, b5b, b2, b2b }
+        return { b5, b5b, b5c, b2, b2b }
       })()`)
       kiem('B5 xoa mot khung che roi Ctrl+Z: tra dung khung do, khong go ca nhom', r.b5 === 2 && r.b5b === 0, JSON.stringify(r))
+      kiem('B5 bo che hai lan rieng: Ctrl+Z tra tung lan, khong tra ca hai', r.b5c === 1, JSON.stringify(r))
       kiem('B2 keo khung che ra cho khac: chu cu khong con tinh la da che; Ctrl+Z thi tinh lai', r.b2 === false && r.b2b === true, JSON.stringify(r))
       w.destroy()
     }
@@ -294,7 +326,7 @@ app.whenReady().then(async () => {
       await d.phim('1'); await cho(200)
       await d.o(`themNet({ type: 'blur', blurType: 'kin', che: true, phu: ['a'], color: '#000', x1: 10, y1: 10, x2: 200, y2: 100 }); redraw(); true`)
       await d.phim('C', [process.platform === 'darwin' ? 'meta' : 'control']); await cho(300)
-      kiem('B1 anh ghim dang che ma Ctrl+C: luu net vao anh TRUOC roi moi chep', thuTu.join(',') === 'luu,chep', thuTu.join(','))
+      kiem('B1 anh ghim dang che ma Ctrl+C: chep CHINH anh da ve, khong chep anh trong bo nho', thuTu.join(',') === 'luu-kem-chep', thuTu.join(','))
       pin.destroy()
     }
   } catch (e) {

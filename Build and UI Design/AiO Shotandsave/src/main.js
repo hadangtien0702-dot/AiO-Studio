@@ -1122,7 +1122,7 @@ function kickGrab() {
       if (cu()) { ghiLog('luong: khung cua luot cu ve sau khi luot moi da bat dau: bo qua'); return list }
       if (!list.length) {
         ghiLog('LUONG: khong ra khung -> roi ve grab cu')
-        return grabDisplaysList().then((l2) => { phatFrozen(l2, _tg, 'grab'); return l2 })
+        return grabDisplaysList().then((l2) => { if (!cu()) phatFrozen(l2, _tg, 'grab'); return l2 })
       }
       if (!daPhat) { phatFrozen(list, _tg, 'luong'); return list }
       // Raw da ve: dien image cho overlay + rawStore (frozen key da phat)
@@ -1775,6 +1775,7 @@ async function handleConfirm(wcId, payload) {
   closeOverlay()
   if (!display) { boLuotChup('khong con ban ghi cua man chup ' + wcId + ' (lenh Xong thu hai sau khi man chup da dong?)', true); return }
   if (!payload) { boLuotChup('khong co du lieu vung chon'); return }
+  if (payload.khongCoNen) { boLuotChup('co net ve ma khong co anh nen'); return }
   if (payload.thieuMan) baoNguoiDung(T('app.thieuMan')) // vung vat nhieu man ma mot man khong co anh: chi con phan man nay
 
   // 28/09: dang bat Multi-Shot Storyboard (nut/phim S tren khung chon) -> QUAY 3 GIAY vung nay thay vi chup 1 tam.
@@ -2040,12 +2041,13 @@ ipcMain.handle('pin:ocr-tu', async (e) => {
     return { ok: false, loi: err.message }
   }
 })
-ipcMain.on('pin:save-edit', (e, dataUrl) => {
+ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
   const rec = pins.get(e.sender.id)
   if (!rec || !dataUrl) return
   let daVe = null
   try { daVe = nativeImage.createFromDataURL(dataUrl) } catch (err) { daVe = null }
   if (!daVe || daVe.isEmpty()) { hoanTacSuaPin(rec, 'anh ve rong'); return }
+  if (chep) clipboard.writeImage(daVe) // Ctrl+C luc dang ve: chep ban da ve ngay, ghi file ben duoi co loi thi clipboard van la ban da che
 
   // Ghi de DUNG file cu, giu dinh dang theo duoi file (.png / .jpg). GHI TRUOC — thanh cong moi doi trang thai.
   if (rec.filePath) {

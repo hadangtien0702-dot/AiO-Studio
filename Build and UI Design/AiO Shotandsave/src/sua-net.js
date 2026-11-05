@@ -34,13 +34,14 @@ const SuaNet = (() => {
     return true
   }
   /* 05/11: shape co `nhom` (Che thong minh: "Tu che", "Che moi cho trung") = MOT buoc Hoan tac / Lam lai cho ca nhom. */
-  /* Chi gop cac op CUNG LOAI: xoa mot khung trong nhom roi Ctrl+Z la tra dung khung do, khong go ca nhom da them truoc do. */
-  const cungNhom = (op, nhom, k) => !!op && !!op.s && op.s.nhom === nhom && op.k === k
+  /* Nhom la cua MOT thao tac: "them" gop theo nhom cua lan them; xoa / sua chi gop khi chinh op do mang nhom (mot lan bam bo che).
+     Xoa mot khung trong nhom roi Ctrl+Z la tra dung khung do, khong go ca nhom da them truoc do. */
+  const nhomCua = (op) => (op && (op.nhom || (op.k === 'them' && op.s && op.s.nhom))) || null
   function hoanTac() {
     const op = luiMot()
     if (!op) return false
-    const nhom = op.s && op.s.nhom
-    if (nhom) while (cungNhom(lichSu[lichSu.length - 1], nhom, op.k)) luiMot()
+    const nhom = nhomCua(op)
+    if (nhom) while (nhomCua(lichSu[lichSu.length - 1]) === nhom) luiMot()
     capNhat()
     return true
   }
@@ -60,8 +61,8 @@ const SuaNet = (() => {
   function lamLai() {
     const op = toiMot()
     if (!op) return false
-    const nhom = op.s && op.s.nhom
-    if (nhom) while (cungNhom(redo[redo.length - 1], nhom, op.k)) toiMot()
+    const nhom = nhomCua(op)
+    if (nhom) while (nhomCua(redo[redo.length - 1]) === nhom) toiMot()
     capNhat()
     return true
   }

@@ -89,10 +89,10 @@ window.addEventListener('mouseup', () => {
 })
 
 /* --- Nut --- */
-/* 05/11 soat: dang ve / che ma sao chep thi clipboard nhan anh GOC chua che. Luu net vao anh truoc; hai lenh di cung mot
-   kenh, main xu ly dung thu tu nen pin:copy lay anh da ve. */
+/* 05/11 soat: dang ve / che ma sao chep thi clipboard nhan anh GOC chua che. Gui anh da ghep kem lenh chep: main chep CHINH anh do,
+   ghi file loi van chep dung ban da che. Ghep loi thi khong chep gi, con hon chep anh chua che. */
 function chepAnh() {
-  if (mode === 've' && shapes.length) luuVe()
+  if (mode === 've' && shapes.length) { luuVe(true); return }
   window.pin.copy()
 }
 btnCopy.addEventListener('click', chepAnh)
@@ -350,6 +350,9 @@ function chonMau(mau) {
 }
 
 function chonCongCu(x) {
+  // Doi cong cu giua luc keo: ghi cu keo vao lich su NGAY, truoc khi bo chon (khong thi khung Che bi keo di van tinh la dang che)
+  if (suaDangKeo) { SuaNet.xong(suaDangKeo); suaDangKeo = null }
+  if (dangKeoShape) { dangKeoShape = false; if (selectedShape && shapeBanDau) SuaNet.ghiSua(selectedShape, shapeBanDau); shapeBanDau = null }
   if (x !== tool) chotOGoChu()
   if (cheTM && cheTM.dangMo()) cheTM.dong()
   tool = x
@@ -853,7 +856,7 @@ toolbarEl.addEventListener('click', (e) => {
 
 /* Luu: ghep anh goc (do phan giai THAT cua anh) + shape phong theo ty le,
    hien ngay tren cua so ghim + gui main ghi de file + cap nhat khay. */
-function luuVe() {
+function luuVe(chep) {
   chotOGoChu()
   if (!shapes.length) { thoatVe(); return }
   try {
@@ -869,7 +872,7 @@ function luuVe() {
     for (const s of shapes) veShape(ctx, s, k)
     const dataUrl = out.toDataURL('image/png')
     img.src = dataUrl            // cua so ghim hien ban da ve ngay
-    window.pin.saveEdit(dataUrl) // main: ghi de file + cap nhat thumbnail khay
+    window.pin.saveEdit(dataUrl, chep === true) // main: ghi de file + cap nhat thumbnail khay
   } catch (err) { /* ghep loi thi giu nguyen anh cu */ }
   thoatVe()
 }
@@ -969,7 +972,7 @@ function chuyenChe() {
 }
 cheTM = window.CheTMUI.tao({
   goc: frame, rect: () => ({ x: 0, y: 0, w: dip.w, h: dip.h }), heSo: heSoAnh, shapes: () => shapes, veLai: () => redraw(),
-  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx }) }, doc: () => window.pin.ocrTu(), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
+  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx, nhom: x.nhom }) }, doc: () => window.pin.ocrTu(), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
   nut: document.getElementById('che-muc'),
 })
 cheMenu = window.CheTMUI.ganMenuXo({

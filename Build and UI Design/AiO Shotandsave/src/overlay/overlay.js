@@ -855,6 +855,9 @@ function datViTriThanhCongCu() {
 }
 
 function chonCongCu(x) {
+  // Doi cong cu giua luc keo: ghi cu keo vao lich su NGAY, truoc khi bo chon (khong thi khung Che bi keo di van tinh la dang che)
+  if (suaDangKeo) { SuaNet.xong(suaDangKeo); suaDangKeo = null }
+  if (dangKeoShape) { dangKeoShape = false; if (selectedShape && shapeBanDau) SuaNet.ghiSua(selectedShape, shapeBanDau); shapeBanDau = null }
   if (x !== tool) { chotOGoChu(); doDon() }
   if (cheTM && cheTM.dangMo()) cheTM.dong()
   tool = x
@@ -1021,6 +1024,7 @@ function batDauVe(e) {
 
 /* Bo vung chon + shape dang co, quay ve che do quet vung — bat dau keo ngay. */
 function chonLaiTuDau(e) {
+  clearTimeout(choNenHen); choNenHen = null; hetChoNen = false // dang cho nen ma chon lai: khong duoc tu luu khung cu
   huyOGoChu()
   doDon()
   selectedShape = null
@@ -1530,10 +1534,10 @@ function xong(copy) {
   redraw()
   if (!shapes.length) { window.overlay.confirm({ rect: curRect, copy: !!copy }); return }
   /* 05/11 soat: bam Xong truoc khi anh nen ve thi anh luu ra CHI CON NET VE, mat noi dung man hinh.
-     Cho toi 3 giay; van khong co thi cat thuong (main cho grab, khong co anh thi bao): mat net ve con hon mat anh. */
+     Cho toi 3 giay; van khong co thi BO luot chup va bao: cat thuong se mat net ve, ma net Che mat la lo dung thu nguoi dung vua che. */
   if (choNenHen) return
   if (!coNenGhep()) {
-    if (hetChoNen) { hetChoNen = false; window.overlay.log('xong: het cho anh nen, cat thuong'); window.overlay.confirm({ rect: curRect, copy: !!copy }); return }
+    if (hetChoNen) { hetChoNen = false; window.overlay.log('xong: het cho anh nen, bo luot chup'); window.overlay.confirm({ khongCoNen: true }); return }
     let n = 0
     const thu = () => {
       choNenHen = null
@@ -1563,9 +1567,9 @@ function xong(copy) {
           curRect.x * DPR, curRect.y * DPR, curRect.w * DPR, curRect.h * DPR,
           0, 0, out.width, out.height)
         ghepVaGui(null, 'jpeg-du-phong(' + ly + ')')
-      } else window.overlay.confirm({ rect: curRect, copy: !!copy }) // khong co nen thi khong ghep: cat thuong, dung luu anh chi co net ve
+      } else window.overlay.confirm({ khongCoNen: true }) // khong co nen: khong luu anh chi co net ve, cung khong cat bo net
     } catch (err) {
-      window.overlay.confirm({ rect: curRect, copy: !!copy }) // ghep loi thi cat thuong
+      window.overlay.confirm({ khongCoNen: true }) // ghep loi: cat thuong se mat net ve (ke ca net Che), nen bo luot va bao
     }
   }
   const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
@@ -2205,7 +2209,7 @@ function chuyenChe() {
 }
 cheTM = window.CheTMUI.tao({
   goc: document.body, rect: () => curRect, heSo: () => DPR, shapes: () => shapes, veLai: () => redraw(),
-  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx }) }, doc: docChuChe, datThanh: datThanhChe, t, log: (m) => window.overlay.log(m),
+  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx, nhom: x.nhom }) }, doc: docChuChe, datThanh: datThanhChe, t, log: (m) => window.overlay.log(m),
   nut: document.getElementById('che-muc'),
 })
 // Tren man chup, muc Che thong minh nam trong menu #blur-menu (NHOM_PHU), khong can menu rieng; cheMenu chi dung o anh ghim

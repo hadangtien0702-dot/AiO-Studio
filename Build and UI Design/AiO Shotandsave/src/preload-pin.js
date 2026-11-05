@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('pin', {
   /** Keo file .png that ra app khac (Premiere/Zalo/Mess). */
   startDrag: () => ipcRenderer.send('pin:start-drag'),
   /** Da ve khung/mui ten -> ghi de file + cap nhat thumbnail khay. */
-  saveEdit: (dataUrl) => ipcRenderer.send('pin:save-edit', dataUrl),
+  saveEdit: (dataUrl, chep) => ipcRenderer.send('pin:save-edit', dataUrl, chep),
   setOpacity: (v) => ipcRenderer.send('pin:opacity', v),
   /** 05/11 Che thong minh: doc chu CA ANH ghim kem toa do tung tu / dong (pixel anh that). */
   ocrTu: () => ipcRenderer.invoke('pin:ocr-tu'),
