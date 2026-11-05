@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiO Studio · 3 mẫu panel tổng</title>
+<!-- NHÁP 04/10/2026. Anh Tiến: "toàn bộ đều xấu" (nháp thẻ áp phích) rồi "em tạo cho anh vài mẫu để anh chọn đi".
+     Ba mẫu KHÁC Ý (không phải ba màu của một kiểu), cùng 12 tool thật, cùng bề rộng panel 664 px, rê chuột là chạy.
+     A · Timeline: 12 tool là 12 clip trên 4 track, đầu đọc chạy theo chuột, "màn hình" phía trên nói tool làm gì.
+     B · Bảng số: chữ to, đánh số 01–12, rê chuột thì màu của tool quét qua cả hàng.
+     C · Bàn pad: 12 pad phát sáng như bàn pad làm nhạc, có phím tắt thật (1 2 3 4 · Q W E R · A S D F).
+     KHÔNG nằm trong bản cài. Chỉ dùng CSS mà Chromium 99 của CEP có. -->
+<style>
+:root { --bg:#141210; --surface:#1f1b18; --line:#2e2925; --line-strong:#3b352f; --ink:#f6f1ec; --ink-2:#cfc6bd; --ink-3:#a89e94; --brand:#F86820;
+  --ease:cubic-bezier(.2,.8,.2,1); --font:'Inter var','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a09; color: var(--ink); font: 13px/1.45 var(--font); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+.trang { max-width: 688px; margin: 0 auto; padding: 16px 12px 40px; }
+.loi { margin: 0 0 18px; font-size: 12px; color: var(--ink-3); }
+.mau { margin: 0 0 30px; }
+.mau h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+.mau h2 b { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 7px; background: var(--brand); color: #fff; font-size: 13px; }
+.mau h2 span { font-size: 11.5px; font-weight: 400; color: var(--ink-3); }
+.pn { width: 100%; border-radius: 10px; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line-strong), 0 24px 50px -30px #000; }
+.pn-tab { height: 26px; padding: 0 10px; background: #1b1b1b; border-bottom: 1px solid #000; font-size: 11.5px; line-height: 26px; color: #b9b9b9; }
+
+/* ════ A · TIMELINE ════ */
+.a-mon { display: flex; align-items: center; gap: 14px; padding: 16px 16px 14px; }
+.a-o { flex: none; display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 13px; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,0) 60%), var(--c); box-shadow: 0 10px 22px -10px var(--c); transition: background-color .25s, box-shadow .25s; }
+.a-ten { font-size: 21px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+.a-viec { margin-top: 3px; font-size: 12px; color: var(--ink-3); }
+.a-viec i { font-style: normal; font-family: var(--mono); font-size: 10.5px; color: var(--c); margin-right: 8px; }
+.a-mo { flex: none; margin-left: auto; height: 32px; padding: 0 15px; border: 0; border-radius: 99px; background: var(--brand); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
+.a-tl { position: relative; padding-bottom: 10px; background: #0f0e0c; border-top: 1px solid var(--line); }
+.a-thuoc { display: flex; height: 22px; margin-left: 52px; overflow: hidden; border-bottom: 1px solid var(--line); font: 10px var(--mono); color: var(--ink-3);
+  background: repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 15px) left bottom / 100% 5px no-repeat; }
+.a-thuoc span { flex: 0 0 120px; padding: 3px 0 0 5px; border-left: 1px solid var(--line-strong); }
+.a-ray { display: flex; align-items: center; height: 46px; border-bottom: 1px solid #1b1815; }
+.a-nhan { flex: 0 0 52px; font-size: 9px; font-weight: 700; letter-spacing: .09em; text-align: center; color: var(--ink-3); }
+.a-lan { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 3px; padding-right: 12px; }
+.a-clip { position: relative; flex: var(--f, 1) 1 0; min-width: 0; height: 34px; margin-left: var(--ho, 0); padding: 0 9px; border: 0; border-radius: 6px; overflow: hidden; text-align: left;
+  background: linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0) 46%), var(--c); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); color: #fff; font-size: 11px; font-weight: 700; line-height: 26px; white-space: nowrap; text-overflow: ellipsis; cursor: pointer;
+  transition: transform .18s var(--ease), filter .18s, box-shadow .18s; }
+.a-clip::after { content: ""; position: absolute; left: 0; right: 0; bottom: 3px; height: 7px; opacity: .38; background: repeating-linear-gradient(90deg, #fff 0 2px, transparent 2px 5px, #fff 5px 7px, transparent 7px 12px); -webkit-mask-image: linear-gradient(90deg, #000 0 60%, transparent); }
+.a-clip:hover, .a-clip.chon { transform: translateY(-2px); filter: brightness(1.1); box-shadow: inset 0 0 0 1.5px #fff, 0 12px 18px -12px var(--c); }
+.a-clip.sap { background: repeating-linear-gradient(135deg, #2b2724 0 6px, #231f1c 6px 12px); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.a-clip.sap::after { display: none; }
+.a-du { flex: var(--f, 1) 1 0; }
+.a-ph { position: absolute; top: 0; bottom: 10px; left: 52px; z-index: 3; width: 2px; margin-left: -1px; background: var(--brand); pointer-events: none; transition: left .28s var(--ease); }
+.a-ph::before { content: ""; position: absolute; left: -5px; top: 0; border: 6px solid transparent; border-top: 8px solid var(--brand); border-bottom: 0; }
+
+/* ════ B · BẢNG SỐ ════ */
+.b-dau { display: flex; align-items: flex-end; gap: 14px; padding: 20px 18px 14px; }
+.b-so { font-size: 52px; font-weight: 800; line-height: .82; letter-spacing: -.05em; }
+.b-chu { padding-bottom: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+.b-chu b { display: block; color: var(--ink); font-size: 14px; }
+.b-ds { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+.b-hang { display: flex; align-items: center; gap: 12px; min-width: 0; height: 58px; padding: 0 18px; border: 0; border-bottom: 1px solid var(--line); text-align: left; cursor: pointer;
+  background: linear-gradient(90deg, var(--c), var(--c)) left / 0% 100% no-repeat; transition: background-size .38s var(--ease); }
+.b-hang:nth-child(odd) { border-right: 1px solid var(--line); }
+.b-n { flex: 0 0 20px; font: 600 11px var(--mono); color: var(--ink-3); transition: color .2s; }
+.b-g { min-width: 0; transition: transform .32s var(--ease); }
+.b-ten { display: block; font-size: 17px; font-weight: 800; letter-spacing: -.025em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-viec { display: block; margin-top: 1px; font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .2s; }
+.b-cham { flex: none; margin-left: auto; width: 9px; height: 9px; border-radius: 50%; background: var(--c); transition: transform .3s var(--ease), background-color .2s; }
+.b-hang:hover, .b-hang:focus-visible { outline: 0; background-size: 100% 100%; }
+.b-hang:hover .b-n, .b-hang:hover .b-viec { color: rgba(255,255,255,.86); }
+.b-hang:hover .b-g { transform: translateX(5px); }
+.b-hang:hover .b-cham { background: #fff; transform: scale(2.2); }
+.b-hang.sap .b-ten { color: var(--ink-3); } .b-hang.sap .b-cham { background: var(--line-strong); }
+
+/* ════ C · BÀN PAD ════ */
+.c-lcd { display: flex; align-items: center; gap: 12px; margin: 14px 14px 12px; padding: 11px 14px; border-radius: 10px; background: #0a0908; box-shadow: inset 0 0 0 1px var(--line), inset 0 3px 12px rgba(0,0,0,.7);
+  font: 700 13px var(--mono); letter-spacing: .04em; color: var(--c); text-shadow: 0 0 14px var(--c); transition: color .2s; }
+.c-lcd small { font-weight: 500; font-size: 11.5px; letter-spacing: 0; color: var(--ink-3); text-shadow: none; }
+.c-pads { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; padding: 0 14px 20px; }
+.c-pad { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; height: 106px; padding: 8px 6px 0; border: 0; border-radius: 15px; color: var(--c); cursor: pointer;
+  background: radial-gradient(120% 85% at 50% 118%, var(--c) -25%, rgba(0,0,0,0) 60%), linear-gradient(180deg, #2a2521, #191613);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09), inset 0 0 0 1px #38312b, 0 6px 0 #0a0908, 0 12px 18px -8px #000; transition: transform .1s, box-shadow .15s, color .15s; }
+.c-pad svg { filter: drop-shadow(0 0 9px var(--c)); }
+.c-ten { font-size: 11px; font-weight: 700; line-height: 1.2; text-align: center; color: var(--ink); }
+.c-phim { position: absolute; left: 8px; top: 8px; padding: 1px 5px; border-radius: 5px; font: 600 10px var(--mono); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.c-pad:hover, .c-pad.sang { color: #fff; background: radial-gradient(130% 115% at 50% 112%, var(--c) 0%, rgba(0,0,0,0) 80%), linear-gradient(180deg, #2f2925, #1c1815);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px var(--c), 0 6px 0 #0a0908, 0 0 28px -6px var(--c); }
+.c-pad:active, .c-pad.nhan { transform: translateY(4px); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), inset 0 0 0 1px var(--c), 0 2px 0 #0a0908, 0 0 32px -4px var(--c); }
+.c-pad.sap { filter: saturate(.15) brightness(.72); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="trang">
+  <p class="loi">Ba mẫu cho panel tổng, cùng 12 tool, cùng bề rộng panel của anh. Rê chuột lên từng mẫu để xem nó chạy. Mẫu C còn bấm được bằng phím.</p>
+  <section class="mau"><h2><b>A</b>Timeline<span>12 tool là 12 clip trên 4 track. Rê chuột: đầu đọc chạy tới clip, phía trên nói tool đó làm gì.</span></h2>
+    <div class="pn"><div class="pn-tab">AiO Studio &nbsp;≡</div><div id="mau-a"></div></div></section>
+  <section class="mau"><h2><b>B</b>Bảng số<span>Chữ to, đánh số 01 đến 12. Rê chuột: màu của tool quét qua cả hàng.</span></h2>
+    <div class="pn"><div class="pn-tab">AiO Studio &nbsp;≡</div><div id="mau-b"></div></div></section>
+  <section class="mau"><h2><b>C</b>Bàn pad<span>12 pad phát sáng như bàn pad làm nhạc. Bấm phím ghi trên pad cũng ăn.</span></h2>
+    <div class="pn"><div class="pn-tab">AiO Studio &nbsp;≡</div><div id="mau-c"></div></div></section>
+</div>
+<script>
+(function () {
+  var P = {
+    scissors: '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+    captions: '<rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/>',
+    messages: '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>',
+    mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
+    crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
+    frame: '<line x1="22" x2="2" y1="6" y2="6"/><line x1="22" x2="2" y1="18" y2="18"/><line x1="6" x2="6" y1="2" y2="22"/><line x1="18" x2="18" y1="2" y2="22"/>',
+    layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+    backpack: '<path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M8 10h8"/><path d="M8 18h8"/><path d="M8 22v-6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+    music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+    folders: '<path d="M20 17a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3.9a2 2 0 0 1-1.69-.9l-.81-1.2a2 2 0 0 0-1.67-.9H8a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2Z"/><path d="M2 8v11a2 2 0 0 0 2 2h14"/>'
+  };
+  function ic(ten, s, w) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + P[ten] + '</svg>'; }
+  var T = [
+    { ten: 'Autocut', icon: 'scissors', c: '#f86820', viec: 'Cắt khoảng lặng', nhom: 'Dựng & cắt' },
+    { ten: 'Auto Podcast', icon: 'mic', c: '#2563eb', viec: 'Cắt theo người đang nói', nhom: 'Dựng & cắt' },
+    { ten: 'Auto Short Viral', icon: 'messages', c: '#059669', viec: 'Chia hỏi–đáp thành short', nhom: 'Dựng & cắt' },
+    { ten: 'Auto Re-Frames', icon: 'crop', c: '#7c3aed', viec: 'Dựng dọc 9:16 bám chủ thể', nhom: 'Dựng & cắt' },
+    { ten: 'Transcripts', icon: 'captions', c: '#0284c7', viec: 'Làm phụ đề từ giọng nói', nhom: 'Chữ & khung hình' },
+    { ten: 'Auto Guideline Frame', icon: 'frame', c: '#d97706', viec: 'Đặt vùng an toàn mạng xã hội', nhom: 'Chữ & khung hình' },
+    { ten: 'Asset Manager', icon: 'layers', c: '#db2777', viec: 'Kho nhạc, logo, hiệu ứng', nhom: 'Tài nguyên' },
+    { ten: 'Power Bins', icon: 'backpack', c: '#0d9488', viec: 'Brand kit hiện ở mọi project', nhom: 'Tài nguyên' },
+    { ten: 'Video Download', icon: 'download', c: '#4f46e5', viec: 'Tải video từ link vào bin', nhom: 'Tài nguyên' },
+    { ten: 'Music & SFX', icon: 'music', c: '#c026d3', viec: 'Nhạc nền và hiệu ứng âm thanh', nhom: 'Tài nguyên' },
+    { ten: 'Shot & Save', icon: 'camera', c: '#65a30d', viec: 'Chụp màn hình, ghim, vẽ (app riêng)', nhom: 'Khác' },
+    { ten: 'Auto Organize Folder', icon: 'folders', c: '#6b6460', viec: 'Tự xếp thư mục dự án (sắp có)', nhom: 'Khác', sap: true }
+  ];
+  var so = function (i) { return (i < 9 ? '0' : '') + (i + 1); };
+
+  // ── A · Timeline ──
+  var RAY = [
+    { nhan: 'CẮT', clip: [[0, 1], [1, 1.25], [2, 1.5], [3, 1.4]] },
+    { nhan: 'CHỮ', clip: [[4, 1.1, 54], [5, 1.9]], du: 1.6 },
+    { nhan: 'KHO', clip: [[6, 1.3], [7, 1], [8, 1.4, 24], [9, 1.2]] },
+    { nhan: 'KHÁC', clip: [[10, 1.1, 148], [11, 1.8]], du: 0.9 }
+  ];
+  var a = document.getElementById('mau-a');
+  a.innerHTML = '<div class="a-mon"><span class="a-o" id="a-o"></span><div><div class="a-ten" id="a-ten"></div><div class="a-viec" id="a-viec"></div></div><button type="button" class="a-mo">Mở tool</button></div>' +
+    '<div class="a-tl" id="a-tl"><div class="a-thuoc"><span>00:00</span><span>00:10</span><span>00:20</span><span>00:30</span><span>00:40</span><span>00:50</span></div>' +
+    RAY.map(function (r) {
+      return '<div class="a-ray"><span class="a-nhan">' + r.nhan + '</span><div class="a-lan">' + r.clip.map(function (k) {
+        var t = T[k[0]];
+        return '<button type="button" class="a-clip' + (t.sap ? ' sap' : '') + '" data-i="' + k[0] + '" style="--c:' + t.c + ';--f:' + k[1] + (k[2] ? ';--ho:' + k[2] + 'px' : '') + '">' + t.ten + '</button>';
+      }).join('') + (r.du ? '<span class="a-du" style="--f:' + r.du + '"></span>' : '') + '</div></div>';
+    }).join('') + '<i class="a-ph" id="a-ph"></i></div>';
+  function chonA(el) {
+    var t = T[Number(el.getAttribute('data-i'))], tl = document.getElementById('a-tl');
+    Array.prototype.forEach.call(a.querySelectorAll('.a-clip'), function (x) { x.classList.toggle('chon', x === el); });
+    var o = document.getElementById('a-o'); o.style.setProperty('--c', t.c); o.innerHTML = ic(t.icon, 22, 2.1);
+    document.getElementById('a-ten').textContent = t.ten;
+    document.getElementById('a-viec').innerHTML = '<i style="--c:' + t.c + '">' + so(T.indexOf(t)) + ' · ' + t.nhom.toUpperCase() + '</i>' + t.viec;
+    document.getElementById('a-ph').style.left = (el.getBoundingClientRect().left - tl.getBoundingClientRect().left + 1) + 'px';
+  }
+  Array.prototype.forEach.call(a.querySelectorAll('.a-clip'), function (el) { el.addEventListener('mouseenter', function () { chonA(el); }); el.addEventListener('focus', function () { chonA(el); }); });
+  chonA(a.querySelector('.a-clip'));
+
+  // ── B · Bảng số ──
+  document.getElementById('mau-b').innerHTML = '<div class="b-dau"><span class="b-so">12</span><span class="b-chu"><b>công cụ cho người dựng phim</b>Chọn một cái. Nó mở ngay trong panel này.</span></div><div class="b-ds">' +
+    T.map(function (t, i) {
+      return '<button type="button" class="b-hang' + (t.sap ? ' sap' : '') + '" style="--c:' + t.c + '"><span class="b-n">' + so(i) + '</span><span class="b-g"><span class="b-ten">' + t.ten + '</span><span class="b-viec">' + t.viec + '</span></span><i class="b-cham"></i></button>';
+    }).join('') + '</div>';
+
+  // ── C · Bàn pad ──
+  var PHIM = ['1', '2', '3', '4', 'Q', 'W', 'E', 'R', 'A', 'S', 'D', 'F'];
+  var c = document.getElementById('mau-c');
+  c.innerHTML = '<div class="c-lcd" id="c-lcd" style="--c:#F86820"><span id="c-l1">AIO STUDIO</span><small id="c-l2">12 công cụ. Bấm pad hoặc bấm phím ghi trên pad.</small></div><div class="c-pads">' +
+    T.map(function (t, i) {
+      return '<button type="button" class="c-pad' + (t.sap ? ' sap' : '') + '" data-i="' + i + '" style="--c:' + t.c + '"><span class="c-phim">' + PHIM[i] + '</span>' + ic(t.icon, 26, 2) + '<span class="c-ten">' + t.ten + '</span></button>';
+    }).join('') + '</div>';
+  function denC(el, nhan) {
+    var t = T[Number(el.getAttribute('data-i'))];
+    document.getElementById('c-lcd').style.setProperty('--c', t.c);
+    document.getElementById('c-l1').textContent = t.ten.toUpperCase();
+    document.getElementById('c-l2').textContent = t.viec;
+    if (nhan) { el.classList.add('sang', 'nhan'); setTimeout(function () { el.classList.remove('nhan'); }, 150); setTimeout(function () { el.classList.remove('sang'); }, 700); }
+  }
+  Array.prototype.forEach.call(c.querySelectorAll('.c-pad'), function (el) { el.addEventListener('mouseenter', function () { denC(el, false); }); });
+  window.addEventListener('keydown', function (e) {
+    var k = PHIM.indexOf(String(e.key).toUpperCase());
+    if (k >= 0 && !e.metaKey && !e.ctrlKey) denC(c.querySelectorAll('.c-pad')[k], true);
+  });
+})();
+</script>
+</body>
+</html>

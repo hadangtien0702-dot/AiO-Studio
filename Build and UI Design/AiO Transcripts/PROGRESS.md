@@ -1,6 +1,27 @@
 # AiO Transcript - Nhat ky
 
-## TRANG THAI HIEN TAI (cap nhat 2026-08-24 23:25 +0700)
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Lam phu de clip 55 s (8 cau doc may): 9 cau, 66,5 s tong (nghe 40,9 s), file .srt dung thoi gian + noi dung, 2 marker co do dung cho nghe khong chac ("hot" <- "hut").
+
+## [mac-toc-do] - 2026-09-30 20:27 (UTC+7) - Mac: whisper nhanh gap 14 lan trong Premiere (so luong luong + CPU tren chip Intel)
+
+- **Boi canh:** anh: *"co cach nao lam cho auto cut nhanh hon duoc khong em"*, *"anh muon chay nhanh - chinh xac hon cho ban mac"*.
+- **Do (Premiere Pro Beta 26.5, Mac i9-9980HK 8 nhan that/16 luong + Radeon Pro 5500M, turbo, clip thu tieng Viet):**
+  Autocut 55 s CU chay 360,2 s (whisper 347,9 s). Cung lenh whisper NGOAI Premiere chi 25,6 s -> goc khong phai whisper.
+  Goi tu trong Premiere, cau 14 s, CPU: 6 luong 12,0 s · 8 luong 14,6 s · 9 luong 54,3 s · 10 luong 78,0 s · 11 luong ~100 s.
+  Vuot so nhan that la cac luong cua ggml cho nhau (Premiere cung gianh CPU). Khong phai App Nap (dua Premiere len truoc: van 102 s),
+  khong phai co nen (`taskpolicy -B`: 97 s). GPU Metal tren chip Intel CHAM hon CPU: ngoai Premiere 18,7 s vs 11,4 s, chu ra y het.
+- **Da sua (`services/whisper.ts`, chi nhanh Mac):** `chiChayCpu()` them `-ng` khi Mac + `os.arch()` = x64 (chip M giu GPU);
+  `soLuongWhisper()` = `hw.physicalcpu` - 2 (toi thieu 2, khong vuot soLuongCpu()). Windows: mang rong + soLuongCpu() nhu cu.
+- **Sau khi sua, do trong Premiere:** Autocut 55 s (file moi, khong dung bo dem) 51,1 s, whisper 24,9 s (`-t 6 -ng`),
+  ket qua giong het ban cu: 8 nhat cat, rut 15,2 s.
+- **Chinh xac (ngoai Premiere, 6 luong, CPU, 55 s, so voi kich ban goc):** turbo 25,5 s WER 3,2% · large-v3 78,4 s WER 2,4%.
+  Da tai ca hai mo hinh vao `~/Library/Application Support/AiO-Studio/whisper/models/`.
+- **Chua kiem:** Mac chip M; video that dai (chi do tieng doc may); may Windows (nhanh Windows khong doi ma).
+
+## TRANG THAI HIEN TAI (cap nhat 2026-09-30 19:27 +0700)
 
 - **Ban dang chay: 2.5.5** — da cai tren may anh Tien, da dong goi
   `Release/2026-08-24-transcript-2.5.5/` (bo cai 92,5 MB KHONG day len git — luat
@@ -18,7 +39,70 @@
 3. [CHO] Autocut chua va `ac_getRangeClips` (dem clip caption MOGRT nhu clip video
    -> tu choi chay tren sequence co caption AiO). Dung stop: Autocut DONG BANG,
    phai hoi anh Tien truoc khi sua.
+4. [CHO] **macOS (30/09):** ma nguon da co nhanh Mac, build + tu kiem + chay that
+   ffmpeg/whisper trong Node DAT, nhung **chua kiem trong Premiere tren Mac**.
+   Xem muc "Mac port" ngay duoi.
 
+
+## [Mac port, chua tang so phien ban] - 2026-09-30 19:27 (UTC+7) - Them nhanh macOS, giu nguyen Windows
+
+Boi canh: may Mac Intel (x86_64), macOS 26, Premiere Pro (Beta) 26.5. Panel truoc
+day chi chay Windows (goi `bin/win64/ffmpeg.exe`, whisper o `C:/AiO-Studio/whisper`,
+mo thu muc bang `explorer`). Luat chung cho ca 8 panel: nhan Mac bang
+`os.platform() === 'darwin'`, THEM nhanh Mac, khong viet lai nhanh Windows.
+
+### Da sua (moi nhanh Windows giu nguyen tung dong)
+- `client/src/lib/node.ts`: them `laMac()`, `thuMucAppSupportMac()`,
+  `timCongCuMac(ten, extDir)`, `conQuyenChay(file)`. Thu tu do cong cu tren Mac:
+  `<extension>/bin/mac/<ten>` -> `~/Library/Application Support/AiO-Studio/bin/mac/<ten>`
+  -> `/opt/homebrew/bin` -> `/usr/local/bin`. Luon tra duong dan tuyet doi (Node cua
+  CEP tren Mac khong co Homebrew trong PATH). Thieu bit x thi thu `chmod 755`.
+- `services/ffmpeg.ts` `getFFmpegPath()`: Mac -> `timCongCuMac('ffmpeg')` (khong duoi .exe).
+- `services/whisper.ts`: Mac -> goc `~/Library/Application Support/AiO-Studio/whisper`,
+  file chay `bin/whisper-cli` (khong co `Release`, khong `.exe`). `thieuGi()` tren Mac
+  coi la thieu du lieu khi KHONG co mo hinh nao (Mac chi cai turbo, khong co
+  large-v3); bao "khoang 1,6 GB" thay vi "3 GB" (them khoa VI/EN trong `chu.ts`).
+  Chon "Phu de cau dai" (v3) tren Mac se lui ve turbo nhu luat cu.
+- `App.tsx`: thu muc kieu rieng tren Mac = `~/Library/Application Support/AiOStudio/caption-styles`
+  (tuong duong `%APPDATA%\AiOStudio\caption-styles`); "Mo thu muc" -> `/usr/bin/open -R <file>`,
+  mo thu muc kieu rieng -> `/usr/bin/open <thu muc>` (thay `explorer`).
+- `lib/cep.ts`: loi `SRT_KHONG_DOC_DUOC` tren Mac bo cau goi y `%APPDATA%` (bay ao hoa
+  AppData chi co tren Windows).
+- `host/*.jsx`: soat, khong co duong dan Windows cung, khong `$.os`/`callSystem`/`.exe`;
+  moi duong dan da doi `\` -> `/` truoc khi dung. Khong sua.
+- `client/public/CSInterface.js`: agent cha va tap trung (getSystemPath tren Mac tra
+  `/Users/...`). Panel nay khong co cho nao tu cat `file:///`.
+
+### Kiem chung (so do)
+- `npm ci` + `npm run build` (dung lenh cua `package-release.ps1`): DAT, `dist/index.html` 495 kB.
+- `npm run kiem`: **HONG TU TRUOC** o buoc `tsc src/lib/cep.ts` (TS6142: `cep.ts` import
+  `ngonngu.tsx` ma lenh khong co `--jsx`; ban goc o HEAD hong y het). Chay lai
+  `kiem-tinh-toan.mjs` bang ban bien dich co `--jsx react-jsx` o thu muc tam: **169 [OK],
+  TAT CA DAT**.
+- `npm run kiem:caption`: 6 [OK], "tat ca dat" (4 bo du lieu that o `E:/` BO QUA - khong co tren Mac).
+- `kiem-wer.mjs` 49/49 · `kiem-ngonngu.mjs` 37/37 · `kiem-catcau.mjs` 21 [OK], 1 phan du
+  lieu that o `E:/` bo qua.
+- Kiem Mac bang chinh ma da bien dich cua panel (Node thuong, gia lap `cep_node`): **17/17 DAT**
+  - `getFFmpegPath()` = `~/Library/Application Support/AiO-Studio/bin/mac/ffmpeg`; ffprobe tim duoc;
+    extension co `bin/mac/ffmpeg` thi thang kho chung, file 644 duoc tra ve 755.
+  - `timBoMay('turbo')` = `.../whisper/bin/whisper-cli` + `ggml-large-v3-turbo.bin` (1.624.555.275 byte);
+    `timBoMay('v3')` lui ve turbo; `thieuGi()` rong.
+  - Clip thu 6,48 s (giong `say` tieng Anh + 1,5 s lang dau/cuoi): `detectSilence` 48 ms ra
+    2 khoang lang dung cho; `trichTieng` 43 ms ra WAV 207.522 byte; `locDaiGiongNoi` ra ban loc;
+    `nghe()` chay whisper-cli that voi dung tham so panel (`-l auto -mc 0 -np -pp -ojf`)
+    mat **56,6 s** (lan chay lanh), nhan `en`, 1 cau dung nguyen van, 13 tu.
+- **chua kiem**: chay trong Premiere tren Mac (nap panel, `napLaiHost`, gan caption track,
+  marker, nut "Mo thu muc", thu muc kieu rieng + `.mogrt` qua ExtendScript tren Mac);
+  toc do whisper tren video dai; cai font `fonts/` tren Mac.
+
+### Con no / bao lai
+- `ngonngu.tsx` (ban chep tu `design-system`) tren Mac suy `%APPDATA%` thanh
+  `~/AppData/Roaming` -> `ngonngu.json` nam o do. Khong sua o day (file dung chung, agent
+  cha xu ly tap trung).
+- Bo cai Mac chua co: `CAI-DAT.bat`/`package-release.ps1` chi cai font vao thu muc font
+  Windows; tren Mac can chep `fonts/*.ttf` vao `~/Library/Fonts` (khoi hieu ung dang AN).
+- `whisper.ts`/`ffmpeg.ts` dung chung ~80% voi Autocut: nhanh Mac o day CHUA chep sang Autocut.
+- Lenh `npm run kiem` hong tu truoc (TS6142) - chua sua, can them `--jsx react-jsx` vao script.
 
 ## [2.5.5] - 2026-08-24 23:17 (UTC+7) - Dong bo nut chinh CA BO AiO Studio (anh Tien khoanh 2 anh)
 

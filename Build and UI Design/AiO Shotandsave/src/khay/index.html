@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; media-src file:; img-src data: blob: file: aioshot:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save · Khay</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <!-- 01/10 GOP KHAY (anh: "phan khay minh toi uu hoa thanh 1 khay"): truoc la 2 cua so rieng (src/storyboard/index.html,
+       src/video/index.html), nay MOT cua so co 2 the. Khuon giao dien van la storyboard.css (= man Cai dat);
+       video.css + khay.css chi them phan rieng. Khay anh noi (src/shelf) KHONG doi. -->
+  <link rel="stylesheet" href="../storyboard/storyboard.css" />
+  <link rel="stylesheet" href="../video/video.css" />
+  <link rel="stylesheet" href="khay.css" />
+</head>
+<body data-tab="dai">
+  <header id="tieu-de">
+    <div class="hieu">
+      <svg class="logo" viewBox="0 0 385.89 351.31" width="18" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+        <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+      </svg>
+      <!-- Hai the = cum lua chon .chon-nhom / .chon-nut cua man Cai dat (dang chon = xam noi). So ben canh ten = so muc
+           trong the do (storyboard.js ghi #dem-dai, video.js ghi #dem-video). Thu tu = thu tu 2 nut tren Khay anh. -->
+      <div id="tab" class="chon-nhom" role="tablist">
+        <button class="chon-nut" role="tab" data-tab="dai" aria-controls="tab-dai"><span data-i18n="sb.tab">Storyboard</span><span id="dem-dai" class="tab-dem">0</span></button>
+        <button class="chon-nut" role="tab" data-tab="video" aria-controls="tab-video"><span data-i18n="vd.tab">Video</span><span id="dem-video" class="tab-dem">0</span></button>
+      </div>
+    </div>
+    <div class="dieu-khien">
+      <button id="btn-close" class="dong" data-i18n-title="sb.dong">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="viewport">
+    <!-- The Storyboard: moi dai 1 hang (storyboard.js dung the .dai). Canvas xuat anh chay AN, chi dung khi Luu / Sao chep / Keo. -->
+    <section id="tab-dai" class="tab-than" role="tabpanel">
+      <div id="ds-dai"></div>
+      <p id="trong-dai" class="trong" hidden data-i18n="sb.chuaCoDai"></p>
+    </section>
+    <!-- The Video: moi doan quay 1 hang (video.js dung the .dai.vd). Ca hang keo duoc: tha vao Premiere / Zalo / Messenger. -->
+    <section id="tab-video" class="tab-than" role="tabpanel" hidden>
+      <div id="ds-video"></div>
+      <p id="trong-video" class="trong" hidden data-i18n="vd.chuaCo"></p>
+    </section>
+  </main>
+  <canvas id="main-canvas" hidden></canvas>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="khay.js"></script>
+  <script src="../storyboard/storyboard.js"></script>
+  <script src="../video/video.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff}
+  #s{position:relative;width:528px;height:214px;background:#fff;overflow:hidden;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  #s div,#s svg,#s span{position:absolute;box-sizing:border-box}
+  .dot{top:9px;width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.2)}
+</style></head>
+<body>
+<div id="s">
+  <div id="win" style="left:34px;top:22px;width:460px;height:172px;border-radius:14px;background:#f6f6f8;box-shadow:0 10px 24px rgba(24,24,40,.16),0 1px 3px rgba(24,24,40,.12);overflow:hidden">
+    <div style="left:0;top:0;right:0;height:24px;background:rgba(0,0,0,.05)"></div>
+    <div class="dot" style="left:11px"></div><div class="dot" style="left:23px"></div><div class="dot" style="left:35px"></div>
+    <span id="tt" style="left:0;right:0;top:5px;text-align:center;font-size:11.5px;font-weight:600;color:#6e6e73"></span>
+    <span id="lb" style="left:22px;top:42px;font-size:11.5px;font-weight:600;color:#6e6e73"></span>
+    <div id="inp" style="left:22px;top:62px;width:296px;height:40px;border-radius:10px;background:#fff;border:1.5px solid #d6d6db;overflow:hidden">
+      <span id="tx" style="left:12px;top:0;line-height:37px;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:14px;font-weight:600;letter-spacing:.03em;color:#1d1d1f;white-space:nowrap"></span>
+      <div id="caret" style="top:9px;width:2px;height:19px;background:#f86820"></div>
+    </div>
+    <div id="btn" style="left:330px;top:62px;width:108px;height:40px;border-radius:10px;background:#f86820;color:#fff;font-weight:700;font-size:13px;line-height:40px;text-align:center;white-space:nowrap"></div>
+    <div id="st" style="left:22px;top:122px;width:420px;height:34px;border-radius:9px;background:#ececf0"></div>
+    <div id="sd" style="left:34px;top:135px;width:8px;height:8px;border-radius:50%;background:#a1a1a6"></div>
+    <span id="stx" style="left:52px;top:124px;line-height:30px;font-size:12.5px;font-weight:600;color:#6e6e73;white-space:nowrap"></span>
+  </div>
+  <div id="p0" style="width:7px;height:7px;border-radius:50%"></div><div id="p1" style="width:7px;height:7px;border-radius:50%"></div><div id="p2" style="width:6px;height:6px;border-radius:50%"></div><div id="p3" style="width:7px;height:7px;border-radius:50%"></div>
+  <div id="p4" style="width:6px;height:6px;border-radius:50%"></div><div id="p5" style="width:7px;height:7px;border-radius:50%"></div><div id="p6" style="width:6px;height:6px;border-radius:50%"></div><div id="p7" style="width:7px;height:7px;border-radius:50%"></div>
+  <svg id="cur" width="22" height="26" viewBox="0 0 22 26" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))"><path d="M1 1 L1 20 L6 15.5 L9.6 24 L13 22.6 L9.4 14.2 L16.5 14 Z" fill="#1d1d1f" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const E = { out: x => 1 - Math.pow(1 - x, 3), io: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2, back: x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); } };
+const lerp = (a, b, k) => a + (b - a) * k;
+const EN = location.hash === '#en';
+const TXT = EN
+  ? { tt: 'License', lb: 'Paste key', btn: 'Activate', ok: '✓ Activated', trial: 'Free trial: 14 days left', done: 'Activated · works on 2 computers' }
+  : { tt: 'Bản quyền', lb: 'Dán key', btn: 'Kích hoạt', ok: '✓ Đã kích hoạt', trial: 'Dùng thử: còn 14 ngày', done: 'Đã kích hoạt · dùng được trên 2 máy' };
+$('tt').textContent = TXT.tt; $('lb').textContent = TXT.lb;
+const KEY = 'AIOSS-7K2P-9QM4-X8TD-3WNB';
+const COL = ['#f86820', '#34c759', '#8a9bff', '#ffb36b', '#34c759', '#f86820', '#8a9bff', '#ffb36b'];
+// vị trí nút trong trang: win(34,22) + (330,62) kích thước 108x40
+const BX = 34 + 330 + 54, BY = 22 + 62 + 20;
+function render(t) {
+  // gõ mã
+  let n = KEY.length;
+  if (t >= 1.1 && t < 1.55) n = 0;
+  else if (t >= 1.55 && t < 3.0) n = Math.floor(KEY.length * E.io(seg(t, 1.55, 3.0)) + 0.0001);
+  if (t >= 1.1 && t < 1.55) { /* xoá sạch */ }
+  const kept = t >= 1.1 && t < 1.2 ? KEY.length * (1 - seg(t, 1.1, 1.2)) | 0 : n;
+  $('tx').textContent = KEY.slice(0, kept);
+  const tw = $('tx').getBoundingClientRect().width;
+  const caretOn = t >= 1.2 && t < 3.3 && (Math.floor(t * 4) % 2 === 0);
+  $('caret').style.left = (12 + tw + 1) + 'px'; $('caret').style.opacity = caretOn ? 1 : 0;
+  $('inp').style.borderColor = t >= 1.3 && t < 3.3 ? '#f86820' : '#d6d6db';
+  // nút
+  let ok = 1;     // 1 = đã kích hoạt
+  if (t >= 1.1 && t < 3.5) ok = 0;
+  else if (t >= 3.5 && t < 3.8) ok = E.out(seg(t, 3.5, 3.8));
+  const press = t >= 3.4 && t < 3.55 ? .95 : 1;
+  const btn = $('btn');
+  btn.style.background = ok > .5 ? '#34c759' : '#f86820';
+  btn.textContent = ok > .5 ? TXT.ok : TXT.btn;
+  btn.style.transform = 'scale(' + (press * (t >= 3.55 && t < 3.9 ? 1 + .06 * Math.sin(seg(t, 3.55, 3.9) * Math.PI) : 1)) + ')';
+  // dòng trạng thái
+  const done = ok > .5 && t >= 3.7 || t < 1.1;
+  $('st').style.background = done ? '#e6f7ec' : '#ececf0';
+  $('sd').style.background = done ? '#34c759' : '#a1a1a6';
+  $('stx').style.color = done ? '#1f7a3d' : '#6e6e73';
+  $('stx').textContent = done ? TXT.done : TXT.trial;
+  // con trỏ: từ ô nhập xuống nút
+  const cur = $('cur');
+  let cx = 300, cy = 160, ca = 0;
+  if (t >= 2.9 && t < 4.4) {
+    const k = E.io(seg(t, 2.9, 3.4));
+    cx = lerp(300, BX + 6, k); cy = lerp(108, BY + 6, k);
+    ca = t < 3.05 ? seg(t, 2.9, 3.05) : (t > 4.1 ? 1 - seg(t, 4.1, 4.4) : 1);
+  }
+  cur.style.left = cx + 'px'; cur.style.top = cy + 'px'; cur.style.opacity = ca;
+  // pháo giấy nhỏ quanh nút
+  for (let i = 0; i < 8; i++) {
+    const e = $('p' + i);
+    if (t >= 3.55 && t < 4.25) {
+      const k = E.out(seg(t, 3.55, 4.25)), a = i / 8 * Math.PI * 2 + .3, r = 20 + 34 * k + (i % 2) * 10;
+      e.style.left = (BX + Math.cos(a) * r * 1.5 - 3) + 'px'; e.style.top = (BY + Math.sin(a) * r * .8 - 3) + 'px';
+      e.style.background = COL[i]; e.style.opacity = 1 - seg(t, 3.85, 4.25);
+    } else e.style.opacity = 0;
+  }
+}
+render(0);
+</script>
+</body></html>

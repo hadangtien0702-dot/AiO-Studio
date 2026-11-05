@@ -1,5 +1,104 @@
 # AiO Auto Short Viral - Nhat ky
 
+## [mac-premiere] - 2026-09-30 21:05 (UTC+7) - DO TRONG PREMIERE TREN MAC
+
+- Premiere Pro Beta 26.5, Mac i9 Intel + Radeon Pro 5500M, project thu Untitled.prproj, do qua cong go loi (CDP).
+- Doc noi dung clip 55 s: 2 s (dung lai bo dem nghe cua Transcripts), 3 khoi (Mo dau / Q1 / Q2; cau hoi 3 bi gop vao Q2). Tao 3 sequence: 9 s, dai 7,0 / 14,6 / 31,5 s.
+- **Loi Premiere tren Mac (CHUA ro goc, khong phai ma AiO):** 3 lan ExtendScript ngung tra loi (evalScript het gio). `sample` Premiere: luong chinh ket trong `-[PlugPlugHtmlView drawRect:]` -> `CAMetalLayer nextDrawable` (~95% mau), luong ExtendScript cho luong chinh (`CallFunctionOnUIThread_Synchronous`). 2/2 lan dong cua so Short Viral la het ket ngay; 1 lan xay ra sau khi nap lai 3 panel. Cach thoat: dong bot panel noi, hoac tat mo lai Premiere.
+
+## [mac-toc-do] - 2026-09-30 20:27 (UTC+7) - Mac: whisper nhanh gap 14 lan trong Premiere (so luong luong + CPU tren chip Intel)
+
+- **Boi canh:** anh: *"co cach nao lam cho auto cut nhanh hon duoc khong em"*, *"anh muon chay nhanh - chinh xac hon cho ban mac"*.
+- **Do (Premiere Pro Beta 26.5, Mac i9-9980HK 8 nhan that/16 luong + Radeon Pro 5500M, turbo, clip thu tieng Viet):**
+  Autocut 55 s CU chay 360,2 s (whisper 347,9 s). Cung lenh whisper NGOAI Premiere chi 25,6 s -> goc khong phai whisper.
+  Goi tu trong Premiere, cau 14 s, CPU: 6 luong 12,0 s · 8 luong 14,6 s · 9 luong 54,3 s · 10 luong 78,0 s · 11 luong ~100 s.
+  Vuot so nhan that la cac luong cua ggml cho nhau (Premiere cung gianh CPU). Khong phai App Nap (dua Premiere len truoc: van 102 s),
+  khong phai co nen (`taskpolicy -B`: 97 s). GPU Metal tren chip Intel CHAM hon CPU: ngoai Premiere 18,7 s vs 11,4 s, chu ra y het.
+- **Da sua (`services/whisper.ts`, chi nhanh Mac):** `chiChayCpu()` them `-ng` khi Mac + `os.arch()` = x64 (chip M giu GPU);
+  `soLuongWhisper()` = `hw.physicalcpu` - 2 (toi thieu 2, khong vuot soLuongCpu()). Windows: mang rong + soLuongCpu() nhu cu.
+- **Sau khi sua, do trong Premiere:** Autocut 55 s (file moi, khong dung bo dem) 51,1 s, whisper 24,9 s (`-t 6 -ng`),
+  ket qua giong het ban cu: 8 nhat cat, rut 15,2 s.
+- **Chinh xac (ngoai Premiere, 6 luong, CPU, 55 s, so voi kich ban goc):** turbo 25,5 s WER 3,2% · large-v3 78,4 s WER 2,4%.
+  Da tai ca hai mo hinh vao `~/Library/Application Support/AiO-Studio/whisper/models/`.
+- **Chua kiem:** Mac chip M; video that dai (chi do tieng doc may); may Windows (nhanh Windows khong doi ma).
+
+## [0.1.2-mac] - 2026-09-30 19:25 (UTC+7) - THEM NHANH macOS (ffmpeg, whisper, phim Cmd). Nhanh Windows giu nguyen. CHUA CAI, CHUA KIEM TRONG PREMIERE MAC
+
+### Trang thai hien tai
+- Ma nguon co nhanh Mac; `npm run build` sach tren Mac (Intel, macOS 26): dist 569,62 kB,
+  kiem-phien-ban 5/5, kiem-byte sach. KHONG bump phien ban (van 0.1.2).
+- Chua cai vao `~/Library/Application Support/Adobe/CEP/extensions` (viec cua nguoi
+  cai), **chua kiem trong Premiere tren Mac**.
+
+### Boi canh
+Luat "phai chay Win + Mac" (31/08) chua dat (muc [CHO] cua 0.1.2). Bo AiO Studio chot
+quy uoc Mac chung cho 8 panel: tim cong cu theo thu tu `<ext>/bin/mac/<ten>` ->
+`~/Library/Application Support/AiO-Studio/bin/mac/<ten>` -> `/opt/homebrew/bin` ->
+`/usr/local/bin`; whisper o `~/Library/Application Support/AiO-Studio/whisper`
+(`bin/whisper-cli`, `models/`).
+
+### Kiem ke cho chi chay Windows (grep client/src, host, CSXS)
+- `services/ffmpeg.ts` `getFFmpegPath`: chi do `bin/win64/ffmpeg.exe` + `%APPDATA%` -> SUA.
+- `services/whisper.ts` `NOI_DE = C:/AiO-Studio/whisper`, `bin/Release/whisper-cli.exe`
+  (o `timBoMay` va `thieuGi`) -> SUA.
+- Chu phim `Ctrl+Z` (tooltip Hoan tac + dong phim tat, App.tsx) va `Ctrl+C` (loi chep,
+  luuRa.ts) -> tren Mac hien `Cmd+Z` / `Cmd+C`. Bo bat phim da nhan ca `metaKey` tu truoc.
+- `ffmpeg.ts` `gietCay`: `taskkill` chi goi khi win32, con lai `kill('SIGKILL')` - da dung
+  cho Mac tu truoc, khong sua. `windowsHide` vo hai tren Mac.
+- 3 file `.ps1` (`do-tren-panel`, `package-release`, `sign-install`) chi la script
+  build / cai / do qua CDP, KHONG chay luc panel chay -> khong port o day.
+- `ffprobe` KHONG duoc panel goi luc chay (chi ffmpeg + whisper-cli).
+- host `*.jsx`: khong co `$.os`, `.exe`, `callSystem`, `Folder`; `sv__chuan` ha chu
+  thuong khi so duong dan - APFS mac dinh khong phan biet hoa thuong nen van dung.
+- `lib/cep.ts` `extensionPath`/`napLaiHost`: khong tu cat `file:///`, chi doi `\` -> `/`
+  -> dung tren Mac sau khi CSInterface.js chung da sua (tra `/Users/...`).
+- `ngonngu.tsx` (ban chep tu design-system): duong lui cuoi suy `AppData\Roaming` tu thu
+  muc nha - file dung chung, em KHONG sua; ban trong panel da duoc sua tap trung (Mac ->
+  `~/Library/Application Support/AiOStudio/ngonngu.json`), build 30/09 da gom ban do.
+- Con lai giu nguyen, vo hai tren Mac: `DAI_DUONG_TOI_DA = 240` (gioi han Windows),
+  loc ky tu cam ten file kieu Windows, file xuat CRLF + BOM.
+
+### Da sua
+- `lib/node.ts`: them `laMac()` - doc `platform` qua `cep_node.process` (khong viet
+  `process.` cho Vite thay), khong co Node thi hoi `navigator.platform`.
+- `services/ffmpeg.ts`: them `ungVienMac(ten)`, `chayDuocMac(p)` (thieu bit thuc thi thi
+  `chmod 755` mot lan), `timCongCuMac(ten)`; `getFFmpegPath` co nhanh Mac o dau ham,
+  nhanh Windows khong doi mot dong.
+- `services/whisper.ts`: `noiDeMac()`, `duongExe()`; `thuMucWhisper`/`timBoMay`/`thieuGi`
+  chon theo he dieu hanh -> bao thieu tren Mac chi dung duong Mac.
+- `chu.ts`: 2 khoa moi (VI + EN) cho chu Cmd; `App.tsx`, `services/luuRa.ts` chon khoa theo `laMac()`.
+
+### Kiem chung (so do 30/09 tren Mac)
+- `npm ci` (ban node_modules cu cai tren Windows) -> esbuild darwin-x64 chay.
+- `npm run build`: sach, dist 569,62 kB, kiem-byte sach, `dist/CSInterface.js` trung
+  `client/public/CSInterface.js`.
+- `npm run kiem`: tsc bien dich sach, nhung bo kiem **DUNG o muc (1)**: ENOENT
+  `E:/2025/T11/Video/Heygen/final.autocut-nghe.json` - bo kiem can dem that tren o E:/G:
+  cua may Windows, may Mac khong co -> **0 phep chay tren Mac**. So 222/0 van la so cu
+  do tren Windows 21/09; chua kiem lai tren Windows sau lan sua nay.
+- `node tests/kiem-phien-ban.mjs --doi-chung` -> HONG, exit 1 (dung y). `kiem-byte` exit 0.
+- Script tam (scratchpad, bundle CHINH ma panel bang esbuild, gia `window.cep_node`):
+  - Gia `platform = win32`: 4/4 OK - `laMac()` false, `getFFmpegPath()` rong (khong do
+    kho Mac), `timBoMay` null, `thieuGi()` chi `C:/AiO-Studio/whisper`.
+  - That tren Mac: 13/13 OK - ffmpeg lay tu kho chung `~/Library/Application Support/AiO-Studio/bin/mac/ffmpeg`;
+    file 644 -> `chayDuocMac` cap lai 755; `timBoMay('turbo')` = `whisper/bin/whisper-cli`
+    + turbo (model 1.624.555.275 byte, dung co may Windows); xin v3 -> lui ve turbo;
+    `thieuGi()` rong.
+  - Chay THAT `trichTieng` + `nghe` (cung tham so panel: `-ar 16000 -ac 1 pcm_s16le`;
+    `-l auto -t 11 -mc 0 -np -pp -ojf`) tren clip 3,66 s giong Linh (`say`): ffmpeg 54 ms,
+    whisper-cli 56,5 s (lan chay dau, may dang chay viec khac), ra `ngonNgu=vi`, 1 cau
+    10 tu: "Xin chao, ban ten la gi? Toi ten la Tien." (dung, co dau `?`). WAV + JSON tam da don.
+  - Nut Dung: giet whisper-cli sau 306 ms, loi `DA_HUY`.
+
+### Con no / chua kiem
+- **Chua kiem trong Premiere Mac**: nap host, doc noi dung, tao sequence, marker.
+- Tren Mac whisper-cli voi `-np` KHONG in dong nap mo hinh (stderr chi 4 dong) -> trang
+  thai "dang nap mo hinh" (bao -1) khong bao gio bat; thanh tien do dung 0% luc nap
+  (thoi gian nap rieng: chua do). Chua sua.
+- Cmd+Z / J/K/M/X trong panel tren Mac co bi Premiere an (hoan tac timeline) khong:
+  **chua kiem** (so loi #10, nay them Cmd+Z).
+- Bo cai Mac (bin/mac trong goi, script cai) chua co; `package-release.ps1` chi cho Windows.
+
 ## [0.1.2-vaphienban] - 2026-09-21 11:22 (UTC+7) - SUA: panel CHAN "Doc noi dung" vi lech phien ban host. DA CAI + DA DO
 
 ### Boi canh

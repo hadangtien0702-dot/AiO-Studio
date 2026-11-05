@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save · Sân diễn</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="../nut/nut.css" />
+  <!-- 01/10 SAN DIEN: cua so trong suot phu workArea, bam xuyen qua, CHI hien trong luc khay thu ve / bung ra (< 1 giay).
+       Moi hinh o day la BAN VE tam (bong cua khay, o anh dang bay, nut tron) do src/dien/dien.js dung theo lenh cua
+       main (src/khay-thu.js). Xong la xoa sach. -->
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background: transparent; overflow: hidden; pointer-events: none; user-select: none; }
+    #san { position: absolute; inset: 0; overflow: hidden; }
+    #san > * { position: absolute; will-change: transform, opacity; }
+    .bong { background-repeat: no-repeat; }
+    .o { background-repeat: no-repeat; border-radius: 6px; }
+    .song { width: 52px; height: 52px; border-radius: 26px; border: 2px solid var(--accent); opacity: 0; }
+  </style>
+</head>
+<body>
+  <div id="san"></div>
+  <script src="dien.js"></script>
+</body>
+</html>

@@ -51,7 +51,7 @@ function chuanHoa(s) {
 function tachTu(q) { return chuanHoa(q).split(' ').filter(Boolean) }
 
 function loaiCuaFile(ten) {
-  if (DUOI_VIDEO.test(ten)) return 'video'
+  if (DUOI_VIDEO.test(ten) || ten.startsWith('shotandsave-video-')) return 'video' // gom ca GIF xuat tu video (shotandsave-video-*.gif)
   if (ten.startsWith(TIEN_TO_DAI)) return 'dai'
   return 'anh'
 }

@@ -29,14 +29,14 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "ads.tiktok.com video-ads-specifications (06/2026) | ra lai 25/09/2026: trang van ban 06/2026, co 5 file zip template chinh thuc (chua do truc tiep), 4 nguon 2026 tai ban 130/484/44/140 -> KHONG doi",
+          "nguon": "ads.tiktok.com video-ads-specifications (06/2026) | ra lai 25/09/2026: trang van ban 06/2026, co 5 file zip template chinh thuc (chua do truc tiep), 4 nguon 2026 tai ban 130/484/44/140 -> KHONG doi | DO ANH APP THAT 26/09/2026 (App Store US (apps.apple.com/us/app/tiktok) anh 1242x2688 = khung iPhone XS Max; tai 26/09): top 8.9% / bottom 22.1% / right 17.4% / left 10.9%, mapping fill; tin cay: trung binh",
           "vung": [
             {
               "canh": "top",
-              "pt": 6.77,
-              "px1080": 130,
+              "pt": 11,
+              "px1080": 211,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Tab LIVE/Following/For You + Search",
                 "en": "LIVE/Following/For You tabs + Search"
@@ -55,10 +55,10 @@
             },
             {
               "canh": "left",
-              "pt": 4.07,
-              "px1080": 44,
-              "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "pt": 10,
+              "px1080": 108,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Chống crop mép giữa các đời máy",
                 "en": "Edge-crop protection across devices"
@@ -66,10 +66,10 @@
             },
             {
               "canh": "right",
-              "pt": 12.96,
-              "px1080": 140,
+              "pt": 19,
+              "px1080": 205,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Avatar, Tim, Bình luận, Lưu, Chia sẻ",
                 "en": "Avatar, Like, Comments, Save, Share"
@@ -139,7 +139,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Meta Ads Guide instagram-reels (doc 01/08/2026): top 14% / bottom 35% / 6% moi ben | ra lai 25/09/2026 (doc truc tiep, ban tieng Viet): van 14/35/6, do phan giai khuyen nghi 1440x2560",
+          "nguon": "Meta Ads Guide instagram-reels (doc 01/08/2026): top 14% / bottom 35% / 6% moi ben | ra lai 25/09/2026 (doc truc tiep, ban tieng Viet): van 14/35/6, do phan giai khuyen nghi 1440x2560 | DO ANH APP THAT 26/09/2026 (App Store US, listing Instagram (Meta Platforms), anh 1/5 cua bo anh gioi thieu (appstore-): top 10.2% / bottom 20.5% / right 18.1% / left 12.8%, mapping fill; tin cay: KHA cho cot phai / khoi duoi / hang tren (anh chinh thuc cua",
           "vung": [
             {
               "canh": "top",
@@ -165,10 +165,10 @@
             },
             {
               "canh": "left",
-              "pt": 6,
-              "px1080": 65,
-              "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "pt": 9,
+              "px1080": 97,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Trừ hao máy màn dài (Meta ghi rõ)",
                 "en": "Tall-screen allowance (per Meta)"
@@ -176,10 +176,10 @@
             },
             {
               "canh": "right",
-              "pt": 6,
-              "px1080": 65,
+              "pt": 19,
+              "px1080": 205,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Trừ hao máy màn dài — cột icon thật ~120px",
                 "en": "Tall-screen allowance — real icon stack ~120px"
@@ -202,7 +202,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Quy tac 250px legacy cua Meta + Buffer 03/2026; ads da chuyen sang chuan gop 14/35/6 | ra lai 25/09/2026: khong doi",
+          "nguon": "Quy tac 250px legacy cua Meta + Buffer 03/2026; ads da chuyen sang chuan gop 14/35/6 | ra lai 25/09/2026: khong doi | DO ANH APP THAT 26/09/2026 (App Store Instagram (appstore-us.html) anh 6/7 'Stay close with Close Friends', 1242x2687 ): top 8.0% / bottom 0.0% / right 0.0% / left 0.0%, mapping khit; tin cay: trung binh-kha: anh chinh la anh chup that nhung nam trong k",
           "vung": [
             {
               "canh": "top",
@@ -290,7 +290,7 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Meta Ads Guide facebook-facebook-reels (doc 01/08/2026): 14% / 35% / 6% | ra lai 25/09/2026 (doc truc tiep, ban tieng Viet): van 14/35/6",
+          "nguon": "Meta Ads Guide facebook-facebook-reels (doc 01/08/2026): 14% / 35% / 6% | ra lai 25/09/2026 (doc truc tiep, ban tieng Viet): van 14/35/6 | DO ANH APP THAT 26/09/2026 (App Store US, screenshot #5 \"Stay entertained\" của app Facebook (1284×2778, tải 26/09/2026): top 10.6% / bottom 14.5% / right 14.6% / left 7.7%, mapping fill; tin cay: Cao cho cột phải, header, mapping fill (hai ảnh độc lập App ",
           "vung": [
             {
               "canh": "top",
@@ -316,10 +316,10 @@
             },
             {
               "canh": "left",
-              "pt": 6,
-              "px1080": 65,
-              "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "pt": 7,
+              "px1080": 76,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Trừ hao máy màn dài",
                 "en": "Tall-screen allowance"
@@ -327,10 +327,10 @@
             },
             {
               "canh": "right",
-              "pt": 6,
-              "px1080": 65,
+              "pt": 17,
+              "px1080": 184,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Trừ hao — cột icon thật ~120px",
                 "en": "Allowance — real icon stack ~120px"
@@ -353,14 +353,14 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "Meta Ads Guide facebook-story (doc 01/08/2026) van ghi 14% top / 20% bottom — MAU THUAN voi trang IG da gop 14/35/6 | ra lai 25/09/2026 (doc truc tiep): van \"14% (250 px) / 20% (340 px)\" - VAN MAU THUAN voi Reels",
+          "nguon": "Meta Ads Guide facebook-story (doc 01/08/2026) van ghi 14% top / 20% bottom — MAU THUAN voi trang IG da gop 14/35/6 | ra lai 25/09/2026 (doc truc tiep): van \"14% (250 px) / 20% (340 px)\" - VAN MAU THUAN voi Reels | DO ANH APP THAT 26/09/2026 (Bai bao SocialBee \"How do Facebook Stories work? (2026 updated guide)\", datePublished 2026): top 15.0% / bottom 5.0% / right 8.0% / left 0.0%, mapping khit; tin cay: trung binh-kha: anh chup iPhone that 1206 px, goc nguoi xem,",
           "vung": [
             {
               "canh": "top",
-              "pt": 14,
-              "px1080": 269,
+              "pt": 15,
+              "px1080": 288,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Thanh tiến trình + avatar + X",
                 "en": "Progress bars + avatar + X"
@@ -375,6 +375,17 @@
               "ui": {
                 "vi": "CTA / thanh trả lời",
                 "en": "CTA / reply bar"
+              }
+            },
+            {
+              "canh": "right",
+              "pt": 8,
+              "px1080": 86,
+              "loai": "ui",
+              "trangThai": "ben_thu_3",
+              "ui": {
+                "vi": "Đo từ ảnh app thật 26/09/2026",
+                "en": "Measured from a real app screenshot 26/09/2026"
               }
             }
           ],
@@ -636,14 +647,14 @@
             "h": 1920
           },
           "trangThai": "chinh_thuc",
-          "nguon": "businesshelp.snapchat.com safe-zones + snap-ads-practices (doc 01/08/2026): top 150 / bottom 330, MOT vung cho moi format | ra lai 25/09/2026: trang Snap khong tai duoc (JS), 6 nguon 2026 tai ban 150/330 -> khong doi. Story Ad TILE 175/269 va Collection 150/450 la format khac, khong ap cho video 9:16",
+          "nguon": "businesshelp.snapchat.com safe-zones + snap-ads-practices (doc 01/08/2026): top 150 / bottom 330, MOT vung cho moi format | ra lai 25/09/2026: trang Snap khong tai duoc (JS), 6 nguon 2026 tai ban 150/330 -> khong doi. Story Ad TILE 175/269 va Collection 150/450 la format khac, khong ap cho video 9:16 | DO ANH APP THAT 26/09/2026 (Google Play listing Snapchat (com.snapchat.android), ảnh #5 'Spotlight – Watch and share t): top 13.9% / bottom 11.0% / right 14.8% / left 1.9%, mapping fill; tin cay: trung bình: ảnh listing Google Play + App Store là màn hình ",
           "vung": [
             {
               "canh": "top",
-              "pt": 7.81,
-              "px1080": 150,
+              "pt": 14,
+              "px1080": 269,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Tên brand + headline + thanh tiến trình",
                 "en": "Brand name + headline + progress bar"
@@ -651,13 +662,35 @@
             },
             {
               "canh": "bottom",
-              "pt": 17.19,
-              "px1080": 330,
+              "pt": 25,
+              "px1080": 480,
               "loai": "ui",
-              "trangThai": "chinh_thuc",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Nút CTA (vị trí động) + vùng swipe-up",
                 "en": "CTA pill (dynamic position) + swipe-up area"
+              }
+            },
+            {
+              "canh": "right",
+              "pt": 20,
+              "px1080": 216,
+              "loai": "ui",
+              "trangThai": "ben_thu_3",
+              "ui": {
+                "vi": "Đo từ ảnh app thật 26/09/2026",
+                "en": "Measured from a real app screenshot 26/09/2026"
+              }
+            },
+            {
+              "canh": "left",
+              "pt": 7,
+              "px1080": 76,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
+              "ui": {
+                "vi": "Đo từ ảnh app thật 26/09/2026",
+                "en": "Measured from a real app screenshot 26/09/2026"
               }
             }
           ],
@@ -752,14 +785,14 @@
             "h": 1920
           },
           "trangThai": "uoc_luong",
-          "nguon": "aicarousels.com 2025 — DUY NHAT mot nguon co so, LinkedIn khong cong bo | ra lai 25/09/2026: LinkedIn van khong cong bo, uoc luong khong doi",
+          "nguon": "aicarousels.com 2025 — DUY NHAT mot nguon co so, LinkedIn khong cong bo | ra lai 25/09/2026: LinkedIn van khong cong bo, uoc luong khong doi | DO ANH APP THAT 26/09/2026 (Loomly blog 'How to Use the New LinkedIn Video Feed' (bai/b2.html), anh chup iPhone 2025 d): top 4.2% / bottom 15.1% / right 11.8% / left 6.9%, mapping fill; tin cay: trung binh-thap: anh man hinh that nhung chi 636 px rong (du",
           "vung": [
             {
               "canh": "top",
-              "pt": 5.63,
-              "px1080": 108,
+              "pt": 14,
+              "px1080": 269,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Vùng thanh hệ thống/search",
                 "en": "System/search bar area"
@@ -767,10 +800,10 @@
             },
             {
               "canh": "bottom",
-              "pt": 16.67,
-              "px1080": 320,
+              "pt": 30,
+              "px1080": 576,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Tên tác giả + caption + thanh reaction",
                 "en": "Author + caption + reactions strip"
@@ -778,10 +811,10 @@
             },
             {
               "canh": "left",
-              "pt": 5.56,
-              "px1080": 60,
+              "pt": 11,
+              "px1080": 119,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Lề chữ caption",
                 "en": "Caption inset"
@@ -789,10 +822,10 @@
             },
             {
               "canh": "right",
-              "pt": 11.11,
-              "px1080": 120,
+              "pt": 20,
+              "px1080": 216,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Cột like/comment/repost/send",
                 "en": "Like/comment/repost/send rail"
@@ -821,14 +854,14 @@
             "h": 1920
           },
           "trangThai": "uoc_luong",
-          "nguon": "socialk.it 2026 — X khong cong bo safe zone cho immersive viewer | ra lai 25/09/2026: X van khong cong bo, socialk.it 2026 van ~400/~140",
+          "nguon": "socialk.it 2026 — X khong cong bo safe zone cho immersive viewer | ra lai 25/09/2026: X van khong cong bo, socialk.it 2026 van ~400/~140 | DO ANH APP THAT 26/09/2026 (31 anh App Store (as-*.jpg) + Google Play (gp-*.png) da xem het qua contact sheet: KHONG a): top 14.5% / bottom 19.2% / right 0.0% / left 0.0%, mapping fill; tin cay: trung binh-kha: 2 anh chup iPhone THAT (piunika 600x1301, le",
           "vung": [
             {
               "canh": "bottom",
-              "pt": 20.83,
-              "px1080": 400,
+              "pt": 23,
+              "px1080": 442,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Handle + nội dung post + timeline",
                 "en": "Handle + post text + timeline"
@@ -836,13 +869,35 @@
             },
             {
               "canh": "right",
-              "pt": 12.96,
-              "px1080": 140,
-              "loai": "ui",
-              "trangThai": "uoc_luong",
+              "pt": 7,
+              "px1080": 76,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Cột like/repost/reply/bookmark",
                 "en": "Like/repost/reply/bookmark rail"
+              }
+            },
+            {
+              "canh": "top",
+              "pt": 15,
+              "px1080": 288,
+              "loai": "ui",
+              "trangThai": "ben_thu_3",
+              "ui": {
+                "vi": "Đo từ ảnh app thật 26/09/2026",
+                "en": "Measured from a real app screenshot 26/09/2026"
+              }
+            },
+            {
+              "canh": "left",
+              "pt": 7,
+              "px1080": 76,
+              "loai": "crop",
+              "trangThai": "ben_thu_3",
+              "ui": {
+                "vi": "Đo từ ảnh app thật 26/09/2026",
+                "en": "Measured from a real app screenshot 26/09/2026"
               }
             }
           ],
@@ -868,7 +923,7 @@
             "h": 1920
           },
           "trangThai": "uoc_luong",
-          "nguon": "Zalo BAT BUOC 'noi dung chinh trong vung an toan' nhung khong cong bo so — uoc theo mat bang nganh | ra lai 25/09/2026: ads.zalo.me van chi ghi \"vung an toan\" khong so",
+          "nguon": "Zalo BAT BUOC 'noi dung chinh trong vung an toan' nhung khong cong bo so — uoc theo mat bang nganh | ra lai 25/09/2026: ads.zalo.me van chi ghi \"vung an toan\" khong so | DO ANH APP THAT 26/09/2026 (quantrimang.com 'Huong dan xem video tren Zalo Video' (cu/qtm-6.jpg cot phai + khoi chu, c): top 5.0% / bottom 15.4% / right 15.6% / left 8.6%, mapping fill; tin cay: THAP-TRUNG BINH: anh chinh 300 px (±0,3%W moi px), bo cuc 20",
           "vung": [
             {
               "canh": "top",
@@ -883,10 +938,10 @@
             },
             {
               "canh": "bottom",
-              "pt": 18,
-              "px1080": 346,
+              "pt": 20,
+              "px1080": 384,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Ước lượng — Zalo không công bố",
                 "en": "Estimate — not published by Zalo"
@@ -894,10 +949,10 @@
             },
             {
               "canh": "left",
-              "pt": 5,
-              "px1080": 54,
+              "pt": 10,
+              "px1080": 108,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Ước lượng",
                 "en": "Estimate"
@@ -905,10 +960,10 @@
             },
             {
               "canh": "right",
-              "pt": 12,
-              "px1080": 130,
+              "pt": 17,
+              "px1080": 184,
               "loai": "ui",
-              "trangThai": "uoc_luong",
+              "trangThai": "ben_thu_3",
               "ui": {
                 "vi": "Ước lượng",
                 "en": "Estimate"
