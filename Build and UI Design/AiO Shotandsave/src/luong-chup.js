@@ -21,8 +21,9 @@
    - Anh raw tu canvas la RGBA; nativeImage.createFromBitmap can BGRA (toBitmap) -> doi
      kenh o renderer (Uint32 xoay byte) truoc khi gui. */
 
-const { BrowserWindow, desktopCapturer, screen, ipcMain, nativeImage, powerMonitor } = require('electron')
+const { BrowserWindow, desktopCapturer, screen, ipcMain, nativeImage, powerMonitor, systemPreferences } = require('electron')
 const path = require('path')
+const nhapQuay = require('./nhap-quay') // 05/11: nguon su kien chuot + phim cho 'hien cu bam' luc quay
 
 const LUONG_FPS = Number(process.env.AIO_LUONG_FPS) > 0 ? Number(process.env.AIO_LUONG_FPS) : 5
 const TAT = process.env.AIO_LUONG === '0' // doi chung: ep di duong grab cu
@@ -224,6 +225,7 @@ function ketQuay(loi, info) {
   if (!q) return
   quay = null
   try { q.onXong(Object.assign({ loi: loi || null }, info || {})) } catch (e) { ghiLog('LUONG quay onXong loi: ' + e.message) }
+  nhapQuay.dung() // 05/11: ngung nghe chuot / phim
   if (!CHAY_SAN) dongLuong() // Mac: quay xong thi buong luong, cham tim tat theo
 }
 function dongLuong() {
@@ -256,6 +258,16 @@ async function batDauQuay(display, rect, opts) {
   if (!cfg) return { ok: false, loi: 'khong co nguon cho man ' + display.id }
   const id = ++soQuay
   const tieng = !!(opts && opts.tieng) && process.platform === 'win32'
+  /* 05/11 MICRO: xin quyen TRUOC (Mac hien hop thoai he thong lan dau; Windows bao 'denied' khi tat trong Privacy).
+     Thieu quyen / khong co micro thi VAN QUAY (chi khong co tieng micro) va tra micLoi de main bao mot dong. */
+  let mic = !!(opts && opts.mic), micLoi = null
+  if (mic && !(opts && opts.micGia)) { // micGia chi bai do dat: nguon am tao trong trang, khong dung thiet bi that
+    try {
+      const tt = systemPreferences.getMediaAccessStatus('microphone')
+      if (tt === 'not-determined' && process.platform === 'darwin') { if (!(await systemPreferences.askForMediaAccess('microphone'))) { mic = false; micLoi = 'quyen' } }
+      else if (tt === 'denied' || tt === 'restricted') { mic = false; micLoi = 'quyen' }
+    } catch (e) { /* khong hoi duoc thi cu thu, renderer se bao neu loi */ }
+  }
   quay = { id, onKhuc: opts.onKhuc, onXong: opts.onXong }
   hangChon.push({ id: cfg.srcId, tieng })
   const q = {
@@ -266,16 +278,38 @@ async function batDauQuay(display, rect, opts) {
     treTieng: (opts && typeof opts.treTieng === 'number') ? opts.treTieng : undefined, // ms, chi bai do truyen
     displayId: String(display.id), nang: !(opts && opts.nang === false), // nang = nang luong chay san len q.fps khi quay
     toiDaW: QUAY_TOI_DA.w, toiDaH: QUAY_TOI_DA.h,
+    mic, micGia: (opts && opts.micGia) || null, micXuLy: !(opts && opts.micXuLy === false), // micXuLy=false chi bai do (tat khu on / tu chinh am luong de so tin hieu)
+    hienNhap: { chuot: !!(opts && opts.hienNhap && opts.hienNhap.chuot), phim: !!(opts && opts.hienNhap && opts.hienNhap.phim) },
   }
   try {
     // ☠️ getDisplayMedia can user gesture -> executeJavaScript voi userGesture=true (nhu batDauLuong)
     const r = await win.webContents.executeJavaScript('window.batDauQuay(' + JSON.stringify(q) + ')', true)
     if (!r || !r.ok) { quay = null; return { ok: false, loi: (r && r.loi) || 'renderer khong tra loi' } }
+    if (micLoi && !r.micLoi) r.micLoi = micLoi
+    if (q.hienNhap.chuot || q.hienNhap.phim) r.nhap = batNghe(display, rect, q.hienNhap, id)
     return r
   } catch (e) {
     quay = null
     return { ok: false, loi: (e && e.message) || String(e) }
   }
+}
+
+/* 05/11 Nghe chuot / phim toan cuc, doi ra toa do 0..1 trong vung quay roi gui cho renderer luong VE VAO KHUNG HINH.
+   Khong co cua so nao phu len vung quay (so loi: cua so trong suot phu video tang toc -> den). Tra { ok, nguon | loi }. */
+function batNghe(display, rect, hien, id) {
+  const r = nhapQuay.bat((sk) => {
+    if (!win || win.isDestroyed() || !quay || quay.id !== id) return
+    if (sk.loai === 'chuot') {
+      if (!hien.chuot) return
+      const fx = (sk.x - display.bounds.x - rect.x) / rect.w, fy = (sk.y - display.bounds.y - rect.y) / rect.h
+      if (fx < 0 || fx > 1 || fy < 0 || fy > 1) return // bam ngoai vung quay: khong co gi de ve
+      win.webContents.send('luong:nhap', { loai: 'chuot', fx, fy, t: sk.t })
+    } else if (sk.loai === 'phim' && hien.phim) {
+      win.webContents.send('luong:nhap', { loai: 'phim', nhan: sk.nhan, t: sk.t })
+    }
+  })
+  if (!r.ok) ghiLog('QUAY: khong nghe duoc chuot / phim (' + r.loi + ') -> quay binh thuong, khong hien cu bam')
+  return r
 }
 
 /* Bao renderer dung. Ket qua ve qua onXong; qua 4 s khong thay thi tu ket (file da ghi toi khuc cuoi van phat duoc). */
@@ -310,4 +344,4 @@ function theoDoiMoiTruong() {
   } catch (e) {}
 }
 
-module.exports = { khoiDong, sanSang, layKhung, catVung, batDauQuay, dungQuay, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH, CHAY_SAN }
+module.exports = { nhapQuay, khoiDong, sanSang, layKhung, catVung, batDauQuay, dungQuay, theoDoiMoiTruong, LUONG_FPS, TAT, NHANH, CHAY_SAN }

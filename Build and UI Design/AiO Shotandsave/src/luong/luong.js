@@ -114,10 +114,54 @@ function chonKieuQuay(coTieng, soDiem) {
   return ds.find((t) => MediaRecorder.isTypeSupported(t)) || ''
 }
 
+/* 05/11 HIEN CU BAM CHUOT / PHIM: VE VAO KHUNG HINH dang ghi (khong cua so nao phu len vung quay).
+   Su kien den tu main (src/nhap-quay.js) kem gio Date.now(); hinh toi bo ghi tre treMs so voi man hinh that nen su kien
+   chi co hieu luc sau treMs (cung cong thuc voi tieng) -> vong tron hien dung o khung co con tro bam. Phim thuong khong
+   bao gio toi day (loc o main, rieng tu). */
+const NHAP_CHUOT_MS = 480, NHAP_PHIM_MS = 1500
+function taoNhap(hien, treMs) {
+  const chuot = [], phim = []
+  return {
+    them(ev) {
+      const t = ev.t - performance.timeOrigin + treMs
+      if (ev.loai === 'chuot' && hien.chuot) { chuot.push({ t, fx: ev.fx, fy: ev.fy }); if (chuot.length > 24) chuot.shift() }
+      else if (ev.loai === 'phim' && hien.phim && ev.nhan) { phim.push({ t, nhan: ev.nhan }); if (phim.length > 8) phim.shift() }
+    },
+    ve(ctx, ow, oh, now) {
+      const u = Math.max(1, ow / 1280)
+      for (const c of chuot) {
+        const age = now - c.t
+        if (age < 0 || age > NHAP_CHUOT_MS) continue
+        const p = age / NHAP_CHUOT_MS, a = 1 - p, r = (12 + 30 * (1 - (1 - p) * (1 - p))) * u
+        ctx.beginPath(); ctx.arc(c.fx * ow, c.fy * oh, r, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(248,104,32,' + (0.28 * a).toFixed(3) + ')'; ctx.fill()
+        ctx.lineWidth = 4 * u; ctx.strokeStyle = 'rgba(248,104,32,' + a.toFixed(3) + ')'; ctx.stroke()
+      }
+      let k = null
+      for (const f of phim) { const age = now - f.t; if (age >= 0 && age <= NHAP_PHIM_MS) k = { f, age } }
+      if (k) {
+        const a = Math.min(1, (NHAP_PHIM_MS - k.age) / 300)
+        const fs = Math.round(22 * u)
+        ctx.save()
+        ctx.font = '700 ' + fs + 'px "Segoe UI", Inter, sans-serif'
+        const tw = ctx.measureText(k.f.nhan).width, ph = Math.round(fs * 1.9), pw = Math.round(tw + fs * 1.4)
+        const px = Math.round(24 * u), py = Math.round(oh - 24 * u - ph)
+        ctx.globalAlpha = a
+        ctx.fillStyle = 'rgba(24,24,24,0.9)'
+        ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, ph / 2); else ctx.rect(px, py, pw, ph); ctx.fill()
+        ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(k.f.nhan, px + fs * 0.7, py + ph / 2 + 1)
+        ctx.restore()
+      }
+    },
+  }
+}
+window.luong.onNhap((d) => { if (dangQuay && dangQuay.nhap) dangQuay.nhap.them(d) })
+
 window.batDauQuay = async function (q) {
   if (dangQuay) return { ok: false, loi: 'dang quay' }
   const t0 = performance.now()
   let st = null
+  let mic = null, micLoi = null
   /* ☠️ 01/10 anh xem lai video thay "giut, nhu thieu fps". Do: file ghi 30 khung/giay nhung HINH THAT chi doi 5 lan/giay
      (bang dem: so nhay moi 12 lan man ve lai; file that cua anh: hinh doi moi 6 khung, 13 % khung co hinh moi).
      Goc: luong chay san cua CUNG man hinh dang xin toi da 5 khung/giay, va Chromium chia chung mot bo chup cho moi
@@ -138,6 +182,26 @@ window.batDauQuay = async function (q) {
       audio: q.tieng ? { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 2 } : false,
       video: { width: { ideal: q.w }, height: { ideal: q.h }, frameRate: { ideal: q.fps, max: q.fps } },
     })
+    /* 05/11 MICRO: xin thiet bi thu am. Loi (khong co micro / bi chan) KHONG lam hong luot quay: bo tieng micro, bao ve main. */
+    if (q.mic && q.micGia) {
+      /* CHI BAI DO: nguon am gia tao trong trang (bip 1 kHz theo mau cho truoc) thay cho thiet bi that — di tiep dung duong tron / tre / ghi nhu micro that. */
+      try {
+        const g = q.micGia, ac0 = new AudioContext({ sampleRate: 48000 })
+        const dich0 = ac0.createMediaStreamDestination(), osc = ac0.createOscillator(), gn = ac0.createGain()
+        osc.frequency.value = g.tanSo; gn.gain.value = 0
+        osc.connect(gn); gn.connect(dich0); osc.start()
+        const t0 = ac0.currentTime + 0.05
+        for (let k = 0; k < 12; k++) for (const [a, b] of g.mau) { gn.gain.setValueAtTime(0.5, t0 + k * g.chuKy + a); gn.gain.setValueAtTime(0, t0 + k * g.chuKy + b) }
+        mic = dich0.stream
+        mic.getTracks().forEach((t) => { const dung = t.stop.bind(t); t.stop = () => { dung(); try { ac0.close() } catch (e) {} } })
+      } catch (e) { micLoi = (e && e.name) || 'loi' }
+    } else if (q.mic) {
+      try {
+        mic = await navigator.mediaDevices.getUserMedia({ video: false, audio: q.micXuLy === false
+          ? { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+          : { echoCancellation: false, noiseSuppression: true, autoGainControl: true } })
+      } catch (e) { micLoi = (e && e.name) || 'loi' }
+    }
     const v = document.createElement('video')
     v.srcObject = st; v.muted = true
     await v.play()
@@ -154,6 +218,21 @@ window.batDauQuay = async function (q) {
     const ctx = cv.getContext('2d', { alpha: false })
     ctx.drawImage(v, sx, sy, sw, sh, 0, 0, ow, oh)
     const at = st.getAudioTracks()
+    const nhapBat = !!(q.hienNhap && (q.hienNhap.chuot || q.hienNhap.phim))
+    // Co lop phu (vong tron / the phim): giu mot canvas SACH (chi man hinh) de ve lai lop phu len no moi khung, khong cong don
+    const base = nhapBat ? document.createElement('canvas') : null
+    if (base) { base.width = ow; base.height = oh }
+    const bctx = base && base.getContext('2d', { alpha: false })
+    let nhap = null
+    const vaoKhung = (nguon, a, b, c2, d2) => {
+      if (!nhap) { ctx.drawImage(nguon, a, b, c2, d2, 0, 0, ow, oh); return }
+      bctx.drawImage(nguon, a, b, c2, d2, 0, 0, ow, oh)
+      ctx.drawImage(base, 0, 0); nhap.ve(ctx, ow, oh, performance.now())
+    }
+    const veLai = () => { // man dung yen: ve lai man sach + lop phu (vong tron van dang toa ra)
+      if (!nhap) { ctx.drawImage(cv, 0, 0); return }
+      ctx.drawImage(base, 0, 0); nhap.ve(ctx, ow, oh, performance.now())
+    }
     /* NHIP VE (q.nhip): 'khung' = ve DUNG khi luong man hinh co khung moi (requestVideoFrameCallback) va tu day tung
        khung vao bo ghi (captureStream(0) + requestFrame) — 1 khung nguon = 1 khung ghi. 'dongho' = cach dau tien
        (setInterval + captureStream(fps)), giu lai lam DOI CHUNG. Vi sao doi: xem chu thich o cho dat o.iv ben duoi. */
@@ -166,23 +245,35 @@ window.batDauQuay = async function (q) {
        (npm run test:dongbotieng): xem so trong PROGRESS. q.treTieng (ms) chi bai do truyen; app dung cong thuc TRE_*. */
     let trackTieng = at
     let acTre = null
-    const treMs = !at.length ? 0 : (typeof q.treTieng === 'number' ? q.treTieng : Math.round(TRE_TIENG_GOC + TRE_TIENG_MOI_MP * ow * oh / 1e6))
-    if (at.length && treMs > 0) {
+    const coAm = at.length > 0 || !!mic
+    const treHinh = Math.round(TRE_TIENG_GOC + TRE_TIENG_MOI_MP * ow * oh / 1e6) // tre cua hinh (ms), cung cong thuc voi tieng
+    const treMs = !coAm ? 0 : (typeof q.treTieng === 'number' ? q.treTieng : treHinh)
+    if (nhapBat) nhap = taoNhap(q.hienNhap, treHinh)
+    if (coAm && (treMs > 0 || mic)) {
+      /* Tieng may + micro TRON vao MOT rai (MediaRecorder MP4 chi ghi mot rai tieng), cung di qua DelayNode de khop hinh.
+         Hai nguon cong lai co the vuot 0 dBFS -> bo han che (compressor) chi khi co ca hai. */
       acTre = new AudioContext({ sampleRate: 48000 })
-      const nguon = acTre.createMediaStreamSource(new MediaStream([at[0]]))
+      const tron2 = acTre.createGain()
+      if (at.length) acTre.createMediaStreamSource(new MediaStream([at[0]])).connect(tron2)
+      if (mic) acTre.createMediaStreamSource(mic).connect(tron2)
       const tre = acTre.createDelay(1)
-      tre.delayTime.value = treMs / 1000
+      tre.delayTime.value = Math.max(0, treMs) / 1000
       const dich = acTre.createMediaStreamDestination()
-      nguon.connect(tre); tre.connect(dich)
+      if (at.length && mic) {
+        const lim = acTre.createDynamicsCompressor()
+        lim.threshold.value = -3; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.1
+        tron2.connect(lim); lim.connect(tre)
+      } else tron2.connect(tre)
+      tre.connect(dich)
       trackTieng = dich.stream.getAudioTracks()
     }
     const tron = new MediaStream([trackCv, ...trackTieng])
-    const mime = chonKieuQuay(at.length > 0, ow * oh)
+    const mime = chonKieuQuay(coAm, ow * oh)
     if (!mime) throw new Error('may khong co bo nen video nao dung duoc')
     // ~0,07 bit / diem anh / khung: 1280x720 ~1,9 Mbit/s, 1920x1080 ~4,4, 2560x1440 ~7,7 (noi dung man hinh nen rat tot)
     const bps = Math.max(1500000, Math.min(16000000, Math.round(ow * oh * q.fps * 0.07)))
     const rec = new MediaRecorder(tron, { mimeType: mime, videoBitsPerSecond: bps, audioBitsPerSecond: 160000 })
-    const o = { id: q.id, st, rec, iv: null, soVe: 0, batDau: performance.now(), hang: Promise.resolve(), loi: null, tre: [], treTieng: treMs }
+    const o = { id: q.id, st, rec, iv: null, soVe: 0, batDau: performance.now(), hang: Promise.resolve(), loi: null, tre: [], treTieng: treMs, nhap, t0Epoch: 0 }
     rec.ondataavailable = (e) => {
       if (!e.data || !e.data.size) return
       o.hang = o.hang.then(() => e.data.arrayBuffer()).then((buf) => window.luong.guiKhucQuay({ id: q.id, buf })).catch((err) => { o.loi = String(err && err.message || err) })
@@ -192,6 +283,7 @@ window.batDauQuay = async function (q) {
       clearInterval(o.iv); clearTimeout(o.hen)
       const ms = Math.round(performance.now() - o.batDau)
       st.getTracks().forEach((t) => t.stop())
+      if (mic) mic.getTracks().forEach((t) => t.stop())
       haNen() // tra luong chay san ve 5 khung/giay (CPU nam nen)
       if (acTre) acTre.close().catch(() => {})
       const s = o.tre.slice().sort((a, b) => a - b)
@@ -202,7 +294,7 @@ window.batDauQuay = async function (q) {
     const vt = st.getVideoTracks()[0]
     if (vt) vt.addEventListener('ended', () => { if (rec.state !== 'inactive') { o.loi = o.loi || 'luong man hinh ket thuc'; rec.stop() } })
     const ve = () => {
-      ctx.drawImage(v, sx, sy, sw, sh, 0, 0, ow, oh); o.soVe++; o.veLuc = performance.now()
+      vaoKhung(v, sx, sy, sw, sh); o.soVe++; o.veLuc = performance.now()
     }
     if (theoKhung && q.nhip !== 'khung' && typeof MediaStreamTrackProcessor === 'function' && vt) {
       /* MAC DINH ('xuly'): lay khung THANG tu luong man hinh (MediaStreamTrackProcessor), khong qua trinh phat <video>
@@ -211,13 +303,13 @@ window.batDauQuay = async function (q) {
          -279..-135 ms). 'khung' giu lai lam duong du phong khi khong co MediaStreamTrackProcessor. */
       const rd = new MediaStreamTrackProcessor({ track: vt, maxBufferSize: 2 }).readable.getReader()
       // giu nhip khi man dung yen: ve lai chinh canvas len no (danh dau canvas "da doi" de bo ghi bat them 1 khung)
-      const giuNhip = () => { if (rec.state === 'inactive') return; ctx.drawImage(cv, 0, 0); o.soVe++; o.hen = setTimeout(giuNhip, 1000 / q.fps) }
+      const giuNhip = () => { if (rec.state === 'inactive') return; veLai(); o.soVe++; o.hen = setTimeout(giuNhip, 1000 / q.fps) }
       ;(async () => {
         for (;;) {
           const { value: fr, done } = await rd.read()
           if (done) break
           if (rec.state === 'inactive') { fr.close(); rd.cancel().catch(() => {}); break }
-          ctx.drawImage(fr, sx, sy, sw, sh, 0, 0, ow, oh); fr.close()
+          vaoKhung(fr, sx, sy, sw, sh); fr.close()
           o.soVe++
           clearTimeout(o.hen); o.hen = setTimeout(giuNhip, 1800 / q.fps)
         }
@@ -249,10 +341,12 @@ window.batDauQuay = async function (q) {
       o.iv = setInterval(ve, 1000 / q.fps)
     }
     rec.start(1000)
+    o.t0Epoch = Date.now()
     dangQuay = o
-    return { ok: true, w: ow, h: oh, mime: rec.mimeType, duoi: /^video\/mp4/.test(rec.mimeType) ? 'mp4' : 'webm', tieng: at.length > 0, msMo: Math.round(performance.now() - t0), nhip: !theoKhung ? 'dongho' : (q.nhip !== 'khung' && typeof MediaStreamTrackProcessor === 'function' ? 'xuly' : 'khung'), fps: q.fps, treTieng: treMs }
+    return { ok: true, w: ow, h: oh, mime: rec.mimeType, duoi: /^video\/mp4/.test(rec.mimeType) ? 'mp4' : 'webm', tieng: coAm, mic: !!mic, micLoi, t0Epoch: o.t0Epoch, treHinh, msMo: Math.round(performance.now() - t0), nhip: !theoKhung ? 'dongho' : (q.nhip !== 'khung' && typeof MediaStreamTrackProcessor === 'function' ? 'xuly' : 'khung'), fps: q.fps, treTieng: treMs }
   } catch (e) {
     if (st) st.getTracks().forEach((t) => t.stop())
+    if (mic) mic.getTracks().forEach((t) => t.stop())
     haNen()
     return { ok: false, loi: (e && e.name) + ': ' + (e && e.message) }
   }
