@@ -107,7 +107,7 @@ async function phanGiaoDien() {
     const n = document.getElementById('nhom-ung-dung'), t = document.getElementById('nhom-ung-dung-ten'), box = document.getElementById('mo-cung')
     const c = box.querySelector('.chon-nut.chon'), nhan = n.querySelector('.nhan-chon')
     const hang = n.querySelector('.hang').getBoundingClientRect(), hb = box.getBoundingClientRect(), hn = nhan.getBoundingClientRect()
-    return { an: n.hidden, anTen: t.hidden, tieuDe: t.textContent, nhan: nhan.textContent, chon: c ? c.dataset.v : null,
+    return { an: document.getElementById('hang-mo-cung').hidden, anNhom: n.hidden, anTen: t.hidden, tieuDe: t.textContent, nhan: nhan.textContent, chon: c ? c.dataset.v : null,
       nut: [...box.querySelectorAll('.chon-nut')].map((b) => b.textContent), msg: document.getElementById('msg-mo-cung').textContent,
       cao: Math.round(n.getBoundingClientRect().height), tran: hb.right > hang.right + 0.5, de: hn.right > hb.left, tranTrang: document.documentElement.scrollWidth > innerWidth }
   })()`)
@@ -148,7 +148,7 @@ async function phanGiaoDien() {
   moCung = { hoTro: false, bat: false, biChan: false }
   w = await mo(420)
   d = await doc(w)
-  kiem('khong ho tro: an ca nhom', d.an && d.anTen)
+  kiem('khong ho tro: an HANG Mo cung, nhom Ung dung van hien (con hang Cap nhat)', d.an && !d.anNhom && !d.anTen)
   w.destroy()
 }
 

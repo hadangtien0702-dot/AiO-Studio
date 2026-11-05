@@ -49,3 +49,10 @@ contextBridge.exposeInMainWorld('banQuyen', {
   huy: () => ipcRenderer.invoke('bq:huy'),
   mua: () => ipcRenderer.invoke('bq:mua'),
 })
+
+/* Cap nhat phan mem (05/11) */
+contextBridge.exposeInMainWorld('capNhat', {
+  get: () => ipcRenderer.invoke('capnhat:get'),
+  kiemNgay: () => ipcRenderer.invoke('capnhat:kiem-ngay'),
+  taiVe: () => ipcRenderer.invoke('capnhat:tai'),
+})

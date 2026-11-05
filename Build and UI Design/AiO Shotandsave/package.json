@@ -48,6 +48,8 @@
     "test:canvasapp": "node scripts/test/do-canvas-app.cjs",
     "test:canvasfigjam": "node scripts/test/do-canvas-figjam.cjs",
     "thu:canvas": "node scripts/test/thu-dung-canvas.cjs",
+    "test:capnhat": "node scripts/test/do-cap-nhat.cjs",
+    "test:capnhat-gd": "node scripts/test/do-cap-nhat-giao-dien.cjs",
     "dist:mac": "electron-builder --mac --x64 --arm64 --publish never"
   },
   "devDependencies": {

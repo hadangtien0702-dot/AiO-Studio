@@ -295,6 +295,17 @@ const DICH = {
     'bq.trayConNgay': 'Dùng thử còn {n} ngày · Nhập mã…',
     'bq.trayHetHan': 'Hết dùng thử · Nhập mã bản quyền…',
     'bq.baoKhoa': 'Đã hết 14 ngày dùng thử. Mở Cài đặt và nhập mã bản quyền để tiếp tục chụp.',
+    // Cap nhat phan mem (05/11)
+    'cn.dangDung': 'Bạn đang dùng bản {v}.',
+    'cn.coBanMoi': 'Có bản mới {v}',
+    'cn.taiVe': 'Tải về',
+    'cn.kiemNgay': 'Kiểm tra ngay',
+    'cn.dangKiem': 'Đang kiểm tra…',
+    'cn.moiNhat': 'Bạn đang dùng bản mới nhất ({v}).',
+    'cn.khongKiem': 'Chưa kiểm tra được lúc này.',
+    'cn.dangBan': 'Đang chụp hoặc quay, thử lại sau.',
+    'cn.tray': 'Có bản mới {v} · Tải về',
+    'cn.baoMoi': 'Có bản mới {v}. Mở menu ở khay hệ thống hoặc Cài đặt để tải về.',
   },
   en: {
     'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
@@ -572,6 +583,17 @@ const DICH = {
     'bq.trayConNgay': 'Trial: {n} days left · Enter key…',
     'bq.trayHetHan': 'Trial ended · Enter license key…',
     'bq.baoKhoa': 'Your 14-day trial has ended. Open Settings and enter your license key to keep capturing.',
+    // Software update (05/11)
+    'cn.dangDung': 'You are on version {v}.',
+    'cn.coBanMoi': 'New version {v} available',
+    'cn.taiVe': 'Download',
+    'cn.kiemNgay': 'Check now',
+    'cn.dangKiem': 'Checking…',
+    'cn.moiNhat': 'You have the latest version ({v}).',
+    'cn.khongKiem': 'Could not check right now.',
+    'cn.dangBan': 'Capturing or recording, try again later.',
+    'cn.tray': 'New version {v} · Download',
+    'cn.baoMoi': 'New version {v} is available. Open the tray menu or Settings to download it.',
   },
 }
 

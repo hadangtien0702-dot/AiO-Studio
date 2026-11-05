@@ -146,10 +146,11 @@
       <p id="msg-folder" class="msg hang-msg"></p>
     </section>
 
-    <!-- ── Ung dung (04/11): chi hien tren ban Windows dong goi, settings.js go hidden ─────── -->
-    <h2 class="nhom-ten" id="nhom-ung-dung-ten" data-i18n="set.nhom.ungDung" hidden>Ứng dụng</h2>
-    <section class="nhom" id="nhom-ung-dung" hidden>
-      <div class="hang">
+    <!-- ── Ung dung (04/11 Mo cung Windows + 05/11 Cap nhat): MOT nhom chung. Hang Mo cung chi hien tren ban Windows dong goi (settings.js),
+         hang Cap nhat hien o moi he dieu hanh. Cap nhat tu chay ngam; hang nay chi de xem + bam kiem tra tay ─── -->
+    <h2 class="nhom-ten" id="nhom-ung-dung-ten" data-i18n="set.nhom.ungDung">Ứng dụng</h2>
+    <section class="nhom" id="nhom-ung-dung">
+      <div class="hang" id="hang-mo-cung" hidden>
         <span class="nhan-chon" data-i18n="set.moCung.tieuDe"></span>
         <div class="chon-nhom nho" id="mo-cung" role="group">
           <button class="chon-nut" data-v="1" data-i18n="set.moCung.bat"></button>
@@ -157,6 +158,16 @@
         </div>
       </div>
       <p id="msg-mo-cung" class="msg err hang-msg"></p>
+      <div class="hang" id="the-cn">
+        <div class="tm-chu">
+          <div id="cn-dong" class="tm-ten"></div>
+          <div id="cn-ghi-chu" class="tm-duong"></div>
+        </div>
+        <div class="phai">
+          <button id="cn-tai" class="nut chinh" data-i18n="cn.taiVe" hidden></button>
+          <button id="cn-kiem" class="nut" data-i18n="cn.kiemNgay"></button>
+        </div>
+      </div>
     </section>
   </main>
 
