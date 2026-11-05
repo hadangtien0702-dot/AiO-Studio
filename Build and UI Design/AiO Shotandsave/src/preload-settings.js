@@ -28,6 +28,10 @@ contextBridge.exposeInMainWorld('settings', {
   setKhaySoAnh: (n) => ipcRenderer.invoke('settings:set-khay-so-anh', n),
   /** So giay cho roi khay tu thu ve nut tron: 5 | 10 | 15. */
   setKhayTuThu: (n) => ipcRenderer.invoke('settings:set-khay-tu-thu', n),
+  /** 05/11 Nut an tren thanh cong cu man chup: mang khoa nut bi an (rect, arrow, text, blur, ocr, so, but, cuon, storyboard, quay). */
+  setAnNut: (ds) => ipcRenderer.invoke('settings:set-an-nut', ds),
+  /** 05/11 Kinh lup khi chon vung: true | false. */
+  setKinhLup: (bat) => ipcRenderer.invoke('settings:set-kinh-lup', !!bat),
   /** Doi kieu lam mo: 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10). */
   setLamMo: (kieu) => ipcRenderer.invoke('settings:set-lam-mo', kieu),
   /** Bat / tat mo cung Windows. Tra { hoTro, bat, biChan } doc lai tu Windows. */

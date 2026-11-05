@@ -37,6 +37,7 @@
     "test:sobuoc": "node scripts/test/do-so-buoc.mjs",
     "test:thanhcu": "node scripts/test/do-thanh-cong-cu.cjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
+    "test:viecnho": "node scripts/test/do-viec-nho.cjs",
     "test:khovideo": "node scripts/test/do-kho-video.cjs",
     "test:quayvideo": "node scripts/test/do-quay-video.mjs",
     "test:quayapp": "node scripts/test/do-quay-app.mjs",

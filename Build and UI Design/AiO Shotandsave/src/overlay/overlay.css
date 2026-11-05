@@ -414,7 +414,28 @@ html, body {
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .muc-xo svg { width: 20px; height: 20px; flex: none; }
-.muc-xo .so { margin-left: auto; padding-left: 14px; font: 600 10px/1 Inter, "Segoe UI", sans-serif; font-style: normal; color: var(--text-3); }
+.muc-xo .so, .muc-xo .pt { margin-left: auto; padding-left: 14px; font: 600 10px/1 Inter, "Segoe UI", sans-serif; font-style: normal; color: var(--text-3); }
 .muc-xo:hover { background: var(--bg-hover); color: var(--text-1); }
 .muc-xo.chon { background: var(--accent-soft); color: var(--accent-text); }
-.muc-xo.chon .so { color: var(--accent-text); }
+.muc-xo.chon .so, .muc-xo.chon .pt { color: var(--accent-text); }
+
+/* ── 05/11 NHOM XO MOI (Lam mo / Lam noi vung, Doc chu / Doc ma QR), KINH LUP, LAM NOI VUNG ────────────────────────
+   Cung khuon voi nut but: nut chinh + menu xo. Thanh KHONG rong them (cong cu moi nam trong menu). */
+.nhom-xo[hidden] { display: none !important; }
+#blur-nhom.sp .ic-blur, #blur-nhom:not(.sp) .ic-spot { display: none; }
+#blur-nhom .ic-blur, #blur-nhom .ic-spot { flex: none; }
+
+/* Kinh lup luc chon vung: o phong to 8 lan quanh con tro + toa do (px that). Chi dung transform de dich nen khong gay layout. */
+#kinh-lup {
+  position: fixed; left: 0; top: 0; z-index: 8; width: 128px;
+  pointer-events: none; will-change: transform; contain: layout paint style;
+  background: rgb(22 22 22 / 96%); border: 1px solid var(--line-2); border-radius: var(--r-md);
+  box-shadow: var(--shadow-md); overflow: hidden;
+}
+#kinh-lup[hidden] { display: none !important; }
+#kl-cv { display: block; width: 128px; height: 128px; }
+#kl-to {
+  padding: 5px 6px; text-align: center; white-space: nowrap;
+  font: 600 11px/1 Inter, "Segoe UI", sans-serif; color: var(--text-2);
+  border-top: 1px solid var(--line-2);
+}

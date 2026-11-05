@@ -44,6 +44,8 @@ const khayBox = document.getElementById('khay-kieu')
 const khaySoAnhBox = document.getElementById('khay-so-anh')
 const khayTuThuBox = document.getElementById('khay-tu-thu')
 const lamMoBox = document.getElementById('lam-mo-kieu')
+const thanhNutBox = document.getElementById('thanh-nut')      // 05/11: chon nut hien tren thanh cong cu man chup
+const kinhLupBox = document.getElementById('kinh-lup-bat')    // 05/11: kinh lup khi chon vung
 const moCungBox = document.getElementById('mo-cung')
 const msgMoCung = document.getElementById('msg-mo-cung')
 const loaiBox = document.getElementById('anh-loai')
@@ -153,6 +155,8 @@ async function load() {
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
   if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu === 0 ? 0 : (s.khayTuThu || 5)))   // 0 = Khong thu
   if (lamMoBox) chonPill(lamMoBox, s.lamMoKieu || 'mosaic')
+  if (thanhNutBox) thanhNutBox.querySelectorAll('.nut-chip').forEach((b) => b.classList.toggle('chon', !(s.anNut || []).includes(b.dataset.k)))
+  if (kinhLupBox) chonPill(kinhLupBox, s.kinhLup === false ? '0' : '1')
   datMoCung(s.moCung)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
@@ -216,6 +220,27 @@ if (lamMoBox) {
     if (!b || b.classList.contains('chon')) return
     chonPill(lamMoBox, b.dataset.v)
     await window.settings.setLamMo(b.dataset.v)
+  })
+}
+
+/* ── Thanh cong cu: chon nut hien (chip sang = hien, chip toi = an; phim tat van chay) ── */
+if (thanhNutBox) {
+  thanhNutBox.querySelectorAll('.nut-chip').forEach((b) => { b.title = b.textContent; b.setAttribute('aria-pressed', 'true') })
+  thanhNutBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.nut-chip')
+    if (!b) return
+    b.classList.toggle('chon')
+    b.setAttribute('aria-pressed', String(b.classList.contains('chon')))
+    const an = [...thanhNutBox.querySelectorAll('.nut-chip:not(.chon)')].map((x) => x.dataset.k)
+    await window.settings.setAnNut(an)
+  })
+}
+if (kinhLupBox) {
+  kinhLupBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    chonPill(kinhLupBox, b.dataset.v)
+    await window.settings.setKinhLup(b.dataset.v === '1')
   })
 }
 

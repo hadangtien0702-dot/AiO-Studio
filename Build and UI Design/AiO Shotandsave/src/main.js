@@ -28,6 +28,7 @@ const { taoKhayThu, giayHopLe } = require('./khay-thu') // 01/10: khay tu thu ve
 const { tinhVienQuay, giao: giaoHCN } = require('./vien-quay') // 29/09: vien quay 3 giay nam NGOAI vung
 const khoDai = require('./kho-dai') // 29/09: dai Storyboard GIU LAI sau khi tat app, tach khoi khay anh thuong
 const canvasKho = require('./canvas-kho') // 12/10: Canvas y tuong — khung tren bang = thu muc con cung ten
+const henGio = require('./hen-gio') // 05/11: hen gio chup 3 / 5 / 10 giay tu menu khay
 const moCungMay = require('./mo-cung-may') // 04/11: tu mo cung Windows, tat duoc trong Cai dat
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
@@ -549,6 +550,11 @@ function dongBanQuyenTray() {
   return [{ label: nhan, click: () => openSettings() }, { type: 'separator' }]
 }
 
+function batDauHenGio(giay) {
+  if (ghiHinh || cuon || overlayWins.length) return
+  henGio.batDau(giay, { BrowserWindow, screen, chup: () => startCapture(), ghiLog, onDoi: () => rebuildTrayMenu() })
+}
+
 function rebuildTrayMenu() {
   if (!tray) return
   const menu = Menu.buildFromTemplate([
@@ -556,6 +562,10 @@ function rebuildTrayMenu() {
     // 01/10: dang quay video -> muc DAU la Dung quay (phim tat chup luc nay cung = dung, xem startCapture)
     ...(ghiHinh ? [{ label: T('tray.dungQuay'), accelerator: currentHotkey, click: () => dungGhiHinh('tray') }, { type: 'separator' }] : []),
     { label: T('tray.chup'), accelerator: ghiHinh ? undefined : currentHotkey, enabled: !ghiHinh, click: () => startCapture() },
+    // 05/11: hen gio chup (dem nguoc khong lot vao anh); dang dem thi muc nay thanh Huy hen gio
+    henGio.dangDem()
+      ? { label: T('tray.huyHen'), click: () => henGio.huy() }
+      : { label: T('tray.henGio'), enabled: !ghiHinh, submenu: [3, 5, 10].map((g) => ({ label: T('tray.henGiay').replace('{n}', String(g)), click: () => batDauHenGio(g) })) },
     { type: 'separator' },
     // 12/10 (anh: "cai settings nay em lam gon lai duoc khong"): 3 khay gop vao MOT muc con -> menu tu 11 xuong 6 dong
     { label: T('tray.cacKhay'), submenu: [
@@ -716,12 +726,45 @@ ipcMain.handle('settings:get', () => {
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
     khayTuThu: giayHopLe(c.khayTuThu),
     lamMoKieu: kieuLamMo(c.lamMoKieu),
+    anNut: anNutHopLe(c.anNut),
+    kinhLup: c.kinhLup !== false,
     moCung: moCungMay.trangThai(app),
   }
 })
 
 /** Kieu lam mo hop le: 'mosaic' (Kham o, mac dinh) | 'blur' (Mo min) | 'kin' (To kin, 04/10). Gia tri la -> mac dinh. */
 function kieuLamMo(v) { return v === 'blur' || v === 'kin' ? v : 'mosaic' }
+
+/* 05/11: nut nguoi dung chon AN tren thanh cong cu man chup (phim tat van chay). Chi nhung nut o danh sach nay moi an duoc;
+   V, mau, hoan tac / lam lai, huy, xong luon hien. Gia tri la bi bo, trung lap bi gop. */
+const NUT_AN_DUOC = ['rect', 'arrow', 'text', 'blur', 'ocr', 'so', 'but', 'cuon', 'storyboard', 'quay']
+function anNutHopLe(v) { return Array.isArray(v) ? NUT_AN_DUOC.filter((k) => v.includes(k)) : [] }
+/* Cau hinh gui cho man chup moi lan mo (overlay:init) va khi doi trong Cai dat (overlay:update-config). */
+function cauHinhOverlay() {
+  const c = kho.docCauHinh()
+  return { lamMoKieu: kieuLamMo(c.lamMoKieu), anNut: anNutHopLe(c.anNut), kinhLup: c.kinhLup !== false }
+}
+function phatCauHinhOverlay(patch) {
+  for (const w of overlayWins) {
+    if (!w.isDestroyed()) w.webContents.send('overlay:update-config', patch)
+  }
+}
+
+ipcMain.handle('settings:set-an-nut', (_e, ds) => {
+  const val = anNutHopLe(ds)
+  kho.ghiCauHinh({ anNut: val })
+  ghiLog('doi nut an tren thanh cong cu: [' + val.join(',') + ']')
+  phatCauHinhOverlay({ anNut: val })
+  return { anNut: val }
+})
+
+ipcMain.handle('settings:set-kinh-lup', (_e, bat) => {
+  const val = bat !== false && bat !== 0 && bat !== '0'
+  kho.ghiCauHinh({ kinhLup: val })
+  ghiLog('doi kinh lup: ' + (val ? 'bat' : 'tat'))
+  phatCauHinhOverlay({ kinhLup: val })
+  return { kinhLup: val }
+})
 
 // 04/11: cong tac Mo cung Windows trong Cai dat. Tra trang thai doc lai tu Windows, khong tra gia tri vua bam.
 ipcMain.handle('settings:set-mo-cung', (_e, bat) => moCungMay.dat(app, kho, ghiLog, !!bat))
@@ -889,6 +932,7 @@ async function startCapture() {
   if (ghiHinh) { dungGhiHinh('phim tat'); return }
   if (cuon) { cuon.dung = true; return } // 06/10: dang chup cuon -> phim tat chup = Xong (duong dung luon co)
   if (overlayWins.length) return // dang chon vung, bo qua
+  henGio.huy() // 05/11: bam phim tat luc dang hen gio = chup ngay, bo hen
   khayThu.huy() // 01/10: khay dang bay ve nut / bung ra thi go san dien ngay (cua so trong suot phu video lau = video den)
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
   if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
@@ -1264,7 +1308,7 @@ function taoPool() {
     win.webContents.once('did-finish-load', () => {
       win._poolReady = true
       // origin gui som de renderer co goc; luc kich hoat gui lai init day du.
-      if (!win.isDestroyed()) win.webContents.send('overlay:init', { origin: { x: disp.bounds.x, y: disp.bounds.y }, lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic' })
+      if (!win.isDestroyed()) win.webContents.send('overlay:init', { origin: { x: disp.bounds.x, y: disp.bounds.y }, ...cauHinhOverlay() })
     })
     win.on('closed', () => { poolWins = poolWins.filter((w) => w !== win) })
     poolWins.push(win)
@@ -1316,7 +1360,7 @@ function kichHoatOverlay(win, disp, idx, sanSang) {
     // [do] 14/09: selftest co SHAPE (duong cat anh goc aioshot://raw) / VAT 2 MAN (composite raw)
     testShape: laSelftest && process.env.AIO_TEST_SHAPE === '1',
     testComposite: laSelftest && process.env.AIO_TEST_COMPOSITE === '1',
-    lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic',
+    ...cauHinhOverlay(), // lamMoKieu + anNut (nut an tren thanh cong cu) + kinhLup
   })
   // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
   if (!win.isVisible()) { win.show(); win.focus() }
