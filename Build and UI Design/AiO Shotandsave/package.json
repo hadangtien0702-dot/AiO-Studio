@@ -22,6 +22,7 @@
     "test:storyboard": "node scripts/test/do-storyboard.mjs",
     "test:vienquay": "node scripts/test/do-vien-quay.mjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
+    "test:cuaso": "node scripts/test/do-chup-cua-so.cjs",
     "dist:mac": "electron-builder --mac --x64 --arm64 --publish never"
   },
   "devDependencies": {

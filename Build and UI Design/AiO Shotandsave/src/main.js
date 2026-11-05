@@ -399,6 +399,7 @@ function rebuildTrayMenu() {
   const menu = Menu.buildFromTemplate([
     ...dongBanQuyenTray(),
     { label: T('tray.chup'), accelerator: currentHotkey, click: () => startCapture() },
+    { label: T('tray.chupLai'), click: () => chupLaiVungCuoi() },
     { type: 'separator' },
     { label: T('tray.khay'), click: () => showShelf() },
     { label: T('tray.storyboard'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
@@ -439,6 +440,20 @@ function registerHotkey() {
   try { ok = globalShortcut.register(currentHotkey, () => startCapture()) }
   catch (e) { ok = false }
   if (!ok && IS_DEV) console.warn('[shotandsave] khong dang ky duoc phim tat', currentHotkey)
+  registerHotkeyLai()
+  return ok
+}
+
+/* 05/11: phim tat "chup lai vung lan truoc". Mac dinh Ctrl/Cmd+Shift+Alt+S (them Alt vao phim chup chinh, it dung voi app khac);
+   doi bang cau-hinh.json "hotkeyLai" (chuoi rong "" = tat). Dang ky loi chi ghi log — khong lam hong phim chup chinh. */
+const DEFAULT_HOTKEY_LAI = 'CommandOrControl+Shift+Alt+S'
+function registerHotkeyLai() {
+  const ch = kho.docCauHinh()
+  const accel = typeof ch.hotkeyLai === 'string' ? ch.hotkeyLai : DEFAULT_HOTKEY_LAI
+  if (!accel || accel === currentHotkey) return false
+  let ok = false
+  try { ok = globalShortcut.register(accel, () => chupLaiVungCuoi()) } catch (e) { ok = false }
+  ghiLog('phim chup-lai-vung ' + accel + ' dang-ky=' + (ok ? 'OK' : 'FAIL'))
   return ok
 }
 
@@ -451,10 +466,12 @@ function setHotkey(accel) {
   try { ok = globalShortcut.register(accel, () => startCapture()) } catch (e) { ok = false }
   if (!ok) {
     try { globalShortcut.register(old, () => startCapture()) } catch (e) {}
+    registerHotkeyLai() // unregisterAll o tren da go ca phim chup-lai-vung
     ghiLog('doi phim ' + old + ' -> ' + accel + ' FAIL (bi giu), giu phim cu')
     return { ok: false, hotkey: old }
   }
   currentHotkey = accel
+  registerHotkeyLai() // unregisterAll o tren da go ca phim chup-lai-vung
   kho.ghiCauHinh({ hotkey: accel })
   rebuildTrayMenu()
   ghiLog('doi phim ' + old + ' -> ' + accel + ' OK, da luu config')
@@ -688,8 +705,10 @@ let nguonGrab = 'grab' // 'luong' (0.5.0) | 'grab' (getSources cu)
 const GRAB_TRUOC = process.env.AIO_GRAB_TRUOC !== '0'
 let layersSanSang = null // layers cua the he hien tai — overlay nao nap xong SAU grab thi lay o day
 
-async function startCapture() {
+async function startCapture(opts) {
   if (overlayWins.length) return // dang chon vung, bo qua
+  // 05/11: opts.vung = chup lai vung lan truoc (phys toan cuc). Chi nhan doi tuong that, tray.on('click') truyen event vao day.
+  vungNapSan = (opts && opts.vung && Number.isFinite(opts.vung.w)) ? opts.vung : null
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
   if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
     ghiLog('capture: KHOA — het dung thu, chua co ma')
@@ -714,6 +733,7 @@ async function startCapture() {
     (GRAB_TRUOC ? ' grab-truoc' : '') + (luong.sanSang() ? ' luong' : ''))
   if (GRAB_TRUOC) kickGrab() // xem chu thich GRAB_TRUOC
   openOverlays(displays)
+  if (!vungNapSan) layCuaSoNen() // 05/11: danh sach cua so de re chuot chon — chay NEN, sau khi overlay da len
 }
 
 /* Bat dau grab — goi SAU khi overlay dau tien da hien + paint. Chan luong ~0,5s
@@ -956,6 +976,14 @@ ipcMain.on('overlay:drag-end', (e) => {
   dragAnchor = null
   ghiLog('drag-end rect=' + JSON.stringify(rect))
   if (rect.w < 8 || rect.h < 8) { ghiLog('huy (vung qua nho)'); closeOverlay(); return }
+  chotVung(rect, dragOwnerId)
+})
+
+/* CHOT mot vung (phys toan cuc) da biet: nam tron mot man -> vao che do ve tren man do; vat ngang nhieu man -> ghep.
+   Tach tu drag-end (05/11) de DUNG CHUNG cho 3 duong: keo chon · bam chon cua so · chup lai vung lan truoc.
+   Phan than ham GIU NGUYEN tung dong nhu truoc khi tach. */
+function chotVung(rect, chuId) {
+  nhoVungCuoi(rect)
   // Nam TRON mot man? (so bang PIXEL VAT LY — dung moi scale/do phan giai)
   const chua = manCache.find((m) =>
     rect.x >= m.px && rect.y >= m.py &&
@@ -975,11 +1003,101 @@ ipcMain.on('overlay:drag-end', (e) => {
     }
   }
   // Vat ngang nhieu man -> chu ghep theo PIXEL VAT LY (1:1 tung man, khong meo)
-  const owner = overlayWins.find((w) => !w.isDestroyed() && w.webContents.id === dragOwnerId)
+  const owner = overlayWins.find((w) => !w.isDestroyed() && w.webContents.id === chuId)
   ghiLog('composite (vat ngang, phys)')
   if (owner) owner.webContents.send('overlay:composite', rect)
   else closeOverlay()
+}
+
+/* ---------------------------------------------------------------------- */
+/* CHON CUA SO (re chuot + bam) va CHUP LAI VUNG LAN TRUOC — 05/11/2026    */
+/* ---------------------------------------------------------------------- */
+const chonCuaSo = require('./overlay/chon-cua-so.js')
+const layCuaSo = require('./lay-cua-so.js')
+const CHON_CUA_SO_BAT = process.env.AIO_CUA_SO !== '0' // doi chung / cong tat khan cap
+let cuaSoGen = 0              // the he lay danh sach (moi luot chup +1; ket qua cu bi bo)
+let danhSachCuaSo = null      // [{x,y,w,h}] PHYS toan cuc, tren cung truoc; null = chua ve / khong co
+let vungNapSan = null         // {x,y,w,h} phys — chup lai vung lan truoc: ap vao overlay ngay khi no hien
+
+/** Lay danh sach cua so NEN (khong chan viec hien overlay). Xong thi gui cho moi overlay. */
+function layCuaSoNen() {
+  danhSachCuaSo = null
+  if (!CHON_CUA_SO_BAT) return
+  const gen = ++cuaSoGen
+  layCuaSo.layDanhSach({ pid: process.pid }).then((r) => {
+    if (gen !== cuaSoGen) return // luot chup khac / da dong
+    let ds = chonCuaSo.docDanhSach(r.text)
+    if (process.platform === 'darwin') {
+      // Mac tra DIP: doi sang phys cung he voi raPhys (tren Mac = nhan sf man chua diem)
+      ds = ds.map((c) => {
+        const a = raPhys({ x: c.x, y: c.y }), b = raPhys({ x: c.x + c.w, y: c.y + c.h })
+        return { x: a.x, y: a.y, w: b.x - a.x, h: b.y - a.y }
+      })
+    }
+    ghiLog('cua-so: ' + (r.ok ? ds.length + ' cua so' : 'LOI lay danh sach') + ' trong ' + r.ms + 'ms')
+    if (!r.ok || !ds.length) return
+    danhSachCuaSo = ds
+    for (const w of overlayWins) guiCuaSoChoOverlay(w)
+  }).catch(() => {})
+}
+
+function guiCuaSoChoOverlay(win) {
+  if (!danhSachCuaSo || win.isDestroyed() || !win._daKichHoat) return
+  const m = manCache.find((x) => x.id === win._displayId)
+  if (!m) return
+  win.webContents.send('overlay:cua-so', { ds: danhSachCuaSo, man: { px: m.px, py: m.py, pw: m.pw, ph: m.ph, sf: m.sf } })
+}
+
+/** Renderer bao: nguoi dung BAM (khong keo) len mot cua so — rect phys cua cua so do. Thay cho drag-end. */
+ipcMain.on('overlay:chon-cua-so', (e, rect) => {
+  if (!rect || ![rect.x, rect.y, rect.w, rect.h].every(Number.isFinite)) return
+  if (dragTimer) { clearInterval(dragTimer); dragTimer = null }
+  dragAnchor = null
+  const kep = chonCuaSo.kepVaoMan(rect, manCache)
+  ghiLog('chon-cua-so rect=' + JSON.stringify(rect) + (kep ? ' kep=' + JSON.stringify(kep) : ' -> huy (ngoai man / qua nho)'))
+  if (!kep) { closeOverlay(); return }
+  chotVung(kep, e.sender.id)
 })
+
+/* Nho vung cuoi: luc CHOT (keo / bam cua so) va luc XONG (sau khi anh chinh khung bang tay nam) — lan XONG ghi de. */
+function nhoVungCuoi(rect) {
+  if (!rect || ![rect.x, rect.y, rect.w, rect.h].every(Number.isFinite)) return
+  kho.ghiCauHinh({ vungCuoi: { x: Math.round(rect.x), y: Math.round(rect.y), w: Math.round(rect.w), h: Math.round(rect.h) } })
+}
+ipcMain.on('overlay:nho-vung', (e, r) => {
+  // r = rect CUC BO (DIP) cua man gui; doi ve phys toan cuc bang man cua chinh nguoi gui
+  if (!r || ![r.x, r.y, r.w, r.h].every(Number.isFinite)) return
+  const shot = overlayShots.get(e.sender.id)
+  const m = shot && manCache.find((x) => x.id === shot.display.id)
+  if (!m) return
+  nhoVungCuoi({ x: m.px + r.x * m.sf, y: m.py + r.y * m.sf, w: r.w * m.sf, h: r.h * m.sf })
+})
+
+/** Ap vung nap san vao overlay khi cua so can thiet da san sang (goi cuoi moi kichHoatOverlay). */
+function thuApDungVungNapSan() {
+  if (!vungNapSan || !overlayWins.length) return
+  const r = vungNapSan
+  const chua = manCache.find((m) => r.x >= m.px && r.y >= m.py && r.x + r.w <= m.px + m.pw && r.y + r.h <= m.py + m.ph)
+  const win = chua ? overlayWins.find((w) => !w.isDestroyed() && w._displayId === chua.id) : overlayWins.find((w) => !w.isDestroyed())
+  if (!win || !win._daKichHoat) return // chua toi luot cua so do — kichHoatOverlay sau se goi lai
+  vungNapSan = null
+  ghiLog('chup-lai-vung ' + JSON.stringify(r))
+  chotVung(r, win.webContents.id)
+}
+
+/** Chup lai vung lan truoc (menu khay / phim tat rieng). Khong co vung hop le thi bao + chup thuong. */
+function chupLaiVungCuoi() {
+  if (overlayWins.length) return
+  napManCache()
+  const v = kho.docCauHinh().vungCuoi
+  if (!chonCuaSo.vungConHopLe(v, manCache)) {
+    ghiLog('chup-lai-vung: khong co vung hop le ' + JSON.stringify(v || null))
+    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.chupLaiKhongCo') }).show()
+    startCapture()
+    return
+  }
+  startCapture({ vung: { x: v.x, y: v.y, w: v.w, h: v.h } })
+}
 
 
 /**
@@ -1116,6 +1234,9 @@ function kichHoatOverlay(win, disp, idx, sanSang) {
   // HIEN NGAY — cua so trong suot, thay man hinh that, lop mo fade vao (CSS).
   if (!win.isVisible()) { win.show(); win.focus() }
   ghiLog('overlay hien ' + disp.id + (sanSang ? ' (san)' : ''))
+  win._daKichHoat = true
+  guiCuaSoChoOverlay(win)  // 05/11: danh sach cua so da ve truoc overlay nay -> gui ngay
+  thuApDungVungNapSan()    // 05/11: chup lai vung lan truoc
   // Grab da xong truoc khi overlay nay nap (GRAB_TRUOC) -> gui lai frozen cho no.
   if (layersSanSang) {
     const item = layersSanSang.find((L) => L.x === b.x && L.y === b.y)
@@ -1165,6 +1286,7 @@ function closeOverlay() {
   for (const w of overlayWins) { if (!w.isDestroyed()) w.close() }
   overlayWins = []
   pending = null
+  cuaSoGen++; vungNapSan = null; danhSachCuaSo = null // 05/11: bo ket qua lay danh sach cua so cua luot chup nay
   frozenStore.clear(); rawStore.clear() // JPEG ~1MB + NativeImage goc ~32MB/man 4K — khong giu sau khi chup
   lenLichPool(400) // 0.5.0: tao san overlay cho luot sau
 }

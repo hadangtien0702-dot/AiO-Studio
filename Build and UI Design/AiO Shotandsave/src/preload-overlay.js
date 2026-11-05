@@ -30,6 +30,12 @@ contextBridge.exposeInMainWorld('overlay', {
   lock: () => ipcRenderer.send('overlay:lock'),
   /** Man khac da bat dau keo — man nay bo qua chuot. */
   onLocked: (cb) => ipcRenderer.on('overlay:locked', () => cb()),
+  /** 05/11 Chon cua so: main gui danh sach cua so (phys) + toa do man nay khi lay xong: { ds:[{x,y,w,h}], man:{px,py,pw,ph,sf} }. */
+  onCuaSo: (cb) => ipcRenderer.on('overlay:cua-so', (_e, d) => cb(d)),
+  /** 05/11 BAM (khong keo) len cua so: rect phys cua cua so — thay cho dragEnd. */
+  chonCuaSo: (rect) => ipcRenderer.send('overlay:chon-cua-so', rect),
+  /** 05/11 Nho vung cuoi (rect cuc bo DIP cua man nay) de 'chup lai vung lan truoc'. */
+  nhoVung: (rect) => ipcRenderer.send('overlay:nho-vung', rect),
   /** Ghi nhat ky chay (qua main). */
   log: (msg) => ipcRenderer.send('overlay:log', msg),
   /** 29/09 Doc chu (phim 5): { key, x, y, w, h (px thiet bi), sf } -> { ok, dong: [chuoi], boDoc, ngonNguMay, loi }. */

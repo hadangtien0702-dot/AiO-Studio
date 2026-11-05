@@ -74,6 +74,17 @@ let biKhoa = false          // man KHAC dang keo -> man nay bo qua chuot
 let soLanThuGhep = 0        // dem retry cho ghep xuyen man
 let lanVeLocal = 0          // moc lan cuoi mousemove LOCAL ve khung (nhuong/gianh voi main)
 
+/* ── CHON CUA SO (05/11/2026): re chuot len cua so thi sang vien, BAM (khong keo) la chon dung khung cua so ──
+   Danh sach cua so (phys) do MAIN lay NEN va gui sau khi overlay da len; chua co thi moi thu chay y nhu cu.
+   Ham thuan (tim cua so, doi toa do, bam/keo) o chon-cua-so.js. KEO chuot van khoanh vung nhu cu: chi khi nhan
+   chuot LEN MOT CUA SO moi co "nguong bam" (4 DIP dau chua ve khung), ngoai cua so hanh vi keo khong doi. */
+let dsCuaSo = null          // [{x,y,w,h}] phys toan cuc, tren cung truoc
+let manCS = null            // { px, py, pw, ph, sf } cua man nay
+let cuaSoDangTro = null     // cua so dang re chuot len (de khong ve lai khi khong doi)
+let cuaSoLucNhan = null     // cua so duoi con tro LUC MOUSEDOWN (null = nhan ra ngoai cua so -> keo thuong)
+let diemNhan = null         // { x, y } DIP luc mousedown
+let daVuotNguong = false    // da keo qua nguong bam -> la KEO, khong con la BAM
+
 /* ── Nhan tin tu main ─────────────────────────────────────────────────── */
 let cheDoTest = {}
 window.overlay.onInit((data) => {
@@ -150,6 +161,39 @@ window.overlay.onFrozen((data) => {
 })
 
 window.overlay.onLocked(() => { biKhoa = true })
+
+if (window.overlay.onCuaSo) {
+  window.overlay.onCuaSo((d) => {
+    if (!d || !Array.isArray(d.ds) || !d.ds.length || !d.man) return
+    dsCuaSo = d.ds; manCS = d.man
+    const h = document.getElementById('hint-cs')
+    if (h) h.hidden = false
+    window.overlay.log('cua so: nhan ' + d.ds.length + ' cua so')
+  })
+}
+
+/** Cua so nam tren cung tai diem (clientX/Y cua mouse event); null neu chua co danh sach / khong co. */
+function cuaSoTaiChuot(e) {
+  if (!dsCuaSo || !manCS || !window.chonCuaSo) return null
+  const p = window.chonCuaSo.cucBoSangPhys({ x: e.clientX, y: e.clientY }, manCS)
+  return window.chonCuaSo.cuaSoTaiDiem(dsCuaSo, p)
+}
+
+/** Re chuot (khong keo, chua chon): sang vien cua so dang tro bang chinh khung guong cua vung chon. */
+function capNhatCuaSoTro(e) {
+  const c = cuaSoTaiChuot(e)
+  if (c === cuaSoDangTro) return
+  cuaSoDangTro = c
+  if (!c) { xoaGuong(); return }
+  const L = window.chonCuaSo.physSangCucBo(c, manCS, window.innerWidth, window.innerHeight)
+  if (!L) { xoaGuong(); return }
+  hintEl.classList.add('hidden')
+  veGuongKhung(L.x, L.y, L.x + L.w, L.y + L.h)
+  gSize.hidden = false
+  gSize.textContent = c.w + ' × ' + c.h
+  gSize.style.left = L.x + 'px'
+  gSize.style.top = (L.y >= 26 ? L.y - 24 : L.y + 4) + 'px'
+}
 
 /* VE VUNG CHON — thong nhat cho MOI man, du lieu tu MAIN ('overlay:sel-rect',
    DIP toan cuc, dung moi scale/DPI). Man co phan giao: khung cam + 4 tam mo;
@@ -384,6 +428,8 @@ window.addEventListener('mousedown', (e) => {
   if (mode === 'annotate') { batDauVe(e); return }
   dragging = true
   startX = e.clientX; startY = e.clientY // neo local cho ve-ngay (31/08)
+  diemNhan = { x: e.clientX, y: e.clientY }; daVuotNguong = false
+  cuaSoLucNhan = cuaSoTaiChuot(e) // 05/11: nhan len cua so -> co the la BAM chon cua so; ngoai cua so = keo thuong
   hintEl.classList.add('hidden')
   batDauDoKeo()
   // MAIN theo doi chuot he thong (dung moi scale) va phat 'sel-rect' ve.
@@ -406,6 +452,12 @@ window.addEventListener('mousemove', (e) => {
      sang man kia + CHOT vung luc tha (logic luu anh khong doi). */
   if (dragging) {
     lanVeLocal = performance.now() // local dang song — main nhuong khung nay
+    // 05/11: nhan len cua so thi 4 DIP dau la "nguong bam": chua ve khung keo (giu vien cua so), vuot nguong la KEO that.
+    if (cuaSoLucNhan && !daVuotNguong) {
+      if (window.chonCuaSo.laBam(diemNhan, { x: e.clientX, y: e.clientY })) return
+      daVuotNguong = true
+      cuaSoDangTro = null
+    }
     const x1 = Math.max(0, Math.min(startX, e.clientX))
     const y1 = Math.max(0, Math.min(startY, e.clientY))
     const x2 = Math.min(window.innerWidth, Math.max(startX, e.clientX))
@@ -417,6 +469,8 @@ window.addEventListener('mousemove', (e) => {
     gSize.textContent = Math.round((x2 - x1) * DPR) + ' × ' + Math.round((y2 - y1) * DPR)
     gSize.style.left = x1 + 'px'
     gSize.style.top = (y1 >= 26 ? y1 - 24 : y1 + 4) + 'px'
+  } else if (!biKhoa) {
+    capNhatCuaSoTro(e) // 05/11: chua nhan chuot -> sang vien cua so dang tro (neu da co danh sach cua so)
   }
 })
 
@@ -433,7 +487,18 @@ window.addEventListener('mouseup', (e) => {
   if (!dragging) return
   dragging = false
   ketThucDoKeo()
-  window.overlay.dragEnd() // main chot vung + dieu phoi (annotate/composite/huy)
+  /* 05/11 BAM (khong keo) len mot cua so -> chon dung khung cua so do. Chi khi nhan LUC DAU nam tren cua so, chua vuot
+     nguong bam, va luc nha van trong nguong. Khong thoa -> duong keo cu (dragEnd), khong doi mot dong nao. */
+  if (cuaSoLucNhan && !daVuotNguong && diemNhan && window.chonCuaSo.laBam(diemNhan, { x: e.clientX, y: e.clientY })) {
+    const c = cuaSoLucNhan
+    cuaSoLucNhan = null
+    window.overlay.log('bam chon cua so ' + c.w + 'x' + c.h + ' @' + c.x + ',' + c.y)
+    window.overlay.chonCuaSo({ x: c.x, y: c.y, w: c.w, h: c.h })
+    return
+  }
+  cuaSoLucNhan = null
+  window.overlay.dragEnd()
+ // main chot vung + dieu phoi (annotate/composite/huy)
 })
 
 window.addEventListener('keydown', (e) => {
@@ -944,6 +1009,7 @@ function napAnh(url) {
 /* ── Xong: ghep anh + shape roi gui ───────────────────────────────────── */
 function xong(copy) {
   chotOGoChu()
+  window.overlay.nhoVung({ x: curRect.x, y: curRect.y, w: curRect.w, h: curRect.h }) // 05/11: nho vung cuoi cho 'chup lai vung lan truoc'
   // 28/09: dang bat Multi-Shot Storyboard -> main QUAY 3 GIAY dung vung nay (6 khung) roi ghep dai.
   // Net ve (neu co) khong ap len khung video dang chay -> chi gui vung.
   if (isStoryboardMode) {

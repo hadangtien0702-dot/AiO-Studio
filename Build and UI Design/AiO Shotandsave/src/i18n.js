@@ -6,11 +6,13 @@
 const DICH = {
   vi: {
     // App
+    'app.chupLaiKhongCo': 'Chưa có vùng nào để chụp lại (hoặc vùng cũ nằm ngoài màn hình hiện tại). Hãy chụp một lần trước.',
     'app.phimBiGiu': 'Phím tắt chụp {phim} đang bị ứng dụng khác giữ — bấm sẽ không ăn. Mở Cài đặt để đổi phím.',
     'app.khongLuuDuoc': 'Không lưu được ảnh vào {thuMuc} (ổ đầy hoặc mất quyền). Ảnh đã chép vào clipboard — mở Cài đặt để đổi thư mục lưu.',
     'app.khongChupDuoc': 'Không chụp được màn hình (hệ thống chưa cấp quyền hoặc lỗi hiển thị). Trên macOS: mở Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Ghi màn hình. Thử lại sau vài giây hoặc khởi động lại ứng dụng.',
     // Tray
     'tray.chup': 'Chụp màn hình',
+    'tray.chupLai': 'Chụp lại vùng lần trước',
     'tray.khay': 'Mở khay ảnh',
     'tray.storyboard': 'Mở khay Storyboard',
     'tray.moThuMuc': 'Mở thư mục ảnh',
@@ -18,6 +20,7 @@ const DICH = {
     'tray.thoat': 'Thoát',
     // Overlay
     'overlay.hint': 'Kéo để chọn vùng',
+    'overlay.hintCuaSo': 'Bấm để chọn cả cửa sổ',
     'overlay.esc': 'Esc',
     'overlay.huy': 'để huỷ',
     'overlay.select': 'Chọn & di chuyển nét vẽ (phím V)',
@@ -178,16 +181,19 @@ const DICH = {
     'bq.baoKhoa': 'Đã hết 14 ngày dùng thử. Mở Cài đặt và nhập mã bản quyền để tiếp tục chụp.',
   },
   en: {
+    'app.chupLaiKhongCo': 'There is no previous area to capture again (or it lies outside the current screens). Take one capture first.',
     'app.phimBiGiu': 'Capture shortcut {phim} is taken by another app — pressing it won’t work. Open Settings to change it.',
     'app.khongLuuDuoc': 'Could not save the image to {thuMuc} (disk full or no permission). It was copied to the clipboard — open Settings to change the save folder.',
     'app.khongChupDuoc': 'Could not capture screen (permission denied or display error). On macOS: open System Settings > Privacy & Security > Screen Recording. Try again in a few seconds or restart the app.',
     'tray.chup': 'Take screenshot',
+    'tray.chupLai': 'Capture last area again',
     'tray.khay': 'Open shelf',
     'tray.storyboard': 'Open Storyboard shelf',
     'tray.moThuMuc': 'Open shots folder',
     'tray.caiDat': 'Settings…',
     'tray.thoat': 'Quit',
     'overlay.hint': 'Drag to select',
+    'overlay.hintCuaSo': 'Click to pick a window',
     'overlay.esc': 'Esc',
     'overlay.huy': 'to cancel',
     'overlay.select': 'Select & move shape (key V)',
