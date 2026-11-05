@@ -1,0 +1,51 @@
+/* CHE THONG MINH (05/11/2026): lop khung chu + thanh dieu khien, dung chung overlay + anh ghim.
+   Theo chuan man Cai dat: nen toi, nut --bg-4, CAM chi cho nut chinh (Xong). Khong khai :root rieng. */
+
+.che-lop[hidden], .che-strip[hidden] { display: none !important; }
+.che-lop { position: absolute; z-index: 11; }
+
+.che-hop {
+  position: absolute; box-sizing: border-box;
+  border: 1px dashed var(--accent-line); border-radius: 2px;
+  background: transparent; cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.che-hop:hover { background: var(--accent-soft); border-style: solid; border-color: var(--accent); }
+/* Da che: lop to kin nam o canvas ben duoi, khung nay chi vien cam dac de thay "cho nao da che" */
+.che-hop.da-che { border: 1px solid var(--accent); background: transparent; }
+.che-hop.da-che:hover { background: rgb(248 104 32 / 10%); }
+
+.che-strip {
+  position: absolute; z-index: 13;
+  left: 50%; bottom: 50px; transform: translateX(-50%);
+  width: max-content; max-width: calc(100% - 12px);
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 8px 10px;
+  background: rgb(22 22 22 / 98%);
+  border: 1px solid var(--line-2); border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-ui); color: var(--text-1);
+}
+.che-tt { font-size: var(--fs-sm); line-height: 1.4; color: var(--text-2); max-width: 420px; }
+.che-strip[data-trang-thai="dang-doc"] .che-tt::before {
+  content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; vertical-align: -1px;
+  border: 2px solid var(--line-strong); border-top-color: var(--accent); border-radius: 50%;
+  animation: che-xoay .7s linear infinite;
+}
+@keyframes che-xoay { to { transform: rotate(360deg); } }
+.che-hang { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.che-seg { display: inline-flex; padding: 2px; gap: 2px; background: var(--bg-0); border-radius: var(--r-sm); }
+.che-segnut, .che-nut {
+  height: var(--h-ctrl); padding: 0 10px;
+  border: none; border-radius: var(--r-sm);
+  background: var(--bg-4); color: var(--text-1);
+  font: var(--fw-semibold) var(--fs-sm)/1 var(--font-ui); cursor: pointer; white-space: nowrap;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.che-segnut { height: 24px; background: transparent; color: var(--text-2); }
+.che-segnut.chon { background: var(--bg-5); color: var(--text-1); }
+.che-segnut:hover, .che-nut:hover { background: var(--bg-5); }
+.che-nut:disabled { opacity: .45; cursor: default; background: var(--bg-4); }
+/* chu 12px tren cam: chu TOI (tuong phan 6,4:1) - chu trang chi hop le cho chu dam >= 14px (design-system) */
+.che-nut.chinh { background: var(--accent); color: #1a0f08; font-weight: var(--fw-bold); }
+.che-nut.chinh:hover { background: var(--accent-hover); }
