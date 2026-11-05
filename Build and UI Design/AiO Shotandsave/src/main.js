@@ -306,7 +306,7 @@ if (!gotLock) {
   try { fs.appendFileSync(RUN_LOG, new Date().toLocaleTimeString('vi-VN', { hour12: false }) + ' boot: da co ban khac dang chay -> thoat (second-instance)\n') } catch (e) {}
   app.quit()
 } else {
-  app.on('second-instance', () => startCapture())
+  app.on('second-instance', (_e, argv) => { if (hanhDongLan2(argv) === 'canvas') openCanvasWindow(); else startCapture() })
 }
 
 app.setName('AiO Shot & Save')
@@ -390,6 +390,7 @@ app.whenReady().then(() => {
   khoVideo.khoiTao(app.getPath('userData'), ghiLog)
   canvasKho.khoiTao(app.getPath('userData'), ghiLog)
   if (THU_CANVAS) { thuCanvas(); return } // che do do: khong tray, khong phim tat, khong luong chup
+  setTimeout(canvasTaoSanAnhNho, 20000)   // A6 (05/11): tao san anh nho cho thu vien, nen mo Canvas lan dau khong phai cho giai ma anh
   xuatGif.khoiTao(ghiLog)
   setTimeout(khoiPhucVideoDo, 5000) // 02/10: file quay do cua lan truoc (app bi tat giua luc quay) -> dua lai vao khay
   { // 04/10 (anh chot huong A): KHONG xoa sach .keo nua — file da dua cho Premiere bi mat sau khi mo lai app.
@@ -407,6 +408,8 @@ app.whenReady().then(() => {
   setTimeout(kiemBanQuyenNen, 15000)                    // hoi lai Polar sau khi boot yen (toi da 3 ngay/lan, xem banquyen.js)
   setInterval(kiemBanQuyenNen, 6 * 60 * 60 * 1000)
   const okPhim = registerHotkey()
+  dangKyPhimCanvas()
+  if (process.argv.includes('--mo-canvas')) setTimeout(() => openCanvasWindow(), 1500)   // A1: loi tat / lenh "AiO Shot & Save.exe --mo-canvas"
   /* Nhat ky boot: sau nay ai bao "phim tat doi/khong an" la co dau vet ngay
      (truoc 31/08 log chi ghi thao tac chup — chuyen phim tat MU hoan toan). */
   ghiLog('boot v' + app.getVersion() + ' hotkey=' + currentHotkey +
@@ -558,7 +561,7 @@ function rebuildTrayMenu() {
       { label: T('tray.khayStory'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
       { label: T('tray.khayVideo'), click: () => openVideoWindow() },
     ] },
-    { label: T('tray.canvas'), click: () => openCanvasWindow() }, // 12/10: bang y tuong kieu Miro, khung = thu muc cung ten
+    { label: T('tray.canvas') + (phimCanvasDangKy ? '    ' + formatAccel(phimCanvasDangKy) : ''), click: () => openCanvasWindow() }, // 12/10: bang y tuong kieu Miro, khung = thu muc cung ten
     { label: T('tray.moThuMuc'), click: () => shell.openPath(kho.baoDamThuMuc(kho.thuMucAnh())) },
     { type: 'separator' },
     { label: T('tray.caiDat'), click: () => openSettings() },
@@ -607,10 +610,12 @@ function setHotkey(accel) {
   try { ok = globalShortcut.register(accel, () => startCapture()) } catch (e) { ok = false }
   if (!ok) {
     try { globalShortcut.register(old, () => startCapture()) } catch (e) {}
+    dangKyPhimCanvas()   // unregisterAll o tren da go ca phim Canvas
     ghiLog('doi phim ' + old + ' -> ' + accel + ' FAIL (bi giu), giu phim cu')
     return { ok: false, hotkey: old }
   }
   currentHotkey = accel
+  dangKyPhimCanvas()
   kho.ghiCauHinh({ hotkey: accel })
   rebuildTrayMenu()
   ghiLog('doi phim ' + old + ' -> ' + accel + ' OK, da luu config')
@@ -2451,8 +2456,28 @@ function openVideoWindow() { moKhay('video') }
    = THU MUC CON cung ten trong thu muc anh. Toan bo phan thu muc + so bo cuc + luat an toan (khong dung anh goc, khong xoa file
    khong phai cua minh) nam o src/canvas-kho.js; o day chi co cua so, kenh noi va anh nho. Trang: src/canvas. */
 let canvasWin = null
+/* A1 (05/11): mo Canvas khong can menu khay. (1) Phim tat toan he thong, mac dinh Ctrl/Cmd+Alt+Shift+C (doi: cau-hinh.json "phimCanvas";
+   chuoi rong = tat). (2) Chay lai ban cai voi "--mo-canvas" (loi tat tren Desktop / thanh tac vu / Dock) -> ban dang chay mo Canvas.
+   setHotkey() goi unregisterAll() nen PHAI dang ky lai phim nay sau moi lan doi phim chup. */
+const PHIM_CANVAS_MAC_DINH = 'CommandOrControl+Alt+Shift+C'
+let phimCanvasDangKy = ''
+function phimCanvasCauHinh() { const c = kho.docCauHinh(); return typeof c.phimCanvas === 'string' ? c.phimCanvas : PHIM_CANVAS_MAC_DINH }
+function dangKyPhimCanvas(accel) {
+  if (phimCanvasDangKy) { try { globalShortcut.unregister(phimCanvasDangKy) } catch (e) {} }
+  phimCanvasDangKy = ''
+  const p = accel === undefined ? phimCanvasCauHinh() : accel
+  if (!p || p === currentHotkey) return false
+  let ok = false
+  try { ok = globalShortcut.register(p, () => openCanvasWindow()) } catch (e) { ok = false }
+  if (ok) phimCanvasDangKy = p; else ghiLog('canvas: khong dang ky duoc phim ' + p + ' (app khac dang giu), mo bang menu khay')
+  return ok
+}
+const hanhDongLan2 = (argv) => (Array.isArray(argv) && argv.includes('--mo-canvas') ? 'canvas' : 'chup')
 const laCanvas = (e) => !!canvasWin && !canvasWin.isDestroyed() && e.sender === canvasWin.webContents
-function canvasLamMoi() { if (canvasWin && !canvasWin.isDestroyed()) { try { canvasWin.webContents.send('canvas:lam-moi') } catch (e) {} } }
+function canvasLamMoi() {
+  setTimeout(canvasTaoSanAnhNho, 1500)   // A6: vua chup xong -> tao anh nho san (Canvas dong cung tao)
+  if (canvasWin && !canvasWin.isDestroyed()) { try { canvasWin.webContents.send('canvas:lam-moi') } catch (e) {} }
+}
 function openCanvasWindow() {
   if (canvasWin && !canvasWin.isDestroyed()) { canvasWin.show(); canvasWin.focus(); canvasLamMoi(); return }
   const wa = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -2497,6 +2522,7 @@ function canvasNap() {
   }
   const ms = Date.now() - t0
   if (ms > 400) ghiLog('canvas nap ' + r.tt.muc.length + ' tam, ' + r.tt.khung.length + ' khung: ' + ms + ' ms')
+  if (!hangNhoNen.length) setTimeout(canvasTaoSanAnhNho, 50)   // A6: tam moi (chup / chep vao) thi tao anh nho nen
   return { tt: r.tt, loiSo: r.loiSo }
 }
 /* Anh nho cho Canvas (rong 400 px, JPEG): tao khi trang xin lan dau, cat vao <userData>/canvas/anh-nho, lan sau doc lai.
@@ -2508,7 +2534,7 @@ function taoAnhNhoCanvas(p) {
   try {
     const goc = path.resolve(kho.thuMucAnh()), f = path.resolve(p)
     if (!f.startsWith(goc + path.sep) || !/\.(png|jpe?g)$/i.test(f)) return null
-    const st = fs.statSync(f), khoa = f + '|' + st.mtimeMs + '|' + st.size
+    const st = fs.statSync(f), khoa = (st.ino ? st.dev + ':' + st.ino : f) + '|' + st.mtimeMs + '|' + st.size   // 05/11: theo MA FILE -> ban noi trong khung dung chung anh nho voi anh goc
     let buf = anhNhoCanvas.get(khoa)
     if (buf) return buf
     const dir = path.join(app.getPath('userData'), 'canvas', 'anh-nho')
@@ -2525,13 +2551,39 @@ function taoAnhNhoCanvas(p) {
     return buf
   } catch (e) { return null }
 }
-function anhNhoCanvasLanLuot(p) {
-  const viec = hangAnhNho.then(() => new Promise((res) => {
-    const lam = () => { if (overlayWins.length > 0 || ghiHinh) { setTimeout(lam, 250); return } setImmediate(() => res(taoAnhNhoCanvas(p))) }
-    lam()
-  }))
-  hangAnhNho = viec.catch(() => null)
-  return viec
+/* 05/11 (ROADMAP 0g A6): hai hang. GAP = anh trang dang xin (nguoi dung dang nhin), NEN = tao san cho ca thu vien (moi tam moi nhat truoc).
+   Luon lam hang GAP truoc; tung tam mot, nhuong luong chinh giua cac tam; dung han khi dang chup / quay (createFromPath chay o luong chinh). */
+const hangNhoGap = [], hangNhoNen = []
+let nhoDangChay = false
+function chayHangNho() {
+  if (nhoDangChay) return
+  nhoDangChay = true
+  const buoc = () => {
+    if (overlayWins.length > 0 || ghiHinh) { setTimeout(buoc, 250); return }
+    const v = hangNhoGap.shift() || hangNhoNen.shift()
+    if (!v) { nhoDangChay = false; return }
+    setImmediate(() => {
+      let kq = null
+      try { kq = taoAnhNhoCanvas(v.p) } catch (e) {}
+      if (v.res) v.res(kq)
+      setTimeout(buoc, v.res ? 0 : 12)
+    })
+  }
+  buoc()
+}
+function anhNhoCanvasLanLuot(p) { return new Promise((res) => { hangNhoGap.push({ p, res }); chayHangNho() }) }
+/** Tao san anh nho cho CA thu vien (moi nhat truoc), chay nen. Goi: luc app khoi dong, luc Canvas nap, sau moi lan chup. */
+function canvasTaoSanAnhNho() {
+  if (process.env.AIO_NHO_SAN === '0') return   // doi chung cua bai test:canvashangngay: tat tao san
+  try {
+    const goc = kho.thuMucAnh(), q = canvasKho.quet(goc), ds = []
+    for (const f of q.file) if (f.kieu === 'anh') ds.push({ p: path.join(goc, f.ten), t: f.mtime })
+    for (const c of q.con) for (const f of c.file) if (f.kieu === 'anh') ds.push({ p: path.join(goc, c.ten, f.ten), t: f.mtime })
+    ds.sort((a, b) => b.t - a.t)
+    hangNhoNen.length = 0
+    for (const d of ds) hangNhoNen.push({ p: d.p })
+    if (hangNhoNen.length) chayHangNho()
+  } catch (e) { ghiLog('canvas: tao san anh nho LOI ' + (e && e.message)) }
 }
 ipcMain.handle('canvas:nap', (e) => (laCanvas(e) ? canvasNap() : null))
 ipcMain.on('canvas:luu', (e, p) => { if (laCanvas(e)) canvasKho.luuViTri(p) })
@@ -2717,6 +2769,22 @@ ipcMain.on('canvas:mo-thu-muc', (e, id) => {
 ipcMain.on('canvas:chup', (e) => { if (laCanvas(e) && !THU_CANVAS) startCapture() })
 /* [do] --thu-canvas: chay TRANG that + MAIN that tren mot thu muc anh thu, cua so khong hien. Keo / bam bang su kien con tro cua
    chinh trang (cung duong voi tay nguoi dung, tru cai chuot that). Ben chay bai (scripts/test/do-canvas-app.cjs) doi chieu voi dia. */
+/** [do] A1: phim tat Canvas + lenh --mo-canvas, KHONG bat Canvas len man (chi dang ky roi go ngay). */
+async function thuPhimCanvas() {
+  const kq = { accel: PHIM_CANVAS_MAC_DINH }
+  const qua = (f) => { try { return f() } catch (e) { return 'LOI ' + e.message } }
+  kq.macDinhDangKy = dangKyPhimCanvas(PHIM_CANVAS_MAC_DINH) && globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH)
+  globalShortcut.unregisterAll()                                  // giong setHotkey()
+  kq.saoUnregister = globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH)
+  kq.sauDoiPhimChup = dangKyPhimCanvas(PHIM_CANVAS_MAC_DINH) && globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH)
+  kq.nhanMenu = T('tray.canvas') + (phimCanvasDangKy ? '    ' + formatAccel(phimCanvasDangKy) : '')
+  kq.nhanMenuCoPhim = phimCanvasDangKy !== '' && kq.nhanMenu.length > T('tray.canvas').length
+  kq.tat = dangKyPhimCanvas('') === false && phimCanvasDangKy === '' && !globalShortcut.isRegistered(PHIM_CANVAS_MAC_DINH) ? false : 'van dang ky'
+  kq.lenhCanvas = qua(() => hanhDongLan2(['app.exe', '--mo-canvas']))
+  kq.lenhThuong = qua(() => hanhDongLan2(['app.exe']))
+  globalShortcut.unregisterAll()
+  return kq
+}
 async function thuCanvas() {
   const kq = { ban: app.getVersion(), loiTrang: [], buoc: {} }
   const cho = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -2728,7 +2796,7 @@ async function thuCanvas() {
     w.webContents.on('console-message', (e, level, msg) => { if (typeof level === 'number' ? level >= 3 : e.level === 'error') kq.loiTrang.push(String(msg || e.message).slice(0, 200)) })
     await new Promise((r) => w.webContents.once('did-finish-load', r))
     const tTai = Date.now()
-    await cho(1800)
+    await cho(process.env.AIO_THU_CHO ? Number(process.env.AIO_THU_CHO) : 1800)   // bai do mo bang tinh gio tu did-finish-load: dat AIO_THU_CHO nho de do duoc < 1,8 s
     const js = (s) => w.webContents.executeJavaScript(s, true)
     await js(`window.__thu = {
       tt() { const t = window.__cv.trangThai(), q = (s) => [...document.querySelectorAll(s)], b = document.getElementById('bao')
@@ -2745,7 +2813,7 @@ async function thuCanvas() {
     const tt = () => js('window.__thu.tt()')
     // 12/10 bai THU DUNG (scripts/test/thu-dung-canvas.cjs): kich ban rieng thay kich ban co san, van cua so an + userData rieng
     if (process.env.AIO_THU_KICHBAN) {
-      await require(process.env.AIO_THU_KICHBAN)({ w, js, cho, kq, tt, tTai, ra: THU_CANVAS.ra, anh: THU_CANVAS.anh, keoRa: canvasKeoRaThu })
+      await require(process.env.AIO_THU_KICHBAN)({ w, js, cho, kq, tt, tTai, ra: THU_CANVAS.ra, anh: THU_CANVAS.anh, keoRa: canvasKeoRaThu, phim: thuPhimCanvas })
       kq.keoRa = canvasKeoRaThu; kq.xemNhanh = canvasXemThu
       fs.writeFileSync(path.join(THU_CANVAS.ra, 'ket-qua.json'), JSON.stringify(kq, null, 1)); app.exit(0); return
     }

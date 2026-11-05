@@ -44,6 +44,7 @@
     "test:canvas": "node scripts/test/do-canvas.cjs",
     "test:canvasapp": "node scripts/test/do-canvas-app.cjs",
     "test:canvasfigjam": "node scripts/test/do-canvas-figjam.cjs",
+    "test:canvashangngay": "node scripts/test/do-canvas-hang-ngay.cjs",
     "thu:canvas": "node scripts/test/thu-dung-canvas.cjs",
     "dist:mac": "electron-builder --mac --x64 --arm64 --publish never"
   },
