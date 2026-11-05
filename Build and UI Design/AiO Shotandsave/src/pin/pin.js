@@ -96,7 +96,8 @@ img.addEventListener('dblclick', () => window.pin.copy())
 window.addEventListener('keydown', (e) => {
   PLOG('key ' + e.key + ' mode=' + mode + ' tool=' + tool)
   if (e.key === 'Escape') {
-    if (bangMauMo() || menuButMo()) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc
+    if (bangMauMo() || menuButMo() || (cheMenu && cheMenu.dangMo())) { e.preventDefault(); dongPopups(); return } // Esc dong bang mau / menu but truoc
+    if (cheTM && cheTM.xuLyPhim(e)) return // dang o che do Che thong minh: Esc chi dong che do do
     if (mode === 've') { thoatVe(); return } // dang ve: Esc chi bo ve, khong dong
     window.pin.close()
     return
@@ -144,6 +145,8 @@ window.addEventListener('keydown', (e) => {
     }
     const t = keyMap[e.key] || keyMap[e.code]
     if (t) { if (mode !== 've') vaoCheDoVe(); chonCongCu(t) }
+    // Phim C = Che thong minh (05/11)
+    else if (!oGoChu && (e.key === 'c' || e.key === 'C' || e.code === 'KeyC')) { e.preventDefault(); chuyenChe() }
   }
 })
 
@@ -165,6 +168,8 @@ let mode = 'view'          // 'view' | 've'
 let tool = 'rect'
 let curColor = '#f86820'   // mac dinh CAM (accent)
 let shapes = []            // { type, x1, y1, x2, y2, color } — toa do DIP cuc bo
+let cheTM = null           // 05/11 CHE THONG MINH (phim C): dieu khien tao o cuoi file
+let cheMenu = null         // menu xo cua nut Lam mo (Lam mo | Che thong minh)
 
 /* ── 12/11 BANG MAU XO + MENU BUT (nhom 7 / 8) + LAM LAI ─────────────────────────────────────────────
    Thanh chi con MOT cham mau; bam thi xo bang 7 mau xuong duoi, gan mep duoi thi xo len tren. Nut but gop but + da quang:
@@ -209,9 +214,9 @@ function bangMauMo() { return !mauPopEl.hidden }
 function menuButMo() { return !butMenuEl.hidden }
 function dongBangMau() { if (mauPopEl.hidden) return; mauPopEl.hidden = true; mauHienEl.setAttribute('aria-expanded', 'false') }
 function dongMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) butMenuEl.hidden = true }
-function dongPopups() { dongBangMau(); dongMenuBut() }
-function moBangMau() { dongMenuBut(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
-function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
+function dongPopups() { dongBangMau(); dongMenuBut(); if (cheMenu) cheMenu.dong() }
+function moBangMau() { dongMenuBut(); if (cheMenu) cheMenu.dong(); mauPopEl.hidden = false; xepXo(mauHienEl, mauPopEl); mauHienEl.setAttribute('aria-expanded', 'true') }
+function moMenuBut() { clearTimeout(butDong); if (!butMenuEl.hidden) return; dongBangMau(); if (cheMenu) cheMenu.dong(); butMenuEl.hidden = false; xepXo(butChinhEl, butMenuEl) }
 let butDong = 0
 butNhomEl.addEventListener('mouseenter', moMenuBut)
 butNhomEl.addEventListener('mouseleave', () => { clearTimeout(butDong); butDong = setTimeout(dongMenuBut, 160) })
@@ -245,7 +250,9 @@ function lamLai() {
   soDangDat = null
   netDangVe = null
   if (!redoStack.length) return
-  shapes.push(redoStack.pop())
+  const lai = redoStack.pop()
+  shapes.push(lai)
+  if (lai.nhom) while (redoStack.length && redoStack[redoStack.length - 1].nhom === lai.nhom) shapes.push(redoStack.pop()) // ca nhom che
   danhSoLai() // so buoc luon lien nhau theo thu tu hien co
   capNhatRedo()
   redraw()
@@ -281,6 +288,7 @@ function vaoCheDoVe() {
 
 function thoatVe() {
   huyOGoChu()
+  if (cheTM) cheTM.dong()
   mode = 'view'
   frame.classList.remove('dang-ve')
   vuaThanh()
@@ -313,6 +321,7 @@ function chonMau(mau) {
 
 function chonCongCu(x) {
   if (x !== tool) chotOGoChu()
+  if (cheTM && cheTM.dangMo()) cheTM.dong()
   tool = x
   capNhatNutBut(x)
   if (tool !== 'select') {
@@ -545,6 +554,7 @@ function hoanTac() {
   netDangVe = null
   const bo = shapes.pop()
   if (bo) redoStack.push(bo)
+  if (bo && bo.nhom) while (shapes.length && shapes[shapes.length - 1].nhom === bo.nhom) redoStack.push(shapes.pop()) // ca nhom che = 1 buoc
   if (selectedShape && !shapes.includes(selectedShape)) selectedShape = null
   capNhatRedo()
   redraw()
@@ -660,6 +670,7 @@ function redraw(preview) {
   if (selectedShape && tool === 'select') {
     veKhungChonShape(veCtx, selectedShape)
   }
+  if (cheTM) cheTM.lamMoi() // Hoan tac / Lam lai / xoa net: khung "da che" theo kip
 }
 
 let offscreenBlurCanvas = null
@@ -815,6 +826,7 @@ toolbarEl.addEventListener('click', (e) => {
   const b = e.target.closest('button')
   if (!b) return
   dongPopups() // bam bat cu nut nao khac = dong bang mau / menu but
+  if (b.dataset.tool === 'che') { chuyenChe(); return }
   if (b.dataset.tool) { if (mode !== 've') vaoCheDoVe(); chonCongCu(b.dataset.tool) } // 14/09: bam chuot cung vao ve duoc
   else if (b.id === 'undo') hoanTac()
   else if (b.id === 'redo') lamLai()
@@ -915,3 +927,32 @@ function veChu(ctx, s, k) {
   }
 }
 
+/* ── 05/11 CHE THONG MINH (phim C, menu xo cua nut Lam mo) ─────────────────────────────────────────────
+   Giong man chup (overlay.js): doc chu CA ANH ghim bang Tesseract (main: pin:ocr-tu, kem toa do), hien khung tung tu / dong;
+   bam chu = che (to kin, blurType 'kin'), Tu che = email / so dien thoai / so the / link, Che moi cho trung.
+   Khi bam Xong, luuVe() ghep lop che len anh THAT (veShape voi he so k) roi ghi de file. Logic: src/che-thong-minh.js. */
+const heSoAnh = () => ((img.naturalWidth || dip.w * DPR) / dip.w) // pixel anh that / DIP hien thi
+function themNhomChe(ds) {
+  for (const x of ds) shapes.push(x)
+  xoaRedo()
+  redraw()
+}
+function datThanhChe(strip) {
+  strip.style.position = ''; strip.style.left = ''; strip.style.top = ''; strip.style.transform = ''; strip.style.bottom = ''
+  // thanh dieu khien nam ngay tren thanh cong cu (CSS .che-strip bottom 50px); anh qua be thi CSS cho cuon ngang
+}
+function chuyenChe() {
+  if (cheTM.dangMo()) { cheTM.dong(); return }
+  if (mode !== 've') vaoCheDoVe()
+  chotOGoChu()
+  cheTM.mo()
+}
+cheTM = window.CheTMUI.tao({
+  goc: frame, rect: () => ({ x: 0, y: 0, w: dip.w, h: dip.h }), heSo: heSoAnh, shapes: () => shapes, veLai: () => redraw(),
+  them: themNhomChe, xoaRedo, doc: () => window.pin.ocrTu(), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
+  nut: document.getElementById('che-muc'),
+})
+cheMenu = window.CheTMUI.ganMenuXo({
+  nhom: document.getElementById('lam-mo-nhom'), chinh: document.getElementById('lam-mo-chinh'), menu: document.getElementById('lam-mo-menu'),
+  xep: xepXo, dongKhac: () => { dongBangMau(); dongMenuBut() },
+})

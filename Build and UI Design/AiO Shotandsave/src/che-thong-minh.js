@@ -7,7 +7,7 @@
    lay tu Tesseract qua src/ocr.js docChuTu - KHONG co bo doc moi).
 
    ☠️ CHON TO KIN, KHONG DUNG KHAM (so lo 27/09, AGENTS.md muc 4): khoi kham 8-15 px con KHOI PHUC duoc chu. Shape che nay
-   la blurType 'kin': tu #101010 DUC 100% phu kin hop chu + le (>= 3 px va 25% chieu cao chu) -> pixel xuat ra khong con
+   la blurType 'kin': den #000 DUC 100% phu kin hop chu + le (ngang >= 5 px va 40% chieu cao chu, doc >= 4 px va 30%) -> pixel xuat ra khong con
    thong tin gi cua chu goc. Di qua DUNG duong shape 'blur' co san (them/xoa/hoan tac/keo/xuat anh nhu cac nhat lam mo khac). */
 
 ;(function (goc, tao) {
@@ -15,7 +15,7 @@
   if (typeof module === 'object' && module.exports) module.exports = m
   else goc.CheTM = m
 })(typeof self !== 'undefined' ? self : this, function () {
-  const MAU_KIN = '#101010'
+  const MAU_KIN = '#000000'
 
   /* ── Nhan dien ──────────────────────────────────────────────────────── */
   const RE_EMAIL = /[A-Za-z0-9][A-Za-z0-9._%+\-]*@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}/g
@@ -176,7 +176,8 @@
   /* heSo = pixel thiet bi tren 1 DIP (overlay: DPR; ghim: anh that / kich thuoc hien thi). rong/cao = vung (pixel thiet bi). */
   function taoShape(m, heSo, rong, cao) {
     const h = Math.max(1, m.y1 - m.y0)
-    const px = Math.max(3, Math.round(h * 0.25)), py = Math.max(3, Math.round(h * 0.25))
+    // Le rong vi toa do OCR LECH that: do 05/11 man 150%, o chu so the bbox cua Tesseract cat mat ~5 px ben trai chu dau (le 3 px cu de lot net chu)
+    const px = Math.max(5, Math.round(h * 0.4)), py = Math.max(4, Math.round(h * 0.3))
     const x0 = Math.max(0, m.x0 - px), y0 = Math.max(0, m.y0 - py)
     const x1 = Math.min(rong, m.x1 + px), y1 = Math.min(cao, m.y1 + py)
     return { type: 'blur', blurType: 'kin', che: true, muc: m.id, phu: m.phu.slice(), khoa: m.khoa, color: MAU_KIN,

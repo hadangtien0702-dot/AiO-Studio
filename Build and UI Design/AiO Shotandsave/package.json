@@ -24,6 +24,7 @@
     "test:khayram": "node scripts/test/do-khay-ram.cjs",
     "test:khaymuc": "node scripts/test/do-khay-muc.cjs",
     "test:lammo": "node scripts/test/do-kieu-lam-mo.mjs",
+    "test:chethongminh": "node scripts/test/do-che-thong-minh.cjs",
     "test:chekin": "node scripts/test/do-che-kin.mjs",
     "test:bamnut": "electron scripts/test/do-bam-nut.cjs",
     "test:mocungmay": "electron scripts/test/do-mo-cung-may.cjs",

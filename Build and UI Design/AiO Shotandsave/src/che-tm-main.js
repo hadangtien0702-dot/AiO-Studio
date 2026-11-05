@@ -44,4 +44,10 @@ async function docVungTu(nativeImage, ocr, img, q) {
   return { ok: true, dong, w, h, phong: k, daoMau: d.dao, ms: Date.now() - t0 }
 }
 
-module.exports = { docVungTu }
+/* Anh ghim: doc CA ANH (pixel anh that). dipW = be rong hien thi (DIP) de suy he so man. */
+function docAnhGhim(nativeImage, ocr, image, dipW) {
+  const sz = image.getSize()
+  return docVungTu(nativeImage, ocr, image, { x: 0, y: 0, w: sz.width, h: sz.height, sf: dipW ? sz.width / dipW : 1 })
+}
+
+module.exports = { docVungTu, docAnhGhim }

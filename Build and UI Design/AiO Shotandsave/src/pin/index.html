@@ -7,6 +7,7 @@
   <title>AiO Pin</title>
   <link rel="stylesheet" href="../../assets/tokens.css" />
   <link rel="stylesheet" href="pin.css" />
+  <link rel="stylesheet" href="../che-tm.css" />
 </head>
 <body>
   <div id="frame">
@@ -40,7 +41,9 @@
       <button class="cong-cu" data-tool="text" data-i18n-title="overlay.text" aria-label="text">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg><i class="so">3</i>
       </button>
-      <button class="cong-cu" data-tool="blur" data-i18n-title="overlay.blur" aria-label="blur">
+      <!-- 05/11 CHE THONG MINH (phim C) vao menu xo cua nut Lam mo: thanh khong rong them. Re chuot vao nut xo menu 2 lua chon. -->
+      <div id="lam-mo-nhom" class="nhom-xo">
+        <button id="lam-mo-chinh" class="cong-cu" data-tool="blur" data-i18n-title="overlay.blur" data-so="4" aria-haspopup="true" aria-label="blur">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
           <!-- 04/10: icon KHUNG CO O KHAM (anh chon kieu D), cung hinh voi src/overlay/index.html. -->
           <rect x="3" y="4" width="18" height="16" rx="2"/>
@@ -49,8 +52,17 @@
           <rect x="10.3" y="11.4" width="3.4" height="3.4" fill="currentColor" stroke="none"/>
           <rect x="7" y="14.6" width="3.4" height="1.6" fill="currentColor" stroke="none"/>
           <rect x="13.6" y="14.6" width="3.4" height="1.6" fill="currentColor" stroke="none"/>
-        </svg><i class="so">4</i>
+        </svg>
       </button>
+        <div id="lam-mo-menu" class="menu-xo" role="menu" hidden>
+          <button class="muc-xo" type="button" role="menuitem" data-tool="blur" data-i18n-title="overlay.blur" aria-label="blur">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="7" y="8" width="3.4" height="3.4" fill="currentColor" stroke="none"/><rect x="13.6" y="8" width="3.4" height="3.4" fill="currentColor" stroke="none"/><rect x="10.3" y="11.4" width="3.4" height="3.4" fill="currentColor" stroke="none"/><rect x="7" y="14.6" width="3.4" height="1.6" fill="currentColor" stroke="none"/><rect x="13.6" y="14.6" width="3.4" height="1.6" fill="currentColor" stroke="none"/></svg><span data-i18n="che.menu.lamMo">Làm mờ</span><i class="so">4</i>
+          </button>
+          <button id="che-muc" class="muc-xo" type="button" role="menuitem" data-tool="che" data-i18n-title="overlay.che" aria-label="smart redact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg><span data-i18n="che.menu.che">Che thông minh</span><i class="so-c">C</i>
+          </button>
+        </div>
+      </div>
       <!-- 02/10 DANH SO BUOC (phim 6, cung phim voi man chup; phim 5 la Doc chu ben man chup). -->
       <!-- 04/10: icon GHIM VI TRI (anh chon kieu A), cung hinh voi src/overlay/index.html. -->
       <button class="cong-cu" data-tool="so" data-i18n-title="overlay.so" aria-label="number marker">
@@ -100,6 +112,8 @@
       </button>
     </div>
   </div>
+  <script src="../che-thong-minh.js"></script>
+  <script src="../che-tm-ui.js"></script>
   <script src="pin.js"></script>
 </body>
 </html>

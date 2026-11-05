@@ -2,7 +2,8 @@
    Theo chuan man Cai dat: nen toi, nut --bg-4, CAM chi cho nut chinh (Xong). Khong khai :root rieng. */
 
 .che-lop[hidden], .che-strip[hidden] { display: none !important; }
-.che-lop { position: absolute; z-index: 11; }
+.che-lop { position: fixed; z-index: 11; }
+#frame .che-lop, #frame .che-strip { position: absolute; } /* anh ghim: nam trong khung anh */
 
 .che-hop {
   position: absolute; box-sizing: border-box;
@@ -16,7 +17,7 @@
 .che-hop.da-che:hover { background: rgb(248 104 32 / 10%); }
 
 .che-strip {
-  position: absolute; z-index: 13;
+  position: fixed; z-index: 13;
   left: 50%; bottom: 50px; transform: translateX(-50%);
   width: max-content; max-width: calc(100% - 12px);
   display: flex; flex-direction: column; gap: 6px;
@@ -49,3 +50,7 @@
 /* chu 12px tren cam: chu TOI (tuong phan 6,4:1) - chu trang chi hop le cho chu dam >= 14px (design-system) */
 .che-nut.chinh { background: var(--accent); color: #1a0f08; font-weight: var(--fw-bold); }
 .che-nut.chinh:hover { background: var(--accent-hover); }
+
+/* so phim "C" trong menu xo: cung kieu .muc-xo .so, nhung KHONG dung class .so de bai do thu tu thanh (1..9) khong dem nham */
+.muc-xo .so-c { margin-left: auto; padding-left: 14px; font: 600 10px/1 Inter, "Segoe UI", sans-serif; font-style: normal; color: var(--text-3); }
+.muc-xo.chon .so-c { color: var(--accent-text); }

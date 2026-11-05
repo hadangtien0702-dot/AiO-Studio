@@ -99,14 +99,25 @@
       segTu.classList.toggle('chon', kieu === 'tu'); segDong.classList.toggle('chon', kieu === 'dong')
     }
 
-    function themShape(m) {
+    /* Them mot loat muc che: moi lan bam = MOT buoc trong lich su Hoan tac / Lam lai (cung nhom) cua man chup. */
+    let demNhom = 0
+    function themDs(ms) {
+      if (!ms.length) return
       const r = opt.rect(), he = opt.heSo()
-      shapes().push(CT.taoShape(m, he, r.w * he, r.h * he))
+      const nhom = 'che' + (++demNhom) + '_' + Date.now()
+      opt.them(ms.map((m) => { const x = CT.taoShape(m, he, r.w * he, r.h * he); x.nhom = nhom; return x }))
+    }
+    /* Bo che bang cach bam lai: go khoi mang nen khong nam trong Hoan tac (Hoan tac chi lui cac lan che); hang doi Lam lai
+       bi xoa de khong hien lai net cu tren cho vua bo. */
+    function boDs(m) {
+      const n = CT.boChe(shapes(), m)
+      if (n && opt.xoaRedo) opt.xoaRedo()
+      return n
     }
 
     function bam(m) {
-      if (CT.daChe(shapes(), m)) { CT.boChe(shapes(), m); if (cuoi && cuoi.id === m.id) cuoi = null }
-      else { themShape(m); cuoi = m }
+      if (CT.daChe(shapes(), m)) { boDs(m); if (cuoi && cuoi.id === m.id) cuoi = null }
+      else { themDs([m]); cuoi = m }
       opt.veLai()
       lamMoi()
       if (opt.log) opt.log('che bam ' + m.id + ' "' + m.text.slice(0, 20) + '" -> ' + (CT.daChe(shapes(), m) ? 'che' : 'bo'))
@@ -122,11 +133,13 @@
     function tuChe() {
       if (!auto.length) { trangThai('khong-thay', t('che.khongThay')); return }
       const dem = {}
+      const moi = []
       for (const m of auto) {
-        if (!CT.daChe(shapes(), m)) themShape(m)
+        if (!CT.daChe(shapes(), m)) moi.push(m)
         dem[m.loai] = (dem[m.loai] || 0) + 1
         cuoi = m
       }
+      themDs(moi)
       opt.veLai()
       lamMoi()
       trangThai('da-tu-che', t('che.daChe').replace('{n}', String(auto.length)).replace('{ds}', moTa(dem)))
@@ -136,11 +149,15 @@
     function cheTrung() {
       if (!cuoi || !CT.daChe(shapes(), cuoi)) return
       const pool = auto.concat(kieu === 'tu' ? tuList : dongList)
-      let them = 0
+      const moi = []
       for (const m of CT.mucTrung(cuoi, pool)) {
         if (m.id === cuoi.id || CT.daChe(shapes(), m)) continue
-        themShape(m); them++
+        // muc nam chong len muc da them trong CUNG luot (tu "an@x.com" va email an@x.com) thi khong che hai lan
+        if (moi.some((q) => q.phu.some((k) => m.phu.indexOf(k) >= 0))) continue
+        moi.push(m)
       }
+      const them = moi.length
+      themDs(moi)
       opt.veLai()
       lamMoi()
       trangThai('da-che-trung', them ? t('che.daTrung').replace('{n}', String(them)) : t('che.khongTrung'))
@@ -194,5 +211,16 @@
     return { mo, dong, lamMoi, xuLyPhim, datViTri, dangMo: () => dangMo, doiKieu }
   }
 
-  window.CheTMUI = { tao }
+  /* Menu xo (re chuot vao nut thi xo menu doc) - cung kieu menu but 7/8: nut chinh + .menu-xo. */
+  function ganMenuXo(o) {
+    let hen = 0
+    const dong = () => { clearTimeout(hen); if (!o.menu.hidden) o.menu.hidden = true }
+    const mo = () => { clearTimeout(hen); if (!o.menu.hidden) return; if (o.dongKhac) o.dongKhac(); o.menu.hidden = false; o.xep(o.chinh, o.menu) }
+    o.nhom.addEventListener('mouseenter', mo)
+    o.nhom.addEventListener('mouseleave', () => { clearTimeout(hen); hen = setTimeout(dong, 160) })
+    window.addEventListener('mousedown', (e) => { if (!o.menu.hidden && !o.nhom.contains(e.target)) dong() }, true)
+    return { dong, mo, dangMo: () => !o.menu.hidden }
+  }
+
+  window.CheTMUI = { tao, ganMenuXo }
 })()

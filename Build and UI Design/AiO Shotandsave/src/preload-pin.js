@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld('pin', {
   /** Da ve khung/mui ten -> ghi de file + cap nhat thumbnail khay. */
   saveEdit: (dataUrl) => ipcRenderer.send('pin:save-edit', dataUrl),
   setOpacity: (v) => ipcRenderer.send('pin:opacity', v),
+  /** 05/11 Che thong minh: doc chu CA ANH ghim kem toa do tung tu / dong (pixel anh that). */
+  ocrTu: () => ipcRenderer.invoke('pin:ocr-tu'),
   /* Keo: neo mot lan roi gui delta TUYET DOI (xem preload-shelf.js). */
   dragStart: () => ipcRenderer.send('pin:drag-start'),
   dragTo: (tongDx, tongDy) => ipcRenderer.send('pin:drag-to', tongDx, tongDy),
