@@ -346,13 +346,54 @@ function baoKetQua(ok) {
 btnPick.addEventListener('click', async () => {
   const r = await window.settings.pickFolder()
   datFolder(r.folder)
-  if (!r.huy) {
+  if (r.loi) { // 06/11: cau hinh khong ghi duoc -> thu muc that van la cho cu, noi that
+    msgFolder.textContent = t('set.thuMuc.loiLuu')
+    msgFolder.className = 'msg err'
+    msgFolder.style.textAlign = 'left'
+  } else if (!r.huy) {
     msgFolder.textContent = t('set.thuMuc.daDoi')
     msgFolder.className = 'msg ok'
     msgFolder.style.textAlign = 'left'
   }
 })
 btnOpen.addEventListener('click', () => window.settings.openFolder())
+
+/* ── Lien ket dieu khien tu ngoai (06/11): liet ke + sao chep. Bo xu ly + hang rao an toan o src/lien-ket.js ── */
+{
+  const ds = document.getElementById('lk-ds')
+  const MAU = [
+    ['aioshot://chup', '--chup', 'set.lienKet.chup'],
+    ['aioshot://chup-lai-vung', '--chup-lai-vung', 'set.lienKet.chupLai'],
+    ['aioshot://canvas', '--canvas', 'set.lienKet.canvas'],
+    ['aioshot://khay', '--khay', 'set.lienKet.khay'],
+    ['aioshot://tim?chu=hoa%20don', '--tim="hoa don"', 'set.lienKet.tim'],
+    ['aioshot://ghim?file=ten-anh.png', '--ghim=ten-anh.png', 'set.lienKet.ghim'],
+  ]
+  const chep = (text) => {
+    const du = () => {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'
+      document.body.appendChild(ta); ta.select(); try { document.execCommand('copy') } catch (e) {} ta.remove()
+    }
+    try { return navigator.clipboard.writeText(text).catch(du) } catch (e) { du(); return Promise.resolve() }
+  }
+  if (ds) for (const [link, co, moTa] of MAU) {
+    const hang = document.createElement('div'); hang.className = 'hang'
+    const chu = document.createElement('div'); chu.className = 'tm-chu'
+    const ten = document.createElement('div'); ten.className = 'tm-ten'; ten.textContent = link
+    const duong = document.createElement('div'); duong.className = 'tm-duong'; duong.textContent = t(moTa) + ' · ' + co
+    chu.appendChild(ten); chu.appendChild(duong)
+    const phai = document.createElement('div'); phai.className = 'phai'
+    const nut = document.createElement('button'); nut.className = 'nut'; nut.textContent = t('set.lienKet.chep')
+    nut.addEventListener('click', () => {
+      chep(link)
+      nut.textContent = t('set.lienKet.daChep')
+      setTimeout(() => { nut.textContent = t('set.lienKet.chep') }, 1500)
+    })
+    phai.appendChild(nut)
+    hang.appendChild(chu); hang.appendChild(phai)
+    ds.appendChild(hang)
+  }
+}
 
 /* ── Ban quyen (24/09) ────────────────────────────────────────────────────
    Chua kich hoat: o nhap ma + Kich hoat + Mua. Da kich hoat: ma da che + han cap nhat + Huy (bam 2 lan).
@@ -397,11 +438,13 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
   }
 
   async function kichHoat() {
+    if (nutKH.disabled) return // 06/11: giu Enter khong duoc gui nhieu lan (o nhap van nhan Enter khi nut bi khoa)
     nutKH.disabled = true; nutKH.textContent = t('bq.dangKichHoat'); bao('')
     try {
       const r = await window.banQuyen.kichHoat(o.value)
       ve(r.trangThai)
-      if (r.ok) { o.value = ''; bao(r.canhBao === 'ma-het-han' ? t('bq.okHetHan') : t('bq.ok'), 'ok') }
+      if (r.ok && r.chuaLuu) { o.value = ''; bao(t('bq.okChuaLuu'), 'err') } // 06/11: Polar da nhan nhung chua ghi duoc xuong dia
+      else if (r.ok) { o.value = ''; bao(r.canhBao === 'ma-het-han' ? t('bq.okHetHan') : t('bq.ok'), 'ok') }
       else bao(t('bq.loi.' + r.loi), 'err')
     } catch (e) { bao(t('bq.loi.mat-mang'), 'err') }
     nutKH.disabled = false; nutKH.textContent = t('bq.kichHoat')

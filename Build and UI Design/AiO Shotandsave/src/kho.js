@@ -111,6 +111,16 @@ function noiLienKet(filePath, dich) {
   try { fs.linkSync(filePath, dich) } catch (e) { fs.copyFileSync(filePath, dich) } // khac o dia -> copy
 }
 
+/** Ten `ten` trong thu muc .keo da co mot lien ket KHONG phai cua `filePath`? */
+function tenDaCoChu(dir, ten, so, filePath) {
+  const dich = path.join(dir, ten)
+  let b
+  try { b = fs.statSync(dich) } catch (e) { return false } // chua co file: dung duoc
+  if (so && so[ten] && khoaDuong(so[ten]) === khoaDuong(filePath)) return false // so ghi dung file nay
+  try { const a = fs.statSync(filePath); if (a.ino && a.ino === b.ino && a.dev === b.dev) return false } catch (e) {} // hard link toi cung file
+  return true
+}
+
 function duongDanKeoAnToan(filePath) {
   if (!filePath) return filePath
   if (AN_TOAN.test(filePath)) return filePath
@@ -123,8 +133,11 @@ function duongDanKeoAnToan(filePath) {
     if (so) {
       const duoi = path.extname(sach)
       const than = sach.slice(0, sach.length - duoi.length)
-      // ten nay dang la lien ket cua mot file goc KHAC con ton tai -> lay ten khac, dung de len
-      for (let i = 2; so[ten] && khoaDuong(so[ten]) !== khoaDuong(filePath) && fs.existsSync(so[ten]); i++) ten = than + '-' + i + duoi
+      /* 06/11 (Codex soat, loi 6): ten nay da co LIEN KET tren dia (Premiere co the dang tro vao no) ma khong phai cua
+         chinh file nay -> lay ten khac. Ban cu chi tranh khi file GOC cua lien ket kia con ton tai: goc da doi cho thi
+         lien ket bi ghi de bang anh khac, Premiere dang tham chieu doi sang anh la. Giu dung neu la cung file (cung inode)
+         hoac so ghi dung file nay. */
+      for (let i = 2; tenDaCoChu(dir, ten, so, filePath); i++) ten = than + '-' + i + duoi
     }
     const dich = path.join(dir, ten)
     let conMoi = false
@@ -215,13 +228,30 @@ function ghiDeAnh(filePath, buf) {
     fs.renameSync(tam, filePath)
     return { ok: true, loi: null, cach: 'doi-ten' }
   } catch (e) {
-    let kq
+    /* 06/11 (Codex soat, loi 5): copy de len file dich ma hong giua chung thi file dich co the cut mat, va ban cu xoa luon
+       file tam chua BAN SUA hoan chinh. Nay: cat ban goc sang file du phong truoc, copy hong thi tra lai ban goc va GIU file
+       tam (nguoi dung / lan sau van lay lai duoc ban sua). Chi xoa tam + du phong khi copy xong va doc lai dung kich thuoc. */
+    const dp = filePath + '.truoc-' + process.pid
+    let coDp = false
+    try { fs.copyFileSync(filePath, dp); coDp = true } catch (eDp) { /* khong co file goc de giu (da bi xoa): van thu ghi */ }
     try {
       fs.copyFileSync(tam, filePath)
-      kq = { ok: true, loi: null, cach: 'ghi-thang', loiDoiTen: ma(e) }
-    } catch (e2) { kq = { ok: false, loi: ma(e) + ' / ' + ma(e2) } }
+      if (fs.statSync(filePath).size !== fs.statSync(tam).size) throw new Error('kich-thuoc-sai')
+    } catch (e2) {
+      /* Anh goc con nguyen (doc lai bang bang ban du phong) -> khong mat gi, don tam + du phong. Hong that -> tra lai tu du phong;
+         tra lai duoc thi don du phong, GIU tam (ban sua hoan chinh) cho den khi nguoi dung / lan sau lay lai. */
+      const giong = () => { try { return Buffer.compare(fs.readFileSync(filePath), fs.readFileSync(dp)) === 0 } catch (e6) { return false } }
+      let conNguyen = coDp && giong()
+      let traLai = false
+      if (coDp && !conNguyen) { try { fs.copyFileSync(dp, filePath); traLai = giong() } catch (e4) {} }
+      if (conNguyen || traLai) { try { fs.unlinkSync(dp) } catch (e5) {} }
+      const anhOk = conNguyen || traLai
+      if (anhOk) { try { fs.unlinkSync(tam) } catch (e7) {} }
+      return { ok: false, loi: ma(e) + ' / ' + ma(e2), giuTam: anhOk ? null : tam, anhGocConNguyen: coDp ? anhOk : null, giuDuPhong: coDp && !anhOk ? dp : null }
+    }
+    if (coDp) { try { fs.unlinkSync(dp) } catch (e5) {} }
     try { fs.unlinkSync(tam) } catch (e3) {}
-    return kq
+    return { ok: true, loi: null, cach: 'ghi-thang', loiDoiTen: ma(e) }
   }
 }
 
@@ -337,13 +367,18 @@ function docCauHinh() {
   return docCauHinhThat().c
 }
 
-function ghiCauHinh(patch) {
+function ghiCauHinh(patch) { return ghiCauHinhTrong(patch).cfg }
+
+/** Nhu ghiCauHinh nhung tra { ok, cfg }: ok=false khi KHONG ghi duoc xuong dia (ben goi phai bao that, dung noi da doi). */
+function ghiCauHinhChac(patch) { return ghiCauHinhTrong(patch) }
+
+function ghiCauHinhTrong(patch) {
   const r = docCauHinhThat()
   if (r.tt === 'khong-doc-duoc' && !nhoCauHinh) {
     /* Co file ma khong doc duoc + chua doc duoc lan nao: ghi luc nay = xoa moi cai dat khac. Tra ban ghep cho
        lan nay (app chay tiep), KHONG dung vao dia. */
     baoKho('cau-hinh: BO QUA lan ghi [' + Object.keys(patch || {}).join(',') + '] vi chua doc duoc file')
-    return Object.assign({}, r.c, patch)
+    return { ok: false, cfg: Object.assign({}, r.c, patch) }
   }
   try {
     const cur = r.c
@@ -355,14 +390,14 @@ function ghiCauHinh(patch) {
        (phim tat, ngon ngu, kieu khay) ma khong ai biet vi sao (31/08). */
     ghiBen(duongDanCauHinh(), JSON.stringify(next, null, 2)) // ep xuong dia: may sap nguon khong de lai file rong ruot (06/11)
     nhoCauHinh = JSON.stringify(next)
-    return next
+    return { ok: true, cfg: next }
   } catch (err) {
     baoKho('cau-hinh: KHONG GHI DUOC [' + Object.keys(patch || {}).join(',') + ']: ' + ((err && err.code) || (err && err.message) || err))
-    return docCauHinh()
+    return { ok: false, cfg: docCauHinh() }
   }
 }
 
 module.exports = {
   thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan, lamMoiKeo, ghiDeAnh, thuMucKeo,
-  duongVideoMoi, docCauHinh, ghiCauHinh, noiNhatKy,
+  duongVideoMoi, docCauHinh, ghiCauHinh, ghiCauHinhChac, noiNhatKy,
 }
