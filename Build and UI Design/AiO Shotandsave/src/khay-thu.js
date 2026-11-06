@@ -235,6 +235,8 @@ function taoKhayThu(deps) {
     if (!nut || nut.isDestroyed()) {
       nut = taoCuaSo(b, 'preload-nut.js', path.join('nut', 'index.html'), 'nut tron')
       nut.on('closed', () => { nut = null })
+      // 06/11 (muc 3): trang nut bi nap lai (doi ngon ngu) la mat thumbnail, so dem va co keoDuoc -> gui lai moi lan nap xong
+      nut.webContents.on('did-finish-load', () => { if (nut && !nut.isDestroyed()) nut.webContents.send('nut:cap-nhat', goiNut()) })
     } else if (lechDang(nut.getBounds(), b)) datO(nut, b, 'nut tron')
     if (!(await nut.__xong)) throw new Error('nut tron khong nap xong')
     return nut

@@ -42,7 +42,7 @@ function overlayKet({ coCuaSo, coTuongTac, moLuc, bayGio, moiMs = 1200 }) {
 
 /** Gui mot muc sang trang khay va CHO trang bao da ve. Khong co tin bao sau `henMs` thi gui lai, toi da `lan` lan,
     roi ghi log. `gui(muc)` co the nem (cua so vua dong): tinh la mot lan chua toi. */
-function taoGuiChac({ gui, ghiLog = () => {}, henMs = 1500, lan = 3, datHen = setTimeout, huyHen = clearTimeout }) {
+function taoGuiChac({ gui, ghiLog = () => {}, heLan = () => {}, henMs = 1500, lan = 3, datHen = setTimeout, huyHen = clearTimeout }) {
   const cho = new Map() // id -> { muc, daGui, hen }
   function thu(id) {
     const c = cho.get(id)
@@ -50,6 +50,7 @@ function taoGuiChac({ gui, ghiLog = () => {}, henMs = 1500, lan = 3, datHen = se
     if (c.daGui >= lan) {
       cho.delete(id)
       ghiLog('LOI khay: trang khay khong xac nhan anh #' + id + ' sau ' + lan + ' lan gui')
+      try { heLan(id, c.muc) } catch (e) { ghiLog('khay: tu cuu LOI ' + ((e && e.message) || e)) } // 06/11: trang khay chet thi nap lai, danh sach gui lai du
       return
     }
     c.daGui++

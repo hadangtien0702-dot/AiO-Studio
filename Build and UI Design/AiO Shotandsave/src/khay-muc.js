@@ -70,4 +70,17 @@ function apDungSuaVaoKhay(cacMuc, rec, daVe, taoAnhNho) {
   return kq
 }
 
-module.exports = { taoMucKhay, anhMucKhay, capNhatMucKhay, mucCuaAnhGhim, apDungSuaVaoKhay }
+/** Cac ban ghi anh ghim CUNG ANH voi `rec` (tru chinh no). Co file: cung duong dan (`cungFile(a, b)` do ben goi cho de chuan hoa
+    khoa duong dan). Khong file: cung DOI TUONG anh `anhTruocKhiSua`. 06/11 (soat dot 2, muc 1): mo hai ghim cua mot tam, che o
+    cai nay roi luu cai kia thi cai kia ghi de ban cu len file, mat net Che. */
+function banGhimCungAnh(cacRec, rec, anhTruocKhiSua, cungFile = (a, b) => a === b) {
+  const kq = []
+  for (const r of cacRec) {
+    if (r === rec) continue
+    if (rec.filePath) { if (r.filePath && cungFile(r.filePath, rec.filePath)) kq.push(r) }
+    else if (!r.filePath && r.image && r.image === anhTruocKhiSua) kq.push(r)
+  }
+  return kq
+}
+
+module.exports = { banGhimCungAnh, taoMucKhay, anhMucKhay, capNhatMucKhay, mucCuaAnhGhim, apDungSuaVaoKhay }

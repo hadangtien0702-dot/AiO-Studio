@@ -42,6 +42,8 @@ let timAnh = null
 const os = require('os')
 const { taoCapNhat } = require('./cap-nhat') // 05/11: bao co ban moi (xem dau src/cap-nhat.js)
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
+const { ganHoiPhuc } = require('./khay-hoi-phuc') // 06/11: trang khay chet / treo thi tu nap lai
+const { banGhimCungAnh } = require('./khay-muc')
 const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
@@ -969,7 +971,15 @@ ipcMain.handle('settings:set-lang', (_e, l) => {
   kho.ghiCauHinh({ lang })
   rebuildTrayMenu()
   for (const w of BrowserWindow.getAllWindows()) {
-    if (!w.isDestroyed() && duocNapLai(w.webContents.getURL())) w.webContents.reload()
+    if (w.isDestroyed() || !duocNapLai(w.webContents.getURL())) continue
+    /* 06/11 (soat dot 2, muc 3): anh ghim chi nhan anh o lan nap DAU (createPinWindow) -> nap lai la TRANG TRANG. Dang ky gui lai
+       TRUOC khi reload. Nut tron thi tu nhan lai du lieu o khay-thu.js (did-finish-load cua cua so nut). */
+    const rec = pins.get(w.webContents.id)
+    if (rec && rec.image) {
+      ghiLog('doi ngon ngu: nap lai anh ghim va gui lai anh (' + (rec.filePath ? path.basename(rec.filePath) : 'chua luu') + ')')
+      w.webContents.once('did-finish-load', () => { if (!w.isDestroyed()) w.webContents.send('pin:data', duLieuPin(rec)) })
+    }
+    w.webContents.reload()
   }
   return { lang }
 })
@@ -2010,6 +2020,9 @@ ipcMain.on('pin:start-drag', (e) => {
    vao file that nen hong giua chung la file cut. Nay: GHI FILE TRUOC, atomic (kho.ghiDeAnh); thanh cong roi moi doi
    anh trong bo nho + khay + lam moi lien ket .keo. Hong: tra anh ghim ve ban dang co trong file + HOP THOAI noi ro
    -> hinh tren man luon giong file se gui di. */
+function duLieuPin(rec) {
+  return { dataUrl: rec.image.toDataURL(), pad: PIN_PAD, w: rec.dipW, h: rec.dipH, lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic' }
+}
 function hoanTacSuaPin(rec, lyDo) {
   ghiLog('pin ve-xong LOI (' + lyDo + ') -> tra anh ghim ve ban dang co trong file')
   const win = rec.win
@@ -2067,6 +2080,14 @@ ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
 
   // Doi anh trong bo nho cua anh ghim + cap nhat DUNG muc khay cua no (thumbnail + dung luong). 04/10: anh chua luu
   // duoc (filePath null) khop theo doi tuong anh; truoc day "null === null" khop moi muc chua luu (src/khay-muc.js).
+  /* 06/11 (soat dot 2, muc 1): hai anh ghim cua CUNG MOT file. Cai kia giu anh cu -> luu cai kia se ghi de mat net Che vua luu.
+     Doi anh trong bo nho cua cac ban ghim anh em va gui lai cho trang cua chung (net dang ve do dang van o tren). */
+  const anhEm = banGhimCungAnh(pins.values(), rec, rec.image, (a, b) => !!a && !!b && khoaDuongDan(a) === khoaDuongDan(b))
+  for (const em of anhEm) {
+    em.image = daVe
+    try { if (em.win && !em.win.isDestroyed()) em.win.webContents.send('pin:data', duLieuPin(em)) } catch (err) { ghiLog('pin dong bo anh em LOI: ' + err.message) }
+  }
+  if (anhEm.length) ghiLog('pin ve-xong: dong bo ' + anhEm.length + ' anh ghim cung file')
   for (const it of apDungSuaVaoKhay(shelfItems.values(), rec, daVe, thumbKhay)) {
     let kb = 0
     try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (err) {}
@@ -2074,6 +2095,7 @@ ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
       shelfWin.webContents.send('shelf:update', { id: it.id, thumb: it.thumb, w: it.w, h: it.h, kb })
     }
   }
+  khayThu.capNhatNut() // 06/11 (muc 5): khay dang la nut tron thi mat nut cung doi theo anh da che
 })
 
 /* 05/11: LAM DEP ANH — cua so rieng (src/lamdep/), luu FILE MOI canh anh goc, khong ghi de. */
@@ -2233,9 +2255,14 @@ function napAnhGanNhatVaoKhay(boQua) {
   ghiLog('tu dong nap ' + shelfItems.size + ' anh gan nhat vao khay')
 }
 
+let khayHoiPhuc = null
 function ensureShelf() {
   napAnhGanNhatVaoKhay()
-  if (shelfWin && !shelfWin.isDestroyed()) return shelfWin
+  if (shelfWin && !shelfWin.isDestroyed()) {
+    // 06/11 (muc 2): cua so con nhung tien trinh ve da chet -> nap lai, khong dung tiep trang hong
+    if (shelfWin.webContents.isCrashed()) { ghiLog('khay: ensureShelf thay trang khay da chet'); khayHoiPhuc && khayHoiPhuc.napLai('ensureShelf: trang chet') }
+    return shelfWin
+  }
 
   const pos = viTriKhay()
   const co = coKhay()
@@ -2262,19 +2289,23 @@ function ensureShelf() {
   moiDesktop(shelfWin, 'khay anh')
   shelfWin.loadFile(path.join(__dirname, 'shelf', 'index.html'))
   // on, khong once: doi ngon ngu nap lai trang khay, danh sach phai gui lai (05/11 soat: truoc day khay trang tron)
-  shelfWin.webContents.on('did-finish-load', () => {
-    if (shelfItems.size && shelfWin && !shelfWin.isDestroyed()) {
+  // 06/11: gan bo hoi phuc (render-process-gone / unresponsive) + gui lai DU danh sach moi lan trang nap xong
+  khayHoiPhuc = ganHoiPhuc(shelfWin, {
+    ghiLog, soMuc: () => shelfItems.size,
+    guiLai: (w) => {
+      if (!shelfItems.size) return
       for (const it of shelfItems.values()) {
         let kb = 0
         try { kb = Math.round(fs.statSync(it.filePath).size / 1024) } catch (e) {}
-        shelfWin.webContents.send('shelf:add', {
+        w.webContents.send('shelf:add', {
           id: it.id, seq: it.seq || it.id, thumb: it.thumb, filePath: it.filePath,
           w: it.w, h: it.h, kb,
         })
       }
-    }
+      ghiLog('khay: trang khay nap xong, gui lai ' + shelfItems.size + ' anh')
+    },
   })
-  shelfWin.on('closed', () => { shelfWin = null })
+  shelfWin.on('closed', () => { shelfWin = null; khayHoiPhuc = null })
   return shelfWin
 }
 
@@ -2294,6 +2325,7 @@ function showShelf() {
    nay: did-finish-load trong ensureShelf gui lai ca danh sach. Muc nguoi dung da xoa thi thoi. */
 const khayGui = chupChac.taoGuiChac({
   ghiLog,
+  heLan: (id) => { if (khayHoiPhuc) khayHoiPhuc.napLai('khong xac nhan anh #' + id) }, // 06/11: tu cuu, khong chi ghi log
   gui: (m) => {
     if (!shelfItems.has(m.id)) { khayGui.bo(m.id); return }
     const k = ensureShelf()

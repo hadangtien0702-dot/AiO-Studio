@@ -83,7 +83,7 @@ if (!process.versions.electron) {
     kiem('A5 doi phim chup: quen ten phim Canvas da go (khong go nham phim chup vua dang ky)', /globalShortcut\.unregisterAll\(\)\n\s*phimCanvasDangKy = ''/.test(main))
     // Co mat trong ma (chua dung lai duoc o day)
     kiem('A2 khung cua luot cu bi bo o ca 4 cho (co mat trong ma)', (main.match(/if \(!?cu\(\)\)/g) || []).length === 4)
-    kiem('A4 khay gui lai danh sach moi lan nap trang (co mat trong ma)', /shelfWin\.webContents\.on\('did-finish-load'/.test(main))
+    kiem('A4 khay gui lai danh sach moi lan nap trang (co mat trong ma)', /ganHoiPhuc\(shelfWin[\s\S]{0,300}guiLai: \(w\) =>[\s\S]{0,400}shelf:add/.test(main)) // 06/11: viec gui lai nam trong src/khay-hoi-phuc.js (did-finish-load)
     kiem('A6 overlay hien sau khong cuop phim cua man co vung (co mat trong ma)', /winGiuFocus && !winGiuFocus\.isDestroyed\(\) \? winGiuFocus : win/.test(main))
     kiem('Mac: khong xin micro khi Info.plist chua khai bao (co mat trong ma)', /coKhaiBaoMic\(\)/.test(doc('luong-chup.js')))
     // B4 + C5 + C6
