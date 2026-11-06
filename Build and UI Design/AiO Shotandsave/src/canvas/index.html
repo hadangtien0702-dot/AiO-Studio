@@ -70,7 +70,18 @@
     .ntr:active { transform: scale(.93); }
     .ntr b { position: absolute; right: -5px; top: -5px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--accent); color: #fff; font: 700 11px/22px Inter, sans-serif; box-shadow: 0 0 0 2px #0c0c0d; }
     .ntr b:empty { display: none; }
-    .trong { position: fixed; left: 0; right: 0; top: 50%; text-align: center; color: var(--text-3); font-size: 15px; pointer-events: none; }
+    /* 06/11 (anh chup c1-canvas-trong): man trong = THE huong dan ro rang, tieu de to tu an di de khong de len chu. */
+    .trong { position: fixed; z-index: 15; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100% - 180px)); padding: 26px 28px 22px; border-radius: 18px; text-align: center; background: rgb(24 24 24 / 92%); border: 1px solid rgb(255 255 255 / 10%); box-shadow: 0 16px 44px rgb(0 0 0 / 50%); display: flex; flex-direction: column; align-items: center; gap: 10px; user-select: none; }
+    .trong[hidden] { display: none; }
+    .trong b { font-size: 20px; font-weight: 800; letter-spacing: -.01em; color: var(--text-1); }
+    .trong span { color: var(--text-2); font-size: 14px; line-height: 1.5; }
+    .trong small { color: var(--text-3); font-size: 12.5px; line-height: 1.5; }
+    .trong .nut-chinh { margin-top: 6px; height: 40px; padding: 0 22px; border: 0; border-radius: 12px; background: var(--accent); color: var(--accent-on, #fff); font: 700 14px/1 Inter, sans-serif; cursor: pointer; }
+    .trong .nut-chinh:hover { filter: brightness(1.08); }
+    body.rong .tieu { opacity: 0; }
+    /* Nhan chu cho nut tron goc duoi-phai ("Chup them"): ben trai nut khi du cho, tren nut khi cua so hep. */
+    .ntr-nhan { position: absolute; right: calc(100% + 10px); top: 50%; transform: translateY(-50%); height: 32px; padding: 0 14px; border-radius: 16px; background: rgb(24 24 24 / 92%); border: 1px solid rgb(255 255 255 / 12%); color: var(--text-1); font: 600 13px/30px Inter, sans-serif; white-space: nowrap; pointer-events: none; box-shadow: 0 6px 16px rgb(0 0 0 / 45%); }
+    @media (max-width: 1240px) { .ntr-nhan { right: 0; top: auto; bottom: calc(100% + 10px); transform: none; } }
     .bao { position: fixed; z-index: 25; left: 50%; bottom: 78px; transform: translateX(-50%) translateY(8px); max-width: min(560px, calc(100% - 32px)); padding: 9px 14px; border-radius: 12px; background: #2a1512; border: 1px solid rgb(255 95 109 / 45%); color: #ffd9dc; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
     .bao.hien { opacity: 1; transform: translateX(-50%); }
     /* ---- 12/10 (anh: "mirro - figjam co gi lam tuong tu di em"): cong cu, vat tu do, chon, tim, ban do nho ---- */
@@ -190,7 +201,7 @@
   <div class="timChip" id="timChip"></div>
   <div class="noi banDoHop" id="banDoHop" hidden><canvas id="banDo" width="400" height="256"></canvas></div>
   <div class="noi ngu" id="ngu" hidden></div>
-  <p class="trong" id="trong" hidden></p>
+  <div class="trong" id="trong" hidden><b id="trongT"></b><span id="trongM"></span><button class="nut-chinh" id="trongNut" type="button"></button><small id="trongG"></small></div>
   <div class="noi ten"><svg width="20" height="18" viewBox="0 0 385.89 351.31" aria-hidden="true"><path fill="#f86820" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15c0-39.55,32.11-71.66,71.66-71.66Z"/><path fill="#f86820" d="M385.89,351.31h-104.2c-32.9,0-62.6-19.73-75.36-50.06L79.21,0h104.2c32.9,0,62.6,19.73,75.36,50.06l127.12,301.25Z"/></svg><b>Canvas</b><span id="dem"></span></div>
   <div class="noi thanh">
     <button id="them"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/></svg><span class="chu" id="chuThem"></span></button>
@@ -201,7 +212,7 @@
     <button id="vua"><span id="chuVua"></span></button>
     <button id="moiNhat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="chu" id="chuMoiNhat"></span></button>
   </div>
-  <button class="ntr" id="chup"><svg width="24" height="22" viewBox="0 0 385.89 351.31" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15c0-39.55,32.11-71.66,71.66-71.66Z"/><path fill="currentColor" d="M385.89,351.31h-104.2c-32.9,0-62.6-19.73-75.36-50.06L79.21,0h104.2c32.9,0,62.6,19.73,75.36,50.06l127.12,301.25Z"/></svg><b id="soNut"></b></button>
+  <button class="ntr" id="chup"><svg width="24" height="22" viewBox="0 0 385.89 351.31" aria-hidden="true"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15c0-39.55,32.11-71.66,71.66-71.66Z"/><path fill="currentColor" d="M385.89,351.31h-104.2c-32.9,0-62.6-19.73-75.36-50.06L79.21,0h104.2c32.9,0,62.6,19.73,75.36,50.06l127.12,301.25Z"/></svg><b id="soNut"></b><span class="ntr-nhan" id="chupNhan"></span></button>
   <div class="bao" id="bao" role="status"></div>
   <script src="canvas.js"></script>
   <script src="canvas-vat.js"></script>

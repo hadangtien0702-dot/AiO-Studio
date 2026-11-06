@@ -44,7 +44,14 @@ const kieuCua = (t) => (LA_ANH.test(t) ? 'anh' : LA_VIDEO.test(t) ? 'video' : nu
 const boQuaGoc = (t) => t.startsWith('.') || t.startsWith('shotandsave-storyboard-')
 /* macOS co the tra ten thu muc o dang tach dau (NFD): "Tham khảo" doc ve khac byte voi chu nguoi dung go -> so bang NFC + chu thuong. */
 const khoaTen = (s) => String(s).normalize('NFC').toLowerCase()
-const macDinh = () => ({ v: 1, khung: [], vt: {}, thuoc: {}, chep: {}, vat: [], noi: [], net: [], z: {}, khoa: {} })
+const macDinh = () => ({ v: 1, khung: [], vt: {}, thuoc: {}, chep: {}, ban: {}, vat: [], noi: [], net: [], z: {}, khoa: {} })
+/* 06/11 (soat Codex, loi 1 / 2 / 6): app NHO ban noi / ban chep nao la CUA MINH bang `ban["<id khung>/<ten>"]` = { ino, size, mtime } cua file
+   trong khung + { gIno, gSize, gMtime } cua anh goc luc do. Chi file con KHOP ba so dau moi coi la cua app (xoa duoc, coi la thanh vien).
+   Truoc day chi so kich thuoc: nguoi dung thay ban chep bang anh khac cung so byte la app xoa nham anh moi. */
+const mungLa = (a, b) => !!a && !!b && !!a.ino && a.ino !== '0' && a.ino === b.ino && a.dev === b.dev
+const banMoi = (sp, sg) => ({ ino: sp.ino, size: sp.size, mtime: sp.mtime, gIno: sg.ino, gSize: sg.size, gMtime: sg.mtime })
+const banKhop = (r, f) => !!r && !!f && r.ino === f.ino && r.size === f.size && r.mtime === Number(f.mtime)
+let chuaGhi = false   // true = lan ghi gan nhat that bai: ban trong RAM MOI hon file tren dia -> khong duoc doc de len RAM
 
 /* ---- 12/10 (anh: "mirro - figjam co gi lam tuong tu di em"): cac thu KHONG phai anh tren bang. Chi nam trong so bo cuc, KHONG
    tao file trong thu muc anh. Khoa trong z / khoa / diem noi: 'o:<khoa tam>' · 'v:<id vat>' · 's:<id net>' · 'f:<id khung>'. ---- */
@@ -111,7 +118,7 @@ function lamSachBang(o, laKhoa) {
 
 function khoiTao(thuMucUserData, log) {
   FILE = path.join(thuMucUserData, 'canvas', 'bo-cuc.json')
-  ram = null; camGhi = false
+  ram = null; camGhi = false; chuaGhi = false
   if (typeof log === 'function') ghiLog = log
 }
 
@@ -133,7 +140,7 @@ function chuan(o) {
         x: Number(k.x) || 0, y: Number(k.y) || 0, w: Math.max(K0.WMIN, Number(k.w) || K0.W), h: Math.max(K0.HMIN, Number(k.h) || K0.H), ino: k.ino ? String(k.ino) : '' })
     }
   }
-  for (const ten of ['vt', 'thuoc', 'chep']) if (o[ten] && typeof o[ten] === 'object' && !Array.isArray(o[ten])) bc[ten] = o[ten]
+  for (const ten of ['vt', 'thuoc', 'chep', 'ban']) if (o[ten] && typeof o[ten] === 'object' && !Array.isArray(o[ten])) bc[ten] = o[ten]
   bc.vat = lamSachVat(o.vat); bc.noi = lamSachNoi(o.noi); bc.net = lamSachNet(o.net)
   bc.z = lamSachBang(o.z, false); bc.khoa = lamSachBang(o.khoa, true)
   return bc
@@ -142,6 +149,7 @@ function chuan(o) {
 /** Doc so. Tra { bc, loi }: loi = null (doc duoc / chua co) · 'doc' (khong doc duoc, CAM ghi de) · 'hong' (da cat file hong). */
 function docBoCuc() {
   if (!FILE) return { bc: macDinh(), loi: 'chua-khoi-tao' }
+  if (chuaGhi && ram) return { bc: ram, loi: null }   // loi 4: lan luu truoc that bai -> ban RAM moi hon dia, KHONG doc dia de len no
   let s
   try { s = fs.readFileSync(FILE, 'utf8') } catch (e) {
     if (e && e.code === 'ENOENT') { camGhi = false; if (!ram) ram = macDinh(); return { bc: ram, loi: null } }
@@ -174,14 +182,17 @@ function ghiBoCuc(bc) {
   try {
     fs.mkdirSync(path.dirname(FILE), { recursive: true })
     ghiBen(FILE, JSON.stringify(bc)) // tmp + ep xuong dia + doi ten, xem ghi-ben.js
+    chuaGhi = false
     return true
-  } catch (e) { ghiLog('canvas: ghi bo-cuc.json LOI ' + (e && e.code)); return false }
+  } catch (e) { chuaGhi = true; ghiLog('canvas: ghi bo-cuc.json LOI ' + (e && e.code)); return false }
 }
+/** true = thay doi gan nhat CHUA xuong dia (o day day, mat quyen ghi, hoac so dang bi cam ghi de) -> trang phai bao nguoi dung. */
+const khongGhiDuoc = () => chuaGhi || camGhi
 
 function thongTin(p) {
   try {
     const s = fs.statSync(p, { bigint: true })
-    return { ino: String(s.ino), laThuMuc: s.isDirectory(), laFile: s.isFile(), mtime: Number(s.mtimeMs), size: Number(s.size) }
+    return { ino: String(s.ino), dev: String(s.dev), laThuMuc: s.isDirectory(), laFile: s.isFile(), mtime: Number(s.mtimeMs), size: Number(s.size) }
   } catch (e) { return null }
 }
 
@@ -189,7 +200,7 @@ function thongTin(p) {
 function quet(goc) {
   const kq = { file: [], con: [] }
   let ds
-  try { ds = fs.readdirSync(goc, { withFileTypes: true }) } catch (e) { return kq }
+  try { ds = fs.readdirSync(goc, { withFileTypes: true }) } catch (e) { kq.loi = (e && e.code) || 'loi'; return kq }   // loi 3: KHONG duoc coi la "thu muc rong"
   for (const d of ds) {
     const t = d.name
     if (t.startsWith('.')) continue
@@ -198,19 +209,19 @@ function quet(goc) {
       const st = thongTin(p); if (!st) continue
       const c = { ten: t, ino: st.ino, file: [] }
       let trong = []
-      try { trong = fs.readdirSync(p, { withFileTypes: true }) } catch (e) {}
+      try { trong = fs.readdirSync(p, { withFileTypes: true }) } catch (e) { kq.loi = (e && e.code) || 'loi' }
       for (const f of trong) {
         if (!f.isFile() || f.name.startsWith('.')) continue
         const k = kieuCua(f.name); if (!k) continue
         const s2 = thongTin(path.join(p, f.name))
-        if (s2) c.file.push({ ten: f.name, kieu: k, ino: s2.ino, mtime: s2.mtime })
+        if (s2) c.file.push({ ten: f.name, kieu: k, ino: s2.ino, dev: s2.dev, size: s2.size, mtime: s2.mtime })
       }
       kq.con.push(c)
     } else if (d.isFile()) {
       if (boQuaGoc(t)) continue
       const k = kieuCua(t); if (!k) continue
       const st = thongTin(p)
-      if (st) kq.file.push({ ten: t, kieu: k, ino: st.ino, mtime: st.mtime })
+      if (st) kq.file.push({ ten: t, kieu: k, ino: st.ino, dev: st.dev, size: st.size, mtime: st.mtime })
     }
   }
   kq.con.sort((a, b) => (khoaTen(a.ten) < khoaTen(b.ten) ? -1 : 1))
@@ -264,11 +275,14 @@ function dongBo(bc0, q, dais) {
   bc.khung = khung
   const theoId = new Map(khung.map((k) => [k.id, k])), theoTen = new Map(khung.map((k) => [khoaTen(k.ten), k]))
   // --- 2. cac tam ---
-  const coGoc = new Set(q.file.map((f) => f.ten)), thanhVien = new Map(), mucs = []
+  const gocTheoTen = new Map(q.file.map((f) => [f.ten, f])), thanhVien = new Map(), mucs = []
   for (const c of q.con) {
     const k = theoTen.get(khoaTen(c.ten)); if (!k) continue
     for (const f of c.file) {
-      if (coGoc.has(f.ten)) { if (!thanhVien.has(f.ten)) thanhVien.set(f.ten, k.id) }
+      const g = gocTheoTen.get(f.ten)
+      /* loi 6 (06/11): trung TEN chua du de coi la thanh vien. Phai la ban noi cung ma file voi anh goc, hoac ban app da ghi so (`ban`) va
+         con nguyen; anh KHAC noi dung cung ten thi hien rieng trong khung (khoa 'k:...'), khong bi nhap lam mot voi anh goc. */
+      if (g && (mungLa(f, g) || banKhop(bc.ban[k.id + '/' + f.ten], f))) { if (!thanhVien.has(f.ten)) thanhVien.set(f.ten, k.id) }
       else mucs.push({ khoa: 'k:' + k.id + '/' + f.ten, kieu: f.kieu, tep: [c.ten, f.ten], mtime: f.mtime, khung: k.id, chiTrongKhung: true })
     }
   }
@@ -346,7 +360,7 @@ function dongBo(bc0, q, dais) {
   for (const m of mucs) vt[m.khoa] = { x: Math.round(m.x), y: Math.round(m.y) }
   if (Object.keys(bc.vt).length !== Object.keys(vt).length) doi = true
   bc.vt = vt
-  for (const kh of Object.keys(bc.chep)) { const id = kh.slice(0, kh.indexOf('/')); if (!theoId.has(id)) { delete bc.chep[kh]; doi = true } }
+  for (const ten of ['chep', 'ban']) for (const kh of Object.keys(bc[ten])) { const id = kh.slice(0, kh.indexOf('/')); if (!theoId.has(id)) { delete bc[ten][kh]; doi = true } }
   // --- 4. vat / mui ten / net: bo thu da mat cho (anh bi xoa ngoai Finder, khung di theo thu muc...) ---
   const co = new Set()
   for (const m of mucs) co.add('o:' + m.khoa)
@@ -367,10 +381,124 @@ function dongBo(bc0, q, dais) {
 
 /** Doc so + quet dia + khop. Ghi lai so neu co gi doi. */
 function nap(goc, dais) {
+  if (chuaGhi && ram) ghiBoCuc(ram)             // loi 4: lan luu truoc that bai -> thu ghi lai ban RAM (moi hon dia) truoc khi lam gi khac
   const d = docBoCuc()
-  const r = dongBo(d.bc, quet(goc), dais)
-  if (r.doi) ghiBoCuc(r.bc); else ram = r.bc
-  return { tt: r.tt, loiSo: d.loi }
+  let q = quet(goc)
+  const soTrong = !d.bc.khung.length && !Object.keys(d.bc.vt).length
+  if (q.loi && !(q.loi === 'ENOENT' && soTrong)) {
+    /* loi 3 (06/11): thu muc anh tam thoi khong doc duoc (USB / o mang ngat). Chi ve de nguoi dung thay, TUYET DOI khong ghi de so bo cuc
+       va khong thay ban RAM: dongBo tren danh sach rong se coi moi khung la "da bi xoa". */
+    if (!napLoiThuMuc) ghiLog('canvas: KHONG doc duoc thu muc anh (' + q.loi + ') -> khong dong bo, khong ghi de bo-cuc.json')
+    napLoiThuMuc = true
+    const r = dongBo(d.bc, { file: [], con: [] }, dais)
+    r.tt.loiThuMuc = true
+    return { tt: r.tt, loiSo: d.loi, loiGhi: khongGhiDuoc() }
+  }
+  napLoiThuMuc = false
+  const bc = d.bc
+  const dd = baoDamBanNoi(goc, bc, q)
+  if (dd.laiQuet) q = quet(goc)
+  const r = dongBo(bc, q, dais)
+  if (r.doi || dd.doi) ghiBoCuc(r.bc); else ram = r.bc
+  return { tt: r.tt, loiSo: d.loi, loiGhi: khongGhiDuoc() }
+}
+let napLoiThuMuc = false
+
+/** So sanh noi dung hai file theo tung khoi 1 MB (dung som khi khac). */
+function giongNoiDung(a, b) {
+  let fa = null, fb = null
+  try {
+    fa = fs.openSync(a, 'r'); fb = fs.openSync(b, 'r')
+    const ba = Buffer.alloc(1 << 20), bb = Buffer.alloc(1 << 20)
+    for (;;) {
+      const na = fs.readSync(fa, ba, 0, ba.length, null), nb = fs.readSync(fb, bb, 0, bb.length, null)
+      if (na !== nb) return false
+      if (na === 0) return true
+      if (ba.compare(bb, 0, nb, 0, na) !== 0) return false
+    }
+  } catch (e) { return false } finally { for (const f of [fa, fb]) if (f != null) { try { fs.closeSync(f) } catch (e) {} } }
+}
+
+/** Dua ban noi / ban chep trong khung ve dung anh goc HIEN TAI (loi 2): link moi / chep moi ra ten tam roi doi ten de len file cu. */
+function thayBanNoi(bc, kh, gocF, p) {
+  const tam = p + '.aio-moi-' + process.pid
+  let chep = false
+  try {
+    try { fs.linkSync(gocF, tam) } catch (e) { fs.copyFileSync(gocF, tam, fs.constants.COPYFILE_EXCL); chep = true }
+    fs.renameSync(tam, p)
+  } catch (e) {
+    try { fs.unlinkSync(tam) } catch (e2) {}
+    // khong thay duoc: BO ban cu cua app (anh goc con nguyen) con hon de ban chua che nam lai trong thu muc khung
+    try { fs.unlinkSync(p); delete bc.ban[kh]; delete bc.chep[kh]; ghiLog('canvas: khong thay duoc ban noi cu (' + (e && e.code) + ') -> da bo ban cu trong khung: ' + kh) } catch (e3) { ghiLog('canvas: KHONG thay va KHONG bo duoc ban noi cu ' + kh + ' (' + (e3 && e3.code) + ')') }
+    return false
+  }
+  const sp = thongTin(p), sg = thongTin(gocF)
+  if (sp && sg) bc.ban[kh] = banMoi(sp, sg)
+  if (chep && sp) bc.chep[kh] = sp.size; else delete bc.chep[kh]
+  ghiLog('canvas: anh goc da doi -> lam moi ban trong khung ' + kh)
+  return true
+}
+const goiDoi = (r, g) => r.gIno !== g.ino || r.gSize !== g.size || r.gMtime !== Number(g.mtime)
+
+/**
+ * Doi chieu cac ban noi trong khung voi anh goc: (a) ban noi cung ma file -> ghi so; (b) ban chep cu chi co kich thuoc -> nhan khi
+ * giong HET noi dung anh goc; (c) ban cua app con nguyen nhung anh goc da bi DOI (vd: Che xong luu de len anh goc) -> lam moi,
+ * khong de ban CU chua che nam trong thu muc khung (loi 2). Tra { doi, laiQuet }.
+ */
+function baoDamBanNoi(goc, bc, q) {
+  const kq = { doi: false, laiQuet: false }
+  const gocTheoTen = new Map(q.file.map((f) => [f.ten, f]))
+  const dung = new Set()
+  for (const k of bc.khung) {
+    let c = k.ino ? q.con.find((x) => x.ino === k.ino && !dung.has(x)) : null
+    if (!c) c = q.con.find((x) => khoaTen(x.ten) === khoaTen(k.ten) && !dung.has(x))
+    if (!c) continue
+    dung.add(c)
+    for (const f of c.file) {
+      const g = gocTheoTen.get(f.ten); if (!g) continue
+      const kh = k.id + '/' + f.ten, r = bc.ban[kh]
+      if (mungLa(f, g)) { if (!r || r.ino !== f.ino || r.gIno !== g.ino || r.gMtime !== Number(g.mtime) || r.gSize !== g.size || r.mtime !== Number(f.mtime)) { bc.ban[kh] = banMoi(f, g); kq.doi = true } continue }
+      if (banKhop(r, f)) {
+        if (goiDoi(r, g) && thayBanNoi(bc, kh, path.join(goc, f.ten), path.join(goc, c.ten, f.ten))) { kq.doi = true; kq.laiQuet = true }
+        else if (goiDoi(r, g)) { kq.doi = true; kq.laiQuet = true }   // khong thay duoc -> da bo ban cu
+        continue
+      }
+      if (!r && bc.chep[kh] != null && bc.chep[kh] === f.size && f.size === g.size && giongNoiDung(path.join(goc, c.ten, f.ten), path.join(goc, f.ten))) { bc.ban[kh] = banMoi(f, g); kq.doi = true }
+    }
+  }
+  return kq
+}
+
+/** Moc cho main.js: TRUOC va SAU khi kho.ghiDeAnh ghi de mot anh o thu muc goc (vd: Che / ve len anh ghim roi luu). Khong sua kho.js. */
+function laAnhGoc(goc, filePath) { try { return path.dirname(path.resolve(filePath)) === path.resolve(goc) } catch (e) { return false } }
+function truocGhiDe(goc, filePath) {
+  try {
+    if (!laAnhGoc(goc, filePath)) return 0
+    const ten = path.basename(filePath), bc = boCucHienTai(), sg = thongTin(filePath)
+    if (!sg || !sg.laFile) return 0
+    let n = 0
+    for (const k of bc.khung) {
+      const sp = thongTin(path.join(goc, k.ten, ten)); if (!sp || !mungLa(sp, sg)) continue
+      bc.ban[k.id + '/' + ten] = banMoi(sp, sg); n++
+    }
+    if (n) ghiBoCuc(bc)
+    return n
+  } catch (e) { ghiLog('canvas: truocGhiDe LOI ' + (e && e.message)); return 0 }
+}
+function sauGhiDe(goc, filePath) {
+  try {
+    if (!laAnhGoc(goc, filePath)) return 0
+    const ten = path.basename(filePath), bc = boCucHienTai(), gocF = path.join(goc, ten), sg = thongTin(gocF)
+    if (!sg || !sg.laFile) return 0
+    let n = 0
+    for (const k of bc.khung) {
+      const kh = k.id + '/' + ten, p = path.join(goc, k.ten, ten), sp = thongTin(p), r = bc.ban[kh]
+      if (!sp || !banKhop(r, sp) || mungLa(sp, sg) || !goiDoi(r, sg)) continue
+      thayBanNoi(bc, kh, gocF, p); n++
+    }
+    if (n) ghiBoCuc(bc)
+    return n
+  } catch (e) { ghiLog('canvas: sauGhiDe LOI ' + (e && e.message)); return 0 }
 }
 const boCucHienTai = () => ram || docBoCuc().bc
 
@@ -421,6 +549,15 @@ function doiTenKhung(goc, id, tenMoi) {
   return { ok: true, ten: t }
 }
 
+/** File `p` trong khung co phai ban noi / ban chep CUA APP (xoa duoc) khong? Cung ma file voi anh goc, hoac con khop so `ban`, hoac ban chep cu
+    chi co kich thuoc nhung giong HET noi dung (loi 1: truoc chi so kich thuoc nen anh khac cung so byte bi xoa nham). */
+function laCuaApp(bc, kh, sp, sg, p, gocF) {
+  if (!sp || !sg) return false
+  if (mungLa(sp, sg)) return true
+  if (banKhop(bc.ban[kh], sp)) return true
+  return bc.chep[kh] != null && bc.chep[kh] === sp.size && sp.size === sg.size && giongNoiDung(p, gocF)
+}
+
 /**
  * Dat mot tam vao khung (khungId) hoac ra ngoai moi khung (null).
  * Tra { ok, giu } — giu > 0: con ban trung ten o khung khac ma app KHONG duoc xoa (khong phai ban noi cua anh goc).
@@ -436,18 +573,24 @@ function datThanhVien(goc, khoa, khungId) {
   const gocF = path.join(goc, khoa), sg = thongTin(gocF)
   if (!sg || !sg.laFile) return { ok: false, loi: 'mat-goc' }
   let giu = 0
+  if (dich) {   // loi 6: khung dich da co mot file KHAC cung ten -> tu choi truoc khi dung toi bat ky khung nao
+    const p = path.join(goc, dich.ten, khoa), sp = thongTin(p)
+    if (sp && !laCuaApp(bc, dich.id + '/' + khoa, sp, sg, p, gocF)) return { ok: false, loi: 'trung-ten' }
+  }
   for (const k of bc.khung) {
     const p = path.join(goc, k.ten, khoa), sp = thongTin(p), kh = k.id + '/' + khoa
     if (dich && k.id === dich.id) {
-      if (sp) continue                                       // da co san trong thu muc do
+      if (sp) continue                                       // da co san trong thu muc do (da kiem la cua app o tren)
+      let chep = false
       try { fs.linkSync(gocF, p) } catch (e) {
-        try { fs.copyFileSync(gocF, p, fs.constants.COPYFILE_EXCL); bc.chep[kh] = sg.size; ghiLog('canvas: o dia khong cho ban noi (' + (e && e.code) + ') -> chep ' + khoa) }
+        try { fs.copyFileSync(gocF, p, fs.constants.COPYFILE_EXCL); chep = true; bc.chep[kh] = sg.size; ghiLog('canvas: o dia khong cho ban noi (' + (e && e.code) + ') -> chep ' + khoa) }
         catch (e2) { ghiLog('canvas: dua vao thu muc LOI ' + (e2 && e2.code)); ghiBoCuc(bc); return { ok: false, loi: 'he-thong', ct: e2 && e2.code } }
       }
+      const s2 = thongTin(p); if (s2) bc.ban[kh] = banMoi(s2, sg)
+      if (!chep) delete bc.chep[kh]
     } else if (sp) {
-      const cuaMinh = sp.ino === sg.ino || (bc.chep[kh] != null && bc.chep[kh] === sp.size && sp.size === sg.size)
-      if (!cuaMinh) { giu++; continue }                      // file KHAC trung ten: khong phai cua app -> de nguyen
-      try { fs.unlinkSync(p); delete bc.chep[kh] } catch (e) { giu++; ghiLog('canvas: bo ban noi LOI ' + (e && e.code)) }
+      if (!laCuaApp(bc, kh, sp, sg, p, gocF)) { giu++; continue }   // file KHAC trung ten: khong phai cua app -> de nguyen
+      try { fs.unlinkSync(p); delete bc.chep[kh]; delete bc.ban[kh] } catch (e) { giu++; ghiLog('canvas: bo ban noi LOI ' + (e && e.code)) }
     }
   }
   ghiBoCuc(bc)
@@ -486,7 +629,7 @@ function xoaKhung(goc, id) {
       if (TEN_RAC.test(d.name)) { cuaMinh.push(p); continue }
       if (!d.isFile() || d.name.startsWith('.')) { la.push(d.name); continue }
       const sp = thongTin(p), sg = thongTin(path.join(goc, d.name)), kh = k.id + '/' + d.name
-      const ok = sp && sg && sg.laFile && (sp.ino === sg.ino || (bc.chep[kh] != null && bc.chep[kh] === sp.size && sp.size === sg.size))
+      const ok = sp && sg && sg.laFile && laCuaApp(bc, kh, sp, sg, p, path.join(goc, d.name))   // loi 1: noi dung / so `ban`, khong chi kich thuoc
       if (ok) cuaMinh.push(p); else la.push(d.name)
     }
     if (la.length) return { ok: false, loi: 'chi-trong-thu-muc', giu: la.length }
@@ -495,7 +638,7 @@ function xoaKhung(goc, id) {
   }
   bc.khung = bc.khung.filter((x) => x !== k)
   for (const kh of Object.keys(bc.thuoc)) if (bc.thuoc[kh] === id) delete bc.thuoc[kh]
-  for (const kh of Object.keys(bc.chep)) if (kh.startsWith(id + '/')) delete bc.chep[kh]
+  for (const ten of ['chep', 'ban']) for (const kh of Object.keys(bc[ten])) if (kh.startsWith(id + '/')) delete bc[ten][kh]
   delete bc.z['f:' + id]; delete bc.khoa['f:' + id]
   ghiBoCuc(bc)
   return { ok: true, don: cuaMinh.length }
@@ -555,4 +698,4 @@ function nhanDoiAnh(goc, khoa) {
   return { ok: true, khoa: ten }
 }
 
-module.exports = { khoiTao, tenHopLe, docBoCuc, ghiBoCuc, quet, dongBo, nap, boCucHienTai, luuViTri, luuVat, taoKhung, doiTenKhung, datThanhVien, xoaKhung, nhapFile, nhapBuf, nhanDoiAnh, khungChua, O, K0, MAU, kieuCua }
+module.exports = { truocGhiDe, sauGhiDe, khongGhiDuoc, khoiTao,tenHopLe, docBoCuc, ghiBoCuc, quet, dongBo, nap, boCucHienTai, luuViTri, luuVat, taoKhung, doiTenKhung, datThanhVien, xoaKhung, nhapFile, nhapBuf, nhanDoiAnh, khungChua, O, K0, MAU, kieuCua }

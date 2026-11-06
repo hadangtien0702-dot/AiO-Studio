@@ -5,6 +5,9 @@ const i18n = require('./i18n')
 
 const lang = ipcRenderer.sendSync('i18n:lang') || 'vi'
 
+let cbLoiGhi = null
+const baoKetQuaGhi = (pr) => { pr.then((r) => { if (r && typeof cbLoiGhi === 'function') cbLoiGhi(!!r.loiGhi) }).catch(() => {}) }
+
 contextBridge.exposeInMainWorld('cv', {
   lang,
   t: (key, params) => {
@@ -15,9 +18,9 @@ contextBridge.exposeInMainWorld('cv', {
   /** -> { tt: { khung, muc, vat, noi, net, z, khoa }, loiSo } : doc so + quet thu muc + khop. */
   nap: () => ipcRenderer.invoke('canvas:nap'),
   /** Vi tri moi sau khi keo: { khung: [{ id, x, y, w, h, mau? }], vt: { khoa: { x, y } } }. */
-  luu: (p) => ipcRenderer.send('canvas:luu', p),
+  luu: (p) => baoKetQuaGhi(ipcRenderer.invoke('canvas:luu', p)),
   /** Thu khong phai anh: { vat, noi, net, z, khoa } (truong nao gui thi thay nguyen truong do). */
-  luuVat: (p) => ipcRenderer.send('canvas:luu-vat', p),
+  luuVat: (p) => baoKetQuaGhi(ipcRenderer.invoke('canvas:luu-vat', p)),
   /** Tao khung = tao thu muc con -> { kq: { ok, id }, tt }. */
   taoKhung: (x, y) => ipcRenderer.invoke('canvas:tao-khung', x, y),
   /** Doi ten khung = doi ten thu muc -> { kq: { ok, loi }, tt }. */
@@ -47,5 +50,7 @@ contextBridge.exposeInMainWorld('cv', {
   mo: (khoa) => ipcRenderer.send('canvas:mo', khoa),
   moThuMuc: (id) => ipcRenderer.send('canvas:mo-thu-muc', id || null),
   chup: () => ipcRenderer.send('canvas:chup'),
+  /** 06/11 (loi 4): cb(true) moi khi main bao thay doi vua gui CHUA xuong dia (o day, mat quyen ghi); cb(false) khi da ghi duoc. */
+  onLoiGhi: (cb) => { cbLoiGhi = cb },
   onLamMoi: (cb) => ipcRenderer.on('canvas:lam-moi', () => cb()),
 })

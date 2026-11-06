@@ -57,6 +57,7 @@
     "test:canvasapp": "node scripts/test/do-canvas-app.cjs",
     "test:canvasfigjam": "node scripts/test/do-canvas-figjam.cjs",
     "test:canvashangngay": "node scripts/test/do-canvas-hang-ngay.cjs",
+    "test:canvasdot2": "node scripts/test/do-canvas-dot2.cjs",
     "thu:canvas": "node scripts/test/thu-dung-canvas.cjs",
     "test:capnhat": "node scripts/test/do-cap-nhat.cjs",
     "test:capnhat-gd": "node scripts/test/do-cap-nhat-giao-dien.cjs",

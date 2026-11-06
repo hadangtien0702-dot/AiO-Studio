@@ -2057,9 +2057,11 @@ ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
       const dd = layDinhDangAnh()
       buf = laPng ? daVe.toPNG() : daVe.toJPEG((dd && dd.q) || 85)
     } catch (err) { buf = null }
+    try { canvasKho.truocGhiDe(kho.thuMucAnh(), rec.filePath) } catch (err) {} // 06/11 Canvas: ghi nho ban noi trong khung TRUOC khi file goc doi ma (loi 2)
     const r = buf && buf.length ? kho.ghiDeAnh(rec.filePath, buf) : { ok: false, loi: 'khong ma hoa duoc anh' }
     if (!r.ok) { hoanTacSuaPin(rec, 'ghi file ' + path.basename(rec.filePath) + ': ' + r.loi); return }
     const n = kho.lamMoiKeo(rec.filePath) // file moi doi ten vao cho cu -> lien ket .keo (neu co) phai noi lai
+    try { canvasKho.sauGhiDe(kho.thuMucAnh(), rec.filePath) } catch (err) {} // 06/11 Canvas: ban noi trong thu muc khung van giu anh CU CHUA CHE -> noi lai vao anh moi
     ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath) +
       (r.cach === 'ghi-thang' ? ' (GHI THANG vi khong doi ten duoc: ' + r.loiDoiTen + ')' : '') +
       (n ? ' (lam moi ' + n + ' lien ket keo)' : ''))
@@ -2892,7 +2894,7 @@ function canvasNap() {
   const ms = Date.now() - t0
   if (ms > 400) ghiLog('canvas nap ' + r.tt.muc.length + ' tam, ' + r.tt.khung.length + ' khung: ' + ms + ' ms')
   if (!hangNhoNen.length) setTimeout(canvasTaoSanAnhNho, 50)   // A6: tam moi (chup / chep vao) thi tao anh nho nen
-  return { tt: r.tt, loiSo: r.loiSo }
+  return { tt: r.tt, loiSo: r.loiSo, loiGhi: !!r.loiGhi }
 }
 /* Anh nho cho Canvas (rong 400 px, JPEG): tao khi trang xin lan dau, cat vao <userData>/canvas/anh-nho, lan sau doc lai.
    CHI phuc vu file anh nam TRONG thu muc anh (duong dan do trang gui len -> khong tin). Tao lan luot tung tam, nhuong luong chinh
@@ -2955,7 +2957,7 @@ function canvasTaoSanAnhNho() {
   } catch (e) { ghiLog('canvas: tao san anh nho LOI ' + (e && e.message)) }
 }
 ipcMain.handle('canvas:nap', (e) => (laCanvas(e) ? canvasNap() : null))
-ipcMain.on('canvas:luu', (e, p) => { if (laCanvas(e)) canvasKho.luuViTri(p) })
+ipcMain.handle('canvas:luu', (e, p) => { if (!laCanvas(e)) return null; canvasKho.luuViTri(p); return { loiGhi: canvasKho.khongGhiDuoc() } }) // 06/11 loi 4: tra ket qua ghi de trang bao nguoi dung
 ipcMain.handle('canvas:tao-khung', (e, x, y) => {
   if (!laCanvas(e)) return null
   const kq = canvasKho.taoKhung(kho.baoDamThuMuc(kho.thuMucAnh()), T('cv.tenMoi'), Number(x), Number(y))
@@ -2998,7 +3000,7 @@ ipcMain.on('canvas:mo', (e, khoa) => {
 })
 /* ---- 12/10 (anh: "mirro - figjam co gi lam tuong tu di em"): vat tren bang (ghi chu, chu, hinh, link, mui ten, net ve), xoa khung,
    dan / tha anh tu ngoai vao, nhan doi, keo ra app khac, xuat khung ra PNG / PDF. Luat an toan nam o src/canvas-kho.js. ---- */
-ipcMain.on('canvas:luu-vat', (e, p) => { if (laCanvas(e)) canvasKho.luuVat(p) })
+ipcMain.handle('canvas:luu-vat', (e, p) => { if (!laCanvas(e)) return null; canvasKho.luuVat(p); return { loiGhi: canvasKho.khongGhiDuoc() } })
 ipcMain.handle('canvas:xoa-khung', (e, id) => {
   if (!laCanvas(e)) return null
   const kq = canvasKho.xoaKhung(kho.thuMucAnh(), String(id))

@@ -30,6 +30,9 @@
   el('tieu').querySelector('small').textContent = T('cv.phu')
   el('chuThem').textContent = T('cv.khungMoi'); el('chuMo').textContent = T('cv.moThuMuc'); el('chuVua').textContent = T('cv.vua')
   for (const [id, khoa] of [['them', 'cv.khungMoi'], ['moTM', 'cv.moThuMuc'], ['vua', 'cv.vua'], ['chup', 'cv.chup']]) { el(id).title = T(khoa); el(id).setAttribute('aria-label', T(khoa)) }
+  el('chupNhan').textContent = T('cv.chupNhan')   // 06/11: nut tron goc duoi-phai co nhan chu, nguoi moi khong phai doan
+  el('trongT').textContent = T('cv.trongT'); el('trongM').textContent = T('cv.trongM'); el('trongG').textContent = T('cv.trongG'); el('trongNut').textContent = T('cv.trongNut')
+  el('trongNut').addEventListener('click', () => cv.chup())
 
   const TM = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>'
   const PHAT = '<span class="phat"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg></span>'
@@ -105,6 +108,11 @@
     the.append(e); X.elO.set(m.khoa, e)
     return e
   }
+  /** Loi 7 (06/11): anh sua ngoai app thi main tra URL moi (kem ?m=mtime) nhung phan tu da co khong doi `src` -> nho van hinh cu. */
+  function lamMoiNguonAnh(m, e) {
+    if (m.kieu === 'anh') { const im = e.querySelector('img.anh'); if (im && m.anh && im.getAttribute('src') !== m.anh) im.setAttribute('src', m.anh) }
+    else if (m.kieu === 'dai') { e.querySelectorAll('.dayk img').forEach((im, i) => { if (m.anh && m.anh[i] && im.getAttribute('src') !== m.anh[i]) im.setAttribute('src', m.anh[i]) }) }
+  }
   function datO(m, e) { e.style.left = m.x + 'px'; e.style.top = m.y + 'px'; e.style.width = m.w + 'px'; e.style.height = m.h + 'px' }
   X.datO = datO
   function bayTuNut(m, e, tre) {
@@ -130,7 +138,7 @@
     const conO = new Set(X.mucs.map((m) => m.khoa)); for (const [kh, e] of X.elO) if (!conO.has(kh)) { e.remove(); X.elO.delete(kh) }
     for (const k of X.khung) datKhung(k)
     const moi = []
-    for (const m of X.mucs) { let e = X.elO.get(m.khoa); if (!e) { e = dungO(m); moi.push([m, e]) } datO(m, e); e.classList.toggle('khoa', khoaCua('o:' + m.khoa)) }
+    for (const m of X.mucs) { let e = X.elO.get(m.khoa); if (!e) { e = dungO(m); moi.push([m, e]) } else lamMoiNguonAnh(m, e); datO(m, e); e.classList.toggle('khoa', khoaCua('o:' + m.khoa)) }
     if (choBay && !matchMedia('(prefers-reduced-motion:reduce)').matches) moi.slice(-36).forEach(([m, e], i) => bayTuNut(m, e, 140 + i * 55))
     if (X.veVat) X.veVat()
     datLop()
@@ -138,7 +146,10 @@
     el('dem').textContent = T('cv.dem', { n: X.mucs.length, k: X.khung.length })
     el('soNut').textContent = X.mucs.length || ''
     const tr = el('trong'); const rong = X.mucs.length === 0 && X.khung.length === 0 && X.vat.length === 0 && X.net.length === 0
-    tr.hidden = !rong; if (rong) tr.textContent = T('cv.trong')
+    const loiTM = !!tt.loiThuMuc   // loi 3: thu muc khong doc duoc -> khong noi "Canvas trong" (se sai), noi that
+    tr.hidden = !(rong || loiTM); document.body.classList.toggle('rong', rong || loiTM)
+    el('trongT').hidden = loiTM; el('trongNut').hidden = loiTM; el('trongG').hidden = loiTM
+    el('trongM').textContent = T(loiTM ? 'cv.loiThuMuc' : 'cv.trongM')
     capNhatChon()
     if (X.timBieu) X.timBieu()
   }
@@ -146,9 +157,11 @@
     if (!r || !r.tt) return
     ve(r.tt, true)
     if ((r.loiSo === 'hong' || r.loiSo === 'doc') && !daBaoSo) { daBaoSo = true; hienBao(T('cv.loiSo')) }
+    if (r.loiGhi) hienBao(T('cv.loiLuu'))   // loi 4: luu hong thi bao tren man, khong de nguoi dung tuong da luu
   }
   X.nhanKetQua = nhanKetQua
-  const LOI = { ten: 'cv.loiTen', trung: 'cv.loiTrung', 'chi-trong-thu-muc': 'cv.chiTrong' }
+  const LOI = { ten: 'cv.loiTen', trung: 'cv.loiTrung', 'chi-trong-thu-muc': 'cv.chiTrong', 'trung-ten': 'cv.loiTrungTen' }
+  cv.onLoiGhi((co) => { if (co) hienBao(T('cv.loiLuu')) })   // moi lan luu vi tri / ghi chu bi main bao that bai
   const chuLoi = (loi) => T(LOI[loi] || 'cv.loiHeThong')
   X.chuLoi = chuLoi
   async function lamMoi() {
@@ -538,7 +551,7 @@
   // ---------- xoa ----------
   /** Xoa khung can bam HAI lan (lan dau chi doi chu nut va nhac). Chi xoa duoc khi thu muc chi con ban noi cua anh goc. */
   async function xoaKhung(id) {
-    if (daiKhungHoi !== id) { daiKhungHoi = id; clearTimeout(henMo); henMo = setTimeout(() => { daiKhungHoi = null; if (X.capNhatNgu) X.capNhatNgu() }, 3500); hienBao(T('cv.c.xoaKhungHoi')); if (X.capNhatNgu) X.capNhatNgu(); return }
+    if (daiKhungHoi !== id) { daiKhungHoi = id; clearTimeout(henMo); henMo = setTimeout(() => { daiKhungHoi = null; if (X.capNhatNgu) X.capNhatNgu() }, 3500); hienBao(T('cv.c.xoaKhungCanhBao')); if (X.capNhatNgu) X.capNhatNgu(); return }
     daiKhungHoi = null
     X.dangCho = true
     try {
@@ -546,7 +559,10 @@
       const r = await cv.xoaKhung(id)
       if (r && r.kq && !r.kq.ok) hienBao(r.kq.loi === 'chi-trong-thu-muc' ? T('cv.xoaKhungKhong', { n: r.kq.giu || 0 }) : chuLoi(r.kq.loi))
       nhanKetQua(r)
-      if (r && r.kq && r.kq.ok) { X.sel.delete('f:' + id); capNhatChon(); X.day(truoc, chup()) }
+      /* Loi 5 (06/11): KHONG dua vao lich su. Hoan tac chi gui lai vi tri cua id khung da mat, main khong dung lai thu muc + ban noi (khung khong
+         ve lai, thu muc khong ve). Da noi ro truoc khi xoa; sau khi xoa noi lai de Ctrl+Z khong bi hieu nham. Khong xoa cac buoc cu trong lich su:
+         chung chi gui vi tri, id khung da mat bi main bo qua, khong gay hai. */
+      if (r && r.kq && r.kq.ok) { X.sel.delete('f:' + id); capNhatChon(); hienBao(T('cv.khungDaXoa')) }
     } finally { X.dangCho = false }
   }
   X.xoaKhung = xoaKhung
