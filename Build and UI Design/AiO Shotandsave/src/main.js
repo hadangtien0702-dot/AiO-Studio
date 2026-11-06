@@ -42,6 +42,7 @@ let timAnh = null
 const os = require('os')
 const { taoCapNhat } = require('./cap-nhat') // 05/11: bao co ban moi (xem dau src/cap-nhat.js)
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
+const { taoLopSua } = require('./lop-sua') // 06/11: lop sua cua anh (cac net da ve + anh sach) trong userData
 const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
@@ -343,6 +344,15 @@ let pending = null
 
 /** Map webContents.id -> { image: NativeImage } cho tung cua so ghim (de Copy). */
 const pins = new Map()
+const lopSua = taoLopSua(app.getPath('userData'), (m) => ghiLog(m))
+/* 06/11: luu lop sua mac dinh BAT; luuLopSua: false trong cau-hinh.json la tat han (khong luu anh sach nua). */
+const luuLopSuaBat = () => kho.docCauHinh().luuLopSua !== false
+/* Ghi lop sua cua MOT anh vua luu/ghi de. lop: { shapes, dpr, dipW, dipH, sach: dataURL PNG | null (giu ban sach cu) }. Loi chi ghi log (anh da luu xong). */
+function ghiLopSuaCuaAnh(filePath, lop, ctx) {
+  if (!filePath || !lop || !Array.isArray(lop.shapes)) return
+  const r = lopSua.ghiTuLop(filePath, lop, luuLopSuaBat())
+  ghiLog('lop-sua ' + (ctx || '') + ' ' + path.basename(filePath) + ': ' + (r.ok ? (r.daXoa ? 'xoa (khong con net)' : lop.shapes.length + ' net') : 'KHONG luu duoc (' + r.loi + ')'))
+}
 
 /* Chi chay mot ban. */
 const gotLock = app.requestSingleInstanceLock()
@@ -386,6 +396,7 @@ app.whenReady().then(() => {
   if (THU_OCR) { thuOcr(); return } // che do do: khong tray, khong phim tat, khong luong chup
   if (THU_QUAY) { thuQuay(); return } // che do do quay video: khong tray, khong phim tat
   anDock() // 04/10 Mac: goi lai sau khi app san sang, phong lan goi luc nap file chua co tac dung (chua co cua so nao)
+  setTimeout(() => { try { lopSua.donDep() } catch (e) {} }, 8000) // 06/11: don lop sua cua anh da xoa / qua han / qua tran dung luong
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
     const headers = {
@@ -841,7 +852,7 @@ function anNutHopLe(v) { return Array.isArray(v) ? NUT_AN_DUOC.filter((k) => v.i
 /* Cau hinh gui cho man chup moi lan mo (overlay:init) va khi doi trong Cai dat (overlay:update-config). */
 function cauHinhOverlay() {
   const c = kho.docCauHinh()
-  return { lamMoKieu: kieuLamMo(c.lamMoKieu), anNut: anNutHopLe(c.anNut), kinhLup: c.kinhLup !== false }
+  return { lamMoKieu: kieuLamMo(c.lamMoKieu), anNut: anNutHopLe(c.anNut), kinhLup: c.kinhLup !== false, veTay: c.veTay === true, luuLopSua: c.luuLopSua !== false }
 }
 function phatCauHinhOverlay(patch) {
   for (const w of overlayWins) {
@@ -1842,6 +1853,7 @@ async function handleConfirm(wcId, payload) {
   //    cai dat nguoi dung (JPEG/PNG + chat luong).
   const filePath = kho.luuAnh(cropped, layDinhDangAnh())
   const _sz = cropped.getSize()
+  if (filePath && payload.lop) ghiLopSuaCuaAnh(filePath, payload.lop, 'chup') // 06/11: luu kem cac net de mo lai sua tiep (anh da luu xong, loi o day khong mat anh)
   if (!filePath) {
     // ☠️ 10/09: luuAnh tra null (o day / mat quyen / thu muc hong). Truoc day
     //    path.basename(null) nem TypeError trong ham async khong await ->
@@ -1961,11 +1973,11 @@ function createPinWindow(image, screenX, screenY, dipW, dipH, filePath) {
   // ☠️ Nho `id` NGAY BAY GIO. Trong handler 'closed', `win.webContents` da bi
   // huy — doc `.id` tu no nem "Object has been destroyed" (vap 24/08).
   const wcId = win.webContents.id
-  pins.set(wcId, { image, filePath, win, dipW, dipH }) // dipW/dipH: de tra anh ghim ve ban cu khi luu sua hong (04/10)
+  pins.set(wcId, { image, filePath, win, dipW, dipH, dipGoc: { w: dipW, h: dipH } }) // dipW/dipH: de tra anh ghim ve ban cu khi luu sua hong (04/10)
 
   win.loadFile(path.join(__dirname, 'pin', 'index.html'))
   win.webContents.once('did-finish-load', () => {
-    win.webContents.send('pin:data', { dataUrl, pad: PIN_PAD, w: dipW, h: dipH, lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic' })
+    win.webContents.send('pin:data', { dataUrl, pad: PIN_PAD, w: dipW, h: dipH, lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic', veTay: kho.docCauHinh().veTay === true, luuLopSua: kho.docCauHinh().luuLopSua !== false })
     win.show()
 
     // Tu kiem: chup ghim + KHAY -> dong ghim (duong da lam sap app) -> thoat.
@@ -2015,9 +2027,10 @@ function hoanTacSuaPin(rec, lyDo) {
   const win = rec.win
   if (!win || win.isDestroyed()) return
   try {
+    if (rec.dipGoc) { rec.dipW = rec.dipGoc.w; rec.dipH = rec.dipGoc.h; doiCoPin(rec, rec.dipW, rec.dipH) } // 06/11: da cat bot anh thi tra ca kich thuoc cua so
     win.webContents.send('pin:data', {
       dataUrl: rec.image.toDataURL(), pad: PIN_PAD, w: rec.dipW, h: rec.dipH,
-      lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic',
+      lamMoKieu: kho.docCauHinh().lamMoKieu || 'mosaic', veTay: kho.docCauHinh().veTay === true,
     })
   } catch (err) { ghiLog('pin hoan tac LOI: ' + err.message) }
   dialog.showMessageBox(win, {
@@ -2041,7 +2054,44 @@ ipcMain.handle('pin:ocr-tu', async (e) => {
     return { ok: false, loi: err.message }
   }
 })
-ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
+/* 06/11 CAT BO KHUC GIUA ANH: renderer doi kich thuoc anh ghim (DIP). Cua so doi theo, giu goc tren-trai. */
+function doiCoPin(rec, w, h) {
+  const win = rec && rec.win
+  if (!win || win.isDestroyed()) return
+  const b = win.getBounds()
+  win.setBounds({ x: b.x, y: b.y, width: Math.round(w) + PIN_PAD * 2, height: Math.round(h) + PIN_PAD * 2 })
+}
+ipcMain.on('pin:doi-co', (e, w, h) => {
+  const rec = pins.get(e.sender.id)
+  w = Math.round(Number(w)); h = Math.round(Number(h))
+  if (!rec || !(w >= 8 && h >= 8 && w <= 20000 && h <= 20000)) return
+  rec.dipW = w; rec.dipH = h
+  doiCoPin(rec, w, h)
+})
+/* 06/11 LOP SUA: renderer anh ghim hoi (luc vao ve) xem anh nay co lop sua khong. Tra { shapes, dpr, dipW, dipH, sach: dataURL } hoac null. */
+ipcMain.handle('pin:lop-doc', (e) => {
+  const rec = pins.get(e.sender.id)
+  if (!rec || !rec.filePath) return null
+  const d = lopSua.doc(rec.filePath)
+  if (!d) return null
+  return { shapes: d.bang.shapes, dpr: d.bang.dpr, dipW: d.bang.dipW, dipH: d.bang.dipH, sach: 'data:image/png;base64,' + d.sach.toString('base64') }
+})
+/* Nguoi dung bam xoa ban sach: go ca lop sua cua anh nay (anh trong thu muc anh giu nguyen). */
+ipcMain.handle('pin:lop-xoa', (e) => {
+  const rec = pins.get(e.sender.id)
+  if (!rec || !rec.filePath) return false
+  const n = lopSua.xoa(rec.filePath)
+  ghiLog('lop-sua: nguoi dung xoa ban sach cua ' + path.basename(rec.filePath) + ' (' + n + ' file)')
+  return n > 0
+})
+/* Cong tac kieu ve tay: nho vao cau hinh, phat cho cac cua so dang mo. */
+ipcMain.on('ve:dat-tay', (e, bat) => {
+  const val = bat === true
+  kho.ghiCauHinh({ veTay: val })
+  phatCauHinhOverlay({ veTay: val })
+  for (const [, rec] of pins) { if (rec.win && !rec.win.isDestroyed()) rec.win.webContents.send('pin:update-config', { veTay: val }) }
+})
+ipcMain.on('pin:save-edit', (e, dataUrl, chep, lop) => {
   const rec = pins.get(e.sender.id)
   if (!rec || !dataUrl) return
   let daVe = null
@@ -2063,7 +2113,10 @@ ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
     ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath) +
       (r.cach === 'ghi-thang' ? ' (GHI THANG vi khong doi ten duoc: ' + r.loiDoiTen + ')' : '') +
       (n ? ' (lam moi ' + n + ' lien ket keo)' : ''))
+    if (lop && Array.isArray(lop.shapes)) ghiLopSuaCuaAnh(rec.filePath, lop, 'pin') // 06/11: sau khi file da ghi xong (dung luong moi)
+    else lopSua.xoa(rec.filePath) // luu khong kem lop sua (ban cu): lop sua cu khong con khop anh nay
   }
+  if (lop && lop.dipW > 0 && lop.dipH > 0) { rec.dipW = Math.round(lop.dipW); rec.dipH = Math.round(lop.dipH); rec.dipGoc = { w: rec.dipW, h: rec.dipH } }
 
   // Doi anh trong bo nho cua anh ghim + cap nhat DUNG muc khay cua no (thumbnail + dung luong). 04/10: anh chua luu
   // duoc (filePath null) khop theo doi tuong anh; truoc day "null === null" khop moi muc chua luu (src/khay-muc.js).

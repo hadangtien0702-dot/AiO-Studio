@@ -206,6 +206,14 @@ html, body {
 #mau-pop.len { top: auto; bottom: calc(100% + 8px); }
 #mau-pop.ngang { flex-direction: row; }
 #mau-pop .mau { width: 24px; height: 24px; flex: none; }
+/* 06/11 tuy chon ve trong bang mau (ve tay, mep cat, xoa ban sach): nut icon 24 px, dang bat = xam noi nhu man Cai dat */
+/* bang mau cao dung 7 mau: nut tuy chon nam o COT THU HAI (luoi 7 hang), khong keo cao bang (bai thanhcu: bang xo len/xuong theo chieu cao) */
+#mau-pop { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 24px); gap: 7px 8px; justify-items: center; align-items: start; }
+#mau-pop.ngang { grid-template-rows: none; }
+#mau-pop .tuy { width: 24px; height: 24px; flex: none; display: grid; place-items: center; padding: 0; border: none; border-radius: var(--r-sm); background: transparent; color: var(--text-2); cursor: pointer; font-family: inherit; }
+#mau-pop .tuy:hover { background: var(--bg-hover); color: var(--text-1); }
+#mau-pop .tuy[aria-pressed="true"] { background: var(--bg-5); color: var(--text-1); }
+#mau-pop .tuy[hidden] { display: none !important; }
 .menu-xo {
   left: 0; top: calc(100% + 8px);
   transform: translateX(var(--dx, 0px));
