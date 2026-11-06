@@ -23,6 +23,8 @@ contextBridge.exposeInMainWorld('sua', {
   xuat: (id, tuyChon) => ipcRenderer.invoke('sua:xuat', id, tuyChon),
   huy: () => ipcRenderer.send('sua:huy'),
   onTienDo: (cb) => ipcRenderer.on('sua:tien-do-ui', (_e, p) => cb(p)),
+  /** Ket qua viec xuat do main bao thang (ke ca khi trang nay duoc nap lai giua luc xuat): { ok, file, ... } | { ok: false, loi } */
+  onKetThuc: (cb) => ipcRenderer.on('sua:ket-thuc-ui', (_e, r) => cb(r)),
   /** Keo file moi ra app khac (chi file do phien nay vua xuat). Goi trong nhip dragstart. */
   keo: (file) => ipcRenderer.send('sua:keo', file),
   moThuMuc: (file) => ipcRenderer.send('sua:mo-thu-muc', file),

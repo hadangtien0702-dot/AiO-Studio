@@ -26,6 +26,10 @@ const MAU_ID = /^vid-\d{8}-\d{6}-\d{3}$/ // vid-YYYYMMDD-HHMMSS-mmm
 const MAU_FILE = /^shotandsave-video-(\d{4})-(\d{2})-(\d{2})-(\d{2})(\d{2})(\d{2})-(\d{3})\.(mp4|webm)$/i
 const MAU_TAM = /^shotandsave-video-\d{4}-\d{2}-\d{2}-\d{6}-\d{3}\.mp4\.tam$/i
 
+/* 06/11 (Codex soat dot 3): file xuat DO cua man Sua video: `<video>-da-sua[-N].mp4.tam` (src/sua-video.js ghi roi moi doi ten).
+   App bi tat giua luc xuat thi file nay nam lai mai: mau tren khong nhan, khong ai don. Mau CHAT: chi ten do app dat. */
+const MAU_TAM_SUA = /^shotandsave-video-\d{4}-\d{2}-\d{2}-\d{6}-\d{3}-da-sua(-\d{1,3})?\.mp4\.tam$/i
+
 function khoiTao(thuMucUserData, log) {
   FILE = path.join(thuMucUserData, 'video', 'danh-sach.json')
   if (typeof log === 'function') ghiLog = log
@@ -239,4 +243,25 @@ function khoiPhucTam(ung, boQua) {
   return kq
 }
 
-module.exports = { khoiTao, them, chotQuay, danhSach, tim, sua, bo, doiChieu, timTam, khoiPhucTam, MAU_ID }
+/* Don file xuat do cua Sua video (MAU_TAM_SUA) trong thu muc anh. Chi go file cu hon opts.tuoiMs (mac dinh 60 s, tranh
+   file dang ghi), khac opts.boQua (file .tam cua luot xuat dang chay). Tra { go: [ten], loi: [chuoi] }. */
+function donTamSua(thuMuc, opts) {
+  const kq = { go: [], loi: [] }
+  const tuoi = opts && opts.tuoiMs != null ? opts.tuoiMs : 60000
+  let ten
+  try { ten = fs.readdirSync(thuMuc) } catch (e) { return kq }
+  for (const t of ten) {
+    if (!MAU_TAM_SUA.test(t)) continue
+    const file = path.join(thuMuc, t)
+    if (opts && opts.boQua && khoa(file) === khoa(opts.boQua)) continue
+    try {
+      const st = fs.statSync(file)
+      if (!st.isFile() || Date.now() - st.mtimeMs < tuoi) continue
+      fs.unlinkSync(file)
+      kq.go.push(t)
+    } catch (e) { kq.loi.push(t + ': ' + e.message) }
+  }
+  return kq
+}
+
+module.exports = { khoiTao, donTamSua, MAU_TAM_SUA, them, chotQuay, danhSach, tim, sua, bo, doiChieu, timTam, khoiPhucTam, MAU_ID }

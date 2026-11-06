@@ -211,7 +211,11 @@ ipcMain.handle('sua:xuat', async (e, id, tuyChon) => {
   const sender = e.sender
   const p = xuat(m.file, dich, t, ct, (x) => { try { if (!sender.isDestroyed()) sender.send('sua:tien-do-ui', x) } catch (err) {} })
   if (viec) { viec.idVideo = m.id; viec.sender = sender.id }
-  return await p
+  const kq = await p
+  /* 06/11 (Codex soat dot 3): trang Sua video tai lai giua luc xuat (bam Sua lan nua / doi ngon ngu) -> loi goi `sua.xuat()` cua trang cu
+     khong con ai nhan; trang moi khoa giao dien vi viec con chay. Bao ket qua THANG cho trang dang mo; trang tu bo qua neu da nhan roi. */
+  try { if (cuaSo && cuaSo.win && !cuaSo.win.isDestroyed() && cuaSo.id === m.id) cuaSo.win.webContents.send('sua:ket-thuc-ui', kq) } catch (err) {}
+  return kq
 })
 ipcMain.on('sua:huy', (e) => { if (cuaSo && cuaSo.win && e.sender === cuaSo.win.webContents) huy() })
 ipcMain.on('sua:keo', (e, file) => {

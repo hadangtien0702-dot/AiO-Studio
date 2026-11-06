@@ -277,4 +277,35 @@ function coDuongTieng(file) {
   } catch (e) { return false } finally { if (fd != null) { try { fs.closeSync(fd) } catch (err) {} } }
 }
 
-module.exports = { taoBanKhongTieng, coDuongTieng }
+/* 06/11 (Codex soat dot 3): ban "Khong tieng" tao TRUOC lan sua 06/11 chi doi ten hop thanh 'free' — du lieu tieng van
+   o trong file va moov van chua 'soun' / 'mp4a' / 'esds'. File nhu vay KHONG duoc dung lai nhu ban khong tieng.
+   Kiem bang NOI DUNG that cua moov (khong dua vao co trong so): true = moov khong con dau vet tieng nao. Khong doc duoc = false.
+   Cache theo (file, dung luong, gio sua): ham nay duoc goi moi lan khay ve lai. */
+const _sach = new Map()
+function sachTieng(file) {
+  let fd = null
+  try {
+    const st = fs.statSync(file)
+    const c = _sach.get(file)
+    if (c && c.size === st.size && c.mtime === st.mtimeMs) return c.ok
+    fd = fs.openSync(file, 'r')
+    const het = st.size
+    let pos = 0, ok = false
+    for (;;) {
+      const h = dauHop(fd, pos, het)
+      if (!h) break
+      if (h.type === 'moov') {
+        if (h.size > MAX_HOP_NHO) break
+        const moov = Buffer.alloc(h.size)
+        fs.readSync(fd, moov, 0, h.size, pos)
+        ok = !['soun', 'mp4a', 'esds', 'Opus', 'dOps'].some((x) => moov.includes(Buffer.from(x, 'latin1')))
+        break
+      }
+      pos += h.size
+    }
+    _sach.set(file, { size: st.size, mtime: st.mtimeMs, ok })
+    return ok
+  } catch (e) { return false } finally { if (fd != null) { try { fs.closeSync(fd) } catch (err) {} } }
+}
+
+module.exports = { taoBanKhongTieng, coDuongTieng, sachTieng }

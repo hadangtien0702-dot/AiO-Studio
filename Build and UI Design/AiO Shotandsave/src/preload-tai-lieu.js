@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('taiLieu', {
   moThuMuc: (p) => ipcRenderer.send('tl:mo-thu-muc', p),
   close: () => ipcRenderer.send('tl:close'),
   onLamMoi: (cb) => ipcRenderer.on('tl:lam-moi', () => cb()),
+  /** Anh vua duoc doi ten (tu dat ten): (duongCu, duongMoi) */
+  onDoiKhoa: (cb) => ipcRenderer.on('tl:doi-khoa', (_e, cu, moi) => cb(cu, moi)),
   dragStart: () => ipcRenderer.send('tl:drag-start'),
   dragTo: (dx, dy) => ipcRenderer.send('tl:drag-to', dx, dy),
   dragEnd: () => ipcRenderer.send('tl:drag-end'),

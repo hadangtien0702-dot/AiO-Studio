@@ -72,6 +72,34 @@ function taoLopSua(thuMucDuLieu, ghiLog, opts) {
     return n
   }
 
+  /* 06/11 (Codex soat dot 3): anh vua DOI TEN (tu dat ten...) thi lop sua phai di theo, neu khong anh moi khong mo sua tiep duoc va lan don
+     sau xoa lop cu (duong anh cu khong con ton tai). Ten file lop sua tinh bang chinh fJson/fSach nen ham nay khong tu ghep ten.
+     Dung luong ghi trong bang GIU NGUYEN (anh bi sua ben ngoai luc doi ten van bi nhan ra). Tra { ok, khong, loi }:
+     khong = anh cu khong co lop sua (khong phai viec). Ghi bang moi TRUOC, doi anh sach, roi moi go bang cu: loi giua chung
+     thi lop cu con nguyen. */
+  function doiTen(cu, moi) {
+    try {
+      if (!cu || !moi) return { ok: false, loi: 'thieu duong dan' }
+      if (!fs.existsSync(fJson(cu)) || !fs.existsSync(fSach(cu))) return { ok: true, khong: true }
+      const bang = JSON.parse(fs.readFileSync(fJson(cu), 'utf8'))
+      if (!bang || bang.v !== 1 || !Array.isArray(bang.shapes)) { xoa(cu); return { ok: false, loi: 'bang hong' } }
+      bang.duong = path.resolve(moi)
+      const cung = process.platform === 'win32' ? (a, b) => a.toLowerCase() === b.toLowerCase() : (a, b) => a === b
+      if (cung(fJson(cu), fJson(moi))) { ghiBen(fJson(moi), Buffer.from(JSON.stringify(bang), 'utf8')); return { ok: true } }
+      ghiBen(fJson(moi), Buffer.from(JSON.stringify(bang), 'utf8'))
+      try { fs.renameSync(fSach(cu), fSach(moi)) } catch (e) {
+        try { fs.unlinkSync(fJson(moi)) } catch (e2) {}
+        log('lop-sua doiTen LOI doi anh sach: ' + (e && e.message))
+        return { ok: false, loi: (e && e.message) || 'loi' }
+      }
+      for (const f of [fJson(cu), fJson(cu) + '.tmp', fSach(cu) + '.tmp']) { try { fs.unlinkSync(f) } catch (e) {} }
+      return { ok: true }
+    } catch (e) {
+      log('lop-sua doiTen LOI ' + path.basename(String(cu)) + ' -> ' + path.basename(String(moi)) + ': ' + (e && e.message))
+      return { ok: false, loi: (e && e.message) || 'loi' }
+    }
+  }
+
   /* Don: mo coi (anh da bi xoa), qua han, qua tran. Tra so file da go. Thu muc anh chua gan (o dia roi) thi KHONG coi la anh da xoa. */
   function donDep(now) {
     let go = 0
@@ -124,7 +152,7 @@ function taoLopSua(thuMucDuLieu, ghiLog, opts) {
     return ghi(filePath, { shapes: lop.shapes, dpr: lop.dpr, dipW: lop.dipW, dipH: lop.dipH, sach: lop.sach ? bufferTuDataUrl(lop.sach) : null })
   }
 
-  return { dir, ghi, ghiTuLop, doc, xoa, donDep, tongByte }
+  return { dir, ghi, ghiTuLop, doc, xoa, doiTen, donDep, tongByte }
 }
 
 /* Chuyen dataURL PNG ve Buffer (hoac null). */
