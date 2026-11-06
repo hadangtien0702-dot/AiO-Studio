@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="../settings/settings.css" />
+  <link rel="stylesheet" href="tai-lieu.css" />
+</head>
+<body>
+  <!-- Header khung giong man Cai dat: logo AiO + tieu de + dong -->
+  <header id="tieu-de">
+    <div class="hieu">
+      <svg class="logo" viewBox="0 0 385.89 351.31" width="18" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+        <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+      </svg>
+      <span data-i18n="tl.tieuDe">Tài liệu từng bước</span>
+    </div>
+    <div class="dieu-khien">
+      <button id="close" class="dong" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="than">
+    <!-- Cot trai: anh trong khay (bam de them thanh mot buoc) -->
+    <aside id="cot-khay">
+      <h2 class="nhom-ten" data-i18n="tl.khay">Ảnh trong khay</h2>
+      <div id="luoi-khay" class="nhom"></div>
+      <p id="khay-trong" class="goi-y"></p>
+      <button id="them-may" class="nut" data-i18n="tl.themTuMay"></button>
+    </aside>
+
+    <!-- Cot phai: tieu de + cac buoc -->
+    <main id="cot-buoc">
+      <input id="tieu-doc" class="bq-o" type="text" maxlength="120" spellcheck="false" autocomplete="off" />
+      <h2 class="nhom-ten"><span data-i18n="tl.cacBuoc">Các bước</span> <span id="dem"></span></h2>
+      <div id="ds-buoc" class="nhom"></div>
+      <p id="buoc-trong" class="goi-y"></p>
+    </main>
+  </div>
+
+  <footer id="chan-xuat">
+    <span id="thong-bao" class="msg"></span>
+    <button id="mo-thu-muc" class="lien-ket" hidden data-i18n="tl.moThuMuc"></button>
+    <span class="cach"></span>
+    <button id="xuat-md" class="nut" data-i18n="tl.xuatMd"></button>
+    <button id="xuat-pdf" class="nut" data-i18n="tl.xuatPdf"></button>
+    <button id="xuat-html" class="nut chinh" data-i18n="tl.xuatHtml"></button>
+  </footer>
+  <script src="tai-lieu.js"></script>
+</body>
+</html>
