@@ -49,6 +49,31 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0k. 06/11/2026 anh: "lam them 10 tinh nang nua, research tren mang, nhung tinh nang dang hay dang hot, va trien khai" — Sonnet tra 15 ung vien, Claude chon 10
+
+Bang chung: hau het la nhat ky cua hang (quang cao). Loi nguoi dung that chi co o muc 1, 2, 3, 4, 8, 11 (Reddit qua ban sao, Product Hunt, dev.to). Cau trich do cong cu doc trang tom tat lai, mo lai kiem truoc khi dua len web.
+
+| # | Tinh nang | Nguoi dung duoc gi | Ai co | Trang thai |
+|---|---|---|---|---|
+| 1 | Tu dat ten file theo noi dung anh | Het ca dong file "shotandsave-gio" | Mirowl dua vao lo trinh | LAM |
+| 2 | Cat bo khuc giua anh | Bo doan thua cua anh chat / timeline dai, khoi chup lai | Snagit Cut Out, ShareX | LAM |
+| 3 | Mo lai anh de sua tiep lop ve | Quay lai sua khung, chu, mui ten, khoi ve lai | Snagit .snagx | LAM |
+| 4 | Video tu phong to theo con tro | Video huong dan khoi dung tay | CleanShot 5 (01/09/2026), Screen Studio | LAM |
+| 5 | Cat dau cuoi video trong khay | Gui dung 8 giay can xem | CleanShot 5, ShareX 22 | LAM |
+| 7 | Xuat tai lieu tung buoc tu anh trong khay | Huong dan cho khach trong vai phut | Snagit, Scribe, Tango | LAM (chup tay, khong hook chuot) |
+| 9 | Kieu ve tay cho khung, chu, mui ten | Anh y tuong nhu ban phac | Shottr 1.9 | LAM |
+| 10 | Nen va khung dep cho video | Video gui khach nhu da dung | CleanShot 5, Screen Studio | LAM |
+| 11 | Dieu khien tu ngoai (link aioshot://) | Raycast, script, AI agent goi chup, mo Canvas | Shottr 1.8, CleanShot | LAM |
+| 13 | Xuat anh WebP | File nhe gui khach | ShareX 22.2, CleanShot 4.8 | LAM |
+| 6 | Tim anh theo nghia, anh giong anh nay | Hop dinh vi "luu y tuong" nhat | Eagle dang lam | CHUA: can do co model WASM va toc do tren 778 anh truoc |
+| 8 | Xoa nen anh | Lay chu the ra PNG trong suot | ShareX 21 | CHUA: model nang, chua tra co, trai "nhe de nhanh" neu kem bo cai |
+| 12 | Bong bong camera khi quay | Video co nguoi noi | ShareX 22, CleanShot 5 | CHUA: khong tim duoc nguoi dung doi, an khop yeu |
+| 14 | Khung dien thoai cho anh app | Anh gioi thieu app | Motionik | CHUA: ngach hep |
+| 15 | Dich chu doc tu anh | Doc anh tieng nuoc ngoai | chua ro | CHUA: rui ro cao nhat, bang chung so bo |
+
+Da loai: link chia se + S3 (gui anh len mang), "Analyze image" bang khoa API (ton tien theo luot), hien phim bam + cu bam (can hook native, dang cho anh quyet `uiohook-napi`).
+Link nguon: cleanshot.com/changelog · getsharex.com/changelog · shottr.cc/newversion.html · support.techsmith.com (Snagit 2026 Version History) · producthunt.com/p/mirowl/mirowl · dev.to/prom_sereyreaksa (Screen Studio cho Windows) · ban sao Reddit r/software, r/Windows11, r/indiehackers.
+
 ### 0j. 05/11/2026 anh hoi "vua app chup hinh thi minh can them tinh nang nao" — Claude tra loi, anh CHUA chot muc nao
 So voi doi thu: doc trang tinh nang CleanShot X ngay 05/11 + lich su phien ban Snagit 2026 + bai review Shottr, Xnapper (review la nguon yeu, khong co so lieu nguoi dung uu tien gi). Ma 0.10.1 doc 05/11.
 Da ngang hoac hon: khoanh vung, ve, lam mo, danh so, but, ghim, doc chu, chup cuon, quay MP4 + GIF, khay keo tha. Rieng minh: Storyboard, Canvas. Windows chua co app nao ngang CleanShot (CleanShot chi Mac, ShareX manh nhung kho dung).
