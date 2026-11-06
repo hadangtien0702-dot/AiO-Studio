@@ -241,8 +241,9 @@ $('nut-xuat').addEventListener('click', async () => {
 })
 /* Ket thuc viec xuat. Co hai nguon: loi tra ve cua `sua.xuat()` va su kien main gui thang (`onKetThuc`, cho truong hop trang nay duoc
    nap lai giua luc xuat nen khong co loi goi nao de cho). Nguon den truoc thang; nguon den sau bi bo (da het khoa). */
+let ketQuaSom = null // ket qua ve luc trang moi nap, chua kip khoa giao dien (init con dang cho nap video)
 function xongViec(r) {
-  if (!dangXuat) return
+  if (!dangXuat) { ketQuaSom = r; return }
   khoaGiaoDien(false)
   $('trang-thai').textContent = ''
   if (!r || !r.ok) {
@@ -307,7 +308,10 @@ async function init() {
     const g = $('ghi-zoom'); g.textContent = t('sv.khongCoConTro'); g.classList.add('canh-bao')
   }
   capNhatThanhNen(); veMauChon()
-  if (data.dangXuat) { khoaGiaoDien(true); $('trang-thai').textContent = t('sv.dangXuat', { p: 0 }) }
+  if (data.dangXuat) {
+    khoaGiaoDien(true); $('trang-thai').textContent = t('sv.dangXuat', { p: 0 })
+    if (ketQuaSom) { const r = ketQuaSom; ketQuaSom = null; xongViec(r) }
+  }
   vong()
 }
 init()

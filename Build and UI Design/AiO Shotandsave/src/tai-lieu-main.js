@@ -204,12 +204,13 @@ function khoiTao(deps) {
     fs.mkdirSync(dirAnh, { recursive: true })
     dau.forEach((x, i) => { fs.writeFileSync(moi[i], x.buf) })
     ghiBen(dich, res.md)
+    const conKet = [] // anh cu dang bi khoa: giu trong danh sach de lan xuat sau go tiep, khong quen no
     for (const f of truoc) {
       if (setMoi.has(khoaDuong(f))) continue
-      try { fs.unlinkSync(f) } catch (e) { if (e && e.code !== 'ENOENT') log('tai-lieu: KHONG go duoc anh cu ' + path.basename(f) + ': ' + e.code) }
+      try { fs.unlinkSync(f) } catch (e) { if (e && e.code !== 'ENOENT') { conKet.push(f); log('tai-lieu: KHONG go duoc anh cu ' + path.basename(f) + ': ' + e.code) } }
       try { fs.rmdirSync(path.dirname(f)) } catch (e) {} // chi go duoc khi thu muc da RONG
     }
-    ds[kd] = moi
+    ds[kd] = moi.concat(conKet)
     luuXuatMd(ds)
     return Buffer.byteLength(res.md)
   }

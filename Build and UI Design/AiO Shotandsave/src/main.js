@@ -3160,6 +3160,8 @@ async function khoiPhucVideoDo() {
     /* 06/11: file xuat do cua man Sua video (`<video>-da-sua.mp4.tam`) — tat app giua luc xuat. Khong dung khi dang co viec xuat. */
     if (!suaVideo.dangBan()) {
       const sd = khoVideo.donTamSua(thuMuc)
+      // file chua du 60 giay (app chet roi mo lai ngay) bi bo qua o lan tren: thu lai mot lan nua
+      setTimeout(() => { try { if (!suaVideo.dangBan()) khoVideo.donTamSua(thuMuc) } catch (e) {} }, 70000)
       if (sd.go.length || sd.loi.length) ghiLog('sua-video: go ' + sd.go.length + ' file xuat do (.tam) cua lan chay truoc' + (sd.loi.length ? ', KHONG go duoc ' + sd.loi.join('; ') : ''))
     }
     if (doi.length) baoVideo('quay.daKhoiPhuc', null, { n: doi.length })
