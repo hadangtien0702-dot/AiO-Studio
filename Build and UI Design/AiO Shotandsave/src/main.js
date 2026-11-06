@@ -783,6 +783,8 @@ const cungPhim = (a, b) => !!a && !!b && chuanPhim(a) === chuanPhim(b)
 let phimLaiDangKy = '' // 06/11: phim chup-lai-vung DANG dang ky that (de hien trong menu khay + go khi doi phim)
 function phimLaiCauHinh() { const ch = kho.docCauHinh(); return typeof ch.hotkeyLai === 'string' ? ch.hotkeyLai : DEFAULT_HOTKEY_LAI }
 function registerHotkeyLai() {
+  // 06/11 soat: go phim cu truoc (chua go ma xoa ten thi phim van chay, bam Tat khong an). Trung phim chup moi thi de nguyen.
+  if (phimLaiDangKy && !cungPhim(phimLaiDangKy, currentHotkey)) { try { globalShortcut.unregister(phimLaiDangKy) } catch (e) {} }
   phimLaiDangKy = ''
   const accel = phimLaiCauHinh()
   if (!accel || cungPhim(accel, currentHotkey) || cungPhim(accel, phimCanvasDangKy)) return false

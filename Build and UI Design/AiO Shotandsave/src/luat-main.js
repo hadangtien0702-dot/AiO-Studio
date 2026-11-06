@@ -7,6 +7,7 @@
    06/11: them gif (xuat GIF: nap lai giua chung la bo ma hoa chay lai tu dau ma van noi vao file .tam cu) va
    sua-xuat (xuat video da sua: cung ly do). */
 function duocNapLai(url) {
+  if (/^data:/i.test(String(url || ''))) return false // cua so an ma hoa WebP: nap lai la cat ngang viec dang lam (06/11 soat)
   return !/\/src\/(luong|dem|dien|gif|sua-xuat)\//.test(String(url || '').replace(/\\/g, '/'))
 }
 

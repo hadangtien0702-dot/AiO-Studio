@@ -68,6 +68,9 @@ if (!process.versions.electron) {
     kiem('Ban quyen: file thanh toan so 0 sau sap nguon: lay lai duoc ma tu ban du phong', lai && lai.key === 'AIOSS-THU', JSON.stringify(lai))
     kiem('Ban quyen: lay lai xong file chinh doc duoc binh thuong', (() => { try { return JSON.parse(fs.readFileSync(fq, 'utf8')).key === 'AIOSS-THU' } catch (e) { return false } })())
 
+    kiem('Doi ngon ngu khong nap lai cua so an ma hoa WebP (data:)', (() => { try { return require(path.join(SRC, 'luat-main.js')).duocNapLai('data:text/html,x') === false } catch (e) { return false } })())
+    kiem('Phim chup lai vung: go phim cu truoc khi dang ky lai', /function registerHotkeyLai\(\) \{[\s\S]{0,260}globalShortcut\.unregister\(phimLaiDangKy\)/.test(doc('main.js')))
+
     // A5 phim trung
     const main = doc('main.js')
     const m = /function chuanPhim[\s\S]*?\n}\n/.exec(main)

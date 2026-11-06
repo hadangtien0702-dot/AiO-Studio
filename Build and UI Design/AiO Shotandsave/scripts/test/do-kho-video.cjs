@@ -161,7 +161,7 @@ const duocNapLai = /const duocNapLai = luatMain\.duocNapLai/.test(mainJs) ? requ
 const goc = 'file:///C:/Users/x/AppData/Local/Programs/aio-shot-and-save/resources/app.asar/src/'
 kiem('duocNapLai: KHONG nap lai cua so luong (bo quay) / dem (dong ho, vien quay) / dien (san dien)', !!duocNapLai && ['luong/index.html', 'dem/quay.html', 'dem/vien.html', 'dem/index.html', 'dien/index.html'].every((t) => duocNapLai(goc + t) === false))
 kiem('duocNapLai: cac cua so co chu van nap lai (khay, cai dat, khay gop, ghim, man chup, nut tron)', !!duocNapLai && ['shelf/index.html', 'settings/index.html', 'khay/index.html?tab=video', 'pin/index.html', 'overlay/index.html', 'nut/index.html'].every((t) => duocNapLai(goc + t) === true) && duocNapLai('file:///D:/luong-cua-toi/src/shelf/index.html') === true)
-kiem('Lenh doi ngon ngu DUNG ham do (khong con nap lai moi cua so)', /if \(!w\.isDestroyed\(\) && duocNapLai\(w\.webContents\.getURL\(\)\)\) w\.webContents\.reload\(\)/.test(mainJs) && !/if \(!w\.isDestroyed\(\)\) w\.webContents\.reload\(\)/.test(mainJs))
+kiem('Lenh doi ngon ngu DUNG ham do (khong con nap lai moi cua so)', /if \(w\.isDestroyed\(\) \|\| !duocNapLai\(w\.webContents\.getURL\(\)\)\) continue/.test(mainJs) && !/if \(!w\.isDestroyed\(\)\) w\.webContents\.reload\(\)/.test(mainJs))
 kiem('ketThucGhiHinh di qua chotQuay, bao nguoi dung o ca 2 kieu hong + khi luot quay bi ngat', /khoVideo\.chotQuay\(\{[^}]*loi: !!loiQuay \}\)/.test(mainJs) && /if \(c\.hong\) \{ baoVideo\('quay\.ngoaiKhay', c\.file\); return \}/.test(mainJs) && /if \(loiQuay\) baoVideo\('quay\.biNgat', null\)/.test(mainJs) && !/file = g\.tam/.test(mainJs))
 
 /* ── 02/10 KHAY hien file quay do (Electron an, khong hien cua so): file bi cut van PHAT duoc, co nhan "Bi ngat" ── */

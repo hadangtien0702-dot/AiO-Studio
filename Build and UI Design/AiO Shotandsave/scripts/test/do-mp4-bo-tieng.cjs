@@ -16,7 +16,7 @@ let dat = true
 const kiem = (ten, ok, chiTiet) => { kq.push((ok ? '  DAT  ' : '  TRUOT ') + ten + (chiTiet ? ' (' + chiTiet + ')' : '')); if (!ok) dat = false }
 const md5 = (f) => crypto.createHash('md5').update(fs.readFileSync(f)).digest('hex')
 
-const bin = ['AiO Autocut', 'AiO Asset Manager', 'AiO Transcripts', 'AiO Power Bins'].map((p) => path.join(ROOT, '..', p, 'bin', 'win64')).find((d) => fs.existsSync(path.join(d, 'ffprobe.exe')))
+const bin = ['AiO Autocut', 'AiO Asset Manager', 'AiO Transcripts', 'AiO Power Bins'].map((p) => path.join(ROOT, '..', p, 'bin', 'win64')).concat((process.env.PATH || '').split(path.delimiter)).find((d) => d && fs.existsSync(path.join(d, 'ffprobe.exe')))
 if (!bin) { console.log('KHONG co ffprobe/ffmpeg tren may -> khong do duoc (thuoc ngoai bat buoc)'); process.exit(1) }
 const soi = (f) => {
   const o = JSON.parse(execFileSync(path.join(bin, 'ffprobe.exe'), ['-v', 'error', '-count_packets', '-show_entries', 'stream=codec_type,codec_name,width,height,nb_read_packets:format=duration', '-of', 'json', f], { encoding: 'utf8' }))

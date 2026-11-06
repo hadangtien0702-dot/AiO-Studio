@@ -37,7 +37,7 @@ for (const m of r || []) {
   const nhan = '[' + m.cfg.w + 'x' + m.cfg.h + ' ' + m.cfg.lang + ' ' + m.cfg.kieu + '] '
   if (m.loi || !m.that) { kiem(nhan + 'nap duoc trang khay', false, m.loi || 'khong co so do'); continue }
   const nut = Object.entries(m.that.nut)
-  kiem(nhan + 'co du 5 nut tren thanh khay', nut.length === 5, nut.map(([k]) => k).join(' '))
+  kiem(nhan + 'co du 6 nut tren thanh khay', nut.length === 6, nut.map(([k]) => k).join(' '))
   for (const [id, n] of nut) {
     const pt = n.tong ? (n.bi * 100) / n.tong : 100
     // Goc che <= 2%: 4 diem o goc BO TRON cua nut roi xuong lop duoi (do 06/10: 4 / 441 diem), khong phai bi che that
