@@ -49,6 +49,14 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0l. 06/11/2026 RA CHO NGUOI MOI BI KET (Sonnet di het app nhu nguoi moi, chup 40 man hinh; anh hoi "stuck o dau, co de cho nguoi dung khong")
+
+So that tren may anh (run-log 05-06/11): 31 lan luu, 13 tam co ve, 0 lan doc chu / quay / Canvas / hen gio, bam nut thu khay 9 lan. Anh chi dung chup + ve; nhung tinh nang kia chua ai dung tren viec that.
+
+DA SUA 06/11: mo lan dau khong thay gi · khach nuoc ngoai thay tieng Viet · bam Xong khong vao clipboard · goi y bien mat sau khi keo · cong cu giau trong menu re chuot · chu Storyboard sai thu tu · trang trong khong co nut · phim Canvas va chup lai khong doi duoc · QR ghi trong Cai dat khi may khong co.
+CHO ANH CHOT: phim chup mac dinh Ctrl+Shift+S trung "Luu thanh" cua Premiere, Photoshop, AE (de xuat Ctrl+Shift+A hoac hoi o the lan dau). Cong cu mac dinh sau khoanh vung giu Khung vi 13/31 tam anh co ve, nguoi moi de ve nham khi muon doi khung.
+CHUA LAM: Lam dep van chi vao tu anh ghim (khay khong co menu chuot phai) · ghim khong co gian duoc.
+
 ### 0k. 06/11/2026 anh: "lam them 10 tinh nang nua, research tren mang, nhung tinh nang dang hay dang hot, va trien khai" — Sonnet tra 15 ung vien, Claude chon 10
 
 Bang chung: hau het la nhat ky cua hang (quang cao). Loi nguoi dung that chi co o muc 1, 2, 3, 4, 8, 11 (Reddit qua ban sao, Product Hunt, dev.to). Cau trich do cong cu doc trang tom tat lai, mo lai kiem truoc khi dua len web.
