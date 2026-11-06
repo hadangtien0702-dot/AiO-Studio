@@ -231,7 +231,7 @@
     /* Chon vi tri khong cham cac lop noi khac (thanh cong cu trai, tieu de, thanh nut giua, ban do nho, nut tron, o tim + chip loc).
        Thu lan luot: tren, duoi, ben phai, ben trai cua phan chon, roi tam man hinh; vi tri nao khong cham gi thi lay. */
     const vat = []
-    for (const sel of ['.cong', '.ten', '.thanh', '#banDoHop', '.ntr', '#tim', '#timChip']) {
+    for (const sel of ['.cong', '.ten', '.thanh', '#banDoHop', '.ntr', '.ntr-nhan', '#tim', '#timChip']) {
       const e = document.querySelector(sel); if (!e || e.hidden) continue
       const cs = getComputedStyle(e); if (cs.display === 'none') continue
       const r = e.getBoundingClientRect(); if (r.width && r.height) vat.push({ l: r.left - 6, t: r.top - 6, r: r.right + 6, b: r.bottom + 6 })
