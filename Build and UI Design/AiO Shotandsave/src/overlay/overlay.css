@@ -281,6 +281,7 @@ html, body {
   transition: opacity 160ms ease, transform 160ms ease;
 }
 #hint b { color: var(--accent-text); }
+#hint-chon[hidden], #hint-xong[hidden] { display: none; }
 #hint .logo { color: var(--accent); flex: none; }
 #hint.hidden { opacity: 0; transform: translateX(-50%) translateY(-8px); }
 
@@ -476,6 +477,12 @@ html, body {
 /* ── 05/11 NHOM XO MOI (Lam mo / Lam noi vung, Doc chu / Doc ma QR), KINH LUP, LAM NOI VUNG ────────────────────────
    Cung khuon voi nut but: nut chinh + menu xo. Thanh KHONG rong them (cong cu moi nam trong menu). */
 .nhom-xo[hidden] { display: none !important; }
+/* 06/11: cham nho o goc duoi-phai nut nhom = "con lua chon khac, re chuot de xem" (so phim nam goc tren-phai) */
+.nhom-xo.co-xo > .cong-cu::before {
+  content: ''; position: absolute; right: 5px; bottom: 5px; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-3); pointer-events: none;
+}
+.nhom-xo.co-xo > .cong-cu.chon::before { background: var(--accent-text); }
 #blur-nhom.sp .ic-blur, #blur-nhom:not(.sp) .ic-spot { display: none; }
 #blur-nhom .ic-blur, #blur-nhom .ic-spot { flex: none; }
 

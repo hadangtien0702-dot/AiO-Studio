@@ -17,6 +17,26 @@ document.querySelectorAll('[data-i18n-title]').forEach((el) => {
   el.title = s
   el.setAttribute('aria-label', s)
 })
+// 06/11: chu trong menu xo (Lam mo, Che thong minh, But, Da quang) co data-i18n tu truoc nhung ghim chua dich -> ban EN van tieng Viet
+document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = window.i18n.t(el.getAttribute('data-i18n')) })
+// 06/11: ten mau + nhom mau doc theo ngon ngu (giong overlay.js)
+document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+  const s = window.i18n.t(el.getAttribute('data-i18n-aria')); el.setAttribute('aria-label', s); if (el.classList.contains('mau')) el.title = s
+})
+/* 06/11 NUT NHOM (Lam mo, But): cham nho goc nut + tooltip "re chuot de xem them" (giong overlay.js, cung ten ham) */
+function datTieuDeNhom(el) {
+  if (!el) return
+  const khoa = el.getAttribute('data-i18n-title')
+  if (!khoa) return
+  el.title = window.i18n.t(khoa) + '\n' + window.i18n.t('overlay.reThem'); el.setAttribute('aria-label', el.title)
+}
+function danhDauNhomXo(idNhom, idChinh) {
+  const n = document.getElementById(idNhom)
+  if (!n) return
+  n.classList.add('co-xo')
+  datTieuDeNhom(document.getElementById(idChinh))
+}
+danhDauNhomXo('lam-mo-nhom', 'lam-mo-chinh'); danhDauNhomXo('but-nhom', 'but-chinh')
 
 let opacity = 1
 const PLOG = (m) => { try { window.pin.log(m) } catch (e) {} }
@@ -260,7 +280,7 @@ function capNhatNutBut(x) {
   if (l) {
     butChinhEl.dataset.tool = x; butChinhEl.dataset.so = l.so
     butChinhEl.setAttribute('data-i18n-title', l.khoa)
-    butChinhEl.title = window.i18n.t(l.khoa); butChinhEl.setAttribute('aria-label', butChinhEl.title)
+    datTieuDeNhom(butChinhEl)
     butNhomEl.classList.toggle('dq', x === 'daquang')
   }
   butMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <link rel="stylesheet" href="lan-dau.css" />
+</head>
+<body>
+  <!-- 06/11 THE LAN CHAY DAU: cua so trong suot, the that nam trong #the (le 14 px cho bong). Khong khai :root rieng. -->
+  <div id="the" role="dialog" aria-labelledby="tieu-de">
+    <div class="dau">
+      <svg class="logo" viewBox="0 0 385.89 351.31" width="18" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+        <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+      </svg>
+      <h1 id="tieu-de" data-i18n="lan.tieuDe"></h1>
+    </div>
+    <p id="chup"></p>
+    <p id="bieu-tuong"></p>
+    <p id="khay" data-i18n="lan.khay"></p>
+    <div class="chan">
+      <button id="doi-phim" class="nut" type="button" data-i18n="lan.doiPhim"></button>
+      <button id="da-hieu" class="nut chinh" type="button" data-i18n="lan.daHieu"></button>
+    </div>
+  </div>
+  <script src="lan-dau.js"></script>
+</body>
+</html>

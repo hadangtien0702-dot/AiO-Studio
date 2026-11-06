@@ -47,6 +47,8 @@ const { banGhimCungAnh } = require('./khay-muc')
 const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 const lienKetMod = require('./lien-ket') // 06/11: dieu khien tu ngoai bang link aioshot://… (hang rao o dau file do)
+const lanDauMod = require('./lan-dau') // 06/11: the lan chay dau cho nguoi moi (CHI may chua co cau hinh), xem dau src/lan-dau.js
+const tuChepMod = require('./tu-chep') // 06/11: bam Xong tu chep anh vao clipboard (mac dinh BAT), 1 cho kiem cau hinh
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
    Video tang toc phan cung nam o lop OVERLAY ma bo chup cu (Desktop Duplication
@@ -220,6 +222,7 @@ async function thuQuay() {
 const DEFAULT_HOTKEY = 'CommandOrControl+Shift+S'
 let currentHotkey = DEFAULT_HOTKEY // nap tu config khi app ready
 let lang = 'vi' // 'vi' | 'en' — nap tu config
+let theLanDau = null // 06/11: the lan chay dau (src/lan-dau.js), chi tao khi app san sang
 const T = (key) => i18n.t(lang, key)
 
 /* ── Ban quyen (24/09, anh chot 23/09 + A 24/09) ──────────────────────────
@@ -397,6 +400,8 @@ app.whenReady().then(() => {
   if (THU_OCR) { thuOcr(); return } // che do do: khong tray, khong phim tat, khong luong chup
   if (THU_QUAY) { thuQuay(); return } // che do do quay video: khong tray, khong phim tat
   anDock() // 04/10 Mac: goi lai sau khi app san sang, phong lan goi luc nap file chua co tac dung (chua co cua so nao)
+  // 06/11: may MOI = chua co cau-hinh.json / ban-quyen.json. Doc NGAY DAY, truoc khi bat ky buoc nao ghi vao userData.
+  const dauHieuMayMoi = lanDauMod.docDauHieuMayMoi(fs, app.getPath('userData'))
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
     const headers = {
@@ -458,7 +463,23 @@ app.whenReady().then(() => {
   }
   const ch = kho.docCauHinh()
   currentHotkey = ch.hotkey || DEFAULT_HOTKEY
+  /* 06/11 (de dung cho nguoi moi): may MOI + chua chon ngon ngu -> theo ngon ngu he thong (khong phai tieng Viet thi tieng Anh).
+     CHI may moi: may da co cau hinh (nhu may anh Tien) khong bao gio bi doi ngon ngu o day. Dang do (bat ky bien AIO_*, --dev,
+     --selftest) thi giu 'vi' nhu cu de bai do khong phu thuoc ngon ngu may. */
+  const dangDo = IS_DEV || IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || Object.keys(process.env).some((k) => k.indexOf('AIO_') === 0)
+  const mayMoi = lanDauMod.nenHienThe(Object.assign({}, dauHieuMayMoi, { daHien: !!ch.lanDauDaHien, dangDo }))
   lang = ch.lang || 'vi'
+  if (!ch.lang && mayMoi) {
+    lang = i18n.ngonNguTuMay(app.getLocale())
+    kho.ghiCauHinh({ lang })
+    ghiLog('may moi: ngon ngu he thong "' + app.getLocale() + '" -> ' + lang)
+  }
+  theLanDau = lanDauMod.taoTheLanDau({
+    electron: { BrowserWindow, screen, ipcMain }, ghiLog, moiDesktop,
+    phim: () => formatAccel(currentHotkey), lang: () => lang,
+    doiPhim: () => openSettings(),
+    ghiCo: () => kho.ghiCauHinh({ lanDauDaHien: true }), // ghi co NGAY LUC HIEN: khong hien lai du nguoi dung tat app giua chung
+  })
   timAnh = timAnhMod.dangKy({ app, ipcMain, BrowserWindow, screen, shell, nativeImage, ocr, daoNeuNenToi, createPinWindow, ghiLog, kho,
     thuMucDuLieu: path.join(app.getPath('userData'), 'tim-anh'), dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh, tieuDe: T('tray.timAnh') })
   setTimeout(() => { if (timAnh) timAnh.batDau() }, 45000) // doc chu nen bat dau sau khi app yen (45 s)
@@ -495,6 +516,11 @@ app.whenReady().then(() => {
       title: 'AiO Shot & Save',
       body: T('app.phimBiGiu').replace('{phim}', formatAccel(currentHotkey)),
     }).show()
+  }
+  rebuildTrayMenu() // 06/11: phim chup-lai-vung + Canvas dang ky xong moi biet de hien trong menu
+  if (mayMoi) {
+    ghiLog('may moi: hien the lan chay dau')
+    setTimeout(() => { try { theLanDau.mo() } catch (e) { ghiLog('the lan dau LOI: ' + e.message) } }, 1500)
   }
   // 04/11: dang ky tu mo cung Windows (chi ban dong goi). Bo qua khi chay do de ban do khong dung vao registry cua anh.
   if (!(IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || process.env.AIO_USERDATA)) {
@@ -644,15 +670,16 @@ function rebuildTrayMenu() {
     // 01/10: dang quay video -> muc DAU la Dung quay (phim tat chup luc nay cung = dung, xem startCapture)
     ...(ghiHinh ? [{ label: T('tray.dungQuay'), accelerator: currentHotkey, click: () => dungGhiHinh('tray') }, { type: 'separator' }] : []),
     { label: T('tray.chup'), accelerator: ghiHinh ? undefined : currentHotkey, enabled: !ghiHinh, click: () => startCapture() },
-    { label: T('tray.chupLai'), enabled: !ghiHinh, click: () => chupLaiVungCuoi() },
+    // 06/11: "Khay anh" ra ngoai cung (truoc nam trong muc con "Mo khay"); chup lai vung hien phim da dat
+    { label: T('tray.khayAnh'), click: () => showShelf() },
+    { label: T('tray.chupLai'), accelerator: ghiHinh ? undefined : (phimLaiDangKy || undefined), enabled: !ghiHinh, click: () => chupLaiVungCuoi() },
     // 05/11: hen gio chup (dem nguoc khong lot vao anh); dang dem thi muc nay thanh Huy hen gio
     henGio.dangDem()
       ? { label: T('tray.huyHen'), click: () => henGio.huy() }
       : { label: T('tray.henGio'), enabled: !ghiHinh, submenu: [3, 5, 10].map((g) => ({ label: T('tray.henGiay').replace('{n}', String(g)), click: () => batDauHenGio(g) })) },
     { type: 'separator' },
     // 12/10 (anh: "cai settings nay em lam gon lai duoc khong"): 3 khay gop vao MOT muc con -> menu tu 11 xuong 6 dong
-    { label: T('tray.cacKhay'), submenu: [
-      { label: T('tray.khayAnh'), click: () => showShelf() },
+    { label: T('tray.khayKhac'), submenu: [
       { label: T('tray.khayStory'), click: () => openStoryboardWindow() }, // 29/09: bo "(phim S)" — S chi an trong khay
       { label: T('tray.khayVideo'), click: () => openVideoWindow() },
     ] },
@@ -708,12 +735,15 @@ function chuanPhim(a) {
   return String(a || '').toLowerCase().split('+').map((x) => doi[x.trim()] || x.trim()).sort().join('+')
 }
 const cungPhim = (a, b) => !!a && !!b && chuanPhim(a) === chuanPhim(b)
+let phimLaiDangKy = '' // 06/11: phim chup-lai-vung DANG dang ky that (de hien trong menu khay + go khi doi phim)
+function phimLaiCauHinh() { const ch = kho.docCauHinh(); return typeof ch.hotkeyLai === 'string' ? ch.hotkeyLai : DEFAULT_HOTKEY_LAI }
 function registerHotkeyLai() {
-  const ch = kho.docCauHinh()
-  const accel = typeof ch.hotkeyLai === 'string' ? ch.hotkeyLai : DEFAULT_HOTKEY_LAI
-  if (!accel || cungPhim(accel, currentHotkey)) return false
+  phimLaiDangKy = ''
+  const accel = phimLaiCauHinh()
+  if (!accel || cungPhim(accel, currentHotkey) || cungPhim(accel, phimCanvasDangKy)) return false
   let ok = false
   try { ok = globalShortcut.register(accel, () => chupLaiVungCuoi()) } catch (e) { ok = false }
+  if (ok) phimLaiDangKy = accel
   ghiLog('phim chup-lai-vung ' + accel + ' dang-ky=' + (ok ? 'OK' : 'FAIL'))
   return ok
 }
@@ -839,8 +869,56 @@ ipcMain.handle('settings:get', () => {
     quayMic: c.quayMic !== false, quayHienChuot: c.quayHienChuot === true, quayHienPhim: c.quayHienPhim === true,
     anNut: anNutHopLe(c.anNut),
     kinhLup: c.kinhLup !== false,
+    tuChepXong: tuChepMod.tuChepKhiXong(c),
+    hotkeyLai: phimLaiCauHinh(), defLai: DEFAULT_HOTKEY_LAI,       // 06/11: Cai dat doi duoc phim chup lai + phim Canvas ('' = tat)
+    phimCanvas: phimCanvasCauHinh(), defCanvas: PHIM_CANVAS_MAC_DINH,
     moCung: moCungMay.trangThai(app),
   }
+})
+
+// 06/11: tu chep vao clipboard khi bam Xong (mac dinh BAT, xem src/tu-chep.js)
+ipcMain.handle('settings:set-tu-chep', (_e, bat) => {
+  const val = bat !== false && bat !== 0 && bat !== '0'
+  kho.ghiCauHinh({ tuChepXong: val })
+  ghiLog('doi tu-chep khi bam Xong: ' + (val ? 'bat' : 'tat'))
+  return { tuChepXong: val }
+})
+
+/* 06/11: doi phim CHUP LAI VUNG ('lai') va phim mo CANVAS ('canvas') trong Cai dat. accel '' = tat phim.
+   That bai (app khac giu / trung phim khac cua app) -> giu phim cu, tra { ok: false, lyDo }. Khong lam mat phim chup chinh. */
+function setHotkeyPhu(loai, accel) {
+  if (loai !== 'lai' && loai !== 'canvas') return { ok: false, lyDo: 'loai' }
+  const a = typeof accel === 'string' ? accel.trim() : ''
+  const cu = loai === 'lai' ? phimLaiCauHinh() : phimCanvasCauHinh()
+  const khia = loai === 'lai' ? phimCanvasCauHinh() : phimLaiCauHinh()
+  if (a && (cungPhim(a, currentHotkey) || cungPhim(a, khia))) { ghiLog('doi phim ' + loai + ' -> ' + a + ' TRUNG phim khac cua app'); return { ok: false, lyDo: 'trung', hotkey: cu } }
+  let ok = true
+  if (loai === 'lai') {
+    if (phimLaiDangKy) { try { globalShortcut.unregister(phimLaiDangKy) } catch (e) {} }
+    phimLaiDangKy = ''
+    if (a) {
+      try { ok = globalShortcut.register(a, () => chupLaiVungCuoi()) } catch (e) { ok = false }
+      if (ok) phimLaiDangKy = a
+      else if (cu && !cungPhim(cu, currentHotkey)) { try { if (globalShortcut.register(cu, () => chupLaiVungCuoi())) phimLaiDangKy = cu } catch (e) {} }
+    }
+  } else {
+    ok = a ? dangKyPhimCanvas(a) : (dangKyPhimCanvas(''), true)
+    if (!ok) dangKyPhimCanvas(cu) // dang ky that bai: tra lai phim cu
+  }
+  if (ok) kho.ghiCauHinh({ [loai === 'lai' ? 'hotkeyLai' : 'phimCanvas']: a })
+  rebuildTrayMenu()
+  ghiLog('doi phim ' + loai + ' ' + (cu || '(tat)') + ' -> ' + (a || '(tat)') + ' ' + (ok ? 'OK' : 'FAIL (bi giu), giu phim cu'))
+  return ok ? { ok: true, hotkey: a } : { ok: false, lyDo: 'bi-giu', hotkey: cu }
+}
+ipcMain.handle('settings:set-hotkey-phu', (_e, loai, accel) => setHotkeyPhu(loai, accel))
+
+/* 06/11: trang trong cua cac khay / Tim anh hien PHIM CHUP DANG DAT + nut Chup ngay. Phim lay bang invoke (khong sendSync) de cac bai do
+   khong dung main that van nap duoc trang. Chup ngay: giau cua so goi (khong lot vao anh chup) roi mo man chon vung nhu bam phim. */
+ipcMain.handle('hotkey:lay', () => ({ chup: formatAccel(currentHotkey) }))
+ipcMain.on('chup-ngay', (e) => {
+  const w = BrowserWindow.fromWebContents(e.sender)
+  if (w && !w.isDestroyed()) w.hide()
+  setTimeout(() => startCapture(), 250)
 })
 
 /** Kieu lam mo hop le: 'mosaic' (Kham o, mac dinh) | 'blur' (Mo min) | 'kin' (To kin, 04/10). Gia tri la -> mac dinh. */
@@ -1080,6 +1158,7 @@ async function startCapture(opts) {
     closeOverlay()
   }
   henGio.huy() // 05/11: bam phim tat luc dang hen gio = chup ngay, bo hen
+  if (theLanDau) theLanDau.dong('nguoi dung chup') // 06/11: da tu thu phim chup thi the huong dan het viec, khong de len man chup
   khayThu.huy() // 01/10: khay dang bay ve nut / bung ra thi go san dien ngay (cua so trong suot phu video lau = video den)
   // 05/11: opts.vung = chup lai vung lan truoc (phys toan cuc). Chi nhan doi tuong that, tray.on('click') truyen event vao day.
   vungNapSan = (opts && opts.vung && Number.isFinite(opts.vung.w)) ? opts.vung : null
@@ -1493,8 +1572,8 @@ function chupLaiVungCuoi() {
   napManCache()
   const v = kho.docCauHinh().vungCuoi
   if (!chonCuaSo.vungConHopLe(v, manCache)) {
-    ghiLog('chup-lai-vung: khong co vung hop le ' + JSON.stringify(v || null))
-    if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.chupLaiKhongCo') }).show()
+    // 06/11: chua co vung cu thi man chon vung MO LUON ngay duoi day, khong bao them (cau bao hien sau man chon la thua)
+    ghiLog('chup-lai-vung: khong co vung hop le ' + JSON.stringify(v || null) + ' -> mo man chon vung')
     startCapture()
     return
   }
@@ -1862,7 +1941,8 @@ async function handleConfirm(wcId, payload) {
 
   // 0) Ctrl+C: copy vao clipboard luon (them, ngoai Enter/nut check) — anh Tien
   //    25/08. Van vao khay binh thuong o duoi.
-  if (payload.copy) { try { clipboard.writeImage(cropped) } catch (e) {} }
+  // 06/11: bam Xong cung chep (mac dinh BAT, tat trong Cai dat): MOT cho kiem cau hinh = tuChepMod.nenChep
+  if (tuChepMod.nenChep(payload, kho.docCauHinh())) { try { clipboard.writeImage(cropped) } catch (e) {} }
 
   // 1) Luu file THAT tren dia truoc — tat app khong mat anh. Dinh dang theo
   //    cai dat nguoi dung (JPEG/PNG + chat luong).
@@ -2531,7 +2611,7 @@ function moVienQuay(display, rect, kieu) {
     wins.push(w)
   }
   // Thuoc dem nguoc: sat TREN khung vien neu con cho trong man, khong thi sat DUOI; het cho -> khong hien.
-  const TH_W = laVideo ? 240 : 200, TH_H = 40 // cua so trong suot; vien thuoc 28 px nam trong, chua 6 px cho bong
+  const TH_W = laVideo ? (laCuon ? 460 : 240) : 200, TH_H = 40 // 06/11: chup cuon them dong "Lan chuot xuong, bam Xong khi xong" nen rong hon // cua so trong suot; vien thuoc 28 px nam trong, chua 6 px cho bong
   const n = v.vungNgoai
   let thY = null
   if (n.y - TH_H >= b.y) thY = n.y - TH_H
@@ -2553,7 +2633,7 @@ function moVienQuay(display, rect, kieu) {
     moiDesktop(thuoc, 'thuoc dem / nut Dung')
     if (!laVideo) thuoc.setIgnoreMouseEvents(true) // quay video: nut Dung phai bam duoc (cua so nam NGOAI vung)
     thuoc.loadFile(path.join(__dirname, 'dem', laVideo ? 'quay.html' : 'index.html'), {
-      query: laVideo ? { lang, dung: T(laCuon ? 'cuon.xong' : 'quay.dung'), dungTitle: T(laCuon ? 'cuon.xongTitle' : 'quay.dungTitle') } : { lang, vi: thY < n.y ? 'tren' : 'duoi' },
+      query: laVideo ? { lang, dung: T(laCuon ? 'cuon.xong' : 'quay.dung'), dungTitle: T(laCuon ? 'cuon.xongTitle' : 'quay.dungTitle'), goiY: laCuon ? T('cuon.goiY') : '' } : { lang, vi: thY < n.y ? 'tren' : 'duoi' },
     })
     thuoc.once('ready-to-show', () => { if (!thuoc.isDestroyed()) thuoc.showInactive() })
     wins.push(thuoc)

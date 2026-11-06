@@ -53,6 +53,7 @@ const loaiBox = document.getElementById('anh-loai')
 const clBox = document.getElementById('anh-chat-luong')
 const hangCL = document.getElementById('hang-chat-luong')
 const verEl = document.getElementById('ver')
+const tuChepBox = document.getElementById('tu-chep')            // 06/11: tu chep vao clipboard khi bam Xong
 
 let isMac = false
 let hotkey = ''      // phim dang dung (accelerator)
@@ -65,6 +66,9 @@ function dichGiaoDien() {
   // 29/09: chu phu dua vao tooltip (anh: "text phu lam gon lai")
   btnReset.title = btnReset.ariaLabel = t('set.phim.macDinh')
   if (lamMoBox) lamMoBox.title = t('set.lamMo.goiY')
+  // 06/11: ten doc cho trinh doc man hinh + tieu de cua so lay tu i18n (khong de chu co dinh trong HTML)
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))))
+  document.title = t('win.caiDat')
 }
 
 /* Tach accelerator thanh mang nhan phim de ve keycap. */
@@ -158,6 +162,9 @@ async function load() {
   for (const k of Object.keys(quayBox)) if (quayBox[k]) chonPill(quayBox[k], s[k] ? '1' : '0')
   if (thanhNutBox) thanhNutBox.querySelectorAll('.nut-chip').forEach((b) => b.classList.toggle('chon', !(s.anNut || []).includes(b.dataset.k)))
   if (kinhLupBox) chonPill(kinhLupBox, s.kinhLup === false ? '0' : '1')
+  if (tuChepBox) chonPill(tuChepBox, s.tuChepXong === false ? '0' : '1')
+  napPhimPhu(s)
+  capNhatNhanOcr()
   datMoCung(s.moCung)
   if (s.version && verEl) verEl.textContent = 'AiO Shot & Save · v' + s.version
   langBox.querySelectorAll('.lang-nut').forEach((b) => {
@@ -257,6 +264,94 @@ if (kinhLupBox) {
   })
 }
 
+/* ── 06/11 Tu chep vao clipboard khi bam Xong (mac dinh BAT) ────────────── */
+if (tuChepBox) {
+  tuChepBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    chonPill(tuChepBox, b.dataset.v)
+    await window.settings.setTuChep(b.dataset.v === '1')
+  })
+}
+
+/* ── 06/11 Nut "Doc chu": chi ghi "/ QR" khi may nay co BarcodeDetector (Windows Electron 43 khong co -> menu QR khong mo duoc) ── */
+function capNhatNhanOcr() {
+  const el = document.getElementById('chip-ocr-nhan')
+  if (!el || typeof BarcodeDetector === 'undefined') return
+  try {
+    BarcodeDetector.getSupportedFormats().then((f) => {
+      if (!f.includes('qr_code')) return
+      el.textContent = t('set.nut.ocr'); if (el.parentNode) el.parentNode.title = el.textContent
+    }).catch(() => {})
+  } catch (e) {}
+}
+
+/* ── 06/11 Phim CHUP LAI VUNG + phim MO CANVAS: ghi phim giong phim chup (to hop hop le = luu ngay), moi hang co "Ve mac dinh" + "Tat" ── */
+let napPhimPhu = () => {}
+;(() => {
+  const HANG = [
+    { loai: 'lai', truong: 'hotkeyLai', macDinh: 'defLai' },
+    { loai: 'canvas', truong: 'phimCanvas', macDinh: 'defCanvas' },
+  ].map((h) => Object.assign(h, {
+    keys: document.getElementById('keys-' + h.loai), doi: document.getElementById('doi-' + h.loai),
+    veMD: document.getElementById('reset-' + h.loai), tat: document.getElementById('tat-' + h.loai),
+    huy: document.getElementById('huy-' + h.loai), msg: document.getElementById('msg-' + h.loai),
+    gt: '', def: '', ghi: false, ban: false,
+  }))
+  if (HANG.some((h) => !h.keys || !h.doi || !h.veMD || !h.tat || !h.huy || !h.msg)) return
+  const bao = (h, chu, kieu) => { h.msg.textContent = chu || ''; h.msg.className = 'msg' + (kieu ? ' ' + kieu : '') }
+  function ve(h) {
+    h.keys.classList.toggle('ghi', h.ghi)
+    h.keys.classList.toggle('tat', !h.ghi && !h.gt)
+    h.keys.textContent = ''
+    if (h.ghi) h.keys.textContent = t('set.phim.nhanToHop')
+    else if (!h.gt) h.keys.textContent = t('set.phim.dangTat')
+    else tachPhim(h.gt).forEach((p, i) => {
+      if (i > 0) { const c = document.createElement('span'); c.className = 'keycap cong'; c.textContent = '+'; h.keys.appendChild(c) }
+      const k = document.createElement('span'); k.className = 'keycap'; k.textContent = p; h.keys.appendChild(k)
+    })
+    h.doi.hidden = h.ghi; h.veMD.hidden = h.ghi; h.tat.hidden = h.ghi || !h.gt; h.huy.hidden = !h.ghi
+  }
+  async function luu(h, accel) {
+    h.ban = true
+    let r
+    try { r = await window.settings.setHotkeyPhu(h.loai, accel) } catch (e) { r = { ok: false } }
+    h.ban = false; h.ghi = false
+    if (r && typeof r.hotkey === 'string') h.gt = r.hotkey
+    ve(h)
+    if (r && r.ok) {
+      bao(h, '')
+      h.keys.classList.remove('vua-luu'); void h.keys.offsetWidth; h.keys.classList.add('vua-luu')
+    } else bao(h, t(r && r.lyDo === 'trung' ? 'set.phim.trung' : 'set.phim.biGiu'), 'err')
+  }
+  for (const h of HANG) {
+    h.doi.addEventListener('click', () => {
+      bao(h, '')
+      document.dispatchEvent(new CustomEvent('ghi-phim', { detail: h.loai }))
+      h.ghi = true; ve(h)
+    })
+    h.huy.addEventListener('click', () => { bao(h, ''); h.ghi = false; ve(h) })
+    h.veMD.addEventListener('click', () => luu(h, h.def))
+    h.tat.addEventListener('click', () => luu(h, ''))
+  }
+  document.addEventListener('ghi-phim', (e) => { for (const h of HANG) if (h.loai !== e.detail && h.ghi) { h.ghi = false; ve(h) } })
+  window.addEventListener('keydown', (e) => {
+    const h = HANG.find((x) => x.ghi && !x.ban)
+    if (!h) return
+    e.preventDefault()
+    const mods = []
+    if (e.ctrlKey) mods.push('Ctrl')
+    if (e.metaKey && isMac) mods.push('Cmd')
+    if (e.altKey) mods.push('Alt')
+    if (e.shiftKey) mods.push('Shift')
+    const key = mainKey(e)
+    if (!key) return
+    if (mods.length === 0) { bao(h, isMac ? t('set.phim.canModifierMac') : t('set.phim.canModifier'), 'err'); return }
+    luu(h, mods.concat(key).join('+'))
+  })
+  napPhimPhu = (s) => { for (const h of HANG) { h.gt = typeof s[h.truong] === 'string' ? s[h.truong] : ''; h.def = s[h.macDinh] || ''; h.ghi = false; ve(h) } }
+})()
+
 /* ── Mo cung Windows ──────────────────────────────────────────────────── */
 if (moCungBox) {
   moCungBox.addEventListener('click', async (e) => {
@@ -287,8 +382,10 @@ function mainKey(e) {
 btnDoi.addEventListener('click', () => {
   msg.textContent = ''
   msg.className = 'msg'
+  document.dispatchEvent(new CustomEvent('ghi-phim', { detail: 'chinh' })) // chi MOT hang ghi phim cung luc
   datTrangThai('recording')
 })
+document.addEventListener('ghi-phim', (e) => { if (e.detail !== 'chinh' && state === 'recording') datTrangThai('idle') })
 
 btnHuyGhi.addEventListener('click', () => {
   msg.textContent = ''

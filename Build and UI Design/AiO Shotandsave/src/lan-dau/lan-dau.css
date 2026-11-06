@@ -1,0 +1,34 @@
+/* The lan chay dau (06/11) — khuon man Cai dat: nen --bg-2, vien --line-2, nut .nut / .nut.chinh (cam chi cho nut chinh). */
+html, body { margin: 0; background: transparent; overflow: hidden; font-family: var(--font-ui); color: var(--text-1); user-select: none; }
+button { font-family: inherit; }
+#the {
+  box-sizing: border-box; width: 360px; margin: 14px;
+  padding: var(--sp-5);
+  background: var(--bg-2); border: 1px solid var(--line-2); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  animation: vao 180ms ease backwards;
+}
+@keyframes vao { from { opacity: 0; transform: translateY(8px); } }
+.dau { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.logo { color: var(--accent); flex: none; }
+h1 { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.3; }
+p { margin: 0 0 var(--sp-3); font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+#chup { color: var(--text-1); }
+.keycap {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 20px; padding: 0 6px; margin: 0 1px; vertical-align: 1px;
+  background: linear-gradient(180deg, var(--bg-3), var(--bg-0));
+  border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: var(--r-sm);
+  font-size: 11px; font-weight: 700; color: var(--text-1);
+}
+.chan { display: flex; justify-content: flex-end; gap: var(--sp-3); margin-top: var(--sp-4); }
+.nut {
+  height: 28px; padding: 0 var(--sp-4);
+  border: 1px solid var(--line-2); border-radius: var(--r-md);
+  background: var(--bg-3); color: var(--text-1);
+  font: 600 12px/1 var(--font-ui); cursor: pointer; white-space: nowrap;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.nut:hover { background: var(--bg-hover); }
+.nut.chinh { height: 32px; padding: 0 var(--sp-5); background: var(--accent); border-color: var(--accent); color: var(--accent-on, #fff); font-size: 13px; font-weight: 700; }
+.nut.chinh:hover { filter: brightness(1.08); }

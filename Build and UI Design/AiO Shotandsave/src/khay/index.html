@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; media-src file:; img-src data: blob: file: aioshot:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
-  <title>AiO Shot &amp; Save · Khay</title>
+  <title>AiO Shot &amp; Save</title>
   <link rel="stylesheet" href="../../assets/tokens.css" />
   <!-- 01/10 GOP KHAY (anh: "phan khay minh toi uu hoa thanh 1 khay"): truoc la 2 cua so rieng (src/storyboard/index.html,
        src/video/index.html), nay MOT cua so co 2 the. Khuon giao dien van la storyboard.css (= man Cai dat);
@@ -38,12 +38,18 @@
     <!-- The Storyboard: moi dai 1 hang (storyboard.js dung the .dai). Canvas xuat anh chay AN, chi dung khi Luu / Sao chep / Keo. -->
     <section id="tab-dai" class="tab-than" role="tabpanel">
       <div id="ds-dai"></div>
-      <p id="trong-dai" class="trong" hidden data-i18n="sb.chuaCoDai"></p>
+      <div id="trong-dai" class="trong" hidden>
+        <p data-i18n="sb.chuaCoDai" data-phim></p>
+        <button class="nut chinh chup-ngay" type="button" data-i18n="chup.ngay"></button>
+      </div>
     </section>
     <!-- The Video: moi doan quay 1 hang (video.js dung the .dai.vd). Ca hang keo duoc: tha vao Premiere / Zalo / Messenger. -->
     <section id="tab-video" class="tab-than" role="tabpanel" hidden>
       <div id="ds-video"></div>
-      <p id="trong-video" class="trong" hidden data-i18n="vd.chuaCo"></p>
+      <div id="trong-video" class="trong" hidden>
+        <p data-i18n="vd.chuaCo" data-phim></p>
+        <button class="nut chinh chup-ngay" type="button" data-i18n="chup.ngay"></button>
+      </div>
     </section>
   </main>
   <canvas id="main-canvas" hidden></canvas>

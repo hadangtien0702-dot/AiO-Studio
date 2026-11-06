@@ -8,6 +8,7 @@ const nut = document.getElementById('dung')
 document.getElementById('dung-chu').textContent = q.get('dung') || 'Stop'
 nut.title = q.get('dungTitle') || q.get('dung') || 'Stop'
 nut.setAttribute('aria-label', nut.title)
+document.getElementById('goi-y').textContent = q.get('goiY') || ''
 
 let t0 = 0
 let iv = null

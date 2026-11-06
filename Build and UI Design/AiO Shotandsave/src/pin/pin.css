@@ -168,6 +168,12 @@ html, body {
 .cong-cu:disabled { opacity: .35; cursor: default; }
 .cong-cu:disabled:hover { background: transparent; color: var(--text-2); }
 .nhom-xo, #mau-nhom { position: relative; }
+/* 06/11: cham nho o goc duoi-phai nut nhom = con lua chon khac (giong overlay.css) */
+.nhom-xo.co-xo > .cong-cu::before {
+  content: ''; position: absolute; right: 5px; bottom: 5px; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-3); pointer-events: none;
+}
+.nhom-xo.co-xo > .cong-cu.chon::before { background: var(--accent-text); }
 #but-nhom.dq .ic-but, #but-nhom:not(.dq) .ic-dq { display: none; }
 /* so phim cua nut but doi theo loai dang dung (7 / 8) */
 .cong-cu[data-so]::after {

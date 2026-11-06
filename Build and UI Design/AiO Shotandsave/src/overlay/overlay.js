@@ -34,6 +34,34 @@ function toggleStoryboardMode(force) {
   if (sbBtn) {
     sbBtn.classList.toggle('chon', isStoryboardMode)
   }
+  capNhatChuXong()
+}
+
+/* 06/11 GOI Y SAU KHI KHOANH VUNG: nguoi moi khong biet "xong" la bam gi. Dong goi y tren cung doi thanh "Enter = luu · Esc = huy"
+   (bat Storyboard: "Enter = quay 3 giay"); nut Xong cung doi tooltip theo (Storyboard: "Bam de quay 3 giay"). Khong hien khi
+   no chong len vung dang chon; tu mo di sau 6 giay. */
+const hintChonEl = document.getElementById('hint-chon'), hintXongEl = document.getElementById('hint-xong')
+let hintXongHen = null
+function capNhatChuXong() {
+  const nut = document.getElementById('xong')
+  if (nut) { nut.title = window.i18n.t(isStoryboardMode ? 'overlay.doneSb' : 'overlay.done'); nut.setAttribute('aria-label', nut.title) }
+  if (hintXongEl) hintXongEl.textContent = window.i18n.t(isStoryboardMode ? 'overlay.hintXongSb' : 'overlay.hintXong')
+}
+function hienHintXong() {
+  capNhatChuXong()
+  clearTimeout(hintXongHen)
+  if (!hintChonEl || !hintXongEl) return
+  hintChonEl.hidden = true; hintXongEl.hidden = false
+  const r = hintEl.getBoundingClientRect()
+  const chong = !(r.right < curRect.x || r.left > curRect.x + curRect.w || r.bottom < curRect.y || r.top > curRect.y + curRect.h)
+  if (chong) { hintEl.classList.add('hidden'); return }
+  hintEl.classList.remove('hidden')
+  hintXongHen = setTimeout(() => hintEl.classList.add('hidden'), 6000)
+}
+function hintVeChon() {
+  clearTimeout(hintXongHen)
+  if (hintChonEl) hintChonEl.hidden = false
+  if (hintXongEl) hintXongEl.hidden = true
 }
 
 if (selStoryboardBtn) {
@@ -52,6 +80,27 @@ document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el
 document.querySelectorAll('[data-i18n-title]').forEach((el) => {
   el.title = t(el.getAttribute('data-i18n-title')); el.setAttribute('aria-label', el.title)
 })
+// 06/11: nhan doc cho trinh doc man hinh (ten mau, nhom mau) lay tu i18n, khong de chu co dinh trong HTML
+document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+  const s = t(el.getAttribute('data-i18n-aria')); el.setAttribute('aria-label', s); if (el.classList.contains('mau')) el.title = s
+})
+document.title = t('win.chonVung')
+
+/* 06/11 NUT NHOM (Lam mo, Doc chu, But, Hut mau): co CHAM nho o goc bao "con lua chon khac" + tooltip ghi "re chuot de xem them".
+   Nhom Doc chu chi co cham khi may co BarcodeDetector (menu QR chi mo duoc luc do). Goi lai moi khi nut doi loai (doi tooltip). */
+function datTieuDeNhom(el) {
+  if (!el) return
+  const khoa = el.getAttribute('data-i18n-title')
+  if (!khoa) return
+  el.title = t(khoa) + '\n' + t('overlay.reThem'); el.setAttribute('aria-label', el.title)
+}
+function danhDauNhomXo(idNhom, idChinh) {
+  const n = document.getElementById(idNhom)
+  if (!n) return
+  n.classList.add('co-xo')
+  datTieuDeNhom(document.getElementById(idChinh))
+}
+danhDauNhomXo('blur-nhom', 'blur-chinh'); danhDauNhomXo('but-nhom', 'but-chinh'); danhDauNhomXo('do-nhom', 'do-chinh')
 
 const DPR = window.devicePixelRatio || 1
 const MAU = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f86820'
@@ -146,13 +195,13 @@ function capNhatNutBlur(x) {
   if (l) {
     blurChinhEl.dataset.tool = x; blurChinhEl.dataset.so = l.so
     blurChinhEl.setAttribute('data-i18n-title', l.khoa)
-    blurChinhEl.title = window.i18n.t(l.khoa); blurChinhEl.setAttribute('aria-label', blurChinhEl.title)
+    datTieuDeNhom(blurChinhEl)
     blurNhomEl.classList.toggle('sp', x === 'spot')
   }
   blurMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
 }
 if (typeof BarcodeDetector !== 'undefined') {
-  try { BarcodeDetector.getSupportedFormats().then((f) => { CO_QR = f.includes('qr_code') }).catch(() => {}) } catch (e) {}
+  try { BarcodeDetector.getSupportedFormats().then((f) => { CO_QR = f.includes('qr_code'); if (CO_QR) danhDauNhomXo('ocr-nhom', 'ocr-chinh') }).catch(() => {}) } catch (e) {}
 }
 
 /* 05/11 AN NUT tren thanh cong cu theo Cai dat (phim tat van chay). ds = danh sach khoa nut bi an. */
@@ -205,7 +254,7 @@ function capNhatNutDo(x) {
   if (l) {
     doChinhEl.dataset.tool = x; doChinhEl.dataset.so = l.so
     doChinhEl.setAttribute('data-i18n-title', l.khoa)
-    doChinhEl.title = window.i18n.t(l.khoa); doChinhEl.setAttribute('aria-label', doChinhEl.title)
+    datTieuDeNhom(doChinhEl)
     doNhomEl.classList.toggle('dm', x === 'thuoc')
   }
   doMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
@@ -215,7 +264,7 @@ function capNhatNutBut(x) {
   if (l) {
     butChinhEl.dataset.tool = x; butChinhEl.dataset.so = l.so
     butChinhEl.setAttribute('data-i18n-title', l.khoa)
-    butChinhEl.title = window.i18n.t(l.khoa); butChinhEl.setAttribute('aria-label', butChinhEl.title)
+    datTieuDeNhom(butChinhEl)
     butNhomEl.classList.toggle('dq', x === 'daquang')
   }
   butMenuEl.querySelectorAll('.muc-xo').forEach((b) => b.classList.toggle('chon', b.dataset.tool === x))
@@ -806,6 +855,7 @@ window.addEventListener('keydown', (e) => {
 /* ── Vao che do VE ────────────────────────────────────────────────────── */
 function vaoCheDoVe() {
   mode = 'annotate'
+  hienHintXong() // 06/11: curRect da co (onAnnotate dat truoc khi goi ham nay)
   klAn()
   veEl.hidden = false
   capNhatGiaoDienKhung()
@@ -1031,6 +1081,7 @@ function chonLaiTuDau(e) {
   suaDangKeo = null
   dangKeoShape = false
   mode = 'select'
+  hintVeChon()
   shapes = []
   xoaRedo()
   dongPopups()

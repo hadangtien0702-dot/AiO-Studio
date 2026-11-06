@@ -17,6 +17,12 @@ contextBridge.exposeInMainWorld('i18n', {
   },
 })
 
+/* 06/11: phim chup DANG DAT + nut Chup ngay cho trang trong. Dung invoke (khong sendSync) de bai do khong dung main that van nap duoc. */
+contextBridge.exposeInMainWorld('hotkeyInfo', {
+  lay: () => ipcRenderer.invoke('hotkey:lay'),
+  chupNgay: () => ipcRenderer.send('chup-ngay'),
+})
+
 contextBridge.exposeInMainWorld('timAnh', {
   tim: (q) => ipcRenderer.invoke('tim-anh:tim', q),
   thumb: (duong) => ipcRenderer.invoke('tim-anh:thumb', duong),

@@ -173,6 +173,15 @@ body.doc #bar button + button { margin-left: -4px; }
   border-radius: var(--r-sm);
   font-weight: 700; font-size: 11px; white-space: nowrap;
 }
+#empty { flex-direction: column; gap: 8px; }
+#empty .dong-chu { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; line-height: 1.5; }
+/* 06/11: nut Chup ngay cua khay trong = nut chinh (cam, chu >= 12px bold) cung khuon .nut.chinh cua Cai dat */
+#empty .chup-ngay {
+  height: 26px; padding: 0 var(--sp-4); border: 1px solid var(--accent); border-radius: var(--r-md);
+  background: var(--accent); color: var(--accent-on, #fff); font: 700 12px/1 var(--font-ui); cursor: pointer; white-space: nowrap;
+  transition: filter var(--dur) var(--ease);
+}
+#empty .chup-ngay:hover { filter: brightness(1.08); }
 body.trong #list { display: none; }
 body.trong #empty { display: flex; }
 
