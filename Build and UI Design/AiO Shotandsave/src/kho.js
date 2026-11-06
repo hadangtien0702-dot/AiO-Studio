@@ -123,6 +123,7 @@ function tenDaCoChu(dir, ten, so, filePath) {
 
 function duongDanKeoAnToan(filePath) {
   if (!filePath) return filePath
+  danhDauDaGiao(filePath) // 06/11: moi duong keo ra ngoai deu qua day -> tu dat ten khong bao gio doi ten file nay nua
   if (AN_TOAN.test(filePath)) return filePath
   try {
     const dir = baoDamThuMuc(thuMucKeo())
@@ -282,6 +283,8 @@ function tenTheoGio(d, duoi) {
  */
 function luuAnh(image, dd) {
   try {
+    /* 06/11: 'webp' can bo ma hoa bat dong bo (nativeImage khong co toWEBP) -> luuAnh DONG BO khong the ghi WebP; ben goi nao
+       con goi ham dong bo thi nhan JPEG chu khong mat anh. Duong chinh dung luuAnhDoi (ben duoi). */
     const loai = (dd && dd.loai) === 'png' ? 'png' : 'jpeg'
     const q = (dd && dd.q) || 85
     const dir = baoDamThuMuc(thuMucAnh())
@@ -292,6 +295,119 @@ function luuAnh(image, dd) {
     console.error('[kho] khong luu duoc anh:', err)
     return null
   }
+}
+
+/** Luu anh (CO WebP). dd = { loai: 'jpeg' | 'png' | 'webp', q (JPEG 1..100), qWebp (0..1, 1 = lossless) }.
+    Tra Promise<duong dan | null>. WebP that bai (anh > 16383 px, cua so ma hoa loi) -> luu JPEG thay vi mat anh;
+    ben goi doc `kho.lanCuoi().lui` neu can biet. */
+let luuCuoi = { lui: '' }
+async function luuAnhDoi(image, dd) {
+  luuCuoi = { lui: '' }
+  if (!dd || dd.loai !== 'webp') return luuAnh(image, dd)
+  try {
+    const buf = await require('./webp').ma(image, dd.qWebp == null ? 0.95 : dd.qWebp)
+    if (buf && buf.length) {
+      const dir = baoDamThuMuc(thuMucAnh())
+      const file = path.join(dir, tenTheoGio(new Date(), 'webp'))
+      fs.writeFileSync(file, buf)
+      return file
+    }
+    luuCuoi.lui = 'webp-khong-ma-hoa-duoc'
+  } catch (err) {
+    luuCuoi.lui = 'webp-loi: ' + ((err && err.message) || err)
+    console.error('[kho] khong luu duoc WebP:', err)
+  }
+  baoKho('luu WebP KHONG DUOC (' + luuCuoi.lui + ') -> luu JPEG thay the')
+  return luuAnh(image, Object.assign({}, dd, { loai: 'jpeg' }))
+}
+const lanCuoi = () => luuCuoi
+
+/** Doc MOT file anh tren dia thanh NativeImage, CO WebP (nativeImage khong doc duoc WebP -> giai ma qua cua so an). null = khong doc duoc. */
+async function docAnhFile(duong) {
+  try {
+    const { nativeImage } = require('electron')
+    if (/\.webp$/i.test(duong)) return await require('./webp').giaiMaFile(duong)
+    const img = nativeImage.createFromPath(duong)
+    return img && !img.isEmpty() ? img : null
+  } catch (e) { return null }
+}
+
+/** Kich thuoc anh WebP doc tu dau file (khong giai ma), hoac null. */
+function kichThuocWebp(duong) {
+  try {
+    const fd = fs.openSync(duong, 'r')
+    try { const b = Buffer.alloc(40); fs.readSync(fd, b, 0, 40, 0); return require('./webp').docKichThuoc(b) } finally { fs.closeSync(fd) }
+  } catch (e) { return null }
+}
+
+/** Ma hoa NativeImage theo DUOI cua file dich (ghi de anh ghim da sua): .png / .webp / con lai JPEG. null = ma hoa that bai. */
+async function maHoaTheoDuoi(filePath, image, dd) {
+  const duoi = path.extname(String(filePath || '')).toLowerCase()
+  if (duoi === '.png') return image.toPNG()
+  if (duoi === '.webp') return require('./webp').ma(image, dd && dd.qWebp != null ? dd.qWebp : 0.95)
+  return image.toJPEG((dd && dd.q) || 85)
+}
+
+/** Duoi file anh app nap / hien duoc: png, jpg, jpeg, webp (06/11). */
+const DUOI_ANH = /\.(png|jpe?g|webp)$/i
+const laFileAnh = (ten) => DUOI_ANH.test(String(ten || ''))
+
+/* ── DA GIAO (06/11, bai 5bi: file da dua cho anh dung la DANG DUNG, khong doi ten) ──────────────────────────────────
+   Moi duong keo ra app khac (khay, anh ghim, Tim anh, Canvas) deu di qua duongDanKeoAnToan() -> danh dau o do. Luu o
+   userData/da-giao.json de mo lai app van nho. Tu dat ten theo noi dung KHONG BAO GIO doi ten file co mat o day. */
+let daGiaoSet = null
+let henLuuGiao = null
+function fileDaGiao() { return path.join(app.getPath('userData'), 'da-giao.json') }
+function napGiao() {
+  if (daGiaoSet) return daGiaoSet
+  daGiaoSet = new Set()
+  try {
+    const j = JSON.parse(fs.readFileSync(fileDaGiao(), 'utf8'))
+    for (const k of (j && Array.isArray(j.ds) ? j.ds : [])) if (typeof k === 'string') daGiaoSet.add(k)
+  } catch (e) {}
+  return daGiaoSet
+}
+function danhDauDaGiao(filePath) {
+  if (!filePath) return
+  const k = khoaDuong(filePath)
+  const s = napGiao()
+  if (s.has(k)) return
+  s.add(k)
+  clearTimeout(henLuuGiao)
+  henLuuGiao = setTimeout(() => {
+    try { ghiBen(fileDaGiao(), JSON.stringify({ v: 1, ds: Array.from(daGiaoSet).slice(-20000) })) } catch (e) { baoKho('da-giao: KHONG GHI DUOC ' + ((e && e.code) || e)) }
+  }, 500)
+  if (henLuuGiao.unref) henLuuGiao.unref()
+}
+/** File nay da tung duoc keo ra ngoai, hoac dang co lien ket trong .keo (anh goc nam trong so)? */
+function daGiao(filePath) {
+  if (!filePath) return false
+  const k = khoaDuong(filePath)
+  if (napGiao().has(k)) return true
+  try {
+    const so = docSoKeo()
+    if (!so) return true // khong doc duoc so lien ket: coi nhu DA GIAO (an toan hon)
+    for (const t of Object.keys(so)) if (khoaDuong(so[t]) === k) return true
+  } catch (e) {}
+  return false
+}
+
+/** Doi ten file MA KHONG BAO GIO ghi de file khac: tao lien ket cung (loi neu ten da co) roi go ten cu; o dia khong co lien
+    ket cung thi kiem ton tai + doi ten. Tra { ok, loi, duong }. */
+function doiTenKhongDe(cu, moi) {
+  try {
+    if (khoaDuong(cu) === khoaDuong(moi)) return { ok: false, loi: 'trung-ten' }
+    try {
+      fs.linkSync(cu, moi)
+    } catch (e) {
+      if (e && e.code === 'EEXIST') return { ok: false, loi: 'ten-da-co' }
+      if (fs.existsSync(moi)) return { ok: false, loi: 'ten-da-co' }
+      fs.renameSync(cu, moi)
+      return { ok: true, duong: moi, cach: 'doi-ten' }
+    }
+    try { fs.unlinkSync(cu) } catch (e) { try { fs.unlinkSync(moi) } catch (e2) {} return { ok: false, loi: 'khong-go-duoc-ten-cu:' + ((e && e.code) || '') } }
+    return { ok: true, duong: moi, cach: 'lien-ket' }
+  } catch (e) { return { ok: false, loi: (e && e.code) || (e && e.message) || 'loi' } }
 }
 
 /* 01/10 QUAY VIDEO: duong dan file video MOI trong thu muc anh — 'shotandsave-video-YYYY-MM-DD-HHMMSS-mmm.<duoi>'.
@@ -400,4 +516,5 @@ function ghiCauHinhTrong(patch) {
 module.exports = {
   thuMucGoc, thuMucAnh, baoDamThuMuc, luuAnh, duongDanKeoAnToan, donKeoAnToan, lamMoiKeo, ghiDeAnh, thuMucKeo,
   duongVideoMoi, docCauHinh, ghiCauHinh, ghiCauHinhChac, noiNhatKy,
+  luuAnhDoi, lanCuoi, maHoaTheoDuoi, docAnhFile, kichThuocWebp, DUOI_ANH, laFileAnh, daGiao, danhDauDaGiao, doiTenKhongDe, tenTheoGio,
 }

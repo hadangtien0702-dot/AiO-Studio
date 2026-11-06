@@ -30,6 +30,7 @@ contextBridge.exposeInMainWorld('shelf', {
   openStoryboard: () => ipcRenderer.send('shelf:open-storyboard'),
   chupNgay: () => ipcRenderer.send('chup-ngay'), // 06/11: nut "Chup ngay" o trang trong cua khay
   openVideo: () => ipcRenderer.send('shelf:open-video'), // 01/10 khay video
+  openTaiLieu: () => ipcRenderer.send('shelf:open-tai-lieu'), // 06/11 xuat tai lieu tung buoc
   hide: () => ipcRenderer.send('shelf:hide'),
 
   /* Keo: neo mot lan roi gui delta TUYET DOI tu luc bat dau — khong gui delta

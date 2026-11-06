@@ -83,4 +83,31 @@ function banGhimCungAnh(cacRec, rec, anhTruocKhiSua, cungFile = (a, b) => a === 
   return kq
 }
 
-module.exports = { banGhimCungAnh, taoMucKhay, anhMucKhay, capNhatMucKhay, mucCuaAnhGhim, apDungSuaVaoKhay }
+/** 06/11 NAP LAI ANH CU VAO KHAY, CO WebP. files: [{ path }] theo thu tu CU -> MOI (de so thu tu khay dung thoi gian).
+    nativeImage KHONG doc duoc WebP (do 06/11) nen file .webp duoc giu CHO ngay (co so thu tu, kich thuoc doc tu dau file, thumbnail xam),
+    giai ma qua cua so an roi thay thumbnail. ctx: { nativeImage, layId: () => id moi, themMuc(muc), taoAnhNho(img) -> dataURL, thumbCho,
+    kichThuocWebp(path) -> {w,h}|null, docAnhFile(path) -> Promise<NativeImage|null>, khiXong(muc), khiLoi(muc) }.
+    Tra Promise xong khi moi WebP da giai ma (that bai thi khiLoi, muc DA bi go khoi khay boi ben goi). */
+function napDanhSach(files, ctx) {
+  const cho = []
+  for (const f of files) {
+    let img = null
+    try { img = ctx.nativeImage.createFromPath(f.path) } catch (e) {}
+    if (img && !img.isEmpty()) { const id = ctx.layId(); ctx.themMuc(taoMucKhay(id, img, f.path, ctx.taoAnhNho)); continue }
+    if (!/\.webp$/i.test(f.path)) continue
+    const kt = ctx.kichThuocWebp(f.path)
+    if (!kt) continue
+    const id = ctx.layId()
+    const muc = { id, seq: id, filePath: f.path, w: kt.w, h: kt.h, thumb: ctx.thumbCho, image: null }
+    ctx.themMuc(muc)
+    cho.push(ctx.docAnhFile(f.path).then((anh) => {
+      if (!anh) { ctx.khiLoi(muc); return }
+      const m2 = taoMucKhay(id, anh, f.path, ctx.taoAnhNho)
+      muc.thumb = m2.thumb; muc.w = m2.w; muc.h = m2.h
+      ctx.khiXong(muc)
+    }).catch(() => { try { ctx.khiLoi(muc) } catch (e) {} }))
+  }
+  return Promise.all(cho)
+}
+
+module.exports = { banGhimCungAnh, taoMucKhay, anhMucKhay, capNhatMucKhay, mucCuaAnhGhim, apDungSuaVaoKhay, napDanhSach }

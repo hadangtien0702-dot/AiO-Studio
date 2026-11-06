@@ -959,6 +959,9 @@ const DICH = {
   },
 }
 
+// 06/11: chuoi cua vung LUU FILE VA XUAT (WebP, tu dat ten, tai lieu tung buoc) o file rieng
+{ const m = require('./i18n-luu-xuat'); Object.assign(DICH.vi, m.vi); Object.assign(DICH.en, m.en) }
+
 /* 06/11 (de dung cho nguoi moi): tren Mac phim la ⌘, khong co Ctrl. Chuoi viet "Ctrl+Z" / "Ctrl + lan chuot" doi sang ⌘ khi chay
    tren Mac. Khong dong vao danh sach liet ke ("Ctrl / Alt / Shift") va "Cmd/Ctrl" (da co san ⌘). `mac` truyen vao de do duoc tren Windows. */
 function chuanHoaMay(s, mac) {

@@ -109,10 +109,11 @@
         <div class="chon-nhom" id="anh-loai" role="group">
           <button class="chon-nut" data-v="jpeg">JPEG</button>
           <button class="chon-nut" data-v="png">PNG</button>
+          <button class="chon-nut" data-v="webp">WebP</button>
         </div>
       </div>
       <div class="hang" id="hang-chat-luong">
-        <span class="nhan-chon" data-i18n="set.anh.chatLuong"></span>
+        <span class="nhan-chon" id="nhan-chat-luong" data-i18n="set.anh.chatLuong"></span>
         <div class="chon-nhom" id="anh-chat-luong" role="group">
           <button class="chon-nut" data-v="thap" data-i18n="set.anh.thap"></button>
           <button class="chon-nut" data-v="cao" data-i18n="set.anh.cao"></button>
@@ -126,6 +127,27 @@
           <button class="chon-nut" data-v="blur" data-i18n="set.lamMo.blur"></button>
           <button class="chon-nut" data-v="kin" data-i18n="set.lamMo.kin"></button>
         </div>
+      </div>
+    </section>
+
+    <!-- ── Ten file (06/11): tu dat ten theo noi dung anh, MAC DINH TAT ─────────────────────────────── -->
+    <h2 class="nhom-ten" data-i18n="set.ten.tieuDe">Tên file</h2>
+    <section class="nhom">
+      <div class="hang">
+        <span class="nhan-chon" data-i18n="set.ten.tuDat"></span>
+        <div class="chon-nhom nho" id="ten-tu-dat" role="group">
+          <button class="chon-nut" data-v="1" data-i18n="set.bat"></button>
+          <button class="chon-nut" data-v="0" data-i18n="set.tat2"></button>
+        </div>
+      </div>
+      <div class="hang cot" id="hang-ten-mau">
+        <span class="nhan-chon" data-i18n="set.ten.mau"></span>
+        <div class="bq-hang">
+          <input id="ten-mau" class="bq-o" type="text" spellcheck="false" autocomplete="off" maxlength="80" />
+          <button id="ten-mau-mac-dinh" class="nut icon" data-i18n-title="set.ten.macDinh"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+        </div>
+        <p class="goi-y" id="ten-vi-du"></p>
+        <p class="goi-y" data-i18n="set.ten.goiY"></p>
       </div>
     </section>
 

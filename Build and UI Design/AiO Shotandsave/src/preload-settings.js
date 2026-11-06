@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('settings', {
   openFolder: () => ipcRenderer.invoke('settings:open-folder'),
   /** Doi dinh dang/chat luong anh: { anhLoai, anhChatLuong }. */
   setAnh: (d) => ipcRenderer.invoke('settings:set-anh', d),
+  /** 06/11 Tu dat ten file theo noi dung: { tuDatTen?: bool, tenMau?: string }. Tra { tuDatTen, tenMau, tenViDu }. */
+  setTen: (d) => ipcRenderer.invoke('settings:set-ten', d),
   /** Doi kieu khay: 'ngang' | 'doc'. */
   setKhay: (kieu) => ipcRenderer.invoke('settings:set-khay', kieu),
   /** So anh tu dong nap vao khay: 0 | 5 | 10 | 20. */
