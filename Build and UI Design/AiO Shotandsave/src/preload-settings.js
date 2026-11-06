@@ -34,6 +34,10 @@ contextBridge.exposeInMainWorld('settings', {
   setAnNut: (ds) => ipcRenderer.invoke('settings:set-an-nut', ds),
   /** 05/11 Kinh lup khi chon vung: true | false. */
   setKinhLup: (bat) => ipcRenderer.invoke('settings:set-kinh-lup', !!bat),
+  /** 06/11 Tu chep anh vao clipboard khi bam Xong: true | false (mac dinh true). */
+  setTuChep: (bat) => ipcRenderer.invoke('settings:set-tu-chep', !!bat),
+  /** 06/11 Doi phim chup lai vung ('lai') / phim mo Canvas ('canvas'); '' = tat. Tra { ok, hotkey, lyDo? }. */
+  setHotkeyPhu: (loai, accel) => ipcRenderer.invoke('settings:set-hotkey-phu', loai, accel),
   /** Doi kieu lam mo: 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To kin, 04/10). */
   setLamMo: (kieu) => ipcRenderer.invoke('settings:set-lam-mo', kieu),
   /** Bat / tat mo cung Windows. Tra { hoTro, bat, biChan } doc lai tu Windows. */

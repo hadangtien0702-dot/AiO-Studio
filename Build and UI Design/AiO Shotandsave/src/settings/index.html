@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; img-src data:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
-  <title>AiO Shot & Save — Cài đặt</title>
+  <title>AiO Shot &amp; Save</title>
   <link rel="stylesheet" href="../../assets/tokens.css" />
   <link rel="stylesheet" href="settings.css" />
 </head>
@@ -19,11 +19,11 @@
       <span data-i18n="set.tieuDe">Cài đặt</span>
     </div>
     <div class="dieu-khien">
-      <div id="lang" class="lang" role="group" aria-label="Language">
+      <div id="lang" class="lang" role="group" data-i18n-aria="set.ngonNgu">
         <button data-lang="vi" class="lang-nut">VI</button>
         <button data-lang="en" class="lang-nut">EN</button>
       </div>
-      <button id="close" class="dong" aria-label="Close">
+      <button id="close" class="dong" data-i18n-aria="set.dong">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
@@ -59,7 +59,7 @@
     <h2 class="nhom-ten" data-i18n="set.nhom.chup">Chụp ảnh</h2>
     <section class="nhom">
       <div class="hang">
-        <span class="nhan-chon" data-i18n="set.phim.tieuDe">Phím tắt</span>
+        <span class="nhan-chon" data-i18n="set.phim.chup">Phím chụp</span>
         <div class="phai">
           <!-- idle: keycaps · recording: dong chu nhap nhay (nhan to hop = luu ngay) -->
           <div id="keys" class="keycaps" aria-live="polite"></div>
@@ -70,6 +70,39 @@
         </div>
       </div>
       <p id="msg" class="msg hang-msg"></p>
+      <div class="hang cot">
+        <span class="nhan-chon" data-i18n="set.phim.lai"></span>
+        <div class="phai">
+          <div id="keys-lai" class="keycaps" aria-live="polite"></div>
+          <button id="doi-lai" class="nut" data-i18n="set.phim.doiPhim"></button>
+          <button id="reset-lai" class="nut icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+          <button id="tat-lai" class="nut phu" data-i18n="set.phim.tat"></button>
+          <button id="huy-lai" class="nut phu" data-i18n="set.phim.huyNgan" hidden></button>
+        </div>
+      </div>
+      <p id="msg-lai" class="msg hang-msg"></p>
+      <div class="hang cot">
+        <span class="nhan-chon" data-i18n="set.phim.canvas"></span>
+        <div class="phai">
+          <div id="keys-canvas" class="keycaps" aria-live="polite"></div>
+          <button id="doi-canvas" class="nut" data-i18n="set.phim.doiPhim"></button>
+          <button id="reset-canvas" class="nut icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+          <button id="tat-canvas" class="nut phu" data-i18n="set.phim.tat"></button>
+          <button id="huy-canvas" class="nut phu" data-i18n="set.phim.huyNgan" hidden></button>
+        </div>
+      </div>
+      <p id="msg-canvas" class="msg hang-msg"></p>
+
+      <div class="hang">
+        <div class="nhan">
+          <span class="nhan-chon" data-i18n="set.tuChep"></span>
+          <span class="goi-y" data-i18n="set.tuChep.goiY"></span>
+        </div>
+        <div class="chon-nhom nho" id="tu-chep" role="group">
+          <button class="chon-nut" data-v="1" data-i18n="set.bat"></button>
+          <button class="chon-nut" data-v="0" data-i18n="set.tat2"></button>
+        </div>
+      </div>
 
       <div class="hang">
         <span class="nhan-chon" data-i18n="set.anh.dinhDang"></span>
@@ -106,7 +139,7 @@
           <button type="button" class="nut-chip chon" data-k="arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19 19 5M11 5h8v8"/></svg><span data-i18n="set.nut.arrow"></span></button>
           <button type="button" class="nut-chip chon" data-k="text"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6h14M12 6v13M9 19h6"/></svg><span data-i18n="set.nut.text"></span></button>
           <button type="button" class="nut-chip chon" data-k="blur"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="7" y="8" width="3.4" height="3.4" fill="currentColor" stroke="none"/><rect x="13.6" y="8" width="3.4" height="3.4" fill="currentColor" stroke="none"/><rect x="10.3" y="11.4" width="3.4" height="3.4" fill="currentColor" stroke="none"/></svg><span data-i18n="set.nut.blur"></span></button>
-          <button type="button" class="nut-chip chon" data-k="ocr"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8h8M7 12h10M7 16h6"/></svg><span data-i18n="set.nut.ocr"></span></button>
+          <button type="button" class="nut-chip chon" data-k="ocr"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8h8M7 12h10M7 16h6"/></svg><span id="chip-ocr-nhan" data-i18n="set.nut.ocrChi"></span></button>
           <button type="button" class="nut-chip chon" data-k="so"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span data-i18n="set.nut.so"></span></button>
           <button type="button" class="nut-chip chon" data-k="but"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg><span data-i18n="set.nut.but"></span></button>
           <button type="button" class="nut-chip chon" data-k="cuon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h-6a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h6"/><path d="M18 14v7"/><path d="M18 3v7"/><path d="M15 18l3 3l3 -3"/><path d="M15 6l3 -3l3 3"/></svg><span data-i18n="set.nut.cuon"></span></button>

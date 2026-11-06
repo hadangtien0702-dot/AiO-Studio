@@ -24,6 +24,9 @@
     @keyframes nhay { 50% { opacity: .4; } }
     #gio { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 30px; }
     #loa { display: none; color: var(--text-3); flex: none; }
+    /* 06/11 chup cuon: dong huong dan "Lan chuot xuong, bam Xong khi xong" (chi hien khi main truyen ?goiY=...) */
+    #goi-y { font-weight: 500; color: var(--text-2); flex: none; }
+    #goi-y:empty { display: none; }
     body.tieng #loa { display: block; }
     .chia { width: 1px; height: 14px; background: rgb(255 255 255 / 14%); flex: none; }
     #dung {
@@ -41,7 +44,7 @@
   <div id="thuoc">
     <span id="rec"></span><span id="gio">0:00</span>
     <svg id="loa" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
-    <span class="chia"></span>
+    <span id="goi-y"></span><span class="chia"></span>
     <button id="dung" type="button"><i></i><span id="dung-chu">Dừng</span></button>
   </div>
   <script src="quay.js"></script>

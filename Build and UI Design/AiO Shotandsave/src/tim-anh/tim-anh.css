@@ -43,6 +43,8 @@ img { -webkit-user-drag: none; }
 #viewport::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 .trong { margin: 56px auto; max-width: 420px; text-align: center; font-size: 12.5px; line-height: 1.5; color: var(--text-3); }
 .trong[hidden] { display: none; }
+#chup-ngay-ta { display: block; margin: calc(-1 * var(--sp-4)) auto 0; }
+#chup-ngay-ta[hidden] { display: none; }
 
 #luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--sp-3); }
 .the { background: var(--bg-2); border: 1px solid var(--line-1); border-radius: var(--r-lg); overflow: hidden; cursor: pointer; transition: border-color var(--dur) var(--ease); outline: none; }

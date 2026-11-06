@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld('shelf', {
   clear: () => ipcRenderer.send('shelf:clear'),
   openFolder: () => ipcRenderer.send('shelf:open-folder'),
   openStoryboard: () => ipcRenderer.send('shelf:open-storyboard'),
+  chupNgay: () => ipcRenderer.send('chup-ngay'), // 06/11: nut "Chup ngay" o trang trong cua khay
   openVideo: () => ipcRenderer.send('shelf:open-video'), // 01/10 khay video
   hide: () => ipcRenderer.send('shelf:hide'),
 

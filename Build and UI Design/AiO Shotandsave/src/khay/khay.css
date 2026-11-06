@@ -9,5 +9,9 @@
 .tab-dem { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-3); }
 #tab .chon-nut.active .tab-dem { color: var(--accent-text); }
 
+/* 06/11: trang trong = cau + nut "Chup ngay" (nut chinh duy nhat cua trang) */
+.trong p { margin: 0; }
+.trong .chup-ngay { margin-top: var(--sp-4); }
+
 /* CANH BAO (so loi app "CSS de len co che AN"): the dang an phai an that, ke ca khi sau nay co luat display theo id */
 .tab-than[hidden] { display: none !important; }

@@ -30,6 +30,20 @@
     khungCuon.scrollTop = cuon[ten] || 0
   }
 
+  /* 06/11 TRANG TRONG: noi DUNG phim chup dang dat (khong phai phim mac dinh) + nut Chup ngay. Ve ngay voi cum "phim chup" chung chung,
+     roi thay bang phim that khi main tra loi (tranh nhay chu "{phim}" thua luc nap). */
+  const dienPhim = (phim) => {
+    document.querySelectorAll('[data-phim]').forEach((el) => {
+      el.textContent = window.i18n.t(el.getAttribute('data-i18n'), { phim: phim || window.i18n.t('phim.chungChung') })
+    })
+  }
+  document.title = window.i18n.t('win.khayGop')
+  document.addEventListener('DOMContentLoaded', () => {
+    dienPhim('')
+    try { window.hotkeyInfo.lay().then((r) => dienPhim(r && r.chup)).catch(() => {}) } catch (e) {}
+  })
+  document.querySelectorAll('.chup-ngay').forEach((b) => b.addEventListener('click', () => { try { window.hotkeyInfo.chupNgay() } catch (e) {} }))
+
   const dau = new URLSearchParams(location.search).get('tab')
   document.body.dataset.tab = '' // chua co the nao "cu" o lan chon dau
   chonThe(dau === 'video' ? 'video' : 'dai')

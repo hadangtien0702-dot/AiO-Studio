@@ -31,8 +31,16 @@ if (emptyEl) {
   chip.textContent = window.i18n.hotkey || ''
   const txt2 = document.createElement('span')
   txt2.textContent = t('khay.trong2')
-  emptyEl.append(txt1, chip, txt2)
+  // 06/11: cau + phim chup dang dat tren MOT dong, nut "Chup ngay" ngay duoi (nguoi moi bam duoc ngay, khong can nho phim)
+  const dong = document.createElement('span')
+  dong.className = 'dong-chu'
+  dong.append(txt1, chip, txt2)
+  const nut = document.createElement('button')
+  nut.type = 'button'; nut.className = 'chup-ngay'; nut.textContent = t('chup.ngay')
+  nut.addEventListener('click', () => window.shelf.chupNgay())
+  emptyEl.append(dong, nut)
 }
+document.title = t('win.khay')
 
 /** Ve mot o anh vao dau day (moi nhat ben trai). */
 function themO(item) {

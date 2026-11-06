@@ -8,6 +8,11 @@ document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el
 document.querySelectorAll('[data-i18n-title]').forEach((el) => { const s = t(el.getAttribute('data-i18n-title')); el.title = s; el.setAttribute('aria-label', s) })
 document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => { el.placeholder = t(el.getAttribute('data-i18n-placeholder')) })
 document.documentElement.lang = window.i18n ? window.i18n.lang : 'vi'
+document.title = t('win.timAnh')
+/* 06/11: kho trong -> cau noi DUNG phim chup dang dat + nut Chup ngay (phim lay 1 lan khi mo; chua co thi noi "phim chup") */
+const phimSan = (window.hotkeyInfo ? window.hotkeyInfo.lay().then((r) => (r && r.chup) || '').catch(() => '') : Promise.resolve(''))
+const nutChupNgay = $('chup-ngay-ta')
+if (nutChupNgay) nutChupNgay.addEventListener('click', () => { try { window.hotkeyInfo.chupNgay() } catch (e) {} })
 
 let loai = 'tat-ca', ngay = 'moi', henTim = null, soLanTim = 0, trangThai = null
 const urls = new Map() // duong -> blob url (thumbnail da nap)
@@ -101,8 +106,11 @@ async function tim() {
   demKq.title = kq.ms + ' ms'
   if (!kq.ds.length) {
     trong.hidden = false
-    trong.textContent = trangThai && trangThai.tong === 0 ? t('ta.trongKho') : t('ta.chuaCo')
-  } else trong.hidden = true
+    const khoTrong = !!trangThai && trangThai.tong === 0
+    trong.textContent = khoTrong ? t('ta.trongKho', { phim: (await phimSan) || t('phim.chungChung') }) : t('ta.chuaCo')
+    if (lan !== soLanTim) return
+    if (nutChupNgay) nutChupNgay.hidden = !khoTrong
+  } else { trong.hidden = true; if (nutChupNgay) nutChupNgay.hidden = true }
   if (kq.daCat) { trong.hidden = false; trong.textContent = t('ta.conNhieu', { n: kq.ds.length }) }
   hienTrangThai()
 }
