@@ -154,6 +154,15 @@ window.addEventListener('mouseup', () => {
   luuNgay()
 })
 
+/* Anh vua doi ten (tu dat ten): buoc dang giu duong dan cu doi sang moi; neu duong moi da co trong danh sach thi bo ban trung. */
+window.taiLieu.onDoiKhoa((cu, moi) => {
+  let co = false
+  buoc = buoc.filter((b) => { if (b.khoa === moi) { if (co) return false; co = true } return true })
+  for (const b of buoc) if (b.khoa === cu) { b.khoa = moi; b.ten = moi.split(/[\\/]/).pop() }
+  for (const k of khay) if (k.khoa === cu) k.khoa = moi
+  veAll(); luuNgay()
+})
+
 /* ── Nap du lieu tu main ─────────────────────────────────────────────── */
 async function nap() {
   const d = await window.taiLieu.lay()

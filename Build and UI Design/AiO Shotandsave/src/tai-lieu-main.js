@@ -33,6 +33,16 @@ function khoiTao(deps) {
   let win = null
   const rieng = new Map() // khoa -> { khoa, ten, thumb, w, h } cho anh them tu may
   const fileNhap = () => path.join(deps.thuMucDuLieu, 'nhap.json')
+  const khoaDuong = (p) => { const x = path.resolve(String(p)); return process.platform === 'win32' ? x.toLowerCase() : x }
+  /* 06/11 (Codex soat dot 3): anh vua doi ten (tu dat ten) — ban nhap + cua so dang mo van co the cam duong dan CU. doiKhoa nho "cu -> moi"
+     trong phien nay de luu nhap / xuat / nap lai luon dung ten moi (khong rot buoc, khong mat mo ta). */
+  const doiKhoa = new Map()
+  const giaiKhoa = (khoa) => {
+    if (typeof khoa !== 'string' || khoa.startsWith('ram:')) return khoa
+    let k = khoa
+    for (let n = 0; n < 20; n++) { const m = doiKhoa.get(khoaDuong(k)); if (!m || khoaDuong(m) === khoaDuong(k)) break; k = m }
+    return k
+  }
 
   const laCuaSoNay = (e) => win && !win.isDestroyed() && e.sender.id === win.webContents.id
 
@@ -42,7 +52,7 @@ function khoiTao(deps) {
       const j = JSON.parse(fs.readFileSync(fileNhap(), 'utf8'))
       return {
         tieuDe: typeof j.tieuDe === 'string' ? j.tieuDe.slice(0, 120) : '',
-        buoc: (Array.isArray(j.buoc) ? j.buoc : []).slice(0, TOI_DA_BUOC).filter((b) => b && typeof b.khoa === 'string').map((b) => ({ khoa: b.khoa.slice(0, 1000), moTa: typeof b.moTa === 'string' ? b.moTa.slice(0, 200) : '' })),
+        buoc: (Array.isArray(j.buoc) ? j.buoc : []).slice(0, TOI_DA_BUOC).filter((b) => b && typeof b.khoa === 'string').map((b) => ({ khoa: giaiKhoa(b.khoa.slice(0, 1000)), moTa: typeof b.moTa === 'string' ? b.moTa.slice(0, 200) : '' })),
       }
     } catch (e) { return { tieuDe: '', buoc: [] } }
   }
@@ -50,7 +60,7 @@ function khoiTao(deps) {
     try {
       const tieuDe = d && typeof d.tieuDe === 'string' ? d.tieuDe.slice(0, 120) : ''
       const buoc = (d && Array.isArray(d.buoc) ? d.buoc : []).slice(0, TOI_DA_BUOC).filter((b) => b && typeof b.khoa === 'string' && !b.khoa.startsWith('ram:'))
-        .map((b) => ({ khoa: b.khoa.slice(0, 1000), moTa: typeof b.moTa === 'string' ? b.moTa.slice(0, 200) : '' })) // anh chua luu (ram:) khong ghi nho qua lan mo app
+        .map((b) => ({ khoa: giaiKhoa(b.khoa.slice(0, 1000)), moTa: typeof b.moTa === 'string' ? b.moTa.slice(0, 200) : '' })) // anh chua luu (ram:) khong ghi nho qua lan mo app
       fs.mkdirSync(deps.thuMucDuLieu, { recursive: true })
       ghiBen(fileNhap(), JSON.stringify({ v: 1, tieuDe, buoc }))
       return true
@@ -155,6 +165,55 @@ function khoiTao(deps) {
     }
   }
 
+  /* ── xuat Markdown: anh nam trong thu muc `<ten>_anh` canh file .md ──
+     06/11 (Codex soat dot 3): (1) KHONG BAO GIO ghi de file khong phai cua minh: gap ten anh da co (anh nguon vua nhap, tai lieu khac)
+     thi doi sang thu muc `<ten>_anh_2`, `_3`... (2) xuat lai cung file .md: anh do CHINH luot truoc ghi ra (xuat-md.json) ma buoc moi
+     khong dung nua thi bi go — khong de anh da bo (co the chua thong tin rieng) nam lai trong thu muc dem gui di. */
+  const fileXuatMd = () => path.join(deps.thuMucDuLieu, 'xuat-md.json')
+  function docXuatMd() {
+    try { const j = JSON.parse(fs.readFileSync(fileXuatMd(), 'utf8')); return j && j.v === 1 && j.ds && typeof j.ds === 'object' ? j.ds : {} } catch (e) { return {} }
+  }
+  function luuXuatMd(ds) {
+    const khoa = Object.keys(ds)
+    if (khoa.length > 60) for (const k of khoa.slice(0, khoa.length - 60)) delete ds[k]
+    fs.mkdirSync(deps.thuMucDuLieu, { recursive: true })
+    ghiBen(fileXuatMd(), JSON.stringify({ v: 1, ds }))
+  }
+  function ghiMarkdown(dich, tieuDe, lang, dau) {
+    const ten = path.basename(dich, path.extname(dich))
+    const dirMd = path.dirname(dich)
+    const ds = docXuatMd()
+    const kd = khoaDuong(dich)
+    const truoc = Array.isArray(ds[kd]) ? ds[kd].filter((x) => typeof x === 'string') : []
+    const cuaTruoc = new Set(truoc.map(khoaDuong))
+    const buocMd = dau.map((x) => ({ moTa: x.moTa, mime: x.mime }))
+    let thuMucAnh = ten + '_anh', dirAnh = null, res = null
+    for (let lan = 1; lan < 100; lan++) {
+      if (lan > 1) thuMucAnh = ten + '_anh_' + lan
+      res = xuatLib.taoMarkdown({ tieuDe, lang, thuMucAnh, buoc: buocMd })
+      dirAnh = path.join(dirMd, thuMucAnh)
+      const dung = res.tenAnh.some((n) => { const f = path.join(dirAnh, n); return fs.existsSync(f) && !cuaTruoc.has(khoaDuong(f)) })
+      if (!dung) break
+      res = null
+    }
+    if (!res) throw new Error('khong tim duoc thu muc anh trong de ghi')
+    const moi = res.tenAnh.map((n) => path.join(dirAnh, n))
+    const setMoi = new Set(moi.map(khoaDuong))
+    ds[kd] = Array.from(new Set(truoc.concat(moi))) // ghi danh sach TRUOC khi ghi anh: tat dien giua chung van biet file nao la cua minh
+    luuXuatMd(ds)
+    fs.mkdirSync(dirAnh, { recursive: true })
+    dau.forEach((x, i) => { fs.writeFileSync(moi[i], x.buf) })
+    ghiBen(dich, res.md)
+    for (const f of truoc) {
+      if (setMoi.has(khoaDuong(f))) continue
+      try { fs.unlinkSync(f) } catch (e) { if (e && e.code !== 'ENOENT') log('tai-lieu: KHONG go duoc anh cu ' + path.basename(f) + ': ' + e.code) }
+      try { fs.rmdirSync(path.dirname(f)) } catch (e) {} // chi go duoc khi thu muc da RONG
+    }
+    ds[kd] = moi
+    luuXuatMd(ds)
+    return Buffer.byteLength(res.md)
+  }
+
   /** d = { kieu, tieuDe, buoc: [{ khoa, moTa }] } -> { ok, duong, ten, soBuoc } | { huy: true } | { ok: false, loi } */
   async function xuat(d) {
     try {
@@ -164,7 +223,7 @@ function khoiTao(deps) {
       let khongDoc = 0
       for (const b of (Array.isArray(d.buoc) ? d.buoc : []).slice(0, TOI_DA_BUOC)) {
         if (!b || typeof b.khoa !== 'string') continue
-        const x = docByte(b.khoa)
+        const x = docByte(giaiKhoa(b.khoa))
         if (x) dau.push(Object.assign({ moTa: String(b.moTa == null ? '' : b.moTa).slice(0, 200) }, x)); else khongDoc++
       }
       if (!dau.length && !khongDoc) return { ok: false, loi: T('tl.thieuBuoc') }
@@ -178,14 +237,7 @@ function khoiTao(deps) {
       fs.mkdirSync(path.dirname(dich), { recursive: true })
       let ghi = 0
       if (kieu === 'md') {
-        const ten = path.basename(dich, path.extname(dich))
-        const thuMucAnh = ten + '_anh'
-        const { md, tenAnh } = xuatLib.taoMarkdown({ tieuDe, lang, thuMucAnh, buoc: dau.map((x) => ({ moTa: x.moTa, mime: x.mime })) })
-        const dirAnh = path.join(path.dirname(dich), thuMucAnh)
-        fs.mkdirSync(dirAnh, { recursive: true })
-        dau.forEach((x, i) => { fs.writeFileSync(path.join(dirAnh, tenAnh[i]), x.buf) })
-        ghiBen(dich, md)
-        ghi = Buffer.byteLength(md)
+        ghi = ghiMarkdown(dich, tieuDe, lang, dau)
       } else {
         const nhung = []
         for (const x of dau) { const n = await banNhung(x); nhung.push({ moTa: x.moTa, mime: n.mime, base64: n.base64 }) }
@@ -198,6 +250,29 @@ function khoiTao(deps) {
       log('tai-lieu: xuat LOI ' + ((e && e.stack) || e))
       return { ok: false, loi: (e && e.message) || String(e) }
     }
+  }
+
+  /** File anh vua doi ten (cu -> moi): ban nhap, anh them tu may, cua so dang mo. Tra so buoc ban nhap da doi. */
+  function doiTen(cu, moi) {
+    if (typeof cu !== 'string' || typeof moi !== 'string' || !cu || !moi) return 0
+    const kc = khoaDuong(cu)
+    if (kc === khoaDuong(moi)) return 0
+    let doi = 0
+    try {
+      const nhap = docNhap() // doc TRUOC khi nho "cu -> moi": docNhap tu giai khoa nen neu nho truoc se khong thay buoc nao can ghi lai
+      const buoc = nhap.buoc.map((b) => {
+        if (!b.khoa.startsWith('ram:') && khoaDuong(b.khoa) === kc) { doi++; return { khoa: moi, moTa: b.moTa } }
+        return b
+      })
+      doiKhoa.set(kc, moi)
+      if (doi) luuNhap({ tieuDe: nhap.tieuDe, buoc })
+    } catch (e) { doiKhoa.set(kc, moi); log('tai-lieu: doiTen LOI ' + ((e && e.message) || e)) }
+    for (const [k, v] of Array.from(rieng.entries())) {
+      if (khoaDuong(k) !== kc) continue
+      rieng.delete(k); rieng.set(moi, Object.assign({}, v, { khoa: moi, ten: path.basename(moi) }))
+    }
+    if (win && !win.isDestroyed()) { try { win.webContents.send('tl:doi-khoa', cu, moi) } catch (e) {} }
+    return doi
   }
 
   /* ── IPC ── */
@@ -250,7 +325,7 @@ function khoiTao(deps) {
     return win
   }
 
-  return { mo, cuaSo: () => win, xuat, lay, luuNhap, docByte }
+  return { mo, cuaSo: () => win, xuat, lay, luuNhap, docByte, doiTen }
 }
 
 module.exports = { khoiTao }

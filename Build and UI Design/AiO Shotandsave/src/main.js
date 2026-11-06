@@ -35,7 +35,7 @@ const luatMain = require('./luat-main') // 06/11: luat nho tach ra de do duoc (d
 const suaVideo = require('./sua-video') // 06/11: man Sua video (cat dau cuoi · tu phong to theo con tro · nen va khung) mo tu Khay video
 const conTroQuay = require('./con-tro-quay') // 06/11: vi tri con tro luc quay -> file phu cho "Tu phong to theo con tro" (man Sua video)
 const thoatAnToan = require('./thoat-an-toan') // 06/11: thoat app giua luc quay video khong duoc mat doan dang quay
-const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
+const { taoBanKhongTieng, coDuongTieng, sachTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
 const chupCuonLib = require('./chup-cuon') // 06/10: chup cuon trang dai (bo ghep + vong lap mot phien)
 const { pathToFileURL } = require('url')
@@ -2638,6 +2638,10 @@ function apDungDoiTen(cu, moi, chu) {
   }
   for (const rec of pins.values()) if (rec.filePath && khoaDuongDan(rec.filePath) === kc) rec.filePath = moi
   if (timAnh) timAnh.chiMuc.doiTen(cu, moi, chu)
+  /* 06/11 (Codex soat dot 3): lop sua (net ve + anh sach) va ban nhap tai lieu cung dang giu ten cu: chuyen sang ten moi,
+     khong thi anh moi khong mo sua tiep duoc va tai lieu rot buoc + mat mo ta. */
+  try { const kq = lopSua.doiTen(cu, moi); if (kq && !kq.ok) ghiLog('doi ten: lop sua KHONG chuyen duoc (' + kq.loi + ')') } catch (e) { ghiLog('doi ten: lop sua LOI ' + e.message) }
+  try { if (taiLieu) taiLieu.doiTen(cu, moi) } catch (e) { ghiLog('doi ten: tai lieu LOI ' + e.message) }
   canvasLamMoi()
 }
 const tuDatTen = tuDatTenMod.taoTuDatTen({
@@ -3151,6 +3155,11 @@ async function khoiPhucVideoDo() {
       }
       if (go) ghiLog('video gif: go ' + go + ' file GIF ghi do (.gif.tam) cua lan chay truoc')
     }
+    /* 06/11: file xuat do cua man Sua video (`<video>-da-sua.mp4.tam`) — tat app giua luc xuat. Khong dung khi dang co viec xuat. */
+    if (!suaVideo.dangBan()) {
+      const sd = khoVideo.donTamSua(thuMuc)
+      if (sd.go.length || sd.loi.length) ghiLog('sua-video: go ' + sd.go.length + ' file xuat do (.tam) cua lan chay truoc' + (sd.loi.length ? ', KHONG go duoc ' + sd.loi.join('; ') : ''))
+    }
     if (doi.length) baoVideo('quay.daKhoiPhuc', null, { n: doi.length })
   } catch (e) { ghiLog('video khoi phuc LOI: ' + ((e && e.stack) || e)) }
 }
@@ -3612,13 +3621,16 @@ ipcMain.on('shelf:open-video', () => openVideoWindow())
    Ban KHONG TIENG = file rieng nam canh ban goc, ten them "-khong-tieng" (src/mp4-bo-tieng.js: chep + doi ten hop
    tieng thanh 'free', khong nen lai hinh, 90 MB = 27 ms). Tao 1 lan khi nguoi dung chon, GIU tren dia (Premiere noi
    file theo duong dan — xoa di la mat lien ket). Lua chon ghi vao so (boTieng) nen mo lai khay van nho. */
-function banKhongTieng(m) { return m && m.fileKhongTieng && fs.existsSync(m.fileKhongTieng) ? m.fileKhongTieng : null }
+/* banKhongTiengCo: file ban Khong tieng CON TREN DIA (de xoa / tinh dung luong / ghi de). banKhongTieng: chi tra file khi no THAT SU
+   khong con tieng (06/11: ban tao truoc lan sua chi doi ten hop, du lieu tieng van nam trong file -> khong dung lai, tao lai). */
+function banKhongTiengCo(m) { return m && m.fileKhongTieng && fs.existsSync(m.fileKhongTieng) ? m.fileKhongTieng : null }
+function banKhongTieng(m) { const f = banKhongTiengCo(m); return f && sachTieng(f) ? f : null }
 /* 06/10 ban GIF: file `.gif` cung ten nam canh video, tao 1 lan khi nguoi dung chon GIF (src/xuat-gif.js), GIU tren dia. */
 function banGif(m) { return m && m.fileGif && fs.existsSync(m.fileGif) ? m.fileGif : null }
 function bytesGif(m) { const g = banGif(m); if (!g) return 0; try { return fs.statSync(g).size } catch (e) { return 0 } }
 /* File nguoi dung DANG CHON cua 1 video: dung khi keo tha ra ngoai va khi bam Mo thu muc. */
 function fileDangChon(m) { return (m.chonGif && banGif(m)) || (m.boTieng && banKhongTieng(m)) || m.file }
-function bytesSeXoa(m) { const k = banKhongTieng(m); let b = m.bytes; if (k) { try { b += fs.statSync(k).size } catch (e) {} } return b + bytesGif(m) }
+function bytesSeXoa(m) { const k = banKhongTiengCo(m); let b = m.bytes; if (k) { try { b += fs.statSync(k).size } catch (e) {} } return b + bytesGif(m) }
 /* Trang thai lua chon tra ve khay sau moi lan doi ban (Co tieng / Khong tieng / GIF) */
 function trangThaiBan(m) { return { ok: true, boTieng: !!(m.boTieng && banKhongTieng(m)), chonGif: !!(m.chonGif && banGif(m)), bytesGif: bytesGif(m), bytesXoa: bytesSeXoa(m) } }
 
@@ -3692,7 +3704,7 @@ ipcMain.handle('video:chon-tieng', (_e, id, coTieng) => {
   }
   let f = banKhongTieng(m)
   if (!f) {
-    f = m.file.replace(/\.mp4$/i, '') + '-khong-tieng.mp4'
+    f = banKhongTiengCo(m) || m.file.replace(/\.mp4$/i, '') + '-khong-tieng.mp4' // ban cu con tieng: ghi de len chinh no
     const t0 = Date.now()
     const r = taoBanKhongTieng(m.file, f)
     ghiLog('video bo tieng ' + id + ': ' + (r.ok ? 'xong ' + (Date.now() - t0) + ' ms, ' + r.soTraf + ' doan -> ' + f : 'LOI ' + r.loi))
@@ -3737,7 +3749,7 @@ ipcMain.handle('video:xoa', async (_e, id) => {
   /* 06/10 ECC soat: truoc day xoa ban GOC truoc, ban dan xuat sau -> ban goc da vao Thung rac ma GIF bi khoa thi tra loi,
      so con muc nhung hang bien khoi khay (file goc mat), GIF mo coi. Nay: ban DAN XUAT di truoc (hong thi ghi log, di tiep:
      chung tao lai duoc), ban GOC di sau cung; goc khong xoa duoc thi tra loi va so + file goc con nguyen de bam lai. */
-  for (const f of [banKhongTieng(m), banGif(m)]) { // ban khong tieng + ban GIF (neu da tao): nut Xoa ghi tong dung luong ca ba
+  for (const f of [banKhongTiengCo(m), banGif(m)]) { // ban khong tieng + ban GIF (neu da tao): nut Xoa ghi tong dung luong ca ba
     if (!f) continue
     try { await shell.trashItem(f) } catch (err) { ghiLog('video xoa ' + id + ': KHONG dua duoc ban dan xuat vao thung rac (' + f + '): ' + err.message) }
   }

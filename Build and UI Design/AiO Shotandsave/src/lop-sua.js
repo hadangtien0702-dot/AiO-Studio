@@ -141,6 +141,13 @@ function taoLopSua(thuMucDuLieu, ghiLog, opts) {
     return go
   }
 
+  /* Goi tu apDungDoiTen: anh khong co lop sua thi van la ok. */
+  function doiTen(cu, moi) {
+    if (!cu || !moi) return { ok: false, loi: 'thieu duong dan' }
+    if (!fs.existsSync(fJson(cu))) return { ok: true, khongCo: true }
+    return { ok: chuyen(cu, moi) }
+  }
+
   /* Don: mo coi (anh da bi xoa), qua han, qua tran. Tra so file da go. Thu muc anh chua gan (o dia roi) thi KHONG coi la anh da xoa. */
   function donDep(now) {
     let go = 0
@@ -194,7 +201,7 @@ function taoLopSua(thuMucDuLieu, ghiLog, opts) {
     return ghi(filePath, { shapes: lop.shapes, dpr: lop.dpr, dipW: lop.dipW, dipH: lop.dipH, sach: lop.sach ? bufferTuDataUrl(lop.sach) : null })
   }
 
-  return { dir, ghi, ghiTuLop, doc, xoa, chuyen, donDep, donMoCoi, tongByte }
+  return { dir, ghi, ghiTuLop, doc, xoa, chuyen, doiTen, donDep, donMoCoi, tongByte }
 }
 
 /* Chuyen dataURL PNG ve Buffer (hoac null). */

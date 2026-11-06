@@ -237,6 +237,12 @@ $('nut-xuat').addEventListener('click', async () => {
   try {
     r = await window.sua.xuat(du.id, { tuMs: tu, denMs: den, giuTieng: giuTieng && du.coTieng, zoom: { bat: zoomMuc !== 'tat', muc: zoomMuc === 'tat' ? 'vua' : zoomMuc }, nen })
   } catch (e) { r = { ok: false, loi: String(e && e.message || e) } }
+  xongViec(r)
+})
+/* Ket thuc viec xuat. Co hai nguon: loi tra ve cua `sua.xuat()` va su kien main gui thang (`onKetThuc`, cho truong hop trang nay duoc
+   nap lai giua luc xuat nen khong co loi goi nao de cho). Nguon den truoc thang; nguon den sau bi bo (da het khoa). */
+function xongViec(r) {
+  if (!dangXuat) return
   khoaGiaoDien(false)
   $('trang-thai').textContent = ''
   if (!r || !r.ok) {
@@ -249,7 +255,8 @@ $('nut-xuat').addEventListener('click', async () => {
   $('kq-ten').textContent = r.ten + ' · ' + t('sv.giay', { s: so((r.ms / 1000).toFixed(1)) }) + ' · ' + dungLuong(r.bytes)
   $('kq-ten').title = r.file
   $('ket-qua').hidden = false
-})
+}
+window.sua.onKetThuc((r) => xongViec(r))
 window.sua.onTienDo((p) => {
   $('tien-vach').style.width = Math.round(p * 100) + '%'
   $('trang-thai').textContent = t('sv.dangXuat', { p: Math.round(p * 100) })
