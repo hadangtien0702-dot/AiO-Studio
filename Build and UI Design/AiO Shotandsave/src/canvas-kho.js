@@ -35,7 +35,7 @@ const MAU = ['#f86820', '#2dd4bf', '#a78bfa', '#ffd65a', '#f472b6', '#4ade80']
 const O = { W: 184, H: 150, WD: 372, KC: 22, LE: 26 }                 // kich thuoc mot tam + khoang cach (don vi bang)
 const K0 = { W: 640, H: 400, X0: 40, Y0: 300, BX: 720, BY: 520, COT: 3, WMIN: 240, HMIN: 180 }
 const COT_NGOAI = 8
-const LA_ANH = /\.(png|jpe?g)$/i
+const LA_ANH = /\.(png|jpe?g|webp)$/i   // 06/11: them webp (anh Canvas hien bang the <img> cua Chromium, doc WebP binh thuong; anh nho do main giai ma)
 const LA_VIDEO = /\.mp4$/i
 const KY_TU_CAM = '\\/:*?"<>|'
 const TEN_DANH_RIENG = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i
@@ -555,4 +555,14 @@ function nhanDoiAnh(goc, khoa) {
   return { ok: true, khoa: ten }
 }
 
-module.exports = { khoiTao, tenHopLe, docBoCuc, ghiBoCuc, quet, dongBo, nap, boCucHienTai, luuViTri, luuVat, taoKhung, doiTenKhung, datThanhVien, xoaKhung, nhapFile, nhapBuf, nhanDoiAnh, khungChua, O, K0, MAU, kieuCua }
+/** 06/11 (tu dat ten file): ten file nay co dang nam trong so bo cuc khong (vi tri, khung, noi, nhan...)? Canvas luu vi tri theo TEN FILE,
+    nen doi ten mot tam da co mat tren bang la lam no mat vi tri. Dung chuoi thuan -> co mat o bat ky khoa nao (ten, k:<khung>/<ten>, noi) cung tinh. */
+function coThamChieuTen(ten) {
+  try {
+    const t = String(ten || '')
+    if (!t) return false
+    return JSON.stringify(boCucHienTai()).includes(JSON.stringify(t).slice(1, -1))
+  } catch (e) { return true } // khong doc duoc so: coi nhu CO (an toan hon)
+}
+
+module.exports = { coThamChieuTen, khoiTao, tenHopLe, docBoCuc, ghiBoCuc, quet, dongBo, nap, boCucHienTai, luuViTri, luuVat, taoKhung, doiTenKhung, datThanhVien, xoaKhung, nhapFile, nhapBuf, nhanDoiAnh, khungChua, O, K0, MAU, kieuCua }

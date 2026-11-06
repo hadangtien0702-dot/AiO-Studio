@@ -134,6 +134,23 @@ function datAnh(loai, chatLuong) {
   chonPill(clBox, chatLuong)
   // PNG luon lossless -> lam mo hang chat luong (khong ap dung)
   hangCL.classList.toggle('mo', loai === 'png')
+  // 06/11: nhan hang chat luong theo dinh dang (WebP co thang rieng, "Toi da" la lossless)
+  const nhan = document.getElementById('nhan-chat-luong')
+  if (nhan) nhan.textContent = t(loai === 'webp' ? 'set.anh.chatLuongWebp' : 'set.anh.chatLuong')
+  hangCL.title = loai === 'webp' ? t('set.anh.webpLuuY') : ''
+}
+
+/* 06/11: tu dat ten file theo noi dung anh (mac dinh TAT) */
+const tenTuDatBox = document.getElementById('ten-tu-dat')
+const tenMauEl = document.getElementById('ten-mau')
+const tenViDuEl = document.getElementById('ten-vi-du')
+const hangTenMau = document.getElementById('hang-ten-mau')
+function datTen(s) {
+  if (!tenTuDatBox) return
+  chonPill(tenTuDatBox, s.tuDatTen ? '1' : '0')
+  hangTenMau.classList.toggle('mo', !s.tuDatTen)
+  if (document.activeElement !== tenMauEl) tenMauEl.value = s.tenMau || ''
+  if (s.tenViDu) tenViDuEl.textContent = t('set.ten.xemTruoc') + ': ' + s.tenViDu
 }
 
 /* 04/11: ve cong tac Mo cung Windows theo trang thai THAT doc tu Windows. Khong ho tro (ban nguon, Mac) thi an ca nhom. */
@@ -151,6 +168,7 @@ async function load() {
   hotkey = s.hotkey
   datFolder(s.saveFolder)
   datAnh(s.anhLoai, s.anhChatLuong)
+  datTen(s)
   chonPill(khayBox, s.khayKieu)
   chonPill(khaySoAnhBox, String(typeof s.khaySoAnh === 'number' ? s.khaySoAnh : 5))
   if (khayTuThuBox) chonPill(khayTuThuBox, String(s.khayTuThu === 0 ? 0 : (s.khayTuThu || 5)))   // 0 = Khong thu
@@ -189,6 +207,21 @@ clBox.addEventListener('click', async (e) => {
   chonPill(clBox, b.dataset.v)
   await window.settings.setAnh({ anhChatLuong: b.dataset.v })
 })
+
+/* ── Ten file tu dat (06/11) ──────────────────────────────────────────── */
+if (tenTuDatBox) {
+  tenTuDatBox.addEventListener('click', async (e) => {
+    const b = e.target.closest('.chon-nut')
+    if (!b || b.classList.contains('chon')) return
+    datTen(Object.assign(await window.settings.setTen({ tuDatTen: b.dataset.v === '1' }), {}))
+  })
+  const luuMau = async () => { datTen(await window.settings.setTen({ tenMau: tenMauEl.value })) }
+  tenMauEl.addEventListener('change', luuMau)
+  tenMauEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); tenMauEl.blur() } })
+  const nutMD = document.getElementById('ten-mau-mac-dinh')
+  nutMD.title = t('set.ten.macDinh')
+  nutMD.addEventListener('click', async () => { datTen(await window.settings.setTen({ tenMau: '' })) })
+}
 
 /* ── Kieu khay + So anh nap vao khay ─────────────────────────────────── */
 khayBox.addEventListener('click', async (e) => {

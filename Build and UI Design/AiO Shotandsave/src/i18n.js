@@ -839,6 +839,9 @@ const DICH = {
   },
 }
 
+// 06/11: chuoi cua vung LUU FILE VA XUAT (WebP, tu dat ten, tai lieu tung buoc) o file rieng
+{ const m = require('./i18n-luu-xuat'); Object.assign(DICH.vi, m.vi); Object.assign(DICH.en, m.en) }
+
 function t(lang, key) {
   const bang = DICH[lang] || DICH.vi
   return bang[key] != null ? bang[key] : (DICH.vi[key] != null ? DICH.vi[key] : key)

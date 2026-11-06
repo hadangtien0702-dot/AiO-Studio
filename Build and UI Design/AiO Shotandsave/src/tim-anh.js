@@ -21,7 +21,7 @@ const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
 
-const DUOI_ANH = /\.(png|jpe?g|gif)$/i
+const DUOI_ANH = /\.(png|jpe?g|gif|webp)$/i // 06/11: them webp
 const DUOI_VIDEO = /\.(mp4|webm|mov|m4v)$/i
 const TIEN_TO_DAI = 'shotandsave-storyboard-'
 const TUOI_TOI_THIEU_MS = 3000 // file vua ghi < 3 s: de yen, tranh doc nua chung
@@ -275,6 +275,23 @@ function taoChiMuc(opts) {
 
   function lay(duong) { return muc.get(duong) || null }
 
+  /* 06/11 (tu dat ten file): file vua DOI TEN -> chuyen muc cu sang ten moi, GIU chu da doc (khong doc lai) va nhan chu moi tu
+     buoc tu dat ten (neu co). Doi ten giu nguyen gio sua + dung luong; thieu muc cu (quet chua kip thay) thi tao muc moi da doc.
+     Chay dong bo ngay sau khi file doi ten nen quet() khong chen vao giua. Tra true neu co muc moi. */
+  function doiTen(cu, moi, chuMoi) {
+    try {
+      const st = fs.statSync(moi)
+      const ten = path.basename(moi)
+      const m = muc.get(cu)
+      muc.delete(cu)
+      const chu = typeof chuMoi === 'string' && chuMoi.trim() ? chuMoi.replace(/\s+/g, ' ').trim() : (m ? m.chu : '')
+      const da = !!(m && m.da) || !!chu
+      muc.set(moi, { ten, mt: Math.round(st.mtimeMs), kt: st.size, loai: loaiCuaFile(ten), da, chu, n: chuanHoa(chu), thu: 0, sauLuc: 0, loi: '' })
+      luuSau()
+      return true
+    } catch (e) { log('tim-anh doiTen LOI ' + e.message); return false }
+  }
+
   function dungHet() {
     dung = true
     clearInterval(hen); hen = null
@@ -284,7 +301,7 @@ function taoChiMuc(opts) {
   function demChu() { let n = 0; for (const m of muc.values()) n += (m.chu || '').length; return n }
 
   nap()
-  return { quet, batDau, vong, tim, lay, luu, trangThai, datTamDung, dungHet, thongKe, demChu,
+  return { quet, batDau, vong, tim, lay, luu, trangThai, datTamDung, dungHet, thongKe, demChu, doiTen,
     _muc: muc, _fileChiMuc: fileChiMuc, goc: () => goc }
 }
 
@@ -302,8 +319,8 @@ function dangKy(ctx) {
   let win = null
 
   async function docAnhThat(file) {
-    let img = nativeImage.createFromPath(file)
-    if (img.isEmpty()) return { ok: false, loi: 'khong mo duoc anh' }
+    let img = ctx.kho.docAnhFile ? await ctx.kho.docAnhFile(file) : nativeImage.createFromPath(file) // 06/11: co ca WebP
+    if (!img || img.isEmpty()) return { ok: false, loi: 'khong mo duoc anh' }
     const s = img.getSize()
     const k = Math.min(1, Math.sqrt(TRAN_DIEM_ANH / Math.max(1, s.width * s.height)))
     if (k < 1) img = img.resize({ width: Math.max(1, Math.round(s.width * k)), height: Math.max(1, Math.round(s.height * k)), quality: 'good' })
@@ -357,8 +374,8 @@ function dangKy(ctx) {
     try { img = await nativeImage.createThumbnailFromPath(duong, { width: 360, height: 240 }) } catch (e) { img = null }
     if (!img || img.isEmpty()) {
       if (m.loai === 'video') return null
-      const g = nativeImage.createFromPath(duong)
-      if (g.isEmpty()) return null
+      const g = ctx.kho.docAnhFile ? await ctx.kho.docAnhFile(duong) : nativeImage.createFromPath(duong) // 06/11: WebP khong doc duoc bang nativeImage
+      if (!g || g.isEmpty()) return null
       img = g.resize({ height: 240, quality: 'good' })
     }
     const buf = img.toJPEG(78)
@@ -429,10 +446,10 @@ function dangKy(ctx) {
   ipcMain.handle('tim-anh:trang-thai', () => chiMuc.trangThai())
   ipcMain.handle('tim-anh:tam-dung', (_e, b) => { chiMuc.datTamDung(b); return chiMuc.trangThai() })
   ipcMain.handle('tim-anh:lam-moi', () => { chiMuc.quet(); chiMuc.vong(); return chiMuc.trangThai() })
-  ipcMain.on('tim-anh:ghim', (_e, duong) => {
+  ipcMain.on('tim-anh:ghim', async (_e, duong) => {
     if (!ghimDuoc(duong) || !fs.existsSync(duong)) return
-    const img = nativeImage.createFromPath(duong)
-    if (img.isEmpty()) return
+    const img = ctx.kho.docAnhFile ? await ctx.kho.docAnhFile(duong) : nativeImage.createFromPath(duong) // 06/11: co ca WebP
+    if (!img || img.isEmpty()) return
     const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
     const sc = d.scaleFactor || 1
     const size = img.getSize()

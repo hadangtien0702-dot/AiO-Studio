@@ -39,10 +39,14 @@ const cheTM = require('./che-tm-main') // 05/11: che thong minh - doc chu kem to
 const ocr = require('./ocr') // 29/09: doc chu trong vung khoanh (phim 5) bang bo doc CO SAN cua Windows / macOS
 const timAnhMod = require('./tim-anh') // 05/11: Tim lai anh cu (chi muc chu trong userData)
 let timAnh = null
+let taiLieu = null // 06/11: cua so xuat tai lieu tung buoc (tao luc app ready)
+const webpMod = require('./webp') // 06/11: ma hoa / giai ma WebP qua cua so an (nativeImage khong doc / ghi duoc WebP)
+const tuDatTenMod = require('./tu-dat-ten') // 06/11: tu dat ten file theo noi dung anh (mac dinh TAT)
+const taiLieuMod = require('./tai-lieu-main') // 06/11: xuat tai lieu tung buoc tu anh trong khay
 const os = require('os')
 const { taoCapNhat } = require('./cap-nhat') // 05/11: bao co ban moi (xem dau src/cap-nhat.js)
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
-const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
+const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay, napDanhSach } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
@@ -451,6 +455,14 @@ app.whenReady().then(() => {
   timAnh = timAnhMod.dangKy({ app, ipcMain, BrowserWindow, screen, shell, nativeImage, ocr, daoNeuNenToi, createPinWindow, ghiLog, kho,
     thuMucDuLieu: path.join(app.getPath('userData'), 'tim-anh'), dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh, tieuDe: T('tray.timAnh') })
   setTimeout(() => { if (timAnh) timAnh.batDau() }, 45000) // doc chu nen bat dau sau khi app yen (45 s)
+  webpMod.noiLog((m) => ghiLog(m))
+  if (layDinhDangAnh().loai === 'webp') setTimeout(() => webpMod.lamNong(), 4000) // mo san cua so ma hoa de lan chup dau khong phai cho
+  taiLieu = taiLieuMod.khoiTao({
+    ipcMain, BrowserWindow, screen, dialog, shell, nativeImage, app, kho, ghiLog: (m) => ghiLog(m),
+    icon: path.join(__dirname, '..', 'assets', 'app.ico'), moiDesktop, lang: () => lang,
+    layKhay: () => [...shelfItems.values()], thuMucDuLieu: path.join(app.getPath('userData'), 'tai-lieu'),
+    batDauKeo, keoDen, ketThucKeo,
+  })
   khoiTaoBanQuyen()
   khoiTaoCapNhat()
   createTray()
@@ -578,6 +590,7 @@ app.on('will-quit', () => {
   globalShortcut.unregisterAll()
   ocr.tatHost() // tien trinh PowerShell doc chu (neu dang giu san)
   if (timAnh) timAnh.luuVaDung()
+  webpMod.tat() // cua so an ma hoa / giai ma WebP
   khayThu.dongHet() // nut tron + san dien cua khay
 })
 
@@ -734,11 +747,15 @@ function setHotkey(accel) {
 // Anh Tien 26/08: "basic nhat cung phai ~100KB" — nang toan bo thang chat luong.
 // Do that vung 1200x700 man 4K: q95~101KB, nen thap=95, cao=98, sieu=100.
 const CHAT_LUONG_Q = { thap: 95, cao: 98, sieu: 100 }
+/* 06/11 WebP: cung 3 muc chat luong. Do (scripts/test/do-webp.cjs + bang ben duoi): thap 0,85 · cao 0,95 · sieu 1 = LOSSLESS cua Chromium.
+   Anh chup man hinh (chu, nen phang) lossless NHE HON ca JPEG q100 hang chuc lan; anh nhieu hat (phong canh) lossless ~ PNG. */
+const CHAT_LUONG_WEBP = { thap: 0.85, cao: 0.95, sieu: 1 }
 function layDinhDangAnh() {
   const c = kho.docCauHinh()
-  const loai = c.anhLoai === 'png' ? 'png' : 'jpeg'
+  const loai = c.anhLoai === 'png' ? 'png' : c.anhLoai === 'webp' ? 'webp' : 'jpeg'
   const q = CHAT_LUONG_Q[c.anhChatLuong] || CHAT_LUONG_Q.cao
-  return { loai, q }
+  const qWebp = CHAT_LUONG_WEBP[c.anhChatLuong] || CHAT_LUONG_WEBP.cao
+  return { loai, q, qWebp }
 }
 
 /* --- Cua so Cai dat --- */
@@ -818,8 +835,9 @@ ipcMain.handle('settings:get', () => {
   return {
     hotkey: currentHotkey, def: DEFAULT_HOTKEY, isMac: process.platform === 'darwin',
     saveFolder: kho.thuMucAnh(), lang, version: app.getVersion(),
-    anhLoai: c.anhLoai === 'png' ? 'png' : 'jpeg',
+    anhLoai: c.anhLoai === 'png' ? 'png' : c.anhLoai === 'webp' ? 'webp' : 'jpeg',
     anhChatLuong: CHAT_LUONG_Q[c.anhChatLuong] ? c.anhChatLuong : 'cao',
+    ...thongTinTen(c), // 06/11: tu dat ten file theo noi dung, mac dinh TAT
     khayKieu: kieuKhay(),
     khaySoAnh: typeof c.khaySoAnh === 'number' ? c.khaySoAnh : 5,
     khayTuThu: giayHopLe(c.khayTuThu),
@@ -909,12 +927,29 @@ ipcMain.handle('settings:set-khay-tu-thu', (_e, n) => {
 /* Doi dinh dang / chat luong anh — ap dung ngay tu lan chup sau. */
 ipcMain.handle('settings:set-anh', (_e, d) => {
   const patch = {}
-  if (d && (d.anhLoai === 'png' || d.anhLoai === 'jpeg')) patch.anhLoai = d.anhLoai
+  if (d && (d.anhLoai === 'png' || d.anhLoai === 'jpeg' || d.anhLoai === 'webp')) patch.anhLoai = d.anhLoai
   if (d && CHAT_LUONG_Q[d.anhChatLuong]) patch.anhChatLuong = d.anhChatLuong
   kho.ghiCauHinh(patch)
   ghiLog('doi dinh dang anh: ' + JSON.stringify(patch))
+  if (layDinhDangAnh().loai === 'webp') webpMod.lamNong() // mo san cua so ma hoa de lan chup dau khong phai cho
   return layDinhDangAnh()
 })
+
+/* 06/11 Tu dat ten file theo noi dung (mac dinh TAT): { tuDatTen: bool, tenMau: '{noidung} {gio}' }. */
+ipcMain.handle('settings:set-ten', (_e, d) => {
+  const patch = {}
+  if (d && typeof d.tuDatTen === 'boolean') patch.tuDatTen = d.tuDatTen
+  if (d && typeof d.tenMau === 'string') patch.tenMau = tuDatTenMod.mauHopLe(d.tenMau) // mau rong / chi toan ky tu la -> mac dinh
+  const c = kho.ghiCauHinh(patch)
+  ghiLog('doi tu dat ten: ' + JSON.stringify(patch))
+  return thongTinTen(c)
+})
+/** { tuDatTen, tenMau, tenViDu } cho man Cai dat. tenMau rong / chua dat -> mau mac dinh. */
+function thongTinTen(c) {
+  const mau = tuDatTenMod.mauHopLe(c.tenMau)
+  const vd = tuDatTenMod.dungTen(mau, { noiDung: 'Bao gia khach ABC', app: 'Chrome', ngay: new Date(2026, 10, 6, 14, 32) })
+  return { tuDatTen: c.tuDatTen === true, tenMau: mau, tenViDu: vd ? vd + '.jpg' : '' }
+}
 
 // Preload nap lang DONG BO luc khoi tao renderer.
 ipcMain.on('i18n:lang', (e) => { e.returnValue = lang })
@@ -1840,7 +1875,7 @@ async function handleConfirm(wcId, payload) {
 
   // 1) Luu file THAT tren dia truoc — tat app khong mat anh. Dinh dang theo
   //    cai dat nguoi dung (JPEG/PNG + chat luong).
-  const filePath = kho.luuAnh(cropped, layDinhDangAnh())
+  const filePath = await kho.luuAnhDoi(cropped, layDinhDangAnh()) // 06/11: co the la WebP (ma hoa bat dong bo); that bai thi tu luu JPEG
   const _sz = cropped.getSize()
   if (!filePath) {
     // ☠️ 10/09: luuAnh tra null (o day / mat quyen / thu muc hong). Truoc day
@@ -1853,7 +1888,7 @@ async function handleConfirm(wcId, payload) {
     try { clipboard.writeImage(cropped) } catch (e) {}
     baoNguoiDung(T('app.khongLuuDuoc').replace('{thuMuc}', kho.thuMucAnh()))
   } else {
-    ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height)
+    ghiLog('luu ' + path.basename(filePath) + ' ' + _sz.width + 'x' + _sz.height + (kho.lanCuoi().lui ? ' (' + kho.lanCuoi().lui + ')' : ''))
   }
   // 2) Vao khay (cho gom moi tam da chup). Khay tu hien len.
   //    ☠️ Anh Tien chot 25/08: chup xong CHI vao khay, KHONG bung anh ghim noi.
@@ -1865,6 +1900,13 @@ async function handleConfirm(wcId, payload) {
       ghiLog('LOI khay: thu lai van loi: ' + ((e2 && e2.message) || e2))
       baoNguoiDung(T('khay.khongThemDuoc'))
     }
+  }
+
+  // 06/11: tu dat ten theo noi dung (mac dinh TAT). Xep hang doc chu NEN; tam chup (DIP toan cuc) de tra ten ung dung nguon neu mau co {app}.
+  if (filePath) {
+    let tam = null
+    try { if (payload.rect && display && display.bounds) tam = { x: display.bounds.x + payload.rect.x + payload.rect.w / 2, y: display.bounds.y + payload.rect.y + payload.rect.h / 2 } } catch (e) {}
+    tuDatTen.xepHang(filePath, { tam })
   }
 
   // [selftest] Van chay duong GHIM de kiem (that: bam thumbnail se goi ham nay).
@@ -2041,7 +2083,7 @@ ipcMain.handle('pin:ocr-tu', async (e) => {
     return { ok: false, loi: err.message }
   }
 })
-ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
+ipcMain.on('pin:save-edit', async (e, dataUrl, chep) => {
   const rec = pins.get(e.sender.id)
   if (!rec || !dataUrl) return
   let daVe = null
@@ -2053,9 +2095,9 @@ ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
   if (rec.filePath) {
     let buf = null
     try {
-      const laPng = /\.png$/i.test(rec.filePath)
-      const dd = layDinhDangAnh()
-      buf = laPng ? daVe.toPNG() : daVe.toJPEG((dd && dd.q) || 85)
+      /* 06/11: ma hoa theo DUOI file (.png / .jpg / .webp); file .webp phai ghi lai dung WebP, khong bao gio ghi JPEG vao .webp.
+         Ma hoa that bai -> buf null -> hoanTacSuaPin. */
+      buf = await kho.maHoaTheoDuoi(rec.filePath, daVe, layDinhDangAnh())
     } catch (err) { buf = null }
     const r = buf && buf.length ? kho.ghiDeAnh(rec.filePath, buf) : { ok: false, loi: 'khong ma hoa duoc anh' }
     if (!r.ok) { hoanTacSuaPin(rec, 'ghi file ' + path.basename(rec.filePath) + ': ' + r.loi); return }
@@ -2119,6 +2161,8 @@ function thumbKhay(img) {
   const h = Math.min(tran, sz.height || tran)
   return 'data:image/jpeg;base64,' + img.resize({ height: h, quality: 'best' }).toJPEG(88).toString('base64')
 }
+/* 06/11: o giu cho cua anh WebP dang giai ma (1x1 xam, nhan theo o khay). */
+const THUMB_CHO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
 const SHELF_H = 128
 // Khay DOC (anh Tien 26/08): anh to hon (chiem ca be ngang), nhieu anh cuon DOC.
 const SHELF_DOC_W = 252
@@ -2184,7 +2228,7 @@ function layDanhSachAnhGanNhat(soLuong) {
     if (!fs.existsSync(dir)) return []
     const files = fs.readdirSync(dir)
       // 29/09 anh chot "tach han": file dai Storyboard KHONG vao khay anh thuong (dai nam o khay Storyboard)
-      .filter((f) => /\.(png|jpe?g)$/i.test(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-'))
+      .filter((f) => kho.laFileAnh(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-')) // 06/11: co ca .webp
       .map((f) => {
         const full = path.join(dir, f)
         let mtime = 0
@@ -2223,13 +2267,26 @@ function napAnhGanNhatVaoKhay(boQua) {
 
   // Xep theo thu tu thoi gian cu truoc -> moi sau de gan so thu tu #1, #2...
   const filesChrono = files.reverse()
-  for (const f of filesChrono) {
-    let img
-    try { img = nativeImage.createFromPath(f.path) } catch (e) {}
-    if (!img || img.isEmpty()) continue
-    const id = ++shelfSeq
-    shelfItems.set(id, taoMucKhay(id, img, f.path, thumbKhay)) // 04/10: chi giu anh nho, anh goc doc lai tu file khi ghim
-  }
+  /* 04/10: chi giu anh nho, anh goc doc lai tu file khi ghim. 06/11: WebP (nativeImage khong doc duoc) giu cho truoc, giai ma sau
+     qua cua so an roi thay thumbnail bang 'shelf:update' (xem napDanhSach trong src/khay-muc.js). */
+  napDanhSach(filesChrono, {
+    nativeImage, taoAnhNho: thumbKhay, thumbCho: THUMB_CHO,
+    layId: () => ++shelfSeq,
+    themMuc: (m) => shelfItems.set(m.id, m),
+    kichThuocWebp: (p) => kho.kichThuocWebp(p),
+    docAnhFile: (p) => kho.docAnhFile(p),
+    khiXong: (m) => {
+      if (!shelfItems.has(m.id)) return
+      let kb = 0
+      try { kb = Math.round(fs.statSync(m.filePath).size / 1024) } catch (e) {}
+      if (shelfWin && !shelfWin.isDestroyed()) shelfWin.webContents.send('shelf:update', { id: m.id, thumb: m.thumb, w: m.w, h: m.h, kb })
+    },
+    khiLoi: (m) => {
+      ghiLog('khay: khong giai ma duoc ' + path.basename(m.filePath || '?') + ' -> bo khoi khay')
+      shelfItems.delete(m.id)
+      if (shelfWin && !shelfWin.isDestroyed()) shelfWin.webContents.send('shelf:removed', m.id)
+    },
+  }).catch(() => {})
   ghiLog('tu dong nap ' + shelfItems.size + ' anh gan nhat vao khay')
 }
 
@@ -2326,10 +2383,59 @@ function shelfAdd(image, filePath) {
   canvasLamMoi() // 12/10: Canvas dang mo thi tam vua chup bay vao bang
 }
 
-ipcMain.on('shelf:pin', (e, id) => {
+/* ── 06/11 TU DAT TEN FILE THEO NOI DUNG (mac dinh TAT; luat an toan o dau src/tu-dat-ten.js) ───────────────────────────── */
+/** Doc chu cua mot file anh tren dia (co WebP) -> { ok, dong }. Cung cach voi Tim anh: thu nho <= 3,5 trieu diem, nen toi thi dao. */
+async function docChuChoTen(file) {
+  let img = await kho.docAnhFile(file)
+  if (!img) return { ok: false, loi: 'khong mo duoc anh' }
+  const s = img.getSize()
+  const k = Math.min(1, Math.sqrt(3.5e6 / Math.max(1, s.width * s.height)))
+  if (k < 1) img = img.resize({ width: Math.max(1, Math.round(s.width * k)), height: Math.max(1, Math.round(s.height * k)), quality: 'good' })
+  const cach = process.platform === 'win32' ? 'tesseract' : 'he-thong'
+  if (cach === 'tesseract') img = daoNeuNenToi(img).img
+  const kq = await ocr.docChu(img.toPNG(), cach)
+  return kq.ok ? { ok: true, dong: kq.dong || [] } : { ok: false, loi: kq.loi || 'doc chu loi' }
+}
+/** Ten ung dung dang nam duoi tam vung chup (chi goi khi mau ten co {app}). */
+async function layTenUngDung(_file, info) {
+  if (!info || !info.tam) return ''
+  let p = info.tam
+  if (process.platform === 'win32') { try { p = screen.dipToScreenPoint({ x: Math.round(p.x), y: Math.round(p.y) }) } catch (e) {} }
+  return require('./ten-ung-dung').lay(p.x, p.y, { pid: process.pid })
+}
+/** File vua doi ten: cap nhat MOI cho dang giu duong dan cu (khay, anh ghim, chi muc Tim anh, Canvas). */
+function apDungDoiTen(cu, moi, chu) {
+  const kc = khoaDuongDan(cu)
+  for (const it of shelfItems.values()) {
+    if (!it.filePath || khoaDuongDan(it.filePath) !== kc) continue
+    it.filePath = moi
+    let kb = 0
+    try { kb = Math.round(fs.statSync(moi).size / 1024) } catch (e) {}
+    if (shelfWin && !shelfWin.isDestroyed()) shelfWin.webContents.send('shelf:update', { id: it.id, thumb: it.thumb, w: it.w, h: it.h, kb })
+  }
+  for (const rec of pins.values()) if (rec.filePath && khoaDuongDan(rec.filePath) === kc) rec.filePath = moi
+  if (timAnh) timAnh.chiMuc.doiTen(cu, moi, chu)
+  canvasLamMoi()
+}
+const tuDatTen = tuDatTenMod.taoTuDatTen({
+  bat: () => kho.docCauHinh().tuDatTen === true,
+  mau: () => kho.docCauHinh().tenMau,
+  docChu: docChuChoTen,
+  dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh,
+  daGiao: (f) => kho.daGiao(f),
+  coThamChieu: (f) => canvasKho.coThamChieuTen(path.basename(f)),
+  doiTen: kho.doiTenKhongDe,
+  apDung: apDungDoiTen,
+  layApp: layTenUngDung,
+  ghiLog: (m) => ghiLog(m),
+})
+
+ipcMain.on('shelf:pin', async (e, id) => {
   const it = shelfItems.get(id)
   if (!it) return
-  const anh = anhMucKhay(it, nativeImage) // 04/10: khay chi giu anh nho -> doc lai anh goc tu file
+  let anh = anhMucKhay(it, nativeImage) // 04/10: khay chi giu anh nho -> doc lai anh goc tu file
+  if (!anh && it.filePath && /\.webp$/i.test(it.filePath)) anh = await kho.docAnhFile(it.filePath) // 06/11: nativeImage khong doc duoc WebP
+  if (!shelfItems.has(id)) return // bi go khoi khay luc dang giai ma
   if (!anh) {
     // File da bi xoa / doi cho ngoai app -> khong ghim duoc. Bo muc khoi khay + BAO, khong im lang.
     ghiLog('khay: KHONG doc duoc anh de ghim ' + path.basename(it.filePath || '(khong co file)') + ' -> bo khoi khay')
@@ -2380,6 +2486,8 @@ ipcMain.on('shelf:clear', (e) => {
   shelfSeq = 0
   e.sender.send('shelf:cleared')
 })
+
+ipcMain.on('shelf:open-tai-lieu', () => { if (taiLieu) taiLieu.mo() }) // 06/11: xuat tai lieu tung buoc tu anh trong khay
 
 ipcMain.on('shelf:open-folder', () => {
   try {
@@ -2574,13 +2682,14 @@ async function chupCuon(display, sf, rect) {
   }
   const image = nativeImage.createFromBitmap(kq.anh.buf, { width: kq.anh.w, height: kq.anh.h })
   if (image.isEmpty()) { ghiLog('chup-cuon LOI: khong dung duoc anh tu ' + kq.anh.w + 'x' + kq.anh.h); return }
-  const filePath = kho.luuAnh(image, layDinhDangAnh())
+  const filePath = await kho.luuAnhDoi(image, layDinhDangAnh()) // 06/11: anh cuon cao > 16383 px khong ma hoa WebP duoc -> tu luu JPEG
   if (!filePath) {
     ghiLog('LOI luu anh cuon: khong ghi duoc vao ' + kho.thuMucAnh())
     try { clipboard.writeImage(image) } catch (e) {}
     if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('app.khongLuuDuoc').replace('{thuMuc}', kho.thuMucAnh()) }).show()
   } else ghiLog('luu ' + path.basename(filePath) + ' ' + kq.anh.w + 'x' + kq.anh.h + ' (chup cuon)')
   shelfAdd(image, filePath)
+  if (filePath) tuDatTen.xepHang(filePath, null) // 06/11: tu dat ten theo noi dung (mac dinh TAT)
   // Chi bao khi co van de: mat nguon hinh giua chung, khong noi duoc hang nao (trang khong cuon / cuon qua nhanh), hoac cham tran
   const thieu = !(d.them > 0)
   if ((thieu || kq.lyDo === 'day' || kq.lyDo === 'het-gio' || kq.lyDo === 'mat-nguon') && Notification.isSupported()) {
@@ -2899,17 +3008,17 @@ function canvasNap() {
    giua cac tam va dung han khi dang chup (createFromPath chay o luong chinh, moi tam vai chuc ms; 800 anh ma lam lien la treo phim tat). */
 const anhNhoCanvas = new Map()
 let hangAnhNho = Promise.resolve()
-function taoAnhNhoCanvas(p) {
+function taoAnhNhoCanvas(p, anhDaGiai) {
   try {
     const goc = path.resolve(kho.thuMucAnh()), f = path.resolve(p)
-    if (!f.startsWith(goc + path.sep) || !/\.(png|jpe?g)$/i.test(f)) return null
+    if (!f.startsWith(goc + path.sep) || !kho.laFileAnh(f)) return null
     const st = fs.statSync(f), khoa = (st.ino ? st.dev + ':' + st.ino : f) + '|' + st.mtimeMs + '|' + st.size   // 05/11: theo MA FILE -> ban noi trong khung dung chung anh nho voi anh goc
     let buf = anhNhoCanvas.get(khoa)
     if (buf) return buf
     const dir = path.join(app.getPath('userData'), 'canvas', 'anh-nho')
     const tep = path.join(dir, require('crypto').createHash('sha1').update(khoa).digest('hex') + '.jpg')
     try { buf = fs.readFileSync(tep) } catch (e) {
-      const img = nativeImage.createFromPath(f)
+      const img = anhDaGiai || nativeImage.createFromPath(f) // 06/11: WebP thi ben goi giai ma truoc (bat dong bo) roi dua vao
       if (!img || img.isEmpty()) return null
       const sz = img.getSize(), k = Math.min(1, 400 / Math.max(1, sz.width))
       buf = img.resize({ width: Math.max(1, Math.round(sz.width * k)), height: Math.max(1, Math.round(sz.height * k)), quality: 'good' }).toJPEG(80)
@@ -2931,9 +3040,15 @@ function chayHangNho() {
     if (overlayWins.length > 0 || ghiHinh) { setTimeout(buoc, 250); return }
     const v = hangNhoGap.shift() || hangNhoNen.shift()
     if (!v) { nhoDangChay = false; return }
-    setImmediate(() => {
+    setImmediate(async () => {
       let kq = null
-      try { kq = taoAnhNhoCanvas(v.p) } catch (e) {}
+      try {
+        kq = taoAnhNhoCanvas(v.p)
+        if (!kq && /\.webp$/i.test(v.p)) { // 06/11: WebP -> nativeImage khong doc duoc, giai ma qua cua so an roi moi thu nho
+          const im = await kho.docAnhFile(v.p)
+          if (im) kq = taoAnhNhoCanvas(v.p, im)
+        }
+      } catch (e) {}
       if (v.res) v.res(kq)
       setTimeout(buoc, v.res ? 0 : 12)
     })
@@ -3039,7 +3154,7 @@ ipcMain.on('canvas:chep', (e, p) => {
   if (!laCanvas(e) || !p) return
   try {
     if (typeof p.text === 'string' && p.text) clipboard.writeText(p.text.slice(0, 200000))
-    else if (p.anh) { const f = canvasFile(p.anh); if (f && canvasKho.kieuCua(f) === 'anh') { const im = nativeImage.createFromPath(f); if (!im.isEmpty()) clipboard.writeImage(im) } }
+    else if (p.anh) { const f = canvasFile(p.anh); if (f && canvasKho.kieuCua(f) === 'anh') { const im = nativeImage.createFromPath(f); if (!im.isEmpty()) clipboard.writeImage(im); else if (/\.webp$/i.test(f)) kho.docAnhFile(f).then((i2) => { if (i2) clipboard.writeImage(i2) }).catch(() => {}) } }
   } catch (err) { ghiLog('canvas: chep LOI ' + err.message) }
 })
 /* XEM NHANH (anh 12/10: "bam dau cach anh se duoc phong to len giong native cua mac os"): macOS -> Quick Look that cua he dieu hanh
@@ -3102,7 +3217,7 @@ ipcMain.on('canvas:keo-ra', (e, khoas) => {
   if (!files.length) return
   let icon = null
   try {
-    const buf = /\.(png|jpe?g)$/i.test(files[0]) ? taoAnhNhoCanvas(files[0]) : null
+    const buf = kho.laFileAnh(files[0]) ? taoAnhNhoCanvas(files[0]) : null // WebP chua co anh nho trong bo nho thi dung bieu tuong mac dinh
     icon = buf ? nativeImage.createFromBuffer(buf) : null
     if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'tray.png'))
     icon = icon.resize({ height: 96 })
