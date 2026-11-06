@@ -107,8 +107,12 @@ async function khoiDong(opts) {
   } finally { dangKhoiDong = false }
 }
 
+let hoanLaiSauQuay = null // 06/11: yeu cau khoi dong lai den GIUA luc quay video -> giu den khi quay xong
 function lenLichLai(ms, laLoi) {
   if (TAT || !CHAY_SAN) return // Mac: luong chi mo luc quay, khong tu bat lai
+  /* 06/11 (Codex soat, loi 3): luong NEN cua mot man khac ket thuc (rut man phu) khong duoc pha cua so luong dang QUAY video:
+     khoi dong lai = win.destroy() = mat doan dang quay. Giu yeu cau, quay xong moi lam. */
+  if (quay) { hoanLaiSauQuay = { ms, laLoi: !!laLoi }; ghiLog('LUONG: yeu cau khoi dong lai den luc dang quay video -> hoan toi khi quay xong'); return }
   if (laLoi) { soLoiLienTiep++; if (soLoiLienTiep > 3) { ghiLog('LUONG: loi 3 lan lien tiep -> ngung thu, dung duong grab cu'); sanSangLuc = 0; return } }
   sanSangLuc = 0
   if (timerLai) clearTimeout(timerLai)
@@ -228,6 +232,7 @@ function ketQuay(loi, info) {
   try { q.onXong(Object.assign({ loi: loi || null }, info || {})) } catch (e) { ghiLog('LUONG quay onXong loi: ' + e.message) }
   nhapQuay.dung() // 05/11: ngung nghe chuot / phim
   if (!CHAY_SAN) dongLuong() // Mac: quay xong thi buong luong, cham tim tat theo
+  else if (hoanLaiSauQuay) { const h = hoanLaiSauQuay; hoanLaiSauQuay = null; lenLichLai(h.ms, h.laLoi) }
 }
 function dongLuong() {
   const w = win
@@ -253,10 +258,12 @@ async function batDauQuay(display, rect, opts) {
     const han = Date.now() + 8000
     while (!sanSang() && Date.now() < han) await new Promise((r) => setTimeout(r, 100))
   }
-  if (!sanSang()) return { ok: false, loi: 'luong chua san sang' }
   if (quay) return { ok: false, loi: 'dang quay' }
+  // 06/11 (Codex soat, ra-g muc 4): Mac mo luong chi de quay -> that bai o BAT KY buoc nao thi phai dong lai, khong thi bang "Currently Sharing" o lai mai
+  const thatBai = (loi) => { if (!CHAY_SAN) dongLuong(); return { ok: false, loi } }
+  if (!sanSang()) return thatBai('luong chua san sang')
   const cfg = cauHinh.find((c) => String(c.displayId) === String(display.id))
-  if (!cfg) return { ok: false, loi: 'khong co nguon cho man ' + display.id }
+  if (!cfg) return thatBai('khong co nguon cho man ' + display.id)
   const id = ++soQuay
   const tieng = !!(opts && opts.tieng) && process.platform === 'win32'
   /* 05/11 MICRO: xin quyen TRUOC (Mac hien hop thoai he thong lan dau; Windows bao 'denied' khi tat trong Privacy).
@@ -271,7 +278,9 @@ async function batDauQuay(display, rect, opts) {
     } catch (e) { /* khong hoi duoc thi cu thu, renderer se bao neu loi */ }
   }
   quay = { id, onKhuc: opts.onKhuc, onXong: opts.onXong }
-  hangChon.push({ id: cfg.srcId, tieng })
+  const muc = { id: cfg.srcId, tieng }
+  hangChon.push(muc)
+  const goMuc = () => { const i = hangChon.indexOf(muc); if (i >= 0) hangChon.splice(i, 1) } // renderer chua xin thi bo, khong de lai cho luot sau lay nham
   const q = {
     id, tieng, rect, w: cfg.w, h: cfg.h,
     dipW: display.bounds.width, dipH: display.bounds.height,
@@ -286,13 +295,13 @@ async function batDauQuay(display, rect, opts) {
   try {
     // ☠️ getDisplayMedia can user gesture -> executeJavaScript voi userGesture=true (nhu batDauLuong)
     const r = await win.webContents.executeJavaScript('window.batDauQuay(' + JSON.stringify(q) + ')', true)
-    if (!r || !r.ok) { quay = null; return { ok: false, loi: (r && r.loi) || 'renderer khong tra loi' } }
+    if (!r || !r.ok) { quay = null; goMuc(); nhapQuay.dung(); return thatBai((r && r.loi) || 'renderer khong tra loi') }
     if (micLoi && !r.micLoi) r.micLoi = micLoi
     if (q.hienNhap.chuot || q.hienNhap.phim) r.nhap = batNghe(display, rect, q.hienNhap, id)
     return r
   } catch (e) {
-    quay = null
-    return { ok: false, loi: (e && e.message) || String(e) }
+    quay = null; goMuc(); nhapQuay.dung()
+    return thatBai((e && e.message) || String(e))
   }
 }
 
