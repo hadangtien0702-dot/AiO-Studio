@@ -77,6 +77,8 @@ body.an #shelf { opacity: 0; pointer-events: none; }
 /* 01/10: them nut Khay video -> khay DOC (252 px) het cho, tieu de "Khay anh" bi bop con 38/48 px (do tren trang that,
    so dem 3 chu so). Khay doc: 5 nut dung sat nhau hon (khe 2 px thay vi 6) = tra lai 16 px. Khay ngang giu nguyen. */
 body.doc #bar button + button { margin-left: -4px; }
+/* 06/11: them nut Tai lieu thi khay doc 252 px het cho, nut "-" dinh mep phai va che goc keo. Khay hep bo logo de giu du 6 nut. */
+@media (max-width: 280px) { #logo { display: none; } }
 #title { white-space: nowrap; }
 #bar #clear:hover { background: var(--danger-strong); color: #fff; }
 
