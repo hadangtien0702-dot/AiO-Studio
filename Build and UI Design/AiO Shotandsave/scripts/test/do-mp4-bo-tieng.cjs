@@ -51,7 +51,10 @@ for (const ten of MAU) {
   const a = md5Hinh(nguon), b = md5Hinh(dich)
   kiem(nhan + 'giai ma het file khong loi', b.loi === '', b.loi.slice(0, 160))
   kiem(nhan + 'HINH giong ban goc tung diem anh (md5 khung da giai ma)', !!a.md5 && a.md5 === b.md5, a.md5 + ' vs ' + b.md5)
-  kiem(nhan + 'dung luong = ban goc (chi doi ten hop, khong doi vi tri)', fs.statSync(dich).size === fs.statSync(nguon).size)
+  // 06/11: bo THAT (khong con chi doi ten hop thanh free): file nho hon goc va khong con byte mo ta tieng (xem them test:suavideo muc A1)
+  const bDich = fs.readFileSync(dich)
+  kiem(nhan + 'file NHO HON ban goc (du lieu tieng da bi bo that)', fs.statSync(dich).size < fs.statSync(nguon).size, fs.statSync(nguon).size + ' -> ' + fs.statSync(dich).size)
+  kiem(nhan + 'khong con chuoi mo ta tieng (soun / mp4a / esds)', !['soun', 'mp4a', 'esds'].some((s) => bDich.includes(Buffer.from(s, 'latin1'))))
 }
 
 // Doi chung + duong LOI: file khong co tieng / khong phai MP4 / file cut -> tu choi va KHONG de lai file dich

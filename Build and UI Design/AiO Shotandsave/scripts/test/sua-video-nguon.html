@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>nguon thu sua video</title></head>
+<body>
+<!-- Tao video THU cho bai do Sua video (cua so AN): chay bang MediaRecorder y nhu bo quay cua app -> cung kieu file MP4 phan manh.
+     ?kieu=ma  : nen xam, hang 16 o ma khung (n) tren cung, vung chop trang o giua moi giay (khung n % 30 < 3) + tieng 1 kHz moi giay
+     ?kieu=quad: bon goc do/xanh la/xanh duong/vang (de thu zoom)
+     ?dur=ms  ?tieng=1|0 -->
+<canvas id="cv" width="640" height="360"></canvas>
+<script>
+const q = new URLSearchParams(location.search)
+const kieu = q.get('kieu') || 'ma', DUR = Number(q.get('dur')) || 6000, coTieng = q.get('tieng') !== '0'
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d', { alpha: false })
+let tStart = 0
+function ve() {
+  const vt = (performance.now() - tStart) / 1000
+  const n = Math.floor(vt * 30)
+  if (kieu === 'quad') {
+    ctx.fillStyle = '#d02020'; ctx.fillRect(0, 0, 320, 180)
+    ctx.fillStyle = '#20c020'; ctx.fillRect(320, 0, 320, 180)
+    ctx.fillStyle = '#2040e0'; ctx.fillRect(0, 180, 320, 180)
+    ctx.fillStyle = '#e0d020'; ctx.fillRect(320, 180, 320, 180)
+    ctx.fillStyle = '#fff'; ctx.fillRect(10 + (n % 60) * 2, 170, 8, 20) // vat chuyen dong nho de bo nen khong coi la anh tinh
+    return
+  }
+  ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, 640, 360)
+  for (let i = 0; i < 16; i++) {
+    ctx.fillStyle = ((n >> (15 - i)) & 1) ? '#ffffff' : '#000000'
+    ctx.fillRect(32 + 36 * i, 10, 36, 36)
+  }
+  if (n % 30 < 3) { ctx.fillStyle = '#ffffff'; ctx.fillRect(32, 120, 576, 180) }
+}
+async function chay() {
+  const st = cv.captureStream(30)
+  let ac = null
+  if (coTieng) {
+    ac = new AudioContext({ sampleRate: 48000 })
+    const dich = ac.createMediaStreamDestination(), osc = ac.createOscillator(), gn = ac.createGain()
+    osc.frequency.value = 1000; gn.gain.value = 0; osc.connect(gn); gn.connect(dich); osc.start()
+    const a0 = ac.currentTime + 0.02
+    for (let k = 0; k < Math.ceil(DUR / 1000) + 1; k++) { gn.gain.setValueAtTime(0.5, a0 + k); gn.gain.setValueAtTime(0, a0 + k + 0.12) }
+    dich.stream.getAudioTracks().forEach((t) => st.addTrack(t))
+    tStart = performance.now() + 20 // burst thu k bat dau o a0 + k ~ now + 20 ms + k
+  } else tStart = performance.now()
+  const mime = coTieng ? 'video/mp4;codecs=avc1.64001f,mp4a.40.2' : 'video/mp4;codecs=avc1.64001f'
+  if (!MediaRecorder.isTypeSupported(mime)) { window.nopLoi('khong ho tro ' + mime); return }
+  const rec = new MediaRecorder(st, { mimeType: mime, videoBitsPerSecond: 4000000, audioBitsPerSecond: 128000 })
+  const khuc = []
+  rec.ondataavailable = (e) => { if (e.data && e.data.size) khuc.push(e.data) }
+  rec.onstop = async () => {
+    clearInterval(iv)
+    const buf = await new Blob(khuc).arrayBuffer()
+    window.nop(buf)
+  }
+  const iv = setInterval(ve, 1000 / 30)
+  ve()
+  rec.start(1000)
+  setTimeout(() => { rec.stop(); st.getTracks().forEach((t) => t.stop()); if (ac) ac.close() }, DUR)
+}
+chay().catch((e) => window.nopLoi(String(e && e.message || e)))
+</script>
+</body></html>

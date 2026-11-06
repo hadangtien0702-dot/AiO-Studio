@@ -2,16 +2,22 @@
 /* TAO BAN KHONG TIENG tu file MP4 da quay (01/10 — anh chot: "mac dinh quay co tieng ... vao khay roi cho nguoi dung
    chon 2 nut nay phia trong"). KHONG can FFmpeg, khong nen lai hinh.
 
+   ☠️ 06/11 (Codex soat, loi 1): ban dau (01/10) chi DOI TEN cac hop cua duong tieng thanh 'free'. Trinh phat bo qua
+   nhung DU LIEU tieng van nam nguyen trong mdat va cac hop mo ta (hdlr 'soun', mp4a, esds) van o do -> nguoi quay cuoc
+   tro chuyen rieng, chon "Khong tieng", gui file di, nguoi nhan co the khoi phuc duong tieng. Nay bo THAT:
+
    File do app quay la MP4 PHAN MANH:  ftyp · moov(mvhd, trak hinh, trak tieng, mvex(trex, trex)) · [moof(mfhd, traf...)
-   · mdat]... · [mfra]. Cach bo tieng: chep nguyen file roi DOI TEN cac hop cua duong tieng thanh 'free' (hop "bo
-   trong", trinh phat bo qua):  trak tieng · trex tieng · moi traf tieng · tfra tieng.
-   Vi KHONG doi kich thuoc hop nao nen moi vi tri du lieu (data_offset cua duong hinh) giu nguyen -> duong hinh con
-   nguyen tung byte. Du lieu tieng van nam trong mdat nhung khong con ai tro toi (~20 KB moi giay, chap nhan).
+   · mdat]... · [mfra]. Cach bo tieng (chep SANG file moi, khong dung toi file goc):
+     - moov: bo trak tieng + trex tieng (khong con 'soun' / 'mp4a' / 'esds' / metadata cua duong tieng nao).
+     - moi moof: bo traf tieng, ghi lai data_offset cua trun hinh; mdat moi chi chua byte cua cac khung HINH.
+     - bo mfra / sidx (chua vi tri byte cu, khong con dung) va moi hop la khong biet.
+   Khung hinh giu nguyen tung byte (chi doi vi tri trong file), tfdt (thoi diem) khong doi.
+   Doi lai: file moi nho hon ban goc dung bang phan tieng (~20 KB / giay).
 
    Chi dung fs cua Node -> kiem duoc bang node tran (scripts/test/do-mp4-bo-tieng.cjs, soi lai bang ffprobe). */
 const fs = require('fs')
 
-const FREE = Buffer.from('free', 'latin1')
+const MAX_HOP_NHO = 64 * 1024 * 1024 // moov / moof khong bao gio to the (1 moof ~ 1 giay)
 
 /* Doc dau hop tai vi tri `pos` cua fd: { size, type, hdr } (hdr = 8 hoac 16 byte). null neu het file / hop hong. */
 function dauHop(fd, pos, het) {
@@ -45,10 +51,22 @@ function duyetCon(buf, tu, den, f) {
 }
 const timCon = (buf, tu, den, ten) => { let r = null; duyetCon(buf, tu, den, (h) => { if (!r && h.type === ten) r = h }); return r }
 
-/* Tim track_ID cua duong TIENG trong moov + vi tri (trong buf moov) cua cac hop can doi ten. */
+/* Dung mot hop tu cac manh con: [size 4][type 4][...manh] */
+function dungHop(loai, manh) {
+  let n = 8
+  for (const m of manh) n += m.length
+  const ra = Buffer.alloc(n)
+  ra.writeUInt32BE(n, 0)
+  ra.write(loai, 4, 'latin1')
+  let o = 8
+  for (const m of manh) { m.copy(ra, o); o += m.length }
+  return ra
+}
+
+/* Phan tich moov: track_ID cua duong TIENG (hdlr 'soun'), cac trak tieng (de bo), co mvex khong, so trak. */
 function phanTichMoov(moov) {
-  const doi = [] // vi tri truong `type` (4 byte) can ghi 'free', tinh trong buf moov
-  const tieng = []
+  const tieng = []      // track_ID cac duong tieng
+  const trakTieng = []  // vi tri (start) cac hop trak tieng trong moov
   let soTrak = 0
   duyetCon(moov, 8, moov.length, (h) => {
     if (h.type !== 'trak') return
@@ -65,70 +83,173 @@ function phanTichMoov(moov) {
     const v = moov.readUInt8(tkhd.start + tkhd.hdr)
     const id = moov.readUInt32BE(tkhd.start + tkhd.hdr + 4 + (v === 1 ? 16 : 8))
     tieng.push(id)
-    doi.push(h.start + 4)
+    trakTieng.push(h.start)
   })
   const mvex = timCon(moov, 8, moov.length, 'mvex')
-  if (mvex) {
-    duyetCon(moov, mvex.start + mvex.hdr, mvex.start + mvex.size, (h) => {
-      // trex: FullBox(4) + track_ID(4)
-      if (h.type === 'trex' && tieng.includes(moov.readUInt32BE(h.start + h.hdr + 4))) doi.push(h.start + 4)
+  return { tieng, trakTieng, soTrak, phanManh: !!mvex, mvex }
+}
+
+/* moov moi: bo trak tieng + trex tieng, moi thu khac giu nguyen byte. */
+function moovKhongTieng(moov, p) {
+  const manh = []
+  duyetCon(moov, 8, moov.length, (h) => {
+    const nguyen = moov.subarray(h.start, h.start + h.size)
+    if (h.type === 'trak' && p.trakTieng.includes(h.start)) return
+    if (h.type === 'mvex') {
+      const con = []
+      duyetCon(moov, h.start + h.hdr, h.start + h.size, (c) => {
+        // trex: FullBox(4) + track_ID(4)
+        if (c.type === 'trex' && p.tieng.includes(moov.readUInt32BE(c.start + c.hdr + 4))) return
+        con.push(moov.subarray(c.start, c.start + c.size))
+      })
+      manh.push(dungHop('mvex', con))
+      return
+    }
+    manh.push(nguyen)
+  })
+  return dungHop('moov', manh)
+}
+
+/* moof moi cho 1 doan: bo traf tieng. Tra { moof: Buffer, khoang: [{ tu, dai }] (byte HINH can chep, theo thu tu trun),
+   viTriOffset: [vi tri trong moof moi cua cac truong data_offset can ghi lai], soTrafBo, byteTiengBo }.
+   `viTri` = vi tri cua moof trong file nguon. Nem loi neu cau truc la (khong chac chep dung -> thoat, KHONG doan). */
+function moofKhongTieng(moof, viTri, tiengIds) {
+  const traf = [] // cac traf giu lai (Buffer ban sao) + thong tin trun
+  let soTrafBo = 0, byteTiengBo = 0
+  let mfhd = null
+  duyetCon(moof, 8, moof.length, (c) => {
+    if (c.type === 'mfhd') { mfhd = moof.subarray(c.start, c.start + c.size); return }
+    if (c.type !== 'traf') return
+    const tfhd = timCon(moof, c.start + c.hdr, c.start + c.size, 'tfhd')
+    if (!tfhd) throw new Error('traf khong co tfhd')
+    const fl = moof.readUInt32BE(tfhd.start + tfhd.hdr) & 0xffffff
+    const id = moof.readUInt32BE(tfhd.start + tfhd.hdr + 4)
+    let q = tfhd.start + tfhd.hdr + 8
+    let goc = viTri // "goc = dau moof" (0x20000) va ca khi khong ghi gi
+    if (fl & 0x1) { goc = Number(moof.readBigUInt64BE(q)); q += 8 }
+    if (fl & 0x2) q += 4
+    let mSize = 0
+    if (fl & 0x8) q += 4
+    if (fl & 0x10) { mSize = moof.readUInt32BE(q); q += 4 }
+    const laTieng = tiengIds.includes(id)
+    const trun = []
+    duyetCon(moof, c.start + c.hdr, c.start + c.size, (t) => {
+      if (t.type !== 'trun') return
+      const f = moof.readUInt32BE(t.start + t.hdr) & 0xffffff
+      const n = moof.readUInt32BE(t.start + t.hdr + 4)
+      let p = t.start + t.hdr + 8
+      if (!(f & 0x1)) throw new Error('trun khong co data_offset (khong ho tro)')
+      const offViTri = p // vi tri truong data_offset trong moof nguon
+      const off = moof.readInt32BE(p); p += 4
+      if (f & 0x4) p += 4
+      let tong = 0
+      for (let k = 0; k < n; k++) {
+        if (f & 0x100) p += 4
+        if (f & 0x200) { tong += moof.readUInt32BE(p); p += 4 } else tong += mSize
+        if (f & 0x400) p += 4
+        if (f & 0x800) p += 4
+      }
+      trun.push({ offViTri, tu: goc + off, dai: tong })
     })
+    if (laTieng) {
+      soTrafBo++
+      for (const t of trun) byteTiengBo += t.dai
+      return
+    }
+    traf.push({ start: c.start, size: c.size, trun })
+  })
+  if (!mfhd) throw new Error('moof khong co mfhd')
+  // moof moi = header + mfhd + cac traf hinh
+  const manh = [Buffer.from(mfhd)]
+  const khoang = []
+  const viTriOffset = []
+  let dai = 8 + mfhd.length
+  const bao = [] // { bufTraf, trun }
+  for (const t of traf) {
+    const b = Buffer.from(moof.subarray(t.start, t.start + t.size))
+    bao.push({ b, t, goc: dai })
+    manh.push(b)
+    dai += b.length
   }
-  return { tieng, doi, soTrak, phanManh: !!mvex }
+  const moofMoi = dungHop('moof', manh)
+  // ghi lai data_offset: mdat moi nam NGAY SAU moof moi: [size 4]['mdat'][...]; offset tinh tu dau moof
+  let cong = moofMoi.length + 8
+  for (const x of bao) {
+    for (const tr of x.t.trun) {
+      const vtTrongMoi = x.goc + (tr.offViTri - x.t.start)
+      moofMoi.writeInt32BE(cong, vtTrongMoi)
+      viTriOffset.push(vtTrongMoi)
+      khoang.push({ tu: tr.tu, dai: tr.dai })
+      cong += tr.dai
+    }
+  }
+  return { moof: moofMoi, khoang, viTriOffset, soTrafBo, byteTiengBo, tongHinh: cong - moofMoi.length - 8 }
 }
 
 /**
- * Chep `nguon` -> `dich` roi bo duong tieng trong `dich`. Khong dung toi `nguon`.
- * Tra ve { ok: true, soTrakTieng, soTraf, soTfra } hoac { ok: false, loi } (va KHONG de lai file dich hong).
+ * Chep `nguon` -> `dich` KHONG con duong tieng nao. Khong dung toi `nguon`.
+ * Tra ve { ok: true, soTrakTieng, soTraf, soTfra, byteTiengBo } hoac { ok: false, loi } (va KHONG de lai file dich hong).
  */
 function taoBanKhongTieng(nguon, dich) {
-  let fd = null
+  let fdVao = null, fdRa = null
   try {
     if (nguon === dich) return { ok: false, loi: 'nguon va dich trung nhau' }
-    fs.copyFileSync(nguon, dich)
-    fd = fs.openSync(dich, 'r+')
-    const het = fs.fstatSync(fd).size
-    const ghiFree = (pos) => fs.writeSync(fd, FREE, 0, 4, pos)
-    let pos = 0, thayMoov = false, tieng = [], soTraf = 0, soTfra = 0, soTrakTieng = 0
+    fdVao = fs.openSync(nguon, 'r')
+    const het = fs.fstatSync(fdVao).size
+    fdRa = fs.openSync(dich, 'w')
+    let ghi = 0
+    const viet = (b) => { fs.writeSync(fdRa, b, 0, b.length); ghi += b.length }
+    let pos = 0, coMoov = false, tieng = [], soTraf = 0, soTrakTieng = 0, byteTiengBo = 0
     for (;;) {
-      const h = dauHop(fd, pos, het)
+      const h = dauHop(fdVao, pos, het)
       if (!h) break
-      if (h.type === 'moov') {
-        if (h.size > 64 * 1024 * 1024) throw new Error('moov qua lon')
+      if (h.type === 'ftyp') {
+        const b = Buffer.alloc(h.size); fs.readSync(fdVao, b, 0, h.size, pos); viet(b)
+      } else if (h.type === 'moov') {
+        if (h.size > MAX_HOP_NHO) throw new Error('moov qua lon')
+        if (coMoov) throw new Error('file co hai moov')
         const moov = Buffer.alloc(h.size)
-        fs.readSync(fd, moov, 0, h.size, pos)
+        fs.readSync(fdVao, moov, 0, h.size, pos)
         const p = phanTichMoov(moov)
         if (!p.phanManh) throw new Error('khong phai MP4 phan manh (khong co mvex)')
         if (p.soTrak - p.tieng.length < 1) throw new Error('khong co duong hinh')
-        thayMoov = true; tieng = p.tieng; soTrakTieng = p.tieng.length
-        for (const o of p.doi) ghiFree(pos + o)
-      } else if (h.type === 'moof' && tieng.length) {
-        if (h.size > 64 * 1024 * 1024) throw new Error('moof qua lon')
+        if (!p.tieng.length) throw new Error('file khong co duong tieng')
+        coMoov = true; tieng = p.tieng; soTrakTieng = p.tieng.length
+        viet(moovKhongTieng(moov, p))
+      } else if (h.type === 'moof') {
+        if (!coMoov) throw new Error('moof dung truoc moov')
+        if (h.size > MAX_HOP_NHO) throw new Error('moof qua lon')
         const moof = Buffer.alloc(h.size)
-        fs.readSync(fd, moof, 0, h.size, pos)
-        duyetCon(moof, h.hdr, h.size, (c) => {
-          if (c.type !== 'traf') return
-          const tfhd = timCon(moof, c.start + c.hdr, c.start + c.size, 'tfhd')
-          // tfhd: FullBox(4) + track_ID(4)
-          if (tfhd && tieng.includes(moof.readUInt32BE(tfhd.start + tfhd.hdr + 4))) { ghiFree(pos + c.start + 4); soTraf++ }
-        })
-      } else if (h.type === 'mfra' && tieng.length) {
-        const mfra = Buffer.alloc(h.size)
-        fs.readSync(fd, mfra, 0, h.size, pos)
-        duyetCon(mfra, h.hdr, h.size, (c) => {
-          // tfra: FullBox(4) + track_ID(4)
-          if (c.type === 'tfra' && tieng.includes(mfra.readUInt32BE(c.start + c.hdr + 4))) { ghiFree(pos + c.start + 4); soTfra++ }
-        })
+        fs.readSync(fdVao, moof, 0, h.size, pos)
+        const r = moofKhongTieng(moof, pos, tieng)
+        for (const k of r.khoang) if (k.tu < 0 || k.tu + k.dai > het) throw new Error('khung hinh nam ngoai file (file bi cut?)')
+        soTraf += r.soTrafBo; byteTiengBo += r.byteTiengBo
+        viet(r.moof)
+        const mdat = Buffer.alloc(8)
+        mdat.writeUInt32BE(8 + r.tongHinh, 0); mdat.write('mdat', 4, 'latin1')
+        viet(mdat)
+        for (const k of r.khoang) {
+          // chep theo manh <= 4 MB de khong giu ca khung trong RAM
+          let c = 0
+          while (c < k.dai) {
+            const n = Math.min(4 * 1024 * 1024, k.dai - c)
+            const b = Buffer.alloc(n)
+            fs.readSync(fdVao, b, 0, n, k.tu + c)
+            viet(b); c += n
+          }
+        }
       }
+      // mdat cu (da chep phan hinh theo offset), mfra, sidx, free, hop la: BO
       pos += h.size
     }
-    fs.closeSync(fd); fd = null
-    if (!thayMoov) throw new Error('khong thay hop moov')
+    fs.closeSync(fdVao); fdVao = null
+    fs.closeSync(fdRa); fdRa = null
+    if (!coMoov) throw new Error('khong thay hop moov')
     if (pos !== het) throw new Error('file ket thuc giua mot hop (doc toi ' + pos + '/' + het + ')')
-    if (!soTrakTieng) throw new Error('file khong co duong tieng')
-    return { ok: true, soTrakTieng, soTraf, soTfra }
+    return { ok: true, soTrakTieng, soTraf, soTfra: 0, byteTiengBo, bytes: ghi }
   } catch (e) {
-    if (fd != null) { try { fs.closeSync(fd) } catch (err) {} }
+    if (fdVao != null) { try { fs.closeSync(fdVao) } catch (err) {} }
+    if (fdRa != null) { try { fs.closeSync(fdRa) } catch (err) {} }
     try { fs.unlinkSync(dich) } catch (err) {} // file dich do chinh ham nay vua tao
     return { ok: false, loi: (e && e.message) || String(e) }
   }
@@ -146,7 +267,7 @@ function coDuongTieng(file) {
       const h = dauHop(fd, pos, het)
       if (!h) return false
       if (h.type === 'moov') {
-        if (h.size > 64 * 1024 * 1024) return false
+        if (h.size > MAX_HOP_NHO) return false
         const moov = Buffer.alloc(h.size)
         fs.readSync(fd, moov, 0, h.size, pos)
         return phanTichMoov(moov).tieng.length > 0

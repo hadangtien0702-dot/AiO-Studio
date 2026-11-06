@@ -145,7 +145,7 @@ const khoiDrag = sbJsKeo.slice(sbJsKeo.indexOf("hang.addEventListener('dragstart
 const thanKeoDai = sbJsKeo.slice(sbJsKeo.indexOf('function keoDai('), sbJsKeo.indexOf('function xuatDai('))
 kiem('dragstart KHONG tu ve canvas/toBlob (goi keoDai, anh ve san luc re chuot)', khoiDrag.includes('keoDai(d)') && !/render\(|toBlob|layBanNen/.test(khoiDrag + thanKeoDai) && sbJsKeo.includes("hang.addEventListener('pointerenter', () => chuanBiKeo(d))"))
 const khoiKeoMain = mainJs.slice(mainJs.indexOf("ipcMain.on('storyboard:keo-dai'"), mainJs.indexOf("ipcMain.on('storyboard:close'"))
-kiem('main storyboard:keo-dai startDrag tu byte VE SAN (khong nhan byte luc keo)', khoiKeoMain.includes('sbVeSan.get(id)') && khoiKeoMain.includes('startDrag(') && !khoiKeoMain.includes('layBuf('))
+kiem('main storyboard:keo-dai startDrag tu byte VE SAN (khong nhan byte luc keo)', (khoiKeoMain.includes('sbVeSan.get(id)') || khoiKeoMain.includes('sbVeSan.lay(id)')) && khoiKeoMain.includes('startDrag(') && !khoiKeoMain.includes('layBuf('))
 kiem('file keo dai ten shotandsave-storyboard-* (khay anh thuong bo qua)', khoiKeoMain.includes("'shotandsave-' + String(id).replace('dai-', 'storyboard-')"))
 kiem('main.js xu ly storyboard:close', mainJs.includes("'storyboard:close'"))
 // 29/09: kiem HANH VI (muc menu mo cua so Storyboard), khong kiem ten khoa chu (menu doi sang 'tray.storyboard', bo "(phim S)")

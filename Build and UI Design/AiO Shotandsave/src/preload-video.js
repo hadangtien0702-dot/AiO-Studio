@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld('video', {
   /** Keo file MP4 that ra app khac. Phai goi trong nhip dragstart. */
   keo: (id) => ipcRenderer.send('video:keo', id),
   moThuMuc: (id) => ipcRenderer.send('video:mo-thu-muc', id),
+  /** 06/11 Mo man Sua video cua video nay (cat dau cuoi, tu phong to theo con tro, nen va khung). */
+  sua: (id) => ipcRenderer.send('sua:mo', id),
   /** Chon ban dung khi phat / keo tha: coTieng true|false -> { ok, boTieng, bytesXoa, loi }. Lan dau chon Khong tieng
       main tao file "-khong-tieng.mp4" canh ban goc. */
   chonTieng: (id, coTieng) => ipcRenderer.invoke('video:chon-tieng', id, !!coTieng),
