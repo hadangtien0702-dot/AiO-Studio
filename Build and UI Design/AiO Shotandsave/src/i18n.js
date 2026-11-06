@@ -409,6 +409,10 @@ const DICH = {
     'ld.kichThuoc': 'Kích thước ảnh xuất ra',
     'ghim.goiY': 'Kéo để di chuyển · 1 / 2 / 3 để vẽ · 4 làm mờ · 6 đánh số · V chọn nét vẽ · Ctrl + lăn chuột = độ trong suốt',
     'ghim.veXong': 'Lưu nét vẽ (Enter)',
+    'ghim.cat': 'Cắt bỏ khúc giữa ảnh (phím X): kéo một dải ngang hoặc dọc, thả ra là bỏ dải đó và hai phần còn lại dính vào nhau',
+    'ghim.catMep': 'Mép cắt rõ: vẽ đường răng cưa ở chỗ hai phần nối nhau',
+    'ghim.xoaSach': 'Xóa bản sạch đã lưu: sau đó không sửa lại được các nét cũ của ảnh này',
+    'overlay.veTay': 'Vẽ tay: khung, mũi tên, chữ và số nhìn như phác bằng tay',
     // Storyboard (Multi-Shot Storyboard Strip)
     'khay.storyboard': 'Mở khay Storyboard (phím S)',
     'sb.tieuDe': 'Khay Storyboard',
@@ -878,6 +882,10 @@ const DICH = {
     'ld.kichThuoc': 'Exported image size',
     'ghim.goiY': 'Drag to move · 1 / 2 / 3 to draw · 4 blur · 6 step numbers · V select · Ctrl + scroll = transparency',
     'ghim.veXong': 'Save drawing (Enter)',
+    'ghim.cat': 'Cut out the middle of the image (key X): drag a horizontal or vertical band, release to remove it and join the two remaining parts',
+    'ghim.catMep': 'Visible cut edge: draw a zigzag line where the two parts join',
+    'ghim.xoaSach': 'Delete the saved clean copy: afterwards the old marks of this image can no longer be edited',
+    'overlay.veTay': 'Hand-drawn: boxes, arrows, text and numbers look sketched by hand',
     // Storyboard (Multi-Shot Storyboard Strip)
     'khay.storyboard': 'Open Storyboard shelf (S key)',
     'sb.tieuDe': 'Storyboard shelf',

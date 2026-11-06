@@ -43,6 +43,7 @@
     "test:thanhcu": "node scripts/test/do-thanh-cong-cu.cjs",
     "test:hutmau": "node scripts/test/do-hut-mau.cjs",
     "test:suanet": "node scripts/test/do-sua-net.cjs",
+    "test:lopsua": "node scripts/test/do-lop-sua.cjs",
     "test:sausoat": "node scripts/test/do-sau-soat.cjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
     "test:timanh": "electron scripts/test/do-tim-anh.cjs",

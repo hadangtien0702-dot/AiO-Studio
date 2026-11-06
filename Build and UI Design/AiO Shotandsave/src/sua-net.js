@@ -55,6 +55,7 @@ const SuaNet = (() => {
     if (op.k === 'them') { op.idx = shapes.indexOf(op.s); if (op.idx >= 0) shapes.splice(op.idx, 1) }
     else if (op.k === 'xoa') shapes.splice(Math.min(op.idx, shapes.length), 0, op.s)
     else if (op.k === 'sua') datLai(op.s, op.truoc)
+    else if (op.k === 'cat') op.ap(op.truoc) // 06/11 cat bo khuc giua anh (pin.js): tra ca anh nen + kich thuoc + vi tri net
     redo.push(op)
     return op
   }
@@ -72,6 +73,7 @@ const SuaNet = (() => {
     if (op.k === 'them') shapes.splice(op.idx >= 0 ? Math.min(op.idx, shapes.length) : shapes.length, 0, op.s)
     else if (op.k === 'xoa') { const i = shapes.indexOf(op.s); if (i >= 0) shapes.splice(i, 1) }
     else if (op.k === 'sua') datLai(op.s, op.sau)
+    else if (op.k === 'cat') op.ap(op.sau)
     lichSu.push(op)
     return op
   }

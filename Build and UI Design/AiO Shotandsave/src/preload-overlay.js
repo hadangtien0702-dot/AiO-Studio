@@ -36,6 +36,8 @@ contextBridge.exposeInMainWorld('overlay', {
   chonCuaSo: (rect) => ipcRenderer.send('overlay:chon-cua-so', rect),
   /** 05/11 Nho vung cuoi (rect cuc bo DIP cua man nay) de 'chup lai vung lan truoc'. */
   nhoVung: (rect) => ipcRenderer.send('overlay:nho-vung', rect),
+  /** 06/11 Cong tac kieu ve tay (nho vao cau hinh). */
+  datKieuTay: (bat) => ipcRenderer.send('ve:dat-tay', !!bat),
   /** Ghi nhat ky chay (qua main). */
   log: (msg) => ipcRenderer.send('overlay:log', msg),
   /** 29/09 Doc chu (phim 5): { key, x, y, w, h (px thiet bi), sf } -> { ok, dong: [chuoi], boDoc, ngonNguMay, loi }. */

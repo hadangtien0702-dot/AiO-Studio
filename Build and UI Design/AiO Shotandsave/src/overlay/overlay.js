@@ -233,6 +233,8 @@ function capNhatAnNut(ds) {
 }
 function ganCauHinh(d) {
   if (!d) return
+  if (typeof d.veTay === 'boolean') { NetTay.dat(d.veTay); capNhatNutTay() } // 06/11 kieu ve tay (nho trong cau hinh)
+  if (typeof d.luuLopSua === 'boolean') luuLopSuaBat = d.luuLopSua
   if (Array.isArray(d.anNut)) capNhatAnNut(d.anNut)
   if (typeof d.kinhLup === 'boolean') { kinhLupBat = d.kinhLup; if (!kinhLupBat) klAn() }
 }
@@ -273,7 +275,23 @@ function capNhatNutBut(x) {
 /* LAM LAI: net bi hoan tac vao redoStack; ve net moi / doi vung = xoa hang doi. */
 const redoStack = SuaNet.redo // mang DUNG CHUNG voi sua-net.js (lich su op: them / xoa / sua), chi doi do dai, khong gan lai
 function capNhatRedo() { nutRedoEl.disabled = redoStack.length === 0 }
-function themNet(s) { shapes.push(s); SuaNet.ghi({ k: 'them', s }) }
+function themNet(s) { NetTay.danhDau(s); shapes.push(s); SuaNet.ghi({ k: 'them', s }) }
+/* 06/11 KIEU VE TAY: cong tac nam trong bang mau. Bat thi net MOI (khung, mui ten, chu, so) ve nhu phac; dang chon mot net
+   ve duoc (cong cu V) thi bam cong tac la doi chinh net do (mot buoc Hoan tac). Lua chon duoc nho vao cau hinh (main). */
+let luuLopSuaBat = true // 06/11: main bao co luu lop sua khong (luuLopSua trong cau-hinh.json)
+const kieuTayEl = document.getElementById('kieu-tay')
+function capNhatNutTay() { if (kieuTayEl) kieuTayEl.setAttribute('aria-pressed', NetTay.dangBat() ? 'true' : 'false') }
+function bamKieuTay() {
+  NetTay.dat(!NetTay.dangBat())
+  capNhatNutTay()
+  window.overlay.datKieuTay(NetTay.dangBat())
+  if (selectedShape && tool === 'select' && NetTay.duocPhep(selectedShape.type)) {
+    const truoc = SuaNet.sao(selectedShape)
+    if (NetTay.dangBat()) { selectedShape.tay = true; selectedShape.seed = selectedShape.seed || NetTay.taoSeed() } else { delete selectedShape.tay }
+    SuaNet.ghiSua(selectedShape, truoc)
+    redraw()
+  }
+}
 function xoaRedo() { redoStack.length = 0; SuaNet.lichSu.length = 0; capNhatRedo() }
 function lamLai() {
   if (!LAM_LAI_DUOC()) return
@@ -1359,12 +1377,14 @@ function veShape(ctx, s) {
   ctx.lineCap = 'round'
   if (s.type === 'rect') {
     const x = Math.min(s.x1, s.x2), y = Math.min(s.y1, s.y2), w = Math.abs(s.x2 - s.x1), h = Math.abs(s.y2 - s.y1)
-    if (s.rot) { ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(s.rot); ctx.strokeRect(-w / 2, -h / 2, w, h); ctx.restore() }
+    if (s.tay) { ctx.save(); if (s.rot) { ctx.translate(x + w / 2, y + h / 2); ctx.rotate(s.rot); NetTay.khung(ctx, -w / 2, -h / 2, w, h, s.seed, 1) } else NetTay.khung(ctx, x, y, w, h, s.seed, 1); ctx.restore() }
+    else if (s.rot) { ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(s.rot); ctx.strokeRect(-w / 2, -h / 2, w, h); ctx.restore() }
     else ctx.strokeRect(x, y, w, h)
   } else if (s.type === 'spot') {
     veKhungSpot(ctx, s)
   } else if (s.type === 'arrow') {
-    veMuiTen(ctx, s.x1, s.y1, s.x2, s.y2)
+    if (s.tay) NetTay.muiTen(ctx, s.x1, s.y1, s.x2, s.y2, s.seed, 1, 13)
+    else veMuiTen(ctx, s.x1, s.y1, s.x2, s.y2)
   } else if (s.type === 'text') {
     veChu(ctx, s, 1)
   } else if (s.type === 'so') {
@@ -1509,10 +1529,10 @@ function veSo(ctx, s, k) {
   ctx.save()
   if (s.rot) { ctx.translate(cx, cy); ctx.rotate(s.rot); ctx.translate(-cx, -cy) }
   ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 4 * kb; ctx.shadowOffsetY = 1 * kb
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
-  ctx.fillStyle = s.color; ctx.fill()
+  ctx.fillStyle = s.color; ctx.lineWidth = 2 * k; ctx.strokeStyle = chu
+  if (s.tay) NetTay.huyHieu(ctx, cx, cy, r, s.seed, k) // 06/11 ve tay: vien khong tron dung
+  else { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); ctx.shadowColor = 'transparent'; ctx.stroke() }
   ctx.shadowColor = 'transparent'
-  ctx.lineWidth = 2 * k; ctx.strokeStyle = chu; ctx.stroke()
   ctx.font = '700 ' + ((so.length > 2 ? 10 : so.length > 1 ? 12 : 14) * k) + 'px Inter, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'
   const m = ctx.measureText(so)
@@ -1527,6 +1547,7 @@ toolbarEl.addEventListener('click', (e) => {
   const mau = e.target.closest('.mau')
   if (mau) { chonMau(mau.dataset.color); dongBangMau(); return }
   if (e.target.closest('#mau-hien')) { if (bangMauMo()) dongBangMau(); else moBangMau(); return }
+  if (e.target.closest('#kieu-tay')) { bamKieuTay(); return } // cong tac nam trong bang mau: giu bang mo
   const b = e.target.closest('button')
   if (!b) return
   dongPopups() // bam bat cu nut nao khac = dong bang mau / menu but
@@ -1610,9 +1631,15 @@ function xong(copy) {
   const ghepVaGui = (nen, nguon) => {
     if (the !== theXong) return
     if (nen) ctx.drawImage(nen, 0, 0, out.width, out.height)
+    /* 06/11 LOP SUA: giu ANH SACH (nen, chua ve gi) + cac net de mo lai sua tiep. Lam lop sua loi thi van luu anh binh thuong.
+       Man chup co Lam noi vung (spot): anh ghim chua ve lai duoc lop toi do -> khong luu lop sua cho anh do. */
+    let lop = null
+    if (luuLopSuaBat && !shapes.some((s) => s.type === 'spot')) {
+      try { lop = { shapes: JSON.parse(JSON.stringify(shapes)), dpr: DPR, dipW: curRect.w, dipH: curRect.h, sach: out.toDataURL('image/png') } } catch (err) { lop = null }
+    }
     ctx.drawImage(veEl, 0, 0) // shape da o device res
-    window.overlay.log('xong shape nen=' + nguon + ' ' + out.width + 'x' + out.height)
-    window.overlay.confirm({ dataUrl: out.toDataURL('image/png'), copy: !!copy })
+    window.overlay.log('xong shape nen=' + nguon + ' ' + out.width + 'x' + out.height + (lop ? ' +lop-sua' : ''))
+    window.overlay.confirm({ dataUrl: out.toDataURL('image/png'), copy: !!copy, lop })
   }
   const roiVeJpeg = (ly) => {
     if (the !== theXong) return
@@ -1770,9 +1797,12 @@ function veChu(ctx, s, k) {
   ctx.save()
   if (s.rot) { ctx.translate(bx + bw / 2, by + bh / 2); ctx.rotate(s.rot); ctx.translate(-(bx + bw / 2), -(by + bh / 2)) }
   ctx.fillStyle = NEN_CHU
-  ctx.beginPath()
-  if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r); else ctx.rect(bx, by, bw, bh)
-  ctx.fill()
+  if (s.tay) NetTay.nenChu(ctx, bx, by, bw, bh, s.seed, k, s.color) // 06/11 ve tay: nen + vien goc le
+  else {
+    ctx.beginPath()
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r); else ctx.rect(bx, by, bw, bh)
+    ctx.fill()
+  }
   ctx.fillStyle = s.color
   for (let i = 0; i < dong.length; i++) {
     ctx.fillText(dong[i], bx + px, by + py + i * lh)

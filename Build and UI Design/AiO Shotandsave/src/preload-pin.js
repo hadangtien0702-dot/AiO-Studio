@@ -15,7 +15,14 @@ contextBridge.exposeInMainWorld('pin', {
   /** Keo file .png that ra app khac (Premiere/Zalo/Mess). */
   startDrag: () => ipcRenderer.send('pin:start-drag'),
   /** Da ve khung/mui ten -> ghi de file + cap nhat thumbnail khay. */
-  saveEdit: (dataUrl, chep) => ipcRenderer.send('pin:save-edit', dataUrl, chep),
+  saveEdit: (dataUrl, chep, lop) => ipcRenderer.send('pin:save-edit', dataUrl, chep, lop),
+  /** 06/11 Lop sua: cac net da ve + anh sach cua anh nay (null neu khong co). Xoa = go ban sach khoi may. */
+  lopDoc: () => ipcRenderer.invoke('pin:lop-doc'),
+  lopXoa: () => ipcRenderer.invoke('pin:lop-xoa'),
+  /** 06/11 Cat bo khuc giua: doi kich thuoc (DIP) cua so anh ghim. */
+  doiCo: (w, h) => ipcRenderer.send('pin:doi-co', w, h),
+  /** 06/11 Cong tac kieu ve tay (nho vao cau hinh). */
+  datKieuTay: (bat) => ipcRenderer.send('ve:dat-tay', !!bat),
   setOpacity: (v) => ipcRenderer.send('pin:opacity', v),
   /** 05/11 Che thong minh: doc chu CA ANH ghim kem toa do tung tu / dong (pixel anh that). */
   ocrTu: () => ipcRenderer.invoke('pin:ocr-tu'),
