@@ -34,7 +34,7 @@ const TOI_DA_DUONG_DAN = 1024
 const KHOANG_TOI_THIEU_MS = 700
 const CUA_SO_MS = 60 * 1000
 const TOI_DA_TRONG_CUA_SO = 10
-const DUOI_ANH = new Set(['.png', '.jpg', '.jpeg'])
+const DUOI_ANH = new Set(['.png', '.jpg', '.jpeg', '.webp']) // 06/11: app tu luu WebP, link ghim phai nhan duoc file do
 const TOI_DA_BYTE_ANH = 300 * 1024 * 1024
 const KY_TU_DIEU_KHIEN = new RegExp('[\u0000-\u001f\u007f-\u009f' + String.fromCharCode(0x2028) + String.fromCharCode(0x2029) + ']')
 

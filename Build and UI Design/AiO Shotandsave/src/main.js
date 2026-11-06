@@ -421,6 +421,10 @@ app.whenReady().then(() => {
   // 06/11: may MOI = chua co cau-hinh.json / ban-quyen.json. Doc NGAY DAY, truoc khi bat ky buoc nao ghi vao userData.
   const dauHieuMayMoi = lanDauMod.docDauHieuMayMoi(fs, app.getPath('userData'))
   setTimeout(() => { try { lopSua.donDep() } catch (e) {} }, 8000) // 06/11: don lop sua cua anh da xoa / qua han / qua tran dung luong
+  /* 06/11 (soat dot 3, muc 6): xoa anh bang Explorer / Finder khi app dang chay thi ban .sach.png (CHUA CHE) khong duoc nam lai toi lan khoi dong
+     sau. Cu 30 giay kiem mot lan (chi existsSync tren chi muc trong bo nho, khong doc file). */
+  const tDonLop = setInterval(() => { try { lopSua.donMoCoi() } catch (e) {} }, 30000)
+  if (tDonLop.unref) tDonLop.unref()
   // Phuc vu anh dong bang tu bo nho (xem chu thich aioshot o dau file).
   protocol.handle('aioshot', (req) => {
     const headers = {
@@ -2215,12 +2219,20 @@ function hoanTacSuaPin(rec, lyDo) {
 }
 
 /* 05/11 CHE THONG MINH tren anh ghim: doc chu CA ANH hien tai (rec.image) kem toa do pixel anh that. */
-ipcMain.handle('pin:ocr-tu', async (e) => {
+ipcMain.handle('pin:ocr-tu', async (e, nenDataUrl) => {
   const rec = pins.get(e.sender.id)
   try {
     if (!rec || !rec.image || rec.image.isEmpty()) return { ok: false, loi: 'khong co anh' }
-    const sz = rec.image.getSize()
-    const kq = await cheTM.docAnhGhim(nativeImage, ocr, rec.image, rec.dipW)
+    /* 06/11 (soat dot 3, muc 7): dang cat bo / mo lai lop sua thi renderer gui nen DANG HIEN; gui ma khong doc duoc thi tu choi (khong roi ve anh cu). */
+    let anhDoc = rec.image
+    if (nenDataUrl != null) {
+      const png = luatMain.pngTuDataUrl(nenDataUrl)
+      const nen = png ? nativeImage.createFromBuffer(png) : null
+      if (!nen || nen.isEmpty()) { ghiLog('che-tm ghim: nen renderer gui khong doc duoc'); return { ok: false, loi: 'khong doc duoc nen dang hien' } }
+      anhDoc = nen
+    }
+    const sz = anhDoc.getSize()
+    const kq = await cheTM.docAnhGhim(nativeImage, ocr, anhDoc, rec.dipW)
     ghiLog('che-tm ghim ' + sz.width + 'x' + sz.height + ': ' + (kq.ok ? kq.dong.length + ' dong' : 'LOI ' + kq.loi) + ' ' + kq.ms + ' ms')
     return kq
   } catch (err) {
@@ -2304,6 +2316,8 @@ ipcMain.on('pin:save-edit', async (e, dataUrl, chep, lop) => {
   const anhEm = banGhimCungAnh(pins.values(), rec, rec.image, (a, b) => !!a && !!b && khoaDuongDan(a) === khoaDuongDan(b))
   for (const em of anhEm) {
     em.image = daVe
+    if (em.dipW !== rec.dipW || em.dipH !== rec.dipH) { em.dipW = rec.dipW; em.dipH = rec.dipH; doiCoPin(em, em.dipW, em.dipH) } // 06/11: ghim kia da cat bot -> anh moi co kich thuoc moi
+    em.dipGoc = { w: em.dipW, h: em.dipH }
     try { if (em.win && !em.win.isDestroyed()) em.win.webContents.send('pin:data', duLieuPin(em)) } catch (err) { ghiLog('pin dong bo anh em LOI: ' + err.message) }
   }
   if (anhEm.length) ghiLog('pin ve-xong: dong bo ' + anhEm.length + ' anh ghim cung file')
@@ -3179,9 +3193,9 @@ function xuLyLienKet(chuoi) {
   if (!lienKet) { if (hangChoLienKet.length < 8) hangChoLienKet.push(chuoi); return }
   lienKet.xuLy(chuoi)
 }
-function ghimFileTuLink(duong) {
-  const img = nativeImage.createFromPath(duong)
-  if (img.isEmpty()) { ghiLog('lien-ket: ghim BO, khong doc duoc anh ' + path.basename(duong)); return }
+async function ghimFileTuLink(duong) {
+  const img = await kho.docAnhFile(duong) // 06/11 (soat dot 3, muc 8): nativeImage khong doc duoc WebP, docAnhFile giai ma qua cua so an
+  if (!img || img.isEmpty()) { ghiLog('lien-ket: ghim BO, khong doc duoc anh ' + path.basename(duong)); return }
   const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
   const sc = d.scaleFactor || 1
   const size = img.getSize()

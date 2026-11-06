@@ -17,6 +17,12 @@
 const path = require('path')
 const fs = require('fs')
 const ROOT = path.resolve(__dirname, '..', '..')
+/* 06/11 (soat dot 3): ten file lop sua gio gom ten + bam cua duong dan day du -> tim file .json cua mot anh bang cach doc truong `duong`. */
+function fileLopJson(L, f) {
+  try { for (const n of fs.readdirSync(L.dir)) { if (!n.endsWith('.json')) continue; try { if (JSON.parse(fs.readFileSync(path.join(L.dir, n), 'utf8')).duong === path.resolve(f)) return path.join(L.dir, n) } catch (e) {} } } catch (e) {}
+  return null
+}
+const conFileSach = (L, ten) => { try { return fs.readdirSync(L.dir).some((n) => n.startsWith(ten) && n.endsWith('.sach.png')) } catch (e) { return false } }
 
 /* ───────────── PHAN NODE ───────────── */
 if (!process.versions.electron) {
@@ -64,7 +70,7 @@ if (!process.versions.electron) {
     // tran dung luong: moi muc ~100 KB, tran 250 KB -> chi con 2 muc moi nhat
     const A = taoLopSua(path.join(goc, 'ud1'), () => {}, { tranByte: 250 * 1024 })
     const fs3 = ['a.png', 'b.png', 'c.png'].map(taoAnh)
-    fs3.forEach((f, i) => { A.ghi(f, { shapes: net, dpr: 1, dipW: 5, dipH: 5, sach: png }); const j = path.join(A.dir, path.basename(f) + '.json'); const b = JSON.parse(fs.readFileSync(j, 'utf8')); b.luc = Date.now() - (3 - i) * 1000; fs.writeFileSync(j, JSON.stringify(b)) })
+    fs3.forEach((f, i) => { A.ghi(f, { shapes: net, dpr: 1, dipW: 5, dipH: 5, sach: png }); const j = fileLopJson(A, f); const b = JSON.parse(fs.readFileSync(j, 'utf8')); b.luc = Date.now() - (3 - i) * 1000; fs.writeFileSync(j, JSON.stringify(b)) })
     A.donDep()
     kiem('Qua tran dung luong: don muc CU NHAT truoc (con b, c; a bi go)', !A.doc(fs3[0]) && !!A.doc(fs3[1]) && !!A.doc(fs3[2]), 'tong ' + A.tongByte() + ' byte')
     kiem('Tong dung luong sau don <= tran (250 KB)', A.tongByte() <= 250 * 1024, A.tongByte() + ' byte')
@@ -75,7 +81,7 @@ if (!process.versions.electron) {
     fs.unlinkSync(fb)
     const bangCuaOMat = path.join(B.dir, 'oroi.png.json'); fs.writeFileSync(bangCuaOMat, JSON.stringify({ v: 1, duong: path.join(goc, 'oroi-khong-co', 'x.png'), bytes: 1, luc: Date.now(), shapes: net })); fs.writeFileSync(path.join(B.dir, 'oroi.png.sach.png'), png)
     B.donDep()
-    kiem('Anh da bi xoa: lop sua cua no bi don', !fs.existsSync(path.join(B.dir, 'mc.png.json')) && !fs.existsSync(path.join(B.dir, 'mc.png.sach.png')))
+    kiem('Anh da bi xoa: lop sua cua no bi don', !fileLopJson(B, fb) && !conFileSach(B, 'mc.png'))
     kiem('Anh con: lop sua giu nguyen', !!B.doc(fb2))
     kiem('Thu muc anh khong con (o dia roi / thu muc offline): KHONG coi la anh da xoa, giu lop sua', fs.existsSync(bangCuaOMat))
     // qua han
@@ -350,7 +356,7 @@ KICH_BAN.S2 = async () => {
   kiem(T('anh luu: khoi trang bi CHE den (anh file la ban DA CHE)'), laDen(A.diem(500, 350)) && laDen(A.diem(460, 310)), JSON.stringify(A.diem(500, 350)))
   kiem(T('luu kem lop sua: 4 net + anh sach, ti le dpr = 1,5 va co dip'), !!r.lop && r.lop.shapes.length === 4 && typeof r.lop.sach === 'string' && r.lop.sach.startsWith('data:image/png') && gan(r.lop.dpr, 1.5, 0.001) && r.lop.dipW === 600 && r.lop.dipH === 400, r.lop ? r.lop.shapes.length + ' net, dpr ' + r.lop.dpr : 'khong co lop')
   const d0 = lopSua.doc(f)
-  kiem(T('lop sua nam trong userData (khong phai thu muc anh): co .json + .sach.png, thu muc anh chi co anh'), !!d0 && fs.existsSync(path.join(lopSua.dir, 's2.png.json')) && fs.readdirSync(path.join(GOC, 'anh')).every((n) => /^s[0-9a-z]+.png$/.test(n)), fs.readdirSync(path.join(GOC, 'anh')).join())
+  kiem(T('lop sua nam trong userData (khong phai thu muc anh): co .json + .sach.png, thu muc anh chi co anh'), !!d0 && !!fileLopJson(lopSua, f) && fs.readdirSync(path.join(GOC, 'anh')).every((n) => /^s[0-9a-z]+.png$/.test(n)), fs.readdirSync(path.join(GOC, 'anh')).join())
   if (d0) {
     const S = docAnh('data:image/png;base64,' + d0.sach.toString('base64'))
     kiem(T('ban sach luu CHUA che: khoi trang con nguyen trong ban sach (3 diem), khong co net cam nao'), S.rong === 900 && laTrang(S.diem(500, 350)) && laTrang(S.diem(460, 310)) && laTrang(S.diem(540, 390)) && !laCam(S.diem(60, 45)), JSON.stringify(S.diem(500, 350)))
@@ -422,10 +428,10 @@ KICH_BAN.S2 = async () => {
   const p7 = await moPin(f3, 600, 400)
   await cho(250); await p7.phim('1'); await cho(200)
   await p7.bamPT('#mau-hien'); await p7.bamPT('#lop-xoa'); await cho(200)
-  kiem(T('bam nut xoa ban sach (chuot that): lop sua + anh sach tren dia bi go, anh trong thu muc anh con nguyen'), rr && coTruoc && !lopSua.doc(f3) && !fs.existsSync(path.join(lopSua.dir, 's2c.png.sach.png')) && fs.existsSync(f3))
+  kiem(T('bam nut xoa ban sach (chuot that): lop sua + anh sach tren dia bi go, anh trong thu muc anh con nguyen'), rr && coTruoc && !lopSua.doc(f3) && !conFileSach(lopSua, 's2c.png') && fs.existsSync(f3))
   kiem(T('sau khi xoa: nut xoa an'), (await p7.o('document.getElementById("lop-xoa").hidden')) === true)
   await cho(100); await p7.capVt(); await p7.keo([200, 200], [300, 260]); await p7.luuAnh()
-  kiem(T('luu tiep sau khi xoa ban sach: KHONG tao lai lop sua'), !lopSua.doc(f3) && !fs.existsSync(path.join(lopSua.dir, 's2c.png.sach.png')))
+  kiem(T('luu tiep sau khi xoa ban sach: KHONG tao lai lop sua'), !lopSua.doc(f3) && !conFileSach(lopSua, 's2c.png'))
   p7.dong()
 
   // ── doi ty le: luu o dpr 2 (man 200 %), ghim o he so 1,25 ──

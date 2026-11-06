@@ -46,6 +46,10 @@ let curBlurType = 'mosaic' // 'mosaic' (Kham o) | 'blur' (Mo min) | 'kin' (To ki
 let anhDaLuu = '' // anh dang hien o che do xem (ban DA ve / da che): thoat ve khong luu thi tra ve dung ban nay
 let luuLopSuaBat = true // 06/11: main bao co luu lop sua khong (luuLopSua trong cau-hinh.json)
 window.pin.onData((data) => {
+  /* 06/11 (soat dot 3, muc 2): main gui anh moi khi MOT ghim khac cung file vua luu (vi du da che). Phien ve/cat dang mo o day
+     dang giu lich su Hoan tac tro ve NEN CU (chua che): Hoan tac se phuc hoi phan thong tin vua che, luu tiep se ghi de mat net che
+     cua ghim kia. Nen bo han phien nay (ban chua luu), lay anh moi lam goc; net chua luu cua phien nay mat, con hon lo thong tin. */
+  if (mode === 've') { PLOG('nhan anh moi tu ghim cung file luc dang ve: bo phien ve chua luu'); thoatVe(true) }
   img.src = data.dataUrl
   anhDaLuu = data.dataUrl
   frame.style.width = data.w + 'px'
@@ -138,8 +142,11 @@ window.addEventListener('mouseup', () => {
 /* --- Nut --- */
 /* 05/11 soat: dang ve / che ma sao chep thi clipboard nhan anh GOC chua che. Gui anh da ghep kem lenh chep: main chep CHINH anh do,
    ghi file loi van chep dung ban da che. Ghep loi thi khong chep gi, con hon chep anh chua che. */
+/* 06/11 (soat dot 3, muc 1): "co gi do da doi trong phien ve" = dung dieu kien cua luuVe (net, cat bo, hoac mo lai lop sua roi xoa het net).
+   Truoc day chi xet shapes.length: cat bo dai chua thong tin rieng, KHONG them net nao, Ctrl+C -> clipboard van la anh GOC chua cat. */
+function phienCoThayDoi() { return mode === 've' && (shapes.length > 0 || nenDoi || (nenTuLop && SuaNet.lichSu.length > 0)) }
 function chepAnh() {
-  if (mode === 've' && shapes.length) { luuVe(true); return }
+  if (phienCoThayDoi()) { luuVe(true); return }
   window.pin.copy()
 }
 btnCopy.addEventListener('click', chepAnh)
@@ -1087,7 +1094,7 @@ toolbarEl.addEventListener('click', (e) => {
 function luuVe(chep, lanCho) {
   chotOGoChu()
   // 06/11: co thay doi nao khong? (net, cat bo, hoac mo lai lop sua roi xoa het net) — khong thi thoat, tra anh ve nhu cu
-  if (!shapes.length && !nenDoi && !(nenTuLop && SuaNet.lichSu.length)) { thoatVe(); return }
+  if (!phienCoThayDoi()) { thoatVe(); return }
   if ((!img.complete || !img.naturalWidth) && (lanCho || 0) < 50) { setTimeout(() => luuVe(chep, (lanCho || 0) + 1), 40); return } // nen moi (anh sach / sau cat) chua nap xong
   let daLuu = false
   try {
@@ -1197,6 +1204,9 @@ function veChu(ctx, s, k) {
    Giong man chup (overlay.js): doc chu CA ANH ghim bang Tesseract (main: pin:ocr-tu, kem toa do), hien khung tung tu / dong;
    bam chu = che (to kin, blurType 'kin'), Tu che = email / so dien thoai / so the / link, Che moi cho trung.
    Khi bam Xong, luuVe() ghep lop che len anh THAT (veShape voi he so k) roi ghi de file. Logic: src/che-thong-minh.js. */
+/* 06/11 (soat dot 3, muc 7): da cat bo (hoac mo lai lop sua) thi nen dang hien KHAC rec.image o main -> gui chinh nen dang hien, khong
+   de main doc anh cu (khung nhan dien + phan che se lech dung so pixel da cat). Chua doi gi thi null: main dung anh ghim nhu cu. */
+function nenChoOcr() { return mode === 've' && (nenDoi || nenTuLop) && nenHienTai ? nenHienTai : null }
 const heSoAnh = () => ((img.naturalWidth || dip.w * DPR) / dip.w) // pixel anh that / DIP hien thi
 function themNhomChe(ds) {
   for (const x of ds) themNet(x) // 05/11: ghi vao lich su; cung `nhom` = mot buoc Hoan tac (src/sua-net.js)
@@ -1214,7 +1224,7 @@ function chuyenChe() {
 }
 cheTM = window.CheTMUI.tao({
   goc: frame, rect: () => ({ x: 0, y: 0, w: dip.w, h: dip.h }), heSo: heSoAnh, shapes: () => shapes, veLai: () => redraw(),
-  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx, nhom: x.nhom }) }, doc: () => window.pin.ocrTu(), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
+  them: themNhomChe, daBo: (ds) => { for (const x of ds) SuaNet.ghi({ k: 'xoa', s: x.s, idx: x.idx, nhom: x.nhom }) }, doc: () => window.pin.ocrTu(nenChoOcr()), datThanh: datThanhChe, t: (k) => window.i18n.t(k), log: PLOG,
   nut: document.getElementById('che-muc'),
 })
 cheMenu = window.CheTMUI.ganMenuXo({

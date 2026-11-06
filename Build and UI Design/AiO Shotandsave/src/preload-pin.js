@@ -25,7 +25,7 @@ contextBridge.exposeInMainWorld('pin', {
   datKieuTay: (bat) => ipcRenderer.send('ve:dat-tay', !!bat),
   setOpacity: (v) => ipcRenderer.send('pin:opacity', v),
   /** 05/11 Che thong minh: doc chu CA ANH ghim kem toa do tung tu / dong (pixel anh that). */
-  ocrTu: () => ipcRenderer.invoke('pin:ocr-tu'),
+  ocrTu: (nen) => ipcRenderer.invoke('pin:ocr-tu', typeof nen === 'string' ? nen : null),
   /* Keo: neo mot lan roi gui delta TUYET DOI (xem preload-shelf.js). */
   dragStart: () => ipcRenderer.send('pin:drag-start'),
   dragTo: (tongDx, tongDy) => ipcRenderer.send('pin:drag-to', tongDx, tongDy),

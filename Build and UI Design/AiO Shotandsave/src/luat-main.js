@@ -48,4 +48,15 @@ function taoCoGif() {
   }
 }
 
-module.exports = { duocNapLai, quyetDinhPhimChup, taoBoVeSan, taoCoGif }
+/* Nen anh do renderer ghim gui len de doc chu (soat dot 3, muc 7): chi nhan dataURL PNG hop le va khong qua lon.
+   Tra Buffer PNG, hoac null (khong hop le -> main tu choi, KHONG roi ve doc anh cu). */
+const TOI_DA_NEN_OCR = 120 * 1024 * 1024
+function pngTuDataUrl(s, toiDa) {
+  if (typeof s !== 'string' || s.length > (toiDa || TOI_DA_NEN_OCR) * 1.4) return null
+  const m = /^data:image\/png;base64,([A-Za-z0-9+/=]+)$/.exec(s)
+  if (!m) return null
+  const b = Buffer.from(m[1], 'base64')
+  return b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 ? b : null
+}
+
+module.exports = { duocNapLai, quyetDinhPhimChup, taoBoVeSan, taoCoGif, pngTuDataUrl }

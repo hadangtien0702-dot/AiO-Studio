@@ -45,6 +45,7 @@
     "test:suanet": "node scripts/test/do-sua-net.cjs",
     "test:lopsua": "node scripts/test/do-lop-sua.cjs",
     "test:sausoat": "node scripts/test/do-sau-soat.cjs",
+    "test:saugop": "node scripts/test/do-sau-gop.cjs",
     "test:khodai": "node scripts/test/do-kho-dai.cjs",
     "test:timanh": "electron scripts/test/do-tim-anh.cjs",
     "test:cuaso": "node scripts/test/do-chup-cua-so.cjs",

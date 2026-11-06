@@ -234,7 +234,17 @@ function ghiDeAnh(filePath, buf) {
        tam (nguoi dung / lan sau van lay lai duoc ban sua). Chi xoa tam + du phong khi copy xong va doc lai dung kich thuoc. */
     const dp = filePath + '.truoc-' + process.pid
     let coDp = false
-    try { fs.copyFileSync(filePath, dp); coDp = true } catch (eDp) { /* khong co file goc de giu (da bi xoa): van thu ghi */ }
+    try { fs.copyFileSync(filePath, dp); coDp = true } catch (eDp) {
+      /* 06/11 (soat dot 3, muc 4): chi khi KHONG CO file goc de giu (da bi xoa, ENOENT) moi duoc ghi tiep. File goc con ma khong
+         sao luu duoc (het dung luong, mat quyen doc...) thi KHONG chep de len no: copy hong giua chung la mat anh goc ma khong con
+         ban nao de tra lai. Giu nguyen file goc, giu file tam (ban sua hoan chinh) cho nguoi dung. */
+      let conGoc = true
+      try { fs.statSync(filePath) } catch (eSt) { if (eSt && eSt.code === 'ENOENT') conGoc = false }
+      if (conGoc) {
+        try { fs.unlinkSync(dp) } catch (eU) {} // ban du phong do chinh lan nay tao dang do (het dung luong): bo
+        return { ok: false, loi: ma(e) + ' / khong-sao-luu-duoc-anh-goc:' + ma(eDp), giuTam: tam, anhGocConNguyen: true, giuDuPhong: null }
+      }
+    }
     try {
       fs.copyFileSync(tam, filePath)
       if (fs.statSync(filePath).size !== fs.statSync(tam).size) throw new Error('kich-thuoc-sai')
