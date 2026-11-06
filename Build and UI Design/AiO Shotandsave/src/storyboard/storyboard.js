@@ -217,6 +217,7 @@ function chuanBiKeo(d) {
     render()
     const { u8, icon } = await layBanNen()
     const r = await window.storyboard.chuanBiKeo(d.id, ver, u8, icon, Math.round(performance.now() - t0))
+    if (r && r.boDi) for (const k of r.boDi) { if (k !== d.id) daVe.delete(k) } // main da loai cac dai nay khoi bo nho ve san
     return !!(r && r.ok)
   }).catch((err) => { console.error('Loi ve san dai de keo:', err); return false })
   daVe.set(d.id, { ver, xong })

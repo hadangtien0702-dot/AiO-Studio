@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; media-src file:; img-src data: blob: file:; style-src 'unsafe-inline' 'self' file:; font-src file:; script-src 'self'" />
+  <title>AiO Shot &amp; Save · Sửa video</title>
+  <link rel="stylesheet" href="../../assets/tokens.css" />
+  <!-- 06/11: man SUA VIDEO (cat dau cuoi · tu phong to theo con tro · nen va khung). Khuon giao dien = man Cai dat qua
+       storyboard.css (header, .chon-nhom/.chon-nut, .nut/.nut.chinh); sua-video.css chi them phan rieng, khong khai token. -->
+  <link rel="stylesheet" href="../storyboard/storyboard.css" />
+  <link rel="stylesheet" href="sua-video.css" />
+</head>
+<body>
+  <header id="tieu-de">
+    <div class="hieu">
+      <svg class="logo" viewBox="0 0 385.89 351.31" width="18" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/>
+        <path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/>
+      </svg>
+      <span id="title" data-i18n="sv.tieuDe">Sửa video</span>
+      <span id="ten-file"></span>
+    </div>
+    <div class="dieu-khien">
+      <button id="btn-close" class="dong" data-i18n-title="sv.dong">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="than">
+    <section id="cot-xem">
+      <div id="xem"><canvas id="cv"></canvas></div>
+      <div id="phat-hang">
+        <button id="nut-phat" class="nut" type="button"></button>
+        <span id="gio-hien">0:00.0</span>
+        <span class="spacer"></span>
+        <span id="nhan-doan"></span>
+      </div>
+      <div id="tl" role="group">
+        <div id="tl-ray"></div>
+        <div id="tl-chon"></div>
+        <div id="tl-kim"></div>
+        <button id="tay-dau" class="tay" type="button" role="slider" aria-label="Start" tabindex="0"></button>
+        <button id="tay-cuoi" class="tay" type="button" role="slider" aria-label="End" tabindex="0"></button>
+      </div>
+      <div id="tl-moc"><span id="moc-tu">0:00.0</span><span id="goi-y-cat" data-i18n="sv.catGoiY"></span><span id="moc-den">0:00.0</span></div>
+    </section>
+
+    <aside id="cot-chon">
+      <section class="muc" id="muc-tieng" hidden>
+        <div class="muc-dau" data-i18n="sv.tieng"></div>
+        <div class="chon-nhom" id="nhom-tieng" role="group">
+          <button class="chon-nut" type="button" data-v="co" data-i18n="sv.coTieng"></button>
+          <button class="chon-nut" type="button" data-v="khong" data-i18n="sv.khongTieng"></button>
+        </div>
+      </section>
+
+      <section class="muc" id="muc-zoom">
+        <div class="muc-dau" data-i18n="sv.zoom"></div>
+        <div class="chon-nhom" id="nhom-zoom" role="group">
+          <button class="chon-nut" type="button" data-v="tat" data-i18n="sv.zoomTat"></button>
+          <button class="chon-nut" type="button" data-v="nhe" data-i18n="sv.zoomNhe"></button>
+          <button class="chon-nut" type="button" data-v="vua" data-i18n="sv.zoomVua"></button>
+          <button class="chon-nut" type="button" data-v="manh" data-i18n="sv.zoomManh"></button>
+        </div>
+        <p class="ghi-chu" id="ghi-zoom" data-i18n="sv.zoomGoiY"></p>
+      </section>
+
+      <section class="muc" id="muc-nen">
+        <div class="muc-dau" data-i18n="sv.nen"></div>
+        <div class="chon-nhom" id="nhom-nen" role="group">
+          <button class="chon-nut" type="button" data-v="khong" data-i18n="sv.nenKhong"></button>
+          <button class="chon-nut" type="button" data-v="chuyen" data-i18n="sv.nenChuyen"></button>
+          <button class="chon-nut" type="button" data-v="dac" data-i18n="sv.nenMau"></button>
+          <button class="chon-nut" type="button" data-v="mo" data-i18n="sv.nenMo"></button>
+        </div>
+        <div id="mau-chon" class="mau-chon" hidden></div>
+        <div id="thanh-nen" hidden>
+          <label class="truot"><span data-i18n="sv.le"></span><input id="r-le" type="range" min="0" max="30" step="1" /><b id="v-le"></b></label>
+          <label class="truot"><span data-i18n="sv.bo"></span><input id="r-bo" type="range" min="0" max="20" step="1" /><b id="v-bo"></b></label>
+          <label class="truot"><span data-i18n="sv.bong"></span><input id="r-bong" type="range" min="0" max="100" step="5" /><b id="v-bong"></b></label>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer id="chan">
+    <div id="ket-qua" hidden>
+      <span id="kq-chu"></span>
+      <span id="kq-ten"></span>
+      <span class="spacer"></span>
+      <button id="kq-keo" class="nut" type="button" draggable="true"></button>
+      <button id="kq-mo" class="nut" type="button"></button>
+    </div>
+    <div id="tien-do" hidden><i id="tien-vach"></i></div>
+    <div id="hanh-dong">
+      <span id="trang-thai"></span>
+      <span class="spacer"></span>
+      <button id="nut-huy" class="nut" type="button" hidden></button>
+      <button id="nut-xuat" class="nut chinh" type="button"></button>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="may-quay.js"></script>
+  <script src="../lamdep/render.js"></script>
+  <script src="render.js"></script>
+  <script src="sua-video.js"></script>
+</body>
+</html>

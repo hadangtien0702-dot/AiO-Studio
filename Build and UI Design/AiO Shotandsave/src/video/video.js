@@ -191,6 +191,11 @@ function taoHang(m, so) {
   const bKeo = nut('nut', t('vd.keoNut'), t('vd.keo'))
   const bMo = nut('nut', t('vd.moThuMuc'))
   bMo.addEventListener('click', () => window.video.moThuMuc(m.id))
+  /* 06/11 SUA VIDEO: cat dau cuoi · tu phong to theo con tro · nen va khung -> file MOI canh video goc (man rieng src/sua-video).
+     Chi voi MP4 do app quay (webm khong doc duoc bang bo tach hop). */
+  const bSua = nut('nut', t('sv.nutSua'), t('sv.nutSuaGoiY'))
+  bSua.disabled = !m.gifDuoc
+  bSua.addEventListener('click', () => { v.pause(); window.video.sua(m.id) })
   const bXoa = nut('nut icon', '', '')
   // Nut xoa noi dung luong THAT se vao Thung rac (ban goc + ban khong tieng neu da tao)
   const datTieuDeXoa = () => { const s = t('vd.xoa', { mb: dungLuong(m.bytesXoa || m.bytes) }); bXoa.title = s; bXoa.setAttribute('aria-label', s) }
@@ -218,7 +223,7 @@ function taoHang(m, so) {
       showToast(t('vd.khongXoaDuoc'))
     }
   })
-  dau.append(ten, ...(nhanLoi ? [nhanLoi] : []), meta, spacer, ...(nhomTieng ? [nhomTieng] : []), bKeo, bMo, bXoa)
+  dau.append(ten, ...(nhanLoi ? [nhanLoi] : []), meta, spacer, ...(nhomTieng ? [nhomTieng] : []), bKeo, bMo, bSua, bXoa)
 
   const khung = document.createElement('div')
   khung.className = 'vd-khung'

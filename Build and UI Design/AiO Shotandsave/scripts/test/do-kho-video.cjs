@@ -156,8 +156,8 @@ if (coMau) {
 
 /* ── 02/10 (A4) doi ngon ngu KHONG nap lai cua so quay: chay chinh ham duocNapLai lay tu main.js ── */
 const mainJs = doc('src', 'main.js')
-const hamNap = (/function duocNapLai\(url\) \{[^\n]*\}/.exec(mainJs) || [])[0]
-const duocNapLai = hamNap ? new Function(hamNap + '; return duocNapLai')() : null
+// 06/11: ham duocNapLai tach sang src/luat-main.js (do duoc rieng bang test:luatmain); main.js chi gan lai
+const duocNapLai = /const duocNapLai = luatMain\.duocNapLai/.test(mainJs) ? require(path.join(ROOT, 'src', 'luat-main.js')).duocNapLai : null
 const goc = 'file:///C:/Users/x/AppData/Local/Programs/aio-shot-and-save/resources/app.asar/src/'
 kiem('duocNapLai: KHONG nap lai cua so luong (bo quay) / dem (dong ho, vien quay) / dien (san dien)', !!duocNapLai && ['luong/index.html', 'dem/quay.html', 'dem/vien.html', 'dem/index.html', 'dien/index.html'].every((t) => duocNapLai(goc + t) === false))
 kiem('duocNapLai: cac cua so co chu van nap lai (khay, cai dat, khay gop, ghim, man chup, nut tron)', !!duocNapLai && ['shelf/index.html', 'settings/index.html', 'khay/index.html?tab=video', 'pin/index.html', 'overlay/index.html', 'nut/index.html'].every((t) => duocNapLai(goc + t) === true) && duocNapLai('file:///D:/luong-cua-toi/src/shelf/index.html') === true)
@@ -184,7 +184,7 @@ if (coMau) {
 fs.rmSync(tam, { recursive: true, force: true })
 
 // ── [2] DAY NOI: preload goi kenh nao thi main phai nghe kenh do ─────────
-const main = doc('src', 'main.js') + '\n' + doc('src', 'luong-chup.js')
+const main = doc('src', 'main.js') + '\n' + doc('src', 'luong-chup.js') + '\n' + doc('src', 'sua-video.js') // 06/11: sua:* nam o sua-video.js
 const nghe = new Set([...main.matchAll(/ipcMain\.(?:on|handle)\('([^']+)'/g)].map((m) => m[1]))
 // main gui xuong trang bang 2 kieu: win.webContents.send(...) va e.sender.send(...) (lan dau chi do kieu 1 -> bao oan
 // 'shelf:removed' / 'shelf:cleared' la khong ai gui)

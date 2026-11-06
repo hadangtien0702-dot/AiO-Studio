@@ -31,6 +31,10 @@ const canvasKho = require('./canvas-kho') // 12/10: Canvas y tuong — khung tre
 const henGio = require('./hen-gio') // 05/11: hen gio chup 3 / 5 / 10 giay tu menu khay
 const moCungMay = require('./mo-cung-may') // 04/11: tu mo cung Windows, tat duoc trong Cai dat
 const khoVideo = require('./kho-video') // 01/10: so ghi cac doan QUAY VIDEO (file MP4 nam trong thu muc anh)
+const luatMain = require('./luat-main') // 06/11: luat nho tach ra de do duoc (duocNapLai, quyetDinhPhimChup, bo ve san dai, co GIF)
+const suaVideo = require('./sua-video') // 06/11: man Sua video (cat dau cuoi · tu phong to theo con tro · nen va khung) mo tu Khay video
+const conTroQuay = require('./con-tro-quay') // 06/11: vi tri con tro luc quay -> file phu cho "Tu phong to theo con tro" (man Sua video)
+const thoatAnToan = require('./thoat-an-toan') // 06/11: thoat app giua luc quay video khong duoc mat doan dang quay
 const { taoBanKhongTieng, coDuongTieng } = require('./mp4-bo-tieng') // 01/10: ban Khong tieng cua video da quay (khong can FFmpeg)
 const xuatGif = require('./xuat-gif') // 06/10: xuat GIF tu video da quay (cua so an src/gif, khong can FFmpeg)
 const chupCuonLib = require('./chup-cuon') // 06/10: chup cuon trang dai (bo ghep + vong lap mot phien)
@@ -249,7 +253,7 @@ function khoiTaoCapNhat() {
     phienBan: app.getVersion(), nenTang: process.platform, ghiLog,
     doc: () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { return null } },
     ghi: (st) => { fs.writeFileSync(file + '.tmp', JSON.stringify(st, null, 2)); fs.renameSync(file + '.tmp', file) },
-    dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh || !!cuon, // chup / quay Storyboard / quay video / chup cuon
+    dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh || !!cuon || suaVideo.dangBan(), // chup / quay Storyboard / quay video / chup cuon / xuat video da sua
     khiDoi: () => rebuildTrayMenu(),
     baoMot: (tt) => {
       if (!Notification.isSupported()) return
@@ -437,6 +441,7 @@ app.whenReady().then(() => {
   if (THU_CANVAS) { thuCanvas(); return } // che do do: khong tray, khong phim tat, khong luong chup
   setTimeout(canvasTaoSanAnhNho, 20000)   // A6 (05/11): tao san anh nho cho thu vien, nen mo Canvas lan dau khong phai cho giai ma anh
   xuatGif.khoiTao(ghiLog)
+  suaVideo.khoiTao({ ghiLog, moiDesktop, tim: (id) => khoVideo.tim(id), keoAnToan: (f) => kho.duongDanKeoAnToan(f) })
   setTimeout(khoiPhucVideoDo, 5000) // 02/10: file quay do cua lan truoc (app bi tat giua luc quay) -> dua lai vao khay
   { // 04/10 (anh chot huong A): KHONG xoa sach .keo nua — file da dua cho Premiere bi mat sau khi mo lai app.
     // Chi bo lien ket ma anh goc da bi xoa han (xem kho.js donKeoAnToan).
@@ -576,6 +581,7 @@ app.on('window-all-closed', (e) => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
+  try { suaVideo.huy() } catch (e) {} // dang xuat video da sua giua luc thoat: huy + xoa file .tam (khong de file do)
   ocr.tatHost() // tien trinh PowerShell doc chu (neu dang giu san)
   if (timAnh) timAnh.luuVaDung()
   khayThu.dongHet() // nut tron + san dien cua khay
@@ -657,11 +663,22 @@ function rebuildTrayMenu() {
 }
 
 let dangThoat = false // 01/10: thoat giua luc quay video -> chot file nhung KHONG mo khay video nua
-function forceQuit() {
+let thoatDuocPhep = false // 06/11: da doi quay xong (hoac het gio) -> before-quit khong chan nua
+/* 06/11 (Codex soat, loi 2): Thoat giua luc quay = DUNG bo ghi, DOI no chot file, roi moi huy cua so (src/thoat-an-toan.js).
+   Truoc day destroy het cua so ngay -> mat khuc cuoi (hoac ca doan neu bam trong giay dau). */
+async function forceQuit() {
   dangThoat = true
+  try { await thoatAnToan.doiQuayXong({ dangQuay: () => !!ghiHinh, dung: () => dungGhiHinh('thoat app'), toiDaMs: 8000, ghiLog }) } catch (e) { ghiLog('thoat LOI: ' + e.message) }
+  thoatDuocPhep = true
   for (const w of BrowserWindow.getAllWindows()) w.destroy()
   app.quit()
 }
+// Moi duong thoat khac (cap nhat, he dieu hanh, Cmd+Q) cung phai doi quay xong
+app.on('before-quit', (e) => {
+  if (thoatDuocPhep || !ghiHinh) return
+  e.preventDefault()
+  forceQuit()
+})
 
 /** [selftest] Chup noi dung mot cua so ra file PNG trong .selftest/. */
 async function saveCapture(win, name) {
@@ -961,7 +978,9 @@ ipcMain.handle('settings:set-khay', (_e, kieu) => {
    luong AN (src/luong: bo quay video + luong chup chay san), dong ho / vien quay (src/dem) va san dien cua khay
    (src/dien) -> doi ngon ngu luc dang quay la doan quay hong, dong ho ve 0:00; luong chup chay san cung chet theo.
    Ba loai cua so do khong co chu can dich lai (nut Dung tren dong ho giu ngon ngu cu toi luot quay sau). */
-function duocNapLai(url) { return !/\/src\/(luong|dem|dien)\//.test(String(url || '').replace(/\\/g, '/')) }
+const duocNapLai = luatMain.duocNapLai
+/* 06/11 (Codex soat, loi 4): them `gif` va `sua-xuat` (cua so AN xuat GIF / xuat video da sua). Nap lai giua luc xuat
+   GIF thi bo ma hoa chay lai tu dau ma van noi vao file .tam cu -> kiem so byte truot, mat ca GIF. Hai cua so do khong co chu. Luat: src/luat-main.js. */
 
 // Doi ngon ngu: luu, cap nhat tray, NAP LAI cac cua so dang mo de dich lai.
 ipcMain.handle('settings:set-lang', (_e, l) => {
@@ -1044,8 +1063,12 @@ let layersSanSang = null // layers cua the he hien tai — overlay nao nap xong 
 async function startCapture(opts) {
   // 01/10: dang QUAY VIDEO -> phim tat chup / bam tray = DUNG quay (duong dung luon co, ke ca khi vung kin man
   // khong con cho dat nut Dung). Khong mo overlay luc dang quay: anh dong bang se lot vao video.
-  if (ghiHinh) { dungGhiHinh('phim tat'); return }
-  if (cuon) { cuon.dung = true; return } // 06/10: dang chup cuon -> phim tat chup = Xong (duong dung luon co)
+  const qd = luatMain.quyetDinhPhimChup({ ghiHinh: !!ghiHinh, cuon: !!cuon, dangQuay })
+  if (qd === 'dung-quay') { dungGhiHinh('phim tat'); return }
+  if (qd === 'dung-cuon') { cuon.dung = true; return } // 06/10: dang chup cuon -> phim tat chup = Xong (duong dung luon co)
+  /* 06/11 (Codex soat, loi 5): dang QUAY 3 GIAY Storyboard thi khong mo man chon vung: overlay phu anh dong bang len
+     vung dang lay mau, cac khung sau sai noi dung. Bo qua phim (vien cam + dem 3-2-1 dang hien nen nguoi dung biet dang quay). */
+  if (qd === 'bo-qua-quay3s') { ghiLog('startCapture BO QUA: dang quay Storyboard 3 giay'); return }
   if (overlayWins.length) {
     // 05/11: man chup hien o cho nguoi dung khong thay (desktop khac, sau app toan man hinh) thi truoc day MOI lan bam phim sau
     // deu bi bo qua toi khi tat app. Chua ai cham vao no -> dong, mo lai. Dang chon vung that thi bo qua nhu cu.
@@ -2692,6 +2715,8 @@ async function batDauGhiHinh(display, rect, tieng) {
     return
   }
   g.batDau = Date.now(); g.w = r.w; g.h = r.h; g.tieng = !!r.tieng
+  // 06/11: ghi vi tri con tro (~30 lan / giay) vao RAM, ghi file phu luc quay xong (khong hook native)
+  try { g.contro = conTroQuay.bat({ bounds: display.bounds, rect, t0: r.t0Epoch || Date.now(), tre: r.treHinh || 0, w: r.w, h: r.h }) } catch (e) { ghiLog('contro bat LOI: ' + e.message) }
   if (cauQuay.quayMic !== false && !r.mic) { // thieu quyen / khong co micro: van quay, bao mot dong
     ghiLog('quay-video: khong thu micro (' + (r.micLoi || 'khong ro') + ')')
     if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T(r.micLoi === 'quyen' || r.micLoi === 'NotAllowedError' ? 'quay.micQuyen' : 'quay.micKhong') }).show()
@@ -2715,6 +2740,7 @@ function huyGhiHinhLoi(e) {
   ghiHinh = null
   if (g) {
     clearTimeout(g.hetGio)
+    try { if (g.contro) g.contro.dung() } catch (err) {}
     try { if (g.vien) g.vien.dong() } catch (err) {}
     if (g.batDau) luong.dungQuay()
     try { fs.closeSync(g.fd) } catch (err) {}
@@ -2738,6 +2764,8 @@ function ketThucGhiHinh(g, info) {
   ghiHinh = null
   clearTimeout(g.hetGio)
   g.vien.dong()
+  let duConTro = null
+  try { if (g.contro) duConTro = g.contro.dung() } catch (e) { ghiLog('contro dung LOI: ' + e.message) }
   try { fs.closeSync(g.fd) } catch (e) {}
   if (tray) tray.setToolTip('AiO Shot & Save')
   rebuildTrayMenu()
@@ -2758,6 +2786,10 @@ function ketThucGhiHinh(g, info) {
        `loi` vao so (khay danh dau "Bi ngat") + thong bao. Truoc do loi chi nam trong log, video thieu trong nhu du. */
   const loiQuay = (info && info.loi) || g.loiGhi || null
   const c = khoVideo.chotQuay({ tam: g.tam, file: g.duong, ms, w: g.w, h: g.h, tieng: g.tieng, bytes: g.bytes, loi: !!loiQuay })
+  if (duConTro && /\.(mp4|webm)$/i.test(c.file || '')) { // file phu canh video (chi khi video da co ten that)
+    const okCt = conTroQuay.luu(c.file, duConTro)
+    ghiLog('contro: ' + (okCt ? 'ghi ' + duConTro.mau.length + ' mau' : 'KHONG ghi duoc / qua it mau') + ' -> ' + conTroQuay.duongPhu(c.file))
+  }
   if (c.hong) { baoVideo('quay.ngoaiKhay', c.file); return } // chotQuay da ghi log ly do
   videoMoi = c.m.id
   if (loiQuay) baoVideo('quay.biNgat', null)
@@ -3253,13 +3285,12 @@ ipcMain.handle('video:get-data', () => {
 /* 06/10 ECC soat, 2 cuoc dua trong luc GIF dang duoc tao (mat vai giay):
    - video bi XOA giua chung -> truoc day GIF van duoc ghi ra, so khong con muc -> file .gif mo coi nam lai trong thu muc anh;
    - nguoi dung chon lai "Co tieng / Khong tieng" (dong mo khay, doi ngon ngu roi bam) -> GIF xong lai de `chonGif: true`. */
-const gifDangTao = new Set() // id video dang duoc tao GIF
-const gifBoChon = new Set()  // id video ma nguoi dung da chon ban KHAC trong luc GIF dang tao
+const gifCo = luatMain.taoCoGif() // co "dang tao GIF" + "da chon ban khac" cua tung video (src/luat-main.js)
 ipcMain.handle('video:chon-gif', async (e, id, chon) => {
   const m = khoVideo.tim(id)
   if (!m || !fs.existsSync(m.file)) return { ok: false, loi: 'khong co video' }
   if (!chon) {
-    if (gifDangTao.has(id)) gifBoChon.add(id)
+    gifCo.chonBanKhac(id)
     const m2 = khoVideo.sua(id, { chonGif: false })
     return m2 ? trangThaiBan(m2) : { ok: false, loi: 'khong ghi duoc so' }
   }
@@ -3269,11 +3300,13 @@ ipcMain.handle('video:chon-gif', async (e, id, chon) => {
   if (!f) {
     if (!/\.mp4$/i.test(m.file)) return { ok: false, loi: 'khong-ho-tro' }
     f = m.file.replace(/\.mp4$/i, '') + '.gif'
-    gifDangTao.add(id); gifBoChon.delete(id)
+    /* 06/11 (Codex soat, loi 7): video nay DANG tao GIF (dong mo khay roi bam lai) -> tu choi NGAY, truoc khi dong vao co. Truoc
+       day yeu cau thu hai xoa co "da chon ban khac" cua yeu cau dau, GIF xong tu chon lai GIF du nguoi dung vua chon Khong tieng. */
+    if (!gifCo.batDau(id)) return { ok: false, loi: 'dang-ban' }
     let r
     try {
       r = await xuatGif.xuat(m.file, f, null, (p) => { try { if (!e.sender.isDestroyed()) e.sender.send('video:gif-tien-do', id, p) } catch (err) {} })
-    } finally { gifDangTao.delete(id); boChon = gifBoChon.delete(id) }
+    } finally { boChon = gifCo.ketThuc(id) }
     if (!r.ok) return { ok: false, loi: r.loi }
     cat = r.cat
     const con = khoVideo.tim(id)
@@ -3290,7 +3323,7 @@ ipcMain.handle('video:chon-gif', async (e, id, chon) => {
 ipcMain.handle('video:chon-tieng', (_e, id, coTieng) => {
   const m = khoVideo.tim(id)
   if (!m || !m.tieng || !fs.existsSync(m.file)) return { ok: false, loi: 'khong co video / video khong co tieng' }
-  if (gifDangTao.has(id)) gifBoChon.add(id) // dang tao GIF ma nguoi dung chon ban khac: GIF xong khong duoc gianh lai lua chon
+  gifCo.chonBanKhac(id) // dang tao GIF ma nguoi dung chon ban khac: GIF xong khong duoc gianh lai lua chon
   if (coTieng) {
     const m2 = khoVideo.sua(id, { boTieng: false, chonGif: false })
     return m2 ? trangThaiBan(m2) : { ok: false, loi: 'khong ghi duoc so' }
@@ -3352,6 +3385,7 @@ ipcMain.handle('video:xoa', async (_e, id) => {
     ghiLog('video xoa ' + id + ' LOI dua vao thung rac: ' + err.message)
     return { ok: false, loi: err.message }
   }
+  try { const fp = conTroQuay.duongPhu(m.file); if (fs.existsSync(fp)) await shell.trashItem(fp) } catch (err) { ghiLog('video xoa ' + id + ': khong dua duoc file con tro vao thung rac: ' + err.message) }
   khoVideo.bo(id)
   videoIcon.delete(id)
   ghiLog('video xoa ' + id + ' -> thung rac: ' + m.file)
@@ -3437,22 +3471,22 @@ ipcMain.handle('storyboard:save', (_e, u8) => {
    chuot vao hang, byte PNG giu o day (toi da 6 dai, bo dai cu nhat); dragstart chi gui id -> ghi file (neu chua co)
    + startDrag ngay. File: thu muc anh, ten theo id + danh sach khung (ver) -> keo lai cung dai KHONG ghi them file
    moi, bo 1 khung la ten moi (khong ghi de file Premiere da nhan — ly do o chu thich luuFileStoryboard). */
-const sbVeSan = new Map() // id -> { ver, buf, icon, file }
+const sbVeSan = luatMain.taoBoVeSan(6) // id -> { ver, buf, icon, file }; toi da 6, them() tra id bi loai
 const MAU_VER = /^[0-9-]{1,40}$/
 ipcMain.handle('storyboard:chuan-bi-keo', (_e, id, ver, u8, iconDataUrl, msVe) => {
   const buf = layBuf(u8)
   if (!khoDai.MAU_ID.test(String(id)) || !MAU_VER.test(String(ver)) || !buf) return { ok: false }
   let icon = iconDataUrl ? nativeImage.createFromDataURL(iconDataUrl) : null
   if (!icon || icon.isEmpty()) icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'icon.png')).resize({ height: 64 })
-  sbVeSan.delete(id)
-  sbVeSan.set(id, { ver, buf, icon, file: null })
-  while (sbVeSan.size > 6) sbVeSan.delete(sbVeSan.keys().next().value)
-  ghiLog('storyboard ve san ' + id + ' v' + ver + ': ' + (msVe | 0) + ' ms, ' + Math.round(buf.length / 1024) + ' KB')
-  return { ok: true }
+  const boDi = sbVeSan.them(id, { ver, buf, icon, file: null })
+  /* 06/11 (Codex soat, loi 6): dai bi loai khoi 6 muc nay ma giao dien van nho "da ve san" -> re qua 7 dai la dai dau het keo
+     duoc (keo-dai bo qua im lang). Nay bao ve ID da loai trong cau tra loi de giao dien quen no va ve lai o lan re chuot sau. */
+  ghiLog('storyboard ve san ' + id + ' v' + ver + ': ' + (msVe | 0) + ' ms, ' + Math.round(buf.length / 1024) + ' KB' + (boDi.length ? ' (loai ' + boDi.join(',') + ')' : ''))
+  return { ok: true, boDi }
 })
 ipcMain.on('storyboard:keo-dai', (e, id, ver) => {
   const t0 = Date.now()
-  const rec = sbVeSan.get(id)
+  const rec = sbVeSan.lay(id)
   if (!rec || rec.ver !== ver) { ghiLog('storyboard keo ' + id + ': CHUA ve san (bo qua)'); return }
   try {
     if (!rec.file || !fs.existsSync(rec.file)) {
