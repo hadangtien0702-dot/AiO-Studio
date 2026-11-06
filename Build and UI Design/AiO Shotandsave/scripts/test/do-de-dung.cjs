@@ -273,7 +273,7 @@ async function phanI18n() {
   kiem('Tu chep: mac dinh doi o MOT cho (hang TU_CHEP_MAC_DINH = ' + tuChep.TU_CHEP_MAC_DINH + ')', tuChep.TU_CHEP_MAC_DINH === true && (doc('src/tu-chep.js').match(/TU_CHEP_MAC_DINH = /g) || []).length === 1)
   // dong that trong handleConfirm: chay voi clipboard gia
   const dong = mainSrc.match(/  if \(tuChepMod\.nenChep\(payload, kho\.docCauHinh\(\)\)\) \{ try \{ clipboard\.writeImage\(cropped\) \} catch \(e\) \{\} \}/)
-  kiem('Tu chep: handleConfirm goi nenChep truoc khi luu anh (cung duong Xong va Ctrl+C)', !!dong && mainSrc.indexOf(dong[0]) < mainSrc.indexOf('const filePath = kho.luuAnh(cropped'))
+  kiem('Tu chep: handleConfirm goi nenChep truoc khi luu anh (cung duong Xong va Ctrl+C)', !!dong && mainSrc.indexOf(dong[0]) < mainSrc.indexOf('const filePath = await kho.luuAnhDoi(cropped'))
   if (dong) {
     const chayDong = (payload, cfg) => { const ds = []; new Function('tuChepMod', 'kho', 'clipboard', 'payload', 'cropped', dong[0])(tuChep, { docCauHinh: () => cfg }, { writeImage: (x) => ds.push(x) }, payload, 'ANH'); return ds.length }
     kiem('Tu chep: chay dong THAT cua handleConfirm: bam Xong (khong Ctrl+C) -> chep 1 lan; tat -> 0 lan; Ctrl+C -> 1 lan',
@@ -405,8 +405,8 @@ async function phanI18n() {
     kho: { docCauHinh: () => ({ hotkeyLai: '', phimCanvas: 'CommandOrControl+Alt+K', tuChepXong: false }), thuMucAnh: () => 'x' },
     app: { getVersion: () => '0.10.1' },
   }
-  new Function('ipcMain', 'kho', 'app', 'currentHotkey', 'DEFAULT_HOTKEY', 'lang', 'CHAT_LUONG_Q', 'kieuKhay', 'giayHopLe', 'kieuLamMo', 'anNutHopLe', 'moCungMay', 'tuChepMod', 'phimLaiCauHinh', 'DEFAULT_HOTKEY_LAI', 'phimCanvasCauHinh', 'PHIM_CANVAS_MAC_DINH',
-    maGet)(stub.ipcMain, stub.kho, stub.app, 'A', 'B', 'vi', { cao: 98 }, () => 'ngang', (x) => x, (x) => x, (x) => x || [], { trangThai: () => ({}) }, tuChep,
+  new Function('thongTinTen', 'ipcMain', 'kho', 'app', 'currentHotkey', 'DEFAULT_HOTKEY', 'lang', 'CHAT_LUONG_Q', 'kieuKhay', 'giayHopLe', 'kieuLamMo', 'anNutHopLe', 'moCungMay', 'tuChepMod', 'phimLaiCauHinh', 'DEFAULT_HOTKEY_LAI', 'phimCanvasCauHinh', 'PHIM_CANVAS_MAC_DINH',
+    maGet)(() => ({}), stub.ipcMain, stub.kho, stub.app, 'A', 'B', 'vi', { cao: 98 }, () => 'ngang', (x) => x, (x) => x, (x) => x || [], { trangThai: () => ({}) }, tuChep,
     () => stub.kho.docCauHinh().hotkeyLai, 'DEF-LAI', () => stub.kho.docCauHinh().phimCanvas, 'DEF-CANVAS')
   const g = got ? got() : {}
   kiem('Phim phu: settings:get tra hotkeyLai (rong = tat), phimCanvas, 2 phim mac dinh va tuChepXong (tat -> false)', g.hotkeyLai === '' && g.phimCanvas === 'CommandOrControl+Alt+K' && g.defLai === 'DEF-LAI' && g.defCanvas === 'DEF-CANVAS' && g.tuChepXong === false, JSON.stringify([g.hotkeyLai, g.phimCanvas, g.defLai, g.defCanvas, g.tuChepXong]))

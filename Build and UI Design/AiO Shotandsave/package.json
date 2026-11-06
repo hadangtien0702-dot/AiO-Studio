@@ -151,6 +151,7 @@
     "dmg": {
       "artifactName": "AiO-Shot-and-Save-${version}-mac-${arch}.dmg"
     },
+    "protocols": [{ "name": "AiO Shot and Save", "schemes": ["aioshot"] }],
     "afterSign": "scripts/afterSign.js"
   },
   "dependencies": {
