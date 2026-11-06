@@ -379,14 +379,17 @@ function dangKy(ctx) {
 
   /* ---- Cua so ---- */
   let lanLamMoi = 0
+  let chuCho = '' // 06/11: link aioshot://tim?chu=… mo cua so voi san chu tim (trang lay qua tim-anh:chu-ban-dau)
   function moCuaSo(o) {
     o = o || {}
+    if (typeof o.chu === 'string') chuCho = o.chu
     chiMuc.quet()
     if (!o.khongDoc) chiMuc.vong()
     donThumbMoCoi()
     if (win && !win.isDestroyed()) {
       if (!o.an) { win.show(); win.focus() }
       win.webContents.send('tim-anh:lam-moi')
+      if (chuCho) { win.webContents.send('tim-anh:dat-chu', chuCho); chuCho = '' }
       return win
     }
     const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
@@ -427,6 +430,7 @@ function dangKy(ctx) {
     return b ? new Uint8Array(b) : null
   })
   ipcMain.handle('tim-anh:trang-thai', () => chiMuc.trangThai())
+  ipcMain.handle('tim-anh:chu-ban-dau', () => { const c = chuCho; chuCho = ''; return c })
   ipcMain.handle('tim-anh:tam-dung', (_e, b) => { chiMuc.datTamDung(b); return chiMuc.trangThai() })
   ipcMain.handle('tim-anh:lam-moi', () => { chiMuc.quet(); chiMuc.vong(); return chiMuc.trangThai() })
   ipcMain.on('tim-anh:ghim', (_e, duong) => {

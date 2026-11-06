@@ -46,6 +46,7 @@ const { ganHoiPhuc } = require('./khay-hoi-phuc') // 06/11: trang khay chet / tr
 const { banGhimCungAnh } = require('./khay-muc')
 const { taoMucKhay, anhMucKhay, apDungSuaVaoKhay } = require('./khay-muc') // 04/10: khay chi giu anh nho, khong giu anh goc
 const { taoBanQuyen, taoKhoFile } = require('./banquyen') // 24/09: dung thu 14 ngay + ma Polar (xem dau src/banquyen.js)
+const lienKetMod = require('./lien-ket') // 06/11: dieu khien tu ngoai bang link aioshot://… (hang rao o dau file do)
 
 /* ☠️ CHUP DUOC VIDEO DANG PHAT (vap 26/08 — anh Tien chup reference video/hinh).
    Video tang toc phan cung nam o lop OVERLAY ma bo chup cu (Desktop Duplication
@@ -353,7 +354,15 @@ if (!gotLock) {
   try { fs.appendFileSync(RUN_LOG, new Date().toLocaleTimeString('vi-VN', { hour12: false }) + ' boot: da co ban khac dang chay -> thoat (second-instance)\n') } catch (e) {}
   app.quit()
 } else {
-  app.on('second-instance', (_e, argv) => { if (hanhDongLan2(argv) === 'canvas') openCanvasWindow(); else startCapture() })
+  app.on('second-instance', (_e, argv) => {
+    /* 06/11: co link aioshot://… / co dong lenh (--chup, --ghim=…) thi chi chay dung lenh do qua hang rao (lien-ket.js);
+       khong co thi hanh vi cu: chay exe lan 2 = chup (hoac --mo-canvas = mo Canvas). */
+    const lenh = lienKetMod.tuArgv(argv)
+    if (lenh.length) { lenh.forEach(xuLyLienKet); return }
+    if (hanhDongLan2(argv) === 'canvas') openCanvasWindow(); else startCapture()
+  })
+  /* macOS: link aioshot://… den qua su kien open-url (co the TRUOC khi app san sang -> xep hang). Phai dang ky som. */
+  app.on('open-url', (e, url) => { try { e.preventDefault() } catch (err) {} xuLyLienKet(url) })
 }
 
 app.setName('AiO Shot & Save')
@@ -461,6 +470,7 @@ app.whenReady().then(() => {
   const okPhim = registerHotkey()
   dangKyPhimCanvas()
   if (process.argv.includes('--mo-canvas')) setTimeout(() => openCanvasWindow(), 1500)   // A1: loi tat / lenh "AiO Shot & Save.exe --mo-canvas"
+  khoiTaoLienKet()                                                                       // 06/11: link aioshot://… + co --chup, --ghim=…
   /* Nhat ky boot: sau nay ai bao "phim tat doi/khong an" la co dau vet ngay
      (truoc 31/08 log chi ghi thao tac chup — chuyen phim tat MU hoan toan). */
   ghiLog('boot v' + app.getVersion() + ' hotkey=' + currentHotkey +
@@ -1000,7 +1010,13 @@ ipcMain.handle('settings:pick-folder', async (e) => {
   })
   if (res.canceled || !res.filePaths.length) return { folder: kho.thuMucAnh(), huy: true }
   const folder = res.filePaths[0]
-  kho.ghiCauHinh({ thuMucAnh: folder })
+  /* 06/11 (Codex soat, loi 8): ban cu bao da doi du ghi cau hinh that bai (file khoa, o day). Doc lai ket qua ghi: chi bao
+     doi khi da xuong dia / vao RAM that, khong thi giu cho cu va noi that cho giao dien. */
+  const kq = kho.ghiCauHinhChac({ thuMucAnh: folder })
+  if (!kq.ok) {
+    ghiLog('doi thu muc anh THAT BAI: khong ghi duoc cau hinh, van la ' + kho.thuMucAnh())
+    return { folder: kho.thuMucAnh(), loi: 'khong-luu-duoc' }
+  }
   return { folder }
 })
 
@@ -2071,7 +2087,10 @@ ipcMain.on('pin:save-edit', (e, dataUrl, chep) => {
       buf = laPng ? daVe.toPNG() : daVe.toJPEG((dd && dd.q) || 85)
     } catch (err) { buf = null }
     const r = buf && buf.length ? kho.ghiDeAnh(rec.filePath, buf) : { ok: false, loi: 'khong ma hoa duoc anh' }
-    if (!r.ok) { hoanTacSuaPin(rec, 'ghi file ' + path.basename(rec.filePath) + ': ' + r.loi); return }
+    if (!r.ok) {
+      hoanTacSuaPin(rec, 'ghi file ' + path.basename(rec.filePath) + ': ' + r.loi + (r.giuTam ? ' (GIU ban sua o ' + path.basename(r.giuTam) + ')' : '') + (r.giuDuPhong ? ' (anh goc o ' + path.basename(r.giuDuPhong) + ')' : ''))
+      return
+    }
     const n = kho.lamMoiKeo(rec.filePath) // file moi doi ten vao cho cu -> lien ket .keo (neu co) phai noi lai
     ghiLog('pin ve-xong ghi de ' + path.basename(rec.filePath) +
       (r.cach === 'ghi-thang' ? ' (GHI THANG vi khong doi ten duoc: ' + r.loiDoiTen + ')' : '') +
@@ -2872,6 +2891,53 @@ function dangKyPhimCanvas(accel) {
   try { ok = globalShortcut.register(p, () => openCanvasWindow()) } catch (e) { ok = false }
   if (ok) phimCanvasDangKy = p; else ghiLog('canvas: khong dang ky duoc phim ' + p + ' (app khac dang giu), mo bang menu khay')
   return ok
+}
+/* ── DIEU KHIEN TU NGOAI BANG LINK (06/11) ──────────────────────────────────────
+   Nguoi xai + hang rao an toan: doc dau src/lien-ket.js. Dang ky giao thuc voi he dieu hanh CHI o ban dong goi
+   (ban nguon / selftest / bai do khong dung vao registry hay Launch Services cua may anh).
+   ☠️ macOS CHI nhan link neu giao thuc co trong Info.plist luc DONG GOI (package.json build.protocols) — dang ky luc chay
+   khong du. Chua them (de bai khong cho sua package.json): xem bao cao. */
+let lienKet = null
+const hangChoLienKet = []
+function xuLyLienKet(chuoi) {
+  if (!lienKet) { if (hangChoLienKet.length < 8) hangChoLienKet.push(chuoi); return }
+  lienKet.xuLy(chuoi)
+}
+function ghimFileTuLink(duong) {
+  const img = nativeImage.createFromPath(duong)
+  if (img.isEmpty()) { ghiLog('lien-ket: ghim BO, khong doc duoc anh ' + path.basename(duong)); return }
+  const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+  const sc = d.scaleFactor || 1
+  const size = img.getSize()
+  let dipW = Math.round(size.width / sc), dipH = Math.round(size.height / sc)
+  const k = Math.min(1, (d.workArea.width * 0.9) / dipW, (d.workArea.height * 0.9) / dipH)
+  if (k < 1) { dipW = Math.round(dipW * k); dipH = Math.round(dipH * k) }
+  const off = (cascade++ % 6) * 24
+  const x = d.workArea.x + Math.round((d.workArea.width - dipW) / 2) + off
+  const y = d.workArea.y + Math.round((d.workArea.height - dipH) / 2) + off
+  createPinWindow(img, x, y, dipW, dipH, duong)
+}
+function khoiTaoLienKet() {
+  if (IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST || THU_QUAY || THU_OCR) return
+  lienKet = lienKetMod.taoLienKet({
+    thuMucAnh: () => kho.thuMucAnh(),
+    ghiLog,
+    lamViec: {
+      chup: () => startCapture(),
+      chupLaiVung: () => chupLaiVungCuoi(),
+      canvas: () => openCanvasWindow(),
+      khay: () => showShelf(),
+      tim: (chu) => { if (timAnh) timAnh.moCuaSo({ chu }) },
+      ghim: (duong) => ghimFileTuLink(duong),
+    },
+  })
+  if (app.isPackaged && !process.env.AIO_USERDATA) {
+    try { ghiLog('lien-ket: dang ky aioshot:// voi he dieu hanh = ' + app.setAsDefaultProtocolClient(lienKetMod.GIAO_THUC)) } catch (e) { ghiLog('lien-ket: dang ky giao thuc LOI ' + e.message) }
+  }
+  const dau = hangChoLienKet.splice(0).concat(lienKetMod.tuArgv(process.argv))
+  // Chay sau khi khay / phim tat da san sang; cac lenh dau tien cach nhau theo gioi han tan suat chung.
+  dau.slice(0, 1).forEach((c) => setTimeout(() => lienKet.xuLy(c), 1500))
+  if (dau.length > 1) ghiLog('lien-ket: luc mo app co ' + dau.length + ' lenh, chi chay lenh dau')
 }
 const hanhDongLan2 = (argv) => (Array.isArray(argv) && argv.includes('--mo-canvas') ? 'canvas' : 'chup')
 const laCanvas = (e) => !!canvasWin && !canvasWin.isDestroyed() && e.sender === canvasWin.webContents

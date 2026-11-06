@@ -173,5 +173,8 @@ window.timAnh.onTienDo((s) => {
 })
 window.timAnh.onLamMoi(() => hoanTim(0))
 
+// 06/11: aioshot://tim?chu=… mo cua so voi san chu tim (khong tu chay lenh nao khac)
+window.timAnh.onDatChu((c) => { oTim.value = String(c || '').slice(0, 120); hoanTim(0) })
+window.timAnh.chuBanDau().then((c) => { if (c) { oTim.value = String(c).slice(0, 120); hoanTim(0) } }).catch(() => {})
 oTim.focus()
 tim()

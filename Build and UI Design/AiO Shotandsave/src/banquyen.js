@@ -50,11 +50,14 @@ const HET_GIO_MS = 15000
 const NHAN_MA_HET_HAN = true
 
 function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', meta = {} }) {
-  /* Gio "da thay" lon nhat: chong vặn lui dong ho de keo dai dung thu. */
-  function gio(s) {
-    const t = now()
-    return Math.max(t, s.gioLonNhat || 0)
-  }
+  /* 06/11 (Codex soat, loi 7): ban cu giu "gio lon nhat da thay" (gioLonNhat) va tinh dung thu = max(gio hien tai, gioLonNhat)
+     - lui dong ho 30 ngay thi dong ho dung thu DUNG 30 ngay (14 ngay thanh 44), va chinh dong ho tien vot roi tra dung gio
+     van giu het han. Nay dung thu tinh bang TONG THOI GIAN DA DUNG (daDungMs): moi lan doc cong them khoang tu lan thay truoc
+     (gioCuoi) toi gio hien tai; dong ho lui = cong 0 (khong tru), nhay toi nhieu hon 14 ngay chi cong 14 ngay. Lui dong ho
+     roi dung tiep thi dong ho thu van chay theo thoi gian dung thuc, khong dung lai. KHONG ngan duoc: nhay dong ho tien
+     <= 14 ngay (khong phan biet voi mot khoang nghi that), va tuan nao cung lui dong ho truoc moi lan mo app. */
+  const NHAY_TOI_DA = SO_NGAY_THU * NGAY
+  const GHI_SAU_MS = 60 * 1000 // dong ho di tien it hon 1 phut thi chua can ghi dia (tinh lai tu moc cu cho cung ket qua)
 
   /* 04/10 (ECC soat, DA DO): ban cu coi MOI loi doc la "lan chay dau" roi GHI DE -> file co ma, doc hong dung 1 lan
      la mat `key` + `activationId` (khach da tra tien ve dung thu, nhap lai ma thi ton them 1 trong 2 cho tren Polar).
@@ -79,27 +82,41 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
       /* Vua mo app + co file ma khong doc duoc: KHONG biet khach da kich hoat chua. Tra trang thai TAM
          (cho chup — khong khoa nguoi da tra tien), KHONG ghi, KHONG nho -> lan goi sau doc lai tu dia. */
       const t0 = now()
-      return { batDauThu: t0, gioLonNhat: t0 }
+      return { batDauThu: t0, daDungMs: 0, gioCuoi: t0 }
     }
     let doi = choGhi
-    if (!s.batDauThu) { s.batDauThu = now(); doi = true }
     const t = now()
-    if (!s.gioLonNhat || t > s.gioLonNhat) { s.gioLonNhat = t; doi = true }
+    if (!s.batDauThu) { s.batDauThu = t; doi = true }
+    if (typeof s.daDungMs !== 'number') {
+      /* Ban luu cu (chi co batDauThu + gioLonNhat): doi sang tong thoi gian da dung. Lay min(gio hien tai, gioLonNhat)
+         de ban da bi "phat" vi nhay dong ho tien thi duoc go lai. */
+      const den = Math.min(t, s.gioLonNhat || t)
+      s.daDungMs = Math.max(0, den - s.batDauThu)
+      s.gioCuoi = t
+      doi = true
+    }
+    const delta = t - (typeof s.gioCuoi === 'number' ? s.gioCuoi : t)
+    if (delta > 0) {
+      s.daDungMs += Math.min(delta, NHAY_TOI_DA)
+      if (delta >= GHI_SAU_MS) { s.gioCuoi = t; doi = true }
+    } else if (delta < 0) { s.gioCuoi = t; doi = true } // dong ho lui: dat lai moc, KHONG tru
+    else if (typeof s.gioCuoi !== 'number') { s.gioCuoi = t; doi = true }
     if (doi) luu(s); else ram = chep(s)
     return s
   }
 
+  /** Tra true neu da xuong dia. 06/11 (Codex soat, loi 3): ben goi can biet de bao that cho khach. */
   function luu(s) {
     ram = chep(s)
-    try { ghi(s); choGhi = false } catch (e) { choGhi = true } // ghi hong: giu trong RAM, lan nap sau ghi lai
+    try { ghi(s); choGhi = false; return true } catch (e) { choGhi = true; return false } // ghi hong: giu trong RAM, lan nap sau ghi lai
   }
 
   /** Trang thai de UI + duong chup doc. Khong goi mang. */
   function trangThai() {
     const s = napTrangThai()
-    const t = gio(s)
-    const hetThu = s.batDauThu + SO_NGAY_THU * NGAY
-    const conLaiMs = hetThu - t
+    const t = now()
+    const conLaiMs = SO_NGAY_THU * NGAY - s.daDungMs
+    const hetThu = t + conLaiMs
     const ngayConLai = Math.max(0, Math.ceil(conLaiMs / NGAY))
     const coMa = !!(s.key && (s.activationId || s.vinhVienKhongMay))
     if (coMa && !s.thuHoi) {
@@ -112,6 +129,7 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
         hetQuyenCapNhat: !!(hetHan && t >= hetHan),
         khongGiuMay: !!s.vinhVienKhongMay,
         kiemLanCuoi: s.kiemLanCuoi || null,
+        chuaLuuXuongDia: choGhi, // lan ghi truoc hong, dang giu trong RAM
       }
     }
     return {
@@ -152,15 +170,31 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
     return 'ma-sai' // 404 / 422 / 403 khac
   }
 
+  /* 06/11 (Codex soat, loi 2): giu Enter / bam lien tiep luc mang cham gui nhieu lenh kich hoat truoc khi cai dau luu duoc
+     activationId -> Polar tao nhieu activation, chi giu id cuoi, chiem het 2 cho. Nay chi MOT viec kich hoat / huy chay
+     mot luc: cung ma thi tra lai ket qua cua lan dang chay, khac ma / dang huy thi tra 'dang-xu-ly'. */
+  let dangKichHoat = null // { key, p }
+  let dangHuy = null
+
   /** Nhap ma -> kich hoat may nay. Tra { ok, loi?, trangThai }. */
-  async function kichHoat(maNhap) {
+  function kichHoat(maNhap) {
     const key = String(maNhap || '').trim()
-    if (!key) return { ok: false, loi: 'ma-trong', trangThai: trangThai() }
+    if (!key) return Promise.resolve({ ok: false, loi: 'ma-trong', trangThai: trangThai() })
+    if (dangKichHoat) {
+      return dangKichHoat.key === key ? dangKichHoat.p : Promise.resolve({ ok: false, loi: 'dang-xu-ly', trangThai: trangThai() })
+    }
+    if (dangHuy) return Promise.resolve({ ok: false, loi: 'dang-xu-ly', trangThai: trangThai() })
+    const p = kichHoatTrong(key).finally(() => { dangKichHoat = null })
+    dangKichHoat = { key, p }
+    return p
+  }
+
+  async function kichHoatTrong(key) {
     const s = napTrangThai()
     if (s.key === key && s.activationId && !s.thuHoi) return { ok: true, trangThai: trangThai() }
     /* Dang giu ma KHAC tren may nay -> tra cho may cu truoc (khong thi mat 1 trong 2 cho). */
     if (s.key && s.activationId && s.key !== key) {
-      const h = await huyKichHoat()
+      const h = await huyTrong()
       if (!h.ok) return { ok: false, loi: h.loi, trangThai: trangThai() }
     }
     const r = await goi('activate', { key, label: String(tenMay).slice(0, 100), meta })
@@ -172,8 +206,10 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
         hetHan: lk.expires_at || null, kiemLanCuoi: now(), thuHoi: false, lyDoMatMa: null,
         vinhVienKhongMay: false,
       })
-      luu(moi)
-      return { ok: true, trangThai: trangThai() }
+      const daLuu = luu(moi)
+      /* Polar da giu cho cua may nay. Chua ghi duoc xuong dia (dia day / mat quyen ghi): van dung duoc trong luot chay nay va
+         lan doc sau ghi lai, nhung PHAI noi that — mo lai app truoc khi ghi duoc la mat kich hoat. */
+      return daLuu ? { ok: true, trangThai: trangThai() } : { ok: true, chuaLuu: true, trangThai: trangThai() }
     }
     const loi = phanLoaiLoi(r)
     if (loi === 'ma-het-han' && NHAN_MA_HET_HAN) {
@@ -182,14 +218,21 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
         key, activationId: null, maHienThi: anMa(key), hetHan: null, kiemLanCuoi: now(),
         thuHoi: false, lyDoMatMa: null, vinhVienKhongMay: true,
       })
-      luu(moi)
-      return { ok: true, canhBao: 'ma-het-han', trangThai: trangThai() }
+      const daLuu = luu(moi)
+      return { ok: true, canhBao: 'ma-het-han', chuaLuu: !daLuu, trangThai: trangThai() }
     }
     return { ok: false, loi, trangThai: trangThai() }
   }
 
   /** Go ma khoi may nay (tra cho cho may khac). */
-  async function huyKichHoat() {
+  function huyKichHoat() {
+    if (dangKichHoat) return Promise.resolve({ ok: false, loi: 'dang-xu-ly', trangThai: trangThai() })
+    if (dangHuy) return dangHuy
+    dangHuy = huyTrong().finally(() => { dangHuy = null })
+    return dangHuy
+  }
+
+  async function huyTrong() {
     const s = napTrangThai()
     if (!s.key) return { ok: true, trangThai: trangThai() }
     if (s.activationId) {
@@ -211,8 +254,12 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
     if (!ep && s.kiemLanCuoi && now() - s.kiemLanCuoi < KIEM_MOI && now() >= s.kiemLanCuoi) {
       return { daHoi: false, trangThai: trangThai() }
     }
-    const r = await goi('validate', { key: s.key, activation_id: s.activationId })
+    const keyHoi = s.key, actHoi = s.activationId
+    const r = await goi('validate', { key: keyHoi, activation_id: actHoi })
     const moi = napTrangThai()
+    /* 06/11 (Codex soat, loi 1): luc cho Polar tra loi, khach co the da huy ma A roi kich hoat ma B. Tra loi cua A ve muon
+       (404) khong duoc xoa B vua luu. Ma / activation hien tai khac cai da hoi = bo tra loi nay. */
+    if (moi.key !== keyHoi || moi.activationId !== actHoi) return { daHoi: false, loi: 'da-doi-ma', trangThai: trangThai() }
     if (r.mang && r.status >= 200 && r.status < 300 && r.json) {
       moi.kiemLanCuoi = now()
       if ('expires_at' in r.json) moi.hetHan = r.json.expires_at || null
@@ -268,7 +315,18 @@ function taoKhoFile(file, { fs = require('fs'), path = require('path'), log = ()
   function doc() {
     let txt
     try { txt = fs.readFileSync(file, 'utf8') } catch (e) {
-      if (e && e.code === 'ENOENT') { bao(''); return null }
+      if (e && e.code === 'ENOENT') {
+        /* File bien mat (antivirus, don dep, nguoi dung xoa nham) nhung ban du phong con: lay lai, dung de khach da tra tien
+           phai nhap ma lai (Polar van giu cho cu, nhap lai co the vuong het 2 may). */
+        const conLai = docDuPhong()
+        if (conLai && conLai.key) {
+          try { ghiBen(file, JSON.stringify(conLai, null, 2), fs) } catch (e2) { /* lan ghi sau se thu lai */ }
+          log('ban-quyen: file MAT, lay lai tu ban du phong')
+          bao('')
+          return conLai
+        }
+        bao(''); return null
+      }
       bao((e && e.code) || 'loi-doc')
       throw e
     }
@@ -288,7 +346,7 @@ function taoKhoFile(file, { fs = require('fs'), path = require('path'), log = ()
         throw e2 // khong cat duoc ban hong thi coi la "khong doc duoc": KHONG ghi de len no
       }
       loiCu = ''
-      const conLai = docDuPhong()
+      const conLai = docDuPhong() || cuuTuVanBan(txt)
       if (conLai) {
         try { ghiBen(file, JSON.stringify(conLai, null, 2), fs) } catch (e2) { /* lan ghi sau se thu lai, trang thai van dung */ }
         log('ban-quyen: file HONG (' + e.message + '), da cat sang ' + path.basename(dich) + ', lay lai tu ban du phong')
@@ -297,6 +355,19 @@ function taoKhoFile(file, { fs = require('fs'), path = require('path'), log = ()
       log('ban-quyen: file HONG (' + e.message + '), da cat sang ' + path.basename(dich) + ', bat dau lai')
       return null
     }
+  }
+  /* 06/11 (Codex soat, loi 4): file hong khong con la JSON nhung van con doan chu doc duoc (cat cut giua chung). Neu van
+     thay du ma + activation thi lay lai, khong bat khach nhap lai (Polar da giu cho: nhap lai ton them 1 trong 2 may). */
+  function cuuTuVanBan(t) {
+    const lay = (ten) => { const m = new RegExp('"' + ten + '"\\s*:\\s*"([^"\\\\]+)"').exec(t); return m ? m[1] : null }
+    const key = lay('key'), act = lay('activationId')
+    const vinhVien = /"vinhVienKhongMay"\s*:\s*true/.test(t)
+    if (!key || (!act && !vinhVien)) return null
+    const s = { key, activationId: act || null, vinhVienKhongMay: vinhVien }
+    const hien = lay('maHienThi'); if (hien) s.maHienThi = hien
+    const han = lay('hetHan'); if (han) s.hetHan = han
+    const bd = /"batDauThu"\s*:\s*(\d{10,})/.exec(t); if (bd) s.batDauThu = Number(bd[1])
+    return s
   }
   function docDuPhong() {
     try {

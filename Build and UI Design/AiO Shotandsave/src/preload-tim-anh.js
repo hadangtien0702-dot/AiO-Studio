@@ -29,4 +29,6 @@ contextBridge.exposeInMainWorld('timAnh', {
   close: () => ipcRenderer.send('tim-anh:close'),
   onTienDo: (cb) => ipcRenderer.on('tim-anh:tien-do', (_e, s) => cb(s)),
   onLamMoi: (cb) => ipcRenderer.on('tim-anh:lam-moi', () => cb()),
+  chuBanDau: () => ipcRenderer.invoke('tim-anh:chu-ban-dau'),
+  onDatChu: (cb) => ipcRenderer.on('tim-anh:dat-chu', (_e, c) => cb(c)),
 })
