@@ -10,6 +10,7 @@
 
 const { app } = require('electron')
 const path = require('path')
+const { ghiBen } = require('./ghi-ben')
 const fs = require('fs')
 
 /**
@@ -202,7 +203,11 @@ function lamMoiKeo(filePath) {
 function ghiDeAnh(filePath, buf) {
   const tam = filePath + '.tam-' + process.pid
   const ma = (e) => (e && e.code) || (e && e.message) || 'loi'
-  try { fs.writeFileSync(tam, buf) } catch (e) {
+  try {
+    // Sap nguon giua luc ghi de la mat luon anh CU: ep xuong dia truoc khi doi ten (06/11)
+    const fd = fs.openSync(tam, 'w')
+    try { fs.writeFileSync(fd, buf); fs.fsyncSync(fd) } finally { fs.closeSync(fd) }
+  } catch (e) {
     try { fs.unlinkSync(tam) } catch (e2) {} // file tam do chinh lan goi nay tao, dung ten
     return { ok: false, loi: ma(e) }
   }
@@ -348,9 +353,7 @@ function ghiCauHinh(patch) {
        keo khay la savePos). May sap/restart giua writeFileSync thang vao file
        that -> JSON hong -> docCauHinh tra {} -> MOI cai dat ve mac dinh
        (phim tat, ngon ngu, kieu khay) ma khong ai biet vi sao (31/08). */
-    const tmp = duongDanCauHinh() + '.tmp'
-    fs.writeFileSync(tmp, JSON.stringify(next, null, 2))
-    fs.renameSync(tmp, duongDanCauHinh())
+    ghiBen(duongDanCauHinh(), JSON.stringify(next, null, 2)) // ep xuong dia: may sap nguon khong de lai file rong ruot (06/11)
     nhoCauHinh = JSON.stringify(next)
     return next
   } catch (err) {

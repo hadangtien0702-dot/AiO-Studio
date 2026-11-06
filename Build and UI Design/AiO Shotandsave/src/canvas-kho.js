@@ -23,6 +23,7 @@
    KHOA cua mot tam: "<ten file>" (anh / video o thu muc goc) · "k:<id khung>/<ten file>" (file CHI co trong thu muc con) · "dai:<id>".
    ========================================================================= */
 const fs = require('fs')
+const { ghiBen } = require('./ghi-ben')
 const path = require('path')
 
 let FILE = null
@@ -172,9 +173,7 @@ function ghiBoCuc(bc) {
   if (!FILE || camGhi) return false
   try {
     fs.mkdirSync(path.dirname(FILE), { recursive: true })
-    const tam = FILE + '.tmp'
-    fs.writeFileSync(tam, JSON.stringify(bc))
-    fs.renameSync(tam, FILE)
+    ghiBen(FILE, JSON.stringify(bc)) // tmp + ep xuong dia + doi ten, xem ghi-ben.js
     return true
   } catch (e) { ghiLog('canvas: ghi bo-cuc.json LOI ' + (e && e.code)); return false }
 }

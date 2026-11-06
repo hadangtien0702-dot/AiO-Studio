@@ -268,6 +268,7 @@ else {
   kiem('ghi roi doc lai: dung noi dung, khong de lai file .tmp', k.doc().key === 'K' && !fs.existsSync(file + '.tmp'))
   fs.writeFileSync(file, String.fromCharCode(0xFEFF) + JSON.stringify({ batDauThu: 2, key: 'BOM' }))
   kiem('file co BOM (luu bang Notepad): van doc duoc', !!k.doc() && k.doc().key === 'BOM')
+  fs.rmSync(file + '.bak', { force: true }) // ca KHONG co ban du phong; ca co ban du phong o do-sau-soat.cjs
   for (const [ten, noiDung] of [['JSON cut', '{"key":"K","activationId":'], ['file rong', ''], ['mang', '[1,2]'], ['chuoi', '"x"']]) {
     fs.writeFileSync(file, noiDung)
     const truoc = nhatKy.length

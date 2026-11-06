@@ -54,6 +54,20 @@ if (!process.versions.electron) {
     kiem('C3 anh sua luc dang doc chu: chi muc giu chu ban MOI, khong giu chu ban cu', cm.tim({ chu: 'chumoi' }).tong === 1 && cm.tim({ chu: 'chucu' }).tong === 0, 'doc ' + lan + ' lan, chu moi ' + cm.tim({ chu: 'chumoi' }).tong + ', chu cu ' + cm.tim({ chu: 'chucu' }).tong)
     cm.dungHet()
 
+    // Ban quyen: may sap nguon lam file thanh toan so 0 (do that tren may nha 06/11: 325 byte so 0, khach mat ma)
+    const { taoKhoFile } = require(path.join(SRC, 'banquyen.js'))
+    const fq = path.join(dir, 'ban-quyen.json')
+    let soFsync = 0
+    const fsDem = Object.assign({}, fs, { fsyncSync: (fd) => { soFsync++; return fs.fsyncSync(fd) } })
+    const kq1 = taoKhoFile(fq, { fs: fsDem, path })
+    kq1.ghi({ key: 'AIOSS-THU', activationId: 'a1', batDauThu: 5 })
+    kiem('Ban quyen: ghi file co ep xuong dia (fsync) truoc khi doi ten', soFsync >= 1, soFsync + ' lan')
+    fs.writeFileSync(fq, Buffer.alloc(325))
+    let lai = null
+    try { lai = taoKhoFile(fq, { path }).doc() } catch (e) { lai = 'nem loi ' + e.message }
+    kiem('Ban quyen: file thanh toan so 0 sau sap nguon: lay lai duoc ma tu ban du phong', lai && lai.key === 'AIOSS-THU', JSON.stringify(lai))
+    kiem('Ban quyen: lay lai xong file chinh doc duoc binh thuong', (() => { try { return JSON.parse(fs.readFileSync(fq, 'utf8')).key === 'AIOSS-THU' } catch (e) { return false } })())
+
     // A5 phim trung
     const main = doc('main.js')
     const m = /function chuanPhim[\s\S]*?\n}\n/.exec(main)

@@ -16,6 +16,7 @@
      file quay do vua duoc khoi phuc).
    - timTam() + khoiPhucTam(): file quay do `.mp4.tam` con lai sau khi app bi tat giua luc quay -> doi ten thanh video. */
 const fs = require('fs')
+const { ghiBen } = require('./ghi-ben')
 const path = require('path')
 
 let FILE = null
@@ -50,8 +51,7 @@ function docSo() {
 function doc() { return docSo().ds }
 function ghi(ds) {
   fs.mkdirSync(path.dirname(FILE), { recursive: true })
-  fs.writeFileSync(FILE + '.tmp', JSON.stringify(ds))
-  fs.renameSync(FILE + '.tmp', FILE) // atomic nhu cau-hinh.json
+  ghiBen(FILE, JSON.stringify(ds)) // tmp + ep xuong dia + doi ten, xem ghi-ben.js
 }
 
 const p = (v, k) => String(v).padStart(k || 2, '0')

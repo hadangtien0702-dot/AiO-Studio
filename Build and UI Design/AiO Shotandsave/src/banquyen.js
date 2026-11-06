@@ -1,5 +1,7 @@
 'use strict'
 
+const { ghiBen } = require('./ghi-ben')
+
 /* =========================================================================
    banquyen.js — dung thu 14 ngay + ma ban quyen Polar (anh Tien chot 23/09)
    -------------------------------------------------------------------------
@@ -253,8 +255,9 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
 
 /** Doc / ghi file ban-quyen.json cho taoBanQuyen (04/10). Tach khoi main.js de do duoc bang node thuan.
     doc(): object = trang thai · null = CHUA co file · NEM LOI = co file ma khong doc duoc (ben goi khong duoc ghi de).
-    File HONG (khong phai JSON object): CAT sang `ban-quyen.hong-<gio>.json` (con nguyen de lay lai ma bang tay) roi
-    coi nhu chua co. BOM dau file (Notepad) duoc bo qua. ghi(): atomic (tmp + rename). */
+    File HONG (khong phai JSON object): CAT sang `ban-quyen.hong-<gio>.json` (con nguyen de lay lai ma bang tay), lay lai tu ban du
+    phong `.bak` neu con, khong thi coi nhu chua co. BOM dau file (Notepad) duoc bo qua. ghi(): ep xuong dia roi moi doi ten + cap nhat
+    ban du phong. 06/11: may sap nguon lam file thanh toan so 0, khach mat ma ma khong co gi de lay lai. */
 function taoKhoFile(file, { fs = require('fs'), path = require('path'), log = () => {}, now = () => Date.now() } = {}) {
   let loiCu = ''
   const bao = (ma) => { // chi ghi nhat ky khi DOI trang thai (ham nay duoc goi moi lan chup)
@@ -285,14 +288,29 @@ function taoKhoFile(file, { fs = require('fs'), path = require('path'), log = ()
         throw e2 // khong cat duoc ban hong thi coi la "khong doc duoc": KHONG ghi de len no
       }
       loiCu = ''
+      const conLai = docDuPhong()
+      if (conLai) {
+        try { ghiBen(file, JSON.stringify(conLai, null, 2), fs) } catch (e2) { /* lan ghi sau se thu lai, trang thai van dung */ }
+        log('ban-quyen: file HONG (' + e.message + '), da cat sang ' + path.basename(dich) + ', lay lai tu ban du phong')
+        return conLai
+      }
       log('ban-quyen: file HONG (' + e.message + '), da cat sang ' + path.basename(dich) + ', bat dau lai')
       return null
     }
   }
+  function docDuPhong() {
+    try {
+      let t = fs.readFileSync(file + '.bak', 'utf8')
+      if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1)
+      const s = JSON.parse(t)
+      return s && typeof s === 'object' && !Array.isArray(s) ? s : null
+    } catch (e) { return null }
+  }
   function ghi(s) {
     fs.mkdirSync(path.dirname(file), { recursive: true })
-    fs.writeFileSync(file + '.tmp', JSON.stringify(s, null, 2))
-    fs.renameSync(file + '.tmp', file)
+    const txt = JSON.stringify(s, null, 2)
+    ghiBen(file, txt, fs)
+    try { ghiBen(file + '.bak', txt, fs) } catch (e) { log('ban-quyen: khong ghi duoc ban du phong (' + ((e && e.code) || 'loi') + ')') }
   }
   return { doc, ghi }
 }
