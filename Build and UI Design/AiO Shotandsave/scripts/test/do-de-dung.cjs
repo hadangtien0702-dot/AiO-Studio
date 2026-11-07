@@ -449,8 +449,11 @@ async function phanThe() {
         tieuDe: document.getElementById('tieu-de').textContent, trong: ps.some((s) => !s.trim()) }
     })()`)
     kiem('The lan dau: ' + id + ' noi dung vua cua so, 2 nut nam tron trong the, khong cuon / tran (the ' + Math.round(dt.the.w) + 'x' + Math.round(dt.the.h) + ')', dt.scrollOk && dt.nut.length === 2 && dt.nut.every((n) => n.l >= dt.the.l && n.r <= dt.the.r && n.t >= dt.the.t && n.b <= dt.the.b && n.h >= 28) && dt.the.b <= dt.vh && dt.the.r <= dt.vw, JSON.stringify(dt.nut.map((n) => [n.id, Math.round(n.l), Math.round(n.r)])))
-    kiem('The lan dau: ' + id + ' noi phim chup that (3 keycap Ctrl / Shift / S), co 3 doan giai thich + tieu de, khong con {phim}', dt.keys.join(',') === 'Ctrl,Shift,S' && dt.ps.length === 3 && !dt.trong && dt.ps.every((s) => !/\{phim\}/.test(s)) && dt.tieuDe.length > 5, dt.keys.join(',') + ' | ' + dt.ps.length)
+    kiem('The lan dau: ' + id + ' noi phim chup that (3 keycap Ctrl / Shift / S), co 4 doan giai thich + tieu de, khong con {phim}', dt.keys.join(',') === 'Ctrl,Shift,S' && dt.ps.length === 4 && !dt.trong && dt.ps.every((s) => !/\{phim\}/.test(s)) && dt.tieuDe.length > 5, dt.keys.join(',') + ' | ' + dt.ps.length)
     const ps = dt.ps.join(' ')
+    // 07/11 anh chot: giu phim mac dinh, chi huong dan khach tu doi. Doan nay phai nam ngay duoi phim chup va goi dung ten nut Doi phim tren the.
+    const nutDoi = await js(w, `document.getElementById('doi-phim').textContent`)
+    kiem('The lan dau: ' + id + ' bao phim trung Luu thanh cua Premiere va chi dung nut "' + nutDoi + '" de doi', /Premiere/.test(dt.ps[1] || '') && /Lưu thành|Save As/.test(dt.ps[1] || '') && !!nutDoi && (dt.ps[1] || '').includes(nutDoi), dt.ps[1])
     kiem('The lan dau: ' + id + ' noi dung dung he dieu hanh (' + (nt === 'darwin' ? 'thanh menu tren cung' : 'khay he thong goc duoi phai') + ') va noi khay se tu thu ve nut tron',
       (nt === 'darwin' ? /menu bar|thanh menu/i.test(ps) && !/system tray|khay hệ thống/i.test(ps) : /system tray|khay hệ thống/i.test(ps)) && /round button|nút tròn/i.test(ps), ps.slice(0, 80))
     if (nt === 'win32') await quetTrang(w, 'the lan dau', lang)

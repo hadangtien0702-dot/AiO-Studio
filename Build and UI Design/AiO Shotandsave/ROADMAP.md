@@ -54,7 +54,7 @@ De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban
 So that tren may anh (run-log 05-06/11): 31 lan luu, 13 tam co ve, 0 lan doc chu / quay / Canvas / hen gio, bam nut thu khay 9 lan. Anh chi dung chup + ve; nhung tinh nang kia chua ai dung tren viec that.
 
 DA SUA 06/11: mo lan dau khong thay gi · khach nuoc ngoai thay tieng Viet · bam Xong khong vao clipboard · goi y bien mat sau khi keo · cong cu giau trong menu re chuot · chu Storyboard sai thu tu · trang trong khong co nut · phim Canvas va chup lai khong doi duoc · QR ghi trong Cai dat khi may khong co.
-CHO ANH CHOT: phim chup mac dinh Ctrl+Shift+S trung "Luu thanh" cua Premiere, Photoshop, AE (de xuat Ctrl+Shift+A hoac hoi o the lan dau). Cong cu mac dinh sau khoanh vung giu Khung vi 13/31 tam anh co ve, nguoi moi de ve nham khi muon doi khung.
+ANH CHOT 07/11: GIU phim chup Ctrl+Shift+S, khong doi mac dinh, the lan dau noi phim nay trung Luu thanh cua Premiere, Photoshop, AE va chi nut Doi phim (da lam). Cong cu mac dinh sau khoanh vung giu Khung vi 13/31 tam anh co ve, nguoi moi de ve nham khi muon doi khung.
 CHUA LAM: Lam dep van chi vao tu anh ghim (khay khong co menu chuot phai) · ghim khong co gian duoc.
 
 ### 0k. 06/11/2026 anh: "lam them 10 tinh nang nua, research tren mang, nhung tinh nang dang hay dang hot, va trien khai" — Sonnet tra 15 ung vien, Claude chon 10

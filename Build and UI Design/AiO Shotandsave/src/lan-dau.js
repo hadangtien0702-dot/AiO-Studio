@@ -2,7 +2,7 @@
 /* =========================================================================
    THE LAN CHAY DAU (06/11/2026) — nguoi moi cai app xong khong biet phim chup la gi, bieu tuong nam dau, khay se tu thu ve.
    Mot the nho canh goc man hinh (Windows: goc duoi-phai, cao hon vung nut tron cua khay; Mac: goc tren-phai duoi thanh menu), noi:
-   phim chup · bieu tuong o dau · khay se tu thu ve nut tron. Co nut Doi phim (mo Cai dat) va Da hieu. KHONG chan gi: khong hoi
+   phim chup · phim nay trung Luu thanh cua Premiere, Photoshop, AE thi tu doi (anh chot 07/11: giu phim mac dinh, chi huong dan) · bieu tuong o dau · khay se tu thu ve nut tron. Co nut Doi phim (mo Cai dat) va Da hieu. KHONG chan gi: khong hoi
    thoai, khong cuop tieu diem (showInactive), khong tu mat sau mot thoi gian — dong khi bam nut hoac khi nguoi dung chup lan dau.
    CHI HIEN cho may MOI: chua co cau-hinh.json, ban-quyen.json, file hong, khong dang do, chua tung hien (co lanDauDaHien).
    May anh Tien da co cau hinh nen KHONG BAO GIO thay the nay. Ghi co NGAY LUC HIEN (ghi cau-hinh.json) nen khong hien lai.
