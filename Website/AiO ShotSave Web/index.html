@@ -5279,8 +5279,9 @@ document.addEventListener("DOMContentLoaded", () => {
     st1.firstChild.textContent = L().st1; st2.firstChild.textContent = L().st2;
   }
   function huyDien() {
+    if (!tuDien) vong++;
     phien++; cur.style.opacity = 0; cur.style.transitionDuration = ""; sang(null); hienDecor();
-    S.o.forEach(o => { o.el.classList.remove("nang", "tudi", "bay"); if (mode) doiKhung(o, khungTai(o)); });
+    S.o.forEach(o => { o.el.classList.remove("nang", "tudi", "bay"); if (mode) doiKhung(o, khungTai(o)); });   // 07/11: ca khi dang bay vao nut trong vong lap
     if (dangGo) {
       const id = dangGo; dangGo = null; K[id].tai.classList.remove("go");
       const v = K[id].inp.value.trim(); S.ten[id] = v || null; K[id].inp.value = tenK(id); rongO(id); tenCay(id);
@@ -5345,7 +5346,41 @@ document.addEventListener("DOMContentLoaded", () => {
     if (daVao) return;
     daVao = true;
     S.o.forEach((o, j) => setTimeout(() => o.el.classList.remove("bay"), 140 + j * 80));
-    setTimeout(dienThu, 140 + 6 * 80 + 950);
+    setTimeout(chayVong, 140 + 6 * 80 + 950);
+  }
+  /* 07/11 anh: "phần này chưa có animation" (bản cũ chỉ diễn MỘT lần lúc cuộn tới rồi đứng im). Nay diễn LẶP khi bảng đang trên màn:
+     diễn xong nghỉ 3 giây → mọi tấm bay ngược vào nút tròn, ghi chú và mũi tên tắt (ra) → bảng trả về đầu → các tấm bay ra lại (vào) → diễn tiếp.
+     Ra khỏi màn thì chờ; khách chạm vào bảng (kéo tấm, sửa tên khung) là dừng hẳn, không giành lại. */
+  let thayCv = false, vong = 0;
+  if ("IntersectionObserver" in window) new IntersectionObserver(es => { thayCv = es.some(e => e.isIntersecting); }, { threshold: .2 }).observe(bang);
+  function datIxIy() {
+    const B = BO[mode], nx = B.nut[0] + B.nut[2] / 2, ny = B.nut[1] + B.nut[2] / 2;
+    S.o.forEach(o => { o.el.style.setProperty("--ix", (nx - o.x - B.pw / 2) + "px"); o.el.style.setProperty("--iy", (ny - o.y - B.ph / 2) + "px"); });
+  }
+  async function chayVong() {
+    const v = ++vong, con = () => tuDien && v === vong;
+    await dienThu();
+    while (con()) {
+      await cho(3000); if (!con()) return;
+      while (!thayCv) { await cho(400); if (!con()) return; }
+      // RA: tấm bay ngược vào nút tròn, nút nảy nhẹ
+      phien++; cur.style.opacity = 0;
+      decor.forEach(e => e.classList.add("bay2"));
+      datIxIy();
+      S.o.forEach((o, j) => setTimeout(() => { if (con()) o.el.classList.add("bay"); }, j * 70));
+      setTimeout(() => { if (con()) nut.animate([{ transform: "scale(1)" }, { transform: "scale(1.18)" }, { transform: "scale(1)" }], { duration: 420, easing: "ease-out" }); }, 6 * 70 + 260);
+      await cho(6 * 70 + 760); if (!con()) return;
+      // trả bảng về đầu (vẫn đang ẩn trong nút)
+      S.ten = { a: null, b: null }; S.doi = false; thu = 10;
+      S.o.forEach(o => { o.k = o.i < 2 ? "a" : o.i === 2 ? "b" : null; o.t = o.i; o.el.style.zIndex = 2; });
+      veChu(); xep(); IDS.forEach(rongO); datIxIy();
+      st1.firstChild.textContent = ""; st2.firstChild.textContent = "";
+      await cho(300); if (!con()) return;
+      // VÀO lại
+      S.o.forEach((o, j) => setTimeout(() => { if (con()) o.el.classList.remove("bay"); }, j * 80));
+      await cho(6 * 80 + 950); if (!con()) return;
+      await dienThu();
+    }
   }
 
   veChu(); co();
