@@ -13,6 +13,13 @@
 - **Web:** commit `c60381a` (giá, hỏi đáp "một máy", điều khoản VI+EN ngày 07/11, demo thanh toán, 4 mẫu thư, hàm gửi thư aio-mail, câu lỗi hết lượt máy trong app). Live md5 = git `e7eded40` lúc 20:18; đếm trên live: trang chính 9 chỗ `$20`, 0 chỗ `$14.99`; điều khoản 2 `$20`, "one computer" + "một máy tính", 0 "two computers". Lần đẩy đầu lúc ~19:5x Vercel báo Canceled, bản sau Ready.
 - **Chưa:** chưa mua thử bằng mã tặng (thư cảm ơn ghi 1 máy chưa đọc trên thư thật); bài thử hàm gửi thư dừng ở bước SMTP vì Node 26 cấm tên máy chủ là IP (lỗi của công cụ thử); câu lỗi mới trong app vào bản đóng gói sau; khách mua trước đây (mã 2 máy) không bị đổi.
 
+## [polar + web] - 2026-11-07 20:19 (UTC+7) - Giá $20 trọn đời, một mã một máy, 20 mã tặng; dừng phát triển
+
+- **Anh:** *"chốt giá là $20 - Lifetime… 1 option duy nhất"*, *"$20 trọn đời - một mã là một máy - xong"*, *"tạo cho anh thêm 20 mã free - anh tặng cho người dùng"*, *"sửa trên polar luôn đi em"*, rồi *"mình không phát triển dự án nữa"*, tập trung marketing.
+- **Polar (qua khung trình duyệt trong app, anh đăng nhập):** sản phẩm "AiO Shot & Save" giá mới $20 (giá cũ $14.99 bị Polar thay); quyền lợi mã bản quyền giới hạn 1 máy, tên "Shot & Save key, 1 computer, for life"; 20 mã giảm 100% dùng 1 lần, chỉ cho sản phẩm này, tiền tố TANG (danh sách: Build and UI Design/AiO Shotandsave/.selftest/ma-tang/, KHÔNG vào git). Đọc lại: giá 2000 usd, máy = 1, 20 mã, 0 lượt dùng; trang thanh toán công khai hiện $20. Sản phẩm Tester (ẩn) vẫn $14.99, chưa đụng.
+- **Web (live `c60381a`, md5 khớp git):** trang chủ 9 chỗ $20, 0 chỗ $14.99; điều khoản VI+EN "một máy", ngày 07/11; demo thanh toán, 4 mẫu thư, hàm gửi thư aio-mail ghi 1 máy.
+- **Chưa:** tên miền chưa mua (anh chưa chọn tên; đề xuất shotandsave.app $9.99 năm đầu); bộ cài trên Polar vẫn là bản cũ, cần anh tự kéo 0.11.0 lên (96 MB, quá giới hạn tải của Claude); câu báo lỗi "2 máy" trong app chỉ sửa ở mã, bản 0.11.0 đang bán vẫn ghi 2 máy khi khách hết lượt; bài thử hàm gửi thư dừng ở bước SMTP giả do Node 26 (lỗi công cụ thử).
+
 ## [web] - 2026-11-07 19:40 (UTC+7) - Web Shot & Save: section Canvas diễn LẶP, đã LIVE
 
 - **Anh:** chụp section Canvas, *"phần này chưa có animation nè"*, rồi *"Đưa lên live"*.
