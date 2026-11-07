@@ -21,6 +21,8 @@
         const o = ["anh", "mau", "bien"].map((l, i) => { const x = el(hang, "bv-o"); const n = el(x, "bv-n"); ve(n, l); el(x, "so", null, "#" + (19 + i)); return x; });
         K.style.top = (h - K.offsetHeight - h * .05) + "px";
         const kr = R(K), dich = { x: kr.x + kr.w / 2, y: kr.y };
+        const diem = el(san, "bv-diem", `left:${dich.x}px;top:${dich.y}px;opacity:0`);
+        tl.to(diem, { opacity: 1, duration: .5 }, 1.2);
         // các tấm trôi: [loại, x, y, rộng (theo w), độ sâu 0 gần .. 1 xa, xoay, có bay về không (thứ tự)]
         const DS = doc
           ? [["anh", .52, .2, .34, 0, -4, 3], ["mau", .1, .24, .28, .45, 6, 0], ["aa", .4, .4, .22, .1, 5, 2], ["bien", .06, .42, .3, .3, -8, 1], ["mau", .7, .45, .24, .2, -6, 0], ["bien", .64, .3, .3, .1, 4, 4], ["anh", .28, .28, .18, .85, 10, 0]]
@@ -39,13 +41,13 @@
           const cx = x + cw / 2, cy = y + ch / 2, dx = dich.x - cx, dy = dich.y - cy, dai = Math.hypot(dx, dy);
           const tia = el(san, "bv-tia", `left:${cx}px;top:${cy}px;width:${dai}px;opacity:${.55 - d * .35}`);
           gsap.set(tia, { rotation: Math.atan2(dy, dx) * 180 / Math.PI, scaleX: 0, transformOrigin: "0 50%" });   // gsap giu goc xoay (dat bang transform inline thi scaleX(0) lam mat goc)
-          tl.to(tia, { scaleX: thu ? .25 : .9, duration: .8, ease: "power2.out" }, .7 + i * .06);
+          tl.to(tia, { scaleX: 1, duration: .8, ease: "power2.out" }, .7 + i * .06);   // 07/11 anh khoanh: moi vet phai cham CUNG mot diem tren mep khay, khong dung lo lung
           if (thu) bay[thu - 1] = { t, tia, loai, cw, x, y, xoay };
         });
         // bốn tấm lần lượt bay về khay; ô mới vào bên phải, các ô cũ dồn sang trái
         bay.forEach((b, i) => {
           const at = 1.5 + i * .85;
-          tl.to(b.tia, { scaleX: 1, opacity: .95, duration: .3, ease: "power2.in" }, at);
+          tl.to(b.tia, { opacity: .95, duration: .3, ease: "power2.in" }, at);
           tl.add(() => {
             const r = R(o[2]), k = r.w / b.cw;
             gsap.to(b.t, { x: r.x - b.x, y: r.y - b.y, overwrite: "auto", scale: k, rotation: 0, filter: "blur(0px)", opacity: 1, duration: .55, ease: "power3.in" });
@@ -57,6 +59,7 @@
             const moi = document.createElement("div"); moi.className = "bv-n"; ve(moi, b.loai); o[2].querySelector(".bv-n").replaceWith(moi);
             o.forEach((x, j) => { x.querySelector(".so").textContent = "#" + (20 + i + j); });
             sl.textContent = 22 + i;
+            gsap.fromTo(diem, { scale: 2.4 }, { scale: 1, duration: .5, ease: "power2.out" });
             gsap.fromTo(o, { x: 14 }, { x: 0, duration: .3, ease: "power2.out", stagger: .03 });
             gsap.fromTo(K, { boxShadow: "0 0 0 1px rgb(255 255 255/9%),0 40px 80px -30px #000,0 0 160px -10px rgb(248 104 32/85%)" }, { boxShadow: "0 0 0 1px rgb(255 255 255/9%),0 40px 80px -30px #000,0 0 120px -30px rgb(248 104 32/45%)", duration: .6 });
           }, at + .82);
