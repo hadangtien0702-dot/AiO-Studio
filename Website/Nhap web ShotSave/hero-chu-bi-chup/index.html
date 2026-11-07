@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đầu trang nháp: chính tiêu đề bị chụp và bị quay (07/11/2026)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<style>
+:root{--acc:#F86820;--t1:#f5f5f7;--t2:#c3c3c8;--t3:#8d8d95}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0e0d0c;color:var(--t1);font-family:Inter,"Segoe UI",sans-serif;overflow-x:hidden}
+.hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;background:radial-gradient(60% 50% at 50% 0%,rgb(248 104 32/.16),transparent 65%),radial-gradient(45% 35% at 50% 88%,rgb(248 104 32/.18),transparent 70%),#0e0d0c}
+.hat{position:absolute;inset:0;pointer-events:none;opacity:.18;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>")}
+.nav{position:relative;z-index:5;display:flex;align-items:center;gap:26px;max-width:1120px;margin:0 auto;height:64px;padding:0 20px;font-size:14px;color:var(--t2)}
+.nav .lg{display:flex;align-items:center;gap:8px;font-weight:800;color:#fff}.nav .lg svg{width:22px;height:20px;color:var(--acc)}
+.nav .sp{flex:1}.nav .mua{padding:8px 16px;border-radius:9px;background:var(--acc);color:#16110d;font-weight:800}
+@media(max-width:640px){.nav .an{display:none}}
+.trong{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:clamp(28px,6vh,64px) 20px 40px;text-align:center}
+.eye{font-size:14px;font-weight:600;color:#ffb891;margin-bottom:18px}.eye i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-right:9px;vertical-align:2px}
+h1{margin:0;font-size:clamp(44px,8.4vw,112px);line-height:.98;font-weight:900;letter-spacing:-.055em}
+h1 .d{display:inline-block}
+h1 .d2{color:var(--acc)}
+h1 .d2 span{display:inline-block;will-change:transform}
+.lede{margin:22px auto 0;max-width:620px;color:var(--t2);font-size:clamp(15px,1.5vw,18px);line-height:1.55}
+/* khay that cua app, dat giua dau trang */
+.khay{position:relative;margin:clamp(26px,5vh,48px) auto 0;width:min(620px,94vw);border-radius:18px;background:#151515;text-align:left;box-shadow:0 0 0 1px rgb(255 255 255/10%),0 50px 90px -30px #000,0 0 140px -30px rgb(248 104 32/55%)}
+.khay .thanh{display:flex;align-items:center;gap:9px;height:46px;padding:0 14px;border-bottom:1px solid rgb(255 255 255/7%)}
+.khay .thanh svg{width:22px;height:20px;color:var(--acc)}.khay .thanh b{font-size:15px}
+.khay .tab{display:flex;gap:4px;margin-left:8px}.khay .tab span{padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;color:var(--t3)}.khay .tab span.on{background:#2a2a2a;color:#fff}
+.khay .thanh em{font-style:normal;margin-left:auto;color:var(--t3);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.khay .luoi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px}
+.o{position:relative;aspect-ratio:16/10;border-radius:9px;overflow:hidden;background:#1d1d1d;box-shadow:0 0 0 1px rgb(255 255 255/9%)}
+.o.trong-o{background:repeating-linear-gradient(135deg,#191919 0 6px,#1d1d1d 6px 12px)}
+.o .so{position:absolute;left:6px;bottom:6px;z-index:2;padding:1px 6px;border-radius:4px;background:rgb(0 0 0/72%);font:700 11px/1.5 Inter;color:#fff}
+.o .dai{position:absolute;right:6px;bottom:6px;z-index:2;padding:1px 6px;border-radius:4px;background:rgb(0 0 0/72%);font:700 11px/1.5 Inter;color:#fff}
+.o .play{position:absolute;left:auto;right:6px;top:6px;margin:0;z-index:2;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:rgb(0 0 0/60%);display:grid;place-items:center}
+.o .play::after{content:"";margin-left:3px;border-left:9px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.o.moi{box-shadow:0 0 0 2px var(--acc),0 0 26px rgb(248 104 32/.5)}
+.o .chu-o{position:absolute;inset:0;display:grid;place-items:center;background:#0e0d0c;font-weight:900;letter-spacing:-.05em;color:#ededf0;white-space:nowrap}
+.o .chu-o.cam{color:var(--acc)}
+.p-hoang{background:linear-gradient(180deg,#2b2f5e 0%,#7b5bd6 55%,#f6a76e 100%)}
+.p-hoang::after{content:"";position:absolute;inset:auto 0 0 0;height:42%;background:#2a2340;clip-path:polygon(0 55%,18% 20%,34% 52%,55% 5%,74% 48%,100% 18%,100% 100%,0 100%)}
+.p-mau{display:grid;grid-template-columns:repeat(5,1fr)}
+.cta{display:flex;justify-content:center;gap:12px;margin-top:26px}
+.cta a{padding:13px 22px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none}.cta .c1{background:var(--acc);color:#16110d}.cta .c2{box-shadow:inset 0 0 0 1px rgb(255 255 255/18%);color:#fff}
+/* lop dien: khung chon, the bay, khung quay, con tro */
+.dien{position:absolute;inset:0;z-index:10;pointer-events:none}
+.sel{position:absolute;border:1.5px solid var(--acc);box-shadow:0 0 0 200vmax rgb(0 0 0/.45);opacity:0}
+.sel i{position:absolute;width:9px;height:9px;background:#fff;border:1.5px solid var(--acc);border-radius:2px}
+.sel b{position:absolute;left:0;top:-30px;padding:3px 8px;border-radius:6px;background:#141414;color:#fff;font:600 12px/1.4 Inter;white-space:nowrap;font-variant-numeric:tabular-nums}
+.flash{position:absolute;inset:0;background:#fff;opacity:0}
+.the{position:absolute;padding:8px 8px 26px;border-radius:6px;background:#fbfaf8;box-shadow:0 30px 60px -20px rgb(0 0 0/.9),0 0 0 2px var(--acc);opacity:0}
+.the .in{width:100%;height:100%;display:grid;place-items:center;background:#0e0d0c;border-radius:2px;font-weight:900;letter-spacing:-.055em;color:#ededf0;white-space:nowrap;overflow:hidden}
+.the em{position:absolute;left:10px;bottom:7px;font:600 11px/1 Inter;font-style:normal;color:#8a817a}
+.quay{position:absolute;border:3px solid var(--acc);border-radius:6px;box-shadow:0 0 40px rgb(248 104 32/.55);opacity:0}
+.quay .rec{position:absolute;left:-3px;bottom:-46px;display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:9px;background:#141414;font:800 15px/1 Inter;font-variant-numeric:tabular-nums;color:#fff;box-shadow:0 0 0 1px rgb(255 255 255/10%)}
+.quay .rec::before{content:"";width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 12px #ff3b30}
+.quay .dung{position:absolute;right:-3px;bottom:-46px;display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:9px;background:#ff3b30;font:800 14px/1 Inter;color:#fff}
+.quay .dung::before{content:"";width:9px;height:9px;border-radius:2px;background:#fff}
+.quay .dung.bam{transform:scale(.92)}
+.phim{position:absolute;display:flex;gap:6px;opacity:0}
+.phim i{min-width:36px;height:36px;padding:0 10px;display:grid;place-items:center;border-radius:9px;background:#1f1f1f;box-shadow:inset 0 -3px 0 #000;font:800 14px/1 Inter;font-style:normal;color:#fff}
+.phim i.cam{background:var(--acc);color:#16110d;box-shadow:inset 0 -3px 0 #b84210}
+.vd{position:absolute;border-radius:9px;overflow:hidden;box-shadow:0 0 0 2px var(--acc),0 30px 50px -20px #000;opacity:0}
+.cur{position:absolute;left:0;top:0;width:24px;height:24px;margin:-2px 0 0 -4px;filter:drop-shadow(0 2px 3px rgb(0 0 0/.6));opacity:0}
+.cur svg{width:100%;height:100%;transition:transform .12s}.cur.bam svg{transform:scale(.8)}
+.nhan{position:absolute;padding:6px 12px;border-radius:99px;background:var(--acc);color:#16110d;font:800 13px/1 Inter;white-space:nowrap;opacity:0}
+.ghichu{max-width:1120px;margin:0 auto;padding:30px 20px 60px;color:var(--t3);font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<section class="hero" id="hero">
+  <div class="hat"></div>
+  <nav class="nav"><span class="lg"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>Shot &amp; Save</span><span class="an">Tính năng</span><span class="an">Giá</span><span class="an">Hỏi đáp</span><span class="sp"></span><span class="mua">Mua</span></nav>
+  <div class="trong">
+    <div class="eye"><i></i>Nơi dân sáng tạo cất ý tưởng</div>
+    <h1><span class="d d1" id="d1">Ý tưởng hay</span><br><span class="d d2" id="d2">không đợi ai.</span></h1>
+    <p class="lede">Thấy là chụp, hay thì quay. Tất cả nằm sẵn trong khay, kéo thả vào Premiere, Figma hay khung chat với khách.</p>
+    <div class="khay" id="khay"><div class="thanh"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg><b>Khay</b><span class="tab"><span class="on" id="tabA">Ảnh 2</span><span id="tabV">Video 0</span></span><em id="dem">2 ý tưởng</em></div>
+      <div class="luoi"><div class="o p-hoang"><span class="so">#1</span></div><div class="o p-mau"><span style="background:#2b2f5e"></span><span style="background:#7b5bd6"></span><span style="background:#f6a76e"></span><span style="background:#f86820"></span><span style="background:#e9d6a8"></span></div><div class="o trong-o" id="o3"></div><div class="o trong-o" id="o4"></div></div></div>
+    <div class="cta"><a class="c1" href="#">Mua Shot &amp; Save</a><a class="c2" href="#">Xem cách hoạt động</a></div>
+  </div>
+  <div class="dien" id="dien"></div>
+</section>
+<p class="ghichu">Bản nháp 07/11/2026, chưa lên live. Đầu trang tự diễn và lặp lại: (1) con trỏ khoanh chụp dòng "Ý tưởng hay", mảnh chữ thành tấm ảnh rơi vào khay; (2) bấm R, viền quay bao lấy dòng "không đợi ai." đang nhún nhảy, đồng hồ đếm 3 giây, bấm Dừng, video rơi vào khay. Thanh 14 công cụ được bỏ khỏi đầu trang.</p>
+<script>
+(() => {
+  if (!window.gsap) return
+  const H = document.getElementById('hero'), D = document.getElementById('dien'), d1 = document.getElementById('d1'), d2 = document.getElementById('d2')
+  const khay = document.getElementById('khay'), o3 = document.getElementById('o3'), o4 = document.getElementById('o4'), dem = document.getElementById('dem')
+  const tabA = document.getElementById('tabA'), tabV = document.getElementById('tabV')
+  // tach chu dong 2 de nhun tung chu khi dang quay
+  d2.innerHTML = [...d2.textContent].map(c => '<span>' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('')
+  const chu2 = [...d2.children]
+  const R = e => { const a = e.getBoundingClientRect(), b = H.getBoundingClientRect(); return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height } }
+  const el = (cls, html) => { const e = document.createElement('div'); e.className = cls; if (html != null) e.innerHTML = html; D.append(e); return e }
+  const CUR = '<svg viewBox="0 0 24 24"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+  let tl = null
+  function dung() {
+    if (tl) tl.kill(); D.innerHTML = ''
+    gsap.set([khay, ...chu2, document.querySelector('.lede')], { clearProps: 'all' })
+    o3.className = 'o trong-o'; o3.innerHTML = ''; o4.className = 'o trong-o'; o4.innerHTML = ''
+    dem.textContent = '2 ý tưởng'; tabA.textContent = 'Ảnh 2'; tabV.textContent = 'Video 0'; tabA.classList.add('on'); tabV.classList.remove('on')
+    const r1 = R(d1), r2 = R(d2), r3 = R(o3), r4 = R(o4), pad = Math.max(10, r1.h * .12)
+    const coVua = (t, r) => Math.min(r.h * .3, r.w * .84 / (t.length * .5))   // chu trong o khay tu co theo be rong o
+    const fs = parseFloat(getComputedStyle(d1).fontSize)
+    const cur = el('cur', CUR), sel = el('sel', '<i style="left:-5px;top:-5px"></i><i style="right:-5px;top:-5px"></i><i style="left:-5px;bottom:-5px"></i><i style="right:-5px;bottom:-5px"></i><b></b>'), sz = sel.querySelector('b')
+    const flash = el('flash'), nh = el('nhan')
+    tl = gsap.timeline({ onComplete: () => gsap.delayedCall(1.2, dung) })
+    // 1. khoanh chup dong 1
+    const x0 = r1.x - pad, y0 = r1.y - pad * .6, sw = r1.w + pad * 2, sh = r1.h + pad * 1.2
+    gsap.set(cur, { x: x0 - 60, y: y0 - 50 })
+    tl.to(cur, { opacity: 1, duration: .25 }, .3).to(cur, { x: x0, y: y0, duration: .5, ease: 'power2.inOut' }, .35)
+    tl.set(sel, { left: x0, top: y0, width: 0, height: 0, opacity: 1 }, .9)
+    const o = { k: 0 }
+    tl.to(o, { k: 1, duration: .7, ease: 'power2.inOut', onUpdate() { const w = sw * o.k, h = sh * o.k; sel.style.width = w + 'px'; sel.style.height = h + 'px'; sz.textContent = Math.round(w * 1.5) + ' × ' + Math.round(h * 1.5); gsap.set(cur, { x: x0 + w, y: y0 + h }) } }, .9)
+    tl.to(flash, { opacity: .55, duration: .06 }, 1.75).to(flash, { opacity: 0, duration: .35 }, 1.81)
+    const the = el('the', '<div class="in" style="font-size:' + fs + 'px">' + d1.textContent + '</div><em>#3 · vừa chụp</em>')
+    gsap.set(the, { left: x0 - 8, top: y0 - 8, width: sw + 16, height: sh + 34 })
+    tl.set(sel, { opacity: 0 }, 1.8).set(the, { opacity: 1 }, 1.8)
+    tl.to(the, { y: -18, rotation: -4, scale: 1.04, duration: .3, ease: 'power2.out' }, 1.85)
+    tl.add(() => {
+      const k = r3.w / (sw + 16)
+      gsap.to(the, { x: r3.x - (x0 - 8), y: r3.y - (y0 - 8), scale: k, rotation: 0, transformOrigin: '0 0', duration: .75, ease: 'power3.inOut' })
+    }, 2.15)
+    tl.to(cur, { opacity: 0, duration: .2 }, 2.1)
+    tl.add(() => {
+      the.style.opacity = 0
+      o3.className = 'o moi'; o3.innerHTML = '<div class="chu-o" style="font-size:' + coVua(d1.textContent, r3) + 'px">' + d1.textContent + '</div><span class="so">#3</span>'
+      dem.textContent = '3 ý tưởng'; tabA.textContent = 'Ảnh 3'
+      gsap.fromTo(khay, { boxShadow: '0 0 0 1px rgb(255 255 255/10%),0 50px 90px -30px #000,0 0 200px -10px rgb(248 104 32/95%)' }, { boxShadow: '0 0 0 1px rgb(255 255 255/10%),0 50px 90px -30px #000,0 0 140px -30px rgb(248 104 32/55%)', duration: .7 })
+      gsap.fromTo(o3, { scale: 1.12 }, { scale: 1, duration: .4, ease: 'back.out(2)' })
+      gsap.set(nh, { left: r3.x + r3.w / 2, top: r3.y - 34, xPercent: -50 }); nh.textContent = '+1 ảnh'; gsap.fromTo(nh, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .25 }); gsap.to(nh, { opacity: 0, duration: .3, delay: 1 })
+    }, 2.92)
+    // 2. bam R, quay dong 2 dang nhun
+    const ph = el('phim', '<i>R</i>')
+    gsap.set(ph, { left: r2.x + r2.w / 2 - 18, top: r2.y + r2.h + 18 })
+    tl.to(ph, { opacity: 1, y: -6, duration: .25 }, 3.5).add(() => ph.firstChild.classList.add('cam'), 3.75).to(ph, { opacity: 0, duration: .25 }, 4.3)
+    const qx = r2.x - pad, qy = r2.y - pad * .6, qw = r2.w + pad * 2, qh = r2.h + pad * 1.2
+    const q = el('quay', '<span class="rec">00:00</span><span class="dung">Dừng</span>'), dh = q.querySelector('.rec'), nd = q.querySelector('.dung')
+    gsap.set(q, { left: qx, top: qy, width: qw, height: qh })
+    tl.fromTo(q, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: .35, ease: 'power2.out' }, 3.85)
+    const lede = document.querySelector('.lede'); tl.to(lede, { opacity: .12, duration: .3 }, 3.85).to(lede, { opacity: 1, duration: .4 }, 7.4)   // dang quay: dong phu lui ra sau, nhan REC khong de chu
+    tl.to(chu2, { y: -fs * .14, duration: .22, ease: 'power1.out', yoyo: true, repeat: 5, stagger: { each: .06, from: 'start' } }, 4.1)
+    const t = { s: 0 }
+    tl.to(t, { s: 3, duration: 3, ease: 'none', onUpdate() { dh.textContent = '00:0' + Math.floor(t.s) } }, 4.1)
+    gsap.set(cur, { x: qx + qw + 40, y: qy - 60 })
+    tl.to(cur, { opacity: 1, duration: .2 }, 6.3)
+    tl.add(() => { const a = nd.getBoundingClientRect(), b = H.getBoundingClientRect(); gsap.to(cur, { x: a.left - b.left + a.width / 2, y: a.top - b.top + a.height / 2, duration: .45, ease: 'power2.inOut' }) }, 6.35)
+    tl.add(() => { cur.classList.add('bam'); nd.classList.add('bam'); setTimeout(() => cur.classList.remove('bam'), 160) }, 7.1)
+    const vd = el('vd', '<div class="chu-o cam" style="position:absolute;inset:0;display:grid;place-items:center;background:#0e0d0c;font-size:' + fs + 'px;font-weight:900;letter-spacing:-.055em;color:#F86820;white-space:nowrap">' + d2.textContent + '</div>')
+    gsap.set(vd, { left: qx, top: qy, width: qw, height: qh })
+    tl.set(vd, { opacity: 1 }, 7.15).to(q, { opacity: 0, duration: .2 }, 7.15).to(cur, { opacity: 0, duration: .2 }, 7.2)
+    tl.add(() => { gsap.to(vd, { x: r4.x - qx, y: r4.y - qy, scaleX: r4.w / qw, scaleY: r4.h / qh, transformOrigin: '0 0', duration: .75, ease: 'power3.inOut' }) }, 7.2)
+    tl.add(() => {
+      vd.style.opacity = 0
+      o4.className = 'o moi'; o4.innerHTML = '<div class="chu-o cam" style="font-size:' + coVua(d2.textContent, r4) + 'px">' + d2.textContent + '</div><span class="play"></span><span class="dai">0:03</span>'
+      o3.classList.remove('moi')
+      dem.textContent = '4 ý tưởng'; tabV.textContent = 'Video 1'; tabV.classList.add('on'); tabA.classList.remove('on')
+      gsap.fromTo(khay, { boxShadow: '0 0 0 1px rgb(255 255 255/10%),0 50px 90px -30px #000,0 0 200px -10px rgb(248 104 32/95%)' }, { boxShadow: '0 0 0 1px rgb(255 255 255/10%),0 50px 90px -30px #000,0 0 140px -30px rgb(248 104 32/55%)', duration: .7 })
+      gsap.fromTo(o4, { scale: 1.12 }, { scale: 1, duration: .4, ease: 'back.out(2)' })
+      gsap.set(nh, { left: r4.x + r4.w / 2, top: r4.y - 34 }); nh.textContent = '+1 video'; gsap.fromTo(nh, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .25 }); gsap.to(nh, { opacity: 0, duration: .3, delay: 1.2 })
+    }, 7.97)
+    tl.to({}, { duration: 2.4 }, 8)
+  }
+  let hen; addEventListener('resize', () => { clearTimeout(hen); hen = setTimeout(dung, 250) })
+  ;(document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(dung, 300))
+  window.__hero = { dung }
+})()
+</script>
+</body>
+</html>
