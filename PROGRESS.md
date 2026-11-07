@@ -5,6 +5,14 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [marketing] - 2026-11-07 22:11 (UTC+7) - Shot & Save: khách mua nay nhận bộ cài 0.11.0 (trước là 0.9.0); web hứa bản Mac mà Polar không giao
+
+- **Anh:** duyệt danh sách marketing, bấm *"Làm theo thứ tự"*. Việc 1 (B1) = bộ cài khách nhận phải khớp tính năng web quảng cáo.
+- **Đã làm:** tải `Release/AiO Shotandsave/win/AiO-Shot-and-Save-Setup-0.11.0.exe` lên Polar qua API (tạo file trong trang đã đăng nhập → 10 mảnh 10 MB PUT thẳng lên kho S3 của Polar bằng Node, 21 giây → báo ghép xong), rồi đổi quyền lợi bộ cài `bb398eee` sang file mới `6665ca5c`. File 0.9.0 (`825f96e4`) vẫn nằm trên Polar, không xoá. Cách này không cần anh kéo tay (lần 07/10 phải nhờ anh vì công cụ tải giới hạn 10 MB).
+- **Kiểm:** Polar trả `is_uploaded: true`, cỡ 96.396.549 byte, sha256 `22067d1530d0…3e63` = sha256 file trong Release. Đọc lại sản phẩm: giá 2000 cent, 2 quyền lợi (mã bản quyền + bộ cài), bộ cài chỉ còn file 0.11.0.
+- **Tìm thêm:** (1) hỏi đáp web ghi bản Mac chạy thử được trên Mac chip Apple và Intel, nhưng Polar chỉ giao bộ cài Windows ⇒ khách Mac mua là không có gì để cài; bản Mac mới nhất 0.10.1. (2) Web không có công cụ đếm người vào nào.
+- **Chưa:** chưa mua thử bằng mã tặng để xem thư + link tải + kích hoạt 1 máy (cần anh nhập email của anh). Danh sách: `Marketing/AiO MVP and Plan Marketing/SHOT_SAVE_MARKETING_CHECKLIST.md` (B1, B2, B9 đã cập nhật).
+
 ## [web] - 2026-11-07 20:18 (UTC+7) - Shot & Save: GIÁ $20 TRỌN ĐỜI, MỘT MÃ MỘT MÁY, đã LIVE web + Polar; 20 mã tặng
 
 - **Anh:** *"anh muốn chốt giá là $20 - Lifetime… 1 option duy nhất"*, *"$20 trọn đời - một mã là một máy - xong"*, *"tạo cho anh thêm 20 mã free - anh tặng cho người dùng"*, *"sửa trên polar luôn"* (anh đăng nhập Polar trong khung trình duyệt của app).

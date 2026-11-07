@@ -10,7 +10,7 @@
 |---|---|
 | Giá | **$20 trả một lần, dùng trọn đời, 1 máy** (Polar + web khớp, 20:18) |
 | Đơn trên Polar | **4 đơn, cả 4 là $0** (mình tự mua thử: 07/10, 16/10 ×2, 20/10). Chưa có khách trả tiền |
-| Bộ cài khách nhận khi mua | **0.9.0** (gắn 07/10). Bản mới nhất đóng gói được là 0.11.0 (07/11), CHƯA gắn |
+| Bộ cài khách nhận khi mua | **0.11.0** (gắn 07/11 22:10, băm khớp file trong Release). Trước đó 0.9.0 |
 | Mã tặng | 20 mã, đã dùng 0 |
 | Tài liệu marketing có sẵn | 8 file trong thư mục này, **0 dòng về Shot & Save** (đều viết cho bộ tool Premiere, tháng 8) |
 
@@ -28,15 +28,15 @@
 
 | # | Việc | Là gì, vì sao cần | Trạng thái |
 |---|---|---|---|
-| B1 | **Bộ cài khách nhận = bản web quảng cáo** | Khách mua thấy thiếu tính năng là đòi hoàn tiền, chê công khai | **Chưa**: khách nhận 0.9.0. Cần gắn 0.11.0 lên Polar (file 96 MB, anh kéo tay) |
-| B2 | Bản Mac | Web bán cho cả Mac? Khách Mac mua phải có bản chạy | **Chưa kiểm** web có hứa Mac không; bản Mac mới nhất 0.10.1, chưa có 0.11.0 |
+| B1 | **Bộ cài khách nhận = bản web quảng cáo** | Khách mua thấy thiếu tính năng là đòi hoàn tiền, chê công khai | **Có (07/11 22:10)**: quyền lợi bộ cài trên Polar nay chỉ chứa 0.11.0 (96.396.549 byte, sha256 `22067d15…` khớp Release). File 0.9.0 vẫn để trên Polar, không xoá. Em tải lên qua API, không cần anh kéo tay |
+| B2 | Bản Mac | Web bán cho cả Mac? Khách Mac mua phải có bản chạy | **Lỗ thật (đo 07/11)**: hỏi đáp trên web ghi *"Yes, as a beta for Apple Silicon and Intel Macs"*, nhưng Polar chỉ giao bộ cài Windows ⇒ khách Mac mua xong không có gì để cài. Bản Mac mới nhất là 0.10.1 (2 file dmg 117 + 121 MB trong Release). Chờ anh chọn: gắn dmg 0.10.1 lên Polar, hay sửa web thành "Mac sắp có" |
 | B3 | Mua thử một lần bằng mã tặng | Đi đúng đường khách thật: trả $0 → thư → mã → kích hoạt 1 máy | **Chưa** sau khi đổi giá + 1 máy |
 | B4 | Tên miền riêng | `aio-shotsave.vercel.app` trông như hàng thử. Tên riêng tăng tin cậy, dễ nhớ khi nói miệng | **Chưa**: em tra 07/11, `shotandsave.com` đã có người lấy; còn trống `shotandsave.app` $9.99 năm đầu ($15 các năm sau), `getshotandsave.com` $12.03, `shotandsave.net` $13.50 |
 | B5 | Email hỗ trợ đúng tên | Khách gửi về Gmail cá nhân thì kém tin; Polar cũng nhắc | **Chưa** (cần tên miền trước) |
 | B6 | Bản dùng thử: để lại email rồi tải | Anh chốt 23/09. Không có bước này thì không thu được ai chưa mua | **Chưa làm** |
 | B7 | Thư cảm ơn + mã | Khách mua xong nhận mã và link tải | **Có** (chạy thật 16/10). Câu "1 máy" mới chưa đọc trên thư thật |
 | B8 | Chính sách hoàn tiền 14 ngày | Giảm sợ khi mua phần mềm lạ | **Có** trên trang điều khoản |
-| B9 | Đếm người vào trang | Không đếm thì không biết kênh nào mang khách tới | **Chưa kiểm** web có công cụ đếm nào |
+| B9 | Đếm người vào trang | Không đếm thì không biết kênh nào mang khách tới | **Chưa có (đo 07/11)**: trang chủ không có dòng đếm nào (0 kết quả cho gtag, Plausible, Umami, Vercel Analytics). Cách rẻ nhất: Vercel Web Analytics (không dùng cookie), cần anh gật |
 
 ## C. Tài sản nội dung: thứ để đăng đi
 
