@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đầu trang nháp: Kính cam phát sáng (07/11/2026)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<style>
+:root{--acc:#F86820;--amb:#FFB454;--t1:#fbf7f3;--t2:#d9cfc6;--t3:#a39388}
+*{box-sizing:border-box}
+html,body{margin:0;background:#060504;color:var(--t1);font-family:Inter,"Segoe UI",sans-serif;overflow-x:hidden}
+.hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;background:#070504}
+.dom{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.hat{position:absolute;inset:0;pointer-events:none;opacity:.2;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>")}
+.nav{position:relative;z-index:5;display:flex;align-items:center;gap:26px;max-width:1120px;margin:0 auto;height:64px;padding:0 20px;font-size:14px;color:var(--t2)}
+.nav .lg{display:flex;align-items:center;gap:8px;font-weight:800;color:#fff}.nav .lg svg{width:22px;height:20px;color:var(--acc)}
+.nav .sp{flex:1}.nav .mua{padding:8px 16px;border-radius:9px;background:var(--acc);color:#1a0f08;font-weight:800}
+@media(max-width:640px){.nav .an{display:none}}
+.trong{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:clamp(24px,5vh,56px) 20px 40px;text-align:center}
+.eye{display:inline-flex;align-items:center;gap:9px;padding:7px 14px;border-radius:99px;font-size:13.5px;font-weight:600;color:#ffd2b3;background:rgb(255 255 255/.06);box-shadow:inset 0 1px 0 rgb(255 255 255/.18),inset 0 0 0 1px rgb(255 255 255/.08);backdrop-filter:blur(12px)}
+.eye i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+h1{margin:20px 0 0;font-size:clamp(44px,8vw,108px);line-height:.98;font-weight:900;letter-spacing:-.055em}
+h1 .d{display:inline-block}
+h1 .d2 span{display:inline-block;background:linear-gradient(180deg,#ffd0a8,#f86820 70%);-webkit-background-clip:text;background-clip:text;color:transparent}   /* mau dat tren TUNG chu: dat o dong cha thi chu dang nhun bi mat */
+.lede{margin:20px auto 0;max-width:620px;color:var(--t2);font-size:clamp(15px,1.5vw,18px);line-height:1.55}
+/* ===== tam kinh (chot 07/11) ===== */
+.kinh{position:relative;border-radius:30px;
+  background:linear-gradient(160deg,rgb(255 255 255/.13),rgb(255 255 255/.04) 42%,rgb(255 160 90/.06));
+  backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);
+  box-shadow:inset 0 1px 0 rgb(255 255 255/.32),inset 0 0 0 1px rgb(255 255 255/.10),inset 0 -40px 60px -30px rgb(248 104 32/.45),0 50px 90px -40px #000}
+.kinh::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1px;
+  background:linear-gradient(170deg,rgb(255 255 255/.55),rgb(255 255 255/.05) 35%,rgb(255 255 255/0) 60%,rgb(255 170 100/.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+/* khay */
+.khay{margin:clamp(26px,5vh,46px) auto 0;width:min(600px,94vw);padding:clamp(14px,2.2vw,22px);text-align:left}
+.khay .dau{display:flex;align-items:center;gap:12px}
+.chip-logo{width:44px;height:44px;flex:none;border-radius:14px;display:grid;place-items:center;background:linear-gradient(160deg,rgb(255 255 255/.22),rgb(255 255 255/.05));box-shadow:inset 0 1px 0 rgb(255 255 255/.4),inset 0 0 0 1px rgb(255 255 255/.12)}
+.chip-logo svg{width:23px;height:21px;color:#fff}
+.ten-k b{display:block;font-size:19px;font-weight:800;letter-spacing:-.02em}.ten-k small{display:block;font-size:12.5px;color:var(--t3);margin-top:2px}
+.so-to{margin-left:auto;text-align:right}.so-to b{display:block;font-size:clamp(32px,5vw,44px);line-height:.95;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.so-to small{font-size:12px;color:var(--t3);font-weight:600}
+.tab{display:flex;gap:4px;margin:16px 0 13px;padding:4px;border-radius:14px;background:rgb(0 0 0/.28);box-shadow:inset 0 0 0 1px rgb(255 255 255/.07);width:max-content}
+.tab span{padding:7px 13px;border-radius:10px;font-size:13px;font-weight:700;color:var(--t3);transition:background .3s,color .3s}
+.tab span.on{background:linear-gradient(160deg,rgb(255 255 255/.2),rgb(255 255 255/.06));color:#fff;box-shadow:inset 0 1px 0 rgb(255 255 255/.3)}
+.tab em{font-style:normal;opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums}
+.luoi{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.2vw,12px)}
+.o{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.16),0 14px 26px -12px rgb(0 0 0/.8)}
+.o.trong-o{background:rgb(0 0 0/.25);box-shadow:inset 0 0 0 1.5px rgb(255 255 255/.12)}
+.o.trong-o::after{content:"";position:absolute;inset:8px;border-radius:9px;border:1.5px dashed rgb(255 255 255/.14)}
+.o .so{position:absolute;left:7px;bottom:7px;z-index:2;padding:2px 7px;border-radius:7px;background:rgb(0 0 0/.45);backdrop-filter:blur(8px);font:700 11px/1.4 Inter;color:#fff}
+.o .dai{position:absolute;right:7px;bottom:7px;z-index:2;padding:2px 7px;border-radius:7px;background:rgb(0 0 0/.45);backdrop-filter:blur(8px);font:700 11px/1.4 Inter;font-variant-numeric:tabular-nums;color:#fff}
+.o .play{position:absolute;left:50%;top:50%;z-index:2;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:rgb(255 255 255/.18);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgb(255 255 255/.4);display:grid;place-items:center}
+.o .play::after{content:"";margin-left:3px;border-left:10px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.o.moi{box-shadow:0 0 0 2px var(--acc),0 0 0 6px rgb(248 104 32/.18),0 0 34px 4px rgb(248 104 32/.55)}
+.o.moi::before{content:"Mới";position:absolute;right:7px;top:7px;z-index:3;padding:2px 8px;border-radius:99px;background:var(--acc);color:#1a0f08;font:800 10.5px/1.5 Inter}
+.o .chu-o{position:absolute;inset:0;display:grid;place-items:center;background:#0e0a08;font-weight:900;letter-spacing:-.05em;color:#f3ece4;white-space:nowrap}
+.o .chu-o.cam{background:linear-gradient(180deg,#140d09,#2a1206);color:#ff9a55}
+.a-nguoi{background:#2a1a12 url(../kinh-cam/nguoi-that.jpg) center/cover}
+.a-hoang{background:linear-gradient(180deg,#2b2f5e 0%,#7b5bd6 52%,#f6a76e 100%)}
+.a-hoang::after{content:"";position:absolute;inset:auto 0 0 0;height:42%;background:#2a2340;clip-path:polygon(0 55%,18% 20%,34% 52%,55% 5%,74% 48%,100% 18%,100% 100%,0 100%)}
+.a-bien{background:linear-gradient(180deg,#0f4c5c,#1b8a8f 60%,#e9d6a8)}
+.a-bien::after{content:"";position:absolute;inset:auto 0 0 0;height:32%;background:#e9d6a8;clip-path:polygon(0 30%,30% 0,60% 25%,100% 5%,100% 100%,0 100%)}
+.a-mau{display:grid;grid-template-columns:repeat(5,1fr)}
+.a-chu{display:grid;place-items:center;background:#f3ece4;color:#1a1410;font-weight:900;font-size:clamp(18px,3vw,30px);letter-spacing:-.05em}
+.a-bieu{background:#fff}.a-bieu i{position:absolute;bottom:0;width:15%;border-radius:4px 4px 0 0;background:#f6b78f}.a-bieu i.c{background:var(--acc)}
+.cta{display:flex;justify-content:center;gap:12px;margin-top:24px}
+.cta a{padding:13px 22px;border-radius:13px;font-weight:800;font-size:15px;text-decoration:none}
+.cta .c1{background:linear-gradient(180deg,#ff8a45,#f86820);color:#1a0f08;box-shadow:inset 0 1px 0 rgb(255 255 255/.4),0 10px 30px -8px rgb(248 104 32/.7)}
+.cta .c2{color:#fff;background:rgb(255 255 255/.06);box-shadow:inset 0 1px 0 rgb(255 255 255/.18),inset 0 0 0 1px rgb(255 255 255/.1);backdrop-filter:blur(12px)}
+/* ===== lop dien ===== */
+.dien{position:absolute;inset:0;z-index:10;pointer-events:none}
+.sel{position:absolute;border:1.5px solid var(--acc);border-radius:4px;box-shadow:0 0 0 200vmax rgb(0 0 0/.45),0 0 30px rgb(248 104 32/.45);opacity:0}
+.sel i{position:absolute;width:10px;height:10px;background:#fff;border:2px solid var(--acc);border-radius:3px}
+.sel b{position:absolute;left:0;top:-34px;padding:4px 10px;border-radius:9px;background:rgb(20 14 10/.8);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgb(255 255 255/.2);color:#fff;font:700 12px/1.4 Inter;white-space:nowrap;font-variant-numeric:tabular-nums}
+.flash{position:absolute;inset:0;background:#fff;opacity:0}
+.the{position:absolute;padding:10px 10px 30px;border-radius:22px;opacity:0;box-shadow:inset 0 1px 0 rgb(255 255 255/.32),inset 0 0 0 1px rgb(255 255 255/.1),0 0 0 2px rgb(248 104 32/.9),0 0 50px 6px rgb(248 104 32/.5),0 40px 80px -30px #000}
+.the .in{width:100%;height:100%;display:grid;place-items:center;border-radius:14px;background:#0e0a08;font-weight:900;letter-spacing:-.055em;color:#f3ece4;white-space:nowrap;overflow:hidden}
+.the em{position:absolute;left:14px;bottom:8px;font:700 12px/1 Inter;font-style:normal;color:var(--t2)}
+.the em b{color:#fff;margin-right:6px}
+.quay{position:absolute;border:2px solid var(--acc);border-radius:10px;box-shadow:0 0 0 1px rgb(255 180 120/.4),0 0 50px rgb(248 104 32/.6);opacity:0}
+/* vien dang quay (Dynamic Island) */
+.vien{position:absolute;height:60px;border-radius:30px;padding:0 9px 0 20px;display:flex;align-items:center;gap:12px;opacity:0;
+  background:linear-gradient(180deg,rgb(18 14 12/.9),rgb(10 8 7/.95));backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgb(255 255 255/.18),inset 0 0 0 1px rgb(255 255 255/.08),inset 0 -20px 34px -18px rgb(248 104 32/.55),0 0 60px -10px rgb(248 104 32/.6),0 30px 60px -20px #000}
+.vien .cham{width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 5px rgb(255 59 48/.18),0 0 14px 3px rgb(255 59 48/.7)}
+.vien b{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.vien .song{width:110px;height:28px;display:flex;align-items:center;gap:3px}
+.vien .song i{flex:1;height:30%;border-radius:2px;background:linear-gradient(180deg,var(--amb),var(--acc))}
+.vien .dung{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(160deg,rgb(255 255 255/.18),rgb(255 255 255/.04));box-shadow:inset 0 1px 0 rgb(255 255 255/.4),inset 0 0 0 1px rgb(255 255 255/.12);transition:transform .12s}
+.vien .dung::after{content:"";width:14px;height:14px;border-radius:4px;background:#ff3b30;box-shadow:0 0 12px rgb(255 59 48/.6)}
+.vien .dung.bam{transform:scale(.88)}
+.phim{position:absolute;display:flex;gap:6px;opacity:0}
+.phim i{min-width:40px;height:40px;padding:0 12px;display:grid;place-items:center;border-radius:12px;font:800 15px/1 Inter;font-style:normal;color:#fff;background:linear-gradient(160deg,rgb(255 255 255/.2),rgb(255 255 255/.05));box-shadow:inset 0 1px 0 rgb(255 255 255/.35),inset 0 0 0 1px rgb(255 255 255/.12),0 10px 20px -8px #000;backdrop-filter:blur(10px)}
+.phim i.cam{background:linear-gradient(180deg,#ff8a45,#f86820);color:#1a0f08;box-shadow:inset 0 1px 0 rgb(255 255 255/.4),0 0 24px rgb(248 104 32/.7)}
+.vd{position:absolute;border-radius:14px;overflow:hidden;box-shadow:0 0 0 2px var(--acc),0 0 40px rgb(248 104 32/.6),0 30px 50px -20px #000;opacity:0}
+.cur{position:absolute;left:0;top:0;width:24px;height:24px;margin:-2px 0 0 -4px;filter:drop-shadow(0 2px 3px rgb(0 0 0/.6));opacity:0}
+.cur svg{width:100%;height:100%;transition:transform .12s}.cur.bam svg{transform:scale(.8)}
+.nhan{position:absolute;padding:6px 12px;border-radius:99px;background:linear-gradient(180deg,#ff8a45,#f86820);color:#1a0f08;font:800 13px/1 Inter;white-space:nowrap;opacity:0;box-shadow:0 0 24px rgb(248 104 32/.6)}
+.ghichu{max-width:1120px;margin:0 auto;padding:30px 20px 60px;color:#8d8d95;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<section class="hero" id="hero">
+  <div class="dom" style="left:50%;top:58%;width:900px;height:520px;margin-left:-450px;background:#f86820;opacity:.55"></div>
+  <div class="dom" style="left:62%;top:6%;width:420px;height:340px;background:#ffb454;opacity:.22"></div>
+  <div class="dom" style="left:8%;top:12%;width:380px;height:320px;background:#7a2c0c;opacity:.45"></div>
+  <div class="hat"></div>
+  <nav class="nav"><span class="lg"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>Shot &amp; Save</span><span class="an">Tính năng</span><span class="an">Giá</span><span class="an">Hỏi đáp</span><span class="sp"></span><span class="mua">Mua</span></nav>
+  <div class="trong">
+    <span class="eye"><i></i>Nơi dân sáng tạo cất ý tưởng</span>
+    <h1><span class="d d1" id="d1">Ý tưởng hay</span><br><span class="d d2" id="d2">không đợi ai.</span></h1>
+    <p class="lede" id="lede">Thấy là chụp, hay thì quay. Tất cả nằm sẵn trong khay, kéo thả vào Premiere, Figma hay khung chat với khách.</p>
+    <div class="kinh khay" id="khay">
+      <div class="dau"><span class="chip-logo"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg></span>
+        <span class="ten-k"><b>Khay ý tưởng</b><small id="phu">Hôm nay · 2 cái mới</small></span>
+        <span class="so-to"><b id="dem">22</b><small>ý tưởng</small></span></div>
+      <div class="tab"><span class="on" id="tabA">Ảnh<em id="soA">16</em></span><span id="tabV">Video<em id="soV">6</em></span><span>Storyboard<em>2</em></span></div>
+      <div class="luoi">
+        <div class="o a-nguoi"><span class="so">#17</span></div>
+        <div class="o a-mau"><span style="background:#2b2f5e"></span><span style="background:#7b5bd6"></span><span style="background:#f6a76e"></span><span style="background:#f86820"></span><span style="background:#e9d6a8"></span></div>
+        <div class="o a-bien"><span class="play"></span><span class="dai">0:12</span></div>
+        <div class="o a-chu">Aa</div>
+        <div class="o a-hoang"><span class="so">#20</span></div>
+        <div class="o a-bieu"><i style="left:10%;height:45%"></i><i class="c" style="left:32%;height:78%"></i><i style="left:54%;height:52%"></i><i class="c" style="left:76%;height:88%"></i></div>
+        <div class="o trong-o" id="o7"></div><div class="o trong-o" id="o8"></div>
+      </div>
+    </div>
+    <div class="cta"><a class="c1" href="#">Mua Shot &amp; Save</a><a class="c2" href="#">Xem cách hoạt động</a></div>
+  </div>
+  <div class="dien" id="dien"></div>
+</section>
+<p class="ghichu">Bản nháp 07/11/2026, ráp 3 thành phần Kính cam phát sáng anh chốt (khay, viên đang quay, thẻ ảnh) vào đầu trang. Tự diễn và lặp lại: khoanh chụp dòng "Ý tưởng hay" thành thẻ kính rơi vào khay; bấm R, viên Dynamic Island hiện trên vùng đang quay dòng "không đợi ai.", 3 giây sau bấm Dừng, video rơi vào khay. Chưa lên live.</p>
+<script>
+(() => {
+  if (!window.gsap) return
+  const H = document.getElementById('hero'), D = document.getElementById('dien'), d1 = document.getElementById('d1'), d2 = document.getElementById('d2')
+  const khay = document.getElementById('khay'), o7 = document.getElementById('o7'), o8 = document.getElementById('o8'), dem = document.getElementById('dem'), phu = document.getElementById('phu')
+  const tabA = document.getElementById('tabA'), tabV = document.getElementById('tabV'), soA = document.getElementById('soA'), soV = document.getElementById('soV'), lede = document.getElementById('lede')
+  d2.innerHTML = [...d2.textContent].map(c => '<span>' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('')
+  const chu2 = [...d2.children], CHU1 = d1.textContent, CHU2 = d2.textContent
+  const R = e => { const a = e.getBoundingClientRect(), b = H.getBoundingClientRect(); return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height } }
+  const el = (cls, html) => { const e = document.createElement('div'); e.className = cls; if (html != null) e.innerHTML = html; D.append(e); return e }
+  const CUR = '<svg viewBox="0 0 24 24"><path d="M4 2.5 19.5 14l-6.8 1.1-3.6 6.1z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+  const coVua = (t, r) => Math.min(r.h * .32, r.w * .84 / (t.length * .5))
+  const loe = () => gsap.fromTo(khay, { boxShadow: 'inset 0 1px 0 rgb(255 255 255/.32),inset 0 0 0 1px rgb(255 255 255/.10),inset 0 -60px 80px -30px rgb(248 104 32/.85),0 50px 90px -40px #000,0 0 120px 10px rgb(248 104 32/.55)' },
+    { boxShadow: 'inset 0 1px 0 rgb(255 255 255/.32),inset 0 0 0 1px rgb(255 255 255/.10),inset 0 -40px 60px -30px rgb(248 104 32/.45),0 50px 90px -40px #000,0 0 0 0 rgb(248 104 32/0)', duration: .9, ease: 'power2.out' })
+  let tl = null
+  function dung() {
+    if (tl) tl.kill(); gsap.killTweensOf('*'); D.innerHTML = ''
+    gsap.set([khay, ...chu2, lede], { clearProps: 'all' })
+    for (const o of [o7, o8]) { o.className = 'o trong-o'; o.innerHTML = '' }
+    dem.textContent = '22'; soA.textContent = '16'; soV.textContent = '6'; phu.textContent = 'Hôm nay · 2 cái mới'; tabA.classList.add('on'); tabV.classList.remove('on')
+    const r1 = R(d1), r2 = R(d2), r7 = R(o7), r8 = R(o8), pad = Math.max(10, r1.h * .12), fs = parseFloat(getComputedStyle(d1).fontSize)
+    const cur = el('cur', CUR), sel = el('sel', '<i style="left:-6px;top:-6px"></i><i style="right:-6px;top:-6px"></i><i style="left:-6px;bottom:-6px"></i><i style="right:-6px;bottom:-6px"></i><b></b>'), sz = sel.querySelector('b')
+    const flash = el('flash'), nh = el('nhan')
+    tl = gsap.timeline({ onComplete: () => gsap.delayedCall(1.4, dung) })
+    // 1. khoanh chup "Y tuong hay"
+    const x0 = r1.x - pad, y0 = r1.y - pad * .6, sw = r1.w + pad * 2, sh = r1.h + pad * 1.2
+    gsap.set(cur, { x: x0 - 60, y: y0 - 50 })
+    tl.to(cur, { opacity: 1, duration: .25 }, .3).to(cur, { x: x0, y: y0, duration: .5, ease: 'power2.inOut' }, .35)
+    tl.set(sel, { left: x0, top: y0, width: 0, height: 0, opacity: 1 }, .9)
+    const o = { k: 0 }
+    tl.to(o, { k: 1, duration: .7, ease: 'power2.inOut', onUpdate() { const w = sw * o.k, h = sh * o.k; sel.style.width = w + 'px'; sel.style.height = h + 'px'; sz.textContent = Math.round(w * 1.5) + ' × ' + Math.round(h * 1.5); gsap.set(cur, { x: x0 + w, y: y0 + h }) } }, .9)
+    tl.to(flash, { opacity: .5, duration: .06 }, 1.75).to(flash, { opacity: 0, duration: .35 }, 1.81)
+    const the = el('kinh the', '<div class="in" style="font-size:' + fs + 'px">' + CHU1 + '</div><em><b>#23</b>vừa chụp</em>')
+    gsap.set(the, { left: x0 - 10, top: y0 - 10, width: sw + 20, height: sh + 40 })
+    tl.set(sel, { opacity: 0 }, 1.8).set(the, { opacity: 1 }, 1.8)
+    tl.to(the, { y: -20, rotation: -3, scale: 1.04, duration: .35, ease: 'power2.out' }, 1.85)
+    tl.add(() => { const k = Math.min(r7.w / (sw + 20), r7.h / (sh + 40)); gsap.to(the, { x: r7.x - (x0 - 10) + (r7.w - (sw + 20) * k) / 2, y: r7.y - (y0 - 10) + (r7.h - (sh + 40) * k) / 2, scale: k, rotation: 0, transformOrigin: '0 0', duration: .8, ease: 'power3.inOut' }) }, 2.2)
+    tl.to(cur, { opacity: 0, duration: .2 }, 2.15)
+    tl.add(() => {
+      the.style.opacity = 0
+      o7.className = 'o moi'; o7.innerHTML = '<div class="chu-o" style="font-size:' + coVua(CHU1, r7) + 'px">' + CHU1 + '</div><span class="so">#23</span>'
+      dem.textContent = '23'; soA.textContent = '17'; phu.textContent = 'Hôm nay · 3 cái mới'; loe()
+      gsap.fromTo(o7, { scale: 1.14 }, { scale: 1, duration: .45, ease: 'back.out(2.2)' })
+      gsap.set(nh, { left: r7.x + r7.w / 2, top: r7.y - 36, xPercent: -50 }); nh.textContent = '+1 ảnh'; gsap.fromTo(nh, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .25 }); gsap.to(nh, { opacity: 0, duration: .3, delay: 1 })
+    }, 3.02)
+    // 2. bam R, quay "khong doi ai."
+    const ph = el('phim', '<i>R</i>')
+    gsap.set(ph, { left: r2.x + r2.w + 18, top: r2.y + r2.h / 2 - 20 })
+    if (r2.x + r2.w + 70 > H.clientWidth) gsap.set(ph, { left: r2.x + r2.w / 2 - 20, top: r2.y + r2.h + 14 })
+    tl.to(ph, { opacity: 1, y: -6, duration: .25 }, 3.55).add(() => ph.firstChild.classList.add('cam'), 3.8).to(ph, { opacity: 0, duration: .25 }, 4.35)
+    const qx = r2.x - pad, qy = r2.y - pad * .5, qw = r2.w + pad * 2, qh = r2.h + pad
+    const q = el('quay'); gsap.set(q, { left: qx, top: qy, width: qw, height: qh })
+    const v = el('vien', '<span class="cham"></span><b>00:00</b><span class="song"></span><span class="dung"></span>'), gio = v.querySelector('b'), song = v.querySelector('.song'), nd = v.querySelector('.dung')
+    for (let i = 0; i < 16; i++) song.append(document.createElement('i'))
+    const vw = Math.min(300, H.clientWidth - 24); gsap.set(v, { width: vw, left: Math.max(12, Math.min(H.clientWidth - vw - 12, qx + qw / 2 - vw / 2)), top: qy + qh + 14 })   // vien nam DUOI vung quay, khong de dong tren
+    tl.fromTo(q, { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: .35, ease: 'power2.out' }, 3.9)
+    tl.fromTo(v, { opacity: 0, y: 12, scale: .7 }, { opacity: 1, y: 0, scale: 1, duration: .5, ease: 'back.out(1.8)' }, 3.95)
+    tl.to(lede, { opacity: .25, duration: .3 }, 3.9).to(lede, { opacity: 1, duration: .4 }, 7.5)
+    tl.to(chu2, { y: -fs * .13, duration: .22, ease: 'power1.out', yoyo: true, repeat: 5, stagger: { each: .06, from: 'start' } }, 4.15)
+    const t = { s: 0 }
+    tl.to(t, { s: 3, duration: 3, ease: 'none', onUpdate() { gio.textContent = '00:0' + Math.floor(t.s); [...song.children].forEach((b, i) => { b.style.height = (22 + 78 * Math.abs(Math.sin(t.s * 7 + i * .8) * Math.cos(t.s * 3.1 + i * .37))).toFixed(0) + '%' }) } }, 4.15)
+    tl.add(() => { const a = R(nd); gsap.set(cur, { x: a.x + a.w + 50, y: a.y - 40 }); gsap.to(cur, { opacity: 1, duration: .2 }); gsap.to(cur, { x: a.x + a.w / 2, y: a.y + a.h / 2, duration: .5, ease: 'power2.inOut' }) }, 6.4)
+    tl.add(() => { cur.classList.add('bam'); nd.classList.add('bam'); setTimeout(() => { cur.classList.remove('bam'); nd.classList.remove('bam') }, 160) }, 7.15)
+    const vd = el('vd', '<div class="chu-o cam" style="position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,#140d09,#2a1206);font-size:' + fs + 'px;font-weight:900;letter-spacing:-.055em;color:#ff9a55;white-space:nowrap">' + CHU2 + '</div>')
+    gsap.set(vd, { left: qx, top: qy, width: qw, height: qh })
+    tl.set(vd, { opacity: 1 }, 7.2).to([q, v], { opacity: 0, duration: .25 }, 7.2).to(cur, { opacity: 0, duration: .2 }, 7.25)
+    tl.add(() => { const k = Math.min(r8.w / qw, r8.h / qh); gsap.to(vd, { x: r8.x - qx + (r8.w - qw * k) / 2, y: r8.y - qy + (r8.h - qh * k) / 2, scale: k, transformOrigin: '0 0', duration: .8, ease: 'power3.inOut' }) }, 7.25)
+    tl.add(() => {
+      vd.style.opacity = 0
+      o8.className = 'o moi'; o8.innerHTML = '<div class="chu-o cam" style="font-size:' + coVua(CHU2, r8) * .9 + 'px">' + CHU2 + '</div><span class="play" style="left:8px;top:8px;margin:0;width:24px;height:24px"></span><span class="dai">0:03</span>'
+      o7.classList.remove('moi')
+      dem.textContent = '24'; soV.textContent = '7'; phu.textContent = 'Hôm nay · 4 cái mới'; tabV.classList.add('on'); tabA.classList.remove('on'); loe()
+      gsap.fromTo(o8, { scale: 1.14 }, { scale: 1, duration: .45, ease: 'back.out(2.2)' })
+      gsap.set(nh, { left: r8.x + r8.w / 2, top: r8.y - 36 }); nh.textContent = '+1 video'; gsap.fromTo(nh, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .25 }); gsap.to(nh, { opacity: 0, duration: .3, delay: 1.2 })
+    }, 8.07)
+    tl.to({}, { duration: 2.4 }, 8.1)
+  }
+  let hen; addEventListener('resize', () => { clearTimeout(hen); hen = setTimeout(dung, 250) })
+  ;(document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(dung, 300))
+  window.__hero = { dung }
+})()
+</script>
+</body>
+</html>
