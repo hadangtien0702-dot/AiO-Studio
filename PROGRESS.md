@@ -5,6 +5,14 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-11-07 20:18 (UTC+7) - Shot & Save: GIÁ $20 TRỌN ĐỜI, MỘT MÃ MỘT MÁY, đã LIVE web + Polar; 20 mã tặng
+
+- **Anh:** *"anh muốn chốt giá là $20 - Lifetime… 1 option duy nhất"*, *"$20 trọn đời - một mã là một máy - xong"*, *"tạo cho anh thêm 20 mã free - anh tặng cho người dùng"*, *"sửa trên polar luôn"* (anh đăng nhập Polar trong khung trình duyệt của app).
+- **Polar (sửa qua API trong trang đã đăng nhập, đọc lại khớp):** giá sản phẩm AiO Shot & Save 1499 → **2000 USD cent** (giá mới id `731e0c53`); quyền lợi mã bản quyền `9d99f57c` giới hạn kích hoạt 2 → **1**, không hết hạn, tên "Shot & Save key, 1 computer, for life" (Polar giới hạn 42 ký tự); trang thanh toán công khai hiện **$20**. Sản phẩm Tester (1 máy, $14.99) không đổi.
+- **20 mã tặng:** giảm 100%, mỗi mã dùng 1 lần, chỉ áp cho AiO Shot & Save, không hết hạn; tên "Tang 07/11 so 01..20"; mã dạng `TANGxxxxxx` (Polar chỉ nhận chữ + số, không nhận gạch). Danh sách nằm ở `Build and UI Design/AiO Shotandsave/.selftest/ma-tang/20-ma-tang-07-11-2026.txt` (KHÔNG vào git, repo public). Đã dùng: 0/20.
+- **Web:** commit `c60381a` (giá, hỏi đáp "một máy", điều khoản VI+EN ngày 07/11, demo thanh toán, 4 mẫu thư, hàm gửi thư aio-mail, câu lỗi hết lượt máy trong app). Live md5 = git `e7eded40` lúc 20:18; đếm trên live: trang chính 9 chỗ `$20`, 0 chỗ `$14.99`; điều khoản 2 `$20`, "one computer" + "một máy tính", 0 "two computers". Lần đẩy đầu lúc ~19:5x Vercel báo Canceled, bản sau Ready.
+- **Chưa:** chưa mua thử bằng mã tặng (thư cảm ơn ghi 1 máy chưa đọc trên thư thật); bài thử hàm gửi thư dừng ở bước SMTP vì Node 26 cấm tên máy chủ là IP (lỗi của công cụ thử); câu lỗi mới trong app vào bản đóng gói sau; khách mua trước đây (mã 2 máy) không bị đổi.
+
 ## [web] - 2026-11-07 19:40 (UTC+7) - Web Shot & Save: section Canvas diễn LẶP, đã LIVE
 
 - **Anh:** chụp section Canvas, *"phần này chưa có animation nè"*, rồi *"Đưa lên live"*.
