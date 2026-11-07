@@ -1267,6 +1267,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
 .hk-c1{background:linear-gradient(180deg,#ff8a45,#f86820);color:#1a0f08;box-shadow:inset 0 1px 0 rgb(255 255 255/.4),0 10px 30px -8px rgb(248 104 32/.7)}
 .hk-c2{color:#fff;background:rgb(255 255 255/.06);box-shadow:inset 0 1px 0 rgb(255 255 255/.18),inset 0 0 0 1px rgb(255 255 255/.1)}
 .hk-cta a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.hk.hk-cho .hk-eye,.hk.hk-cho .hk-h1,.hk.hk-cho .hk-lede,.hk.hk-cho .hk-khay,.hk.hk-cho .hk-cta,.hk.hk-cho .hk-dom{opacity:0}   /* an ngan truoc khi dien VAO; tu bo sau 2,5 s neu script loi */
+.hk-tu{display:inline-block}
 /* man thap (laptop 768, 700): thu gon de ca khay nam trong man, cho anh va video roi vao la thay ngay (do 07/11: o 1024x700 hang 2 cua khay nam duoi mep man) */
 @media (max-height:860px) and (min-width:641px){.hk-trong{padding-top:28px}.hero.hk h1.hk-h1{margin-top:14px;font-size:clamp(40px,min(7vw,9.5vh),96px)}.hk-lede{margin-top:12px}.hk-khay{margin-top:20px;width:min(560px,94vw);padding:16px}.hk-tab{margin:12px 0 10px}}
 /* lớp diễn */
@@ -1359,6 +1361,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
     </div>
     <div class="hk-dien" id="hkDien" aria-hidden="true"></div>
   </section>
+  <script>(()=>{const h=document.getElementById("hk");if(!h||matchMedia("(prefers-reduced-motion: reduce)").matches||scrollY>4)return;h.classList.add("hk-cho");setTimeout(()=>h.classList.remove("hk-cho"),2500)})()</script>
 
   <!-- Section LÝ DO (07/10, anh: "một section riêng nêu ra lí do tại sao anh làm cái này ... khai thác nó thành UI kể chuyện").
        Câu chuyện của anh kể thành 3 câu (bản đầu 5 câu, anh: "gom lại thành 03 slide", "bán câu chuyện và nỗi đau của mình chứ không bán hàng"):
@@ -5452,9 +5455,62 @@ document.addEventListener("DOMContentLoaded", () => {
   addEventListener("resize", () => { if (innerWidth === rong) return; rong = innerWidth; clearTimeout(hen); hen = setTimeout(dung, 250); });   // thanh địa chỉ điện thoại ẩn/hiện chỉ đổi chiều cao: không dựng lại
   window.ssHkRelang = () => { clearTimeout(hen); hen = setTimeout(dung, 60); };
   window.ssHk = { dung };   // để đo
-  const batDau = () => (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(dung, 200));
+  const batDau = () => { if (window.ssHkVao) return; (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(dung, 200)); };
   if (document.readyState === "complete") batDau(); else addEventListener("load", batDau);
 })();
+</script>
+<script>
+/* ===== 07/11 ĐẦU TRANG: chuyển động VÀO (mở trang) và RA (cuộn xuống). Anh: "dựng thêm animation in-out cho hero".
+   VÀO: đốm sáng nở ra · nhãn nhỏ rơi xuống · từng chữ tiêu đề trồi lên từ dưới (mờ → nét) · dòng phụ · khay kính dựng đứng từ tư thế ngả
+        ra sau + các ô bật lần lượt + số đếm 0 → 22 · hai nút. Xong mới bắt đầu vòng "chụp, quay" (ssHk.dung).
+   RA: cuộn xuống thì tiêu đề trôi lên và mờ dần, khay ngả ra sau như đặt xuống bàn, đốm sáng trôi chậm hơn (chiều sâu). Chỉ transform /
+       opacity (không blur khi cuộn: tốn máy). Đang cuộn khỏi đầu trang thì dừng vòng diễn; cuộn về đỉnh thì diễn lại.
+   Không GSAP / giảm chuyển động: không ẩn gì, không diễn. Chữ chính không bị ẩn quá ~0,9 giây (bài 28/09: hiện dần đầu trang làm LCP 6 giây). ===== */
+const hkInOut = () => {
+  const H = document.getElementById("hk"); if (!H) return;
+  const giam = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const q = s => H.querySelector(s), qa = s => [...H.querySelectorAll(s)];
+  const eye = q(".hk-eye"), h1 = q(".hk-h1"), d1 = q("#hkD1"), d2 = q("#hkD2"), lede = q(".hk-lede"), khay = q("#hkKhay"), cta = q(".hk-cta"), dom = qa(".hk-dom"), dien = q("#hkDien"), dem = q("#hkDem");
+  const mo = () => H.classList.remove("hk-cho");
+  if (giam || !window.gsap) { mo(); return; }
+  // tách chữ dòng 1 theo TỪ (dòng 2 vòng diễn tự tách theo chữ cái)
+  const tachTu = el => { const t = el.textContent; el.innerHTML = t.split(" ").map(w => '<span class="hk-tu">' + w + "</span>").join(" "); return [...el.children]; };
+  let vaoXong = false;
+  function vao() {
+    const tu1 = tachTu(d1), tu2 = tachTu(d2), o = qa(".hk-o"), nut = [...cta.children];
+    mo();   // bo an TRUOC khi tao tween: from() doc gia tri hien tai lam dich
+    gsap.set(H, { perspective: 1200 });
+    const tl = gsap.timeline({ defaults: { ease: "expo.out" }, onComplete: () => { vaoXong = true; d1.textContent = d1.textContent; d2.textContent = d2.textContent; if (window.ssHk) window.ssHk.dung(); } });
+    tl.from(dom, { scale: .55, opacity: 0, duration: 1.6, stagger: .12, ease: "power2.out" }, 0)
+      .from(eye, { y: -18, opacity: 0, filter: "blur(6px)", duration: .6 }, .05)
+      .from([...tu1, ...tu2], { yPercent: 70, rotationX: -55, opacity: 0, filter: "blur(10px)", transformOrigin: "50% 100%", duration: .9, stagger: .07 }, .12)
+      .from(lede, { y: 18, opacity: 0, duration: .7 }, .5)
+      .from(khay, { y: 90, rotationX: 32, scale: .93, opacity: 0, transformOrigin: "50% 100%", duration: 1.1 }, .55)
+      .from(o, { scale: .82, opacity: 0, duration: .55, stagger: { each: .045, from: "start" }, ease: "back.out(1.8)" }, .85)
+      .from(nut, { y: 16, opacity: 0, duration: .6, stagger: .08 }, 1.0);
+    const so = { n: 0 }; tl.to(so, { n: 22, duration: .9, ease: "power2.out", onUpdate: () => { dem.textContent = Math.round(so.n); } }, .85);
+  }
+  // RA: theo vị trí cuộn
+  let hen = 0, dangRa = false;
+  const ra = () => {
+    hen = 0;
+    const p = Math.min(1, Math.max(0, scrollY / (H.offsetHeight * .85)));
+    gsap.set(h1, { y: -p * 90, scale: 1 - p * .08, opacity: 1 - p * 1.15, force3D: true });
+    gsap.set([eye, lede], { y: -p * 60, opacity: 1 - p * 1.4 });
+    gsap.set(khay, { y: -p * 30, rotationX: p * 22, scale: 1 - p * .07, opacity: 1 - Math.max(0, p - .35) * 1.6, transformOrigin: "50% 100%", transformPerspective: 1200 });
+    gsap.set(cta, { y: -p * 20, opacity: 1 - p * 1.6 });
+    gsap.set(dom, { y: p * 140 });
+    gsap.set(dien, { opacity: p > .03 ? 0 : 1 });
+    const ra2 = p > .03;
+    if (ra2 !== dangRa && vaoXong && window.ssHk) { dangRa = ra2; if (!ra2) window.ssHk.dung(); }
+  };
+  addEventListener("scroll", () => { if (!hen) hen = requestAnimationFrame(ra); }, { passive: true });
+  if (scrollY > 4) { mo(); vaoXong = true; ra(); if (window.ssHk) window.ssHk.dung(); return; }   // mở trang giữa chừng (bấm link #...): không diễn vào
+  window.ssHkVao = { vao, ra };   // để đo; hero.js thấy biến này thì không tự chạy vòng diễn lúc load
+  vao();
+};
+// GSAP nạp kiểu defer: chạy sau DOMContentLoaded (script defer chạy xong trước sự kiện này)
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", hkInOut); else hkInOut();
 </script>
 </body>
 </html>
