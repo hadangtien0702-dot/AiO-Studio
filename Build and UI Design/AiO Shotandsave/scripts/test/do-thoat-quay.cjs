@@ -55,7 +55,7 @@ if (M && !M.loi) {
   kiem('T1 [moi] file phat duoc, dai ~0,4 s (0,2 - 1,5 s)', d1 > 0.2 && d1 < 1.5, 'dai ' + d1.toFixed(2) + ' s')
   const d2 = dai(M.t2.file)
   kiem('T2 [moi] luong nen ket thuc luc dang quay: van quay du ~3,8 s (>= 3,3 s) khong loi', d2 >= 3.3 && !(M.t2.info && M.t2.info.loi), 'dai ' + d2.toFixed(2) + ' s, loi=' + (M.t2.info && M.t2.info.loi))
-  kiem('T2 [moi] cua so luong khong bi huy luc dang quay, sau quay xong luong CHAY LAI (yeu cau bi hoan van duoc thuc hien)', M.t2SongSau === true && M.sanSang3 === true, 'songSau=' + M.t2SongSau + ' sanSang3=' + M.sanSang3)
+  kiem('T2 [moi] cua so luong khong bi huy luc dang quay, sau quay xong luong CHAY LAI (yeu cau bi hoan van duoc thuc hien)', M.t2SongSau === true && M.sanSang3 === true, 'songSau=' + M.t2SongSau + ' sanSangSau=' + M.msSanSang3 + 'ms' + ' sanSang3=' + M.sanSang3)
   kiem('T2 [moi] run-log ghi "hoan toi khi quay xong"', M.nhatKy.some((s) => /hoan toi khi quay xong/.test(s)))
   // T3: quay THAT + con tro THAT -> Sua video chay tren chinh file app quay
   const t3 = M.t3, x = M.t3Xuat, x0 = M.t3XuatKhongZoom

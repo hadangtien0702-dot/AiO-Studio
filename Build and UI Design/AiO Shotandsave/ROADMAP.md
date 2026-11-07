@@ -49,6 +49,23 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0m. 07/11/2026 XEM PINTEREST: NGUOI TA TRINH BAY ANH VA UI THE NAO (anh: "research tren pinterest khac show hinh anh va cach lam UI cho dep") — anh CHUA chot huong nao
+
+Nguon: 4 trang tim kiem Pinterest xem khong dang nhap ngay 07/11 (tu khoa: screenshot manager app ui dark · image gallery app ui dark masonry · moodboard app ui design · desktop app landing page product showcase dark), khoang 90 ghim. Chi ghi KIEU trinh bay lap lai nhieu lan, khong chep thiet ke cua ai. Pinterest la anh dung san de khoe, khong phai so lieu nguoi dung.
+
+Lap lai nhieu nhat:
+1. San pham dat trong MAY THAT (laptop, man hinh, dien thoai) tren nen toi, co mot quang sang mau thuong hieu phia sau. Khach thay "app nam tren may minh" truoc khi doc chu.
+2. Nen toi + MOT mau nhan (cam, tim) + lop sang loang mem sau the. Web Shot & Save da dung nen toi + cam #F86820 nen hop ngay.
+3. Luoi bento: the to nho khac nhau, moi the la mot MANH GIAO DIEN THAT cat ra, chu rat it. Khac voi luoi 11 the chu anh da che 29/09 ("vo duyen"): o day hinh la chinh, chu chi 1 dong.
+4. Nhieu man hinh xep nghieng (phoi canh), do bong duoi, tao chieu sau.
+5. So lon lam diem nhan (+2.5k, 100%, 01 / 04).
+6. Thu vien anh: luoi so le (masonry) giu nguyen ti le anh, anh to, vien rat mong, ten va ngay chi hien khi re chuot; nhom theo ngay; anh dang chon phong to, cac anh khac lui toi.
+
+De xuat ap vao (CHO ANH CHON, lam MOT mau truoc theo bai 5bh):
+- A. Web: dau trang dat cai khay + mot tam anh ghim trong man hinh laptop toi co quang cam, thay hinh minh hoa phang.
+- B. Web: them mot dai bento ngay sau rap, 6-8 o la anh chup that cua app (Tim lai anh cu, Lam dep, Sua video, Tai lieu), moi o 1 dong chu.
+- C. App: cua so Tim lai anh cu va Khay doi sang luoi so le giu ti le anh, nhom theo ngay, chu hien khi re chuot.
+
 ### 0l. 06/11/2026 RA CHO NGUOI MOI BI KET (Sonnet di het app nhu nguoi moi, chup 40 man hinh; anh hoi "stuck o dau, co de cho nguoi dung khong")
 
 So that tren may anh (run-log 05-06/11): 31 lan luu, 13 tam co ve, 0 lan doc chu / quay / Canvas / hen gio, bam nut thu khay 9 lan. Anh chi dung chup + ve; nhung tinh nang kia chua ai dung tren viec that.

@@ -291,7 +291,7 @@ async function chay() {
   // bo loc khay: copy dung bieu thuc trong main.js layDanhSachAnhGanNhat
   const mainSrc = fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8').split(String.fromCharCode(13)).join('')
   const locKhay = (f) => /\.(png|jpe?g)$/i.test(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-')
-  kiem('main.js van dung bo loc nay (tranh do bang ban sao cu)', mainSrc.includes("/\\.(png|jpe?g)$/i.test(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-')"))
+  kiem('main.js van dung bo loc nay (tranh do bang ban sao cu)', mainSrc.includes("kho.laFileAnh(f) && !f.startsWith('.') && !f.startsWith('shotandsave-storyboard-')")) // 07/11: main doi sang kho.laFileAnh khi them WebP 06/11
   kiem('khay nap lai duoc moi file moi', moiFile.every(locKhay))
   kiem('shelfAdd va handleConfirm khong bi sua (khong co tu lamdep trong 2 ham)', (() => {
     const m1 = mainSrc.match(/function shelfAdd[\s\S]*?\n}\n/), m2 = mainSrc.match(/function handleConfirm[\s\S]*?\n}\n/)

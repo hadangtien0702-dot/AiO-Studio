@@ -80,8 +80,10 @@ app.whenReady().then(async () => {
         luong.dungQuay()
       })
       // sau khi quay xong, yeu cau khoi dong lai bi hoan phai duoc thuc hien (ban moi): luong van san sang lai
-      await cho(3500)
-      kq.sanSang3 = luong.sanSang()
+      // 07/11: luong khoi dong mat 1,5-3,7 s tuy may (do: "chuan bi 3695ms"), cho cung 3,5 s la truot oan. Cho toi 15 s, ghi so giay that.
+      const t3 = Date.now()
+      while (!luong.sanSang() && Date.now() - t3 < 15000) await cho(100)
+      kq.sanSang3 = luong.sanSang(); kq.msSanSang3 = Date.now() - t3
     }
     // T3 (chi ban moi): quay THAT 3,5 s co tieng may (Windows: loopback) + ghi vi tri con tro THAT, roi chay Sua video tren chinh file do
     if (BIEN_THE === 'moi' && kq.sanSang3) {
