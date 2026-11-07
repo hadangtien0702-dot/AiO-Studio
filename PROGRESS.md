@@ -9,7 +9,7 @@
 
 - **Anh:** *"mỗi tính năng là một UI animation creative trên pinterest"* → 24 ý (bản xem chỉ trên máy, ROADMAP 0m) → mẫu ngăn kéo bị chê *"xấu goắc, không creative gì hết"* → 3 khung tĩnh lấy ý từ chính app, anh chọn khung C (*"cái này có vẻ hay"*), khoanh lỗi vệt sáng dừng lơ lửng, rồi *"Đưa lên live"*.
 - **Cảnh:** ảnh, bảng màu, chữ trôi ở nhiều độ sâu; vệt sáng cam từ mọi tấm hội tụ một điểm trên mép khay; 4 tấm lần lượt bay vào khay (đếm 21 → 25), bấm một ô là nhấc lên ghim. Nháp: Website/Nhap web ShotSave/mau-bay-ve-khay/ (mã cảnh: canh-bay-ve-khay.js).
-- **Đo:** 6 nhịp ở 1440×900, 390×844, 1024×640 (EN): 0 phần tử tràn sân, 0 lỗi; lăn chuột thật 176 nấc xuống + 179 nấc lên qua đủ 24/24 cảnh; live  md5 khớp git, 5 nhịp chụp trên live 0 tràn,  404.
+- **Đo:** 6 nhịp ở 1440×900, 390×844, 1024×640 (EN): 0 phần tử tràn sân, 0 lỗi; lăn chuột thật 176 nấc xuống + 179 nấc lên qua đủ 24/24 cảnh; live `8f448bf` md5 khớp git, 5 nhịp chụp trên live 0 tràn, `/.env.local` 404.
 - **Chưa:** điện thoại thật, Safari; 23 cảnh còn lại chưa làm theo kiểu mới.
 
 ## [web] - 2026-11-07 15:38 (UTC+7) - Web Shot & Save: rạp 17 → 24 cảnh, đã LIVE - máy nhà Windows
