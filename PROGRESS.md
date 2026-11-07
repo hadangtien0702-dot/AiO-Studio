@@ -5,6 +5,14 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-11-07 19:29 (UTC+7) - Web Shot & Save: đầu trang thêm chuyển động VÀO và RA, đã LIVE
+
+- **Anh:** *"dựng thêm animation in-out cho hero"*, xem ảnh từng nhịp rồi *"Đưa lên live"*.
+- **Vào (mở trang, ~2 giây):** đốm sáng nở · nhãn nhỏ rơi xuống · từng chữ tiêu đề trồi lên (mờ thành nét) · dòng phụ · khay kính dựng đứng từ tư thế ngả, ô bật lần lượt, số đếm 0 → 22 · hai nút. Xong mới chạy vòng chụp và quay. **Ra (cuộn):** tiêu đề trôi lên mờ dần, khay ngả ra sau rồi mờ, đốm sáng trôi chậm hơn; về đỉnh thì vòng diễn chạy lại. Chỉ transform và opacity khi cuộn.
+- **An toàn:** giảm chuyển động thì không ẩn, không diễn; script lỗi thì tự hiện lại sau 2,5 giây; mở trang giữa chừng thì bỏ phần vào. Vòng diễn không tự chạy lúc load nữa khi có phần vào (biến ssHkVao).
+- **Đo:** live `59da115` md5 khớp git; máy tính và điện thoại thấy phần vào chạy (khay mờ 0 → 0,45 → 1, số đếm 11 → 19 → 22) rồi vòng diễn chạy (~2,4 giây); cuộn 25/50/80% khay ngả 6/13/21 độ; về đỉnh vòng diễn chạy lại; 0 lỗi console; lăn chuột thật đủ 24/24 cảnh rạp (trên máy).
+- **Chưa:** điện thoại thật, Safari; chưa xem bằng mắt chuyển động liền mạch (chỉ ảnh từng nhịp).
+
 ## [web] - 2026-11-07 19:11 (UTC+7) - Web Shot & Save: ĐẦU TRANG mới "Kính cam phát sáng", đã LIVE
 
 - **Anh:** đầu trang "một rừng tính năng", phải làm nổi Khay và Quay màn hình; chê 2 khung laptop *"cần creative hơn"*, chê bản tiêu đề bị chụp *"các elements chưa creative"*, bảo research Pinterest, chốt chất liệu Kính cam phát sáng (ghim glass-02, glass-03, glass-09, tray-03), chốt 3 thành phần tĩnh (ô mới dùng ảnh người thật Unsplash), rồi *"Đưa lên live"*.
