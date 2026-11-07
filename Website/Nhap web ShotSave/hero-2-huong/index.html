@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Đầu trang: 2 hướng làm nổi Khay và Quay (khung tĩnh, 07/11/2026)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#F86820;--t1:#f5f5f7;--t2:#c3c3c8;--t3:#8d8d95}
+*{box-sizing:border-box}
+body{margin:0;background:#070708;color:var(--t1);font-family:Inter,"Segoe UI",sans-serif}
+.w{max-width:1500px;margin:0 auto;padding:36px 30px 70px}
+h1.bc{font-size:26px;margin:0 0 6px}.nho{color:var(--t3);font-size:14px;line-height:1.6;margin:0 0 20px;max-width:1100px}
+.ten{display:flex;align-items:baseline;gap:12px;margin:34px 0 12px}.ten b{color:var(--acc);font-size:15px}.ten span{font-size:20px;font-weight:700}.ten i{font-style:normal;color:var(--t3);font-size:14px}
+.khung{position:relative;width:1440px;height:900px;overflow:hidden;border-radius:18px;background:radial-gradient(70% 60% at 50% 0%,rgb(248 104 32/.14),transparent 60%),#121110;box-shadow:0 0 0 1px rgb(255 255 255/7%)}
+.hat{position:absolute;inset:0;pointer-events:none;opacity:.2;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>")}
+/* thanh tren gia lap trang that */
+.nav{position:absolute;left:0;right:0;top:0;height:64px;display:flex;align-items:center;gap:28px;padding:0 160px;border-bottom:1px solid rgb(255 255 255/6%);font-size:14px;color:var(--t2)}
+.nav .lg{display:flex;align-items:center;gap:8px;font-weight:800;color:#fff}.nav .lg svg{width:22px;height:20px;color:var(--acc)}
+.nav .sp{flex:1}.nav .mua{padding:8px 16px;border-radius:9px;background:var(--acc);color:#16110d;font-weight:800}
+.eye{position:absolute;left:0;right:0;text-align:center;font-size:14px;font-weight:600;color:#ffb891}
+.eye i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-right:9px;vertical-align:2px}
+.h1{position:absolute;left:0;right:0;text-align:center;font-size:66px;line-height:1.04;font-weight:900;letter-spacing:-.045em}
+.h1 em{font-style:normal;color:var(--acc)}
+.lede{position:absolute;left:0;right:0;text-align:center;color:var(--t2);font-size:18px}
+.cta{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:12px}
+.cta a{padding:13px 22px;border-radius:12px;font-weight:800;font-size:15px}.cta .c1{background:var(--acc);color:#16110d}.cta .c2{box-shadow:inset 0 0 0 1px rgb(255 255 255/18%);color:#fff}
+/* may tinh */
+.lap{position:absolute;border-radius:22px;background:#1d1c1b;box-shadow:0 0 0 1px rgb(255 255 255/8%),0 60px 120px -40px #000;padding:14px}
+.man{position:relative;width:100%;height:100%;border-radius:12px;overflow:hidden;background:#f3efe9}
+.man .tb{height:30px;display:flex;align-items:center;gap:7px;padding:0 12px;background:#e7e1d9}.man .tb i{width:10px;height:10px;border-radius:50%;background:#d7cdc2}
+.dash{position:absolute;left:0;right:0;top:30px;bottom:0;display:grid;grid-template-columns:24% 1fr;gap:16px;padding:16px}
+.dash .cot{border-radius:10px;background:#fff;padding:16px}.dash .cot i{display:block;height:12px;border-radius:6px;background:#e4ddd5;margin-bottom:16px}
+.dash .chinh{position:relative;border-radius:10px;background:#fff;padding:20px}
+.dash h3{margin:0 0 10px;color:#1b1714;font-size:24px;letter-spacing:-.02em}
+.cot2{position:absolute;bottom:0;width:9%;border-radius:6px 6px 0 0}
+/* khay that cua app */
+.khay{position:absolute;border-radius:18px;background:#151515;box-shadow:0 0 0 1px rgb(255 255 255/10%),0 50px 90px -30px #000,0 0 140px -30px rgb(248 104 32/55%)}
+.khay .thanh{display:flex;align-items:center;gap:9px;height:46px;padding:0 14px;border-bottom:1px solid rgb(255 255 255/7%)}
+.khay .thanh svg{width:22px;height:20px;color:var(--acc)}.khay .thanh b{font-size:15px}
+.khay .tab{display:flex;gap:4px;margin-left:10px}.khay .tab span{padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;color:var(--t3)}.khay .tab span.on{background:#2a2a2a;color:#fff}
+.khay .thanh em{font-style:normal;margin-left:auto;color:var(--t3);font-size:13px;font-weight:600}
+.khay .luoi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px}
+.o{position:relative;aspect-ratio:16/10;border-radius:9px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/10%)}
+.o .so{position:absolute;left:6px;bottom:6px;z-index:2;padding:1px 6px;border-radius:4px;background:rgb(0 0 0/72%);font:700 11px/1.5 Inter}
+.o .dai{position:absolute;right:6px;bottom:6px;z-index:2;padding:1px 6px;border-radius:4px;background:rgb(0 0 0/72%);font:700 11px/1.5 Inter}
+.o .play{position:absolute;left:50%;top:50%;z-index:2;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgb(0 0 0/55%);display:grid;place-items:center}
+.o .play::after{content:"";margin-left:3px;border-left:10px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.o.moi{box-shadow:0 0 0 2px var(--acc),0 0 30px rgb(248 104 32/.45)}
+.p-hoang{background:linear-gradient(180deg,#2b2f5e 0%,#7b5bd6 55%,#f6a76e 100%)}
+.p-hoang::before{content:"";position:absolute;left:60%;top:18%;width:16%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff4d6,#ffb454 55%,#f86820)}
+.p-hoang::after{content:"";position:absolute;inset:auto 0 0 0;height:42%;background:#2a2340;clip-path:polygon(0 55%,18% 20%,34% 52%,55% 5%,74% 48%,100% 18%,100% 100%,0 100%)}
+.p-bien{background:linear-gradient(180deg,#0f4c5c,#1b8a8f 60%,#e9d6a8)}
+.p-bien::after{content:"";position:absolute;inset:auto 0 0 0;height:30%;background:#e9d6a8;clip-path:polygon(0 30%,30% 0,60% 25%,100% 5%,100% 100%,0 100%)}
+.p-mau{display:grid;grid-template-columns:repeat(5,1fr)}
+.p-chu{display:grid;place-items:center;background:#f1ebe3;color:#1a1410;font-weight:800;font-size:30px;letter-spacing:-.04em}
+.p-bieu{background:#fff}.p-bieu i{position:absolute;bottom:0;width:14%;border-radius:3px 3px 0 0;background:#f6b78f}.p-bieu i.c{background:var(--acc)}
+.tia{position:absolute;height:2px;transform-origin:0 50%;background:linear-gradient(90deg,transparent,rgb(248 104 32/.9));border-radius:2px}
+/* --- HUONG A --- */
+.A .lap{left:150px;top:470px;width:820px;height:520px}
+.A .chon{position:absolute;left:470px;top:150px;width:250px;height:190px;box-shadow:0 0 0 2px var(--acc),0 0 0 9999px rgb(0 0 0/.35)}
+.A .chon::before,.A .chon::after{content:"";position:absolute;width:14px;height:14px;border:3px solid var(--acc)}
+.A .chon::before{left:-8px;top:-8px;border-right:0;border-bottom:0}.A .chon::after{right:-8px;bottom:-8px;border-left:0;border-top:0}
+.A .bay{position:absolute;left:915px;top:500px;width:150px;height:96px;border-radius:8px;overflow:hidden;transform:rotate(-6deg);box-shadow:0 0 0 2px var(--acc),0 26px 40px -14px #000}
+.A .khay{left:930px;top:560px;width:420px}
+.A .nhan{position:absolute;left:1105px;top:520px;padding:6px 12px;border-radius:99px;background:var(--acc);color:#16110d;font:800 13px/1 Inter}
+/* --- HUONG B --- */
+.B .lap{left:170px;top:440px;width:900px;height:560px}
+.B .ed{position:absolute;left:0;right:0;top:30px;bottom:0;background:#1b1b1d;display:grid;grid-template-rows:62% 1fr}
+.B .xem::before{width:7%;left:66%;top:16%}.B .xem{position:relative;margin:12px 12px 6px;border-radius:8px;overflow:hidden}
+.B .tl{margin:6px 12px 12px;border-radius:8px;background:#141416;padding:10px;display:grid;gap:7px;align-content:start}
+.B .tl i{display:block;height:16px;border-radius:4px}
+.B .vien{position:absolute;left:330px;top:85px;width:430px;height:255px;border:3px solid var(--acc);border-radius:4px;box-shadow:0 0 0 9999px rgb(0 0 0/.28),0 0 40px rgb(248 104 32/.5)}
+.B .rec{position:absolute;left:330px;top:44px;display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:9px;background:#141414;font:800 16px/1 Inter;font-variant-numeric:tabular-nums;box-shadow:0 0 0 1px rgb(255 255 255/10%)}
+.B .rec::before{content:"";width:11px;height:11px;border-radius:50%;background:#ff3b30;box-shadow:0 0 14px #ff3b30}
+.B .dung{position:absolute;left:660px;top:44px;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:9px;background:#ff3b30;font:800 14px/1 Inter;color:#fff}
+.B .dung::before{content:"";width:10px;height:10px;border-radius:2px;background:#fff}
+.B .khay{left:960px;top:600px;width:420px}
+.B .hang-vd{display:grid;gap:8px;padding:12px}
+.B .vd{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:8px;border-radius:10px;background:#1c1c1c}
+.B .vd .o{aspect-ratio:16/10}
+.B .vd b{display:block;font-size:14px}.B .vd small{display:block;color:var(--t3);font-size:12px;margin-top:3px}
+.B .vd.moi{box-shadow:0 0 0 2px var(--acc),0 0 30px rgb(248 104 32/.35)}
+.B .chip{display:inline-flex;gap:6px;margin-top:7px}.B .chip span{padding:3px 8px;border-radius:6px;background:#2a2a2a;font-size:11px;font-weight:700}.B .chip span.on{background:var(--acc);color:#16110d}
+</style>
+</head>
+<body><div class="w">
+<h1 class="bc">Đầu trang: 2 hướng làm nổi Khay và Quay màn hình (khung tĩnh)</h1>
+<p class="nho">Bỏ thanh 14 công cụ khỏi đầu trang (công cụ nào cũng đã có cảnh riêng bên dưới). Đầu trang chỉ còn 2 nhân vật: Khay và Quay. Chữ nhỏ trên tiêu đề đổi theo định vị "lưu ý tưởng" anh chốt 07/10 (đang ghi "Công cụ chụp màn hình"). Câu chữ dưới đây là em đề xuất, anh chưa duyệt. Anh chọn hướng, em mới làm chuyển động.</p>
+
+<div class="ten"><b>A</b><span>Khay là nhân vật chính</span><i>Khoanh một vùng trên máy tính, tấm ảnh bay ra ngoài màn, rơi vào một Khay to nằm tràn ra cạnh máy, trong khay có cả ảnh lẫn video.</i></div>
+<div class="khung A">
+  <div class="nav"><span class="lg"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>Shot &amp; Save</span><span>Tính năng</span><span>Giá</span><span>Hỏi đáp</span><span class="sp"></span><span class="mua">Mua</span></div>
+  <div class="eye" style="top:104px"><i></i>Nơi dân sáng tạo cất ý tưởng</div>
+  <div class="h1" style="top:140px">Chụp, quay, kéo thả.<br><em>Mọi ý tưởng về chung một khay.</em></div>
+  <div class="lede" style="top:304px">Thấy gì hay thì chụp hoặc quay lại, nó nằm sẵn trong khay, kéo thả vào Premiere, Zalo, Figma.</div>
+  <div class="cta" style="top:350px"><a class="c1">Mua Shot &amp; Save</a><a class="c2">Xem cách hoạt động</a></div>
+  <div class="lap"><div class="man"><div class="tb"><i></i><i></i><i></i></div>
+    <div class="dash"><div class="cot"><i style="width:80%"></i><i style="width:60%;background:#f3c9ae"></i><i style="width:70%"></i><i style="width:50%"></i><i style="width:75%"></i></div>
+      <div class="chinh"><h3>Doanh thu theo tuần</h3>
+        <span class="cot2" style="left:8%;height:28%;background:#f3c9ae"></span><span class="cot2" style="left:20%;height:44%;background:#f3c9ae"></span><span class="cot2" style="left:32%;height:62%;background:#f86820"></span><span class="cot2" style="left:44%;height:38%;background:#f3c9ae"></span><span class="cot2" style="left:56%;height:52%;background:#f3c9ae"></span><span class="cot2" style="left:68%;height:70%;background:#f86820"></span><span class="cot2" style="left:80%;height:46%;background:#f3c9ae"></span>
+      </div></div>
+    <div class="chon"></div>
+  </div></div>
+  <div class="tia" style="left:860px;top:650px;width:120px;transform:rotate(-30deg);opacity:.0"></div>
+  <div class="bay p-bieu"><i style="left:12%;height:45%"></i><i class="c" style="left:34%;height:78%"></i><i style="left:56%;height:52%"></i><i class="c" style="left:78%;height:88%"></i></div>
+  <div class="khay"><div class="thanh"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg><b>Khay</b><span class="tab"><span class="on">Ảnh</span><span>Video</span></span><em>24</em></div>
+    <div class="luoi">
+      <div class="o p-hoang"><span class="so">#19</span></div><div class="o p-mau"><span style="background:#2b2f5e"></span><span style="background:#7b5bd6"></span><span style="background:#f6a76e"></span><span style="background:#f86820"></span><span style="background:#e9d6a8"></span></div><div class="o p-bien"><span class="play"></span><span class="dai">0:12</span></div>
+      <div class="o p-chu">Aa</div><div class="o p-hoang"><span class="play"></span><span class="dai">0:07</span></div><div class="o p-bieu moi"><i style="left:12%;height:45%"></i><i class="c" style="left:34%;height:78%"></i><i style="left:56%;height:52%"></i><i class="c" style="left:78%;height:88%"></i><span class="so">#24</span></div>
+    </div></div>
+  <div class="nhan">+1 vào khay</div>
+  <div class="hat"></div>
+</div>
+
+<div class="ten"><b>B</b><span>Mở màn bằng Quay màn hình</span><i>Trên máy tính đang quay một vùng (viền cam, REC đếm giây, nút Dừng); video vừa quay hiện ngay trong Khay video tràn ra cạnh máy, chọn Có tiếng hay Không tiếng rồi kéo đi.</i></div>
+<div class="khung B">
+  <div class="nav"><span class="lg"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg>Shot &amp; Save</span><span>Tính năng</span><span>Giá</span><span>Hỏi đáp</span><span class="sp"></span><span class="mua">Mua</span></div>
+  <div class="eye" style="top:104px"><i></i>Nơi dân sáng tạo cất ý tưởng</div>
+  <div class="h1" style="top:140px">Thấy là chụp. Hay thì quay.<br><em>Tất cả nằm sẵn trong khay.</em></div>
+  <div class="lede" style="top:304px">Quay một vùng màn hình ra video có tiếng, bấm Dừng là video nằm ngay trong khay.</div>
+  <div class="cta" style="top:350px"><a class="c1">Mua Shot &amp; Save</a><a class="c2">Xem cách hoạt động</a></div>
+  <div class="lap"><div class="man"><div class="tb" style="background:#2a2a2c"><i style="background:#444"></i><i style="background:#444"></i><i style="background:#444"></i></div>
+    <div class="ed"><div class="xem p-hoang"></div>
+      <div class="tl"><i style="width:72%;background:#5a4fb0"></i><i style="width:58%;margin-left:12%;background:#c96aa5"></i><i style="width:84%;background:#3e8f8a"></i><i style="width:40%;margin-left:30%;background:#6b6b70"></i></div></div>
+    <div class="vien"></div><div class="rec">REC 00:07</div><div class="dung">Dừng</div>
+  </div></div>
+  <div class="khay"><div class="thanh"><svg viewBox="0 0 385.89 351.31"><path fill="currentColor" d="M71.66,232.56h61.05v46.15c0,39.55-32.11,71.66-71.66,71.66H0v-46.15C0,264.67,32.11,232.56,71.66,232.56Z"/><path fill="currentColor" d="M385.89,351.31h-53.03c-96.53-2.15-100.18,5.1-136.92-40.6l-116.4-144.82c-36.73-45.7-28.47-110.09,16.24-149.27L116.47,0l269.42,351.31Z"/></svg><b>Khay</b><span class="tab"><span>Ảnh</span><span class="on">Video</span></span><em>3</em></div>
+    <div class="hang-vd">
+      <div class="vd moi"><div class="o p-hoang"><span class="play"></span><span class="dai">0:07</span></div><div><b>Video 03</b><small>vừa quay · 1280×720 · 1,1 MB</small><span class="chip"><span class="on">Có tiếng</span><span>Không tiếng</span><span>GIF</span></span></div></div>
+      <div class="vd"><div class="o p-bien"><span class="play"></span><span class="dai">0:12</span></div><div><b>Video 02</b><small>10:24 · 1920×1080 · 2,4 MB</small></div></div>
+    </div></div>
+  <div class="hat"></div>
+</div>
+</div></body></html>
