@@ -5,6 +5,16 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-11-07 15:38 (UTC+7) - Web Shot & Save: rạp 17 → 24 cảnh, đã LIVE - máy nhà Windows
+
+- **Anh yêu cầu:** *"cài bản mới nhất cho anh và em hãy cập nhật lên trang web cho anh nhé"*.
+- **Đã làm:** 7 cảnh mới trong rạp + 7 thẻ dự phòng, đủ VI + EN: tìm lại ảnh cũ · che thông minh (C) · hút màu (I) + thước đo (M) · làm đẹp ảnh · sửa tiếp sau khi lưu (V) + cắt khúc giữa (X) · sửa video · tài liệu từng bước. Cài đặt có thêm WebP. Dưới 420 px thanh clip bỏ số vì 24 ô không đủ chỗ. Chữ nút lấy đúng `src/i18n.js`.
+- **Đo trước khi lên:** 7 cảnh ở 1440×900, 390×844, 1024×640, 320×640: 0 phần tử tràn sân, nhãn không đè cửa sổ (bắt và sửa 2 lỗi ở 320 px). Xem ảnh ghép bằng mắt ở 1440 và 390. Chế độ giảm chuyển động hiện đúng khung cuối.
+- **Đo trên live:** commit `5c2e671`, md5 live = blob git `44178ef6` lúc 15:36:59. Lăn chuột thật 176 nấc xuống + 179 nấc lên: thấy 24/24 cảnh cả hai chiều, ra khỏi rạp ở hai đầu, 0 lỗi console. `/premiere/` 200, `/.env.local` 404.
+- **Chưa kiểm:** điện thoại thật, Safari, chưa cho người khác soát mã cảnh mới; anh chưa xem. Các tính năng 05–06/11 chưa chạy trên Mac.
+- ☠️ **Web đang quảng cáo trước bộ cài:** bộ cài trên Polar chưa có các tính năng 05–06/11 (app máy anh mới nạp tại chỗ, chưa đóng gói). Khách mua lúc này chưa có các cảnh 18–24. Chờ anh gật đóng gói.
+- **Push:** `git push` thường bị 403 vì Windows Credential Manager giữ `DreamtalentMarketing007`; `gh` đang đúng `hadangtien0702-dot`. Đẩy riêng commit web qua worktree tạm, dùng `-c credential.helper= -c "credential.helper=!gh auth git-credential"`, không đổi cấu hình. 210 commit app vẫn chỉ ở máy.
+
 ## [web] - 2026-10-12 14:59 (UTC+7) - Web Shot & Save: SECTION RIÊNG cho Canvas ý tưởng (`#canvas`), đã LIVE - máy Mac
 
 - **Anh yêu cầu:** *"ok rồi thêm vào website và build đi em"* (sau khi duyệt bản mẫu Canvas), rồi *"gửi link web mới"*. Em định thêm thành cảnh thứ 18

@@ -346,6 +346,7 @@ mở phiên mới. Gmail connector chỉ tạo THƯ NHÁP, không tự gửi.
   `git -c credential.helper= -c credential.helper=manager push`. Sửa gốc
   (`~/.gitconfig`) cần anh gật — chưa làm. (01/10: `git push origin HEAD:main` thường chạy được 2 lần liền, không 403.
   Cứ thử lệnh thường trước, 403 mới dùng lệnh né.)
+- **Máy nhà Windows (đo 07/11):** lệnh né ở trên vẫn 403 vì chính Credential Manager giữ `DreamtalentMarketing007`; `gh auth status` đang đúng `hadangtien0702-dot`. Đẩy bằng `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push ...`. Sửa gốc cần anh gật.
 - **Đẩy RIÊNG việc web khi `main` trên máy đang giữ commit chưa được push** (luật 01/10: Shot & Save test xong hết mới
   push). KHÔNG `git push` từ `main`, nó kéo theo cả commit đang chờ. Cách đã chạy 3 lần ngày 01/10 (`ce061fd`, `12609a2`,
   `fe54c7d`): `git worktree add --detach <thư mục nháp> origin/main` → sửa/chép file trong đó → `git commit -- <đúng file>`
