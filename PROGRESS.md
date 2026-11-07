@@ -5,6 +5,13 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-11-07 19:11 (UTC+7) - Web Shot & Save: ĐẦU TRANG mới "Kính cam phát sáng", đã LIVE
+
+- **Anh:** đầu trang "một rừng tính năng", phải làm nổi Khay và Quay màn hình; chê 2 khung laptop *"cần creative hơn"*, chê bản tiêu đề bị chụp *"các elements chưa creative"*, bảo research Pinterest, chốt chất liệu Kính cam phát sáng (ghim glass-02, glass-03, glass-09, tray-03), chốt 3 thành phần tĩnh (ô mới dùng ảnh người thật Unsplash), rồi *"Đưa lên live"*.
+- **Đã làm:** bỏ demo canvas + thanh 14 công cụ; đầu trang luôn nền tối với các đốm sáng cam; chính dòng tiêu đề 1 bị khoanh chụp thành thẻ kính bay vào Khay kính, dòng 2 bị quay (viên Dynamic Island có chấm đỏ, đồng hồ, sóng âm, nút Dừng), video vào khay; lặp lại, ngoài màn thì tạm dừng; giảm chuyển động thì đứng yên ở khay đủ 24. Chữ mới VI + EN (dòng nhỏ đổi thành "Nơi dân sáng tạo cất ý tưởng"). Demo cũ và khung chọn cũ tự thoát khi không còn phần tử. Ảnh: img/hk-nguoi.jpg (nguồn: Website/Nhap web ShotSave/kinh-cam/NGUON-ANH.txt).
+- **Đo:** máy và live (commit a03e0d2, md5 khớp git, ảnh 200): 6 khổ màn 360x640 tới 1920x1080, ô video mới nằm trong màn ở cả 6 (bắt lỗi ở 1024x700: hàng 2 khay dưới mép màn, đã thu gọn cho màn thấp); VI + EN; 0 lỗi console; lăn chuột thật qua đủ 24/24 cảnh rạp sau khi đổi đầu trang.
+- **Chưa:** điện thoại thật, Safari; chế độ nền sáng (đầu trang cố ý giữ tối); anh chưa duyệt câu chữ tiếng Anh.
+
 ## [web] - 2026-11-07 17:01 (UTC+7) - Web Shot & Save: cảnh 06 Khay làm lại kiểu "ý tưởng bay về khay", đã LIVE
 
 - **Anh:** *"mỗi tính năng là một UI animation creative trên pinterest"* → 24 ý (bản xem chỉ trên máy, ROADMAP 0m) → mẫu ngăn kéo bị chê *"xấu goắc, không creative gì hết"* → 3 khung tĩnh lấy ý từ chính app, anh chọn khung C (*"cái này có vẻ hay"*), khoanh lỗi vệt sáng dừng lơ lửng, rồi *"Đưa lên live"*.
