@@ -66,6 +66,8 @@ De xuat ap vao (CHO ANH CHON, lam MOT mau truoc theo bai 5bh):
 - B. Web: them mot dai bento ngay sau rap, 6-8 o la anh chup that cua app (Tim lai anh cu, Lam dep, Sua video, Tai lieu), moi o 1 dong chu.
 - C. App: cua so Tim lai anh cu va Khay doi sang luoi so le giu ti le anh, nhom theo ngay, chu hien khi re chuot.
 
+**07/11 anh them: "moi tinh nang la mot UI animation creative tren pinterest".** Em tim 24 luot (1 luot / tinh nang), ghi 1 y chuyen dong cho tung canh. Ban xem: .selftest/pinterest-07-11/24/bao-cao.html (CHI tren may nha, co anh Pinterest nen khong vao git). 13 y em danh dau hop nhieu: chup kieu kinh ngam, lam mo kieu tam kinh mo, khay kieu ngan keo, keo tha bay vao vung net dut, thu muc mo nap, storyboard phac chi doi thanh hinh that, nut REC tho sang, but co van that, tim anh xoe vong cung, che kieu xao ky tu thanh vach den, hut mau giot roi, sua tiep tach lop xep tang, sua video timeline + truoc sau. Anh CHUA chon; lam MOT canh mau truoc (bai 5bh).
+
 ### 0l. 06/11/2026 RA CHO NGUOI MOI BI KET (Sonnet di het app nhu nguoi moi, chup 40 man hinh; anh hoi "stuck o dau, co de cho nguoi dung khong")
 
 So that tren may anh (run-log 05-06/11): 31 lan luu, 13 tam co ve, 0 lan doc chu / quay / Canvas / hen gio, bam nut thu khay 9 lan. Anh chi dung chup + ve; nhung tinh nang kia chua ai dung tren viec that.
