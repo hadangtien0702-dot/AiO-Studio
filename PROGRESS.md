@@ -5,6 +5,14 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [web] - 2026-11-07 19:40 (UTC+7) - Web Shot & Save: section Canvas diễn LẶP, đã LIVE
+
+- **Anh:** chụp section Canvas, *"phần này chưa có animation nè"*, rồi *"Đưa lên live"*.
+- **Gốc:** section có sẵn phần tự diễn (tấm bay ra từ nút tròn, kéo một tấm vào khung, gõ tên khung, ghi chú + mũi tên) nhưng CHỈ diễn một lần lúc cuộn tới (~13 giây) rồi đứng im. Ảnh anh chụp là cảnh đã diễn xong.
+- **Đã làm:** diễn lặp khi bảng trên màn: nghỉ 3 giây, các tấm bay ngược vào nút tròn, ghi chú tắt, nút nảy; bảng trả về đầu; bay ra lại; diễn tiếp (vòng ~17 giây). Ra khỏi màn thì chờ. Khách chạm vào bảng là dừng hẳn (huyDien tăng vong), tấm đang ẩn trong nút hiện lại ngay.
+- **Đo:** live `a7e1fc4` md5 khớp git; theo dõi 25 giây trên live: kéo vào khung 4,5 giây, gõ tên 8,5 giây, 6 tấm bay vào nút 15,5 giây, bay ra 17,5 giây, diễn lại; 0 lỗi console. Trên máy: chạm giữa lúc đang bay vào nút thì 0 tấm còn ẩn, 9 giây sau bảng không đổi.
+- **Chưa:** điện thoại thật; nếu Windows của khách tắt hiệu ứng chuyển động thì section đứng yên (cố ý).
+
 ## [web] - 2026-11-07 19:29 (UTC+7) - Web Shot & Save: đầu trang thêm chuyển động VÀO và RA, đã LIVE
 
 - **Anh:** *"dựng thêm animation in-out cho hero"*, xem ảnh từng nhịp rồi *"Đưa lên live"*.
