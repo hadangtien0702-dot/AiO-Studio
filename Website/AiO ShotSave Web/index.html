@@ -1455,6 +1455,42 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-bet
           <h3 data-i="f17t">Turn a recording into a GIF</h3>
           <p data-i="f17p">In the Video shelf, click GIF on any recording under 60 seconds. A few seconds later the GIF is ready to drag into a chat or any other app, just like the video.</p>
         </article>
+        <!-- 07/11: 7 the cho tinh nang 05-06/11 (app dang o 0.10.1 nap tai cho). Chi ghi thu co trong ma. Chu nut lay dung src/i18n.js. -->
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+          <h3 data-i="f18t">Find any old shot</h3>
+          <p data-i="f18p">Type a word that appears inside the image, like a quote or a client name, and the old shot comes back. The app reads your shots on your own computer. Open it from the tray menu.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M4 12h16M4 17h7"/><rect x="13" y="15" width="8" height="5" rx="1" fill="currentColor"/></svg></div>
+          <h3 data-i="f19t">Redact in one click</h3>
+          <p data-i-html="f19p">Press <kbd>C</kbd> and the app finds emails, phone numbers, card numbers and links. Click Auto redact to cover them all, or click any word to cover just that one.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 7 3 3M5 19l1-4 9-9a2.1 2.1 0 0 1 3 3l-9 9z"/></svg></div>
+          <h3 data-i="f20t">Pick colors, measure pixels</h3>
+          <p data-i-html="f20p">Press <kbd>I</kbd> and click to copy a color code. Press <kbd>M</kbd> and drag between two points to read the real pixels.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><rect x="7.5" y="7.5" width="9" height="9" rx="1.5"/></svg></div>
+          <h3 data-i="f21t">Make a shot look finished</h3>
+          <p data-i="f21p">From a pinned shot, add a background, margin, rounded corners, a shadow and a set ratio. It saves as a new file and your original stays.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h18M3 16h18"/><path d="M8 3v3M16 3v3M8 18v3M16 18v3"/></svg></div>
+          <h3 data-i="f22t">Keep editing after you save</h3>
+          <p data-i-html="f22p">Pin a shot you marked up and your boxes, arrows and text can still move. Press <kbd>X</kbd> to cut a strip out of the middle of a long image.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/></svg></div>
+          <h3 data-i="f23t">Polish a recording</h3>
+          <p data-i="f23p">Click Edit on a recording to trim both ends, zoom in where your cursor stops, and add a background and frame. Export makes a new video and your original stays.</p>
+        </article>
+        <article class="card rong" data-hien>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7"/></svg></div>
+          <h3 data-i="f24t">Step by step guides</h3>
+          <p data-i="f24p">Pick shots from the shelf, add one line to each, then export a guide as HTML, Markdown or PDF.</p>
+        </article>
       </div>
     </div>
     <!-- 29/09 NHAP "Rap chieu" (anh: 2 huong A/B "chua du Creative"): 11 canh dien thang len CHU tren san khau, dinh giua man,
@@ -1641,9 +1677,69 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .gifo{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px rgb(0 0 0/10%)}
 .gifo .nhg{position:absolute;left:6px;top:6px;z-index:2;padding:0 5px;border-radius:4px;background:rgb(10 10 10/74%);color:#fff;font:700 10px/1.6 Inter,sans-serif}
 @media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after,.dhq .r{animation:none}}
+/* 07/11: 7 cảnh mới (tìm ảnh, che thông minh, hút màu, làm đẹp, sửa tiếp, sửa video, tài liệu). Tiền tố n- để không trùng tên cũ. */
+@media (max-width:420px){.tl-ray{gap:2px}.clip span{display:none}}   /* 24 clip ở 320–420 px còn 9–13 px mỗi ô, số bị cắt: số đang xem đã có ở góc trên */
+.n-tim{display:flex;align-items:center;gap:8px;height:max(32px,calc(var(--u)*5));margin:10px 12px 0;padding:0 10px;border-radius:8px;background:#141414;box-shadow:inset 0 0 0 1px rgb(255 255 255/10%);color:var(--t1);font:600 max(13px,calc(var(--u)*2))/1 Inter,sans-serif}
+.n-tim svg{flex:none;width:1.1em;height:1.1em;color:var(--t3)}
+.n-nhay{width:2px;height:1.1em;background:var(--acc);animation:nhay .8s steps(2) infinite}
+.n-luoi{position:absolute;left:12px;right:12px;top:calc(max(32px,calc(var(--u)*5)) + 22px);bottom:12px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:10px}
+.n-luoi.doc{grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr)}
+.n-o{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:6px 9px;overflow:hidden;border-radius:7px;box-shadow:inset 0 0 0 1px rgb(255 255 255/9%)}
+.n-m0{background:#232a44}.n-m1{background:#3a2a22}.n-m2{background:#22362e}
+.n-o b{font:600 max(11px,calc(var(--u)*1.7))/1.25 Inter,sans-serif;color:#f5f5f7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n-o b mark{background:var(--acc);color:#16110d;border-radius:3px;padding:0 2px}
+.n-o>i,.n-o span>i{display:block;height:4px;border-radius:2px;background:rgb(255 255 255/16%)}
+.n-o>i:last-child{width:60%}
+.n-o.khop{box-shadow:inset 0 0 0 2px var(--acc)}
+.n-o.da{opacity:.35}
+.n-che{position:absolute;left:50%;top:6%;z-index:30;display:flex;align-items:center;gap:12px;width:max-content;max-width:calc(100% - 16px);padding:6px 6px 6px 14px;border-radius:10px;background:#1d1d1d;box-shadow:0 0 0 1px rgb(255 255 255/10%),0 14px 28px -14px #000;transform:translateX(-50%);color:var(--t2);font:600 max(12px,calc(var(--u)*1.8))/1.2 Inter,sans-serif}
+.n-che b{flex:none;padding:7px 12px;border-radius:7px;background:#2a2a2a;color:#fff;font-weight:700}
+.n-che b.bam{background:var(--acc);color:#16110d}
+.n-lup{position:absolute;z-index:30;display:flex;align-items:center;gap:8px;padding:5px 11px 5px 5px;border-radius:999px;background:#141414;box-shadow:0 0 0 1px rgb(255 255 255/14%),0 12px 22px -10px #000;font:700 max(12px,calc(var(--u)*1.8))/1 Inter,sans-serif;color:#fff;white-space:nowrap}
+.n-lup i{width:22px;height:22px;border-radius:50%;background:#FFB454;box-shadow:inset 0 0 0 2px rgb(255 255 255/70%)}
+.n-thuoc{position:absolute;z-index:30;height:2px;background:#fff;box-shadow:0 0 0 1px rgb(0 0 0/35%)}
+.n-thuoc::before,.n-thuoc::after{content:"";position:absolute;top:-6px;width:2px;height:14px;background:#fff}
+.n-thuoc::before{left:0}.n-thuoc::after{right:0}
+.n-thuoc b{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);padding:3px 8px;border-radius:6px;background:#141414;color:#fff;font:700 max(12px,calc(var(--u)*1.7))/1.3 Inter,sans-serif;white-space:nowrap}
+.n-nen{position:absolute;border-radius:12px;background:linear-gradient(135deg,#f86820,#c13a6e 55%,#4b3bb8)}
+.n-ban{display:flex;flex-direction:column;justify-content:center;gap:9px}
+.n-ban i{display:block;height:7px;width:82%;border-radius:4px;background:#ddd4cb}.n-ban i:nth-child(2){width:62%}.n-ban i:nth-child(3){width:72%}
+.n-chon{position:absolute;left:50%;top:4%;z-index:30;display:flex;gap:6px;transform:translateX(-50%)}
+.n-chon div{padding:6px 11px;border-radius:7px;background:#1f1f1f;box-shadow:inset 0 0 0 1px rgb(255 255 255/10%);color:var(--t2);font:600 max(11.5px,calc(var(--u)*1.7))/1.2 Inter,sans-serif;white-space:nowrap}
+.n-chon div.on{background:#3a3a3a;color:#fff}
+@container (max-width:340px){.n-chon{gap:3px}.n-chon div{padding:5px 6px;font-size:10.5px}}
+.n-pin{position:absolute;z-index:12;overflow:hidden;border-radius:4px;background:#fff;box-shadow:0 0 0 1.5px var(--acc),0 24px 44px -18px #000}
+.n-phan{position:relative;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:9%;padding:0 8%;overflow:hidden}
+.n-phan i{flex:none;display:block;height:8px;border-radius:4px;background:#d9d0c7}
+.n-phan.giua{background:#f4efe9}
+.n-phan.giua.cat{background:repeating-linear-gradient(45deg,#ffd9c4 0 8px,#ffeadf 8px 16px);box-shadow:inset 0 2px 0 var(--acc),inset 0 -2px 0 var(--acc)}
+.n-khung{position:absolute;box-sizing:border-box;border:3px solid var(--acc);border-radius:3px}
+.n-khung.chon{outline:1px dashed rgb(0 0 0/45%);outline-offset:3px}
+.n-vk{position:absolute;left:12px;right:12px;top:12px;bottom:calc(max(32px,calc(var(--u)*5)) + 24px);overflow:hidden;border-radius:7px;background:#101010}
+.n-kv{position:absolute;inset:0;overflow:hidden}
+.n-tro{position:absolute;z-index:2;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px rgb(255 255 255/28%)}
+.n-day{position:absolute;left:12px;right:12px;bottom:12px;height:max(32px,calc(var(--u)*5));display:flex;align-items:center;gap:12px}
+.n-ray{position:relative;flex:1;min-width:0;height:60%;border-radius:5px;background:#2a2a2a}
+.n-chon-doan{position:absolute;top:0;bottom:0;border-radius:5px;background:rgb(248 104 32/.32);box-shadow:inset 0 0 0 1.5px var(--acc)}
+.n-ray i{position:absolute;top:-3px;bottom:-3px;width:6px;margin-left:-3px;border-radius:3px;background:var(--acc)}
+.n-day b{flex:none;padding:8px 12px;border-radius:8px;background:#2a2a2a;color:#fff;font:700 max(11.5px,calc(var(--u)*1.7))/1 Inter,sans-serif;white-space:nowrap}
+.n-day b.bam{background:var(--acc);color:#16110d}
+.n-tl{position:absolute;inset:12px;display:grid;grid-template-columns:26% 1fr;gap:12px}
+.n-tl.doc{grid-template-columns:1fr;grid-template-rows:20% 1fr}
+.n-cot{display:grid;grid-template-rows:repeat(3,1fr);gap:8px;min-height:0}
+.n-tl.doc .n-cot{grid-template-rows:1fr;grid-template-columns:repeat(3,1fr)}
+.n-ben{min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
+.n-buoc{flex:1;min-height:0;display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:7px;background:#161616;box-shadow:inset 0 0 0 1px rgb(255 255 255/8%)}
+.n-buoc span.n-o{flex:none;width:18%;height:76%;padding:0 5px}
+.n-buoc div{min-width:0}
+.n-buoc b{display:block;color:var(--acc);font:700 max(11px,calc(var(--u)*1.55))/1.3 Inter,sans-serif}
+.n-buoc small{display:block;color:#f5f5f7;font:500 max(12px,calc(var(--u)*1.75))/1.3 Inter,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n-xuat{flex:none;display:flex;justify-content:flex-end;gap:6px}
+.n-xuat i{padding:7px 12px;border-radius:7px;background:#2a2a2a;color:#fff;font:normal 700 max(11.5px,calc(var(--u)*1.7))/1 Inter,sans-serif}
+.n-xuat i.on{background:var(--acc);color:#16110d}
 </style>
 <div class="dinh">
-  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / <span id="soTong">17</span></span></div>
+  <div class="tren le"><span><i class="rec"></i><span class="nhan-tren" data-r="tren"></span></span><span class="so-dem"><b id="soNay">01</b> / <span id="soTong">24</span></span></div>
   <div class="san-khung le"><div class="san" id="san"></div></div>
   <div class="duoi le"><div class="cap"><h3 id="capTen"></h3><p id="capMo"></p></div><div class="phim-cap" id="capPhim"></div></div>
   <div class="tl le">
@@ -1808,7 +1904,7 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
             <div class="st-nhom-ten" data-w="nhomChup"></div>
             <div class="st-nhom">
               <div class="st-hang" data-buoc="0"><span class="st-nhan" data-w="phim"></span><span class="st-phai"><span class="st-keys" id="stKeys"></span><span class="st-nut" id="stDoi" data-w="doiPhim"></span><span class="st-nut icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><span class="st-nut phu" id="stHuy" data-w="huy" hidden></span></span></div>
-              <div class="st-hang" data-buoc="1"><span class="st-nhan" data-w="dinhDang"></span><span class="st-seg" id="stLoai"><i data-v="jpeg">JPEG</i><i data-v="png">PNG</i></span></div>
+              <div class="st-hang" data-buoc="1"><span class="st-nhan" data-w="dinhDang"></span><span class="st-seg" id="stLoai"><i data-v="jpeg">JPEG</i><i data-v="png">PNG</i><i data-v="webp">WebP</i></span></div>
               <div class="st-hang" data-buoc="1" id="stCL"><span class="st-nhan" data-w="chatLuong"></span><span class="st-seg" id="stChat"><i data-v="thap" data-w="thap"></i><i data-v="cao" data-w="cao"></i><i data-v="sieu" data-w="sieu"></i></span></div>
               <div class="st-hang" data-buoc="2"><span class="st-nhan" data-w="moKieu"></span><span class="st-seg" id="stMoKieu"><i data-v="mosaic" data-w="moMosaic"></i><i data-v="blur" data-w="moBlur"></i></span></div>
             </div>
@@ -1937,6 +2033,13 @@ const T = {
     f15t:"Bút vẽ tay và bút dạ quang", f15p:"Bấm <kbd>7</kbd> để vẽ tay, <kbd>8</kbd> để tô lên chỗ cần chú ý. Giữ Shift ra đường thẳng.",
     f16t:"Chụp cuộn trang dài", f16p:"Khoanh phần trang đang cuộn rồi bấm <kbd>9</kbd>. Bạn lăn chuột cuộn xuống, app ghép những gì đi qua thành một ảnh dài. Bấm Xong để lưu.",
     f17t:"Xuất GIF từ đoạn quay", f17p:"Trong Khay video, bấm GIF ở đoạn quay dưới 60 giây. Vài giây sau GIF đã sẵn để kéo thả vào khung chat hay ứng dụng khác, như với video.",
+    f18t:"Tìm lại ảnh cũ", f18p:"Gõ một chữ có trong ảnh, như báo giá hay tên khách, ảnh cũ hiện ra. App đọc chữ ngay trên máy của bạn. Mở từ menu biểu tượng.",
+    f19t:"Che thông tin bằng một cú bấm", f19p:"Bấm <kbd>C</kbd>, app tự tìm email, số điện thoại, số thẻ, đường link. Bấm Tự che để che hết, hoặc bấm từng chữ để che đúng chữ đó.",
+    f20t:"Hút màu, đo pixel", f20p:"Bấm <kbd>I</kbd> rồi bấm vào ảnh để chép mã màu. Bấm <kbd>M</kbd> rồi kéo giữa hai điểm để biết bao nhiêu pixel.",
+    f21t:"Làm đẹp ảnh", f21p:"Từ ảnh ghim, thêm nền, lề, bo góc, đổ bóng và chọn tỉ lệ. Lưu thành file mới, ảnh gốc giữ nguyên.",
+    f22t:"Sửa tiếp sau khi lưu", f22p:"Ghim lại ảnh đã vẽ là khung, mũi tên, chữ vẫn dời được. Bấm <kbd>X</kbd> để cắt bỏ một khúc giữa ảnh dài.",
+    f23t:"Sửa video ngay trong khay", f23p:"Bấm Sửa trên một video để cắt hai đầu, phóng to chỗ con trỏ dừng, thêm nền và khung. Xuất ra video mới, bản gốc giữ nguyên.",
+    f24t:"Tài liệu từng bước", f24p:"Chọn ảnh trong khay, thêm một dòng cho mỗi ảnh, rồi xuất tài liệu HTML, Markdown hoặc PDF.",
     priceTitle:"Một mức giá, trả một lần.", priceSub:"Không thuê bao, không gia hạn. Mọi bản cập nhật sau này đều miễn phí.",
     priceTag:"Trả một lần", once:"một lần", li1:"Đầy đủ tính năng, không giới hạn", li2:"Nhận mọi bản cập nhật sau này", li3:"Windows 10/11 · macOS (bản thử nghiệm)",
     b1:"Hôm nay", b1s:"Thanh toán một lần", b2:"Các bản cập nhật sau", b2s:"Tính năng mới và bản sửa lỗi", b2n:"Miễn phí",
@@ -3988,11 +4091,20 @@ document.addEventListener("DOMContentLoaded", () => {
     butChu: 'Draft <span class="a">number 3</span><br><span class="b">send before 5 pm</span>', butNh: "Hold Shift for a straight line",
     xong: "Done", cuonNh: "One long image, straight to the shelf", gifNh: "Drag the GIF like the video" });
   RT.vi.ngan.push("Đánh số", "Bút vẽ", "Chụp cuộn", "GIF"); RT.en.ngan.push("Steps", "Pen", "Scroll", "GIF");
+  // 07/11: thêm 7 cảnh (tìm ảnh · che thông minh · hút màu · làm đẹp · sửa tiếp · sửa video · tài liệu) -> 24 cảnh. Chữ nút lấy đúng src/i18n.js.
+  Object.assign(RT.vi, { tren: "Shot & Save · 24 tính năng", timTen: "Tìm lại ảnh cũ", timTu: "báo giá", timAnh: ["Logo bản 3", "Báo giá tháng 10", "Bảng màu phim", "Timeline tập 4", "Báo giá khách An", "Brief buổi quay"], timNh: "Gõ chữ trong ảnh, ảnh cũ hiện ra",
+    cheThay: "Thấy 3 chỗ cần che", cheNut: "Tự che", cheNh: "Bấm một lần, che hết", hutNh: "Chép mã màu, đọc số pixel", depNut: ["Nền", "Lề", "Bo góc", "Đổ bóng"], depNh: "Lưu thành file mới, ảnh gốc giữ nguyên",
+    suaNh: "Sửa lại nét cũ, cắt bỏ khúc thừa", svTen: "Sửa video", svNut: "Xuất video mới", svNh: "Xuất ra video mới, bản gốc giữ nguyên", tlTen: "Tài liệu từng bước", tlSo: "Bước", tlBuoc: ["Mở bảng Xuất", "Chọn định dạng", "Bấm Xuất"], tlNh: "Một file gửi cho khách là xong" });
+  Object.assign(RT.en, { tren: "Shot & Save · 24 features", timTen: "Find past shots", timTu: "quote", timAnh: ["Logo v3", "Quote for October", "Film palette", "Episode 4 cut", "Quote for Anna", "Shoot brief"], timNh: "Type a word, the old shot comes back",
+    cheThay: "Found 3 to cover", cheNut: "Auto redact", cheNh: "One click covers them all", hutNh: "Copy the color, read the pixels", depNut: ["Background", "Margin", "Corners", "Shadow"], depNh: "Saved as a new file, your original stays",
+    suaNh: "Fix old marks, cut what you don't need", svTen: "Edit video", svNut: "Export new video", svNh: "A new video, your original stays", tlTen: "Step by step document", tlSo: "Step", tlBuoc: ["Open the Export panel", "Pick a format", "Click Export"], tlNh: "One file for your client, done" });
+  RT.vi.ngan.push("Tìm ảnh", "Che", "Hút màu", "Làm đẹp", "Sửa tiếp", "Sửa video", "Tài liệu"); RT.en.ngan.push("Find", "Redact", "Color", "Beautify", "Re-edit", "Edit video", "Guide");
   const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = k => RT[LG()][k];
   // canh i -> khoa chu cua the (f?t/f?p) + phim
   const TN = [{ k: 1, phim: ["Ctrl", "Shift", "S"] }, { k: 5 }, { k: 4, phim: ["1", "2", "3"] }, { k: 7, phim: ["4"] }, { k: 8, phim: ["V"] },
     { k: 6 }, { k: 3 }, { k: 2 }, { k: 9 }, { k: 11, phim: ["5"] }, { k: 10, phim: ["S"] }, { k: 12, phim: ["R"] }, { k: 13 },
-    { k: 14, phim: ["6"] }, { k: 15, phim: ["7", "8"] }, { k: 16, phim: ["9"] }, { k: 17 }];
+    { k: 14, phim: ["6"] }, { k: 15, phim: ["7", "8"] }, { k: 16, phim: ["9"] }, { k: 17 },
+    { k: 18 }, { k: 19, phim: ["C"] }, { k: 20, phim: ["I", "M"] }, { k: 21 }, { k: 22, phim: ["V", "X"] }, { k: 23 }, { k: 24 }];
 
   function batDau() {
     if (!window.gsap) return;                       // CDN hong -> giu luoi the
@@ -4089,6 +4201,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const eIO = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);          // đường bay của app (dien.js)
     const eLo = t => 1 - Math.exp(-6.5 * t) * Math.cos(9.5 * t);                            // lò xo của app: vượt ~6% rồi về
+
+    // 07/11 đồ nghề cho các cảnh có cửa sổ app tối
+    function cuaSo(x, y, cw, ch, ten) { const c = el(san, "cs toi-mau", `left:${x}px;top:${y}px;width:${cw}px;height:${ch}px`, '<div class="tb"><i></i><i></i><i></i>' + ten + '</div><div class="bd" style="padding:0"></div>'); return c.querySelector(".bd"); }
 
     const CANH = [
       // 0. Chụp tức thì: chụp CHÍNH tiêu đề section
@@ -4578,6 +4693,146 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!doc) tl.add(() => { const b2 = el(chat, "bong trai", null, L("duyet")); gsap.fromTo(b2, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3 }); }, 4.9);   // điện thoại: cửa sổ chat thấp, không đủ chỗ cho bong bóng trả lời
         nhan(tl, L("gifNh"), 4.4, "top:auto;bottom:1.5%");
         return tl.to({}, { duration: 2.2 }, 5.2);
+      },
+      // 17. Tìm lại ảnh cũ (app 05/11, menu biểu tượng): gõ chữ có trong ảnh, ảnh không khớp mờ đi, chữ khớp sáng lên.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < h * .9;
+        const cw = doc ? w * .92 : Math.min(w * .72, h * 1.5), bd = cuaSo((w - cw) / 2, h * .04, cw, Math.min(h * .82, h * .96 - 58), L("timTen"));
+        const o = el(bd, "n-tim", null, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="n-go"></span><span class="n-nhay"></span>');
+        const go = o.querySelector(".n-go"), g = el(bd, "n-luoi" + (doc ? " doc" : "")), tu = L("timTu");
+        const ds = L("timAnh").map((t, i) => { const a = el(g, "n-o n-m" + (i % 3), null, "<b>" + t + "</b><i></i><i></i>"); a.ten = t; return a; });
+        const khop = ds.filter(a => a.ten.toLowerCase().includes(tu)), khac = ds.filter(a => !khop.includes(a));
+        const r = R(o), c = conTro(w * .86, h * .9), q = { n: 0 }, t1 = 1 + tu.length * .1 + .15;
+        di(tl, c, r.x + r.w * .3, r.y + r.h / 2, .5, .2); bam(tl, c, .75);
+        tl.to(q, { n: tu.length, duration: tu.length * .1, ease: "none", onUpdate() { go.textContent = tu.slice(0, Math.round(q.n)); } }, 1);
+        tl.to(khac, { opacity: .12, scale: .95, duration: .35 }, t1);
+        tl.add(() => khop.forEach(a => { a.querySelector("b").innerHTML = a.ten.replace(new RegExp(tu, "i"), m => "<mark>" + m + "</mark>"); a.classList.add("khop"); }), t1);
+        tl.to(c, { opacity: 0, duration: .2 }, t1 + .4);
+        nhan(tl, L("timNh"), t1 + .5, "top:auto;bottom:2.5%");
+        return tl.to({}, { duration: 2 }, t1 + .6);
+      },
+      // 18. Che thông minh (app 05/11, phím C): app tự tìm email, số điện thoại, đường link, bấm Tự che là che hết.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const ch = el(san, "chu trai", "font-size:calc(var(--u)*4.6);line-height:1.62;top:50%",
+          L("khach") + '<br><span class="m1">an.nguyen@gmail.com</span><br><span class="m2">' + L("sdt") + '</span><br><span class="m3">facebook.com/anfilm</span>');
+        const os = [".m1", ".m2", ".m3"].map(k => khoiMo(ch.querySelector(k)));
+        const b = el(san, "n-che", "opacity:0", "<span>" + L("cheThay") + "</span><b>" + L("cheNut") + "</b>"), nut = b.querySelector("b");
+        const c = conTro(w * .88, h * .86), p = phim(["C"]);
+        hienPhim(tl, p, .15);
+        tl.to(b, { opacity: 1, duration: .3 }, 1);
+        tl.add(() => { const r = R(nut); gsap.to(c, { x: r.x + r.w / 2, y: r.y + r.h / 2, duration: .5, ease: "power2.inOut" }); }, 1.4);
+        bam(tl, c, 1.95); tl.add(() => nut.classList.add("bam"), 1.95);
+        os.forEach((m, i) => tl.to(m, { clipPath: "inset(0 0% 0 0)", duration: .42, ease: "power1.inOut" }, 2.1 + i * .3));
+        tl.to(c, { opacity: 0, duration: .2 }, 2.3);
+        nhan(tl, L("cheNh"), 3.2, "top:auto;bottom:3%");
+        return tl.to({}, { duration: 2 }, 3.3);
+      },
+      // 19. Hút màu (phím I) + Thước đo (phím M) (app 05/11): bấm chép mã màu, kéo hai điểm đọc số pixel.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < h * .9;
+        const vw = doc ? w * .92 : w * .66, vh = doc ? Math.min(h * .66, vw * .8) : h * .76, vx = (w - vw) / 2, vy = doc ? h * .06 : h * .05;
+        const v = video(san, `left:${vx}px;top:${vy}px;width:${vw}px;height:${vh}px`, .5), m = R(v.querySelector(".mt")), mx = m.x + m.w / 2, my = m.y + m.h / 2;
+        const c = conTro(w * .88, h * .88), p1 = phim(["I"]), p2 = phim(["M"]);
+        const lup = el(san, "n-lup", `left:${mx + 16}px;top:${my + 12}px;opacity:0`, "<i></i><b>#FFB454</b>"), ma = lup.querySelector("b");
+        hienPhim(tl, p1, .15); di(tl, c, mx, my, .55, .4);
+        tl.to(lup, { opacity: 1, duration: .2 }, .85); bam(tl, c, 1.5);
+        tl.add(() => { ma.textContent = L("daChep") + " #FFB454"; }, 1.52);
+        tl.to(lup, { opacity: 0, duration: .25 }, 2.55);
+        const y = vy + vh * .74, x0 = vx + vw * .14, dai = vw * .66, th = el(san, "n-thuoc", `left:${x0}px;top:${y}px;width:0;opacity:0`, "<b></b>"), so = th.querySelector("b"), o = { d: 0 };
+        hienPhim(tl, p2, 2.6); di(tl, c, x0, y, .4, 2.75);
+        tl.set(th, { opacity: 1 }, 3.2);
+        tl.to(o, { d: dai, duration: .85, ease: "power2.inOut", onUpdate() { th.style.width = o.d + "px"; so.textContent = Math.round(o.d * 1.5) + " px"; } }, 3.2).to(c, { x: x0 + dai, duration: .85, ease: "power2.inOut" }, 3.2);
+        tl.to(c, { opacity: 0, duration: .2 }, 4.2);
+        nhan(tl, L("hutNh"), 4.25, "top:auto;bottom:2.5%");
+        return tl.to({}, { duration: 1.9 }, 4.35);
+      },
+      // 20. Làm đẹp ảnh (app 05/11, mở từ ảnh ghim): ảnh trần có thêm nền, lề, bo góc, bóng, lưu thành file mới.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < h * .9;
+        const bw = doc ? w * .92 : Math.min(w * .62, h * 1.25), bh = doc ? Math.min(h * .62, bw) : h * .68, bx = (w - bw) / 2, by = doc ? h * .17 : h * .17;
+        const nen = el(san, "n-nen", `left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px;opacity:0`);
+        const sw = bw * .72, sh = bh * .72, cs = el(san, "cs", `left:${bx + (bw - sw) / 2}px;top:${by + (bh - sh) / 2}px;width:${sw}px;height:${sh}px;border-radius:0;box-shadow:none`, '<div class="tb"><i></i><i></i><i></i>' + L("trinh") + '</div><div class="bd n-ban"><i></i><i></i><i></i></div>');
+        const k = el(san, "n-chon"), nut = L("depNut").map(t => el(k, null, null, t)), c = conTro(w * .5, h * .94), q = n => { const r = R(nut[n]); return [r.x + r.w / 2, r.y + r.h / 2]; };
+        gsap.set(cs, { scale: 1.34 });
+        [[.4, () => tl.to(nen, { opacity: 1, duration: .35 }, .95)],
+          [1.3, () => tl.to(cs, { scale: 1, duration: .5, ease: "power2.inOut" }, 1.85)],
+          [2.2, () => tl.to(cs, { borderRadius: Math.max(10, sh * .06), duration: .35 }, 2.75)],
+          [3.1, () => tl.to(cs, { boxShadow: "0 30px 50px -18px rgb(0 0 0/.7)", duration: .35 }, 3.65)]].forEach(([at, f], i) => {
+          const [x, y] = q(i); di(tl, c, x, y, .5, at); bam(tl, c, at + .52); tl.add(() => nut[i].classList.add("on"), at + .52); f();
+        });
+        tl.to(c, { opacity: 0, duration: .2 }, 4.1);
+        nhan(tl, L("depNh"), 4.2, "top:auto;bottom:2.5%");
+        return tl.to({}, { duration: 1.9 }, 4.3);
+      },
+      // 21. Sửa tiếp sau khi lưu (app 06/11): khung đã vẽ vẫn co giãn được (V), cắt bỏ khúc giữa ảnh (X).
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H();
+        const pw = Math.min(w * .6, h * .95), a = h * .3, m = h * .2, b = h * .3, px = (w - pw) / 2, py = h * .08;
+        const pin = el(san, "n-pin", `left:${px}px;top:${py}px;width:${pw}px`);
+        const dong = n => Array.from({ length: n }, (_, i) => '<i style="width:' + (48 + (i * 23) % 44) + '%"></i>').join("");
+        const A = el(pin, "n-phan", `height:${a}px`, dong(3)), M = el(pin, "n-phan giua", `height:${m}px`, dong(2));
+        el(pin, "n-phan", `height:${b}px`, dong(3));
+        const kx = pw * .08, ky = a * .16, kw = pw * .4, kh = a * .4, kh2 = a * .66, kw2 = pw * .66;
+        const kh1 = el(pin, "n-khung", `left:${kx}px;top:${ky}px;width:${kw}px;height:${kh}px`), c = conTro(w * .88, h * .86), p1 = phim(["V"]), p2 = phim(["X"]);
+        hienPhim(tl, p1, .15);
+        di(tl, c, px + kx + kw, py + ky + kh, .55, .4);
+        tl.add(() => kh1.classList.add("chon"), 1); bam(tl, c, 1);
+        tl.to(kh1, { width: kw2, height: kh2, duration: .7, ease: "power2.inOut" }, 1.1).to(c, { x: px + kx + kw2, y: py + ky + kh2, duration: .7, ease: "power2.inOut" }, 1.1);
+        tl.add(() => kh1.classList.remove("chon"), 1.95);
+        hienPhim(tl, p2, 2.1);
+        tl.add(() => M.classList.add("cat"), 2.75);
+        di(tl, c, px + pw * .5, py + a + m / 2, .4, 2.5);
+        tl.to(M, { height: 0, duration: .55, ease: "power3.inOut" }, 3.2);
+        tl.to(c, { opacity: 0, duration: .2 }, 3.4);
+        nhan(tl, L("suaNh"), 3.85, "top:auto;bottom:2.5%");
+        return tl.to({}, { duration: 2 }, 3.95);
+      },
+      // 22. Sửa video (app 06/11, nút Sửa trong Khay video): cắt hai đầu, tự phóng to theo con trỏ, nền và khung, xuất file mới.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < h * .9;
+        const cw = doc ? w * .92 : Math.min(w * .7, h * 1.45), ch = h * .84, cx = (w - cw) / 2, cy = h * .03, bd = cuaSo(cx, cy, cw, ch, L("svTen"));
+        const vk = el(bd, "n-vk"), nen = el(vk, "n-nen", "inset:0;opacity:0"), kv = el(vk, "n-kv"), v = video(kv, "left:0;top:0;width:100%;height:100%;border-radius:0", .3);
+        const tr = el(v, "n-tro");
+        const day = el(bd, "n-day", null, '<div class="n-ray"><span class="n-chon-doan"></span><i class="d1"></i><i class="d2"></i></div><b>' + L("svNut") + "</b>");
+        const ray = day.querySelector(".n-ray"), doan = day.querySelector(".n-chon-doan"), d1 = day.querySelector(".d1"), d2 = day.querySelector(".d2"), nut = day.querySelector("b");
+        const rr = R(ray), yr = rr.y + rr.h / 2, c = conTro(w * .8, h * .5), o = { a: 0, b: 100 };
+        const ve = () => { d1.style.left = o.a + "%"; d2.style.left = o.b + "%"; doan.style.left = o.a + "%"; doan.style.width = (o.b - o.a) + "%"; }; ve();
+        di(tl, c, rr.x, yr, .45, .2); bam(tl, c, .66);
+        tl.to(o, { a: 22, duration: .55, ease: "power2.inOut", onUpdate: ve }, .7).to(c, { x: rr.x + rr.w * .22, duration: .55, ease: "power2.inOut" }, .7);
+        di(tl, c, rr.x + rr.w, yr, .45, 1.3); bam(tl, c, 1.76);
+        tl.to(o, { b: 74, duration: .55, ease: "power2.inOut", onUpdate: ve }, 1.8).to(c, { x: rr.x + rr.w * .74, duration: .55, ease: "power2.inOut" }, 1.8);
+        tl.to(c, { opacity: 0, duration: .15 }, 2.4);
+        tl.fromTo(tr, { left: "22%", top: "30%", opacity: 0 }, { left: "64%", top: "58%", opacity: 1, duration: .6, ease: "power2.inOut" }, 2.45);
+        tl.set(v, { transformOrigin: "64% 58%" }, 2.45).to(v, { scale: 1.75, duration: .6, ease: "power2.inOut" }, 3.05).to(v, { scale: 1, duration: .55, ease: "power2.inOut" }, 3.9);
+        tl.to(tr, { opacity: 0, duration: .2 }, 4.25);
+        tl.to(nen, { opacity: 1, duration: .35 }, 4.45).to(kv, { scale: .8, borderRadius: 10, duration: .45, ease: "power2.inOut" }, 4.45);
+        tl.set(c, { x: w * .8, y: h * .6 }, 4.8).to(c, { opacity: 1, duration: .15 }, 4.8);
+        tl.add(() => { const r = R(nut); gsap.to(c, { x: r.x + r.w / 2, y: r.y + r.h / 2, duration: .4, ease: "power2.inOut" }); }, 4.9);
+        bam(tl, c, 5.32); tl.add(() => nut.classList.add("bam"), 5.32);
+        tl.to(c, { opacity: 0, duration: .2 }, 5.5);
+        nhan(tl, L("svNh"), 5.55, "top:auto;bottom:1.5%");
+        return tl.to({}, { duration: 1.9 }, 5.65);
+      },
+      // 23. Tài liệu từng bước (app 06/11, nút trên khay): bấm ảnh thành bước, thêm một dòng, xuất HTML / Markdown / PDF.
+      () => {
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < h * .9;
+        const cw = doc ? w * .92 : Math.min(w * .72, h * 1.5), bd = cuaSo((w - cw) / 2, h * .04, cw, h * .82, L("tlTen"));
+        const k = el(bd, "n-tl" + (doc ? " doc" : "")), cot = el(k, "n-cot"), ben = el(k, "n-ben");
+        const nguon = [0, 1, 2].map(i => el(cot, "n-o n-m" + i, null, "<i></i><i></i>")), b = L("tlBuoc");
+        const hang = b.map((t, i) => el(ben, "n-buoc", "opacity:0", '<span class="n-o n-m' + i + '"><i></i><i></i></span><div><b>' + L("tlSo") + " " + (i + 1) + "</b><small>" + t + "</small></div>"));
+        const xuat = el(ben, "n-xuat", null, "<i>HTML</i><i>Markdown</i><i>PDF</i>"), pdf = xuat.children[2], c = conTro(w * .86, h * .9);
+        nguon.forEach((a, i) => {
+          const r = R(a), at = .35 + i * .9;
+          di(tl, c, r.x + r.w / 2, r.y + r.h / 2, .45, at); bam(tl, c, at + .47);
+          tl.add(() => a.classList.add("da"), at + .47);
+          tl.fromTo(hang[i], { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .3 }, at + .5);
+        });
+        const rp = R(pdf);
+        di(tl, c, rp.x + rp.w / 2, rp.y + rp.h / 2, .5, 3.1); bam(tl, c, 3.62); tl.add(() => pdf.classList.add("on"), 3.62);
+        tl.to(c, { opacity: 0, duration: .2 }, 3.85);
+        nhan(tl, L("tlNh"), 3.9, "top:auto;bottom:2.5%");
+        return tl.to({}, { duration: 2 }, 4);
       },
     ];
 
