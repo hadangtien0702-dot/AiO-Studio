@@ -110,10 +110,10 @@ function dungThu(order, ma, env) {
   const chuaDien = html.match(/\{\{[a-z_]+\}\}/g)
   if (chuaDien) throw new Error('mau thu con o trong: ' + chuaDien.join(','))
   const L = ng === 'vi'
-    ? { sub: 'Cảm ơn bạn! Mã bản quyền Shot & Save của bạn', t: ['Cảm ơn bạn đã mua Shot & Save.', 'Mã bản quyền của bạn:', 'Tải cho Windows:', 'Tải cho macOS:', 'Kích hoạt: mở app từ biểu tượng ở khay hệ thống, vào Cài đặt, thẻ Bản quyền, dán mã rồi bấm Kích hoạt.', 'Dùng trên 2 máy. Cập nhật miễn phí trọn đời. Hoàn tiền trong 14 ngày. Cần hỗ trợ, bạn cứ trả lời thư này.', 'Mã đơn'] }
-    : { sub: 'Thank you! Your Shot & Save license key', t: ['Thank you for buying Shot & Save.', 'Your license key:', 'Download for Windows:', 'Download for macOS:', 'Activate: open the app from the system tray icon, go to Settings, the License tab, paste the key and click Activate.', 'Works on 2 computers. Free updates for life. 14-day refund. Need help? Just reply to this email.', 'Order'] }
+    ? { sub: 'Cảm ơn bạn! Mã bản quyền Shot & Save của bạn', t: ['Cảm ơn bạn đã mua Shot & Save.', 'Mã bản quyền của bạn:', 'Tải cho Windows:', 'Tải cho macOS:', 'Kích hoạt: mở app từ biểu tượng ở khay hệ thống, vào Cài đặt, thẻ Bản quyền, dán mã rồi bấm Kích hoạt.', 'Dùng trên 1 máy. Cập nhật miễn phí trọn đời. Hoàn tiền trong 14 ngày. Cần hỗ trợ, bạn cứ trả lời thư này.', 'Mã đơn'] }
+    : { sub: 'Thank you! Your Shot & Save license key', t: ['Thank you for buying Shot & Save.', 'Your license key:', 'Download for Windows:', 'Download for macOS:', 'Activate: open the app from the system tray icon, go to Settings, the License tab, paste the key and click Activate.', 'Works on 1 computer. Free updates for life. 14-day refund. Need help? Just reply to this email.', 'Order'] }
   let text = [L.t[0], '', L.t[1], ma, '', L.t[2] + ' ' + win, L.t[3] + ' ' + mac, '', L.t[4], '', L.t[5], '', L.t[6] + ' ' + idNgan + ' · ' + ngay].join('\r\n')
-  // Ma cua san pham "Tester" chi chay 1 may (Polar: limit_activations = 1); mau thu viet san "2 may" cho ban that.
+  // 07/11: ban that cung 1 may (anh chot "mot ma la mot may"); giu nhanh Tester cho thu cu con chu 2 may.
   if (/tester/i.test((order.product && order.product.name) || '')) {
     html = html.split('2 máy').join('1 máy').split('2 computers').join('1 computer')
     text = text.split('2 máy').join('1 máy').split('2 computers').join('1 computer')
