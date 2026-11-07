@@ -1677,6 +1677,29 @@ kbd{display:inline-block;min-width:20px;padding:0 5px;border-radius:5px;backgrou
 .gifo{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px rgb(0 0 0/10%)}
 .gifo .nhg{position:absolute;left:6px;top:6px;z-index:2;padding:0 5px;border-radius:4px;background:rgb(10 10 10/74%);color:#fff;font:700 10px/1.6 Inter,sans-serif}
 @media (prefers-reduced-motion:reduce){.tren .rec,.chuve::after,.dhq .r{animation:none}}
+/* 07/11 MẪU cảnh Khay "ý tưởng bay về khay" (cảnh 06, anh chọn khung C) */
+.bv-tieu{position:absolute;z-index:3;margin:0;font-weight:800;letter-spacing:-.04em;line-height:1.04;color:var(--t1);font-size:calc(var(--u)*4.4);white-space:nowrap}
+.bv-tieu em{font-style:normal;color:var(--acc)}
+.bv-phu{position:absolute;z-index:3;color:var(--t3);font:500 max(12px,calc(var(--u)*1.45))/1.55 Inter,sans-serif}
+.bv-sang{position:absolute;z-index:1;pointer-events:none;background:radial-gradient(50% 50% at 50% 60%,rgb(248 104 32/.30),transparent 70%)}
+.bv-the{position:absolute;overflow:hidden;border-radius:10px;box-shadow:0 26px 50px -20px #000,0 0 0 1px rgb(255 255 255/12%)}
+.bv-mau{display:grid;grid-template-columns:repeat(5,1fr)}.bv-mau span{display:block}
+.bv-aa{display:grid;place-items:center;background:#f1ebe3;color:#1a1410;font-weight:800;letter-spacing:-.04em;font-family:Inter,sans-serif}
+.bv-bien{background:linear-gradient(180deg,#0f4c5c,#1b8a8f 60%,#e9d6a8)}
+.bv-bien::after{content:"";position:absolute;inset:auto 0 0 0;height:32%;background:#e9d6a8;clip-path:polygon(0 30%,30% 0,60% 25%,100% 5%,100% 100%,0 100%)}
+.bv-diem{position:absolute;z-index:21;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:radial-gradient(circle,#fff 0 22%,#ffb27a 38%,rgb(248 104 32/.55) 60%,transparent 72%);box-shadow:0 0 18px 6px rgb(248 104 32/.45);pointer-events:none}
+.bv-tia{position:absolute;z-index:5;height:2px;transform-origin:0 50%;background:linear-gradient(90deg,transparent,rgb(248 104 32/.95));border-radius:2px;pointer-events:none}
+.bv-khay{position:absolute;z-index:20;border-radius:14px;background:#151515;box-shadow:0 0 0 1px rgb(255 255 255/9%),0 40px 80px -30px #000,0 0 120px -30px rgb(248 104 32/45%)}
+.bv-khay .kb{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-bottom:1px solid rgb(255 255 255/7%);font:700 12.5px/1 Inter,sans-serif;color:var(--t1)}
+.bv-khay .kb svg{width:18px;height:16px;color:var(--acc)}
+.bv-khay .kb em{margin-left:auto;font-style:normal;color:var(--t3);font-weight:600}
+.bv-khay .hang{display:flex;gap:8px;padding:9px}
+.bv-o{position:relative;flex:1;aspect-ratio:16/10;border-radius:7px;box-shadow:0 0 0 1px rgb(255 255 255/10%)}
+.bv-n{position:absolute;inset:0;overflow:hidden;border-radius:7px}
+.bv-o .so{position:absolute;left:4px;bottom:4px;z-index:2;padding:0 4px;border-radius:3px;background:rgb(0 0 0/72%);color:#fff;font:700 9px/1.5 Inter,sans-serif}
+.bv-o.ghim-on{z-index:3;box-shadow:0 0 0 2px var(--acc),0 18px 30px -10px #000}
+.bv-o .pi{position:absolute;right:-8px;top:-8px;z-index:3;width:22px;height:22px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center}
+.bv-o .pi svg{width:12px}
 /* 07/11: 7 cảnh mới (tìm ảnh, che thông minh, hút màu, làm đẹp, sửa tiếp, sửa video, tài liệu). Tiền tố n- để không trùng tên cũ. */
 @media (max-width:420px){.tl-ray{gap:2px}.clip span{display:none}}   /* 24 clip ở 320–420 px còn 9–13 px mỗi ô, số bị cắt: số đang xem đã có ở góc trên */
 .n-tim{display:flex;align-items:center;gap:8px;height:max(32px,calc(var(--u)*5));margin:10px 12px 0;padding:0 10px;border-radius:8px;background:#141414;box-shadow:inset 0 0 0 1px rgb(255 255 255/10%);color:var(--t1);font:600 max(13px,calc(var(--u)*2))/1 Inter,sans-serif}
@@ -4098,6 +4121,8 @@ document.addEventListener("DOMContentLoaded", () => {
   Object.assign(RT.en, { tren: "Shot & Save · 24 features", timTen: "Find past shots", timTu: "quote", timAnh: ["Logo v3", "Quote for October", "Film palette", "Episode 4 cut", "Quote for Anna", "Shoot brief"], timNh: "Type a word, the old shot comes back",
     cheThay: "Found 3 to cover", cheNut: "Auto redact", cheNh: "One click covers them all", hutNh: "Copy the color, read the pixels", depNut: ["Background", "Margin", "Corners", "Shadow"], depNh: "Saved as a new file, your original stays",
     suaNh: "Fix old marks, cut what you don't need", svTen: "Edit video", svNut: "Export new video", svNh: "A new video, your original stays", tlTen: "Step by step document", tlSo: "Step", tlBuoc: ["Open the Export panel", "Pick a format", "Click Export"], tlNh: "One file for your client, done" });
+  Object.assign(RT.vi, { bvT1: "Mọi ý tưởng,", bvT2: "về chung một khay.", bvPhu: "Chụp từ trình duyệt, từ video, từ chat với khách. Không tìm lại trong mười thư mục.", bvNh: "Bấm một tấm là ghim nổi lên màn hình" });
+  Object.assign(RT.en, { bvT1: "Every idea,", bvT2: "in one shelf.", bvPhu: "From the browser, a video, a client chat. No more digging through ten folders.", bvNh: "Click a shot to pin it on top" });
   RT.vi.ngan.push("Tìm ảnh", "Che", "Hút màu", "Làm đẹp", "Sửa tiếp", "Sửa video", "Tài liệu"); RT.en.ngan.push("Find", "Redact", "Color", "Beautify", "Re-edit", "Edit video", "Guide");
   const LG = () => document.documentElement.lang === "vi" ? "vi" : "en", L = k => RT[LG()][k];
   // canh i -> khoa chu cua the (f?t/f?p) + phim
@@ -4306,30 +4331,85 @@ document.addEventListener("DOMContentLoaded", () => {
         nhan(tl, L("chinhNh"), 3.6);
         return tl.to({}, { duration: 1.5 }, 3.7);
       },
-      // 5. Khay: 3 chữ lần lượt bị chụp, bay vào khay; bấm #2 là ghim
+      // 5. Khay (07/11 MẪU "ý tưởng bay về khay", anh chọn khung C): ảnh, bảng màu, chữ trôi ở nhiều độ sâu; lần lượt theo vệt sáng
+      //    cam bay về khay, khay đếm lên; cuối cùng bấm một ô là nhấc lên ghim. Chú thích dưới sân giữ nguyên (f6t / f6p).
       () => {
-        const tl = gsap.timeline(), w = W(), h = H();
-        const K = khay(w * .2, h * .7, w * .6, Math.max(72, h * .24)), tu = L("tu").slice(0, 3), ths = [];
-        tu.forEach((t, i) => {
-          const at = .15 + i * 1.15;
-          const ch = el(san, "chu", "font-size:calc(var(--u)*9);top:34%;opacity:0", t);
-          const r = R(ch), pad = Math.max(12, w * .015), x0 = r.x - pad, y0 = r.y - pad, sw = r.w + pad * 2, sh = r.h + pad * 2;
-          const th = themTh(K, i + 1, t); gsap.set(th, { opacity: 0 }); ths.push(th);
-          const s = sel(x0, y0);
-          tl.fromTo(ch, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .3 }, at);
-          tl.to(s, { opacity: 1, duration: .1 }, at + .3); keoSel(tl, s, null, sw, sh, .35, at + .3);
-          flash(tl, at + .7); tl.set(s, { opacity: 0 }, at + .72);
-          const a = anhChup(ch, x0, y0, sw, sh); gsap.set(a, { opacity: 0 }); tl.set(a, { opacity: 1 }, at + .72).set(ch, { opacity: 0 }, at + .72);
-          bayVao(tl, a, th, at + .75, .5);
-          tl.set(th, { opacity: 1 }, at + 1.25).set(a, { opacity: 0 }, at + 1.26).add(() => K.dem(i + 1), at + 1.25);
+        const tl = gsap.timeline(), w = W(), h = H(), doc = w < h * .9;
+        const MAU = ["#2b2f5e", "#7b5bd6", "#f6a76e", "#f86820", "#e9d6a8"];
+        const ve = (p, loai) => {
+          if (loai === "anh") video(p, "left:0;top:0;width:100%;height:100%;border-radius:0", .62);
+          else if (loai === "mau") { p.classList.add("bv-mau"); p.innerHTML = MAU.map(c => '<span style="background:' + c + '"></span>').join(""); }
+          else if (loai === "aa") { p.classList.add("bv-aa"); p.textContent = "Aa"; }
+          else p.classList.add("bv-bien");
+        };
+        // tiêu đề: trái trên (máy tính) / trên cùng (điện thoại)
+        const td = el(san, "bv-tieu", doc ? `left:${w * .05}px;top:${h * .04}px;font-size:calc(var(--u)*7)` : `left:${w * .05}px;top:${h * .1}px`, L("bvT1") + "<br><em>" + L("bvT2") + "</em>");
+        const tdr = R(td);
+        if (!doc) el(san, "bv-phu", `left:${w * .05}px;top:${tdr.y + tdr.h + h * .04}px;width:${Math.min(w * .3, 380)}px`, L("bvPhu"));
+        // khay thật của app: thanh + hàng 3 ô
+        const kw = doc ? w * .86 : Math.min(w * .34, 430), kx = (w - kw) / 2;
+        el(san, "bv-sang", `left:${w * .5 - kw}px;top:${h * .55}px;width:${kw * 2}px;height:${h * .6}px`);
+        const K = el(san, "bv-khay", `left:${kx}px;width:${kw}px`, '<div class="kb">' + LOGO + "<b>" + L("khay") + '</b><em><span class="sl">21</span> ' + L("anh") + '</em></div><div class="hang"></div>');
+        const hang = K.querySelector(".hang"), sl = K.querySelector(".sl");
+        const o = ["anh", "mau", "bien"].map((l, i) => { const x = el(hang, "bv-o"); const n = el(x, "bv-n"); ve(n, l); el(x, "so", null, "#" + (19 + i)); return x; });
+        K.style.top = (h - K.offsetHeight - h * .05) + "px";
+        const kr = R(K), dich = { x: kr.x + kr.w / 2, y: kr.y };
+        const diem = el(san, "bv-diem", `left:${dich.x}px;top:${dich.y}px;opacity:0`);
+        tl.to(diem, { opacity: 1, duration: .5 }, 1.2);
+        // các tấm trôi: [loại, x, y, rộng (theo w), độ sâu 0 gần .. 1 xa, xoay, có bay về không (thứ tự)]
+        const DS = doc
+          ? [["anh", .52, .2, .34, 0, -4, 3], ["mau", .1, .24, .28, .45, 6, 0], ["aa", .4, .4, .22, .1, 5, 2], ["bien", .06, .42, .3, .3, -8, 1], ["mau", .7, .45, .24, .2, -6, 0], ["bien", .64, .3, .3, .1, 4, 4], ["anh", .28, .28, .18, .85, 10, 0]]
+          : [["anh", .54, .08, .2, 0, -4, 3], ["mau", .78, .16, .14, .5, -8, 0], ["aa", .66, .36, .12, .12, 5, 2], ["bien", .42, .38, .15, .35, -8, 1], ["mau", .8, .44, .13, .2, 6, 0], ["bien", .73, .6, .13, .08, 4, 4], ["anh", .4, .22, .09, .85, 10, 0], ["aa", .9, .04, .08, .9, -12, 0]];
+        const bay = [];
+        DS.forEach(([loai, fx, fy, fw, d, xoay, thu], i) => {
+          const cw = w * fw, ch = loai === "aa" ? cw * .7 : cw * .62, x = w * fx, y = h * fy;
+          const t = el(san, "bv-the", `left:${x}px;top:${y}px;width:${cw}px;height:${ch}px;z-index:${10 - Math.round(d * 6)}`);
+          ve(t, loai);
+          if (loai === "aa") t.style.fontSize = ch * .5 + "px";
+          const k = 1 - d * .45;
+          gsap.set(t, { transformOrigin: "0 0", scale: k, rotation: xoay, filter: "blur(" + (d * 5).toFixed(1) + "px)", opacity: 0 });
+          tl.to(t, { opacity: 1 - d * .4, duration: .5, ease: "power2.out" }, .25 + i * .07);
+          tl.to(t, { y: (i % 2 ? -1 : 1) * h * .015, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: 2 }, .3);   // trôi nhẹ
+          // vệt sáng từ tấm về khay
+          const cx = x + cw / 2, cy = y + ch / 2, dx = dich.x - cx, dy = dich.y - cy, dai = Math.hypot(dx, dy);
+          const tia = el(san, "bv-tia", `left:${cx}px;top:${cy}px;width:${dai}px;opacity:${.55 - d * .35}`);
+          gsap.set(tia, { rotation: Math.atan2(dy, dx) * 180 / Math.PI, scaleX: 0, transformOrigin: "0 50%" });   // gsap giu goc xoay (dat bang transform inline thi scaleX(0) lam mat goc)
+          tl.to(tia, { scaleX: 1, duration: .8, ease: "power2.out" }, .7 + i * .06);   // 07/11 anh khoanh: moi vet phai cham CUNG mot diem tren mep khay, khong dung lo lung
+          if (thu) bay[thu - 1] = { t, tia, loai, cw, x, y, xoay };
         });
-        const c = conTro(w * .9, h * .4); gsap.set(c, { opacity: 0 });
-        tl.to(c, { opacity: 1, duration: .2 }, 3.7);
-        tl.add(() => { const t = R(ths[1]); gsap.to(c, { x: t.x + t.w / 2, y: t.y + t.h / 2, duration: .55, ease: "power2.inOut" }); }, 3.75);
-        bam(tl, c, 4.35);
-        const g = el(san, "ghim", `left:${w * .64}px;top:${h * .06}px;width:${w * .32}px;height:${w * .32 * .56}px;opacity:0`, '<div class="th" style="position:absolute;inset:0;height:auto;border-radius:0;box-shadow:none"><div class="tc">' + tu[1] + '</div></div><span class="pi">' + PIN + "</span>");
-        tl.fromTo(g, { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .45, ease: "back.out(2)" }, 4.4);
-        return tl.to({}, { duration: 1.5 }, 4.8);
+        // bốn tấm lần lượt bay về khay; ô mới vào bên phải, các ô cũ dồn sang trái
+        bay.forEach((b, i) => {
+          const at = 1.5 + i * .85;
+          tl.to(b.tia, { opacity: .95, duration: .3, ease: "power2.in" }, at);
+          tl.add(() => {
+            const r = R(o[2]), k = r.w / b.cw;
+            gsap.to(b.t, { x: r.x - b.x, y: r.y - b.y, overwrite: "auto", scale: k, rotation: 0, filter: "blur(0px)", opacity: 1, duration: .55, ease: "power3.in" });
+          }, at + .25);
+          tl.add(() => {
+            b.t.style.visibility = "hidden";
+            const cu = o.map(x => x.querySelector(".bv-n").outerHTML);
+            o[0].querySelector(".bv-n").outerHTML = cu[1]; o[1].querySelector(".bv-n").outerHTML = cu[2];
+            const moi = document.createElement("div"); moi.className = "bv-n"; ve(moi, b.loai); o[2].querySelector(".bv-n").replaceWith(moi);
+            o.forEach((x, j) => { x.querySelector(".so").textContent = "#" + (20 + i + j); });
+            sl.textContent = 22 + i;
+            gsap.fromTo(diem, { scale: 2.4 }, { scale: 1, duration: .5, ease: "power2.out" });
+            gsap.fromTo(o, { x: 14 }, { x: 0, duration: .3, ease: "power2.out", stagger: .03 });
+            gsap.fromTo(K, { boxShadow: "0 0 0 1px rgb(255 255 255/9%),0 40px 80px -30px #000,0 0 160px -10px rgb(248 104 32/85%)" }, { boxShadow: "0 0 0 1px rgb(255 255 255/9%),0 40px 80px -30px #000,0 0 120px -30px rgb(248 104 32/45%)", duration: .6 });
+          }, at + .82);
+          tl.to(b.tia, { opacity: 0, duration: .35 }, at + .82);
+        });
+        // bấm một ô: nhấc lên thành ảnh ghim
+        const c = conTro(w * .9, h * .9); gsap.set(c, { opacity: 0 });
+        tl.to(c, { opacity: 1, duration: .2 }, 5);
+        tl.add(() => { const r = R(o[1]); gsap.to(c, { x: r.x + r.w / 2, y: r.y + r.h / 2, duration: .5, ease: "power2.inOut" }); }, 5.05);
+        bam(tl, c, 5.6);
+        tl.add(() => {
+          o[1].classList.add("ghim-on"); el(o[1], "pi", null, PIN);
+          gsap.to(o[1], { y: -h * .06, scale: 1.18, duration: .45, ease: "back.out(2)" });
+        }, 5.65);
+        tl.to(c, { opacity: 0, duration: .2 }, 6.1);
+        nhan(tl, L("bvNh"), 6.15, doc ? "top:auto;bottom:" + (h - kr.y + 10) + "px" : "top:auto;bottom:" + (h - kr.y + 14) + "px");
+        return tl.to({}, { duration: 1.6 }, 6.25);
       },
       // 6. Ghim: cửa sổ thay nhau lên trước, ảnh ghim vẫn nằm trên
       () => {
