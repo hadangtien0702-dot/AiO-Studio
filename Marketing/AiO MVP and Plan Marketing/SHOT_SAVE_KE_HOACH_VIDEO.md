@@ -1,4 +1,4 @@
-# Shot & Save: kế hoạch video marketing (bản 2, 08/11/2026 18:11, anh CHƯA duyệt)
+# Shot & Save: kế hoạch video marketing (bản 2, 08/11/2026 18:11; thêm nháp lời video 01 lúc 18:23; anh CHƯA duyệt)
 
 > Bản 1 (08/11 sáng) trả lời *"kế hoạch làm video marketing như thế nào em"*.
 > Bản 2 viết lại theo lời anh 08/11 chiều: *"cái video đầu tiên thì chúng ta sẽ chỉ tối đa 30 giây thôi, tập trung vào giới thiệu app là gì, câu chuyện về nó, câu hỏi, giá trị mà nó đem lại… phải trả lời được câu hỏi là Shot and Save để làm gì? Giúp cho ai? … lên kế hoạch khoảng bao nhiêu video"*.
@@ -52,6 +52,40 @@ Lời đọc khoảng 65–75 chữ tiếng Anh (nhịp giọng Emma 2,6–3,4 c
 - [Đo] Kịch bản bản 4 (dự án `D:\Production\Highend Video\AiO Shot and Save - Quang cao 30s`) có đủ phần câu chuyện và phần giá trị (box, pin, drag), nhưng **không có câu nào trả lời "giúp cho ai"**, và mở bằng câu khẳng định, không phải câu hỏi.
 - [Đề xuất] Viết **bản 5** theo khung trên. Câu anh đã duyệt "Every project starts with a hunt." giữ lại làm câu mở phần Câu chuyện (giây 3).
 - [Đề xuất] Giữ bộ màu, font, icon, 50 ảnh Pinterest, animatic của dự án cũ. Cảnh 1 (bản Sonar v4–v7, anh chưa chọn) để anh xem lại sau khi lời bản 5 chốt, vì cảnh 1 mới đổi thành cảnh câu hỏi.
+
+### Lời video 01 bản 5: NHÁP, hai cách kể (08/11 18:23, anh CHƯA duyệt)
+
+Anh chốt 08/11: **phong cách kể chuyện cho cả AiO Studio** (ghi ở mục 3 `CLAUDE.md` gốc repo). Hai bản dưới cùng một khung 30 giây, chỉ khác **chuyện của ai**. Anh chọn một, sửa chữ nào cũng được.
+
+**Bản A: chuyện một nhân vật** (người xem thấy chính mình trong cô ấy; khoảng 78 chữ ≈ 27–30 giây)
+
+| Giây | Lời đọc (tiếng Anh) | Nghĩa |
+|---|---|---|
+| 0–3 | Midnight. Mia is cutting a brand film. | Nửa đêm. Mia đang dựng một phim thương hiệu. |
+| 3–6 | She spots the perfect frame. Screenshot. | Cô thấy một khung hình hoàn hảo. Chụp lại. |
+| 6–10 | By morning, it's buried in a folder of two thousand. Where did it go? | Sáng ra, nó chìm trong thư mục hai nghìn ảnh. Nó đâu rồi? |
+| 10–13 | Every project starts with a hunt. Most ideas don't survive it. | Dự án nào cũng bắt đầu bằng một cuộc săn. Phần lớn ý tưởng không sống sót. |
+| 13–18 | Now she boxes it with Shot and Save. It waits on a shelf, right beside her. | Giờ cô khoanh lại bằng Shot & Save. Nó nằm chờ trên khay, ngay cạnh cô. |
+| 18–24 | Pinned over her timeline. Dragged into Figma. Sent to the client. | Ghim nổi trên timeline. Kéo vào Figma. Gửi cho khách. |
+| 24–27 | For editors, designers, every creator who hunts. | Cho editor, designer, mọi người làm sáng tạo đang đi săn ý tưởng. |
+| 27–30 | Shot and Save. Keep every idea within reach. | Shot & Save. Giữ mọi ý tưởng trong tầm tay. |
+
+**Bản B: chuyện thật của người làm ra app** (anh; người đọc là giọng nữ kể ở ngôi thứ ba; khoảng 78 chữ)
+
+| Giây | Lời đọc (tiếng Anh) | Nghĩa |
+|---|---|---|
+| 0–3 | Where do your best ideas go? | Ý tưởng hay nhất của bạn đi đâu mất? |
+| 3–7 | For five years, one video editor kept asking that. | Suốt năm năm, một editor cứ tự hỏi câu đó. |
+| 7–12 | He'd spot the perfect frame, screenshot it, and lose it in a folder of thousands. | Thấy khung hình đẹp, chụp lại, rồi để lạc trong thư mục hàng nghìn ảnh. |
+| 12–14 | So he built a shelf for ideas. | Nên anh làm ra một cái khay cho ý tưởng. |
+| 14–18 | Shot and Save. Box anything on screen. It waits right beside you. | Shot & Save. Khoanh bất cứ thứ gì trên màn hình. Nó chờ ngay cạnh bạn. |
+| 18–23 | Pin it over Premiere. Drag it into Figma. Send it to the client. | Ghim nổi trên Premiere. Kéo vào Figma. Gửi cho khách. |
+| 23–27 | Made by an editor, for editors, designers, and every creator who hunts. | Một editor làm ra, cho editor, designer và mọi người làm sáng tạo. |
+| 27–30 | Shot and Save. Keep every idea within reach. | Shot & Save. Giữ mọi ý tưởng trong tầm tay. |
+
+**Khác nhau ở đâu:** A dễ dựng hình hơn (một nhân vật đi xuyên suốt, người xem tự đặt mình vào). B dùng đúng câu chuyện anh muốn bán (07/10: "câu chuyện của anh là lõi sống của app"), đáng tin hơn vì người làm nghề làm ra; nhưng trùng ý với video câu chuyện ở đợt 4 nên đợt 4 phải kể sâu hơn (cảnh thật, giọng anh).
+
+**Câu khẳng định đã soát với app [Đo]:** kéo ảnh từ khay vào Figma: anh tự kéo, nhận đủ file (sổ Shot & Save, 14/09) · ghim ảnh nổi trên mọi cửa sổ: có · kéo vào Premiere: có (lỗi mở lại app thành Media Offline, sổ lỗi #18, đã sửa 04/10) · "gửi cho khách": kéo vào Zalo / Messenger, anh đã kéo 14/09. Tên "Mia" và "hai nghìn ảnh" là chi tiết kể chuyện, không phải số đo.
 
 ## 3. Đợt 2 và 3: danh sách từng video [Đề xuất]
 
