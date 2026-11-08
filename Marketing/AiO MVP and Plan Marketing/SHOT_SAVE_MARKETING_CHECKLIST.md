@@ -40,7 +40,7 @@
 
 ## C. Tài sản nội dung: thứ để đăng đi
 
-> Kế hoạch video chi tiết (08/11, chờ anh duyệt): `SHOT_SAVE_KE_HOACH_VIDEO.md`.
+> Kế hoạch video (bản 2, 08/11, chờ anh duyệt): 15 video / 5 đợt, mở bằng video 01 giới thiệu ≤ 30 giây. File `SHOT_SAVE_KE_HOACH_VIDEO.md`.
 
 | # | Việc | Là gì, vì sao cần | Trạng thái |
 |---|---|---|---|
