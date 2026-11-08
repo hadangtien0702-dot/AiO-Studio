@@ -40,6 +40,8 @@
 
 ## C. Tài sản nội dung: thứ để đăng đi
 
+> Kế hoạch video chi tiết (08/11, chờ anh duyệt): `SHOT_SAVE_KE_HOACH_VIDEO.md`.
+
 | # | Việc | Là gì, vì sao cần | Trạng thái |
 |---|---|---|---|
 | C1 | Video giới thiệu 30–60 giây | Thứ chạy được ở mọi kênh (web, Product Hunt, TikTok, Reels) | **Dở dang**: quảng cáo 30 giây phong cách ElevenLabs làm 19–20/10, chưa xong |
