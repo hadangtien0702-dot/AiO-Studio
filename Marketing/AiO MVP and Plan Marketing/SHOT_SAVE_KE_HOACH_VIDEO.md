@@ -53,7 +53,7 @@ Lời đọc khoảng 65–75 chữ tiếng Anh (nhịp giọng Emma 2,6–3,4 c
 - [Đề xuất] Viết **bản 5** theo khung trên. Câu anh đã duyệt "Every project starts with a hunt." giữ lại làm câu mở phần Câu chuyện (giây 3).
 - [Đề xuất] Giữ bộ màu, font, icon, 50 ảnh Pinterest, animatic của dự án cũ. Cảnh 1 (bản Sonar v4–v7, anh chưa chọn) để anh xem lại sau khi lời bản 5 chốt, vì cảnh 1 mới đổi thành cảnh câu hỏi.
 
-### Lời video 01 bản 5: NHÁP, hai cách kể (08/11 18:23, anh CHƯA duyệt)
+### Lời video 01 bản 5: hai cách kể (08/11 18:23). **ANH CHỌN BẢN B** (chuyện của anh) lúc 18:2x, không sửa chữ. Lời chính thức nằm ở `01_Content/KICH-BAN-30S.md` của dự án video; bước kế: chọn hướng hình (`02_Idea/Y-TUONG-V5_Claude.html`)
 
 Anh chốt 08/11: **phong cách kể chuyện cho cả AiO Studio** (ghi ở mục 3 `CLAUDE.md` gốc repo). Hai bản dưới cùng một khung 30 giây, chỉ khác **chuyện của ai**. Anh chọn một, sửa chữ nào cũng được.
 
