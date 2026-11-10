@@ -55,7 +55,7 @@ Lời đọc khoảng 65–75 chữ tiếng Anh (nhịp giọng Emma 2,6–3,4 c
 
 ### Lời video 01 bản 5: hai cách kể (08/11 18:23). **ANH CHỌN BẢN B** (chuyện của anh) lúc 18:2x, không sửa chữ. Lời chính thức nằm ở `01_Content/KICH-BAN-30S.md` của dự án video; bước kế: chọn hướng hình (`02_Idea/Y-TUONG-V5_Claude.html`)
 
-**10/11 08:45: anh chọn hướng hình 2 "Kể bằng ánh sáng"** (*"anh không quay thật đâu"*): dựng hết trong After Effects, không có người trên hình. Animatic có màu 7 cảnh chạy theo lời đọc: `03_Storyboard/ANIMATIC-V5_Claude.html` trong dự án video, chờ anh duyệt (cổng 2). Hệ quả cho kế hoạch: video câu chuyện ở đợt 4 cũng chưa có cảnh quay anh; muốn có người thật thì phải tính lại (ảnh chân dung, giọng anh, hoặc AI).
+**10/11 08:45: anh chọn hướng hình 2 "Kể bằng ánh sáng"** (*"anh không quay thật đâu"*): dựng hết trong After Effects, không có người trên hình. Animatic có màu 7 cảnh chạy theo lời đọc: `03_Storyboard/ANIMATIC-V5_Claude.html` trong dự án video, chờ anh duyệt (cổng 2). **10/11 09:02:** anh chê animatic *"animation xấu quá"* → cài skill HyperFrames (HTML xuất MP4, Apache-2.0), làm một cảnh mẫu giây 12–18 bằng ảnh thật, đèn rọi, chiều sâu (`04_Motion/HF_Video01_Claude` trong dự án video), chờ anh xem rồi mới làm 6 cảnh còn lại. Hệ quả cho kế hoạch: video câu chuyện ở đợt 4 cũng chưa có cảnh quay anh; muốn có người thật thì phải tính lại (ảnh chân dung, giọng anh, hoặc AI).
 
 Anh chốt 08/11: **phong cách kể chuyện cho cả AiO Studio** (ghi ở mục 3 `CLAUDE.md` gốc repo). Hai bản dưới cùng một khung 30 giây, chỉ khác **chuyện của ai**. Anh chọn một, sửa chữ nào cũng được.
 
