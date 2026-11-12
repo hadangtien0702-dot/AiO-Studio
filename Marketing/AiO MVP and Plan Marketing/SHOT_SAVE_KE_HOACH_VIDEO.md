@@ -4,6 +4,61 @@
 > Bản 2 viết lại theo lời anh 08/11 chiều: *"cái video đầu tiên thì chúng ta sẽ chỉ tối đa 30 giây thôi, tập trung vào giới thiệu app là gì, câu chuyện về nó, câu hỏi, giá trị mà nó đem lại… phải trả lời được câu hỏi là Shot and Save để làm gì? Giúp cho ai? … lên kế hoạch khoảng bao nhiêu video"*.
 > Mỗi video vẫn đi theo khung 8 bước, 5 cổng anh duyệt (skill `khung-video`).
 > Nhãn: [Đo] em đọc/đo được · [Đề xuất] em nghĩ, anh chưa gật.
+> **12/11/2026 23:20: thêm mục 0 (bản 3, loạt video tính năng mỗi video khoảng 30 giây). Anh CHƯA chốt mục nào.**
+
+## 0. Bản 3 (12/11/2026 23:20): loạt video tính năng, mỗi video khoảng 30 giây [Đề xuất, anh CHƯA chốt mục nào]
+
+**Lời anh 12/11:** *"em xem thử aio studio của anh có thể làm video số 3 mkt nên quảng cáo tính năng nào"*, rồi *"chia ra thành các video ngắn, mỗi video tầm 30s"*.
+Em hiểu "AiO Studio" ở đây là Shot & Save (10/11 anh dặn chỉ làm Shot & Save trước); anh chưa xác nhận cách hiểu này.
+Khác bản 2: bản 2 ghi clip tính năng 8–15 giây, không giọng (đợt 3). Lời anh hôm nay là 30 giây mỗi video, nên nếu anh gật thì mục này thay danh sách "Đợt 3" ở mục 3.
+
+**Đã kể rồi, không lặp lại:** Video 01 (35,1 s) = app là gì: khoanh → khay → ghim trên Premiere / kéo vào Figma / gửi khách. Video 02 (đang dựng, theo kịch bản bản 2) = cái khay: ảnh vào khay, kéo to, tự thu về nút tròn, kéo thả, bấm là ghim, dọn, kiểu dọc, khay nhớ. Trang bán hàng có 24 thẻ tính năng + mục Canvas: hai video này phủ 6 thẻ (f1, f2, f3, f6, f9, f13), còn 18 thẻ + Canvas.
+
+Mỗi video kể theo luật 08/11 (nhân vật, rắc rối, bước ngoặt, kết quả; tính năng là lối ra, không liệt kê). Cột "Rắc rối mở chuyện" là điểm xuất phát em đề xuất, chốt ở cổng 1 từng video.
+
+| Video | Rắc rối mở chuyện [Đề xuất] | Tính năng là lối ra (thẻ trên web) | Anh dùng thật trên máy nhà, 05–11/11 |
+|---|---|---|---|
+| 03 Vẽ lên ảnh | Khách nhắn "sửa chỗ kia một chút", nhắn qua lại ba tin vẫn chưa biết chỗ nào | khung, mũi tên, chữ (phím 1, 2, 3) · đánh số bước (6) · bút + dạ quang (7, 8) · chọn nét để dời / xoá (V) · sửa tiếp nét sau khi lưu (f4, f8, f14, f15, f22) | 66/188 ảnh có vẽ; khung 45/50 ảnh, mũi tên 8/50; chữ, số, bút, dạ quang 0 |
+| 04 Storyboard 3 giây | Thấy một đoạn chuyển cảnh hay, chụp tay từng khung thì trượt mất nhịp | khoanh vùng đang chuyển động, bấm S, ra dải 6 khung đánh số, kéo cả dải (f10) | 0 |
+| 05 Quay màn hình | Ảnh tĩnh không tả nổi một chuyển động hay một lỗi | quay vùng (R) · xuất GIF · cắt đầu đuôi, tự phóng theo con trỏ, nền + khung (f12, f17, f23) | 0 |
+| 06 Chữ trong ảnh | Nhớ là đã chụp câu đó rồi, lục cả nghìn ảnh không ra (nối chuyện Video 01) | chép chữ (phím 5) · tìm lại ảnh cũ bằng một từ nằm trong ảnh (f11, f18) | chép chữ 0; tìm ảnh: nhật ký không ghi lần tìm |
+| 07 Che thông tin riêng | Sắp gửi ảnh thì thấy trong đó có email, số điện thoại của khách | làm mờ (phím 4) · tự tìm và che email, số điện thoại, số thẻ, link (C) (f7, f19) | làm mờ 0; che tự động 1 lần |
+| 08 Canvas | Ảnh tham khảo của một dự án nằm rải ở nhiều thư mục | bảng gom ảnh, clip, ghi chú, mũi tên; mỗi khung là một thư mục thật (mục Canvas trên web) | 0 lần mở |
+| 09 Chụp thứ khó chụp | Trang dài hơn màn hình, timeline nằm vắt qua hai màn | chụp cuộn trang dài (9) · một khung qua hai màn hình · bấm vào cửa sổ là chụp đúng cửa sổ đó (f16, f5 + tính năng có trong app) | hai màn 4 · cửa sổ 5 · cuộn 0 |
+| 10 Cho designer | Cần đúng mã màu trên một tấm poster, cần biết lề bao nhiêu pixel | hút mã màu (I) · đo pixel (M) · thêm nền, lề, bo góc, bóng, tỉ lệ (f20, f21) | hút màu 8 mã; làm đẹp 0; đo pixel không rõ |
+| 11 Hướng dẫn từng bước | Khách hỏi cách làm tới lần thứ ba | chọn ảnh trong khay, mỗi ảnh một dòng, xuất HTML / Markdown / PDF (f24) | 0 lần xuất |
+
+**Video 03 em đề xuất: "Vẽ lên ảnh".** Lý do: (1) là thứ anh dùng nhiều nhất sau việc chụp (66/188 ảnh, 35%); (2) Video 01 và 02 chưa kể; (3) nối câu "Send it to the client" của Video 01: gửi đi một tấm đã khoanh, đã chỉ rõ chỗ sửa. Phương án B nếu anh muốn Video 03 là thứ chỉ mình có: Storyboard 3 giây.
+
+**Thứ tự xếp:** thứ anh đã dùng thật lên trước (03) → thứ riêng mình theo bảng so đối thủ 05/11 trong `ROADMAP.md` của app, mục 0j (Storyboard, Canvas) → thứ đối thủ cũng có. Canvas để sau Storyboard vì là phần to nhất và anh chưa mở lần nào trong 7 ngày đo.
+
+**Cách đo cột "dùng thật" [Đo]:** chỉ đọc `%APPDATA%\AiO Shot & Save\run-log.txt` (app ghi 0.10.1, từ 05/11 11:52 tới 11/11 10:22) + 50 file lớp sửa trong `net-ve\`. 230 lượt bấm chụp, 188 ảnh lưu (118 không vẽ, 66 có vẽ, 4 ghép hai màn), 40 lượt huỷ. 50 lớp sửa: 77 nét = 61 khung + 16 mũi tên. Khay: thu 25, bung 23. Ghim 3. Thước mù: kéo ảnh từ khay ra app khác và lần tìm ảnh cũ không được ghi khi thành công, nên không đếm được. Từ 12/11 08:36 app trên máy này báo hết dùng thử và khoá chụp (bị chặn 2 lần, 08:53 và 09:06), nên sau 11/11 không có số.
+
+**Luật "dùng trước khi bán" áp vào đây:** Video 04, 05, 08, 11 kể tính năng nhật ký ghi 0 lần dùng; 06 chép chữ 0 lần; 07 mới 1 lần. Video nào sắp làm thì anh dùng tính năng đó trên một việc thật trước. Riêng Video 03: chữ, đánh số, bút, dạ quang chưa có trong ảnh nào của 50 ảnh, chỉ có khung và mũi tên.
+
+**Bảng này CHƯA trả lời được:** video nào kéo nhiều người tải nhất (web chưa có bộ đếm, checklist B9; chưa có số của 20 người nhận mã). Số đo chỉ là một máy, một người, 7 ngày.
+
+**Chờ anh quyết:** Video 03 là "Vẽ lên ảnh" hay Storyboard · giữ 9 video hay gộp bớt · loạt này thay "Đợt 3" của bản 2 hay chạy song song.
+
+## 0b. Bộ panel "AiO Studio for Premiere Pro": mỗi tool một video khoảng 30 giây (12/11/2026 23:28) [Đề xuất, anh CHƯA chốt]
+
+Viết thêm vì chữ "aio studio của anh" có thể là cả bộ panel Premiere, không riêng Shot & Save. Nguồn: 2 trợ lý Sonnet đọc sổ 11 panel (khoảng 270 nghìn token, 1,5 phút), em mở lại sổ gốc kiểm từng số ghi dưới đây. Đã bỏ một số trợ lý báo nhầm: "58:37 → 24:41" là kết quả của bản Autocut LỖI (cắt mất lời, `AiO Autocut/CLAUDE.md` dòng 215), không được dùng để quảng cáo.
+
+| Thứ tự | Tool | Rắc rối mở chuyện [Đề xuất] | Số thật trong sổ | Vướng gì trước khi quảng cáo |
+|---|---|---|---|---|
+| P1 | Autocut 1.6.0 | Buổi quay nói một giờ, ngồi nghe lại để cắt từng chỗ im lặng | 413 nhát cắt, rút 4:03, 0 câu hỏng; anh tự dựng bài thật rồi nghe lại 19/08, "không mất lời" | Video 1 giờ chạy khoảng 19 phút; mới xác nhận cho một người nói gần mic; web đang diễn cắt "um/uh" (tool cắt khoảng lặng, không cắt từ đệm); chưa cài thử máy sạch |
+| P2 | Auto Podcast (panel 0.6.x) | Podcast hai người ba máy, ngồi đổi cam theo người nói | liệu 40:27, 411 nhát, 0 đen hình; anh nghe và chốt "không thấy sai" (25/08) | chưa đo từ 3 người, mic rời, tập hơn 1 giờ; manifest còn ghi 0.1.0; chưa có FFmpeg đóng kèm |
+| P3 | Guide Frame 0.3.2 | Đăng lên rồi mới thấy chữ bị nút của app che | đặt khung 0,74 s trên sequence 4K 306 clip, gỡ 0,13 s; 10/11 khổ dọc đo từ ảnh app thật; anh test đạt 21/09 | anh chưa bấm trên bài thật 11 track; web ghi 54 vùng, sổ 59; chưa có bộ cài |
+| P4 | Asset Manager 2.0.0 (gói miễn phí) | Rời Premiere đi lục ổ cứng tìm một tiếng động | kho 28.846 file; anh 14/09: "xài ổn định rồi" | chưa cài thử trên máy sạch |
+| P5 | Power Bins 2.0.0 | Project mới nào cũng phải nhập lại logo, intro của khách | project mới 0 clip, bấm Import ra 1 clip (đo 29/07) | sổ không ghi anh dùng trên việc thật; mới đo 1 brand |
+| P6 | Auto Short Viral 0.1.2 | Bộ phỏng vấn 40 phút, tua mãi mới tìm ra đoạn đáng cắt | 40 phút ra 61 khối hỏi đáp, 579 câu; anh đã mở trên bài riêng dài 1:17:11 | sổ cấm hứa "AI chọn đoạn viral" |
+| P7 | Transcripts 2.5.5 | Gõ phụ đề bằng tay | 765 câu cho video 60 phút | anh chưa dùng trên bài thật; chưa đo độ chính xác; khối hiệu ứng chữ đang ẩn |
+
+Chưa nên làm video: Auto Re-Frames (chưa ai duyệt bằng mắt việc bám đúng người) · Music (đoán key đúng 79,0%, anh: "tool này nó khá là chưa ổn", đang chờ đổi thành Keynote) · Video Download (TikTok lỗi 403 ngẫu nhiên, anh chưa dùng trên bài thật; quảng cáo tool tải video trên chính YouTube / Instagram là rủi ro em nêu, CHƯA tra chính sách) · Auto Organize Folder (chưa có mã) · panel tổng (04/10 anh chê giao diện, chờ chọn mẫu mới).
+
+**Chặn trước khi đăng bất kỳ video nào của bộ Premiere:** trang `/premiere/` đang chạy nhưng ô email "báo tôi khi mở bán" CHƯA lưu gì (`CLAUDE.md` gốc, mục 8), khách để lại email là mất; trang chưa có giá, chưa có nút mua, trang Shot & Save chưa có link sang. Video đăng lúc này không giữ lại được ai.
+
+**Video 03 lấy dòng nào [Đề xuất]:** em nghiêng về Shot & Save "Vẽ lên ảnh", vì đó là thứ đang bán được ($20, web + Polar đang chạy) và 10/11 anh dặn làm Shot & Save trước. Nếu anh muốn Video 03 mở dòng Premiere thì là Autocut, sau khi nối ô email. Anh CHƯA chọn.
 
 ## 1. Tổng: 15 video, chia 5 đợt [Đề xuất]
 
