@@ -49,6 +49,37 @@ Nhom 3 - Claude khuyen CHUA lam:
 De xuat thu tu cua Claude: 1 -> 4 -> 3. Truoc khi lam cai moi con 2 viec cua ban dang co: anh bam phim 5 tren ban cai
 0.7.9, va do loi khung 1 den cua Storyboard tren video. Anh CHUA chot muc nao trong danh sach nay.
 
+### 0n. 12/11/2026 anh: "tim them cho 5 tinh nang moi tren thi truong chua co" — Sonnet tra web (29 luot tim, 12 trang da mo), anh CHUA chot muc nao
+
+Dieu kien loc: khong tinh bat ky thu gi da nam trong muc 0b den 0m. "Chua ai co" o day = chua thay APP CHUP MAN HINH nao gan san; phan lon
+da co o app CHUYEN BIET khac (ghi ro o cot giua). Muc chac chan la cua nguoi tra, em CHUA tu mo lai tung link. Cong la uoc luong, chua do.
+
+| # | Tinh nang | Editor duoc gi | Ai gan nhat, thieu gi | Chac chan | Cong (ngay) |
+|---|---|---|---|---|---|
+| 1 | Look tu khung tham chieu (xuat .cube) | Ghim 1 khung phim mau + chup 1 khung clip cua minh, bam "Khop look", ra file LUT ap vao Premiere / Resolve | CineGrade (web, dvp-website.pages.dev/cinematch): co LUT tu 2 anh, khong phai app chup. Eagle chi XEM file .cube. Changelog Shottr / CleanShot / ShareX khong co chu LUT | Vua | 4-5 |
+| 2 | Mo bang tham chieu | Tha 1 video mau vao, ra bang anh tung canh cat + timecode + so canh + do dai canh trung binh + dai mau | PySceneDetect (chi dong lenh). Eagle "Video Frame Exporter" chi lay khung theo khoang deu, khong do canh cat | Vua | 4-6 |
+| 3 | May do mau (scopes) tren anh ghim | Waveform, vectorscope, RGB parade tren anh tham chieu, dat canh khung cua minh | Scopes (fubax.gumroad.com/l/scopes), OmniScope: app dung rieng. App chup man hinh: khong thay ai co | Vua | 2 (anh tinh) - 4 (do truc tiep) |
+| 4 | Gui tham chieu vao Premiere / AE | Mot phim: anh trong khay vao bin "Reference" cua project dang mo | Khong tim thay app nao lam; day la "khong tim thay", CHUA co trang xac nhan | Thap | 3-4 |
+| 5 | Storyboard thanh animatic MP4 + XML | Dai Storyboard co san -> dat thoi luong tung khung -> MP4 gui khach + XML mo thang trong Premiere / Resolve | Boords, Storyboarder (app storyboard, khong phai app chup) | Vua | 3-4 |
+
+Thu tu nguoi tra de xuat theo gia tri voi editor: 1, 2, 3, 4, 5.
+
+Lam duoc khong (deu khong can ma native, chay tai may, khong ton tien dich vu ngoai):
+- 1: tinh trong trang bang JS. Rui ro: anh chup la sRGB da chinh, khong phai footage log -> LUT chi la XAP XI, phai ghi ro gioi han (CineGrade cung dan
+  ap LUT "after your camera input transform"). ☠️ Lien quan 12/11: anh chup tren Windows dang lech mau 1-2 don vi vi di qua khung video I420 (PROGRESS
+  12/11); muon lam muc 1 va 3 cho dung thi phai sua duong anh luu truoc.
+- 2: ffmpeg co san trong bo cai hoac so khung bang canvas. Rui ro: video co khoa ban quyen (Netflix) ra khung den; video dai lam may nang -> gioi han do dai, chay nen.
+- 3: canvas / WebGL. Ban do truc tiep phai giu luong chup o nen: Mac se hien cham tim chia se man hinh (so loi #27) -> lam ban anh tinh truoc.
+- 4: khong lam trong app; di qua panel AiO Studio da co (CEP, ExtendScript `importFiles`) nghe thu muc hoac link aioshot://. Rui ro: phu thuoc phien ban Premiere, hai tien trinh, phai thu tren may that.
+- 5: co san Storyboard + ffmpeg; XML la file chu. Rui ro: Premiere co the nhap anh thanh chuoi anh thay vi anh roi, phai thu tren Premiere that.
+
+Y da LOAI vi da co nguoi lam: luu nguon cua anh (app / trang web): Snagit Library da co · tim anh giong anh nay: Eagle AI Search (va da nam o 0k #6) ·
+dat anh ghim mo de len de so: Shottr 1.7 · anh truoc / sau 2 khung: Shottr 1.6 · tu lay khung theo khoang deu: Eagle · hut mau / bang mau: nhieu app co.
+
+CHUA KIEM DUOC (noi thang): chua mo trang tinh nang cua Lightshot, Greenshot, Flameshot, PicPick, Snipaste, Xnapper, Loom, Raindrop, PureRef, Milanote,
+Windows Snipping Tool, Screen Studio; changelog ShareX moi doc mot nua. CHUA tim duoc loi nguoi dung that (Reddit, dien dan editor) doi rieng 5 tinh nang
+nay: nhu cau chua duoc chung minh bang loi khach, moi la suy tu viec cua editor. Truoc khi lam muc nao: lam MOT ban mau cho anh thu (brain 5bh).
+
 ### 0m. 07/11/2026 XEM PINTEREST: NGUOI TA TRINH BAY ANH VA UI THE NAO (anh: "research tren pinterest khac show hinh anh va cach lam UI cho dep") — anh CHUA chot huong nao
 
 Nguon: 4 trang tim kiem Pinterest xem khong dang nhap ngay 07/11 (tu khoa: screenshot manager app ui dark · image gallery app ui dark masonry · moodboard app ui design · desktop app landing page product showcase dark), khoang 90 ghim. Chi ghi KIEU trinh bay lap lai nhieu lan, khong chep thiet ke cua ai. Pinterest la anh dung san de khoe, khong phai so lieu nguoi dung.

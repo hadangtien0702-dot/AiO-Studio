@@ -23,6 +23,9 @@ import { spawnSync, spawn, execFileSync } from 'node:child_process'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CHI_DUNG = process.argv.includes('--chi-dung')
 const BO_QUA_DUNG = process.argv.includes('--bo-qua-dung')
+const BAN_CHU = process.argv.includes('--ban-chu') // 13/11: ban cho may chu, chup khong can ma (xem src/ban-chu.js)
+import banChu from '../src/ban-chu.js'
+if (BAN_CHU && BO_QUA_DUNG) { console.error('DUNG LAI: --ban-chu can dung lai ban dong goi, khong di cung --bo-qua-dung'); process.exit(1) }
 const TEN_EXE = 'AiO Shot & Save.exe'
 const DUNG = path.join(ROOT, 'dist', 'win-unpacked')
 const CAI = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'aio-shot-and-save')
@@ -68,7 +71,11 @@ if (CHI_KIEM) {
 if (!BO_QUA_DUNG) {
   console.log('[1] Dung dist/win-unpacked (electron-builder --win dir) ...')
   const t0 = Date.now()
-  const r = spawnSync('npx electron-builder --win dir', { cwd: ROOT, shell: true, encoding: 'utf8' })
+  /* 13/11 --ban-chu: ghi dau van tay MAY NAY vao package.json BEN TRONG ban dong goi (khong dung toi package.json cua repo) ->
+     app chup khong can ma tren dung may nay (src/ban-chu.js). Khong co co nay thi ban dung giong het bo cai ban cho khach. */
+  const lenhDung = 'npx electron-builder --win dir' + (BAN_CHU ? ' -c.extraMetadata.aioBanChu=' + banChu.maMay() : '')
+  if (BAN_CHU) console.log('    --ban-chu: ban nay chup khong can ma, CHI tren may nay (dau van tay ' + banChu.maMay().slice(0, 8) + '…). KHONG dem ban nay di phat hanh.')
+  const r = spawnSync(lenhDung, { cwd: ROOT, shell: true, encoding: 'utf8' })
   if (r.status !== 0) dung('electron-builder loi:\n' + String(r.stdout || '').split('\n').slice(-12).join('\n') + '\n' + String(r.stderr || '').split('\n').slice(-12).join('\n'))
   console.log('    xong ' + Math.round((Date.now() - t0) / 1000) + ' s')
 }
@@ -135,9 +142,10 @@ let boot = ''
 for (let i = 0; i < 80 && !boot; i++) {
   ngu(250)
   try {
-    const s = fs.readFileSync(RUN_LOG, 'utf8')
+    // 13/11: coLog la so BYTE; ban cu so voi so KY TU cua chuoi (log co chu nhieu byte -> luon ngan hon) nen doc ca file va vo ngay dong boot CU
+    const b = fs.readFileSync(RUN_LOG)
     // file co the vua bi cat (qua 300 KB) -> doc ca file neu ngan hon moc cu
-    const moi = s.length >= coLog ? s.slice(coLog) : s
+    const moi = (b.length >= coLog ? b.subarray(coLog) : b).toString('utf8')
     const m = moi.split('\n').filter((l) => l.includes(' boot v')).pop()
     if (m) boot = m.trim()
   } catch (e) {}
@@ -149,6 +157,13 @@ const sau = dem()
 const giong = truoc.anh === sau.anh && truoc.dai === sau.dai && truoc.cauHinh === sau.cauHinh && truoc.banQuyen === sau.banQuyen
 console.log('[7] Sau:   ' + sau.anh + ' anh/video · ' + sau.dai + ' dai · cau hinh ' + sau.cauHinh + ' -> ' + (giong ? 'GIONG truoc' : 'KHAC TRUOC'))
 
-const dat = boot.includes('boot v' + banMoi + ' ') && boot.includes('dang-ky=OK') && giong && dangChay() > 0
+// 13/11 --ban-chu: ban vua nap phai tu nhan la may chu (dong 'ban-chu:' nam ngay truoc dong boot trong run-log)
+let chuOk = true
+if (BAN_CHU) {
+  try { const b = fs.readFileSync(RUN_LOG); chuOk = (b.length >= coLog ? b.subarray(coLog) : b).toString('utf8').includes('ban-chu: may nay la may chu') } catch (e) { chuOk = false }
+  console.log('[8] Ban chu: ' + (chuOk ? 'run-log co dong "ban-chu: may nay la may chu" -> chup khong can ma' : 'KHONG thay dong ban-chu trong run-log -> app VAN hoi ma'))
+}
+if (boot.includes('dang-ky=FAIL')) console.log('    (!) Phim chup KHONG dang ky duoc: app khac dang giu phim do (13/11 may anh Tien: Lightshot dat cung phim Shift+`). App tu thu lai; ban nap van dung.')
+const dat = boot.includes('boot v' + banMoi + ' ') && giong && dangChay() > 0 && chuOk
 console.log('\n' + (dat ? 'XONG: app dang chay ban v' + banMoi + ' (nap tai cho, khong tao bo cai).' : 'CHUA DAT — xem cac dong tren. Tra ban cu: chep ' + CAT + '\\app.asar + app.asar.unpacked ve ' + path.join(CAI, 'resources')))
 if (!dat) process.exit(1)

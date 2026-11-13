@@ -254,6 +254,7 @@ function khoiTaoBanQuyen() {
   })
   const s = bq.trangThai()
   ghiLog('ban-quyen: ' + s.loai + (s.loai === 'da-kich-hoat' ? ' ' + s.maHienThi + (s.hetQuyenCapNhat ? ' het-cap-nhat' : '') : ' con ' + s.ngayConLai + ' ngay'))
+  if (BAN_CHU) ghiLog('ban-chu: may nay la may chu (ban nap tai cho --ban-chu), chup khong can ma')
 }
 /* ── Cap nhat phan mem (05/11, gop y #10): hoi file JSON cong khai moi 24 gio, CHI BAO + nut Tai ve ── */
 let capNhat = null
@@ -278,6 +279,9 @@ function khoiTaoCapNhat() {
 /** Chi mo link https (da loc trong cap-nhat.js). Khong co link cho he dieu hanh nay thi thoi. */
 function moTrangTai(link) { if (typeof link === 'string' && /^https:/i.test(link)) shell.openExternal(link) }
 const BO_QUA_BAN_QUYEN = IS_SELFTEST || IS_DRAGTEST || IS_SHELFTEST
+/* 13/11 BAN CHU: ban nap tai cho bang `cai-tai-cho.mjs --ban-chu` tren may anh Tien chup khong can ma (xem dau src/ban-chu.js).
+   Bo cai ban cho khach khong co truong aioBanChu nen dong nay luon false o may khach. Chi bo khoa chup, KHONG bo kiem quyen macOS. */
+const BAN_CHU = app.isPackaged && require('./ban-chu').laBanChu(require('../package.json'))
 async function kiemBanQuyenNen() {
   if (!bq) return
   try {
@@ -327,6 +331,9 @@ kho.noiNhatKy(ghiLog) // 04/10: cau-hinh.json khong doc / khong ghi duoc thi pha
    thay overlay chop roi mat; Notification khong hien tren may anh). Windows: khong lam gi. Xem src/quyen-man-hinh.js. */
 const kiemQuyen = taoKiemQuyen({ systemPreferences, dialog, shell, T, ghiLog, app })
 const chupChac = require('./chup-chac')
+/* 12/11 Hut mau dung tung diem anh: raw cua luong chay san la khung video I420 (mau lech 1-2 don vi), nen khi nguoi dung mo
+   Hut mau thi chup MOT anh nguyen goc cua man do va phuc vu qua aioshot://that (xem dau src/hut-that.js). */
+const hutThat = require('./hut-that').tao({ desktopCapturer, screen, ghiLog: (m) => ghiLog(m) })
 /* 05/11: bao loi cho nguoi dung. Mac: Notification KHONG hien tren may anh (so loi #20) nen moi loi mat anh deu im lang -> hop thoai that. */
 let dangBaoLoi = false
 function baoNguoiDung(body) {
@@ -452,6 +459,14 @@ app.whenReady().then(() => {
       ghiLog('raw crop ' + w + 'x' + h + ' png ' + Math.round(buf.length / 1024) + 'KB ' + (Date.now() - _t) + 'ms')
       return new Response(buf, { headers: Object.assign({ 'Content-Type': 'image/png' }, headers) })
     }
+    // aioshot://that/<gen>/<displayId>/<x>_<y>_<w>_<h>.bin — 12/11 Hut mau: diem anh NGUYEN GOC cua vung (BGRA tho, 8 byte dau =
+    // rong, cao). raw o tren la khung video I420 khi luot chup di duong luong chay san. Xem src/hut-that.js.
+    m = /^aioshot:\/\/that\/(\d+\/([^/]+))\/(\d+)_(\d+)_(\d+)_(\d+)\.bin$/.exec(req.url)
+    if (m) {
+      return hutThat.phucVu(m[1], m[2], +m[3], +m[4], +m[5], +m[6], rawStore.get(m[1])).then((r) => (r.status === 200
+        ? new Response(r.body, { headers: Object.assign({}, headers, { 'Content-Type': 'application/octet-stream', 'Cache-Control': 'no-store' }) })
+        : new Response('', { status: r.status, headers })))
+    }
     // aioshot://dai/<id>/<seq>.jpg — khung cua dai Storyboard trong kho (29/09). Qua protocol (ACAO) de canvas
     // xuat dai khong bi "taint", va khong day hang chuc MB base64 qua IPC.
     m = /^aioshot:\/\/dai\/([^/]+)\/(\d{1,2})\.jpg$/.exec(req.url)
@@ -531,15 +546,25 @@ app.whenReady().then(() => {
     ' lang=' + lang)
   /* 05/11: run-log may Windows dang-ky=FAIL 4/7 lan boot gan day (app khac giu luc may vua mo) ma khong ai thu lai: phim chet toi lan
      mo app sau. Nay thu lai moi 5 giay trong 2 phut. */
+  /* 13/11: DA TIM RA ai giu phim tren may nha anh Tien: Lightshot dat CUNG phim Shift+` (registry HKCU\Software\SkillBrains\Lightshot:
+     Hotkey_main_mod 4 = Shift, Hotkey_main_vk 192 = `); app nao mo truoc thi duoc phim, nen FAIL luc co luc khong. Truoc day het 2 phut
+     la bo cuoc: nguoi dung thoat app kia xong van phai mo lai AiO. Nay het 2 phut thi thu THUA moi 30 giay cho toi khi duoc. Chi
+     dang ky phim chinh va chi ghi log khi doi trang thai (ban cu goi registerHotkey moi 5 giay = 24 dong log phim chup-lai-vung). */
   if (!okPhim) {
     let lanPhim = 0
-    const henPhim = setInterval(() => {
+    const thuPhim = () => {
+      if (globalShortcut.isRegistered(currentHotkey)) return true
+      try { return globalShortcut.register(currentHotkey, () => startCapture()) } catch (e) { return false }
+    }
+    const lapPhim = () => {
       lanPhim++
-      if (globalShortcut.isRegistered(currentHotkey) || registerHotkey()) {
-        clearInterval(henPhim); ghiLog('phim tat: dang ky duoc sau ' + lanPhim + ' lan thu lai')
-      } else if (lanPhim >= 24) { clearInterval(henPhim); ghiLog('phim tat: thu lai 24 lan van bi giu') }
-    }, 5000)
-    if (henPhim.unref) henPhim.unref()
+      if (thuPhim()) { ghiLog('phim tat: dang ky duoc sau ' + lanPhim + ' lan thu lai'); rebuildTrayMenu(); return }
+      if (lanPhim === 24) ghiLog('phim tat: thu lai 24 lan van bi giu -> thu thua moi 30 giay cho toi khi duoc')
+      const h = setTimeout(lapPhim, lanPhim < 24 ? 5000 : 30000)
+      if (h.unref) h.unref()
+    }
+    const h0 = setTimeout(lapPhim, 5000)
+    if (h0.unref) h0.unref()
   }
   /* Phim bi app khac giu -> bao HAN ra man hinh, dung chet im lang: nguoi
      dung bam khong an se tuong "phim tu doi" (chi bao khi THAT BAI). */
@@ -680,7 +705,7 @@ function createTray() {
 function dongBanQuyenTray() {
   if (!bq) return []
   const s = bq.trangThai()
-  if (s.loai === 'da-kich-hoat') return []
+  if (s.loai === 'da-kich-hoat' || BAN_CHU) return [] // 13/11: may chu khong hien dong nhac nhap ma
   const nhan = s.loai === 'dung-thu' ? T('bq.trayConNgay').replace('{n}', s.ngayConLai) : T('bq.trayHetHan')
   return [{ label: nhan, click: () => openSettings() }, { type: 'separator' }]
 }
@@ -1238,7 +1263,7 @@ async function startCapture(opts) {
   // 05/11: opts.vung = chup lai vung lan truoc (phys toan cuc). Chi nhan doi tuong that, tray.on('click') truyen event vao day.
   vungNapSan = (opts && opts.vung && Number.isFinite(opts.vung.w)) ? opts.vung : null
   // Het dung thu / ma bi thu hoi: KHOA chup, mo Cai dat o the Ban quyen (anh chot 23/09)
-  if (bq && !BO_QUA_BAN_QUYEN && !bq.trangThai().choPhepChup) {
+  if (bq && !BO_QUA_BAN_QUYEN && !BAN_CHU && !bq.trangThai().choPhepChup) {
     ghiLog('capture: KHOA — het dung thu, chua co ma')
     if (Notification.isSupported()) new Notification({ title: 'AiO Shot & Save', body: T('bq.baoKhoa') }).show()
     openSettings()
@@ -1395,12 +1420,13 @@ function phatFrozen(list, _tg, nguon, nhanh) {
       } else ghiLog('[do] sang: khong co man ' + id)
     } catch (e) { ghiLog('[do] sang LOI ' + e.message) }
   }
-  frozenStore.clear(); rawStore.clear() // chi giu the he hien tai
+  frozenStore.clear(); rawStore.clear(); hutThat.xoa() // chi giu the he hien tai
   const layers = list.map((x) => {
     const m = manCache.find((mm) => mm.id === x.display.id) || {}
     const key = grabGen + '/' + x.display.id
     if (nhanh) frozenStore.set(key + '/nhanh', x.jpgNhanh); else frozenStore.set(key, x.jpg)
     if (x.image) rawStore.set(key, x.image)
+    hutThat.danhDau(key, (nguon || nguonGrab) === 'luong' ? 'luong' : 'grab') // 12/11: raw cua luong la khung video I420, Hut mau can anh nguyen goc
     return {
       x: x.display.bounds.x, y: x.display.bounds.y,
       w: x.display.bounds.width, h: x.display.bounds.height,
@@ -1849,7 +1875,7 @@ function closeOverlay() {
   overlayWins = []
   pending = null
   cuaSoGen++; vungNapSan = null; danhSachCuaSo = null // 05/11: bo ket qua lay danh sach cua so cua luot chup nay
-  frozenStore.clear(); rawStore.clear() // JPEG ~1MB + NativeImage goc ~32MB/man 4K — khong giu sau khi chup
+  frozenStore.clear(); rawStore.clear(); hutThat.xoa() // JPEG ~1MB + NativeImage goc ~32MB/man 4K — khong giu sau khi chup
   lenLichPool(400) // 0.5.0: tao san overlay cho luot sau
 }
 

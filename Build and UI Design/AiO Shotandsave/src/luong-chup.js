@@ -19,7 +19,15 @@
    - Khong co setDisplayMediaRequestHandler thi getDisplayMedia TREO im lang (khong loi,
      khong resolve). Handler dat tren session cua cua so nay, chi tra loi cho chinh no.
    - Anh raw tu canvas la RGBA; nativeImage.createFromBitmap can BGRA (toBitmap) -> doi
-     kenh o renderer (Uint32 xoay byte) truoc khi gui. */
+     kenh o renderer (Uint32 xoay byte) truoc khi gui.
+
+   ☠️ 13/11 DA DO (so loi #32, anh bao "pick mau chua dung"): KHUNG CUA LUONG LA VIDEO I420 (BT.601, dai gioi han), KHONG
+   phai diem anh man hinh nguyen goc. So voi desktopCapturer.getSources (= chup GDI doc lap 99,99-100 %) chi 14,9 % diem
+   giong het: mau phang lech 1-2 don vi (#21252B -> #1F252A), mep chu mau lech toi 97, mau xam dung. VideoFrame.copyTo
+   ({ format: 'RGBA' }) lech y nhu vay. Co --enable-features=WebRtcAllowWgcUsingTexture (ca khi kem AllowWgcScreenCapturer):
+   DA THU tren Electron 43.4.1 / Chromium 150, van I420, khong doi gi: dung thu lai khi chua doi ban Electron.
+   -> Viec can DUNG MA MAU (Hut mau) lay anh nguyen goc qua src/hut-that.js + ghep src/overlay/hut-ghep.js.
+   -> ANH LUU van lay tu khung nay (PNG khong nen cua mot khung da lech mau): CHUA sua, cho anh Tien chot huong. */
 
 const { BrowserWindow, desktopCapturer, screen, ipcMain, nativeImage, powerMonitor, systemPreferences } = require('electron')
 const path = require('path')

@@ -1,7 +1,7 @@
 {
   "name": "aio-shot-and-save",
   "productName": "AiO Shot & Save",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "AiO Shot & Save — chup vung chon + ghim noi (sticky) len man hinh, cho he thong AiO Studio.",
   "author": "AiO Studio",
   "license": "UNLICENSED",
@@ -42,6 +42,8 @@
     "test:chupchac": "electron scripts/test/do-chup-chac.cjs",
     "test:thanhcu": "node scripts/test/do-thanh-cong-cu.cjs",
     "test:hutmau": "node scripts/test/do-hut-mau.cjs",
+    "test:hutthat": "node scripts/test/do-hut-that.cjs",
+    "test:banchu": "node scripts/test/do-ban-chu.cjs",
     "test:suanet": "node scripts/test/do-sua-net.cjs",
     "test:lopsua": "node scripts/test/do-lop-sua.cjs",
     "test:sausoat": "node scripts/test/do-sau-soat.cjs",

@@ -149,7 +149,12 @@ kiem('main storyboard:keo-dai startDrag tu byte VE SAN (khong nhan byte luc keo)
 kiem('file keo dai ten shotandsave-storyboard-* (khay anh thuong bo qua)', khoiKeoMain.includes("'shotandsave-' + String(id).replace('dai-', 'storyboard-')"))
 kiem('main.js xu ly storyboard:close', mainJs.includes("'storyboard:close'"))
 // 29/09: kiem HANH VI (muc menu mo cua so Storyboard), khong kiem ten khoa chu (menu doi sang 'tray.storyboard', bo "(phim S)")
-kiem('Tray menu co lua chon tao storyboard', /label:\s*T\('tray\.storyboard'\),\s*click:\s*\(\)\s*=>\s*openStoryboardWindow\(\)/.test(mainJs))
+// 13/11: muc nay truot tu 12/10 vi bieu thuc van ghim ten khoa 'tray.storyboard' trong khi menu gon lai da doi sang 'tray.khayStory' (nam trong
+// "Khay khac"); menu VAN co muc mo Storyboard. Nay kiem dung hanh vi: co mot muc cua rebuildTrayMenu bam la goi openStoryboardWindow().
+{
+  const khoiMenu = mainJs.slice(mainJs.indexOf('function rebuildTrayMenu()'), mainJs.indexOf('function rebuildTrayMenu()') + 4000)
+  kiem('Tray menu co lua chon tao storyboard', /label:\s*T\('tray\.[A-Za-z]+'\),\s*click:\s*\(\)\s*=>\s*openStoryboardWindow\(\)/.test(khoiMenu))
+}
 
 console.log('\n[5] Kiem tra Cam tuyet doi Emoji trong UI (Luat 01)')
 const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u

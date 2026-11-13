@@ -1985,6 +1985,9 @@ window.addEventListener('keydown', (e) => {
    bang "Mau chu dao cua vung chon" liet ke 5 mau, bam tung dong de chep. MAU DOC TU ANH GOC khong nen: xin main cat
    vung chon qua aioshot://raw (PNG, lossless) — anh dong bang dang nhin la JPEG, mau o mep khoi mau bi lech nen chi dung
    lam du phong khi raw loi. Diem anh duoi con tro = floor(toa do man x ti le man).
+   ☠️ 12/11 SUA: "raw = lossless" chi dung khi luot chup di duong getSources. Tren Windows raw la khung video I420 cua luong
+   chay san (PNG khong nen cua mot anh DA lech mau) -> hutNapNguon xin them anh nguyen goc (aioshot://that) va ghep
+   (hut-ghep.js). Diem khong chac dung thi kinh hien "≈ #MA". Bai do: do-hut-mau.cjs (raw gia la I420) + do-hut-that.cjs.
    THUOC DO: keo giua hai diem, hien so PIXEL THAT cua anh (DIP x ti le man, bam vao VACH LUOI diem anh gan nhat, nen do
    do rong mot khoi = dung so diem anh cua khoi do). Giu Shift = do thang. Lop do nam NGOAI canvas ve (#ve) nen KHONG vao
    anh xuat. Bai do: scripts/test/do-hut-mau.cjs */
@@ -2029,33 +2032,74 @@ function hutNapNguon() {
   const rx = Math.round(curRect.x * DPR), ry = Math.round(curRect.y * DPR)
   const rw = Math.max(1, Math.round(curRect.w * DPR)), rh = Math.max(1, Math.round(curRect.h * DPR))
   const own = layers.find((L) => L.x === origin.x && L.y === origin.y)
+  /* 12/11: nap RONG RA toi luoi 8 diem cua ca khung (toi da 7 diem moi phia). Sac mau cua khung video duoc lay theo o 2x2 cua
+     CA KHUNG, nen o ghep bi cat cut o mep vung chon lech sac va bi tu choi oan (bai do bat duoc o man 125 %: diem sat mep
+     vung ra mau pha voi phan ngoai vung). (vx, vy, vw, vh) = vung chon nam trong canvas da nap; (rx, ry) cua n = goc canvas. */
+  const O8 = (window.HutGhep && window.HutGhep.O) || 8
+  const ex = Math.floor(rx / O8) * O8, ey = Math.floor(ry / O8) * O8
+  let ex2 = Math.ceil((rx + rw) / O8) * O8, ey2 = Math.ceil((ry + rh) / O8) * O8
+  if (own && own.pw > 0) ex2 = Math.min(ex2, Math.max(own.pw, rx + rw))
+  if (own && own.ph > 0) ey2 = Math.min(ey2, Math.max(own.ph, ry + rh))
   const p = (async () => {
     let im = null
-    if (own && own.key) { try { im = await napAnh(urlRaw(own.key, rx, ry, rw, rh)) } catch (e) { im = null } }
-    let cv = document.createElement('canvas'), ctx, nguon = 'raw-png'
+    if (own && own.key) { try { im = await napAnh(urlRaw(own.key, ex, ey, ex2 - ex, ey2 - ey)) } catch (e) { im = null } }
+    let cv = document.createElement('canvas'), ctx, nguon = 'raw-png', n
     if (im && im.naturalWidth) {
       cv.width = im.naturalWidth; cv.height = im.naturalHeight
       ctx = cv.getContext('2d', { willReadFrequently: true })
       ctx.drawImage(im, 0, 0)
+      n = { k, ctx, w: cv.width, h: cv.height, rx: ex, ry: ey, vx: rx - ex, vy: ry - ey, nguon, goc: false, ghep: null }
+      n.vw = Math.max(1, Math.min(rw, n.w - n.vx)); n.vh = Math.max(1, Math.min(rh, n.h - n.vy))
     } else if (frozenImg && frozenImg.naturalWidth) {
       nguon = 'jpeg'
       cv.width = rw; cv.height = rh
       ctx = cv.getContext('2d', { willReadFrequently: true })
       ctx.drawImage(frozenImg, rx, ry, rw, rh, 0, 0, rw, rh)
+      n = { k, ctx, w: rw, h: rh, rx, ry, vx: 0, vy: 0, vw: rw, vh: rh, nguon, goc: false, ghep: null }
     } else return null
-    const n = { k, ctx, w: cv.width, h: cv.height, rx, ry, nguon }
+    /* 12/11 (anh: "pick mau chua dung"): raw cua luot chup tren Windows la khung video I420 cua luong chay san, mau lech 1-2
+       don vi (do: chi 14,9 % diem dung). Xin main anh NGUYEN GOC cua dung vung roi ghep theo o 8x8 (hut-ghep.js): o cung noi
+       dung lay diem nguyen goc, o da doi (video, con tro) giu diem cua luong va danh dau gan dung.
+       goc = raw von da dung tung diem (Mac, hoac luong chua san sang). ghep = ket qua ghep (null = khong co anh nguyen goc). */
+    if (nguon === 'raw-png' && window.HutGhep) {
+      const th = await hutLayThat(own.key, n.rx, n.ry, n.w, n.h)
+      if (th && th.loai === 'goc') n.goc = true
+      else if (th && th.loai === 'that') {
+        const id = ctx.getImageData(0, 0, n.w, n.h)
+        n.ghep = window.HutGhep.ghep(id.data, th.buf, n.w, n.h, n.rx, n.ry)
+        ctx.putImageData(id, 0, 0)
+      }
+    }
     if (hutKhoa() === k) hutNguon = n
-    window.overlay.log('hut mau nguon=' + nguon + ' ' + n.w + 'x' + n.h)
+    window.overlay.log('hut mau nguon=' + nguon + ' ' + n.w + 'x' + n.h +
+      (n.goc ? ' goc' : n.ghep ? ' that ' + n.ghep.soKhop + '/' + n.ghep.soO + ' o' : ' gan-dung (khong co anh nguyen goc)'))
     return n
   })().then((n) => { if (!n && hutNap && hutNap.k === k) hutNap = null; return n })
   hutNap = { k, p }
   return p
 }
 
+/* 12/11: diem anh NGUYEN GOC cua vung (main: src/hut-that.js). Tra { loai: 'goc' } = raw da dung san, { loai: 'that', buf }
+   = BGRA cung co voi vung, null = khong lay duoc (giu mau cua luong, danh dau gan dung). */
+async function hutLayThat(key, x, y, w, h) {
+  try {
+    const r = await fetch('aioshot://that/' + key + '/' + [x, y, w, h].join('_') + '.bin', { cache: 'no-store' })
+    if (!r.ok) return null
+    const b = new Uint8Array(await r.arrayBuffer())
+    if (b.length < 8) return null
+    const dv = new DataView(b.buffer, b.byteOffset, 8), tw = dv.getUint32(0, true), th = dv.getUint32(4, true)
+    if (!tw && !th) return { loai: 'goc' }
+    if (tw !== w || th !== h || b.length !== 8 + w * h * 4) return null
+    return { loai: 'that', buf: b.subarray(8) }
+  } catch (e) { return null }
+}
+
+/* gan = true: diem nay KHONG chac dung tung don vi (mau cua luong video / JPEG), kinh hien dau ≈ truoc ma. */
 function hutDoc(n, cx, cy) {
   const px = clamp(diemAnh(cx) - n.rx, 0, n.w - 1), py = clamp(diemAnh(cy) - n.ry, 0, n.h - 1)
   const d = n.ctx.getImageData(px, py, 1, 1).data
-  return { r: d[0], g: d[1], b: d[2], px, py }
+  const gan = !(n.goc || (n.ghep && window.HutGhep && window.HutGhep.laThat(n.ghep, px, py)))
+  return { r: d[0], g: d[1], b: d[2], px, py, gan }
 }
 
 function hutBao(mau, chu) {
@@ -2066,10 +2110,10 @@ function hutBao(mau, chu) {
   clearTimeout(hutBaoHen)
   hutBaoHen = setTimeout(() => { hutBaoEl.hidden = true }, 1800)
 }
-function hutChep(hex) {
+function hutChep(hex, gan) {
   window.overlay.copyText(hex)
-  window.overlay.log('hut mau chep ' + hex)
-  hutBao(hex, t('hut.daChep').replace('{ma}', hex))
+  window.overlay.log('hut mau chep ' + hex + (gan ? ' (gan dung)' : ''))
+  hutBao(hex, t(gan ? 'hut.daChepGan' : 'hut.daChep').replace('{ma}', hex))
 }
 
 function hutDatKinh(cx, cy) {
@@ -2094,7 +2138,7 @@ function hutVe(cx, cy) {
   g.lineWidth = 1
   g.strokeStyle = '#000'; g.strokeRect(m * HUT_CO + 0.5, m * HUT_CO + 0.5, HUT_CO - 1, HUT_CO - 1)
   g.strokeStyle = '#fff'; g.strokeRect(m * HUT_CO + 1.5, m * HUT_CO + 1.5, HUT_CO - 3, HUT_CO - 3)
-  hutHexEl.textContent = hex
+  hutHexEl.textContent = (c.gan ? '≈ ' : '') + hex
   hutMauEl.style.background = hex
   hutDatKinh(cx, cy)
 }
@@ -2113,7 +2157,7 @@ async function hutBam(e) {
   const n = await hutNapNguon()
   if (!n) { hutBao(null, t('hut.khongCo')); return }
   const c = hutDoc(n, cx, cy)
-  hutChep(hexMau(c.r, c.g, c.b))
+  hutChep(hexMau(c.r, c.g, c.b), c.gan)
 }
 
 /* 5 mau chu dao: gom diem theo 4 bit moi kenh, trong moi nhom lay mau NGUYEN GOC hay gap nhat (anh chup man hinh co
@@ -2121,13 +2165,14 @@ async function hutBam(e) {
    mot. Lay mau toi da ~500 nghin diem. */
 function mauChuDao(n, soMau) {
   const max = soMau || 5, NGUONG = 32
-  const img = n.ctx.getImageData(0, 0, n.w, n.h).data
-  const buoc = Math.max(1, Math.floor(Math.sqrt((n.w * n.h) / 500000)))
+  const vw = n.vw || n.w, vh = n.vh || n.h // 12/11: canvas nap rong hon vung chon (luoi 8), bang mau chi tinh trong vung chon
+  const img = n.ctx.getImageData(n.vx || 0, n.vy || 0, vw, vh).data
+  const buoc = Math.max(1, Math.floor(Math.sqrt((vw * vh) / 500000)))
   const dem = new Map()
   let tong = 0
-  for (let y = 0; y < n.h; y += buoc) {
-    for (let x = 0; x < n.w; x += buoc) {
-      const i = (y * n.w + x) * 4
+  for (let y = 0; y < vh; y += buoc) {
+    for (let x = 0; x < vw; x += buoc) {
+      const i = (y * vw + x) * 4
       if (img[i + 3] < 128) continue
       const k = (img[i] << 16) | (img[i + 1] << 8) | img[i + 2]
       dem.set(k, (dem.get(k) || 0) + 1); tong++

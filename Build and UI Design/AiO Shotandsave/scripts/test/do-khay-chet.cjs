@@ -33,7 +33,12 @@ ipcMain.on('shelf:da-them', (_e, id) => { if (nghe) nghe(id) })
 
 const ANH = 'data:image/gif;base64,R0lGODlhAQABAAAAACw='
 const MUC = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, seq: i + 1, thumb: ANH, filePath: 'C:/x/' + i + '.jpg', w: 800, h: 600, kb: 10 }))
-const demO = (w) => w.webContents.executeJavaScript(`document.querySelectorAll('#list .item').length`)
+/* 13/11: bai nay TREO 2/2 lan (12/11 23:29 va 13/11 09:48, may dang ban After Effects) ngay sau muc doi chung cua [1]: lenh
+   executeJavaScript gui dung luc tien trinh ve dang chet / dang nap lai thi KHONG BAO GIO tra loi, vong cho co han gio cung dung
+   theo vi han gio chi duoc xet giua hai lan hoi. Day la loi cua BAI DO (ma khay-hoi-phuc.js khong cho executeJavaScript).
+   Nay moi lan hoi trang co han 1,5 giay. */
+const hoi = (w, ma, ms = 1500) => Promise.race([w.webContents.executeJavaScript(ma), new Promise((_, tuChoi) => setTimeout(() => tuChoi(new Error('trang khong tra loi trong ' + ms + ' ms')), ms))])
+const demO = (w) => hoi(w, `document.querySelectorAll('#list .item').length`)
 async function moKhay(ganHP, nhatKy, tuyChon) {
   const w = new BrowserWindow({ show: false, width: 500, height: 200, webPreferences: { preload: path.join(ROOT, 'src/preload-shelf.js'), sandbox: false, contextIsolation: true } })
   let hp = null
@@ -42,8 +47,8 @@ async function moKhay(ganHP, nhatKy, tuyChon) {
   if (!ganHP) for (const m of MUC) w.webContents.send('shelf:add', m)
   return { w, hp }
 }
-const dat0 = (w) => w.webContents.executeJavaScript('window.__marca = 1')
-async function sangTrangMoi(w, ms) { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if (await w.webContents.executeJavaScript('window.__marca === undefined')) return true } catch (e) {} await cho(50) } return false }
+const dat0 = (w) => hoi(w, 'window.__marca = 1', 5000)
+async function sangTrangMoi(w, ms) { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if (await hoi(w, 'window.__marca === undefined')) return true } catch (e) {} await cho(50) } return false }
 async function choDu(w, n, ms) { const t0 = Date.now(); while (Date.now() - t0 < ms) { try { if ((await demO(w)) === n) return true } catch (e) {} await cho(50) } return false }
 async function giet(w) { w.webContents.forcefullyCrashRenderer() ; await cho(150) }
 

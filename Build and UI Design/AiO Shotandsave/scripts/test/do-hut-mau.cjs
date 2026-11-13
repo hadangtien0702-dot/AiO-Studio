@@ -4,12 +4,19 @@
    CHAY AN: khong bat cua so nao, khong cuop chuot, KHONG cham clipboard that (lenh chep di qua IPC 'overlay:copy-text'
    va bai tu hung). 1 cua so offscreen nap THAT src/overlay/index.html voi preload that; chuot / phim la su kien gia lap.
    Dung giao thuc aioshot:// GIA (dang ky trong bai nay) phuc vu nhu main.js: anh dong bang = JPEG chat luong thap (de
-   lo ra neu code doc mau tu JPEG), cat vung aioshot://raw = PNG nguyen ven.
+   lo ra neu code doc mau tu JPEG).
+   ☠️ 12/11 (anh Tien: "pick mau chua dung"): ban cu cua bai nay phuc vu aioshot://raw bang anh NGUYEN VEN nen dat 108/108
+   trong khi app that doc mau sai, vi raw that tren Windows la KHUNG VIDEO I420 cua luong chay san (do tren man that: chi
+   14,9 % diem dung, mau phang lech 1-2 don vi). Nay aioshot://raw = PNG cua khung I420 GIA LAP (scripts/test/gia-lap-i420.cjs,
+   da doi chieu 14 mau do tren man that), aioshot://that = diem anh nguyen goc (nhu src/hut-that.js). Rieng MOT O DEN
+   16 x 16 DIP trong dai 5 cua anh nguyen goc gia lam "vung da doi tu luc bam phim" (video bi den): o do app phai giu mau
+   cua luong va hien dau ≈.
    Anh thu TAO SAN, biet truoc tung diem anh: 5 dai mau (rong 240/152/88/72/48 DIP trong vung chon 600 x 300), nen xam
    ngoai vung, MOT diem anh don mau xanh la sang giua dai 1. Dap an mau lay tu BO DEM diem anh cua chinh bai nay (khong
    tu code app). Chay o ti le man 100 / 125 / 150 %.
    DOI CHUNG: [jpeg] ep doc mau tu anh JPEG -> mau tai mep dai va diem don phai SAI; [css] thuoc do dung diem CSS thay vi
-   diem anh that -> so pixel phai SAI o 150 %; [mau] bang 5 mau chu dao sai -> phai bi bat.
+   diem anh that -> so pixel phai SAI o 150 %; [mau] bang 5 mau chu dao sai -> phai bi bat; [luong] aioshot://that tra 404
+   (khong co anh nguyen goc, dung nhu app truoc 12/11) -> mau giua 5 dai phai SAI.
    Cach chay: node scripts/test/do-hut-mau.cjs   (tu goi Electron)
    ========================================================================= */
 const path = require('path')
@@ -40,7 +47,7 @@ if (!process.versions.electron) {
     for (const c of k.kq) { tong++; if (c.ok) dat++; console.log((c.ok ? '  DAT   ' : '  TRUOT ') + c.ten + (c.ct ? ' (' + c.ct + ')' : '')) }
   }
   for (const tl of [1, 1.25, 1.5]) in_(chay(tl), 'Man ' + Math.round(tl * 100) + ' %')
-  const doiChung = [['jpeg', 1.25, /Hut mau: (diem sat mep|diem anh don|kinh)/], ['css', 1.5, /^Thuoc do: /], ['mau', 1, /^Mau chu dao: /]]
+  const doiChung = [['jpeg', 1.25, /Hut mau: (diem sat mep|diem anh don|kinh)/], ['css', 1.5, /^Thuoc do: /], ['mau', 1, /^Mau chu dao: /], ['luong', 1.25, /^Hut mau: mau dung tai 5 giua dai/]]
   let doiChungDat = 0
   console.log('\n== DOI CHUNG (co y lam hong, bai do PHAI truot) ==')
   for (const [hong, tl, mau] of doiChung) {
@@ -105,6 +112,17 @@ const BIEN = [100] // moc dai (DIP)
 }
 const anhGoc = nativeImage.createFromBitmap(buf, { width: W, height: H })
 const jpegDongBang = anhGoc.toJPEG(55)
+/* 12/11: raw cua luong = anh goc di qua I420 gia lap. bufLuong la BGRA nhu buf. */
+const { quaI420 } = require('./gia-lap-i420.cjs')
+const bufLuong = Buffer.alloc(W * H * 4)
+{ const s = quaI420(buf, W, H, false); for (let i = 0; i < s.length; i += 4) { bufLuong[i] = s[i + 2]; bufLuong[i + 1] = s[i + 1]; bufLuong[i + 2] = s[i]; bufLuong[i + 3] = 255 } }
+const anhLuong = nativeImage.createFromBitmap(bufLuong, { width: W, height: H })
+const docLuong = (x, y) => { const i = (y * W + x) * 4; return [bufLuong[i + 2], bufLuong[i + 1], bufLuong[i]] }
+/* Anh "nguyen goc chup luc mo Hut mau": giong anh goc, tru O DEN (video bi den / vung da doi) nam trong dai 5. */
+const O_DEN = { x: 660, y: 110, w: 16, h: 16 } // DIP
+const bufThat = Buffer.from(buf)
+for (let y = Math.round(O_DEN.y * S); y < Math.round((O_DEN.y + O_DEN.h) * S); y++) for (let x = Math.round(O_DEN.x * S); x < Math.round((O_DEN.x + O_DEN.w) * S); x++) { const i = (y * W + x) * 4; bufThat[i] = bufThat[i + 1] = bufThat[i + 2] = 0 }
+let soLanThat = 0
 /* Dap an "mau chu dao" tu bo dem diem anh: tat ca diem trong vung (DIP) -> top 5 theo so diem. */
 function demMau(v) {
   const m = new Map()
@@ -119,8 +137,18 @@ app.whenReady().then(async () => {
     if (/^aioshot:\/\/frozen\/7\/d1\.jpg$/.test(req.url)) return new Response(jpegDongBang, { headers: Object.assign({ 'Content-Type': 'image/jpeg' }, hd) })
     const m = /^aioshot:\/\/raw\/(\d+\/[^/]+)\/(\d+)_(\d+)_(\d+)_(\d+)\.png$/.exec(req.url)
     if (m && m[1] === '7/d1') {
-      const buf2 = anhGoc.crop({ x: +m[2], y: +m[3], width: Math.min(+m[4], W - +m[2]), height: Math.min(+m[5], H - +m[3]) }).toPNG()
+      const buf2 = anhLuong.crop({ x: +m[2], y: +m[3], width: Math.min(+m[4], W - +m[2]), height: Math.min(+m[5], H - +m[3]) }).toPNG()
       return new Response(buf2, { headers: Object.assign({ 'Content-Type': 'image/png' }, hd) })
+    }
+    const mt = /^aioshot:\/\/that\/(\d+\/[^/]+)\/(\d+)_(\d+)_(\d+)_(\d+)\.bin$/.exec(req.url)
+    if (mt && mt[1] === '7/d1') {
+      soLanThat++
+      if (HONG === 'luong') return new Response('', { status: 404, headers: hd })
+      const x = +mt[2], y = +mt[3], w = Math.min(+mt[4], W - x), h = Math.min(+mt[5], H - y)
+      const body = Buffer.alloc(8 + w * h * 4)
+      body.writeUInt32LE(w, 0); body.writeUInt32LE(h, 4)
+      for (let r = 0; r < h; r++) bufThat.copy(body, 8 + r * w * 4, ((y + r) * W + x) * 4, ((y + r) * W + x + w) * 4)
+      return new Response(body, { headers: Object.assign({ 'Content-Type': 'application/octet-stream' }, hd) })
     }
     return new Response('', { status: 404 })
   })
@@ -187,7 +215,12 @@ app.whenReady().then(async () => {
   await o(`__t.phim('i', 'KeyI'); true`)
   const sanSang = await cho_('!!hutMauDao && hutDsEl.querySelectorAll(".hang").length > 0 && !!hutNguon')
   const nguon = await o('hutNguon && hutNguon.nguon')
-  kiem('Hut mau: nap xong pixel vung chon, nguon la ' + (HONG === 'jpeg' ? 'JPEG (do co y ep)' : 'PNG goc (raw)'), sanSang && nguon === (HONG === 'jpeg' ? 'jpeg' : 'raw-png'), 'nguon ' + nguon)
+  kiem('Hut mau: nap xong pixel vung chon, nguon la ' + (HONG === 'jpeg' ? 'JPEG (do co y ep)' : 'raw cua luot chup'), sanSang && nguon === (HONG === 'jpeg' ? 'jpeg' : 'raw-png'), 'nguon ' + nguon)
+  /* 12/11: raw la khung I420 (lech mau) -> app phai xin anh nguyen goc va ghep */
+  const daiLech = DAI.filter((c, i) => hex(docLuong(dev(BIEN[i] + RONG_DAI[i] / 2), dev(250))) !== hex(c)).length
+  kiem('Tien de: raw cua luong (I420 gia lap) KHAC anh goc o it nhat 3/5 dai mau (bai do phan biet duoc)', daiLech >= 3, daiLech + '/5 dai lech')
+  const gh = await o('hutNguon && hutNguon.ghep ? { khop: hutNguon.ghep.soKhop, o: hutNguon.ghep.soO } : null')
+  kiem('Hut mau: da xin anh nguyen goc (aioshot://that) va ghep, hon 95 % o duoc nhan', soLanThat >= 1 && !!gh && gh.khop / gh.o > 0.95 && nhatKy.some((l) => /^hut mau nguon=raw-png .* that \d+\/\d+ o$/.test(l)), 'xin ' + soLanThat + ' lan, ' + JSON.stringify(gh))
   const diemThu = [
     ['giua dai 1', 200, 200], ['giua dai 2', 416, 200], ['giua dai 3', 536, 260], ['giua dai 4', 616, 300], ['giua dai 5', 676, 380],
     ['goc tren-trai vung', 100, 100], ['goc duoi-phai vung', 699, 399],
@@ -218,6 +251,25 @@ app.whenReady().then(async () => {
   await o(`__t.chuot('mousemove', 300, 200, toolbarEl); true`)
   const tren = await o('hutKinhEl.hidden')
   kiem('Hut mau: ra ngoai vung chon hoac re len thanh cong cu thi kinh an', ngoai === true && tren === true)
+
+  /* 12/11: O DA DOI noi dung (anh nguyen goc den, luong con mau dai 5) -> giu mau cua luong + dau ≈, khong lay mau den */
+  {
+    const gx = O_DEN.x + 8, gy = O_DEN.y + 8
+    await o(`__t.di(${gx}, ${gy}); true`)
+    const g1 = await o(`({ hex: hutHexEl.textContent, giua: __t.diemKinh(60, 60) })`)
+    const mauLuong = hex(docLuong(dev(gx), dev(gy)))
+    kiem('Hut mau: vung da doi tu luc bam phim -> hien "≈ " + mau cua luong, KHONG lay mau den cua anh moi', g1.hex === '≈ ' + mauLuong && hex(g1.giua) === mauLuong && mauLuong !== '#000000', g1.hex + ' (luong ' + mauLuong + ')')
+    const tran = await o(`(() => { const a = hutHexEl.getBoundingClientRect(), b = hutKinhEl.getBoundingClientRect(); return { phai: Math.round(a.right * 10) / 10, kinh: Math.round(b.right * 10) / 10 } })()`)
+    kiem('Hut mau: ma co dau gan dung van nam gon trong kinh (khong tran mep phai)', tran.phai <= tran.kinh - 2, JSON.stringify(tran))
+    copied.length = 0
+    await o(`__t.bam(${gx}, ${gy}); true`)
+    await cho(250)
+    const b1 = await o(`({ chu: hutBaoChuEl.textContent })`)
+    kiem('Hut mau: bam o vung gan dung -> chep ma KHONG kem dau ≈, dong bao co ghi chu them, nhat ky ghi (gan dung)', copied[0] === mauLuong && b1.chu.includes(mauLuong) && /\(.+\)/.test(b1.chu) && nhatKy.some((l) => l === 'hut mau chep ' + mauLuong + ' (gan dung)'), copied[0] + ' | ' + b1.chu)
+    await o(`__t.di(${O_DEN.x + 20}, ${O_DEN.y + 60}); true`) // cung dai 5, ngoai o den
+    const g2 = await o(`({ hex: hutHexEl.textContent })`)
+    kiem('Hut mau: ngay canh o da doi (cung dai 5) van doc dung tung diem, khong co dau ≈', g2.hex === hexTai(O_DEN.x + 20, O_DEN.y + 60), g2.hex)
+  }
 
   /* bam = chep + dong bao */
   copied.length = 0
