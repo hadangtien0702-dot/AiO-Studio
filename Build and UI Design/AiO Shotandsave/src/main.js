@@ -49,6 +49,7 @@ const tuDatTenMod = require('./tu-dat-ten') // 06/11: tu dat ten file theo noi d
 const taiLieuMod = require('./tai-lieu-main') // 06/11: xuat tai lieu tung buoc tu anh trong khay
 const os = require('os')
 const { taoCapNhat } = require('./cap-nhat') // 05/11: bao co ban moi (xem dau src/cap-nhat.js)
+const { taoTaiBanMoi } = require('./cap-nhat-tai') // 23/11: nut Cap nhat ngay tren Windows (tai + kiem + cai im lang)
 const { taoKiemQuyen } = require('./quyen-man-hinh') // 04/10: macOS thieu quyen Ghi man hinh -> hop thoai ro rang
 const { taoLopSua } = require('./lop-sua') // 06/11: lop sua cua anh (cac net da ve + anh sach) trong userData
 const { ganHoiPhuc } = require('./khay-hoi-phuc') // 06/11: trang khay chet / treo thi tu nap lai
@@ -267,14 +268,42 @@ function khoiTaoCapNhat() {
     ghi: (st) => { fs.writeFileSync(file + '.tmp', JSON.stringify(st, null, 2)); fs.renameSync(file + '.tmp', file) },
     dangBan: () => overlayWins.length > 0 || dangQuay || !!ghiHinh || !!cuon || suaVideo.dangBan(), // chup / quay Storyboard / quay video / chup cuon / xuat video da sua
     khiDoi: () => rebuildTrayMenu(),
+    tuCai: () => TU_CAI_DUOC && !!(bq && bq.maDangDung()), // 23/11: co ma tren may nay thi nut Cap nhat ngay
     baoMot: (tt) => {
       if (!Notification.isSupported()) return
-      const n = new Notification({ title: 'AiO Shot & Save', body: T('cn.baoMoi').replace('{v}', tt.phienBan) })
-      n.on('click', () => moTrangTai(tt.link))
+      const n = new Notification({ title: 'AiO Shot & Save', body: T(tt.tuCai ? 'cn.baoMoiNgay' : 'cn.baoMoi').replace('{v}', tt.phienBan) })
+      n.on('click', () => (tt.tuCai ? batDauCapNhatNgay() : moTrangTai(tt.link)))
       n.show()
     },
   })
+  /* 23/11 (anh: "update now... bam vao chi can cho vai giay la ban moi tu dong update"): tai bo cai qua cong aio-mail (chi khach co ma),
+     kiem sha256 hai nguon, chay bo cai im lang /S --force-run (dong app, cai de, mo lai). Xem dau src/cap-nhat-tai.js. */
+  taiBanMoi = taoTaiBanMoi({
+    fetch: (url, opt) => net.fetch(url, opt),
+    layMa: () => (bq ? bq.maDangDung() : null),
+    banMoi: () => (capNhat ? capNhat.banHieuLuc() : null),
+    thuMuc: app.getPath('temp'), fs, path, crypto: require('crypto'), ghiLog,
+    cong: process.env.AIO_CONG_TAI || undefined, // chi de bai do tro may chu gia
+    chayBoCai: (file) => {
+      if (process.env.AIO_THU_KHONG_CAI === '1') { ghiLog('cap-nhat-tai: [thu] bo qua chay bo cai ' + file); return }
+      const p = require('child_process').spawn(file, ['/S', '--force-run'], { detached: true, stdio: 'ignore' })
+      p.unref()
+    },
+    thoat: () => { if (process.env.AIO_THU_KHONG_CAI === '1') return; setTimeout(() => forceQuit(), 400) },
+    tienDo: (st) => {
+      if (settingsWin && !settingsWin.isDestroyed()) settingsWin.webContents.send('capnhat:tien-do', st)
+      rebuildTrayMenu()
+    },
+  })
   if (!IS_SELFTEST && !IS_DRAGTEST && !IS_SHELFTEST) capNhat.batDau()
+}
+/* Tu cai chi tren Windows ban dong goi (ban chay tu ma nguon khong co bo cai NSIS de thay). AIO_THU_CAP_NHAT=1: bai do bat cho ban nguon. */
+const TU_CAI_DUOC = process.platform === 'win32' && (app.isPackaged || process.env.AIO_THU_CAP_NHAT === '1')
+let taiBanMoi = null
+/** Bam "Cap nhat ngay" o khay he thong / thong bao: mo Cai dat de thay tien do, roi bat dau. */
+function batDauCapNhatNgay() {
+  openSettings()
+  if (taiBanMoi) taiBanMoi.capNhatNgay()
 }
 /** Chi mo link https (da loc trong cap-nhat.js). Khong co link cho he dieu hanh nay thi thoi. */
 function moTrangTai(link) { if (typeof link === 'string' && /^https:/i.test(link)) shell.openExternal(link) }
@@ -713,6 +742,12 @@ function dongBanQuyenTray() {
 function dongCapNhatTray() {
   const tt = capNhat && capNhat.trangThai()
   if (!tt || !tt.coBanMoi) return []
+  if (tt.tuCai) {
+    const st = taiBanMoi ? taiBanMoi.trangThai() : { buoc: 'roi' }
+    const dang = st.buoc === 'xin-link' || st.buoc === 'tai' || st.buoc === 'kiem' || st.buoc === 'cai'
+    const nhan = dang ? T('cn.trayDang').replace('{n}', st.phanTram || 0) : T('cn.trayNgay').replace('{v}', tt.phienBan)
+    return [{ label: nhan, enabled: !dang, click: () => batDauCapNhatNgay() }, { type: 'separator' }]
+  }
   return [{ label: T('cn.tray').replace('{v}', tt.phienBan), click: () => (tt.link ? moTrangTai(tt.link) : openSettings()) }, { type: 'separator' }]
 }
 
@@ -1222,6 +1257,8 @@ ipcMain.handle('capnhat:kiem-ngay', async () => {
   return { ketQua: r.ketQua, trangThai: r.trangThai }
 })
 ipcMain.handle('capnhat:tai', () => { const tt = capNhat && capNhat.trangThai(); if (tt && tt.link) moTrangTai(tt.link) })
+ipcMain.handle('capnhat:ngay', () => (taiBanMoi ? taiBanMoi.capNhatNgay() : { ok: false, loi: 'khong-tu-cai' }))
+ipcMain.handle('capnhat:tien-do', () => (taiBanMoi ? taiBanMoi.trangThai() : null))
 ipcMain.handle('bq:mua', () => shell.openExternal(WEB_MUA))
 
 /* ---------------------------------------------------------------------- */

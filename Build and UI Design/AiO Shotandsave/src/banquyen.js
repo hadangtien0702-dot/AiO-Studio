@@ -297,7 +297,14 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
     return { daHoi: true, trangThai: trangThai() }
   }
 
-  return { trangThai, kichHoat, huyKichHoat, kiemTra }
+  /** 23/11: ma + activation dang dung tren may nay, CHI de cong tai ban moi kiem (cap-nhat-tai.js). Khong co ma hop le -> null. */
+  function maDangDung() {
+    if (trangThai().loai !== 'da-kich-hoat') return null
+    const s = napTrangThai()
+    return s.key ? { key: s.key, activationId: s.activationId || null } : null
+  }
+
+  return { trangThai, kichHoat, huyKichHoat, kiemTra, maDangDung }
 }
 
 /** Doc / ghi file ban-quyen.json cho taoBanQuyen (04/10). Tach khoi main.js de do duoc bang node thuan.

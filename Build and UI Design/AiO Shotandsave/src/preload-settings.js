@@ -67,4 +67,8 @@ contextBridge.exposeInMainWorld('capNhat', {
   get: () => ipcRenderer.invoke('capnhat:get'),
   kiemNgay: () => ipcRenderer.invoke('capnhat:kiem-ngay'),
   taiVe: () => ipcRenderer.invoke('capnhat:tai'),
+  // 23/11: nut Cap nhat ngay (Windows, co ma) + tien do tai / cai
+  capNhatNgay: () => ipcRenderer.invoke('capnhat:ngay'),
+  tienDo: () => ipcRenderer.invoke('capnhat:tien-do'),
+  onTienDo: (fn) => ipcRenderer.on('capnhat:tien-do', (_e, st) => fn(st)),
 })

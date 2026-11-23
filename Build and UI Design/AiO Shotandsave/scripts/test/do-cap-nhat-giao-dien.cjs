@@ -86,8 +86,47 @@ async function chayNgonNgu(l) {
   m.w.destroy(); await doi(300)
 }
 
+/* 23/11: nut "Cap nhat ngay" (Windows, co ma): nhan nut, bam -> main nhan lenh, tien do tung buoc, loi -> nut ve "Tai ve". */
+let daBamNgay = 0, tienDoCuoi = null
+ipcMain.handle('capnhat:ngay', () => { daBamNgay++; return new Promise(() => {}) }) // luot tai that chay o main, o day khong tra ve
+ipcMain.handle('capnhat:tien-do', () => tienDoCuoi)
+async function chayTuCai(l) {
+  lang = l; const vi = l === 'vi'
+  console.log('\n--- cap nhat ngay ' + l + ' ---')
+  tt = mac({ coBanMoi: true, phienBan: '0.11.2', ghiChu: { vi: 'Sua loi', en: 'Fixes' }, link: 'https://polar.sh/aiostudio/portal', tuCai: true })
+  tienDoCuoi = null
+  let m = await mo(); let d = await m.doc()
+  kiem(l + ': co ma -> nut "' + (vi ? 'Cập nhật ngay' : 'Update now') + '"', d.tai && d.taiNhan === (vi ? 'Cập nhật ngay' : 'Update now'), JSON.stringify(d))
+  const truocLink = daMoLink, truocNgay = daBamNgay
+  await m.js(`document.getElementById('cn-tai').click()`); await doi(100); d = await m.doc()
+  kiem(l + ': bam -> main nhan cap-nhat-ngay, KHONG mo trang web', daBamNgay === truocNgay + 1 && daMoLink === truocLink, daBamNgay + '/' + daMoLink)
+  kiem(l + ': dang chay -> nut khoa', await m.js(`document.getElementById('cn-tai').disabled && document.getElementById('cn-kiem').disabled`))
+  await m.js(`document.getElementById('cn-tai').click()`); await doi(80)
+  kiem(l + ': bam lan 2 luc dang chay -> khong gui them', daBamNgay === truocNgay + 1)
+  const buoc = [['tai', 37, vi ? 'Đang tải bản mới… 37%' : 'Downloading the new version… 37%'], ['kiem', 100, vi ? 'Đang kiểm tra file…' : 'Checking the file…'], ['cai', 100, vi ? 'Đang cài, app sẽ tự mở lại sau vài giây…' : 'Installing, the app will reopen in a few seconds…']]
+  for (const [b, n, chu] of buoc) {
+    m.w.webContents.send('capnhat:tien-do', { buoc: b, phanTram: n, loi: null }); await doi(60); d = await m.doc()
+    kiem(l + ': tien do ' + b, d.dong === chu, d.dong)
+  }
+  m.w.webContents.send('capnhat:tien-do', { buoc: 'loi', phanTram: 0, loi: 'cong-502-polar-loi' }); await doi(60); d = await m.doc()
+  kiem(l + ': loi cong -> cau de hieu + nut ve "Tai ve", mo khoa', /Tải về|Download/.test(d.dong) && d.taiNhan === (vi ? 'Tải về' : 'Download') && !d.kiemTat && !/502|polar/i.test(d.dong), JSON.stringify(d))
+  await m.js(`document.getElementById('cn-tai').click()`); await doi(80)
+  kiem(l + ': sau loi bam -> mo trang khach (duong cu)', daMoLink === truocLink + 1 && daBamNgay === truocNgay + 1)
+  m.w.destroy(); await doi(300)
+  // mo lai Cai dat GIUA luc dang tai -> doc tien do tu main
+  tienDoCuoi = { buoc: 'tai', phanTram: 64, loi: null }
+  m = await mo(); d = await m.doc()
+  kiem(l + ': mo Cai dat giua chung -> thay 64%', /64%/.test(d.dong) && d.kiemTat, d.dong)
+  m.w.destroy(); await doi(300)
+  // DOI CHUNG: khong co ma (tuCai false) -> van la "Tai ve" nhu cu
+  tienDoCuoi = null; tt = mac({ coBanMoi: true, phienBan: '0.11.2', link: 'https://polar.sh/aiostudio/portal', tuCai: false })
+  m = await mo(); d = await m.doc()
+  kiem(l + ': DOI CHUNG: khong ma -> nut "Tai ve"', d.taiNhan === (vi ? 'Tải về' : 'Download'), d.taiNhan)
+  m.w.destroy(); await doi(300)
+}
+
 app.whenReady().then(async () => {
-  try { await chayNgonNgu('vi'); await chayNgonNgu('en') } catch (e) { truot++; console.log('  TRUOT ngoai le: ' + (e && e.stack || e)) }
+  try { await chayNgonNgu('vi'); await chayNgonNgu('en'); await chayTuCai('vi'); await chayTuCai('en') } catch (e) { truot++; console.log('  TRUOT ngoai le: ' + (e && e.stack || e)) }
   console.log('\nTong: ' + dat + ' dat, ' + truot + ' truot')
   app.exit(truot ? 1 : 0)
 })

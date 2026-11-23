@@ -2,7 +2,7 @@
 /* Cap nhat phan mem (05/11/2026, gop y #10): app tu hoi mot file JSON cong khai xem co ban moi khong.
    Anh chot: Mac KHONG tu cai (21/09, khong mua Apple Developer), khong mua chung chi ky so (14/08)
    => CHI bao co ban moi + nut Tai ve mo trinh duyet. Windows: chua tu cai o ban nay (chua co noi dat bo cai
-   cong khai); thiet ke de sau gan duoc: JSON da co `linkWin`, trangThai() tra `tuCai: false` — ve sau chi them
+   cong khai) [23/11: DA LAM — nut Cap nhat ngay, xem src/cap-nhat-tai.js]; thiet ke de sau gan duoc: JSON da co `linkWin`, trangThai() tra `tuCai: false` — ve sau chi them
    mot nhanh o main.js (tai bo cai vao thu muc tam + chay) roi doi co nay.
 
    ☠️ FILE JSON NAY CHUA CO TREN WEB (05/11/2026). Duong dan du kien `LINK_BAN_MOI` ben duoi: khi chua dang len
@@ -67,6 +67,8 @@ function docBanMoi(text, chapNhanHttp) {
       phienBan: v.join('.'),
       linkWin: linkHopLe(j.linkWin, chapNhanHttp),
       linkMac: linkHopLe(j.linkMac, chapNhanHttp),
+      // 23/11: sha256 bo cai Windows -> nut Cap nhat ngay (cap-nhat-tai.js) chi chay khi co truong nay
+      sha256Win: typeof j.sha256Win === 'string' && /^[0-9a-f]{64}$/i.test(j.sha256Win.trim()) ? j.sha256Win.trim().toLowerCase() : null,
       ghiChu: { vi: chuGhiChu(gc.vi), en: chuGhiChu(gc.en) },
     },
   }
@@ -125,7 +127,8 @@ function taoCapNhat(o) {
       phienBan: b ? b.phienBan : null,
       ghiChu: b ? b.ghiChu : { vi: '', en: '' },
       link: b ? (nenTang === 'darwin' ? b.linkMac : b.linkWin) : null,
-      tuCai: false, // Windows tu cai: chua lam (xem dau file). Mac: khong bao gio (quyet dinh 21/09).
+      // 23/11: Windows + co ma + json co sha256Win -> nut Cap nhat ngay (main.js truyen o.tuCai). Mac: khong bao gio (quyet dinh 21/09).
+      tuCai: !!(b && nenTang !== 'darwin' && b.sha256Win && o.tuCai && o.tuCai(b)),
       lanKiemCuoi: nap().lanKiemCuoi,
     }
   }
@@ -204,7 +207,7 @@ function taoCapNhat(o) {
   }
   function dung() { if (hanHen) { huyHen(hanHen); hanHen = null } }
 
-  return { kiemTra, trangThai, batDau, dung, nap }
+  return { kiemTra, trangThai, batDau, dung, nap, banHieuLuc: banConHieuLuc }
 }
 
 module.exports = { taoCapNhat, soSanh, chuanPhienBan, docBanMoi, LINK_BAN_MOI, SAU_KHI_MO_MS, CHU_KY_MS, THU_LAI_KHI_BAN_MS, HET_GIO_MS }

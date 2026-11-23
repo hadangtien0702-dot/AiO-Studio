@@ -615,19 +615,43 @@ btnOpen.addEventListener('click', () => window.settings.openFolder())
   const nutTai = document.getElementById('cn-tai'), nutKiem = document.getElementById('cn-kiem')
   if (!dong || !window.capNhat) return
   const lop = window.i18n.lang === 'en' ? 'en' : 'vi'
+  let tuCai = false, dangChay = false, sCuoi = null
   const ve = (s, thongBao) => {
+    sCuoi = s
+    tuCai = !!(s && s.coBanMoi && s.tuCai)
     if (s && s.coBanMoi) {
       dong.textContent = t('cn.coBanMoi').replace('{v}', s.phienBan)
       ghiChu.textContent = (s.ghiChu && (s.ghiChu[lop] || s.ghiChu[lop === 'en' ? 'vi' : 'en'])) || ''
-      nutTai.hidden = !s.link
+      nutTai.hidden = !tuCai && !s.link
+      nutTai.textContent = t(tuCai ? 'cn.capNhatNgay' : 'cn.taiVe')
     } else {
       dong.textContent = thongBao || t('cn.dangDung').replace('{v}', s ? s.hienTai : '')
       ghiChu.textContent = ''
       nutTai.hidden = true
     }
   }
-  window.capNhat.get().then((s) => ve(s))
-  nutTai.addEventListener('click', () => window.capNhat.taiVe())
+  /* 23/11: tien do Cap nhat ngay (main day ve moi khi doi buoc / doi %). Loi thi noi ro + doi nut ve "Tai ve" (mo trang khach). */
+  const veTienDo = (st) => {
+    if (!st || st.buoc === 'roi') return
+    dangChay = st.buoc !== 'loi'
+    nutTai.disabled = dangChay; nutKiem.disabled = dangChay
+    if (st.buoc === 'xin-link') dong.textContent = t('cn.dangXinLink')
+    else if (st.buoc === 'tai') dong.textContent = t('cn.dangTai').replace('{n}', st.phanTram || 0)
+    else if (st.buoc === 'kiem') dong.textContent = t('cn.dangKiemFile')
+    else if (st.buoc === 'cai') dong.textContent = t('cn.dangCai')
+    else if (st.buoc === 'loi') {
+      const k = 'cn.loi.' + String(st.loi || '').replace(/^(cong|tai)-.*$/, '$1')
+      dong.textContent = t(window.i18n.t(k) !== k ? k : 'cn.loi.khac')
+      tuCai = false
+      nutTai.textContent = t('cn.taiVe'); nutTai.hidden = !(sCuoi && sCuoi.link)
+    }
+  }
+  window.capNhat.get().then((s) => { ve(s); if (window.capNhat.tienDo) window.capNhat.tienDo().then(veTienDo) })
+  if (window.capNhat.onTienDo) window.capNhat.onTienDo(veTienDo)
+  nutTai.addEventListener('click', () => {
+    if (dangChay) return
+    if (tuCai) { veTienDo({ buoc: 'xin-link' }); window.capNhat.capNhatNgay() } else window.capNhat.taiVe()
+  })
   nutKiem.addEventListener('click', async () => {
     nutKiem.disabled = true; dong.textContent = t('cn.dangKiem'); ghiChu.textContent = ''; nutTai.hidden = true
     try {
