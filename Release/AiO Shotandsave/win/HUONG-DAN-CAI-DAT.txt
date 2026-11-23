@@ -1,6 +1,6 @@
-AiO Shot & Save 0.11.1 - 23/11/2026
+AiO Shot & Save 0.11.2 - 23/11/2026
 
-1. Chay AiO-Shot-and-Save-Setup-0.11.1.exe (mot cu bam, khong can Admin).
+1. Chay AiO-Shot-and-Save-Setup-0.11.2.exe (mot cu bam, khong can Admin).
 2. Windows hoi SmartScreen -> "More info" -> "Run anyway".
 3. Xong. Phim tat chup: Ctrl + Shift + S (doi trong Cai dat).
 4. Co ma ban quyen: Cai dat -> Ban quyen -> Dan key -> Kich hoat. Chua co ma thi dung thu 14 ngay.
