@@ -1,0 +1,8 @@
+{
+  "phienBan": "0.11.1",
+  "linkWin": "https://polar.sh/aiostudio/portal",
+  "ghiChu": {
+    "vi": "Hút màu lấy đúng mã màu trên màn hình. Phím chụp tự lấy lại khi app khác nhả ra. Đăng nhập bằng email mua hàng để tải bộ cài mới.",
+    "en": "The color picker now reads the exact color on screen. The capture shortcut recovers on its own when another app releases it. Sign in with your purchase email to download the new installer."
+  }
+}
