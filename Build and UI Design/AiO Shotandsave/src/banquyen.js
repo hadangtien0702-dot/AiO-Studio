@@ -49,6 +49,17 @@ const HET_GIO_MS = 15000
    false = bat khach gia han $2 moi cai may moi duoc. */
 const NHAN_MA_HET_HAN = true
 
+/* 23/11 ANH CHOT: MA NHA SANG LAP, go thang vao o ma trong app, KHONG qua Polar, KHONG gioi han may / so lan
+   (anh chon trong bang hoi, da duoc bao truoc la repo cong khai). Ma nguon CHI giu dau bam sha256 cua ma (viet hoa,
+   bo khoang trang dau cuoi), khong giu chu that -> doc GitHub khong thay ma. Gioi han: ai doan dung ma van mo duoc;
+   sua tay ban-quyen.json cung mo duoc (gioi han cua kieu khoa nay, so loi trong PROGRESS 04/10).
+   May dung ma nay: dung vinh vien, khong giu cho may nao tren Polar, khong hoi lai Polar, KHONG co nut Cap nhat ngay
+   (cong tai can ma Polar that) -> van co nut "Tai ve". Huy kich hoat = chi xoa o may nay. */
+const BAM_MA_SANG_LAP = '86bed8fd46a6652f82c8b4b5416e0978d8ac9a08fbd87fc22188c1f4de17a788'
+function laMaSangLap(key) {
+  try { return require('crypto').createHash('sha256').update(String(key || '').trim().toUpperCase()).digest('hex') === BAM_MA_SANG_LAP } catch (e) { return false }
+}
+
 function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', meta = {} }) {
   /* 06/11 (Codex soat, loi 7): ban cu giu "gio lon nhat da thay" (gioLonNhat) va tinh dung thu = max(gio hien tai, gioLonNhat)
      - lui dong ho 30 ngay thi dong ho dung thu DUNG 30 ngay (14 ngay thanh 44), va chinh dong ho tien vot roi tra dung gio
@@ -127,7 +138,8 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
         maHienThi: s.maHienThi || anMa(s.key),
         hetHan: s.hetHan || null,
         hetQuyenCapNhat: !!(hetHan && t >= hetHan),
-        khongGiuMay: !!s.vinhVienKhongMay,
+        khongGiuMay: !!s.vinhVienKhongMay && !s.sangLap, // ma sang lap: UI ghi "cap nhat tron doi", con nut Huy (chi xoa o may nay)
+        sangLap: !!s.sangLap,
         kiemLanCuoi: s.kiemLanCuoi || null,
         chuaLuuXuongDia: choGhi, // lan ghi truoc hong, dang giu trong RAM
       }
@@ -191,6 +203,20 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
 
   async function kichHoatTrong(key) {
     const s = napTrangThai()
+    if (laMaSangLap(key)) {
+      /* Dang giu ma Polar tren may nay -> tra cho cho Polar truoc, nhu khi doi sang ma khac. */
+      if (s.key && s.activationId) {
+        const h = await huyTrong()
+        if (!h.ok) return { ok: false, loi: h.loi, trangThai: trangThai() }
+      }
+      const moi = napTrangThai()
+      Object.assign(moi, {
+        key: 'SANG-LAP', activationId: null, maHienThi: 'Founder', hetHan: null, kiemLanCuoi: now(),
+        thuHoi: false, lyDoMatMa: null, vinhVienKhongMay: true, sangLap: true,
+      })
+      const daLuu = luu(moi)
+      return daLuu ? { ok: true, trangThai: trangThai() } : { ok: true, chuaLuu: true, trangThai: trangThai() }
+    }
     if (s.key === key && s.activationId && !s.thuHoi) return { ok: true, trangThai: trangThai() }
     /* Dang giu ma KHAC tren may nay -> tra cho may cu truoc (khong thi mat 1 trong 2 cho). */
     if (s.key && s.activationId && s.key !== key) {
@@ -204,7 +230,7 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
       Object.assign(moi, {
         key, activationId: r.json.id, maHienThi: lk.display_key || anMa(key),
         hetHan: lk.expires_at || null, kiemLanCuoi: now(), thuHoi: false, lyDoMatMa: null,
-        vinhVienKhongMay: false,
+        vinhVienKhongMay: false, sangLap: false,
       })
       const daLuu = luu(moi)
       /* Polar da giu cho cua may nay. Chua ghi duoc xuong dia (dia day / mat quyen ghi): van dung duoc trong luot chay nay va
@@ -216,7 +242,7 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
       const moi = napTrangThai()
       Object.assign(moi, {
         key, activationId: null, maHienThi: anMa(key), hetHan: null, kiemLanCuoi: now(),
-        thuHoi: false, lyDoMatMa: null, vinhVienKhongMay: true,
+        thuHoi: false, lyDoMatMa: null, vinhVienKhongMay: true, sangLap: false,
       })
       const daLuu = luu(moi)
       return { ok: true, canhBao: 'ma-het-han', chuaLuu: !daLuu, trangThai: trangThai() }
@@ -242,7 +268,7 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
       if (!ok) return { ok: false, loi: phanLoaiLoi(r), trangThai: trangThai() }
     }
     const moi = napTrangThai()
-    for (const k of ['key', 'activationId', 'maHienThi', 'hetHan', 'kiemLanCuoi', 'vinhVienKhongMay', 'thuHoi', 'lyDoMatMa']) delete moi[k]
+    for (const k of ['key', 'activationId', 'maHienThi', 'hetHan', 'kiemLanCuoi', 'vinhVienKhongMay', 'sangLap', 'thuHoi', 'lyDoMatMa']) delete moi[k]
     luu(moi)
     return { ok: true, trangThai: trangThai() }
   }
@@ -291,7 +317,7 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
     if (!polar404) return { daHoi: false, loi: 'tra-loi-la', maTraLoi: r.status, trangThai: trangThai() }
     /* 404 cua Polar: activation bi go (khach go tu cong khach hang Polar) hoac ma bi doi
        -> may nay mat ma, quay ve che do dung thu (thuong da het). */
-    for (const k of ['key', 'activationId', 'maHienThi', 'hetHan', 'kiemLanCuoi', 'vinhVienKhongMay']) delete moi[k]
+    for (const k of ['key', 'activationId', 'maHienThi', 'hetHan', 'kiemLanCuoi', 'vinhVienKhongMay', 'sangLap']) delete moi[k]
     moi.lyDoMatMa = 'may-bi-go'
     luu(moi)
     return { daHoi: true, trangThai: trangThai() }
@@ -301,7 +327,7 @@ function taoBanQuyen({ doc, ghi, fetch, now = () => Date.now(), tenMay = 'May', 
   function maDangDung() {
     if (trangThai().loai !== 'da-kich-hoat') return null
     const s = napTrangThai()
-    return s.key ? { key: s.key, activationId: s.activationId || null } : null
+    return s.key && !s.sangLap ? { key: s.key, activationId: s.activationId || null } : null // ma nha sang lap: khong co ma Polar de xin link
   }
 
   return { trangThai, kichHoat, huyKichHoat, kiemTra, maDangDung }
