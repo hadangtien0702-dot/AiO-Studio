@@ -5,6 +5,15 @@
 >
 > Lập 21/09/2026 — trước đó mục 8 `CLAUDE.md` ghi *"PROGRESS.md gốc repo | Chưa có"*.
 
+## [polar + web] - 2026-11-23 10:44 (UTC+7) - Shot & Save 0.11.1 lên Polar; app 0.11.0 trở lên tự báo có bản mới; giá về $14.99 trọn đời, một sản phẩm
+
+- **Anh:** *"Đóng gói, đưa lên"* (0.11.1), *"khi có bản mới thì phải có thông báo ở app cho người ra download"*, rồi *"giá chỉ có $14.99 cho 1 lần payment xài cả đời"*, *"chỉ để 1 bản duy nhất"*. Trước đó anh nhập mã tặng `TANG…` vào ô kích hoạt trong app và bị báo sai: mã TANG là mã GIẢM GIÁ ở trang thanh toán, mã kích hoạt là `AIOSS-…` Polar gửi qua thư sau khi đổi mã (đã giải thích, app chưa nhận ra mã TANG).
+- **Bộ cài 0.11.1:** `npm run dist` 31 giây, 96.402.071 byte, ProductVersion 0.11.1, sha256 `6d43f7fa…2ac2`; trong `app.asar` version 0.11.1, KHÔNG có `aioBanChu` (bản chủ chỉ có khi nạp tại chỗ bằng `--ban-chu`). Chép vào `Release/AiO Shotandsave/win/` (0.11.0 và 0.10.1 vẫn giữ, chưa xoá).
+- **Polar:** tải qua API trong khung trình duyệt đã đăng nhập: `POST /v1/files` (10 mảnh 10 MB) → Node PUT thẳng S3 (15,8 giây) → `POST /v1/files/<id>/uploaded`: `is_uploaded true`, sha256 khớp file Release. Quyền lợi bộ cài `bb398eee` trỏ file mới `578d50da`; file 0.11.0 `6665ca5c` vẫn nằm trên Polar. Giá sản phẩm `547b63d4`: 2000 → 1499 cent (giá mới `cccf4687`), sản phẩm Tester `d7dd301f` lưu trữ; danh sách sản phẩm đang bán chỉ còn "AiO Shot & Save 1499".
+- **Báo bản mới trong app:** cơ chế có sẵn từ 0.11.0 (`src/cap-nhat.js`: hỏi web 30 giây sau khi mở rồi mỗi 24 giờ, thông báo Windows một lần mỗi bản + dòng trong menu khay + dòng trong Cài đặt có nút Tải về), chỉ thiếu file. Đã thêm `Website/AiO ShotSave Web/ban-moi.json` (0.11.1, `linkWin` = trang khách Polar `polar.sh/aiostudio/portal`, khách đăng nhập bằng email mua hàng; ghi chú VI + EN). Thử module thật với file này: app 0.11.0 báo "moi" + link đúng, app 0.11.1 báo "moi-nhat". Khách dùng 0.9.0 / 0.10.x KHÔNG nhận được (chưa có module).
+- **Web giá:** `index.html` 9 chỗ + số chạy lên dừng ở 14.99, `legal.html` 2 chỗ + ngày 23/11, `checkout-demo.html` 5 chỗ; còn 0 chỗ $20; 6 khối script qua `new Function`.
+- **Ra bản sau:** đóng gói → tải lên Polar (cách trên) → sửa `phienBan` trong `ban-moi.json` → đẩy web. Sửa json TRƯỚC khi Polar có file mới là đưa khách tới bộ cài cũ.
+
 ## [marketing] - 2026-11-07 22:11 (UTC+7) - Shot & Save: khách mua nay nhận bộ cài 0.11.0 (trước là 0.9.0); web hứa bản Mac mà Polar không giao
 
 - **Anh:** duyệt danh sách marketing, bấm *"Làm theo thứ tự"*. Việc 1 (B1) = bộ cài khách nhận phải khớp tính năng web quảng cáo.
